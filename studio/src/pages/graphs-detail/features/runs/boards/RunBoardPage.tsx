@@ -34,6 +34,10 @@ import {
 	runBoardSpec,
 } from "@/pages/graphs-detail/features/runs/boards/runBoardSpec";
 import {
+	groupSteps,
+	VIEW_DASHBOARD,
+} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
+import {
 	STEP_ACTIONS,
 	type StepPanels,
 	type StepTab,
@@ -41,10 +45,6 @@ import {
 	stepContext,
 } from "@/pages/graphs-detail/features/runs/boards/stepBoardSpec";
 import { useRunTrace } from "@/pages/graphs-detail/features/runs/boards/useRunTrace";
-import {
-	groupSteps,
-	VIEW_DASHBOARD,
-} from "@/pages/graphs-detail/shared/dashboards/shared";
 import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 
 export interface RunBoardPageProps {

@@ -14,7 +14,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { traceApi } from "@/pages/graphs-detail/features/runs/api";
-import { isLive } from "@/pages/graphs-detail/shared/dashboards/shared";
+import { isLive } from "@/pages/graphs-detail/features/runs/boards/runDashboards";
 
 const LIVE_POLL_MS = 2000;
 

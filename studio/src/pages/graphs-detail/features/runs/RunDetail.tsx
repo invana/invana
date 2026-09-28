@@ -35,6 +35,13 @@ import type { ReactNode } from "react";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses";
 import { waterfallTasks } from "@/pages/graphs-detail/features/runs/boards/runBoardSpec";
+import {
+	groupSteps,
+	isLive,
+	originOf,
+	runAddress,
+	toneOf,
+} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
 import { useRunTrace } from "@/pages/graphs-detail/features/runs/boards/useRunTrace";
 import {
 	planKeyOf,
@@ -42,13 +49,6 @@ import {
 	type SummaryRow,
 } from "@/pages/graphs-detail/features/runs/runSummary";
 import { TraceIdValue } from "@/pages/graphs-detail/features/runs/TraceIdValue";
-import {
-	groupSteps,
-	isLive,
-	originOf,
-	runAddress,
-	toneOf,
-} from "@/pages/graphs-detail/shared/dashboards/shared";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 export interface RunDetailProps {

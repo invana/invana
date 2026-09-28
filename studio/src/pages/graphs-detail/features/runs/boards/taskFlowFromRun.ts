@@ -18,7 +18,7 @@ import { formatDuration } from "@/lib/time";
 import {
 	durationMs,
 	type TaskGroup,
-} from "@/pages/graphs-detail/shared/dashboards/shared";
+} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
 
 function iconOf(bound: string | null): string {
 	if (bound === "llm") return "lucide/sparkles";

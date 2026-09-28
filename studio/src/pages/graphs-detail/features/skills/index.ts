@@ -21,6 +21,7 @@ export {
 } from "@/pages/graphs-detail/features/skills/queries";
 export { SkillBoardPage } from "@/pages/graphs-detail/features/skills/SkillBoardPage";
 export { SkillsViewPanel } from "@/pages/graphs-detail/features/skills/SkillsViewPanel";
+export { StepRules } from "@/pages/graphs-detail/features/skills/StepRules";
 export type {
 	BindRefusal,
 	OfferedRule,

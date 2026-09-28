@@ -51,7 +51,7 @@ import {
 	VIEW_ACTION,
 	VIEW_DASHBOARD,
 	VIEW_SPEC,
-} from "@/pages/graphs-detail/shared/dashboards/shared";
+} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
 
 export const STEP_ACTIONS = {
 	view: VIEW_ACTION,

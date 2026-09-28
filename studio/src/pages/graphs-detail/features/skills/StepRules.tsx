@@ -13,7 +13,7 @@
  */
 
 import { cn } from "@invana/ui";
-import type { OfferedRule } from "@/pages/graphs-detail/features/skills";
+import type { OfferedRule } from "@/pages/graphs-detail/features/skills/types";
 
 export interface StepRulesProps {
 	/** A fact: these statements were in the prompt. */

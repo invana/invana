@@ -17,7 +17,7 @@ import type { Bound, StatusDotProps, TaskGanttStatus } from "@invana/ui";
 import type {
 	TraceRead,
 	TraceStepRead,
-} from "@/pages/graphs-detail/features/runs";
+} from "@/pages/graphs-detail/features/runs/api";
 
 /** A run that has not settled — the Gantt grows a now line, Cancel is offered. */
 export const LIVE_STATUSES: ReadonlySet<string> = new Set([

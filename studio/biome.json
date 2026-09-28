@@ -509,8 +509,11 @@
 							"options": {
 								"patterns": [
 									{
-										"group": ["@/pages/graphs-detail/features/*/**"],
-										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+										"group": [
+											"@/pages/graphs-detail/features",
+											"@/pages/graphs-detail/features/**"
+										],
+										"message": "shared/ is the leaf — it imports no module (code-shape.md §4)."
 									},
 									{
 										"group": ["@/pages/graphs-detail/shell/**"],

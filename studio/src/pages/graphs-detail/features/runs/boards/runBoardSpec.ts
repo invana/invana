@@ -36,8 +36,6 @@ import type {
 	TraceRead,
 	TraceStepRead,
 } from "@/pages/graphs-detail/features/runs/api";
-import { taskFlowFromRun } from "@/pages/graphs-detail/features/runs/boards/taskFlowFromRun";
-import { runSummary } from "@/pages/graphs-detail/features/runs/runSummary";
 import {
 	compact,
 	count,
@@ -59,7 +57,9 @@ import {
 	VIEW_ACTION,
 	VIEW_DASHBOARD,
 	VIEW_SPEC,
-} from "@/pages/graphs-detail/shared/dashboards/shared";
+} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
+import { taskFlowFromRun } from "@/pages/graphs-detail/features/runs/boards/taskFlowFromRun";
+import { runSummary } from "@/pages/graphs-detail/features/runs/runSummary";
 import type { WithFlow } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 

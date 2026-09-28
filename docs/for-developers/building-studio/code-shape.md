@@ -220,7 +220,7 @@ features/agents/
 | A renderer two modules draw is a canvas | `src/canvases/<name>/`. The module keeps only its adapter — `PlanCanvas` in `projects/`, `EnvelopeCanvas` and `LineageCanvas` in `agents/` |
 | One direction inside a module | A sub-folder imports its parent's types, never the reverse. `models/model-editor/` renders `stitch/`'s block; `stitch/` imports only the selection type back |
 | No `utils/` | A file is named for what it holds — `typeColor.ts`, `propertyTypes.ts`, `runSummary.ts`. A bag named `utils/` is the shape word that hides the most |
-| No module imports the shell | Dependency direction is `shell → features → shared`. A feature that needs the router takes a prop or a hook from `shared/`. Biome `noRestrictedImports` fails a `features/` or `shared/` file that imports `shell/**` |
+| No module imports the shell | Dependency direction is `shell → features → shared`. A feature that needs the router takes a prop or a hook from `shared/`. Biome `noRestrictedImports` fails a `features/` or `shared/` file that imports `shell/**`, and a `shared/` file that imports any module — `shared/` is the leaf. A dashboard registry that composes several modules' widgets is the host's, in `boards/` |
 
 ### 4.1b A module's folder is its module; a sub-folder is one of its features
 

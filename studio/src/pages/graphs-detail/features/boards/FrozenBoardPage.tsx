@@ -16,9 +16,9 @@ import { Dashboard, type DashboardSpec } from "@invana/dashboard";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useQuery } from "@tanstack/react-query";
 import { formatRelativeTime } from "@/lib/time";
+import { DECLARED_WIDGETS } from "@/pages/graphs-detail/features/boards/dashboardWidgets";
 import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import { DECLARED_WIDGETS } from "@/pages/graphs-detail/shared/dashboardWidgets";
 
 export interface FrozenBoardPageProps {
 	username: string;

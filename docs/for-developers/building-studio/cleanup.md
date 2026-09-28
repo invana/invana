@@ -22,7 +22,6 @@ Items 7–12 are independent of that chain and can land in any order.
 
 | # | Cleanup | Size today | Specified in | Changes behaviour |
 |---|---|---|---|---|
-| 13 | `shared/` imports modules — the dashboard widget registry (`dashboardWidgets.ts`, `dashboards/shared.ts`) and `StepRules` reach into `lenses` · `plans` · `skills` · `runs`, so `shared/` is not yet the leaf the direction needs | 3 files | [code-shape.md](code-shape.md) §4 | no — the registry moves to the shell, `StepRules` to `skills` |
 | 4 | knip gates unused exports and types, not only dead files | 217 | [code-shape.md](code-shape.md) §8 | no |
 | 5 | Kit swaps with no kit change: `StylingPanel` → `StylingViewPanel`, `LayersPanel` → `LayersViewPanel` | 2 files; no e2e covers either | [module-structure.md](../module-structure.md) §4 | **yes** — swatches and sliders; Layers gains Groups and loses Refresh |
 | 6 | Kit swaps that need kit work: `ListRow` → `Item size="xs"`, `ListPanelChrome` · `ListFilterMenu` → `PanelContent`, `InspectorViewPanel` → `ElementInspectorViewPanel` | three kit extensions with stories, then a release | [module-structure.md](../module-structure.md) §4 | **yes** — row density; the Inspector reads the canvas |

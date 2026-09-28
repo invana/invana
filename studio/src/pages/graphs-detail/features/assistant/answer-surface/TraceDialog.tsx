@@ -43,7 +43,7 @@ import {
 	type TraceStepRead,
 	traceApi,
 } from "@/pages/graphs-detail/features/runs";
-import { StepRules } from "@/pages/graphs-detail/shared/StepRules";
+import { StepRules } from "@/pages/graphs-detail/features/skills";
 import { stepTone } from "@/pages/graphs-detail/shared/statusTone";
 
 interface Props {

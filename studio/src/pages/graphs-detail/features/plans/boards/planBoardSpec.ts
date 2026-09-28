@@ -31,7 +31,7 @@ import type {
 	PlanWindow,
 	TaskPlanDetail,
 } from "@/pages/graphs-detail/features/plans/types";
-import { runAddress } from "@/pages/graphs-detail/shared/dashboards/shared";
+import { runAddress } from "@/pages/graphs-detail/features/runs";
 import type { FlowOptions } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 
