@@ -1,13 +1,11 @@
 import {
 	LayeredCanvasHeader,
 	LayeredCanvasStatus,
-	type LayeredCanvasTarget,
 } from "@/canvases/layered/LayeredCanvasChrome";
 import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents/AgentsViewPanel";
 import { EnvelopeCanvas } from "@/pages/graphs-detail/features/agents/EnvelopeCanvas";
 import { LineageCanvas } from "@/pages/graphs-detail/features/agents/LineageCanvas";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
-import type { AgentEdge } from "@/pages/graphs-detail/features/agents/types";
 import { attachmentFor } from "@/pages/graphs-detail/features/assistant/SessionComposer";
 import {
 	hasSeenSessionTutorial,
@@ -102,7 +100,6 @@ import { taskPlansApi } from "@/pages/graphs-detail/features/plans/api";
 import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { PlanCanvas } from "@/pages/graphs-detail/features/projects/PlanCanvas";
 import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects/ProjectsViewPanel";
-import { useTodoMutations } from "@/pages/graphs-detail/features/projects/queries";
 import { RunsViewPanel } from "@/pages/graphs-detail/features/runs/RunsViewPanel";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import { useRunStep } from "@/pages/graphs-detail/features/runs/boards";
@@ -119,6 +116,7 @@ import {
 	declaredBoardContent,
 } from "@/pages/graphs-detail/shell/declaredBoardBody";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
+import { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
 import { useLibraryViewPanel } from "@/pages/graphs-detail/shell/useLibraryViewPanel";
@@ -313,28 +311,32 @@ export function GraphDetailPage() {
 	const settingsPanel = useLeftSection();
 	const closeLeftPanel = settingsPanel.close;
 
-	// ── S12 surfaces (docs/for-developers/modules/work/spec.md) ────────────────────────────────────────────────
-	//
-	// One piece of state per noun, held here rather than in each panel, because
-	// the panel and the canvas are two views of the same selection: clicking a
-	// task on the Plan canvas has to light the Plan tab's row, and clicking an
-	// agent node on a lineage has to light the agents list.
-	const [selectedProjectKey, setSelectedProjectKey] = useState<string | null>(
-		null,
-	);
-	const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-	const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
-	const [selectedWorkflowKey, setSelectedWorkflowKey] = useState<string | null>(
-		null,
-	);
+	// The selection the panels and the layered canvases share, and the canvas
+	// kind `mainSection` draws — one piece of state per noun.
+	const {
+		selectedProjectKey,
+		setSelectedProjectKey,
+		selectedTaskId,
+		setSelectedTaskId,
+		selectedAgentId,
+		setSelectedAgentId,
+		selectedWorkflowKey,
+		setSelectedWorkflowKey,
+		selectedStepId,
+		setSelectedStepId,
+		selectedSkillId,
+		setSelectedSkillId,
+		selectedLineageEdge,
+		setSelectedLineageEdge,
+		workKind,
+		setWorkKind,
+		planError,
+		setPlanError,
+		taskMutations,
+		workTarget,
+		workPageId,
+	} = useLayeredCanvas(username, graphSlug, settingsPanel.section);
 	const libraryPlanKey = useLibraryViewPanel().planKey;
-	const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
-	const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
-	const [selectedLineageEdge, setSelectedLineageEdge] =
-		useState<AgentEdge | null>(null);
-	// Which of the six kinds the main area is drawing. `data` is the canvas the
-	// Explorer has always shown; the rest are opened from their panel.
-	const [workKind, setWorkKind] = useState<CanvasKind | null>(null);
 	// The **declared** boards that are open — a run dashboard, and a step's
 	// (see-what-ran.md SR36). They are pages like any other, keyed
 	// `<kind>:<subject_id>`, so the tab strip carries them beside the canvases
@@ -526,10 +528,6 @@ export function GraphDetailPage() {
 	const [modelSelection, setModelSelection] = useState<ModelSelection | null>(
 		null,
 	);
-	// A dependency that would close a loop comes back as a 422 naming it; the
-	// canvas shows that rather than drawing anything (docs/for-developers/modules/work/spec.mda).
-	const [planError, setPlanError] = useState<string | null>(null);
-	const taskMutations = useTodoMutations(username ?? "", graphSlug ?? "");
 
 	const openWorkPanel = useCallback(
 		(section: "projects" | "runs" | "library" | "agents" | "skills") => {
@@ -546,7 +544,7 @@ export function GraphDetailPage() {
 			setSelectedAgentId(id);
 			openBoard({ kind: "agent", subjectId: id });
 		},
-		[openBoard],
+		[openBoard, setSelectedAgentId],
 	);
 	// An agent's two canvases — its envelope and its lineage. Asked for from the
 	// agent's page or the list, they have to come in front of a focused board,
@@ -563,48 +561,6 @@ export function GraphDetailPage() {
 	// panel owns, which panel the left column draws).
 	const { section: settingsSection } = settingsPanel;
 
-	/**
-	 * **The main area is always a canvas, and it belongs to the open panel.**
-	 *
-	 * Every work panel owns a kind, and selecting a row is the gesture that opens
-	 * it — there is no separate "draw it" step to discover. Before this, picking a
-	 * project left the main area on the Explorer's placeholder, so four of the six
-	 * kinds were reachable only through a button most people never pressed.
-	 *
-	 * Two rules keep it predictable:
-	 *
-	 * - **A canvas is replaced only by its own panel's kind.** Switching from
-	 *   Projects to Agents swaps the plan for the lineage, because a plan drawn
-	 *   under the agents list answers a question nobody asked. But switching
-	 *   between an agent's *envelope* and its *lineage* — both `agents` — is the
-	 *   panel's own choice and is left alone, which is what lets the Agent
-	 *   surface's tabs drive the canvas.
-	 * - **It never closes one.** Closing is the tab's X; a click that silently
-	 *   threw away what you were looking at would make the canvas feel unstable.
-	 *
-	 * `skills` is deliberately absent: a skill hangs over the work rather than
-	 * having a shape, so its panel opens beside whatever canvas is already there.
-	 */
-	useEffect(() => {
-		// The kind this panel would draw, given what is selected in it.
-		const own: CanvasKind | null =
-			// Projects owns both sections, so it owns the `plan` canvas whether the
-			// project or one of its Todos is what was picked (PT7).
-			settingsSection === "projects" && selectedProjectKey
-				? "plan"
-				: // Library's plan opens as a page, not a canvas (LB24).
-					settingsSection === "agents" && selectedAgentId
-					? "lineage"
-					: null;
-		if (!own) return;
-		setWorkKind((current) => {
-			if (!current) return own;
-			// Already showing something this panel owns — leave the panel's own
-			// choice (envelope vs lineage) alone.
-			const owner = CANVAS_KINDS[current].panel;
-			return owner === settingsSection ? current : own;
-		});
-	}, [settingsSection, selectedProjectKey, selectedAgentId]);
 	// The inspector is an occupant of the right side, not a flag on it: showing
 	// it *is* `?right=inspector`, and hiding it closes the region.
 	const closeInspector = right.close;
@@ -1389,6 +1345,7 @@ export function GraphDetailPage() {
 		},
 		[
 			boardPage.setPageId,
+			setWorkKind,
 			openTabs,
 			activeCanvasId,
 			canvasList,
@@ -2314,20 +2271,6 @@ export function GraphDetailPage() {
 			/>
 		) : null;
 
-	// The main area, when a work canvas is open. The Explorer's data canvas is
-	// still the default — these replace it only while their panel drove them
-	// there, and switching back to Sessions leaves them behind.
-	// What the open work canvas is drawing — the one value the tab strip and the
-	// status line both need (`studio.md` § 6.26).
-	const workTarget: LayeredCanvasTarget | null =
-		workKind === "plan" && selectedProjectKey
-			? { kind: "plan", projectKey: selectedProjectKey }
-			: workKind === "workflow" && selectedWorkflowKey
-				? { kind: "workflow", workflowKey: selectedWorkflowKey }
-				: (workKind === "envelope" || workKind === "lineage") && selectedAgentId
-					? { kind: workKind, agentId: selectedAgentId }
-					: null;
-
 	/**
 	 * What the main area says when it has nothing to draw.
 	 *
@@ -2417,15 +2360,6 @@ export function GraphDetailPage() {
 	// four-branch ternary fighting over one slot is a list, and the branch that
 	// used to explain why the slot was empty is now the graph page — a page that
 	// is always there and cannot be closed (G6).
-	const workPageId = workTarget
-		? `${workTarget.kind}:${
-				"projectKey" in workTarget
-					? workTarget.projectKey
-					: "workflowKey" in workTarget
-						? workTarget.workflowKey
-						: workTarget.agentId
-			}`
-		: null;
 
 	// The graduation cap opens the wizard from anywhere in the Graph (setup.md
 	// SU19), and the wizard is the graph page's content — so asking for it makes
