@@ -1,5 +1,5 @@
-import { EnvelopeCanvas } from "@/pages/graphs-detail/features/agents/EnvelopeCanvas";
-import { LineageCanvas } from "@/pages/graphs-detail/features/agents/LineageCanvas";
+import { EnvelopeCanvas } from "@/pages/graphs-detail/features/agents";
+import { LineageCanvas } from "@/pages/graphs-detail/features/agents";
 import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans/PlanFlowCanvas";
 import { PlanCanvas } from "@/pages/graphs-detail/features/projects/PlanCanvas";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";

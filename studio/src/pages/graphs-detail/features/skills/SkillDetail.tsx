@@ -22,7 +22,7 @@
  * prose, so a word implying we did would be a lie told in a badge (US4).
  */
 
-import { useAgentMutations } from "@/pages/graphs-detail/features/agents/queries";
+import { useAgentMutations } from "@/pages/graphs-detail/features/agents";
 import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";
 import { SkillPlaybookTab } from "@/pages/graphs-detail/features/skills/SkillPlaybookTab";
 import {

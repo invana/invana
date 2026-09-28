@@ -6,7 +6,7 @@
  * task-plan schemas field for field.
  */
 
-import type { AgentChip } from "@/pages/graphs-detail/features/agents/types";
+import type { AgentChip } from "@/pages/graphs-detail/features/agents";
 import type {
 	PlanArg,
 	SkillLayer,

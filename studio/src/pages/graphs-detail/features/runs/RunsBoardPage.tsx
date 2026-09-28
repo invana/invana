@@ -18,7 +18,7 @@ import { useTicker } from "@/hooks/useTicker";
 import { formatCompact } from "@/lib/format";
 import { formatElapsed } from "@/lib/time";
 
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import { RunsFilterBar } from "@/pages/graphs-detail/features/runs/RunsFilterBar";
 import {
 	elapsedOf,

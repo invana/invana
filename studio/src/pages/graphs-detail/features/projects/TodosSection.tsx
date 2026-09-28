@@ -19,7 +19,7 @@
  */
 
 import { formatDuration } from "@/lib/time";
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
 	StepList,
 	totalDuration,

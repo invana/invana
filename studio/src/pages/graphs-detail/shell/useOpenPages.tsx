@@ -1,5 +1,5 @@
 import { LayeredCanvasHeader } from "@/canvases/layered/LayeredCanvasChrome";
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,

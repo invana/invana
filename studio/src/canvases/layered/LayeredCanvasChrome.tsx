@@ -15,7 +15,7 @@
 import {
 	useAgentLineageQuery,
 	useAgentsQuery,
-} from "@/pages/graphs-detail/features/agents/queries";
+} from "@/pages/graphs-detail/features/agents";
 import { CANVAS_KINDS } from "@/pages/graphs-detail/features/boards";
 import { useTaskPlanQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects/queries";

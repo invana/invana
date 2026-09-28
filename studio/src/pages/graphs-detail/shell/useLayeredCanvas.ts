@@ -1,5 +1,5 @@
 import type { LayeredCanvasTarget } from "@/canvases/layered/LayeredCanvasChrome";
-import type { AgentEdge } from "@/pages/graphs-detail/features/agents/types";
+import type { AgentEdge } from "@/pages/graphs-detail/features/agents";
 import {
 	CANVAS_KINDS,
 	type CanvasKind,

@@ -1,4 +1,4 @@
-import { AgentBoardPage } from "@/pages/graphs-detail/features/agents/AgentBoardPage";
+import { AgentBoardPage } from "@/pages/graphs-detail/features/agents";
 import {
 	BOARD_KINDS,
 	FrozenBoardPage,

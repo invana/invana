@@ -19,7 +19,7 @@
  * which is the property SR12 was protecting when it asked for section adjacency.
  */
 
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses/queries";
 import {
 	RunDetail,
