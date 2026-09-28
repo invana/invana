@@ -205,9 +205,8 @@ Leaf-first, so a module never moves while something it owns is still elsewhere.
 
 ### 3.2 Decomposing `GraphDetailPage.tsx`
 
-**Status: open.** 3,214 lines at the start, almost all of it one component; 461 now. Every row below has left. What is still over the 400-line
-target is not in the table: the `leftSection` region's wrapper, the Models-page opener, the legacy
-`?panel=sessions` rewrite and the plan-name maps. It is cut by moves, not rewritten: each
+**Status: done.** 3,214 lines at the start, almost all of it one component; 362 now, and every row below
+has left. It is cut by moves, not rewritten: each
 piece leaves with its state, its effects and its one-shot refs, and the page keeps calling it the
 way it did. What remains composes — `GraphDetail`'s regions, the providers, the header controls.
 
@@ -228,6 +227,10 @@ way it did. What remains composes — `GraphDetail`'s regions, the providers, th
 | The page list, the active page, select, close, the strip's actions, and the data page's body with the handle the strip calls into | `shell/useOpenPages.tsx` | hook |
 | The `rightSection` occupants and their sizes, in the region's error boundary | `shell/rightSections.tsx` | function |
 | The header controls — the assistant's trigger, the canvas toolbar — and the `footer`'s status and message bar | `shell/GraphDetailChrome.tsx` | function |
+| The `leftSection` region — its occupant, sizes and keyed error boundary | `shell/leftSectionContent.tsx` | function |
+| The plan-name maps — a plan page's tab, and the newest version the Library's `&plan=` opens | `shell/useOpenBoards.ts` | hook |
+| The Models page — opened when the `leftNav` switches to Models, and brought forward by its panel | `shell/useModelsPage.ts` | hook |
+| The rewrite of an old `?panel=sessions` link onto the assistant | `shell/useLegacySessionsLink.ts` | hook |
 
 Everything lands in `shell/` except what reads no region: a module never imports the shell
 ([code-shape.md](code-shape.md) §4). The stream callback `useSessions` takes stays a ref on the page,

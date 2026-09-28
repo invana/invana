@@ -11,8 +11,7 @@ is done, remove its row and update the Status line in the doc it points to.
 
 ```mermaid
 flowchart LR
-    A["1 · Finish the graph-page cut"] --> B["2 · Module surfaces + Biome 2"]
-    B --> C["3 · Features stop importing the shell"]
+    B["2 · Module surfaces + Biome 2"] --> C["3 · Features stop importing the shell"]
     B --> D["4 · knip gates unused exports"]
     B --> E["5 · Kit swaps: Styling, Layers"]
     E --> F["6 · Kit swaps: ListRow, ListPanel, Inspector"]
@@ -25,7 +24,6 @@ Items 7–12 are independent of that chain and can land in any order.
 
 | # | Cleanup | Size today | Specified in | Changes behaviour |
 |---|---|---|---|---|
-| 1 | Finish the `GraphDetailPage.tsx` cut — what the §3.2 table does not list: the `leftSection` wrapper, the Models-page opener, the `?panel=sessions` rewrite, the plan-name maps | page 461 lines (target under 400) | [refactor-plan.md](refactor-plan.md) §3.2 | no |
 | 2 | Every module gets `index.ts` as its public surface, then Biome 2 with `noRestrictedImports` on `features/*/!(index.ts)` | 207 deep cross-module imports in 96 files; 4 of 16 modules have an `index.ts` | [code-shape.md](code-shape.md) §8 | no |
 | 3 | Modules import the shell — the direction is shell → features → shared | 17 files under `features/`, most in `setup/`, plus `LibraryViewPanel`, `ProjectsViewPanel`, `AgentsViewPanel`, `AgentActivityTab` | [code-shape.md](code-shape.md) §4 | no — the hook's value is passed in as a prop |
 | 4 | knip gates unused exports and types, not only dead files | 217 | [code-shape.md](code-shape.md) §8 | no |
@@ -42,7 +40,6 @@ Items 7–12 are independent of that chain and can land in any order.
 
 | Item | Command (from `studio/`) |
 |---|---|
-| 1 | `wc -l src/pages/graphs-detail/GraphDetailPage.tsx` |
 | 2 | count `from "@/pages/graphs-detail/features/<m>/…"` outside `<m>`, excluding `<m>` and `<m>/index` |
 | 3 | `grep -rl 'graphs-detail/shell/' src/pages/graphs-detail/features` |
 | 4 | `pnpm exec knip --include exports,types` |

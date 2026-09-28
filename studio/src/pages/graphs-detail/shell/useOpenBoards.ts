@@ -7,10 +7,11 @@ import {
 	parseBoardPageId,
 } from "@/pages/graphs-detail/features/boards";
 import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
+import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 import { useLibraryViewPanel } from "@/pages/graphs-detail/shell/useLibraryViewPanel";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 /**
  * The declared boards open in `mainSection`, and which one is in front.
@@ -18,14 +19,37 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * A board is a page like any other, keyed `<kind>:<subject_id>`, and `?page=`
  * names the focused one — so a cold link or a reload reopens it here, once, on
  * the way in. `openBoard` is the one writer: it adds or replaces the board,
- * focuses it and writes the URL. `newestPlanIdByKey` lets the plan page follow
- * the Library's `&plan=`, which names a plan by key.
+ * focuses it and writes the URL. The plan page follows the Library's `&plan=`,
+ * which names a plan by key, to that plan's newest version; `planRefById` names
+ * a plan page's tab.
  */
 export function useOpenBoards(
 	username: string | undefined,
 	graphSlug: string | undefined,
-	newestPlanIdByKey: Map<string, { id: string; version: number }>,
 ) {
+	// And the plan page for a library plan (LB24): keyed by `task_plans.id`,
+	// titled `key@version`, and opened from the section by key — the newest
+	// version, which is the one the section reads.
+	const planLibrary = useTaskPlansQuery(username, graphSlug);
+	const planRefById = useMemo(
+		() =>
+			new Map(
+				(planLibrary.data?.items ?? []).map((p) => [
+					p.id,
+					`${p.key}@${p.version}`,
+				]),
+			),
+		[planLibrary.data],
+	);
+	const newestPlanIdByKey = useMemo(() => {
+		const out = new Map<string, { id: string; version: number }>();
+		for (const p of planLibrary.data?.items ?? []) {
+			const seen = p.key ? out.get(p.key) : undefined;
+			if (p.key && (!seen || p.version > seen.version))
+				out.set(p.key, { id: p.id, version: p.version });
+		}
+		return out;
+	}, [planLibrary.data]);
 	const libraryPlanKey = useLibraryViewPanel().planKey;
 	// The **declared** boards that are open — a run dashboard, and a step's
 	// (see-what-ran.md SR36). They are pages like any other, keyed
@@ -187,5 +211,6 @@ export function useOpenBoards(
 		openBoard,
 		openRecordBoard,
 		openLensBoard,
+		planRefById,
 	};
 }

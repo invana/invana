@@ -1,5 +1,4 @@
 import { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
-import { boardPageId } from "@/pages/graphs-detail/features/boards";
 import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
 import {
 	useGraphConnectionQuery,
@@ -10,23 +9,21 @@ import {
 	isGateOpen,
 } from "@/pages/graphs-detail/features/graphs/types";
 import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms/queries";
-import {
-	type ModelSelection,
-	useModelsView,
-} from "@/pages/graphs-detail/features/models";
+import type { ModelSelection } from "@/pages/graphs-detail/features/models";
 import { useModelsQuery } from "@/pages/graphs-detail/features/models/queries";
-import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { useRunStep } from "@/pages/graphs-detail/features/runs/boards";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { graphDetailChrome } from "@/pages/graphs-detail/shell/GraphDetailChrome";
 import { layeredCanvasBody } from "@/pages/graphs-detail/shell/layeredCanvasBody";
-import { leftSectionContent } from "@/pages/graphs-detail/shell/leftSectionContent";
+import { leftSection } from "@/pages/graphs-detail/shell/leftSectionContent";
 import { rightSection } from "@/pages/graphs-detail/shell/rightSections";
 import { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 import { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useLegacySessionsLink } from "@/pages/graphs-detail/shell/useLegacySessionsLink";
 import { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
+import { useModelsPage } from "@/pages/graphs-detail/shell/useModelsPage";
 import { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
 import { useOpenPages } from "@/pages/graphs-detail/shell/useOpenPages";
 import { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
@@ -35,8 +32,8 @@ import type { QueryResponse } from "@/types/query";
 import { CanvasContext } from "@invana/canvas-react";
 import { BoardPagesViewPanel } from "@invana/canvas-ui";
 import { ErrorBoundary } from "@invana/ui";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useCallback, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 
 export function GraphDetailPage() {
 	const { username, graphSlug } = useParams<{
@@ -66,30 +63,6 @@ export function GraphDetailPage() {
 	// The Govern panel's own URL keys — `Edit` on a lens board puts the section
 	// back on that lens in one write (WO16).
 	const governPanel = useLensesViewPanel();
-	// And the plan page for a library plan (LB24): keyed by `task_plans.id`,
-	// titled `key@version`, and opened from the section by key — the newest
-	// version, which is the one the section reads.
-	const planLibrary = useTaskPlansQuery(username, graphSlug);
-	const planRefById = useMemo(
-		() =>
-			new Map(
-				(planLibrary.data?.items ?? []).map((p) => [
-					p.id,
-					`${p.key}@${p.version}`,
-				]),
-			),
-		[planLibrary.data],
-	);
-	const newestPlanIdByKey = useMemo(() => {
-		const out = new Map<string, { id: string; version: number }>();
-		for (const p of planLibrary.data?.items ?? []) {
-			const seen = p.key ? out.get(p.key) : undefined;
-			if (p.key && (!seen || p.version > seen.version))
-				out.set(p.key, { id: p.id, version: p.version });
-		}
-		return out;
-	}, [planLibrary.data]);
-
 	const sessionState = useSessions(username, graphSlug, {
 		onResult: ({ sessionId, messageId, result }) =>
 			handleStreamResult(sessionId, messageId, result),
@@ -112,10 +85,6 @@ export function GraphDetailPage() {
 	// thread open is *Everything*.
 	const threadWorldId = world.threadLensId;
 
-	// Page state lives in the URL, one param per region (graph-detail-page.md
-	// G16). `setSearchParams` is here for the one-write legacy migration below;
-	// each region reads and writes its own param through its own hook.
-	const [, setSearchParams] = useSearchParams();
 	// Who holds the right side — `?right=assistant | inspector`, absent means
 	// closed. One param, so opening one occupant replaces the other and the
 	// region survives a reload. The inspector defaults closed: it is only useful
@@ -134,41 +103,21 @@ export function GraphDetailPage() {
 	const { setSelectedAgentId, setSelectedStepId, setWorkKind, workTarget } =
 		layered;
 	// The declared boards open in `mainSection`, and the focused one (`?page=`).
-	const openBoards = useOpenBoards(username, graphSlug, newestPlanIdByKey);
+	const openBoards = useOpenBoards(username, graphSlug);
 	const {
-		setBoards,
 		setActiveBoardId,
 		boardPage,
 		openBoard,
 		openRecordBoard,
 		openLensBoard,
+		planRefById,
 	} = openBoards;
 	// `&step=` — the task open inside the focused run page (SR72).
 	const runStep = useRunStep().stepId;
 
 	// Which model the Model panel has open, and which of its types is selected —
 	// the selection drives the form that spans the main column (model-editor.md ME6).
-	// Sessions used to be a left-rail panel. Links carrying `?panel=sessions`
-	// (and `?panel=messages`, which aliases onto it) still exist, so honour
-	// them where the panel actually lives now: open the assistant, drop the rail
-	// key. One write, not two — `settingsPanel.close()` followed by
-	// `right.open("assistant")` would each rebuild the query string from its own
-	// snapshot, the second restoring the key the first removed, and the effect
-	// would fire forever on the URL it just wrote.
-	const staleSessionsKey =
-		settingsPanel.isOpen && settingsPanel.section === "sessions";
-	useEffect(() => {
-		if (!staleSessionsKey) return;
-		setSearchParams(
-			(current) => {
-				const next = new URLSearchParams(current);
-				next.delete("settings");
-				if (!next.has("right")) next.set("right", "assistant");
-				return next;
-			},
-			{ replace: true },
-		);
-	}, [staleSessionsKey, setSearchParams]);
+	useLegacySessionsLink(settingsPanel);
 	// The attachment is the canvas selection until someone takes it off — asked
 	// without it, and the thread records that (AD2).
 	const [attachmentDetached, setAttachmentDetached] = useState(false);
@@ -245,36 +194,12 @@ export function GraphDetailPage() {
 		[],
 	);
 
-	/**
-	 * **Models is one page** (the-model-page.md MP1 · MP18): switching the
-	 * `leftNav` to Models opens the `models` board, whatever the scope. It fires
-	 * on the transition into the panel and nothing else, so closing the page with
-	 * its X while the panel is open leaves it closed — a page that reopened
-	 * itself would be a page you cannot close.
-	 */
-	const modelsView = useModelsView().view;
-	const openModelsPage = useCallback(() => {
-		if (graphSlug) openBoard({ kind: "models", subjectId: graphSlug });
-	}, [openBoard, graphSlug]);
-	// The panel brings the board forward and names it in the URL in the same
-	// write as the scope it picked, so this only touches the strip.
-	const showModelsPage = useCallback((): Record<string, string | null> => {
-		const id = graphSlug ? boardPageId("models", graphSlug) : null;
-		if (!id || !graphSlug) return {};
-		setBoards((open) =>
-			open.some((b) => b.kind === "models" && b.subjectId === graphSlug)
-				? open
-				: [...open, { kind: "models", subjectId: graphSlug }],
-		);
-		setActiveBoardId(id);
-		return { page: id, step: null };
-	}, [graphSlug, setActiveBoardId, setBoards]);
-	const wasModels = useRef(false);
-	useEffect(() => {
-		const isModels = settingsSection === "model";
-		if (isModels && !wasModels.current) openModelsPage();
-		wasModels.current = isModels;
-	}, [settingsSection, openModelsPage]);
+	// The Models page, opened by the `leftNav` and by its panel.
+	const { modelsView, showModelsPage } = useModelsPage(
+		graphSlug,
+		settingsSection,
+		openBoards,
+	);
 
 	// The data canvases, the ask, and everything that draws on them.
 	const dataBoards = useDataBoards({
@@ -302,8 +227,8 @@ export function GraphDetailPage() {
 	});
 	const { canvas, styling, sessionTitleById, selected } = dataBoards;
 
-	// One rail, one page: the `leftSection` occupant for the open `?panel` key.
-	const leftContent = leftSectionContent({
+	// The `leftSection` region for the open `?panel` key.
+	const leftRegion = leftSection({
 		username,
 		graphSlug,
 		settingsPanel,
@@ -408,31 +333,7 @@ export function GraphDetailPage() {
 						activeSessionId ? sessionTitleById.get(activeSessionId) : undefined
 					}
 					{...chrome}
-					// One column, one open `?panel` key. With no key open — or one this
-					// page draws nothing for — there is no left column at all.
-					leftSection={
-						leftContent
-							? {
-									// Generous max so long Cypher/Gremlin queries can spread out.
-									// mainSection.minSize below still keeps the canvas usable when
-									// the user drags the divider far right.
-									defaultSize: "300px",
-									minSize: "240px",
-									maxSize: "900px",
-									collapsible: false,
-									// A broken panel shows the kit's notice in its column and
-									// is reported; opening another panel starts it afresh.
-									content: (
-										<ErrorBoundary
-											key={settingsPanel.section}
-											onError={reportBoundaryError}
-										>
-											{leftContent}
-										</ErrorBoundary>
-									),
-								}
-							: undefined
-					}
+					leftSection={leftRegion}
 					mainSection={{
 						defaultSize: "600px",
 						minSize: "300px",

@@ -16,8 +16,10 @@ import { RunsViewPanel } from "@/pages/graphs-detail/features/runs/RunsViewPanel
 import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills/SkillsViewPanel";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 import type { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { reportBoundaryError } from "@/services/telemetry/errors";
 import type { QueryResultItem } from "@/types/query";
 import type { GraphCanvas } from "@invana/graph";
+import { ErrorBoundary } from "@invana/ui";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 type Sessions = ReturnType<typeof useSessions>;
@@ -226,4 +228,38 @@ export function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			onClose={closeLeftPanel}
 		/>
 	) : null;
+}
+
+/**
+ * The `leftSection` region — the occupant for the open `?panel` key, sized for
+ * long queries, inside an error boundary keyed on the key so opening another
+ * panel starts it afresh. `undefined` when there is no occupant.
+ */
+export function leftSection(deps: LeftSectionDeps) {
+	const { settingsPanel } = deps;
+	// One rail, one page: the `leftSection` occupant for the open `?panel` key.
+	const leftContent = leftSectionContent(deps);
+	// One column, one open `?panel` key. With no key open — or one this
+	// page draws nothing for — there is no left column at all.
+	return leftContent
+		? {
+				// Generous max so long Cypher/Gremlin queries can spread out.
+				// mainSection.minSize below still keeps the canvas usable when
+				// the user drags the divider far right.
+				defaultSize: "300px",
+				minSize: "240px",
+				maxSize: "900px",
+				collapsible: false,
+				// A broken panel shows the kit's notice in its column and
+				// is reported; opening another panel starts it afresh.
+				content: (
+					<ErrorBoundary
+						key={settingsPanel.section}
+						onError={reportBoundaryError}
+					>
+						{leftContent}
+					</ErrorBoundary>
+				),
+			}
+		: undefined;
 }
