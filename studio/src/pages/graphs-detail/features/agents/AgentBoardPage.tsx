@@ -4,7 +4,7 @@
  *
  * This is the host half: which agent, whether it is the Graph default, and the
  * writes — Save, bind, pause, resume, retire, make default. {@link AgentDetail}
- * is the page itself. Pause and Retire go through the same confirm the drawer
+ * is the page itself. Pause and Retire go through the same confirm the section
  * uses, naming the open work they would disturb (LC9 · LC10).
  */
 
@@ -32,7 +32,7 @@ export function AgentBoardPage({
 	onOpenLineage: (agentId: string) => void;
 	onOpenEnvelope: (agentId: string) => void;
 }) {
-	// The same list the drawer reads, so the page and the row never disagree
+	// The same list the section reads, so the page and the row never disagree
 	// about status or default — and a retired or ephemeral agent still opens.
 	const query = useAgentsQuery(username, graphSlug, {
 		includeEphemeral: true,

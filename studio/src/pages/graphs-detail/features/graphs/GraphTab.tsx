@@ -49,7 +49,7 @@ interface Props {
  * | Agents | how hard may they run here | concurrency |
  *
  * One flat form of everything was the earlier shape, and it read as a junk
- * drawer: a name sat above a connection string sat above a ceiling on
+ * section: a name sat above a connection string sat above a ceiling on
  * concurrent runs, three unrelated questions saved by two different
  * buttons. **The tab is the group now**, so no tab wraps its fields in a
  * collapsible section: a group that is the only thing in its tab is a title over

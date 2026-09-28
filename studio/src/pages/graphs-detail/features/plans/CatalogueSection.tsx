@@ -1,8 +1,8 @@
-// **Catalogue** — the second drawer of the Library stack (the-catalogue.md 7.6).
+// **Catalogue** — the second section of the Library stack (the-catalogue.md 7.6).
 //
 // The closed vocabulary a plan may name at all: one entry per callable, grouped
 // by the bound it spends (graph-detail-page.md §3a). It is the definition of the
-// drawer above it, the way a template is the rendering of what that plan
+// section above it, the way a template is the rendering of what that plan
 // produced — which is why the three are stacked rather than given three icons.
 //
 // The list renders `runtime/catalogue/registry.py` through `GET …/catalogue`,
@@ -31,7 +31,7 @@ export interface CatalogueSectionProps {
 	username: string;
 	graphSlug: string;
 	ui: StackSectionUi;
-	/** `&entry=` — the entry whose detail replaces this drawer's body (CA6). */
+	/** `&entry=` — the entry whose detail replaces this section's body (CA6). */
 	entryKey: string | null;
 	onOpenEntry: (key: string | null) => void;
 	defaultSize?: number | string;
@@ -173,7 +173,7 @@ function CatalogueSectionBody({
 	);
 }
 
-/** The contract — bound · args · outputs · requires (C2–C4), in the drawer only (CA6). */
+/** The contract — bound · args · outputs · requires (C2–C4), in the section only (CA6). */
 function EntryDetail({
 	entry,
 	onOpenEntry,

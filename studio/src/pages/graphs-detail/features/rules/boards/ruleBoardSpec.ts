@@ -12,7 +12,7 @@
  * ([RU7](../../../../../../docs/for-developers/modules/skills/features/rules.md) ·
  * [RU9](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  *
- * **The board reads.** Deactivating keeps its dialog in the drawer, where *what
+ * **The board reads.** Deactivating keeps its dialog in the section, where *what
  * stops* and *what stays* can be read at the moment of the act
  * ([RU11](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */

@@ -1,16 +1,16 @@
 /**
  * Skills — a **stack**, not a list (G33): `Skills` over `Rules`.
  *
- * The two drawers answer different questions about one subject — what a run is
+ * The two sections answer different questions about one subject — what a run is
  * *given* before it runs. A skill is a playbook that may be offered; a rule is
  * a statement that is always true. Both reach a step as discrete items with
  * ids, and **neither is enforced** (skills/spec.md § 2).
  *
- * A stack has no panel header above its drawers: the first drawer header is the
+ * A stack has no panel header above its sections: the first section header is the
  * top of the column, and the breadcrumb already says which panel is open (G32).
- * The Skills drawer is its list: selecting a row gives a quick look under it,
+ * The Skills section is its list: selecting a row gives a quick look under it,
  * and **Open** gives the skill's page in `mainSection` (SK17 · SK37). The Rules
- * drawer keeps its place underneath.
+ * section keeps its place underneath.
  *
  * ## The canvas keeps whatever it was showing
  *
@@ -149,8 +149,8 @@ export function SkillsViewPanel({
 		{
 			id: "skills",
 			title: <SectionTitle count={items.length}>Skills</SectionTitle>,
-			// The header's one action area carries the act the drawer is for
-			// (SK27). The drawer does not drill in — the detail is the page.
+			// The header's one action area carries the act the section is for
+			// (SK27). The section does not drill in — the detail is the page.
 			headerActions: [
 				{
 					name: "New skill",

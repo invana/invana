@@ -607,7 +607,7 @@ export interface PlanVersionDiff {
 	key: string;
 	version: number;
 	against_version: number | null;
-	/** The one line the drawer prints — `+await_reply · fetch changed`. */
+	/** The one line the section prints — `+await_reply · fetch changed`. */
 	summary: string;
 	added: string[];
 	removed: string[];

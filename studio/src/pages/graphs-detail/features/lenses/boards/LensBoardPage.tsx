@@ -16,7 +16,7 @@
  * so the permission never lands at a different moment from the rules it
  * governs.
  *
- * **The board reads; the acts stay in the drawer**
+ * **The board reads; the acts stay in the section**
  * ([WO16](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
  * `Edit` puts the Govern panel back on this lens, drilled in — it is the only
  * action here that leads to a write.
@@ -42,7 +42,7 @@ export interface LensBoardPageProps {
 	kind: LensKind;
 	/** The `lenses.id` every panel binds to. */
 	lensId: string;
-	/** `Edit` — puts the Govern drawer back on this lens, drilled in. */
+	/** `Edit` — puts the Govern section back on this lens, drilled in. */
 	onEdit: (kind: LensKind, lensId: string) => void;
 }
 

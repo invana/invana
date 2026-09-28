@@ -33,7 +33,7 @@ export const SKILL_ACTIONS = {
 	openSkill: "open-skill",
 	/** A Bindings row — opens that agent in the Agents panel. */
 	openAgent: "open-agent",
-	/** `Edit` — puts the drawer back on this record, drilled in. */
+	/** `Edit` — puts the section back on this record, drilled in. */
 	edit: "edit",
 	/** A step or citation row — opens the run it came from. */
 	openRun: "open-run",

@@ -10,7 +10,7 @@
  * **It states, and it does not offer.** Nothing here is pickable — a guardrail
  * is in force whatever world is chosen, and a row that highlighted on click
  * would say it is one of the things you choose between. The one control is the
- * way to the drawer that holds the rules, because a bound nobody may read is a
+ * way to the section that holds the rules, because a bound nobody may read is a
  * bound nobody can work within
  * ([GR5](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  */

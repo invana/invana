@@ -9,14 +9,14 @@
  *
  * **It is a list, not a stack.** The definitions a run is composed from — plans,
  * the catalogue, templates — are **Library** (G41), so there is no second list
- * here for `?drawer=` to choose between, and the panel keeps the one-header
+ * here for `?section=` to choose between, and the panel keeps the one-header
  * `ListPanelChrome` grammar every other list uses. A drill-in replaces the
  * panel body and turns the header into `‹ RUNS / orders.csv`; `More` opens the
  * run's dashboard as a page (SR13 · SR36).
  *
  * The step that crosses into Library is *run → the plan it ran*, and
  * `mainSection` carries it: `keepMounted` keeps the run open beside the plan,
- * which is the property SR12 was protecting when it asked for drawer adjacency.
+ * which is the property SR12 was protecting when it asked for section adjacency.
  */
 
 import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
@@ -75,9 +75,9 @@ export function RunsViewPanel({
 
 	// Search narrows here, beside the chips, so the status bar's `shown` counts
 	// what is actually on screen.
-	const drawerUi = ui.get("runs");
-	const needle = drawerUi.searchOpen
-		? drawerUi.search.trim().toLowerCase()
+	const sectionUi = ui.get("runs");
+	const needle = sectionUi.searchOpen
+		? sectionUi.search.trim().toLowerCase()
 		: "";
 	const rows = needle
 		? journal.rows.filter((r) =>
@@ -95,7 +95,7 @@ export function RunsViewPanel({
 	// A drilled-in run is addressed, not titled: `RUNS / run:7d3184f1` (SR54).
 	const runTitle = runId ? runAddress(runId) : undefined;
 	// Drilled in, the bar counts the run's ledger rather than the journal:
-	// `9 events · 1 refusal` (SR67). Shares the drawer's query, so no second read.
+	// `9 events · 1 refusal` (SR67). Shares the section's query, so no second read.
 	const touchesQuery = useRunTouchesQuery(
 		username,
 		graphSlug,
@@ -103,7 +103,7 @@ export function RunsViewPanel({
 	);
 	const touches = touchesQuery.data;
 	// Drilled in, `Refresh` reads the run again — its trace and its ledger,
-	// the two things the drawer is drawn from.
+	// the two things the section is drawn from.
 	const qc = useQueryClient();
 	const traceKey = ["runs", username, graphSlug, runId, "trace"];
 	const traceFetching = useIsFetching({ queryKey: traceKey }) > 0;
@@ -177,7 +177,7 @@ export function RunsViewPanel({
 								),
 								children: () =>
 									runId ? (
-										// A drill-in replaces the drawer body with the run's five
+										// A drill-in replaces the section body with the run's five
 										// sections and its two ways out (SR67).
 										<RunDetail
 											username={username}

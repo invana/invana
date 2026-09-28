@@ -11,7 +11,7 @@ import { expect, test } from "@playwright/test";
 const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 
 test("the plan panel draws the four bands of a plan", async ({ page }) => {
-	await page.goto(`${GRAPH}?panel=library&drawer=plans`);
+	await page.goto(`${GRAPH}?panel=library&section=plans`);
 
 	const row = page.getByRole("button", { name: /nl-single/ }).first();
 	await expect(row).toBeVisible({ timeout: 30_000 });
@@ -48,7 +48,7 @@ test("the plan panel draws the four bands of a plan", async ({ page }) => {
 });
 
 test("a library row carries the bands it will engage", async ({ page }) => {
-	await page.goto(`${GRAPH}?panel=library&drawer=plans`);
+	await page.goto(`${GRAPH}?panel=library&section=plans`);
 	const row = page.getByRole("button", { name: /nl-single/ }).first();
 	await expect(row).toBeVisible({ timeout: 30_000 });
 	// The bands are on the row, not only in the detail — *what will this cost

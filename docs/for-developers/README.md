@@ -347,6 +347,7 @@ replacement lands.
 |---|---|---|
 | `/modeller` as its own route | [1.4 Model editor](modules/connect-and-model/features/model-editor.md) as a board kind | The next major. The canvas is reachable from the one page now, so the route is three lines of redirect kept for bookmarks — a 404 would be a worse answer than the panel the bookmark meant |
 | `pages/graphs/modeller/ModellerPage.tsx` | The Model panel and the model canvas | Nothing imports it. Its *components* stay — the panel and canvas compose them |
+| `?drawer=` in a graph page URL | `?section=` ([G35](building-studio/graph-detail-page.md)) | The next minor release. Until then it is read as `?section=`, so a link from before the rename still opens its section; nothing writes it |
 
 
 ## Not building

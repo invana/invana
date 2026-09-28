@@ -490,7 +490,7 @@ function SliceControls({
 				</div>
 			))}
 
-			{/* What the picks add up to, in the sentence the drawer and the CLI both
+			{/* What the picks add up to, in the sentence the section and the CLI both
 			    print — and marked when the model cannot support it. */}
 			<SliceSummary
 				select={select}

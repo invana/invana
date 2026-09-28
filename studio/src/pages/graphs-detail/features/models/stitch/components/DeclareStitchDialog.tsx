@@ -1,11 +1,11 @@
 /**
- * The declare card, as a dialog — for the Stitches drawer, which has no canvas
+ * The declare card, as a dialog — for the Stitches section, which has no canvas
  * to dock against.
  *
  * *All models* floats {@link DeclareStitchCard} over the drawing, because the
  * gesture that opens it is a drag on that drawing and hiding it behind a scrim
  * would hide the two frames the stitch is about (the *Declaring* artboard, T5).
- * Opened from a model's Stitches drawer there is nothing behind it worth
+ * Opened from a model's Stitches section there is nothing behind it worth
  * keeping in view, so it is a dialog — the same card, the same words, the same
  * counts.
  */

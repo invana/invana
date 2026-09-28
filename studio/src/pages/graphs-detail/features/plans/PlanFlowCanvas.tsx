@@ -5,7 +5,7 @@
  * The same canvas a skill's Flow tab and a run's Flow tab draw on, so a plan,
  * a skill that inlines it and a run of it read as one drawing. Read-only:
  * `Edit as a draft` is the way to change a plan. Picking a node selects its
- * step, which the drawer's step card reads.
+ * step, which the section's step card reads.
  */
 
 import {

@@ -480,7 +480,7 @@ function flow(
 
 /**
  * The waterfall's rows — one per task, on the run's clock (SR73). Shared by
- * the Overview and the drawer, so the two draw one chart.
+ * the Overview and the section, so the two draw one chart.
  */
 export function waterfallTasks(groups: TaskGroup[]): TaskGanttTask[] {
 	return groups.map((group) => {

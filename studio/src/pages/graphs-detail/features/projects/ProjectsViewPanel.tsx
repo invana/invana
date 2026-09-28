@@ -1,11 +1,11 @@
 /**
- * **Projects** — one icon, one panel, two drawers (projects-and-tasks.md PT7).
+ * **Projects** — one icon, one panel, two sections (projects-and-tasks.md PT7).
  *
  * `Projects` over `Todos`. **Projects owns Todos; there is no Todos icon**: a
  * Todo without its project is a to-do list, and the project is the thing it is
- * for. With no project drilled into, the Todos drawer is every Todo in the
+ * for. With no project drilled into, the Todos section is every Todo in the
  * Graph — which *is* the **No project** bucket, because a Todo nobody filed is
- * still work somebody wrote. Drill into a project and the drawer narrows to its
+ * still work somebody wrote. Drill into a project and the section narrows to its
  * Todos, while the projects list keeps its place above (G33).
  *
  * The rail's **Tasks** icon is execution only — `TaskRun`s, `TaskPlan`s and the
@@ -51,23 +51,23 @@ export function ProjectsViewPanel({
 	// `PanelStack` reads `defaultSize` at **mount**, so this is the opening split
 	// only — after that the column's shape belongs to whoever dragged it (G35).
 	const size = (d: "projects" | "todos") =>
-		projects.drawer === d ? "60%" : "40%";
+		projects.sectionKey === d ? "60%" : "40%";
 
 	// A drill-in is the one thing allowed to override that drag: opening a Todo
-	// from a run's trace, or a project from a breadcrumb, has to bring its drawer
+	// from a run's trace, or a project from a breadcrumb, has to bring its section
 	// back if the reader had collapsed it — otherwise the row lands in a shut
 	// section and nothing appears to happen. Watching the drilled-into id as well
-	// as the focus is what catches the case where `?drawer=` never moves and only
+	// as the focus is what catches the case where `?section=` never moves and only
 	// `&todo=` does (G35).
 	const stackRef = useRef<PanelStackHandle>(null);
 	const focused =
-		projects.drawer === "projects" ? projects.projectKey : projects.todoId;
+		projects.sectionKey === "projects" ? projects.projectKey : projects.todoId;
 	// `focused` is a trigger, not a value: the effect re-runs when the drill-in
 	// moves but never reads it. Dropping it is the bug this wiring exists to fix.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: see above.
 	useEffect(() => {
-		stackRef.current?.expand(projects.drawer);
-	}, [projects.drawer, focused]);
+		stackRef.current?.expand(projects.sectionKey);
+	}, [projects.sectionKey, focused]);
 
 	return (
 		<PanelStack
@@ -171,7 +171,7 @@ export function ProjectsViewPanel({
 	);
 }
 
-/** `6 projects` — the count the drawer header carries beside its label. */
+/** `6 projects` — the count the section header carries beside its label. */
 function ProjectsCount({
 	username,
 	graphSlug,

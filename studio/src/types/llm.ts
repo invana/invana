@@ -91,7 +91,7 @@ export type LLMModelStatus = "active" | "removed";
 
 /**
  * What the **shipped cast** reads, and nothing a vendor merely states (PM12).
- * A model added without ranks is never auto-cast, so the drawer asks for them.
+ * A model added without ranks is never auto-cast, so the section asks for them.
  */
 export interface LLMModelCapabilities {
 	context_window?: number | null;

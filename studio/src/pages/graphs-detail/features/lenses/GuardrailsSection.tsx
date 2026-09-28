@@ -7,8 +7,8 @@
  * something I can do deliberately rather than by trial and refusal.*
  *
  * **It sits under Worlds**, which is where a person arrives. The ceiling is
- * still read first — the locked strip at the top of that drawer states it (W4)
- * — and this drawer is where its rules are read in full.
+ * still read first — the locked strip at the top of that section states it (W4)
+ * — and this section is where its rules are read in full.
  *
  * **Readable by everyone, editable by a permission**
  * ([GR5](../../../../../docs/for-developers/modules/govern/features/guardrails.md)):
@@ -91,7 +91,7 @@ export function guardrailsSection({
 			label: "Guardrails",
 			icon: ShieldCheck,
 			// `0` is a fact worth printing: *nothing is set* reads differently from
-			// *not loaded yet*, and the count has to read while the drawer is shut.
+			// *not loaded yet*, and the count has to read while the section is shut.
 			count: isLoading ? undefined : `${items.length} in force`,
 			trail: authoring ? "New guardrail" : drilled?.display_name,
 			onBack: () => {

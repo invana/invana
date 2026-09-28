@@ -1,10 +1,10 @@
 /**
- * A run, as the drawer reads it — **five sections off two reads**
+ * A run, as the section reads it — **five sections off two reads**
  * ([SR67](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
  *
  * `The run` · `What it cost` · `What it touched` · `Bounds reached` ·
  * `Refused`, derived from the trace (`GET …/runs/{id}/trace`) and the ledger
- * (`GET …/runs/{id}/touches`). This file derives; the drawer only lays it out.
+ * (`GET …/runs/{id}/touches`). This file derives; the section only lays it out.
  *
  * **A row nobody recorded is absent, never zero** (SR34). A run with no price
  * has no cost row, a run with no agent has no ceiling to read `of` against, and

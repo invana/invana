@@ -46,7 +46,7 @@ sequenceDiagram
     participant E as Engine
     participant I as Interpreter
 
-    P->>W: open ?panel=govern&drawer=worlds
+    P->>W: open ?panel=govern&section=worlds
     W-->>P: guardrails strip (locked) + the worlds list
     P->>W: pick "EU · H1 2026"
     W->>A: set the active world

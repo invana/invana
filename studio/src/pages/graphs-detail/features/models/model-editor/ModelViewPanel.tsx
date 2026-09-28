@@ -1,5 +1,5 @@
 /**
- * The Models panel — the list, and a model's three drawers (the-model-page.md
+ * The Models panel — the list, and a model's three sections (the-model-page.md
  * MP4 · MP5).
  *
  * **The panel lists; the page acts.** The list view is only the models: a click
@@ -9,7 +9,7 @@
  * the `MODELS / <name>` crumb, and nothing acts on the model itself: `Edit`,
  * `Publish`, `Rename`, `Export`, `Archive` and `Introspect` are on the page
  * header, because they act on what the page shows. The staged set is the bar
- * under that header (MP6), not a drawer.
+ * under that header (MP6), not a section.
  *
  * ```
  * ‹  MODELS / AirRoutes
@@ -69,7 +69,7 @@ import { toast } from "sonner";
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** The type the Model tab has selected — the drawers light it (ME6). */
+	/** The type the Model tab has selected — the sections light it (ME6). */
 	selection: ModelSelection | null;
 	onSelect: (selection: ModelSelection | null) => void;
 	/**
@@ -389,7 +389,7 @@ function ModelListView({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// One model: its three drawers
+// One model: its three sections
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ModelDetail({
@@ -424,7 +424,7 @@ function ModelDetail({
 	const staged = useStagedSetQuery(username, graphSlug, model.id, !!draft);
 
 	// Adding is authoring, and authoring is on a draft (ME3): `+ add` is on the
-	// two type drawers while one is open, and `Edit` on the page opens one.
+	// two type sections while one is open, and `Edit` on the page opens one.
 	const ctx: ModelEditCtx | undefined =
 		draft && canWrite
 			? { username, graphSlug, modelId: model.id, versionId: draft.id }
@@ -448,7 +448,7 @@ function ModelDetail({
 		"edge_type",
 	);
 
-	// Stitch hands the model a drawer and a dialog; the model places both
+	// Stitch hands the model a section and a dialog; the model places both
 	// (stitch-models.md ST12). One direction — `model → stitch`, never back.
 	const { section: stitchesSection, dialog: stitchesDialog } =
 		useStitchesSection({
@@ -460,7 +460,7 @@ function ModelDetail({
 
 	const sections: PanelStackSection[] = [
 		{
-			// The drill-in is the first drawer (ME17 · G33): `MODELS / AirRoutes`
+			// The drill-in is the first section (ME17 · G33): `MODELS / AirRoutes`
 			// is its header and the chevron the way back. Its body is empty — what
 			// the model *is* reads on the page header (ME21).
 			id: "model",

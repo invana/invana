@@ -456,7 +456,7 @@ function layersRows(plan: TaskPlanDetail, perf: PlanPerformance | undefined) {
 					title: "Layers it declares",
 					aside: `${declared} of ${plan.declared_layers.length}`,
 					flush: true,
-					// The bands arrive **open**: the tab has the width the drawer did
+					// The bands arrive **open**: the tab has the width the section did
 					// not (LB31).
 					options: { bands, items, scale: "seq", palette: LAYER_PALETTE },
 				},

@@ -2,7 +2,7 @@
  * The rule board, as a page — artboard `RuleDash`
  * ([34t](../../../../../../docs/for-developers/the-screens.md)).
  *
- * The rule itself comes from the Graph's list — one read the drawer has
+ * The rule itself comes from the Graph's list — one read the section has
  * already made — and the counts from its citations, which is the one read only
  * this page needs ([RU11](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */
@@ -25,7 +25,7 @@ export interface RuleBoardPageProps {
 	graphSlug: string;
 	/** The `rules.id` every panel binds to. */
 	ruleId: string;
-	/** `Edit` — puts the Rules drawer back on this rule, drilled in. */
+	/** `Edit` — puts the Rules section back on this rule, drilled in. */
 	onEdit: (ruleId: string) => void;
 	/** A citation row — opens the run the citing step came from. */
 	onOpenRun?: (runId: string) => void;

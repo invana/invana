@@ -162,7 +162,7 @@ export const SETUP_STEPS: readonly SetupStepMeta[] = [
 			body: "Invana sends the question and the schema, never the database. The provider writes a query; the engine runs it against your records.",
 		},
 		// `Agents › LLMs` — the providers left Settings when an agent stopped
-		// binding one (PM6). A stacked panel takes a drawer where a tabbed one
+		// binding one (PM6). A stacked panel takes a section where a tabbed one
 		// takes a tab, and `settingsTab` names whichever that section has.
 		settingsSection: "agents",
 		settingsTab: "llms",

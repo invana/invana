@@ -2,7 +2,7 @@
  * The two pieces every rule surface is made of — the row and the form.
  *
  * A rule reads the same wherever it is offered from: the Graph's `Rules`
- * drawer and a Project's **Working rules** section both draw *the statement is
+ * section and a Project's **Working rules** section both draw *the statement is
  * the row*, with kind, scope and citation count underneath
  * ([RulesPanel · RulesProject](docs/for-developers/modules/skills/features/rules.md)).
  * Two copies of that would be two chances to disagree about what a rule looks

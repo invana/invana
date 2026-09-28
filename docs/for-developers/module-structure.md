@@ -223,7 +223,7 @@ before Studio uses it.
 
 ## 5. Component names — one meaning per suffix
 
-**Status: done** for every file and component row below, and for the shell hooks and shared builders. Still open: `LayersPanel` · `StylingPanel` · `ListPanel` (replaced by the kit in phase K), and the `?drawer=` value types `ProjectsDrawer` · `LibraryDrawer` · `GovernDrawer`, which rename with the `?drawer=` → `?section=` key.
+**Status: done** for every file and component row below, and for the shell hooks and shared builders. Still open: `LayersPanel` · `StylingPanel` · `ListPanel` (replaced by the kit in phase K). The URL key is `?section=` (`?drawer=` read as an alias for one release, [G35](building-studio/graph-detail-page.md)); its value types are `ProjectsSectionKey` · `LibrarySectionKey` · `GovernSectionKey` · `AgentsSectionKey`, and *drawer* is gone from Studio's identifiers and comments — it survives only in two lines of UI copy, which this refactor does not change (§11).
 
 The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `PanelStack` and its
 `PanelStackSection`s; canvas-ui names every region occupant `*ViewPanel` (`LayersViewPanel`,

@@ -1,7 +1,7 @@
-// **Plans** — the first drawer of the Library stack (graph-detail-page.md §3a ·
+// **Plans** — the first section of the Library stack (graph-detail-page.md §3a ·
 // G41).
 //
-// A plan is what can be run, and the two drawers under it are what it is made
+// A plan is what can be run, and the two sections under it are what it is made
 // of: the catalogue it may name, and the template that renders what it produced.
 // The journal of what actually ran is **Runs**, its own panel (SR1).
 //
@@ -36,12 +36,12 @@ export interface PlansSectionProps {
 	username: string;
 	graphSlug: string;
 	ui: StackSectionUi;
-	/** `&plan=` — the plan whose detail replaces this drawer's body. */
+	/** `&plan=` — the plan whose detail replaces this section's body. */
 	planKey: string | null;
 	onOpenPlan: (key: string | null) => void;
 	selectedStepId: string | null;
 	onOpenAgent?: (agentId: string) => void;
-	/** Promoting is the list's one write — its control is this drawer's header. */
+	/** Promoting is the list's one write — its control is this section's header. */
 	promoting: boolean;
 	onPromoting: (v: boolean) => void;
 	exportUrl?: (key: string) => string;
@@ -79,7 +79,7 @@ export function plansSection({
 			count: <PlansCount username={username} graphSlug={graphSlug} />,
 			trail: planKey ?? undefined,
 			onBack: () => onOpenPlan(null),
-			// The list's one write, in the slot every drawer puts its own act in —
+			// The list's one write, in the slot every section puts its own act in —
 			// and gone while drilled in, because it acts on the list (G43 · SK27).
 			headerActions: [
 				{
@@ -159,7 +159,7 @@ export function plansSection({
 }
 
 /**
- * `6 · 3 builtin` — what the drawer header carries beside its label, as the
+ * `6 · 3 builtin` — what the section header carries beside its label, as the
  * artboard draws it. The total is *how much there is to pick from*; the builtin
  * share is *how much of it came with Invana*, which is the one split a reader
  * asks about before they have authored anything (LB5).

@@ -87,11 +87,11 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"model",
 	"projects",
 	// **Execution and definition are two panels** (G41). `runs` is the journal as
-	// one list; `library` is the three-drawer stack — Plans · Catalogue ·
+	// one list; `library` is the three-section stack — Plans · Catalogue ·
 	// Templates. `imports`, `workflows` and `templates` are gone from this list
 	// because they are gone from the product: an import is a `kind` of TaskRun, a
 	// workflow is a reusable TaskPlan, and a projection template is Library's
-	// third drawer (G30 · G38).
+	// third section (G30 · G38).
 	"runs",
 	"library",
 	"govern",

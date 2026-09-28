@@ -44,7 +44,7 @@ export function SkillFlowTab({
 	 * What to say when there is no plan, for a caller that knows **why**.
 	 *
 	 * The default says a version without a plan is a fault, because inside the
-	 * drawer it is: a version owns exactly one plan. The board reads a skill's
+	 * section it is: a version owns exactly one plan. The board reads a skill's
 	 * *published* version, so a draft reaches this with nothing to draw and no
 	 * fault to report — and a refusal that names the wrong cause is worse than
 	 * none (SK21).

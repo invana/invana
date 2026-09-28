@@ -1,5 +1,5 @@
 /**
- * A run, read in the drawer — **six sections and two ways out**
+ * A run, read in the section — **six sections and two ways out**
  * ([SR67](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions) ·
  * [SR73](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
  *

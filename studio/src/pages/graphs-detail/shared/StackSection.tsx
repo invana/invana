@@ -1,19 +1,19 @@
-// One drawer of a **stacked panel** — Library, Projects, Govern, Agents, Skills
+// One section of a **stacked panel** — Library, Projects, Govern, Agents, Skills
 // (graph-detail-page.md G32 · G33).
 //
-// **A drawer owns its header; the panel owns the status bar.** Each drawer
+// **A section owns its header; the panel owns the status bar.** Each section
 // draws its own title, count, search and filter, and a drill-in stays inside it
-// — the header becomes `‹ PLANS / nl-single@4` while the other drawers keep
+// — the header becomes `‹ PLANS / nl-single@4` while the other sections keep
 // their place. What is shared is one status bar in `footer.left` and one column
 // width, so the stack has three headers and no panel chrome above them.
 //
 // This is the `ListPanelChrome` grammar (title · count · search · filter ·
 // body) expressed as a `PanelStackSection` rather than a `PanelContent`: the
 // kit's `PanelStack` already draws a collapsible, resizable header per section,
-// so a drawer that wrapped itself in `ListPanelChrome` would draw two headers
+// so a section that wrapped itself in `ListPanelChrome` would draw two headers
 // over one list.
 //
-// Search and filter state is **per drawer and owned by the stack**, not by this
+// Search and filter state is **per section and owned by the stack**, not by this
 // module: `PanelStack` renders a section's title and its body as siblings, so
 // the state they share has to sit above both. {@link useStackSectionUi} is that
 // holder, called once by the panel.
@@ -49,8 +49,8 @@ export interface StackSectionUi {
 }
 
 /**
- * Per-drawer search and filter state for one stack. The three lists filter on
- * different columns, so each drawer keeps its own — one shared bar would be
+ * Per-section search and filter state for one stack. The three lists filter on
+ * different columns, so each section keeps its own — one shared bar would be
  * re-offered per list anyway (G33).
  */
 export function useStackSectionUi(): StackSectionUi {
@@ -71,16 +71,16 @@ export function useStackSectionUi(): StackSectionUi {
 }
 
 export interface StackSectionSpec {
-	/** The drawer's key — also the `?drawer=` value it focuses. */
+	/** The section's key — also the `?section=` value it focuses. */
 	id: string;
-	/** What this drawer is, in the header. `PLANS` · `CATALOGUE` · `TEMPLATES`. */
+	/** What this section is, in the header. `PLANS` · `CATALOGUE` · `TEMPLATES`. */
 	label: string;
 	/** A 14px lucide glyph before the label. */
 	icon?: ElementType;
 	/**
 	 * The count beside the label — `24 · 2 running`, `7 reusable`,
 	 * `25 · 5 bounds`. Always visible: a count is chrome that must read even
-	 * while the drawer is collapsed.
+	 * while the section is collapsed.
 	 */
 	count?: ReactNode;
 	/**
@@ -92,7 +92,7 @@ export interface StackSectionSpec {
 	/** Body renderer — receives the live search string, empty when closed. */
 	children: (ctx: { search: string }) => ReactNode;
 	/**
-	 * Actions before the search and filter icons — a drawer's own `+`, for the
+	 * Actions before the search and filter icons — a section's own `+`, for the
 	 * one thing it creates. Every create CTA for an item happens in the section
 	 * that owns it (G3).
 	 */
@@ -117,10 +117,10 @@ export interface StackSectionSpec {
 		iconClassName?: string;
 		onClick: () => void;
 	}[];
-	/** Enables this drawer's own search toggle. */
+	/** Enables this section's own search toggle. */
 	searchable?: boolean;
 	searchPlaceholder?: string;
-	/** This drawer's own filter menu content. Omit to hide the funnel. */
+	/** This section's own filter menu content. Omit to hide the funnel. */
 	filterMenu?: ReactNode;
 	/**
 	 * Filter **chips** instead of a menu: the funnel toggles this row under the
@@ -132,12 +132,12 @@ export interface StackSectionSpec {
 	filtered?: boolean;
 	/** Start collapsed (header only). */
 	defaultCollapsed?: boolean;
-	/** The height this drawer takes while it is the focused one. */
+	/** The height this section takes while it is the focused one. */
 	defaultSize?: number | string;
 	minSize?: number | string;
 }
 
-/** Build one {@link PanelStackSection} from a drawer spec. */
+/** Build one {@link PanelStackSection} from a section spec. */
 export function stackSection(
 	spec: StackSectionSpec,
 	ui: StackSectionUi,
@@ -154,9 +154,9 @@ export function stackSection(
 		// `PanelStack` renders the title *inside* the header's collapse button and
 		// `headerActions` in a sibling beside it — so a control drawn in the title
 		// was a `<button>` inside a `<button>`, and every click on one also toggled
-		// the drawer. Opening search collapsed the drawer over the box it had just
+		// the section. Opening search collapsed the section over the box it had just
 		// opened. The kit's slot is the fix, not a `stopPropagation`.
-		headerActions: drawerActions(spec, state, (patch) =>
+		headerActions: sectionActions(spec, state, (patch) =>
 			ui.set(spec.id, patch),
 		),
 		content: (
@@ -178,9 +178,9 @@ export function stackSection(
 				</div>
 			</div>
 		),
-		// The count and the two icons are chrome that must read while the drawer
+		// The count and the two icons are chrome that must read while the section
 		// is collapsed — the quiet-header default would hide exactly the controls
-		// G33 puts in every drawer header.
+		// G33 puts in every section header.
 		actionsOnHover: false,
 		defaultCollapsed: spec.defaultCollapsed,
 		defaultSize: spec.defaultSize,
@@ -189,10 +189,10 @@ export function stackSection(
 }
 
 /**
- * The drawer's header text — **and nothing interactive**.
+ * The section's header text — **and nothing interactive**.
  *
  * It renders inside `PanelStack`'s collapse button, so anything clickable here
- * is a nested button: invalid markup, and a click that toggles the drawer as
+ * is a nested button: invalid markup, and a click that toggles the section as
  * well as doing its own job. Every control lives in {@link drawerActions}.
  */
 function StackSectionTitle({
@@ -234,22 +234,22 @@ function StackSectionTitle({
 }
 
 /**
- * Everything a drawer header can do, as `NavHorizontalItem`s.
+ * Everything a section header can do, as `NavHorizontalItem`s.
  *
  * **Back is here rather than on the breadcrumb.** The artboard draws the
  * drilled header as `‹ RUNS / orders.csv`, with the chevron on the left; the
  * left of that bar is the collapse button, so a back control drawn there is a
  * button inside a button. It reads `RUNS / orders.csv` with `Back to RUNS`
- * beside the drawer's other controls until `PanelStack` offers a slot ahead of
+ * beside the section's other controls until `PanelStack` offers a slot ahead of
  * its own chevron — at which point this row moves and nothing else changes.
  *
- * Search and filter apply to the list only, so a drilled-in drawer — showing
+ * Search and filter apply to the list only, so a drilled-in section — showing
  * one record — offers neither: narrowing a list that is not on screen would be
  * a control with no subject. For the same reason the list's own acts go with
  * it, and what takes their place is {@link StackSectionSpec.detailActions}: the
- * acts on the record the drawer is now showing (G43).
+ * acts on the record the section is now showing (G43).
  */
-function drawerActions(
+function sectionActions(
 	spec: StackSectionSpec,
 	state: StackSectionUiState,
 	onSet: (patch: Partial<StackSectionUiState>) => void,
@@ -302,7 +302,7 @@ function drawerActions(
 		});
 	} else if (spec.filterMenu) {
 		// A **static** item — no `onClick`, no `menuItems` — so the kit renders a
-		// plain `<div>` and the drawer keeps its own rich menu: labelled groups
+		// plain `<div>` and the section keeps its own rich menu: labelled groups
 		// and radio rows, which `menuItems` has no way to say. The item still
 		// earns the row's tooltip and its place in the strip.
 		items.push({

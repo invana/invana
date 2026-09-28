@@ -47,7 +47,7 @@ export interface LensDetailProps {
 	lens: Lens;
 	username?: string;
 	graphSlug?: string;
-	/** Actions, the ladder and the editor — whatever the drawer hangs below it. */
+	/** Actions, the ladder and the editor — whatever the section hangs below it. */
 	children?: React.ReactNode;
 }
 
@@ -78,7 +78,7 @@ export function LensDetail({
 	return (
 		<div className="flex min-w-0 flex-col gap-4">
 			{/* **Titled `Rules`, not with the lens's name.** This body only ever
-			    renders drilled into a drawer, whose header already reads
+			    renders drilled into a section, whose header already reads
 			    `‹ WORLDS / EU · H1 2026` — repeating the name directly under it
 			    spends the first line of a 420px column saying what the line above
 			    it said. */}

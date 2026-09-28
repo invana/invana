@@ -69,7 +69,7 @@ const VIEW_SECTIONS: SectionMeta[] = [
 	{ key: "runs", label: "Runs", icon: History },
 	// **Templates has no item of its own** (G38). A projection template is to an
 	// answer what a plan is to a run — both are definitions, both are promoted
-	// from what served — so it is Library's third drawer rather than a place you
+	// from what served — so it is Library's third section rather than a place you
 	// go. It is the same rule G14 applies to Stitches.
 	{ key: "library", label: "Library", icon: Library },
 	// **Govern is its own item** (GV17) — worlds and guardrails, not a tab of
@@ -91,7 +91,7 @@ const VIEW_SECTIONS: SectionMeta[] = [
  *   TaskPlan, so each was an icon onto a *filter* of a list that already exists
  *   — and an icon per filter is how one journal became four panels. An import is
  *   reached in **Runs**, a workflow in **Library › Plans**. **Templates has no
- *   icon either** (G38): it is Library's third drawer.
+ *   icon either** (G38): it is Library's third section.
  *   Every one is a `?panel` key, so the whole rail is a single-open accordion
  *   with one mechanism. Info
  *   is the exception that proves it: it still renders through `SettingsViewPanel`,

@@ -1,4 +1,4 @@
-// **Templates** — the third drawer of the Library stack (graph-detail-page.md
+// **Templates** — the third section of the Library stack (graph-detail-page.md
 // G38 · G41).
 //
 // A projection template is to an answer what a plan is to a run: both are
@@ -7,7 +7,7 @@
 // the other two things a run is composed from — the same rule G14 applies to
 // Stitches: a library you open while authoring is not a place you go.
 //
-// The drawer owns the header — label, count, search, filter and the `+` that
+// The section owns the header — label, count, search, filter and the `+` that
 // authors one (G32 · G3). The body is `TemplatesSectionBody`.
 
 import {
@@ -42,10 +42,10 @@ export interface TemplatesSectionProps {
 	username: string;
 	graphSlug: string;
 	ui: StackSectionUi;
-	/** `&template=` — the template whose detail replaces this drawer's body. */
+	/** `&template=` — the template whose detail replaces this section's body. */
 	templateId: string | null;
 	onOpenTemplate: (id: string | null) => void;
-	/** The drawer's `+` — authoring happens in the section that owns it (G3). */
+	/** The section's `+` — authoring happens in the section that owns it (G3). */
 	authoring: boolean;
 	onAuthoring: (v: boolean) => void;
 	kindFilter: string;

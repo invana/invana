@@ -1,12 +1,12 @@
 /**
- * Projection templates — the third drawer of the **Library** stack
+ * Projection templates — the third section of the **Library** stack
  * (projections.md § 5 · graph-detail-page.md G38 · G41).
  *
  * A projection template is to an answer what a plan is to a run: both are
  * definitions, both are promoted from what served (projections.md C7). So it
  * has no rail icon of its own and sits under `Plans` and `Catalogue` — the two
  * other things a run is composed from. What this file owns is the **body**: the
- * drawer draws the header, the count, the search and the `+` (G32).
+ * section draws the header, the count, the search and the `+` (G32).
  *
  * A projection template is what stops the model from authoring markup (P1), so
  * it is authored here by a person and versioned like anything else that decides
@@ -72,7 +72,7 @@ function useTemplatesQuery(username: string, graphSlug: string) {
 }
 
 /**
- * The drilled-in drawer header's trail. A template's id is a uuid and says
+ * The drilled-in section header's trail. A template's id is a uuid and says
  * nothing, so the header carries its **name** — read from the list already in
  * cache rather than by a second request.
  */
@@ -90,7 +90,7 @@ export function TemplateTrail({
 	return <>{found?.name ?? id.slice(0, 8)}</>;
 }
 
-/** `11 · 5 result` — what the drawer header carries beside its label. */
+/** `11 · 5 result` — what the section header carries beside its label. */
 export function TemplatesCount({
 	username,
 	graphSlug,
@@ -108,21 +108,21 @@ export function TemplatesCount({
 interface BodyProps {
 	username: string;
 	graphSlug: string;
-	/** The live search string from the drawer header, empty when closed. */
+	/** The live search string from the section header, empty when closed. */
 	search?: string;
-	/** The drawer's own filters — `kind` and `surface` (§3a). */
+	/** The section's own filters — `kind` and `surface` (§3a). */
 	kindFilter?: string;
 	surfaceFilter?: string;
-	/** `&template=` — the template whose detail replaces this drawer's body. */
+	/** `&template=` — the template whose detail replaces this section's body. */
 	selectedId: string | null;
 	onSelect: (id: string | null) => void;
-	/** True while the drawer's `+` has the author form open. */
+	/** True while the section's `+` has the author form open. */
 	authoring?: boolean;
 	onAuthored?: () => void;
 }
 
 /**
- * The drawer's body: the author form, one template read end to end, or the
+ * The section's body: the author form, one template read end to end, or the
  * two-section list — `Result` over `Prompt`, which is the order a person meets
  * them in (an answer is rendered before a question is asked back).
  */
@@ -152,7 +152,7 @@ export function TemplatesSectionBody({
 			projectionTemplatesApi.remove(username, graphSlug, id),
 		onSuccess: () => {
 			invalidate();
-			// The row it was drilled into is gone, so the drawer goes back to the
+			// The row it was drilled into is gone, so the section goes back to the
 			// list rather than showing a detail for a record that no longer exists.
 			onSelect(null);
 		},
@@ -347,7 +347,7 @@ function TemplateRow({
 }
 
 /**
- * One template, read end to end — `&template=`, inside the drawer (G33).
+ * One template, read end to end — `&template=`, inside the section (G33).
  *
  * It is a **statement of fact**, not a disabled form: a published template is
  * read-only because an answer rendered with it must not change shape after the

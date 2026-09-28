@@ -186,7 +186,7 @@ export function TaskFlowCanvas({
 				className: "!h-[30px]",
 				title,
 				// Read-only (SR52): no undo, edge-routing or erase — which is also
-				// what lets Detail and Settings fit at drawer width.
+				// what lets Detail and Settings fit at section width.
 				center: (
 					<GraphControlsToolbar
 						sections={{

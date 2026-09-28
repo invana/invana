@@ -24,7 +24,7 @@ export function SkillBoardPage({
 	onOpenAgent: (agentId: string) => void;
 	onOpenUsageDashboard: (skillId: string) => void;
 }) {
-	// The same list the drawer reads, so the page and the row never disagree
+	// The same list the section reads, so the page and the row never disagree
 	// about version or draft.
 	const skills = useSkillsQuery(username, graphSlug);
 	const [editing, setEditing] = useState(false);

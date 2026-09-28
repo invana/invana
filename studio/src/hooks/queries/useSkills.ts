@@ -169,7 +169,7 @@ export function useDiscardDraftMutation(
 /**
  * Hand-edit the draft's plan — the correction the prose cannot make.
  *
- * The plan becomes `authored`, so the drawer row's origin badge moves and a
+ * The plan becomes `authored`, so the section row's origin badge moves and a
  * redraw becomes an offer that says what it discards (SK7). The whole subtree
  * is invalidated because the list row carries the plan summary too.
  */
@@ -232,7 +232,7 @@ export function useAnswerClarificationMutation(
 /**
  * Create **and publish** v1, for a surface with no authoring flow of its own.
  *
- * `POST …/skills` leaves a draft, because the drawer's *New skill* opens the
+ * `POST …/skills` leaves a draft, because the section's *New skill* opens the
  * editor and the person publishes when the flow is drawn (SK20). A plain form
  * that says *Skill added* and leaves an unpublished row would be telling the
  * user something that is not true, so it publishes what it just wrote.

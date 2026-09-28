@@ -88,7 +88,7 @@ function sinceCutoff(since: RunsSince): number {
  *
  * The chips narrow here rather than server-side: the endpoint takes `kind` and
  * `agent_id` but not status, role or a date, and one page of fifty is what the
- * drawer reads either way. `total` is the unfiltered count, so the status bar
+ * section reads either way. `total` is the unfiltered count, so the status bar
  * can say `11 of 24 shown`.
  */
 export function useRunsJournalQuery(

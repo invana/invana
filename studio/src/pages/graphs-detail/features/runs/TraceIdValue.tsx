@@ -2,7 +2,7 @@
  * A trace id, as a row value — the first sixteen characters, monospace.
  *
  * Usage: `<TraceIdValue id={run.trace_id} window={{ start, end }} />` wherever
- * a `trace` row is drawn (the run drawer's `The run`, an event's detail). The
+ * a `trace` row is drawn (the run section's `The run`, an event's detail). The
  * window is when the record happened — the collector's view opens on it.
  *
  * When the deployment names its collector's trace view

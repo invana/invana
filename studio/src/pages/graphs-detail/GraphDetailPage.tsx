@@ -337,12 +337,12 @@ export function GraphDetailPage() {
 	// belongs to.
 	const setupOutstanding = hasOutstandingSetup(graphContainer);
 
-	// The Govern panel's own URL keys — `Edit` on a lens board puts the drawer
+	// The Govern panel's own URL keys — `Edit` on a lens board puts the section
 	// back on that lens in one write (WO16).
 	const governPanel = useLensesViewPanel();
 	// **A lens board's tab is named for the lens** — `EU · H1 2026`, never
 	// `World` (WO15): a strip of four tabs all reading `World` is a strip you
-	// have to click through to read. It comes off the list the Govern drawer
+	// have to click through to read. It comes off the list the Govern section
 	// already read, so this costs no request; a name that has not landed yet
 	// falls back to the kind's label rather than to an empty tab.
 	const lenses = useLensesQuery(username, graphSlug);
@@ -367,8 +367,8 @@ export function GraphDetailPage() {
 		[skillsList.data],
 	);
 	// And the plan page for a library plan (LB24): keyed by `task_plans.id`,
-	// titled `key@version`, and opened from the drawer by key — the newest
-	// version, which is the one the drawer reads.
+	// titled `key@version`, and opened from the section by key — the newest
+	// version, which is the one the section reads.
 	const planLibrary = useWorkflowsQuery(username, graphSlug);
 	const planRefById = useMemo(
 		() =>
@@ -464,7 +464,7 @@ export function GraphDetailPage() {
 	// The **declared** boards that are open — a run dashboard, and a step's
 	// (see-what-ran.md SR36). They are pages like any other, keyed
 	// `<kind>:<subject_id>`, so the tab strip carries them beside the canvases
-	// and `More` opens one rather than growing the drawer (SR13 · CV14).
+	// and `More` opens one rather than growing the section (SR13 · CV14).
 	const [boards, setBoards] = useState<OpenBoard[]>([]);
 	const [activeBoardId, setActiveBoardId] = useState<string | null>(null);
 	// `?page=` — the focused declared board, so a link and a reload both land on
@@ -579,7 +579,7 @@ export function GraphDetailPage() {
 	// a link to one is drawn (RU13). Narrower than `openBoard` on purpose: these
 	// three kinds bind to a record and read no trace, so there is no `runId` to
 	// forget (SD3).
-	// **Picking a plan opens its page** (G42 · LB24). The Plans drawer names
+	// **Picking a plan opens its page** (G42 · LB24). The Plans section names
 	// what it drilled into in the URL, so the page follows `&plan=`. Only ever
 	// *opens*: going back to the list clears `&plan=` and leaves the page where
 	// it is — a panel opens a page and never closes one.
@@ -714,7 +714,7 @@ export function GraphDetailPage() {
 	useEffect(() => {
 		// The kind this panel would draw, given what is selected in it.
 		const own: CanvasKind | null =
-			// Projects owns both drawers, so it owns the `plan` canvas whether the
+			// Projects owns both sections, so it owns the `plan` canvas whether the
 			// project or one of its Todos is what was picked (PT7).
 			settingsSection === "projects" && selectedProjectKey
 				? "plan"
@@ -2325,7 +2325,7 @@ export function GraphDetailPage() {
 			// The panel lists; the page acts (MP4). Its selection is the page's
 			// scope, and both are the URL's — so a row picked here reads on the
 			// `models` board beside it. A stack with no panel header above its
-			// drawers (G33 · ME17), so it takes no `onClose`.
+			// sections (G33 · ME17), so it takes no `onClose`.
 			<ModelViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
@@ -2334,9 +2334,9 @@ export function GraphDetailPage() {
 				onShowPage={showModelsPage}
 			/>
 		) : settingsPanel.section === "projects" ? (
-			// **Projects owns Todos** (PT7) — two drawers, `Projects` over `Todos`,
+			// **Projects owns Todos** (PT7) — two sections, `Projects` over `Todos`,
 			// the same stack shape Library takes. With no project drilled into, the
-			// Todos drawer is every Todo in the Graph: the *No project* bucket.
+			// Todos section is every Todo in the Graph: the *No project* bucket.
 			<ProjectsViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
@@ -2351,7 +2351,7 @@ export function GraphDetailPage() {
 					openWorkPanel("agents");
 				}}
 				// A statement on a step row opens the rule's board beside the
-				// drawer, the same way `More` does from Rules (RU11 · RU12).
+				// section, the same way `More` does from Rules (RU11 · RU12).
 				onOpenRule={(ruleId) => openBoard({ kind: "rule", subjectId: ruleId })}
 			/>
 		) : settingsPanel.section === "runs" ? (
@@ -2369,7 +2369,7 @@ export function GraphDetailPage() {
 				onOpenJournal={() =>
 					openBoard({ kind: "runs", subjectId: graphSlug as string })
 				}
-				// The run stays in the drawer; the plan it ran is drawn beside it.
+				// The run stays in the section; the plan it ran is drawn beside it.
 				onOpenPlan={(key) => {
 					setSelectedWorkflowKey(key);
 					setWorkKind("workflow");
@@ -2405,7 +2405,7 @@ export function GraphDetailPage() {
 				onOpenRuleDashboard={(id) => openBoard({ kind: "rule", subjectId: id })}
 			/>
 		) : settingsPanel.section === "govern" ? (
-			// Govern holds Worlds over Guardrails as two drawers of one panel (GV17),
+			// Govern holds Worlds over Guardrails as two sections of one panel (GV17),
 			// with no panel header above them — the same stack shape Library and
 			// Projects take. It opens no canvas: a world is a bound the *other*
 			// panels run inside, so it hangs over whatever is already drawn.
@@ -2413,12 +2413,12 @@ export function GraphDetailPage() {
 				username={username}
 				graphSlug={graphSlug}
 				// A drill-in opens that lens as a page, titled with its own name
-				// (WO15 · GR14) — the drawer keeps the picking reading, the board
+				// (WO15 · GR14) — the section keeps the picking reading, the board
 				// carries the auditing one.
 				onOpenBoard={openLensBoard}
 			/>
 		) : settingsPanel.section === "agents" ? (
-			// Agents holds the agents over the LLMs as two drawers of one panel
+			// Agents holds the agents over the LLMs as two sections of one panel
 			// (PM6 · GV18) — a provider is what an agent's cast resolves against,
 			// so it is read where agents are rather than in a tab of Settings.
 			<AgentsViewPanel
@@ -2767,7 +2767,7 @@ export function GraphDetailPage() {
 							: openStep
 					}
 					// `Retune` — the run stays in `mainSection` while Govern opens
-					// beside it, which is the whole reason the drawer is a stack
+					// beside it, which is the whole reason the section is a stack
 					// (SR12 · worlds.md Journey 2).
 					onRetune={() => settingsPanel.setSection("govern")}
 					// The pair is the subject, and the first half is this run —
@@ -2842,7 +2842,7 @@ export function GraphDetailPage() {
 					kind={board.kind}
 					lensId={board.subjectId}
 					// `Edit` puts the Govern panel back on this lens, drilled in —
-					// the board reads and the acts stay in the drawer (WO16).
+					// the board reads and the acts stay in the section (WO16).
 					onEdit={(kind, lensId) => governPanel.reveal(kind, lensId)}
 				/>
 			);

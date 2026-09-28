@@ -32,7 +32,7 @@ const WINDOW = "models_window";
 export interface ModelsView {
 	/** The model the page reads, or `null` for All models. */
 	scope: string | null;
-	/** The panel is drilled into {@link scope}'s drawers. */
+	/** The panel is drilled into {@link scope}'s sections. */
 	open: boolean;
 	tab: ModelsTab;
 	window: ModelsWindow;

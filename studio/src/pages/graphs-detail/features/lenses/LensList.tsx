@@ -1,8 +1,8 @@
 /**
- * The rows a Govern drawer is made of, and the three states it owes besides
+ * The rows a Govern section is made of, and the three states it owes besides
  * them: loading, failed, and nothing set.
  *
- * Both drawers list the same record — a guardrail and a world are one row
+ * Both sections list the same record — a guardrail and a world are one row
  * separated by `kind` (GV1) — so they list it the same way. What differs is the
  * sentence each shows when the list is empty, which is why that is a prop: *no
  * guardrails* and *no worlds* are different facts about a Graph, and neither is
@@ -22,7 +22,7 @@ export interface LensListProps {
 	error: unknown;
 	selectedId: string | null;
 	onSelect: (id: string) => void;
-	/** What the drawer says when the Graph has none of these. A sentence. */
+	/** What the section says when the Graph has none of these. A sentence. */
 	emptyLine: string;
 	/** What a failure says. The message beneath it is the error's own. */
 	errorTitle: string;

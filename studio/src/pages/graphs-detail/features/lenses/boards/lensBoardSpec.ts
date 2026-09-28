@@ -9,15 +9,15 @@
  * `kind` changes what the page **says** — the crumb, the usage band, whether
  * `Edit` is offered — and nothing about how it is built.
  *
- * **This is the auditing reading, not the drawer widened**
+ * **This is the auditing reading, not the section widened**
  * ([WO15](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
- * The drawer is where a bound is picked, in a 420px column, with the run that
+ * The section is where a bound is picked, in a 420px column, with the run that
  * prompted the narrowing still open beside it. The board is what an auditor is
  * handed: what it narrows, how it has been used, every rule as an addressable
  * row, and the cast resolved against the effective guardrails. Only this one
  * can be **kept** — `Save report` freezes the resolved document
  * ([B6](../../../../../../docs/for-developers/building-engine/boards-migration.md)),
- * and *what was this world when the run happened* is the question a live drawer
+ * and *what was this world when the run happened* is the question a live section
  * cannot answer an hour later.
  *
  * Nothing here fetches and nothing here renders: a composer is a pure function
@@ -45,7 +45,7 @@ import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 export const LENS_ACTIONS = {
 	/** `Dashboard ¦ spec.json`. */
 	view: VIEW_ACTION,
-	/** `Edit` — puts the Govern drawer back on this lens, drilled in (WO16). */
+	/** `Edit` — puts the Govern section back on this lens, drilled in (WO16). */
 	edit: "edit",
 } as const;
 

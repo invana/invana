@@ -59,7 +59,7 @@ export interface ProviderDetailProps {
 	provider: LLMProvider;
 	/** Worlds and guardrails that name each address in their `cast` (PM11). */
 	castBy: CastBy;
-	/** The endpoint is gone — the drawer goes back to the list. */
+	/** The endpoint is gone — the section goes back to the list. */
 	onGone: () => void;
 }
 

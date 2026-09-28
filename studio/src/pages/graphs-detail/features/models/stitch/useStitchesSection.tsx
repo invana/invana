@@ -40,12 +40,12 @@ function HighlightOnMount({
 }
 
 /**
- * One model's stitches, as a drawer in the Model panel's stack, and the dialog
+ * One model's stitches, as a section in the Model panel's stack, and the dialog
  * that declares another (stitch-models.md ST12).
  *
  * The surface is **Stitches**; the record is a link (ST13). A person stitches
  * two models together, and `model_links` is what the engine stores once they
- * have — so the drawer, its header and its copy say stitch, while the wire
+ * have — so the section, its header and its copy say stitch, while the wire
  * format, the routes and the events keep saying link.
  *
  * A link joins **two** models, so this lists every link that touches the one on
@@ -88,7 +88,7 @@ export function useStitchesSection({
 }): {
 	section: PanelStackSection;
 	dialog: ReactNode;
-	/** Opens the declare card from outside the drawer — the panel's own strip. */
+	/** Opens the declare card from outside the section — the panel's own strip. */
 	declare: () => void;
 } {
 	const [declaring, setDeclaring] = useState<LinkKind | null>(null);
@@ -219,7 +219,7 @@ export function useStitchesSection({
 								// stitch resolves on, because that is the thing anyone
 								// reviewing it has to judge.
 								// The rule, the state, and — when something other than
-								// this drawer declared it — where it came from, so a
+								// this section declared it — where it came from, so a
 								// stitch applied from a bundle on the command line is
 								// not an anonymous row nobody remembers making (ST50).
 								subtitle={`${stitchRule(link, sourceModelName(link))} · ${

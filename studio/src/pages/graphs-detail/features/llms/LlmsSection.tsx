@@ -1,10 +1,10 @@
 /**
- * A6 · **LLMs is a drawer of the Agents panel**, not a tab of Graph settings
+ * A6 · **LLMs is a section of the Agents panel**, not a tab of Graph settings
  * ([PM6](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md) ·
  * [GV18](../../../../../docs/for-developers/modules/govern/spec.md)).
  *
  * *As someone reading an agent's cast, I want the endpoints it resolves against
- * one drawer away, so that "which model answers this" and "what is configured"
+ * one section away, so that "which model answers this" and "what is configured"
  * are one reading.*
  *
  * **An endpoint is a group and its models are the rows under it** (PM9). The

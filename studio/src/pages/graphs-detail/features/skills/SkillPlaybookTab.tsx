@@ -90,7 +90,7 @@ export function SkillPlaybookTab({
 	// Publishing is its own route: `POST …/versions` stamps the open draft and
 	// moves the head. `PATCH …/draft` only writes the prose — a *Publish vN*
 	// wired to it saved the text and left the skill a draft for ever, which is
-	// the one act this drawer exists to complete (SK20).
+	// the one act this section exists to complete (SK20).
 	const publish = usePublishSkillVersionMutation(username, graphSlug);
 	const discard = useDiscardDraftMutation(username, graphSlug, skill.id);
 	const draw = useDrawDraftMutation(username, graphSlug, skill.id);

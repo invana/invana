@@ -87,9 +87,9 @@ type TaskTab = "work" | "activity" | "runs";
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** The drawer header's live search string (G33) — this body owns no chrome. */
+	/** The section header's live search string (G33) — this body owns no chrome. */
 	search: string;
-	/** Opens the new-Todo form, which the drawer header's `+` toggles. */
+	/** Opens the new-Todo form, which the section header's `+` toggles. */
 	creating: boolean;
 	onCreating: (v: boolean) => void;
 	selectedTaskId: string | null;

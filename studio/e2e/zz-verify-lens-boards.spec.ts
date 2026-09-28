@@ -11,7 +11,7 @@ const GUARDRAIL = "Airways guardrails";
 test("WO15 — drilling into a world opens a board named for the world", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=govern&drawer=worlds`);
+	await page.goto(`${GRAPH}?panel=govern&section=worlds`);
 	await page.getByRole("button", { name: new RegExp(`^${WORLD}`) }).click();
 
 	// The tab carries the world's own name, never `World`.
@@ -40,7 +40,7 @@ test("WO15 — drilling into a world opens a board named for the world", async (
 test("WO15 — the page id is world:<id>, and a reload lands on it", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=govern&drawer=worlds`);
+	await page.goto(`${GRAPH}?panel=govern&section=worlds`);
 	await page.getByRole("button", { name: new RegExp(`^${WORLD}`) }).click();
 	await expect(page.getByText("The record", { exact: true })).toBeVisible({
 		timeout: 20_000,
@@ -58,7 +58,7 @@ test("WO15 — the page id is world:<id>, and a reload lands on it", async ({
 test("WO15 — a cold link with a drill-in arrives with its board open", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=govern&drawer=worlds`);
+	await page.goto(`${GRAPH}?panel=govern&section=worlds`);
 	await page.getByRole("button", { name: new RegExp(`^${WORLD}`) }).click();
 	await expect(page.getByText("The record", { exact: true })).toBeVisible({
 		timeout: 20_000,
@@ -67,7 +67,7 @@ test("WO15 — a cold link with a drill-in arrives with its board open", async (
 
 	// The drill-in alone — no `?page=`. The board is opened by what is drilled
 	// into, so a shared link lands on both.
-	await page.goto(`${GRAPH}?panel=govern&drawer=worlds&world=${lensId}`);
+	await page.goto(`${GRAPH}?panel=govern&section=worlds&world=${lensId}`);
 	await expect(page.getByRole("tab", { name: new RegExp(WORLD) })).toBeVisible({
 		timeout: 20_000,
 	});
@@ -77,7 +77,7 @@ test("WO15 — a cold link with a drill-in arrives with its board open", async (
 test("GR14 — a guardrail opens the same board, under its own name", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=govern&drawer=guardrails`);
+	await page.goto(`${GRAPH}?panel=govern&section=guardrails`);
 	await page.getByRole("button", { name: new RegExp(`^${GUARDRAIL}`) }).click();
 
 	await expect(
@@ -91,10 +91,10 @@ test("GR14 — a guardrail opens the same board, under its own name", async ({
 	).toBeVisible();
 });
 
-test("WO16 — Edit puts the drawer back on the lens, drilled in", async ({
+test("WO16 — Edit puts the section back on the lens, drilled in", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=govern&drawer=worlds`);
+	await page.goto(`${GRAPH}?panel=govern&section=worlds`);
 	await page.getByRole("button", { name: new RegExp(`^${WORLD}`) }).click();
 	await expect(
 		page.getByRole("button", { name: "Edit", exact: true }),
@@ -103,12 +103,13 @@ test("WO16 — Edit puts the drawer back on the lens, drilled in", async ({
 
 	const url = new URL(page.url());
 	expect(url.searchParams.get("panel")).toBe("govern");
-	expect(url.searchParams.get("drawer")).toBe("worlds");
+	expect(url.searchParams.get("section")).toBe("worlds");
+	expect(url.searchParams.has("drawer")).toBe(false);
 	expect(url.searchParams.get("world")).toBeTruthy();
 });
 
 test("spec.json — the board can show the document it is", async ({ page }) => {
-	await page.goto(`${GRAPH}?panel=govern&drawer=worlds`);
+	await page.goto(`${GRAPH}?panel=govern&section=worlds`);
 	await page.getByRole("button", { name: new RegExp(`^${WORLD}`) }).click();
 	const specTab = page.getByText("spec.json", { exact: true });
 	await expect(specTab).toBeVisible({ timeout: 20_000 });

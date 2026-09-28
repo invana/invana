@@ -32,10 +32,10 @@ flowchart LR
     subgraph Shell["AppLayoutV2"]
         N[leftNav] --> G["Govern<br/>?panel=govern"]
         N --> A["Agents<br/>?panel=agents"]
-        G --> GW["drawer=worlds<br/>WorldsSection"]
-        G --> GG["drawer=guardrails<br/>GuardrailsSection"]
-        A --> AR["drawer=agents<br/>AgentsSection"]
-        A --> AL["drawer=llms<br/>LlmsSection"]
+        G --> GW["section=worlds<br/>WorldsSection"]
+        G --> GG["section=guardrails<br/>GuardrailsSection"]
+        A --> AR["section=agents<br/>AgentsSection"]
+        A --> AL["section=llms<br/>LlmsSection"]
         GW -->|world=id| WD[LensDetail]
         GW -->|world=new| WE[LensEditor]
         GG -->|guardrail=id| GD[LensDetail]
@@ -52,18 +52,18 @@ flowchart LR
 
 | Route | Opens | Artboard |
 |---|---|---|
-| `?panel=govern&drawer=worlds` | the worlds list, guardrails strip locked above it | W1 · W4 |
-| `?panel=govern&drawer=worlds&world=<id>` | the drill-in, header `‹ WORLDS / EU · H1 2026`, **and the board `world:<id>` in `mainSection`** | W2 |
-| `?panel=govern&drawer=worlds&world=new` | the authoring form — the same `LensEditor` the guardrail uses ([WO10](../modules/govern/features/worlds.md)) | W3 |
-| `?panel=govern&drawer=guardrails` | the guardrails in force | G1 |
-| `?panel=govern&drawer=guardrails&guardrail=<id>` | that guardrail's rules, grouped by layer, **and the board `guardrail:<id>`** | G1 |
-| `?panel=govern&drawer=guardrails&guardrail=new` | the same editor, with the rule builder and its live match preview | G2 |
+| `?panel=govern&section=worlds` | the worlds list, guardrails strip locked above it | W1 · W4 |
+| `?panel=govern&section=worlds&world=<id>` | the drill-in, header `‹ WORLDS / EU · H1 2026`, **and the board `world:<id>` in `mainSection`** | W2 |
+| `?panel=govern&section=worlds&world=new` | the authoring form — the same `LensEditor` the guardrail uses ([WO10](../modules/govern/features/worlds.md)) | W3 |
+| `?panel=govern&section=guardrails` | the guardrails in force | G1 |
+| `?panel=govern&section=guardrails&guardrail=<id>` | that guardrail's rules, grouped by layer, **and the board `guardrail:<id>`** | G1 |
+| `?panel=govern&section=guardrails&guardrail=new` | the same editor, with the rule builder and its live match preview | G2 |
 | the composer's world chip, `sessions.lens_id` | which world the session's next question is asked under | W1 |
-| `?panel=agents&drawer=agents` | the agents, the LLMs drawer beneath it | A1 |
-| `?panel=agents&drawer=agents&page=agent:<id>` | the list with the agent selected, **and the page `agent:<id>` in `mainSection`** — five tabs ([AG23](../modules/agents/features/author-an-agent.md#decisions) · [AG34](../modules/agents/features/author-an-agent.md#decisions)). An old `&agent=<id>` link opens the same page and drops the key | A1 · A2 · A4 |
-| `?panel=agents&drawer=llms` | the endpoints, each a group over the models it offers | A6 |
-| `?panel=agents&drawer=llms&provider=<id>` | one endpoint: its fields, its ping, its models | A6 |
-| `?panel=agents&drawer=llms&provider=new` | configuring one — the same drill-in a world's `new` is | A6 |
+| `?panel=agents&section=agents` | the agents, the LLMs drawer beneath it | A1 |
+| `?panel=agents&section=agents&page=agent:<id>` | the list with the agent selected, **and the page `agent:<id>` in `mainSection`** — five tabs ([AG23](../modules/agents/features/author-an-agent.md#decisions) · [AG34](../modules/agents/features/author-an-agent.md#decisions)). An old `&agent=<id>` link opens the same page and drops the key | A1 · A2 · A4 |
+| `?panel=agents&section=llms` | the endpoints, each a group over the models it offers | A6 |
+| `?panel=agents&section=llms&provider=<id>` | one endpoint: its fields, its ping, its models | A6 |
+| `?panel=agents&section=llms&provider=new` | configuring one — the same drill-in a world's `new` is | A6 |
 | `?panel=settings&tab=agents` | the Graph's run ceiling, and its pools busy or quiet | A5 |
 | page `run:<id>` | the layer strip, and *this run's lens* | R1 · R2 |
 | page `compare:<runA>:<runB>` | two runs, side by side, touches diffed | R3 |
@@ -187,7 +187,7 @@ Feature modules under `studio/src/pages/graphs-detail/features/`, following
 | `graph-settings/LLMsPanel.tsx` (733 lines) | **deleted.** `LlmsSection` · `ProviderDetail` · `ProviderForm` replace it, and none of them is a tab of Settings ([PM6](../modules/agents/features/providers-and-models.md)) |
 | `agents/AgentDetail.tsx` | *Bindings → LLM* is *Bounds → Works in*, with the cast read **through** the lens; *Budget*'s five inputs are the ten-row ceilings table |
 | `hooks/queries/useLLMProviders.ts` | a provider holds models; `setDefault` is gone and `addModel` · `removeModel` answer in its place |
-| `shell/useAgentsViewPanel.ts` | new — `?drawer=agents\|llms`, `&agent=`, `&provider=`, the same grammar Govern's two drawers use |
+| `shell/useAgentsViewPanel.ts` | new — `?section=agents\|llms`, `&agent=`, `&provider=`, the same grammar Govern's two drawers use |
 | `shell/useLeftSection.ts` | `agents` is a stack; `llms` is an **alias** onto it rather than a section; and `setSection(s, t)` names a *drawer* where the section is stacked and a *tab* where it is not |
 
 ---

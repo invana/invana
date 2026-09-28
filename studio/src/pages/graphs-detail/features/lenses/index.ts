@@ -1,7 +1,7 @@
 /**
  * Govern — worlds and guardrails, the bounds a Graph runs inside.
  *
- * Its own `leftNav` item holding two drawers (GV17): a guardrail belongs beside
+ * Its own `leftNav` item holding two sections (GV17): a guardrail belongs beside
  * the worlds it bounds, and the two are one record.
  */
 

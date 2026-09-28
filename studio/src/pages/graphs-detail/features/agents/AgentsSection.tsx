@@ -12,7 +12,7 @@
  * the work (AG24). So the row draws its guardrail, not a model id: a list that
  * printed a model would be printing the one thing an agent no longer decides.
  *
- * Three things this drawer is careful about:
+ * Three things this section is careful about:
  *
  * - **Ephemeral agents are hidden, not absent.** A spawned helper exists for
  *   one task and would otherwise grow the list without bound — but it is
@@ -73,7 +73,7 @@ const STATUS_OPTIONS = ["active", "paused", "retired"].map((value) => ({
 	label: value,
 }));
 
-/** What narrows the list — behind the drawer's funnel (AG36). */
+/** What narrows the list — behind the section's funnel (AG36). */
 export interface AgentFilters {
 	kind: string;
 	status: string;
@@ -89,7 +89,7 @@ export const NO_AGENT_FILTERS: AgentFilters = {
 export interface AgentsSectionProps {
 	filters: AgentFilters;
 	onFilters: (next: AgentFilters) => void;
-	/** The rows the list shows, beside the drawer's title. */
+	/** The rows the list shows, beside the section's title. */
 	count?: number;
 	ui: StackSectionUi;
 	username: string;

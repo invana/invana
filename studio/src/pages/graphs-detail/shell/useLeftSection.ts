@@ -1,5 +1,6 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { useSearchParams } from "react-router-dom";
+import { LEGACY_SECTION_PARAM, SECTION_PARAM } from "./useStackSections";
 
 // The left panel is a single-open accordion driven by one `?panel` param.
 // **No value means no left column.** `explorer` is a key like every other, so
@@ -57,14 +58,15 @@ const DEFAULT_SECTION: LeftNavKey = "info";
 export const PANEL_PARAM = "panel";
 export const LEGACY_PANEL_PARAM = "settings";
 
-// A stacked panel's own keys (useStackSections): which drawer holds the height,
+// A stacked panel's own keys (useStackSections): which section holds the height,
 // and what is drilled into inside it (G31 · G35). **Library** (Plans ·
 // Catalogue · Templates) and **Projects** (Projects · Todos) are the two stacks;
-// **Runs** is a list, so it carries `run` and no `drawer` (G33). These are
+// **Runs** is a list, so it carries `run` and no `sectionKey` (G33). These are
 // dropped whenever the section changes, exactly as `?tab=` is — a run left in
 // the URL under a different rail icon names a body that is not on screen.
 export const STACK_PARAMS = [
-	"drawer",
+	SECTION_PARAM,
+	LEGACY_SECTION_PARAM,
 	"run",
 	"plan",
 	"entry",
@@ -79,21 +81,21 @@ export const STACK_PARAMS = [
 
 // Which stack keys belong to which section. A write names one section, so every
 // key that is not that section's is dropped — switching from Runs to Projects
-// must not leave `&run=` behind, and `?drawer=plans` is not a Projects drawer.
+// must not leave `&run=` behind, and `?section=plans` is not a Projects section.
 const STACK_KEYS_OF: Partial<Record<LeftNavKey, readonly string[]>> = {
-	// Runs takes no `?drawer=` — one list, so there is nothing to choose between.
+	// Runs takes no `?section=` — one list, so there is nothing to choose between.
 	runs: ["run"],
-	library: ["drawer", "plan", "entry", "template"],
-	projects: ["drawer", "project", "todo"],
+	library: [SECTION_PARAM, "plan", "entry", "template"],
+	projects: [SECTION_PARAM, "project", "todo"],
 	// **Govern** is the third stack — Worlds over Guardrails (GV17). Both keys
 	// name a `Lens` id, because a guardrail and a world are one record separated
 	// by `kind` (GV1); they are two keys because reading the ceiling is not
 	// reading the world drawn inside it.
-	govern: ["drawer", "world", "guardrail"],
+	govern: [SECTION_PARAM, "world", "guardrail"],
 	// **Agents** is the fourth stack — Agents over the LLMs
 	// (PM6 · GV18). `agent` is an agent's own surface, `provider` one
 	// configured endpoint and the models it offers.
-	agents: ["drawer", "agent", "provider"],
+	agents: [SECTION_PARAM, "agent", "provider"],
 };
 
 // A panel whose content is itself tabbed says which tab through `?tab=`. Only
@@ -145,7 +147,7 @@ const ALIASES: Partial<Record<string, LeftNavKey>> = {
 	schema: "model",
 	// The providers left Graph settings: a provider is what an agent's cast
 	// resolves against, so it is read where agents are (PM6 · GV18). The old key
-	// lands on the panel that holds them, whose LLMs drawer is one click down.
+	// lands on the panel that holds them, whose LLMs section is one click down.
 	llms: "agents",
 	// Stitching moved into the Model panel and the union became a page
 	// (stitch-models.md · Surfaces). A bookmark lands on the panel that now
@@ -215,15 +217,19 @@ export function useLeftSection() {
 			next.set(PANEL_PARAM, s);
 			next.delete(LEGACY_PANEL_PARAM);
 			const keep = STACK_KEYS_OF[s] ?? [];
-			// **A stacked panel has drawers, not tabs.** The second argument names
+			// **A stacked panel has sections, not tabs.** The second argument names
 			// whichever that section has, so one call — `setSection("agents",
-			// "llms")` — sends the setup step to the drawer that holds the field it
+			// "llms")` — sends the setup step to the section that holds the field it
 			// is asking for, exactly as it sends it to a tab of Settings.
-			const stacked = keep.includes("drawer");
+			const stacked = keep.includes(SECTION_PARAM);
 			next.delete(TAB_PARAM);
 			if (t && !stacked) next.set(TAB_PARAM, t);
+			const legacy = next.get(LEGACY_SECTION_PARAM);
+			if (stacked && legacy && !next.has(SECTION_PARAM)) {
+				next.set(SECTION_PARAM, legacy);
+			}
 			for (const p of STACK_PARAMS) if (!keep.includes(p)) next.delete(p);
-			if (t && stacked) next.set("drawer", t);
+			if (t && stacked) next.set(SECTION_PARAM, t);
 			setParams(next, { replace: true });
 		},
 		[params, setParams],

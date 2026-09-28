@@ -237,7 +237,7 @@ export interface DeclaredKindSpec {
 	renders: "dashboard";
 	label: string;
 	icon: ElementType;
-	/** Which drawer opens it. */
+	/** Which section opens it. */
 	panel: string;
 	/** What `subject_id` names — the record every panel binds to. */
 	subject: string;
@@ -322,7 +322,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Compare",
 		icon: GitCompareArrows,
-		// `Compare…` in the Worlds drawer, or the run dashboard's lens band.
+		// `Compare…` in the Worlds section, or the run dashboard's lens band.
 		panel: "govern",
 		subject: 'two root task_runs.id joined by ":"',
 	},
@@ -335,7 +335,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Skill",
 		icon: Scale,
-		// `Open` on the Skills drawer's selected row (SK37).
+		// `Open` on the Skills section's selected row (SK37).
 		panel: "skills",
 		subject: "a skills.id",
 	},
@@ -347,7 +347,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Usage",
 		icon: TrendingUp,
-		// `Usage…` on the skill board, or `More` on the drawer's Usage tab.
+		// `Usage…` on the skill board, or `More` on the section's Usage tab.
 		panel: "skills",
 		subject: "a skills.id",
 	},
@@ -356,7 +356,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Rule",
 		icon: Quote,
-		// `More` on the Rules drawer, drilled in (RU11).
+		// `More` on the Rules section, drilled in (RU11).
 		panel: "skills",
 		subject: "a rules.id",
 	},
@@ -393,7 +393,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Agent",
 		icon: Bot,
-		// `Open` on the Agents drawer; the list stays beside it.
+		// `Open` on the Agents section; the list stays beside it.
 		panel: "agents",
 		subject: "an agents.id",
 	},

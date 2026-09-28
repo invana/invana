@@ -115,7 +115,7 @@ export interface LensListResponse {
 	/**
 	 * `graph_members.can_edit_guardrails` for whoever asked (GV22) — the one
 	 * field-level permission in the product. It rides on this list because the
-	 * drawer reads the list exactly once; a second request would let the bound
+	 * section reads the list exactly once; a second request would let the bound
 	 * and the right to edit it arrive at different moments.
 	 *
 	 * **The rules render for everyone either way** (GR5). This decides whether

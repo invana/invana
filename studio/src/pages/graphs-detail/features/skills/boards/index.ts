@@ -5,7 +5,7 @@
  * This file is the border ([code-shape §4.1](../../../../../../docs/for-developers/building-studio/code-shape.md)):
  * the page host imports the page bodies and nothing else from here, and the
  * composers and the shared vocabulary stay inside. `skill:<id>` is the skill's
- * page, not a board (SK36) — `SkillBoardPage`, beside the drawer.
+ * page, not a board (SK36) — `SkillBoardPage`, beside the section.
  */
 
 export { UsageBoardPage } from "@/pages/graphs-detail/features/skills/boards/UsageBoardPage";

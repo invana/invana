@@ -7,7 +7,7 @@
  * a threat model
  * (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
  *
- * **The drawer's chrome is the drawer's** (G43). This body is the list, or —
+ * **The section's chrome is the section's** (G43). This body is the list, or —
  * drilled in — the one record, and nothing else: the header carries the trail,
  * the search, the filter and the acts, and the status bar belongs to the panel.
  *
@@ -70,7 +70,7 @@ const slugOf = (layer: SkillLayer): Layer => layerSlug(layer);
  * border — four boxed cards in a 420px column read as four containers stacked
  * in a fifth, and the panel already has chrome of its own. `Eyebrow` is the
  * kit's smallest heading for exactly this, and several of them in one column
- * stay subordinate to the drawer's header the way the artboard draws them.
+ * stay subordinate to the section's header the way the artboard draws them.
  */
 function Band({
 	title,
@@ -101,9 +101,9 @@ export const PLAN_KINDS = ["nl", "ql"] as const;
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** The drawer header's live search string (G33) — this body owns no chrome. */
+	/** The section header's live search string (G33) — this body owns no chrome. */
 	search: string;
-	/** The drawer funnel's filters (G33). The body reads them, never owns them. */
+	/** The section funnel's filters (G33). The body reads them, never owns them. */
 	kindFilter: string;
 	sourceFilter: string;
 	selectedKey: string | null;
@@ -111,7 +111,7 @@ interface Props {
 	/** The step selected on the DAG — the panel's detail swaps to it (D1). */
 	selectedStepId: string | null;
 	/**
-	 * Promoting is the list's one write, and its control is the drawer's header
+	 * Promoting is the list's one write, and its control is the section's header
 	 * action — so the flag is the panel's, and this only draws the dialog (G43).
 	 */
 	promoting: boolean;
@@ -145,7 +145,7 @@ export function PlansSectionBody({
 	const step = detail.data?.nodes.find((n) => n.id === selectedStepId) ?? null;
 
 	// **Drilled in, the body is the record** (G43). The list is not drawn under
-	// it, and neither is the list's footer: the drawer header already reads
+	// it, and neither is the list's footer: the section header already reads
 	// `‹ PLANS / nl-single`, and repeating the nine rows beneath the one that was
 	// asked for is what made the detail the last thing in a scrolling column.
 	if (selectedKey) {
@@ -289,7 +289,7 @@ function TaskPlanDetailBlock({
 		// and a hairline under every band turns four labels into four boxes
 		// without borders on three sides.
 		<div className="flex min-w-0 flex-col">
-			{/* **The record names itself first.** The drawer's trail says the key
+			{/* **The record names itself first.** The section's trail says the key
 			    and nothing else; the version and the fact that it is published are
 			    what a reader has to know before reading a single row under them —
 			    a published version is immutable (LB1), so *which one am I reading*

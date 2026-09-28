@@ -26,7 +26,7 @@ export interface Skill {
 	updated_at: string;
 	/** `builtin` ships with Invana: editable, re-seeded by name, never deleted (SK25). */
 	origin: string;
-	/** Never published — nothing is offered it, and the drawer says so (SK21). */
+	/** Never published — nothing is offered it, and the section says so (SK21). */
 	is_draft: boolean;
 	/** An unpublished row waiting to be published, head or no head. */
 	draft_version_id: string | null;
@@ -69,7 +69,7 @@ export type SkillLayer =
 	| "human"
 	| "agent";
 
-/** What the drawer row and the Flow tab's badge need without a second call. */
+/** What the section row and the Flow tab's badge need without a second call. */
 export interface SkillPlanSummary {
 	plan_id: string;
 	/** `generated` when the planner drew it, `authored` after a hand-edit (SK7). */
@@ -227,7 +227,7 @@ export interface SkillDraft {
 	 * a run that died. The next draw that writes rows clears it.
 	 */
 	refusal: SkillDrawRefusal | null;
-	/** What a hand-edit may name — the catalogue, in the drawer's words (SK28). */
+	/** What a hand-edit may name — the catalogue, in the section's words (SK28). */
 	vocabulary: SkillStepChoice[];
 }
 

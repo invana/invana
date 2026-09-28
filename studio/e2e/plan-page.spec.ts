@@ -10,7 +10,7 @@ import { type Page, expect, test } from "@playwright/test";
 const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 
 async function openPlan(page: Page, key: string) {
-	await page.goto(`${GRAPH}?panel=library&drawer=plans`);
+	await page.goto(`${GRAPH}?panel=library&section=plans`);
 	const row = page.getByRole("button", { name: new RegExp(`^${key}`) }).first();
 	await expect(row).toBeVisible({ timeout: 30_000 });
 	await row.click();

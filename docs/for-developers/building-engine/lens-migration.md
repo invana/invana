@@ -176,7 +176,7 @@ is cut before it leaves.
 | New feature dir | `studio/src/pages/graphs-detail/features/govern/` |
 | Contributes | one `GraphFeature` — a `leftSection` component, no page kinds ([govern/spec.md §5](../modules/govern/spec.md)) |
 | Panel | a stack: `Worlds` · `Guardrails` |
-| URL | `?panel=govern&drawer=worlds\|guardrails`, drill-in `&world=` ([G31](../building-studio/graph-detail-page.md)) |
+| URL | `?panel=govern&section=worlds\|guardrails`, drill-in `&world=` ([G31](../building-studio/graph-detail-page.md)) |
 | Artboards | `GovWorlds` · `GovWorld` · `GovGuardrails` · `GovCompare` |
 
 **The world chip goes in the session's composer**, and the world is stored on the session; a run
@@ -218,7 +218,7 @@ Two things, and they are independent of each other.
 ## What to settle before the first route is written
 
 **Route versus `?panel=`.** [code-shape §5.2](../building-studio/code-shape.md) settles it in favour
-of the query string — a plan is `?panel=library&drawer=plans&plan=<key>` and a path to it is not
+of the query string — a plan is `?panel=library&section=plans&plan=<key>` and a path to it is not
 offered. The route map in that file names the same sections for the router's sake. **Read that
 before touching `router.tsx`.**
 

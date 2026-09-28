@@ -8,10 +8,10 @@
  *
  * It **leads the stack**, and carries the ceiling with it: the guardrails are a
  * locked strip at the top of the list (W4), so every world is read as *narrower
- * than this* rather than as the whole bound. The Guardrails drawer below is
+ * than this* rather than as the whole bound. The Guardrails section below is
  * where those rules are read in full (GV17).
  *
- * **Authoring opens inside the drawer, not over it.** `&world=new` is the
+ * **Authoring opens inside the section, not over it.** `&world=new` is the
  * drill-in like any other, so the ceiling stays a scroll away and the run that
  * prompted the narrowing stays open in `mainSection` — which is the property
  * Journey 2 exists to protect.
@@ -50,7 +50,7 @@ export interface WorldsSectionProps {
 	 * and it is absent on a surface with no page host.
 	 */
 	onOpenBoard?: (id: string) => void;
-	/** Give the Guardrails drawer the height — the strip's one control. */
+	/** Give the Guardrails section the height — the strip's one control. */
 	onReadGuardrails: () => void;
 	/** Whether the promote control is drawn at all (GV22 · GR5). */
 	mayEditGuardrails: boolean;
@@ -113,7 +113,7 @@ export function worldsSection({
 							},
 						]
 					: undefined,
-			// The one thing this drawer creates, in the drawer that owns it (G3).
+			// The one thing this section creates, in the section that owns it (G3).
 			headerActions: [
 				{
 					key: "new",
@@ -171,7 +171,7 @@ export function worldsSection({
 						{/* The strip shows even when there are no worlds (W1's empty
 						    seam): what is in force does not depend on anyone having
 						    written a world. It is absent only when the Graph has no
-						    guardrail at all, which the Guardrails drawer states in a
+						    guardrail at all, which the Guardrails section states in a
 						    sentence of its own. */}
 						{guardrails.length ? (
 							<div className="px-3 pt-2">

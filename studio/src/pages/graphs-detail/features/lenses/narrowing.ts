@@ -1,7 +1,7 @@
 /**
- * What a lens narrows, as the drawer states it.
+ * What a lens narrows, as the section states it.
  *
- * This mirrors `invana govern list` exactly — the CLI and the drawer are two
+ * This mirrors `invana govern list` exactly — the CLI and the section are two
  * readings of one record, and a world that reads `4 allow · sliced · closes
  * graph_data` in a terminal must not read as something else on screen.
  */

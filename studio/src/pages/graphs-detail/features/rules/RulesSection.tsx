@@ -1,5 +1,5 @@
 /**
- * Rules — the second drawer of the Skills stack (G33).
+ * Rules — the second section of the Skills stack (G33).
  *
  * **The statement is the row.** A rule is one sentence that is always true in
  * its scope, so the row shows the sentence itself and puts kind, scope and how

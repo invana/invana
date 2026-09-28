@@ -1,36 +1,36 @@
 /**
- * **Govern** — one rail icon, one panel, two drawers (GV17 · G32 · G33).
+ * **Govern** — one rail icon, one panel, two sections (GV17 · G32 · G33).
  *
  * `Worlds` over `Guardrails`, stacked, with no panel header above them: the
- * first drawer header is the top of the column, and the breadcrumb already says
+ * first section header is the top of the column, and the breadcrumb already says
  * which panel is open (G16).
  *
  * **Worlds leads and carries the ceiling with it.** A person arrives at Govern
  * to see which world a question can go under, so that list is on top; the
  * guardrails ride above it as a locked strip (W4), which states what is in
- * force without spending a drawer's height on one or two rows. The Guardrails
- * drawer below is where those rules are read in full (G1), and the strip's one
+ * force without spending a section's height on one or two rows. The Guardrails
+ * section below is where those rules are read in full (G1), and the strip's one
  * control is the way down to it.
  *
  * **One query, split by `kind`.** A guardrail and a world are one record
- * separated by `kind` (GV1), so both drawers read one list rather than two
+ * separated by `kind` (GV1), so both sections read one list rather than two
  * endpoints — a second fetch would be the second enforcement path this module
  * exists not to have. The same response carries `may_edit_guardrails`, which is
  * why the permission never lands at a different moment from the rules it
  * governs.
  *
- * **The panel owns the write.** Both drawers author the same record through the
+ * **The panel owns the write.** Both sections author the same record through the
  * same two mutations, and the guardrail save is the one that has to ask what it
  * would cost first (GR2) — so the impact dialog lives here, above both, rather
- * than inside the drawer that raised it.
+ * than inside the section that raised it.
  *
  * It opens no canvas. A world is the bound the *other* panels run inside, so it
  * hangs over whatever is already drawn.
  *
- * **A drill-in opens the record's board beside the drawer**
+ * **A drill-in opens the record's board beside the section**
  * ([WO15](../../../../../docs/for-developers/modules/govern/features/worlds.md) ·
  * [GR14](../../../../../docs/for-developers/modules/govern/features/guardrails.md)),
- * titled with the lens's own name. The drawer stays the **picking** reading —
+ * titled with the lens's own name. The section stays the **picking** reading —
  * 420px of rules, with the run that prompted the narrowing still open — and the
  * board is the **auditing** one, which is the reading `Save report` can keep.
  */
@@ -49,7 +49,7 @@ import {
 } from "@/pages/graphs-detail/features/lenses/WorldsSection";
 import { useStackSectionUi } from "@/pages/graphs-detail/shared/StackSection";
 import {
-	type GovernDrawer,
+	type GovernSectionKey,
 	useLensesViewPanel,
 } from "@/pages/graphs-detail/shell/useLensesViewPanel";
 import { ApiError } from "@/services/api/client";
@@ -63,7 +63,7 @@ export interface LensesViewPanelProps {
 	graphSlug?: string;
 	/**
 	 * Open this lens as a page — `world:<id>` or `guardrail:<id>` (WO15 · GR14).
-	 * Absent on a surface with no page host, and then a drill-in is the drawer
+	 * Absent on a surface with no page host, and then a drill-in is the section
 	 * alone rather than a control that fails.
 	 */
 	onOpenBoard?: (kind: LensKind, lensId: string) => void;
@@ -165,34 +165,34 @@ export function LensesViewPanel({
 		});
 	};
 
-	// The drawer named by `?drawer=` opens with more of the column, and the other
+	// The section named by `?section=` opens with more of the column, and the other
 	// keeps enough to read its list. `PanelStack` reads `defaultSize` at
 	// **mount**, so this is the opening split only (G35) — after that it is the
 	// reader's.
 	//
 	// **A Graph has one or two guardrails and several worlds**, so the split is
 	// not even: an even one spends half the column on a single row.
-	const size = (d: GovernDrawer) =>
+	const size = (d: GovernSectionKey) =>
 		d === "worlds"
-			? govern.drawer === "worlds"
+			? govern.sectionKey === "worlds"
 				? "75%"
 				: "55%"
-			: govern.drawer === "guardrails"
+			: govern.sectionKey === "guardrails"
 				? "45%"
 				: "25%";
 
-	// A drill-in expands the drawer holding it — the URL now names something to
+	// A drill-in expands the section holding it — the URL now names something to
 	// look at, and rendering it into a section that was collapsed makes the click
 	// look like it did nothing (G35).
 	const stackRef = useRef<PanelStackHandle>(null);
 	const focused =
-		govern.drawer === "worlds" ? govern.worldId : govern.guardrailId;
+		govern.sectionKey === "worlds" ? govern.worldId : govern.guardrailId;
 	// `focused` is a trigger, not a value: the effect re-runs when the drill-in
 	// moves but never reads it.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: see above.
 	useEffect(() => {
-		stackRef.current?.expand(govern.drawer);
-	}, [govern.drawer, focused]);
+		stackRef.current?.expand(govern.sectionKey);
+	}, [govern.sectionKey, focused]);
 
 	// **What is drilled into is what is on the board** (WO15 · GR14).
 	//
@@ -216,12 +216,12 @@ export function LensesViewPanel({
 	const openedLens = useRef<string | null>(null);
 	useEffect(() => {
 		if (!onOpenBoard) return;
-		const kind = govern.drawer === "worlds" ? "world" : "guardrail";
+		const kind = govern.sectionKey === "worlds" ? "world" : "guardrail";
 		const lens = focused && focused !== NEW_LENS ? `${kind}:${focused}` : null;
 		if (openedLens.current === lens) return;
 		openedLens.current = lens;
 		if (focused && lens) onOpenBoard(kind, focused);
-	}, [govern.drawer, focused, onOpenBoard]);
+	}, [govern.sectionKey, focused, onOpenBoard]);
 
 	return (
 		<>

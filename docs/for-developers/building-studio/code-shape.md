@@ -321,18 +321,18 @@ cannot be linked to a colleague.
 ```
 
 **`?panel=` is the vocabulary inside the graph page; these are its routes' names, not a second
-scheme.** A panel is reached as `?panel=<name>`, its open drawer as `&drawer=<name>`, and the record
+scheme.** A panel is reached as `?panel=<name>`, its open drawer as `&section=<name>`, and the record
 drilled into by a key named for the record ([G31](graph-detail-page.md)). The paths above name the
 same sections for the router's sake — they do **not** give a plan two spellings.
 
 | Why the query string wins | |
 |---|---|
 | The breadcrumb reads the URL back **literally** ([G16](graph-detail-page.md)) | `owner › graph › panel › object` is the query string's shape, not a path's |
-| One key per region, and the occupant is its value | `?panel=` · `?page=` · `?right=` · `?drawer=` · `?tab=` already describe **every** region this way. A path for one of them would be the exception that needs explaining |
+| One key per region, and the occupant is its value | `?panel=` · `?page=` · `?right=` · `?section=` · `?tab=` already describe **every** region this way. A path for one of them would be the exception that needs explaining |
 | `mainSection` is `keepMounted` and holds several pages at once | a path names one thing; the region holds many, so `?page=` is the only honest spelling |
 | A deep link must survive a panel switch | dropping `&plan=` when `?panel=` moves ([G35](graph-detail-page.md)) is a query-string operation |
 
-**So a plan is `?panel=library&drawer=plans&plan=nl-single@4`, and nothing else.** A path to it is not
+**So a plan is `?panel=library&section=plans&plan=nl-single@4`, and nothing else.** A path to it is not
 offered, not redirected and not kept working.
 
 **Retired names, deleted not redirected** (G31): `datasets` · `tasks` · `workflows` · `imports` ·
