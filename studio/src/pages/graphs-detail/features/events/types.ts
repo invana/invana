@@ -10,9 +10,9 @@
  * row carries a null `actor` (the actor is not a user), so every agent's
  * event read as a deleted user.
  */
-export type ActorKind = "user" | "agent" | "system" | "external" | "anonymous";
+type ActorKind = "user" | "agent" | "system" | "external" | "anonymous";
 
-export interface ActorRef {
+interface ActorRef {
 	id: string;
 	username: string;
 	display_name: string;
@@ -54,11 +54,4 @@ export interface EventListFilters {
 	actions?: string[];
 	since?: string;
 	until?: string;
-}
-
-/** SSE frame payload (matches `iter_frames` in engine/src/invana/events/notify.py). */
-export interface EventStreamFrame {
-	id: string;
-	graph_id: string | null;
-	created_at: string;
 }

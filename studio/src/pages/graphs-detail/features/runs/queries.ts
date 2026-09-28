@@ -3,7 +3,7 @@ import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
 
 /** What a journal row is, whatever kind of work produced it. */
-export type RunKind = "import" | "bulk" | "ask";
+type RunKind = "import" | "bulk" | "ask";
 
 export interface RunListRow {
 	id: string;

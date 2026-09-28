@@ -60,13 +60,7 @@ export type CanvasKind =
 	| "plan"
 	| "workflow"
 	| "envelope"
-	| "lineage";
-
-/** What a click on a node does. */
-export type ClickBehaviour =
-	| "select" // highlights, and the panel's detail block states the fact
-	| "navigate" // opens a different panel — the node is not of this panel's kind
-	| "inert"; // nothing to show, and nowhere to go
+	| "lineage"; // nothing to show, and nowhere to go
 
 export interface CanvasKindSpec {
 	kind: CanvasKind;
@@ -169,30 +163,6 @@ export const CANVAS_KINDS: Record<CanvasKind, CanvasKindSpec> = {
 		footer: "TRACE",
 	},
 };
-
-/** A kind the tabs bar does not know falls back to pan/zoom/select. */
-export function specFor(kind: string | undefined): CanvasKindSpec {
-	return CANVAS_KINDS[(kind ?? "data") as CanvasKind] ?? CANVAS_KINDS.data;
-}
-
-/**
- * What a click on one node should do.
- *
- * Five kinds are unambiguous, because every node is the same kind of thing as
- * the rows in the open panel. `lineage` breaks that — its nodes are agents,
- * people and tasks — so it is the one kind with a per-node branch (docs/for-developers/modules/agents/features/lineage.md):
- * an *agent* selects into the agents list, a *task* navigates to Tasks, a *person*
- * is inert because MVP has no person surface.
- */
-export function clickBehaviour(
-	kind: CanvasKind,
-	nodeKind?: string,
-): ClickBehaviour {
-	if (kind !== "lineage") return "select";
-	if (nodeKind === "agent") return "select";
-	if (nodeKind === "task") return "navigate";
-	return "inert";
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Declared kinds — the boards that are not drawn
@@ -486,12 +456,6 @@ export function parseBoardPageId(pageId: string): BoardPageId | null {
 				id: rest.slice(0, mark),
 				versionId: rest.slice(mark + 1),
 			};
-}
-
-/** Whether a page id names a board that is drawn rather than declared. */
-export function isDrawnPage(pageId: string): boolean {
-	const page = parseBoardPageId(pageId);
-	return page ? BOARD_KINDS[page.kind].renders === "canvas" : false;
 }
 
 /** The kind and subject behind a page id, for a kind that is declared. */

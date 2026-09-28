@@ -3,7 +3,6 @@ import type { TaskFlowTemplates } from "@/canvases/taskflow/types";
 import settingsJson from "./settings.json";
 import templatesJson from "./templates.json";
 
-export type { TaskFlowCanvasProps } from "@/canvases/taskflow/TaskFlowCanvas";
 export { TaskFlowCanvas } from "@/canvases/taskflow/TaskFlowCanvas";
 export * from "@/canvases/taskflow/types";
 

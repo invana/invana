@@ -37,7 +37,7 @@ import { Table, TableBody, TableCell, TableRow } from "@invana/ui";
 type Enforcement = "admission" | "validation" | "drawn" | "unread";
 
 /** What a number limits — how hard it tries, what it spends, how wide it spreads. */
-export type CeilingGroup = "effort" | "budget" | "reach";
+type CeilingGroup = "effort" | "budget" | "reach";
 
 interface Ceiling {
 	key: string;

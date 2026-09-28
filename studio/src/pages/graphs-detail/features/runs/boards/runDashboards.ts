@@ -20,7 +20,7 @@ import type {
 } from "@/pages/graphs-detail/features/runs/api";
 
 /** A run that has not settled — the Gantt grows a now line, Cancel is offered. */
-export const LIVE_STATUSES: ReadonlySet<string> = new Set([
+const LIVE_STATUSES: ReadonlySet<string> = new Set([
 	"queued",
 	"running",
 	"run",
@@ -57,7 +57,7 @@ export function toneOf(status: string): StatusDotProps["tone"] {
 }
 
 /** The chip/panel tone vocabulary, which has no `queued`. */
-export function chipToneOf(status: string): Tone | undefined {
+function chipToneOf(status: string): Tone | undefined {
 	const tone = toneOf(status);
 	return tone === "queued" || tone == null ? undefined : tone;
 }
@@ -240,12 +240,4 @@ export function groupSteps(steps: TraceStepRead[]): TaskGroup[] {
 			attempts: Math.max(...ordered.map((s) => s.attempt)),
 		};
 	});
-}
-
-/** Find the group one of its rows belongs to — how `‹ ›` and a flow click land. */
-export function groupOf(
-	groups: TaskGroup[],
-	stepId: string,
-): TaskGroup | undefined {
-	return groups.find((g) => g.steps.some((s) => s.id === stepId));
 }

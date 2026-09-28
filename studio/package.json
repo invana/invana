@@ -9,7 +9,7 @@
 		"preview": "vite preview",
 		"lint": "biome check . && node scripts/check-names.mjs",
 		"check-names": "node scripts/check-names.mjs",
-		"knip": "knip --include files",
+		"knip": "knip --include files,exports,types",
 		"format": "biome format --write .",
 		"check-types": "tsc -b --noEmit",
 		"test": "vitest run",

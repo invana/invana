@@ -5,7 +5,7 @@
 // `GraphConnection` child. URLs: /u/{owner_username}/{slug}.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type GraphContainerStatus = "active" | "archived";
+type GraphContainerStatus = "active" | "archived";
 
 export interface SetupSectionState {
 	/** Whether the thing the step asks for exists. The engine reads this off the
@@ -32,7 +32,7 @@ export interface SetupSectionState {
 	broken?: string | null;
 }
 
-export type SetupState = Partial<Record<SetupSection, SetupSectionState>>;
+type SetupState = Partial<Record<SetupSection, SetupSectionState>>;
 
 export interface Graph {
 	id: string;
@@ -121,7 +121,7 @@ export type SetupSection =
 	| "skills";
 
 /** In the order they are drawn. */
-export const SETUP_SECTIONS: readonly SetupSection[] = [
+const SETUP_SECTIONS: readonly SetupSection[] = [
 	"graph_info",
 	"model",
 	"datasets",
@@ -144,7 +144,7 @@ export const SETUP_SKIPPABLE: readonly SetupSection[] = [
  *  unlocks, so a surface waits on the one it needs rather than on all of them. */
 export type SetupGate = "connected" | "grounded" | "answering";
 
-export const SETUP_GATES: readonly {
+const SETUP_GATES: readonly {
 	gate: SetupGate;
 	sections: readonly SetupSection[];
 }[] = [
@@ -220,11 +220,7 @@ export function missingForGate(graph: Graph, gate: SetupGate): SetupSection[] {
 // auth) and runtime health. Edited via /u/:username/:graphSlug/connection.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type GraphConnectionStatus =
-	| "CONNECTING"
-	| "ACTIVE"
-	| "ERROR"
-	| "INACTIVE";
+type GraphConnectionStatus = "CONNECTING" | "ACTIVE" | "ERROR" | "INACTIVE";
 
 export const CONNECTOR_OPTIONS = [
 	{ label: "Neo4j", value: "invana_neo4j.connector.Neo4jConnector" },
@@ -246,8 +242,6 @@ export const CONNECTOR_OPTIONS = [
 		value: "invana_tinkergraph.connector.TinkerGraphConnector",
 	},
 ] as const;
-
-export type ConnectorClass = (typeof CONNECTOR_OPTIONS)[number]["value"];
 
 // "cypher" | "gremlin" — the subset of capabilities Studio's query-language
 // selector understands. Empty/missing means "no constraint reported"; UI
@@ -288,11 +282,7 @@ export interface GraphConnectionRead {
 }
 
 // How the detected/declared DB version relates to the connector's tested window.
-export type CompatibilityStatus =
-	| "supported"
-	| "untested"
-	| "unsupported"
-	| "unknown";
+type CompatibilityStatus = "supported" | "untested" | "unsupported" | "unknown";
 
 export interface GraphConnectionCreate {
 	uri: string;

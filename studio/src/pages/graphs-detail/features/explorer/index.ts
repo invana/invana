@@ -16,7 +16,6 @@ export { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
 // Query results as canvas items, and a saved state as the engine reads it.
 export {
 	adaptItems,
-	expandRefusal,
 	isCanvasStateSnapshot,
 	resultToItems,
 } from "@/pages/graphs-detail/features/explorer/canvasItems";
@@ -27,10 +26,8 @@ export type {
 	ExpandMenuSchema,
 } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
 export {
-	ACTIVE_LAYOUT_ID,
 	ExplorerCanvas,
 	ExplorerHeaderToolbar,
-	HIDDEN_STATE_NAME,
 } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
 export { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer/ExplorerViewPanel";
 export { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer/InspectorViewPanel";
@@ -42,21 +39,10 @@ export { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/quer
 export type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer/StylingPanel";
 export { StylingPanel } from "@/pages/graphs-detail/features/explorer/StylingPanel";
 // Engine adapters — PixiJS needs concrete values, not classes.
-export {
-	slotForType,
-	typeColorNumber,
-	typeDotColor,
-} from "@/pages/graphs-detail/features/explorer/typeColor";
+export { slotForType } from "@/pages/graphs-detail/features/explorer/typeColor";
 export type {
 	ExpandRequest,
 	NeighborExpandResponse,
 	TypeCountsResponse,
 } from "@/pages/graphs-detail/features/explorer/types";
 export { useCanvasExpand } from "@/pages/graphs-detail/features/explorer/useCanvasExpand";
-export { useExpandNode } from "@/pages/graphs-detail/features/explorer/useExpandNode";
-export {
-	hiddenNodeTypes,
-	isNodeHidden,
-	setNodeHidden,
-	setNodeTypeHidden,
-} from "@/pages/graphs-detail/features/explorer/visibility";

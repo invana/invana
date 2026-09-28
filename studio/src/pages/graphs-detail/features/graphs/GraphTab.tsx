@@ -30,8 +30,8 @@ import type {
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /** The tabs, in strip order. `?tab=` carries the open one. */
-export const SETTINGS_TABS = ["basic", "graph", "agents"] as const;
-export type SettingsTab = (typeof SETTINGS_TABS)[number];
+const SETTINGS_TABS = ["basic", "graph", "agents"] as const;
+type SettingsTab = (typeof SETTINGS_TABS)[number];
 
 interface Props {
 	username: string;

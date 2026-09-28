@@ -16,9 +16,6 @@ export interface SkillFlowOptions {
 	empty?: { title: string; description: string };
 }
 
-/** The registry entry this panel registers under, for the spec's type argument. */
-export type WithSkillFlow = { skillFlow: SkillFlowOptions };
-
 export function SkillFlowWidget({
 	options,
 }: PanelRendererProps<SkillFlowOptions>) {

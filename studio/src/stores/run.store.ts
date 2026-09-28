@@ -223,8 +223,3 @@ export const useRunStore = create<RunState>((set) => ({
 			return { views: rest };
 		}),
 }));
-
-/** Steps of the queued plan a run shows before its stream arrives. */
-export function seedSteps(steps: RunNode[]): RunNode[] {
-	return [...steps].sort((a, b) => a.seq - b.seq || a.attempt - b.attempt);
-}

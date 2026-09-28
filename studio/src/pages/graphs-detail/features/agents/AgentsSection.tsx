@@ -53,7 +53,6 @@ import type {
 	AgentEdge,
 } from "@/pages/graphs-detail/features/agents/types";
 import {
-	AgentChipRow,
 	DetailBlock,
 	DetailProse,
 	DetailStatus,
@@ -480,5 +479,3 @@ function EdgeDetail({
 		</DetailBlock>
 	);
 }
-
-export { AgentChipRow };

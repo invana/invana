@@ -75,7 +75,7 @@ export interface LensDraft {
 	as_of: string | null;
 }
 
-export function draftOf(lens?: Lens | null): LensDraft {
+function draftOf(lens?: Lens | null): LensDraft {
 	return {
 		name: lens?.name ?? "",
 		rules: lens?.rules ? structuredClone(lens.rules) : [],

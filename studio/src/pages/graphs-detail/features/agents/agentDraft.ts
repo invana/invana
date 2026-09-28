@@ -110,7 +110,7 @@ export function voiceSummary(traits: SoulTraits): string {
 	].join(" · ");
 }
 
-export const EFFORT_WORDS: { key: string; word: string }[] = [
+const EFFORT_WORDS: { key: string; word: string }[] = [
 	{ key: "max_steps", word: "steps" },
 	{ key: "max_replans", word: "replans" },
 	{ key: "max_clarifications", word: "questions" },

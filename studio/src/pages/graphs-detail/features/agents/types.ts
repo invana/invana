@@ -7,11 +7,11 @@
 
 // ── Agents ───────────────────────────────────────────────────────────────────
 
-export type AgentKind = "seeded" | "authored" | "spawned";
+type AgentKind = "seeded" | "authored" | "spawned";
 
-export type AgentStatus = "active" | "paused" | "retired";
+type AgentStatus = "active" | "paused" | "retired";
 
-export type AgentLifetime = "persistent" | "ephemeral";
+type AgentLifetime = "persistent" | "ephemeral";
 
 export interface Agent {
 	id: string;
@@ -94,7 +94,7 @@ export type AgentUpdate = Partial<
 	Omit<AgentCreate, "envelope_from" | "skill_ids">
 >;
 
-export type EffortKey = "max_steps" | "max_replans" | "max_clarifications";
+type EffortKey = "max_steps" | "max_replans" | "max_clarifications";
 
 /** The four voice dials (author-an-agent § Voice dials). */
 export interface SoulTraits {
@@ -179,7 +179,7 @@ export interface SoulPreview {
 }
 
 /** A lineage node. Heterogeneous by design — docs/for-developers/modules/agents/features/lineage.md */
-export interface AgentNode {
+interface AgentNode {
 	id: string;
 	kind: "agent" | "user" | "task";
 	label: string;

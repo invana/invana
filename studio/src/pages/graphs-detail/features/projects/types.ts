@@ -55,7 +55,7 @@ export interface ProjectAssignment {
 
 // ── Tasks ────────────────────────────────────────────────────────────────────
 
-export type TodoStatus =
+type TodoStatus =
 	| "open"
 	| "assigned"
 	| "in_progress"

@@ -29,8 +29,6 @@ const FALLBACK_HUES = [
 	0xe34948,
 ] as const;
 
-export const HUE_COUNT = FALLBACK_HUES.length;
-
 /**
  * A model's slot in the palette, `1`–`8`, by its name — so a model keeps its
  * hue when another is added, deleted or the list is re-sorted (GM7).
@@ -120,7 +118,7 @@ const ROW_HEIGHT = 22;
  * name, `key` when a stitch keys on it, type. The story writes these out per
  * type; here the rows come from the type's own properties (GM6).
  */
-export function schemaCard(name: string, d: ModelTypeData) {
+function schemaCard(name: string, d: ModelTypeData) {
 	const hueLookup = { bind: "data.hue", map: {} };
 	const rows = d.properties.flatMap((p, i) => {
 		const y = ROWS_TOP + i * ROW_HEIGHT;

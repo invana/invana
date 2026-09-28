@@ -84,7 +84,7 @@ export const RUN_ACTIONS = {
 } as const;
 
 /** The run page's tabs, in order (SR71). */
-export const RUN_TABS = ["overview", "layers", "flow", "touched"] as const;
+const RUN_TABS = ["overview", "layers", "flow", "touched"] as const;
 export type RunTab = (typeof RUN_TABS)[number];
 
 export interface RunBoardView {

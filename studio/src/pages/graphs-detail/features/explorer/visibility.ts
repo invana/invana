@@ -17,7 +17,7 @@ import type { GraphStore } from "@invana/graph";
 import { HIDDEN_STATE_NAME } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
 
 /** Is this node currently hidden on the canvas? */
-export function isNodeHidden(store: GraphStore, id: string): boolean {
+function isNodeHidden(store: GraphStore, id: string): boolean {
 	return store.hasNodeState(id, HIDDEN_STATE_NAME);
 }
 

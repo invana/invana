@@ -76,18 +76,8 @@ export function useUpdateCanvasMutation(username: string, graphSlug: string) {
 	});
 }
 
-export function useDeleteCanvasMutation(username: string, graphSlug: string) {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: (id: string) => boardsApi.remove(username, graphSlug, id),
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: canvasesKey(username, graphSlug) });
-		},
-	});
-}
-
 const STATES_KEY = ["canvasStates"] as const;
-export const canvasStatesKey = (
+const canvasStatesKey = (
 	username: string,
 	graphSlug: string,
 	boardId: string,

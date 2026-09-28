@@ -15,12 +15,12 @@ import {
 import type { PanelRendererProps } from "@invana/dashboard";
 import { formatElapsed } from "@/lib/time";
 
-export interface DailyRunsOptions {
+interface DailyRunsOptions {
 	days: { label: string; served: number; failed: number }[];
 	ticks: number[];
 }
 
-export interface PlanTrendOptions {
+interface PlanTrendOptions {
 	/** Work p50 a day, in ms; `null` on a day nothing ran. */
 	values: (number | null)[];
 	labels: string[];
@@ -34,9 +34,7 @@ export type PlanChartWidgets = {
 };
 
 /** **Runs a day** — served and failed stacked on one count axis. */
-export function DailyRunsWidget({
-	options,
-}: PanelRendererProps<DailyRunsOptions>) {
+function DailyRunsWidget({ options }: PanelRendererProps<DailyRunsOptions>) {
 	const top = Math.max(1, ...options.days.map((d) => d.served + d.failed));
 	return (
 		<StackedBarChartV
@@ -59,9 +57,7 @@ export function DailyRunsWidget({
  * **Work p50, a day** — its own chart, never a second axis on the runs chart,
  * with each version's publish marked.
  */
-export function PlanTrendWidget({
-	options,
-}: PanelRendererProps<PlanTrendOptions>) {
+function PlanTrendWidget({ options }: PanelRendererProps<PlanTrendOptions>) {
 	const top = Math.max(1, ...options.values.map((v) => v ?? 0));
 	return (
 		<LineChart

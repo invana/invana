@@ -1,7 +1,7 @@
 /** Shared auth + graph membership types. Must mirror engine schemas (docs/for-developers/modules/identity-and-access/spec.md).
  *  Membership is binary (docs/for-developers/modules/identity-and-access/features/membership.md) — there is no per-graph role. */
 
-export interface GraphMembership {
+interface GraphMembership {
 	graph_id: string;
 	graph_name: string;
 	graph_slug: string;
@@ -18,7 +18,7 @@ export interface ThemeSelection {
 }
 
 /** Open per-user UI-preferences bag returned by the engine. */
-export interface UserPreferences {
+interface UserPreferences {
 	theme?: ThemeSelection;
 	[key: string]: unknown;
 }

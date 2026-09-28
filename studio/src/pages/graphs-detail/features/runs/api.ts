@@ -26,7 +26,6 @@ import type { OfferedRule } from "@/pages/graphs-detail/features/skills";
 import { API_BASE_URL, request } from "@/services/api/client";
 import { recordStreamReconnect } from "@/services/telemetry/metrics";
 import { type Interaction, withTraceparent } from "@/services/telemetry/tracer";
-import type { QueryResponse } from "@/types/query";
 
 // ── Wire DTOs ────────────────────────────────────────────────────────────────
 
@@ -128,7 +127,7 @@ const base = (username: string, graphSlug: string) =>
 	`/api/v1/u/${username}/${graphSlug}/runs`;
 
 // Every kind the runtime emits — `EventSource` needs a listener per event name.
-export const EMISSION_KINDS = [
+const EMISSION_KINDS = [
 	"run.started",
 	"step.started",
 	"step.progress",
@@ -148,7 +147,7 @@ export const EMISSION_KINDS = [
 	"run.cancelled",
 ] as const;
 
-export const TERMINAL_KINDS: ReadonlySet<string> = new Set([
+const TERMINAL_KINDS: ReadonlySet<string> = new Set([
 	"run.done",
 	"run.cancelled",
 	"clarification.requested",
@@ -306,8 +305,6 @@ export function messageFromFrame(
 		runId: (p.run_id as string | null) ?? undefined,
 	};
 }
-
-export type { QueryResponse };
 
 // ── Emissions and the trace (the-answer-surface.md · reasoning-trace.md) ─────
 
@@ -548,7 +545,7 @@ export interface TraceStepRead {
  * Either half may be `null`: a bound nobody set has no meter, and a meter
  * against a ceiling that does not exist is the thing [SR20] warns about.
  */
-export interface RunBudget {
+interface RunBudget {
 	max_tokens: number | null;
 	max_cost_usd: number | null;
 	max_cost_usd_run?: number | null;

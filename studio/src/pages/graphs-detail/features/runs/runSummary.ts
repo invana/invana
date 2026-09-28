@@ -57,7 +57,7 @@ export interface RunSummary {
 }
 
 /** `template:nl-query@5` → `nl-query@5`; a generated plan says so. */
-export function planOf(trace: TraceRead): string {
+function planOf(trace: TraceRead): string {
 	const origin = trace.plan_origin ?? "";
 	if (origin.startsWith("template:")) return origin.slice("template:".length);
 	if (origin === "generated") return `${trace.workflow_key} · planned`;

@@ -71,7 +71,7 @@ import type {
 } from "@/canvases/model/types";
 import { useStudioCanvasTheme } from "@/canvases/theme";
 
-export const MODEL_LAYER_ID = "graph";
+const MODEL_LAYER_ID = "graph";
 const FIT = { fitCamera: { padding: 60 } };
 /** The one layout every modeller canvas runs (GM3). */
 const LAYOUT = "elk";
@@ -105,7 +105,7 @@ export interface GraphModelCanvasProps {
  * The stitch gesture (GM12): the Stitch tool in the header toolbar arms a drag
  * from one type to another, and the declare card docks on the right.
  */
-export interface GraphModelStitching {
+interface GraphModelStitching {
 	/**
 	 * A drag landed on `targetId` from `sourceId` — node ids. Return the reason
 	 * it is refused, which the message bar says; `null` accepts it, and the host

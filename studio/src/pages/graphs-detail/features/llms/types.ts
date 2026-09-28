@@ -87,13 +87,13 @@ export const LLM_PROVIDER_OPTIONS: ReadonlyArray<{
 ];
 
 /** Whether this endpoint still offers the model (PM11). */
-export type LLMModelStatus = "active" | "removed";
+type LLMModelStatus = "active" | "removed";
 
 /**
  * What the **shipped cast** reads, and nothing a vendor merely states (PM12).
  * A model added without ranks is never auto-cast, so the section asks for them.
  */
-export interface LLMModelCapabilities {
+interface LLMModelCapabilities {
 	context_window?: number | null;
 	supports_tools?: boolean;
 	embedding?: boolean;
@@ -102,7 +102,7 @@ export interface LLMModelCapabilities {
 	local?: boolean;
 }
 
-export interface LLMModelPricing {
+interface LLMModelPricing {
 	input_per_mtok?: number;
 	output_per_mtok?: number;
 }

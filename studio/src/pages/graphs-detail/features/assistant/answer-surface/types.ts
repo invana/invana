@@ -20,7 +20,7 @@ export type EmissionKind =
 	| "empty";
 
 /** The projection template that chose the rendering, when one did (AS9). */
-export interface EmissionTemplate {
+interface EmissionTemplate {
 	id?: string;
 	name: string;
 	version: number;
@@ -43,7 +43,7 @@ export interface TemplateOffer {
 }
 
 /** What the emission was produced from — the query, and how many records. */
-export interface EmissionCitation {
+interface EmissionCitation {
 	recordCount: number;
 	queryId?: string;
 	/** The query itself, verbatim and copyable (RT2). */
@@ -91,7 +91,7 @@ export interface EmptyEmission {
 	statement: string;
 }
 
-export type EmissionBody =
+type EmissionBody =
 	| TableEmission
 	| SubgraphEmission
 	| MetricEmission

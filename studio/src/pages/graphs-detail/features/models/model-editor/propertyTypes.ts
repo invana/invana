@@ -8,7 +8,7 @@
 // the modeller renders the connection's backend+version-resolved
 // `supported_property_types` (docs/for-developers/modules/graph-connectors/features/capabilities.md). This is the always-safe universal +
 // semantic-overlay subset that every backend can store.
-export const FALLBACK_PROPERTY_TYPE_OPTIONS = [
+const FALLBACK_PROPERTY_TYPE_OPTIONS = [
 	"string",
 	"integer",
 	"float",

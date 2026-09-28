@@ -93,7 +93,7 @@ const DEBUG = import.meta.env.VITE_TELEMETRY_DEBUG === "true";
 const SAMPLE_RATIO = sampleRatio(import.meta.env.VITE_TELEMETRY_SAMPLE_RATIO);
 
 /** Tracer name shared with ./tracer's span helpers. */
-export const SERVICE_NAME = "invana-studio";
+const SERVICE_NAME = "invana-studio";
 
 /** Full URL of the engine's browser-span proxy (docs/for-developers/modules/platform/features/telemetry.md). */
 const TRACES_URL = `${API_BASE_URL}/api/v1/telemetry/traces`;

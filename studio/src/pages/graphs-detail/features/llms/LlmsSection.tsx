@@ -39,14 +39,14 @@ import {
 } from "@/pages/graphs-detail/shared/StackSection";
 
 /** `&provider=new` is the authoring drill-in — a value, not a second param. */
-export const NEW_PROVIDER = "new";
+const NEW_PROVIDER = "new";
 
 /**
  * Which worlds name each address in their `cast`, read off the one lens list
  * the Govern panel already fetches — never a counter, which can disagree with
  * the rows it counts.
  */
-export function castByAddress(lenses: Lens[]): Map<string, string[]> {
+function castByAddress(lenses: Lens[]): Map<string, string[]> {
 	const out = new Map<string, string[]>();
 	for (const lens of lenses) {
 		for (const address of Object.values(lens.cast ?? {})) {

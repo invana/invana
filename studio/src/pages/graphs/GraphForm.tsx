@@ -18,7 +18,7 @@ import { FormError } from "@/components/forms/FormError";
 import type { GraphConnectionCreate } from "@/pages/graphs-detail/features/graphs";
 import { CONNECTOR_OPTIONS } from "@/pages/graphs-detail/features/graphs";
 
-export interface GraphFormValues {
+interface GraphFormValues {
 	uri: string;
 	connector_class: string;
 	/** Which database on the server to read. Blank = the connector's default (docs/for-developers/modules/connect-and-model/features/connect-a-database.md CD8). */

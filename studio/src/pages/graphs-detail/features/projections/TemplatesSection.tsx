@@ -29,8 +29,8 @@ import {
 } from "@/pages/graphs-detail/shared/StackSection";
 
 /** `kind` and `surface` — the two columns this list is narrowed on (§3a). */
-export const TEMPLATE_KINDS = ["result", "prompt"] as const;
-export const TEMPLATE_SURFACES = [
+const TEMPLATE_KINDS = ["result", "prompt"] as const;
+const TEMPLATE_SURFACES = [
 	"table",
 	"metric",
 	"chart",

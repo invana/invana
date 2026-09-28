@@ -13,10 +13,7 @@ import { useStackSections } from "@/pages/graphs-detail/shared/useStackSections"
 // names an endpoint or from a refusal that says none is configured.
 export type AgentsSectionKey = "agents" | "llms";
 
-export const AGENTS_SECTION_KEYS: readonly AgentsSectionKey[] = [
-	"agents",
-	"llms",
-];
+const AGENTS_SECTION_KEYS: readonly AgentsSectionKey[] = ["agents", "llms"];
 
 // One key per section, named for the record rather than for the section, so a
 // link says what it opens. `agent` is read only — an old link to the drill-in

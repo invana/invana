@@ -8,11 +8,7 @@
  * this folder reaches past this file.
  */
 export { ModelViewPanel } from "@/pages/graphs-detail/features/models/model-editor/ModelViewPanel";
-export type {
-	ModelEditCtx,
-	ModelSelection,
-	SelectedItem,
-} from "@/pages/graphs-detail/features/models/model-editor/types";
+export type { ModelSelection } from "@/pages/graphs-detail/features/models/model-editor/types";
 export { ModelsPage } from "@/pages/graphs-detail/features/models/model-page/ModelsPage";
 export { useModelsView } from "@/pages/graphs-detail/features/models/model-page/useModelsView";
 

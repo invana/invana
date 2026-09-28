@@ -35,7 +35,7 @@ export type EgressClass =
 	| "everything";
 
 /** A slice along the axes the matched model declared. */
-export interface RuleSelect {
+interface RuleSelect {
 	time?: { axis: string; from?: string; to?: string };
 	geo?: { axis: string; vocab?: string; in: string[] };
 	dims?: Record<string, string[]>;
@@ -57,7 +57,7 @@ export interface GovernRule {
 	options?: Record<string, unknown>;
 }
 
-export interface LensUsage {
+interface LensUsage {
 	runs: number;
 	last_used_at: string | null;
 	actor_ids: string[];
@@ -99,7 +99,7 @@ export interface Lens {
 }
 
 /** One role, after *innermost wins* and then the check against the rules. */
-export interface CastResolution {
+interface CastResolution {
 	role: CastRole;
 	address: string | null;
 	allowed: boolean;
@@ -176,7 +176,7 @@ export interface Refusal {
 	recourse: string | null;
 }
 
-export interface Warning {
+interface Warning {
 	code: string;
 	rule: string;
 	message: string;
@@ -189,7 +189,7 @@ export interface ValidationResponse {
 }
 
 /** What one world would lose if a guardrail were saved as proposed. */
-export interface WorldImpact {
+interface WorldImpact {
 	lens_id: string;
 	name: string;
 	loses: string[];
@@ -203,7 +203,7 @@ export interface ImpactResponse {
 	worlds: WorldImpact[];
 }
 
-export type TouchDirection = "out" | "in" | "refused" | "skipped";
+type TouchDirection = "out" | "in" | "refused" | "skipped";
 
 /** One engagement, projected from the ledger and carrying its `seq` (GV20). */
 export interface Touch {
@@ -287,7 +287,7 @@ export type AppliedField = keyof AppliedNarrowing;
  * claiming a narrowing that named nothing. A narrowing written against the
  * grounding version itself is filed under `*`.
  */
-export interface AppliedNarrowing {
+interface AppliedNarrowing {
 	/** The authored model versions whose rules reached this read (GV33). */
 	models?: string[];
 	/** `{ [typeName]: RuleSelect }` — the slice the connector composed. */

@@ -112,7 +112,7 @@ interface Props {
 	onTabChange?: (tab: ProjectTab) => void;
 }
 
-export type ProjectTab = "tasks" | "plan" | "activity" | "details";
+type ProjectTab = "tasks" | "plan" | "activity" | "details";
 
 export function ProjectsSectionBody({
 	username,

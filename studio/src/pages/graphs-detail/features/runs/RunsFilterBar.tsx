@@ -21,8 +21,8 @@ import type {
 	RunsSince,
 } from "@/pages/graphs-detail/features/runs/queries";
 
-export const RUN_KINDS = ["nl", "ql", "import", "bulk"] as const;
-export const RUN_STATUSES = [
+const RUN_KINDS = ["nl", "ql", "import", "bulk"] as const;
+const RUN_STATUSES = [
 	"queued",
 	"running",
 	"awaiting_approval",
@@ -31,8 +31,8 @@ export const RUN_STATUSES = [
 	"failed",
 	"cancelled",
 ] as const;
-export const RUN_ROLES = ["execute", "plan", "evaluate"] as const;
-export const RUN_SINCE: { value: RunsSince; label: string }[] = [
+const RUN_ROLES = ["execute", "plan", "evaluate"] as const;
+const RUN_SINCE: { value: RunsSince; label: string }[] = [
 	{ value: "today", label: "today" },
 	{ value: "7d", label: "7 days" },
 	{ value: "30d", label: "30 days" },

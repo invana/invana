@@ -81,7 +81,7 @@ const LAYOUT_ID = "work-layered";
  * The same status vocabulary the panels use, so a task drawn on the plan and the
  * same task listed beside it cannot disagree about what colour it is.
  */
-export type LayeredTone = Tone;
+type LayeredTone = Tone;
 
 export interface LayeredNode {
 	id: string;

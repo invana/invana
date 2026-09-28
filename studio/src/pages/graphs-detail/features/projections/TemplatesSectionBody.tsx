@@ -61,7 +61,7 @@ const RESULT_SURFACES = [
 	"markdown",
 ] as const;
 
-export const templatesKey = (username: string, graphSlug: string) =>
+const templatesKey = (username: string, graphSlug: string) =>
 	["projection-templates", username, graphSlug] as const;
 
 function useTemplatesQuery(username: string, graphSlug: string) {

@@ -45,10 +45,10 @@ import type { ElementType, ReactNode } from "react";
 import { useState } from "react";
 
 // Sort is the same two-way toggle everywhere the engine lists entities.
-export type ListSort = "updated" | "created";
+type ListSort = "updated" | "created";
 
 // A single header icon-button, matching TabbedPanel's `rightNavItems` shape.
-export interface ListHeaderAction {
+interface ListHeaderAction {
 	key: string;
 	name: string;
 	icon: ElementType;

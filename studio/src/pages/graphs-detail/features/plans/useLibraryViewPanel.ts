@@ -18,7 +18,7 @@ import { useStackSections } from "@/pages/graphs-detail/shared/useStackSections"
 // deleted, not redirected (G31).
 export type LibrarySectionKey = "plans" | "catalogue" | "templates";
 
-export const LIBRARY_SECTION_KEYS: readonly LibrarySectionKey[] = [
+const LIBRARY_SECTION_KEYS: readonly LibrarySectionKey[] = [
 	"plans",
 	"catalogue",
 	"templates",

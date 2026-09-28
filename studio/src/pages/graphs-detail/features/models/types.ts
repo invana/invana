@@ -1,11 +1,11 @@
 // Graph models (modeller; docs/for-developers/modules/connect-and-model/features/domain-models.md). Response shapes for the version tree
 // (node/edge types, property keys, constraints, indexes) live in ./schemas.
 
-export type VersionStatus = "draft" | "active" | "archived";
+type VersionStatus = "draft" | "active" | "archived";
 
 // How a model came to exist. `introspected` = the read-only system "global" model
 // mirroring the physical DB; `studio` = authored in the Modeller; `yaml` = YAML-managed.
-export type ModelOrigin = "studio" | "yaml" | "introspected";
+type ModelOrigin = "studio" | "yaml" | "introspected";
 
 export interface VersionSummary {
 	id: string;
@@ -66,7 +66,7 @@ export interface VersionActivate {
 	version?: string | null;
 }
 
-export interface ValidationRuleCreate {
+interface ValidationRuleCreate {
 	rule_type:
 		| "range"
 		| "pattern"
@@ -145,7 +145,7 @@ export interface PropertyKeyUpdate {
 	validation_rules?: ValidationRuleCreate[];
 }
 
-export type ConstraintType =
+type ConstraintType =
 	| "unique"
 	| "exists"
 	| "node_key"
@@ -160,7 +160,7 @@ export interface ConstraintCreate {
 	properties: string[];
 }
 
-export type IndexType =
+type IndexType =
 	| "range"
 	| "composite"
 	| "fulltext"
@@ -183,15 +183,15 @@ export interface IndexCreate {
 // between the draft and the version it replaces, which is why it survives a
 // reload and reads the same to everyone who opens the model.
 
-export type StagedOp = "added" | "removed" | "modified";
-export type StagedKind =
+type StagedOp = "added" | "removed" | "modified";
+type StagedKind =
 	| "node_type"
 	| "edge_type"
 	| "property_key"
 	| "constraint"
 	| "index";
 
-export interface StagedChange {
+interface StagedChange {
 	id: string;
 	op: StagedOp;
 	kind: StagedKind;
@@ -213,7 +213,7 @@ export interface StagedSet {
 }
 
 /** One operation a projection would push (the-model-page.md MP20). */
-export interface ProjectionOperation {
+interface ProjectionOperation {
 	action: "create_index" | "create_constraint";
 	name: string;
 	label: string;
@@ -258,7 +258,7 @@ export interface ModelArtefact {
 }
 
 /** A property type the bound database cannot hold — named, never dropped (SM4). */
-export interface UnsupportedPropertyType {
+interface UnsupportedPropertyType {
 	property_key: string;
 	type: string;
 }
@@ -304,7 +304,7 @@ export interface StarterSummary {
 
 export type LinkKind = "anchor" | "relationship";
 /** A stitch is declared staged and reaches the union on a commit (ST21). */
-export type LinkStatus = "staged" | "active";
+type LinkStatus = "staged" | "active";
 export type IdentityMatch = "exact" | "case_insensitive";
 
 export interface ModelLink {
@@ -403,7 +403,7 @@ export interface GlobalModel {
 // ── Insights — the model page's measured tabs (the-model-page.md MP33) ─────
 
 export type InsightsWindow = "7d" | "30d" | "90d";
-export type WriteSource = "introspect" | "import" | "stitch_commit";
+type WriteSource = "introspect" | "import" | "stitch_commit";
 
 export interface WrittenBy {
 	source: WriteSource;
@@ -411,7 +411,7 @@ export interface WrittenBy {
 	at: string;
 }
 
-export interface GrowthSeries {
+interface GrowthSeries {
 	key: string;
 	name: string;
 	kind: "model" | "node" | "edge";
@@ -463,7 +463,7 @@ export interface Signal {
 	why: string;
 }
 
-export interface DayValue {
+interface DayValue {
 	label: string;
 	value: number | null;
 }
@@ -587,7 +587,7 @@ export interface ShapeCard {
 
 // ── Validation Rules ───────────────────────────────────────────────────────
 
-export interface ValidationRuleResponse {
+interface ValidationRuleResponse {
 	id: string;
 	rule_type:
 		| "range"

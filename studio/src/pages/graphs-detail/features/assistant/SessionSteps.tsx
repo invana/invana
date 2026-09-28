@@ -47,7 +47,7 @@ export function totalDuration(steps: RunNode[]): number {
 	}, 0);
 }
 
-export function isLiveStep(s: RunNode): boolean {
+function isLiveStep(s: RunNode): boolean {
 	return s.status === "running";
 }
 

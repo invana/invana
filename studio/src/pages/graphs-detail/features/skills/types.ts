@@ -70,7 +70,7 @@ export type SkillLayer =
 	| "agent";
 
 /** What the section row and the Flow tab's badge need without a second call. */
-export interface SkillPlaybookSummary {
+interface SkillPlaybookSummary {
 	plan_id: string;
 	/** `generated` when the planner drew it, `authored` after a hand-edit (SK7). */
 	origin: string;
@@ -98,7 +98,7 @@ export interface SkillPlaybookNode {
 	source_plan_key: string | null;
 }
 
-export interface SkillPlaybookEdge {
+interface SkillPlaybookEdge {
 	source: string;
 	target: string;
 	/** `order` · `binding` */
@@ -157,7 +157,7 @@ export interface InlinablePlanListResponse {
 // ── the draft, and the question it is waiting on ────────────────────────────
 
 /** One reading the planner offered, naming the step it would write. */
-export interface SkillClarificationOption {
+interface SkillClarificationOption {
 	step_key: string;
 	label: string;
 	why: string;
@@ -316,7 +316,7 @@ export interface SkillVersionPublish {
 	when_to_use?: string;
 }
 
-export interface SkillVersionFieldDiff {
+interface SkillVersionFieldDiff {
 	field: string;
 	changed: boolean;
 	/** Unified diff lines, computed by the engine so every surface agrees. */
@@ -346,7 +346,7 @@ export interface SkillUsageVersion {
 	enough_to_read: boolean;
 }
 
-export interface SkillUsageByAgent {
+interface SkillUsageByAgent {
 	agent_id: string | null;
 	agent_name: string | null;
 	offered: number;
@@ -355,7 +355,7 @@ export interface SkillUsageByAgent {
 	enough_to_read: boolean;
 }
 
-export interface SkillUsageByOutcome {
+interface SkillUsageByOutcome {
 	/** The **run's** outcome — answered · cannot_answer · failed · cancelled. */
 	outcome: string | null;
 	offered: number;
@@ -364,7 +364,7 @@ export interface SkillUsageByOutcome {
 	enough_to_read: boolean;
 }
 
-export interface SkillUsageStep {
+interface SkillUsageStep {
 	run_id: string | null;
 	step_id: string;
 	label: string;
@@ -442,7 +442,7 @@ export interface RuleListResponse {
 	inherited: Rule[];
 }
 
-export interface RuleVersion {
+interface RuleVersion {
 	id: string;
 	rule_id: string;
 	version: number;
@@ -456,7 +456,7 @@ export interface RuleVersionListResponse {
 	total: number;
 }
 
-export interface RuleCitation {
+interface RuleCitation {
 	run_id: string | null;
 	step_id: string;
 	label: string;
@@ -475,7 +475,7 @@ export interface RuleCitation {
  * newest-first window, and a total taken from a page is a different number
  * wearing the same label (RU10).
  */
-export interface RuleVersionCitations {
+interface RuleVersionCitations {
 	rule_version_id: string;
 	version: number;
 	statement: string;

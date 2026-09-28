@@ -129,7 +129,7 @@ function EmissionBody({ emission }: { emission: Emission }) {
 	}
 }
 
-export function AnswerEmission({
+function AnswerEmission({
 	emission,
 	className,
 	onSwitchTemplate,

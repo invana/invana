@@ -26,7 +26,7 @@ import {
 // below it is where those rules are read in full (G1).
 export type GovernSectionKey = "worlds" | "guardrails";
 
-export const GOVERN_SECTION_KEYS: readonly GovernSectionKey[] = [
+const GOVERN_SECTION_KEYS: readonly GovernSectionKey[] = [
 	"worlds",
 	"guardrails",
 ];

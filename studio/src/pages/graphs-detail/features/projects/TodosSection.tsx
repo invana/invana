@@ -54,7 +54,6 @@ import type {
 import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 import {
 	DetailBlock,
-	DetailPlaceholder,
 	DetailProse,
 	DetailStatus,
 } from "@/pages/graphs-detail/shared/DetailRows";
@@ -756,5 +755,3 @@ function ResultBlock({ task }: { task: Todo }) {
 		</div>
 	);
 }
-
-export { DetailPlaceholder };

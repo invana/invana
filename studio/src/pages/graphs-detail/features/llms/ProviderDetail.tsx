@@ -51,7 +51,7 @@ export function providerLabel(provider: LLMProvider): string {
 }
 
 /** Which worlds cast an address — `address → names`, read off the lens list. */
-export type CastBy = Map<string, string[]>;
+type CastBy = Map<string, string[]>;
 
 export interface ProviderDetailProps {
 	username: string;

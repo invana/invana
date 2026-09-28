@@ -20,7 +20,7 @@ import type {
  * a reader is checking for, and a band that vanished when empty would be
  * indistinguishable from one that failed to load.
  */
-export interface TaskPlanLayer {
+interface TaskPlanLayer {
 	layer: SkillLayer;
 	declared: boolean;
 	steps: number;
@@ -74,7 +74,7 @@ export interface TaskPlanSummary {
 	caller_count: number;
 }
 
-export interface TaskPlanStepSpec {
+interface TaskPlanStepSpec {
 	id: string;
 	task: string;
 	label: string;
@@ -103,7 +103,7 @@ export interface TaskPlanDagNode extends TaskPlanStepSpec {
 	pinned_by: AgentChip[];
 }
 
-export interface TaskPlanDagEdge {
+interface TaskPlanDagEdge {
 	source: string;
 	target: string;
 	/** `order` = required sequence; `binding` = this step consumes that output. */
@@ -233,14 +233,14 @@ export interface TaskPlanListResponse {
 
 // ── Catalogue (the-catalogue.md 7.6) ────────────────────────────────────────
 
-export interface CatalogueArg {
+interface CatalogueArg {
 	name: string;
 	type: string;
 	required: boolean;
 	default: unknown;
 }
 
-export interface CatalogueOutput {
+interface CatalogueOutput {
 	name: string;
 	type: string;
 	/** How lanes roll up on a fan-out; `null` — per lane only (C3). */

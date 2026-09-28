@@ -11,7 +11,6 @@ export type {
 	ApiTaskRunStep,
 	ProjectionTemplateRead,
 	RunStreamHandle,
-	TraceRead,
 	TraceStepRead,
 } from "@/pages/graphs-detail/features/runs/api";
 export {

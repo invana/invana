@@ -89,7 +89,7 @@ export const stitchRule = (link: ModelLink, sourceModel?: string): string => {
 		: "rows that ship with its records";
 };
 
-export const frameIdOf = (modelId: string): string => `model:${modelId}`;
+const frameIdOf = (modelId: string): string => `model:${modelId}`;
 export const memberIdOf = (modelId: string, typeName: string): string =>
 	`${modelId}::${typeName}`;
 

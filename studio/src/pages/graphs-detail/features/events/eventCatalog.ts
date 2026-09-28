@@ -7,7 +7,7 @@
  * API's repeatable `action` query param.
  */
 
-export interface EventType {
+interface EventType {
 	/** Exact `action` string as stored on the event row. */
 	action: string;
 	/** Short human label shown in the picker. */
@@ -160,13 +160,3 @@ export const EVENT_CATEGORIES: EventCategory[] = [
 		],
 	},
 ];
-
-/** All known event-type action strings, flattened. */
-export const ALL_EVENT_TYPES: string[] = EVENT_CATEGORIES.flatMap((c) =>
-	c.types.map((t) => t.action),
-);
-
-/** Friendly label for a category key (falls back to the key itself). */
-export function categoryLabel(key: string): string {
-	return EVENT_CATEGORIES.find((c) => c.key === key)?.label ?? key;
-}

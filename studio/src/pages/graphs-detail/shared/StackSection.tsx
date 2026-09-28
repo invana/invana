@@ -31,7 +31,7 @@ import { ChevronLeft, Filter, Search } from "lucide-react";
 import type { ElementType, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-export interface StackSectionUiState {
+interface StackSectionUiState {
 	searchOpen: boolean;
 	search: string;
 	filterOpen: boolean;

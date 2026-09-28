@@ -39,7 +39,7 @@ export interface SortSpec {
 export type ExpandDirection = "in" | "out" | "both";
 
 /** Shared body for every expand request. */
-export interface ExpandBase {
+interface ExpandBase {
 	vertex_id: string;
 	direction?: ExpandDirection;
 	filters?: FilterGroup | null;
@@ -80,14 +80,6 @@ export type ExpandRequest =
 	| { kind: "neighbors"; body: ExpandNeighborsRequest }
 	| { kind: "by-edge-type"; body: ExpandByEdgeTypeRequest }
 	| { kind: "by-node-type"; body: ExpandByNodeTypeRequest };
-
-/** Stable identity for a node's expand pagination state. */
-export function expandKey(req: ExpandRequest): string {
-	const b = req.body;
-	const edge = req.kind === "by-edge-type" ? req.body.edge_label : "";
-	const node = req.kind === "by-node-type" ? req.body.neighbor_label : "";
-	return `${b.vertex_id}:${b.direction ?? "both"}:${edge}:${node}`;
-}
 
 /** One type and how many of it the graph holds; `count` is null when the
  *  vendor cannot count (selection-and-the-panel.md SP8). */

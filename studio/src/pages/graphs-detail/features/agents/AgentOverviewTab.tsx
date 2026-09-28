@@ -26,7 +26,7 @@ import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
 import { PanelSection } from "@/ui/PanelSection";
 
 /** The two switches the Overview carries (AG23). Keys are the engine's. */
-export const POLICY_FIELDS: { key: string; label: string; hint: string }[] = [
+const POLICY_FIELDS: { key: string; label: string; hint: string }[] = [
 	{
 		key: "can_be_assigned",
 		label: "Can be assigned",

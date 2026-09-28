@@ -54,14 +54,14 @@ export const PLAN_ACTIONS = {
 } as const;
 
 /** What `⋯` opens, each as its own page beside the plan's (LB38). */
-export const PLAN_READINGS = {
+const PLAN_READINGS = {
 	versions: "Versions",
 	arguments: "Arguments",
 	export: "Export YAML",
 } as const;
 export type PlanReading = keyof typeof PLAN_READINGS;
 
-export const PLAN_TABS = ["overview", "layers", "flow", "activity"] as const;
+const PLAN_TABS = ["overview", "layers", "flow", "activity"] as const;
 export type PlanTab = (typeof PLAN_TABS)[number];
 
 export const WINDOWS: Record<string, PlanWindow> = {

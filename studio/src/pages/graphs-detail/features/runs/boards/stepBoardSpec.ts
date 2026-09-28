@@ -67,7 +67,7 @@ export const STEP_ACTIONS = {
 } as const;
 
 /** A step's tabs, in order (SR55). */
-export const STEP_TABS = ["overview", "touched", "log"] as const;
+const STEP_TABS = ["overview", "touched", "log"] as const;
 export type StepTab = (typeof STEP_TABS)[number];
 
 export interface StepBoardView {

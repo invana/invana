@@ -13,12 +13,12 @@ import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 import type { RunNode } from "@/pages/graphs-detail/features/runs";
 import type { QueryMode } from "@/types/query";
 
-export type SessionMessageRole = "user" | "assistant";
+type SessionMessageRole = "user" | "assistant";
 
 /** Lifecycle of an assistant reply tied to a query execution. `stopped` is
  *  written by the engine when the user cancels the run behind the reply
  *  (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md). */
-export type SessionMessageStatus = "running" | "ok" | "error" | "stopped";
+type SessionMessageStatus = "running" | "ok" | "error" | "stopped";
 
 /**
  * A send refused before its run opened — the cast the ask's world picked is

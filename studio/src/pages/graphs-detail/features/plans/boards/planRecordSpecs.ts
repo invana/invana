@@ -29,7 +29,7 @@ const header = (ref: string, reading: string) => ({
 });
 
 /** A value as the plan holds it — a literal reads as itself, a binding as its marker. */
-export const shown = (v: unknown): string =>
+const shown = (v: unknown): string =>
 	v === undefined ? "—" : typeof v === "string" ? v : JSON.stringify(v);
 
 // ── Versions ──────────────────────────────────────────────────────────────────

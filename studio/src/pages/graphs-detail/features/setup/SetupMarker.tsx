@@ -40,7 +40,7 @@ export function SetupMarker({
 
 /** The five states that are not `done`. Kept here so the stepper, the band and
  *  the board cannot disagree about what colour a blocked step is. */
-export function toneFor(
+function toneFor(
 	status: Status,
 	isNext: boolean,
 ): "success" | "error" | "muted" | "info" | "queued" {

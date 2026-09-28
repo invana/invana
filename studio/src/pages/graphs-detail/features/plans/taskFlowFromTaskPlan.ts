@@ -30,7 +30,7 @@ const ms = (v: number) => formatElapsed(Math.round(v));
 /** A p95 this far over its p50 makes a step unpredictable (LB33). */
 export const WIDE_SPREAD = 4;
 /** A step fewer than this share of runs take is a branch, and is dim (LB35). */
-export const RARE_BRANCH = 0.25;
+const RARE_BRANCH = 0.25;
 
 const isWide = (step: StepMeasures) =>
 	step.p50_ms != null &&

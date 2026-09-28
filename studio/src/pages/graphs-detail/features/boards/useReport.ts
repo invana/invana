@@ -32,8 +32,8 @@ import { boardReportsKey } from "@/pages/graphs-detail/features/boards/queries";
 import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
 
 /** The two action ids a declared board's header carries. */
-export const SAVE_REPORT_ACTION = "save-report";
-export const OPEN_REPORTS_ACTION = "open-reports";
+const SAVE_REPORT_ACTION = "save-report";
+const OPEN_REPORTS_ACTION = "open-reports";
 
 export interface DeclaredBoardValue {
 	username: string;

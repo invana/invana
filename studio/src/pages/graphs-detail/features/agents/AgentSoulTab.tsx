@@ -32,7 +32,7 @@ import type {
 import { PanelSection } from "@/ui/PanelSection";
 
 /** Two columns at 760px of page, one below — a container query, not the viewport. */
-export const TWO_COLUMNS =
+const TWO_COLUMNS =
 	"grid items-start gap-2.5 @min-[760px]:grid-cols-[340px_minmax(0,1fr)]";
 
 /** A question most agents get — the author changes it to one this agent gets. */

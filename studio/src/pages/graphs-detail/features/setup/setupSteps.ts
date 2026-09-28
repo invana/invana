@@ -18,7 +18,7 @@ import type { LeftNavKey } from "@/pages/graphs-detail/shared/useLeftSection";
 /** The one Invana idea a step depends on, taught where it is about to be used
  *  (setup.md SU17). Required steps carry one; optional steps do not — a concept
  *  is taught at the step that needs it, or not at all. */
-export interface SetupConcept {
+interface SetupConcept {
 	title: string;
 	body: string;
 }

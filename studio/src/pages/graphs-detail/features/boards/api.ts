@@ -48,7 +48,7 @@ interface ApiListResponse {
 }
 
 /** List ordering — newest by last activity (default) or by creation. */
-export type BoardSort = "updated" | "created";
+type BoardSort = "updated" | "created";
 
 /** Server-side list controls (pinned always float to the top regardless). */
 export interface BoardListOptions {
@@ -112,7 +112,7 @@ function toSummary(c: ApiSummary): BoardSummary {
 	};
 }
 
-export function toBoard(d: ApiDetail): Board {
+function toBoard(d: ApiDetail): Board {
 	return {
 		...toSummary(d),
 		snapshot: d.snapshot ?? { items: [] },

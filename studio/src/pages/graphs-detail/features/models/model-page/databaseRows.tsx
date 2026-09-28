@@ -33,7 +33,7 @@ const DRIFT: Record<Drift, { tone: MarkTone; glyph: string; label: string }> = {
 };
 
 /** A glyph beside the word, so drift is never colour alone. */
-export function DriftMark({ drift }: { drift: Drift }) {
+function DriftMark({ drift }: { drift: Drift }) {
 	const d = DRIFT[drift];
 	return (
 		<MarkChip tone={d.tone}>

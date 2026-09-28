@@ -12,8 +12,7 @@ export {
 	parseComparePair,
 } from "@/pages/graphs-detail/features/lenses/CompareBoardPage";
 export { CompareDialog } from "@/pages/graphs-detail/features/lenses/CompareDialog";
-export { LensDetail } from "@/pages/graphs-detail/features/lenses/LensDetail";
-export { LensEditor } from "@/pages/graphs-detail/features/lenses/LensEditor";
+
 export { LensesViewPanel } from "@/pages/graphs-detail/features/lenses/LensesViewPanel";
 export {
 	useLensesQuery,

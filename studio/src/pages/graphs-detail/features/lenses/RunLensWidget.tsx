@@ -40,8 +40,6 @@ export interface RunLensOptions {
 	openAction?: string;
 }
 
-export type WithRunLens = { runLens: RunLensOptions };
-
 export function RunLensWidget({
 	options,
 	onAction,

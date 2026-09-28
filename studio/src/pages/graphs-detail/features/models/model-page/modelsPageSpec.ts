@@ -67,7 +67,7 @@ export const MODELS_ACTIONS = {
 } as const;
 
 /** What `⋯` holds, per scope and state (the-model-page.md · The page). */
-export const MODELS_MENU = {
+const MODELS_MENU = {
 	starters: "Starter models",
 	introspect: "Introspect",
 	rename: "Rename",

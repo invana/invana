@@ -1,12 +1,5 @@
 import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 
-// ── Query request ─────────────────────────────────────────────────────────────
-
-export interface QueryRequest {
-	query: string;
-	parameters?: Record<string, unknown>;
-}
-
 // ── Composer payload ──────────────────────────────────────────────────────────
 // What the SessionComposer hands up when the user sends. The panel/hook
 // dispatches on `mode`: query-language runs against the engine; natural
@@ -33,13 +26,13 @@ export type QueryRunPayload =
 
 // ── Graph data types (mirrors engine's Vertex / Edge / GraphResponse) ─────────
 
-export interface GraphVertex {
+interface GraphVertex {
 	id: string;
 	label: string;
 	properties: Record<string, unknown>;
 }
 
-export interface GraphEdge {
+interface GraphEdge {
 	id: string;
 	label: string;
 	source: string;

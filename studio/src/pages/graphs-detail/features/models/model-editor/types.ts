@@ -19,18 +19,6 @@ export interface ModelEditCtx {
 }
 
 /**
- * What the canvas has selected, and therefore what the detail column draws.
- * `null` is the model's own overview, not an empty screen.
- */
-export type SelectedItem =
-	| { kind: "node-type"; id: string }
-	| { kind: "edge-type"; id: string }
-	| { kind: "property-keys" }
-	| { kind: "constraints" }
-	| { kind: "indexes" }
-	| null;
-
-/**
  * What the panel has selected — by name, because the panel lists types the
  * version declares and the canvas draws the same set by id.
  */

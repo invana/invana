@@ -59,7 +59,7 @@ export interface LeftSectionDeps {
  * draws nothing there. Each panel owns the canvas kind it opens, which is why
  * the selection it drives lives above it, in `useLayeredCanvas`.
  */
-export function leftSectionContent(deps: LeftSectionDeps): ReactNode {
+function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 	const {
 		username,
 		graphSlug,

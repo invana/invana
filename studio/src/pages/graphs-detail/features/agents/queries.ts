@@ -114,21 +114,6 @@ export function useAgentMetersQuery(
 	});
 }
 
-/** The agent's own event feed, newest first. */
-export function useAgentActivityQuery(
-	username: string | undefined,
-	graphSlug: string | undefined,
-	agentId: string | undefined,
-) {
-	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
-	return useQuery({
-		queryKey: agentsKey(scope, ["activity", agentId]),
-		queryFn: () =>
-			agentsApi.activity(scope.username, scope.graphSlug, agentId as string),
-		enabled: !!username && !!graphSlug && !!agentId,
-	});
-}
-
 /**
  * The caller's own sessions bound to this agent. Sessions stay private to
  * whoever opened them; the Graph-wide number is `meters.sessions` (AG31).

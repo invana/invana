@@ -12,7 +12,7 @@ import { useStackSections } from "@/pages/graphs-detail/shared/useStackSections"
 // catalogue, never Todos (PT7 · SR3).
 export type ProjectsSectionKey = "projects" | "todos";
 
-export const PROJECTS_SECTION_KEYS: readonly ProjectsSectionKey[] = [
+const PROJECTS_SECTION_KEYS: readonly ProjectsSectionKey[] = [
 	"projects",
 	"todos",
 ];

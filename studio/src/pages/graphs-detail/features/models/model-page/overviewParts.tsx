@@ -23,7 +23,7 @@ import {
 import { P95Line } from "./performanceRows";
 import type { ModelsTab } from "./useModelsView";
 
-export interface AttentionItem {
+interface AttentionItem {
 	signal: string;
 	subject: string;
 	why: string;
@@ -38,7 +38,7 @@ const TAB_LABEL: Partial<Record<ModelsTab, string>> = {
 };
 
 /** The drift rows, as attention items — unmodelled labels at All models, what the model lacks at one (MP9). */
-export function driftAttention(
+function driftAttention(
 	physical: PhysicalSchema | undefined,
 	one: boolean,
 ): AttentionItem[] {

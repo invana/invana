@@ -11,7 +11,6 @@ is done, remove its row and update the Status line in the doc it points to.
 
 ```mermaid
 flowchart LR
-    D["4 · knip gates unused exports"]
     E["5 · Kit swaps: Styling, Layers"] --> F["6 · Kit swaps: ListRow, ListPanel, Inspector"]
     K["Kit branches merge"] --> F
 ```
@@ -22,7 +21,6 @@ Items 7–12 are independent of that chain and can land in any order.
 
 | # | Cleanup | Size today | Specified in | Changes behaviour |
 |---|---|---|---|---|
-| 4 | knip gates unused exports and types, not only dead files | 217 | [code-shape.md](code-shape.md) §8 | no |
 | 5 | Kit swaps with no kit change: `StylingPanel` → `StylingViewPanel`, `LayersPanel` → `LayersViewPanel` | 2 files; no e2e covers either | [module-structure.md](../module-structure.md) §4 | **yes** — swatches and sliders; Layers gains Groups and loses Refresh |
 | 6 | Kit swaps that need kit work: `ListRow` → `Item size="xs"`, `ListPanelChrome` · `ListFilterMenu` → `PanelContent`, `InspectorViewPanel` → `ElementInspectorViewPanel` | three kit extensions with stories, then a release | [module-structure.md](../module-structure.md) §4 | **yes** — row density; the Inspector reads the canvas |
 | 7 | Decision ids in code comments and docstrings | about 1,100 in `src/` | CLAUDE.md rule 12 · [module-structure.md](../module-structure.md) §5b | no |
@@ -37,7 +35,6 @@ Items 7–12 are independent of that chain and can land in any order.
 |---|---|
 | 2 | count `from "@/pages/graphs-detail/features/<m>/…"` outside `<m>`, excluding `<m>` and `<m>/index` |
 | 3 | `grep -rl 'graphs-detail/shell/' src/pages/graphs-detail/features` |
-| 4 | `pnpm exec knip --include exports,types` |
 | 7 | `grep -rEc '\b(G\|SR\|AD\|WO\|LB\|MP\|SK\|SD\|RU\|PT\|AG\|GV\|B\|CV\|GC\|DS)[0-9]{1,3}\b' src` |
 | 8 | `grep -rEo 'hsl\(\|#[0-9a-fA-F]{6}\b' src` |
 | 9 | `grep -rEo '\bh-(7\|8\|9)\b' src` |

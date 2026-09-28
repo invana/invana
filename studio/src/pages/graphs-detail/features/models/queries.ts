@@ -4,7 +4,6 @@ import {
 	schemasApi,
 } from "@/pages/graphs-detail/features/models/api";
 import type {
-	ConstraintCreate,
 	EdgeTypeCreate,
 	EdgeTypeUpdate,
 	GraphModelCreate,
@@ -176,29 +175,6 @@ export function useModelVersionQuery(
 	});
 }
 
-export function useModelActiveVersionQuery(
-	username?: string,
-	graphSlug?: string,
-	modelId?: string,
-) {
-	return useQuery({
-		queryKey: [
-			"models",
-			username,
-			graphSlug,
-			modelId,
-			"active-version",
-		] as const,
-		queryFn: () =>
-			modelsApi.getActiveVersion(
-				username as string,
-				graphSlug as string,
-				modelId as string,
-			),
-		enabled: !!username && !!graphSlug && !!modelId,
-	});
-}
-
 // ── Mutations ──────────────────────────────────────────────────────────────
 // Every mutation invalidates the whole ["models", u, g] subtree so the model
 // list, version list, and the open version tree all refresh.
@@ -238,24 +214,6 @@ export const useCreateDraftMutation = (u: string, g: string) =>
 		GraphVersionResponse
 	>(u, g, ({ modelId, basedOn }) =>
 		modelsApi.createDraft(u, g, modelId, { based_on: basedOn ?? null }),
-	);
-
-export const useActivateVersionMutation = (u: string, g: string) =>
-	useModelMutation(
-		u,
-		g,
-		({
-			modelId,
-			versionId,
-			version,
-		}: {
-			modelId: string;
-			versionId: string;
-			version?: string | null;
-		}) =>
-			modelsApi.activate(u, g, modelId, versionId, {
-				version: version ?? null,
-			}),
 	);
 
 // ── Type authoring (draft versions only) ──────────────────────────────────
@@ -341,48 +299,12 @@ export const useUpdatePropertyKeyMutation = (u: string, g: string) =>
 			modelsApi.updatePropertyKey(u, g, modelId, versionId, keyId, data),
 	);
 
-export const useDeletePropertyKeyMutation = (u: string, g: string) =>
-	useModelMutation(
-		u,
-		g,
-		({ modelId, versionId, keyId }: TypeCtx & { keyId: string }) =>
-			modelsApi.deletePropertyKey(u, g, modelId, versionId, keyId),
-	);
-
-export const useCreateConstraintMutation = (u: string, g: string) =>
-	useModelMutation(
-		u,
-		g,
-		({ modelId, versionId, data }: TypeCtx & { data: ConstraintCreate }) =>
-			modelsApi.createConstraint(u, g, modelId, versionId, data),
-	);
-
-export const useDeleteConstraintMutation = (u: string, g: string) =>
-	useModelMutation(
-		u,
-		g,
-		({
-			modelId,
-			versionId,
-			constraintId,
-		}: TypeCtx & { constraintId: string }) =>
-			modelsApi.deleteConstraint(u, g, modelId, versionId, constraintId),
-	);
-
 export const useCreateIndexMutation = (u: string, g: string) =>
 	useModelMutation(
 		u,
 		g,
 		({ modelId, versionId, data }: TypeCtx & { data: IndexCreate }) =>
 			modelsApi.createIndex(u, g, modelId, versionId, data),
-	);
-
-export const useDeleteIndexMutation = (u: string, g: string) =>
-	useModelMutation(
-		u,
-		g,
-		({ modelId, versionId, indexId }: TypeCtx & { indexId: string }) =>
-			modelsApi.deleteIndex(u, g, modelId, versionId, indexId),
 	);
 
 // ── The staged set (model-editor.md) ───────────────────────────────────────
@@ -433,35 +355,6 @@ export const useCommitDraftMutation = (u: string, g: string) =>
 			modelsApi.commit(u, g, modelId, version),
 	);
 
-/** What changed in a published version, against the one before it. */
-export function useVersionDiffQuery(
-	username?: string,
-	graphSlug?: string,
-	modelId?: string,
-	versionId?: string,
-) {
-	return useQuery({
-		queryKey: [
-			"models",
-			username,
-			graphSlug,
-			modelId,
-			"diff",
-			versionId,
-		] as const,
-		queryFn: () =>
-			modelsApi.versionDiff(
-				username as string,
-				graphSlug as string,
-				modelId as string,
-				versionId as string,
-			),
-		enabled: !!username && !!graphSlug && !!modelId && !!versionId,
-		// A published version is immutable, so its diff is too.
-		staleTime: Number.POSITIVE_INFINITY,
-	});
-}
-
 // ── Portability (share-a-model.md · starter-models.md) ─────────────────────
 
 export function useStartersQuery(username?: string, graphSlug?: string) {
@@ -480,20 +373,6 @@ export const useImportModelMutation = (u: string, g: string) =>
 		g,
 		(body: { artefact?: ModelArtefact; starter?: string; name?: string }) =>
 			modelsApi.importModel(u, g, body),
-	);
-
-export const useUpgradeModelMutation = (u: string, g: string) =>
-	useModelMutation(
-		u,
-		g,
-		({
-			modelId,
-			...body
-		}: {
-			modelId: string;
-			artefact?: ModelArtefact;
-			starter?: string;
-		}) => modelsApi.upgradeModel(u, g, modelId, body),
 	);
 
 // ── Links and the global model (stitch-models.md) ──────────────────────────

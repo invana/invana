@@ -14,7 +14,6 @@ import type {
 	CastRole,
 	GovernLayer,
 	GovernRule,
-	Lens,
 	LensCreate,
 	LensKind,
 	LensUpdate,
@@ -212,5 +211,3 @@ export function useGuardrailImpactMutation(
 			governApi.guardrailImpact(username as string, graphSlug as string, data),
 	});
 }
-
-export type { Lens };

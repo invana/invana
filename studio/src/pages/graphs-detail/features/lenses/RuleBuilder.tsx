@@ -46,7 +46,7 @@ import {
 	MatchPreview,
 	SliceSummary,
 } from "@invana/ui";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
 	type AddressParts,
 	ANY_SUBLAYER,
@@ -550,14 +550,4 @@ function EgressPicker({
 /** A new rule opens as *allow this whole layer* — the widest thing it can say. */
 export function blankRule(layer: GovernLayer = "graph_data"): GovernRule {
 	return { match: `${layer}/${REST}`, allow: true };
-}
-
-/** A rule builder's editing state, held by whichever screen opened it. */
-export function useRuleDraft(initial?: GovernRule) {
-	const [draft, setDraft] = useState<GovernRule>(initial ?? blankRule());
-	return {
-		draft,
-		setDraft,
-		reset: (r?: GovernRule) => setDraft(r ?? blankRule()),
-	};
 }

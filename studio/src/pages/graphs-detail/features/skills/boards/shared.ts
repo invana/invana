@@ -102,8 +102,3 @@ export function ruleTitle(rule: Rule): string {
 export function when(at: string | null | undefined): string {
 	return at ? formatRelativeTime(new Date(at)) : "—";
 }
-
-/** A short id, the way every trace surface writes one. */
-export function shortId(id: string | null | undefined): string {
-	return id ? id.slice(-4) : "—";
-}

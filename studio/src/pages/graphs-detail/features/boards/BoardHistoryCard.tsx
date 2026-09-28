@@ -23,7 +23,7 @@ import { formatRelativeTime } from "@/lib/time";
 import type { BoardVersionSummary } from "@/pages/graphs-detail/features/boards/types";
 
 /** What the row's one button does — the half that is not shared. */
-export interface BoardHistoryAction {
+interface BoardHistoryAction {
 	label: string;
 	onClick: () => void;
 	disabled?: boolean;
