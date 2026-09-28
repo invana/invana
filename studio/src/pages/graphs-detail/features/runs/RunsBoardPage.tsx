@@ -1,3 +1,4 @@
+import { usd } from "@/lib/format";
 /**
  * **Runs, drawn wide** — the journal as a page in `mainSection`, opened from
  * `Dashboard` on the Runs panel's header (see-what-ran.md SR70 ·
@@ -16,7 +17,7 @@
 import { useTicker } from "@/hooks/useTicker";
 import { formatCompact } from "@/lib/format";
 import { formatElapsed } from "@/lib/time";
-import { usd } from "@/pages/graphs-detail/features/agents/agentDraft";
+
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
 import { RunsFilterBar } from "@/pages/graphs-detail/features/runs/RunsFilterBar";
 import {

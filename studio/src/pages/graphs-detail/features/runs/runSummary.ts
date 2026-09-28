@@ -1,3 +1,4 @@
+import { usd } from "@/lib/format";
 /**
  * A run, as the section reads it — **five sections off two reads**
  * ([SR67](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
@@ -23,7 +24,6 @@ import type { TraceRead } from "@/pages/graphs-detail/features/runs/api";
 import {
 	durationMs,
 	originOf,
-	usd,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
 import type { TraceWindow } from "@/services/telemetry/traceLink";
 import type { TouchItem } from "@invana/ui";

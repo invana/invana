@@ -1,3 +1,4 @@
+import { usdWhole } from "@/lib/format";
 /**
  * A2 · the ceilings this agent runs inside — **value · what it bounds ·
  * whether anything enforces it**.
@@ -137,7 +138,7 @@ export interface CeilingsTableProps {
 
 function show(c: Ceiling, v: number | undefined): string {
 	if (v == null) return "—";
-	if (c.usd) return `$${v.toFixed(2)}`;
+	if (c.usd) return usdWhole(v);
 	return v >= 1000 && v % 1000 === 0 ? `${v / 1000}k` : String(v);
 }
 

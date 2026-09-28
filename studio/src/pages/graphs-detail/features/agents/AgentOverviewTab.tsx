@@ -1,3 +1,4 @@
+import { usd, usdWhole } from "@/lib/format";
 /**
  * Overview — the agent read whole (AG23): who it is, its focus, how it thinks,
  * what it can do, what is always in force, its limits, and the two policy
@@ -9,7 +10,6 @@ import type { AgentTab } from "@/pages/graphs-detail/features/agents/AgentDetail
 import {
 	type AgentDraft,
 	effortSummary,
-	usd,
 	voiceSummary,
 } from "@/pages/graphs-detail/features/agents/agentDraft";
 import {
@@ -219,8 +219,8 @@ export function AgentOverviewTab({
 								<span className="flex items-center gap-2">
 									<Progress value={spendShare} className="h-1 w-16" />
 									{m.spend_this_month == null
-										? `nothing priced · of ${usd(m.max_cost_usd_month)} this month`
-										: `${usd(m.spend_this_month)} of ${usd(m.max_cost_usd_month)} this month`}
+										? `nothing priced · of ${usdWhole(m.max_cost_usd_month)} this month`
+										: `${usd(m.spend_this_month)} of ${usdWhole(m.max_cost_usd_month)} this month`}
 								</span>
 							)}
 						</LimitRow>

@@ -1,3 +1,4 @@
+import { usd, usdWhole } from "@/lib/format";
 /**
  * Activity — what the agent is using and has done (AG23): the meters, each
  * beside the limit that caps it, its runs, its sessions, its lineage and its
@@ -10,10 +11,7 @@
 
 import { formatRelativeTime } from "@/lib/time";
 import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
-import {
-	type AgentDraft,
-	usd,
-} from "@/pages/graphs-detail/features/agents/agentDraft";
+import type { AgentDraft } from "@/pages/graphs-detail/features/agents/agentDraft";
 import {
 	useAgentLineageQuery,
 	useAgentMetersQuery,
@@ -106,7 +104,7 @@ function Meters({ m }: { m: AgentMeters }) {
 						? "nothing priced this month"
 						: m.max_cost_usd_month == null
 							? "this month"
-							: `of ${usd(m.max_cost_usd_month)}`
+							: `of ${usdWhole(m.max_cost_usd_month)}`
 				}
 				meter={
 					m.spend_this_month == null

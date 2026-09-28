@@ -116,23 +116,6 @@ export {
 export { formatCompact as compact } from "@/lib/format";
 
 /**
- * `$0.04` · `$0.0013` · `<$0.0001` — money, never rounded to nothing.
- *
- * A haiku call on a few hundred tokens is fractions of a cent, and a tile
- * reading `$0.00` says *this was free* — the exact claim
- * [SR34](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)
- * refuses to let an absent record make. `$0` is kept for a spend that genuinely
- * was zero, which is what a local model costs.
- */
-export function usd(value: number): string {
-	if (value === 0) return "$0";
-	if (value < 0.0001) return "<$0.0001";
-	if (value < 1)
-		return `$${value.toFixed(4).replace(/0+$/, "").replace(/\.$/, "")}`;
-	return `$${value.toFixed(2)}`;
-}
-
-/**
  * `0`–`1` for a value that has a real ceiling, `undefined` for one that does not.
  *
  * [SR20](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md):

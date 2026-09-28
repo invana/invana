@@ -123,6 +123,3 @@ export function effortSummary(effort: Record<string, number>): string {
 		return `${n} ${n === 1 ? word.replace(/s$/, "") : word}`;
 	}).join(" · ");
 }
-
-export const usd = (n: number) =>
-	`$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;

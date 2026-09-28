@@ -1,3 +1,4 @@
+import { usdWhole } from "@/lib/format";
 /**
  * C10 · a spend per run for the thread — the session's settings, opened from
  * the thread header (the-assistant.md AD18 · AD21).
@@ -21,8 +22,6 @@ import {
 	PopoverTrigger,
 } from "@invana/ui";
 import { useEffect, useState } from "react";
-
-const usd = (v: number) => `$${v.toFixed(2)}`;
 
 export interface SessionSettingsProps {
 	session: Session;
@@ -90,7 +89,9 @@ export function SessionSettings({
 						inputMode="decimal"
 						min={0}
 						step={0.1}
-						placeholder={cap != null ? `${usd(cap)} — the agent's cap` : "USD"}
+						placeholder={
+							cap != null ? `${usdWhole(cap)} — the agent's cap` : "USD"
+						}
 						value={draft}
 						onChange={(e) => setDraft(e.target.value)}
 						onKeyDown={(e) => {
@@ -101,9 +102,11 @@ export function SessionSettings({
 				</div>
 				<p className="text-muted-foreground">
 					{cap != null
-						? `${session.agentName ?? "The agent"} caps a run at ${usd(cap)}.`
+						? `${session.agentName ?? "The agent"} caps a run at ${usdWhole(cap)}.`
 						: `${session.agentName ?? "The agent"} sets no cap per run.`}
-					{clamped ? ` Held at ${usd(cap as number)} — the agent's cap.` : ""}
+					{clamped
+						? ` Held at ${usdWhole(cap as number)} — the agent's cap.`
+						: ""}
 				</p>
 				<div className="flex justify-end gap-2">
 					<Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>

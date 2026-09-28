@@ -1,3 +1,4 @@
+import { usd } from "@/lib/format";
 /**
  * The plan page as a dashboard document ([LB24 · LB33–LB35](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
  *
@@ -23,10 +24,7 @@ import type {
 	TaskPlanDetail,
 } from "@/pages/graphs-detail/features/plans/types";
 import type { FlowOptions } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
-import {
-	runAddress,
-	usd,
-} from "@/pages/graphs-detail/shared/dashboards/shared";
+import { runAddress } from "@/pages/graphs-detail/shared/dashboards/shared";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 import type {
 	DashboardSpec,

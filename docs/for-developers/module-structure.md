@@ -174,7 +174,7 @@ The Studio and engine trees, file by file, are [§12](#12-target-code-structure)
 
 ### Files in the wrong folder
 
-**Status: done**, except `usd` → `lib/format` (still in `agents/agentDraft.ts`). `WorkCanvas.tsx` is split: `projects/PlanCanvas.tsx`, `agents/EnvelopeCanvas.tsx`, `agents/LineageCanvas.tsx`.
+**Status: done.** Money is `lib/format`: `usd` for what was spent and `usdWhole` for a budget or a cap ([SR40](modules/operate/features/see-what-ran.md#decisions)). `WorkCanvas.tsx` is split: `projects/PlanCanvas.tsx`, `agents/EnvelopeCanvas.tsx`, `agents/LineageCanvas.tsx`.
 
 Evidence is the import graph: each file below is imported only from the folder it moves to.
 

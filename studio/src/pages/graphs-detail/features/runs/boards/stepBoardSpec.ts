@@ -1,3 +1,4 @@
+import { usd } from "@/lib/format";
 /**
  * A step dashboard, composed — artboards **D2 · D3 · D4** ([34l–34n](../../../../../../docs/for-developers/the-screens.md)).
  *
@@ -43,7 +44,6 @@ import {
 	stepTitle,
 	tileToneOf,
 	toneOf,
-	usd,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
 import type {
 	DashboardSpec,

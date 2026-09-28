@@ -1,3 +1,4 @@
+import { usd } from "@/lib/format";
 /**
  * The run dashboard, composed — artboard **D1** ([34k](../../../../../../docs/for-developers/the-screens.md)).
  *
@@ -50,7 +51,6 @@ import {
 	statusChip,
 	tileToneOf,
 	toneOf,
-	usd,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 import type {
