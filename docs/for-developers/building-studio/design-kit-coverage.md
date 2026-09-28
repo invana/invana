@@ -995,7 +995,7 @@ declares is also a name the kit exports.
 | Stayed | Reason |
 |---|---|
 | `ui/PanelSection` · `ui/PanelStatusBar` · `ui/FilterSelect` · `ui/PrincipalChip` | compositions **over** kit components, not copies of them. Still kit candidates (§6a), still tracked by G3/G4 |
-| `ui/PolicyFlag` · `ui/BindRefusalCard` | Invana rules, not markup shapes — the agent-policy tri-state and the bind refusal's two halves (DS2) |
+| `ui/BindRefusalCard` | an Invana rule, not a markup shape — the bind refusal's two halves (DS2) |
 | `ui/layerPalette.ts` | the kit ships **no** hues; which colour means `llm` is the product's decision, passed as `palette` at every call site |
 | `RunCannotAnswer` · `RunDiagnosis` · `AnswerEmission` · `CanvasLegend` · `StitchCardHeader` · `HeaderBreadcrumb` · `TemplateSwitcher` | the renamed hosts of the substitutions above — a Studio-shaped wrapper whose body is kit components. **An adapter never takes the name of the component it wraps**: five Govern and Agents files import the kit's `CannotAnswerCard` directly, and two things called that is the drift the sweep exists to stop (code-shape §4.1a) |
 
@@ -1029,7 +1029,7 @@ hand-rolled markup in it is gone: every piece now draws with a kit primitive or 
 | `PanelActionBar` · `PanelAction` | ✅ **deleted** — `CardFooter` + `Button`, inlined at all 8 sites | ✅ |
 | `PanelTabsList` · `PanelTab` | ✅ **deleted** — `Tabs size="sm"` + the kit's own `TabsList`/`TabsTrigger`, restyle dropped | ✅ |
 | `FilterSelect` · `FilterChipOption` | `ui/FilterSelect` over `FilterChip` | kit gap — see below |
-| `PolicyFlag` | `ui/PolicyFlag` | **stays** — DS2, the tri-state is an Invana agent-policy rule |
+| `PolicyFlag` | ✅ **deleted** — nothing imports it; knip gates a file with no importer | ✅ |
 
 `src/ui/` is what code-shape §4 reserves for "only components the kit cannot own". Everything above
 marked *kit candidate* is a composition with no Invana noun in its props, so by the design rules it

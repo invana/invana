@@ -198,11 +198,17 @@ A Studio component the kit already ships is deleted against the kit import, not 
 ([code-shape.md](building-studio/code-shape.md) §2.2). These go first (phase K), so R3 never renames
 a file that is about to be deleted.
 
+**Status: open.** This table is the plan of record for phase K; where canvas-ui-coverage.md or
+refactor-plan.md say otherwise, this table wins. Styling and Layers need no kit change and go first.
+`ListRow`, `ListPanelChrome` · `ListFilterMenu` and the Inspector wait for kit work, which lands after
+the open design-kit and canvas branches merge. No e2e spec covers any of these surfaces, so each swap
+lands a small spec first and runs it before and after.
+
 | Studio today | Kit | Verdict |
 |---|---|---|
 | `explorer/LayersPanel.tsx` | canvas-ui `LayersViewPanel` (0.0.14) | **Replace.** A fork of the kit panel. First move `visibility.ts` onto the store's hide API (`setNodeHidden`), because `ExplorerTypesPanel` shares that hidden state |
 | `explorer/StylingPanel.tsx` | canvas-ui `StylingViewPanel` (0.0.14) | **Replace.** Map `CanvasStyling.labelProperty` → the kit's `labelKey` dot path (`name` → `data.name`) in `types/board.ts`; drop Studio's own painting in `ExplorerCanvas` |
-| `explorer/InspectorPanel.tsx` | canvas-ui `ElementInspectorViewPanel` | **Replace after extending the kit**: add `isMissing(id)` and `propertyFilter` props. Studio keeps a short `InspectorViewPanel` host that passes `renderExtra={ProvenanceBlock}` |
+| `explorer/InspectorViewPanel.tsx` | canvas-ui `ElementInspectorViewPanel` | **Replace after extending the kit**: add `isMissing(id)` and `propertyFilter` props. Studio keeps a short `InspectorViewPanel` host that passes `renderExtra={ProvenanceBlock}` |
 | `explorer/ExpandFineTunePanel.tsx` | none — the kit panels filter what is drawn; this fetches neighbours from the engine | **Keep**, as `ExpandNeighboursDialog`. Its form moves to canvas-ui only when `GraphExpandEditorPanel` (B9) is built |
 | `shared/ListPanel.tsx` → `ListRow` | `@invana/ui` `Item size="xs"` | **Replace** (hover-only actions via an `ItemActions` option) |
 | `shared/ListPanel.tsx` → `ListPanelChrome` · `ListFilterMenu` | `PanelContent` | **Replace after extending the kit**: a searchable header and a header dropdown action on `PanelContent` |
