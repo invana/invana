@@ -20,7 +20,7 @@
  */
 
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
-import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses/queries";
+import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses";
 import {
 	RunDetail,
 	runAddress,

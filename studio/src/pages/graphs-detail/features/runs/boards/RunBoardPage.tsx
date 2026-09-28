@@ -15,9 +15,9 @@
  */
 
 import { useReport } from "@/pages/graphs-detail/features/boards";
-import { CompareDialog } from "@/pages/graphs-detail/features/lenses/CompareDialog";
-import { StepTouchWidget } from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
-import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses/queries";
+import { CompareDialog } from "@/pages/graphs-detail/features/lenses";
+import { StepTouchWidget } from "@/pages/graphs-detail/features/lenses";
+import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/features/runs/boards/icons";
 import {

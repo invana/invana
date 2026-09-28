@@ -19,7 +19,7 @@
  */
 
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
-import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses/queries";
+import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses";
 import { TraceIdValue } from "@/pages/graphs-detail/features/runs/TraceIdValue";
 import { waterfallTasks } from "@/pages/graphs-detail/features/runs/boards/runBoardSpec";
 import { useRunTrace } from "@/pages/graphs-detail/features/runs/boards/useRunTrace";

@@ -17,7 +17,7 @@ import {
 	useAgentSkillsAndCallablesQuery,
 } from "@/pages/graphs-detail/features/agents/queries";
 import type { Agent } from "@/pages/graphs-detail/features/agents/types";
-import { useLensesQuery } from "@/pages/graphs-detail/features/lenses/queries";
+import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
 import { PanelSection } from "@/ui/PanelSection";
 import { Switch } from "@invana/forms";
 import { Button, Progress, PropertyList, PropertyRow } from "@invana/ui";

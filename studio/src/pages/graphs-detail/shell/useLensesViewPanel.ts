@@ -1,4 +1,4 @@
-import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
+import type { LensKind } from "@/pages/graphs-detail/features/lenses";
 import {
 	LEGACY_PANEL_PARAM,
 	PANEL_PARAM,

@@ -15,11 +15,11 @@ import { usd } from "@/lib/format";
 
 import { formatCompact } from "@/lib/format";
 import { formatElapsed } from "@/lib/time";
-import { BANDS } from "@/pages/graphs-detail/features/lenses/runLayers";
+import { BANDS } from "@/pages/graphs-detail/features/lenses";
 import type {
 	Touch,
 	TouchesResponse,
-} from "@/pages/graphs-detail/features/lenses/types";
+} from "@/pages/graphs-detail/features/lenses";
 import type { TraceRead } from "@/pages/graphs-detail/features/runs/api";
 import {
 	durationMs,

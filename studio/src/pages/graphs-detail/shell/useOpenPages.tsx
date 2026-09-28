@@ -18,7 +18,7 @@ import {
 	type BoardPageHandle,
 	DataBoardPage,
 } from "@/pages/graphs-detail/features/boards";
-import { useLensesQuery } from "@/pages/graphs-detail/features/lenses/queries";
+import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models";
 import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
 import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";

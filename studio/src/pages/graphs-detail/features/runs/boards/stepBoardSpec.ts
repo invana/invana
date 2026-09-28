@@ -17,8 +17,8 @@ import { formatDuration } from "@/lib/time";
 import {
 	type WithStepTouch,
 	touchesOfStepKey,
-} from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
-import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses/types";
+} from "@/pages/graphs-detail/features/lenses";
+import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
 import type {
 	TraceRead,
 	TraceStepRead,

@@ -19,8 +19,8 @@
  * report must not be ([B13](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 
-import { RunLensWidget } from "@/pages/graphs-detail/features/lenses/RunLensWidget";
-import { StepTouchWidget } from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
+import { RunLensWidget } from "@/pages/graphs-detail/features/lenses";
+import { StepTouchWidget } from "@/pages/graphs-detail/features/lenses";
 import { PLAN_CHART_WIDGETS } from "@/pages/graphs-detail/features/plans/boards/PlanChartWidgets";
 import { SkillFlowWidget } from "@/pages/graphs-detail/features/skills/boards/SkillFlowWidget";
 import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";

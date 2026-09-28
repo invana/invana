@@ -17,12 +17,12 @@ import { usd } from "@/lib/format";
  */
 
 import { formatDuration } from "@/lib/time";
-import { layersOptions } from "@/pages/graphs-detail/features/lenses/runLayers";
+import { layersOptions } from "@/pages/graphs-detail/features/lenses";
 import {
 	lensSummary,
 	runLensOptions,
-} from "@/pages/graphs-detail/features/lenses/runLens";
-import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses/types";
+} from "@/pages/graphs-detail/features/lenses";
+import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
 import type {
 	TraceRead,
 	TraceStepRead,

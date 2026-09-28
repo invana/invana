@@ -24,3 +24,19 @@ export {
 	StepTouchWidget,
 	touchesOfStepKey,
 } from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
+
+export { matches } from "@/pages/graphs-detail/features/lenses/addressing";
+export { CompareDialog } from "@/pages/graphs-detail/features/lenses/CompareDialog";
+export {
+	useLensesQuery,
+	useParticipantsQuery,
+	useRunTouchesQuery,
+} from "@/pages/graphs-detail/features/lenses/queries";
+export { BANDS } from "@/pages/graphs-detail/features/lenses/runLayers";
+export type { WithStepTouch } from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
+export type {
+	Lens,
+	LensKind,
+	Touch,
+	TouchesResponse,
+} from "@/pages/graphs-detail/features/lenses/types";

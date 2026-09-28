@@ -4,7 +4,7 @@ import type { OpenBoard } from "@/pages/graphs-detail/features/boards";
 import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
 import { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer";
 import { LensesViewPanel } from "@/pages/graphs-detail/features/lenses";
-import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
+import type { LensKind } from "@/pages/graphs-detail/features/lenses";
 import {
 	type ModelSelection,
 	ModelViewPanel,

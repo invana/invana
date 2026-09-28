@@ -18,7 +18,7 @@
  * removed at all (PM11).
  */
 
-import type { Lens } from "@/pages/graphs-detail/features/lenses/types";
+import type { Lens } from "@/pages/graphs-detail/features/lenses";
 import {
 	ProviderDetail,
 	providerLabel,

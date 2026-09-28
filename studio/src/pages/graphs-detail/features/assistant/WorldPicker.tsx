@@ -20,11 +20,11 @@
  * ([GR13](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  */
 
-import { matches } from "@/pages/graphs-detail/features/lenses/addressing";
+import { matches } from "@/pages/graphs-detail/features/lenses";
 import {
 	useLensesQuery,
 	useParticipantsQuery,
-} from "@/pages/graphs-detail/features/lenses/queries";
+} from "@/pages/graphs-detail/features/lenses";
 import { RichSelect, type RichSelectOption } from "@invana/ui";
 import { Globe, Settings2 } from "lucide-react";
 import { useMemo } from "react";

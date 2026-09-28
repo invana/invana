@@ -6,7 +6,7 @@ import {
 	boardPageId,
 	parseBoardPageId,
 } from "@/pages/graphs-detail/features/boards";
-import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
+import type { LensKind } from "@/pages/graphs-detail/features/lenses";
 import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
