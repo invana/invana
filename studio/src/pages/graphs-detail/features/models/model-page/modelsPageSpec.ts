@@ -9,7 +9,7 @@
  * (MP2): what one scope lacks is a section, not a tab.
  */
 
-import type { TypeCountsResponse } from "@/pages/graphs-detail/features/explorer/types";
+import type { TypeCountsResponse } from "@/pages/graphs-detail/features/explorer";
 import type { ModelFrame } from "@/pages/graphs-detail/features/models/stitch/allModels";
 import type {
 	GraphModelResponse,

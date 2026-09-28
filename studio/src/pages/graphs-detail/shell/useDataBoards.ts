@@ -20,7 +20,7 @@ import {
 	adaptItems,
 	isCanvasStateSnapshot,
 } from "@/pages/graphs-detail/features/explorer";
-import { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
+import { explorerApi } from "@/pages/graphs-detail/features/explorer";
 import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs/queries";
 import { useOpenSessionRequest } from "@/pages/graphs-detail/shell/useOpenSessionRequest";
 import type { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";

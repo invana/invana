@@ -45,7 +45,7 @@ import {
 import type {
 	ExpandRequest,
 	NeighborExpandResponse,
-} from "@/pages/graphs-detail/features/explorer/types";
+} from "@/pages/graphs-detail/features/explorer";
 import type { InteractionRef } from "@/services/telemetry/tracer";
 import { RendererCapabilityBanner } from "@invana/canvas-ui";
 import type {

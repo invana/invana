@@ -8,7 +8,7 @@
  */
 
 import { formatRelativeTime } from "@/lib/time";
-import { slotForType } from "@/pages/graphs-detail/features/explorer/typeColor";
+import { slotForType } from "@/pages/graphs-detail/features/explorer";
 import type {
 	Growth,
 	GrowthRow,

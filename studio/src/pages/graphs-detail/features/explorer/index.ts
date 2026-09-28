@@ -57,3 +57,12 @@ export {
 	setNodeHidden,
 	setNodeTypeHidden,
 } from "@/pages/graphs-detail/features/explorer/visibility";
+
+export { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
+export { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
+export { slotForType } from "@/pages/graphs-detail/features/explorer/typeColor";
+export type {
+	ExpandRequest,
+	NeighborExpandResponse,
+	TypeCountsResponse,
+} from "@/pages/graphs-detail/features/explorer/types";

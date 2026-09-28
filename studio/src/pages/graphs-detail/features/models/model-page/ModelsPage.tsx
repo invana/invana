@@ -10,7 +10,7 @@
  */
 
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
-import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
+import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer";
 import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
 import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs/queries";
 import { modelsApi } from "@/pages/graphs-detail/features/models/api";
