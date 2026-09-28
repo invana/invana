@@ -1,10 +1,6 @@
-import { LayeredCanvasStatus } from "@/canvases/layered/LayeredCanvasChrome";
-import { attachmentFor } from "@/pages/graphs-detail/features/assistant/SessionComposer";
 import { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
 import { boardPageId } from "@/pages/graphs-detail/features/boards";
 import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
-import { ExplorerHeaderToolbar } from "@/pages/graphs-detail/features/explorer";
-import { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer";
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,
@@ -22,31 +18,23 @@ import { useModelsQuery } from "@/pages/graphs-detail/features/models/queries";
 import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { useRunStep } from "@/pages/graphs-detail/features/runs/boards";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
-import { AssistantHost } from "@/pages/graphs-detail/shell/AssistantHost";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
+import { graphDetailChrome } from "@/pages/graphs-detail/shell/GraphDetailChrome";
 import { layeredCanvasBody } from "@/pages/graphs-detail/shell/layeredCanvasBody";
 import { leftSectionContent } from "@/pages/graphs-detail/shell/leftSectionContent";
+import { rightSection } from "@/pages/graphs-detail/shell/rightSections";
 import { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 import { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
 import { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
 import { useOpenPages } from "@/pages/graphs-detail/shell/useOpenPages";
-import {
-	type RightSectionKey,
-	useRightSection,
-} from "@/pages/graphs-detail/shell/useRightSection";
+import { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
 import { reportBoundaryError } from "@/services/telemetry/errors";
 import type { QueryResponse } from "@/types/query";
 import { CanvasContext } from "@invana/canvas-react";
-import {
-	BoardPagesViewPanel,
-	CanvasMessageBar,
-	GraphStatusBar as CanvasStatusBar,
-} from "@invana/canvas-ui";
-import { Button, ErrorBoundary, cn } from "@invana/ui";
-import { Sparkles } from "lucide-react";
-import type { ReactNode } from "react";
+import { BoardPagesViewPanel } from "@invana/canvas-ui";
+import { ErrorBoundary } from "@invana/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 
@@ -102,34 +90,23 @@ export function GraphDetailPage() {
 		return out;
 	}, [planLibrary.data]);
 
+	const sessionState = useSessions(username, graphSlug, {
+		onResult: ({ sessionId, messageId, result }) =>
+			handleStreamResult(sessionId, messageId, result),
+	});
 	const {
 		sessions,
 		activeSession,
 		activeSessionId,
-		isRunning,
-		isRefreshing,
-		sort,
-		setSort,
-		showArchived,
-		setShowArchived,
 		send,
 		rerun,
 		recordLoad,
-		fetchContext,
-		setFeedback,
-		stop,
 		refresh,
-		setPinned,
-		setArchived,
 		renameSession,
 		world,
-		setSpendPerRun,
 		openSession,
 		backToList,
-	} = useSessions(username, graphSlug, {
-		onResult: ({ sessionId, messageId, result }) =>
-			handleStreamResult(sessionId, messageId, result),
-	});
+	} = sessionState;
 	// The canvas works in the open thread's world (AS5 · AD15): its restore
 	// check, its expansions and its legend read what the thread asks in. No
 	// thread open is *Everything*.
@@ -323,116 +300,7 @@ export function GraphDetailPage() {
 		setWorkKind,
 		streamResultRef,
 	});
-	const {
-		resultsByMessageId,
-		canvas,
-		magnet,
-		toggleMagnet,
-		backend,
-		canvasData,
-		styling,
-		missingIds,
-		setBackend,
-		bannerCanvasIdBySession,
-		sessionTitleById,
-		selected,
-		availableLanguages,
-		defaultLanguage,
-		handleOpenSession,
-		handleLoadToCanvasClick,
-		handleRun,
-		handleRerun,
-		handleBack,
-	} = dataBoards;
-
-	// The assistant, as the right side's `assistant` occupant. Its close closes
-	// the region.
-	const assistantContent = (
-		<AssistantHost
-			connectionMissing={connectionMissing}
-			cannotAnswer={cannotAnswer}
-			graph={graphContainer}
-			world={world}
-			onManageWorlds={() => settingsPanel.setSection("govern")}
-			availableLanguages={availableLanguages}
-			defaultLanguage={defaultLanguage}
-			llmProviders={llmProviders}
-			onRun={handleRun}
-			onStop={stop}
-			isRunning={isRunning}
-			sessions={sessions}
-			activeSession={activeSession}
-			username={username}
-			graphSlug={graphSlug}
-			bannerCanvasIdBySession={bannerCanvasIdBySession}
-			onOpenSession={handleOpenSession}
-			onBack={handleBack}
-			onRerun={handleRerun}
-			onFetchContext={fetchContext}
-			onSetFeedback={setFeedback}
-			results={resultsByMessageId}
-			onLoadToCanvas={handleLoadToCanvasClick}
-			onRefresh={refresh}
-			isRefreshing={isRefreshing}
-			onClose={right.close}
-			// The chip rides above the composer's input, not above the panel
-			// (the-assistant.md AD10).
-			attachment={attachmentDetached ? null : attachmentFor(selected)}
-			onRemoveAttachment={() => setAttachmentDetached(true)}
-			sort={sort}
-			onSortChange={setSort}
-			showArchived={showArchived}
-			onShowArchivedChange={setShowArchived}
-			onPin={setPinned}
-			onArchive={setArchived}
-			onSetSpendPerRun={setSpendPerRun}
-		/>
-	);
-
-	// The occupants of `rightSection`, keyed by `?right=`. Inspecting and asking
-	// stopped competing for the side the moment one param named which of them
-	// holds it; closing it closes the region rather than restoring the other
-	// (the-assistant.md AD11).
-	const rightSections: Record<
-		RightSectionKey,
-		{
-			defaultSize: string;
-			minSize: string;
-			maxSize: string;
-			collapsible: boolean;
-			content: ReactNode;
-		}
-	> = {
-		assistant: {
-			defaultSize: "360px",
-			minSize: "300px",
-			maxSize: "560px",
-			collapsible: false,
-			content: assistantContent,
-		},
-		inspector: {
-			defaultSize: "280px",
-			minSize: "240px",
-			maxSize: "360px",
-			collapsible: false,
-			content: (
-				<InspectorViewPanel
-					selected={selected}
-					allItems={canvasData}
-					missingIds={missingIds}
-					onClose={closeInspector}
-					modelName={modelName}
-					onOpenModel={() => {
-						// A node's provenance line opens the journal that holds the run
-						// that wrote it — the Runs panel, not an Imports panel of its own
-						// (SR7 · G41). There is no model facet to narrow to: the journal
-						// is filtered by kind, never by subject.
-						settingsPanel.setSection("runs");
-					}}
-				/>
-			),
-		},
-	};
+	const { canvas, styling, sessionTitleById, selected } = dataBoards;
 
 	// One rail, one page: the `leftSection` occupant for the open `?panel` key.
 	const leftContent = leftSectionContent({
@@ -493,6 +361,33 @@ export function GraphDetailPage() {
 		toggleInspector,
 	});
 
+	// The right side's occupant, and the header controls and `footer`.
+	const regionDeps = {
+		username,
+		graphSlug,
+		right,
+		sessionState,
+		dataBoards,
+		connectionMissing,
+		cannotAnswer,
+		graphContainer,
+		settingsPanel,
+		llmProviders,
+		attachmentDetached,
+		setAttachmentDetached,
+		closeInspector,
+		modelName,
+	};
+	const chrome = graphDetailChrome({
+		username,
+		graphSlug,
+		right,
+		dataBoards,
+		activeSessionId,
+		workCanvas,
+		workTarget,
+	});
+
 	return (
 		// Lifted context: the live engine reaches the header toolbar, which lives
 		// in GraphDetail's header (a sibling of <Board>, outside its own provider).
@@ -512,39 +407,7 @@ export function GraphDetailPage() {
 					objectLabel={
 						activeSessionId ? sessionTitleById.get(activeSessionId) : undefined
 					}
-					// One assistant, reachable from every surface (AD1). The trigger sits
-					// in the header's panel controls, after fullscreen — a persistent
-					// control, so it keeps one name wherever you are.
-					headerPanelControls={
-						<Button
-							variant="ghost"
-							size="icon"
-							className={cn("h-7 w-7", right.is("assistant") && "text-primary")}
-							onClick={() => right.toggle("assistant")}
-							title={
-								right.is("assistant") ? "Close the assistant" : "Ask about this"
-							}
-						>
-							<Sparkles className="h-4 w-4" />
-						</Button>
-					}
-					headerCenter={
-						canvas && activeSessionId ? (
-							// The canvas toolbar reads the live camera; it only initialises
-							// correctly mounted in the app header (in the main-section tab bar
-							// the camera reads null and `HeaderToolbarItems` throws). It sits
-							// directly above the canvas tabs. Dead-centre it against the full
-							// header width (the header nav is `relative`; see useAppHeader).
-							<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-								<ExplorerHeaderToolbar
-									magnet={magnet}
-									onToggleMagnet={toggleMagnet}
-									backend={backend}
-									onBackendChange={setBackend}
-								/>
-							</div>
-						) : undefined
-					}
+					{...chrome}
 					// One column, one open `?panel` key. With no key open — or one this
 					// page draws nothing for — there is no left column at all.
 					leftSection={
@@ -590,46 +453,7 @@ export function GraphDetailPage() {
 							</ErrorBoundary>
 						),
 					}}
-					// One region, one occupant, looked up by `?right=`. A third occupant
-					// is one more entry here — not another branch (graph-detail-page.md
-					// G16). Each entry carries its own size triple, because the size
-					// belongs to what is in the region rather than to the region.
-					rightSection={
-						right.key
-							? {
-									...rightSections[right.key],
-									content: (
-										<ErrorBoundary
-											key={right.key}
-											onError={reportBoundaryError}
-										>
-											{rightSections[right.key].content}
-										</ErrorBoundary>
-									),
-								}
-							: undefined
-					}
-					statusMetrics={
-						// Live engine telemetry — node/edge totals, zoom, pan, pointer world
-						// position, hovered node/edge, selection counts — self-wired off the
-						// lifted CanvasContext (same status bar as the canvas-react story).
-						// A work canvas has no engine, so it states what it *is* instead:
-						// `LIBRARY · 8 steps · 3 agents`.
-						workCanvas && workTarget ? (
-							<LayeredCanvasStatus
-								username={username as string}
-								graphSlug={graphSlug as string}
-								target={workTarget}
-							/>
-						) : canvas && activeSessionId ? (
-							<CanvasStatusBar />
-						) : null
-					}
-					// The shared message bar — shows whatever was last pushed via
-					// Board.showMessage (e.g. a layout's "Running… / ready"); empty when idle.
-					footerRightExtras={
-						canvas && activeSessionId ? <CanvasMessageBar /> : null
-					}
+					rightSection={rightSection(regionDeps)}
 				/>
 			</OpenBoardContext.Provider>
 		</CanvasContext.Provider>

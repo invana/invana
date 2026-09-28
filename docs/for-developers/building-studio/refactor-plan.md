@@ -205,7 +205,9 @@ Leaf-first, so a module never moves while something it owns is still elsewhere.
 
 ### 3.2 Decomposing `GraphDetailPage.tsx`
 
-**Status: open.** 3,214 lines at the start, almost all of it one component; 637 now. Every row below has left except the last — the `rightSection` occupants, with the header controls and the `footer`. It is cut by moves, not rewritten: each
+**Status: open.** 3,214 lines at the start, almost all of it one component; 461 now. Every row below has left. What is still over the 400-line
+target is not in the table: the `leftSection` region's wrapper, the Models-page opener, the legacy
+`?panel=sessions` rewrite and the plan-name maps. It is cut by moves, not rewritten: each
 piece leaves with its state, its effects and its one-shot refs, and the page keeps calling it the
 way it did. What remains composes — `GraphDetail`'s regions, the providers, the header controls.
 
@@ -224,7 +226,8 @@ way it did. What remains composes — `GraphDetail`'s regions, the providers, th
 | Node expansion under the thread's world, and the menus it offers | `features/explorer/useCanvasExpand.ts` | hook |
 | The ask, its stream, the inline results, the restore of a session's canvas | `features/assistant/useAssistantCanvasBridge.ts` | hook |
 | The page list, the active page, select, close, the strip's actions, and the data page's body with the handle the strip calls into | `shell/useOpenPages.tsx` | hook |
-| The `rightSection` occupants and their sizes | `shell/rightSections.tsx` | function |
+| The `rightSection` occupants and their sizes, in the region's error boundary | `shell/rightSections.tsx` | function |
+| The header controls — the assistant's trigger, the canvas toolbar — and the `footer`'s status and message bar | `shell/GraphDetailChrome.tsx` | function |
 
 Everything lands in `shell/` except what reads no region: a module never imports the shell
 ([code-shape.md](code-shape.md) §4). The stream callback `useSessions` takes stays a ref on the page,
