@@ -1,4 +1,5 @@
 import { usd } from "@/lib/format";
+
 /**
  * A step dashboard, composed — artboards **D2 · D3 · D4** ([34l–34n](../../../../../../docs/for-developers/the-screens.md)).
  *
@@ -13,21 +14,23 @@ import { usd } from "@/lib/format";
  * catalogue entry ships a surface by recording one of those shapes.
  */
 
+import type {
+	DashboardSpec,
+	PanelSpec,
+	TableOptions,
+	TabSpec,
+} from "@invana/dashboard";
 import { formatDuration } from "@/lib/time";
-import {
-	type WithStepTouch,
-	touchesOfStepKey,
-} from "@/pages/graphs-detail/features/lenses";
 import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
+import {
+	touchesOfStepKey,
+	type WithStepTouch,
+} from "@/pages/graphs-detail/features/lenses";
 import type {
 	TraceRead,
 	TraceStepRead,
 } from "@/pages/graphs-detail/features/runs/api";
 import {
-	type TaskGroup,
-	VIEW_ACTION,
-	VIEW_DASHBOARD,
-	VIEW_SPEC,
 	boundOf,
 	compact,
 	count,
@@ -42,15 +45,13 @@ import {
 	statusChip,
 	stepAddress,
 	stepTitle,
+	type TaskGroup,
 	tileToneOf,
 	toneOf,
+	VIEW_ACTION,
+	VIEW_DASHBOARD,
+	VIEW_SPEC,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
-import type {
-	DashboardSpec,
-	PanelSpec,
-	TabSpec,
-	TableOptions,
-} from "@invana/dashboard";
 
 export const STEP_ACTIONS = {
 	view: VIEW_ACTION,
@@ -371,6 +372,7 @@ function input(step: TraceStepRead): PanelSpec | null {
 	return {
 		kind: "properties",
 		title: "Input · the request, resolved",
+		// biome-ignore lint/suspicious/noTemplateCurlyInString: the copy shows the binding syntax itself
 		aside: step.args ? "args after ${…} binding" : "what the step recorded",
 		options: {
 			rows: Object.entries(args).map(([label, value]) => ({

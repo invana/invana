@@ -8,18 +8,18 @@
  * ([US7](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  */
 
+import { Dashboard } from "@invana/dashboard";
+import { EmptyState, Spinner } from "@invana/ui";
+import { useMemo, useState } from "react";
 import { useReport } from "@/pages/graphs-detail/features/boards";
 import { SKILL_ACTIONS } from "@/pages/graphs-detail/features/skills/boards/shared";
 import { usageBoardSpec } from "@/pages/graphs-detail/features/skills/boards/usageBoardSpec";
 import {
-	useSkillUsageQuery,
 	useSkillsQuery,
+	useSkillUsageQuery,
 } from "@/pages/graphs-detail/features/skills/queries";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 import { VIEW_DASHBOARD } from "@/pages/graphs-detail/shared/dashboardSpec";
-import { Dashboard } from "@invana/dashboard";
-import { EmptyState, Spinner } from "@invana/ui";
-import { useMemo, useState } from "react";
 
 export interface UsageBoardPageProps {
 	username: string;

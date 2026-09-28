@@ -1,11 +1,13 @@
-import { EnvelopeCanvas } from "@/pages/graphs-detail/features/agents";
-import { LineageCanvas } from "@/pages/graphs-detail/features/agents";
+import type { ReactNode } from "react";
+import {
+	EnvelopeCanvas,
+	LineageCanvas,
+} from "@/pages/graphs-detail/features/agents";
 import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans";
 import { PlanCanvas } from "@/pages/graphs-detail/features/projects";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 import type { LeftNavKey } from "@/pages/graphs-detail/shell/useLeftSection";
 import { ApiError } from "@/services/api/client";
-import type { ReactNode } from "react";
 
 /**
  * What the main area says when it has nothing to draw.

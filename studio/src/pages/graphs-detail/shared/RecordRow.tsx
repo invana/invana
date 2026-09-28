@@ -23,10 +23,10 @@
  *   reveal, and they sit before it.
  */
 
+import { cn, StatusDot } from "@invana/ui";
+import type { CSSProperties, ReactNode } from "react";
 import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
-import { StatusDot, cn } from "@invana/ui";
-import type { CSSProperties, ReactNode } from "react";
 
 export function RecordRow({
 	active,

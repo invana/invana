@@ -19,6 +19,9 @@
  * name the one skill it refused (BN11).
  */
 
+import { Button, RecordHeader, TabbedPanel } from "@invana/ui";
+import { Eye, Lock, Play, Save, Star } from "lucide-react";
+import { useMemo, useState } from "react";
 import { AgentActivityTab } from "@/pages/graphs-detail/features/agents/AgentActivityTab";
 import { AgentEffortTab } from "@/pages/graphs-detail/features/agents/AgentEffortTab";
 import { AgentOverviewTab } from "@/pages/graphs-detail/features/agents/AgentOverviewTab";
@@ -41,9 +44,6 @@ import {
 	agentTone,
 	humanStatus,
 } from "@/pages/graphs-detail/shared/statusTone";
-import { Button, RecordHeader, TabbedPanel } from "@invana/ui";
-import { Eye, Lock, Play, Save, Star } from "lucide-react";
-import { useMemo, useState } from "react";
 
 /**
  * Every step the interpreter knows. The allow-list is drawn against this whole

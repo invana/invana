@@ -20,14 +20,14 @@
  * ([GR13](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  */
 
-import { matches } from "@/pages/graphs-detail/features/lenses";
-import {
-	useLensesQuery,
-	useParticipantsQuery,
-} from "@/pages/graphs-detail/features/lenses";
 import { RichSelect, type RichSelectOption } from "@invana/ui";
 import { Globe, Settings2 } from "lucide-react";
 import { useMemo } from "react";
+import {
+	matches,
+	useLensesQuery,
+	useParticipantsQuery,
+} from "@/pages/graphs-detail/features/lenses";
 
 /** The rules GR13 resolves — a model version is the one participant a world can
  *  name that the Graph can stop publishing underneath it. */

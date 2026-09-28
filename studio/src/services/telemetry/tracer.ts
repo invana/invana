@@ -29,12 +29,12 @@
  */
 import {
 	type Context,
+	context,
+	propagation,
 	ROOT_CONTEXT,
 	type Span,
 	SpanKind,
 	SpanStatusCode,
-	context,
-	propagation,
 	trace,
 } from "@opentelemetry/api";
 import { recordAction } from "./metrics";

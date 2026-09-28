@@ -1,19 +1,17 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-	"vcs": {
-		"enabled": true,
-		"clientKind": "git",
-		"useIgnoreFile": true
-	},
+	"$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+	"root": false,
+	"extends": "//",
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": [
-			"node_modules",
-			"dist",
-			"e2e/.auth",
-			"test-results",
-			"playwright-report",
-			"blob-report"
+		"includes": [
+			"**",
+			"!**/node_modules",
+			"!**/dist",
+			"!**/e2e/.auth",
+			"!**/test-results",
+			"!**/playwright-report",
+			"!**/blob-report"
 		]
 	},
 	"formatter": {
@@ -24,10 +22,23 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true,
+			"preset": "recommended",
 			"correctness": {
 				"noUnusedVariables": "warn",
 				"noUnusedImports": "warn"
+			},
+			"style": {
+				"noRestrictedImports": {
+					"level": "error",
+					"options": {
+						"patterns": [
+							{
+								"group": ["@/pages/graphs-detail/features/*/**"],
+								"message": "Import another module through its index.ts (code-shape.md §4.1)."
+							}
+						]
+					}
+				}
 			}
 		}
 	},
@@ -38,7 +49,396 @@
 			"semicolons": "always"
 		}
 	},
-	"organizeImports": {
-		"enabled": true
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["src/**", "!**/*.test.ts", "!**/*.test.tsx"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noFocusedTests": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/agents/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/agents/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/assistant/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/assistant/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/boards/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/boards/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/events/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/events/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/explorer/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/explorer/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/graphs/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/graphs/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/lenses/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/lenses/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/llms/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/llms/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/models/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/models/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/plans/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/plans/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/projections/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/projections/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/projects/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/projects/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/rules/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/rules/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/runs/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/runs/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/setup/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/setup/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/features/skills/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@/pages/graphs-detail/features/*/**",
+											"!@/pages/graphs-detail/features/skills/**"
+										],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		}
+	],
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
 	}
 }

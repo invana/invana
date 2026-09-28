@@ -1,9 +1,3 @@
-import {
-	ProvenanceBlock,
-	isProvenanceKey,
-	readProvenance,
-} from "@/pages/graphs-detail/features/explorer/ProvenanceBlock";
-import type { QueryResultItem } from "@/types/query";
 import { ScrollArea, TabbedPanel } from "@invana/ui";
 import {
 	Network,
@@ -11,6 +5,12 @@ import {
 	PanelRightClose,
 	SlidersHorizontal,
 } from "lucide-react";
+import {
+	isProvenanceKey,
+	ProvenanceBlock,
+	readProvenance,
+} from "@/pages/graphs-detail/features/explorer/ProvenanceBlock";
+import type { QueryResultItem } from "@/types/query";
 
 interface InspectorViewPanelProps {
 	selected: QueryResultItem | null;

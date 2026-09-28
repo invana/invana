@@ -7,6 +7,7 @@
  * disagrees with the panel.
  */
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	projectsApi,
 	todosApi,
@@ -18,7 +19,6 @@ import type {
 	TodoUpdate,
 } from "@/pages/graphs-detail/features/projects/types";
 import { runsApi } from "@/pages/graphs-detail/features/runs";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type Scope = { username: string; graphSlug: string };
 

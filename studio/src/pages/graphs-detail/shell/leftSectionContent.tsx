@@ -1,16 +1,23 @@
+import type { GraphCanvas } from "@invana/graph";
+import { ErrorBoundary } from "@invana/ui";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant";
-import type { OpenBoard } from "@/pages/graphs-detail/features/boards";
-import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
+import type {
+	CanvasStyling,
+	OpenBoard,
+} from "@/pages/graphs-detail/features/boards";
 import { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer";
-import { LensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import type { LensKind } from "@/pages/graphs-detail/features/lenses";
+import { LensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import {
 	type ModelSelection,
 	ModelViewPanel,
 } from "@/pages/graphs-detail/features/models";
-import { LibraryViewPanel } from "@/pages/graphs-detail/features/plans";
-import { taskPlansApi } from "@/pages/graphs-detail/features/plans";
+import {
+	LibraryViewPanel,
+	taskPlansApi,
+} from "@/pages/graphs-detail/features/plans";
 import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects";
 import { RunsViewPanel } from "@/pages/graphs-detail/features/runs";
 import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills";
@@ -18,9 +25,6 @@ import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCan
 import type { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { reportBoundaryError } from "@/services/telemetry/errors";
 import type { QueryResultItem } from "@/types/query";
-import type { GraphCanvas } from "@invana/graph";
-import { ErrorBoundary } from "@invana/ui";
-import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 type Sessions = ReturnType<typeof useSessions>;
 

@@ -7,13 +7,11 @@
  * bounces the user to /login on next render.
  */
 
-import { recordRequest } from "@/services/telemetry/metrics";
-import { type Interaction, startClientSpan } from "@/services/telemetry/tracer";
 import {
+	propagation,
 	type Span,
 	type SpanContext,
 	SpanStatusCode,
-	propagation,
 } from "@opentelemetry/api";
 import axios, {
 	type AxiosError,
@@ -22,6 +20,8 @@ import axios, {
 	type InternalAxiosRequestConfig,
 } from "axios";
 import { toast } from "sonner";
+import { recordRequest } from "@/services/telemetry/metrics";
+import { type Interaction, startClientSpan } from "@/services/telemetry/tracer";
 
 /** Engine origin — shared with the SSE clients, which can't go through axios. */
 export const API_BASE_URL =

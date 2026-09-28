@@ -133,6 +133,7 @@ export const CANVAS_KINDS: Record<CanvasKind, CanvasKindSpec> = {
 		label: "Workflow",
 		icon: Workflow,
 		nodes: "steps",
+		// biome-ignore lint/suspicious/noTemplateCurlyInString: the copy shows the binding syntax itself
 		edges: "required order + ${steps.X.y} bindings",
 		// Authoring a workflow is out of MVP; a canvas is not a loophole in a
 		// threat model (docs/for-developers/modules/explore/features/selection-and-the-panel.md).

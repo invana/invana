@@ -1,11 +1,11 @@
-import { RecentSessions } from "@/pages/graphs-detail/features/graphs/RecentSessions";
+import { Badge, Button, Skeleton } from "@invana/ui";
+import { useCallback } from "react";
 import { useGraphQuery } from "@/pages/graphs-detail/features/graphs/queries";
+import { RecentSessions } from "@/pages/graphs-detail/features/graphs/RecentSessions";
 import { isSetupComplete } from "@/pages/graphs-detail/features/graphs/types";
 import { SetupTimeline } from "@/pages/graphs-detail/features/setup";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
-import { Badge, Button, Skeleton } from "@invana/ui";
-import { useCallback } from "react";
 
 interface Props {
 	username: string;

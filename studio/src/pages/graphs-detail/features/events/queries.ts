@@ -6,9 +6,9 @@
  * surfaces can render an append-as-you-scroll list naturally.
  */
 
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { eventsApi } from "@/pages/graphs-detail/features/events/api";
 import type { EventListFilters } from "@/pages/graphs-detail/features/events/types";
-import { useInfiniteQuery } from "@tanstack/react-query";
 
 const STALE_MS = 30_000; // 30s — events are streamed live; cache rarely matters.
 

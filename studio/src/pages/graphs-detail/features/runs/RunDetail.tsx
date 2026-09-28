@@ -18,24 +18,6 @@
  * plan it ran in `mainSection`, beside the run, which stays open here.
  */
 
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
-import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses";
-import { TraceIdValue } from "@/pages/graphs-detail/features/runs/TraceIdValue";
-import { waterfallTasks } from "@/pages/graphs-detail/features/runs/boards/runBoardSpec";
-import { useRunTrace } from "@/pages/graphs-detail/features/runs/boards/useRunTrace";
-import {
-	type SummaryRow,
-	planKeyOf,
-	runSummary,
-} from "@/pages/graphs-detail/features/runs/runSummary";
-import {
-	groupSteps,
-	isLive,
-	originOf,
-	runAddress,
-	toneOf,
-} from "@/pages/graphs-detail/shared/dashboards/shared";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 import {
 	AddressChip,
 	Badge,
@@ -50,6 +32,24 @@ import {
 	TouchStrip,
 } from "@invana/ui";
 import type { ReactNode } from "react";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
+import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses";
+import { waterfallTasks } from "@/pages/graphs-detail/features/runs/boards/runBoardSpec";
+import { useRunTrace } from "@/pages/graphs-detail/features/runs/boards/useRunTrace";
+import {
+	planKeyOf,
+	runSummary,
+	type SummaryRow,
+} from "@/pages/graphs-detail/features/runs/runSummary";
+import { TraceIdValue } from "@/pages/graphs-detail/features/runs/TraceIdValue";
+import {
+	groupSteps,
+	isLive,
+	originOf,
+	runAddress,
+	toneOf,
+} from "@/pages/graphs-detail/shared/dashboards/shared";
+import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 export interface RunDetailProps {
 	username: string;

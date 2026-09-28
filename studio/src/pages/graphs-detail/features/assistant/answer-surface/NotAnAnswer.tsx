@@ -21,8 +21,8 @@
  * this is *not* a result, without reading a word of it.
  */
 
-import type { Diagnosis } from "@/pages/graphs-detail/features/runs";
 import { Button, CannotAnswerCard, DiagnosisCard } from "@invana/ui";
+import type { Diagnosis } from "@/pages/graphs-detail/features/runs";
 
 /**
  * The graph does not hold what was asked.

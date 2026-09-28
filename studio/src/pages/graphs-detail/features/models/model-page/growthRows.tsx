@@ -7,6 +7,11 @@
  * nothing ever counted draws the never-imported state, never a chart of zeros.
  */
 
+import { StackedAreaChart } from "@invana/charts";
+import type { RowSpec } from "@invana/dashboard";
+import { type ColumnDef, DataTable } from "@invana/tables";
+import { Button, EmptyState } from "@invana/ui";
+import { Activity, Upload } from "lucide-react";
 import { formatRelativeTime } from "@/lib/time";
 import { slotForType } from "@/pages/graphs-detail/features/explorer";
 import type {
@@ -14,11 +19,6 @@ import type {
 	GrowthRow,
 	WrittenBy,
 } from "@/pages/graphs-detail/features/models/types";
-import { StackedAreaChart } from "@invana/charts";
-import type { RowSpec } from "@invana/dashboard";
-import { type ColumnDef, DataTable } from "@invana/tables";
-import { Button, EmptyState } from "@invana/ui";
-import { Activity, Upload } from "lucide-react";
 
 export interface GrowthRowsOptions {
 	/** One model's name, and its version readout, when scoped. */

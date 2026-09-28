@@ -27,6 +27,22 @@
  * project its title (PT8 · PT9, docs/for-developers/modules/work/features/projects-and-tasks.md).
  */
 
+import { Input, Label, Textarea } from "@invana/forms";
+import {
+	Button,
+	ClampedText,
+	cn,
+	FilterBar,
+	PropertyList,
+	PropertyRow,
+	Spinner,
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger,
+} from "@invana/ui";
+import { Archive, ArchiveRestore, Pencil } from "lucide-react";
+import { useMemo, useState } from "react";
 import {
 	useProjectMutations,
 	useProjectPlanQuery,
@@ -40,8 +56,8 @@ import type {
 	Todo,
 } from "@/pages/graphs-detail/features/projects/types";
 import { ProjectRules } from "@/pages/graphs-detail/features/rules";
-import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 import {
 	DetailBlock,
 	DetailPlaceholder,
@@ -54,22 +70,6 @@ import { humanStatus, taskTone } from "@/pages/graphs-detail/shared/statusTone";
 import { FilterSelect } from "@/ui/FilterSelect";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import { PrincipalChip } from "@/ui/PrincipalChip";
-import { Input, Label, Textarea } from "@invana/forms";
-import {
-	Button,
-	ClampedText,
-	FilterBar,
-	PropertyList,
-	PropertyRow,
-	Spinner,
-	Tabs,
-	TabsContent,
-	TabsList,
-	TabsTrigger,
-	cn,
-} from "@invana/ui";
-import { Archive, ArchiveRestore, Pencil } from "lucide-react";
-import { useMemo, useState } from "react";
 
 /**
  * Focus the field the moment it appears. The form only exists because the user

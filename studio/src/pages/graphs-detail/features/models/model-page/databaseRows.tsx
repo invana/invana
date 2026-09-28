@@ -8,13 +8,6 @@
  * draws no marks.
  */
 
-import { formatRelativeTime } from "@/lib/time";
-import type {
-	Drift,
-	PhysicalRule,
-	PhysicalSchema,
-	PhysicalType,
-} from "@/pages/graphs-detail/features/models/types";
 import type { RowSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import {
@@ -25,6 +18,13 @@ import {
 	SectionHeader,
 } from "@invana/ui";
 import { Database, RefreshCw } from "lucide-react";
+import { formatRelativeTime } from "@/lib/time";
+import type {
+	Drift,
+	PhysicalRule,
+	PhysicalSchema,
+	PhysicalType,
+} from "@/pages/graphs-detail/features/models/types";
 
 const DRIFT: Record<Drift, { tone: MarkTone; glyph: string; label: string }> = {
 	in_both: { tone: "success", glyph: "●", label: "in both" },

@@ -1,7 +1,3 @@
-import { SaturationBridge } from "@/components/SaturationBridge";
-import { ThemeSyncBridge } from "@/components/ThemeSyncBridge";
-import { router } from "@/router";
-import { reportError, shouldReport } from "@/services/telemetry/errors";
 import { ThemeProvider } from "@invana/themes";
 import { Toaster, TooltipProvider } from "@invana/ui";
 import {
@@ -13,6 +9,10 @@ import {
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
+import { SaturationBridge } from "@/components/SaturationBridge";
+import { ThemeSyncBridge } from "@/components/ThemeSyncBridge";
+import { router } from "@/router";
+import { reportError, shouldReport } from "@/services/telemetry/errors";
 // Side-effect import: register OpenTelemetry-Web (docs/for-developers/modules/platform/features/telemetry.md) before the app
 // renders, so the query→render pipeline is traced from the first interaction.
 import "@/services/telemetry/setup";

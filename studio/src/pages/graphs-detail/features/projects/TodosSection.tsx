@@ -18,35 +18,6 @@
  * purpose: a step row must mean one thing in Studio, not two.
  */
 
-import { formatDuration } from "@/lib/time";
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
-import {
-	StepList,
-	totalDuration,
-} from "@/pages/graphs-detail/features/assistant";
-import { TodoActivityTree } from "@/pages/graphs-detail/features/projects/TodoActivityTree";
-import {
-	useTodoActivityQuery,
-	useTodoMutations,
-	useTodoQuery,
-	useTodoRunsQuery,
-	useTodosQuery,
-} from "@/pages/graphs-detail/features/projects/queries";
-import type { Todo } from "@/pages/graphs-detail/features/projects/types";
-import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
-import type { RunNode } from "@/pages/graphs-detail/features/runs";
-import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
-import {
-	DetailBlock,
-	DetailPlaceholder,
-	DetailProse,
-	DetailStatus,
-} from "@/pages/graphs-detail/shared/DetailRows";
-import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import { humanStatus, taskTone } from "@/pages/graphs-detail/shared/statusTone";
-import { FilterSelect } from "@/ui/FilterSelect";
-import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
-import { PrincipalChip } from "@/ui/PrincipalChip";
 import {
 	Button,
 	CardFooter,
@@ -61,6 +32,37 @@ import {
 } from "@invana/ui";
 import { Check, Undo2, UserCog } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { formatDuration } from "@/lib/time";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
+import {
+	StepList,
+	totalDuration,
+} from "@/pages/graphs-detail/features/assistant";
+import {
+	useTodoActivityQuery,
+	useTodoMutations,
+	useTodoQuery,
+	useTodoRunsQuery,
+	useTodosQuery,
+} from "@/pages/graphs-detail/features/projects/queries";
+import { TodoActivityTree } from "@/pages/graphs-detail/features/projects/TodoActivityTree";
+import type { Todo } from "@/pages/graphs-detail/features/projects/types";
+import type {
+	RunNode,
+	TaskRunSummary,
+} from "@/pages/graphs-detail/features/runs";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
+import {
+	DetailBlock,
+	DetailPlaceholder,
+	DetailProse,
+	DetailStatus,
+} from "@/pages/graphs-detail/shared/DetailRows";
+import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
+import { humanStatus, taskTone } from "@/pages/graphs-detail/shared/statusTone";
+import { FilterSelect } from "@/ui/FilterSelect";
+import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
+import { PrincipalChip } from "@/ui/PrincipalChip";
 
 /**
  * Focus the field the moment it appears. The form only exists because the user

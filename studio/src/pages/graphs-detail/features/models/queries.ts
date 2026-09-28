@@ -1,3 +1,4 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	modelsApi,
 	schemasApi,
@@ -19,7 +20,6 @@ import type {
 	PropertyKeyCreate,
 	PropertyKeyUpdate,
 } from "@/pages/graphs-detail/features/models/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const root = (u: string, g: string) => ["models", u, g] as const;
 
@@ -248,7 +248,11 @@ export const useActivateVersionMutation = (u: string, g: string) =>
 			modelId,
 			versionId,
 			version,
-		}: { modelId: string; versionId: string; version?: string | null }) =>
+		}: {
+			modelId: string;
+			versionId: string;
+			version?: string | null;
+		}) =>
 			modelsApi.activate(u, g, modelId, versionId, {
 				version: version ?? null,
 			}),
@@ -485,8 +489,11 @@ export const useUpgradeModelMutation = (u: string, g: string) =>
 		({
 			modelId,
 			...body
-		}: { modelId: string; artefact?: ModelArtefact; starter?: string }) =>
-			modelsApi.upgradeModel(u, g, modelId, body),
+		}: {
+			modelId: string;
+			artefact?: ModelArtefact;
+			starter?: string;
+		}) => modelsApi.upgradeModel(u, g, modelId, body),
 	);
 
 // ── Links and the global model (stitch-models.md) ──────────────────────────

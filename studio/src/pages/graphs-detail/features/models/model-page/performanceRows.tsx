@@ -9,12 +9,6 @@
  * the model that declares the label. Advice is a draft change, never a write.
  */
 
-import type {
-	GrowthMark,
-	Performance,
-	ShapeCard,
-	ShapeRow,
-} from "@/pages/graphs-detail/features/models/types";
 import { LineChart } from "@invana/charts";
 import type { RowSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";
@@ -34,12 +28,18 @@ import {
 	Spinner,
 } from "@invana/ui";
 import { Plus } from "lucide-react";
+import type {
+	GrowthMark,
+	Performance,
+	ShapeCard,
+	ShapeRow,
+} from "@/pages/graphs-detail/features/models/types";
 import {
-	SignalMark,
 	callerSplit,
 	dayLabel,
 	fmtMs,
 	fmtNum,
+	SignalMark,
 } from "./insightParts";
 
 export interface PerformanceRowsOptions {
@@ -334,7 +334,13 @@ export function ShapeSheet({
 							<div className="flex flex-col gap-0.5">
 								<Eyebrow>The plan</Eyebrow>
 								{card.plan.map((line, i) => (
-									<span key={`${i}:${line}`} className="font-mono text-sm">
+									<span
+										key={`${
+											// biome-ignore lint/suspicious/noArrayIndexKey: the list is rebuilt whole, never reordered in place
+											i
+										}:${line}`}
+										className="font-mono text-sm"
+									>
 										{line}
 									</span>
 								))}

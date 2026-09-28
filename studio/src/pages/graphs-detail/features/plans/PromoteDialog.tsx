@@ -15,13 +15,9 @@
  * would quietly turn this into the authoring surface MVP does not have.
  */
 
-import { usePromoteTaskPlanMutation } from "@/pages/graphs-detail/features/plans/queries";
-import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
-import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
-import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
-import { ApiError } from "@/services/api/client";
 import {
 	Button,
+	cn,
 	Dialog,
 	DialogContent,
 	DialogDescription,
@@ -29,9 +25,13 @@ import {
 	DialogHeader,
 	DialogTitle,
 	Spinner,
-	cn,
 } from "@invana/ui";
 import { useState } from "react";
+import { usePromoteTaskPlanMutation } from "@/pages/graphs-detail/features/plans/queries";
+import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
+import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
+import { ApiError } from "@/services/api/client";
 
 /** `nl-compare` — a key is the contract, so it is constrained like one. */
 const KEY_PATTERN = /^[a-z][a-z0-9-]{1,62}$/;

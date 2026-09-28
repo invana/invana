@@ -18,14 +18,16 @@
  * at a list of projects.
  */
 
+import { PropertyList, PropertyRow, StatusDot } from "@invana/ui";
 import {
+	hasOutstandingSetup,
 	useGraphConnectionQuery,
 	useGraphQuery,
 } from "@/pages/graphs-detail/features/graphs";
-import { hasOutstandingSetup } from "@/pages/graphs-detail/features/graphs";
-import { OnboardingWizard } from "@/pages/graphs-detail/features/setup";
-import { useOnboarding } from "@/pages/graphs-detail/features/setup";
-import { PropertyList, PropertyRow, StatusDot } from "@invana/ui";
+import {
+	OnboardingWizard,
+	useOnboarding,
+} from "@/pages/graphs-detail/features/setup";
 
 interface GraphHomePageProps {
 	username: string;

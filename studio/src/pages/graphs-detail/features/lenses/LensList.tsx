@@ -9,12 +9,12 @@
  * an empty table ([GR6](../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  */
 
+import { EmptyState, LensRow, Spinner } from "@invana/ui";
 import {
 	narrowingsOf,
 	since,
 } from "@/pages/graphs-detail/features/lenses/narrowing";
 import type { Lens } from "@/pages/graphs-detail/features/lenses/types";
-import { EmptyState, LensRow, Spinner } from "@invana/ui";
 
 export interface LensListProps {
 	items: Lens[];

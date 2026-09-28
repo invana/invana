@@ -1,22 +1,22 @@
+import { Button, Progress } from "@invana/ui";
+import { X } from "lucide-react";
 import {
 	type Graph,
-	SETUP_REQUIRED,
-	SETUP_SKIPPABLE,
 	isGateOpen,
 	isSetupComplete,
+	SETUP_REQUIRED,
+	SETUP_SKIPPABLE,
 	setupSectionStatus,
 } from "@/pages/graphs-detail/features/graphs";
 import { SetupBoard } from "@/pages/graphs-detail/features/setup/SetupBoard";
 import { SetupLesson } from "@/pages/graphs-detail/features/setup/SetupLesson";
 import { SetupStepper } from "@/pages/graphs-detail/features/setup/SetupStepper";
-import { WhatNextPane } from "@/pages/graphs-detail/features/setup/WhatNextPane";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
 import {
-	WHAT_NEXT_KEY,
 	useSetupStep,
+	WHAT_NEXT_KEY,
 } from "@/pages/graphs-detail/features/setup/useSetupStep";
-import { Button, Progress } from "@invana/ui";
-import { X } from "lucide-react";
+import { WhatNextPane } from "@/pages/graphs-detail/features/setup/WhatNextPane";
 
 /**
  * The onboarding wizard — the surface that walks Setup

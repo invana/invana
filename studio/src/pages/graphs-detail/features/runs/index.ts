@@ -7,6 +7,13 @@
  * shared vocabulary stay inside.
  */
 
+export type {
+	ApiTaskRunStep,
+	ProjectionTemplateRead,
+	RunStreamHandle,
+	TraceRead,
+	TraceStepRead,
+} from "@/pages/graphs-detail/features/runs/api";
 export {
 	emissionsApi,
 	messageFromFrame,
@@ -15,13 +22,6 @@ export {
 	stepFromFrame,
 	toRunNode,
 	traceApi,
-} from "@/pages/graphs-detail/features/runs/api";
-export type {
-	ApiTaskRunStep,
-	ProjectionTemplateRead,
-	RunStreamHandle,
-	TraceRead,
-	TraceStepRead,
 } from "@/pages/graphs-detail/features/runs/api";
 export { RunBoardPage } from "@/pages/graphs-detail/features/runs/boards/RunBoardPage";
 export { useRunStep } from "@/pages/graphs-detail/features/runs/boards/useRunStep";
@@ -33,7 +33,6 @@ export { runAddress } from "@/pages/graphs-detail/features/runs/RunDetail";
 export { RunsBoardPage } from "@/pages/graphs-detail/features/runs/RunsBoardPage";
 export { RunsViewPanel } from "@/pages/graphs-detail/features/runs/RunsViewPanel";
 export { TraceIdValue } from "@/pages/graphs-detail/features/runs/TraceIdValue";
-export { LIVE_RUN_STATUSES } from "@/pages/graphs-detail/features/runs/types";
 export type {
 	AskFrame,
 	Diagnosis,
@@ -44,3 +43,4 @@ export type {
 	RunView,
 	TaskRunSummary,
 } from "@/pages/graphs-detail/features/runs/types";
+export { LIVE_RUN_STATUSES } from "@/pages/graphs-detail/features/runs/types";

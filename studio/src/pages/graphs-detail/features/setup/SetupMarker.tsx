@@ -1,6 +1,6 @@
-import type { setupSectionStatus } from "@/pages/graphs-detail/features/graphs";
 import { StatusDot } from "@invana/ui";
 import { Check } from "lucide-react";
+import type { setupSectionStatus } from "@/pages/graphs-detail/features/graphs";
 
 type Status = ReturnType<typeof setupSectionStatus>;
 

@@ -1,12 +1,12 @@
+import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
+import { ArrowRight, Lock } from "lucide-react";
 import {
 	type Graph,
-	type SetupGate,
 	missingForGate,
+	type SetupGate,
 } from "@/pages/graphs-detail/features/graphs";
 import { SETUP_STEP_BY_KEY } from "@/pages/graphs-detail/features/setup/setupSteps";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
-import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
-import { ArrowRight, Lock } from "lucide-react";
 
 const GATE_SENTENCE: Record<SetupGate, string> = {
 	connected: "a database is connected",

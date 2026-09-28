@@ -46,16 +46,16 @@
  */
 import {
 	type Context,
-	ROOT_CONTEXT,
-	type SpanContext,
 	isSpanContextValid,
 	context as otelContext,
+	ROOT_CONTEXT,
+	type SpanContext,
 	trace,
 } from "@opentelemetry/api";
 import {
 	type LogAttributes,
-	SeverityNumber,
 	logs,
+	SeverityNumber,
 } from "@opentelemetry/api-logs";
 import { type ErrorSource, moduleOf, recordError } from "./metrics";
 

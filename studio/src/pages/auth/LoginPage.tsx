@@ -1,9 +1,3 @@
-import { ModeToggle } from "@/components/ModeToggle";
-import { FormError } from "@/components/forms/FormError";
-import { useAuth } from "@/hooks/useAuth";
-import { useSessionResume } from "@/hooks/useSessionResume";
-import { authApi } from "@/services/api/auth";
-import { ApiError } from "@/services/api/client";
 import { Checkbox, Input, Label } from "@invana/forms";
 import {
 	Button,
@@ -18,15 +12,21 @@ import {
 	Container,
 	FlaskConical,
 	GitBranch,
+	Loader2,
 	Network,
 	ShieldCheck,
 	Terminal,
 	Waypoints,
 } from "lucide-react";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { FormError } from "@/components/forms/FormError";
+import { ModeToggle } from "@/components/ModeToggle";
+import { useAuth } from "@/hooks/useAuth";
+import { useSessionResume } from "@/hooks/useSessionResume";
+import { authApi } from "@/services/api/auth";
+import { ApiError } from "@/services/api/client";
 
 // Capability pillars shown on the brand panel. Phrased as what Invana *is
 // about* — no falsifiable benchmarks (the "100K+ nodes" line deliberately

@@ -1,11 +1,3 @@
-import { FormError } from "@/components/forms/FormError";
-import { modelsApi } from "@/pages/graphs-detail/features/models/api";
-import {
-	useCreateModelMutation,
-	useUpdateModelMutation,
-} from "@/pages/graphs-detail/features/models/queries";
-import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
-import { ApiError } from "@/services/api/client";
 import {
 	Input,
 	Label,
@@ -28,6 +20,14 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { FormError } from "@/components/forms/FormError";
+import { modelsApi } from "@/pages/graphs-detail/features/models/api";
+import {
+	useCreateModelMutation,
+	useUpdateModelMutation,
+} from "@/pages/graphs-detail/features/models/queries";
+import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
+import { ApiError } from "@/services/api/client";
 
 interface Props {
 	open: boolean;

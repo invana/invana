@@ -21,12 +21,6 @@
  * two runs themselves.
  */
 
-import { useCompareRunsQuery } from "@/pages/graphs-detail/features/lenses/queries";
-import type {
-	AppliedDiff,
-	AppliedField,
-	CompareSide,
-} from "@/pages/graphs-detail/features/lenses/types";
 import {
 	AddressChip,
 	Button,
@@ -41,6 +35,12 @@ import {
 	RecordHeader,
 	Spinner,
 } from "@invana/ui";
+import { useCompareRunsQuery } from "@/pages/graphs-detail/features/lenses/queries";
+import type {
+	AppliedDiff,
+	AppliedField,
+	CompareSide,
+} from "@/pages/graphs-detail/features/lenses/types";
 
 export interface CompareBoardPageProps {
 	username: string;

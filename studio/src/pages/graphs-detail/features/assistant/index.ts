@@ -2,23 +2,23 @@
  * The assistant module's public surface — the only file another module imports.
  */
 
+export type { AssistantViewPanelProps } from "@/pages/graphs-detail/features/assistant/AssistantViewPanel";
+export { AssistantViewPanel } from "@/pages/graphs-detail/features/assistant/AssistantViewPanel";
 export type {
 	Emission,
 	EmissionKind,
 	TemplateOffer,
 } from "@/pages/graphs-detail/features/assistant/answer-surface/types";
 export { sessionsApi } from "@/pages/graphs-detail/features/assistant/api";
-export { AssistantViewPanel } from "@/pages/graphs-detail/features/assistant/AssistantViewPanel";
-export type { AssistantViewPanelProps } from "@/pages/graphs-detail/features/assistant/AssistantViewPanel";
 export { attachmentFor } from "@/pages/graphs-detail/features/assistant/SessionComposer";
 export {
 	StepList,
 	totalDuration,
 } from "@/pages/graphs-detail/features/assistant/SessionSteps";
 export {
-	SessionTutorialModal,
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,
+	SessionTutorialModal,
 } from "@/pages/graphs-detail/features/assistant/SessionTutorialModal";
 export type {
 	Session,

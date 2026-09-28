@@ -18,7 +18,6 @@
  * legitimate thing to want and refusing it would be a rule nobody asked for.
  */
 
-import { useRunListQuery } from "@/pages/graphs-detail/features/runs";
 import {
 	Dialog,
 	DialogContent,
@@ -34,6 +33,7 @@ import {
 	StatusDot,
 } from "@invana/ui";
 import { useMemo } from "react";
+import { useRunListQuery } from "@/pages/graphs-detail/features/runs";
 
 export interface CompareDialogProps {
 	open: boolean;

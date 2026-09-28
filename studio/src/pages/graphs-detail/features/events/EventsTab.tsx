@@ -1,15 +1,3 @@
-import { useEventStream } from "@/hooks/useEventStream";
-import { EventTypeFilter } from "@/pages/graphs-detail/features/events/EventTypeFilter";
-import { matchesEventSearch } from "@/pages/graphs-detail/features/events/eventSearch";
-import {
-	type EventStatus,
-	StatusFilter,
-	eventStatus,
-	matchesStatusFilter,
-} from "@/pages/graphs-detail/features/events/eventStatus";
-import { useGraphEventsQuery } from "@/pages/graphs-detail/features/events/queries";
-import type { AuditEvent } from "@/pages/graphs-detail/features/events/types";
-import { TraceIdValue } from "@/pages/graphs-detail/features/runs";
 import {
 	Badge,
 	Button,
@@ -40,6 +28,18 @@ import {
 	Wand2,
 } from "lucide-react";
 import { type ReactNode, useMemo, useState } from "react";
+import { useEventStream } from "@/hooks/useEventStream";
+import { EventTypeFilter } from "@/pages/graphs-detail/features/events/EventTypeFilter";
+import { matchesEventSearch } from "@/pages/graphs-detail/features/events/eventSearch";
+import {
+	type EventStatus,
+	eventStatus,
+	matchesStatusFilter,
+	StatusFilter,
+} from "@/pages/graphs-detail/features/events/eventStatus";
+import { useGraphEventsQuery } from "@/pages/graphs-detail/features/events/queries";
+import type { AuditEvent } from "@/pages/graphs-detail/features/events/types";
+import { TraceIdValue } from "@/pages/graphs-detail/features/runs";
 
 interface Props {
 	username: string;

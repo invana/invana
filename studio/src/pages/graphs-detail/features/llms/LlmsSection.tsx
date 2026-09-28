@@ -18,6 +18,14 @@
  * removed at all (PM11).
  */
 
+import {
+	AddressChip,
+	EmptyState,
+	type PanelStackSection,
+	Spinner,
+	StatusDot,
+} from "@invana/ui";
+import { Plus, Sparkles } from "lucide-react";
 import type { Lens } from "@/pages/graphs-detail/features/lenses";
 import {
 	ProviderDetail,
@@ -29,14 +37,6 @@ import {
 	type StackSectionUi,
 	stackSection,
 } from "@/pages/graphs-detail/shared/StackSection";
-import {
-	AddressChip,
-	EmptyState,
-	type PanelStackSection,
-	Spinner,
-	StatusDot,
-} from "@invana/ui";
-import { Plus, Sparkles } from "lucide-react";
 
 /** `&provider=new` is the authoring drill-in — a value, not a second param. */
 export const NEW_PROVIDER = "new";

@@ -7,6 +7,7 @@
  * adapters on the same renderer. A library plan draws on `TaskFlowCanvas` instead (LB35).
  */
 
+import { useMemo } from "react";
 import {
 	LayeredCanvas,
 	type LayeredEdge,
@@ -14,7 +15,6 @@ import {
 } from "@/canvases/layered/LayeredCanvas";
 import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects/queries";
 import { taskTone } from "@/pages/graphs-detail/shared/statusTone";
-import { useMemo } from "react";
 
 interface Scope {
 	username: string;

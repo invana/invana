@@ -37,14 +37,14 @@
  * axis and it is never drawn as unspent.
  */
 
+import type { LayersOptions } from "@invana/dashboard";
+import type { Layer, LayerItem } from "@invana/ui";
 import type {
 	Touch,
 	TouchesResponse,
 } from "@/pages/graphs-detail/features/lenses/types";
 import type { TraceStepRead } from "@/pages/graphs-detail/features/runs";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
-import type { LayersOptions } from "@invana/dashboard";
-import type { Layer, LayerItem } from "@invana/ui";
 
 /** Every layer, spine last — the order the bands are read in. */
 export const BANDS: Layer[] = [

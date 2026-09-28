@@ -8,13 +8,6 @@
  * `templates.json` from this folder and passes them in with its own data.
  */
 
-import { renderTaskEdge, renderTaskNode } from "@/canvases/taskflow/preview";
-import type {
-	Detail,
-	TaskFlowData,
-	TaskFlowTemplates,
-} from "@/canvases/taskflow/types";
-import { useStudioCanvasTheme } from "@/canvases/theme";
 import type { CanvasConfig } from "@invana/canvas";
 import {
 	BackgroundLayer,
@@ -48,6 +41,13 @@ import type {
 import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import { Settings } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { renderTaskEdge, renderTaskNode } from "@/canvases/taskflow/preview";
+import type {
+	Detail,
+	TaskFlowData,
+	TaskFlowTemplates,
+} from "@/canvases/taskflow/types";
+import { useStudioCanvasTheme } from "@/canvases/theme";
 
 const LAYOUT = "elk";
 const FIT = { fitCamera: { padding: 60 } };

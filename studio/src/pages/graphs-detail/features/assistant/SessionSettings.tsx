@@ -1,4 +1,5 @@
 import { usdWhole } from "@/lib/format";
+
 /**
  * C10 · a spend per run for the thread — the session's settings, opened from
  * the thread header (the-assistant.md AD18 · AD21).
@@ -12,7 +13,6 @@ import { usdWhole } from "@/lib/format";
  * Empty is *the agent's cap*.
  */
 
-import type { Session } from "@/pages/graphs-detail/features/assistant/types";
 import { Input } from "@invana/forms";
 import {
 	Button,
@@ -22,6 +22,7 @@ import {
 	PopoverTrigger,
 } from "@invana/ui";
 import { useEffect, useState } from "react";
+import type { Session } from "@/pages/graphs-detail/features/assistant/types";
 
 export interface SessionSettingsProps {
 	session: Session;

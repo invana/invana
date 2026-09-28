@@ -14,6 +14,9 @@
  * It does not write a model. Authoring is the model canvas, on a draft (ME1).
  */
 
+import { Button, EmptyState, Spinner } from "@invana/ui";
+import { AlertTriangle, Boxes, Check } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import {
 	GraphModelCanvas,
 	graphModelSettings,
@@ -24,17 +27,14 @@ import {
 	useCommitStitchesMutation,
 	useDiscardStitchesMutation,
 } from "@/pages/graphs-detail/features/models/queries";
-import { UnionList } from "@/pages/graphs-detail/features/models/stitch/UnionList";
 import {
 	buildAllModelsData,
 	parseMemberId,
 } from "@/pages/graphs-detail/features/models/stitch/allModels";
 import { DeclareStitchCard } from "@/pages/graphs-detail/features/models/stitch/components/DeclareStitchCard";
+import { UnionList } from "@/pages/graphs-detail/features/models/stitch/UnionList";
 import { useAllModels } from "@/pages/graphs-detail/features/models/stitch/useAllModels";
 import type { LinkKind } from "@/pages/graphs-detail/features/models/types";
-import { Button, EmptyState, Spinner } from "@invana/ui";
-import { AlertTriangle, Boxes, Check } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
 
 interface Props {
 	username: string;

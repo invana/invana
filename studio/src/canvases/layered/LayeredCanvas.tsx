@@ -27,12 +27,6 @@
  * endpoint the panel uses.
  */
 
-import { readCanvasThemeConfig } from "@/canvases/theme";
-import {
-	CANVAS_KINDS,
-	type CanvasKind,
-} from "@/pages/graphs-detail/features/boards";
-import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
 // The root is `<GraphCanvas>`, not `<Board>`: only it provides
 // `GraphCanvasContext`, which every `useGraphCanvas()` below depends on. Up to
 // canvas 0.0.11 `<Board>` provided it too, so this reads like a free swap —
@@ -50,12 +44,13 @@ import {
 	GraphLayer,
 	PinchZoomBehaviour,
 	TextResolutionLODBehaviour,
-	WheelZoomBehaviour,
 	useCanvasEvent,
 	useGraphCanvas,
 	useGraphCanvasUpdate,
 	useSelection,
+	WheelZoomBehaviour,
 } from "@invana/canvas-react";
+import type * as graph from "@invana/graph";
 import type {
 	GraphData,
 	GraphEdge,
@@ -63,16 +58,21 @@ import type {
 	ResolvableEdgeStyle,
 	ResolvableNodeStyle,
 } from "@invana/graph";
-import type * as graph from "@invana/graph";
 import { ElkLayout } from "@invana/graph-layout-elkjs";
 import { useTheme } from "@invana/themes";
-import { Legend, LegendItem, type LegendSwatchKind, cn } from "@invana/ui";
+import { cn, Legend, LegendItem, type LegendSwatchKind } from "@invana/ui";
 // Vite's worker idiom: `?worker` makes the bundler emit the ELK solver as a
 // worker asset and hand back a constructor. See {@link newElkLayout} for why
 // the layout package's own default factory cannot be used.
 import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import { MousePointer2, Spline } from "lucide-react";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { readCanvasThemeConfig } from "@/canvases/theme";
+import {
+	CANVAS_KINDS,
+	type CanvasKind,
+} from "@/pages/graphs-detail/features/boards";
+import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
 
 const LAYER_ID = "graph";
 const LAYOUT_ID = "work-layered";
@@ -668,6 +668,7 @@ const LEGENDS: Record<CanvasKind, { keys: LegendKey[]; note: string }> = {
 			},
 			{ swatch: "node", tone: "info", label: "template step" },
 			{ swatch: "edge", label: "required order" },
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: the copy shows the binding syntax itself
 			{ swatch: "edge", dashed: true, label: "${steps.X.y} binding" },
 		],
 		note: "A workflow is the reusable plan. Each agent's envelope decides which workflows it may select and pins what a plan cannot change. Clicking a step selects it; nothing here is editable.",

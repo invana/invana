@@ -15,10 +15,10 @@
  * ([GR5](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  */
 
+import { Button, Eyebrow, type Layer, LayerChip } from "@invana/ui";
 import { ruleLayer } from "@/pages/graphs-detail/features/lenses/narrowing";
 import type { Lens } from "@/pages/graphs-detail/features/lenses/types";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
-import { Button, Eyebrow, type Layer, LayerChip } from "@invana/ui";
 
 export interface GuardrailsStripProps {
 	guardrails: Lens[];

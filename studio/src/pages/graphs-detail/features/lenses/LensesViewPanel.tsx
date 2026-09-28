@@ -35,12 +35,11 @@
  * board is the **auditing** one, which is the reading `Save report` can keep.
  */
 
+import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { guardrailsSection } from "@/pages/graphs-detail/features/lenses/GuardrailsSection";
 import { ImpactDialog } from "@/pages/graphs-detail/features/lenses/ImpactDialog";
-import {
-	NEW_LENS,
-	worldsSection,
-} from "@/pages/graphs-detail/features/lenses/WorldsSection";
 import {
 	useCreateLensMutation,
 	useGuardrailImpactMutation,
@@ -52,15 +51,16 @@ import type {
 	LensKind,
 	Refusal,
 } from "@/pages/graphs-detail/features/lenses/types";
+import {
+	NEW_LENS,
+	worldsSection,
+} from "@/pages/graphs-detail/features/lenses/WorldsSection";
 import { useStackSectionUi } from "@/pages/graphs-detail/shared/StackSection";
 import {
 	type GovernSectionKey,
 	useLensesViewPanel,
 } from "@/pages/graphs-detail/shell/useLensesViewPanel";
 import { ApiError } from "@/services/api/client";
-import { PanelStack, type PanelStackHandle } from "@invana/ui";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
 
 export interface LensesViewPanelProps {
 	username?: string;

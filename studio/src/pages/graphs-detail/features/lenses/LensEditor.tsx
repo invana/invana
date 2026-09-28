@@ -30,28 +30,6 @@
  * button and nothing else.
  */
 
-import {
-	RuleBuilder,
-	blankRule,
-} from "@/pages/graphs-detail/features/lenses/RuleBuilder";
-import {
-	GOVERNED_LAYERS,
-	layerSummary,
-} from "@/pages/graphs-detail/features/lenses/narrowing";
-import {
-	useParticipantsQuery,
-	useValidateLensMutation,
-} from "@/pages/graphs-detail/features/lenses/queries";
-import type {
-	CastRole,
-	GovernLayer,
-	GovernRule,
-	Lens,
-	LensCreate,
-	Participant,
-	Refusal,
-} from "@/pages/graphs-detail/features/lenses/types";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 import { Checkbox, Input, Label } from "@invana/forms";
 import {
 	Button,
@@ -66,6 +44,28 @@ import {
 } from "@invana/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import {
+	GOVERNED_LAYERS,
+	layerSummary,
+} from "@/pages/graphs-detail/features/lenses/narrowing";
+import {
+	useParticipantsQuery,
+	useValidateLensMutation,
+} from "@/pages/graphs-detail/features/lenses/queries";
+import {
+	blankRule,
+	RuleBuilder,
+} from "@/pages/graphs-detail/features/lenses/RuleBuilder";
+import type {
+	CastRole,
+	GovernLayer,
+	GovernRule,
+	Lens,
+	LensCreate,
+	Participant,
+	Refusal,
+} from "@/pages/graphs-detail/features/lenses/types";
+import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 export interface LensDraft {
 	name: string;

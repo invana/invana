@@ -7,13 +7,13 @@
  * panels only hand them the spec's data.
  */
 
-import { formatElapsed } from "@/lib/time";
 import {
 	LineChart,
 	type LineChartMark,
 	StackedBarChartV,
 } from "@invana/charts";
 import type { PanelRendererProps } from "@invana/dashboard";
+import { formatElapsed } from "@/lib/time";
 
 export interface DailyRunsOptions {
 	days: { label: string; served: number; failed: number }[];

@@ -8,8 +8,8 @@
  * is no run to open and no step to retry.
  */
 
-import type { CastRefusal } from "@/pages/graphs-detail/features/assistant/types";
 import { RefusalCard } from "@invana/ui";
+import type { CastRefusal } from "@/pages/graphs-detail/features/assistant/types";
 
 /** The refusal in a failed send's body, or null for any other failure. */
 export function asCastRefusal(error: unknown): CastRefusal | null {

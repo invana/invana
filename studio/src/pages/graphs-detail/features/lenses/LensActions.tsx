@@ -21,14 +21,6 @@
  * with nothing named is not something anybody can act on.
  */
 
-import {
-	useDeleteLensMutation,
-	useDuplicateLensMutation,
-	usePromoteLensMutation,
-	useUpdateLensMutation,
-} from "@/pages/graphs-detail/features/lenses/queries";
-import type { Lens } from "@/pages/graphs-detail/features/lenses/types";
-import { ApiError } from "@/services/api/client";
 import { Input } from "@invana/forms";
 import {
 	AlertDialog,
@@ -45,6 +37,14 @@ import {
 } from "@invana/ui";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+	useDeleteLensMutation,
+	useDuplicateLensMutation,
+	usePromoteLensMutation,
+	useUpdateLensMutation,
+} from "@/pages/graphs-detail/features/lenses/queries";
+import type { Lens } from "@/pages/graphs-detail/features/lenses/types";
+import { ApiError } from "@/services/api/client";
 
 export interface LensActionsProps {
 	username?: string;

@@ -21,7 +21,6 @@
  * unaffected* without borrowing a mark that means the opposite.
  */
 
-import type { ImpactResponse } from "@/pages/graphs-detail/features/lenses/types";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -35,6 +34,7 @@ import {
 	DiffRow,
 	Spinner,
 } from "@invana/ui";
+import type { ImpactResponse } from "@/pages/graphs-detail/features/lenses/types";
 
 export interface ImpactDialogProps {
 	open: boolean;

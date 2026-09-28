@@ -12,12 +12,12 @@
  * `$0.00` or `{}`.
  */
 
+import type { ChipSpec, Tone } from "@invana/dashboard";
+import type { Bound, StatusDotProps, TaskGanttStatus } from "@invana/ui";
 import type {
 	TraceRead,
 	TraceStepRead,
 } from "@/pages/graphs-detail/features/runs";
-import type { ChipSpec, Tone } from "@invana/dashboard";
-import type { Bound, StatusDotProps, TaskGanttStatus } from "@invana/ui";
 
 /** A run that has not settled — the Gantt grows a now line, Cancel is offered. */
 export const LIVE_STATUSES: ReadonlySet<string> = new Set([
@@ -94,6 +94,9 @@ export function boundOf(step: TraceStepRead): Bound | undefined {
 		: undefined;
 }
 
+/** `8.2k` — a token total, which is read as a magnitude rather than a number.
+ *  It lives in `@/lib/format` now, because the journal row reads it too (SR45). */
+export { formatCompact as compact } from "@/lib/format";
 /**
  * `omit` · `count` · the view switch · `specPanel` live in
  * `shared/dashboardSpec.ts`: Skills composes declared boards too, and a second
@@ -103,17 +106,13 @@ export function boundOf(step: TraceStepRead): Bound | undefined {
  * needs.
  */
 export {
-	VIEW_ACTION,
-	VIEW_DASHBOARD,
-	VIEW_SPEC,
 	count,
 	omit,
 	specPanel,
+	VIEW_ACTION,
+	VIEW_DASHBOARD,
+	VIEW_SPEC,
 } from "@/pages/graphs-detail/shared/dashboardSpec";
-
-/** `8.2k` — a token total, which is read as a magnitude rather than a number.
- *  It lives in `@/lib/format` now, because the journal row reads it too (SR45). */
-export { formatCompact as compact } from "@/lib/format";
 
 /**
  * `0`–`1` for a value that has a real ceiling, `undefined` for one that does not.

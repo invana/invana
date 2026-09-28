@@ -14,7 +14,7 @@
 // Studio's whole palette, through `useStudioCanvasTheme`.
 
 import type { CanvasProps } from "@invana/canvas-react";
-import { type GraphCanvas, cssColorToNumber } from "@invana/graph";
+import { cssColorToNumber, type GraphCanvas } from "@invana/graph";
 import { useTheme } from "@invana/themes";
 import { useEffect } from "react";
 
@@ -62,7 +62,9 @@ function num(varName: string, fallback: number): number {
  */
 export function readCanvasThemeConfig({
 	edgeColor = true,
-}: { edgeColor?: boolean } = {}): CanvasConfig {
+}: {
+	edgeColor?: boolean;
+} = {}): CanvasConfig {
 	// Background is a CSS string on the layer; the rest are PixiJS numbers.
 	const background = resolveVar("--color-background") ?? "#181a1b";
 	const grid = resolveVar("--color-border") ?? "#35383b";

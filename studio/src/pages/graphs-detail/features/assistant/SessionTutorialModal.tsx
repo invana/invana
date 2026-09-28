@@ -1,4 +1,3 @@
-import { CAPABILITIES } from "@/pages/graphs-detail/features/assistant/sessionCapabilities";
 import {
 	Button,
 	Dialog,
@@ -8,6 +7,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@invana/ui";
+import { CAPABILITIES } from "@/pages/graphs-detail/features/assistant/sessionCapabilities";
 
 // localStorage flag so the tutorial auto-opens only on a user's first session
 // (docs/for-developers/modules/explore/features/graph-canvas.md). Reopenable anytime via the "?" in the canvas header.

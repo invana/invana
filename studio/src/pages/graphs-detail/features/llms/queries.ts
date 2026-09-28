@@ -1,10 +1,10 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { llmProvidersApi } from "@/pages/graphs-detail/features/llms/api";
 import type {
 	LLMModelCreate,
 	LLMProviderCreate,
 	LLMProviderUpdate,
 } from "@/pages/graphs-detail/features/llms/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const key = (username: string, graphSlug: string) =>
 	["llm-providers", username, graphSlug] as const;

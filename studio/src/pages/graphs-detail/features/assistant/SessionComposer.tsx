@@ -1,11 +1,3 @@
-import type { Session } from "@/pages/graphs-detail/features/assistant/types";
-import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
-import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
-import type {
-	QueryMode,
-	QueryResultItem,
-	QueryRunPayload,
-} from "@/types/query";
 import { defaultKeymap, insertNewlineAndIndent } from "@codemirror/commands";
 import { StreamLanguage } from "@codemirror/language";
 import { cypher } from "@codemirror/legacy-modes/mode/cypher";
@@ -16,6 +8,14 @@ import { Button, ChatSessionComposer, RichSelect } from "@invana/ui";
 import { ArrowUp, Bot, Paperclip, Square, Timer, X } from "lucide-react";
 import type { ChangeEvent, KeyboardEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { Session } from "@/pages/graphs-detail/features/assistant/types";
+import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
+import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
+import type {
+	QueryMode,
+	QueryResultItem,
+	QueryRunPayload,
+} from "@/types/query";
 
 // ── CodeMirror theme ──────────────────────────────────────────────────────────
 // Reads the design-kit colour tokens so the QL editor follows the active theme
@@ -711,7 +711,10 @@ export function SessionComposer({
 		files.length > 0
 			? files.map((file, i) => (
 					<span
-						key={`${file.name}-${i}`}
+						key={`${file.name}-${
+							// biome-ignore lint/suspicious/noArrayIndexKey: the list is rebuilt whole, never reordered in place
+							i
+						}`}
 						className="inline-flex items-center gap-1 bg-muted border border-border rounded-control px-1.5 py-0.5 text-muted-foreground max-w-full"
 					>
 						<span className="truncate max-w-40" title={file.name}>
@@ -732,6 +735,7 @@ export function SessionComposer({
 	return (
 		<>
 			{attachmentChip}
+			{/** biome-ignore lint/a11y/noStaticElementInteractions: a key or menu handler scoped to the region, not a control */}
 			<div ref={rootRef} onKeyDown={handleNlKeyDown}>
 				<ChatSessionComposer
 					value={nlQuery}

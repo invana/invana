@@ -1,6 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
-import { useQuery } from "@tanstack/react-query";
 
 /** What a journal row is, whatever kind of work produced it. */
 export type RunKind = "import" | "bulk" | "ask";

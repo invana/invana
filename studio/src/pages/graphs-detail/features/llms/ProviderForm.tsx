@@ -19,19 +19,6 @@
  * one is still one round trip; more are offered from the detail.
  */
 
-import { FormError } from "@/components/forms/FormError";
-import {
-	useCreateLLMProviderMutation,
-	useUpdateLLMProviderMutation,
-} from "@/pages/graphs-detail/features/llms/queries";
-import {
-	type LLMCredentialKind,
-	type LLMProvider,
-	type LLMProviderKind,
-	LLM_PROVIDER_OPTIONS,
-	PROVIDER_NAME_PATTERN,
-	suggestProviderName,
-} from "@/pages/graphs-detail/features/llms/types";
 import {
 	Input,
 	Label,
@@ -44,6 +31,19 @@ import {
 import { Button } from "@invana/ui";
 import { useState } from "react";
 import { toast } from "sonner";
+import { FormError } from "@/components/forms/FormError";
+import {
+	useCreateLLMProviderMutation,
+	useUpdateLLMProviderMutation,
+} from "@/pages/graphs-detail/features/llms/queries";
+import {
+	LLM_PROVIDER_OPTIONS,
+	type LLMCredentialKind,
+	type LLMProvider,
+	type LLMProviderKind,
+	PROVIDER_NAME_PATTERN,
+	suggestProviderName,
+} from "@/pages/graphs-detail/features/llms/types";
 
 export interface ProviderFormProps {
 	username: string;

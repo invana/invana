@@ -1,35 +1,3 @@
-import { useTicker } from "@/hooks/useTicker";
-import { formatDuration } from "@/lib/time";
-import { CastRefusalCard } from "@/pages/graphs-detail/features/assistant/CastRefusal";
-import { SessionContextDisclosure } from "@/pages/graphs-detail/features/assistant/SessionContextDisclosure";
-import {
-	OptionRow,
-	type StepClarification,
-	StepList,
-	StepTrace,
-	StepsSummary,
-} from "@/pages/graphs-detail/features/assistant/SessionSteps";
-import { stepsFor } from "@/pages/graphs-detail/features/assistant/SessionStepsTimeline";
-import {
-	RunCannotAnswer,
-	RunDiagnosis,
-} from "@/pages/graphs-detail/features/assistant/answer-surface/NotAnAnswer";
-import {
-	LoadToCanvasAction,
-	ResultBlock,
-	loadableGraph,
-} from "@/pages/graphs-detail/features/assistant/answer-surface/ResultBlock";
-import {
-	type SessionContextTurn,
-	type SessionMessage,
-	isClarification,
-} from "@/pages/graphs-detail/features/assistant/types";
-import {
-	LIVE_RUN_STATUSES,
-	type RunNode,
-} from "@/pages/graphs-detail/features/runs";
-import { useRunStore } from "@/stores/run.store";
-import type { QueryResponse } from "@/types/query";
 import {
 	ChatSessionActivityRow,
 	type ChatSessionActivityStatus,
@@ -54,6 +22,38 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTicker } from "@/hooks/useTicker";
+import { formatDuration } from "@/lib/time";
+import {
+	RunCannotAnswer,
+	RunDiagnosis,
+} from "@/pages/graphs-detail/features/assistant/answer-surface/NotAnAnswer";
+import {
+	LoadToCanvasAction,
+	loadableGraph,
+	ResultBlock,
+} from "@/pages/graphs-detail/features/assistant/answer-surface/ResultBlock";
+import { CastRefusalCard } from "@/pages/graphs-detail/features/assistant/CastRefusal";
+import { SessionContextDisclosure } from "@/pages/graphs-detail/features/assistant/SessionContextDisclosure";
+import {
+	OptionRow,
+	type StepClarification,
+	StepList,
+	StepsSummary,
+	StepTrace,
+} from "@/pages/graphs-detail/features/assistant/SessionSteps";
+import { stepsFor } from "@/pages/graphs-detail/features/assistant/SessionStepsTimeline";
+import {
+	isClarification,
+	type SessionContextTurn,
+	type SessionMessage,
+} from "@/pages/graphs-detail/features/assistant/types";
+import {
+	LIVE_RUN_STATUSES,
+	type RunNode,
+} from "@/pages/graphs-detail/features/runs";
+import { useRunStore } from "@/stores/run.store";
+import type { QueryResponse } from "@/types/query";
 
 // ── User turn ─────────────────────────────────────────────────────────────────
 

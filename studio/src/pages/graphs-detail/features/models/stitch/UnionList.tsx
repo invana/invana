@@ -7,9 +7,9 @@
  * answer "who else holds this?". Derived on read; there is no row behind it.
  */
 
+import { Badge, PanelBox, SectionHeader, Spinner } from "@invana/ui";
 import { useGlobalModelQuery } from "@/pages/graphs-detail/features/models/queries";
 import type { GlobalType } from "@/pages/graphs-detail/features/models/types";
-import { Badge, PanelBox, SectionHeader, Spinner } from "@invana/ui";
 
 function Rows({ types }: { types: GlobalType[] }) {
 	return (

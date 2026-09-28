@@ -1,9 +1,3 @@
-import { SaturationControl } from "@/components/SaturationControl";
-import { STUDIO_THEMES } from "@/components/studioThemes";
-import { useAuth } from "@/hooks/useAuth";
-import { AccessTokensTab } from "@/pages/settings/AccessTokensTab";
-import { authApi } from "@/services/api/auth";
-import { ApiError } from "@/services/api/client";
 import { Input, Label } from "@invana/forms";
 import { ThemeSelector } from "@invana/themes";
 import {
@@ -30,6 +24,12 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { SaturationControl } from "@/components/SaturationControl";
+import { STUDIO_THEMES } from "@/components/studioThemes";
+import { useAuth } from "@/hooks/useAuth";
+import { AccessTokensTab } from "@/pages/settings/AccessTokensTab";
+import { authApi } from "@/services/api/auth";
+import { ApiError } from "@/services/api/client";
 
 const USERNAME_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
 const USERNAME_COOLDOWN_DAYS = 30;

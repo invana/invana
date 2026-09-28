@@ -9,17 +9,6 @@
  * (MP2): what one scope lacks is a section, not a tab.
  */
 
-import type { TypeCountsResponse } from "@/pages/graphs-detail/features/explorer";
-import type { ModelFrame } from "@/pages/graphs-detail/features/models/stitch/allModels";
-import type {
-	GraphModelResponse,
-	GraphModelSummary,
-	Insights,
-	ModelLink,
-	StagedSet,
-	VersionSummary,
-} from "@/pages/graphs-detail/features/models/types";
-import type { PhysicalSchema } from "@/pages/graphs-detail/features/models/types";
 import type {
 	ActionSpec,
 	DashboardSpec,
@@ -29,6 +18,17 @@ import type {
 	TabSpec,
 } from "@invana/dashboard";
 import type { ReactNode } from "react";
+import type { TypeCountsResponse } from "@/pages/graphs-detail/features/explorer";
+import type { ModelFrame } from "@/pages/graphs-detail/features/models/stitch/allModels";
+import type {
+	GraphModelResponse,
+	GraphModelSummary,
+	Insights,
+	ModelLink,
+	PhysicalSchema,
+	StagedSet,
+	VersionSummary,
+} from "@/pages/graphs-detail/features/models/types";
 import {
 	type DatabaseRowsOptions,
 	databaseRows,

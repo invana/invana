@@ -4,6 +4,7 @@
  * Selecting an agent selects it in the agents list; selecting a task opens it.
  */
 
+import { useMemo } from "react";
 import {
 	LayeredCanvas,
 	type LayeredEdge,
@@ -11,7 +12,6 @@ import {
 } from "@/canvases/layered/LayeredCanvas";
 import { useAgentLineageQuery } from "@/pages/graphs-detail/features/agents/queries";
 import type { AgentEdge } from "@/pages/graphs-detail/features/agents/types";
-import { useMemo } from "react";
 
 interface Scope {
 	username: string;

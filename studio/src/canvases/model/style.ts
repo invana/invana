@@ -10,6 +10,7 @@
  * template's solid line.
  */
 
+import type { EdgeStyle, GraphData, NodeStyle } from "@invana/graph";
 import type { LiveColors } from "@/canvases/model/config";
 import {
 	MODEL_EMPTY_TYPE,
@@ -18,7 +19,6 @@ import {
 	type ModelFrameData,
 	type ModelGraphData,
 } from "@/canvases/model/types";
-import type { EdgeStyle, GraphData, NodeStyle } from "@invana/graph";
 
 const STITCH_DASH: [number, number] = [6, 4];
 

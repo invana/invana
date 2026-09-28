@@ -1,5 +1,3 @@
-import { FormError } from "@/components/forms/FormError";
-import { useCreateGraphMutation } from "@/pages/graphs-detail/features/graphs";
 import {
 	type Control,
 	type FieldConfig,
@@ -15,6 +13,8 @@ import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { FormError } from "@/components/forms/FormError";
+import { useCreateGraphMutation } from "@/pages/graphs-detail/features/graphs";
 
 function slugify(input: string): string {
 	return input

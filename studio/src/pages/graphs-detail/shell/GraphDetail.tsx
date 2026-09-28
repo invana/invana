@@ -1,16 +1,18 @@
+import { AppLayoutV2 } from "@invana/themes";
+import type { ReactNode } from "react";
+import { useParams } from "react-router-dom";
 import { AppVersion } from "@/components/AppVersion";
 import { useAppHeader } from "@/components/header/useAppHeader";
-import { SettingsViewPanel } from "@/pages/graphs-detail/features/graphs";
-import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
+import {
+	SettingsViewPanel,
+	useGraphConnectionQuery,
+} from "@/pages/graphs-detail/features/graphs";
 import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
 import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
 import {
 	type LeftNavKey,
 	useLeftSection,
 } from "@/pages/graphs-detail/shell/useLeftSection";
-import { AppLayoutV2 } from "@invana/themes";
-import type { ReactNode } from "react";
-import { useParams } from "react-router-dom";
 
 // The shell's own section shapes. Re-declared rather than imported because
 // `@invana/themes` does not export them at the top level; they are the same

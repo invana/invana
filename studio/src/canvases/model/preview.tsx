@@ -1,15 +1,15 @@
 import {
-	MODEL_EMPTY_TYPE,
-	MODEL_FRAME_TYPE,
-	type ModelEdgeData,
-	type ModelTypeData,
-} from "@/canvases/model/types";
-import {
 	EdgePreviewCard,
 	NodePreviewCard,
 	type PreviewCardRow,
 } from "@invana/canvas-ui";
 import type { GraphEdge, GraphNode } from "@invana/graph";
+import {
+	MODEL_EMPTY_TYPE,
+	MODEL_FRAME_TYPE,
+	type ModelEdgeData,
+	type ModelTypeData,
+} from "@/canvases/model/types";
 
 /** A type's hover card — its description and one row per property. */
 export function renderModelNode(node: GraphNode) {

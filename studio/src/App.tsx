@@ -1,9 +1,9 @@
-import { UserMenu } from "@/components/header/UserMenu";
-import { useAppHeader } from "@/components/header/useAppHeader";
-import { reportBoundaryError } from "@/services/telemetry/errors";
 import { AppLayoutV2 } from "@invana/themes";
 import { ErrorBoundary } from "@invana/ui";
 import { Outlet, useLocation } from "react-router-dom";
+import { UserMenu } from "@/components/header/UserMenu";
+import { useAppHeader } from "@/components/header/useAppHeader";
+import { reportBoundaryError } from "@/services/telemetry/errors";
 
 export default function App() {
 	// `leftNav` has no top items here. This shell hosts the graph-less routes

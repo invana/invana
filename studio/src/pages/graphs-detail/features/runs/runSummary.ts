@@ -1,4 +1,5 @@
 import { usd } from "@/lib/format";
+
 /**
  * A run, as the section reads it — **five sections off two reads**
  * ([SR67](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
@@ -13,20 +14,20 @@ import { usd } from "@/lib/format";
  * rather than `0 of 0`.
  */
 
+import type { TouchItem } from "@invana/ui";
 import { formatCompact } from "@/lib/format";
 import { formatElapsed } from "@/lib/time";
-import { BANDS } from "@/pages/graphs-detail/features/lenses";
 import type {
 	Touch,
 	TouchesResponse,
 } from "@/pages/graphs-detail/features/lenses";
+import { BANDS } from "@/pages/graphs-detail/features/lenses";
 import type { TraceRead } from "@/pages/graphs-detail/features/runs/api";
 import {
 	durationMs,
 	originOf,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
 import type { TraceWindow } from "@/services/telemetry/traceLink";
-import type { TouchItem } from "@invana/ui";
 
 export interface SummaryRow {
 	label: string;

@@ -1,8 +1,8 @@
 // The node and edge types the picked world holds, counted inside it — the
 // Explorer panel's legend and the expand menus' vocabulary (docs/for-developers/modules/explore/features/selection-and-the-panel.md SP6).
 
-import { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
 import { useQuery } from "@tanstack/react-query";
+import { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
 
 const TYPE_COUNTS_KEY = ["type-counts"] as const;
 

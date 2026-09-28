@@ -30,6 +30,20 @@
  */
 
 import {
+	Button,
+	CardFooter,
+	FilterBar,
+	FilterChip,
+	type PanelStackSection,
+	Progress,
+	PropertyList,
+	PropertyRow,
+	Spinner,
+	StatusDot,
+} from "@invana/ui";
+import { Bot, ChevronRight, Plus, Shield } from "lucide-react";
+import { useMemo } from "react";
+import {
 	useAgentMetersQuery,
 	useAgentSkillsAndCallablesQuery,
 	useAgentsQuery,
@@ -52,20 +66,6 @@ import {
 import { agentTone } from "@/pages/graphs-detail/shared/statusTone";
 import { FilterSelect } from "@/ui/FilterSelect";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
-import {
-	Button,
-	CardFooter,
-	FilterBar,
-	FilterChip,
-	type PanelStackSection,
-	Progress,
-	PropertyList,
-	PropertyRow,
-	Spinner,
-	StatusDot,
-} from "@invana/ui";
-import { Bot, ChevronRight, Plus, Shield } from "lucide-react";
-import { useMemo } from "react";
 
 const KIND_OPTIONS = ["seeded", "authored", "spawned"].map((value) => ({
 	value,

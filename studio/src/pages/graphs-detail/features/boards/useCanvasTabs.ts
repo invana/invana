@@ -1,5 +1,8 @@
-import { sessionsApi } from "@/pages/graphs-detail/features/assistant";
+import type { Dispatch, MutableRefObject, SetStateAction } from "react";
+import { useCallback, useMemo } from "react";
+import { toast } from "sonner";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant";
+import { sessionsApi } from "@/pages/graphs-detail/features/assistant";
 import { boardsApi } from "@/pages/graphs-detail/features/boards/api";
 import type { CanvasKind } from "@/pages/graphs-detail/features/boards/boardKinds";
 import {
@@ -10,9 +13,6 @@ import type { Board } from "@/pages/graphs-detail/features/boards/types";
 import type { useBoardVersions } from "@/pages/graphs-detail/features/boards/useBoardVersions";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import { ApiError } from "@/services/api/client";
-import { useCallback, useMemo } from "react";
-import type { Dispatch, MutableRefObject, SetStateAction } from "react";
-import { toast } from "sonner";
 
 type Sessions = ReturnType<typeof useSessions>;
 type BoardContents = ReturnType<typeof useBoardVersions>;

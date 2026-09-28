@@ -16,18 +16,6 @@
  * the reader looking for what it meant.
  */
 
-import { ProviderForm } from "@/pages/graphs-detail/features/llms/ProviderForm";
-import { llmProvidersApi } from "@/pages/graphs-detail/features/llms/api";
-import {
-	useAddLLMModelMutation,
-	useDeleteLLMProviderMutation,
-	useRemoveLLMModelMutation,
-} from "@/pages/graphs-detail/features/llms/queries";
-import {
-	type LLMModel,
-	type LLMProvider,
-	LLM_PROVIDER_OPTIONS,
-} from "@/pages/graphs-detail/features/llms/types";
 import { Input, Label } from "@invana/forms";
 import {
 	AddressChip,
@@ -42,6 +30,18 @@ import { useMutation } from "@tanstack/react-query";
 import { Check, Loader2, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { llmProvidersApi } from "@/pages/graphs-detail/features/llms/api";
+import { ProviderForm } from "@/pages/graphs-detail/features/llms/ProviderForm";
+import {
+	useAddLLMModelMutation,
+	useDeleteLLMProviderMutation,
+	useRemoveLLMModelMutation,
+} from "@/pages/graphs-detail/features/llms/queries";
+import {
+	LLM_PROVIDER_OPTIONS,
+	type LLMModel,
+	type LLMProvider,
+} from "@/pages/graphs-detail/features/llms/types";
 
 export function providerLabel(provider: LLMProvider): string {
 	return (

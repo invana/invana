@@ -6,11 +6,14 @@
  * They fetch and answer actions; `planRecordSpecs` builds each document.
  */
 
+import { Dashboard, type DashboardSpec } from "@invana/dashboard";
+import { EmptyState, Spinner } from "@invana/ui";
+import { type ReactNode, useMemo, useState } from "react";
 import {
-	RECORD_ACTIONS,
 	planArgumentsSpec,
 	planExportSpec,
 	planVersionsSpec,
+	RECORD_ACTIONS,
 } from "@/pages/graphs-detail/features/plans/boards/planRecordSpecs";
 import {
 	usePlanDiffsQuery,
@@ -20,9 +23,6 @@ import {
 } from "@/pages/graphs-detail/features/plans/queries";
 import type { TaskPlanSummary } from "@/pages/graphs-detail/features/plans/types";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import { Dashboard, type DashboardSpec } from "@invana/dashboard";
-import { EmptyState, Spinner } from "@invana/ui";
-import { type ReactNode, useMemo, useState } from "react";
 
 interface RecordPageProps {
 	username: string;

@@ -1,4 +1,5 @@
 import { usd } from "@/lib/format";
+
 /**
  * The plan page as a dashboard document ([LB24 · LB33–LB35](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
  *
@@ -8,12 +9,19 @@ import { usd } from "@/lib/format";
  * fetches and answers actions, and `@invana/dashboard` draws.
  */
 
+import type {
+	DashboardSpec,
+	MetricsOptions,
+	PanelSpec,
+	RunPanelOptions,
+	TabSpec,
+} from "@invana/dashboard";
 import { formatElapsed } from "@/lib/time";
 import type { PlanChartWidgets } from "@/pages/graphs-detail/features/plans/boards/PlanChartWidgets";
 import { planLayerStrip } from "@/pages/graphs-detail/features/plans/planLayers";
 import {
-	WIDE_SPREAD,
 	taskFlowFromTaskPlan,
+	WIDE_SPREAD,
 } from "@/pages/graphs-detail/features/plans/taskFlowFromTaskPlan";
 import type {
 	Measure,
@@ -23,16 +31,9 @@ import type {
 	PlanWindow,
 	TaskPlanDetail,
 } from "@/pages/graphs-detail/features/plans/types";
-import type { FlowOptions } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 import { runAddress } from "@/pages/graphs-detail/shared/dashboards/shared";
+import type { FlowOptions } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
-import type {
-	DashboardSpec,
-	MetricsOptions,
-	PanelSpec,
-	RunPanelOptions,
-	TabSpec,
-} from "@invana/dashboard";
 
 export type PlanPanels = PlanChartWidgets & {
 	flow: FlowOptions;

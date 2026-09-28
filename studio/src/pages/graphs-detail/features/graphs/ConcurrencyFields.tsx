@@ -15,12 +15,6 @@
  * contention has to be visible where the number that causes it is set (C8).
  */
 
-import { PoolsTable } from "@/pages/graphs-detail/features/graphs/PoolsTable";
-import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
-import {
-	useGraphQuery,
-	useUpdateGraphMutation,
-} from "@/pages/graphs-detail/features/graphs/queries";
 import {
 	Input,
 	Label,
@@ -34,6 +28,12 @@ import { Button } from "@invana/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
+import { PoolsTable } from "@/pages/graphs-detail/features/graphs/PoolsTable";
+import {
+	useGraphQuery,
+	useUpdateGraphMutation,
+} from "@/pages/graphs-detail/features/graphs/queries";
 
 interface Props {
 	username: string;

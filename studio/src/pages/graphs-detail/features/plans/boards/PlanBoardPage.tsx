@@ -8,6 +8,9 @@
  * here, never in the URL, because a link to a plan is a link to the plan.
  */
 
+import { Dashboard, type DashboardSpec, RUN_PANELS } from "@invana/dashboard";
+import { EmptyState, Spinner } from "@invana/ui";
+import { useMemo, useState } from "react";
 import { useReport } from "@/pages/graphs-detail/features/boards";
 import { PLAN_CHART_WIDGETS } from "@/pages/graphs-detail/features/plans/boards/PlanChartWidgets";
 import {
@@ -17,8 +20,8 @@ import {
 	type PlanReading,
 	type PlanTab,
 	type PlanView,
-	WINDOWS,
 	planBoardSpec,
+	WINDOWS,
 } from "@/pages/graphs-detail/features/plans/boards/planBoardSpec";
 import {
 	usePlanPerformanceQuery,
@@ -28,9 +31,6 @@ import {
 } from "@/pages/graphs-detail/features/plans/queries";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
-import { Dashboard, type DashboardSpec, RUN_PANELS } from "@invana/dashboard";
-import { EmptyState, Spinner } from "@invana/ui";
-import { useMemo, useState } from "react";
 
 const REGISTRY = {
 	layers: RUN_PANELS.layers,

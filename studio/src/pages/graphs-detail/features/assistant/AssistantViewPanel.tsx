@@ -1,32 +1,3 @@
-import { formatCompactCount } from "@/lib/format";
-import {
-	SessionComposer,
-	deriveComposerConfig,
-} from "@/pages/graphs-detail/features/assistant/SessionComposer";
-import type { AssistantAttachment } from "@/pages/graphs-detail/features/assistant/SessionComposer";
-import { SessionLegendDialog } from "@/pages/graphs-detail/features/assistant/SessionLegendDialog";
-import { SessionList } from "@/pages/graphs-detail/features/assistant/SessionList";
-import { SessionSettings } from "@/pages/graphs-detail/features/assistant/SessionSettings";
-import {
-	SessionStepsTimeline,
-	stepsFor,
-} from "@/pages/graphs-detail/features/assistant/SessionStepsTimeline";
-import { SessionThread } from "@/pages/graphs-detail/features/assistant/SessionThread";
-import type { SessionSort } from "@/pages/graphs-detail/features/assistant/api";
-import type {
-	Session,
-	SessionContextTurn,
-	SessionMessage,
-} from "@/pages/graphs-detail/features/assistant/types";
-import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
-import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
-import type { RunView } from "@/pages/graphs-detail/features/runs";
-import {
-	ListFilterMenu,
-	ListPanelChrome,
-} from "@/pages/graphs-detail/shared/ListPanel";
-import { useRunStore } from "@/stores/run.store";
-import type { QueryResponse, QueryRunPayload } from "@/types/query";
 import {
 	Button,
 	ChatSessionStatusBar,
@@ -45,6 +16,35 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import { formatCompactCount } from "@/lib/format";
+import type { SessionSort } from "@/pages/graphs-detail/features/assistant/api";
+import type { AssistantAttachment } from "@/pages/graphs-detail/features/assistant/SessionComposer";
+import {
+	deriveComposerConfig,
+	SessionComposer,
+} from "@/pages/graphs-detail/features/assistant/SessionComposer";
+import { SessionLegendDialog } from "@/pages/graphs-detail/features/assistant/SessionLegendDialog";
+import { SessionList } from "@/pages/graphs-detail/features/assistant/SessionList";
+import { SessionSettings } from "@/pages/graphs-detail/features/assistant/SessionSettings";
+import {
+	SessionStepsTimeline,
+	stepsFor,
+} from "@/pages/graphs-detail/features/assistant/SessionStepsTimeline";
+import { SessionThread } from "@/pages/graphs-detail/features/assistant/SessionThread";
+import type {
+	Session,
+	SessionContextTurn,
+	SessionMessage,
+} from "@/pages/graphs-detail/features/assistant/types";
+import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
+import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
+import type { RunView } from "@/pages/graphs-detail/features/runs";
+import {
+	ListFilterMenu,
+	ListPanelChrome,
+} from "@/pages/graphs-detail/shared/ListPanel";
+import { useRunStore } from "@/stores/run.store";
+import type { QueryResponse, QueryRunPayload } from "@/types/query";
 
 export interface AssistantViewPanelProps {
 	// Composer

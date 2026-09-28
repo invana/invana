@@ -19,13 +19,13 @@
 // holder, called once by the panel.
 
 import {
+	cn,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
 	type NavHorizontalItem,
 	type PanelStackSection,
 	SearchInput,
-	cn,
 } from "@invana/ui";
 import { ChevronLeft, Filter, Search } from "lucide-react";
 import type { ElementType, ReactNode } from "react";

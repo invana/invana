@@ -5,7 +5,7 @@
  * Needs `demos/airways`: four published models, stitched to each other. The
  * refusal changes nothing — an archive refused leaves the model where it was.
  */
-import { type Page, expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import { ask } from "./explorer";
 
 const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";

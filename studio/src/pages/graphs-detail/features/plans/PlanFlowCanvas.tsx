@@ -8,6 +8,9 @@
  * step, which the section's step card reads.
  */
 
+import { EmptyState, Spinner } from "@invana/ui";
+import { Workflow } from "lucide-react";
+import { useMemo } from "react";
 import {
 	TaskFlowCanvas,
 	taskFlowSettings,
@@ -15,9 +18,6 @@ import {
 } from "@/canvases/taskflow";
 import { useTaskPlanQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { taskFlowFromTaskPlan } from "@/pages/graphs-detail/features/plans/taskFlowFromTaskPlan";
-import { EmptyState, Spinner } from "@invana/ui";
-import { Workflow } from "lucide-react";
-import { useMemo } from "react";
 
 export function PlanFlowCanvas({
 	username,

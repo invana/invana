@@ -13,6 +13,8 @@
  * the models would put a territory on the canvas nobody can stitch (spec.md §2).
  */
 
+import { useQueries } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { hueSlotForName } from "@/canvases/model";
 import { modelsApi } from "@/pages/graphs-detail/features/models/api";
 import {
@@ -21,8 +23,6 @@ import {
 } from "@/pages/graphs-detail/features/models/queries";
 import type { ModelFrame } from "@/pages/graphs-detail/features/models/stitch/allModels";
 import type { ModelLink } from "@/pages/graphs-detail/features/models/types";
-import { useQueries } from "@tanstack/react-query";
-import { useMemo } from "react";
 
 export interface AllModelsResult {
 	frames: ModelFrame[];

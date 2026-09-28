@@ -1,10 +1,4 @@
 import {
-	type Graph,
-	isSetupComplete,
-} from "@/pages/graphs-detail/features/graphs";
-import { WHAT_NEXT } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
-import {
 	Button,
 	Eyebrow,
 	Item,
@@ -15,6 +9,12 @@ import {
 	ItemTitle,
 } from "@invana/ui";
 import { ArrowRight } from "lucide-react";
+import {
+	type Graph,
+	isSetupComplete,
+} from "@/pages/graphs-detail/features/graphs";
+import { WHAT_NEXT } from "@/pages/graphs-detail/features/setup/setupSteps";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 
 /**
  * The offers, in the pane the lessons use (setup.md SU4).

@@ -14,10 +14,17 @@
  * because a function is not JSON ([SR30](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 
+import { Dashboard, type DashboardSpec, RUN_PANELS } from "@invana/dashboard";
+import { EmptyState, Spinner } from "@invana/ui";
+import { useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useReport } from "@/pages/graphs-detail/features/boards";
-import { CompareDialog } from "@/pages/graphs-detail/features/lenses";
-import { StepTouchWidget } from "@/pages/graphs-detail/features/lenses";
-import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses";
+import {
+	CompareDialog,
+	StepTouchWidget,
+	useRunTouchesQuery,
+} from "@/pages/graphs-detail/features/lenses";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/features/runs/boards/icons";
 import {
@@ -34,16 +41,11 @@ import {
 	stepContext,
 } from "@/pages/graphs-detail/features/runs/boards/stepBoardSpec";
 import { useRunTrace } from "@/pages/graphs-detail/features/runs/boards/useRunTrace";
-import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 import {
-	VIEW_DASHBOARD,
 	groupSteps,
+	VIEW_DASHBOARD,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
-import { Dashboard, type DashboardSpec, RUN_PANELS } from "@invana/dashboard";
-import { EmptyState, Spinner } from "@invana/ui";
-import { useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 
 export interface RunBoardPageProps {
 	username: string;

@@ -12,11 +12,11 @@
  * reads that as an Authorization fallback on SSE endpoints only.
  */
 
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { recordStreamReconnect } from "@/services/telemetry/metrics";
 import { startAction, withTraceparent } from "@/services/telemetry/tracer";
 import { useAuthStore } from "@/stores/auth.store";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8200";
 

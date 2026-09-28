@@ -1,6 +1,3 @@
-import { useDeleteModelMutation } from "@/pages/graphs-detail/features/models/queries";
-import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
-import { ApiError } from "@/services/api/client";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -12,6 +9,9 @@ import {
 	AlertDialogTitle,
 } from "@invana/ui";
 import { toast } from "sonner";
+import { useDeleteModelMutation } from "@/pages/graphs-detail/features/models/queries";
+import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
+import { ApiError } from "@/services/api/client";
 
 interface Props {
 	/** The model pending deletion, or null when the dialog is closed. */

@@ -16,9 +16,9 @@
  *                  instead of flashing the sign-in form.
  */
 
+import { useEffect, useState } from "react";
 import { authApi } from "@/services/api/auth";
 import { useAuthStore } from "@/stores/auth.store";
-import { useEffect, useState } from "react";
 
 export type SessionResumeState = "checking" | "resumed" | "anonymous";
 

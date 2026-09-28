@@ -7,21 +7,21 @@
  * were and the number that turns signals on.
  */
 
+import { InlineMeter, SegmentedBar, SegmentedBarLegend } from "@invana/charts";
+import type { RowSpec } from "@invana/dashboard";
+import { type ColumnDef, DataTable } from "@invana/tables";
+import { Alert, AlertDescription } from "@invana/ui";
 import { formatRelativeTime } from "@/lib/time";
 import type {
 	Usage,
 	UsageRow,
 } from "@/pages/graphs-detail/features/models/types";
-import { InlineMeter, SegmentedBar, SegmentedBarLegend } from "@invana/charts";
-import type { RowSpec } from "@invana/dashboard";
-import { type ColumnDef, DataTable } from "@invana/tables";
-import { Alert, AlertDescription } from "@invana/ui";
 import {
 	CALLER_SERIES,
-	SignalMark,
-	Signals,
 	callerSplit,
 	fmtNum,
+	SignalMark,
+	Signals,
 } from "./insightParts";
 
 export interface UsageRowsOptions {
@@ -321,7 +321,9 @@ export function usageRows(
 									header: k,
 									cell: ({
 										row,
-									}: { row: { original: Usage["properties"][number] } }) => (
+									}: {
+										row: { original: Usage["properties"][number] };
+									}) => (
 										<span className="font-mono tabular-nums">
 											{fmtNum(row.original[k])}
 										</span>

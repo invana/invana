@@ -22,8 +22,8 @@
  * observer catches all of those and always re-reads the now-current base.
  */
 
-import { useAppearanceStore } from "@/stores/appearance.store";
 import { useEffect } from "react";
+import { useAppearanceStore } from "@/stores/appearance.store";
 
 // Colours re-saturated: primary, its focus-ring mirror, and accent. Foregrounds
 // (near-white/near-black text-on-colour) are intentionally left alone.

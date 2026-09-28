@@ -1,3 +1,4 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
 import type {
 	GraphConnectionCreate,
@@ -7,7 +8,6 @@ import type {
 } from "@/pages/graphs-detail/features/graphs/types";
 import { authApi } from "@/services/api/auth";
 import { useAuthStore } from "@/stores/auth.store";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /**
  * Re-fetch `/auth/me` and update the auth store. Keeps `user.graphs` in
@@ -94,8 +94,10 @@ export function useDeleteGraphMutation() {
 		mutationFn: ({
 			username,
 			graphSlug,
-		}: { username: string; graphSlug: string }) =>
-			graphsApi.remove(username, graphSlug),
+		}: {
+			username: string;
+			graphSlug: string;
+		}) => graphsApi.remove(username, graphSlug),
 		onSuccess: async () => {
 			qc.invalidateQueries({ queryKey: GRAPHS_KEY });
 			// Remove the dropped membership from user.graphs.
@@ -173,8 +175,10 @@ export function useDeleteGraphConnectionMutation() {
 		mutationFn: ({
 			username,
 			graphSlug,
-		}: { username: string; graphSlug: string }) =>
-			graphsApi.deleteConnection(username, graphSlug),
+		}: {
+			username: string;
+			graphSlug: string;
+		}) => graphsApi.deleteConnection(username, graphSlug),
 		onSuccess: (_, { username, graphSlug }) => {
 			qc.invalidateQueries({ queryKey: connectionKey(username, graphSlug) });
 			qc.invalidateQueries({ queryKey: graphKey(username, graphSlug) });
@@ -188,8 +192,10 @@ export function usePingGraphConnectionMutation() {
 		mutationFn: ({
 			username,
 			graphSlug,
-		}: { username: string; graphSlug: string }) =>
-			graphsApi.pingConnection(username, graphSlug),
+		}: {
+			username: string;
+			graphSlug: string;
+		}) => graphsApi.pingConnection(username, graphSlug),
 		onSuccess: (_, { username, graphSlug }) => {
 			qc.invalidateQueries({ queryKey: connectionKey(username, graphSlug) });
 		},
@@ -203,8 +209,10 @@ export function useAcknowledgeConnectionVersionMutation() {
 		mutationFn: ({
 			username,
 			graphSlug,
-		}: { username: string; graphSlug: string }) =>
-			graphsApi.acknowledgeConnectionVersion(username, graphSlug),
+		}: {
+			username: string;
+			graphSlug: string;
+		}) => graphsApi.acknowledgeConnectionVersion(username, graphSlug),
 		onSuccess: (_, { username, graphSlug }) => {
 			qc.invalidateQueries({ queryKey: connectionKey(username, graphSlug) });
 		},
@@ -219,7 +227,11 @@ export function useDeclareConnectionVersionMutation() {
 			username,
 			graphSlug,
 			serverVersion,
-		}: { username: string; graphSlug: string; serverVersion: string }) =>
+		}: {
+			username: string;
+			graphSlug: string;
+			serverVersion: string;
+		}) =>
 			graphsApi.declareConnectionVersion(username, graphSlug, serverVersion),
 		onSuccess: (_, { username, graphSlug }) => {
 			qc.invalidateQueries({ queryKey: connectionKey(username, graphSlug) });

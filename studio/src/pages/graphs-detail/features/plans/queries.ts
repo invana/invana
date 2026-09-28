@@ -6,18 +6,18 @@
  */
 
 import {
-	catalogueApi,
-	taskPlansApi,
-} from "@/pages/graphs-detail/features/plans/api";
-import type { PlanWindow } from "@/pages/graphs-detail/features/plans/types";
-import { startAction } from "@/services/telemetry/tracer";
-import {
 	useInfiniteQuery,
 	useMutation,
 	useQueries,
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
+import {
+	catalogueApi,
+	taskPlansApi,
+} from "@/pages/graphs-detail/features/plans/api";
+import type { PlanWindow } from "@/pages/graphs-detail/features/plans/types";
+import { startAction } from "@/services/telemetry/tracer";
 
 type Scope = { username: string; graphSlug: string };
 

@@ -1,5 +1,5 @@
-import type { BindRefusal } from "@/pages/graphs-detail/features/skills";
 import { cn } from "@invana/ui";
+import type { BindRefusal } from "@/pages/graphs-detail/features/skills";
 
 /**
  * Why a bind was refused — **one card, drawn wherever the click was**.

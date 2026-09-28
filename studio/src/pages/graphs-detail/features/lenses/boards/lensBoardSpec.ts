@@ -24,6 +24,7 @@
  * of one read, which is what lets `spec.json` show the document the page is.
  */
 
+import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 import {
 	GOVERNED_LAYERS,
 	layerSummary,
@@ -36,14 +37,13 @@ import type {
 	Lens,
 } from "@/pages/graphs-detail/features/lenses/types";
 import {
-	VIEW_ACTION,
-	VIEW_DASHBOARD,
-	VIEW_SPEC,
 	count,
 	omit,
 	specPanel,
+	VIEW_ACTION,
+	VIEW_DASHBOARD,
+	VIEW_SPEC,
 } from "@/pages/graphs-detail/shared/dashboardSpec";
-import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 
 /** Action ids this page answers. The spec carries the string; the page the behaviour. */
 export const LENS_ACTIONS = {

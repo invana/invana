@@ -26,27 +26,6 @@
  * (`docs/for-developers/modules/explore/features/boards.md` CV6).
  */
 
-import { SessionTutorialModal } from "@/pages/graphs-detail/features/assistant";
-import { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardFormDialog";
-import { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardHistoryWidget";
-import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
-import { ExpandNeighboursDialog } from "@/pages/graphs-detail/features/explorer";
-import type {
-	CanvasBackend,
-	ExpandMenuHandlers,
-	ExpandMenuSchema,
-} from "@/pages/graphs-detail/features/explorer";
-import { ExplorerCanvas } from "@/pages/graphs-detail/features/explorer";
-import { LayersPanel } from "@/pages/graphs-detail/features/explorer";
-import {
-	type StyleTypeInfo,
-	StylingPanel,
-} from "@/pages/graphs-detail/features/explorer";
-import type {
-	ExpandRequest,
-	NeighborExpandResponse,
-} from "@/pages/graphs-detail/features/explorer";
-import type { InteractionRef } from "@/services/telemetry/tracer";
 import { RendererCapabilityBanner } from "@invana/canvas-ui";
 import type {
 	GraphCanvas as GraphCanvasEngine,
@@ -59,6 +38,25 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import { SessionTutorialModal } from "@/pages/graphs-detail/features/assistant";
+import { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardFormDialog";
+import { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardHistoryWidget";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
+import type {
+	CanvasBackend,
+	ExpandMenuHandlers,
+	ExpandMenuSchema,
+	ExpandRequest,
+	NeighborExpandResponse,
+} from "@/pages/graphs-detail/features/explorer";
+import {
+	ExpandNeighboursDialog,
+	ExplorerCanvas,
+	LayersPanel,
+	type StyleTypeInfo,
+	StylingPanel,
+} from "@/pages/graphs-detail/features/explorer";
+import type { InteractionRef } from "@/services/telemetry/tracer";
 
 /**
  * What the strip can ask of the canvas page under it. The shell holds one of

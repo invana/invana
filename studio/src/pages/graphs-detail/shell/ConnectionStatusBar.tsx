@@ -1,5 +1,5 @@
-import type { GraphConnectionRead } from "@/pages/graphs-detail/features/graphs";
 import type { ReactNode } from "react";
+import type { GraphConnectionRead } from "@/pages/graphs-detail/features/graphs";
 
 interface Props {
 	/** The graph's connection record. Undefined while loading; null when the

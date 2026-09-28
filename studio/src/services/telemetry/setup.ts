@@ -74,7 +74,7 @@ import {
 } from "@opentelemetry/sdk-trace-web";
 import { onCLS, onINP, onLCP, onTTFB } from "web-vitals";
 import { reportError, shouldReport } from "./errors";
-import { type WebVital, moduleOf, recordWebVital } from "./metrics";
+import { moduleOf, recordWebVital, type WebVital } from "./metrics";
 import { sampleRatio } from "./sampling";
 
 const API_BASE_URL =

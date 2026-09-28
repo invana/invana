@@ -17,6 +17,11 @@
  * it returns is the **physical mirror**, never the model (introspect-a-database.md ID2).
  */
 
+import { Badge, Button, Skeleton } from "@invana/ui";
+import { Pencil, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { GraphForm } from "@/pages/graphs/GraphForm";
 import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
 import {
 	useGraphConnectionQuery,
@@ -28,11 +33,6 @@ import {
 	type GraphConnectionCreate,
 	type GraphConnectionRead,
 } from "@/pages/graphs-detail/features/graphs/types";
-import { GraphForm } from "@/pages/graphs/GraphForm";
-import { Badge, Button, Skeleton } from "@invana/ui";
-import { Pencil, Sparkles } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface Props {
 	username: string;
@@ -170,11 +170,7 @@ export function ConnectionFields({ username, graphSlug }: Props) {
  * read-write. A failure keeps the last successful check's time rather than
  * going silent (C7).
  */
-function ConnectionStrip({
-	connection,
-}: {
-	connection: GraphConnectionRead;
-}) {
+function ConnectionStrip({ connection }: { connection: GraphConnectionRead }) {
 	const connected = connection.status === "ACTIVE";
 	return (
 		<div className="flex flex-wrap items-center gap-1.5 text-sm">
@@ -258,7 +254,10 @@ function Capabilities({ connection }: { connection: GraphConnectionRead }) {
 function Row({
 	label,
 	children,
-}: { label: string; children: React.ReactNode }) {
+}: {
+	label: string;
+	children: React.ReactNode;
+}) {
 	return (
 		<div className="flex gap-3">
 			<dt className="w-28 shrink-0 text-muted-foreground">{label}</dt>

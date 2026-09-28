@@ -8,11 +8,11 @@
  * not from session state. The store therefore tracks only the user + tokens.
  */
 
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { registerAuthAccess } from "@/services/api/client";
 import { registerTelemetryUser } from "@/services/telemetry/tracer";
 import type { AuthUser } from "@/types/auth";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 interface AuthState {
 	user: AuthUser | null;

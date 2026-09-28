@@ -1,8 +1,8 @@
-import type { SessionContextTurn } from "@/pages/graphs-detail/features/assistant/types";
 import { Button, ChatSessionDisclosure } from "@invana/ui";
 import { Copy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import type { SessionContextTurn } from "@/pages/graphs-detail/features/assistant/types";
 
 export interface SessionContextDisclosureProps {
 	/** The assistant reply whose context is shown. */

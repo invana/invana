@@ -12,6 +12,8 @@
  * a hunt through two components.
  */
 
+import { cn } from "@invana/ui";
+import { X } from "lucide-react";
 import {
 	useAgentLineageQuery,
 	useAgentsQuery,
@@ -19,8 +21,6 @@ import {
 import { CANVAS_KINDS } from "@/pages/graphs-detail/features/boards";
 import { useTaskPlanQuery } from "@/pages/graphs-detail/features/plans";
 import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects";
-import { cn } from "@invana/ui";
-import { X } from "lucide-react";
 
 /** What the open work canvas is drawing. One shape per kind, id included. */
 export type LayeredCanvasTarget =

@@ -1,17 +1,3 @@
-import { useSetupSectionMutation } from "@/pages/graphs-detail/features/graphs";
-import {
-	type Graph,
-	SETUP_REQUIRED,
-	SETUP_SKIPPABLE,
-	type SetupSection,
-	setupSectionStatus,
-} from "@/pages/graphs-detail/features/graphs";
-import {
-	SETUP_GATE_META,
-	SETUP_STEP_BY_KEY,
-	setupCommand,
-} from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import {
 	Button,
 	ButtonGroup,
@@ -21,6 +7,20 @@ import {
 } from "@invana/ui";
 import { ArrowLeft, ArrowRight, Copy, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import {
+	type Graph,
+	SETUP_REQUIRED,
+	SETUP_SKIPPABLE,
+	type SetupSection,
+	setupSectionStatus,
+	useSetupSectionMutation,
+} from "@/pages/graphs-detail/features/graphs";
+import {
+	SETUP_GATE_META,
+	SETUP_STEP_BY_KEY,
+	setupCommand,
+} from "@/pages/graphs-detail/features/setup/setupSteps";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 
 /**
  * One step, taught (setup.md 7.1 · 7.2).

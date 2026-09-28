@@ -16,11 +16,11 @@
  * Nothing here writes (IW3). Loading is CLI and API only (BD6).
  */
 
+import { EmptyState, RunRow, Spinner } from "@invana/ui";
 import { useTicker } from "@/hooks/useTicker";
 import { formatCompact } from "@/lib/format";
 import { formatElapsed, formatRelativeTime } from "@/lib/time";
 import type { RunListRow } from "@/pages/graphs-detail/features/runs/queries";
-import { EmptyState, RunRow, Spinner } from "@invana/ui";
 
 /**
  * The **short id** — the last eight characters, quoted the way a commit is

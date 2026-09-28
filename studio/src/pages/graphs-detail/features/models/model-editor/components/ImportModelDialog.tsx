@@ -13,14 +13,6 @@
  *   publishing blocked until it is resolved — not refused, not degraded.
  */
 
-import {
-	useImportModelMutation,
-	useStartersQuery,
-} from "@/pages/graphs-detail/features/models/queries";
-import type {
-	ModelArtefact,
-	ModelImportResult,
-} from "@/pages/graphs-detail/features/models/types";
 import { Input } from "@invana/forms";
 import {
 	Button,
@@ -33,6 +25,14 @@ import {
 } from "@invana/ui";
 import { FileUp, Package } from "lucide-react";
 import { useRef, useState } from "react";
+import {
+	useImportModelMutation,
+	useStartersQuery,
+} from "@/pages/graphs-detail/features/models/queries";
+import type {
+	ModelArtefact,
+	ModelImportResult,
+} from "@/pages/graphs-detail/features/models/types";
 
 interface Props {
 	open: boolean;

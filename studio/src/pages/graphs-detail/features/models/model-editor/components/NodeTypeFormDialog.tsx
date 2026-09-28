@@ -1,11 +1,3 @@
-import { FormError } from "@/components/forms/FormError";
-import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
-import {
-	useCreateNodeTypeMutation,
-	useUpdateNodeTypeMutation,
-} from "@/pages/graphs-detail/features/models/queries";
-import type { NodeTypeResponse } from "@/pages/graphs-detail/features/models/types";
-import { ApiError, suppressActionToast } from "@/services/api/client";
 import {
 	Checkbox,
 	Input,
@@ -27,6 +19,14 @@ import {
 } from "@invana/ui";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { FormError } from "@/components/forms/FormError";
+import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
+import {
+	useCreateNodeTypeMutation,
+	useUpdateNodeTypeMutation,
+} from "@/pages/graphs-detail/features/models/queries";
+import type { NodeTypeResponse } from "@/pages/graphs-detail/features/models/types";
+import { ApiError, suppressActionToast } from "@/services/api/client";
 
 const INHERIT = "__inherit__";
 

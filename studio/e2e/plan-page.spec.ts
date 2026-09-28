@@ -5,7 +5,7 @@
  * Reads only. It needs a Graph where `nl-single` has run and
  * `expand-neighbours` never has — `demos/airways` after a few asks.
  */
-import { type Page, expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 
@@ -98,6 +98,7 @@ test("⋯ opens a plan's versions, arguments and export, each as its own page", 
 	).toBeVisible();
 	await expect(page.getByText("v1 → v2")).toBeVisible();
 	await expect(
+		// biome-ignore lint/suspicious/noTemplateCurlyInString: the copy shows the binding syntax itself
 		page.getByText("args.read_only: was true, is now ${args.read_only}"),
 	).toBeVisible();
 

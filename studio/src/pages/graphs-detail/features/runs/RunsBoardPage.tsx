@@ -1,4 +1,5 @@
 import { usd } from "@/lib/format";
+
 /**
  * **Runs, drawn wide** — the journal as a page in `mainSection`, opened from
  * `Dashboard` on the Runs panel's header (see-what-ran.md SR70 ·
@@ -14,23 +15,6 @@ import { usd } from "@/lib/format";
  * bar against a made-up ceiling would both be claims the record cannot back.
  */
 
-import { useTicker } from "@/hooks/useTicker";
-import { formatCompact } from "@/lib/format";
-import { formatElapsed } from "@/lib/time";
-
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
-import { RunsFilterBar } from "@/pages/graphs-detail/features/runs/RunsFilterBar";
-import {
-	elapsedOf,
-	shortRunId,
-} from "@/pages/graphs-detail/features/runs/RunsList";
-import {
-	type RunListRow,
-	useRunListQuery,
-} from "@/pages/graphs-detail/features/runs/queries";
-import { useRunsFilters } from "@/pages/graphs-detail/features/runs/useRunsFilters";
-import { useRunsViewPanel } from "@/pages/graphs-detail/shell/useRunsViewPanel";
-import { PanelSection } from "@/ui/PanelSection";
 import {
 	Badge,
 	Button,
@@ -47,6 +31,22 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { RefreshCw } from "lucide-react";
+import { useTicker } from "@/hooks/useTicker";
+import { formatCompact } from "@/lib/format";
+import { formatElapsed } from "@/lib/time";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
+import {
+	type RunListRow,
+	useRunListQuery,
+} from "@/pages/graphs-detail/features/runs/queries";
+import { RunsFilterBar } from "@/pages/graphs-detail/features/runs/RunsFilterBar";
+import {
+	elapsedOf,
+	shortRunId,
+} from "@/pages/graphs-detail/features/runs/RunsList";
+import { useRunsFilters } from "@/pages/graphs-detail/features/runs/useRunsFilters";
+import { useRunsViewPanel } from "@/pages/graphs-detail/shell/useRunsViewPanel";
+import { PanelSection } from "@/ui/PanelSection";
 
 const LIVE = ["queued", "running", "awaiting_input", "awaiting_approval"];
 const WAITING = ["awaiting_input", "awaiting_approval"];

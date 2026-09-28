@@ -17,6 +17,8 @@
  * Journey 2 exists to protect.
  */
 
+import type { PanelStackSection } from "@invana/ui";
+import { Globe, Maximize2, Plus } from "lucide-react";
 import { GuardrailsStrip } from "@/pages/graphs-detail/features/lenses/GuardrailsStrip";
 import { LensActions } from "@/pages/graphs-detail/features/lenses/LensActions";
 import { LensDetail } from "@/pages/graphs-detail/features/lenses/LensDetail";
@@ -31,8 +33,6 @@ import {
 	type StackSectionUi,
 	stackSection,
 } from "@/pages/graphs-detail/shared/StackSection";
-import type { PanelStackSection } from "@invana/ui";
-import { Globe, Maximize2, Plus } from "lucide-react";
 
 /** `&world=new` is the authoring drill-in — a value, not a second param. */
 export const NEW_LENS = "new";

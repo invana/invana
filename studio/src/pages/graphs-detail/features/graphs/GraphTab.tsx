@@ -1,16 +1,3 @@
-import { FormError } from "@/components/forms/FormError";
-import { ConcurrencyFields } from "@/pages/graphs-detail/features/graphs/ConcurrencyFields";
-import { ConnectionFields } from "@/pages/graphs-detail/features/graphs/ConnectionFields";
-import {
-	useGraphConnectionQuery,
-	useGraphQuery,
-	useUpdateGraphMutation,
-} from "@/pages/graphs-detail/features/graphs/queries";
-import type {
-	Graph,
-	GraphUpdate,
-} from "@/pages/graphs-detail/features/graphs/types";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { Form, FormField, InputField, TextareaField } from "@invana/forms";
 import {
 	Button,
@@ -28,6 +15,19 @@ import { Archive, ArchiveRestore, Bot, Database, Info } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { FormError } from "@/components/forms/FormError";
+import { ConcurrencyFields } from "@/pages/graphs-detail/features/graphs/ConcurrencyFields";
+import { ConnectionFields } from "@/pages/graphs-detail/features/graphs/ConnectionFields";
+import {
+	useGraphConnectionQuery,
+	useGraphQuery,
+	useUpdateGraphMutation,
+} from "@/pages/graphs-detail/features/graphs/queries";
+import type {
+	Graph,
+	GraphUpdate,
+} from "@/pages/graphs-detail/features/graphs/types";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 
 /** The tabs, in strip order. `?tab=` carries the open one. */
 export const SETTINGS_TABS = ["basic", "graph", "agents"] as const;

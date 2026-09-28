@@ -7,13 +7,13 @@
  * so none carries a window switch or `Save report`.
  */
 
+import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 import type {
 	PlanVersionDiff,
 	TaskPlanCaller,
 	TaskPlanSummary,
 } from "@/pages/graphs-detail/features/plans/types";
 import type { PlanArg } from "@/pages/graphs-detail/features/skills";
-import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 
 export const RECORD_ACTIONS = {
 	/** The crumb naming the plan — back to its page. */

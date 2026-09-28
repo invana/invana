@@ -1,3 +1,5 @@
+import { Badge, Button, Separator } from "@invana/ui";
+import { Pencil, Trash2 } from "lucide-react";
 import { ConstraintTable } from "@/pages/graphs-detail/features/models/model-editor/components/ConstraintTable";
 import { IndexTable } from "@/pages/graphs-detail/features/models/model-editor/components/IndexTable";
 import { PropertyEditor } from "@/pages/graphs-detail/features/models/model-editor/components/PropertyEditor";
@@ -9,8 +11,6 @@ import type {
 	NodeTypeResponse,
 	PropertyKeyResponse,
 } from "@/pages/graphs-detail/features/models/types";
-import { Badge, Button, Separator } from "@invana/ui";
-import { Pencil, Trash2 } from "lucide-react";
 
 interface Props {
 	nodeType: NodeTypeResponse;

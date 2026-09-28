@@ -1,13 +1,18 @@
-import type { useBoardVersions } from "@/pages/graphs-detail/features/boards";
-import type { CaptureCanvasState } from "@/pages/graphs-detail/features/boards";
-import {
-	ACTIVE_LAYOUT_ID,
-	type ExpandMenuSchema,
-} from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
+import type { GraphCanvas, GraphLayer } from "@invana/graph";
+import { useCallback, useMemo } from "react";
+import { toast } from "sonner";
+import type {
+	CaptureCanvasState,
+	useBoardVersions,
+} from "@/pages/graphs-detail/features/boards";
 import {
 	adaptItems,
 	expandRefusal,
 } from "@/pages/graphs-detail/features/explorer/canvasItems";
+import {
+	ACTIVE_LAYOUT_ID,
+	type ExpandMenuSchema,
+} from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
 import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
 import type {
 	ExpandRequest,
@@ -16,9 +21,6 @@ import type {
 import { useExpandNode } from "@/pages/graphs-detail/features/explorer/useExpandNode";
 import { useActiveVersionQuery } from "@/pages/graphs-detail/features/models";
 import type { QueryResultItem } from "@/types/query";
-import type { GraphCanvas, GraphLayer } from "@invana/graph";
-import { useCallback, useMemo } from "react";
-import { toast } from "sonner";
 
 /** What node expansion reads from the data canvas it grows. */
 export interface CanvasExpandDeps {

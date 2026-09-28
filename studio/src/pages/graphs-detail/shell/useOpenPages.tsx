@@ -1,43 +1,7 @@
-import { LayeredCanvasHeader } from "@/canvases/layered/LayeredCanvasChrome";
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
-import {
-	hasSeenSessionTutorial,
-	markSessionTutorialSeen,
-} from "@/pages/graphs-detail/features/assistant";
-import type { useSessions } from "@/pages/graphs-detail/features/assistant";
-import {
-	BOARD_KINDS,
-	CANVAS_KINDS,
-	type CanvasKind,
-	boardPageId,
-	declaredPage,
-	parseBoardPageId,
-} from "@/pages/graphs-detail/features/boards";
-import { DeclaredBoard } from "@/pages/graphs-detail/features/boards";
-import {
-	type BoardPageHandle,
-	DataBoardPage,
-} from "@/pages/graphs-detail/features/boards";
-import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
-import type { ModelSelection } from "@/pages/graphs-detail/features/models";
-import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
-import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
-import {
-	type BoardTitleNames,
-	type DeclaredBoardDeps,
-	boardTitle,
-	declaredBoardContent,
-} from "@/pages/graphs-detail/shell/declaredBoardBody";
-import { canvasEmptyHint } from "@/pages/graphs-detail/shell/layeredCanvasBody";
-import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
-import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
-import type { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
-import type { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
-import type { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
-import type { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
 import type {
 	BoardHeaderAction,
 	BoardPage as BoardPageDef,
+	BoardPagesViewPanelProps,
 } from "@invana/canvas-ui";
 import {
 	HelpCircle,
@@ -51,11 +15,43 @@ import {
 	SlidersHorizontal,
 	X,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useMemo, useRef } from "react";
-
-import type { BoardPagesViewPanelProps } from "@invana/canvas-ui";
-import type { Dispatch, SetStateAction } from "react";
+import { LayeredCanvasHeader } from "@/canvases/layered/LayeredCanvasChrome";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
+import type { useSessions } from "@/pages/graphs-detail/features/assistant";
+import {
+	hasSeenSessionTutorial,
+	markSessionTutorialSeen,
+} from "@/pages/graphs-detail/features/assistant";
+import {
+	BOARD_KINDS,
+	type BoardPageHandle,
+	boardPageId,
+	CANVAS_KINDS,
+	type CanvasKind,
+	DataBoardPage,
+	DeclaredBoard,
+	declaredPage,
+	parseBoardPageId,
+} from "@/pages/graphs-detail/features/boards";
+import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
+import type { ModelSelection } from "@/pages/graphs-detail/features/models";
+import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
+import {
+	type BoardTitleNames,
+	boardTitle,
+	type DeclaredBoardDeps,
+	declaredBoardContent,
+} from "@/pages/graphs-detail/shell/declaredBoardBody";
+import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
+import { canvasEmptyHint } from "@/pages/graphs-detail/shell/layeredCanvasBody";
+import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
+import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
+import type { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import type { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
+import type { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
+import type { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
 
 /** The page that is always open and can never be closed (graph-detail-page.md G6). */
 const GRAPH_PAGE_ID = "graph";

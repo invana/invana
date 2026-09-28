@@ -1,8 +1,3 @@
-import { FullscreenToggle } from "@/components/FullscreenToggle";
-import { GitHubStars } from "@/components/GitHubStars";
-import { ThemeMenu } from "@/components/ThemeMenu";
-import { OnboardingCap } from "@/components/header/OnboardingCap";
-import { useAuth } from "@/hooks/useAuth";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -10,11 +5,16 @@ import {
 	BreadcrumbList,
 	BreadcrumbPage,
 	BreadcrumbSeparator,
-	Separator,
 	cn,
+	Separator,
 } from "@invana/ui";
 import { Fragment, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { FullscreenToggle } from "@/components/FullscreenToggle";
+import { GitHubStars } from "@/components/GitHubStars";
+import { OnboardingCap } from "@/components/header/OnboardingCap";
+import { ThemeMenu } from "@/components/ThemeMenu";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AppHeaderOptions {
 	/** Last breadcrumb segment for the current page. Defaults to a label
@@ -136,7 +136,12 @@ function HeaderBreadcrumb({ segments }: { segments: Segment[] }) {
 				{segments.map((s, i) => {
 					const isLast = i === segments.length - 1;
 					return (
-						<Fragment key={`${s.label}-${i}`}>
+						<Fragment
+							key={`${s.label}-${
+								// biome-ignore lint/suspicious/noArrayIndexKey: the list is rebuilt whole, never reordered in place
+								i
+							}`}
+						>
 							{i > 0 && (
 								<BreadcrumbSeparator className="shrink-0 text-muted-foreground/60 [&>svg]:h-3.5 [&>svg]:w-3.5" />
 							)}

@@ -1,23 +1,3 @@
-import { useSetupSectionMutation } from "@/pages/graphs-detail/features/graphs";
-import {
-	type Graph,
-	SETUP_REQUIRED,
-	SETUP_SKIPPABLE,
-	type SetupSection,
-	type SetupSectionState,
-	isGateOpen,
-	isSetupComplete,
-	setupSectionStatus,
-} from "@/pages/graphs-detail/features/graphs";
-import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
-import {
-	SETUP_GATE_META,
-	SETUP_STEPS,
-	SETUP_STEP_BY_KEY,
-	WHAT_NEXT,
-	setupCommand,
-} from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import {
 	Button,
 	Card,
@@ -35,6 +15,26 @@ import {
 } from "@invana/ui";
 import { ArrowRight, Copy } from "lucide-react";
 import { toast } from "sonner";
+import {
+	type Graph,
+	isGateOpen,
+	isSetupComplete,
+	SETUP_REQUIRED,
+	SETUP_SKIPPABLE,
+	type SetupSection,
+	type SetupSectionState,
+	setupSectionStatus,
+	useSetupSectionMutation,
+} from "@/pages/graphs-detail/features/graphs";
+import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
+import {
+	SETUP_GATE_META,
+	SETUP_STEP_BY_KEY,
+	SETUP_STEPS,
+	setupCommand,
+	WHAT_NEXT,
+} from "@/pages/graphs-detail/features/setup/setupSteps";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 
 /**
  * Setup as one column — three gate cards, six step rows and the offers below
@@ -302,11 +302,7 @@ function SetupRow({
 	);
 }
 
-function WhatNextRow({
-	offer,
-}: {
-	offer: (typeof WHAT_NEXT)[number];
-}) {
+function WhatNextRow({ offer }: { offer: (typeof WHAT_NEXT)[number] }) {
 	const { setSection } = useLeftSection();
 	return (
 		<Item variant="muted">

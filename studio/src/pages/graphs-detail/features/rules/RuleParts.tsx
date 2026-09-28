@@ -16,10 +16,10 @@
  * editable from the project that inherits it ([RU8](docs/for-developers/modules/skills/features/rules.md#decisions)).
  */
 
-import type { Rule } from "@/pages/graphs-detail/features/skills";
 import { Textarea } from "@invana/forms";
 import { Badge, Button } from "@invana/ui";
 import { useState } from "react";
+import type { Rule } from "@/pages/graphs-detail/features/skills";
 
 /** Past which length a statement reads as two rules (RU1). Nudged, never refused. */
 const LONG = 160;

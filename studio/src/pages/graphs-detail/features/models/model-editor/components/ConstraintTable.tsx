@@ -1,4 +1,3 @@
-import type { ConstraintResponse } from "@/pages/graphs-detail/features/models/types";
 import {
 	Table,
 	TableBody,
@@ -7,6 +6,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import type { ConstraintResponse } from "@/pages/graphs-detail/features/models/types";
 
 interface Props {
 	constraints: ConstraintResponse[];

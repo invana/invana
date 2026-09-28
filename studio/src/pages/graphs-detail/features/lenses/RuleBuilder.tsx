@@ -27,25 +27,6 @@
  */
 
 import {
-	ANY_SUBLAYER,
-	type AddressParts,
-	REST,
-	buildMatch,
-	matches,
-	nameOptionsIn,
-	splitMatch,
-	sublayersIn,
-} from "@/pages/graphs-detail/features/lenses/addressing";
-import { GOVERNED_LAYERS } from "@/pages/graphs-detail/features/lenses/narrowing";
-import type {
-	CatalogueResponse,
-	EgressClass,
-	GovernLayer,
-	GovernRule,
-	Participant,
-} from "@/pages/graphs-detail/features/lenses/types";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
-import {
 	Checkbox,
 	Input,
 	Label,
@@ -61,11 +42,30 @@ import {
 	Button,
 	Eyebrow,
 	LayerChip,
+	layerLabel,
 	MatchPreview,
 	SliceSummary,
-	layerLabel,
 } from "@invana/ui";
 import { useMemo, useState } from "react";
+import {
+	type AddressParts,
+	ANY_SUBLAYER,
+	buildMatch,
+	matches,
+	nameOptionsIn,
+	REST,
+	splitMatch,
+	sublayersIn,
+} from "@/pages/graphs-detail/features/lenses/addressing";
+import { GOVERNED_LAYERS } from "@/pages/graphs-detail/features/lenses/narrowing";
+import type {
+	CatalogueResponse,
+	EgressClass,
+	GovernLayer,
+	GovernRule,
+	Participant,
+} from "@/pages/graphs-detail/features/lenses/types";
+import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 /** What may accompany a call across the boundary. The closed set (GV11 · GV12). */
 const EGRESS_CLASSES: { value: EgressClass; label: string }[] = [

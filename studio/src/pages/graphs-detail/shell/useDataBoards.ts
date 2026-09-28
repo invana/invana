@@ -1,42 +1,45 @@
-import { sessionsApi } from "@/pages/graphs-detail/features/assistant";
+import { canUseWebGPU } from "@invana/canvas-react";
+import type { GraphCanvas, GraphLayer } from "@invana/graph";
+import type { Dispatch, MutableRefObject, SetStateAction } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant";
 import {
-	STATE_THUMB_MAX_EDGE,
-	captureBanner,
-} from "@/pages/graphs-detail/features/boards";
-import { useBoardVersions } from "@/pages/graphs-detail/features/boards";
-import { boardsApi } from "@/pages/graphs-detail/features/boards";
-import { useCreateCanvasStateMutation } from "@/pages/graphs-detail/features/boards";
-import { useUpdateCanvasMutation } from "@/pages/graphs-detail/features/boards";
+	sessionsApi,
+	useAssistantCanvasBridge,
+} from "@/pages/graphs-detail/features/assistant";
 import type {
 	Board,
 	BoardVersionCause,
 	CanvasStyling,
+	CanvasKind as DataBoardsCanvasKind,
 } from "@/pages/graphs-detail/features/boards";
-import { boardVersionsApi } from "@/pages/graphs-detail/features/boards";
-import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
-import type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer";
+import {
+	boardsApi,
+	boardVersionsApi,
+	captureBanner,
+	STATE_THUMB_MAX_EDGE,
+	useBoardVersions,
+	useCanvasTabs,
+	useCreateCanvasStateMutation,
+	useUpdateCanvasMutation,
+} from "@/pages/graphs-detail/features/boards";
+import type {
+	CanvasBackend,
+	StyleTypeInfo,
+} from "@/pages/graphs-detail/features/explorer";
 import {
 	adaptItems,
+	explorerApi,
 	isCanvasStateSnapshot,
+	useCanvasExpand,
 } from "@/pages/graphs-detail/features/explorer";
-import { explorerApi } from "@/pages/graphs-detail/features/explorer";
 import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
+import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 import { useOpenSessionRequest } from "@/pages/graphs-detail/shell/useOpenSessionRequest";
 import type { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
 import { type Interaction, measureSync } from "@/services/telemetry/tracer";
 import type { QueryResponse, QueryResultItem } from "@/types/query";
-import { canUseWebGPU } from "@invana/canvas-react";
-import type { GraphCanvas, GraphLayer } from "@invana/graph";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
-
-import { useAssistantCanvasBridge } from "@/pages/graphs-detail/features/assistant";
-import type { CanvasKind as DataBoardsCanvasKind } from "@/pages/graphs-detail/features/boards";
-import { useCanvasTabs } from "@/pages/graphs-detail/features/boards";
-import { useCanvasExpand } from "@/pages/graphs-detail/features/explorer";
-import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
-import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 
 // localStorage key persisting the user's render-backend choice across reloads.
 const BACKEND_STORAGE_KEY = "explorer.canvas.backend";

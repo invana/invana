@@ -5,9 +5,9 @@
  * document renders whatever it names ([B16](../../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 
+import type { PanelRendererProps } from "@invana/dashboard";
 import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";
 import type { SkillPlaybookRead } from "@/pages/graphs-detail/features/skills/types";
-import type { PanelRendererProps } from "@invana/dashboard";
 
 export interface SkillFlowOptions {
 	plan: SkillPlaybookRead | null;

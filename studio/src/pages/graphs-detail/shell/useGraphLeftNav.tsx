@@ -1,8 +1,3 @@
-import { UserMenu } from "@/components/header/UserMenu";
-import {
-	type LeftNavKey,
-	useLeftSection,
-} from "@/pages/graphs-detail/shell/useLeftSection";
 import {
 	Activity,
 	Bot,
@@ -17,6 +12,11 @@ import {
 	Shield,
 	Wand2,
 } from "lucide-react";
+import { UserMenu } from "@/components/header/UserMenu";
+import {
+	type LeftNavKey,
+	useLeftSection,
+} from "@/pages/graphs-detail/shell/useLeftSection";
 
 interface SectionMeta {
 	key: LeftNavKey;

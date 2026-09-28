@@ -9,16 +9,6 @@
 // (the-library.md LB5–LB7) — a workflow is a reusable TaskPlan, not a kind
 // (SR5), so there is no Workflows icon any more (G30).
 
-import { PlansSectionBody } from "@/pages/graphs-detail/features/plans/PlansSectionBody";
-import {
-	PLAN_KINDS,
-	PLAN_SOURCES,
-} from "@/pages/graphs-detail/features/plans/PlansSectionBody";
-import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
-import {
-	type StackSectionUi,
-	stackSection,
-} from "@/pages/graphs-detail/shared/StackSection";
 import {
 	DropdownMenuLabel,
 	DropdownMenuRadioGroup,
@@ -31,6 +21,16 @@ import {
 	Download,
 	Workflow as WorkflowIcon,
 } from "lucide-react";
+import {
+	PLAN_KINDS,
+	PLAN_SOURCES,
+	PlansSectionBody,
+} from "@/pages/graphs-detail/features/plans/PlansSectionBody";
+import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
+import {
+	type StackSectionUi,
+	stackSection,
+} from "@/pages/graphs-detail/shared/StackSection";
 
 export interface PlansSectionProps {
 	username: string;

@@ -9,6 +9,15 @@
  * tab says so.
  */
 
+import { MarkdownEditorBlock } from "@invana/editor";
+import { Input } from "@invana/forms";
+import {
+	EmissionCard,
+	PropertyList,
+	PropertyRow,
+	SegmentedControl,
+} from "@invana/ui";
+import { useState } from "react";
 import { formatRelativeTime } from "@/lib/time";
 import {
 	type AgentDraft,
@@ -21,15 +30,6 @@ import type {
 	SoulTraits,
 } from "@/pages/graphs-detail/features/agents/types";
 import { PanelSection } from "@/ui/PanelSection";
-import { MarkdownEditorBlock } from "@invana/editor";
-import { Input } from "@invana/forms";
-import {
-	EmissionCard,
-	PropertyList,
-	PropertyRow,
-	SegmentedControl,
-} from "@invana/ui";
-import { useState } from "react";
 
 /** Two columns at 760px of page, one below — a container query, not the viewport. */
 export const TWO_COLUMNS =

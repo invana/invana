@@ -4,21 +4,21 @@
  * at All models, p95 against the Graph's at one (the-model-page.md · The tabs).
  */
 
-import type {
-	GrowthMark,
-	Overview,
-} from "@/pages/graphs-detail/features/models/types";
-import type { PhysicalSchema } from "@/pages/graphs-detail/features/models/types";
 import { StackedBarChartV } from "@invana/charts";
 import type { PanelSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Button } from "@invana/ui";
+import type {
+	GrowthMark,
+	Overview,
+	PhysicalSchema,
+} from "@/pages/graphs-detail/features/models/types";
 import {
 	CALLER_SERIES,
-	SignalMark,
 	dayLabel,
 	fmtMs,
 	fmtNum,
+	SignalMark,
 } from "./insightParts";
 import { P95Line } from "./performanceRows";
 import type { ModelsTab } from "./useModelsView";

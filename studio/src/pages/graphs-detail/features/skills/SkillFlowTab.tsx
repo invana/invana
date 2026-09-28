@@ -22,6 +22,9 @@
  * what makes a published skill do tomorrow what it did today.
  */
 
+import { Badge, EmptyState, Spinner } from "@invana/ui";
+import { Workflow } from "lucide-react";
+import { useMemo } from "react";
 import {
 	TaskFlowCanvas,
 	taskFlowSettings,
@@ -33,9 +36,6 @@ import type {
 	SkillPlaybookNode,
 	SkillPlaybookRead,
 } from "@/pages/graphs-detail/features/skills/types";
-import { Badge, EmptyState, Spinner } from "@invana/ui";
-import { Workflow } from "lucide-react";
-import { useMemo } from "react";
 
 export function SkillFlowTab({
 	plan,

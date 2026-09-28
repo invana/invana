@@ -18,21 +18,21 @@
  * and `EgressList` reads the two differently because they are different claims.
  */
 
-import type {
-	Touch,
-	TouchesResponse,
-} from "@/pages/graphs-detail/features/lenses/types";
 import type { PanelRendererProps } from "@invana/dashboard";
 import {
 	AddressChip,
 	type AddressTone,
 	CannotAnswerCard,
 	EgressList,
+	layerItemLabel,
 	PropertyList,
 	PropertyRow,
 	SliceSummary,
-	layerItemLabel,
 } from "@invana/ui";
+import type {
+	Touch,
+	TouchesResponse,
+} from "@/pages/graphs-detail/features/lenses/types";
 
 const TONE: Record<Touch["direction"], AddressTone> = {
 	out: "allowed",

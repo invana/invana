@@ -1,5 +1,5 @@
-import { useStackSections } from "@/pages/graphs-detail/shell/useStackSections";
 import { useCallback } from "react";
+import { useStackSections } from "@/pages/graphs-detail/shell/useStackSections";
 
 // The **Library** panel is a stack of three sections, not a tabbed panel
 // (graph-detail-page.md G33 · G41). All three are on screen at once; `?section=`

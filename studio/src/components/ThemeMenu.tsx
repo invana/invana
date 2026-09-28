@@ -8,11 +8,11 @@
  * page keeps `ModeToggle` (pre-auth, nothing to sync).
  */
 
-import { SaturationControl } from "@/components/SaturationControl";
-import { STUDIO_THEMES } from "@/components/studioThemes";
 import { ThemeSelector } from "@invana/themes";
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@invana/ui";
 import { Monitor, Moon, Palette, Sun } from "lucide-react";
+import { SaturationControl } from "@/components/SaturationControl";
+import { STUDIO_THEMES } from "@/components/studioThemes";
 
 const MODE_ICONS = { light: Sun, dark: Moon, system: Monitor };
 

@@ -11,15 +11,6 @@
 // Distinct from the Modeller's `GraphModelCanvas` (`@/canvases/model`), which
 // draws models as frames of types.
 
-import { readCanvasThemeConfig } from "@/canvases/theme";
-import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
-import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
-import type { ExpandRequest } from "@/pages/graphs-detail/features/explorer/types";
-import {
-	type InteractionRef,
-	endInteraction,
-	startChild,
-} from "@/services/telemetry/tracer";
 // The root is `<GraphCanvas>`, not `<Board>`: only it provides
 // `GraphCanvasContext`, which every `useGraphCanvas()` below depends on. Up to
 // canvas 0.0.11 `<Board>` provided it too, so this reads like a free swap —
@@ -31,6 +22,7 @@ import {
 	type CanvasProps,
 	ClickSelectBehaviour,
 	ClickViewBehaviour,
+	canUseWebGPU,
 	D3ForceLayout,
 	DragNodeBehaviour,
 	DragPanBehaviour,
@@ -45,8 +37,6 @@ import {
 	PinchZoomBehaviour,
 	TextResolutionLODBehaviour,
 	type UseClipboardResult,
-	WheelZoomBehaviour,
-	canUseWebGPU,
 	useCanvas,
 	useCanvasEvent,
 	useClipboard,
@@ -59,8 +49,10 @@ import {
 	useStyleEditorSection,
 	useViewContext,
 	useViewSection,
+	WheelZoomBehaviour,
 } from "@invana/canvas-react";
 import {
+	applyIconOverrides,
 	GraphBackgroundContextMenu,
 	type GraphBackgroundMenuContext,
 	GraphEdgeContextMenu,
@@ -69,14 +61,13 @@ import {
 	type GraphNodeMenuContext,
 	type ToolbarItem,
 	ToolbarItems,
-	applyIconOverrides,
 } from "@invana/canvas-ui";
+import type * as graph from "@invana/graph";
 import type {
 	GraphCanvas as GraphCanvasEngine,
 	GraphData,
 	GraphNode,
 } from "@invana/graph";
-import type * as graph from "@invana/graph";
 import { D3ForceLayout as D3ForceLayoutEngine } from "@invana/graph-layout-d3-force";
 import { ElkLayout } from "@invana/graph-layout-elkjs";
 import { useTheme } from "@invana/themes";
@@ -118,6 +109,15 @@ import {
 	ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { readCanvasThemeConfig } from "@/canvases/theme";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
+import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
+import type { ExpandRequest } from "@/pages/graphs-detail/features/explorer/types";
+import {
+	endInteraction,
+	type InteractionRef,
+	startChild,
+} from "@/services/telemetry/tracer";
 
 /** Schema slice that drives the node-expand submenus (docs/for-developers/modules/explore/features/graph-canvas.md). */
 export interface ExpandMenuSchema {

@@ -1,4 +1,3 @@
-import { useAuth } from "@/hooks/useAuth";
 import {
 	Button,
 	DropdownMenu,
@@ -10,6 +9,7 @@ import {
 } from "@invana/ui";
 import { Activity, LogOut, UserCircle, UserCog } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 /**
  * Avatar + name dropdown pinned to the very bottom of the left rail

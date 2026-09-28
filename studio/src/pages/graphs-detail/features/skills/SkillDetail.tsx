@@ -22,9 +22,10 @@
  * prose, so a word implying we did would be a lie told in a badge (US4).
  */
 
+import { Badge, Button, RecordHeader, Spinner, TabbedPanel } from "@invana/ui";
+import { BarChart3, GitBranch } from "lucide-react";
+import { useState } from "react";
 import { useAgentMutations } from "@/pages/graphs-detail/features/agents";
-import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";
-import { SkillPlaybookTab } from "@/pages/graphs-detail/features/skills/SkillPlaybookTab";
 import {
 	useSkillAgentsQuery,
 	useSkillDiffQuery,
@@ -33,6 +34,8 @@ import {
 	useSkillUsageQuery,
 	useSkillVersionsQuery,
 } from "@/pages/graphs-detail/features/skills/queries";
+import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";
+import { SkillPlaybookTab } from "@/pages/graphs-detail/features/skills/SkillPlaybookTab";
 import type {
 	BindRefusal,
 	Skill,
@@ -40,11 +43,8 @@ import type {
 	SkillUsageVersion,
 } from "@/pages/graphs-detail/features/skills/types";
 import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
-import { BindRefusalCard, asBindRefusal } from "@/ui/BindRefusalCard";
+import { asBindRefusal, BindRefusalCard } from "@/ui/BindRefusalCard";
 import { PanelSection } from "@/ui/PanelSection";
-import { Badge, Button, RecordHeader, Spinner, TabbedPanel } from "@invana/ui";
-import { BarChart3, GitBranch } from "lucide-react";
-import { useState } from "react";
 
 export type SkillTab = "playbook" | "flow" | "bindings" | "usage" | "versions";
 

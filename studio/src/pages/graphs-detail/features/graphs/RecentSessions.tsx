@@ -1,9 +1,3 @@
-import { formatRelativeTime } from "@/lib/time";
-import { sessionsApi } from "@/pages/graphs-detail/features/assistant";
-import type { Session } from "@/pages/graphs-detail/features/assistant";
-import { sessionsListKey } from "@/pages/graphs-detail/features/assistant";
-import { ListRow } from "@/pages/graphs-detail/shared/ListPanel";
-import { requestOpenSession } from "@/pages/graphs-detail/shell/useOpenSessionRequest";
 import {
 	Button,
 	EmptyState,
@@ -13,6 +7,14 @@ import {
 } from "@invana/ui";
 import { useQuery } from "@tanstack/react-query";
 import { MessageSquare } from "lucide-react";
+import { formatRelativeTime } from "@/lib/time";
+import type { Session } from "@/pages/graphs-detail/features/assistant";
+import {
+	sessionsApi,
+	sessionsListKey,
+} from "@/pages/graphs-detail/features/assistant";
+import { ListRow } from "@/pages/graphs-detail/shared/ListPanel";
+import { requestOpenSession } from "@/pages/graphs-detail/shell/useOpenSessionRequest";
 
 /** How many rows the panel shows. The assistant holds the rest. */
 const LIMIT = 5;

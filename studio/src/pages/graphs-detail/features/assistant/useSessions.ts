@@ -1,4 +1,5 @@
-import { asCastRefusal } from "@/pages/graphs-detail/features/assistant/CastRefusal";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	type RecordOperationBody,
 	type SendMessageBody,
@@ -6,25 +7,22 @@ import {
 	type SessionUpdateBody,
 	sessionsApi,
 } from "@/pages/graphs-detail/features/assistant/api";
+import { asCastRefusal } from "@/pages/graphs-detail/features/assistant/CastRefusal";
 import type {
 	Session,
 	SessionMessage,
 } from "@/pages/graphs-detail/features/assistant/types";
 import {
-	type RunStreamHandle,
-	messageFromFrame,
-	runsApi,
-} from "@/pages/graphs-detail/features/runs";
-import {
 	type AskFrame,
 	LIVE_RUN_STATUSES,
+	messageFromFrame,
+	type RunStreamHandle,
+	runsApi,
 } from "@/pages/graphs-detail/features/runs";
 import { type Action, startAction } from "@/services/telemetry/tracer";
 import { useAuthStore } from "@/stores/auth.store";
 import { useRunStore } from "@/stores/run.store";
 import type { QueryResponse, QueryRunPayload } from "@/types/query";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 // A session's title is seeded from its first message so it's never blank —
 // mirrors the engine's `_title_from_text` (64-char cap + ellipsis). Set at
@@ -316,13 +314,8 @@ export function useSessions(
 	// (pinned-first) and archived visibility re-sort. Archiving the open session
 	// drops back to the list, since it's no longer shown by default.
 	const updateMutation = useMutation({
-		mutationFn: ({
-			id,
-			body,
-		}: {
-			id: string;
-			body: SessionUpdateBody;
-		}) => sessionsApi.update(u, g, id, body),
+		mutationFn: ({ id, body }: { id: string; body: SessionUpdateBody }) =>
+			sessionsApi.update(u, g, id, body),
 		onSuccess: (_data, { id, body }) => {
 			qc.invalidateQueries({ queryKey: listPrefix });
 			// A rename also changes the open thread's title (the breadcrumb + the

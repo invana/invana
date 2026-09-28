@@ -1,14 +1,3 @@
-import type { ExpandMenuSchema } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
-import type {
-	ExpandDirection,
-	ExpandRequest,
-	FilterExpression,
-	FilterGroup,
-	FilterOp,
-	NeighborExpandResponse,
-	SortDirection,
-	SortSpec,
-} from "@/pages/graphs-detail/features/explorer/types";
 import {
 	Input,
 	Label,
@@ -31,6 +20,17 @@ import {
 } from "@invana/ui";
 import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { ExpandMenuSchema } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
+import type {
+	ExpandDirection,
+	ExpandRequest,
+	FilterExpression,
+	FilterGroup,
+	FilterOp,
+	NeighborExpandResponse,
+	SortDirection,
+	SortSpec,
+} from "@/pages/graphs-detail/features/explorer/types";
 
 const ANY = "__any__";
 

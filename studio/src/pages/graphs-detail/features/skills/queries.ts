@@ -1,3 +1,4 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { rulesApi, skillsApi } from "@/pages/graphs-detail/features/skills/api";
 import type {
 	RuleCreate,
@@ -6,7 +7,6 @@ import type {
 	SkillDraftTaskWrite,
 	SkillVersionPublish,
 } from "@/pages/graphs-detail/features/skills/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const key = (username: string, graphSlug: string) =>
 	["skills", username, graphSlug] as const;

@@ -1,13 +1,4 @@
 import {
-	useDeleteGraphMutation,
-	useGraphsQuery,
-} from "@/pages/graphs-detail/features/graphs";
-import {
-	type Graph,
-	SETUP_REQUIRED,
-	setupSectionStatus,
-} from "@/pages/graphs-detail/features/graphs";
-import {
 	Button,
 	Dialog,
 	DialogContent,
@@ -33,6 +24,13 @@ import {
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import {
+	type Graph,
+	SETUP_REQUIRED,
+	setupSectionStatus,
+	useDeleteGraphMutation,
+	useGraphsQuery,
+} from "@/pages/graphs-detail/features/graphs";
 
 const PAGE_SIZE = 6;
 

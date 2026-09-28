@@ -19,21 +19,21 @@
  * section is never an empty context.
  */
 
+import { Button, Spinner } from "@invana/ui";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 import {
 	RuleStatementForm,
 	RuleStatementRow,
 } from "@/pages/graphs-detail/features/rules/RuleParts";
+import type { Rule } from "@/pages/graphs-detail/features/skills";
 import {
 	useCreateProjectRuleMutation,
 	useProjectRulesQuery,
 	useSetRuleActiveMutation,
 	useUpdateRuleMutation,
 } from "@/pages/graphs-detail/features/skills";
-import type { Rule } from "@/pages/graphs-detail/features/skills";
 import { PanelSection } from "@/ui/PanelSection";
-import { Button, Spinner } from "@invana/ui";
-import { Plus } from "lucide-react";
-import { useState } from "react";
 
 export function ProjectRules({
 	username,

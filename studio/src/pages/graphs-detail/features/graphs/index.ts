@@ -12,16 +12,6 @@ export {
 	useSetupSectionMutation,
 } from "@/pages/graphs-detail/features/graphs/queries";
 export { SettingsViewPanel } from "@/pages/graphs-detail/features/graphs/SettingsViewPanel";
-export {
-	CONNECTOR_OPTIONS,
-	SETUP_REQUIRED,
-	SETUP_SKIPPABLE,
-	hasOutstandingSetup,
-	isGateOpen,
-	isSetupComplete,
-	missingForGate,
-	setupSectionStatus,
-} from "@/pages/graphs-detail/features/graphs/types";
 export type {
 	Graph,
 	GraphConnectionCreate,
@@ -30,4 +20,14 @@ export type {
 	SetupGate,
 	SetupSection,
 	SetupSectionState,
+} from "@/pages/graphs-detail/features/graphs/types";
+export {
+	CONNECTOR_OPTIONS,
+	hasOutstandingSetup,
+	isGateOpen,
+	isSetupComplete,
+	missingForGate,
+	SETUP_REQUIRED,
+	SETUP_SKIPPABLE,
+	setupSectionStatus,
 } from "@/pages/graphs-detail/features/graphs/types";

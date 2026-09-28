@@ -7,18 +7,18 @@
  * this page needs ([RU11](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */
 
+import { Dashboard } from "@invana/dashboard";
+import { EmptyState, Spinner } from "@invana/ui";
+import { useMemo, useState } from "react";
 import { useReport } from "@/pages/graphs-detail/features/boards";
 import { ruleBoardSpec } from "@/pages/graphs-detail/features/rules/boards/ruleBoardSpec";
-import { SKILL_ACTIONS } from "@/pages/graphs-detail/features/skills";
 import {
+	SKILL_ACTIONS,
 	useRuleCitationsQuery,
 	useRulesQuery,
 } from "@/pages/graphs-detail/features/skills";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 import { VIEW_DASHBOARD } from "@/pages/graphs-detail/shared/dashboardSpec";
-import { Dashboard } from "@invana/dashboard";
-import { EmptyState, Spinner } from "@invana/ui";
-import { useMemo, useState } from "react";
 
 export interface RuleBoardPageProps {
 	username: string;

@@ -18,11 +18,6 @@
  */
 
 import {
-	stitchPair,
-	stitchRule,
-} from "@/pages/graphs-detail/features/models/stitch/allModels";
-import type { ModelLink } from "@/pages/graphs-detail/features/models/types";
-import {
 	AlertDialog,
 	AlertDialogAction,
 	AlertDialogCancel,
@@ -33,6 +28,11 @@ import {
 	Badge,
 } from "@invana/ui";
 import { Trash2 } from "lucide-react";
+import {
+	stitchPair,
+	stitchRule,
+} from "@/pages/graphs-detail/features/models/stitch/allModels";
+import type { ModelLink } from "@/pages/graphs-detail/features/models/types";
 
 interface Props {
 	/** The stitch being withdrawn; `null` closes the dialog. */

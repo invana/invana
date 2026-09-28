@@ -1,3 +1,4 @@
+import { cn, Eyebrow } from "@invana/ui";
 import {
 	type Graph,
 	SETUP_SKIPPABLE,
@@ -13,7 +14,6 @@ import {
 	type SetupStepKey,
 	WHAT_NEXT_KEY,
 } from "@/pages/graphs-detail/features/setup/useSetupStep";
-import { Eyebrow, cn } from "@invana/ui";
 
 /**
  * The wizard's left rail: every step, grouped by the gate it opens, with the

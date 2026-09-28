@@ -5,11 +5,6 @@
  * before they act.
  */
 
-import { useDraftProjectionQuery } from "@/pages/graphs-detail/features/models/queries";
-import type {
-	BindingStitch,
-	StagedSet,
-} from "@/pages/graphs-detail/features/models/types";
 import {
 	Button,
 	Dialog,
@@ -25,6 +20,11 @@ import {
 	Spinner,
 } from "@invana/ui";
 import { Check } from "lucide-react";
+import { useDraftProjectionQuery } from "@/pages/graphs-detail/features/models/queries";
+import type {
+	BindingStitch,
+	StagedSet,
+} from "@/pages/graphs-detail/features/models/types";
 
 const OP: Record<string, "add" | "remove" | "change"> = {
 	added: "add",

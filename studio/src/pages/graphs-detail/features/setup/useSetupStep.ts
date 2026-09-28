@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
 	type Graph,
 	SETUP_REQUIRED,
@@ -6,8 +8,6 @@ import {
 	setupSectionStatus,
 } from "@/pages/graphs-detail/features/graphs";
 import { SETUP_STEPS } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
 
 // Which step the onboarding wizard is showing, carried in the URL so a step can
 // be handed to a teammate (setup.md SU16). One param per axis of the page

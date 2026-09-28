@@ -6,13 +6,13 @@
  * graph_data` in a terminal must not read as something else on screen.
  */
 
+import type { Narrowing } from "@invana/ui";
 import type {
 	CastRole,
 	GovernLayer,
 	GovernRule,
 	Lens,
 } from "@/pages/graphs-detail/features/lenses/types";
-import type { Narrowing } from "@invana/ui";
 
 /** The five layers a rule may govern. The spine is not one of them. */
 export const GOVERNED_LAYERS: GovernLayer[] = [

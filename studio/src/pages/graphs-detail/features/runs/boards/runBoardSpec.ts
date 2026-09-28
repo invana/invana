@@ -1,4 +1,5 @@
 import { usd } from "@/lib/format";
+
 /**
  * The run dashboard, composed — artboard **D1** ([34k](../../../../../../docs/for-developers/the-screens.md)).
  *
@@ -16,25 +17,28 @@ import { usd } from "@/lib/format";
  * [SR41](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 
+import type {
+	DashboardSpec,
+	LogOptions,
+	PanelSpec,
+	RunPanelOptions,
+	TabSpec,
+} from "@invana/dashboard";
+import type { TaskGanttSegment, TaskGanttTask } from "@invana/ui";
 import { formatDuration } from "@/lib/time";
-import { layersOptions } from "@/pages/graphs-detail/features/lenses";
+import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
 import {
+	layersOptions,
 	lensSummary,
 	runLensOptions,
 } from "@/pages/graphs-detail/features/lenses";
-import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
 import type {
 	TraceRead,
 	TraceStepRead,
 } from "@/pages/graphs-detail/features/runs/api";
 import { taskFlowFromRun } from "@/pages/graphs-detail/features/runs/boards/taskFlowFromRun";
 import { runSummary } from "@/pages/graphs-detail/features/runs/runSummary";
-import type { WithFlow } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 import {
-	type TaskGroup,
-	VIEW_ACTION,
-	VIEW_DASHBOARD,
-	VIEW_SPEC,
 	compact,
 	count,
 	durationMs,
@@ -49,18 +53,15 @@ import {
 	runTitle,
 	specPanel,
 	statusChip,
+	type TaskGroup,
 	tileToneOf,
 	toneOf,
+	VIEW_ACTION,
+	VIEW_DASHBOARD,
+	VIEW_SPEC,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
+import type { WithFlow } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
-import type {
-	DashboardSpec,
-	LogOptions,
-	PanelSpec,
-	RunPanelOptions,
-	TabSpec,
-} from "@invana/dashboard";
-import type { TaskGanttSegment, TaskGanttTask } from "@invana/ui";
 
 /** Action ids the page answers. The spec carries the string; the page carries the behaviour. */
 export const RUN_ACTIONS = {

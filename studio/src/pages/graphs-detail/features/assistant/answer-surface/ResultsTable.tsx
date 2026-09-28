@@ -54,7 +54,10 @@ export function ResultsTable({ rows }: ResultsTableProps) {
 					<TableBody>
 						{shown.map((row, i) => (
 							<TableRow
-								key={`${i}:${columns.map((c) => renderCell(row[c])).join("|")}`}
+								key={`${
+									// biome-ignore lint/suspicious/noArrayIndexKey: the list is rebuilt whole, never reordered in place
+									i
+								}:${columns.map((c) => renderCell(row[c])).join("|")}`}
 							>
 								{columns.map((c) => (
 									<TableCell key={c} className="font-mono">

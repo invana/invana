@@ -20,10 +20,10 @@
  * appears, so nothing is lost in the gap.
  */
 
-import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
-import type { QueryResultItem } from "@/types/query";
 import type { GraphData } from "@invana/graph";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
+import type { QueryResultItem } from "@/types/query";
 
 export interface BoardSlice {
 	/** Everything drawn on this canvas. A query replaces it; an expand appends. */

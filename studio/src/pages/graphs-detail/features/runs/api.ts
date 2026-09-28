@@ -8,25 +8,25 @@
 // so a dropped connection replays from where it left off.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { ROOT_CONTEXT } from "@opentelemetry/api";
 import type {
 	Emission,
 	EmissionKind,
+	SessionMessage,
 	TemplateOffer,
 } from "@/pages/graphs-detail/features/assistant";
-import type { SessionMessage } from "@/pages/graphs-detail/features/assistant";
 import type {
 	AskFrame,
 	RunNode,
 	RunNodeStatus,
 	RunStatus,
+	TaskRunListResponse,
 } from "@/pages/graphs-detail/features/runs/types";
-import type { TaskRunListResponse } from "@/pages/graphs-detail/features/runs/types";
 import type { OfferedRule } from "@/pages/graphs-detail/features/skills";
 import { API_BASE_URL, request } from "@/services/api/client";
 import { recordStreamReconnect } from "@/services/telemetry/metrics";
 import { type Interaction, withTraceparent } from "@/services/telemetry/tracer";
 import type { QueryResponse } from "@/types/query";
-import { ROOT_CONTEXT } from "@opentelemetry/api";
 
 // ── Wire DTOs ────────────────────────────────────────────────────────────────
 

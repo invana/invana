@@ -6,8 +6,8 @@
  * narrowed list is not a place — so it is in memory, not a URL key (G31).
  */
 
-import type { RunsFilters } from "@/pages/graphs-detail/features/runs/queries";
 import { create } from "zustand";
+import type { RunsFilters } from "@/pages/graphs-detail/features/runs/queries";
 
 interface RunsFiltersState {
 	filters: RunsFilters;

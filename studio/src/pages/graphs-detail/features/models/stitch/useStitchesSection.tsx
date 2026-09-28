@@ -1,3 +1,6 @@
+import { Button, type PanelStackSection } from "@invana/ui";
+import { Check, Link2, Plus, Trash2, Undo2 } from "lucide-react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models/model-editor/types";
 import {
 	useCommitStitchesMutation,
@@ -18,9 +21,6 @@ import type {
 } from "@/pages/graphs-detail/features/models/types";
 import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
 import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
-import { Button, type PanelStackSection } from "@invana/ui";
-import { Check, Link2, Plus, Trash2, Undo2 } from "lucide-react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
 
 /**
  * Scrolls its row into view the moment it becomes the marked one.

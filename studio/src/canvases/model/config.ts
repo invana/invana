@@ -8,6 +8,9 @@
  * `schema:*`, and the eight model hues read off `--color-data-N`.
  */
 
+import type { CanvasConfig } from "@invana/canvas";
+import { cssColorToNumber } from "@invana/graph";
+import { colorSlotByString } from "@invana/styling/color";
 import {
 	type Detail,
 	type GraphModelTemplates,
@@ -19,9 +22,6 @@ import {
 	type ModelTypeNode,
 	SCHEMA_CARD,
 } from "@/canvases/model/types";
-import type { CanvasConfig } from "@invana/canvas";
-import { cssColorToNumber } from "@invana/graph";
-import { colorSlotByString } from "@invana/styling/color";
 
 /** `@invana/styling`'s `--color-data-1…8`, used only when a token cannot be read. */
 const FALLBACK_HUES = [

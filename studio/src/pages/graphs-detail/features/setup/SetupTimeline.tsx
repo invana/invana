@@ -1,5 +1,7 @@
+import { Button, SectionHeader, TimelineEntry, TimelineList } from "@invana/ui";
+import { ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 import { formatRelativeTime } from "@/lib/time";
-import { useSetupSectionMutation } from "@/pages/graphs-detail/features/graphs";
 import {
 	type Graph,
 	SETUP_REQUIRED,
@@ -7,17 +9,15 @@ import {
 	type SetupSection,
 	type SetupSectionState,
 	setupSectionStatus,
+	useSetupSectionMutation,
 } from "@/pages/graphs-detail/features/graphs";
 import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
 import {
-	SETUP_STEPS,
 	SETUP_STEP_BY_KEY,
+	SETUP_STEPS,
 	type SetupStepMeta,
 } from "@/pages/graphs-detail/features/setup/setupSteps";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
-import { Button, SectionHeader, TimelineEntry, TimelineList } from "@invana/ui";
-import { ArrowRight } from "lucide-react";
-import { toast } from "sonner";
 
 interface Props {
 	graph: Graph;

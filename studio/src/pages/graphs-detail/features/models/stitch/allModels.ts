@@ -18,6 +18,7 @@
  * (ST16), so the global-model page stays stated rather than drawn (ST6).
  */
 
+import { colorSlotByString } from "@invana/styling/color";
 import {
 	MODEL_EMPTY_TYPE,
 	MODEL_FRAME_TYPE,
@@ -28,12 +29,11 @@ import {
 	type ModelProperty,
 	type ModelTypeNode,
 } from "@/canvases/model";
-import type { ModelLink } from "@/pages/graphs-detail/features/models/types";
 import type {
 	EdgeTypeResponse,
+	ModelLink,
 	NodeTypeResponse,
 } from "@/pages/graphs-detail/features/models/types";
-import { colorSlotByString } from "@invana/styling/color";
 
 /** One model, with the published version that is drawn. */
 export interface ModelFrame {

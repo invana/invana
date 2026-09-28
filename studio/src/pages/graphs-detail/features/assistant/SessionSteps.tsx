@@ -1,3 +1,9 @@
+import {
+	ChatSessionActivitySubLine,
+	ChatSessionDisclosure,
+	ChatSessionTaskRow,
+	type ChatSessionTaskStatus,
+} from "@invana/ui";
 import { useTicker } from "@/hooks/useTicker";
 import { formatCompactCount } from "@/lib/format";
 import { formatDuration } from "@/lib/time";
@@ -5,12 +11,6 @@ import type {
 	RunNode,
 	RunNodeStatus,
 } from "@/pages/graphs-detail/features/runs";
-import {
-	ChatSessionActivitySubLine,
-	ChatSessionDisclosure,
-	ChatSessionTaskRow,
-	type ChatSessionTaskStatus,
-} from "@invana/ui";
 
 // ── Status mapping ────────────────────────────────────────────────────────────
 
@@ -181,7 +181,10 @@ export function StepList({
 								    full set stays in the step's trace. */}
 								{rounds.map((round, ri) => (
 									<div
-										key={`${step.id}-ask-${ri}`}
+										key={`${step.id}-ask-${
+											// biome-ignore lint/suspicious/noArrayIndexKey: the list is rebuilt whole, never reordered in place
+											ri
+										}`}
 										className="flex flex-col gap-px"
 									>
 										<ChatSessionActivitySubLine>
@@ -196,7 +199,10 @@ export function StepList({
 												<div className="flex flex-col items-start gap-px pl-4">
 													{round.options.map((option, oi) => (
 														<OptionRow
-															key={`${step.id}-opt-${ri}-${oi}`}
+															key={`${step.id}-opt-${
+																// biome-ignore lint/suspicious/noArrayIndexKey: the list is rebuilt whole, never reordered in place
+																ri
+															}-${oi}`}
 															label={option}
 															// Static on a read-only surface like the
 															// Tasks view, which has no composer to

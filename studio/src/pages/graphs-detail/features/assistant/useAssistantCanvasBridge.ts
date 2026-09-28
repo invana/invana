@@ -1,3 +1,6 @@
+import type { Dispatch, MutableRefObject, SetStateAction } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { attachmentFor } from "@/pages/graphs-detail/features/assistant/SessionComposer";
 import type { SessionMessage } from "@/pages/graphs-detail/features/assistant/types";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
@@ -10,17 +13,16 @@ import {
 	type CanvasBackend,
 	resultToItems,
 } from "@/pages/graphs-detail/features/explorer";
-import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
-import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
+import type {
+	QueryLanguage,
+	useGraphConnectionQuery,
+} from "@/pages/graphs-detail/features/graphs";
 import { type Interaction, startAction } from "@/services/telemetry/tracer";
 import type {
 	QueryResponse,
 	QueryResultItem,
 	QueryRunPayload,
 } from "@/types/query";
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { Dispatch, MutableRefObject, SetStateAction } from "react";
-import { toast } from "sonner";
 
 // Fallback when the engine hasn't reported any query languages yet (e.g. the
 // connector class couldn't be loaded server-side). Studio shows both rather

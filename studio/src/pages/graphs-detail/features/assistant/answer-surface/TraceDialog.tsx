@@ -22,6 +22,21 @@
  *   answer is running the query yourself, not trusting the prose around it.
  */
 
+import {
+	Button,
+	cn,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	Spinner,
+	StatusDot,
+} from "@invana/ui";
+import { useQuery } from "@tanstack/react-query";
+import { Check, ChevronRight, Copy } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { formatDuration } from "@/lib/time";
 import { useOpenBoard } from "@/pages/graphs-detail/features/boards";
 import {
@@ -30,21 +45,6 @@ import {
 } from "@/pages/graphs-detail/features/runs";
 import { StepRules } from "@/pages/graphs-detail/shared/StepRules";
 import { stepTone } from "@/pages/graphs-detail/shared/statusTone";
-import {
-	Button,
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-	Spinner,
-	StatusDot,
-	cn,
-} from "@invana/ui";
-import { useQuery } from "@tanstack/react-query";
-import { Check, ChevronRight, Copy } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface Props {
 	open: boolean;

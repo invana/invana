@@ -1,4 +1,5 @@
 import { usd, usdWhole } from "@/lib/format";
+
 /**
  * Overview — the agent read whole (AG23): who it is, its focus, how it thinks,
  * what it can do, what is always in force, its limits, and the two policy
@@ -6,6 +7,10 @@ import { usd, usdWhole } from "@/lib/format";
  * drawn, stacking below 760px (AG38).
  */
 
+import { Switch } from "@invana/forms";
+import { Button, Progress, PropertyList, PropertyRow } from "@invana/ui";
+import { Shield } from "lucide-react";
+import type { ReactNode } from "react";
 import type { AgentTab } from "@/pages/graphs-detail/features/agents/AgentDetail";
 import {
 	type AgentDraft,
@@ -19,10 +24,6 @@ import {
 import type { Agent } from "@/pages/graphs-detail/features/agents/types";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
 import { PanelSection } from "@/ui/PanelSection";
-import { Switch } from "@invana/forms";
-import { Button, Progress, PropertyList, PropertyRow } from "@invana/ui";
-import { Shield } from "lucide-react";
-import type { ReactNode } from "react";
 
 /** The two switches the Overview carries (AG23). Keys are the engine's. */
 export const POLICY_FIELDS: { key: string; label: string; hint: string }[] = [

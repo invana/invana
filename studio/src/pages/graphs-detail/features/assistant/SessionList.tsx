@@ -1,11 +1,11 @@
+import { Button, ScrollArea } from "@invana/ui";
+import { Archive, ArchiveRestore, MessageSquare, Pin } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { formatRelativeTime } from "@/lib/time";
 import type { SessionSort } from "@/pages/graphs-detail/features/assistant/api";
 import type { Session } from "@/pages/graphs-detail/features/assistant/types";
 import { useCanvasBannerQuery } from "@/pages/graphs-detail/features/boards";
 import { ListRow } from "@/pages/graphs-detail/shared/ListPanel";
-import { Button, ScrollArea } from "@invana/ui";
-import { Archive, ArchiveRestore, MessageSquare, Pin } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 // How many sessions show before the "MORE" expander kicks in.
 const VISIBLE_LIMIT = 8;

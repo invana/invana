@@ -17,24 +17,24 @@
  * ([RU11](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */
 
-import {
-	SKILL_ACTIONS,
-	ruleTitle,
-	when,
-} from "@/pages/graphs-detail/features/skills";
+import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 import type {
 	Rule,
 	RuleCitationsResponse,
 } from "@/pages/graphs-detail/features/skills";
 import {
-	VIEW_ACTION,
-	VIEW_DASHBOARD,
-	VIEW_SPEC,
+	ruleTitle,
+	SKILL_ACTIONS,
+	when,
+} from "@/pages/graphs-detail/features/skills";
+import {
 	count,
 	omit,
 	specPanel,
+	VIEW_ACTION,
+	VIEW_DASHBOARD,
+	VIEW_SPEC,
 } from "@/pages/graphs-detail/shared/dashboardSpec";
-import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 
 export interface RuleBoardView {
 	/** `Dashboard` or `spec.json`. */

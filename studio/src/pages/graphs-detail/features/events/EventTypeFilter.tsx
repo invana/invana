@@ -1,4 +1,3 @@
-import { EVENT_CATEGORIES } from "@/pages/graphs-detail/features/events/eventCatalog";
 import {
 	Badge,
 	Button,
@@ -33,6 +32,7 @@ import {
 	X,
 } from "lucide-react";
 import { useState } from "react";
+import { EVENT_CATEGORIES } from "@/pages/graphs-detail/features/events/eventCatalog";
 
 /** Per-category glyph for the rich-select rows. */
 const CATEGORY_ICON: Record<string, LucideIcon> = {

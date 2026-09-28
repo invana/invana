@@ -16,11 +16,11 @@
  * always there and there is nothing to fork into ([B22](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 
-import { formatRelativeTime } from "@/lib/time";
-import type { BoardVersionSummary } from "@/pages/graphs-detail/features/boards/types";
 import { Button, ScrollArea } from "@invana/ui";
 import { History, X } from "lucide-react";
 import type { ReactNode } from "react";
+import { formatRelativeTime } from "@/lib/time";
+import type { BoardVersionSummary } from "@/pages/graphs-detail/features/boards/types";
 
 /** What the row's one button does — the half that is not shared. */
 export interface BoardHistoryAction {

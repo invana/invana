@@ -8,9 +8,9 @@
  * leaves the graph alone* is the fact a reader is checking for (D22).
  */
 
+import type { LayerBand, LayerItem } from "@invana/ui";
 import type { TaskPlanDetail } from "@/pages/graphs-detail/features/plans/types";
 import { layerSlug } from "@/ui/layerPalette";
-import type { LayerBand, LayerItem } from "@invana/ui";
 
 export function planLayerStrip(
 	plan: TaskPlanDetail,

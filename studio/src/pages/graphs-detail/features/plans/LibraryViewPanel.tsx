@@ -36,6 +36,8 @@
  * one does.
  */
 
+import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import { useEffect, useRef, useState } from "react";
 import { catalogueSection } from "@/pages/graphs-detail/features/plans/CatalogueSection";
 import { plansSection } from "@/pages/graphs-detail/features/plans/PlansSection";
 import { templatesSection } from "@/pages/graphs-detail/features/projections";
@@ -45,8 +47,6 @@ import {
 	useLibraryViewPanel,
 } from "@/pages/graphs-detail/shell/useLibraryViewPanel";
 import { PanelStatusBar, StatusCrumb } from "@/ui/PanelStatusBar";
-import { PanelStack, type PanelStackHandle } from "@invana/ui";
-import { useEffect, useRef, useState } from "react";
 
 export interface LibraryViewPanelProps {
 	username: string;

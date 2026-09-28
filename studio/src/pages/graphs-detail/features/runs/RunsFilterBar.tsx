@@ -7,10 +7,6 @@
  * it was narrowed while it scrolls — a funnel alone would hide that.
  */
 
-import type {
-	RunsFilters,
-	RunsSince,
-} from "@/pages/graphs-detail/features/runs/queries";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -20,6 +16,10 @@ import {
 	FilterBar,
 	FilterChip,
 } from "@invana/ui";
+import type {
+	RunsFilters,
+	RunsSince,
+} from "@/pages/graphs-detail/features/runs/queries";
 
 export const RUN_KINDS = ["nl", "ql", "import", "bulk"] as const;
 export const RUN_STATUSES = [

@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { LensKind } from "@/pages/graphs-detail/features/lenses";
 import {
 	LEGACY_PANEL_PARAM,
@@ -9,8 +11,6 @@ import {
 	SECTION_PARAM,
 	useStackSections,
 } from "@/pages/graphs-detail/shell/useStackSections";
-import { useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
 
 // **Govern** is one rail icon over a stack of two sections
 // (govern/spec.md GV17, graph-detail-page.md G32 · G33). A guardrail belongs

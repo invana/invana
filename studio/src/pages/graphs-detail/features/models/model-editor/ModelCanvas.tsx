@@ -17,12 +17,15 @@
  * only. Nothing here commits: Publish is on the page header (MP4).
  */
 
+import { Button, EmptyState } from "@invana/ui";
+import { PanelBottomClose } from "lucide-react";
+import { useMemo, useState } from "react";
 import {
 	GraphModelCanvas,
-	type ModelCanvasSelection,
 	graphModelSettings,
 	graphModelTemplates,
 	hueSlotForName,
+	type ModelCanvasSelection,
 } from "@/canvases/model";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
@@ -38,9 +41,9 @@ import {
 	useCreateDraftMutation,
 	useDeleteEdgeTypeMutation,
 	useDeleteNodeTypeMutation,
+	useModelsQuery,
 	useModelVersionQuery,
 	useModelVersionsQuery,
-	useModelsQuery,
 } from "@/pages/graphs-detail/features/models/queries";
 import {
 	buildAllModelsData,
@@ -51,9 +54,6 @@ import type {
 	EdgeTypeResponse,
 	NodeTypeResponse,
 } from "@/pages/graphs-detail/features/models/types";
-import { Button, EmptyState } from "@invana/ui";
-import { PanelBottomClose } from "lucide-react";
-import { useMemo, useState } from "react";
 
 interface Props {
 	username: string;

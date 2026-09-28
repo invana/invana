@@ -1,9 +1,9 @@
+import { useMutation } from "@tanstack/react-query";
 import { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
 import type {
 	ExpandRequest,
 	NeighborExpandResponse,
 } from "@/pages/graphs-detail/features/explorer/types";
-import { useMutation } from "@tanstack/react-query";
 
 /**
  * Imperative node-expand mutation (docs/for-developers/modules/explore/features/graph-canvas.md). Each right-click "expand" is a POST

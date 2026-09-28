@@ -6,11 +6,11 @@
  * (AG27). Effort is `agents.effort`, edited here and nowhere else (EB9).
  */
 
-import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
+import { Textarea } from "@invana/forms";
 import type { AgentDraft } from "@/pages/graphs-detail/features/agents/agentDraft";
+import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
 import type { Agent } from "@/pages/graphs-detail/features/agents/types";
 import { PanelSection } from "@/ui/PanelSection";
-import { Textarea } from "@invana/forms";
 
 export function AgentEffortTab({
 	agent,

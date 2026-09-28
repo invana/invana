@@ -23,7 +23,10 @@
  * throw away a correction somebody made deliberately.
  */
 
-import { SkillPlaybookEditor } from "@/pages/graphs-detail/features/skills/SkillPlaybookEditor";
+import { Input, Label, Textarea } from "@invana/forms";
+import { Badge, Button, Spinner } from "@invana/ui";
+import { PencilLine, Sparkles, SquarePen, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
 	useAnswerClarificationMutation,
 	useDiscardDraftMutation,
@@ -34,6 +37,7 @@ import {
 	useSkillDraftQuery,
 	useWriteDraftTasksMutation,
 } from "@/pages/graphs-detail/features/skills/queries";
+import { SkillPlaybookEditor } from "@/pages/graphs-detail/features/skills/SkillPlaybookEditor";
 import type {
 	Skill,
 	SkillClarification,
@@ -42,10 +46,6 @@ import type {
 	SkillPlaybookRead,
 } from "@/pages/graphs-detail/features/skills/types";
 import { PanelSection } from "@/ui/PanelSection";
-import { Input, Label, Textarea } from "@invana/forms";
-import { Badge, Button, Spinner } from "@invana/ui";
-import { PencilLine, Sparkles, SquarePen, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
 
 /** One line of the playbook, and what it drew. */
 function sentences(content: string): string[] {

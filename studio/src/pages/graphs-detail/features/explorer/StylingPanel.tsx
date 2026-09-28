@@ -1,10 +1,10 @@
+import { Button, ScrollArea } from "@invana/ui";
+import { X } from "lucide-react";
 import type {
 	CanvasStyling,
 	EdgeTypeStyle,
 	NodeTypeStyle,
 } from "@/pages/graphs-detail/features/boards";
-import { Button, ScrollArea } from "@invana/ui";
-import { X } from "lucide-react";
 
 // A node/edge type present on the canvas, with the property keys seen on its
 // instances (offered as label-property choices).

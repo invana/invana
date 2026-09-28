@@ -1,8 +1,10 @@
-import { useGraphQuery } from "@/pages/graphs-detail/features/graphs";
-import { hasOutstandingSetup } from "@/pages/graphs-detail/features/graphs";
-import { useOnboarding } from "@/pages/graphs-detail/features/setup";
 import { ButtonWithTooltip, cn } from "@invana/ui";
 import { GraduationCap } from "lucide-react";
+import {
+	hasOutstandingSetup,
+	useGraphQuery,
+} from "@/pages/graphs-detail/features/graphs";
+import { useOnboarding } from "@/pages/graphs-detail/features/setup";
 
 /**
  * The door the onboarding wizard never closes

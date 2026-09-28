@@ -23,28 +23,6 @@
  * selected here is the scope the page reads, so a reload lands on both.
  */
 
-import { modelsApi } from "@/pages/graphs-detail/features/models/api";
-import { EdgeTypeFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/EdgeTypeFormDialog";
-import { ImportModelDialog } from "@/pages/graphs-detail/features/models/model-editor/components/ImportModelDialog";
-import { ModelFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/ModelFormDialog";
-import { NodeTypeFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/NodeTypeFormDialog";
-import type {
-	ModelEditCtx,
-	ModelSelection,
-} from "@/pages/graphs-detail/features/models/model-editor/types";
-import { useModelsView } from "@/pages/graphs-detail/features/models/model-page/useModelsView";
-import {
-	useModelVersionQuery,
-	useModelVersionsQuery,
-	useModelsQuery,
-	useStagedSetQuery,
-	useUpdateModelMutation,
-} from "@/pages/graphs-detail/features/models/queries";
-import { useStitchesSection } from "@/pages/graphs-detail/features/models/stitch/useStitchesSection";
-import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
-import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
-import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import { Switch } from "@invana/forms";
 import {
 	Button,
@@ -65,6 +43,28 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { modelsApi } from "@/pages/graphs-detail/features/models/api";
+import { EdgeTypeFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/EdgeTypeFormDialog";
+import { ImportModelDialog } from "@/pages/graphs-detail/features/models/model-editor/components/ImportModelDialog";
+import { ModelFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/ModelFormDialog";
+import { NodeTypeFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/NodeTypeFormDialog";
+import type {
+	ModelEditCtx,
+	ModelSelection,
+} from "@/pages/graphs-detail/features/models/model-editor/types";
+import { useModelsView } from "@/pages/graphs-detail/features/models/model-page/useModelsView";
+import {
+	useModelsQuery,
+	useModelVersionQuery,
+	useModelVersionsQuery,
+	useStagedSetQuery,
+	useUpdateModelMutation,
+} from "@/pages/graphs-detail/features/models/queries";
+import { useStitchesSection } from "@/pages/graphs-detail/features/models/stitch/useStitchesSection";
+import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
+import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
+import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
+import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 
 interface Props {
 	username: string;

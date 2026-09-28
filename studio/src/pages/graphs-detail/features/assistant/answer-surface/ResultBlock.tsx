@@ -1,14 +1,14 @@
-import { EmissionList } from "@/pages/graphs-detail/features/assistant/answer-surface/AnswerEmission";
-import { TraceDialog } from "@/pages/graphs-detail/features/assistant/answer-surface/TraceDialog";
-import { emissionsFromResult } from "@/pages/graphs-detail/features/assistant/answer-surface/emissions";
-import type { Emission } from "@/pages/graphs-detail/features/assistant/answer-surface/types";
-import { emissionsApi } from "@/pages/graphs-detail/features/runs";
-import type { QueryResponse } from "@/types/query";
 import { Button } from "@invana/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Network } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { EmissionList } from "@/pages/graphs-detail/features/assistant/answer-surface/AnswerEmission";
+import { emissionsFromResult } from "@/pages/graphs-detail/features/assistant/answer-surface/emissions";
+import { TraceDialog } from "@/pages/graphs-detail/features/assistant/answer-surface/TraceDialog";
+import type { Emission } from "@/pages/graphs-detail/features/assistant/answer-surface/types";
+import { emissionsApi } from "@/pages/graphs-detail/features/runs";
+import type { QueryResponse } from "@/types/query";
 
 // An assistant reply's result, rendered as the emissions it is
 // (docs/for-developers/modules/ask/features/the-answer-surface.md). Every one
@@ -68,7 +68,10 @@ export function ResultBlock({
 		mutationFn: ({
 			emissionId,
 			templateId,
-		}: { emissionId: string; templateId: string }) =>
+		}: {
+			emissionId: string;
+			templateId: string;
+		}) =>
 			emissionsApi.switchTemplate(
 				username as string,
 				graphSlug as string,

@@ -12,13 +12,13 @@
  * (B16), so the blob renders through the same `<Dashboard>` as it was written.
  */
 
+import { Dashboard, type DashboardSpec } from "@invana/dashboard";
+import { EmptyState, Spinner } from "@invana/ui";
+import { useQuery } from "@tanstack/react-query";
 import { formatRelativeTime } from "@/lib/time";
 import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 import { DECLARED_WIDGETS } from "@/pages/graphs-detail/shared/dashboardWidgets";
-import { Dashboard, type DashboardSpec } from "@invana/dashboard";
-import { EmptyState, Spinner } from "@invana/ui";
-import { useQuery } from "@tanstack/react-query";
 
 export interface FrozenBoardPageProps {
 	username: string;

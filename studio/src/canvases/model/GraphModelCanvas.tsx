@@ -12,21 +12,6 @@
  * else.
  */
 
-import {
-	type LiveColors,
-	detailPatch,
-	initialConfig,
-	readLiveColors,
-} from "@/canvases/model/config";
-import { renderModelEdge, renderModelNode } from "@/canvases/model/preview";
-import { decorate } from "@/canvases/model/style";
-import type {
-	Detail,
-	GraphModelTemplates,
-	ModelCanvasSelection,
-	ModelGraphData,
-} from "@/canvases/model/types";
-import { useStudioCanvasTheme } from "@/canvases/theme";
 import type { CanvasConfig } from "@invana/canvas";
 import {
 	BackgroundLayer,
@@ -70,6 +55,21 @@ import {
 	useRef,
 	useState,
 } from "react";
+import {
+	detailPatch,
+	initialConfig,
+	type LiveColors,
+	readLiveColors,
+} from "@/canvases/model/config";
+import { renderModelEdge, renderModelNode } from "@/canvases/model/preview";
+import { decorate } from "@/canvases/model/style";
+import type {
+	Detail,
+	GraphModelTemplates,
+	ModelCanvasSelection,
+	ModelGraphData,
+} from "@/canvases/model/types";
+import { useStudioCanvasTheme } from "@/canvases/theme";
 
 export const MODEL_LAYER_ID = "graph";
 const FIT = { fitCamera: { padding: 60 } };

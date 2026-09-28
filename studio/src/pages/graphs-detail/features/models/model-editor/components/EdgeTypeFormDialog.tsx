@@ -1,15 +1,3 @@
-import { FormError } from "@/components/forms/FormError";
-import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
-import {
-	useCreateEdgeTypeMutation,
-	useUpdateEdgeTypeMutation,
-} from "@/pages/graphs-detail/features/models/queries";
-import type { Multiplicity } from "@/pages/graphs-detail/features/models/types";
-import type {
-	EdgeTypeResponse,
-	NodeTypeResponse,
-} from "@/pages/graphs-detail/features/models/types";
-import { ApiError, suppressActionToast } from "@/services/api/client";
 import {
 	Checkbox,
 	Input,
@@ -31,6 +19,18 @@ import {
 } from "@invana/ui";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { FormError } from "@/components/forms/FormError";
+import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
+import {
+	useCreateEdgeTypeMutation,
+	useUpdateEdgeTypeMutation,
+} from "@/pages/graphs-detail/features/models/queries";
+import type {
+	EdgeTypeResponse,
+	Multiplicity,
+	NodeTypeResponse,
+} from "@/pages/graphs-detail/features/models/types";
+import { ApiError, suppressActionToast } from "@/services/api/client";
 
 const MULTIPLICITIES: Multiplicity[] = [
 	"MULTI",

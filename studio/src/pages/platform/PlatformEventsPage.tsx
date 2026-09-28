@@ -1,13 +1,3 @@
-import { useAuth } from "@/hooks/useAuth";
-import { useEventStream } from "@/hooks/useEventStream";
-import { EventTypeFilter } from "@/pages/graphs-detail/features/events";
-import { matchesEventSearch } from "@/pages/graphs-detail/features/events";
-import {
-	StatusFilter,
-	matchesStatusFilter,
-} from "@/pages/graphs-detail/features/events";
-import { useGlobalEventsQuery } from "@/pages/graphs-detail/features/events";
-import type { AuditEvent } from "@/pages/graphs-detail/features/events";
 import { Input } from "@invana/forms";
 import {
 	Button,
@@ -19,6 +9,16 @@ import {
 import { Activity, ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useEventStream } from "@/hooks/useEventStream";
+import type { AuditEvent } from "@/pages/graphs-detail/features/events";
+import {
+	EventTypeFilter,
+	matchesEventSearch,
+	matchesStatusFilter,
+	StatusFilter,
+	useGlobalEventsQuery,
+} from "@/pages/graphs-detail/features/events";
 
 /**
  * Platform-wide events view (docs/for-developers/modules/operate/features/audit-and-activity.md) — superuser-only. Mirrors the per-graph

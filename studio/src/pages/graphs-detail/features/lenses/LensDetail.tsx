@@ -21,6 +21,15 @@
  */
 
 import {
+	CannotAnswerCard,
+	type CastResolution,
+	type CastRole,
+	CastTable,
+	Eyebrow,
+	LayerSection,
+	RuleRow,
+} from "@invana/ui";
+import {
 	GOVERNED_LAYERS,
 	layerSummary,
 	rulesInLayer,
@@ -30,15 +39,6 @@ import type {
 	GovernRule,
 	Lens,
 } from "@/pages/graphs-detail/features/lenses/types";
-import {
-	CannotAnswerCard,
-	type CastResolution,
-	type CastRole,
-	CastTable,
-	Eyebrow,
-	LayerSection,
-	RuleRow,
-} from "@invana/ui";
 
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 

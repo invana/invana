@@ -23,22 +23,22 @@
  * nobody saw at the moment they signed for it.
  */
 
+import type { PanelStackSection } from "@invana/ui";
+import { Maximize2, Plus, ShieldCheck } from "lucide-react";
 import { LensActions } from "@/pages/graphs-detail/features/lenses/LensActions";
 import { LensDetail } from "@/pages/graphs-detail/features/lenses/LensDetail";
 import { LensEditor } from "@/pages/graphs-detail/features/lenses/LensEditor";
 import { LensList } from "@/pages/graphs-detail/features/lenses/LensList";
-import { NEW_LENS } from "@/pages/graphs-detail/features/lenses/WorldsSection";
 import type {
 	Lens,
 	LensCreate,
 	Refusal,
 } from "@/pages/graphs-detail/features/lenses/types";
+import { NEW_LENS } from "@/pages/graphs-detail/features/lenses/WorldsSection";
 import {
 	type StackSectionUi,
 	stackSection,
 } from "@/pages/graphs-detail/shared/StackSection";
-import type { PanelStackSection } from "@invana/ui";
-import { Maximize2, Plus, ShieldCheck } from "lucide-react";
 
 export interface GuardrailsSectionProps {
 	ui: StackSectionUi;

@@ -1,5 +1,5 @@
-import { CAPABILITIES } from "@/pages/graphs-detail/features/assistant/sessionCapabilities";
 import { ArrowDown } from "lucide-react";
+import { CAPABILITIES } from "@/pages/graphs-detail/features/assistant/sessionCapabilities";
 
 /**
  * Inline helper shown in a fresh session's empty thread (docs/for-developers/modules/explore/features/graph-canvas.md). Instead of a

@@ -1,3 +1,5 @@
+import { ChatSession } from "@invana/ui";
+import { useMemo } from "react";
 import { timelineFor } from "@/pages/graphs-detail/features/assistant/SessionStepsTimeline";
 import { SessionThreadWelcome } from "@/pages/graphs-detail/features/assistant/SessionThreadWelcome";
 import {
@@ -5,15 +7,13 @@ import {
 	PromptTurn,
 } from "@/pages/graphs-detail/features/assistant/SessionTurn";
 import {
+	isClarification,
 	type Session,
 	type SessionContextTurn,
 	type SessionMessage,
-	isClarification,
 } from "@/pages/graphs-detail/features/assistant/types";
 import { useRunStore } from "@/stores/run.store";
 import type { QueryResponse } from "@/types/query";
-import { ChatSession } from "@invana/ui";
-import { useMemo } from "react";
 
 export interface SessionThreadProps {
 	session: Session;

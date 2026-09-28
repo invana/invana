@@ -1,6 +1,5 @@
-import { ApiError } from "@/services/api/client";
 import { metrics } from "@opentelemetry/api";
-import { SeverityNumber, logs } from "@opentelemetry/api-logs";
+import { logs, SeverityNumber } from "@opentelemetry/api-logs";
 import {
 	InMemoryLogRecordExporter,
 	LoggerProvider,
@@ -19,6 +18,7 @@ import {
 	WebTracerProvider,
 } from "@opentelemetry/sdk-trace-web";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import { ApiError } from "@/services/api/client";
 import { reportError, shouldReport } from "./errors";
 import { startAction, withInteraction } from "./tracer";
 

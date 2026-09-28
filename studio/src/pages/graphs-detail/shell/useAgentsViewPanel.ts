@@ -1,5 +1,5 @@
-import { useStackSections } from "@/pages/graphs-detail/shell/useStackSections";
 import { useCallback } from "react";
+import { useStackSections } from "@/pages/graphs-detail/shell/useStackSections";
 
 // **Agents** is one rail icon over a stack of two sections — the list, and the
 // endpoints its casts resolve against

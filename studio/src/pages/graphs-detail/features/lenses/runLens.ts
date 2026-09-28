@@ -31,18 +31,18 @@
  * no ledger row to read a layer off, still lands in the right band.
  */
 
-import { BANDS } from "@/pages/graphs-detail/features/lenses/runLayers";
-import type {
-	Touch,
-	TouchesResponse,
-} from "@/pages/graphs-detail/features/lenses/types";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 import type {
 	LensOptions,
 	LensSectionSpec,
 	ParticipantSpec,
 } from "@invana/dashboard";
 import type { Layer } from "@invana/ui";
+import { BANDS } from "@/pages/graphs-detail/features/lenses/runLayers";
+import type {
+	Touch,
+	TouchesResponse,
+} from "@/pages/graphs-detail/features/lenses/types";
+import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 /** `graph_data/model/Routes@v4` → `graph_data`. The engine's own split (GV20). */
 function layerOf(address: string): Layer {

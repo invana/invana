@@ -11,8 +11,8 @@
  * tooltip either way, so it can be read or copied whole.
  */
 
-import { type TraceWindow, traceUrl } from "@/services/telemetry/traceLink";
 import { Link } from "@invana/ui";
+import { type TraceWindow, traceUrl } from "@/services/telemetry/traceLink";
 
 export function TraceIdValue({
 	id,

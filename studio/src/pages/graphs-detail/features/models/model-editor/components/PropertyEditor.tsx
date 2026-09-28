@@ -1,18 +1,3 @@
-import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
-import { propertyTypeOptions } from "@/pages/graphs-detail/features/models/model-editor/propertyTypes";
-import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
-import {
-	useCreatePropertyKeyMutation,
-	useUpdateEdgeTypeMutation,
-	useUpdateNodeTypeMutation,
-	useUpdatePropertyKeyMutation,
-} from "@/pages/graphs-detail/features/models/queries";
-import type { TypePropertyMappingCreate } from "@/pages/graphs-detail/features/models/types";
-import type {
-	PropertyKeyResponse,
-	TypePropertyMappingResponse,
-} from "@/pages/graphs-detail/features/models/types";
-import { ApiError, suppressActionToast } from "@/services/api/client";
 import {
 	Input,
 	Select,
@@ -33,6 +18,21 @@ import {
 import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
+import { propertyTypeOptions } from "@/pages/graphs-detail/features/models/model-editor/propertyTypes";
+import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
+import {
+	useCreatePropertyKeyMutation,
+	useUpdateEdgeTypeMutation,
+	useUpdateNodeTypeMutation,
+	useUpdatePropertyKeyMutation,
+} from "@/pages/graphs-detail/features/models/queries";
+import type {
+	PropertyKeyResponse,
+	TypePropertyMappingCreate,
+	TypePropertyMappingResponse,
+} from "@/pages/graphs-detail/features/models/types";
+import { ApiError, suppressActionToast } from "@/services/api/client";
 
 type Cardinality = "SINGLE" | "LIST" | "SET";
 const CARDINALITIES: Cardinality[] = ["SINGLE", "LIST", "SET"];

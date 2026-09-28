@@ -19,12 +19,14 @@
  * report must not be ([B13](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 
-import { RunLensWidget } from "@/pages/graphs-detail/features/lenses";
-import { StepTouchWidget } from "@/pages/graphs-detail/features/lenses";
+import { RUN_PANELS } from "@invana/dashboard";
+import {
+	RunLensWidget,
+	StepTouchWidget,
+} from "@/pages/graphs-detail/features/lenses";
 import { PLAN_CHART_WIDGETS } from "@/pages/graphs-detail/features/plans";
 import { SkillFlowWidget } from "@/pages/graphs-detail/features/skills";
 import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
-import { RUN_PANELS } from "@invana/dashboard";
 
 export const DECLARED_WIDGETS = {
 	// The run vocabulary the kit ships — `trace · touched · attempts ·

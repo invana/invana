@@ -5,35 +5,36 @@
  * the worlds it bounds, and the two are one record.
  */
 
-export { LensesViewPanel } from "@/pages/graphs-detail/features/lenses/LensesViewPanel";
+export { matches } from "@/pages/graphs-detail/features/lenses/addressing";
 export { LensBoardPage } from "@/pages/graphs-detail/features/lenses/boards/LensBoardPage";
-export { LensDetail } from "@/pages/graphs-detail/features/lenses/LensDetail";
-export { LensEditor } from "@/pages/graphs-detail/features/lenses/LensEditor";
 export {
 	CompareBoardPage,
 	parseComparePair,
 } from "@/pages/graphs-detail/features/lenses/CompareBoardPage";
-export { layersOptions } from "@/pages/graphs-detail/features/lenses/runLayers";
-export {
-	lensSummary,
-	runLensOptions,
-} from "@/pages/graphs-detail/features/lenses/runLens";
-/** Legacy — frozen reports only. See the file. */
-export { RunLensWidget } from "@/pages/graphs-detail/features/lenses/RunLensWidget";
-export {
-	StepTouchWidget,
-	touchesOfStepKey,
-} from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
-
-export { matches } from "@/pages/graphs-detail/features/lenses/addressing";
 export { CompareDialog } from "@/pages/graphs-detail/features/lenses/CompareDialog";
+export { LensDetail } from "@/pages/graphs-detail/features/lenses/LensDetail";
+export { LensEditor } from "@/pages/graphs-detail/features/lenses/LensEditor";
+export { LensesViewPanel } from "@/pages/graphs-detail/features/lenses/LensesViewPanel";
 export {
 	useLensesQuery,
 	useParticipantsQuery,
 	useRunTouchesQuery,
 } from "@/pages/graphs-detail/features/lenses/queries";
-export { BANDS } from "@/pages/graphs-detail/features/lenses/runLayers";
+/** Legacy — frozen reports only. See the file. */
+export { RunLensWidget } from "@/pages/graphs-detail/features/lenses/RunLensWidget";
+export {
+	BANDS,
+	layersOptions,
+} from "@/pages/graphs-detail/features/lenses/runLayers";
+export {
+	lensSummary,
+	runLensOptions,
+} from "@/pages/graphs-detail/features/lenses/runLens";
 export type { WithStepTouch } from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
+export {
+	StepTouchWidget,
+	touchesOfStepKey,
+} from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
 export type {
 	Lens,
 	LensKind,

@@ -8,6 +8,22 @@
  * redraws the tables after Save, not while it is typed.
  */
 
+import { Textarea } from "@invana/forms";
+import { type ColumnDef, DataTable } from "@invana/tables";
+import {
+	Alert,
+	Badge,
+	BoundChip,
+	Button,
+	cn,
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+	Spinner,
+} from "@invana/ui";
+import { Ban, Plus } from "lucide-react";
+import { useMemo, useState } from "react";
 import { ALL_TASKS } from "@/pages/graphs-detail/features/agents/AgentDetail";
 import type {
 	AgentDraft,
@@ -20,26 +36,10 @@ import type {
 	AgentSkillRow,
 } from "@/pages/graphs-detail/features/agents/types";
 import { useCatalogueQuery } from "@/pages/graphs-detail/features/plans";
-import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
 import type { Skill } from "@/pages/graphs-detail/features/skills";
-import { BindRefusalCard, asBindRefusal } from "@/ui/BindRefusalCard";
+import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
+import { asBindRefusal, BindRefusalCard } from "@/ui/BindRefusalCard";
 import { PanelSection } from "@/ui/PanelSection";
-import { Textarea } from "@invana/forms";
-import { type ColumnDef, DataTable } from "@invana/tables";
-import {
-	Alert,
-	Badge,
-	BoundChip,
-	Button,
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-	Spinner,
-	cn,
-} from "@invana/ui";
-import { Ban, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
 
 /** Chips a Needs cell draws before folding the rest into `+N`. */
 const NEEDS_SHOWN = 3;

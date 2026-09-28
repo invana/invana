@@ -1,4 +1,3 @@
-import { reportError } from "@/services/telemetry/errors";
 import { Button } from "@invana/ui";
 import { ArrowLeft, Home, RefreshCw } from "lucide-react";
 import { useEffect } from "react";
@@ -7,6 +6,7 @@ import {
 	useNavigate,
 	useRouteError,
 } from "react-router-dom";
+import { reportError } from "@/services/telemetry/errors";
 
 export function ErrorPage() {
 	const error = useRouteError();

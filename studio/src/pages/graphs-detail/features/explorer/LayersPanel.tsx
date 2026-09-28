@@ -7,8 +7,6 @@
 // a Photoshop-style visibility eye on the right; every layer/element row also has
 // a right-click context menu (Focus · Select · Hide/Show).
 
-import { HIDDEN_STATE_NAME } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
-import { setNodeHidden } from "@/pages/graphs-detail/features/explorer/visibility";
 import { Panel, PanelContent } from "@invana/canvas-ui";
 import type {
 	ClickSelectBehaviour,
@@ -53,6 +51,8 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { HIDDEN_STATE_NAME } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
+import { setNodeHidden } from "@/pages/graphs-detail/features/explorer/visibility";
 
 interface Props {
 	/** Rendered only while open — the strip's Layers control toggles it. */
@@ -637,6 +637,7 @@ function LayersPanelBody({ canvas, onClose }: Omit<Props, "open">) {
 						<p className="text-sm">Open a session to paint a canvas.</p>
 					</div>
 				) : (
+					// biome-ignore lint/a11y/noStaticElementInteractions: a key or menu handler scoped to the region, not a control
 					<div className="p-2" onContextMenu={handleContextMenu}>
 						<TreeView
 							items={items}

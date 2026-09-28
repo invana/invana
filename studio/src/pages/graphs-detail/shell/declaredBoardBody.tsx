@@ -1,9 +1,11 @@
+import { EmptyState, Spinner } from "@invana/ui";
+import type { Dispatch, SetStateAction } from "react";
 import { AgentBoardPage } from "@/pages/graphs-detail/features/agents";
 import {
 	BOARD_KINDS,
+	boardPageId,
 	FrozenBoardPage,
 	type OpenBoard,
-	boardPageId,
 } from "@/pages/graphs-detail/features/boards";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import {
@@ -16,23 +18,25 @@ import {
 	ModelsPage,
 	type useModelsView,
 } from "@/pages/graphs-detail/features/models";
-import { PlanBoardPage } from "@/pages/graphs-detail/features/plans";
 import {
 	PlanArgumentsPage,
+	PlanBoardPage,
 	PlanExportPage,
 	PlanVersionsPage,
 } from "@/pages/graphs-detail/features/plans";
 import { RuleBoardPage } from "@/pages/graphs-detail/features/rules";
-import { runAddress } from "@/pages/graphs-detail/features/runs";
-import { RunsBoardPage } from "@/pages/graphs-detail/features/runs";
-import { RunBoardPage } from "@/pages/graphs-detail/features/runs";
-import { SkillBoardPage } from "@/pages/graphs-detail/features/skills";
-import { UsageBoardPage } from "@/pages/graphs-detail/features/skills";
+import {
+	RunBoardPage,
+	RunsBoardPage,
+	runAddress,
+} from "@/pages/graphs-detail/features/runs";
+import {
+	SkillBoardPage,
+	UsageBoardPage,
+} from "@/pages/graphs-detail/features/skills";
 import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 import type { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import type { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
-import { EmptyState, Spinner } from "@invana/ui";
-import type { Dispatch, SetStateAction } from "react";
 
 /** What a declared board's body reads from the page that hosts it. */
 export interface DeclaredBoardDeps {

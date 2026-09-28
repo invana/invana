@@ -21,9 +21,9 @@
  * served before a scheduled run (CC3).
  */
 
-import type { GraphContention } from "@/pages/graphs-detail/features/graphs/types";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { useMemo } from "react";
+import type { GraphContention } from "@/pages/graphs-detail/features/graphs/types";
 
 type Pool = GraphContention["pools"][number];
 type Queued = GraphContention["queued"][number];

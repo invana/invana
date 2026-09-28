@@ -13,6 +13,17 @@
  */
 
 import {
+	EmissionCard,
+	type EmissionKind,
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+	type TemplateOption,
+	TemplatePicker,
+} from "@invana/ui";
+import { ChevronDown } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
 	ChartBody,
 	EmptyBody,
 	MetricBody,
@@ -24,17 +35,6 @@ import type {
 	Emission,
 	TemplateOffer,
 } from "@/pages/graphs-detail/features/assistant/answer-surface/types";
-import {
-	EmissionCard,
-	type EmissionKind,
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-	type TemplateOption,
-	TemplatePicker,
-} from "@invana/ui";
-import { ChevronDown } from "lucide-react";
-import { useMemo, useState } from "react";
 
 /** The label a reader knows a template by — `table-compact@3`. */
 const offerLabel = (offer: TemplateOffer) => `${offer.name}@${offer.version}`;

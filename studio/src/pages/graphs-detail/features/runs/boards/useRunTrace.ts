@@ -12,9 +12,9 @@
  * kind of run, including ones with no stream open, so it asks.
  */
 
+import { useQuery } from "@tanstack/react-query";
 import { traceApi } from "@/pages/graphs-detail/features/runs/api";
 import { isLive } from "@/pages/graphs-detail/shared/dashboards/shared";
-import { useQuery } from "@tanstack/react-query";
 
 const LIVE_POLL_MS = 2000;
 

@@ -12,6 +12,17 @@
  * (SP7), because the count is graph-wide (SP6).
  */
 
+import type { GraphCanvas, GraphLayer, GraphStore } from "@invana/graph";
+import { cn, PanelStack, ScrollArea } from "@invana/ui";
+import { Compass, Eye, EyeOff } from "lucide-react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
 import { readProvenance } from "@/pages/graphs-detail/features/explorer/ProvenanceBlock";
 import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
@@ -23,17 +34,6 @@ import {
 } from "@/pages/graphs-detail/features/explorer/visibility";
 import { ListPanelChrome } from "@/pages/graphs-detail/shared/ListPanel";
 import type { QueryResultItem } from "@/types/query";
-import type { GraphCanvas, GraphLayer, GraphStore } from "@invana/graph";
-import { PanelStack, ScrollArea, cn } from "@invana/ui";
-import { Compass, Eye, EyeOff } from "lucide-react";
-import {
-	type ReactNode,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
 
 /**
  * A `PanelStack` section title that carries a count on its right.

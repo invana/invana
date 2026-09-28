@@ -16,10 +16,11 @@
  * text** ([US3](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  */
 
+import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 import {
-	SKILL_ACTIONS,
 	gapTile,
 	readsAs,
+	SKILL_ACTIONS,
 	skillVersionLabel,
 	versionRow,
 	when,
@@ -29,14 +30,13 @@ import type {
 	SkillUsageResponse,
 } from "@/pages/graphs-detail/features/skills/types";
 import {
-	VIEW_ACTION,
-	VIEW_DASHBOARD,
-	VIEW_SPEC,
 	count,
 	omit,
 	specPanel,
+	VIEW_ACTION,
+	VIEW_DASHBOARD,
+	VIEW_SPEC,
 } from "@/pages/graphs-detail/shared/dashboardSpec";
-import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 
 export interface UsageBoardView {
 	/** `Dashboard` or `spec.json`. */

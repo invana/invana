@@ -1,5 +1,7 @@
-import { attachmentFor } from "@/pages/graphs-detail/features/assistant";
+import { ErrorBoundary } from "@invana/ui";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant";
+import { attachmentFor } from "@/pages/graphs-detail/features/assistant";
 import { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer";
 import type { useGraphQuery } from "@/pages/graphs-detail/features/graphs";
 import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
@@ -11,8 +13,6 @@ import type {
 	useRightSection,
 } from "@/pages/graphs-detail/shell/useRightSection";
 import { reportBoundaryError } from "@/services/telemetry/errors";
-import { ErrorBoundary } from "@invana/ui";
-import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 /** What the right side's occupants read from the page that hosts them. */
 export interface RightSectionDeps {

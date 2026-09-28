@@ -1,9 +1,3 @@
-import type {
-	Agent,
-	LifecycleAct,
-	LifecycleEffect,
-	LifecycleItem,
-} from "@/pages/graphs-detail/features/agents/types";
 import { type ColumnDef, DataTable } from "@invana/tables";
 /**
  * A4 · what pausing or retiring would do to an agent's open work — **item by
@@ -33,6 +27,12 @@ import {
 	Skeleton,
 } from "@invana/ui";
 import { useMemo } from "react";
+import type {
+	Agent,
+	LifecycleAct,
+	LifecycleEffect,
+	LifecycleItem,
+} from "@/pages/graphs-detail/features/agents/types";
 
 /** The effect's tone, so the reassuring case and the disturbing one differ. */
 const TONE: Record<

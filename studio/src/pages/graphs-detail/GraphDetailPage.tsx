@@ -1,12 +1,15 @@
+import { CanvasContext } from "@invana/canvas-react";
+import { BoardPagesViewPanel } from "@invana/canvas-ui";
+import { ErrorBoundary } from "@invana/ui";
+import { useCallback, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useSessions } from "@/pages/graphs-detail/features/assistant";
 import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
 import {
-	useGraphConnectionQuery,
-	useGraphQuery,
-} from "@/pages/graphs-detail/features/graphs";
-import {
 	hasOutstandingSetup,
 	isGateOpen,
+	useGraphConnectionQuery,
+	useGraphQuery,
 } from "@/pages/graphs-detail/features/graphs";
 import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models";
@@ -29,11 +32,6 @@ import { useOpenPages } from "@/pages/graphs-detail/shell/useOpenPages";
 import { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
 import { reportBoundaryError } from "@/services/telemetry/errors";
 import type { QueryResponse } from "@/types/query";
-import { CanvasContext } from "@invana/canvas-react";
-import { BoardPagesViewPanel } from "@invana/canvas-ui";
-import { ErrorBoundary } from "@invana/ui";
-import { useCallback, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
 
 export function GraphDetailPage() {
 	const { username, graphSlug } = useParams<{

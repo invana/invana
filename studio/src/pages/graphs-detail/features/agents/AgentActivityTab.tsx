@@ -1,4 +1,5 @@
 import { usd, usdWhole } from "@/lib/format";
+
 /**
  * Activity — what the agent is using and has done (AG23): the meters, each
  * beside the limit that caps it, its runs, its sessions, its lineage and its
@@ -9,22 +10,6 @@ import { usd, usdWhole } from "@/lib/format";
  * reader's own (AG31 · AG32).
  */
 
-import { formatRelativeTime } from "@/lib/time";
-import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
-import type { AgentDraft } from "@/pages/graphs-detail/features/agents/agentDraft";
-import {
-	useAgentLineageQuery,
-	useAgentMetersQuery,
-	useAgentSessionsQuery,
-} from "@/pages/graphs-detail/features/agents/queries";
-import type {
-	Agent,
-	AgentMeters,
-} from "@/pages/graphs-detail/features/agents/types";
-import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
-import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
-import { PanelSection } from "@/ui/PanelSection";
 import {
 	Button,
 	Eyebrow,
@@ -41,6 +26,22 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { useState } from "react";
+import { formatRelativeTime } from "@/lib/time";
+import type { AgentDraft } from "@/pages/graphs-detail/features/agents/agentDraft";
+import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
+import {
+	useAgentLineageQuery,
+	useAgentMetersQuery,
+	useAgentSessionsQuery,
+} from "@/pages/graphs-detail/features/agents/queries";
+import type {
+	Agent,
+	AgentMeters,
+} from "@/pages/graphs-detail/features/agents/types";
+import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { PanelSection } from "@/ui/PanelSection";
 
 /** How a run ended, in the reader's words and tone (CA8). */
 function outcomeOf(run: TaskRunSummary): { text: string; tone: string } {

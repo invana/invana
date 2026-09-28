@@ -19,6 +19,18 @@
  * because "which of the N?" has no honest default (D4).
  */
 
+import { Sparkline } from "@invana/charts";
+import {
+	Eyebrow,
+	type Layer,
+	LayerChip,
+	PropertyList,
+	PropertyRow,
+	RecordHeader,
+	Spinner,
+} from "@invana/ui";
+import { Wand2 } from "lucide-react";
+import type { ReactNode } from "react";
 import { formatElapsed } from "@/lib/time";
 import { PromoteDialog } from "@/pages/graphs-detail/features/plans/PromoteDialog";
 import {
@@ -42,18 +54,6 @@ import {
 } from "@/pages/graphs-detail/shared/DetailRows";
 import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
 import { LAYER_PALETTE, layerSlug } from "@/ui/layerPalette";
-import { Sparkline } from "@invana/charts";
-import {
-	Eyebrow,
-	type Layer,
-	LayerChip,
-	PropertyList,
-	PropertyRow,
-	RecordHeader,
-	Spinner,
-} from "@invana/ui";
-import { Wand2 } from "lucide-react";
-import type { ReactNode } from "react";
 
 /** The reader's spelling back to the address segment the kit's components take.
  *

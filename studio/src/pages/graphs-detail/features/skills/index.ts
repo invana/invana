@@ -2,12 +2,12 @@
  * The skills module's public surface — the only file another module imports.
  */
 
+export { SkillFlowWidget } from "@/pages/graphs-detail/features/skills/boards/SkillFlowWidget";
 export {
-	SKILL_ACTIONS,
 	ruleTitle,
+	SKILL_ACTIONS,
 	when,
 } from "@/pages/graphs-detail/features/skills/boards/shared";
-export { SkillFlowWidget } from "@/pages/graphs-detail/features/skills/boards/SkillFlowWidget";
 export { UsageBoardPage } from "@/pages/graphs-detail/features/skills/boards/UsageBoardPage";
 export {
 	useCreateProjectRuleMutation,

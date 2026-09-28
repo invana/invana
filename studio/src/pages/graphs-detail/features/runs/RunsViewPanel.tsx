@@ -19,15 +19,18 @@
  * which is the property SR12 was protecting when it asked for section adjacency.
  */
 
+import { PanelStack } from "@invana/ui";
+import { useIsFetching, useQueryClient } from "@tanstack/react-query";
+import { LayoutDashboard, RefreshCw } from "lucide-react";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses";
+import { useRunListQuery } from "@/pages/graphs-detail/features/runs/queries";
 import {
 	RunDetail,
 	runAddress,
 } from "@/pages/graphs-detail/features/runs/RunDetail";
 import { RunsFilterBar } from "@/pages/graphs-detail/features/runs/RunsFilterBar";
 import { RunsList } from "@/pages/graphs-detail/features/runs/RunsList";
-import { useRunListQuery } from "@/pages/graphs-detail/features/runs/queries";
 import { useRunsFilters } from "@/pages/graphs-detail/features/runs/useRunsFilters";
 import {
 	stackSection,
@@ -36,9 +39,6 @@ import {
 import { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
 import { useRunsViewPanel } from "@/pages/graphs-detail/shell/useRunsViewPanel";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
-import { PanelStack } from "@invana/ui";
-import { useIsFetching, useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, RefreshCw } from "lucide-react";
 
 export interface RunsViewPanelProps {
 	username: string;

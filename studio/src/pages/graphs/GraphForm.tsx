@@ -1,6 +1,3 @@
-import { FormError } from "@/components/forms/FormError";
-import { CONNECTOR_OPTIONS } from "@/pages/graphs-detail/features/graphs";
-import type { GraphConnectionCreate } from "@/pages/graphs-detail/features/graphs";
 import {
 	type Control,
 	type FieldConfig,
@@ -17,6 +14,9 @@ import { useEffect, useState } from "react";
 // Only `useForm` — @invana/forms re-exports every form *type* Studio needs
 // but not the hook itself, so this is the one react-hook-form import left.
 import { useForm } from "react-hook-form";
+import { FormError } from "@/components/forms/FormError";
+import type { GraphConnectionCreate } from "@/pages/graphs-detail/features/graphs";
+import { CONNECTOR_OPTIONS } from "@/pages/graphs-detail/features/graphs";
 
 export interface GraphFormValues {
 	uri: string;

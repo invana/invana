@@ -39,12 +39,6 @@
  * ([LB19](docs/for-developers/modules/workflows/features/the-library.md)).
  */
 
-import type {
-	InlinablePlan,
-	SkillDraftTaskWrite,
-	SkillPlaybookRead,
-	SkillStepChoice,
-} from "@/pages/graphs-detail/features/skills/types";
 import {
 	Input,
 	Select,
@@ -56,6 +50,12 @@ import {
 import { Badge, Button } from "@invana/ui";
 import { Plus, X } from "lucide-react";
 import { useState } from "react";
+import type {
+	InlinablePlan,
+	SkillDraftTaskWrite,
+	SkillPlaybookRead,
+	SkillStepChoice,
+} from "@/pages/graphs-detail/features/skills/types";
 
 /** The value the picker uses for *a person does this*. A form, not a step. */
 const HUMAN = "__human__";

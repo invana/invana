@@ -1,3 +1,4 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	type BoardCreateBody,
 	type BoardListOptions,
@@ -6,10 +7,9 @@ import {
 } from "@/pages/graphs-detail/features/boards/api";
 import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
 import {
-	type CanvasStateCreateBody,
 	boardVersionsApi,
+	type CanvasStateCreateBody,
 } from "@/pages/graphs-detail/features/boards/versionsApi";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const CANVASES_KEY = ["canvases"] as const;
 const canvasesKey = (username: string, graphSlug: string) =>

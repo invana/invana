@@ -1,18 +1,18 @@
+import { lazy, Suspense } from "react";
+import {
+	createBrowserRouter,
+	Navigate,
+	useLocation,
+	useParams,
+} from "react-router-dom";
 import App from "@/App";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { ErrorPage } from "@/pages/ErrorPage";
 import { LoginPage } from "@/pages/auth/LoginPage";
+import { ErrorPage } from "@/pages/ErrorPage";
 import { GraphCreatePage } from "@/pages/graphs/GraphCreatePage";
 import { GraphsListPage } from "@/pages/graphs/GraphsListPage";
 import { PlatformEventsPage } from "@/pages/platform/PlatformEventsPage";
 import { ProfileSettingsPage } from "@/pages/settings/ProfileSettingsPage";
-import { Suspense, lazy } from "react";
-import {
-	Navigate,
-	createBrowserRouter,
-	useLocation,
-	useParams,
-} from "react-router-dom";
 
 // Lazy-loaded — the graph page carries the heaviest UI (graph rendering). Lazy
 // keeps the auth + settings flows snappy and isolates any canvas-side

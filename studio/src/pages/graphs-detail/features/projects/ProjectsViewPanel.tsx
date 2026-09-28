@@ -12,20 +12,20 @@
  * catalogue, never Todos (PT7 · SR3).
  */
 
+import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import { FolderOpen, ListTodo, Plus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { ProjectsSectionBody } from "@/pages/graphs-detail/features/projects/ProjectsSection";
-import { TodosSectionBody } from "@/pages/graphs-detail/features/projects/TodosSection";
 import {
 	useProjectsQuery,
 	useTodosQuery,
 } from "@/pages/graphs-detail/features/projects/queries";
+import { TodosSectionBody } from "@/pages/graphs-detail/features/projects/TodosSection";
 import {
 	stackSection,
 	useStackSectionUi,
 } from "@/pages/graphs-detail/shared/StackSection";
 import { useProjectsViewPanel } from "@/pages/graphs-detail/shell/useProjectsViewPanel";
-import { PanelStack, type PanelStackHandle } from "@invana/ui";
-import { FolderOpen, ListTodo, Plus } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 
 export interface ProjectsViewPanelProps {
 	username: string;

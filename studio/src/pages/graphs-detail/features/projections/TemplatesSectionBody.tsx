@@ -24,16 +24,6 @@
  */
 
 import {
-	type ProjectionTemplateRead,
-	projectionTemplatesApi,
-} from "@/pages/graphs-detail/features/runs";
-import {
-	DetailBlock,
-	DetailStatus,
-} from "@/pages/graphs-detail/shared/DetailRows";
-import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import { PanelSection } from "@/ui/PanelSection";
-import {
 	Input,
 	Label,
 	Select,
@@ -52,6 +42,16 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
+import {
+	type ProjectionTemplateRead,
+	projectionTemplatesApi,
+} from "@/pages/graphs-detail/features/runs";
+import {
+	DetailBlock,
+	DetailStatus,
+} from "@/pages/graphs-detail/shared/DetailRows";
+import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
+import { PanelSection } from "@/ui/PanelSection";
 
 const RESULT_SURFACES = [
 	"table",

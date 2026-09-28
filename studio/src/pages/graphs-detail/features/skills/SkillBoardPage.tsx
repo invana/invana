@@ -6,10 +6,10 @@
  * edited. {@link SkillDetail} is the page itself.
  */
 
-import { SkillDetail } from "@/pages/graphs-detail/features/skills/SkillDetail";
-import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useState } from "react";
+import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
+import { SkillDetail } from "@/pages/graphs-detail/features/skills/SkillDetail";
 
 export function SkillBoardPage({
 	username,

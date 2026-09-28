@@ -17,9 +17,9 @@
  * is what stops a read-only detail from reading as broken (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
  */
 
-import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
-import { AgentChip, Badge, PropertyList, cn } from "@invana/ui";
+import { AgentChip, Badge, cn, PropertyList } from "@invana/ui";
 import type { ReactNode } from "react";
+import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
 
 export function DetailBlock({
 	title,

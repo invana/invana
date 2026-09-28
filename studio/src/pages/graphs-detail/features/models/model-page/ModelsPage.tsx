@@ -9,15 +9,23 @@
  * never in the panel (MP4).
  */
 
+import { Dashboard } from "@invana/dashboard";
+import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer";
-import { graphsApi } from "@/pages/graphs-detail/features/graphs";
-import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
+import {
+	graphsApi,
+	useGraphConnectionQuery,
+} from "@/pages/graphs-detail/features/graphs";
 import { modelsApi } from "@/pages/graphs-detail/features/models/api";
-import { ModelCanvas } from "@/pages/graphs-detail/features/models/model-editor/ModelCanvas";
 import { DeleteModelDialog } from "@/pages/graphs-detail/features/models/model-editor/components/DeleteModelDialog";
 import { ImportModelDialog } from "@/pages/graphs-detail/features/models/model-editor/components/ImportModelDialog";
 import { ModelFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/ModelFormDialog";
+import { ModelCanvas } from "@/pages/graphs-detail/features/models/model-editor/ModelCanvas";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models/model-editor/types";
 import {
 	useCommitDraftMutation,
@@ -28,13 +36,13 @@ import {
 	useModelInsightsQuery,
 	useModelLinksQuery,
 	useModelQuery,
-	useModelVersionsQuery,
 	useModelsQuery,
+	useModelVersionsQuery,
+	usePhysicalSchemaQuery,
 	useShapeQuery,
 	useStagedSetQuery,
 	useUpdateModelMutation,
 } from "@/pages/graphs-detail/features/models/queries";
-import { usePhysicalSchemaQuery } from "@/pages/graphs-detail/features/models/queries";
 import { AllModelsCanvas } from "@/pages/graphs-detail/features/models/stitch/AllModelsCanvas";
 import { useAllModels } from "@/pages/graphs-detail/features/models/stitch/useAllModels";
 import type {
@@ -44,12 +52,6 @@ import type {
 } from "@/pages/graphs-detail/features/models/types";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 import { ApiError } from "@/services/api/client";
-import { Dashboard } from "@invana/dashboard";
-import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 import { ArchiveRefused, PublishConfirm } from "./ModelsDialogs";
 import {
 	LOCKED_UNTIL_PUBLISHED,

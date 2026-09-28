@@ -16,8 +16,8 @@ import {
 } from "@/canvases/taskflow";
 import { formatDuration } from "@/lib/time";
 import {
-	type TaskGroup,
 	durationMs,
+	type TaskGroup,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
 
 function iconOf(bound: string | null): string {

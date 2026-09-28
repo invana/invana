@@ -1,17 +1,17 @@
+import { ChatSession, ChatSessionTaskGroup } from "@invana/ui";
+import { useMemo } from "react";
 import {
 	type StepClarification,
 	StepList,
 	totalDuration,
 } from "@/pages/graphs-detail/features/assistant/SessionSteps";
 import {
+	isClarification,
 	type Session,
 	type SessionMessage,
-	isClarification,
 } from "@/pages/graphs-detail/features/assistant/types";
 import type { RunNode, RunView } from "@/pages/graphs-detail/features/runs";
 import { useRunStore } from "@/stores/run.store";
-import { ChatSession, ChatSessionTaskGroup } from "@invana/ui";
-import { useMemo } from "react";
 
 export interface SessionStepsTimelineProps {
 	session: Session;

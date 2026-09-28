@@ -22,20 +22,6 @@
  * promising a change that has not happened.
  */
 
-import { modelsApi } from "@/pages/graphs-detail/features/models/api";
-import {
-	useDeclareLinkMutation,
-	useModelsQuery,
-	usePreviewStitchMutation,
-} from "@/pages/graphs-detail/features/models/queries";
-import type {
-	AlreadyStitched,
-	EndpointSource,
-	IdentityMatch,
-	LinkKind,
-	StitchPreview,
-} from "@/pages/graphs-detail/features/models/types";
-import { ApiError } from "@/services/api/client";
 import {
 	Input,
 	Select,
@@ -51,15 +37,29 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
+	cn,
 	Spinner,
 	Tabs,
 	TabsList,
 	TabsTrigger,
-	cn,
 } from "@invana/ui";
 import { useQueries } from "@tanstack/react-query";
 import { HelpCircle, Link2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { modelsApi } from "@/pages/graphs-detail/features/models/api";
+import {
+	useDeclareLinkMutation,
+	useModelsQuery,
+	usePreviewStitchMutation,
+} from "@/pages/graphs-detail/features/models/queries";
+import type {
+	AlreadyStitched,
+	EndpointSource,
+	IdentityMatch,
+	LinkKind,
+	StitchPreview,
+} from "@/pages/graphs-detail/features/models/types";
+import { ApiError } from "@/services/api/client";
 
 /** One node type on one published version — what either side of a stitch names. */
 interface TypeOption {
