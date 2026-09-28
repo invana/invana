@@ -38,7 +38,7 @@
 
 import { catalogueSection } from "@/pages/graphs-detail/features/plans/CatalogueSection";
 import { plansSection } from "@/pages/graphs-detail/features/plans/PlansSection";
-import { templatesSection } from "@/pages/graphs-detail/features/projections/TemplatesSection";
+import { templatesSection } from "@/pages/graphs-detail/features/projections";
 import { useStackSectionUi } from "@/pages/graphs-detail/shared/StackSection";
 import {
 	type LibrarySectionKey,
