@@ -2,6 +2,7 @@
 
 from .config import DEFAULT_LOGGING_CONFIG, configure_logging, set_level
 from .filters import (
+    OtlpDisplayFieldsFilter,
     OtlpThirdPartyFilter,
     RedactFilter,
     RedactTokenFilter,
@@ -11,6 +12,7 @@ from .filters import (
 
 __all__ = [
     "DEFAULT_LOGGING_CONFIG",
+    "OtlpDisplayFieldsFilter",
     "OtlpThirdPartyFilter",
     "RedactFilter",
     "RedactTokenFilter",

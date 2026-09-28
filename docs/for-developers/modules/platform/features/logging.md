@@ -78,6 +78,7 @@ flowchart LR
 | LO8 | Structured context is bound, never passed: code logs `log.info(..., extra={...})` with its own ids, and who, from where and which Graph arrive from the context the span helpers bound. |
 | LO9 | Redaction is a filter on each handler, not on a logger — a logger's filter never sees the records its children propagate. |
 | LO10 | After startup, a level changes in place (`set_level`); the configuration is never rebuilt, because rebuilding closes every handler — telemetry's OTLP handler with them. |
+| LO11 | A shipped log record carries no console-only attributes (`trace`, `log_fields`, `trace_id`, `span_id`) — the OTLP record takes its trace from the active span; the OTLP handler's last filter ships a copy without them. |
 
 ## Not building
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import logging
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
@@ -137,6 +138,33 @@ _RECORD_ATTRS = frozenset(logging.LogRecord("", 0, "", 0, "", None, None).__dict
     "log_fields",
     "taskName",
 }
+
+
+class OtlpDisplayFieldsFilter(logging.Filter):
+    """
+    Keeps the console-only attributes off the records the OTLP handler ships.
+
+    ``TraceContextFilter`` adds ``trace`` and ``log_fields`` for the plain
+    format string, and ``trace_id`` / ``span_id`` for it and the JSON formatter.
+    The OpenTelemetry SDK turns every non-standard record attribute into a log
+    attribute, so without this filter each shipped line would repeat its trace
+    ids — which the SDK already sets from the active span — and a pre-rendered
+    copy of its fields. ``principal`` · ``origin`` · ``graph_id`` and a caller's
+    own fields are kept.
+
+    Attach it last on the OTLP handler. It returns a copy of the record rather
+    than editing it, because the same record object is passed to every handler
+    and the console handler still needs those attributes. The filter never
+    drops a record.
+    """
+
+    FIELDS = ("trace", "log_fields", "trace_id", "span_id")
+
+    def filter(self, record: logging.LogRecord) -> logging.LogRecord:
+        shipped = copy.copy(record)
+        for name in self.FIELDS:
+            shipped.__dict__.pop(name, None)
+        return shipped
 
 
 class RedactFilter(logging.Filter):

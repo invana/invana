@@ -11,10 +11,12 @@ from __future__ import annotations
 import json
 import logging
 
+from opentelemetry.sdk._logs import LoggerProvider
 from pydantic import SecretStr
 
 from invana.core.logging import DEFAULT_LOGGING_CONFIG, RedactFilter, TraceContextFilter
 from invana.core.logging.formatters import JSONFormatter, PlainFormatter
+from invana.core.telemetry.setup import _otlp_log_handler
 from invana.core.telemetry.spans import root_span, set_current
 
 PLAIN_FORMAT = DEFAULT_LOGGING_CONFIG["formatters"]["simple"]["format"]
@@ -70,3 +72,14 @@ def test_ordinary_fields_are_left_as_they_are():
     record = _record({"counts": {"nodes": 3, "tokens_used": 9}})
     _write(record)
     assert record.counts == {"nodes": 3, "tokens_used": 9}
+
+
+def test_a_shipped_line_keeps_its_fields_but_not_the_console_ones():
+    """The OTLP handler's filters keep who and where; the console's copy keeps the rest."""
+    handler = _otlp_log_handler(LoggerProvider())
+    record = _record({"run_id": "r-1"})
+    with root_span("system.graph_health", origin="daemon"):
+        shipped = handler.filter(record)
+    assert (shipped.principal, shipped.origin, shipped.run_id) == ("system", "daemon", "r-1")
+    assert not {"trace", "log_fields", "trace_id", "span_id"} & shipped.__dict__.keys()
+    assert hasattr(record, "trace") and record.log_fields  # the record other handlers see is unchanged

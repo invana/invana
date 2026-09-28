@@ -281,22 +281,34 @@ def _setup_logs(resource: Resource, endpoint: str) -> None:
     on the console handler, so OTel still sees their records for debugging.
 
     The handler stamps ``principal`` · ``origin`` · ``graph_id`` on each record
-    (they become log attributes) and redacts a record's fields by the same rule
-    as the console handler.
+    (they become log attributes), redacts a record's fields by the same rule
+    as the console handler, and leaves out the attributes only the console
+    formats read (``trace``, ``log_fields``, ``trace_id``, ``span_id``).
     """
-    # Local import avoids circular dependency at module load time.
-    from opentelemetry.sdk._logs import LoggingHandler
-
     exporter = OTLPLogExporter(endpoint=endpoint)
     provider = LoggerProvider(resource=resource)
     provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
     set_logger_provider(provider)
 
-    from invana.core.logging.filters import OtlpThirdPartyFilter, RedactFilter, TraceContextFilter
+    logging.getLogger().addHandler(_otlp_log_handler(provider))
+
+
+def _otlp_log_handler(provider: LoggerProvider) -> logging.Handler:
+    """Build the root logger's OTLP handler and its filters, in the order they run."""
+    # Local import avoids circular dependency at module load time.
+    from opentelemetry.sdk._logs import LoggingHandler
+
+    from invana.core.logging.filters import (
+        OtlpDisplayFieldsFilter,
+        OtlpThirdPartyFilter,
+        RedactFilter,
+        TraceContextFilter,
+    )
 
     otlp_handler = LoggingHandler(level=logging.NOTSET, logger_provider=provider)
     otlp_handler.addFilter(OtlpThirdPartyFilter())
     # Who acted and from where become record attributes; credentials never do.
     otlp_handler.addFilter(TraceContextFilter())
     otlp_handler.addFilter(RedactFilter())
-    logging.getLogger().addHandler(otlp_handler)
+    otlp_handler.addFilter(OtlpDisplayFieldsFilter())
+    return otlp_handler
