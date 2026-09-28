@@ -29,8 +29,8 @@ import {
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
 import type { AgentEdge } from "@/pages/graphs-detail/features/agents/types";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
-import { llmsSection } from "@/pages/graphs-detail/features/llms/LlmsSection";
-import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms/queries";
+import { llmsSection } from "@/pages/graphs-detail/features/llms";
+import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms";
 import { useStackSectionUi } from "@/pages/graphs-detail/shared/StackSection";
 import {
 	type AgentsSectionKey,

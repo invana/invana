@@ -2,7 +2,7 @@ import { attachmentFor } from "@/pages/graphs-detail/features/assistant";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant";
 import { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer";
 import type { useGraphQuery } from "@/pages/graphs-detail/features/graphs";
-import type { LLMProvider } from "@/pages/graphs-detail/features/llms/types";
+import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
 import { AssistantHost } from "@/pages/graphs-detail/shell/AssistantHost";
 import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 import type { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";

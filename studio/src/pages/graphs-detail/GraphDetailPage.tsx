@@ -8,7 +8,7 @@ import {
 	hasOutstandingSetup,
 	isGateOpen,
 } from "@/pages/graphs-detail/features/graphs";
-import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms/queries";
+import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models";
 import { useModelsQuery } from "@/pages/graphs-detail/features/models/queries";
 import { useRunStep } from "@/pages/graphs-detail/features/runs/boards";

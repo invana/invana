@@ -19,7 +19,7 @@ import type {
 	SessionMessage,
 } from "@/pages/graphs-detail/features/assistant/types";
 import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
-import type { LLMProvider } from "@/pages/graphs-detail/features/llms/types";
+import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
 import type { RunView } from "@/pages/graphs-detail/features/runs/types";
 import {
 	ListFilterMenu,
