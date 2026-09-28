@@ -465,8 +465,13 @@ ontology — are removed, not rewritten.
 
 ## 8b. Keeping the names
 
-A check in CI, so the structure cannot drift again. `scripts/check-names` (Python, no dependencies,
-runs on every OS), added in R2 and tightened as each phase lands.
+A check in CI, so the structure cannot drift again, tightened as each phase lands. **Studio's half is
+`studio/scripts/check-names.mjs`** (Node, reads identifiers with the TypeScript parser Studio already
+ships, in `pnpm lint`): the module map, the suffixes and the retired words in identifiers. Its module
+map spells each engine folder as it is today — `assistant` → `sessions`, `lenses` → `govern`, `llms` →
+`llm_providers`, `models` → `modeller`, `plans` → `task_plans`, `projects` → `work`, `runs` and
+`projections` → `runtime` — so R5 is a one-line change per module there. The docs and engine rows below
+are `scripts/check-names` (Python, no dependencies, runs on every OS), not yet written.
 
 | Fails when | Scope |
 |---|---|

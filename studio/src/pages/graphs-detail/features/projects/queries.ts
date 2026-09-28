@@ -191,9 +191,9 @@ export function useTodoMutations(username: string, graphSlug: string) {
 export function useTodoRunsQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
-	thinkingIds: string[] | undefined,
+	runIds: string[] | undefined,
 ) {
-	const ids = thinkingIds ?? [];
+	const ids = runIds ?? [];
 	return useQuery({
 		queryKey: ["runs", username, graphSlug, ids] as const,
 		queryFn: () =>

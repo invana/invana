@@ -56,21 +56,21 @@ export function CompareDialog({
 	question,
 	onPick,
 }: CompareDialogProps) {
-	const journal = useRunListQuery(username, graphSlug);
+	const runList = useRunListQuery(username, graphSlug);
 
 	const { sameQuestion, others } = useMemo(() => {
-		const rows = journal.rows.filter((r) => r.id !== runId);
+		const rows = runList.rows.filter((r) => r.id !== runId);
 		// Compare like with like: the journal derives a row's title from the ask
 		// (`askTitle`), so matching the raw `body` against those titles never
 		// groups anything. This run's **own row** is the thing to match on, and
 		// the body is only the fallback for a run the journal has not loaded.
-		const mine = journal.rows.find((r) => r.id === runId);
+		const mine = runList.rows.find((r) => r.id === runId);
 		const asked = (mine?.title ?? question ?? "").trim();
 		return {
 			sameQuestion: asked ? rows.filter((r) => r.title.trim() === asked) : [],
 			others: asked ? rows.filter((r) => r.title.trim() !== asked) : rows,
 		};
-	}, [journal.rows, runId, question]);
+	}, [runList.rows, runId, question]);
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -84,7 +84,7 @@ export function CompareDialog({
 					</DialogDescription>
 				</DialogHeader>
 
-				{journal.isLoading ? (
+				{runList.isLoading ? (
 					<div className="flex items-center gap-2 py-2 text-sm text-muted-foreground">
 						<Spinner className="size-3" /> reading this Graph's runs
 					</div>
@@ -108,7 +108,7 @@ export function CompareDialog({
 					</>
 				) : null}
 
-				{!journal.isLoading && !sameQuestion.length && !others.length ? (
+				{!runList.isLoading && !sameQuestion.length && !others.length ? (
 					// A sentence, not an empty list — and it names what would fix it.
 					<p className="py-2 text-sm text-muted-foreground">
 						This Graph has only run once. Ask the same question under another

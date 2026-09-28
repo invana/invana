@@ -68,7 +68,7 @@ export function RunsViewPanel({
 	const ui = useStackSectionUi();
 	// Shared with the Runs page, so the two read one journal (SR70).
 	const { filters, patch } = useRunsFilters();
-	const journal = useRunListQuery(username, graphSlug, filters);
+	const runList = useRunListQuery(username, graphSlug, filters);
 	const agents = (useAgentsQuery(username, graphSlug).data?.items ?? []).map(
 		(a) => ({ id: a.id, name: a.name }),
 	);
@@ -80,16 +80,16 @@ export function RunsViewPanel({
 		? sectionUi.search.trim().toLowerCase()
 		: "";
 	const rows = needle
-		? journal.rows.filter((r) =>
+		? runList.rows.filter((r) =>
 				[r.title, r.id, r.plan].some((v) => v.toLowerCase().includes(needle)),
 			)
-		: journal.rows;
+		: runList.rows;
 
 	const filtered = Object.values(filters).some(Boolean);
-	const count = journal.total
-		? journal.live
-			? `${journal.total} · ${journal.live} running`
-			: `${journal.total}`
+	const count = runList.total
+		? runList.live
+			? `${runList.total} · ${runList.live} running`
+			: `${runList.total}`
 		: undefined;
 
 	// A drilled-in run is addressed, not titled: `RUNS / run:7d3184f1` (SR54).
@@ -137,10 +137,10 @@ export function RunsViewPanel({
 										key: "refresh",
 										name: "Refresh",
 										icon: RefreshCw,
-										iconClassName: journal.isFetching
+										iconClassName: runList.isFetching
 											? "animate-spin"
 											: undefined,
-										onClick: () => void journal.refetch(),
+										onClick: () => void runList.refetch(),
 									},
 									...(onOpenRunsBoard
 										? [
@@ -190,7 +190,7 @@ export function RunsViewPanel({
 									) : (
 										<RunsList
 											rows={rows}
-											isLoading={journal.isLoading}
+											isLoading={runList.isLoading}
 											runId={runId}
 											onOpenRun={openRun}
 											narrowed={filtered || Boolean(needle)}
@@ -210,10 +210,10 @@ export function RunsViewPanel({
 					</>
 				}
 				middle={
-					journal.live
+					runList.live
 						? [
 								<StatusCount key="live" tone="running">
-									{journal.live} running
+									{runList.live} running
 								</StatusCount>,
 							]
 						: []
@@ -221,8 +221,8 @@ export function RunsViewPanel({
 				right={
 					runId
 						? runRight
-						: journal.total
-							? `${rows.length} of ${journal.total} shown`
+						: runList.total
+							? `${rows.length} of ${runList.total} shown`
 							: undefined
 				}
 			/>

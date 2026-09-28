@@ -145,14 +145,14 @@ export interface RunsBoardPageProps {
 export function RunsBoardPage({ username, graphSlug }: RunsBoardPageProps) {
 	const { runId, openRun } = useRunsViewPanel();
 	const { filters, patch } = useRunsFilters();
-	const journal = useRunListQuery(username, graphSlug, filters);
+	const runList = useRunListQuery(username, graphSlug, filters);
 	// The tiles read the whole fetched journal — the same query key, so no
 	// second request — while the table reads what the chips leave.
 	const all = useRunListQuery(username, graphSlug);
 	const agentList = useAgentsQuery(username, graphSlug).data?.items ?? [];
 	const agentName = new Map(agentList.map((a) => [a.id, a.name]));
 	// A running row's elapsed moves; the ticker keeps it honest.
-	const now = useTicker(journal.live > 0);
+	const now = useTicker(runList.live > 0);
 
 	const filtered = Object.values(filters).some(Boolean);
 
@@ -163,11 +163,11 @@ export function RunsBoardPage({ username, graphSlug }: RunsBoardPageProps) {
 				chips={
 					<>
 						<Badge variant="outline" size="xs">
-							{journal.total}
+							{runList.total}
 						</Badge>
-						{journal.live ? (
+						{runList.live ? (
 							<Badge variant="outline" tone="info" size="xs">
-								{journal.live} running
+								{runList.live} running
 							</Badge>
 						) : null}
 					</>
@@ -177,10 +177,10 @@ export function RunsBoardPage({ username, graphSlug }: RunsBoardPageProps) {
 						variant="ghost"
 						size="icon-xs"
 						aria-label="Refresh"
-						onClick={() => void journal.refetch()}
+						onClick={() => void runList.refetch()}
 					>
 						<RefreshCw
-							className={journal.isFetching ? "animate-spin" : undefined}
+							className={runList.isFetching ? "animate-spin" : undefined}
 						/>
 					</Button>
 				}
@@ -198,13 +198,13 @@ export function RunsBoardPage({ username, graphSlug }: RunsBoardPageProps) {
 				title="Runs — newest first"
 				action={
 					<span className="text-muted-foreground">
-						{journal.rows.length} of {journal.total} shown
+						{runList.rows.length} of {runList.total} shown
 					</span>
 				}
 			>
-				{journal.isLoading ? (
+				{runList.isLoading ? (
 					<Spinner />
-				) : !journal.rows.length ? (
+				) : !runList.rows.length ? (
 					<EmptyState
 						title={
 							filtered ? "No run matches these filters" : "Nothing has run yet"
@@ -231,7 +231,7 @@ export function RunsBoardPage({ username, graphSlug }: RunsBoardPageProps) {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{journal.rows.map((row) => {
+							{runList.rows.map((row) => {
 								const t = row.run;
 								const elapsed = elapsedOf(row, now);
 								const tokens = (t.tokens_in ?? 0) + (t.tokens_out ?? 0);

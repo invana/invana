@@ -405,7 +405,7 @@ A convention a community project cannot enforce is a convention it does not have
 | No cross-feature deep imports | Biome `noRestrictedImports`: `src/features/*/!(index.ts)` is not importable from another feature |
 | No canvas-ui fork | A canvas panel, toolbar, card, menu or status strip is `@invana/canvas-ui`'s. [canvas-ui-coverage.md](canvas-ui-coverage.md) is the map, read before writing one; a surface listed there is consumed, never reimplemented |
 | No dead files | `knip` in CI |
-| Names follow modules | `scripts/check-names` — Studio `features/<m>/` ↔ engine `server/<m>/`, the §4.1c suffixes only, no retired word in an identifier ([module-structure.md](../module-structure.md) §8b) |
+| Names follow modules | `studio/scripts/check-names.mjs`, in `pnpm lint` and CI's Lint job — every `features/<m>/` is in its module map and the engine `server/` folder it maps to exists; no `.tsx` under `features/` ends in `Drawer` · `StackPanel` · `DashboardPage` · a bare `Panel`; no identifier carries `drawer` · `StackPanel` · `DashboardPage` · `journal` · `thinking` · `railItem`. Identifiers are read with the TypeScript parser, so strings, JSX text and comments are never flagged. Each exception is an allow-list line with its reason ([module-structure.md](../module-structure.md) §8b) |
 | Comments stay short | one or two lines; cite the decision id instead of restating the feature file; no history ([module-structure.md](../module-structure.md) §5b) |
 | Tokens only | Extend the check script to fail on `hsl(` · `#rrggbb` · `bg-{palette}-{n}` in `src/` — the same rule `.design/board/build.mjs` enforces (§5.4) |
 | The type ladder | Fail on `text-[Npx]`. **30 sites today** — fix them in Phase 1, then the gate holds (D7 · DS13) |

@@ -25,8 +25,9 @@ jobs:
       - name: Import linter
         run: cd engine && uv run lint-imports
 
-      - name: Biome check
-        run: cd studio && pnpm biome check .
+      # docs/for-developers/building-studio/code-shape.md §8 — Biome, then names.
+      - name: Biome and names check
+        run: cd studio && pnpm lint
 
       - name: TypeScript type check
         run: cd studio && pnpm tsc --noEmit
