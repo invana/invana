@@ -36,8 +36,11 @@ export { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer/Insp
 // Canvases'.
 export { LayersPanel } from "@/pages/graphs-detail/features/explorer/LayersPanel";
 export { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
-export type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer/StylingPanel";
-export { StylingPanel } from "@/pages/graphs-detail/features/explorer/StylingPanel";
+// A board's stored styling in and out of canvas-ui's `StylingViewPanel`.
+export {
+	fromTypeStylingPatch,
+	toTypeStylingPatch,
+} from "@/pages/graphs-detail/features/explorer/stylingPatch";
 // Engine adapters — PixiJS needs concrete values, not classes.
 export { slotForType } from "@/pages/graphs-detail/features/explorer/typeColor";
 export type {

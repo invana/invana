@@ -27,7 +27,7 @@ export interface NodeTypeStyle {
 }
 
 /** Visual rules for one edge type (docs/for-developers/modules/explore/features/graph-canvas.md). */
-export interface EdgeTypeStyle {
+interface EdgeTypeStyle {
 	color?: string;
 	labelProperty?: string;
 	width?: number;

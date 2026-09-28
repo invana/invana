@@ -151,7 +151,6 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		setSelectedId,
 		sessionTitleById,
 		handleStylingChange,
-		styleTypes,
 		handleShowDetail,
 		handleSaveState,
 		openCanvasTab,
@@ -217,7 +216,6 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			magnet={magnet}
 			backend={backend}
 			styling={styling}
-			styleTypes={styleTypes}
 			onStylingChange={handleStylingChange}
 			onReady={handleReady}
 			onViewTargetChange={setSelectedId}

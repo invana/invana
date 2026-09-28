@@ -1,7 +1,7 @@
 import { canUseWebGPU } from "@invana/canvas-react";
 import type { GraphCanvas, GraphLayer } from "@invana/graph";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant";
 import {
@@ -24,10 +24,7 @@ import {
 	useCreateCanvasStateMutation,
 	useUpdateCanvasMutation,
 } from "@/pages/graphs-detail/features/boards";
-import type {
-	CanvasBackend,
-	StyleTypeInfo,
-} from "@/pages/graphs-detail/features/explorer";
+import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import {
 	adaptItems,
 	explorerApi,
@@ -196,7 +193,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 	// Session tutorial (docs/for-developers/modules/explore/features/graph-canvas.md) — auto-open once on a user's first session,
 	// reopenable from the "?" in the canvas header.
 	// Per-type styling (docs/for-developers/modules/explore/features/graph-canvas.md) for the active canvas — hydrated from it on open,
-	// edited in the StylingPanel, applied live by the renderer + persisted.
+	// edited in the Styling card, painted by `ExplorerCanvas` and persisted.
 	const activeCanvasId =
 		openTabs.find((t) => t.sessionId === activeSessionId)?.id ?? null;
 
@@ -266,28 +263,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		},
 		[activeCanvasId, username, graphSlug, setStyling],
 	);
-
-	// Node/edge types currently on the canvas (+ their property keys) — the rows
-	// the StylingPanel offers. Derived from the painted data (docs/for-developers/modules/explore/features/graph-canvas.md).
-	const styleTypes = useMemo(() => {
-		const nodes = new Map<string, Set<string>>();
-		const edges = new Map<string, Set<string>>();
-		for (const item of canvasData) {
-			const map =
-				item.type === "vertex" ? nodes : item.type === "edge" ? edges : null;
-			if (!map) continue;
-			const label = String(item.label ?? "");
-			if (!label) continue;
-			const set = map.get(label) ?? new Set<string>();
-			for (const k of Object.keys(item.properties ?? {})) set.add(k);
-			map.set(label, set);
-		}
-		const toArr = (m: Map<string, Set<string>>): StyleTypeInfo[] =>
-			[...m.entries()]
-				.map(([name, props]) => ({ name, properties: [...props].sort() }))
-				.sort((a, b) => a.name.localeCompare(b.name));
-		return { nodeTypes: toArr(nodes), edgeTypes: toArr(edges) };
-	}, [canvasData]);
 
 	// Clicked node/edge id, lifted from the canvas by <InspectorSelectionBridge>.
 	const selected: QueryResultItem | null = selectedId
@@ -929,7 +904,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		bannerCanvasIdBySession,
 		sessionTitleById,
 		handleStylingChange,
-		styleTypes,
 		selected,
 		handleShowDetail,
 		availableLanguages,

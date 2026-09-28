@@ -26,7 +26,12 @@
  * (`docs/for-developers/modules/explore/features/boards.md`).
  */
 
-import { RendererCapabilityBanner } from "@invana/canvas-ui";
+import {
+	Panel,
+	PanelContent,
+	RendererCapabilityBanner,
+	StylingViewPanel,
+} from "@invana/canvas-ui";
 import type {
 	GraphCanvas as GraphCanvasEngine,
 	GraphData,
@@ -52,9 +57,9 @@ import type {
 import {
 	ExpandNeighboursDialog,
 	ExplorerCanvas,
+	fromTypeStylingPatch,
 	LayersPanel,
-	type StyleTypeInfo,
-	StylingPanel,
+	toTypeStylingPatch,
 } from "@/pages/graphs-detail/features/explorer";
 import type { InteractionRef } from "@/services/telemetry/tracer";
 
@@ -93,7 +98,6 @@ export interface BoardPageProps {
 	magnet: boolean;
 	backend: CanvasBackend;
 	styling: CanvasStyling;
-	styleTypes: { nodeTypes: StyleTypeInfo[]; edgeTypes: StyleTypeInfo[] };
 	onStylingChange: (next: CanvasStyling) => void;
 
 	onReady: (canvas: GraphCanvasEngine | null) => void;
@@ -134,7 +138,6 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			magnet,
 			backend,
 			styling,
-			styleTypes,
 			onStylingChange,
 			onReady,
 			onViewTargetChange,
@@ -227,14 +230,27 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 						canvas={canvas}
 						onClose={() => setOverlay(null)}
 					/>
-					<StylingPanel
-						open={overlay === "styling"}
-						onClose={() => setOverlay(null)}
-						nodeTypes={styleTypes.nodeTypes}
-						edgeTypes={styleTypes.edgeTypes}
-						styling={styling}
-						onChange={onStylingChange}
-					/>
+					{overlay === "styling" && (
+						// The card only edits: `ExplorerCanvas` paints the styling,
+						// so a board keeps it while the card is closed.
+						<Panel position="top-right" offset={12} zIndex={20}>
+							<PanelContent
+								width={288}
+								className="max-h-[70vh]"
+								header="Styling"
+								onClose={() => setOverlay(null)}
+							>
+								<StylingViewPanel
+									canvas={canvas}
+									apply={false}
+									value={toTypeStylingPatch(styling)}
+									onChange={(next) =>
+										onStylingChange(fromTypeStylingPatch(next))
+									}
+								/>
+							</PanelContent>
+						</Panel>
+					)}
 					<BoardHistoryWidget
 						open={overlay === "history"}
 						onClose={() => setOverlay(null)}
