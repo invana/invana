@@ -58,8 +58,6 @@ import type {
 import {
 	ExpandNeighboursDialog,
 	ExplorerCanvas,
-	fromTypeStylingPatch,
-	toTypeStylingPatch,
 } from "@/pages/graphs-detail/features/explorer";
 import type { InteractionRef } from "@/services/telemetry/tracer";
 
@@ -250,10 +248,8 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 								<StylingViewPanel
 									canvas={canvas}
 									apply={false}
-									value={toTypeStylingPatch(styling)}
-									onChange={(next) =>
-										onStylingChange(fromTypeStylingPatch(next))
-									}
+									value={styling}
+									onChange={onStylingChange}
 								/>
 							</PanelContent>
 						</Panel>

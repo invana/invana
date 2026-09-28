@@ -5,6 +5,7 @@ import {
 	adaptItems,
 	expandRefusal,
 	isCanvasStateSnapshot,
+	labelAt,
 	resultToItems,
 } from "./canvasItems";
 
@@ -71,5 +72,25 @@ describe("expandRefusal", () => {
 			"Failed to load neighbours.",
 		);
 		expect(expandRefusal(new Error("net"))).toBe("Failed to load neighbours.");
+	});
+});
+
+describe("labelAt", () => {
+	const node = {
+		id: "7",
+		type: "airport",
+		data: { code: "MMK", meta: { tier: 1 } },
+	};
+
+	it("reads a root field, a property and a nested property", () => {
+		expect(labelAt(node, "id")).toBe("7");
+		expect(labelAt(node, "type")).toBe("airport");
+		expect(labelAt(node, "data.code")).toBe("MMK");
+		expect(labelAt(node, "data.meta.tier")).toBe("1");
+	});
+
+	it("is empty where the path reaches nothing", () => {
+		expect(labelAt(node, "data.name")).toBe("");
+		expect(labelAt(node, "data.code.x")).toBe("");
 	});
 });

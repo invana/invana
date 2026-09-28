@@ -32,11 +32,6 @@ export {
 export { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer/ExplorerViewPanel";
 export { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer/InspectorViewPanel";
 export { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
-// A board's stored styling in and out of canvas-ui's `StylingViewPanel`.
-export {
-	fromTypeStylingPatch,
-	toTypeStylingPatch,
-} from "@/pages/graphs-detail/features/explorer/stylingPatch";
 // Engine adapters — PixiJS needs concrete values, not classes.
 export { slotForType } from "@/pages/graphs-detail/features/explorer/typeColor";
 export type {

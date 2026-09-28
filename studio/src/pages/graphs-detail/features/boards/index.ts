@@ -47,7 +47,6 @@ export type {
 	BoardVersionCause,
 	CanvasStyling,
 	CaptureCanvasState,
-	NodeTypeStyle,
 } from "@/pages/graphs-detail/features/boards/types";
 
 export { useBoardVersions } from "@/pages/graphs-detail/features/boards/useBoardVersions";

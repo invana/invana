@@ -111,6 +111,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { readCanvasThemeConfig } from "@/canvases/theme";
 import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
+import { labelAt } from "@/pages/graphs-detail/features/explorer/canvasItems";
 import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
 import type { ExpandRequest } from "@/pages/graphs-detail/features/explorer/types";
 import {
@@ -801,6 +802,33 @@ function ThemeBridge() {
 	return null;
 }
 
+/**
+ * Repaints the graph layer when the board's styling changes.
+ *
+ * `<GraphLayer>` reads `node.style` / `edge.style` once, at mount, so a new
+ * resolver set passed as a prop would be ignored until the canvas remounts.
+ * This pushes each new set into the live layer's template instead, which
+ * re-renders every element — an edit in the Styling card paints at once, and
+ * keeps painting after the card closes.
+ */
+function StylingBridge({
+	nodeStyle,
+	edgeStyle,
+}: {
+	nodeStyle: object;
+	edgeStyle: object;
+}) {
+	const canvas = useGraphCanvas();
+	useEffect(() => {
+		const layer = canvas.layers.get<graph.GraphLayer>("graph");
+		if (!layer) return;
+		// Resolvers are not expressible through the setters' flat style type.
+		layer.setNodeDefaults(nodeStyle as Partial<graph.NodeStyle>);
+		layer.setEdgeDefaults(edgeStyle as Partial<graph.EdgeStyle>);
+	}, [canvas, nodeStyle, edgeStyle]);
+	return null;
+}
+
 /** Lifts the clicked element's id up to ExplorerPage to drive the Inspector. */
 function InspectorSelectionBridge({
 	onViewTargetChange,
@@ -854,9 +882,11 @@ export function ExplorerCanvas({
 	styling,
 }: ExplorerCanvasProps) {
 	// Resolver-based node/edge styles derived from the canvas's per-type rules.
-	// Colour always resolves (explicit → palette fallback); size / label-property
-	// and edge colour/width apply only once the user sets them, so an unstyled
-	// canvas is visually unchanged.
+	// Colour always resolves (explicit → palette fallback); size, label and edge
+	// width apply only once the user sets them, so an unstyled canvas is visually
+	// unchanged. Every resolver is always present, returning `undefined` for the
+	// template default: `StylingBridge` merges them into the live layer, so a
+	// resolver left out would keep the previous one.
 	const { nodeStyle, edgeStyle } = useMemo(() => {
 		const nt = styling?.nodeTypes ?? {};
 		const et = styling?.edgeTypes ?? {};
@@ -868,19 +898,12 @@ export function ExplorerCanvas({
 			bgFill: (n: GraphNode) =>
 				typeColorNumber(String(n.type ?? ""), nt[String(n.type ?? "")]?.color),
 			labelText: (n: GraphNode) => {
-				const lp = nt[String(n.type ?? "")]?.labelProperty;
-				if (lp) {
-					const v = (n.data as Record<string, unknown> | undefined)?.[lp];
-					if (v != null && v !== "") return String(v);
-				}
-				return nodeLabelText(n);
+				const key = nt[String(n.type ?? "")]?.labelKey;
+				return (key && labelAt(n, key)) || nodeLabelText(n);
 			},
-			...(hasNodeSize
-				? {
-						size: (n: GraphNode) =>
-							nt[String(n.type ?? "")]?.size ?? DEFAULT_NODE_SIZE,
-					}
-				: {}),
+			size: (n: GraphNode) =>
+				nt[String(n.type ?? "")]?.size ??
+				(hasNodeSize ? DEFAULT_NODE_SIZE : undefined),
 		};
 		// Every relationship type has a colour by default, the same one its row's
 		// dot shows in the Types panel — explicit styling first, palette after.
@@ -889,14 +912,17 @@ export function ExplorerCanvas({
 		const edgeStyle = {
 			strokeColor: edgeColor,
 			arrowTargetColor: edgeColor,
-			...(hasEdgeWidth
-				? {
-						strokeWidth: (e: graph.GraphEdge) =>
-							et[String(e.type ?? "")]?.width ?? DEFAULT_EDGE_WIDTH,
-					}
-				: {}),
+			strokeWidth: (e: graph.GraphEdge) =>
+				et[String(e.type ?? "")]?.width ??
+				(hasEdgeWidth ? DEFAULT_EDGE_WIDTH : undefined),
 		};
-		return { nodeStyle, edgeStyle };
+		// A resolver may return `undefined` for the template default — the layer
+		// skips it at resolve time — though the resolvable types do not say so.
+		return {
+			nodeStyle: nodeStyle as unknown as graph.ResolvableNodeStyle<GraphNode>,
+			edgeStyle:
+				edgeStyle as unknown as graph.ResolvableEdgeStyle<graph.GraphEdge>,
+		};
 	}, [styling]);
 	return (
 		// `key={backend}`: the renderer backend is fixed at `Application.init`, so
@@ -931,6 +957,7 @@ export function ExplorerCanvas({
 			<AutoLayoutBridge data={data} interactionRef={interactionRef} />
 
 			<ThemeBridge />
+			<StylingBridge nodeStyle={nodeStyle} edgeStyle={edgeStyle} />
 
 			{/* Camera + interaction. Enabled state comes from APP_OPTIONS; pan +
 			    node-drag are what the view section's lock disables. */}

@@ -66,6 +66,20 @@ export function resultToItems(result: QueryResponse | null): QueryResultItem[] {
 }
 
 /**
+ * The value a root-relative dot path names on a node — `id`, `type`,
+ * `data.name`, `data.meta.tier` — as label text. Empty when the path reaches
+ * nothing, so the caller falls back to the default label.
+ */
+export function labelAt(node: object, key: string): string {
+	let value: unknown = node;
+	for (const part of key.split(".")) {
+		if (value == null || typeof value !== "object") return "";
+		value = (value as Record<string, unknown>)[part];
+	}
+	return value == null ? "" : String(value);
+}
+
+/**
  * What a failed expansion says. A refusal names what the world lacks, and a
  * queued run says so — neither is "failed" (graph-canvas.md).
  */

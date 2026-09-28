@@ -88,7 +88,7 @@ The visibility workaround is the keystone: it is why the Layers fork exists, so 
 | 1 ✅ | `visibility.ts` → `store.setNodeHidden` / `isNodeHidden` / `hiddenNodes`; drop `HIDDEN_STATE_NAME` and its registration in `ExplorerCanvas`; `ExplorerViewPanel`'s type-row eye loops the store API | 2 | 78 |
 | 2 ✅ | `LayersPanel` → `LayersViewPanel`, wrapped in `Panel` + `PanelContent` | — | 674 |
 | 3 | `ExplorerHeaderToolbar` → `GraphControlsToolbar` with `extraItems` for magnet + backend | — | ~284 |
-| 4 ✅ | `StylingPanel` → `StylingViewPanel` with `apply={false}`, wrapped in `Panel` + `PanelContent`; `labelProperty` ↔ `labelKey` at the panel boundary. `CanvasHistoryPanel` skips this step — it goes straight to `CanvasVersionsViewPanel` on the next canvas release (B4) | — | ~190 |
+| 4 ✅ | `StylingPanel` → `StylingViewPanel` with `apply={false}`, wrapped in `Panel` + `PanelContent`; the stored styling is the kit's patch, `labelKey` included. `CanvasHistoryPanel` skips this step — it goes straight to `CanvasVersionsViewPanel` on the next canvas release (B4) | — | ~190 |
 | 5 | `DataBoardPage`'s `overlay` union → `useSidePanels` | — | ~40 |
 | 6 | `InspectorViewPanel` property rendering → `DetailCard` + `PropertyDetailView`; keep provenance and the `missing` badge | — | ~80 |
 | 7 | `ThemeBridge` + `canvasTheme.ts` → `CanvasThemeSync`, once the engine path is verified equivalent | — | ~91 |

@@ -17,11 +17,11 @@ export interface CanvasSnapshot {
 export type CanvasPositions = Record<string, { x: number; y: number }>;
 
 /** Visual rules for one node type (docs/for-developers/modules/explore/features/graph-canvas.md). All optional — unset uses defaults. */
-export interface NodeTypeStyle {
+interface NodeTypeStyle {
 	/** Hex color, e.g. "#7c3aed". */
 	color?: string;
-	/** Property key to draw as the node's label (falls back to the default). */
-	labelProperty?: string;
+	/** Root-relative dot path to the label — `id` · `type` · `data.name`; unset is the default. */
+	labelKey?: string;
 	/** Node size (px). */
 	size?: number;
 }
