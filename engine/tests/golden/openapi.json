@@ -9963,7 +9963,7 @@
         "type": "object"
       },
       "ResultMetadata": {
-        "description": "Metadata about a query result.\n\nAttributes:\n    node_count: Number of nodes in the result.\n    edge_count: Number of edges in the result.\n    record_count: Number of raw records returned.\n    duration_ms: Query execution duration in milliseconds.\n    query: The executed query text, when the caller records it\n    (docs/for-developers/modules/explore/features/boards.md) \u2014\n        e.g. the traversal a node-expand generated, logged into the session.",
+        "description": "Metadata about a query result.\n\nAttributes:\n    node_count: Number of nodes in the result.\n    edge_count: Number of edges in the result.\n    record_count: Number of raw records returned.\n    duration_ms: Query execution duration in milliseconds.\n    query: The executed query text, when the caller records it \u2014 e.g.\n        the traversal a node-expand generated, logged into the session.",
         "properties": {
           "duration_ms": {
             "default": 0.0,
