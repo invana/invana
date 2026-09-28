@@ -8,5 +8,13 @@ import { defineConfig } from "vitest/config";
  */
 export default defineConfig({
 	resolve: { alias: { "@": path.resolve(__dirname, "src") } },
-	test: { include: ["src/**/*.test.{ts,tsx}"], environment: "node" },
+	test: {
+		include: ["src/**/*.test.{ts,tsx}"],
+		environment: "node",
+		// Measured over all of src, not only the files a test happens to load.
+		coverage: {
+			include: ["src/**/*.{ts,tsx}"],
+			exclude: ["src/**/*.test.{ts,tsx}"],
+		},
+	},
 });

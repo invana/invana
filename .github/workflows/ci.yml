@@ -105,7 +105,7 @@ jobs:
       - name: Run unit & component tests
         run: |
           cd studio
-          pnpm test run --coverage
+          pnpm test --coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
