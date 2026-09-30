@@ -1,6 +1,7 @@
 import { AppVersion } from "@/components/AppVersion";
 import { useAppHeader } from "@/components/header/useAppHeader";
 import { useGraphConnectionQuery } from "@/hooks/queries/useGraphs";
+import { MAIN_SECTION, SIDE_SECTION } from "@/lib/sections";
 import { SettingsPanel } from "@/pages/graphs-detail/features/graph-settings/SettingsPanel";
 import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
 import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
@@ -12,22 +13,10 @@ import { AppLayoutV2 } from "@invana/themes";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 
-// The shell's own section shapes. Re-declared rather than imported because
-// `@invana/themes` does not export them at the top level; they are the same
-// four keys `AppLayoutV2` reads, so a page written against these is written
-// against the shell.
-interface SectionConfig {
+// A page hands the shell content only; the shell owns every region's size, so
+// the left panel, docked settings, the assistant and the inspector all open alike.
+interface SectionSlot {
 	content: ReactNode;
-	defaultSize?: number | string;
-	minSize?: number | string;
-	maxSize?: number | string;
-	collapsible?: boolean;
-}
-
-interface MainSectionConfig {
-	content: ReactNode;
-	defaultSize?: number | string;
-	minSize?: number | string;
 }
 
 interface GraphDetailProps {
@@ -39,12 +28,12 @@ interface GraphDetailProps {
 	/** Page-side left panel. Shown only while a page-owned `?settings` key is
 	 *  open; a settings section docks the SettingsPanel here instead, and
 	 *  nothing open means no left column. */
-	leftSection?: SectionConfig;
+	leftSection?: SectionSlot;
 	/** Main content. Replaced by SettingsPanel when settings is expanded. */
-	mainSection: MainSectionConfig;
+	mainSection: SectionSlot;
 	/** Right auxiliary panel (e.g. Inspector / DetailPanel). Hidden when
 	 *  settings is expanded so the panel owns the full content width. */
-	rightSection?: SectionConfig;
+	rightSection?: SectionSlot;
 	/** Slot inside ConnectionStatusBar (left of footer) for page-specific
 	 *  counters — "0 nodes · 0 relationships · 0 queries", etc. */
 	statusMetrics?: ReactNode;
@@ -171,44 +160,37 @@ export function GraphDetail({
 	const settingsExpanded = settingsOpen && settingsPanel.expanded;
 	const settingsDocked = settingsOpen && !settingsPanel.expanded;
 
-	// Native panel open → render the page's own leftSection. Settings docked →
-	// render SettingsPanel with panel-sized constraints (independent of the
-	// page's own sizing). Settings expanded → drop leftSection so the panel can
-	// own main width. **Nothing open → no left column**: every panel here,
-	// the Explorer's own included, is a `?panel` key, so closing one leaves the
-	// canvas with the rail beside it and nothing docked.
-	const effectiveLeftSection: SectionConfig | undefined = showNative
-		? leftSection
-		: settingsExpanded
-			? undefined
-			: settingsDocked
-				? {
-						defaultSize: "420px",
-						minSize: "320px",
-						maxSize: "640px",
-						collapsible: false,
-						content: (
-							<SettingsPanel
-								username={username as string}
-								graphSlug={graphSlug as string}
-							/>
-						),
-					}
-				: undefined;
+	// Native panel open → the page's own leftSection. Settings docked → the
+	// SettingsPanel. Settings expanded → it takes main and both sides close.
+	// Nothing open → no left column.
+	const leftContent = showNative ? (
+		leftSection?.content
+	) : settingsDocked ? (
+		<SettingsPanel
+			username={username as string}
+			graphSlug={graphSlug as string}
+		/>
+	) : undefined;
+	const effectiveLeftSection = leftContent
+		? { ...SIDE_SECTION, content: leftContent }
+		: undefined;
 
-	const effectiveMainSection: MainSectionConfig = settingsExpanded
-		? {
-				...mainSection,
-				content: (
-					<SettingsPanel
-						username={username as string}
-						graphSlug={graphSlug as string}
-					/>
-				),
-			}
-		: mainSection;
+	const effectiveMainSection = {
+		...MAIN_SECTION,
+		content: settingsExpanded ? (
+			<SettingsPanel
+				username={username as string}
+				graphSlug={graphSlug as string}
+			/>
+		) : (
+			mainSection.content
+		),
+	};
 
-	const effectiveRightSection = settingsExpanded ? undefined : rightSection;
+	const effectiveRightSection =
+		rightSection && !settingsExpanded
+			? { ...SIDE_SECTION, content: rightSection.content }
+			: undefined;
 
 	// The shell owns the layout (DS12). It keeps `mainSection` mounted at a
 	// stable position with each side region as a conditional sibling, so opening

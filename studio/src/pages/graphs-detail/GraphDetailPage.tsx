@@ -2312,28 +2312,11 @@ export function GraphDetailPage() {
 	// stopped competing for the side the moment one param named which of them
 	// holds it; closing it closes the region rather than restoring the other
 	// (the-assistant.md AD11).
-	const rightSections: Record<
-		RightSectionKey,
-		{
-			defaultSize: string;
-			minSize: string;
-			maxSize: string;
-			collapsible: boolean;
-			content: ReactNode;
-		}
-	> = {
+	const rightSections: Record<RightSectionKey, { content: ReactNode }> = {
 		assistant: {
-			defaultSize: "360px",
-			minSize: "300px",
-			maxSize: "560px",
-			collapsible: false,
 			content: assistantContent,
 		},
 		inspector: {
-			defaultSize: "280px",
-			minSize: "240px",
-			maxSize: "360px",
-			collapsible: false,
 			content: (
 				<InspectorPanel
 					selected={selected}
@@ -3118,23 +3101,8 @@ export function GraphDetailPage() {
 					}
 					// One column, one open `?panel` key. With no key open — or one this
 					// page draws nothing for — there is no left column at all.
-					leftSection={
-						leftContent
-							? {
-									// Generous max so long Cypher/Gremlin queries can spread out.
-									// mainSection.minSize below still keeps the canvas usable when
-									// the user drags the divider far right.
-									defaultSize: "300px",
-									minSize: "240px",
-									maxSize: "900px",
-									collapsible: false,
-									content: leftContent,
-								}
-							: undefined
-					}
+					leftSection={leftContent ? { content: leftContent } : undefined}
 					mainSection={{
-						defaultSize: "600px",
-						minSize: "300px",
 						// One host for every kind of page — the strip and the bodies in one
 						// component, so the tabs cannot drift from what they switch
 						// (graph-detail-page.md G4, the-shell.md).

@@ -189,14 +189,24 @@ Old param names stay **readable** so bookmarks survive, and are never written �
 
 ### A region that opens takes its width from `mainSection`
 
+**Every side region has one size, and a page passes content only.** `GraphDetail` is the one
+layout for the graph page. The shell's side regions — the page's `leftSection`, the docked
+SettingsPanel, the Assistant and the Inspector — and a canvas's own side panels (the model and
+task-flow canvases) all read the same bounds from `studio/src/lib/sections.ts`:
+
+| Region | Default | Min | Max |
+|---|---|---|---|
+| `leftSection` · `rightSection` | **280** | 240 | 640 |
+| `mainSection` | the rest | 300 | — |
+
 Every screen is drawn at **1440**, so opening `rightSection` is a subtraction, never a widening:
-`leftNav` 45 + `leftSection` 420 + `mainSection`, and the occupant's own width comes out of
+`leftNav` 45 + `leftSection` 280 + `mainSection`, and the occupant's own width comes out of
 `mainSection` alone.
 
 | `rightSection` | `mainSection` |
 |---|---|
-| absent | **974** |
-| the Assistant, or the Inspector (360) | **613** |
+| absent | **1115** |
+| the Assistant, or the Inspector (280) | **835** |
 
 `leftSection` never gives. It is the panel you are working *from* — a list you are picking in, a
 palette you are dragging from — and a region that narrowed when another opened would move the thing
@@ -205,7 +215,7 @@ the cursor was already on.
 **`mainSection` narrowing is not a smaller drawing of the same screen.** Each part answers for
 itself, and the rules are the same wherever a board is drawn:
 
-| Part | At 613 |
+| Part | Narrowed |
 |---|---|
 | a **canvas** | **pans, never refits.** Scale is the user's and position is the app's: a refit on every panel toggle would move every node. It pans to the **selection**, because what must never end up behind the new edge is what you were working on |
 | a **table** | keeps its key columns and scrolls the rest; it does not drop one silently |

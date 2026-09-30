@@ -27,6 +27,7 @@ import type {
 	ModelGraphData,
 } from "@/canvases/model/types";
 import { useStudioCanvasTheme } from "@/canvases/theme";
+import { SIDE_SECTION } from "@/lib/sections";
 import type { CanvasConfig } from "@invana/canvas";
 import {
 	BackgroundLayer,
@@ -229,7 +230,7 @@ export function GraphModelCanvas({
 					]
 				: []),
 		],
-		{ section: { defaultSize: "380px", maxSize: "520px" } },
+		{ section: SIDE_SECTION },
 	);
 
 	// A drag that is accepted opens the dock on the card, and the card closing

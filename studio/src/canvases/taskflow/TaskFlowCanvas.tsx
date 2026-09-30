@@ -15,6 +15,7 @@ import type {
 	TaskFlowTemplates,
 } from "@/canvases/taskflow/types";
 import { useStudioCanvasTheme } from "@/canvases/theme";
+import { SIDE_SECTION } from "@/lib/sections";
 import type { CanvasConfig } from "@invana/canvas";
 import {
 	BackgroundLayer,
@@ -111,7 +112,7 @@ export function TaskFlowCanvas({
 				),
 			},
 		],
-		{ section: { defaultSize: "380px", maxSize: "520px" } },
+		{ section: SIDE_SECTION },
 	);
 
 	const onReady = useCallback(
