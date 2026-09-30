@@ -36,7 +36,6 @@ import {
 	DragPanBehaviour,
 	GraphCanvas,
 	GraphClipboardProvider,
-	GraphHistoryProvider,
 	GraphLayer,
 	HoverActivateBehaviour,
 	LassoSelectBehaviour,
@@ -1019,11 +1018,9 @@ interface ExplorerHeaderToolbarProps {
 }
 
 /**
- * Board toolbar for the app header. The history section reads the history
- * provider, so item assembly lives in a child mounted *inside* it. ExplorerPage
- * only renders this once the engine (and thus the `'graph'` layer) is live, so
- * the provider + hooks resolve immediately. Clipboard ops (cut/copy/paste) live
- * in the canvas context menus, not here — so no clipboard provider is needed.
+ * Board toolbar for the app header. Undo / redo read `canvas.history`, so no
+ * provider is needed. ExplorerPage only renders this once the engine (and thus
+ * the `'graph'` layer) is live. Clipboard ops live in the canvas context menus.
  *
  * Reused by the Modeller's read-only canvas via `showMagnet={false}` +
  * `showHistory={false}` (no neighbour-hover, nothing to undo on a static view).
@@ -1038,19 +1035,15 @@ export function ExplorerHeaderToolbar({
 	onBackendChange,
 }: ExplorerHeaderToolbarProps) {
 	return (
-		// The provider is always mounted (so `useHistorySection` resolves) even when
-		// the history items are hidden — keeping the hook call unconditional.
-		<GraphHistoryProvider layerId="graph">
-			<HeaderToolbarItems
-				magnet={magnet}
-				onToggleMagnet={onToggleMagnet}
-				showMagnet={showMagnet}
-				showHistory={showHistory}
-				showSelectMode={showSelectMode}
-				backend={backend}
-				onBackendChange={onBackendChange}
-			/>
-		</GraphHistoryProvider>
+		<HeaderToolbarItems
+			magnet={magnet}
+			onToggleMagnet={onToggleMagnet}
+			showMagnet={showMagnet}
+			showHistory={showHistory}
+			showSelectMode={showSelectMode}
+			backend={backend}
+			onBackendChange={onBackendChange}
+		/>
 	);
 }
 
