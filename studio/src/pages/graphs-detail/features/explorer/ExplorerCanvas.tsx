@@ -11,15 +11,6 @@
 // Distinct from the Modeller's `GraphModelCanvas` (`@/canvases/model`), which
 // draws models as frames of types.
 
-import { readCanvasThemeConfig } from "@/canvases/theme";
-import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
-import {
-	type InteractionRef,
-	endInteraction,
-	startChild,
-} from "@/services/telemetry/tracer";
-import type { CanvasStyling } from "@/types/board";
-import type { ExpandRequest } from "@/types/traversal";
 // The root is `<GraphCanvas>`, not `<Board>`: only it provides
 // `GraphCanvasContext`, which every `useGraphCanvas()` below depends on. Up to
 // canvas 0.0.11 `<Board>` provided it too, so this reads like a free swap —
@@ -31,6 +22,7 @@ import {
 	type CanvasProps,
 	ClickSelectBehaviour,
 	ClickViewBehaviour,
+	canUseWebGPU,
 	D3ForceLayout,
 	DragNodeBehaviour,
 	DragPanBehaviour,
@@ -44,8 +36,6 @@ import {
 	PinchZoomBehaviour,
 	TextResolutionLODBehaviour,
 	type UseClipboardResult,
-	WheelZoomBehaviour,
-	canUseWebGPU,
 	useCanvas,
 	useCanvasEvent,
 	useClipboard,
@@ -58,8 +48,10 @@ import {
 	useStyleEditorSection,
 	useViewContext,
 	useViewSection,
+	WheelZoomBehaviour,
 } from "@invana/canvas-react";
 import {
+	applyIconOverrides,
 	GraphBackgroundContextMenu,
 	type GraphBackgroundMenuContext,
 	GraphEdgeContextMenu,
@@ -68,14 +60,13 @@ import {
 	type GraphNodeMenuContext,
 	type ToolbarItem,
 	ToolbarItems,
-	applyIconOverrides,
 } from "@invana/canvas-ui";
+import type * as graph from "@invana/graph";
 import type {
 	GraphCanvas as GraphCanvasEngine,
 	GraphData,
 	GraphNode,
 } from "@invana/graph";
-import type * as graph from "@invana/graph";
 import { D3ForceLayout as D3ForceLayoutEngine } from "@invana/graph-layout-d3-force";
 import { ElkLayout } from "@invana/graph-layout-elkjs";
 import { useTheme } from "@invana/themes";
@@ -117,6 +108,16 @@ import {
 	ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { readCanvasThemeConfig } from "@/canvases/theme";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
+import { labelAt } from "@/pages/graphs-detail/features/explorer/canvasItems";
+import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
+import type { ExpandRequest } from "@/pages/graphs-detail/features/explorer/types";
+import {
+	endInteraction,
+	type InteractionRef,
+	startChild,
+} from "@/services/telemetry/tracer";
 
 /** Schema slice that drives the node-expand submenus (docs/for-developers/modules/explore/features/graph-canvas.md). */
 export interface ExpandMenuSchema {
@@ -153,38 +154,13 @@ const BACKEND_LABEL: Record<CanvasBackend, string> = {
 // comfortably sized.
 const FOCUS_ZOOM = 2;
 
-// TODO(canvas-visibility): remove this whole block once `@invana/canvas` ships a
-// first-class per-element hide API — see docs/for-developers/modules/explore/spec.md.
-// Then revert the <GraphLayer> props to `node={{ style: nodeStyle }}` /
-// `edge={{ style: edgeStyle }}`.
-//
-// A sticky `hidden` state overlay registered on the graph layer so a single
-// element can be shown/hidden non-destructively (the Layers panel toggles it via
-// `store.setNodeState(id, "hidden", …)` / `setEdgeState`). It just drives every
-// alpha to 0 — the element stays in the store (counts unchanged) and reappears
-// when the state clears. Not a canonical state, so focal drivers (hover /
-// selection dimming) never touch it. `HIDDEN_STATE_NAME` is re-exported for the
-// panel so the string stays in one place.
-export const HIDDEN_STATE_NAME = "hidden";
-const HIDDEN_NODE_STATE = {
-	[HIDDEN_STATE_NAME]: { bgAlpha: 0, bgStrokeAlpha: 0, labelAlpha: 0 },
-};
-const HIDDEN_EDGE_STATE = {
-	[HIDDEN_STATE_NAME]: {
-		strokeAlpha: 0,
-		arrowSourceAlpha: 0,
-		arrowTargetAlpha: 0,
-		labelAlpha: 0,
-	},
-};
-
 // Defaults applied only once the user has styled *some* type (so an unstyled
 // canvas keeps the theme defaults untouched).
 const DEFAULT_NODE_SIZE = 16;
 const DEFAULT_EDGE_WIDTH = 1.5;
 
 // Forces for the registered active layout (run on every query repaint by
-// `<AutoLayoutBridge>` and on every node-expand). `animate: false` (GC8): the
+// `<AutoLayoutBridge>` and on every node-expand). `animate: false`: the
 // sim solves off-screen and the graph is drawn once, at its settled positions —
 // no per-tick repaint, and nothing drifts out from under the cursor.
 //
@@ -750,7 +726,7 @@ function AutoLayoutBridge({
 	// the data it lays out, so the layer's placement gate lifts against a flush
 	// that has already happened and no shape is installed — the store and the
 	// minimap hold the graph, the viewport stays empty. `redraw()` is a pure
-	// render pass over the store (same fix as GraphModelCanvas, ME25).
+	// render pass over the store (same fix as GraphModelCanvas).
 	useCanvasEvent("layout:run:end", (e) => {
 		if (e.id !== ACTIVE_LAYOUT_ID || !canvas) return;
 		canvas.layers.get<graph.GraphLayer>("graph")?.redraw();
@@ -825,6 +801,33 @@ function ThemeBridge() {
 	return null;
 }
 
+/**
+ * Repaints the graph layer when the board's styling changes.
+ *
+ * `<GraphLayer>` reads `node.style` / `edge.style` once, at mount, so a new
+ * resolver set passed as a prop would be ignored until the canvas remounts.
+ * This pushes each new set into the live layer's template instead, which
+ * re-renders every element — an edit in the Styling card paints at once, and
+ * keeps painting after the card closes.
+ */
+function StylingBridge({
+	nodeStyle,
+	edgeStyle,
+}: {
+	nodeStyle: object;
+	edgeStyle: object;
+}) {
+	const canvas = useGraphCanvas();
+	useEffect(() => {
+		const layer = canvas.layers.get<graph.GraphLayer>("graph");
+		if (!layer) return;
+		// Resolvers are not expressible through the setters' flat style type.
+		layer.setNodeDefaults(nodeStyle as Partial<graph.NodeStyle>);
+		layer.setEdgeDefaults(edgeStyle as Partial<graph.EdgeStyle>);
+	}, [canvas, nodeStyle, edgeStyle]);
+	return null;
+}
+
 /** Lifts the clicked element's id up to ExplorerPage to drive the Inspector. */
 function InspectorSelectionBridge({
 	onViewTargetChange,
@@ -878,9 +881,11 @@ export function ExplorerCanvas({
 	styling,
 }: ExplorerCanvasProps) {
 	// Resolver-based node/edge styles derived from the canvas's per-type rules.
-	// Colour always resolves (explicit → palette fallback); size / label-property
-	// and edge colour/width apply only once the user sets them, so an unstyled
-	// canvas is visually unchanged.
+	// Colour always resolves (explicit → palette fallback); size, label and edge
+	// width apply only once the user sets them, so an unstyled canvas is visually
+	// unchanged. Every resolver is always present, returning `undefined` for the
+	// template default: `StylingBridge` merges them into the live layer, so a
+	// resolver left out would keep the previous one.
 	const { nodeStyle, edgeStyle } = useMemo(() => {
 		const nt = styling?.nodeTypes ?? {};
 		const et = styling?.edgeTypes ?? {};
@@ -892,19 +897,12 @@ export function ExplorerCanvas({
 			bgFill: (n: GraphNode) =>
 				typeColorNumber(String(n.type ?? ""), nt[String(n.type ?? "")]?.color),
 			labelText: (n: GraphNode) => {
-				const lp = nt[String(n.type ?? "")]?.labelProperty;
-				if (lp) {
-					const v = (n.data as Record<string, unknown> | undefined)?.[lp];
-					if (v != null && v !== "") return String(v);
-				}
-				return nodeLabelText(n);
+				const key = nt[String(n.type ?? "")]?.labelKey;
+				return (key && labelAt(n, key)) || nodeLabelText(n);
 			},
-			...(hasNodeSize
-				? {
-						size: (n: GraphNode) =>
-							nt[String(n.type ?? "")]?.size ?? DEFAULT_NODE_SIZE,
-					}
-				: {}),
+			size: (n: GraphNode) =>
+				nt[String(n.type ?? "")]?.size ??
+				(hasNodeSize ? DEFAULT_NODE_SIZE : undefined),
 		};
 		// Every relationship type has a colour by default, the same one its row's
 		// dot shows in the Types panel — explicit styling first, palette after.
@@ -913,14 +911,17 @@ export function ExplorerCanvas({
 		const edgeStyle = {
 			strokeColor: edgeColor,
 			arrowTargetColor: edgeColor,
-			...(hasEdgeWidth
-				? {
-						strokeWidth: (e: graph.GraphEdge) =>
-							et[String(e.type ?? "")]?.width ?? DEFAULT_EDGE_WIDTH,
-					}
-				: {}),
+			strokeWidth: (e: graph.GraphEdge) =>
+				et[String(e.type ?? "")]?.width ??
+				(hasEdgeWidth ? DEFAULT_EDGE_WIDTH : undefined),
 		};
-		return { nodeStyle, edgeStyle };
+		// A resolver may return `undefined` for the template default — the layer
+		// skips it at resolve time — though the resolvable types do not say so.
+		return {
+			nodeStyle: nodeStyle as unknown as graph.ResolvableNodeStyle<GraphNode>,
+			edgeStyle:
+				edgeStyle as unknown as graph.ResolvableEdgeStyle<graph.GraphEdge>,
+		};
 	}, [styling]);
 	return (
 		// `key={backend}`: the renderer backend is fixed at `Application.init`, so
@@ -940,8 +941,8 @@ export function ExplorerCanvas({
 			<GraphLayer
 				id="graph"
 				data={data}
-				node={{ style: nodeStyle, state: HIDDEN_NODE_STATE }}
-				edge={{ style: edgeStyle, state: HIDDEN_EDGE_STATE }}
+				node={{ style: nodeStyle }}
+				edge={{ style: edgeStyle }}
 			/>
 
 			{/* Registers the active layout under ACTIVE_LAYOUT_ID (config-first:
@@ -955,6 +956,7 @@ export function ExplorerCanvas({
 			<AutoLayoutBridge data={data} interactionRef={interactionRef} />
 
 			<ThemeBridge />
+			<StylingBridge nodeStyle={nodeStyle} edgeStyle={edgeStyle} />
 
 			{/* Camera + interaction. Enabled state comes from APP_OPTIONS; pan +
 			    node-drag are what the view section's lock disables. */}
@@ -976,7 +978,7 @@ export function ExplorerCanvas({
 			<LassoSelectBehaviour id="lasso-select" targetLayerId="graph" />
 
 			{/* Click-to-view — no `panel`; the bridge feeds the right-side
-			    InspectorPanel instead of a floating viewer. */}
+			    InspectorViewPanel instead of a floating viewer. */}
 			<ClickViewBehaviour id="click-view" targetLayerId="graph" />
 
 			<TextResolutionLODBehaviour id="label-lod" targetLayerId="graph" />

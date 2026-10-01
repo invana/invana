@@ -1,23 +1,14 @@
 /**
  * Soul — who the agent is and how it speaks (5.8): four voice dials beside the
  * Markdown, and a preview that answers one ask in the current voice and in the
- * draft (SO7 · SO8).
+ * draft.
  *
- * The dials and the soul reach only the steps a person reads (SO2), so nothing
+ * The dials and the soul reach only the steps a person reads, so nothing
  * here can change what the agent may do. An empty soul is Invana's default
- * voice, never no voice (SO3) — the editor shows it as its placeholder and the
+ * voice, never no voice — the editor shows it as its placeholder and the
  * tab says so.
  */
 
-import { useSoulPreviewMutation } from "@/hooks/queries/useWork";
-import { formatRelativeTime } from "@/lib/time";
-import {
-	type AgentDraft,
-	DEFAULT_VOICE,
-	DIALS,
-} from "@/pages/graphs-detail/features/agents/agentDraft";
-import type { Agent, SoulTraits } from "@/types/work";
-import { PanelSection } from "@/ui/PanelSection";
 import { MarkdownEditorBlock } from "@invana/editor";
 import { Input } from "@invana/forms";
 import {
@@ -27,9 +18,21 @@ import {
 	SegmentedControl,
 } from "@invana/ui";
 import { useState } from "react";
+import { formatRelativeTime } from "@/lib/time";
+import {
+	type AgentDraft,
+	DEFAULT_VOICE,
+	DIALS,
+} from "@/pages/graphs-detail/features/agents/agentDraft";
+import { useSoulPreviewMutation } from "@/pages/graphs-detail/features/agents/queries";
+import type {
+	Agent,
+	SoulTraits,
+} from "@/pages/graphs-detail/features/agents/types";
+import { PanelSection } from "@/ui/PanelSection";
 
 /** Two columns at 760px of page, one below — a container query, not the viewport. */
-export const TWO_COLUMNS =
+const TWO_COLUMNS =
 	"grid items-start gap-2.5 @min-[760px]:grid-cols-[340px_minmax(0,1fr)]";
 
 /** A question most agents get — the author changes it to one this agent gets. */

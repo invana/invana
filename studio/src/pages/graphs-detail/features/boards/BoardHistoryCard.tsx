@@ -1,29 +1,29 @@
 /**
  * The history card — one shell and one row shape, two bindings
- * ([B21](../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
  * A drawn board's versions and a declared board's reports are the same
  * reading — *what was kept of this board, newest first* — and they are
  * addressed differently: `boardVersions` by `board_id`, `boardReports` by a
  * `(kind, subject_id)` pair, because a live dashboard has no row until the
- * first report creates one ([B18](../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * first report creates one ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  * So the fetch and the act belong to the binding and everything a reader sees
  * belongs here.
  *
  * The row's act differs too, and deliberately: a canvas' version **forks**
  * into a new board, because the one you are standing on is what you would
  * otherwise overwrite; a report **opens**, because the live dashboard is
- * always there and there is nothing to fork into ([B22](../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * always there and there is nothing to fork into ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 
-import { formatRelativeTime } from "@/lib/time";
-import type { BoardVersionSummary } from "@/types/board";
 import { Button, ScrollArea } from "@invana/ui";
 import { History, X } from "lucide-react";
 import type { ReactNode } from "react";
+import { formatRelativeTime } from "@/lib/time";
+import type { BoardVersionSummary } from "@/pages/graphs-detail/features/boards/types";
 
 /** What the row's one button does — the half that is not shared. */
-export interface BoardHistoryAction {
+interface BoardHistoryAction {
 	label: string;
 	onClick: () => void;
 	disabled?: boolean;
@@ -39,7 +39,7 @@ export interface BoardHistoryCardProps {
 	empty: string;
 	/**
 	 * Above the list. A canvas puts `Save current state` here; a dashboard puts
-	 * nothing, because `Save report` is on its own header (B21).
+	 * nothing, because `Save report` is on its own header.
 	 */
 	toolbar?: ReactNode;
 	/** A row's thumbnail, for the binding that has one. */

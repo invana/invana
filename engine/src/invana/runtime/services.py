@@ -44,7 +44,7 @@ from invana.apps.work.models import Task
 from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.core.settings import settings
 from invana.runtime.catalogue.records import LoadRefused
 from invana.runtime.models import RunRole, RunStatus, TaskRun, TriggeredBy
@@ -490,7 +490,6 @@ async def open_todo_run(
         actor_id=agent.id,
         on_behalf_of_user_id=on_behalf_of_user_id,
         details={"actor_name": agent.name, "parent_run_id": parent_run_id},
-        trace_id=current_trace_id(),
     )
     await db.flush()
     return th
@@ -562,7 +561,6 @@ async def open_draft_run(
         run_id=th.id,
         actor_id=actor_id,
         details={"role": RunRole.plan.value, "skill": skill_name, "skill_version_id": version.id},
-        trace_id=current_trace_id(),
     )
     await db.flush()
     return th

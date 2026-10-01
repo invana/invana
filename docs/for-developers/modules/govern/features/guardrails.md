@@ -41,7 +41,7 @@ sequenceDiagram
     participant E as Engine
     participant W as Existing worlds
 
-    Ad->>S: ?panel=govern&drawer=guardrails
+    Ad->>S: ?panel=govern&section=guardrails
     S-->>Ad: the rules in force, Graph-wide
     Ad->>S: add "third_party/** deny"
     Ad->>S: add "Deal.revenue excluded"

@@ -2,7 +2,7 @@
  * Verification for the model-board pass — **not a repo test**. Untracked.
  * Proves ME25 · ME26 against the running stack and this dev Graph.
  */
-import { type Page, expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const GRAPH = "/u/admin/airways";
 

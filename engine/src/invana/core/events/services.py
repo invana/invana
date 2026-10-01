@@ -1,47 +1,16 @@
-"""Service layer for emitting domain audit events (docs/for-developers/modules/operate/features/audit-and-activity.md).
+"""Service layer for emitting domain audit events.
 
 The single entry point for any service-layer function that wants to record
 an event. Inserts into the same SQLAlchemy session as the state change so
 they commit (or roll back) atomically.
 
-Sensitive fields are stripped from any ``details`` dict before storage —
-callers can pass an unfiltered payload and the helper takes care of redaction.
+Sensitive fields are stripped from any ``details`` dict before storage by the
+write path (``invana.core.redaction``) — callers can pass an unfiltered payload.
 """
 
 from __future__ import annotations
 
 from typing import Any
-
-# ── Sensitive-field redaction ────────────────────────────────────────────────
-#
-# Defence in depth — call sites shouldn't pass these in the first place, but
-# strip them anyway so a fresh emit_event call site can't accidentally leak.
-# Match is suffix-based so "api_key", "password_hash", "auth_encrypted",
-# "old_api_key", etc. are all caught.
-
-_REDACT_SUFFIXES: tuple[str, ...] = (
-    "_hash",
-    "_encrypted",
-    "password",
-    "api_key",
-    "secret",
-    "token",
-)
-
-
-def _is_sensitive(key: str) -> bool:
-    k = key.lower()
-    return any(k == s or k.endswith(s) for s in _REDACT_SUFFIXES)
-
-
-def _redact(value: Any) -> Any:
-    """Recursively drop sensitive keys from dicts; pass other shapes through."""
-    if isinstance(value, dict):
-        return {k: _redact(v) for k, v in value.items() if not _is_sensitive(k)}
-    if isinstance(value, list):
-        return [_redact(item) for item in value]
-    return value
-
 
 # ── emit_event ───────────────────────────────────────────────────────────────
 
@@ -94,24 +63,3 @@ def diff_changed_fields(
         if b != a:
             out[f] = {"before": b, "after": a}
     return out
-
-
-# ── OTel trace_id resolver ───────────────────────────────────────────────────
-
-
-def current_trace_id() -> str | None:
-    """Pull the OTel trace_id (hex) off the active span if telemetry is up.
-
-    Returns None when telemetry isn't initialised or there's no active span.
-    Safe to call from any service — never raises.
-    """
-    try:
-        from opentelemetry import trace
-
-        span = trace.get_current_span()
-        ctx = span.get_span_context()
-        if not ctx or not ctx.is_valid:
-            return None
-        return f"{ctx.trace_id:032x}"
-    except Exception:
-        return None

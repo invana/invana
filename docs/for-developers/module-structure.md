@@ -157,6 +157,8 @@ The Studio and engine trees, file by file, are [§12](#12-target-code-structure)
 
 ### Folder moves
 
+**Status: done.** Every row below is moved; `features/` holds `agents · assistant · boards · events · explorer · graphs · lenses · llms · models · plans · projections · projects · rules · runs · setup · skills`.
+
 | Today | Target | Files | Action |
 |---|---|---|---|
 | `connect-and-model/` | `models/` | 40 | rename |
@@ -171,6 +173,8 @@ The Studio and engine trees, file by file, are [§12](#12-target-code-structure)
 | `bring-data-in/ImportsPanel.tsx` (`ImportsJournalBody`) | `operate/RunsList.tsx` (`RunsList`) → `runs/` in R2 | 1 | **done** |
 
 ### Files in the wrong folder
+
+**Status: done.** Money is `lib/format`: `usd` for what was spent and `usdWhole` for a budget or a cap ([SR40](modules/operate/features/see-what-ran.md#decisions)). `WorkCanvas.tsx` is split: `projects/PlanCanvas.tsx`, `agents/EnvelopeCanvas.tsx`, `agents/LineageCanvas.tsx`.
 
 Evidence is the import graph: each file below is imported only from the folder it moves to.
 
@@ -194,11 +198,17 @@ A Studio component the kit already ships is deleted against the kit import, not 
 ([code-shape.md](building-studio/code-shape.md) §2.2). These go first (phase K), so R3 never renames
 a file that is about to be deleted.
 
+**Status: open.** This table is the plan of record for phase K; where canvas-ui-coverage.md or
+refactor-plan.md say otherwise, this table wins. Styling and Layers are done.
+`ListRow`, `ListPanelChrome` · `ListFilterMenu` and the Inspector wait for kit work, which lands after
+the open design-kit and canvas branches merge. No e2e spec covers any of these surfaces, so each swap
+lands a small spec first and runs it before and after.
+
 | Studio today | Kit | Verdict |
 |---|---|---|
-| `explorer/LayersPanel.tsx` | canvas-ui `LayersViewPanel` (0.0.14) | **Replace.** A fork of the kit panel. First move `visibility.ts` onto the store's hide API (`setNodeHidden`), because `ExplorerTypesPanel` shares that hidden state |
-| `explorer/StylingPanel.tsx` | canvas-ui `StylingViewPanel` (0.0.14) | **Replace.** Map `CanvasStyling.labelProperty` → the kit's `labelKey` dot path (`name` → `data.name`) in `types/board.ts`; drop Studio's own painting in `ExplorerCanvas` |
-| `explorer/InspectorPanel.tsx` | canvas-ui `ElementInspectorViewPanel` | **Replace after extending the kit**: add `isMissing(id)` and `propertyFilter` props. Studio keeps a short `InspectorViewPanel` host that passes `renderExtra={ProvenanceBlock}` |
+| `explorer/LayersPanel.tsx` | canvas-ui `LayersViewPanel` (0.0.14) | **Done.** `DataBoardPage` mounts `LayersViewPanel` in `Panel` + `PanelContent`. Hidden is the store's flag (`setNodesHidden` · `hiddenNodes`), which `ExplorerViewPanel`'s type eyes set too, so Layers and the eyes read one state |
+| `explorer/StylingPanel.tsx` | canvas-ui `StylingViewPanel` (0.0.14) | **Done**, with `apply={false}`. The kit panel paints only while it is mounted, so Studio keeps painting a board's styling in `ExplorerCanvas` and the card only edits it. The stored styling *is* the kit's patch — a label is the `labelKey` dot path (`id` · `type` · `data.name`) — so it is handed to the panel as it stands. `ExplorerCanvas` pushes each new styling into the live layer (`<GraphLayer>` reads its styles only at mount), so an edit paints at once. An unstyled row's swatch shows canvas-ui's hashed colour, not the painted slot, until `typeColor` is promoted ([canvas-ui-coverage.md](building-studio/canvas-ui-coverage.md) CU6) |
+| `explorer/InspectorViewPanel.tsx` | canvas-ui `ElementInspectorViewPanel` | **Replace after extending the kit**: add `isMissing(id)` and `propertyFilter` props. Studio keeps a short `InspectorViewPanel` host that passes `renderExtra={ProvenanceBlock}` |
 | `explorer/ExpandFineTunePanel.tsx` | none — the kit panels filter what is drawn; this fetches neighbours from the engine | **Keep**, as `ExpandNeighboursDialog`. Its form moves to canvas-ui only when `GraphExpandEditorPanel` (B9) is built |
 | `shared/ListPanel.tsx` → `ListRow` | `@invana/ui` `Item size="xs"` | **Replace** (hover-only actions via an `ItemActions` option) |
 | `shared/ListPanel.tsx` → `ListPanelChrome` · `ListFilterMenu` | `PanelContent` | **Replace after extending the kit**: a searchable header and a header dropdown action on `PanelContent` |
@@ -208,14 +218,18 @@ before Studio uses it.
 
 ### Unused code
 
+**Status: done.** `PropertyKeyFormDialog.tsx` was deleted with them — its only importer was `PropertyKeyTable`. `SkillsSection.tsx` went with the three skill mutations only it called (`useCreatePublishedSkillMutation` · `useUpdateSkillMutation` · `useDeleteSkillMutation`).
+
 | File | Evidence | Action |
 |---|---|---|
 | `shell/useTasksPanel.ts` | zero importers; the Tasks stack is retired (G31 · G41) | delete |
-| `skills/SkillsSection.tsx` | unreachable — `skills` is in `PAGE_OWNED_SECTIONS` | delete |
+| `skills/SkillsSection.tsx` | reached only through a gap — `skills` was page-owned but not native, so an expanded Settings drew it in `mainSection` beside the Skills panel; `skills` is now in both lists (G19) | delete |
 | `connect-and-model/CompatibilityBanner.tsx` | zero importers | delete |
 | `model/components/DetailPanel.tsx` + `ModelOverview`, `NoSelectionPlaceholder`, `PropertyKeyTable` | no importers; the three are `@deprecated` and used only by `DetailPanel` | delete |
 
 ## 5. Component names — one meaning per suffix
+
+**Status: done** for every file and component row below, and for the shell hooks and shared builders. Still open: `ListPanel` (replaced by the kit in phase K). The URL key is `?section=` (`?drawer=` read as an alias for one release, [G35](building-studio/graph-detail-page.md)); its value types are `ProjectsSectionKey` · `LibrarySectionKey` · `GovernSectionKey` · `AgentsSectionKey`, and *drawer* is gone from Studio's identifiers and comments — it survives only in two lines of UI copy, which this refactor does not change (§11).
 
 The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `PanelStack` and its
 `PanelStackSection`s; canvas-ui names every region occupant `*ViewPanel` (`LayersViewPanel`,
@@ -231,7 +245,7 @@ The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `Pane
 | `XList` | the rows of a list section | `RunsList` (done) |
 | `XDetail` | a drill-in that replaces a section's body | `RunDetailDrawer` → `RunDetail` |
 | `XBoardPage` | anything in `mainSection` | `PlanDashboardPage` · `RunDashboardPage` · `RuleDashboardPage` · `UsageDashboardPage` → `*BoardPage` · `RunsJournalPage` → `RunsBoardPage` · `ComparePage` → `CompareBoardPage` |
-| `XCard` | floats over the canvas | `DeclareStitchPanel` → `DeclareStitchCard`. `LayersPanel` and `StylingPanel` are replaced by the kit in phase K; `ExpandFineTunePanel` → `ExpandNeighboursDialog` |
+| `XCard` | floats over the canvas | `DeclareStitchPanel` → `DeclareStitchCard`. `LayersPanel` and `StylingPanel` are the kit's `LayersViewPanel` and `StylingViewPanel`; `ExpandFineTunePanel` → `ExpandNeighboursDialog` |
 | `XWidget` | one tile on a board | `TaskFlowPanel` · `SkillFlowPanel` · `RunLensPanel` · `StepTouchPanel` · `BoardHistoryPanel` → `*Widget`; `shared/dashboardPanels.ts` → `dashboardWidgets.ts` |
 | `XTab` | a tab body, settings or detail | `EventsSection` → `EventsTab` · `GraphSettingsSection` → `GraphTab` · `GraphInfoPanel` → `InfoTab` |
 | `xRows.ts` | row builders, not components | `databaseTab` · `growthTab` · `performanceTab` · `usageTab` → `*Rows` |
@@ -244,21 +258,22 @@ never share a spelling.
 
 ## 5b. Comments
 
-Every file a phase touches leaves with its comments trimmed. Today about 23% of the engine's
-non-blank lines and 16% of Studio's are comments, many of them multi-paragraph essays that restate a
-feature file.
+Every file a phase touches leaves its model and column comments trimmed. Module, class and method
+docstrings stay full — they are how a reader learns to use the code.
 
 | Rule | Detail |
 |---|---|
-| One or two lines | Say what is not obvious from the code — a constraint, a trap, a reason. Never what the next line does |
-| Cite, don't restate | The reasoning lives in `docs/for-developers/`; a comment points at it by decision id — `# Refused before the wire (GV3).` |
+| Inline comments | Say what is not obvious from the code — a constraint, a trap, a reason. Never what the next line does |
+| Standalone | Code documentation reads without the docs: never cite a decision id (`GV3`, `TE14`) in code or tests. A doc link names the file. In Studio, `scripts/check-names.mjs` fails a comment that cites one |
 | Models and columns | A column gets a comment only when its name cannot carry its meaning — a unit, an enum's source, a nullable's meaning |
-| Querysets and managers | The class gets one line on what it owns; a method gets one only when its contract is not in its name and signature |
-| Components | One line above the export if the name is not enough. No header essays |
+| Classes and methods | A docstring on usage and design — what it is for, how to call it, what it guarantees |
+| Components | A docblock on usage when the name and props are not enough |
 | No history | Never "used to be", "was renamed from", "no longer". Git holds history |
-| Module docstring | One line naming the module and its feature file, or nothing |
+| Module docstring | What the module does and how it is used; a design note and what it emits when that helps — `core/telemetry/middleware.py` is the model |
 
 ## 6. Retired words still in Studio
+
+**Status: file and component names done** — `TodoActivityTree`, `TodoRunsBlock`, `LayeredCanvas*`, `RecordRow`, `PlanTrendWidget`, `taskFlowFromTaskPlan`, `SkillPlaybookEditor`, `AgentEffortTab`, `useLeftSection` · `LeftNavKey`. The type, hook and API names are done too — `Todo*` · `todosApi` · `useTodosQuery` · `useTodoRunsQuery`, `TaskRun` · `RunStreamHandle` · `RunState` · `LIVE_RUN_STATUSES`, `useTaskPlansQuery` · `taskPlansApi`, `SkillPlaybook*`, `navItem`. **Journal:** the journal hook is `useRunListQuery` and its row `RunListRow`; `useRunsQuery` keeps its name, because it is a different read — the raw list with server-side filters, where the journal shapes and filters rows client-side — and both live in `runs/queries.ts`. Only a *Todo* retires *Task*: `TaskFlowCanvas`, `TaskGroup`, `TaskPlan*` and `TaskRun` name the runtime step and keep it. UI copy keeps its words (§11) — the Todos section still labels its runs *Thoughts*.
 
 | Word | Where | Becomes |
 |---|---|---|
@@ -456,8 +471,13 @@ ontology — are removed, not rewritten.
 
 ## 8b. Keeping the names
 
-A check in CI, so the structure cannot drift again. `scripts/check-names` (Python, no dependencies,
-runs on every OS), added in R2 and tightened as each phase lands.
+A check in CI, so the structure cannot drift again, tightened as each phase lands. **Studio's half is
+`studio/scripts/check-names.mjs`** (Node, reads identifiers with the TypeScript parser Studio already
+ships, in `pnpm lint`): the module map, the suffixes and the retired words in identifiers. Its module
+map spells each engine folder as it is today — `assistant` → `sessions`, `lenses` → `govern`, `llms` →
+`llm_providers`, `models` → `modeller`, `plans` → `task_plans`, `projects` → `work`, `runs` and
+`projections` → `runtime` — so R5 is a one-line change per module there. The docs and engine rows below
+are `scripts/check-names` (Python, no dependencies, runs on every OS), not yet written.
 
 | Fails when | Scope |
 |---|---|
@@ -639,6 +659,8 @@ engine/src/invana/
 
 ### 12.1 Studio
 
+**Status: R6 done.** Every module owns its `api.ts` · `queries.ts` · `types.ts`; what is left in `services/api/`, `hooks/queries/` and `types/` is app-wide — the client, `auth`, `health` (the header's version), `useAppVersion`, `useGitHubStars`, `types/query`. Two differences from the tree below: `health.ts` stays in `services/api/` because the app header reads it, not a Graph; and `boards/` keeps three API files — `api.ts` · `versionsApi.ts` · `reportsApi.ts` — because each has its own private `base` and summary mapper.
+
 ```text
 studio/src/
 ├── App.tsx  main.tsx  router.tsx  index.css
@@ -702,9 +724,9 @@ studio/src/
             ├── explorer/
             │   ├── index.ts  api.ts  queries.ts  types.ts   ← explorer.ts · useTypeCounts.ts · traversal.ts
             │   ├── ExplorerCanvas.tsx  ExplorerViewPanel.tsx  InspectorViewPanel.tsx   ← InspectorPanel · ExplorerTypesPanel
-            │   ├── ExpandNeighboursDialog.tsx   ← ExpandFineTunePanel · (LayersPanel, StylingPanel → canvas-ui in K)
+            │   ├── ExpandNeighboursDialog.tsx   ← ExpandFineTunePanel · (LayersPanel, StylingPanel → canvas-ui)
             │   ├── ProvenanceBlock.tsx      ← bring-data-in/
-            │   └── typeColor.ts  visibility.ts  useExpandNode.ts
+            │   └── typeColor.ts  stylingPatch.ts  useExpandNode.ts
             ├── lenses/                      ← govern/
             │   ├── index.ts  api.ts  queries.ts  types.ts   ← govern.ts · useGovern.ts · types/govern.ts
             │   ├── LensesViewPanel.tsx          ← GovernStackPanel.tsx

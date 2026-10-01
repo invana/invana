@@ -91,12 +91,12 @@
 [data-theme="default-dark"],
 .theme-default-dark {
 	--color-accent: rgb(255 255 255 / 0.06);
-	--color-accent-foreground: hsl(0 0% 85%);
+	--color-accent-foreground: var(--color-foreground);
 }
 [data-theme="default-light"],
 .theme-default-light {
 	--color-accent: rgb(0 0 0 / 0.05);
-	--color-accent-foreground: hsl(210 10% 20%);
+	--color-accent-foreground: var(--color-foreground);
 }
 
 /* @invana/themes' ThemeSelector renders its Light/Dark/System mode toggle with a
@@ -116,8 +116,9 @@
 
 /* No `font-size` here: body inherits the root, which is the only dial (D7). */
 body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu",
-		"Droid Sans", sans-serif;
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Droid Sans",
+		sans-serif;
 }
 
 /* Allow the @invana/themes AppLayoutV1 <main className="w-full"> flex item

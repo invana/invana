@@ -140,5 +140,4 @@ WS /ws/query-stream
 ## What's Next?
 
 - [Connectors](connectors.md) — How database adapters work
-- [Running Queries](../guides/running-queries.md) — Step-by-step guide
 - [Studio: Query Workspace](../studio/query-workspace.md) — Visual query editor

@@ -33,7 +33,7 @@ from invana.apps.work.models import Task, TaskStatus
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.runtime.delegation import depth_of
 from invana.runtime.models import RunStatus, TaskRun
 from invana.runtime.querysets import TaskRunQuerySet
@@ -177,7 +177,6 @@ class AgentLifecycleManager:
             graph_id=graph_id,
             actor_id=actor.id,
             details={"name": name},
-            trace_id=current_trace_id(),
         )
 
     async def retire_ephemeral_for_task(self, session: AsyncSession, *, task_id: str, graph_id: str) -> None:

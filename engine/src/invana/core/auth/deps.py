@@ -27,7 +27,8 @@ from invana.core.auth.tokens import (
 from invana.core.db import get_session
 from invana.core.events import actions as event_actions
 from invana.core.events.models import ActorType
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
+from invana.core.telemetry.spans import set_current
 
 _bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -82,6 +83,7 @@ async def get_current_user(
             raise _unauthorized("Personal access tokens are accepted in the Authorization header only.")
         user = await _user_from_personal_access_token(request, session, raw_token=raw_token)
         request.state.current_user = user
+        _record_caller(user, origin="api")
         return user
 
     try:
@@ -100,7 +102,18 @@ async def get_current_user(
         raise _forbidden("User is disabled.")
 
     request.state.current_user = user
+    _record_caller(user, origin="studio")
     return user
+
+
+def _record_caller(user: User, *, origin: str) -> None:
+    """Say on the request's span who is calling, and from where.
+
+    The credential decides the origin: a session token is what Studio holds, and
+    a personal access token is what a script or integration holds. Only ids are
+    recorded — never a name or an email.
+    """
+    set_current(**{"enduser.id": user.id, "invana.principal": "user", "invana.origin": origin})
 
 
 async def _user_from_personal_access_token(request: Request, session: AsyncSession, *, raw_token: str) -> User:
@@ -118,7 +131,6 @@ async def _user_from_personal_access_token(request: Request, session: AsyncSessi
             target_kind=event_actions.TARGET_TOKEN,
             actor_type=ActorType.anonymous,
             details={"reason": refusal.reason},
-            trace_id=current_trace_id(),
         )
         await session.commit()
         raise _unauthorized(refusal.detail) from refusal

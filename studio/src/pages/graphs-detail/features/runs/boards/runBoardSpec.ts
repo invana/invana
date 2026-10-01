@@ -1,0 +1,664 @@
+import { usd } from "@/lib/format";
+
+/**
+ * The run dashboard, composed — artboard ([34k](../../../../../../docs/for-developers/the-screens.md)).
+ *
+ * A pure function of one `GET …/runs/{id}/trace` ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
+ * tiles · the flow with status on it · the Gantt · what opened the run and
+ * `result.json` · the log. Nothing here fetches, nothing here renders — the
+ * page does the first and `@invana/dashboard` does the second, and this file is
+ * the whole of what the two have to agree on.
+ *
+ * Bands with nothing behind them are **absent, not empty**
+ * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
+ * a run whose model has no published rate draws no Cost tile, and a run with no
+ * agent draws its spend with no meter — because a spend without its ceiling is
+ * a number nobody can act on ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md) ·
+ * [see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+ */
+
+import type {
+	DashboardSpec,
+	LogOptions,
+	PanelSpec,
+	RunPanelOptions,
+	TabSpec,
+} from "@invana/dashboard";
+import type { TaskGanttSegment, TaskGanttTask } from "@invana/ui";
+import { formatDuration } from "@/lib/time";
+import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
+import {
+	layersOptions,
+	lensSummary,
+	runLensOptions,
+} from "@/pages/graphs-detail/features/lenses";
+import type {
+	TraceRead,
+	TraceStepRead,
+} from "@/pages/graphs-detail/features/runs/api";
+import {
+	compact,
+	count,
+	durationMs,
+	ganttStatusOf,
+	groupSteps,
+	isLive,
+	meterOf,
+	offsetOf,
+	omit,
+	originOf,
+	runAddress,
+	runTitle,
+	specPanel,
+	statusChip,
+	type TaskGroup,
+	tileToneOf,
+	toneOf,
+	VIEW_ACTION,
+	VIEW_DASHBOARD,
+	VIEW_SPEC,
+} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
+import { taskFlowFromRun } from "@/pages/graphs-detail/features/runs/boards/taskFlowFromRun";
+import { runSummary } from "@/pages/graphs-detail/features/runs/runSummary";
+import type { WithFlow } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
+import { LAYER_PALETTE } from "@/ui/layerPalette";
+
+/** Action ids the page answers. The spec carries the string; the page carries the behaviour. */
+export const RUN_ACTIONS = {
+	view: VIEW_ACTION,
+	cancel: "cancel",
+	/** A waterfall row — opens that task inside the run, by group key. */
+	selectTask: "select-task",
+	/** A flow card — opens that task inside the run, by step id. */
+	openStep: "open-step",
+	/** A column of the layer strip — opens that task inside the run, by group key. */
+	selectTouchStep: "select-touch-step",
+	/** The tab strip under the header. */
+	tab: "tab",
+	/** *This run's lens* → the Govern panel, without closing the run. */
+	retune: "retune",
+	/** Pick the second run, and open `compare:<a>:<b>` as a page. */
+	compare: "compare",
+	/** The layer strip's `Fit` switch — on fits the panel, off scrolls. */
+	layersFit: "layers-fit",
+} as const;
+
+/** The run page's tabs, in order. */
+const RUN_TABS = ["overview", "layers", "flow", "touched"] as const;
+export type RunTab = (typeof RUN_TABS)[number];
+
+export interface RunBoardView {
+	/** `Dashboard` or `spec.json`. */
+	view: string;
+	/** The active tab. */
+	tab: RunTab;
+	/** The task picked on the waterfall or the strip, by group key. */
+	selectedKey: string | null;
+	/**
+	 * What the run engaged — 's two bands
+	 * ([14.1](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
+	 *
+	 * A **second** read beside the trace, because it is a projection of the
+	 * ledger rather than part of it and a run opened before its Graph had
+	 * a lens has a trace and no touches. Absent, the two bands are **absent** —
+	 * never an empty grid, which would say the run touched nothing.
+	 */
+	touches?: TouchesResponse;
+	/** The world the run froze. Absent reads `Everything`, which is a real one. */
+	lensName?: string | null;
+	/** The layer strip fits the panel's width. Absent reads on. */
+	layersFit?: boolean;
+}
+
+/**
+ * The panel kinds this dashboard draws beyond the built-ins.
+ *
+ * `RunPanelOptions` is the kit's own run vocabulary — `trace · touched ·
+ * attempts · artifacts · layers · lens · clarification` — registered as
+ * `RUN_PANELS`. `flow` is the one Studio still owns: a run's plan on a canvas
+ * is `@invana/canvas`, which a dashboard package does not depend on.
+ *
+ * What stays here is the **composing**: `layers` and `lens` are drawn by the
+ * kit and fed from Govern's ledger, because how a `TouchesResponse` becomes
+ * bands and sections is Studio's knowledge, not the kit's.
+ */
+export type RunPanels = WithFlow & RunPanelOptions;
+
+/** How many cards the flow lays across before it wraps. */
+/** The least the flow is drawn at; the panel grows into the rest of the page. */
+const FLOW_HEIGHT = 360;
+
+export function runBoardSpec(
+	trace: TraceRead,
+	{ view, tab, selectedKey, touches, lensName, layersFit }: RunBoardView,
+): DashboardSpec<RunPanels> {
+	const groups = groupSteps(trace.steps);
+	const live = isLive(trace.status);
+	const selected = groups.find((g) => g.key === selectedKey) ?? null;
+
+	const header: DashboardSpec<RunPanels>["header"] = {
+		tone: toneOf(trace.status),
+		// Addressed, not titled: what was asked is the Overview's first row.
+		crumbs: [runAddress(trace.run_id)],
+		chips: omit([
+			trace.ask_kind ? { label: trace.ask_kind } : null,
+			statusChip(trace.status),
+			trace.outcome && trace.outcome !== trace.status
+				? { label: trace.outcome }
+				: null,
+		]),
+		actions: omit([
+			{
+				id: RUN_ACTIONS.view,
+				options: [VIEW_DASHBOARD, VIEW_SPEC],
+				value: view,
+			},
+			// Comparing needs a run that has finished — two traces, placed side by
+			// side, and a live one has half of one.
+			live
+				? null
+				: {
+						id: RUN_ACTIONS.compare,
+						label: "Compare\u2026",
+						variant: "ghost" as const,
+					},
+			// Narrowing opens Govern beside the run rather than inside a band
+			// — it acts on the next run, not on this reading of this one,
+			// which is why it sits with the page's other acts. Absent when
+			// nothing was recorded: there is no gap to act on.
+			touches
+				? {
+						id: RUN_ACTIONS.retune,
+						label: "Retune\u2026",
+						variant: "ghost" as const,
+					}
+				: null,
+			// Cancel is the one thing this surface writes, and only while
+			// there is something to stop.
+			live
+				? {
+						id: RUN_ACTIONS.cancel,
+						label: "Cancel",
+						variant: "outline" as const,
+					}
+				: null,
+		]),
+	};
+
+	const spec: DashboardSpec<RunPanels> = {
+		title: runTitle(trace),
+		header,
+		rows: [],
+		tab,
+		tabAction: RUN_ACTIONS.tab,
+		tabs: runTabs(
+			trace,
+			groups,
+			selected,
+			selectedKey,
+			touches,
+			lensName,
+			layersFit ?? true,
+		),
+	};
+
+	// `spec.json` renders the document it is inside — the same spec, in one code
+	// panel — which is what makes "a dashboard is data" checkable rather than
+	// claimed ([boards.md](../../../../../../docs/for-developers/modules/explore/features/boards.md)).
+	return view === VIEW_SPEC
+		? { ...spec, tabs: undefined, rows: [{ panels: [specPanel(spec)] }] }
+		: spec;
+}
+
+/**
+ * The four tabs. **Overview** reads the run at a glance — tiles, the
+ * waterfall, what it touched, what opened it and what it returned, its log;
+ * **Layers** is the strip on the run's clock; **Flow** the plan with status on
+ * it; **Touched** every participant the world allowed, and what became of it.
+ */
+function runTabs(
+	trace: TraceRead,
+	groups: TaskGroup[],
+	selected: TaskGroup | null,
+	selectedKey: string | null,
+	touches: TouchesResponse | undefined,
+	lensName: string | null | undefined,
+	layersFit: boolean,
+): TabSpec<RunPanels>[] {
+	const summary = runSummary(trace, touches);
+	return [
+		{
+			id: "overview",
+			label: "Overview",
+			rows: omit([
+				{ panels: [tiles(trace, groups)] },
+				groups.length
+					? { panels: [performance(trace, groups, selectedKey)] }
+					: null,
+				summary.touched.length
+					? {
+							panels: [
+								{
+									kind: "touched" as const,
+									title: "What it touched",
+									aside: summary.refusedCount
+										? `${summary.refusedCount} refused`
+										: undefined,
+									options: { items: summary.touched, palette: LAYER_PALETTE },
+								},
+							],
+						}
+					: null,
+				{ panels: omit([input(trace), resultJson(trace)]) },
+				summary.bounds.length
+					? {
+							panels: [
+								{
+									kind: "properties" as const,
+									title: "Bounds reached",
+									aside: summary.boundsAside ?? undefined,
+									options: { rows: summary.bounds },
+								},
+							],
+						}
+					: null,
+				{ panels: [log(trace, selected)] },
+			]),
+		},
+		{
+			id: "layers",
+			label: "Layers",
+			rows: touches
+				? [{ panels: [layerStrip(touches, trace, selectedKey, layersFit)] }]
+				: [{ panels: [notRecorded("What each step engaged")] }],
+		},
+		{
+			id: "flow",
+			label: "Flow",
+			rows: groups.length
+				? [{ panels: [flow(groups, selected)] }]
+				: [{ panels: [notRecorded("The flow")] }],
+		},
+		{
+			id: "touched",
+			label: "Touched",
+			rows: touches
+				? [
+						{ panels: [lensTiles(touches)] },
+						{ panels: [runLens(touches, lensName)] },
+					]
+				: [{ panels: [notRecorded("What it touched")] }],
+		},
+	];
+}
+
+/** A tab whose record nobody wrote says so, rather than drawing an empty box. */
+function notRecorded(title: string): PanelSpec<RunPanels> {
+	return {
+		kind: "text",
+		title,
+		options: {
+			text: "This run opened before runs of its kind were governed; what it engaged was not recorded.",
+			tone: "muted",
+		},
+	};
+}
+
+/**
+ * the six bands as a gantt — time across, refusals struck in place.
+ *
+ * The trace goes in beside the ledger because a touch has no clock of its own:
+ * its bar is the window of the step it belongs to, and without that the strip
+ * falls back to the ledger's `seq` order rather than inventing timings.
+ */
+function layerStrip(
+	touches: TouchesResponse,
+	trace: TraceRead,
+	selectedKey: string | null,
+	layersFit: boolean,
+): PanelSpec<RunPanels> {
+	const options = {
+		...layersOptions(touches, trace.steps, {
+			selectedItem: selectedKey,
+			selectAction: RUN_ACTIONS.selectTouchStep,
+		}),
+		// On, every step stays in the panel's width as it is resized; off, the
+		// bars keep a measurable width and the strip scrolls.
+		fit: layersFit,
+	};
+
+	return {
+		kind: "layers",
+		title: "What each step engaged",
+		aside: `${touches.total} touch${touches.total === 1 ? "" : "es"}`,
+		actions: [{ id: RUN_ACTIONS.layersFit, label: "Fit", pressed: layersFit }],
+		flush: true,
+		// Not an empty track. *Nothing was recorded* and *nothing was touched*
+		// are different facts, and an empty axis says the second while meaning
+		// the first — so the band says which one it is.
+		// Told apart by the lens, not the count: a governed run with no
+		// touches engaged nothing, and its six bands draw muted.
+		absent: trace.governed
+			? undefined
+			: {
+					reason: "unrecorded" as const,
+					note: "This run opened before runs of its kind were governed; what it engaged was not recorded.",
+				},
+		options,
+	};
+}
+
+/** · the counts the retune rests on — allowed · touched · never · refused. */
+function lensTiles(touches: TouchesResponse): PanelSpec<RunPanels> {
+	return { kind: "metrics", options: { tiles: lensSummary(touches) } };
+}
+
+/**
+ * *This run's lens* — every participant the world allowed, under its layer.
+ *
+ * `Everything` is a real world and the default one, so an unnamed lens says so
+ * on the box rather than leaving a blank, which would read as *not recorded*.
+ * The world is frozen with the plan ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)),
+ * hence *as frozen at open* — never *as set*.
+ */
+function runLens(
+	touches: TouchesResponse,
+	lensName: string | null | undefined,
+): PanelSpec<RunPanels> {
+	return {
+		kind: "lens",
+		title: `This run's lens — ${lensName ?? "Everything"}`,
+		aside: "as frozen at open",
+		options: runLensOptions(touches),
+	};
+}
+
+// ── the bands ───────────────────────────────────────────────────────────────
+
+/** Tiles, bare — no `title`, so the strip sits on the surface rather than in a box. */
+function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
+	const done = groups.filter((g) => g.head.finished_at).length;
+	const total = groups.length;
+	const ms =
+		trace.duration_ms ?? durationMs(originOf(trace), trace.finished_at);
+	const tokens = (trace.tokens_in ?? 0) + (trace.tokens_out ?? 0);
+	const rows = trace.emissions.reduce(
+		(n, e) => n + (e.citation.record_count ?? 0),
+		0,
+	);
+	const retried = groups.filter((g) => g.attempts > 1);
+	const fanned = groups.filter((g) => g.lanes > 1);
+	const live = isLive(trace.status);
+	const ceilings = trace.budget ?? { max_tokens: null, max_cost_usd: null };
+
+	return {
+		kind: "metrics",
+		options: {
+			tiles: omit([
+				total
+					? {
+							label: "Tasks",
+							value: `${done} / ${total}`,
+							caption: live ? trace.status : (trace.outcome ?? trace.status),
+							tone: tileToneOf(trace.status),
+							meter: total ? done / total : undefined,
+						}
+					: null,
+				ms == null
+					? null
+					: {
+							label: live ? "Elapsed" : "Duration",
+							value: formatDuration(ms),
+							caption: live ? "still running" : `${total} tasks`,
+						},
+				// `8.2k of 40k`, with the meter — and a bare `8.2k` when the run
+				// had no agent, because the ceiling is the agent's.
+				tokens
+					? {
+							label: "Tokens",
+							value: ceilings.max_tokens
+								? `${compact(tokens)} of ${compact(ceilings.max_tokens)}`
+								: compact(tokens),
+							caption: `in ${count(trace.tokens_in ?? 0)} · out ${count(trace.tokens_out ?? 0)}`,
+							meter: meterOf(tokens, ceilings.max_tokens),
+						}
+					: null,
+				// Absent when nothing this run ran had a published rate — never
+				// `$0.00`, which would claim the run was free.
+				trace.cost_usd != null
+					? {
+							label: "Cost",
+							value: ceilings.max_cost_usd
+								? `${usd(trace.cost_usd)} of ${usd(ceilings.max_cost_usd)}`
+								: usd(trace.cost_usd),
+							caption: ceilings.max_cost_usd
+								? "against the agent's ceiling"
+								: "no ceiling on this run",
+							meter: meterOf(trace.cost_usd, ceilings.max_cost_usd),
+						}
+					: null,
+				rows
+					? {
+							label: "Rows",
+							value: count(rows),
+							caption: `${trace.emissions.length} emission${trace.emissions.length === 1 ? "" : "s"}`,
+						}
+					: null,
+				retried.length
+					? {
+							label: "Retries",
+							value: String(retried.length),
+							caption: retried[0].taskKey,
+							tone: "warning" as const,
+						}
+					: null,
+				fanned.length
+					? {
+							label: "Lanes",
+							value: String(Math.max(...fanned.map((g) => g.lanes))),
+							caption: fanned[0].taskKey,
+						}
+					: null,
+			]),
+		},
+	};
+}
+
+function flow(
+	groups: TaskGroup[],
+	selected: TaskGroup | null,
+): PanelSpec<RunPanels> {
+	return {
+		// No title, so no box: the flow is the whole tab, edge to edge.
+		kind: "flow",
+		options: {
+			data: taskFlowFromRun(groups),
+			selectedId: selected?.head.id ?? null,
+			openAction: RUN_ACTIONS.openStep,
+			height: FLOW_HEIGHT,
+			bleed: true,
+			message: "Status as it ran — click a task for its step detail",
+		},
+	};
+}
+
+/**
+ * The waterfall's rows — one per task, on the run's clock. Shared by
+ * the Overview and the section, so the two draw one chart.
+ */
+export function waterfallTasks(groups: TaskGroup[]): TaskGanttTask[] {
+	return groups.map((group) => {
+		const earlier = group.steps.slice(0, -1);
+		return {
+			key: group.key,
+			label: group.label,
+			status: ganttStatusOf(group.head.status),
+			startedAt: group.head.started_at ?? undefined,
+			finishedAt: group.head.finished_at ?? undefined,
+			// A retry is segments to the left of the bar that stuck.
+			attempts: earlier.length ? earlier.map(segmentOf) : undefined,
+			log: group.head.detail || undefined,
+			result: group.head.result ?? group.head.output ?? undefined,
+			error: group.head.error
+				? {
+						code: String(group.head.error.cls ?? group.head.error.code ?? ""),
+						message: String(group.head.error.message ?? ""),
+						detail: String(group.head.error.cause ?? ""),
+					}
+				: undefined,
+		};
+	});
+}
+
+function performance(
+	trace: TraceRead,
+	groups: TaskGroup[],
+	selectedKey: string | null,
+): PanelSpec<RunPanels> {
+	const origin = originOf(trace);
+	const live = isLive(trace.status);
+	const tasks = waterfallTasks(groups);
+
+	return {
+		id: "performance",
+		kind: "gantt",
+		title: "Waterfall — where the time went",
+		aside: performanceAside(groups, selectedKey),
+		options: {
+			tasks,
+			density: "comfortable",
+			selectedKey,
+			selectAction: RUN_ACTIONS.selectTask,
+			nowMs:
+				live && origin ? Date.now() - new Date(origin).getTime() : undefined,
+			openEnded: live,
+		},
+	};
+}
+
+function segmentOf(step: TraceStepRead): TaskGanttSegment {
+	return {
+		startedAt: step.started_at ?? undefined,
+		finishedAt: step.finished_at ?? undefined,
+		status: ganttStatusOf(step.status),
+	};
+}
+
+function performanceAside(
+	groups: TaskGroup[],
+	selectedKey: string | null,
+): string | undefined {
+	if (selectedKey) {
+		const group = groups.find((g) => g.key === selectedKey);
+		const ms =
+			group?.head.duration_ms ??
+			durationMs(group?.head.started_at, group?.head.finished_at);
+		return group && ms != null
+			? `${group.key} · ${formatDuration(ms)}`
+			: undefined;
+	}
+	const retried = groups.filter((g) => g.attempts > 1).length;
+	const never = groups.filter((g) => g.head.status === "stopped").length;
+	const parts = omit([
+		retried ? `${retried} retried` : null,
+		never ? `${never} never ran` : null,
+	]);
+	return parts.length ? parts.join(" · ") : "where the time went";
+}
+
+/** What opened the run — the trace's own provenance, not a second record. */
+function input(trace: TraceRead): PanelSpec<RunPanels> {
+	return {
+		kind: "properties",
+		title: "Input · what opened this run",
+		aside: "what the trace recorded",
+		options: {
+			rows: omit([
+				trace.body ? { label: "asked", value: `"${trace.body}"` } : null,
+				{
+					label: "plan",
+					value: trace.plan_origin ?? trace.workflow_key,
+					mono: true,
+				},
+				trace.plan_revision
+					? { label: "revision", value: `v${trace.plan_revision}` }
+					: null,
+				trace.agent_id
+					? {
+							label: "agent",
+							value: trace.agent_version
+								? `${trace.agent_id} · v${trace.agent_version}`
+								: trace.agent_id,
+							mono: true,
+						}
+					: null,
+				{ label: "run", value: trace.run_id, mono: true },
+				trace.error
+					? {
+							label: "error",
+							value: String(trace.error.message ?? trace.error),
+						}
+					: null,
+			]),
+		},
+	};
+}
+
+/**
+ * `result.json`, when there is one.
+ *
+ * The column is declared and the runtime does not write it yet,
+ * so this returns nothing rather than an empty document — and the Input panel
+ * takes the whole row, which is the honest drawing of a run with no result.
+ */
+function resultJson(trace: TraceRead): PanelSpec<RunPanels> | null {
+	if (!trace.result) return null;
+	return {
+		kind: "json",
+		title: isLive(trace.status) ? "result.json · so far" : "result.json",
+		aside: "every task merges into it",
+		flush: true,
+		options: { maxHeight: 220, value: trace.result },
+	};
+}
+
+/**
+ * The log — one line per task, which is what a run records today.
+ *
+ * Picking a Gantt row filters it to that task; the lines a run wrote
+ * about itself are not that task's lines, so they go with the filter.
+ */
+function log(
+	trace: TraceRead,
+	selected: TaskGroup | null,
+): PanelSpec<RunPanels> {
+	const steps = selected ? selected.steps : trace.steps;
+	const lines: LogOptions["lines"] = omit(
+		steps.map((step) =>
+			step.detail
+				? {
+						time: offsetOf(trace, step.started_at),
+						level: levelOf(step.status),
+						source: step.task_key || step.step_key || undefined,
+						message: step.detail,
+					}
+				: null,
+		),
+	);
+
+	return {
+		kind: "log",
+		title: selected ? "Log · this task only" : "Log",
+		aside: selected
+			? `${lines.length} of ${trace.steps.length} lines`
+			: `${lines.length} line${lines.length === 1 ? "" : "s"} · one per task`,
+		flush: true,
+		options: { lines },
+	};
+}
+
+function levelOf(status: string): "info" | "warn" | "error" {
+	if (status === "failed") return "error";
+	if (status === "needs_input" || status === "stopped") return "warn";
+	return "info";
+}

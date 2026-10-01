@@ -74,6 +74,7 @@ nav:
   - Deployment:
       - Docker: deployment/docker.md
       - Production: deployment/production.md
+      - Telemetry: deployment/telemetry.md
   - API Reference:
       - Overview: api-reference/overview.md
       - Code Reference: api-reference/

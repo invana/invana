@@ -7,8 +7,12 @@
  * bounces the user to /login on next render.
  */
 
-import { startClientSpan } from "@/services/telemetry/tracer";
-import { type Span, SpanStatusCode, propagation } from "@opentelemetry/api";
+import {
+	propagation,
+	type Span,
+	type SpanContext,
+	SpanStatusCode,
+} from "@opentelemetry/api";
 import axios, {
 	type AxiosError,
 	type AxiosInstance,
@@ -16,14 +20,26 @@ import axios, {
 	type InternalAxiosRequestConfig,
 } from "axios";
 import { toast } from "sonner";
+import { recordRequest } from "@/services/telemetry/metrics";
+import { type Interaction, startClientSpan } from "@/services/telemetry/tracer";
 
 /** Engine origin — shared with the SSE clients, which can't go through axios. */
 export const API_BASE_URL =
 	import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8200";
 const BASE_URL = API_BASE_URL;
 
-/** Carries the per-request telemetry span from request → response interceptor. */
-type TracedConfig = InternalAxiosRequestConfig & { _otelSpan?: Span };
+/** Carries the per-request telemetry span and its start from request → response interceptor. */
+type TracedConfig = InternalAxiosRequestConfig & {
+	_otelSpan?: Span;
+	_otelStart?: number;
+};
+
+declare module "axios" {
+	interface AxiosRequestConfig {
+		/** The user action this call belongs to; its span parents the request's. */
+		action?: Interaction;
+	}
+}
 
 /**
  * Standard mutation envelope: `{ message, data }`. The backend owns the
@@ -47,7 +63,7 @@ function isActionEnvelope(body: unknown): body is ActionEnvelope {
 }
 
 // `suppressActionToast` raises this depth for the duration of a client-orchestrated
-// gesture (docs/for-developers/modules/platform/spec.md PL8) so its sub-requests' envelopes don't each fire a
+// gesture (docs/for-developers/modules/platform/spec.md) so its sub-requests' envelopes don't each fire a
 // toast — the gesture shows its own single summary instead.
 let toastSuppressDepth = 0;
 
@@ -79,10 +95,24 @@ export class ApiError extends Error {
 		 * surface that has something better to draw than a toast.
 		 */
 		public readonly detail?: unknown,
+		/**
+		 * How the request ended, beyond its status: the client span it was sent
+		 * under, so an error report joins that request's trace, and whether the
+		 * caller cancelled it — a cancellation is not a failure.
+		 */
+		options: { spanContext?: SpanContext; cancelled?: boolean } = {},
 	) {
 		super(message);
 		this.name = "ApiError";
+		this.spanContext = options.spanContext;
+		this.cancelled = options.cancelled ?? false;
 	}
+
+	/** The request's client span, when the request was traced. */
+	public readonly spanContext?: SpanContext;
+
+	/** True when the request was cancelled rather than answered. */
+	public readonly cancelled: boolean;
 }
 
 interface AuthAccess {
@@ -115,49 +145,52 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 	return config;
 });
 
-// Telemetry (docs/for-developers/modules/platform/features/telemetry.md · docs/for-developers/modules/platform/features/telemetry.md): trace the outgoing request and inject W3C
-// trace-context so the engine's request span nests under it. We propagate
-// explicitly here rather than rely on auto-XHR instrumentation, whose ambient
-// context is lost crossing TanStack Query's async hops under Vite's native
-// async/await (docs/for-developers/modules/platform/features/telemetry.md).
-//
-// Two cases produce a span: (a) an Explorer run is in flight → nests under
-// `explorer.query.run`; (b) the request targets a session/message endpoint →
-// its own one-span distributed trace, even outside a run (docs/for-developers/modules/platform/features/telemetry.md). All
-// other API calls stay untraced.
+// Telemetry: every request is a CLIENT span, parented on the action passed in
+// its config or, with none, a root of its own. `traceparent` is injected so the
+// engine's request span joins the same trace. Propagation is explicit because
+// ambient context does not survive TanStack Query's async hops.
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 	const method = (config.method ?? "get").toUpperCase();
-	// Message ops live under `…/sessions/{id}/messages…`, so `/sessions` matches
-	// both. Other routes (graphs, llm, events, …) stay untraced outside a run.
-	const standalone = (config.url ?? "").includes("/sessions");
 	const client = startClientSpan(
 		`HTTP ${method}`,
 		{
 			"http.request.method": method,
 			"url.full": `${config.baseURL ?? ""}${config.url ?? ""}`,
 		},
-		{ standalone },
+		config.action,
 	);
-	if (client) {
-		propagation.inject(client.ctx, config.headers, {
-			set: (carrier, key, value) => carrier.set(key, value),
-		});
-		(config as TracedConfig)._otelSpan = client.span;
-	}
+	propagation.inject(client.ctx, config.headers, {
+		set: (carrier, key, value) => carrier.set(key, value),
+	});
+	(config as TracedConfig)._otelSpan = client.span;
+	(config as TracedConfig)._otelStart = performance.now();
 	return config;
 });
 
-/** End the request's telemetry span (if any), stamping the HTTP status. */
+/**
+ * End the request's telemetry span (if any), stamping the HTTP status, and
+ * record its `ui.request.duration` under the route template — an error when
+ * the status is 400 or above, or there is none (the request never answered).
+ */
 function endRequestSpan(
 	config: TracedConfig | undefined,
 	status?: number,
 ): void {
 	const span = config?._otelSpan;
 	if (!span) return;
+	const failed = !status || status >= 400;
 	if (status) span.setAttribute("http.response.status_code", status);
-	if (!status || status >= 400) span.setStatus({ code: SpanStatusCode.ERROR });
+	if (failed) span.setStatus({ code: SpanStatusCode.ERROR });
 	span.end();
+	if (config._otelStart !== undefined) {
+		recordRequest(
+			config.url ?? "",
+			failed ? "error" : "ok",
+			(performance.now() - config._otelStart) / 1000,
+		);
+	}
 	config._otelSpan = undefined; // a 401 retry re-runs the interceptor → fresh span
+	config._otelStart = undefined;
 }
 
 // Single-flight refresh: concurrent 401s coalesce onto one /auth/refresh call.
@@ -247,6 +280,10 @@ apiClient.interceptors.response.use(
 			| (InternalAxiosRequestConfig & { _retried?: boolean })
 			| undefined;
 		const status = error.response?.status;
+		// Read before the span is ended and cleared, so the error can name it.
+		const spanContext = (
+			config as TracedConfig | undefined
+		)?._otelSpan?.spanContext();
 		endRequestSpan(config as TracedConfig | undefined, status);
 		// Only the token endpoints themselves must skip the refresh-retry —
 		// refreshing on their own 401 would loop. Every other `/auth/*` route is
@@ -272,6 +309,7 @@ apiClient.interceptors.response.use(
 			status ?? 0,
 			formatErrorDetail(error),
 			(error.response?.data as { detail?: unknown } | undefined)?.detail,
+			{ spanContext, cancelled: axios.isCancel(error) },
 		);
 	},
 );
@@ -280,7 +318,10 @@ apiClient.interceptors.response.use(
  * Backwards-compatible `request<T>` helper so existing services
  * (`graphs.ts`, `schemas.ts`) keep working unchanged.
  */
-export async function request<T>(path: string, init?: RequestInit): Promise<T> {
+export async function request<T>(
+	path: string,
+	init?: RequestInit & { action?: Interaction },
+): Promise<T> {
 	const method = (init?.method ?? "GET").toUpperCase();
 	const data =
 		init?.body != null
@@ -297,6 +338,7 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
 		// "stop query" control aborts the session message run). Axios raises a
 		// `CanceledError` the caller can detect via its own `signal.aborted`.
 		signal: init?.signal ?? undefined,
+		action: init?.action,
 	};
 	const res = await apiClient.request(config);
 	if (res.status === 204) return undefined as T;

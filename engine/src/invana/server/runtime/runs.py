@@ -455,6 +455,7 @@ async def get_trace(
         plan_origin=run.plan_origin,
         plan_revision=run.plan_revision,
         triggered_by=run.triggered_by,
+        trace_id=run.trace_id,
         opened_by=opened_by,
         clarifications=run.clarifications,
         replans=run.replans,

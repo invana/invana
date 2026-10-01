@@ -9,9 +9,9 @@ one read, laid out by `@invana/dashboard`, bound to one record through `subject_
 |---|---|
 | Ships | [6.1 Authoring](../modules/skills/features/authoring-a-skill.md) · [6.3 Usage](../modules/skills/features/usage.md) · [6.4 Rules](../modules/skills/features/rules.md) |
 | Registry | [boards-migration § 5](../building-engine/boards-migration.md) — `apps/boards/kinds.py` and `boardKinds.ts` go from ten kinds to thirteen |
-| Drawn from | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — the drawers `SkillsPanel` · `SkillFlow` · `SkillVersions` · `SkillUsage` · `UsageVersions` · `UsageReadings` · `UsageSeams` · `RulesPanel` · `RuleCited` |
+| Drawn from | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — the drawers `SkillsViewPanel` · `SkillFlow` · `SkillVersions` · `SkillUsage` · `UsageVersions` · `UsageReadings` · `UsageSeams` · `RulesPanel` · `RuleCited` |
 | Drawn as | the boards themselves — `SkillDash` (S6) · `SkillDashDraft` (S7) · `UsageDash` (U5) · `UsageDashStates` (U6) · `RuleDash` (RL5), rows [34r–34t](../the-screens.md) |
-| Pattern | `runDashboardSpec` / `stepDashboardSpec` ([see-what-ran SR30](../modules/operate/features/see-what-ran.md)) — a pure function of one read, nothing fetching, nothing rendering |
+| Pattern | `runBoardSpec` / `stepBoardSpec` ([see-what-ran SR30](../modules/operate/features/see-what-ran.md)) — a pure function of one read, nothing fetching, nothing rendering |
 | Not in scope | authoring a dashboard, a panel Studio invents at runtime, and a dashboard for `bindings` — the Bindings tab is a picker, and a picker is not a reading |
 
 ---
@@ -212,7 +212,7 @@ act on.
 | `boardKinds.ts` | three `DeclaredKindSpec`s; `DeclaredKind` gains three members |
 | `GraphDetailPage.tsx` | `OpenBoard.runId` optional ([SD3](#3--skill--the-panel-set)); the `renders: dashboard` branch gains three bodies; the Skills panel gets `onOpenSkillDashboard` · `onOpenUsageDashboard` · `onOpenRuleDashboard` |
 | `features/skills/dashboards/` | the three composers, the three pages, one `shared.ts`, one `index.ts` border |
-| `SkillsPanel.tsx` · `SkillDetail.tsx` · `RulesDrawer.tsx` | a `More` header action, drilled in only |
+| `SkillsViewPanel.tsx` · `SkillDetail.tsx` · `RulesSection.tsx` | a `More` header action, drilled in only |
 
 **The composers live under `features/skills/`, not under `boards/`.** A dashboard's panels are the
 feature's vocabulary — *offered*, *applied*, *cited*, *enough to read* — and the boards folder owns

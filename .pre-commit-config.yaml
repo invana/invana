@@ -38,8 +38,8 @@ repos:
 
   # ─── TypeScript (studio) ──────────────────────────────────────
   - repo: https://github.com/biomejs/pre-commit
-    rev: v2.0.0
+    rev: v2.5.14
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@1.9.4"]
+        additional_dependencies: ["@biomejs/biome@2.5.14"]
         files: ^studio/

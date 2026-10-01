@@ -15,7 +15,11 @@ export function useGitHubStarsQuery() {
 		queryFn: async () => {
 			const res = await fetch(`https://api.github.com/repos/${REPO}`);
 			if (!res.ok) {
-				throw new Error(`GitHub API responded ${res.status}`);
+				// The status rides the error, so a rate limit (403) reads as the
+				// refusal it is rather than a failure worth reporting.
+				throw Object.assign(new Error(`GitHub API responded ${res.status}`), {
+					status: res.status,
+				});
 			}
 			const data = (await res.json()) as { stargazers_count: number };
 			return data.stargazers_count;

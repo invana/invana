@@ -179,8 +179,8 @@ sequenceDiagram
 
 | Surface | Region | Reached by | Owner |
 |---|---|---|---|
-| **Worlds** | first drawer of the **Govern** stack | `?panel=govern&drawer=worlds`, drill-in `&world=<id>` ([G35](../../building-studio/graph-detail-page.md)) | this module |
-| **Guardrails** | second drawer of the same stack | `?panel=govern&drawer=guardrails` | this module |
+| **Worlds** | first drawer of the **Govern** stack | `?panel=govern&section=worlds`, drill-in `&world=<id>` ([G35](../../building-studio/graph-detail-page.md)) | this module |
+| **Guardrails** | second drawer of the same stack | `?panel=govern&section=guardrails` | this module |
 | A world's detail | inside its own drawer, header `‹ WORLDS / EU · H1 2026` ([G36](../../building-studio/graph-detail-page.md)) | the drill-in, `&world=<id>` | this module |
 | A guardrail's rules | inside the Guardrails drawer, same header shape | the drill-in, `&guardrail=<id>` | this module |
 | The guardrails strip | locked at the top of the **Worlds** drawer | always, while the Graph has a guardrail | this module |

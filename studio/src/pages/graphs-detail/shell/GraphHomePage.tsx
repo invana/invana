@@ -1,10 +1,10 @@
 /**
  * The graph page — what `mainSection` shows when nothing else is open, and the
  * surface setup is drawn on until the Graph is ready
- * (graph-detail-page.md G6 · G26).
+ * (graph-detail-page.md).
  *
  * It is a **page**, not an empty state
- * (`docs/for-developers/building-studio/graph-detail-page.md` G6): it is always
+ * (`docs/for-developers/building-studio/graph-detail-page.md`): it is always
  * in the strip, it cannot be closed, and it is never evicted. That matters
  * because six of the ten `leftNav` items open no page at all — Skills, Events,
  * Templates, Settings — and the region behind them has to say something true
@@ -18,14 +18,16 @@
  * at a list of projects.
  */
 
+import { PropertyList, PropertyRow, StatusDot } from "@invana/ui";
 import {
+	hasOutstandingSetup,
 	useGraphConnectionQuery,
 	useGraphQuery,
-} from "@/hooks/queries/useGraphs";
-import { OnboardingWizard } from "@/pages/graphs-detail/features/setup/OnboardingWizard";
-import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
-import { hasOutstandingSetup } from "@/types/graphs";
-import { PropertyList, PropertyRow, StatusDot } from "@invana/ui";
+} from "@/pages/graphs-detail/features/graphs";
+import {
+	OnboardingWizard,
+	useOnboarding,
+} from "@/pages/graphs-detail/features/setup";
 
 interface GraphHomePageProps {
 	username: string;
@@ -43,7 +45,7 @@ export function GraphHomePage({
 	const { data: graph } = useGraphQuery(username, graphSlug);
 	const { isOpen } = useOnboarding();
 
-	// The wizard is what this page is *for* until the graph is ready (G26). It is
+	// The wizard is what this page is *for* until the graph is ready. It is
 	// the page a new Graph lands on, it is never a modal over the thing it
 	// configures, and it goes away on its own: it holds while any step is
 	// outstanding, and a skipped step counts as resolved. What is left after that
@@ -51,9 +53,9 @@ export function GraphHomePage({
 	// live.
 	//
 	// It stays *reachable* once it is finished through the graduation cap in
-	// `header.right` (SU19), which is also what re-opens it here: undoing a skip,
+	// `header.right`, which is also what re-opens it here: undoing a skip,
 	// reading why a step broke and going over a concept again are things only the
-	// wizard can do, and the Info panel's band is gone by then (G20).
+	// wizard can do, and the Info panel's band is gone by then.
 	if (graph && (hasOutstandingSetup(graph) || isOpen)) {
 		return (
 			<OnboardingWizard
@@ -66,7 +68,7 @@ export function GraphHomePage({
 
 	// Only what the engine actually reports. There are no node/edge totals on the
 	// Graph, and a page that invented them would be worse than one that omits
-	// them (DS15) — the live counts belong to a canvas, and this page is not one.
+	// them — the live counts belong to a canvas, and this page is not one.
 	const live = connection?.status === "ACTIVE";
 
 	return (

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 logger = logging.getLogger(__name__)
@@ -78,13 +78,13 @@ class Settings(BaseSettings):
     # Telemetry (OpenTelemetry)
     telemetry_enabled: bool = True
     telemetry_otlp_endpoint: str = "http://localhost:4317"
-    # OTLP/HTTP collector endpoint the studio's browser spans are proxied to
-    # (docs/for-developers/modules/platform/features/telemetry.md). Browsers can't speak OTLP gRPC, so
-    # /api/v1/telemetry/traces
-    # forwards their export here verbatim, keeping the collector off the network.
-    telemetry_otlp_http_endpoint: str = "http://localhost:4318/v1/traces"
+    # The collector's OTLP/HTTP base URL; the studio proxy posts to <base>/v1/{traces,metrics,logs}.
+    # A value ending in /v1/traces is read as its base, so a full traces URL still works.
+    telemetry_otlp_http_endpoint: str = "http://localhost:4318"
     telemetry_service_name: str = "invana-engine"
     telemetry_environment: str = "development"
+    # Fraction of new root traces kept (0 to 1); traces with a parent follow the parent's decision.
+    telemetry_sample_ratio: float = Field(default=1.0, ge=0, le=1)
 
     # Graphs — runtime connection pool
     encryption_key: str = ""  # INVANA_ENCRYPTION_KEY — required in production; 32-byte URL-safe base64 Fernet key

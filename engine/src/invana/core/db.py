@@ -9,11 +9,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import sqlalchemy
 from alembic import command
 from alembic.config import Config
 from fastapi import Request
-from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext import asyncio as sa_asyncio
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from invana.core.settings import settings
 
@@ -28,8 +29,12 @@ def run_migrations(url: str = settings.database_url) -> None:
 
 
 async def create_db_engine(url: str = settings.database_url):
-    """Create an async engine. Run `invana migrate` before starting the server."""
-    return create_async_engine(
+    """Create an async engine. Run `invana migrate` before starting the server.
+
+    The factory is looked up on its module at call time, so a process that
+    instruments SQLAlchemy after importing this module still gets a traced engine.
+    """
+    return sa_asyncio.create_async_engine(
         url,
         echo=settings.database_echo,
         pool_size=settings.database_pool_size,
@@ -44,7 +49,7 @@ def create_sync_engine(url: str | None = None):
     """
     async_url = url or settings.database_url
     sync_url = async_url.replace("+asyncpg", "")
-    return create_engine(
+    return sqlalchemy.create_engine(
         sync_url,
         echo=settings.database_echo,
         pool_size=settings.database_pool_size,

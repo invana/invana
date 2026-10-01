@@ -27,6 +27,7 @@ from datetime import datetime
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from invana.core.telemetry.recorders import add_stream
 from invana.runtime.models import TaskRun, TaskStream
 
 log = logging.getLogger(__name__)
@@ -141,31 +142,39 @@ async def subscribe(
     between is missed (duplicates are dropped by seq). Ends after a terminal
     frame; a ``: keepalive`` comment every 25 s keeps proxies from closing an
     idle tail. Mirrors ``events.notify.iter_frames``.
+
+    The stream counts on ``invana.assistant.streams.active`` (``stream=run``)
+    from the moment it is first read until it ends, a client disconnecting
+    included.
     """
-    with broadcaster.attach(run_id) as q:
-        async with session_factory() as db:
-            backlog = await replay(db, run_id=run_id, after=after)
-            status = (await db.execute(select(TaskRun.status).where(TaskRun.id == run_id))).scalar_one_or_none()
-        for e in backlog:
-            after = e.seq
-            yield e.as_frame()
-            if e.kind in TERMINAL_KINDS:
+    add_stream(1, stream="run")
+    try:
+        with broadcaster.attach(run_id) as q:
+            async with session_factory() as db:
+                backlog = await replay(db, run_id=run_id, after=after)
+                status = (await db.execute(select(TaskRun.status).where(TaskRun.id == run_id))).scalar_one_or_none()
+            for e in backlog:
+                after = e.seq
+                yield e.as_frame()
+                if e.kind in TERMINAL_KINDS:
+                    return
+            # Nothing more will come from a settled run with no terminal frame
+            # in the backlog (pre-runtime rows, or a run the reconciler failed).
+            if status in {"succeeded", "failed", "cancelled"} and not backlog:
                 return
-        # Nothing more will come from a settled run with no terminal frame
-        # in the backlog (pre-runtime rows, or a run the reconciler failed).
-        if status in {"succeeded", "failed", "cancelled"} and not backlog:
-            return
-        while True:
-            try:
-                e = await asyncio.wait_for(q.get(), timeout=_KEEPALIVE_S)
-            except TimeoutError:
-                yield ": keepalive\n\n"
-                continue
-            if e is None:
-                return
-            if e.seq <= after:
-                continue
-            after = e.seq
-            yield e.as_frame()
-            if e.kind in TERMINAL_KINDS:
-                return
+            while True:
+                try:
+                    e = await asyncio.wait_for(q.get(), timeout=_KEEPALIVE_S)
+                except TimeoutError:
+                    yield ": keepalive\n\n"
+                    continue
+                if e is None:
+                    return
+                if e.seq <= after:
+                    continue
+                after = e.seq
+                yield e.as_frame()
+                if e.kind in TERMINAL_KINDS:
+                    return
+    finally:
+        add_stream(-1, stream="run")

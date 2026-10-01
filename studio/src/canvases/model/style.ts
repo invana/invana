@@ -1,5 +1,5 @@
 /**
- * The two styles config cannot say (GM8, GM9).
+ * The two styles config cannot say.
  *
  * A styling template cannot bind a colour to a field, so a frame carries its
  * model's hue as its own style — only the wash and the border; the tab, the
@@ -10,6 +10,7 @@
  * template's solid line.
  */
 
+import type { EdgeStyle, GraphData, NodeStyle } from "@invana/graph";
 import type { LiveColors } from "@/canvases/model/config";
 import {
 	MODEL_EMPTY_TYPE,
@@ -18,7 +19,6 @@ import {
 	type ModelFrameData,
 	type ModelGraphData,
 } from "@/canvases/model/types";
-import type { EdgeStyle, GraphData, NodeStyle } from "@invana/graph";
 
 const STITCH_DASH: [number, number] = [6, 4];
 
@@ -32,7 +32,7 @@ const frameStyle = (hue: number): NodeStyle => ({
 
 function stitchStyle(d: ModelEdgeData, success: number): EdgeStyle | undefined {
 	if (d.kind === "edge") return undefined;
-	// Staged reads differently from committed: what is about to land (ST21).
+	// Staged reads differently from committed: what is about to land.
 	return d.staged
 		? { strokeDashArray: STITCH_DASH, strokeColor: success, strokeWidth: 2 }
 		: { strokeDashArray: STITCH_DASH };

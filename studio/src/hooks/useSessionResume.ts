@@ -3,22 +3,22 @@
  *
  * Landing on `/login` with a session already in localStorage (a bookmarked
  * `/login?next=…`, a second tab, a back-button) should not ask for a password
- * again — sessions.md SS1/SS2 say the refresh token is the session, so the page
+ * again — sessions.md says the refresh token is the session, so the page
  * proves it and moves on.
  *
  * Three outcomes:
  * - `resumed`    — user + access token already in the store, or `/auth/me`
  *                  answered (the axios interceptor rotates an expired access
- *                  token underneath it, sessions.md SS3).
+ *                  token underneath it, sessions.md).
  * - `anonymous`  — no refresh token, or `/auth/me` refused. The store is
  *                  cleared so a stale half-session cannot linger.
  * - `checking`   — `/auth/me` is in flight; the caller shows a waiting state
  *                  instead of flashing the sign-in form.
  */
 
+import { useEffect, useState } from "react";
 import { authApi } from "@/services/api/auth";
 import { useAuthStore } from "@/stores/auth.store";
-import { useEffect, useState } from "react";
 
 export type SessionResumeState = "checking" | "resumed" | "anonymous";
 

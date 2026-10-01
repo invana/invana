@@ -934,7 +934,7 @@ drawn — the two drawings differ in exactly the way the record differs, and in 
 
 ### This contradicts SR32, and the contradiction is the decision
 
-[SR32](modules/operate/features/see-what-ran.md) says `TaskFlowPanel` wraps steps into rows. That was
+[SR32](modules/operate/features/see-what-ran.md) says `TaskFlowWidget` wraps steps into rows. That was
 written for a flow with no vertical axis — wrapping was the only way to use the width. With bands the
 vertical axis is spent, and expansion needs all of it.
 
@@ -1041,9 +1041,9 @@ plan stays portable, and the lens is visibly what turned `decide` into `opus-5` 
 | `sent` | on boundary-crossing touches | document key | [§5](#5-egress--what-leaves-the-curated-graph) |
 | `tokens_cached_in` | `result.json` → `tokens` | int, a fact | never an estimate |
 | Cost by layer and participant | `GET …/metrics/cost` | a grouping | no new source |
-| `Touches` · `Slice` · `Egress` · `Attempts` · `Model` · `Cache` bands | `stepDashboardSpec` | spec composition | pure functions of the trace ([SR30](modules/operate/features/see-what-ran.md)) |
-| `Layers touched` · `This run's lens` bands | `runDashboardSpec` | spec composition | `Retune` is the only non-read control |
-| Layer-banded, expandable flow strip | `TaskFlowPanel` | component change | replaces the wrap |
+| `Touches` · `Slice` · `Egress` · `Attempts` · `Model` · `Cache` bands | `stepBoardSpec` | spec composition | pure functions of the trace ([SR30](modules/operate/features/see-what-ran.md)) |
+| `Layers touched` · `This run's lens` bands | `runBoardSpec` | spec composition | `Retune` is the only non-read control |
+| Layer-banded, expandable flow strip | `TaskFlowWidget` | component change | replaces the wrap |
 | The lens editor | a new Studio surface | new feature | rules, slices, cast, egress |
 
 **No new table.** Every fact is a key in a document the interpreter already writes, a field on a record

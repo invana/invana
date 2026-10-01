@@ -109,4 +109,3 @@ See [Simulations](simulations.md) for details.
 ## What's Next?
 
 - [Simulations](simulations.md) — Run algorithms in tandem with decision models
-- [Running Queries](../guides/running-queries.md) — Execute raw queries

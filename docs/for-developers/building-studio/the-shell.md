@@ -140,7 +140,7 @@ Each of these named a region. They are gone from code, docs, artboards and comme
 
 | Not this | Say | Was in |
 |---|---|---|
-| rail · left rail · `railItem` · activity bar · icon column | `leftNav` · **leftNav item** | Studio ×104, docs ×19, kit JSDoc |
+| rail · left rail · `navItem` · activity bar · icon column | `leftNav` · **leftNav item** | Studio ×104, docs ×19, kit JSDoc |
 | sidebar · `sidebar-panel` · left panel · docked panel | `leftSection` | kit panel id, Studio |
 | editor · `editor-panel` · `editor-area` · main content · `mainContent` · canvas area · workspace | `mainSection` | kit panel ids |
 | auxiliary · `auxiliary-panel` · right panel · **drawer** | `rightSection` | kit panel id, Studio ×46 |
@@ -178,7 +178,7 @@ occupant ([graph-detail-page.md](graph-detail-page.md) G16):
 |---|---|---|---|
 | `?left=` | `leftSection` | the open panel key | **`?panel=`**, with `?settings=` read as a legacy alias. A rename |
 | `?main=` | `mainSection` | the active page id | **nothing.** `activePageId` is *derived* from four unrelated pieces of local state — `globalModelOpen`, `workKind`, `workCanvas`, `activeCanvasId` — and `selectPage` dispatches back into all four. Not a rename: a new single source of truth |
-| `?right=` | `rightSection` | `assistant` · `inspector` · absent | ✅ **shipped** — `shell/useRightSection.ts` is the one owner. `?ai=` and `?inspector=open` are read as legacy aliases and normalised away on the next write |
+| `?right=` | `rightSection` | `assistant` · `inspector` · absent | ✅ **shipped** — `shared/useRightSection.ts` is the one owner. `?ai=` and `?inspector=open` are read as legacy aliases and normalised away on the next write |
 | `?bottom=` | `bottomSection` | `console` · absent | nothing — the Console is not wired |
 
 Only `?left=` is a rename. The other three are the point of doing this: naming the region forces
@@ -186,7 +186,7 @@ each one to have exactly one owner. `rightSection` had two and now has one; `mai
 four.
 
 Old param names stay **readable** so bookmarks survive, and are never written — the one-way alias
-`useSettingsPanel` already applies to `?settings=`.
+`useLeftSection` already applies to `?settings=`.
 
 ### A region that opens takes its width from `mainSection`
 
@@ -235,9 +235,9 @@ intent and this one as fact:
 |---|---|---|
 | `header` | ✅ | `useAppHeader` — `left` (wordmark · breadcrumb) · `center` (the camera toolbar) · `right` (`rightExtras` · `GitHubStars` · **the onboarding cap, graph-scoped only** · `ThemeMenu` · `FullscreenToggle` · `panelControls`) |
 | `leftNav` | ✅ | `useGraphLeftNav` |
-| `leftSection` | ✅ | the open panel, or `SettingsPanel` docked |
+| `leftSection` | ✅ | the open panel, or `SettingsViewPanel` docked |
 | `mainSection` | ✅ | `BoardPagesViewPanel`, with **`keepMounted={false}`** — only the active page's body is mounted, until each canvas owns its own engine |
-| `rightSection` | ✅ | the `?right=` occupant, looked up in the page's `rightSections` registry — `assistant` → `AssistantPanel`, `inspector` → `InspectorPanel`. Absent → the region is not handed to the kit at all. Each entry carries its own size triple |
+| `rightSection` | ✅ | the `?right=` occupant, looked up in the page's `rightSections` registry — `assistant` → `AssistantViewPanel`, `inspector` → `InspectorViewPanel`. Absent → the region is not handed to the kit at all. Each entry carries its own size triple |
 | `bottomSection` | ❌ | — |
 | `footer` | ✅ | `left`: `ConnectionStatusBar` + metrics · `right`: extras + `AppVersion` |
 
@@ -266,7 +266,7 @@ the one every row in the stack already used before it was written down.
 
 | Rule | Detail |
 |---|---|
-| Rows own it, full-bleed | A selectable row (`RunRow`, `LensRow`, `WorkRow`, `ListPanel`'s row, `SkillRow`) runs edge to edge so its hover, selection and divider reach the border, and pads **inside** itself with `px-3`. It is never wrapped in a padded container. |
+| Rows own it, full-bleed | A selectable row (`RunRow`, `LensRow`, `RecordRow`, `ListPanel`'s row, `SkillRow`) runs edge to edge so its hover, selection and divider reach the border, and pads **inside** itself with `px-3`. It is never wrapped in a padded container. |
 | Documents are wrapped once | A drilled-in body, an editor, a form, a filter or search bar, an empty or loading line: one wrapper with `px-3` and its own vertical padding. Nothing inside it adds a second horizontal inset. |
 | Kit headers and footers match | `SectionHeader` is `px-3`; `PanelStatusBar` passes `px-3` to `AppStatusBar`. A section's title, its content and its footer share the edge. |
 | Depth is added, never restated | A nested row keeps `px-3` and adds its indent through `--row-indent` (`ps-[calc(var(--spacing)*3+var(--row-indent))]`). No row writes `paddingLeft: 12 + …` — the base is the class, so changing the inset is one edit. |
@@ -352,7 +352,7 @@ document argued the opposite on evidence that did not hold up. Two things settle
 ```tsx
 mainSection: { content:
     workKind === "model" ? <ModelCanvas …/>
-  : workCanvas          ? <WorkCanvasHeader …/> + workCanvas
+  : workCanvas          ? <LayeredCanvasHeader …/> + workCanvas
   : activeSessionId     ? canvasContent
   :                       <the reason there is no canvas yet /> }
 ```
@@ -376,7 +376,7 @@ the 2,245-line file is the bill.
 | 4 | `mainSection` becomes `BoardPagesViewPanel` over those pages. `CanvasTabsBar` is deleted |
 | 5 | Each page publishes its engine when active; the lifted `CanvasContext` provides the active one, so the header toolbar and inspector keep resolving *the* canvas |
 
-What `ExplorerPage` keeps is what is genuinely cross-page: sessions, the assistant, `leftNav`, the
+What `GraphDetailPage` keeps is what is genuinely cross-page: sessions, the assistant, `leftNav`, the
 console. It should land near 300 lines.
 
 ### The one thing that needs deciding

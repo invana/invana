@@ -1,8 +1,3 @@
-import { FullscreenToggle } from "@/components/FullscreenToggle";
-import { GitHubStars } from "@/components/GitHubStars";
-import { ThemeMenu } from "@/components/ThemeMenu";
-import { OnboardingCap } from "@/components/header/OnboardingCap";
-import { useAuth } from "@/hooks/useAuth";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -10,16 +5,21 @@ import {
 	BreadcrumbList,
 	BreadcrumbPage,
 	BreadcrumbSeparator,
-	Separator,
 	cn,
+	Separator,
 } from "@invana/ui";
 import { Fragment, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { FullscreenToggle } from "@/components/FullscreenToggle";
+import { GitHubStars } from "@/components/GitHubStars";
+import { OnboardingCap } from "@/components/header/OnboardingCap";
+import { ThemeMenu } from "@/components/ThemeMenu";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AppHeaderOptions {
 	/** Last breadcrumb segment for the current page. Defaults to a label
 	 *  derived from the URL (Graphs, New graph, Profile, Settings). The graph
-	 *  page passes none: its URL is the graph (graph-detail-page.md G15), so
+	 *  page passes none: its URL is the graph (graph-detail-page.md), so
 	 *  `owner › graph` already names where you are. */
 	pageLabel?: string;
 	/** The object open on this screen — the canvas, the model, the agent. Drawn
@@ -67,7 +67,7 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 	const { pathname } = useLocation();
 	const { user } = useAuth();
 
-	// The onboarding cap is graph-scoped (setup.md SU19): a Graph has onboarding,
+	// The onboarding cap is graph-scoped (setup.md): a Graph has onboarding,
 	// the Graphs list does not. The route is what says which graph, so the cap is
 	// read off the same match the breadcrumb uses rather than threaded through
 	// every caller.
@@ -136,7 +136,12 @@ function HeaderBreadcrumb({ segments }: { segments: Segment[] }) {
 				{segments.map((s, i) => {
 					const isLast = i === segments.length - 1;
 					return (
-						<Fragment key={`${s.label}-${i}`}>
+						<Fragment
+							key={`${s.label}-${
+								// biome-ignore lint/suspicious/noArrayIndexKey: the list is rebuilt whole, never reordered in place
+								i
+							}`}
+						>
 							{i > 0 && (
 								<BreadcrumbSeparator className="shrink-0 text-muted-foreground/60 [&>svg]:h-3.5 [&>svg]:w-3.5" />
 							)}
@@ -214,7 +219,7 @@ function graphRestSegments(
 	rest: string | undefined,
 	graphRoot: string,
 ): Segment[] {
-	// The graph's own URL *is* the page (graph-detail-page.md G15), so a missing
+	// The graph's own URL *is* the page (graph-detail-page.md), so a missing
 	// tail adds no third crumb — `owner › graph` already names where you are.
 	// The page passes a `pageLabel` override for what is open on it.
 	if (!rest) return [];

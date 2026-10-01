@@ -21,12 +21,15 @@ import asyncio
 import contextlib
 import json
 import logging
+import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 
 import asyncpg
 
 from invana.core.settings import settings
+from invana.core.telemetry.recorders import add_stream, record_loop
+from invana.core.telemetry.spans import root_span, set_current
 
 log = logging.getLogger(__name__)
 
@@ -110,7 +113,16 @@ class EventBroadcaster:
     # ── LISTEN loop ────────────────────────────────────────────────────────
 
     async def _run(self) -> None:
-        """Open a dedicated asyncpg connection, LISTEN, fan out forever."""
+        """Open a dedicated asyncpg connection, LISTEN, fan out forever.
+
+        Each connect attempt — the connect and the ``add_listener``, not the
+        park that follows nor the backoff sleep — is its own trace: a
+        ``system.events_listen`` root span (origin ``daemon``) with
+        ``invana.outcome`` ``ok`` or ``failed``. The task is started during
+        startup, so a root of its own keeps a reconnect hours later off the
+        startup trace. The same attempt is one ``events_listen`` iteration on
+        the loop metrics, a failure when it did not connect.
+        """
         # Build a direct asyncpg DSN from the async SQLAlchemy URL. We bypass
         # SQLAlchemy here because asyncpg's LISTEN/NOTIFY is connection-scoped
         # and SQLAlchemy's session is unsuited to long-lived listeners.
@@ -121,8 +133,18 @@ class EventBroadcaster:
         backoff = 1.0
         while True:
             try:
-                self._conn = await asyncpg.connect(dsn=dsn)
-                await self._conn.add_listener("events", self._on_notify)
+                with root_span("system.events_listen", origin="daemon"):
+                    # The error itself is recorded as it leaves the span.
+                    started = time.perf_counter()
+                    try:
+                        self._conn = await asyncpg.connect(dsn=dsn)
+                        await self._conn.add_listener("events", self._on_notify)
+                    except Exception:
+                        set_current(**{"invana.outcome": "failed"})
+                        record_loop(loop="events_listen", duration_s=time.perf_counter() - started, failed=True)
+                        raise
+                    set_current(**{"invana.outcome": "ok"})
+                    record_loop(loop="events_listen", duration_s=time.perf_counter() - started, failed=False)
                 log.info("EventBroadcaster: LISTEN events established")
                 backoff = 1.0
                 # Stay parked here forever; the listener fires in the
@@ -199,7 +221,12 @@ async def iter_frames(sub: _Subscriber) -> AsyncIterator[str]:
 
     Heartbeats (``: keepalive\\n\\n``) are emitted every 25s when no real
     frames are flowing so reverse proxies don't close the idle connection.
+
+    The stream counts on ``invana.assistant.streams.active`` (``stream=events``)
+    from the moment it is first read until it ends, a client disconnecting
+    included.
     """
+    add_stream(1, stream="events")
     try:
         while True:
             if sub.lost_count > 0:
@@ -222,4 +249,5 @@ async def iter_frames(sub: _Subscriber) -> AsyncIterator[str]:
             }
             yield f"event: row\ndata: {json.dumps(payload)}\n\n"
     finally:
+        add_stream(-1, stream="events")
         broadcaster.unsubscribe(sub)

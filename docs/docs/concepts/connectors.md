@@ -136,5 +136,5 @@ This is translated to the native vector search syntax of the connected database.
 
 ## What's Next?
 
-- [Connecting to Neo4j](../guides/connecting-neo4j.md) — Step-by-step setup
+- [Connecting to a graph database](../getting-started/quickstart.md#2-connect-to-a-graph-database) — Step-by-step setup
 - [Query Engine](query-engine.md) — How queries are executed

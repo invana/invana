@@ -1,23 +1,3 @@
-import { useSetupSectionMutation } from "@/hooks/queries/useGraphs";
-import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
-import {
-	SETUP_GATE_META,
-	SETUP_STEPS,
-	SETUP_STEP_BY_KEY,
-	WHAT_NEXT,
-	setupCommand,
-} from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
-import {
-	type Graph,
-	SETUP_REQUIRED,
-	SETUP_SKIPPABLE,
-	type SetupSection,
-	type SetupSectionState,
-	isGateOpen,
-	isSetupComplete,
-	setupSectionStatus,
-} from "@/types/graphs";
 import {
 	Button,
 	Card,
@@ -35,6 +15,26 @@ import {
 } from "@invana/ui";
 import { ArrowRight, Copy } from "lucide-react";
 import { toast } from "sonner";
+import {
+	type Graph,
+	isGateOpen,
+	isSetupComplete,
+	SETUP_REQUIRED,
+	SETUP_SKIPPABLE,
+	type SetupSection,
+	type SetupSectionState,
+	setupSectionStatus,
+	useSetupSectionMutation,
+} from "@/pages/graphs-detail/features/graphs";
+import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
+import {
+	SETUP_GATE_META,
+	SETUP_STEP_BY_KEY,
+	SETUP_STEPS,
+	setupCommand,
+	WHAT_NEXT,
+} from "@/pages/graphs-detail/features/setup/setupSteps";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /**
  * Setup as one column — three gate cards, six step rows and the offers below
@@ -44,10 +44,10 @@ import { toast } from "sonner";
  * own width, where a 248px stepper beside a lesson would leave neither enough
  * room. Same rows, same derivation, one column — `variant="stacked"` drops the standing header
  * and the outer frame, because the island already carries both. It owns **no
- * forms** (SU2): every action opens the panel that already holds that field,
+ * forms**: every action opens the panel that already holds that field,
  * with its tab named, so there is one form per fact in the whole product. And
  * it invents nothing — done, required, blocked and broken are all read off what
- * the engine derived (SU1), which is why a step finished at a terminal or by
+ * the engine derived, which is why a step finished at a terminal or by
  * another member is finished here without being told.
  *
  * The compact rendering of the same rows is `SetupTimeline`, in the Info panel.
@@ -168,7 +168,7 @@ export function SetupBoard({
 					</ItemGroup>
 				</Card>
 
-				{/* ── What next — offers, never steps (SU4) ────────────────────── */}
+				{/* ── What next — offers, never steps ────────────────────── */}
 				{ready && (
 					<Card className="overflow-hidden">
 						<SectionHeader title="What next" className="px-4" />
@@ -216,7 +216,7 @@ function SetupRow({
 	const state = graph.setup_state?.[section];
 	const status = setupSectionStatus(state);
 	const optional = SETUP_SKIPPABLE.includes(section);
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 	const setupMutation = useSetupSectionMutation();
 	const command = setupCommand(meta, username, graphSlug);
 
@@ -302,12 +302,8 @@ function SetupRow({
 	);
 }
 
-function WhatNextRow({
-	offer,
-}: {
-	offer: (typeof WHAT_NEXT)[number];
-}) {
-	const { setSection } = useSettingsPanel();
+function WhatNextRow({ offer }: { offer: (typeof WHAT_NEXT)[number] }) {
+	const { setSection } = useLeftSection();
 	return (
 		<Item variant="muted">
 			<ItemContent>

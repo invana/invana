@@ -1,13 +1,17 @@
 /**
  * The agent page's edit buffer — what **Save** sends, and nothing else.
  *
- * One buffer for all five tabs (AG23): a Save is one agent edit, one version,
- * whichever tabs the edits came from (AG28). Only the fields that moved are
+ * One buffer for all five tabs: a Save is one agent edit, one version,
+ * whichever tabs the edits came from. Only the fields that moved are
  * sent, so saving an effort does not also re-send the soul and emit a voice
  * change nobody made.
  */
 
-import type { Agent, AgentUpdate, SoulTraits } from "@/types/work";
+import type {
+	Agent,
+	AgentUpdate,
+	SoulTraits,
+} from "@/pages/graphs-detail/features/agents/types";
 
 /** The envelope, as this page reads and writes it. */
 export interface Envelope {
@@ -62,7 +66,7 @@ export function changesOf(agent: Agent, draft: AgentDraft): AgentUpdate {
 /**
  * Invana's default voice — the editor's placeholder when the soul is empty.
  *
- * A copy of `DEFAULT_VOICE` in `engine/src/invana/apps/llm/voice.py` (SO9):
+ * A copy of `DEFAULT_VOICE` in `engine/src/invana/apps/llm/voice.py`:
  * the engine owns the words a run reads; this is only what the empty editor
  * shows. Change both together.
  */
@@ -71,7 +75,7 @@ export const DEFAULT_VOICE =
 	"Keep it brief: short sentences, no filler, no jargon the reader did not use. " +
 	"When you can, end with one thing the reader could do or ask next.";
 
-/** Each dial, its values in order, and its default — Invana's voice (AG16). */
+/** Each dial, its values in order, and its default — Invana's voice. */
 export const DIALS: {
 	key: keyof SoulTraits;
 	label: string;
@@ -106,7 +110,7 @@ export function voiceSummary(traits: SoulTraits): string {
 	].join(" · ");
 }
 
-export const EFFORT_WORDS: { key: string; word: string }[] = [
+const EFFORT_WORDS: { key: string; word: string }[] = [
 	{ key: "max_steps", word: "steps" },
 	{ key: "max_replans", word: "replans" },
 	{ key: "max_clarifications", word: "questions" },
@@ -119,6 +123,3 @@ export function effortSummary(effort: Record<string, number>): string {
 		return `${n} ${n === 1 ? word.replace(/s$/, "") : word}`;
 	}).join(" · ");
 }
-
-export const usd = (n: number) =>
-	`$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;

@@ -1,27 +1,13 @@
 /**
  * Skills & callables — *what this agent can do*, as two tables that name each
- * other (C12): its **skills** (how it approaches work) above its **callables**
+ * other: its **skills** (how it approaches work) above its **callables**
  * (what its envelope lets it run).
  *
  * Both are one read, `…/skills-and-callables`, derived on every request and
- * never stored (AG30). They read the **saved** agent: an envelope edited here
+ * never stored. They read the **saved** agent: an envelope edited here
  * redraws the tables after Save, not while it is typed.
  */
 
-import { useSkillsQuery } from "@/hooks/queries/useSkills";
-import {
-	useAgentSkillsAndCallablesQuery,
-	useCatalogueQuery,
-} from "@/hooks/queries/useWork";
-import { ALL_TASKS } from "@/pages/graphs-detail/features/agents/AgentDetail";
-import type {
-	AgentDraft,
-	Envelope,
-} from "@/pages/graphs-detail/features/agents/agentDraft";
-import type { Skill } from "@/types/skills";
-import type { Agent, AgentCallableRow, AgentSkillRow } from "@/types/work";
-import { BindRefusalCard, asBindRefusal } from "@/ui/BindRefusalCard";
-import { PanelSection } from "@/ui/PanelSection";
 import { Textarea } from "@invana/forms";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import {
@@ -29,15 +15,31 @@ import {
 	Badge,
 	BoundChip,
 	Button,
+	cn,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 	Spinner,
-	cn,
 } from "@invana/ui";
 import { Ban, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ALL_TASKS } from "@/pages/graphs-detail/features/agents/AgentDetail";
+import type {
+	AgentDraft,
+	Envelope,
+} from "@/pages/graphs-detail/features/agents/agentDraft";
+import { useAgentSkillsAndCallablesQuery } from "@/pages/graphs-detail/features/agents/queries";
+import type {
+	Agent,
+	AgentCallableRow,
+	AgentSkillRow,
+} from "@/pages/graphs-detail/features/agents/types";
+import { useCatalogueQuery } from "@/pages/graphs-detail/features/plans";
+import type { Skill } from "@/pages/graphs-detail/features/skills";
+import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
+import { asBindRefusal, BindRefusalCard } from "@/ui/BindRefusalCard";
+import { PanelSection } from "@/ui/PanelSection";
 
 /** Chips a Needs cell draws before folding the rest into `+N`. */
 const NEEDS_SHOWN = 3;
@@ -82,8 +84,8 @@ export function AgentSkillsTab({
 	);
 
 	// Which skill the last bind was for. A refusal floating above the table
-	// could not say which skill it was about — the failure BN8 exists to
-	// prevent (BN11).
+	// could not say which skill it was about — the failure exists to
+	// prevent.
 	const [refusedFor, setRefusedFor] = useState<string | null>(null);
 	const refusal = asBindRefusal(bindError);
 	const refusedSkill =
@@ -149,7 +151,7 @@ export function AgentSkillsTab({
 				cell: ({ row }) => {
 					const missing = new Set(row.original.missing);
 					// What it lacks first, so the chips that matter never fold
-					// into the `+N` (AG38).
+					// into the `+N`.
 					const needs = [
 						...row.original.needs.filter((n) => missing.has(n)),
 						...row.original.needs.filter((n) => !missing.has(n)),
@@ -280,7 +282,7 @@ export function AgentSkillsTab({
 								.join(" · ")}
 						</span>
 					) : (
-						// Allowed, and a candidate for tightening (EB5).
+						// Allowed, and a candidate for tightening.
 						<span className="text-warning">nothing bound</span>
 					),
 			},
@@ -310,14 +312,14 @@ export function AgentSkillsTab({
 										key={skill.id}
 										onSelect={() => {
 											// The refusal belongs under the skill that raised it, so
-											// the pick is remembered before it is sent (BN11).
+											// the pick is remembered before it is sent.
 											setRefusedFor(skill.id);
 											onBindSkill(skill.id);
 										}}
 									>
 										{skill.name}
 										{/* A bound draft is bound and offered to nothing until
-										    it is published (BN14). */}
+										    it is published. */}
 										{skill.is_draft ? (
 											<span className="ml-1 text-muted-foreground">draft</span>
 										) : null}
@@ -541,9 +543,9 @@ export function AgentSkillsTab({
 /**
  * `2 of 3 bound skills are offered — ~4,200 characters in every ask.`
  *
- * A draft is bound and offered to nothing ([BN14]), so it is named apart
+ * A draft is bound and offered to nothing ([]), so it is named apart
  * rather than folded into the cost: counting a draft's prose would report a
- * prompt that is never assembled. Characters, never tokens (BN15).
+ * prompt that is never assembled. Characters, never tokens.
  */
 function bindingsCost(
 	skills: Skill[],

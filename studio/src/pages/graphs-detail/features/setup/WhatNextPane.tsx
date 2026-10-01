@@ -1,6 +1,3 @@
-import { WHAT_NEXT } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
-import { type Graph, isSetupComplete } from "@/types/graphs";
 import {
 	Button,
 	Eyebrow,
@@ -12,9 +9,15 @@ import {
 	ItemTitle,
 } from "@invana/ui";
 import { ArrowRight } from "lucide-react";
+import {
+	type Graph,
+	isSetupComplete,
+} from "@/pages/graphs-detail/features/graphs";
+import { WHAT_NEXT } from "@/pages/graphs-detail/features/setup/setupSteps";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /**
- * The offers, in the pane the lessons use (setup.md SU4).
+ * The offers, in the pane the lessons use (setup.md).
  *
  * Setup ends at the first answer — but the answers worth having come from the
  * surfaces below it: an agent that knows the domain, a workflow that pins down
@@ -26,7 +29,7 @@ import { ArrowRight } from "lucide-react";
  * there is no dot in the rail beside this row, and none on any row here.
  */
 export function WhatNextPane({ graph }: { graph: Graph }) {
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 	const ready = isSetupComplete(graph);
 
 	return (

@@ -251,5 +251,5 @@ Simulations can involve more than two players. Graph structure determines intera
 ## Next Steps
 
 - [Simulation Concepts](../concepts/simulations.md) — deep dive into the simulation engine
-- [Tic-Tac-Toe Example](tic-tac-toe-example.md) — complete worked example
+- [Tic-Tac-Toe Example](_tic-tac-toe-example.md) — complete worked example
 - [Simulation Dashboard](../studio/simulation-dashboard.md) — visualize results in Studio

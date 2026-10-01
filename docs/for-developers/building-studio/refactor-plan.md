@@ -4,6 +4,7 @@ The *what* is [`code-shape.md`](code-shape.md): feature modules, the deletion li
 route map, the guardrails. This is the *how* — the mechanics of getting there without breaking a
 product that has no unit tests, and the substitution table for the components `@invana/ui@0.0.23`
 and `@invana/canvas-ui@0.0.14` now own.
+What has not moved yet, with its size today, is [cleanup.md](cleanup.md).
 
 ---
 
@@ -38,7 +39,7 @@ Bigger on paper than in the editor: 16 of them were one wrong type annotation, t
 | 2 | `SessionTasksView.tsx` | `Turn.clarifications` was annotated singular while its producer (`Timeline`) and consumer (`StepList`) are both plural — a stale annotation, and the only genuine defect in the 26. Corrected to the plural |
 | 2 | `GraphCreatePage.tsx` · `GraphForm.tsx` | `react-hook-form`'s `Control` is invariant in its field-values parameter, so `Control<FormShape>` will not assign to `ObjectFieldProps`' `Control<any>`. **The real fix is in `@invana/forms`** — make `ObjectField` generic in `TFieldValues`. Until it ships (DS3), one cast at each of the two call sites, each carrying that sentence |
 | 1 | `useEventStream.ts` | `useAuth()` reads the token but does not return it. Now read from `auth.store` with a selector, rather than widening `useAuth`'s surface for one caller |
-| 1 | `ExplorerPage.tsx` | The `Record<string, unknown>` → `CanvasStateSnapshot` cast is now an `isCanvasStateSnapshot` guard. A state written by an older engine is refused with a toast instead of throwing inside the renderer |
+| 1 | `shell/useDataBoards.ts` | The `Record<string, unknown>` → `CanvasStateSnapshot` cast is now an `isCanvasStateSnapshot` guard. A state written by an older engine is refused with a toast instead of throwing inside the renderer |
 | 1 | `WorkGraphCanvas.tsx` | `layers.get()` is typed `ILayer`; only a world layer has an extent. Narrowed with `instanceof WorldLayer`, which is how the engine duck-types it |
 | 1 | `CanvasesPanel.tsx` | Dead file — deleted, error went with it |
 
@@ -75,16 +76,18 @@ The refactor is mostly deletion. Each row is *delete the Studio file, import the
 Released this week, and it took the React components with it — `CanvasMessageBar`, `GraphStatusBar`,
 the three context menus, `ToolbarItem(s)` and `applyIconOverrides` left `@invana/canvas-react`.
 
+Where a row here and [module-structure.md](../module-structure.md) §4 *Kit substitutions* disagree, §4 wins.
+
 | Studio | Lines | Becomes |
 |---|---|---|
 | `explorer/LayersPanel.tsx` | 646 | `LayersViewPanel` |
-| `explorer/ExpandFineTunePanel.tsx` | 418 | `CanvasFiltersViewPanel` + `FindInCanvasViewPanel` |
+| `explorer/ExpandFineTunePanel.tsx` | 418 | Kept, as `ExpandNeighboursDialog` — it fetches neighbours from the engine; the kit panels only filter what is drawn |
 | `modeller/PropertyEditor.tsx` | 415 | `PropertiesEditor` |
 | `explorer/CanvasTabsBar.tsx` | 269 | `BoardPagesViewPanel`, and with it the four-branch ternary in `mainSection`. The layout is the small half; extracting a `DataBoardPage` that owns one board's state is the work. See [the-shell.md](the-shell.md) › *The Explorer's main region is a page host already* |
 | `work/WorkCanvasChrome.tsx` | 193 | `CanvasMessageBar` + `GraphLegendLayerEditorPanel` |
-| `explorer/InspectorPanel.tsx` | 178 | `InspectorPanel` + `NodeDetailView` + `EdgeDetailView` |
-| `explorer/StylingPanel.tsx` | — | `NodeStyleEditorPanel` + `NodeStylingEditorPanel` + `ThemeEditorPanel` |
-| `explorer/lib/visibility.ts` | — | The store: `hideNodes` · `showNodes` · `isNodeHidden` · `hideNodesByPredicate` · `showAllHidden` |
+| `explorer/InspectorViewPanel.tsx` | 178 | `ElementInspectorViewPanel`, after the kit gains `isMissing(id)` and `propertyFilter`; a short host passes `renderExtra={ProvenanceBlock}` |
+| `explorer/StylingPanel.tsx` | 190 | `StylingViewPanel` with `apply={false}` — Studio keeps painting |
+| `explorer/visibility.ts` | 78 | The store: `setNodeHidden` · `setNodesHidden` · `isNodeHidden` · `hiddenNodes` · `showAllHidden` |
 
 ****Installing canvas-ui pulls four more packages.** `canvas-react@0.0.12` statically imports
 `@invana/renderer-pixijs`, `graph-layer-d3-contour`, `graph-layer-maplibre` and
@@ -109,7 +112,7 @@ hooks roots on `<GraphCanvas>`.
 `BoardPagesViewPanel` is the one to study — [the-shell.md](the-shell.md) is the contract it fixes.** It renders the tab strip *and* the page bodies as one
 column, and `keepMounted` means a tab switch is visibility, not a remount — each board keeps its
 camera, layout and selection. It replaces `CanvasTabsBar` *and* the canvas-tab state in
-`ExplorerPage`. The reference is `canvas-ui/apps/AppLayoutV2` in the canvas Storybook: the canvas-side
+`useCanvasTabs`. The reference is `canvas-ui/apps/AppLayoutV2` in the canvas Storybook: the canvas-side
 twin of `Themes/AppV2 › ExplorerShell`.
 
 ### 2.3 The rule for every substitution
@@ -199,24 +202,48 @@ Leaf-first, so a module never moves while something it owns is still elsewhere.
 | 4 | `agents` · `skills` · `task_plans` · `work` | The `work/` panels, one module each. Already near-separable |
 | 5 | `bring-data-in` · `connect-and-model` | The model canvas is the risk here — move it with its components in one commit |
 | 6 | `ask` | The answer surface. Substituted in Phase 2, so it moves as kit compositions rather than as 1,700 lines |
-| 7 | `explore` | Last, and biggest. `ExplorerPage.tsx` is decomposed *as* it moves — see below |
+| 7 | `explore` | Last, and biggest. `GraphDetailPage.tsx` is decomposed *as* it moves — see below |
 | 8 | `graphs` | The shell that hosts the rest; correct once its tenants have left |
 
-### 3.2 Decomposing `ExplorerPage.tsx`
+### 3.2 Decomposing `GraphDetailPage.tsx`
 
-2,222 lines is the hardest single file. It is not refactored in place — it is **emptied by the
-phases before it**:
+**Status: done.** 3,214 lines at the start, almost all of it one component; 362 now, and every row below
+has left. It is cut by moves, not rewritten: each
+piece leaves with its state, its effects and its one-shot refs, and the page keeps calling it the
+way it did. What remains composes — `GraphDetail`'s regions, the providers, the header controls.
 
-| What leaves it | To | When |
+| Piece | To | Kind |
 |---|---|---|
-| Canvas tab state and the strip | the strip is `BoardPagesViewPanel` (done); the state goes to `features/canvases/{usePages,useCanvasTabs}` | Phase 2 |
-| The five work panels it imports and switches on | their own modules, reached by route | Phase 4 |
-| Panel/region layout | `AppLayoutV2` regions via `app/shell/` | Phase 5 |
-| Canvas wiring | `features/explorer/` (already separate) | Phase 3 |
-| Session/assistant state | `features/ask/assistant/` (already separate) | Phase 3 |
+| Canvas item mapping — `adaptItems` · `resultToItems` · `expandRefusal` · `isCanvasStateSnapshot` | `features/explorer/canvasItems.ts` | pure functions |
+| `OpenBoard`, the record behind a declared tab | `features/boards/boardKinds.ts` | type |
+| The declared board body (one branch per kind) and its tab title | `shell/declaredBoardBody.tsx` | function over a deps object |
+| The assistant occupant — setup locks, `AssistantViewPanel`, `WorldPicker` | `shell/AssistantHost.tsx` | component |
+| The selection the panels and the layered canvases share, and `workKind` | `shell/useLayeredCanvas.ts` | hook |
+| The `leftSection` occupant, one branch per `?panel` key | `shell/leftSectionContent.tsx` | function over a deps object |
+| The layered canvas in `mainSection` and its empty hint | `shell/layeredCanvasBody.tsx` | functions |
+| Open declared boards — the cold-link restore, `openBoard`, the plan page following `&plan=` | `shell/useOpenBoards.ts` | hook |
+| The data canvases — engine, contents, autosave, history; composes the three below | `shell/useDataBoards.ts` | hook |
+| Their tabs — open, new, close, a session's canvas from the list, each tab's title | `features/boards/useCanvasTabs.ts` | hook |
+| Node expansion under the thread's world, and the menus it offers | `features/explorer/useCanvasExpand.ts` | hook |
+| The ask, its stream, the inline results, the restore of a session's canvas | `features/assistant/useAssistantCanvasBridge.ts` | hook |
+| The page list, the active page, select, close, the strip's actions, and the data page's body with the handle the strip calls into | `shell/useOpenPages.tsx` | hook |
+| The `rightSection` occupants and their sizes, in the region's error boundary | `shell/rightSections.tsx` | function |
+| The header controls — the assistant's trigger, the canvas toolbar — and the `footer`'s status and message bar | `shell/GraphDetailChrome.tsx` | function |
+| The `leftSection` region — its occupant, sizes and keyed error boundary | `shell/leftSectionContent.tsx` | function |
+| The plan-name maps — a plan page's tab, and the newest version the Library's `&plan=` opens | `shell/useOpenBoards.ts` | hook |
+| The Models page — opened when the `leftNav` switches to Models, and brought forward by its panel | `shell/useModelsPage.ts` | hook |
+| The rewrite of an old `?panel=sessions` link onto the assistant | `shell/useLegacySessionsLink.ts` | hook |
 
-What should remain is a screen that composes: a canvas, a left panel, an inspector, a console. If it
-is still over 400 lines at the end, something in the list above did not actually leave.
+Everything lands in `shell/` except what reads no region: a module never imports the shell
+([code-shape.md](code-shape.md) §4). The stream callback `useSessions` takes stays a ref on the page,
+so the data-canvas hook assigns it rather than the page reordering its hooks. `useDataBoards` holds the
+tab list and the restored-session ref and hands them to its three parts: which canvas is active decides
+whose contents it resolves, and the tab actions call the save and paint that follow — so the parts share
+the same state and ref objects rather than reading each other through a bridge. It calls them in the
+order that keeps every effect where it ran before, and the one effect that answers the shell's open-session
+request stays in `shell/`. Each cut is one commit,
+with `check-types` and the e2e specs run before it lands. If the page is still over 400 lines at the
+end, something in the table did not actually leave.
 
 ---
 
@@ -228,7 +255,7 @@ The structural rules are in recommendation.md §4.1. These are about the code in
 |---|---|
 | **A component renders; a hook decides** | Data fetching, URL sync and derived state live in `queries.ts` or a hook. A screen file that contains a `useEffect` chain is a hook that has not been extracted yet |
 | **Props take what the component shows, not where it came from** | `<AgentRow agent={a} />`, not `<AgentRow agentId={id} />` with a fetch inside. One fetch per screen, at the top |
-| **No `any`, and no `as` across a real boundary** | A cast at an API edge is a missing type guard. `ExplorerPage`'s `CanvasStateSnapshot` cast is the example to not repeat |
+| **No `any`, and no `as` across a real boundary** | A cast at an API edge is a missing type guard. A `Record<string, unknown>` cast to `CanvasStateSnapshot` is the example to not repeat; `isCanvasStateSnapshot` is the guard |
 | **Name for the domain, in the product's words** | `terminology.md` pins them. A `Run` is not a "job"; an `Emission` is not a "result card" |
 | **Comments say *why*** | The existing code does this well and it is worth keeping — the comment on `AppLayoutV2`'s stable main position is why that bug stayed fixed |
 | **Empty, loading and error are not afterruns** | Every screen renders all three, and `EmptyState` names what unlocks it (DS15). A screen that only handles the happy path is half a screen |
@@ -329,7 +356,7 @@ no consumer impact.
 | | `statusMetrics` | `footerMetrics` |
 | | `headerPanelControls` | dropped — the toggles move to `BoardPagesViewPanel`'s `headerActions` ([the-shell.md](the-shell.md)) |
 | `shell/ConnectionStatusBar.tsx` | `ConnectionStatusBar` | `ConnectionStatus` — the `footer` *is* the bar |
-| `features/explore/assistant/` → **`features/ask/assistant/`** | `AssistantDrawer` · `AssistantDrawerShell` · `useAssistantDrawer` | ✅ done — the shell is **deleted** (its attachment chip belongs to the composer, AD10) and the hook is `shell/useRightSection`. A region hook lives with the region, beside `useSettingsPanel`, not inside one of its occupants |
+| `features/explore/assistant/` → **`features/ask/assistant/`** | `AssistantDrawer` · `AssistantDrawerShell` · `useAssistantDrawer` | ✅ done — the shell is **deleted** (its attachment chip belongs to the composer, AD10) and the hook is `shared/useRightSection`. A region hook lives beside `useLeftSection`, not inside one of the region's occupants |
 | `components/header/UserMenu.tsx` | "rail" | `leftNav` |
 
 ### 7.3a The two params that are not renames

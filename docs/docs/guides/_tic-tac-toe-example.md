@@ -233,6 +233,6 @@ curl -X POST http://localhost:8000/api/v1/simulations/{sim_id}/hypothesis \
 
 ## Next Steps
 
-- [Running Simulations](running-simulations.md) — more simulation patterns
+- [Running Simulations](_running-simulations.md) — more simulation patterns
 - [Algorithms](../concepts/algorithms.md) — graph algorithms for analysis
 - [Simulation Dashboard](../studio/simulation-dashboard.md) — visualization and monitoring

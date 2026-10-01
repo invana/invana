@@ -1,6 +1,6 @@
 import type { CanvasConfig } from "@invana/canvas";
 
-/** The three templates the Detail switcher picks between (GM4). */
+/** The three templates the Detail switcher picks between. */
 export type Detail = "high" | "medium" | "low";
 
 /** `node.type` of a model's frame. A member's `type` is its qualified name. */
@@ -9,17 +9,17 @@ export const MODEL_FRAME_TYPE = "model";
 /**
  * `node.type` of a model with no types drawn — a sized frame, not a group,
  * because ELK sizes a group from its members and reserves nothing for one
- * with none (ST29).
+ * with none.
  */
 export const MODEL_EMPTY_TYPE = "model.empty";
 
 /**
  * The placeholder binding in `settings.json` and `templates.json`. It is
- * expanded into one binding per member type the data carries (GM5).
+ * expanded into one binding per member type the data carries.
  */
 export const MEMBER_BINDING = "model.type";
 
-/** The structure name a template uses for "each type's own schema card" (GM6). */
+/** The structure name a template uses for "each type's own schema card". */
 export const SCHEMA_CARD = "schema:*";
 
 export interface ModelFrameData {
@@ -27,7 +27,7 @@ export interface ModelFrameData {
 	description: string;
 	/** The version drawn. */
 	version: string | null;
-	/** `1`–`8`, the `--color-data-N` slot (GM7). */
+	/** `1`–`8`, the `--color-data-N` slot. */
 	hue: number;
 }
 
@@ -47,10 +47,10 @@ export interface ModelTypeData {
 	/**
 	 * The model's name when the type sits in its frame — what the card and hover
 	 * card print under the type. Absent on the unframed one-model canvas, where
-	 * the page already names the model (ME26).
+	 * the page already names the model.
 	 */
 	frame?: string;
-	/** `1`–`8`, the slot the type's own name hashes to (ST17). */
+	/** `1`–`8`, the slot the type's own name hashes to. */
 	hue: number;
 	description: string;
 	/** `lucide/<name>`. */
@@ -65,13 +65,13 @@ export interface ModelTypeData {
 }
 
 export interface ModelEdgeData {
-	/** A model's own edge type, or one of the two stitch kinds (GM9). */
+	/** A model's own edge type, or one of the two stitch kinds. */
 	kind: "edge" | "anchor" | "relationship";
 	/** The hover card's title — `Model.Type ≡ Model.Type` for a stitch. */
 	title: string;
-	/** The model an edge type belongs to. Absent on the unframed one-model canvas (ME26). */
+	/** The model an edge type belongs to. Absent on the unframed one-model canvas. */
 	model?: string;
-	/** Declared, not committed (ST21). */
+	/** Declared, not committed. */
 	staged?: boolean;
 	description?: string;
 	/** Stitch only — the rule, for the hover card. */
@@ -90,7 +90,7 @@ export interface ModelTypeNode {
 	id: string;
 	/** `Model.Type` — the key the expanded bindings are written under. */
 	type: string;
-	/** The model's frame. Absent on the model canvas, which draws one model unframed (ME26). */
+	/** The model's frame. Absent on the model canvas, which draws one model unframed. */
 	parentId?: string;
 	data: ModelTypeData;
 }

@@ -1,12 +1,12 @@
 /**
  * The two acts a declared board carries — `Save report` and `Reports`
- * ([B6 · B21](../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
  * A live dashboard reads its subject on every open, so a finished run's numbers
  * are only *probably* stable and a running one's are not stable at all. Keeping
  * a reading writes the **resolved document** — the spec with the numbers
  * already in it — as a `board_versions` row, and the page becomes
- * `kind:{subjectId}@{versionId}` ([B13](../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * `kind:{subjectId}@{versionId}` ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
  * **The host owns which board this is, not the page.** Every declared page is
  * mounted by `declaredBoardContent` inside `<DeclaredBoard>`, so a composer
@@ -20,20 +20,20 @@
  *
  * `Reports` is the other half of the same pair — *keep this reading*, and
  * *find a kept one* — and it sits beside `Save report` on the dashboard's own
- * header rather than on the strip, which stays as narrow as it was (B21). The
+ * header rather than on the strip, which stays as narrow as it was. The
  * card it opens is drawn by `DeclaredBoard`, because a hook cannot draw.
  */
 
-import { boardReportsKey } from "@/hooks/queries/useBoardVersions";
-import { boardReportsApi } from "@/services/api/boardReports";
 import type { DashboardSpec, ExtraPanels } from "@invana/dashboard";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext } from "react";
 import { toast } from "sonner";
+import { boardReportsKey } from "@/pages/graphs-detail/features/boards/queries";
+import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
 
 /** The two action ids a declared board's header carries. */
-export const SAVE_REPORT_ACTION = "save-report";
-export const OPEN_REPORTS_ACTION = "open-reports";
+const SAVE_REPORT_ACTION = "save-report";
+const OPEN_REPORTS_ACTION = "open-reports";
 
 export interface DeclaredBoardValue {
 	username: string;
@@ -115,7 +115,7 @@ export function useReport<X extends ExtraPanels>(
 			}
 			if (actionId !== SAVE_REPORT_ACTION) return false;
 			// A kept reading keeps every tab, and switches them itself: the page
-			// that answered `tabAction` is not there to answer it (SR71).
+			// that answered `tabAction` is not there to answer it.
 			if (spec) save.mutate({ ...spec, tabAction: undefined });
 			return true;
 		},
@@ -142,7 +142,7 @@ export function useReport<X extends ExtraPanels>(
 								disabled: save.isPending,
 							},
 							// The other half of the pair — a kept reading is only kept
-							// if there is a way back to it (B21).
+							// if there is a way back to it.
 							{
 								id: OPEN_REPORTS_ACTION,
 								label: "Reports",

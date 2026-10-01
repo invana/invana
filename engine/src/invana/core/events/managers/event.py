@@ -2,43 +2,18 @@
 
 `core/events` holds the row and the write path; **nothing here knows what an app
 is**. Each app subclasses ``EventManager`` and declares its own verbs and target
-kinds — that is what keeps a feature shipping without touching `core`
-(migration-plan §14.7, E1).
+kinds — that is what keeps a feature shipping without touching `core`.
 """
 
 from __future__ import annotations
-
-from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.core.events.models import ActorKind, Event
 from invana.core.events.querysets import EventQuerySet
-
-# Never stored, whatever a caller passes.
-_REDACT_SUFFIXES: tuple[str, ...] = (
-    "_hash",
-    "_encrypted",
-    "password",
-    "api_key",
-    "secret",
-    "token",
-)
-
-
-def _is_sensitive(key: str) -> bool:
-    k = key.lower()
-    return any(k == s or k.endswith(s) for s in _REDACT_SUFFIXES)
-
-
-def _redact(value: Any) -> Any:
-    """Recursively drop sensitive keys from dicts; pass other shapes through."""
-    if isinstance(value, dict):
-        return {k: _redact(v) for k, v in value.items() if not _is_sensitive(k)}
-    if isinstance(value, list):
-        return [_redact(item) for item in value]
-    return value
-
+from invana.core.redaction import redact
+from invana.core.telemetry.recorders import record_event
+from invana.core.telemetry.spans import current_ids
 
 # ── emit_event ───────────────────────────────────────────────────────────────
 
@@ -71,7 +46,6 @@ class EventManager:
         node_run_id: str | None = None,
         skill_ids: list[str] | None = None,
         details: dict | None = None,
-        trace_id: str | None = None,
     ) -> Event:
         """Append an audit event to the current SQLAlchemy session.
 
@@ -81,13 +55,21 @@ class EventManager:
 
         ``actor_kind`` defaults to ``user``; callers running background work should
         pass ``ActorKind.system`` and leave ``actor_id=None``. ``actor_type`` is the
-        pre-docs/for-developers/modules/work/spec.md spelling, accepted so call sites migrate without a flag day.
+        older spelling, accepted so call sites migrate without a flag day.
 
         **An ``agent`` row must name the human it acted for.** ``on_behalf_of_user_id``
         is set by the engine from the root run, never from anything an agent
         can influence, and this helper refuses the row when it is missing — the
-        attribution chain is only worth reading if it cannot be skipped
-        (docs/for-developers/modules/work/spec.md, *attribution laundering*).
+        attribution chain is only worth reading if it cannot be skipped.
+
+        **The row carries the trace and span it was written in.** Both ids are
+        read off the current span, so a caller never passes them and a row from
+        any code path opens the exact step that wrote it in the trace backend.
+        Outside any span both are null.
+
+        **Each row counts on ``invana.events.emitted``**, by action, once it is
+        added to the session — the count is of rows written, and a row the
+        caller later rolls back has still been counted.
 
         Sensitive fields in ``details`` (keys matching ``*_hash``, ``*_encrypted``,
         ``password``, ``api_key``, ``secret``, ``token``) are stripped before
@@ -102,7 +84,8 @@ class EventManager:
                 "Pass the human at the root of the chain."
             )
 
-        safe_details = _redact(details or {})
+        safe_details = redact(details or {})
+        trace_id, span_id = current_ids()
 
         event = Event(
             graph_id=graph_id,
@@ -120,5 +103,8 @@ class EventManager:
             target_id=target_id,
             details=safe_details,
             trace_id=trace_id,
+            span_id=span_id,
         )
-        return await self.events_qs.add(session, event)
+        added = await self.events_qs.add(session, event)
+        record_event(action=action)
+        return added

@@ -58,7 +58,7 @@ export const authApi = {
 
 	// Personal access tokens
 	// (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
-	// Every call here needs a session — a token cannot manage tokens (PT4).
+	// Every call here needs a session — a token cannot manage tokens.
 	listTokens: async () =>
 		(await apiClient.get<PersonalAccessTokenList>("/api/v1/auth/me/tokens"))
 			.data,

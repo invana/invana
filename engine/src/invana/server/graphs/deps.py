@@ -32,6 +32,7 @@ from invana.apps.setup.managers import SetupManager
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.telemetry.spans import set_current
 from invana.runtime.querysets import TaskRunQuerySet
 
 
@@ -61,6 +62,8 @@ async def resolve_graph_by_username_slug(
     graph = (await session.execute(stmt)).scalar_one_or_none()
     if graph is None:
         raise _not_found("Graph not found.")
+    # The Graph in the same `user/graph` form Studio records on its action spans.
+    set_current(**{"invana.graph": f"{username.lower()}/{graph.slug}", "invana.graph_id": graph.id})
     return graph
 
 

@@ -1,6 +1,6 @@
-import type { TaskEdgeData, TaskNodeData } from "@/canvases/taskflow/types";
 import { EdgePreviewCard, NodePreviewCard } from "@invana/canvas-ui";
 import type { GraphEdge, GraphNode } from "@invana/graph";
+import type { TaskEdgeData, TaskNodeData } from "@/canvases/taskflow/types";
 
 export function renderTaskNode(node: GraphNode) {
 	const d = node.data as unknown as TaskNodeData;

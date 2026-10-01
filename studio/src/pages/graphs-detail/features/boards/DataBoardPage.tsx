@@ -15,36 +15,24 @@
  * open canvas, and it is deliberately the next step rather than this one.
  *
  * **The strip is not here.** `mainSection` is `BoardPagesViewPanel`
- * (`docs/for-developers/building-studio/graph-detail-page.md` G4), which owns the
+ * (`docs/for-developers/building-studio/graph-detail-page.md`), which owns the
  * tabs for every open page — a canvas, a model, a plan. This page is one body
  * inside it. The five controls that act on *this* canvas — help, layers,
  * styling, history, rename — reach it through {@link BoardPageHandle}, because
- * `BoardHeaderAction` is strip-level and carries no page id (G12).
+ * `BoardHeaderAction` is strip-level and carries no page id.
  *
  * Layers, Styling and History are **one at a time**: all three are cards pinned
  * to the canvas's top-right corner, so opening one closes the other
- * (`docs/for-developers/modules/explore/features/boards.md` CV6).
+ * (`docs/for-developers/modules/explore/features/boards.md`).
  */
 
-import { SessionTutorialModal } from "@/pages/graphs-detail/features/ask/assistant/SessionTutorialModal";
-import { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardFormDialog";
-import { BoardHistoryPanel } from "@/pages/graphs-detail/features/boards/BoardHistoryPanel";
-import { ExpandFineTunePanel } from "@/pages/graphs-detail/features/explorer";
-import type {
-	CanvasBackend,
-	ExpandMenuHandlers,
-	ExpandMenuSchema,
-} from "@/pages/graphs-detail/features/explorer";
-import { ExplorerCanvas } from "@/pages/graphs-detail/features/explorer";
-import { LayersPanel } from "@/pages/graphs-detail/features/explorer";
 import {
-	type StyleTypeInfo,
-	StylingPanel,
-} from "@/pages/graphs-detail/features/explorer";
-import type { InteractionRef } from "@/services/telemetry/tracer";
-import type { CanvasStyling } from "@/types/board";
-import type { ExpandRequest, NeighborExpandResponse } from "@/types/traversal";
-import { RendererCapabilityBanner } from "@invana/canvas-ui";
+	LayersViewPanel,
+	Panel,
+	PanelContent,
+	RendererCapabilityBanner,
+	StylingViewPanel,
+} from "@invana/canvas-ui";
 import type {
 	GraphCanvas as GraphCanvasEngine,
 	GraphData,
@@ -56,6 +44,22 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import { SessionTutorialModal } from "@/pages/graphs-detail/features/assistant";
+import { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardFormDialog";
+import { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardHistoryWidget";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
+import type {
+	CanvasBackend,
+	ExpandMenuHandlers,
+	ExpandMenuSchema,
+	ExpandRequest,
+	NeighborExpandResponse,
+} from "@/pages/graphs-detail/features/explorer";
+import {
+	ExpandNeighboursDialog,
+	ExplorerCanvas,
+} from "@/pages/graphs-detail/features/explorer";
+import type { InteractionRef } from "@/services/telemetry/tracer";
 
 /**
  * What the strip can ask of the canvas page under it. The shell holds one of
@@ -92,7 +96,6 @@ export interface BoardPageProps {
 	magnet: boolean;
 	backend: CanvasBackend;
 	styling: CanvasStyling;
-	styleTypes: { nodeTypes: StyleTypeInfo[]; edgeTypes: StyleTypeInfo[] };
 	onStylingChange: (next: CanvasStyling) => void;
 
 	onReady: (canvas: GraphCanvasEngine | null) => void;
@@ -133,7 +136,6 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			magnet,
 			backend,
 			styling,
-			styleTypes,
 			onStylingChange,
 			onReady,
 			onViewTargetChange,
@@ -153,7 +155,7 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 		ref,
 	) {
 		// Overlays. Each is about this canvas, so each lives with it. The three
-		// corner cards share one slot — they share the corner (CV6).
+		// corner cards share one slot — they share the corner.
 		const [overlay, setOverlay] = useState<
 			"layers" | "styling" | "history" | null
 		>(null);
@@ -187,7 +189,7 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 		);
 
 		// The strip's five canvas controls. `BoardHeaderAction.onClick` takes no
-		// page id (G12), so the shell cannot address this page by argument — it holds
+		// page id, so the shell cannot address this page by argument — it holds
 		// the handle instead and calls straight into it.
 		useImperativeHandle(
 			ref,
@@ -221,20 +223,38 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 						onShowDetail={onShowDetail}
 						styling={styling}
 					/>
-					<LayersPanel
-						open={overlay === "layers"}
-						canvas={canvas}
-						onClose={() => setOverlay(null)}
-					/>
-					<StylingPanel
-						open={overlay === "styling"}
-						onClose={() => setOverlay(null)}
-						nodeTypes={styleTypes.nodeTypes}
-						edgeTypes={styleTypes.edgeTypes}
-						styling={styling}
-						onChange={onStylingChange}
-					/>
-					<BoardHistoryPanel
+					{overlay === "layers" && (
+						<Panel position="top-right" offset={12} zIndex={20}>
+							<PanelContent
+								width={320}
+								className="max-h-[70vh]"
+								header="Layers"
+								onClose={() => setOverlay(null)}
+							>
+								<LayersViewPanel canvas={canvas} />
+							</PanelContent>
+						</Panel>
+					)}
+					{overlay === "styling" && (
+						// The card only edits: `ExplorerCanvas` paints the styling,
+						// so a board keeps it while the card is closed.
+						<Panel position="top-right" offset={12} zIndex={20}>
+							<PanelContent
+								width={288}
+								className="max-h-[70vh]"
+								header="Styling"
+								onClose={() => setOverlay(null)}
+							>
+								<StylingViewPanel
+									canvas={canvas}
+									apply={false}
+									value={styling}
+									onChange={onStylingChange}
+								/>
+							</PanelContent>
+						</Panel>
+					)}
+					<BoardHistoryWidget
 						open={overlay === "history"}
 						onClose={() => setOverlay(null)}
 						username={username}
@@ -246,7 +266,7 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 						isSaving={isSaving}
 					/>
 					{fineTuneVertex && (
-						<ExpandFineTunePanel
+						<ExpandNeighboursDialog
 							open
 							vertexId={fineTuneVertex}
 							schema={expandSchema}

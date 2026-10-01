@@ -242,6 +242,5 @@ A complete ontology for a movie database:
 
 ## Next Steps
 
-- [Running Queries](running-queries.md) — query your modelled graph
 - [Ontology Concepts](../concepts/ontology-modelling.md) — deep dive into the modelling system
 - [Connectors](../concepts/connectors.md) — how ontologies map to different backends

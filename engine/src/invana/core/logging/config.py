@@ -17,10 +17,22 @@ DEFAULT_LOGGING_CONFIG: dict = {
         "suppress_noisy": {
             "()": "invana.core.logging.filters.SuppressNoisyFilter",
         },
+        # Stamps each record with the active span's trace_id / span_id (and the
+        # "{trace}" suffix used below), so a console line can be found in the
+        # trace backend. Empty outside a span or without OpenTelemetry installed.
+        "trace_context": {
+            "()": "invana.core.logging.filters.TraceContextFilter",
+        },
+        # Drops credentials from a record's fields, by the same rule as events.
+        "redact": {
+            "()": "invana.core.logging.filters.RedactFilter",
+        },
     },
     "formatters": {
         "simple": {
-            "format": "{levelname} - {asctime} : {message}",
+            # PlainFormatter fills {trace} and {log_fields} itself when a handler lacks trace_context.
+            "()": "invana.core.logging.formatters.PlainFormatter",
+            "format": "{levelname} - {asctime}{trace}{log_fields} : {message}",
             "style": "{",
         },
         "json": {
@@ -32,7 +44,7 @@ DEFAULT_LOGGING_CONFIG: dict = {
             "class": "logging.StreamHandler",
             "level": "INFO",
             "formatter": "simple",
-            "filters": ["suppress_noisy"],
+            "filters": ["suppress_noisy", "trace_context", "redact"],
         },
     },
     "root": {
@@ -79,3 +91,28 @@ def configure_logging(level: str = "INFO", config: dict | None = None) -> None:
         cfg["loggers"]["invana"]["level"] = level
         config = cfg
     logging.config.dictConfig(config)
+
+
+def set_level(level: str) -> None:
+    """
+    Change the level of the pipeline ``configure_logging()`` built, in place.
+
+    For an entry point that wants a different level after startup — the CLI
+    prints at ``INFO`` whatever the configured level is. It sets the root
+    logger, the ``invana`` logger and the ``console`` handler, the three places
+    ``configure_logging(level=...)`` sets, and touches nothing else.
+
+    Calling ``configure_logging()`` a second time would not do: ``dictConfig``
+    closes and flushes **every** handler first, the OTLP log handler that
+    telemetry added among them, so the process would stop shipping logs and an
+    unreachable collector would hold its exit up on that flush.
+
+    Examples::
+
+        set_level("INFO")
+    """
+    logging.getLogger().setLevel(level)
+    logging.getLogger("invana").setLevel(level)
+    for handler in logging.getLogger().handlers:
+        if handler.get_name() == "console":
+            handler.setLevel(level)

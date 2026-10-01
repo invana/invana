@@ -20,7 +20,7 @@ from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.graph_traversal import GraphTraversalSource
 
 from invana.core.querylog import ObservedQuery, observe
-from invana.core.telemetry.recorders import add_graph_query_in_flight, record_graph_query
+from invana.core.telemetry.recorders import record_graph_query
 from invana.graph.connectors.base.connector import (
     BaseConnector,
     _query_span,
@@ -325,74 +325,68 @@ class GremlinConnector(BaseConnector):
         ``timeout_s`` is enforced client-side around the blocking driver call so
         a hung traversal can't outlive its budget; ``None`` leaves it unbounded.
 
-        Instrumented (docs/for-developers/modules/operate/features/observability.md) with the same
-        ``graph.query.db_execute`` span and
-        ``invana.query.graph.*`` metrics as the Cypher path in
-        ``BaseConnector.execute`` — this path previously bypassed both, so every
-        Gremlin traversal was invisible in traces and metrics.
+        Instrumented with the same ``graph.query.db_execute`` span and
+        ``invana.graph_connectors.query.*`` metrics as the Cypher path in
+        ``BaseConnector.execute``: connector class · language · operation
+        (``query``) · outcome, and the number of results on success.
         """
         language = self._query_language_label()
-        backend = type(self).__name__
-        add_graph_query_in_flight(1, language=language, backend=backend)
+        connector = type(self).__name__
         start = time.perf_counter()
-        try:
-            with _query_span("graph.query.db_execute") as span:
-                try:
-                    coro = asyncio.to_thread(traversal_obj.to_list)
-                    if timeout_s is not None:
-                        results = await asyncio.wait_for(coro, timeout=timeout_s)
-                    else:
-                        results = await coro
-                except TimeoutError as e:
-                    exc = QueryExecutionError(
-                        f"Traversal timed out after {timeout_s}s",
-                        category=QueryErrorCategory.TIMEOUT,
-                    )
-                    _record_span_exception(span, exc)
-                    record_graph_query(
-                        language=language,
-                        backend=backend,
-                        duration_ms=(time.perf_counter() - start) * 1000,
-                        status="failed",
-                        error_type=type(exc).__name__,
-                        error_category=exc.category,
-                    )
-                    raise exc from e
-                except Exception as e:
-                    exc = QueryExecutionError(f"Traversal execution failed: {e}")
-                    _record_span_exception(span, exc)
-                    record_graph_query(
-                        language=language,
-                        backend=backend,
-                        duration_ms=(time.perf_counter() - start) * 1000,
-                        status="failed",
-                        error_type=type(exc).__name__,
-                        error_category=exc.category,
-                    )
-                    raise exc from e
-            duration_ms = (time.perf_counter() - start) * 1000
-            record_graph_query(
-                language=language,
-                backend=backend,
-                duration_ms=duration_ms,
-                status="success",
-                result_size=len(results),
-            )
-            # A traversal's shape is its bytecode's text (the-model-page.md MP37).
-            observe(
-                lambda caller: ObservedQuery(
-                    caller=caller,
-                    query=str(getattr(traversal_obj, "bytecode", traversal_obj)),
-                    parameters={},
-                    language=language,
-                    duration_ms=duration_ms,
-                    rows=len(results),
-                    ok=True,
+        with _query_span("graph.query.db_execute") as span:
+            try:
+                coro = asyncio.to_thread(traversal_obj.to_list)
+                if timeout_s is not None:
+                    results = await asyncio.wait_for(coro, timeout=timeout_s)
+                else:
+                    results = await coro
+            except TimeoutError as e:
+                exc = QueryExecutionError(
+                    f"Traversal timed out after {timeout_s}s",
+                    category=QueryErrorCategory.TIMEOUT,
                 )
+                _record_span_exception(span, exc)
+                record_graph_query(
+                    connector=connector,
+                    language=language,
+                    operation="query",
+                    outcome="failed",
+                    duration_s=time.perf_counter() - start,
+                )
+                raise exc from e
+            except Exception as e:
+                exc = QueryExecutionError(f"Traversal execution failed: {e}")
+                _record_span_exception(span, exc)
+                record_graph_query(
+                    connector=connector,
+                    language=language,
+                    operation="query",
+                    outcome="failed",
+                    duration_s=time.perf_counter() - start,
+                )
+                raise exc from e
+        duration_ms = (time.perf_counter() - start) * 1000
+        record_graph_query(
+            connector=connector,
+            language=language,
+            operation="query",
+            outcome="ok",
+            duration_s=duration_ms / 1000,
+            result_size=len(results),
+        )
+        # A traversal's shape is its bytecode's text (the-model-page.md MP37).
+        observe(
+            lambda caller: ObservedQuery(
+                caller=caller,
+                query=str(getattr(traversal_obj, "bytecode", traversal_obj)),
+                parameters={},
+                language=language,
+                duration_ms=duration_ms,
+                rows=len(results),
+                ok=True,
             )
-            return results
-        finally:
-            add_graph_query_in_flight(-1, language=language, backend=backend)
+        )
+        return results
 
     async def health_check(self) -> bool:
         """Verify connectivity by running a simple traversal."""

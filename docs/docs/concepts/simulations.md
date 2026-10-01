@@ -225,7 +225,5 @@ WS /ws/simulation-stream
 
 ## What's Next?
 
-- [Running Simulations](../guides/running-simulations.md) — Step-by-step guide
-- [Tic-Tac-Toe Example](../guides/tic-tac-toe-example.md) — Full walkthrough
 - [Algorithms](algorithms.md) — Use algorithms as simulation inputs
 - [Studio: Simulation Dashboard](../studio/simulation-dashboard.md) — Visual builder

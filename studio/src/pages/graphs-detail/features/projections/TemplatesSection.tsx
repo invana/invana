@@ -1,0 +1,159 @@
+// **Templates** — the third section of the Library stack (graph-detail-page.md).
+//
+// A projection template is to an answer what a plan is to a run: both are
+// definitions, both are promoted from what served (projections.md). So it has
+// no `leftNav` item of its own and sits under `Plans` and `Catalogue`, which are
+// the other two things a run is composed from — the same rule applies to
+// Stitches: a library you open while authoring is not a place you go.
+//
+// The section owns the header — label, count, search, filter and the `+` that
+// authors one. The body is `TemplatesSectionBody`.
+
+import {
+	DropdownMenuLabel,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+	DropdownMenuSeparator,
+	type PanelStackSection,
+} from "@invana/ui";
+import { Plus, Table2 } from "lucide-react";
+import {
+	TemplatesCount,
+	TemplatesSectionBody,
+	TemplateTrail,
+} from "@/pages/graphs-detail/features/projections/TemplatesSectionBody";
+import {
+	type StackSectionUi,
+	stackSection,
+} from "@/pages/graphs-detail/shared/StackSection";
+
+/** `kind` and `surface` — the two columns this list is narrowed on (§3a). */
+const TEMPLATE_KINDS = ["result", "prompt"] as const;
+const TEMPLATE_SURFACES = [
+	"table",
+	"metric",
+	"chart",
+	"subgraph",
+	"markdown",
+] as const;
+
+export interface TemplatesSectionProps {
+	username: string;
+	graphSlug: string;
+	ui: StackSectionUi;
+	/** `&template=` — the template whose detail replaces this section's body. */
+	templateId: string | null;
+	onOpenTemplate: (id: string | null) => void;
+	/** The section's `+` — authoring happens in the section that owns it. */
+	authoring: boolean;
+	onAuthoring: (v: boolean) => void;
+	kindFilter: string;
+	onKindFilter: (v: string) => void;
+	surfaceFilter: string;
+	onSurfaceFilter: (v: string) => void;
+	defaultSize?: number | string;
+	defaultCollapsed?: boolean;
+}
+
+export function templatesSection({
+	username,
+	graphSlug,
+	ui,
+	templateId,
+	onOpenTemplate,
+	authoring,
+	onAuthoring,
+	kindFilter,
+	onKindFilter,
+	surfaceFilter,
+	onSurfaceFilter,
+	defaultSize,
+	defaultCollapsed,
+}: TemplatesSectionProps): PanelStackSection {
+	return stackSection(
+		{
+			id: "templates",
+			label: "Templates",
+			icon: Table2,
+			count: <TemplatesCount username={username} graphSlug={graphSlug} />,
+			// Authoring is a body, not a record — so it borrows the drill-in header
+			// (`‹ TEMPLATES / new`) rather than inventing a second way back.
+			trail: templateId ? (
+				<TemplateTrail
+					username={username}
+					graphSlug={graphSlug}
+					id={templateId}
+				/>
+			) : authoring ? (
+				"new"
+			) : undefined,
+			onBack: () => {
+				onAuthoring(false);
+				onOpenTemplate(null);
+			},
+			searchable: true,
+			searchPlaceholder: "Search templates",
+			headerActions: [
+				{
+					key: "new",
+					name: "Author a template",
+					icon: Plus,
+					onClick: () => {
+						onOpenTemplate(null);
+						onAuthoring(true);
+					},
+				},
+			],
+			filtered: Boolean(kindFilter || surfaceFilter),
+			filterMenu: (
+				<>
+					<DropdownMenuLabel>Kind</DropdownMenuLabel>
+					<DropdownMenuRadioGroup
+						value={kindFilter || "all"}
+						onValueChange={(v) => onKindFilter(v === "all" ? "" : v)}
+					>
+						<DropdownMenuRadioItem value="all">
+							both kinds
+						</DropdownMenuRadioItem>
+						{TEMPLATE_KINDS.map((k) => (
+							<DropdownMenuRadioItem key={k} value={k}>
+								{k}
+							</DropdownMenuRadioItem>
+						))}
+					</DropdownMenuRadioGroup>
+					<DropdownMenuSeparator />
+					<DropdownMenuLabel>Surface</DropdownMenuLabel>
+					<DropdownMenuRadioGroup
+						value={surfaceFilter || "all"}
+						onValueChange={(v) => onSurfaceFilter(v === "all" ? "" : v)}
+					>
+						<DropdownMenuRadioItem value="all">
+							every surface
+						</DropdownMenuRadioItem>
+						{TEMPLATE_SURFACES.map((s) => (
+							<DropdownMenuRadioItem key={s} value={s}>
+								{s}
+							</DropdownMenuRadioItem>
+						))}
+					</DropdownMenuRadioGroup>
+				</>
+			),
+			defaultSize,
+			defaultCollapsed,
+			children: ({ search }) => (
+				<TemplatesSectionBody
+					username={username}
+					graphSlug={graphSlug}
+					search={search}
+					kindFilter={kindFilter}
+					surfaceFilter={surfaceFilter}
+					selectedId={templateId}
+					onSelect={onOpenTemplate}
+					authoring={authoring}
+					onAuthored={() => onAuthoring(false)}
+				/>
+			),
+		},
+		ui,
+	);
+}

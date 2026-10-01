@@ -17,11 +17,11 @@
  * Renders nothing; mount it once inside `<ThemeProvider>`.
  */
 
+import { useTheme } from "@invana/themes";
+import { useEffect, useRef } from "react";
 import { authApi } from "@/services/api/auth";
 import { useAuthStore } from "@/stores/auth.store";
 import type { ThemeSelection } from "@/types/auth";
-import { useTheme } from "@invana/themes";
-import { useEffect, useRef } from "react";
 
 const keyOf = (s: ThemeSelection) => `${s.theme}|${s.mode}|${s.accent ?? ""}`;
 

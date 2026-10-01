@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 
-// The wizard is the graph page's content while anything is outstanding (G26),
+// The wizard is the graph page's content while anything is outstanding,
 // so it needs no param to be *shown*. This one exists for the other half of
-// SU19: re-opening it once the Graph is ready, from the graduation cap in
+// re-opening it once the Graph is ready, from the graduation cap in
 // `header.right`. It is the cap's only state.
 const ONBOARDING_PARAM = "onboarding";
 
@@ -13,7 +13,7 @@ const ONBOARDING_PARAM = "onboarding";
  * `open()` puts the wizard on the graph page and leaves it there until it is
  * closed — a reload keeps it, because it is in the URL, and a teammate sent the
  * link lands on the same thing. There is no per-user flag and no first-run
- * cookie: setup belongs to the Graph, not the person (SU14).
+ * cookie: setup belongs to the Graph, not the person.
  */
 export function useOnboarding() {
 	const [params, setParams] = useSearchParams();

@@ -1,17 +1,3 @@
-import { useSetupSectionMutation } from "@/hooks/queries/useGraphs";
-import {
-	SETUP_GATE_META,
-	SETUP_STEP_BY_KEY,
-	setupCommand,
-} from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
-import {
-	type Graph,
-	SETUP_REQUIRED,
-	SETUP_SKIPPABLE,
-	type SetupSection,
-	setupSectionStatus,
-} from "@/types/graphs";
 import {
 	Button,
 	ButtonGroup,
@@ -21,6 +7,20 @@ import {
 } from "@invana/ui";
 import { ArrowLeft, ArrowRight, Copy, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import {
+	type Graph,
+	SETUP_REQUIRED,
+	SETUP_SKIPPABLE,
+	type SetupSection,
+	setupSectionStatus,
+	useSetupSectionMutation,
+} from "@/pages/graphs-detail/features/graphs";
+import {
+	SETUP_GATE_META,
+	SETUP_STEP_BY_KEY,
+	setupCommand,
+} from "@/pages/graphs-detail/features/setup/setupSteps";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /**
  * One step, taught (setup.md 7.1 · 7.2).
@@ -30,8 +30,8 @@ import { toast } from "sonner";
  * same six on every step, so a step's teaching cannot say one thing here and
  * another in the docs.
  *
- * It owns **no form** (SU2): the primary action opens the panel that already
- * holds the field. And it never claims a step is done — that is derived (SU1),
+ * It owns **no form**: the primary action opens the panel that already
+ * holds the field. And it never claims a step is done — that is derived,
  * which is why the closing band says what to *look at* rather than offering an
  * "I've done it" button.
  */
@@ -61,7 +61,7 @@ export function SetupLesson({
 	const gate = SETUP_GATE_META.find((g) => g.gate === state?.gate);
 	const command = setupCommand(meta, username, graphSlug);
 
-	// "step 3 of 4" counts the **required** steps, never all six (SU15). An
+	// "step 3 of 4" counts the **required** steps, never all six. An
 	// optional step is not the nth of anything — it says so instead.
 	const requiredIndex = SETUP_REQUIRED.indexOf(section);
 	const position =
@@ -69,7 +69,7 @@ export function SetupLesson({
 			? `step ${requiredIndex + 1} of ${SETUP_REQUIRED.length}`
 			: "optional";
 
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 	const setupMutation = useSetupSectionMutation();
 	const act = (action: "skip" | "reset") =>
 		setupMutation.mutate(
@@ -104,7 +104,7 @@ export function SetupLesson({
 				</p>
 			</header>
 
-			{/* ── The product lesson (SU17) ──────────────────────────────────── */}
+			{/* ── The product lesson ──────────────────────────────────── */}
 			{meta.concept && (
 				<aside className="flex gap-2.5 rounded-control border border-info/30 bg-info/5 p-3">
 					<Sparkles className="mt-0.5 size-4 shrink-0 text-info" />
@@ -211,7 +211,7 @@ export function SetupLesson({
 				)}
 			</div>
 
-			{/* ── The same thing, at a terminal (SU6) ────────────────────────── */}
+			{/* ── The same thing, at a terminal ────────────────────────── */}
 			{command && (
 				<section className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-2">

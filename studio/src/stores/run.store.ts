@@ -4,9 +4,8 @@
 // moving right now (and keeps the reasoning / diagnosis / result that only
 // ride the stream, so they stay visible after the reply settles).
 
-import { stepFromFrame } from "@/services/api/runs";
-import type { Emission } from "@/types/emission";
-import type { QueryResponse } from "@/types/query";
+import { create } from "zustand";
+import type { Emission } from "@/pages/graphs-detail/features/assistant";
 import type {
 	AskFrame,
 	Diagnosis,
@@ -14,10 +13,11 @@ import type {
 	RunNode,
 	RunStatus,
 	RunView,
-} from "@/types/run";
-import { create } from "zustand";
+} from "@/pages/graphs-detail/features/runs";
+import { stepFromFrame } from "@/pages/graphs-detail/features/runs";
+import type { QueryResponse } from "@/types/query";
 
-interface ThinkingState {
+interface RunState {
 	views: Record<string, RunView>;
 	/** Register a run before its stream opens (or from a session detail). */
 	seed: (
@@ -78,8 +78,8 @@ function fold(view: RunView, e: AskFrame): RunView {
 		case "result":
 			return { ...v, result: p.result as QueryResponse };
 		case "emission": {
-			// Emissions paint as they arrive rather than at the end of the run
-			// (SW1). They are re-read from the record once it settles (AS10);
+			// Emissions paint as they arrive rather than at the end of the run.
+			// They are re-read from the record once it settles;
 			// this is the live copy, and the seq keeps their order.
 			const arriving = p as unknown as {
 				id: string;
@@ -100,7 +100,7 @@ function fold(view: RunView, e: AskFrame): RunView {
 		}
 		case "cannot_answer":
 			// Not a diagnosis: the graph is telling you what it does not hold,
-			// which is an answer (CA1). Rendering it beside "the graph timed out"
+			// which is an answer. Rendering it beside "the graph timed out"
 			// would put two different things in one shape.
 			return {
 				...v,
@@ -127,7 +127,7 @@ function fold(view: RunView, e: AskFrame): RunView {
 /**
  * One arriving emission frame, as the card reads it.
  *
- * The kind comes off the frame — the producing step declared it (AS2) — so this
+ * The kind comes off the frame — the producing step declared it — so this
  * never inspects the payload to decide what it is looking at.
  */
 function foldEmission(frame: {
@@ -194,7 +194,7 @@ function freshView(): Pick<RunView, "status" | "steps" | "seq"> {
 	return { status: "queued", steps: [], seq: 0 };
 }
 
-export const useRunStore = create<ThinkingState>((set) => ({
+export const useRunStore = create<RunState>((set) => ({
 	views: {},
 	seed: (view) =>
 		set((state) => ({
@@ -223,8 +223,3 @@ export const useRunStore = create<ThinkingState>((set) => ({
 			return { views: rest };
 		}),
 }));
-
-/** Steps of the queued plan a run shows before its stream arrives. */
-export function seedSteps(steps: RunNode[]): RunNode[] {
-	return [...steps].sort((a, b) => a.seq - b.seq || a.attempt - b.attempt);
-}

@@ -51,7 +51,7 @@ studio/src/canvases/
 | `initialDetail` | `Detail` | — | `circles` by default, which is what `settings.json` starts on |
 | `selectedId` | `string \| null` | — | the node drawn selected (a ring, no drag handles — [SR52](../modules/operate/features/see-what-ran.md#decisions)) |
 | `onOpenNode` | `(id: string) => void` | — | click on a node. Leave it out and a click only selects |
-| `height` | `number` | — | for a host that gives no height of its own — a dashboard panel body is content-height. Left out, the canvas fills its parent. The run's `TaskFlowPanel` measures the room left in the dashboard's scroller and passes that, never less than 360px, so the Flow tab takes the whole page |
+| `height` | `number` | — | for a host that gives no height of its own — a dashboard panel body is content-height. Left out, the canvas fills its parent. The run's `TaskFlowWidget` measures the room left in the dashboard's scroller and passes that, never less than 360px, so the Flow tab takes the whole page |
 
 `Detail` is `'circles' | 'cards'`.
 
@@ -95,8 +95,8 @@ When the Detail select changes: `stopLayout` → `update(templates[detail])` →
 
 ```mermaid
 flowchart LR
-  SP[SkillPlanRead] -->|skills/taskFlowFromPlan.ts| D1[TaskFlowData]
-  TR[TraceRead · TaskGroup] -->|operate/dashboards/taskFlowFromRun.ts| D2[TaskFlowData]
+  SP[SkillPlanRead] -->|taskflow/taskFlowFromPlan.ts| D1[TaskFlowData]
+  TR[TraceRead · TaskGroup] -->|runs/boards/taskFlowFromRun.ts| D2[TaskFlowData]
   D1 --> C[TaskFlowCanvas]
   D2 --> C
   S[settings.json · templates.json] --> C
@@ -108,8 +108,8 @@ flowchart LR
 | Surface | File | Data | Edges |
 |---|---|---|---|
 | Skill detail › **Flow** tab | `features/skills/SkillFlowTab.tsx`: a one-line header (steps · layers declared), the canvas, then **Composed** | `taskFlowFromPlan(plan)`: the current version's plan | the plan's own `edges`. `binding` stays `binding`, `order` becomes `require` |
-| Skill board › `skillFlow` panel | `features/skills/dashboards/SkillFlowPanel.tsx` | the same `SkillFlowTab` | the same |
-| Run page › **Flow** tab | `features/operate/dashboards/TaskFlowPanel.tsx`, still registered as `flow` | `taskFlowFromRun(groups)`: one node per task group, with its status in the hover rows | `sequence`, in `seq` order, until `plan_snapshot` is on the trace ([SR32](../modules/operate/features/see-what-ran.md#decisions)) |
+| Skill board › `skillFlow` panel | `features/skills/boards/SkillFlowWidget.tsx` | the same `SkillFlowTab` | the same |
+| Run page › **Flow** tab | `shared/dashboards/TaskFlowWidget.tsx`, still registered as `flow` | `taskFlowFromRun(groups)`: one node per task group, with its status in the hover rows | `sequence`, in `seq` order, until `plan_snapshot` is on the trace ([SR32](../modules/operate/features/see-what-ran.md#decisions)) |
 
 ### Mapping to the three node types
 
@@ -144,4 +144,4 @@ real value in `data.bound`.
 | A theme toggle on the canvas | TF7 |
 | Editing: drag-to-connect, adding a node, deleting | the flow is read-only on both surfaces ([SR52](../modules/operate/features/see-what-ran.md#decisions)). Drafting is [7.7](../modules/workflows/features/draft-a-plan.md)'s canvas |
 | Per-caller templates | one pair of templates. A caller that needs another passes its own `templates` (TF2) and does not fork the component |
-| Any flow drawing other than this one | the grid of `TaskNode` cards in `TaskFlowPanel` and the layer strip in `SkillFlowTab` are removed, not kept beside it |
+| Any flow drawing other than this one | the grid of `TaskNode` cards in `TaskFlowWidget` and the layer strip in `SkillFlowTab` are removed, not kept beside it |

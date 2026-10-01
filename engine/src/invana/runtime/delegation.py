@@ -35,7 +35,7 @@ from invana.apps.skills.managers import SkillBindingManager
 from invana.apps.skills.querysets import SkillQuerySet
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.runtime.models import RunStatus, TaskRun, TaskStream
 from invana.runtime.querysets import TaskRunQuerySet
 
@@ -196,7 +196,6 @@ async def spawn(
         actor_id=parent.id,
         on_behalf_of_user_id=run.on_behalf_of_user_id,
         details={"actor_name": parent.name, "child_name": child.name, "lifetime": lifetime},
-        trace_id=current_trace_id(),
     )
     return child
 

@@ -21,7 +21,7 @@ from invana.apps.modeller.store import ModelStore
 from invana.apps.sessions.managers import SessionManager
 from invana.apps.sessions.reconcile import reconcile_proposal
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.runtime.catalogue.contract import (
     Out,
     RunVars,
@@ -77,7 +77,6 @@ async def validate_proposal_task(ctx: TaskContext, v: RunVars) -> Out:
             "output_tokens": v.proposal.usage.output_tokens,
             "latency_ms": round(v.proposal.duration_ms),
         },
-        trace_id=current_trace_id(),
     )
     c = v.counts
     added = [

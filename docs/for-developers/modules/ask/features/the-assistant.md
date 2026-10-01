@@ -116,11 +116,11 @@ flowchart TD
 | AD3 | Answers land where the user is working, not only in the thread. |
 | AD4 | Closing it never cancels a run. |
 | AD5 | It uses the ordinary ask runtime — no second path. |
-| AD6 | It is the Sessions panel, moved, and renamed **`AssistantPanel`** for the occupant it is rather than the contents it holds. Nothing inside it is redesigned: it already switches between the list and the open thread, and its composer already names the bound agent. **What is inside stays sessions** — a session belongs to the graph, not to the assistant, so `Session*` components and `useSessions` keep their names. |
+| AD6 | It is the Sessions panel, moved, and renamed **`AssistantViewPanel`** for the occupant it is rather than the contents it holds. Nothing inside it is redesigned: it already switches between the list and the open thread, and its composer already names the bound agent. **What is inside stays sessions** — a session belongs to the graph, not to the assistant, so `Session*` components and `useSessions` keep their names. |
 | AD7 | It is the `assistant` value of `?right=`, independent of the left panel's `?panel=`, so opening it costs nothing else on screen. The region is the param and the occupant is the value ([graph-detail-page.md](../../../building-studio/graph-detail-page.md) G16); `?ai=` is read as a legacy alias and never written. |
 | AD8 | The attachment goes into the ask **in words**. What the thread records is what was asked — a hidden context field would make the transcript a partial account. |
 | AD9 | Sessions has no left-rail entry. The right side is where it lives, the header's Assistant control is the one door, and a stale `?panel=sessions` link opens the assistant instead. A panel on the right whose collapse control folded the left column was the proof it was still keyed to the wrong side. |
-| AD10 | **The attachment chip belongs to the composer, not to a wrapper around the panel.** AD2 says it rides above the composer; a shell that renders it above the *whole panel* pins it to the top of the region, a list's length away from the ask it qualifies. `SessionComposer` owns it, and the assistant has no shell component of its own — the occupant of `rightSection` is `AssistantPanel` itself. |
+| AD10 | **The attachment chip belongs to the composer, not to a wrapper around the panel.** AD2 says it rides above the composer; a shell that renders it above the *whole panel* pins it to the top of the region, a list's length away from the ask it qualifies. `SessionComposer` owns it, and the assistant has no shell component of its own — the occupant of `rightSection` is `AssistantViewPanel` itself. |
 | AD11 | **The right side has no memory.** Opening the assistant replaces the inspector and closing it closes the region, rather than restoring what was there before. Restoring needs a second piece of state to hold the previous occupant, which is what one param per region exists to remove. |
 | AD15 | **The world chip sits in the composer, between the ask kind and the agent.** The world belongs to the session, so it is set where that session asks; the header belongs to the page, and a chip there would show a world nothing is asking in whenever the assistant is closed or on another thread. The agent stays last — it is who answers; the world is where it looks. |
 | AD16 | **Next ask only is a checkbox in the world picker, not a second chip.** One control sets the world; the checkbox scopes it to one ask and the trigger carries a *next ask only* tag until that ask is sent. Two chips would make *which one applies* a question the reader has to answer. |
@@ -151,7 +151,7 @@ now reads *assistant decision*.
 
 | | |
 |---|---|
-| Studio | `src/pages/graphs-detail/features/ask/assistant/` — `AssistantPanel` and its `Session*` parts |
-| The region | `src/pages/graphs-detail/shell/useRightSection.ts` — who holds `rightSection`, which is the shell's question, not the assistant's |
+| Studio | `src/pages/graphs-detail/features/ask/assistant/` — `AssistantViewPanel` and its `Session*` parts |
+| The region | `src/pages/graphs-detail/shared/useRightSection.ts` — who holds `rightSection`, which is the region's question, not the assistant's |
 | Siblings | `features/ask/answer-surface/` (what a reply renders) and `features/ask/projections/` (the Templates panel). One module, one sub-folder per feature |
 | Not | `features/explore/` — it was there, and that was the filing mistake AD12 names |

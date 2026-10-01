@@ -1,6 +1,6 @@
 /**
  * The **Flow** tab — a skill's plan on `TaskFlowCanvas`
- * ([SK16](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+ * ([authoring-a-skill.md](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
  *
  * The plan's own tasks and edges, laid out by ELK, as Circles or Cards
  * ([task-flow-canvas.md](docs/for-developers/building-studio/task-flow-canvas.md)).
@@ -12,42 +12,46 @@
  * ## What it composed
  *
  * A step inlined from a library plan is an ordinary node — that is the whole of
- * [SK33](docs/for-developers/modules/skills/features/authoring-a-skill.md) — and
+ * [authoring-a-skill.md](docs/for-developers/modules/skills/features/authoring-a-skill.md) — and
  * its hover card says which plan it came from. **Composed** under the canvas
  * names each plan once, with what this skill tuned and whether the library has
  * published a newer version since
- * ([LB19](docs/for-developers/modules/workflows/features/the-library.md) ·
- * [SK34](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+ * ([the-library.md](docs/for-developers/modules/workflows/features/the-library.md) ·
+ * [authoring-a-skill.md](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
  * It only says so: re-inlining is an act somebody asks for, because the copy is
  * what makes a published skill do tomorrow what it did today.
  */
 
+import { Badge, EmptyState, Spinner } from "@invana/ui";
+import { Workflow } from "lucide-react";
+import { useMemo } from "react";
 import {
 	TaskFlowCanvas,
 	taskFlowSettings,
 	taskFlowTemplates,
 } from "@/canvases/taskflow";
-import { taskFlowFromPlan } from "@/pages/graphs-detail/features/skills/taskFlowFromPlan";
-import type { PlanUse, SkillPlanNode, SkillPlanRead } from "@/types/skills";
-import { Badge, EmptyState, Spinner } from "@invana/ui";
-import { Workflow } from "lucide-react";
-import { useMemo } from "react";
+import { taskFlowFromPlan } from "@/canvases/taskflow/taskFlowFromPlan";
+import type {
+	PlanUse,
+	SkillPlaybookNode,
+	SkillPlaybookRead,
+} from "@/pages/graphs-detail/features/skills/types";
 
 export function SkillFlowTab({
 	plan,
 	loading,
 	empty,
 }: {
-	plan: SkillPlanRead | undefined;
+	plan: SkillPlaybookRead | undefined;
 	loading: boolean;
 	/**
 	 * What to say when there is no plan, for a caller that knows **why**.
 	 *
 	 * The default says a version without a plan is a fault, because inside the
-	 * drawer it is: a version owns exactly one plan. The board reads a skill's
+	 * section it is: a version owns exactly one plan. The board reads a skill's
 	 * *published* version, so a draft reaches this with nothing to draw and no
 	 * fault to report — and a refusal that names the wrong cause is worse than
-	 * none (SK21).
+	 * none.
 	 */
 	empty?: { title: string; description: string };
 }) {
@@ -69,7 +73,7 @@ export function SkillFlowTab({
 	return <SkillFlow plan={plan} />;
 }
 
-function SkillFlow({ plan }: { plan: SkillPlanRead }) {
+function SkillFlow({ plan }: { plan: SkillPlaybookRead }) {
 	const data = useMemo(() => taskFlowFromPlan(plan), [plan]);
 	const declared = new Set(plan.nodes.map((n) => n.layer));
 
@@ -114,7 +118,7 @@ function Composed({
 	nodes,
 }: {
 	uses: PlanUse[];
-	nodes: SkillPlanNode[];
+	nodes: SkillPlaybookNode[];
 }) {
 	if (uses.length === 0) return null;
 

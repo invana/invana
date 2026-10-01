@@ -1,12 +1,14 @@
-import { useGraphQuery } from "@/hooks/queries/useGraphs";
-import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
-import { hasOutstandingSetup } from "@/types/graphs";
 import { ButtonWithTooltip, cn } from "@invana/ui";
 import { GraduationCap } from "lucide-react";
+import {
+	hasOutstandingSetup,
+	useGraphQuery,
+} from "@/pages/graphs-detail/features/graphs";
+import { useOnboarding } from "@/pages/graphs-detail/features/setup";
 
 /**
  * The door the onboarding wizard never closes
- * (docs/for-developers/modules/platform/features/setup.md SU19).
+ * (docs/for-developers/modules/platform/features/setup.md).
  *
  * `header.right`, between `GitHubStars` and `ThemeMenu`, on graph-scoped routes
  * only — a Graph has onboarding, the Graphs list does not. It is **lit** while

@@ -3,12 +3,13 @@
 Public API
 ----------
 setup_telemetry()       Register OTel providers (traces/metrics/logs). Idempotent.
-instrument_app()        Add FastAPI + SQLAlchemy auto-instrumentation. Call in lifespan.
+instrument_app()        Add SQLAlchemy auto-instrumentation. Call in lifespan.
+instrument_process()    Instrument every engine created afterwards (the CLI). Idempotent.
+shutdown_telemetry()    Export what the providers hold and shut them down, within a budget.
 TelemetryMiddleware     Pure-ASGI middleware that spans every HTTP request.
 
-Decorators (import from invana.core.telemetry.decorators):
-  @track()              Wrap any async/sync method in an OTel span.
-  @capture_metrics()    Record domain-specific metrics per method call.
+Metrics are recorded through ``invana.core.telemetry.recorders`` (no-op-safe
+functions over the instrument catalogue in ``metrics.py``).
 
 Everything here is resolved lazily via ``__getattr__`` so that importing the
 package (e.g. ``invana.telemetry.recorders`` from the connector / LLM client) does
@@ -16,7 +17,13 @@ not pull in OpenTelemetry — the optional ``telemetry`` extra
 (docs/for-developers/modules/operate/features/observability.md).
 """
 
-__all__ = ["TelemetryMiddleware", "instrument_app", "setup_telemetry"]
+__all__ = [
+    "TelemetryMiddleware",
+    "instrument_app",
+    "instrument_process",
+    "setup_telemetry",
+    "shutdown_telemetry",
+]
 
 
 def __getattr__(name: str):
@@ -24,7 +31,7 @@ def __getattr__(name: str):
         from invana.core.telemetry.middleware import TelemetryMiddleware
 
         return TelemetryMiddleware
-    if name in ("instrument_app", "setup_telemetry"):
+    if name in ("instrument_app", "instrument_process", "setup_telemetry", "shutdown_telemetry"):
         from invana.core.telemetry import setup
 
         return getattr(setup, name)

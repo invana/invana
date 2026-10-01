@@ -27,7 +27,7 @@ from invana.apps.llm_providers.querysets import LLMModelQuerySet, LLMProviderQue
 from invana.apps.llm_providers.schemas import LLMModelCreate, LLMProviderCreate, LLMProviderUpdate
 from invana.core.errors import ConflictError, InvanaError, NotFoundError, ValidationError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, diff_changed_fields, emit_event
+from invana.core.events.services import diff_changed_fields, emit_event
 
 # Providers that can run without a stored key. `claude_agent_sdk` falls through
 # to the local Claude Code CLI's own login when none is set.
@@ -98,7 +98,6 @@ class LLMProviderManager:
                 "has_base_url": provider.base_url is not None,
                 "has_api_key": provider.api_key_encrypted is not None,
             },
-            trace_id=current_trace_id(),
         )
         return provider
 
@@ -147,7 +146,6 @@ class LLMProviderManager:
                     "name": provider.name,
                     "provider": provider.provider.value,
                 },
-                trace_id=current_trace_id(),
             )
         return provider
 
@@ -163,7 +161,6 @@ class LLMProviderManager:
             graph_id=graph_id,
             actor_id=actor_id,
             details=snapshot,
-            trace_id=current_trace_id(),
         )
 
     async def ping(
@@ -233,7 +230,6 @@ class LLMProviderManager:
                 "address": endpoint.address,
                 **result,
             },
-            trace_id=current_trace_id(),
         )
         return result
 
@@ -284,7 +280,6 @@ class LLMProviderManager:
             graph_id=provider.graph_id,
             actor_id=actor_id,
             details={"address": LLMEndpoint(row=provider, model=model).address},
-            trace_id=current_trace_id(),
         )
         return model
 
@@ -311,7 +306,6 @@ class LLMProviderManager:
             graph_id=provider.graph_id,
             actor_id=actor_id,
             details={"address": address},
-            trace_id=current_trace_id(),
         )
 
     async def first_endpoint(self, session: AsyncSession, *, provider: LLMProvider) -> LLMEndpoint | None:

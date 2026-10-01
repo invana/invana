@@ -1,12 +1,7 @@
-import { useSetupSectionMutation } from "@/hooks/queries/useGraphs";
+import { Button, SectionHeader, TimelineEntry, TimelineList } from "@invana/ui";
+import { ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 import { formatRelativeTime } from "@/lib/time";
-import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
-import {
-	SETUP_STEPS,
-	SETUP_STEP_BY_KEY,
-	type SetupStepMeta,
-} from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
 import {
 	type Graph,
 	SETUP_REQUIRED,
@@ -14,24 +9,29 @@ import {
 	type SetupSection,
 	type SetupSectionState,
 	setupSectionStatus,
-} from "@/types/graphs";
-import { Button, SectionHeader, TimelineEntry, TimelineList } from "@invana/ui";
-import { ArrowRight } from "lucide-react";
-import { toast } from "sonner";
+	useSetupSectionMutation,
+} from "@/pages/graphs-detail/features/graphs";
+import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
+import {
+	SETUP_STEP_BY_KEY,
+	SETUP_STEPS,
+	type SetupStepMeta,
+} from "@/pages/graphs-detail/features/setup/setupSteps";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 interface Props {
 	graph: Graph;
 }
 
 /**
- * Setup, as the sequence it actually is (graph-detail-page.md G21 · G27).
+ * Setup, as the sequence it actually is (graph-detail-page.md).
  *
  * The compact half of the pair: the board on the graph page is where a step is
  * done, this is where it is remembered. Both read `setupSteps.ts`, so the
  * sequence cannot say two different things in two places.
  *
  * It draws what the engine **derived** — a step is done when the thing it asks
- * for exists (setup.md SU1), so importing data ticks "Bring data in" without
+ * for exists (setup.md), so importing data ticks "Bring data in" without
  * anyone telling setup. That is the whole reason this replaced a checklist: the
  * old one could be honestly finished and still read as untouched.
  *
@@ -40,11 +40,11 @@ interface Props {
  * schema records one, and the step's standing where it does not.
  *
  * The card is not rendered at all once the required steps are done — see
- * `GraphInfoPanel`. A finished checklist is the one kind worth removing.
+ * `InfoTab`. A finished checklist is the one kind worth removing.
  */
 export function SetupTimeline({ graph }: Props) {
 	const setupMutation = useSetupSectionMutation();
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 
 	const done = SETUP_REQUIRED.filter(
 		(s) => setupSectionStatus(graph.setup_state?.[s]) !== "todo",
@@ -52,7 +52,7 @@ export function SetupTimeline({ graph }: Props) {
 
 	// The first step still to do is the one the user is being asked for now;
 	// everything after it waits its turn. Only one step is ever "next", and a
-	// blocked one is never it (SU12).
+	// blocked one is never it.
 	const nextKey = SETUP_STEPS.find(
 		(s) =>
 			setupSectionStatus(graph.setup_state?.[s.key]) === "todo" &&

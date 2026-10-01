@@ -1,23 +1,23 @@
 /**
- * The agent's page, as a page in `mainSection` (AG34) — `agent:<id>` on the
+ * The agent's page, as a page in `mainSection` — `agent:<id>` on the
  * strip, the Agents list left beside it in `leftSection`.
  *
  * This is the host half: which agent, whether it is the Graph default, and the
  * writes — Save, bind, pause, resume, retire, make default. {@link AgentDetail}
- * is the page itself. Pause and Retire go through the same confirm the drawer
- * uses, naming the open work they would disturb (LC9 · LC10).
+ * is the page itself. Pause and Retire go through the same confirm the section
+ * uses, naming the open work they would disturb.
  */
 
+import { EmptyState, Spinner } from "@invana/ui";
+import { useState } from "react";
+import { AgentDetail } from "@/pages/graphs-detail/features/agents/AgentDetail";
+import { LifecycleDialog } from "@/pages/graphs-detail/features/agents/LifecycleDialog";
 import {
 	useAgentMutations,
 	useAgentsQuery,
 	useLifecyclePreviewQuery,
-} from "@/hooks/queries/useWork";
-import { AgentDetail } from "@/pages/graphs-detail/features/agents/AgentDetail";
-import { LifecycleDialog } from "@/pages/graphs-detail/features/agents/LifecycleDialog";
-import type { LifecycleAct } from "@/types/work";
-import { EmptyState, Spinner } from "@invana/ui";
-import { useState } from "react";
+} from "@/pages/graphs-detail/features/agents/queries";
+import type { LifecycleAct } from "@/pages/graphs-detail/features/agents/types";
 
 export function AgentBoardPage({
 	username,
@@ -32,7 +32,7 @@ export function AgentBoardPage({
 	onOpenLineage: (agentId: string) => void;
 	onOpenEnvelope: (agentId: string) => void;
 }) {
-	// The same list the drawer reads, so the page and the row never disagree
+	// The same list the section reads, so the page and the row never disagree
 	// about status or default — and a retired or ephemeral agent still opens.
 	const query = useAgentsQuery(username, graphSlug, {
 		includeEphemeral: true,
@@ -81,7 +81,7 @@ export function AgentBoardPage({
 				onOpenEnvelope={() => onOpenEnvelope(agent.id)}
 				onBindSkill={(skillId) => {
 					// Cleared first, so the card under the skill is this pick's
-					// refusal and never the last one's (BN11).
+					// refusal and never the last one's.
 					mutations.bindSkill.reset();
 					mutations.bindSkill.mutate({ id: agent.id, skillId });
 				}}

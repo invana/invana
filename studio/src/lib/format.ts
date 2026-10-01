@@ -19,3 +19,27 @@ export function formatCompact(n: number): string {
 	if (n < 1_000_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
 	return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}m`;
 }
+
+/**
+ * `$0.04` · `$0.0013` · `<$0.0001` — a cost, never rounded to nothing.
+ *
+ * A small model call on a few hundred tokens is fractions of a cent, and a
+ * figure reading `$0.00` says *this was free* — a claim an absent record must
+ * not make. `$0` is kept for a spend that genuinely was zero, which is what a
+ * local model costs. For a budget or a cap, use {@link usdWhole}.
+ */
+export function usd(value: number): string {
+	if (value === 0) return "$0";
+	if (value < 0.0001) return "<$0.0001";
+	if (value < 1)
+		return `$${value.toFixed(4).replace(/0+$/, "").replace(/\.$/, "")}`;
+	return `$${value.toFixed(2)}`;
+}
+
+/**
+ * `$5.00` · `$1,250.00` — a budget or a cap, which someone typed in whole
+ * cents. For what was actually spent, use {@link usd}.
+ */
+export function usdWhole(value: number): string {
+	return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}

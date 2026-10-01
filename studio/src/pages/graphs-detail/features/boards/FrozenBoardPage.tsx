@@ -1,24 +1,24 @@
 /**
  * A report, opened — `kind:{subjectId}@{versionId}`
- * ([B16 · § 6.4](../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * ([ · § 6.4](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
  * **One body for every declared kind**, because a frozen reading has no kind to
  * branch on: the stored blob *is* the document, so there is nothing left for a
  * composer to do. The subject is never read — that is what makes it a report,
- * and what lets it outlive a pruned `result.json` (B13).
+ * and what lets it outlive a pruned `result.json`.
  *
  * Nothing is re-merged against today's builder either. Re-merging would give
- * panels the data has nothing for, and data for panels that no longer exist
- * (B16), so the blob renders through the same `<Dashboard>` as it was written.
+ * panels the data has nothing for, and data for panels that no longer exist,
+ * so the blob renders through the same `<Dashboard>` as it was written.
  */
 
-import { formatRelativeTime } from "@/lib/time";
-import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import { DECLARED_PANELS } from "@/pages/graphs-detail/shared/dashboardPanels";
-import { boardReportsApi } from "@/services/api/boardReports";
 import { Dashboard, type DashboardSpec } from "@invana/dashboard";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useQuery } from "@tanstack/react-query";
+import { formatRelativeTime } from "@/lib/time";
+import { DECLARED_WIDGETS } from "@/pages/graphs-detail/features/boards/dashboardWidgets";
+import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
+import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 
 export interface FrozenBoardPageProps {
 	username: string;
@@ -90,9 +90,9 @@ export function FrozenBoardPage({
 					className="h-full min-h-0"
 					spec={spec}
 					// Every registered kind, not this page's — a report has no
-					// composer to tell it which it needs (B19). All of them are
+					// composer to tell it which it needs. All of them are
 					// pure, so nothing here re-reads the subject.
-					registry={DECLARED_PANELS}
+					registry={DECLARED_WIDGETS}
 					icons={DASHBOARD_ICONS}
 				/>
 			</div>

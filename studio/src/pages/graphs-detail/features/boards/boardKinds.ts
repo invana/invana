@@ -4,7 +4,7 @@
  *
  * `kind` is **one column of ten values**. Whether a board is *drawn* or
  * *declared* is `renders`, a trait of the row here — not a second column, which
- * would make `kind=canvas, subject=run` representable and meaningless (B3).
+ * would make `kind=canvas, subject=run` representable and meaningless.
  * The engine mirrors this table in `apps/boards/kinds.py`, and
  * `tests/golden/openapi.json` pins the enum that keeps the two honest.
  *
@@ -21,14 +21,14 @@
  * a user would call a "setting" — a name, an arg, a budget, an assignee, a
  * colour — is edited in a form, on every kind, with no exception; on
  * `workflow` that form is `bottomSection`, not the panel and never a card
- * floating over the drawing (draft-a-plan.md DP11). A new exception is argued
+ * floating over the drawing (draft-a-plan.md). A new exception is argued
  * in the feature file, never added in code. A declared kind has no gesture at
  * all.
  *
  * ## Why this file exists
  *
  * `BoardPagesViewPanel` switches tools, inspector, legend and footer by kind
- * (docs/for-developers/modules/explore/spec.md / docs/for-developers/modules/explore/features/selection-and-the-panel.md F4), and the selection handler branches by kind too.
+ * (docs/for-developers/modules/explore/spec.md / docs/for-developers/modules/explore/features/selection-and-the-panel.md), and the selection handler branches by kind too.
  * Keeping the table here means those two never drift, and adding a kind is one
  * entry rather than a hunt.
  */
@@ -60,13 +60,7 @@ export type CanvasKind =
 	| "plan"
 	| "workflow"
 	| "envelope"
-	| "lineage";
-
-/** What a click on a node does. */
-export type ClickBehaviour =
-	| "select" // highlights, and the panel's detail block states the fact
-	| "navigate" // opens a different panel — the node is not of this panel's kind
-	| "inert"; // nothing to show, and nowhere to go
+	| "lineage"; // nothing to show, and nowhere to go
 
 export interface CanvasKindSpec {
 	kind: CanvasKind;
@@ -133,12 +127,13 @@ export const CANVAS_KINDS: Record<CanvasKind, CanvasKindSpec> = {
 		label: "Workflow",
 		icon: Workflow,
 		nodes: "steps",
+		// biome-ignore lint/suspicious/noTemplateCurlyInString: the copy shows the binding syntax itself
 		edges: "required order + ${steps.X.y} bindings",
 		// Authoring a workflow is out of MVP; a canvas is not a loophole in a
 		// threat model (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
 		writesFromGesture: false,
 		// The library is **Library › Plans**; a workflow is a reusable TaskPlan, not
-		// a panel of its own (G30 · G41).
+		// a panel of its own.
 		panel: "library",
 		hasLayers: false,
 		footer: "LIBRARY",
@@ -169,30 +164,6 @@ export const CANVAS_KINDS: Record<CanvasKind, CanvasKindSpec> = {
 	},
 };
 
-/** A kind the tabs bar does not know falls back to pan/zoom/select. */
-export function specFor(kind: string | undefined): CanvasKindSpec {
-	return CANVAS_KINDS[(kind ?? "data") as CanvasKind] ?? CANVAS_KINDS.data;
-}
-
-/**
- * What a click on one node should do.
- *
- * Five kinds are unambiguous, because every node is the same kind of thing as
- * the rows in the open panel. `lineage` breaks that — its nodes are agents,
- * people and tasks — so it is the one kind with a per-node branch (docs/for-developers/modules/agents/features/lineage.md):
- * an *agent* selects into the agents list, a *task* navigates to Tasks, a *person*
- * is inert because MVP has no person surface.
- */
-export function clickBehaviour(
-	kind: CanvasKind,
-	nodeKind?: string,
-): ClickBehaviour {
-	if (kind !== "lineage") return "select";
-	if (nodeKind === "agent") return "select";
-	if (nodeKind === "task") return "navigate";
-	return "inert";
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Declared kinds — the boards that are not drawn
 // ─────────────────────────────────────────────────────────────────────────────
@@ -203,7 +174,7 @@ export function clickBehaviour(
  *
  * The six above are drawn: elements at positions, a camera, layers, a layout
  * engine. These four are declared: panels from a closed set, bound to one
- * record, laid out by the spec ([CV12](../../../../../docs/for-developers/modules/explore/features/boards.md)).
+ * record, laid out by the spec ([boards.md](../../../../../docs/for-developers/modules/explore/features/boards.md)).
  * They share the page host, the tab strip and the id shape; they share no
  * drawing code, which is why `renders` is the **only** thing the host branches
  * on.
@@ -237,14 +208,14 @@ export interface DeclaredKindSpec {
 	renders: "dashboard";
 	label: string;
 	icon: ElementType;
-	/** Which drawer opens it. */
+	/** Which section opens it. */
 	panel: string;
 	/** What `subject_id` names — the record every panel binds to. */
 	subject: string;
 }
 
 export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
-	// The journal drawn wide (SR70). Studio-only, like `agent`: it binds to
+	// The journal drawn wide. Studio-only, like `agent`: it binds to
 	// the Graph rather than to a record, so it offers no `Save report`.
 	runs: {
 		kind: "runs",
@@ -260,7 +231,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Run",
 		icon: LayoutDashboard,
-		// `More` on a run in the Runs panel (SR13).
+		// `More` on a run in the Runs panel.
 		panel: "runs",
 		subject: "a root task_runs.id",
 	},
@@ -273,7 +244,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		panel: "library",
 		subject: "a task_plans.id",
 	},
-	// `⋯` on the plan page (LB38) — records, not readings over a window, so
+	// `⋯` on the plan page — records, not readings over a window, so
 	// Studio-only like `runs`: none offers `Save report`.
 	plan_versions: {
 		kind: "plan_versions",
@@ -304,12 +275,12 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Step",
 		icon: SquareActivity,
-		// A task on the run dashboard's flow (SR18) — never a list row of its own.
+		// A task on the run dashboard's flow — never a list row of its own.
 		panel: "runs",
 		subject: "one attempt of a task — a child task_runs.id",
 	},
-	// R3 · the same question under two worlds, and what B touched that A did not
-	// (docs/for-developers/modules/govern/features/worlds.md WO4). **The diff is
+	// the same question under two worlds, and what B touched that A did not
+	// (docs/for-developers/modules/govern/features/worlds.md). **The diff is
 	// the deliverable**, not the two answers — it is the only part a person
 	// cannot reconstruct by reading both runs.
 	//
@@ -322,32 +293,32 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Compare",
 		icon: GitCompareArrows,
-		// `Compare…` in the Worlds drawer, or the run dashboard's lens band.
+		// `Compare…` in the Worlds section, or the run dashboard's lens band.
 		panel: "govern",
 		subject: 'two root task_runs.id joined by ":"',
 	},
 	// Skills (docs/for-developers/building-studio/skills-dashboards.md).
-	// `skill` is the skill's page — it authors, like `agent` (SK36). `skill_usage`
+	// `skill` is the skill's page — it authors, like `agent`. `skill_usage`
 	// names the same record and is **not** the same page: it is what happened
-	// when the skill was offered, drawn from `task_runs` (SD2).
+	// when the skill was offered, drawn from `task_runs`.
 	skill: {
 		kind: "skill",
 		renders: "dashboard",
 		label: "Skill",
 		icon: Scale,
-		// `Open` on the Skills drawer's selected row (SK37).
+		// `Open` on the Skills section's selected row.
 		panel: "skills",
 		subject: "a skills.id",
 	},
 	// Addressed by the skill, not by a version: one read returns every version,
 	// and the page's job is reading one count against the next — so a board per
-	// version would be seven boards each holding a seventh of one reading (SD1).
+	// version would be seven boards each holding a seventh of one reading.
 	skill_usage: {
 		kind: "skill_usage",
 		renders: "dashboard",
 		label: "Usage",
 		icon: TrendingUp,
-		// `Usage…` on the skill board, or `More` on the drawer's Usage tab.
+		// `Usage…` on the skill board, or `More` on the section's Usage tab.
 		panel: "skills",
 		subject: "a skills.id",
 	},
@@ -356,14 +327,14 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Rule",
 		icon: Quote,
-		// `More` on the Rules drawer, drilled in (RU11).
+		// `More` on the Rules section, drilled in.
 		panel: "skills",
 		subject: "a rules.id",
 	},
-	// A world and a guardrail are **one `lenses` row separated by `kind`**
-	// (GV1), and one composer draws both. They are two kinds for the reason the
+	// A world and a guardrail are **one `lenses` row separated by `kind`**,
+	// and one composer draws both. They are two kinds for the reason the
 	// two names exist at all: a tab reading `Lens` would make a reader open it
-	// to find out which of the two bounds they are looking at (WO15 · GR14).
+	// to find out which of the two bounds they are looking at.
 	//
 	// Neither tab is titled by `label`, either — the host names a lens board
 	// after the lens, so a strip of four worlds reads as four worlds.
@@ -372,7 +343,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "World",
 		icon: Globe,
-		// The Worlds drill-in opens it (WO15).
+		// The Worlds drill-in opens it.
 		panel: "govern",
 		subject: "a lenses.id",
 	},
@@ -381,23 +352,23 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Guardrail",
 		icon: ShieldCheck,
-		// The Guardrails drill-in opens it (GR14).
+		// The Guardrails drill-in opens it.
 		panel: "govern",
 		subject: "a lenses.id",
 	},
-	// The agent's one page — five tabs, the one declared page that edits
-	// (AG23 · AG34). Titled with the agent's name, like a lens board, because a
+	// The agent's one page — five tabs, the one declared page that edits.
+	// Titled with the agent's name, like a lens board, because a
 	// strip of three tabs all reading `Agent` has to be clicked through to read.
 	agent: {
 		kind: "agent",
 		renders: "dashboard",
 		label: "Agent",
 		icon: Bot,
-		// `Open` on the Agents drawer; the list stays beside it.
+		// `Open` on the Agents section; the list stays beside it.
 		panel: "agents",
 		subject: "an agents.id",
 	},
-	// Models, as one page (the-model-page.md MP1 · MP18). Studio-only and bound
+	// Models, as one page (the-model-page.md). Studio-only and bound
 	// to the Graph, like `runs`: the scope is a filter in the URL, never a
 	// second board, so its tab reads `All models` or the model's name.
 	models: {
@@ -433,14 +404,14 @@ export const BOARD_KINDS: Record<BoardKind, BoardKindSpec> = {
  * frozen reading of it** — a version of a drawn board, a report of a declared
  * one. The `@` suffix is what says *frozen*; a `?frozen=true` beside the id
  * would be the same fact in two places, and the two would disagree the first
- * time a link was shared (B12).
+ * time a link was shared.
  */
 export interface BoardPageId {
 	kind: BoardKind;
 	/**
 	 * What the page is *of*: the board row for a drawn kind — a drawing is the
 	 * subject of itself — and the subject record for a declared one, which is
-	 * the only address a live dashboard has, because it has no row (B9).
+	 * the only address a live dashboard has, because it has no row.
 	 */
 	id: string;
 	/** Set when the page is a frozen reading. */
@@ -487,12 +458,6 @@ export function parseBoardPageId(pageId: string): BoardPageId | null {
 			};
 }
 
-/** Whether a page id names a board that is drawn rather than declared. */
-export function isDrawnPage(pageId: string): boolean {
-	const page = parseBoardPageId(pageId);
-	return page ? BOARD_KINDS[page.kind].renders === "canvas" : false;
-}
-
 /** The kind and subject behind a page id, for a kind that is declared. */
 export function declaredPage(
 	id: string,
@@ -501,4 +466,40 @@ export function declaredPage(
 	return page && page.kind in DECLARED_KINDS
 		? { kind: page.kind as DeclaredKind, subjectId: page.id }
 		: null;
+}
+
+/**
+ * A declared board the tab strip is holding open.
+ *
+ * `subjectId` is the record every panel on it binds to — a run's id, one
+ * attempt of a task, a skill, a rule. `runId` is the trace the three
+ * trace-reading kinds share, which is why a step board carries it rather than
+ * fetching its own (see-what-ran.md).
+ *
+ * **It is optional, because a skill has no run** (skills-dashboards.md).
+ * Carrying a placeholder one would put a fact on the record that nothing wrote
+ * and something would eventually read.
+ */
+export interface OpenBoard {
+	kind: DeclaredKind;
+	subjectId: string;
+	runId?: string;
+	/**
+	 * Set when the page is a **report** — a frozen reading of this board
+	 * ([boards-migration.md](../../../docs/for-developers/building-engine/boards-migration.md)).
+	 * `kind:id` is live, `kind:id@version` is frozen: one parser, and the page
+	 * id carries which you are looking at rather than a flag beside it.
+	 */
+	versionId?: string;
+	/**
+	 * A step board opened **cold** — a reload, or a link — while it reads which
+	 * run it belongs to ([see-what-ran.md](../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+	 * The tab is there immediately and says it is loading; without the flag the
+	 * page would draw [boards-migration.md](../../../docs/for-developers/building-engine/boards-migration.md)'s
+	 * refusal for the half-second before the answer arrives, which is a refusal
+	 * that is not true yet.
+	 */
+	resolvingRun?: boolean;
+	/** Open the run with this step inside it — written as `&step=`. */
+	stepId?: string;
 }

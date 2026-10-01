@@ -1,10 +1,9 @@
-import type { TaskFlowTemplates } from "@/canvases/taskflow/types";
 import type { CanvasConfig } from "@invana/canvas";
+import type { TaskFlowTemplates } from "@/canvases/taskflow/types";
 import settingsJson from "./settings.json";
 import templatesJson from "./templates.json";
 
 export { TaskFlowCanvas } from "@/canvases/taskflow/TaskFlowCanvas";
-export type { TaskFlowCanvasProps } from "@/canvases/taskflow/TaskFlowCanvas";
 export * from "@/canvases/taskflow/types";
 
 // JSON import widens string-literal unions to `string`; the files are a

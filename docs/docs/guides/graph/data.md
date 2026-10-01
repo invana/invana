@@ -413,5 +413,4 @@ All data operations are accessed through two querysets on the connector:
 ## What's Next
 
 - [Schema Operations](schema.md) — manage indexes, constraints, and inspect the database schema
-- [Running Queries](../running-queries.md) — execute raw Cypher or Gremlin when you need full query language power
 - [Building an Ontology](../building-ontology.md) — define node types, edge types, and validation rules

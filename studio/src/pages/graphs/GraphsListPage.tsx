@@ -1,9 +1,4 @@
 import {
-	useDeleteGraphMutation,
-	useGraphsQuery,
-} from "@/hooks/queries/useGraphs";
-import { type Graph, SETUP_REQUIRED, setupSectionStatus } from "@/types/graphs";
-import {
 	Button,
 	Dialog,
 	DialogContent,
@@ -29,6 +24,13 @@ import {
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import {
+	type Graph,
+	SETUP_REQUIRED,
+	setupSectionStatus,
+	useDeleteGraphMutation,
+	useGraphsQuery,
+} from "@/pages/graphs-detail/features/graphs";
 
 const PAGE_SIZE = 6;
 
@@ -47,7 +49,7 @@ function formatRelative(iso: string): string {
 }
 
 /** How far along a graph is, counted over the **required** steps only
- *  (setup.md SU15): an optional step that drags the number down turns an offer
+ *  (setup.md): an optional step that drags the number down turns an offer
  *  into a debt. */
 function setupProgress(graph: Graph): { done: number; total: number } {
 	const done = SETUP_REQUIRED.filter(
@@ -98,7 +100,7 @@ function GraphRow({
 		<div className="flex items-center gap-3 py-1.5 group">
 			<div
 				className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-					setupDone ? "bg-green-500" : "bg-muted-foreground/40"
+					setupDone ? "bg-success" : "bg-muted-foreground/40"
 				}`}
 			/>
 			<button

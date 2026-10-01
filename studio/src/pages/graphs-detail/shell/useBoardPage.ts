@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 /**
  * `?page=` — which declared board is open, in the URL
- * ([B12](../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
  * A declared board is reached by its id alone: there is no panel state behind
  * it to put back, which is what `subject_id` buys. That is also what makes it
@@ -11,7 +11,7 @@ import { useSearchParams } from "react-router-dom";
  * frozen, one parser and one key.
  *
  * **A report is the reason this key exists.** A reading kept and then
- * unreachable after a reload is not kept at all: B6's own criterion is
+ * unreachable after a reload is not kept at all: 's own criterion is
  * *reopening it an hour later*, and an hour is longer than a tab lives.
  *
  * Only the **focused** page is carried. Restoring a whole tab strip from a link
@@ -27,8 +27,8 @@ export function useBoardPage() {
 	// The functional form, so the writer is stable across renders — it is handed
 	// to the page host, and an unstable one re-fires every effect that has it.
 	//
-	// `extra` writes other keys in the same update — `step` beside a run page
-	// (SR72). Two writes in one tick do not compose, so a key that moves with
+	// `extra` writes other keys in the same update — `step` beside a run page.
+	// Two writes in one tick do not compose, so a key that moves with
 	// the page moves in this call or not at all.
 	const setPageId = useCallback(
 		(id: string | null, extra?: Record<string, string | null>) => {

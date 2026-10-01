@@ -17,7 +17,7 @@ from invana.apps.work.schemas import AssignmentCreate
 from invana.core.auth.models import User
 from invana.core.errors import NotFoundError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 
 
 class StaffingManager:
@@ -76,7 +76,6 @@ class StaffingManager:
             project_id=project.id,
             actor_id=actor.id,
             details={"principal_kind": payload.principal_kind, "principal_id": payload.principal_id},
-            trace_id=current_trace_id(),
         )
         return row
 
@@ -95,7 +94,6 @@ class StaffingManager:
             project_id=project.id,
             actor_id=actor.id,
             details=details,
-            trace_id=current_trace_id(),
         )
 
     async def _require_principal_in_graph(

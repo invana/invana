@@ -306,5 +306,4 @@ print(Capability.SCHEMA_ENFORCEMENT in caps)  # True/False
 ## What's Next
 
 - [Data Operations](data.md) — create, read, update, and delete vertices and edges
-- [Running Queries](../running-queries.md) — execute raw Cypher or Gremlin when you need full query language power
 - [Building an Ontology](../building-ontology.md) — define node types, edge types, and validation rules

@@ -1,31 +1,32 @@
+import { usd, usdWhole } from "@/lib/format";
+
 /**
- * Overview — the agent read whole (AG23): who it is, its focus, how it thinks,
+ * Overview — the agent read whole: who it is, its focus, how it thinks,
  * what it can do, what is always in force, its limits, and the two policy
  * switches. Each summary names the tab that edits it. Two columns of cards as
- * drawn, stacking below 760px (AG38).
+ * drawn, stacking below 760px.
  */
 
-import { useLensesQuery } from "@/hooks/queries/useGovern";
-import {
-	useAgentMetersQuery,
-	useAgentSkillsAndCallablesQuery,
-} from "@/hooks/queries/useWork";
-import type { AgentTab } from "@/pages/graphs-detail/features/agents/AgentDetail";
-import {
-	type AgentDraft,
-	effortSummary,
-	usd,
-	voiceSummary,
-} from "@/pages/graphs-detail/features/agents/agentDraft";
-import type { Agent } from "@/types/work";
-import { PanelSection } from "@/ui/PanelSection";
 import { Switch } from "@invana/forms";
 import { Button, Progress, PropertyList, PropertyRow } from "@invana/ui";
 import { Shield } from "lucide-react";
 import type { ReactNode } from "react";
+import type { AgentTab } from "@/pages/graphs-detail/features/agents/AgentDetail";
+import {
+	type AgentDraft,
+	effortSummary,
+	voiceSummary,
+} from "@/pages/graphs-detail/features/agents/agentDraft";
+import {
+	useAgentMetersQuery,
+	useAgentSkillsAndCallablesQuery,
+} from "@/pages/graphs-detail/features/agents/queries";
+import type { Agent } from "@/pages/graphs-detail/features/agents/types";
+import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
+import { PanelSection } from "@/ui/PanelSection";
 
-/** The two switches the Overview carries (AG23). Keys are the engine's. */
-export const POLICY_FIELDS: { key: string; label: string; hint: string }[] = [
+/** The two switches the Overview carries. Keys are the engine's. */
+const POLICY_FIELDS: { key: string; label: string; hint: string }[] = [
 	{
 		key: "can_be_assigned",
 		label: "Can be assigned",
@@ -57,8 +58,8 @@ export function AgentOverviewTab({
 	onPatch: (next: Partial<AgentDraft>) => void;
 	onGoTo: (tab: AgentTab) => void;
 }) {
-	// Every guardrail that holds on this agent's runs: the Graph's, and its own
-	// (AG7). Worlds are not here — a world comes with the work (AG24).
+	// Every guardrail that holds on this agent's runs: the Graph's, and its own.
+	// Worlds are not here — a world comes with the work.
 	const guardrails = useLensesQuery(username, graphSlug, { kind: "guardrail" });
 	const inForce = (guardrails.data?.items ?? []).filter(
 		(g) => g.scope === "graph" || g.scope === `agent:${agent.id}`,
@@ -164,9 +165,8 @@ export function AgentOverviewTab({
 
 			<div className="flex min-w-0 flex-col gap-2.5">
 				<PanelSection card title="Always in force">
-					{/* An agent binds no provider and no world (PM1 · AG24): what
-					    holds whoever asks is the Graph's guardrails and its own (AG7 ·
-					    AG10), edited in Govern › Guardrails. */}
+					{/* An agent binds no provider and no world: what
+					    holds whoever asks is the Graph's guardrails and its own, edited in Govern › Guardrails. */}
 					{inForce.length ? (
 						<ul className="divide-y">
 							{inForce.map((g) => (
@@ -219,8 +219,8 @@ export function AgentOverviewTab({
 								<span className="flex items-center gap-2">
 									<Progress value={spendShare} className="h-1 w-16" />
 									{m.spend_this_month == null
-										? `nothing priced · of ${usd(m.max_cost_usd_month)} this month`
-										: `${usd(m.spend_this_month)} of ${usd(m.max_cost_usd_month)} this month`}
+										? `nothing priced · of ${usdWhole(m.max_cost_usd_month)} this month`
+										: `${usd(m.spend_this_month)} of ${usdWhole(m.max_cost_usd_month)} this month`}
 								</span>
 							)}
 						</LimitRow>
@@ -253,7 +253,7 @@ export function AgentOverviewTab({
 											checked={on === true}
 											onCheckedChange={(next) => setTo(next)}
 										/>
-										{/* Unset is its own state: the Graph decides (AG38). */}
+										{/* Unset is its own state: the Graph decides. */}
 										<span className="min-w-0 flex-1 truncate text-muted-foreground">
 											{field.hint}
 											{on === undefined ? " · Graph default" : ""}

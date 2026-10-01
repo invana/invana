@@ -1,7 +1,3 @@
-import { FormError } from "@/components/forms/FormError";
-import { useUpdateCanvasMutation } from "@/hooks/queries/useBoards";
-import { boardsApi } from "@/services/api/boards";
-import { ApiError } from "@/services/api/client";
 import { Input, Label, Textarea } from "@invana/forms";
 import {
 	Button,
@@ -14,6 +10,10 @@ import {
 } from "@invana/ui";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { FormError } from "@/components/forms/FormError";
+import { boardsApi } from "@/pages/graphs-detail/features/boards/api";
+import { useUpdateCanvasMutation } from "@/pages/graphs-detail/features/boards/queries";
+import { ApiError } from "@/services/api/client";
 
 interface Props {
 	open: boolean;

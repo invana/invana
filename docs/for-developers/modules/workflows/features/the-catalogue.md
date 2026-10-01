@@ -82,7 +82,7 @@ flowchart TD
 | **Catalogue** drawer | The third drawer of the **Tasks** stack ([G33](../../../building-studio/graph-detail-page.md)). While a draft is open it is also the **palette** — drag an entry onto the canvas ([7.7](draft-a-plan.md)). Rows grouped under their bound, the group header carrying the bound and its count. A row is `step_key` (mono) · one-line summary · **how many plans name it**, or `unused`. The main column stays empty and says why an entry opens no page (CA6) |
 | Entry detail | **In the drawer only** (CA6): the bound, then `args`, `outputs` (with roll-up), `requires`, *Used by*, *Agents granted this bound*. There is no dashboard page for an entry |
 | The contract, where it is used | The same fields render as the **contract card** beside a task's parameter form ([7.7](draft-a-plan.md)) — the form is generated from them — and inside a refusal. That is where an entry is actually read |
-| Deep links | A task on a run's canvas and a task on a plan's canvas both link to `?panel=library&drawer=catalogue&entry=<step_key>` — the refusal message links to the same place |
+| Deep links | A task on a run's canvas and a task on a plan's canvas both link to `?panel=library&section=catalogue&entry=<step_key>` — the refusal message links to the same place |
 
 ## Engine
 

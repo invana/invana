@@ -25,11 +25,16 @@ jobs:
       - name: Import linter
         run: cd engine && uv run lint-imports
 
-      - name: Biome check
-        run: cd studio && pnpm biome check .
+      # docs/for-developers/building-studio/code-shape.md §8 — Biome, then names.
+      - name: Biome and names check
+        run: cd studio && pnpm lint
 
+      - name: Dead files
+        run: cd studio && pnpm knip
+
+      # Bare `tsc` checks nothing: tsconfig.json is references only.
       - name: TypeScript type check
-        run: cd studio && pnpm tsc --noEmit
+        run: cd studio && pnpm check-types
 
   # docs/for-developers/building-engine/refactor-plan.md §1 — the golden guards.
   # An empty diff here is the promise that Studio cannot tell a refactor happened.
@@ -100,7 +105,7 @@ jobs:
       - name: Run unit & component tests
         run: |
           cd studio
-          pnpm test run --coverage
+          pnpm test --coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4

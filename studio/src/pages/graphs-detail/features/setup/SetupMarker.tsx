@@ -1,6 +1,6 @@
-import type { setupSectionStatus } from "@/types/graphs";
 import { StatusDot } from "@invana/ui";
 import { Check } from "lucide-react";
+import type { setupSectionStatus } from "@/pages/graphs-detail/features/graphs";
 
 type Status = ReturnType<typeof setupSectionStatus>;
 
@@ -9,12 +9,12 @@ type Status = ReturnType<typeof setupSectionStatus>;
  *
  * A **done** step is a check, not a dot. The other five states are states — a
  * thing that could still change — and a dot is the right shape for those. Done
- * is a fact that exists (SU1), and a step already carries "the fact exists" in
+ * is a fact that exists, and a step already carries "the fact exists" in
  * its own right; a green dot beside it says only "green", which at a glance is
  * indistinguishable from `running` in every other list in the product.
  *
  * One component because the stepper and the Info band are one sequence in two
- * renderings (G27): a marker that drifts between them makes the same step read
+ * renderings: a marker that drifts between them makes the same step read
  * as two different things in two places.
  */
 export function SetupMarker({
@@ -40,7 +40,7 @@ export function SetupMarker({
 
 /** The five states that are not `done`. Kept here so the stepper, the band and
  *  the board cannot disagree about what colour a blocked step is. */
-export function toneFor(
+function toneFor(
 	status: Status,
 	isNext: boolean,
 ): "success" | "error" | "muted" | "info" | "queued" {

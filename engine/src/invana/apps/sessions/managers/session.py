@@ -32,7 +32,7 @@ from invana.apps.sessions.transcript import (
 )
 from invana.core.errors import NotFoundError, ValidationError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 
 
 class SessionManager:
@@ -180,7 +180,6 @@ class SessionManager:
             graph_id=graph_id,
             actor_id=user_id,
             details={},
-            trace_id=current_trace_id(),
         )
         return sess
 
@@ -292,7 +291,6 @@ class SessionManager:
             graph_id=graph_id,
             actor_id=actor_id,
             details={},
-            trace_id=current_trace_id(),
         )
 
     async def _grounding_version(self, session: AsyncSession, graph_id: str) -> GraphVersion | None:

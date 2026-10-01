@@ -57,12 +57,3 @@ export const stepTone = (status: string): Tone => STEP_TONES[status] ?? "muted";
 /** The words the UI shows. `in_progress` is never printed with an underscore. */
 export const humanStatus = (status: string): string =>
 	status.replace(/_/g, " ");
-
-/** Verify's verdict, as the badge reads it (docs/for-developers/modules/agents/spec.md). */
-export const verdictLabel = (served: string | null | undefined): string =>
-	({ yes: "served", partial: "partial", no: "not served" })[served ?? ""] ?? "";
-
-export const verdictTone = (served: string | null | undefined): Tone =>
-	(({ yes: "success", partial: "warning", no: "error" })[
-		served ?? ""
-	] as Tone) ?? "muted";

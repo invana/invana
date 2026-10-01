@@ -19,7 +19,7 @@ from invana.apps.agents.models import Agent
 from invana.apps.work.models import Task as WorkTask
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.runtime.catalogue.contract import (
     Out,
     RunVars,
@@ -122,7 +122,6 @@ async def delegate(ctx: TaskContext, v: RunVars) -> Out:
         actor_id=v.agent.id if v.agent else None,
         on_behalf_of_user_id=v.run.on_behalf_of_user_id,
         details={"actor_name": v.agent.name if v.agent else None, "child_run_id": child_run.id},
-        trace_id=current_trace_id(),
     )
     await ctx.db.commit()
     await ctx.emit("delegation.opened", {"child_run_id": child_run.id, "agent": child_agent.name})
@@ -192,7 +191,6 @@ async def create_task(ctx: TaskContext, v: RunVars) -> Out:
         actor_id=v.agent.id if v.agent else None,
         on_behalf_of_user_id=v.run.on_behalf_of_user_id,
         details={"actor_name": v.agent.name if v.agent else None, "title": child.title, "parent_id": parent.id},
-        trace_id=current_trace_id(),
     )
     return Out(detail=f'sub-task "{child.title}"', output={"task_id": child.id})
 

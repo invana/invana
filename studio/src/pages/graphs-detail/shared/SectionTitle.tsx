@@ -2,12 +2,12 @@ import { Badge } from "@invana/ui";
 import type { ReactNode } from "react";
 
 /**
- * A `PanelStack` drawer's title: the section's name, and the count of what is
+ * A `PanelStack` section's title: the section's name, and the count of what is
  * inside it.
  *
  * The count lives here rather than in `headerActions` because those are quiet
- * until the header is hovered, and a count has to read while the drawer is
- * closed — that is most of what a closed drawer is for (model-editor.md ME13).
+ * until the header is hovered, and a count has to read while the section is
+ * closed — that is most of what a closed section is for (model-editor.md).
  *
  * A `PanelStack` styles a string title itself; a node is rendered as-is, so the
  * kit's own header typography is repeated here deliberately.
@@ -17,7 +17,7 @@ export function SectionTitle({
 	count,
 }: {
 	children: ReactNode;
-	/** Omitted means "no count to show", which is not the same as zero (ME14). */
+	/** Omitted means "no count to show", which is not the same as zero. */
 	count?: number;
 }) {
 	return (

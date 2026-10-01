@@ -35,7 +35,7 @@ from invana.apps.graphs.schemas import (
 from invana.apps.setup.sections import _iso, _mark_section
 from invana.core.errors import ConflictError, ValidationError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -275,7 +275,6 @@ class SetupManager:
                 graph_id=graph.id,
                 actor_id=actor_id,
                 details={"section": section},
-                trace_id=current_trace_id(),
             )
         return await self.graph_read(session, graph)
 

@@ -1,8 +1,12 @@
-import { SETUP_STEP_BY_KEY } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
-import { type Graph, type SetupGate, missingForGate } from "@/types/graphs";
 import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
 import { ArrowRight, Lock } from "lucide-react";
+import {
+	type Graph,
+	missingForGate,
+	type SetupGate,
+} from "@/pages/graphs-detail/features/graphs";
+import { SETUP_STEP_BY_KEY } from "@/pages/graphs-detail/features/setup/setupSteps";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 const GATE_SENTENCE: Record<SetupGate, string> = {
 	connected: "a database is connected",
@@ -22,7 +26,7 @@ interface Props {
 
 /**
  * A surface that is not open yet, and the gate that opens it
- * (setup.md SU13 · graph-detail-page.md G28).
+ * (setup.md graph-detail-page.md).
  *
  * It replaced one banner that could only say the graph was not ready and never
  * what for. `EmptyState`'s `locks` is the point: naming the step that unlocks a
@@ -30,7 +34,7 @@ interface Props {
  * panel that owns that step rather than on "setup" in general.
  */
 export function SetupLock({ graph, gate, surface }: Props) {
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 	const missing = graph ? missingForGate(graph, gate) : [];
 	const first = missing[0];
 	const firstMeta = first ? SETUP_STEP_BY_KEY[first] : undefined;

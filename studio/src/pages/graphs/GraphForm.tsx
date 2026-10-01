@@ -1,6 +1,3 @@
-import { FormError } from "@/components/forms/FormError";
-import { CONNECTOR_OPTIONS } from "@/types/graphs";
-import type { GraphConnectionCreate } from "@/types/graphs";
 import {
 	type Control,
 	type FieldConfig,
@@ -17,11 +14,14 @@ import { useEffect, useState } from "react";
 // Only `useForm` — @invana/forms re-exports every form *type* Studio needs
 // but not the hook itself, so this is the one react-hook-form import left.
 import { useForm } from "react-hook-form";
+import { FormError } from "@/components/forms/FormError";
+import type { GraphConnectionCreate } from "@/pages/graphs-detail/features/graphs";
+import { CONNECTOR_OPTIONS } from "@/pages/graphs-detail/features/graphs";
 
-export interface GraphFormValues {
+interface GraphFormValues {
 	uri: string;
 	connector_class: string;
-	/** Which database on the server to read. Blank = the connector's default (docs/for-developers/modules/connect-and-model/features/connect-a-database.md CD8). */
+	/** Which database on the server to read. Blank = the connector's default (docs/for-developers/modules/connect-and-model/features/connect-a-database.md). */
 	database: string;
 	username: string;
 	password: string;
@@ -206,7 +206,7 @@ export function GraphForm({
 			uri: v.uri,
 			connector_class: v.connector_class,
 			// Blank clears the stored name back to "the connector's default" — the
-			// "blank means keep" rule belongs to credentials alone (CD8).
+			// "blank means keep" rule belongs to credentials alone.
 			database: v.database.trim() || null,
 			auth:
 				isEdit && !credsTouched
@@ -283,7 +283,7 @@ export function GraphForm({
 					// `Control` is invariant in its field-values parameter — so a real
 					// `Control<FormShape>` will not assign to it. The fix belongs in
 					// `@invana/forms` (make `ObjectField` generic in `TFieldValues`);
-					// until that ships, this is the one place Studio says so (DS3).
+					// until that ships, this is the one place Studio says so.
 					control={form.control as unknown as Control<FieldValues>}
 					name="connection"
 					fields={fields}
@@ -294,7 +294,7 @@ export function GraphForm({
 
 				{/* Test status banner */}
 				{testState.kind === "passed" && (
-					<div className="flex items-center gap-2 text-green-500">
+					<div className="flex items-center gap-2 text-success">
 						<CheckCircle2 className="w-4 h-4" />
 						<span>
 							Connection works
@@ -317,7 +317,7 @@ export function GraphForm({
 				{testState.kind === "passed" &&
 					testState.compatibilityStatus &&
 					testState.compatibilityStatus !== "supported" && (
-						<p className="text-amber-600 dark:text-amber-400">
+						<p className="text-warning">
 							{testState.compatibilityStatus === "unsupported"
 								? "This version is below Invana's supported range — the connection will be read-only."
 								: testState.compatibilityStatus === "untested"

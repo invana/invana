@@ -12,6 +12,9 @@ from datetime import UTC, date, datetime, timedelta
 
 import pytest
 import pytest_asyncio
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 from invana.apps.graphs.models import Graph
 from invana.apps.modeller.managers import InsightsManager, QueryLogWriter
@@ -19,7 +22,8 @@ from invana.apps.modeller.models import GraphQueryLog, TypeCountSnapshot
 from invana.apps.modeller.query_shapes import shape_of
 from invana.apps.modeller.versioner import Versioner
 from invana.core.auth.models import User
-from invana.core.querylog import ObservedQuery, QueryCaller, calling_as, set_query_observer
+from invana.core.querylog import ObservedQuery, QueryCaller, calling_as, observe, set_query_observer
+from invana.core.telemetry import spans
 from invana.runtime.callers import classify
 from invana.runtime.models import TaskRun
 from tests.graph.connectors.backends import NEO4J
@@ -121,6 +125,46 @@ async def test_the_writer_explains_a_shape_once_and_drops_what_it_cannot_hold(
     first, second = sorted(rows, key=lambda r: r.at)
     assert "airport.city" in first.properties_touched["scanned"]
     assert first.properties_touched.get("plan") and "plan" not in second.properties_touched
+
+
+@pytest.mark.asyncio
+async def test_a_logged_query_is_written_in_its_own_trace_linked_to_where_it_was_asked(
+    session_factory, session, graph_id, monkeypatch
+):
+    exporter = InMemorySpanExporter()
+    provider = TracerProvider()
+    provider.add_span_processor(SimpleSpanProcessor(exporter))
+    monkeypatch.setattr(spans._trace, "get_tracer", lambda *a, **k: provider.get_tracer("test"))
+
+    async def connector_for(_):
+        return None
+
+    writer = QueryLogWriter(session_factory, connector_for)
+    set_query_observer(writer.submit)
+    try:
+        with spans.span("request") as request, calling_as(QueryCaller(graph_id=graph_id, kind="api")):
+            observe(
+                lambda caller: ObservedQuery(
+                    caller=caller,
+                    query="MATCH (a:airport) RETURN a",
+                    parameters={},
+                    language="cypher",
+                    duration_ms=4.0,
+                    rows=1,
+                    ok=True,
+                )
+            )
+    finally:
+        set_query_observer(None)
+    await writer.drain()
+
+    rows = (await session.execute(GraphQueryLog.__table__.select())).all()
+    assert len(rows) == 1
+    (write,) = [s for s in exporter.get_finished_spans() if s.name == "system.query_log"]
+    asked = request.get_span_context()
+    assert write.parent is None and write.context.trace_id != asked.trace_id
+    assert write.attributes["invana.origin"] == "daemon" and write.attributes["invana.query_log.batch"] == 1
+    assert [link.context.span_id for link in write.links] == [asked.span_id]
 
 
 async def _published(session, store, graph_id, name, nodes):

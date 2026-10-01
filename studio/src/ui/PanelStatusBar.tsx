@@ -1,6 +1,6 @@
-import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
 import { AppStatusBar, cn } from "@invana/ui";
 import type { ReactNode } from "react";
+import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
 
 /**
  * A panel's own status line, on the kit's `AppStatusBar`.

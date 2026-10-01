@@ -1,11 +1,4 @@
-import type { QueryLanguage } from "@/types/graphs";
-
-// ── Query request ─────────────────────────────────────────────────────────────
-
-export interface QueryRequest {
-	query: string;
-	parameters?: Record<string, unknown>;
-}
+import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 
 // ── Composer payload ──────────────────────────────────────────────────────────
 // What the SessionComposer hands up when the user sends. The panel/hook
@@ -33,13 +26,13 @@ export type QueryRunPayload =
 
 // ── Graph data types (mirrors engine's Vertex / Edge / GraphResponse) ─────────
 
-export interface GraphVertex {
+interface GraphVertex {
 	id: string;
 	label: string;
 	properties: Record<string, unknown>;
 }
 
-export interface GraphEdge {
+interface GraphEdge {
 	id: string;
 	label: string;
 	source: string;

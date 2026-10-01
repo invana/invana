@@ -2,8 +2,8 @@
  * What every declared board agrees on, whichever module owns it.
  *
  * Four surfaces compose a `DashboardSpec` now — a run and a task run
- * ([Operate](../features/operate/dashboards)), and a skill, its usage and a
- * rule ([Skills](../features/skills/dashboards)) — and these five helpers were
+ * ([Runs](../features/runs/boards)), and a skill, its usage and a
+ * rule ([Skills](../features/skills/boards) · [Rules](../features/rules/boards)) — and these five helpers were
  * the part of the vocabulary that has nothing to do with runs. Two modules
  * needing the same domain-free helper is the signal that it belongs in
  * `shared/` ([code-shape §4.1](../../../../../docs/for-developers/building-studio/code-shape.md)),
@@ -20,7 +20,7 @@ import type { PanelSpec } from "@invana/dashboard";
  *
  * A composer builds every optional tile, panel and row as `x ?? null` and
  * passes the list through here, so **a band with no record is absent, not
- * zero** ([SR34](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md))
+ * zero** ([see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md))
  * is one filter rather than a condition spelled out at each of fifty call
  * sites.
  */
@@ -33,7 +33,7 @@ export function count(n: number): string {
 	return n.toLocaleString();
 }
 
-/** The `Dashboard ¦ spec.json` switch every declared board carries ([SR37](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)). */
+/** The `Dashboard ¦ spec.json` switch every declared board carries ([see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)). */
 export const VIEW_ACTION = "view";
 export const VIEW_DASHBOARD = "Dashboard";
 export const VIEW_SPEC = "spec.json";

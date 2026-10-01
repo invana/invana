@@ -122,6 +122,8 @@ class Event(Base):
     # specific payload for query/auth. Sensitive fields (api_key, password,
     # *_hash, *_encrypted) are always omitted by emit_event helpers.
     details: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
-    # OTel trace_id (hex) of the originating request, for trace correlation.
+    # The trace this row was written in (hex), filled by emit.
     trace_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    # The span it was written in (hex), so the row opens that exact step.
+    span_id: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)

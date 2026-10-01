@@ -27,7 +27,7 @@ from invana.apps.skills.models import Skill, SkillBinding
 from invana.apps.skills.querysets import SkillBindingQuerySet
 from invana.core.errors import ConflictError, NotFoundError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 
 
 class BindCheck(Protocol):
@@ -97,7 +97,6 @@ class SkillBindingManager:
             graph_id=skill.graph_id,
             actor_id=actor_id,
             details={"skill_id": skill.id, "skill_name": skill.name, "agent_name": agent_name},
-            trace_id=current_trace_id(),
         )
         return binding
 
@@ -125,5 +124,4 @@ class SkillBindingManager:
             graph_id=skill.graph_id,
             actor_id=actor_id,
             details={"skill_id": skill.id, "skill_name": skill.name, "agent_name": agent_name},
-            trace_id=current_trace_id(),
         )

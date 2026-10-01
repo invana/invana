@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, Literal
 
+from invana.core.telemetry.spans import current_span_context
+
 logger = logging.getLogger(__name__)
 
 CallerKind = Literal["agent", "plan", "explorer", "api"]
@@ -48,6 +50,8 @@ class ObservedQuery:
     node_labels: set[str] = field(default_factory=set)
     edge_labels: set[str] = field(default_factory=set)
     at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    #: The producer's span, so the writer's span can link back to the query that caused the row.
+    span_context: Any = None
 
 
 query_caller: ContextVar[QueryCaller | None] = ContextVar("query_caller", default=None)
@@ -78,11 +82,19 @@ def observe(build: Callable[[QueryCaller], ObservedQuery]) -> None:
 
     ``build`` is only called when both are true, so a query nobody logs costs a
     context-variable read and nothing else.
+
+    The observer only queues the query; the row is written later, in another
+    task and another trace. So ``observe`` stamps the query with the span
+    current here — the request or run that asked it — and the writer's span
+    links back to it, which is how a log row's write is found from the query
+    that caused it. Without the telemetry extra the stamp is ``None``.
     """
     caller = query_caller.get()
     if caller is None or not _observers:
         return
     try:
-        _observers[0](build(caller))
+        observed = build(caller)
+        observed.span_context = current_span_context()
+        _observers[0](observed)
     except Exception:
         logger.warning("A graph query could not be handed to the log", exc_info=True)

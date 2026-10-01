@@ -16,7 +16,7 @@ layout becomes `studio/README.md`, which is what a new contributor reads.
 
 | # | Problem | Today | After |
 |---|---|---|---|
-| 1 | **One route hosts the product** | `ExplorerPage.tsx` is 2,222 lines and renders Agents, Projects, Tasks, Skills, Workflows, Model, Links, Datasets, Templates, the canvas and the assistant. Every noun is a value in a 19-member `?panel=` union | One route per screen, one folder per feature module. No file over ~400 lines |
+| 1 | **One route hosts the product** | `GraphDetailPage.tsx` is the one route, and it renders Agents, Projects, Tasks, Skills, Workflows, Model, Links, Datasets, Templates, the canvas and the assistant. Every noun is a value in a 19-member `?panel=` union | One route per screen, one folder per feature module. No file over ~400 lines |
 | 2 | **A parallel component layer** | 20 Studio components share an exact name with a kit export; `PanelChrome` (564) · `WorkRow` (138) · `CanvasTabsBar` (269) · the answer surface (717) all predate the kit's | Deleted. `@invana/ui` is the only component layer (DS1 · DS17) |
 | 3 | **Dead code** | 2,462 lines in 9 files are unreachable from `main.tsx` — `ModellerPage.tsx` alone is 1,031 | Deleted, with a lint gate so it cannot come back |
 | 4 | **Imports are positional** | No path alias; `../../../services/api/client` appears throughout. Moving a file rewrites its neighbours | `@/` alias + a per-module public surface. A move is a move |
@@ -92,13 +92,13 @@ Each needs one read against the kit before it is cut. Named so the pass is finit
 
 | Lines | Studio | Likely kit replacement |
 |---|---|---|
-| 646 | `explorer/components/LayersPanel.tsx` | `LayersViewPanel` (canvas-ui) — **unblocked**, canvas `0.0.12` is published |
+| 646 | `explorer/components/LayersPanel.tsx` | `LayersViewPanel` (canvas-ui) — **done** |
 | 418 | `explorer/components/ExpandFineTunePanel.tsx` | **Keep** — it fetches neighbours from the engine; the kit panels only filter what is drawn. Renamed `ExpandNeighboursDialog` ([module-structure.md](../module-structure.md) §4) |
 | 415 | `modeller/components/PropertyEditor.tsx` | `PropertiesEditor` (canvas-ui) |
 | 269 | `explorer/components/CanvasTabsBar.tsx` | `BoardPagesViewPanel` (canvas-ui) — strip **and** bodies in one column, `keepMounted` |
 | 193 | `work/WorkCanvasChrome.tsx` | `CanvasMessageBar` + `GraphLegendLayerEditorPanel` (canvas-ui) |
 | 178 | `explorer/components/InspectorPanel.tsx` | `InspectorPanel` · `NodeDetailView` · `EdgeDetailView` (canvas-ui) |
-| — | `explorer/lib/visibility.ts` | The store's native API — `hideNodes` · `showNodes` · `isNodeHidden` · `hideNodesByPredicate` · `showAllHidden` |
+| — | `explorer/lib/visibility.ts` | The store's native API — `setNodesHidden` · `hiddenNodes` — **done** |
 | 686 | `explorer/components/SessionComposer.tsx` | `ChatSessionComposer` + `ChatSessionContextChip`; the CodeMirror half → `@invana/editor` |
 | 89 fields, 11 files | hand-written form markup — ProfileSettings · LLMs · NodeType · EdgeType · Skills · PropertyKey · Model · DeclareLink · Login · CanvasForm · Concurrency | `ObjectField` from `@invana/forms`, driven by a `FieldConfig[]` (DS18). **Gated on the kit gaining field validation** — see refactor-plan §2.5 |
 | 520 | `explorer/components/SessionTurn.tsx` | `ChatSessionMessage` + `ChatSessionPromptRow` + `EmissionCard` |
@@ -115,7 +115,7 @@ Two findings from the `0.0.12` bump, both pre-existing and neither caused by it.
 
 | Finding | Detail |
 |---|---|
-| `pnpm check-types` compiles nothing | `tsconfig.json` carries `"files": []` and two `references`. `tsc --noEmit` with no `-b` honours that literally and checks zero files, so the script has always passed |
+| `pnpm check-types` compiles nothing | `tsconfig.json` carries `"files": []` and two `references`. `tsc --noEmit` with no `-b` honours that literally and checks zero files, so the script has always passed. The script is `tsc -b --noEmit`, and CI's type-check step runs the script rather than bare `tsc` |
 | `pnpm build` (`tsc -b`) has 26 errors | 15 are canvas API drift never followed through (style props that no longer take functions, `GraphStore.getNodes` → `nodes`, `ILayer.getBounds`), 8 are Studio bugs (`run.store.ts` duplicate spread keys, a `Map<string, X>` / `Map<string, X[]>` mismatch, `useAuth().accessToken`), 3 are `react-hook-form` `Control<T>` variance |
 
 **Both are fixed** (Phase 1): the 26 are cleared and `check-types` is `tsc -b --noEmit`, verified by
@@ -136,7 +136,7 @@ the 26 turned out to be — 16 of them were one wrong type annotation, written t
 | ✅ **Removed** | `rbush` · `d3-force` · `immer` · `@types/d3-force` | Zero imports in `src/` |
 | **Keep, do not "clean up"** | `pixi.js` · `pixi-viewport` | Zero imports, but `vite.config.ts` pins them so a local canvas checkout does not load PixiJS twice (DS11). Rule 10 forbids PixiJS *code*, not the pin |
 | **Keep** | `elkjs` | Two real consumers (`ExplorerCanvas`, `WorkGraphCanvas`) |
-| **Add (dev)** | `vitest` · `@testing-library/react` · `knip` | §8 and §9 — not yet added |
+| **Add (dev)** | `vitest` · `knip` added; `@testing-library/react` | §8 and §9 — Testing Library not yet added |
 
 ---
 
@@ -220,7 +220,7 @@ features/agents/
 | A renderer two modules draw is a canvas | `src/canvases/<name>/`. The module keeps only its adapter — `PlanCanvas` in `projects/`, `EnvelopeCanvas` and `LineageCanvas` in `agents/` |
 | One direction inside a module | A sub-folder imports its parent's types, never the reverse. `models/model-editor/` renders `stitch/`'s block; `stitch/` imports only the selection type back |
 | No `utils/` | A file is named for what it holds — `typeColor.ts`, `propertyTypes.ts`, `runSummary.ts`. A bag named `utils/` is the shape word that hides the most |
-| No module imports the shell | Dependency direction is `shell → features → shared`. A feature that needs the router takes a prop or a hook from `shared/` |
+| No module imports the shell | Dependency direction is `shell → features → shared`. A feature that needs the router takes a prop or a hook from `shared/`. Biome `noRestrictedImports` fails a `features/` or `shared/` file that imports `shell/**`, and a `shared/` file that imports any module — `shared/` is the leaf. A dashboard registry that composes several modules' widgets is the host's, in `boards/` |
 
 ### 4.1b A module's folder is its module; a sub-folder is one of its features
 
@@ -267,7 +267,7 @@ engine has not granted.
 | **A noun belongs to whoever the engine says owns it** | A session belongs to the *graph* — the route is `/sessions`, the client is `sessionsApi`, and the same hook serves two surfaces. So it is `useSessions`, never `useAssistantSessions`: the prefix would claim an ownership the engine does not grant, and would be wrong at one of the two call sites |
 | **A view panel is named for its occupant, not its contents** | `AssistantViewPanel`, because the occupant of the region is the Assistant and sessions are what it holds ([the-shell.md](the-shell.md)). `SessionsPanel` named the contents, and the name stopped being true the moment the panel moved |
 | **A name that has stopped being true is a bug** | `closeSessions` closed the *left* panel and was handed to nine panels, none of them Sessions. Rename on sight — a lying name costs more than an unfashionable one, and an unfashionable one costs nothing |
-| **A hook that names a region lives with the shell** | `useRightSection` sits in `shell/`, beside `useLeftSection`, not inside `features/assistant/`. The region is the shell's question; the assistant is only one of the things that can answer it |
+| **A hook that names a region lives in `shared/`** | `useLeftSection` · `useRightSection` · `useOpenSessionRequest` sit in `pages/graphs-detail/shared/`, beside `useStackSections`: the shell and the occupants both read them, and the direction is shell → features → shared, so neither side can own them. They never live inside an occupant — the region is not the assistant's question. A panel's own URL keys (`useAgentsViewPanel`, `useLensesViewPanel`, …) are its module's |
 
 The test for a rename is whether the name is **false**, not whether it is **unprefixed**. Renaming
 `SessionsPanel` was worth it (the occupant is not "sessions"); renaming `SessionList` inside it
@@ -321,18 +321,18 @@ cannot be linked to a colleague.
 ```
 
 **`?panel=` is the vocabulary inside the graph page; these are its routes' names, not a second
-scheme.** A panel is reached as `?panel=<name>`, its open drawer as `&drawer=<name>`, and the record
+scheme.** A panel is reached as `?panel=<name>`, its open drawer as `&section=<name>`, and the record
 drilled into by a key named for the record ([G31](graph-detail-page.md)). The paths above name the
 same sections for the router's sake — they do **not** give a plan two spellings.
 
 | Why the query string wins | |
 |---|---|
 | The breadcrumb reads the URL back **literally** ([G16](graph-detail-page.md)) | `owner › graph › panel › object` is the query string's shape, not a path's |
-| One key per region, and the occupant is its value | `?panel=` · `?page=` · `?right=` · `?drawer=` · `?tab=` already describe **every** region this way. A path for one of them would be the exception that needs explaining |
+| One key per region, and the occupant is its value | `?panel=` · `?page=` · `?right=` · `?section=` · `?tab=` already describe **every** region this way. A path for one of them would be the exception that needs explaining |
 | `mainSection` is `keepMounted` and holds several pages at once | a path names one thing; the region holds many, so `?page=` is the only honest spelling |
 | A deep link must survive a panel switch | dropping `&plan=` when `?panel=` moves ([G35](graph-detail-page.md)) is a query-string operation |
 
-**So a plan is `?panel=library&drawer=plans&plan=nl-single@4`, and nothing else.** A path to it is not
+**So a plan is `?panel=library&section=plans&plan=nl-single@4`, and nothing else.** A path to it is not
 offered, not redirected and not kept working.
 
 **Retired names, deleted not redirected** (G31): `datasets` · `tasks` · `workflows` · `imports` ·
@@ -384,7 +384,7 @@ screens start at 5.
 |---|---|---|
 | ✅ **1 · Sweep** | Delete §2.1. Add the `@/` alias. Drop `rbush` · `d3-force` · `immer`. Clear the 26 build errors and point `check-types` at `tsc -b --noEmit` (§2.4) | **Done.** `pnpm build`, `pnpm check-types` and `pnpm lint` green; `pnpm dev` serves; −2,538 lines. Outstanding: `vitest` and `knip` are not installed, and the e2e specs need the engine to run |
 | **2 · De-duplicate** | §2.2 in one commit per row, each replacing a Studio component with a kit import at its call sites | No Studio component shares a name with a kit export. −2,180 lines |
-| **3 · Move** | §4.2 — mechanical moves, no logic changes, one commit per module. `shared/` is staging | `git log --stat` shows renames only. `ExplorerPage.tsx` is under 400 lines |
+| **3 · Move** | §4.2 — mechanical moves, no logic changes, one commit per module. `shared/` is staging | `git log --stat` shows renames only. `GraphDetailPage.tsx` is under 400 lines |
 | **4 · Route** | §5.2 — the rail drives the router; `?panel=` becomes redirects; per-module lazy routes | Every current surface has a URL; a reload lands on the same screen; the Explorer chunk shrinks |
 | **5 · Shell** | §4a A2–A4 — `GraphDetail` drives `AppLayoutV2`'s regions; the Explorer composes to the contract; the console lands | A panel toggle does not remount the canvas. S12f closes |
 | **6 · Kit gaps** | §4a A5 — `NavVertical` `active`, `TabbedPanel variant="strip"`, 38/25 defaults → release → drop the overrides both sides | No `!` override in Studio or in the `ExplorerShell` story |
@@ -401,15 +401,16 @@ A convention a community project cannot enforce is a convention it does not have
 
 | Guard | How |
 |---|---|
-| No component shadowing a kit export | `scripts/check-kit-overlap.mjs` — reads `@invana/ui`'s `.d.ts`, greps Studio's exported component names, fails on a collision. Runs in `pnpm lint` |
-| No cross-feature deep imports | Biome `noRestrictedImports`: `src/features/*/!(index.ts)` is not importable from another feature |
+| No component shadowing a kit export | `scripts/check-kit-overlap.mjs` reads `@invana/ui`'s and `@invana/canvas-ui`'s `dist/index.d.ts`, and fails when a Studio `.tsx` exports a component under one of their names. Runs in `pnpm lint` |
+| No cross-feature deep imports | Biome 2 `noRestrictedImports` in `studio/biome.json`: `@/pages/graphs-detail/features/*/**` is an error everywhere, and each module's override allows its own folder — so another module is reached only through its `index.ts`, which exports from the declaring files, never through a sub-barrel. A new module adds one override |
+| Biome's recommended set | A rule the recommended set adds is met, or suppressed at the site with its reason — never switched off wholesale. `noFocusedTests` is off outside test files, because `fit()` there is the canvas's fit-to-content |
 | No canvas-ui fork | A canvas panel, toolbar, card, menu or status strip is `@invana/canvas-ui`'s. [canvas-ui-coverage.md](canvas-ui-coverage.md) is the map, read before writing one; a surface listed there is consumed, never reimplemented |
-| No dead files | `knip` in CI |
-| Names follow modules | `scripts/check-names` — Studio `features/<m>/` ↔ engine `server/<m>/`, the §4.1c suffixes only, no retired word in an identifier ([module-structure.md](../module-structure.md) §8b) |
-| Comments stay short | one or two lines; cite the decision id instead of restating the feature file; no history ([module-structure.md](../module-structure.md) §5b) |
-| Tokens only | Extend the check script to fail on `hsl(` · `#rrggbb` · `bg-{palette}-{n}` in `src/` — the same rule `.design/board/build.mjs` enforces (§5.4) |
-| The type ladder | Fail on `text-[Npx]`. **30 sites today** — fix them in Phase 1, then the gate holds (D7 · DS13) |
-| No PixiJS | Fail on any `pixi` import in `src/` (rule 10). The `vite.config.ts` pin is exempt |
+| No dead code | `pnpm knip` (`knip --include files,exports,types`, `studio/knip.json`) in CI's Lint job — a file nothing imports, an export nobody reads and an exported type nobody names each fail the build. A module's `index.ts` re-exports only what another module imports |
+| Names follow modules | `studio/scripts/check-names.mjs`, in `pnpm lint` and CI's Lint job — every `features/<m>/` is in its module map and the engine `server/` folder it maps to exists; no `.tsx` under `features/` ends in `Drawer` · `StackPanel` · `DashboardPage` · a bare `Panel`; no identifier carries `drawer` · `StackPanel` · `DashboardPage` · `journal` · `thinking` · `railItem`. Identifiers are read with the TypeScript parser, so strings, JSX text and comments are never flagged; comments get their own check, for decision ids. Each exception is an allow-list line with its reason ([module-structure.md](../module-structure.md) §8b) |
+| Comments stay short | One or two lines on a column; full docstrings on modules, classes and methods; never a decision id — `check-names.mjs` fails a comment that cites one; no history ([module-structure.md](../module-structure.md) §5b) |
+| Tokens only | `check-names.mjs` fails on `hsl(` · `#rrggbb` in a string or a stylesheet and on a Tailwind palette class (`text-emerald-600`), read with the TypeScript parser so comments are never flagged — the same rule `.design/board/build.mjs` enforces (§5.4). One file is allow-listed with its reason: `SaturationBridge` rebuilds `hsl()` from the theme's own triplets |
+| The type ladder | `check-names.mjs` fails on `text-[Npx]`; size is `text-base` · `text-sm` · `text-xs` |
+| No PixiJS | `check-names.mjs` fails on a `pixi.js` or `@pixi/*` import in `src/` (rule 10). The `vite.config.ts` pin is outside `src/` |
 | File size | Warn over 400 lines. A warning, not an error — some canvas files earn it |
 | One `TooltipProvider`, in the shell | `main.tsx` mounts it around the router with `delayDuration={300}`. A screen never declares its own — a second provider is a second delay to keep in step, and the one that wins depends on where a component happens to sit. Kit components that provide one internally are unaffected: nesting is legal, and theirs wins inside them |
 | Nothing interactive in a `PanelStack` title | A section header **is** its collapse `<button>`, so a `<button>` in the title is a button inside a button — invalid HTML, and it steals the collapse click. A drill-in's trail is text and its *back* is a `headerActions` item ([SK27](../modules/skills/features/authoring-a-skill.md#decisions)); `TaskDrawer` and `SkillsPanel` both do it that way |
@@ -421,11 +422,19 @@ instead of by a reviewer.
 
 ## 9. Testing, proportionate
 
-CLAUDE.md asks for few tests, positive and negative, and 80% coverage. Today: **zero unit tests.**
-Chasing 80% across 42 screens would be its own project, so the recommendation is narrower.
+CLAUDE.md asks for few tests, positive and negative, no mocks, and 80% coverage. The 80% is measured
+over Studio's **logic**, not over all of `src/`: 42 screens are markup the kit's stories and the e2e
+specs already cover.
 
 | Layer | What is tested | Not tested |
 |---|---|---|
+| Vitest (`pnpm test --coverage`, in CI's Studio Tests job) | The logic subset named in `studio/vitest.config.ts`: `lib/`, `stores/`, `services/telemetry/` (not its SDK boot, `setup.ts`), and the pure modules under `features/` and `canvases/` — `agentDraft` · `emissions` · `boardKinds` · `eventSearch` · `canvasItems` · `addressing` · `runSummary` · the three `taskFlowFrom*` adapters. Statements, branches, functions and lines each fail the build under 80%. A module that reaches another module's barrel loads the kit from `node_modules`, transformed by Vitest | Hooks, the API client and screens — they are I/O, and the e2e specs cover them |
+| Playwright | The read-only journeys against a live engine and graph database | Every screen |
+| The guardrails in §8 | Structure — which is where a 42-screen codebase actually rots | |
+
+A new pure module joins the subset in `vitest.config.ts` with its tests in the same commit.
+
+---|---|---|
 | Vitest + Testing Library | Per module: the query hooks, the reducers, the URL ↔ state mapping, and one render of each screen's empty and error states | A screen's happy-path markup — that is what the kit's stories already cover |
 | Playwright | The two specs today, plus one per journey as its module closes | Every screen |
 | The guardrails in §8 | Structure — which is where a 42-screen codebase actually rots | |

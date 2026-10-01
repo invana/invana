@@ -9,7 +9,7 @@
  * `@invana/styling/color`'s `colorByString`, the one hash every surface shares
  * (nodes, relationships, model hues).
  *
- * **The palette is `@invana/styling`'s, not ours** (design-kit-coverage.md D2):
+ * **The palette is `@invana/styling`'s, not ours** (design-kit-coverage.md):
  * `--color-data-1` … `--color-data-8`, one scale shared by charts, legends, list
  * dots and `@invana/canvas`. Tokens, so light and dark are each selected rather
  * than one flipped into the other, and so no hex lives in Studio. Read off the

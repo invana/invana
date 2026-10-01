@@ -205,8 +205,8 @@ provider row and its models, and reopens four rows below. The shapes:
 | 13.1 | [Design system](modules/platform/features/design-system.md) | Studio builds from `@invana/design-kit`, never beside it | — | — | 🟡 | — |
 | 13.2 | [Theming](modules/platform/features/theming.md) | Light · dark · theme variants, everywhere | — | — | ✅ | — |
 | 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · models · loader` | — | 🟡 | — | — |
-| 13.4 | [Logging](modules/platform/features/logging.md) | One call at startup; plain or JSON; every line carries its trace; lifecycle, not chatter | 🟡 | 🔵 | — | S1 |
-| 13.5 | [Telemetry](modules/platform/features/telemetry.md) | Traces, metrics and logs for everything a person or the system does — one trace per action from the Studio click through runs, queries and model calls, metrics that open it, logs that carry it; optional | 🟡 | 🔵 | 🔵 | S1 |
+| 13.4 | [Logging](modules/platform/features/logging.md) | One call at startup; plain or JSON; every line carries its trace; lifecycle, not chatter | ✅ | ✅ | — | S1 |
+| 13.5 | [Telemetry](modules/platform/features/telemetry.md) | Traces, metrics and logs for everything a person or the system does — one trace per action from the Studio click through runs, queries and model calls, metrics that open it, logs that carry it; optional | ✅ | ✅ | ✅ | S1 |
 | 13.6 | [Admin and health](modules/platform/features/admin-and-health.md) | A generated browser over app state, and a readiness probe | ✅ | — | — | S1 |
 | 13.7 | [Setup](modules/platform/features/setup.md) | Four required steps in four features — the onboarding wizard, created to answering | ✅ | — | 🟡 | S13 |
 | 13.8 | [The runtime](modules/platform/features/runtime.md) | The workhorse: plan graph · frontier · signals · pools · approvals · what it emits | 🟡 | — | — | S15 |
@@ -347,6 +347,7 @@ replacement lands.
 |---|---|---|
 | `/modeller` as its own route | [1.4 Model editor](modules/connect-and-model/features/model-editor.md) as a board kind | The next major. The canvas is reachable from the one page now, so the route is three lines of redirect kept for bookmarks — a 404 would be a worse answer than the panel the bookmark meant |
 | `pages/graphs/modeller/ModellerPage.tsx` | The Model panel and the model canvas | Nothing imports it. Its *components* stay — the panel and canvas compose them |
+| `?drawer=` in a graph page URL | `?section=` ([G35](building-studio/graph-detail-page.md)) | The next minor release. Until then it is read as `?section=`, so a link from before the rename still opens its section; nothing writes it |
 
 
 ## Not building
@@ -437,7 +438,8 @@ The artboard → route → feature map, the order, and what each screen still ne
 [building-studio/refactor-plan.md](building-studio/refactor-plan.md); what each screen composes from is
 [building-studio/design-kit-coverage.md](building-studio/design-kit-coverage.md); what every **canvas**
 surface composes from is [building-studio/canvas-ui-coverage.md](building-studio/canvas-ui-coverage.md);
-and every screen's own status is [the-screens.md](the-screens.md).
+and every screen's own status is [the-screens.md](the-screens.md). What the code cleanup still owes is
+[building-studio/cleanup.md](building-studio/cleanup.md).
 
 | Rule | Detail |
 |---|---|

@@ -1,17 +1,19 @@
-import { AppVersion } from "@/components/AppVersion";
-import { useAppHeader } from "@/components/header/useAppHeader";
-import { useGraphConnectionQuery } from "@/hooks/queries/useGraphs";
-import { MAIN_SECTION, SIDE_SECTION } from "@/lib/sections";
-import { SettingsPanel } from "@/pages/graphs-detail/features/graph-settings/SettingsPanel";
-import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
-import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
-import {
-	type SettingsSection,
-	useSettingsPanel,
-} from "@/pages/graphs-detail/shell/useSettingsPanel";
 import { AppLayoutV2 } from "@invana/themes";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
+import { AppVersion } from "@/components/AppVersion";
+import { useAppHeader } from "@/components/header/useAppHeader";
+import { MAIN_SECTION, SIDE_SECTION } from "@/lib/sections";
+import {
+	SettingsViewPanel,
+	useGraphConnectionQuery,
+} from "@/pages/graphs-detail/features/graphs";
+import {
+	type LeftNavKey,
+	useLeftSection,
+} from "@/pages/graphs-detail/shared/useLeftSection";
+import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
+import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
 
 // A page hands the shell content only; the shell owns every region's size, so
 // the left panel, docked settings, the assistant and the inspector all open alike.
@@ -22,14 +24,14 @@ interface SectionSlot {
 interface GraphDetailProps {
 	/** The object open on this screen — drawn as the last breadcrumb crumb,
 	 *  after `owner › graph › panel`. Omitted when nothing is open. There is no
-	 *  *screen* crumb: the graph's URL is the page (graph-detail-page.md G15),
+	 *  *screen* crumb: the graph's URL is the page (graph-detail-page.md),
 	 *  so what follows the graph is the open panel, then what it opened. */
 	objectLabel?: string;
 	/** Page-side left panel. Shown only while a page-owned `?settings` key is
-	 *  open; a settings section docks the SettingsPanel here instead, and
+	 *  open; a settings section docks the SettingsViewPanel here instead, and
 	 *  nothing open means no left column. */
 	leftSection?: SectionSlot;
-	/** Main content. Replaced by SettingsPanel when settings is expanded. */
+	/** Main content. Replaced by SettingsViewPanel when settings is expanded. */
 	mainSection: SectionSlot;
 	/** Right auxiliary panel (e.g. Inspector / DetailPanel). Hidden when
 	 *  settings is expanded so the panel owns the full content width. */
@@ -50,18 +52,18 @@ interface GraphDetailProps {
 }
 
 // The page-owned panels keyed into the shared `?settings` param. These open via
-// the page's own `leftSection` instead of rendering a SettingsPanel tab — so the
+// the page's own `leftSection` instead of rendering a SettingsViewPanel tab — so the
 // whole rail stays one single-open accordion.
 //
 // There is one page (docs/for-developers/modules/explore/spec.md), so there is one list: Model
 // plus the work surfaces (docs/for-developers/modules/work/spec.md). The Modeller's `schema` and
-// `messages` keys are aliased onto `model` / `sessions` by `useSettingsPanel`
+// `messages` keys are aliased onto `model` / `sessions` by `useLeftSection`
 // and never reach here.
 //
 // `sessions` is deliberately absent: it is the assistant, on the right
-// (the-assistant.md AD1). It stays in ALL_NATIVE_SECTIONS below so a
+// (the-assistant.md). It stays in ALL_NATIVE_SECTIONS below so a
 // stale `?panel=sessions` link is still recognised as page-owned — the page
-// answers it by opening the assistant — rather than docking the SettingsPanel.
+// answers it by opening the assistant — rather than docking the SettingsViewPanel.
 //
 // `skills` is page-owned rather than a settings section. That is deliberate: a
 // skill is *configured* like a connection but *read* like work — "is this prose
@@ -71,23 +73,23 @@ interface GraphDetailProps {
 // This used to be a record keyed by a `GraphDetailSection` ("overview" |
 // "explorer" | "modeller") with one key filled in. There is one page, so it is
 // one list.
-const PAGE_OWNED_SECTIONS: SettingsSection[] = [
+const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"explorer",
 	"model",
 	"projects",
-	// **Execution and definition are two panels** (G41). `runs` is the journal as
-	// one list; `library` is the three-drawer stack — Plans · Catalogue ·
+	// **Execution and definition are two panels**. `runs` is the journal as
+	// one list; `library` is the three-section stack — Plans · Catalogue ·
 	// Templates. `imports`, `workflows` and `templates` are gone from this list
 	// because they are gone from the product: an import is a `kind` of TaskRun, a
 	// workflow is a reusable TaskPlan, and a projection template is Library's
-	// third drawer (G30 · G38).
+	// third section.
 	"runs",
 	"library",
 	"govern",
 	"agents",
 	"skills",
 ];
-const ALL_NATIVE_SECTIONS: SettingsSection[] = [
+const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
 	"explorer",
 	"sessions",
 	"schema",
@@ -99,14 +101,15 @@ const ALL_NATIVE_SECTIONS: SettingsSection[] = [
 	"library",
 	"govern",
 	"agents",
+	"skills",
 ];
 
 /**
  * The shell for the graph page — one page, at the graph's own URL
- * (graph-detail-page.md G1 · G15). Owns:
+ * (graph-detail-page.md). Owns:
  *
  * - The breadcrumb header (`useAppHeader`) and left rail (`useGraphLeftNav`).
- * - SettingsPanel takeover: docked replaces `leftSection`; expanded replaces
+ * - SettingsViewPanel takeover: docked replaces `leftSection`; expanded replaces
  *   `mainSection` and hides both `leftSection` and `rightSection`.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
  *   and a right cluster (extras + `AppVersion`).
@@ -130,14 +133,14 @@ export function GraphDetail({
 	}>();
 
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
-	const settingsPanel = useSettingsPanel();
+	const settingsPanel = useLeftSection();
 	const leftNav = useGraphLeftNav();
 
 	// **No mode switch** (docs/for-developers/modules/explore/spec.md). The header is a breadcrumb naming the
 	// graph and the open panel; the view crumb follows the rail, so it answers
 	// "where am I?" without being a second way to navigate.
 	// `owner › graph › panel › object`. The panel crumb is the `?panel` value
-	// verbatim (G16), so the breadcrumb is a literal reading of the URL — the two
+	// verbatim, so the breadcrumb is a literal reading of the URL — the two
 	// crumbs before it are identifiers too, the username and the slug.
 	const header = useAppHeader({
 		pageLabel: settingsPanel.isOpen ? settingsPanel.section : undefined,
@@ -148,8 +151,8 @@ export function GraphDetail({
 	});
 
 	// The whole left rail shares one `?settings` param. This view's own panel
-	// (AssistantPanel / SchemaNav) opens under its native key; every other value
-	// is a bottom-rail settings section that renders the SettingsPanel. A value
+	// (AssistantViewPanel / SchemaNav) opens under its native key; every other value
+	// is a bottom-rail settings section that renders the SettingsViewPanel. A value
 	// belonging to the *other* view's native key shows nothing here.
 	const nativeKeys = PAGE_OWNED_SECTIONS;
 	const sectionIsNative = ALL_NATIVE_SECTIONS.includes(settingsPanel.section);
@@ -161,12 +164,12 @@ export function GraphDetail({
 	const settingsDocked = settingsOpen && !settingsPanel.expanded;
 
 	// Native panel open → the page's own leftSection. Settings docked → the
-	// SettingsPanel. Settings expanded → it takes main and both sides close.
+	// SettingsViewPanel. Settings expanded → it takes main and both sides close.
 	// Nothing open → no left column.
 	const leftContent = showNative ? (
 		leftSection?.content
 	) : settingsDocked ? (
-		<SettingsPanel
+		<SettingsViewPanel
 			username={username as string}
 			graphSlug={graphSlug as string}
 		/>
@@ -178,7 +181,7 @@ export function GraphDetail({
 	const effectiveMainSection = {
 		...MAIN_SECTION,
 		content: settingsExpanded ? (
-			<SettingsPanel
+			<SettingsViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
 			/>
@@ -192,7 +195,7 @@ export function GraphDetail({
 			? { ...SIDE_SECTION, content: rightSection.content }
 			: undefined;
 
-	// The shell owns the layout (DS12). It keeps `mainSection` mounted at a
+	// The shell owns the layout. It keeps `mainSection` mounted at a
 	// stable position with each side region as a conditional sibling, so opening
 	// a panel never remounts the canvas — a property of the shell since
 	// `@invana/themes` 0.0.23, not something a page re-implements to protect

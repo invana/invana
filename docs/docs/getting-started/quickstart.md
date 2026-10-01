@@ -191,4 +191,3 @@ Click the **Graph** tab in the query results to see nodes and edges rendered in 
 
 - [Configuration](configuration.md) — Customize Invana settings
 - [Building an Ontology](../guides/building-ontology.md) — Deep dive into modelling
-- [Running Simulations](../guides/running-simulations.md) — Game theory and hypothesis testing

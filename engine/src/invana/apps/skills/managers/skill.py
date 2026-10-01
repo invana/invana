@@ -49,7 +49,7 @@ from invana.apps.skills.schemas import (
 from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
-from invana.core.events.services import current_trace_id, diff_changed_fields, emit_event
+from invana.core.events.services import diff_changed_fields, emit_event
 
 #: What lives on a version. Changing any of these publishes.
 _VERSIONED = ["description", "content", "when_to_use"]
@@ -192,7 +192,6 @@ class SkillManager:
             graph_id=skill.graph_id,
             actor_id=actor_id,
             details={"name": skill.name, "version": draft.version, "changed": changed},
-            trace_id=current_trace_id(),
         )
         return draft
 
@@ -248,7 +247,6 @@ class SkillManager:
             graph_id=skill.graph_id,
             actor_id=actor_id,
             details={"name": skill.name, "version": number, "changed": changed},
-            trace_id=current_trace_id(),
         )
         return version
 
@@ -304,7 +302,6 @@ class SkillManager:
             actor_id=actor_id,
             actor_kind=actor_kind,
             details={"name": skill.name, "version": 1, "origin": origin},
-            trace_id=current_trace_id(),
         )
         return skill
 
@@ -342,7 +339,6 @@ class SkillManager:
                 graph_id=skill.graph_id,
                 actor_id=actor_id,
                 details={"changed": changed, "name": skill.name},
-                trace_id=current_trace_id(),
             )
 
         # Prose that is sent but unchanged is not a publish: republishing
@@ -386,5 +382,4 @@ class SkillManager:
             graph_id=graph_id,
             actor_id=actor_id,
             details={"name": name},
-            trace_id=current_trace_id(),
         )

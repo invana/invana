@@ -4123,6 +4123,17 @@
             "title": "Skill Ids",
             "type": "array"
           },
+          "span_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Span Id"
+          },
           "target_id": {
             "anyOf": [
               {
@@ -9952,7 +9963,7 @@
         "type": "object"
       },
       "ResultMetadata": {
-        "description": "Metadata about a query result.\n\nAttributes:\n    node_count: Number of nodes in the result.\n    edge_count: Number of edges in the result.\n    record_count: Number of raw records returned.\n    duration_ms: Query execution duration in milliseconds.\n    query: The executed query text, when the caller records it\n    (docs/for-developers/modules/explore/features/boards.md) \u2014\n        e.g. the traversal a node-expand generated, logged into the session.",
+        "description": "Metadata about a query result.\n\nAttributes:\n    node_count: Number of nodes in the result.\n    edge_count: Number of edges in the result.\n    record_count: Number of raw records returned.\n    duration_ms: Query execution duration in milliseconds.\n    query: The executed query text, when the caller records it \u2014 e.g.\n        the traversal a node-expand generated, logged into the session.",
         "properties": {
           "duration_ms": {
             "default": 0.0,
@@ -14780,6 +14791,17 @@
             "title": "Stream Seq",
             "type": "integer"
           },
+          "trace_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace Id"
+          },
           "workflow_key": {
             "title": "Workflow Key",
             "type": "string"
@@ -15818,6 +15840,17 @@
             "default": 0,
             "title": "Tokens Out",
             "type": "integer"
+          },
+          "trace_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace Id"
           },
           "triggered_by": {
             "default": "user",
@@ -17778,6 +17811,46 @@
         "summary": "Create Graph",
         "tags": [
           "graphs"
+        ]
+      }
+    },
+    "/api/v1/telemetry/logs": {
+      "post": {
+        "description": "Forward an OTLP/HTTP log export \u2014 the studio's error logs \u2014 to the collector.",
+        "operationId": "proxy_logs_api_v1_telemetry_logs_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Proxy Logs",
+        "tags": [
+          "telemetry"
+        ]
+      }
+    },
+    "/api/v1/telemetry/metrics": {
+      "post": {
+        "description": "Forward an OTLP/HTTP metric export to the collector.",
+        "operationId": "proxy_metrics_api_v1_telemetry_metrics_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Proxy Metrics",
+        "tags": [
+          "telemetry"
         ]
       }
     },

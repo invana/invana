@@ -19,7 +19,7 @@ from invana.apps.skills.models import Rule, RuleVersion
 from invana.apps.skills.querysets import RuleQuerySet, RuleVersionQuerySet
 from invana.core.errors import NotFoundError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 
 
 class RuleManager:
@@ -84,7 +84,6 @@ class RuleManager:
             graph_id=graph_id,
             actor_id=actor_id,
             details={"statement": version.statement, "kind": rule.kind, "project_id": project_id},
-            trace_id=current_trace_id(),
         )
         return rule
 
@@ -104,7 +103,6 @@ class RuleManager:
             graph_id=rule.graph_id,
             actor_id=actor_id,
             details={"statement": statement, "version": number},
-            trace_id=current_trace_id(),
         )
         return version
 
@@ -134,7 +132,6 @@ class RuleManager:
             graph_id=rule.graph_id,
             actor_id=actor_id,
             details={"statement": rule.statement},
-            trace_id=current_trace_id(),
         )
         return rule
 

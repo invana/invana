@@ -1,15 +1,15 @@
 /**
- * The skill's page, as a page in `mainSection` (SK17 · SK36) — `skill:<id>`
+ * The skill's page, as a page in `mainSection` — `skill:<id>`
  * on the strip, the Skills list left beside it in `leftSection`.
  *
  * This is the host half: which skill, and whether its Playbook is being
  * edited. {@link SkillDetail} is the page itself.
  */
 
-import { useSkillsQuery } from "@/hooks/queries/useSkills";
-import { SkillDetail } from "@/pages/graphs-detail/features/skills/SkillDetail";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useState } from "react";
+import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
+import { SkillDetail } from "@/pages/graphs-detail/features/skills/SkillDetail";
 
 export function SkillBoardPage({
 	username,
@@ -24,7 +24,7 @@ export function SkillBoardPage({
 	onOpenAgent: (agentId: string) => void;
 	onOpenUsageDashboard: (skillId: string) => void;
 }) {
-	// The same list the drawer reads, so the page and the row never disagree
+	// The same list the section reads, so the page and the row never disagree
 	// about version or draft.
 	const skills = useSkillsQuery(username, graphSlug);
 	const [editing, setEditing] = useState(false);
@@ -50,7 +50,7 @@ export function SkillBoardPage({
 			username={username}
 			graphSlug={graphSlug}
 			skill={skill}
-			// A draft has nothing to read yet, so it opens editing (SK37).
+			// A draft has nothing to read yet, so it opens editing.
 			editing={editing || skill.is_draft}
 			onEditing={setEditing}
 			onOpenAgent={onOpenAgent}

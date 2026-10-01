@@ -14,7 +14,7 @@
 // Studio's whole palette, through `useStudioCanvasTheme`.
 
 import type { CanvasProps } from "@invana/canvas-react";
-import { type GraphCanvas, cssColorToNumber } from "@invana/graph";
+import { cssColorToNumber, type GraphCanvas } from "@invana/graph";
 import { useTheme } from "@invana/themes";
 import { useEffect } from "react";
 
@@ -32,6 +32,9 @@ const FALLBACK = {
 	border: 0x35383b,
 	primary: 0x52e086,
 } as const;
+
+/** A PixiJS colour number as the CSS string the background layer takes. */
+const cssHex = (n: number) => `#${n.toString(16).padStart(6, "0")}`;
 
 // Resolve a `var(--token)` to a concrete `rgb(...)` string by letting the
 // browser compute it against `document.documentElement` (where the theme class
@@ -62,10 +65,13 @@ function num(varName: string, fallback: number): number {
  */
 export function readCanvasThemeConfig({
 	edgeColor = true,
-}: { edgeColor?: boolean } = {}): CanvasConfig {
+}: {
+	edgeColor?: boolean;
+} = {}): CanvasConfig {
 	// Background is a CSS string on the layer; the rest are PixiJS numbers.
-	const background = resolveVar("--color-background") ?? "#181a1b";
-	const grid = resolveVar("--color-border") ?? "#35383b";
+	const background =
+		resolveVar("--color-background") ?? cssHex(FALLBACK.background);
+	const grid = resolveVar("--color-border") ?? cssHex(FALLBACK.grid);
 	const foreground = num("--color-foreground", FALLBACK.foreground);
 	const bg = num("--color-background", FALLBACK.background);
 	const edge = num("--color-muted-foreground", FALLBACK.edge);

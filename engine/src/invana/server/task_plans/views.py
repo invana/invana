@@ -27,7 +27,7 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.errors import ValidationError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.runtime.managers import PlanPerformanceManager, TaskPlanRunsManager
 from invana.runtime.managers.plan_performance import WINDOWS
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
@@ -177,7 +177,6 @@ async def promote(
         run_id=payload.run_id,
         actor_id=user.id,
         details={"key": workflow.key, "version": workflow.version},
-        trace_id=current_trace_id(),
     )
     read = TaskPlanRead.model_validate(workflow)
     read.step_count = len(await library.workflows_qs.tasks_for(session, plan_id=workflow.id))

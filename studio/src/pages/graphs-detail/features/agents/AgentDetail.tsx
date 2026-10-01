@@ -1,12 +1,12 @@
 /**
- * The agent's page — one page, five tabs (AG23): **Overview · Skills &
+ * The agent's page — one page, five tabs: **Overview · Skills &
  * callables · Thinking · Soul · Activity**.
  *
  * *As someone running work through agents, I want to see what one agent is,
  * what it can do, how it thinks, how it speaks and what it has done, so that
  * assigning it a task is a choice and not a guess.*
  *
- * There is no Bounds tab. The world comes with the work (AG24), and every
+ * There is no Bounds tab. The world comes with the work, and every
  * standing limit sits where it is read: effort on Thinking, spend and reach on
  * Activity beside the meters they cap.
  *
@@ -14,33 +14,36 @@
  *
  * Nothing here autosaves. An envelope is a permission boundary and a voice is
  * a version, so edits from every tab accumulate in one buffer, Discard · Save
- * appear in the header while it differs, and one **Save** is one agent edit
- * (AG28). Binding a skill is the exception — its own write, so a refusal can
- * name the one skill it refused (BN11).
+ * appear in the header while it differs, and one **Save** is one agent edit.
+ * Binding a skill is the exception — its own write, so a refusal can
+ * name the one skill it refused.
  */
 
+import { Button, RecordHeader, TabbedPanel } from "@invana/ui";
+import { Eye, Lock, Play, Save, Star } from "lucide-react";
+import { useMemo, useState } from "react";
 import { AgentActivityTab } from "@/pages/graphs-detail/features/agents/AgentActivityTab";
+import { AgentEffortTab } from "@/pages/graphs-detail/features/agents/AgentEffortTab";
 import { AgentOverviewTab } from "@/pages/graphs-detail/features/agents/AgentOverviewTab";
 import { AgentSkillsTab } from "@/pages/graphs-detail/features/agents/AgentSkillsTab";
 import {
 	AgentSoulTab,
 	useSoulPreview,
 } from "@/pages/graphs-detail/features/agents/AgentSoulTab";
-import { AgentThinkingTab } from "@/pages/graphs-detail/features/agents/AgentThinkingTab";
 import {
 	type AgentDraft,
 	changesOf,
 	draftOf,
 } from "@/pages/graphs-detail/features/agents/agentDraft";
+import type {
+	Agent,
+	AgentUpdate,
+} from "@/pages/graphs-detail/features/agents/types";
 import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 import {
 	agentTone,
 	humanStatus,
 } from "@/pages/graphs-detail/shared/statusTone";
-import type { Agent, AgentUpdate } from "@/types/work";
-import { Button, RecordHeader, TabbedPanel } from "@invana/ui";
-import { Eye, Lock, Play, Save, Star } from "lucide-react";
-import { useMemo, useState } from "react";
 
 /**
  * Every step the interpreter knows. The allow-list is drawn against this whole
@@ -98,7 +101,7 @@ export function AgentDetail({
 	onOpenEnvelope: () => void;
 	onBindSkill: (skillId: string) => void;
 	onUnbindSkill: (skillId: string) => void;
-	/** The engine's `409`, drawn under the chip that raised it (BN11). */
+	/** The engine's `409`, drawn under the chip that raised it. */
 	bindError?: unknown;
 	/** The last Save's refusal — a `422` naming the dial or key it refused. */
 	saveError?: unknown;
@@ -191,7 +194,7 @@ export function AgentDetail({
 					) : (
 						<>
 							{previewButton}
-							{/* Only an agent that answers asks can be the default (AG3). */}
+							{/* Only an agent that answers asks can be the default. */}
 							{!isDefault && agent.status === "active" && agent.answers_asks ? (
 								<Button size="sm" variant="ghost" onClick={onSetDefault}>
 									<Star /> Make default
@@ -225,7 +228,7 @@ export function AgentDetail({
 				</p>
 			) : null}
 
-			{/* The kit's underline tab strip, as drawn (AG38). Its card border is
+			{/* The kit's underline tab strip, as drawn. Its card border is
 			    the page's own, so it is dropped here. */}
 			<TabbedPanel
 				className="min-h-0 flex-1 border-0 bg-transparent shadow-none"
@@ -271,7 +274,7 @@ export function AgentDetail({
 						value: "thinking",
 						label: "Thinking",
 						content: (
-							<AgentThinkingTab agent={agent} draft={draft} onPatch={patch} />
+							<AgentEffortTab agent={agent} draft={draft} onPatch={patch} />
 						),
 					},
 					{

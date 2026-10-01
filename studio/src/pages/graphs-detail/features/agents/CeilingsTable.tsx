@@ -1,5 +1,6 @@
+import { usdWhole } from "@/lib/format";
 /**
- * A2 · the ceilings this agent runs inside — **value · what it bounds ·
+ * the ceilings this agent runs inside — **value · what it bounds ·
  * whether anything enforces it**.
  *
  * *As the person who set this agent's budget, I want to see which ceilings stop
@@ -7,15 +8,15 @@
  * protecting me when it is not.*
  *
  * **Declared is not the same as enforced, and the table says which**
- * ([EB7](../../../../../docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+ * ([envelope-and-budget.md](../../../../../docs/for-developers/modules/agents/features/envelope-and-budget.md)).
  * `max_concurrent_runs` refuses at admission, naming the agent
- * ([CC11](../../../../../docs/for-developers/modules/agents/features/concurrency-and-contention.md));
+ * ([concurrency-and-contention.md](../../../../../docs/for-developers/modules/agents/features/concurrency-and-contention.md));
  * a spend ceiling is drawn against rather than stopped on, because stopping
- * mid-run is exactly what [EB2] forbids; and `max_fanout` is unread until
+ * mid-run is exactly what [ ] forbids; and `max_fanout` is unread until
  * something dispatches a `map_over`. A table that printed all ten the same way
  * would be telling the reader that ten numbers protect them when four do.
  *
- * **Drawn as the page draws it (AG38):** each row is the key a reader will meet
+ * **Drawn as the page draws it:** each row is the key a reader will meet
  * in a plan's refusal (`max_steps`), the number, and what it bounds. A ceiling
  * that is only drawn against, or that nothing reads yet, says so after what it
  * bounds — the one column the page does not draw is folded into the words.
@@ -24,7 +25,7 @@
  * Empty is *the default applies*, never zero: a blank ceiling is the Graph's,
  * and `0` would be an agent that may not take a step.
  *
- * **One table per group, drawn where it is read** (AG23 · EB9): *Effort* on the
+ * **One table per group, drawn where it is read**: *Effort* on the
  * agent's Thinking tab, *Budget* and *Reach* on its Activity tab beside the
  * meters they cap. Effort is `agents.effort`; the other two are `agents.budget`.
  */
@@ -36,7 +37,7 @@ import { Table, TableBody, TableCell, TableRow } from "@invana/ui";
 type Enforcement = "admission" | "validation" | "drawn" | "unread";
 
 /** What a number limits — how hard it tries, what it spends, how wide it spreads. */
-export type CeilingGroup = "effort" | "budget" | "reach";
+type CeilingGroup = "effort" | "budget" | "reach";
 
 interface Ceiling {
 	key: string;
@@ -51,7 +52,7 @@ interface Ceiling {
 /**
  * Every key of `effective_budget` and `effective_effort`, each group in the
  * order the page lists it. A ceiling the record carries and the screen does not
- * draw is one nobody can work within (EB6).
+ * draw is one nobody can work within.
  */
 const CEILINGS: readonly Ceiling[] = [
 	{
@@ -118,7 +119,7 @@ const CEILINGS: readonly Ceiling[] = [
 	},
 ];
 
-/** Said only where the number does not stop a run by itself (EB7). */
+/** Said only where the number does not stop a run by itself. */
 const NOT_ENFORCED: Partial<Record<Enforcement, string>> = {
 	drawn: "drawn against",
 	unread: "nothing reads it yet",
@@ -137,7 +138,7 @@ export interface CeilingsTableProps {
 
 function show(c: Ceiling, v: number | undefined): string {
 	if (v == null) return "—";
-	if (c.usd) return `$${v.toFixed(2)}`;
+	if (c.usd) return usdWhole(v);
 	return v >= 1000 && v % 1000 === 0 ? `${v / 1000}k` : String(v);
 }
 

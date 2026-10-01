@@ -2,21 +2,15 @@
  * Profile › Access tokens
  * (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
  *
- * A token carries the person's identity, not a scope (PT1) — so this surface has
+ * A token carries the person's identity, not a scope — so this surface has
  * no permission picker, and never suggests one. The two things it must get right
- * are the secret being shown exactly once (PT2) and revocation being one click
+ * are the secret being shown exactly once and revocation being one click
  * away from the row that names it.
  *
  * The expiry choices and the ceiling come from the list response, not from a
- * constant here (C10): the deployment configures them.
+ * constant here: the deployment configures them.
  */
 
-import { authApi } from "@/services/api/auth";
-import { ApiError } from "@/services/api/client";
-import type {
-	PersonalAccessToken,
-	PersonalAccessTokenList,
-} from "@/types/auth";
 import {
 	Input,
 	Label,
@@ -42,19 +36,25 @@ import {
 import { Check, Copy, KeySquare, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { authApi } from "@/services/api/auth";
+import { ApiError } from "@/services/api/client";
+import type {
+	PersonalAccessToken,
+	PersonalAccessTokenList,
+} from "@/types/auth";
 
 const NEVER = "never";
 
 export function AccessTokensTab() {
 	const [listing, setListing] = useState<PersonalAccessTokenList | null>(null);
 	const [loadError, setLoadError] = useState<string | null>(null);
-	// The secret, held only for as long as the dialog is open (PT2).
+	// The secret, held only for as long as the dialog is open.
 	const [minted, setMinted] = useState<{ name: string; secret: string } | null>(
 		null,
 	);
 	const [revoking, setRevoking] = useState<PersonalAccessToken | null>(null);
 	// The form lives in a dialog: the section is a list, not a form with a list
-	// under it (PT10).
+	// under it.
 	const [creating, setCreating] = useState(false);
 
 	const load = useCallback(async () => {

@@ -19,7 +19,7 @@ from invana.apps.boards.schemas import BoardCreate, BoardUpdate
 from invana.apps.sessions.querysets import SessionMessageQuerySet, SessionQuerySet
 from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 
 
 class BoardManager:
@@ -182,7 +182,6 @@ class BoardManager:
             graph_id=graph_id,
             actor_id=actor_id,
             details={"kind": kind},
-            trace_id=current_trace_id(),
         )
 
     async def _emit(self, session: AsyncSession, action: str, board: Board, actor_id: str, details: dict) -> None:
@@ -194,7 +193,6 @@ class BoardManager:
             graph_id=board.graph_id,
             actor_id=actor_id,
             details=details,
-            trace_id=current_trace_id(),
         )
 
     async def _backing_session(self, session: AsyncSession, *, session_id: str, graph_id: str, user_id: str):

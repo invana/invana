@@ -34,8 +34,6 @@ from invana.runtime.models import TaskRun
 
 sessions = SessionManager()
 
-pytestmark = pytest.mark.asyncio
-
 
 async def _message_count(session, session_id: str) -> int:
     stmt = select(func.count()).select_from(SessionMessage).where(SessionMessage.session_id == session_id)

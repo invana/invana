@@ -17,7 +17,7 @@ from invana.apps.llm.planner import generate_plan
 from invana.apps.llm.propose import propose_model
 from invana.apps.llm.translate import Clarification, nl_to_query
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.runtime.catalogue.contract import (
     POOL_GRAPHDB,
     CannotAnswer,
@@ -341,7 +341,6 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
             "output_tokens": usage.output_tokens,
             "duration_ms": round(generated.duration_ms),
         },
-        trace_id=current_trace_id(),
     )
     return Out(
         detail=f"proposed {generated.language.title()} · {_line_count(generated.query)} line"
@@ -588,7 +587,6 @@ async def _clarify_event(ctx: TaskContext, v: RunVars, *, question: str, usage, 
             "output_tokens": usage.output_tokens,
             "duration_ms": round(duration_ms),
         },
-        trace_id=current_trace_id(),
     )
 
 

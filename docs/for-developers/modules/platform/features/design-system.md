@@ -51,8 +51,8 @@ steps, a diagnosis and a windowed table. A component that carries a domain type 
 | Tabbed panel · panel stack · panel content · toolbar · tree view · nav rails · search input · rich select · table · tabs · badge · tooltip · sheet · skeleton · spinner | `@invana/ui` |
 | Icon rail | `useGraphLeftNav` on the kit's vertical nav |
 | Filter chip band · action bar · panel status line | `work/PanelChrome.tsx` — **retiring** into `FilterBar` + `SectionHeader` + `AppStatusBar` (DS17) |
-| Work row | `work/WorkRow.tsx` — **retiring** into `Item size="xs"` + `StatusDot` + `Badge tone` (DS17) |
-| Canvas tab bar · canvas legend and footer cards | `explorer/CanvasTabsBar.tsx` — **retiring** into `TabbedPanel variant="strip"` (DS17) · `work/WorkCanvasChrome.tsx` |
+| Work row | `shared/RecordRow.tsx` — **retiring** into `Item size="xs"` + `StatusDot` + `Badge tone` (DS17) |
+| Canvas tab bar · canvas legend and footer cards | `explorer/CanvasTabsBar.tsx` — **retiring** into `TabbedPanel variant="strip"` (DS17) · `layered/LayeredCanvasChrome.tsx` |
 | Graph status bar | `graphs/components/GraphStatusBar.tsx` — **retiring** into `AppStatusBar` (DS17) |
 
 Nothing here is rebuilt. A shell change is a change to the file that already owns it — and for the five

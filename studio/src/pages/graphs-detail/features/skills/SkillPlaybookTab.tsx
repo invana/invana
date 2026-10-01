@@ -3,26 +3,30 @@
  *
  * Two states, one surface. A published skill reads as its sentences with the
  * step each drew beside it, and a sentence that produced none is marked
- * **unmapped** — the diagnosis, without the author hunting for it (C11). Edit
+ * **unmapped** — the diagnosis, without the author hunting for it. Edit
  * it and the same lines become a **draft**: the one mutable version row there
- * will ever be (SK20), with its own plan being drawn beside it.
+ * will ever be, with its own plan being drawn beside it.
  *
  * ## What happens when the planner stops
  *
  * A sentence with two readings raises a question **against that sentence**, and
- * nothing is written until it is answered (C10 · SK26). The readings are the
+ * nothing is written until it is answered. The readings are the
  * options — each naming the step it would write — and never a free-text box,
  * because that is a second way to write the playbook in a box that is not the
  * playbook.
  *
  * ## And when the prose cannot fix it
  *
- * **Edit by hand** opens the rows themselves (SK7). After that the plan is
+ * **Edit by hand** opens the rows themselves. After that the plan is
  * `authored`, so drawing again stops being a button and becomes an offer that
  * names what it would discard — because editing the prose must never silently
  * throw away a correction somebody made deliberately.
  */
 
+import { Input, Label, Textarea } from "@invana/forms";
+import { Badge, Button, Spinner } from "@invana/ui";
+import { PencilLine, Sparkles, SquarePen, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
 	useAnswerClarificationMutation,
 	useDiscardDraftMutation,
@@ -32,20 +36,16 @@ import {
 	useSaveDraftMutation,
 	useSkillDraftQuery,
 	useWriteDraftTasksMutation,
-} from "@/hooks/queries/useSkills";
-import { SkillPlanEditor } from "@/pages/graphs-detail/features/skills/SkillPlanEditor";
+} from "@/pages/graphs-detail/features/skills/queries";
+import { SkillPlaybookEditor } from "@/pages/graphs-detail/features/skills/SkillPlaybookEditor";
 import type {
 	Skill,
 	SkillClarification,
 	SkillDrawRefusal,
-	SkillPlanNode,
-	SkillPlanRead,
-} from "@/types/skills";
+	SkillPlaybookNode,
+	SkillPlaybookRead,
+} from "@/pages/graphs-detail/features/skills/types";
 import { PanelSection } from "@/ui/PanelSection";
-import { Input, Label, Textarea } from "@invana/forms";
-import { Badge, Button, Spinner } from "@invana/ui";
-import { PencilLine, Sparkles, SquarePen, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
 
 /** One line of the playbook, and what it drew. */
 function sentences(content: string): string[] {
@@ -59,8 +59,8 @@ function sentences(content: string): string[] {
  *  *ask which* qualifies *turn it into a query* rather than adding a step. */
 function stepFor(
 	sentence: string,
-	nodes: SkillPlanNode[],
-): SkillPlanNode | undefined {
+	nodes: SkillPlaybookNode[],
+): SkillPlaybookNode | undefined {
 	return nodes.find((n) => (n.source_span ?? "").includes(sentence));
 }
 
@@ -75,12 +75,12 @@ export function SkillPlaybookTab({
 	username: string;
 	graphSlug: string;
 	skill: Skill;
-	plan: SkillPlanRead | undefined;
+	plan: SkillPlaybookRead | undefined;
 	editing: boolean;
 	onEditing: (editing: boolean) => void;
 }) {
 	// The draft exists as a row the moment it is opened, so this is a read of
-	// something durable rather than form state (SK20).
+	// something durable rather than form state.
 	const [drawing, setDrawing] = useState(false);
 	const draft = useSkillDraftQuery(username, graphSlug, skill.id, {
 		enabled: editing,
@@ -90,22 +90,22 @@ export function SkillPlaybookTab({
 	// Publishing is its own route: `POST …/versions` stamps the open draft and
 	// moves the head. `PATCH …/draft` only writes the prose — a *Publish vN*
 	// wired to it saved the text and left the skill a draft for ever, which is
-	// the one act this drawer exists to complete (SK20).
+	// the one act this section exists to complete.
 	const publish = usePublishSkillVersionMutation(username, graphSlug);
 	const discard = useDiscardDraftMutation(username, graphSlug, skill.id);
 	const draw = useDrawDraftMutation(username, graphSlug, skill.id);
 	const answer = useAnswerClarificationMutation(username, graphSlug, skill.id);
 	const writeTasks = useWriteDraftTasksMutation(username, graphSlug, skill.id);
 	// The Graph's library, read only while the rows are open: a plan a skill may
-	// inline instead of redrawing its steps (SK32).
+	// inline instead of redrawing its steps.
 	const inlinable = useInlinablePlansQuery(username, graphSlug, editing);
 	const [editingPlan, setEditingPlan] = useState(false);
-	// A redraw over an authored plan is offered, never automatic (SK7).
+	// A redraw over an authored plan is offered, never automatic.
 	const [confirmRedraw, setConfirmRedraw] = useState(false);
 
 	const open = draft.data?.open_clarification ?? null;
 	const drawn = draft.data?.plan;
-	// Only a hand-edit flips `origin` (SK29), so this is the one fact that
+	// Only a hand-edit flips `origin`, so this is the one fact that
 	// claims somebody's rows are at stake — the plan a draft is born with is
 	// `generated`, and nobody wrote it.
 	const handEdited = drawn?.origin === "authored";
@@ -135,9 +135,9 @@ export function SkillPlaybookTab({
 		}
 	}, [drawing, inFlight, draw.isPending, draft.isFetching]);
 
-	// Answering continues the drawing (SK30): the run that asked has settled,
+	// Answering continues the drawing: the run that asked has settled,
 	// so the next draw is opened here. A hand-edited plan is the exception —
-	// there a draw discards rows somebody wrote, so it stays an offer (SK7).
+	// there a draw discards rows somebody wrote, so it stays an offer.
 	const startDraw = () => {
 		setConfirmRedraw(false);
 		setDrawing(true);
@@ -196,7 +196,7 @@ export function SkillPlaybookTab({
 								disabled={busy}
 								onClick={() => {
 									// An authored plan is somebody's correction, so drawing over
-									// it asks first and says what it would throw away (SK7).
+									// it asks first and says what it would throw away.
 									if (handEdited && !confirmRedraw) {
 										setConfirmRedraw(true);
 										return;
@@ -241,8 +241,8 @@ export function SkillPlaybookTab({
 								{ clarificationId: open.id, answer: value },
 								{
 									// The answer was given to get the flow drawn, so the next
-									// draw opens on it (SK30) — unless it would discard a
-									// hand-edit, which stays an offer (SK7).
+									// draw opens on it — unless it would discard a
+									// hand-edit, which stays an offer.
 									onSuccess: (next) => {
 										if (next.plan.origin !== "authored") startDraw();
 									},
@@ -251,7 +251,7 @@ export function SkillPlaybookTab({
 						}
 					/>
 				) : editingPlan && drawn ? (
-					<SkillPlanEditor
+					<SkillPlaybookEditor
 						plan={drawn}
 						vocabulary={draft.data.vocabulary ?? []}
 						inlinable={inlinable.data?.items ?? []}
@@ -341,7 +341,7 @@ function Published({
 	onEdit,
 }: {
 	skill: Skill;
-	plan: SkillPlanRead | undefined;
+	plan: SkillPlaybookRead | undefined;
 	onEdit: () => void;
 }) {
 	const nodes = plan?.nodes ?? [];
@@ -515,7 +515,7 @@ function DraftFields({
 /**
  * What the last draw refused, where the flow would have been.
  *
- * A refusal settles rather than fails (SK31), so it is shown here rather than
+ * A refusal settles rather than fails, so it is shown here rather than
  * left in a run nobody opens. The reasons are the validator's own — a plan is
  * refused **on what was checked** — and the two acts that can answer them are
  * the two the Seams table already names: rewrite the sentence, or edit by hand.
@@ -597,7 +597,7 @@ function DrawnSteps({
 	plan,
 	drawing,
 }: {
-	plan: SkillPlanRead | undefined;
+	plan: SkillPlaybookRead | undefined;
 	drawing: boolean;
 }) {
 	if (drawing)

@@ -1,7 +1,7 @@
 /** Shared auth + graph membership types. Must mirror engine schemas (docs/for-developers/modules/identity-and-access/spec.md).
  *  Membership is binary (docs/for-developers/modules/identity-and-access/features/membership.md) — there is no per-graph role. */
 
-export interface GraphMembership {
+interface GraphMembership {
 	graph_id: string;
 	graph_name: string;
 	graph_slug: string;
@@ -18,7 +18,7 @@ export interface ThemeSelection {
 }
 
 /** Open per-user UI-preferences bag returned by the engine. */
-export interface UserPreferences {
+interface UserPreferences {
 	theme?: ThemeSelection;
 	[key: string]: unknown;
 }
@@ -49,7 +49,7 @@ export interface UsernameAvailabilityResponse {
 
 /** A personal access token as the list shows it
  *  (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
- *  The secret is not here — it exists once, in the create response (PT2). */
+ *  The secret is not here — it exists once, in the create response. */
 export interface PersonalAccessToken {
 	id: string;
 	name: string;
@@ -62,7 +62,7 @@ export interface PersonalAccessToken {
 }
 
 /** The list, plus what this deployment allows — the picker and the ceiling are
- *  rendered from configuration rather than restated here (C10). */
+ *  rendered from configuration rather than restated here. */
 export interface PersonalAccessTokenList {
 	tokens: PersonalAccessToken[];
 	expiry_day_choices: number[];
