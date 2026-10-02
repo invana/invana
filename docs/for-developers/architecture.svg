@@ -1,0 +1,627 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="2012" viewBox="0 0 1600 2012" role="img" aria-labelledby="title desc">
+<title id="title">Invana architecture</title>
+<desc id="desc">The services Invana runs (studio, engine, Postgres, graph databases, HyperDX, LLM providers) and the modules inside Studio and the engine, with designed but unbuilt pieces dashed.</desc>
+
+<style>
+  svg { --bg:#ffffff; --fg:#0f172a; --muted:#475569; --faint:#64748b; --col:#f8fafc; --col-b:#e2e8f0;
+        --card:#ffffff; --card-b:#e2e8f0; --chip:#f1f5f9; --chip-b:#e2e8f0; --edge:#64748b;
+        --studio:#6d28d9; --engine:#0f766e; --plan:#b45309; --plan-bg:#fffbeb; --plan-chip:#fef3c7; }
+  @media (prefers-color-scheme: dark) {
+    svg { --bg:#0b0f19; --fg:#e5e7eb; --muted:#9ca3af; --faint:#9ca3af; --col:#111827; --col-b:#1f2937;
+          --card:#0f172a; --card-b:#334155; --chip:#1e293b; --chip-b:#334155; --edge:#94a3b8;
+          --studio:#a78bfa; --engine:#2dd4bf; --plan:#fbbf24; --plan-bg:#1c1606; --plan-chip:#2a2008; }
+  }
+  text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; fill: var(--fg); }
+  .bg { fill: var(--bg); }
+  .h1 { font-size: 22px; font-weight: 650; }
+  .sub { font-size: 13px; fill: var(--muted); }
+  .leg { font-size: 12px; fill: var(--muted); }
+  .sect { font-size: 11px; font-weight: 650; letter-spacing: .08em; fill: var(--faint); }
+  .col { fill: var(--col); stroke: var(--col-b); }
+  .studio-col { stroke: var(--studio); stroke-opacity: .35; }
+  .engine-col { stroke: var(--engine); stroke-opacity: .35; }
+  .col-h { font-size: 16px; font-weight: 650; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .svc, .card, .lib { fill: var(--card); stroke: var(--card-b); }
+  .studio-b { stroke: var(--studio); stroke-width: 1.5; }
+  .engine-b { stroke: var(--engine); stroke-width: 1.5; }
+  .external { fill: var(--card); stroke: var(--edge); stroke-dasharray: 2 3; }
+  .planned { fill: var(--plan-bg); stroke: var(--plan); stroke-dasharray: 6 4; }
+  .svc-h { font-size: 14px; font-weight: 650; }
+  .card-h { font-size: 12px; font-weight: 600; }
+  .planned-h { font-size: 12px; font-weight: 600; fill: var(--plan); }
+  .studio-t { fill: var(--studio); }
+  .engine-t { fill: var(--engine); }
+  .band-h { font-size: 13px; font-weight: 650; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: var(--engine); }
+  .cap { font-size: 12px; fill: var(--muted); }
+  .cap-b { font-size: 12px; font-weight: 600; fill: var(--muted); }
+  .cap-s { font-size: 11px; fill: var(--faint); }
+  .chip { fill: var(--chip); stroke: var(--chip-b); }
+  .pchip { fill: var(--plan-chip); stroke: var(--plan); stroke-dasharray: 3 2; }
+  .chip-t, .pchip-t { font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .pchip-t { fill: var(--plan); }
+  .mchip { fill: none; stroke: var(--chip-b); }
+  .mchip-t { font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: var(--faint); }
+  .edge { fill: none; stroke: var(--edge); stroke-width: 1.4; }
+  .edge-faint { fill: none; stroke: var(--edge); stroke-width: 1.2; stroke-dasharray: 4 4; }
+  .edge-t { font-size: 11px; fill: var(--muted); }
+  .arrowhead { fill: var(--edge); }
+</style>
+
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<rect class="bg" x="0" y="0" width="1600" height="2012"/>
+<rect class="col studio-col" x="32" y="614" width="528" height="1346" rx="12"/>
+<rect class="col engine-col" x="592" y="614" width="976" height="1346" rx="12"/>
+<path class="edge-faint" d="M260,302 L260,610" marker-end="url(#arr)"/>
+<path class="edge-faint" d="M770,550 L770,610" marker-end="url(#arr)"/>
+<text class="h1" x="32" y="44">Invana — architecture</text>
+<text class="sub" x="32" y="68">The services that run, then the modules inside each. Current design as of October 2026.</text>
+<rect class="card" x="1060" y="30" width="26" height="16" rx="4"/>
+<text class="leg" x="1094" y="42">built</text>
+<rect class="planned" x="1144" y="30" width="26" height="16" rx="4"/>
+<text class="leg" x="1178" y="42">designed, not built</text>
+<rect class="external" x="1312" y="30" width="26" height="16" rx="4"/>
+<text class="leg" x="1346" y="42">external</text>
+<path class="edge" d="M1410,38 L1444,38" marker-end="url(#arr)"/>
+<text class="leg" x="1452" y="42">calls / reads</text>
+<text class="leg" x="1060" y="70">Ports are the docker-compose host ports.</text>
+<text class="sect" x="32" y="104">CLIENTS</text>
+<rect class="svc" x="32" y="114" width="290" height="56" rx="8"/>
+<text class="svc-h" x="42" y="136">Browser</text>
+<text class="cap" x="42" y="154">runs the Studio SPA</text>
+<rect class="svc" x="600" y="114" width="160" height="56" rx="8"/>
+<text class="svc-h" x="610" y="136">invana CLI</text>
+<text class="cap" x="610" y="154">start · migrate · version</text>
+<rect class="svc" x="780" y="114" width="160" height="56" rx="8"/>
+<text class="svc-h" x="790" y="136">API callers</text>
+<text class="cap" x="790" y="154">REST · access tokens</text>
+<text class="sect" x="32" y="204">SERVICES — docker-compose</text>
+<rect class="svc studio-b" x="32" y="214" width="290" height="88" rx="8"/>
+<text class="svc-h studio-t" x="42" y="236">studio  :8300</text>
+<text class="cap" x="42" y="254">React 19 · TypeScript · Vite</text>
+<text class="cap" x="42" y="270">SPA, served to the browser</text>
+<text class="cap" x="42" y="286">pnpm · Biome · Vitest · Playwright</text>
+<rect class="svc engine-b" x="600" y="214" width="340" height="336" rx="8"/>
+<text class="svc-h engine-t" x="610" y="236">engine  :8200</text>
+<text class="cap" x="610" y="254">FastAPI · uvicorn · Python 3.14</text>
+<text class="cap" x="610" y="270">REST + SSE at /api/v1</text>
+<text class="cap" x="610" y="286">one process — every run executes</text>
+<text class="cap" x="610" y="302">inside it, as an asyncio task</text>
+<text class="cap" x="610" y="318">SQLAlchemy async → PostgreSQL</text>
+<text class="cap" x="610" y="334">OpenTelemetry → hyperdx</text>
+<text class="cap-b" x="610" y="362">bands, detailed below</text>
+<rect class="chip" x="610" y="372" width="95" height="20" rx="4"/>
+<text class="chip-t" x="618" y="386">server · cli</text>
+<rect class="chip" x="711" y="372" width="69" height="20" rx="4"/>
+<text class="chip-t" x="719" y="386">activity</text>
+<rect class="chip" x="786" y="372" width="62" height="20" rx="4"/>
+<text class="chip-t" x="794" y="386">runtime</text>
+<rect class="chip" x="854" y="372" width="42" height="20" rx="4"/>
+<text class="chip-t" x="862" y="386">apps</text>
+<rect class="chip" x="610" y="398" width="49" height="20" rx="4"/>
+<text class="chip-t" x="618" y="412">graph</text>
+<rect class="chip" x="665" y="398" width="42" height="20" rx="4"/>
+<text class="chip-t" x="673" y="412">core</text>
+<rect class="planned" x="610" y="436" width="320" height="88" rx="8"/>
+<text class="planned-h" x="620" y="458">Designed, not built — scale-out</text>
+<text class="cap" x="620" y="476">workers on N servers pull runs from a durable</text>
+<text class="cap" x="620" y="492">Postgres queue (leases · retries · cron),</text>
+<text class="cap" x="620" y="508">autoscaled on queue depth</text>
+<rect class="svc" x="1170" y="214" width="398" height="72" rx="8"/>
+<text class="svc-h" x="1180" y="236">postgres:18  :5432</text>
+<text class="cap" x="1180" y="254">app state · run rows · events</text>
+<text class="cap" x="1180" y="270">LISTEN/NOTIFY → live event tail</text>
+<rect class="svc" x="1170" y="296" width="398" height="90" rx="8"/>
+<text class="svc-h" x="1180" y="318">graph databases</text>
+<rect class="chip" x="1180" y="328" width="102" height="20" rx="4"/>
+<text class="chip-t" x="1188" y="342">neo4j_5 :7687</text>
+<rect class="chip" x="1288" y="328" width="115" height="20" rx="4"/>
+<text class="chip-t" x="1296" y="342">memgraph :17687</text>
+<rect class="chip" x="1409" y="328" width="108" height="20" rx="4"/>
+<text class="chip-t" x="1417" y="342">arcadedb :2480</text>
+<rect class="chip" x="1180" y="354" width="122" height="20" rx="4"/>
+<text class="chip-t" x="1188" y="368">janusgraph :8182</text>
+<rect class="svc" x="1170" y="396" width="398" height="72" rx="8"/>
+<text class="svc-h" x="1180" y="418">hyperdx  :8080</text>
+<text class="cap" x="1180" y="436">OTLP :4317 gRPC · :4318 HTTP</text>
+<text class="cap" x="1180" y="452">ClickHouse · traces, metrics, logs</text>
+<rect class="external" x="1170" y="478" width="398" height="72" rx="8"/>
+<text class="svc-h" x="1180" y="500">LLM providers</text>
+<text class="cap" x="1180" y="518">Anthropic · Claude Agent SDK</text>
+<text class="cap" x="1180" y="534">OpenAI · Ollama</text>
+<path class="edge" d="M940,250 L1166,250" marker-end="url(#arr)"/>
+<text class="edge-t" x="1055" y="244" text-anchor="middle">SQLAlchemy async · LISTEN/NOTIFY</text>
+<path class="edge" d="M940,341 L1166,341" marker-end="url(#arr)"/>
+<text class="edge-t" x="1055" y="335" text-anchor="middle">Bolt · Gremlin WebSocket</text>
+<path class="edge" d="M940,432 L1166,432" marker-end="url(#arr)"/>
+<text class="edge-t" x="1055" y="426" text-anchor="middle">OTLP gRPC · browser OTLP via proxy</text>
+<path class="edge" d="M940,514 L1166,514" marker-end="url(#arr)"/>
+<text class="edge-t" x="1055" y="508" text-anchor="middle">HTTPS</text>
+<path class="edge" d="M260,170 L260,210" marker-end="url(#arr)"/>
+<text class="edge-t" x="268" y="194">loads the SPA</text>
+<path class="edge" d="M680,170 L680,210" marker-end="url(#arr)"/>
+<path class="edge" d="M860,170 L860,210" marker-end="url(#arr)"/>
+<path class="edge" d="M322,254 L596,254" marker-end="url(#arr)"/>
+<text class="edge-t" x="461" y="248" text-anchor="middle">REST · SSE  /api/v1</text>
+<text class="edge-t" x="461" y="270" text-anchor="middle">browser OTel → telemetry proxy</text>
+<text class="sect" x="32" y="600">WHAT POWERS EACH SERVICE</text>
+<text class="col-h studio-t" x="48" y="648">studio/src</text>
+<text class="cap" x="48" y="668">React 19 · TailwindCSS 4 · Zustand + TanStack Query</text>
+<rect class="card" x="48" y="684" width="496" height="90" rx="8"/>
+<text class="card-h" x="58" y="706">Shell — one layout, every screen fills its regions</text>
+<rect class="chip" x="58" y="716" width="89" height="20" rx="4"/>
+<text class="chip-t" x="66" y="730">AppLayoutV2</text>
+<rect class="chip" x="153" y="716" width="62" height="20" rx="4"/>
+<text class="chip-t" x="161" y="730">leftNav</text>
+<rect class="chip" x="221" y="716" width="89" height="20" rx="4"/>
+<text class="chip-t" x="229" y="730">leftSection</text>
+<rect class="chip" x="315" y="716" width="141" height="20" rx="4"/>
+<text class="chip-t" x="323" y="730">BoardPagesViewPanel</text>
+<rect class="chip" x="58" y="742" width="128" height="20" rx="4"/>
+<text class="chip-t" x="66" y="756">GraphDetailChrome</text>
+<rect class="chip" x="192" y="742" width="102" height="20" rx="4"/>
+<text class="chip-t" x="200" y="756">AssistantHost</text>
+<rect class="card" x="48" y="782" width="496" height="116" rx="8"/>
+<text class="card-h" x="58" y="804">Feature modules — pages/graphs-detail/features</text>
+<rect class="chip" x="58" y="814" width="56" height="20" rx="4"/>
+<text class="chip-t" x="66" y="828">agents</text>
+<rect class="chip" x="120" y="814" width="75" height="20" rx="4"/>
+<text class="chip-t" x="128" y="828">assistant</text>
+<rect class="chip" x="201" y="814" width="56" height="20" rx="4"/>
+<text class="chip-t" x="209" y="828">boards</text>
+<rect class="chip" x="263" y="814" width="56" height="20" rx="4"/>
+<text class="chip-t" x="271" y="828">events</text>
+<rect class="chip" x="324" y="814" width="69" height="20" rx="4"/>
+<text class="chip-t" x="332" y="828">explorer</text>
+<rect class="chip" x="399" y="814" width="56" height="20" rx="4"/>
+<text class="chip-t" x="407" y="828">graphs</text>
+<rect class="chip" x="461" y="814" width="56" height="20" rx="4"/>
+<text class="chip-t" x="469" y="828">lenses</text>
+<rect class="chip" x="58" y="840" width="42" height="20" rx="4"/>
+<text class="chip-t" x="66" y="854">llms</text>
+<rect class="chip" x="106" y="840" width="56" height="20" rx="4"/>
+<text class="chip-t" x="114" y="854">models</text>
+<rect class="chip" x="168" y="840" width="49" height="20" rx="4"/>
+<text class="chip-t" x="176" y="854">plans</text>
+<rect class="chip" x="223" y="840" width="89" height="20" rx="4"/>
+<text class="chip-t" x="231" y="854">projections</text>
+<rect class="chip" x="318" y="840" width="69" height="20" rx="4"/>
+<text class="chip-t" x="326" y="854">projects</text>
+<rect class="chip" x="392" y="840" width="49" height="20" rx="4"/>
+<text class="chip-t" x="400" y="854">rules</text>
+<rect class="chip" x="447" y="840" width="42" height="20" rx="4"/>
+<text class="chip-t" x="455" y="854">runs</text>
+<rect class="chip" x="58" y="866" width="49" height="20" rx="4"/>
+<text class="chip-t" x="66" y="880">setup</text>
+<rect class="chip" x="113" y="866" width="56" height="20" rx="4"/>
+<text class="chip-t" x="121" y="880">skills</text>
+<rect class="card" x="48" y="906" width="496" height="64" rx="8"/>
+<text class="card-h" x="58" y="928">Canvases — canvases/</text>
+<rect class="chip" x="58" y="938" width="62" height="20" rx="4"/>
+<text class="chip-t" x="66" y="952">layered</text>
+<rect class="chip" x="126" y="938" width="49" height="20" rx="4"/>
+<text class="chip-t" x="134" y="952">model</text>
+<rect class="chip" x="181" y="938" width="69" height="20" rx="4"/>
+<text class="chip-t" x="189" y="952">taskflow</text>
+<rect class="card" x="48" y="978" width="496" height="64" rx="8"/>
+<text class="card-h" x="58" y="1000">Pages</text>
+<rect class="chip" x="58" y="1010" width="42" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1024">auth</text>
+<rect class="chip" x="106" y="1010" width="56" height="20" rx="4"/>
+<text class="chip-t" x="114" y="1024">graphs</text>
+<rect class="chip" x="168" y="1010" width="102" height="20" rx="4"/>
+<text class="chip-t" x="176" y="1024">graphs-detail</text>
+<rect class="chip" x="276" y="1010" width="69" height="20" rx="4"/>
+<text class="chip-t" x="284" y="1024">platform</text>
+<rect class="chip" x="351" y="1010" width="69" height="20" rx="4"/>
+<text class="chip-t" x="359" y="1024">settings</text>
+<rect class="card" x="48" y="1050" width="496" height="90" rx="8"/>
+<text class="card-h" x="58" y="1072">State &amp; services</text>
+<rect class="chip" x="58" y="1082" width="82" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1096">auth.store</text>
+<rect class="chip" x="146" y="1082" width="75" height="20" rx="4"/>
+<text class="chip-t" x="154" y="1096">run.store</text>
+<rect class="chip" x="227" y="1082" width="122" height="20" rx="4"/>
+<text class="chip-t" x="235" y="1096">appearance.store</text>
+<rect class="chip" x="355" y="1082" width="108" height="20" rx="4"/>
+<text class="chip-t" x="363" y="1096">TanStack Query</text>
+<rect class="chip" x="58" y="1108" width="82" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1122">api/client</text>
+<rect class="chip" x="146" y="1108" width="82" height="20" rx="4"/>
+<text class="chip-t" x="154" y="1122">REST · SSE</text>
+<rect class="chip" x="234" y="1108" width="69" height="20" rx="4"/>
+<text class="chip-t" x="242" y="1122">OTel web</text>
+<text class="cap-b" x="48" y="1182">Libraries — one direction: design-kit → canvas → studio</text>
+<rect class="lib" x="48" y="1194" width="496" height="346" rx="8"/>
+<text class="card-h studio-t" x="58" y="1216">@invana/canvas  0.0.14   ~/Projects/invana/canvas</text>
+<text class="cap" x="58" y="1234">every graph Studio draws — WebGPU first, WebGL fallback</text>
+<rect class="chip" x="58" y="1244" width="56" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1258">canvas</text>
+<text class="cap" x="183" y="1258">rendering engine: layers · behaviours · layouts</text>
+<rect class="chip" x="58" y="1270" width="95" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1284">canvas-react</text>
+<text class="cap" x="183" y="1284">React bindings — the &lt;GraphCanvas&gt; root</text>
+<rect class="chip" x="58" y="1296" width="75" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1310">canvas-ui</text>
+<text class="cap" x="183" y="1310">canvas chrome: style editors · panels · controls</text>
+<rect class="chip" x="58" y="1322" width="49" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1336">graph</text>
+<text class="cap" x="183" y="1336">GraphLayer · minimap · select · lasso · drag</text>
+<rect class="chip" x="58" y="1348" width="115" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1362">renderer-pixijs</text>
+<text class="cap" x="183" y="1362">PixiJS 8 drawing backend</text>
+<rect class="chip" x="58" y="1374" width="108" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1388">graph-layout-*</text>
+<text class="cap" x="183" y="1388">d3-force · elkjs · d3-sankey</text>
+<rect class="chip" x="58" y="1400" width="102" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1414">graph-layer-*</text>
+<text class="cap" x="183" y="1414">d3-contour · maplibre basemap</text>
+<text class="cap-s" x="58" y="1446">also in the repo — transitive, or not used by Studio</text>
+<rect class="mchip" x="58" y="1454" width="89" height="20" rx="4"/>
+<text class="mchip-t" x="66" y="1468">canvas-core</text>
+<rect class="mchip" x="153" y="1454" width="95" height="20" rx="4"/>
+<text class="mchip-t" x="161" y="1468">canvas-store</text>
+<rect class="mchip" x="254" y="1454" width="115" height="20" rx="4"/>
+<text class="mchip-t" x="262" y="1468">canvas-designer</text>
+<rect class="mchip" x="375" y="1454" width="155" height="20" rx="4"/>
+<text class="mchip-t" x="383" y="1468">canvas-telemetry-otel</text>
+<rect class="mchip" x="58" y="1480" width="141" height="20" rx="4"/>
+<text class="mchip-t" x="66" y="1494">layout-d3-hierarchy</text>
+<rect class="mchip" x="205" y="1480" width="122" height="20" rx="4"/>
+<text class="mchip-t" x="213" y="1494">layout-geometric</text>
+<rect class="mchip" x="333" y="1480" width="128" height="20" rx="4"/>
+<text class="mchip-t" x="341" y="1494">layer-bubble-sets</text>
+<rect class="mchip" x="58" y="1506" width="108" height="20" rx="4"/>
+<text class="mchip-t" x="66" y="1520">graph-datasets</text>
+<rect class="lib" x="48" y="1580" width="496" height="294" rx="8"/>
+<text class="card-h studio-t" x="58" y="1602">@invana/design-kit  0.0.31   ~/Projects/invana/design-kit</text>
+<text class="cap" x="58" y="1620">every component Studio renders — shadcn + TailwindCSS 4</text>
+<rect class="chip" x="58" y="1630" width="29" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1644">ui</text>
+<text class="cap" x="143" y="1644">shadcn primitives + ui-extended compositions</text>
+<rect class="chip" x="58" y="1656" width="49" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1670">forms</text>
+<text class="cap" x="143" y="1670">FormField · ObjectField · leaf inputs</text>
+<rect class="chip" x="58" y="1682" width="56" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1696">tables</text>
+<text class="cap" x="143" y="1696">data tables</text>
+<rect class="chip" x="58" y="1708" width="56" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1722">themes</text>
+<text class="cap" x="143" y="1722">app layout themes and components</text>
+<rect class="chip" x="58" y="1734" width="62" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1748">styling</text>
+<text class="cap" x="143" y="1748">tokens · density · type ladder 13/12/11</text>
+<rect class="chip" x="58" y="1760" width="56" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1774">editor</text>
+<text class="cap" x="143" y="1774">code and markdown editing — CodeMirror 6</text>
+<rect class="chip" x="58" y="1786" width="75" height="20" rx="4"/>
+<text class="chip-t" x="66" y="1800">dashboard</text>
+<text class="cap" x="143" y="1800">JSON-driven dashboards from kit panels</text>
+<text class="cap-s" x="58" y="1832">also in the kit — not yet used by Studio</text>
+<rect class="mchip" x="58" y="1840" width="75" height="20" rx="4"/>
+<text class="mchip-t" x="66" y="1854">assistant</text>
+<rect class="mchip" x="139" y="1840" width="56" height="20" rx="4"/>
+<text class="mchip-t" x="147" y="1854">blocks</text>
+<rect class="mchip" x="201" y="1840" width="56" height="20" rx="4"/>
+<text class="mchip-t" x="209" y="1854">charts</text>
+<path class="edge" d="M484,1580 L484,1544" marker-end="url(#arr)"/>
+<text class="edge-t" x="476" y="1564" text-anchor="end">canvas-ui peer-depends on @invana/ui</text>
+<path class="edge" d="M484,1194 L484,1144" marker-end="url(#arr)"/>
+<text class="edge-t" x="476" y="1156" text-anchor="end">imported by Studio</text>
+<text class="col-h engine-t" x="608" y="648">engine/src/invana</text>
+<text class="cap" x="608" y="668">Python 3.14 · FastAPI · SQLAlchemy async · uv · Ruff · pytest</text>
+<text class="cap" x="1552" y="648" text-anchor="end">imports flow downward only — import-linter</text>
+<rect class="card" x="720" y="684" width="622" height="116" rx="8"/>
+<text class="card-h" x="730" y="706">server — FastAPI routers, one per module</text>
+<rect class="chip" x="730" y="716" width="42" height="20" rx="4"/>
+<text class="chip-t" x="738" y="730">auth</text>
+<rect class="chip" x="778" y="716" width="56" height="20" rx="4"/>
+<text class="chip-t" x="786" y="730">graphs</text>
+<rect class="chip" x="840" y="716" width="69" height="20" rx="4"/>
+<text class="chip-t" x="848" y="730">explorer</text>
+<rect class="chip" x="915" y="716" width="69" height="20" rx="4"/>
+<text class="chip-t" x="923" y="730">modeller</text>
+<rect class="chip" x="990" y="716" width="56" height="20" rx="4"/>
+<text class="chip-t" x="998" y="730">govern</text>
+<rect class="chip" x="1051" y="716" width="49" height="20" rx="4"/>
+<text class="chip-t" x="1059" y="730">rules</text>
+<rect class="chip" x="1106" y="716" width="56" height="20" rx="4"/>
+<text class="chip-t" x="1114" y="730">agents</text>
+<rect class="chip" x="1168" y="716" width="56" height="20" rx="4"/>
+<text class="chip-t" x="1176" y="730">skills</text>
+<rect class="chip" x="1229" y="716" width="82" height="20" rx="4"/>
+<text class="chip-t" x="1237" y="730">task_plans</text>
+<rect class="chip" x="730" y="742" width="42" height="20" rx="4"/>
+<text class="chip-t" x="738" y="756">work</text>
+<rect class="chip" x="778" y="742" width="69" height="20" rx="4"/>
+<text class="chip-t" x="786" y="756">sessions</text>
+<rect class="chip" x="853" y="742" width="62" height="20" rx="4"/>
+<text class="chip-t" x="861" y="756">runtime</text>
+<rect class="chip" x="921" y="742" width="56" height="20" rx="4"/>
+<text class="chip-t" x="929" y="756">boards</text>
+<rect class="chip" x="983" y="742" width="56" height="20" rx="4"/>
+<text class="chip-t" x="991" y="756">events</text>
+<rect class="chip" x="1045" y="742" width="102" height="20" rx="4"/>
+<text class="chip-t" x="1053" y="756">llm_providers</text>
+<rect class="chip" x="1152" y="742" width="49" height="20" rx="4"/>
+<text class="chip-t" x="1160" y="756">admin</text>
+<rect class="chip" x="1207" y="742" width="115" height="20" rx="4"/>
+<text class="chip-t" x="1215" y="756">telemetry proxy</text>
+<rect class="chip" x="730" y="768" width="56" height="20" rx="4"/>
+<text class="chip-t" x="738" y="782">health</text>
+<rect class="card" x="1350" y="684" width="202" height="116" rx="8"/>
+<text class="card-h" x="1360" y="706">cli — invana</text>
+<rect class="chip" x="1360" y="716" width="49" height="20" rx="4"/>
+<text class="chip-t" x="1368" y="730">start</text>
+<rect class="chip" x="1415" y="716" width="62" height="20" rx="4"/>
+<text class="chip-t" x="1423" y="730">migrate</text>
+<rect class="chip" x="1360" y="742" width="62" height="20" rx="4"/>
+<text class="chip-t" x="1368" y="756">version</text>
+<rect class="chip" x="1428" y="742" width="62" height="20" rx="4"/>
+<text class="chip-t" x="1436" y="756">records</text>
+<text class="band-h" x="608" y="706">server · cli</text>
+<text class="cap-s" x="608" y="724">the edge</text>
+<rect class="card" x="720" y="814" width="832" height="64" rx="8"/>
+<text class="card-h" x="730" y="836">activity — who did what, for whom, caused by what</text>
+<rect class="chip" x="730" y="846" width="75" height="20" rx="4"/>
+<text class="chip-t" x="738" y="860">task_read</text>
+<rect class="chip" x="811" y="846" width="42" height="20" rx="4"/>
+<text class="chip-t" x="819" y="860">tree</text>
+<text class="band-h" x="608" y="836">activity</text>
+<text class="cap-s" x="608" y="854">read model</text>
+<rect class="card" x="720" y="892" width="272" height="72" rx="8"/>
+<text class="card-h" x="730" y="914">Planner — planning.py</text>
+<text class="cap" x="730" y="932">envelope → plan rows</text>
+<text class="cap" x="730" y="948">select or generate, validate first</text>
+<rect class="card" x="1000" y="892" width="272" height="72" rx="8"/>
+<text class="card-h" x="1010" y="914">Interpreter — interpreter/</text>
+<text class="cap" x="1010" y="932">linear pipeline · signals</text>
+<text class="cap" x="1010" y="948">suspend · resume · replan</text>
+<rect class="card" x="1280" y="892" width="272" height="72" rx="8"/>
+<text class="card-h" x="1290" y="914">Scheduler — contention.py</text>
+<text class="cap" x="1290" y="932">Graph · agent · pool slots</text>
+<text class="cap" x="1290" y="948">priority queue, in process memory</text>
+<rect class="card" x="720" y="972" width="552" height="90" rx="8"/>
+<text class="card-h" x="730" y="994">Step catalogue — catalogue/ (closed, no plugins)</text>
+<rect class="chip" x="730" y="1004" width="82" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1018">graph_read</text>
+<rect class="chip" x="818" y="1004" width="89" height="20" rx="4"/>
+<text class="chip-t" x="826" y="1018">graph_write</text>
+<rect class="chip" x="913" y="1004" width="56" height="20" rx="4"/>
+<text class="chip-t" x="921" y="1018">ingest</text>
+<rect class="chip" x="974" y="1004" width="36" height="20" rx="4"/>
+<text class="chip-t" x="982" y="1018">llm</text>
+<rect class="chip" x="1016" y="1004" width="75" height="20" rx="4"/>
+<text class="chip-t" x="1024" y="1018">stitching</text>
+<rect class="chip" x="1097" y="1004" width="95" height="20" rx="4"/>
+<text class="chip-t" x="1105" y="1018">schema_write</text>
+<rect class="chip" x="730" y="1030" width="82" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1044">work_write</text>
+<rect class="chip" x="818" y="1030" width="56" height="20" rx="4"/>
+<text class="chip-t" x="826" y="1044">bundle</text>
+<rect class="chip" x="880" y="1030" width="62" height="20" rx="4"/>
+<text class="chip-t" x="888" y="1044">records</text>
+<rect class="chip" x="948" y="1030" width="42" height="20" rx="4"/>
+<text class="chip-t" x="956" y="1044">pure</text>
+<rect class="card" x="1280" y="972" width="272" height="90" rx="8"/>
+<text class="card-h" x="1290" y="994">Executor — executor.py</text>
+<text class="cap" x="1290" y="1012">one protocol, one implementation</text>
+<text class="cap" x="1290" y="1028">in-process asyncio</text>
+<rect class="card" x="720" y="1070" width="272" height="72" rx="8"/>
+<text class="card-h" x="730" y="1092">Delegation — delegation.py</text>
+<text class="cap" x="730" y="1110">subagents: depth ≤ 2</text>
+<text class="cap" x="730" y="1126">≤ 3 children per run</text>
+<rect class="card" x="1000" y="1070" width="272" height="72" rx="8"/>
+<text class="card-h" x="1010" y="1092">Stream — stream.py</text>
+<text class="cap" x="1010" y="1110">persist → in-process broadcast</text>
+<text class="cap" x="1010" y="1126">→ SSE to the reader</text>
+<rect class="card" x="1280" y="1070" width="272" height="72" rx="8"/>
+<text class="card-h" x="1290" y="1092">Governing — governing.py · layers.py</text>
+<text class="cap" x="1290" y="1110">enforce the run&#x27;s frozen lens</text>
+<text class="cap" x="1290" y="1126">record the bands it engaged</text>
+<rect class="card" x="720" y="1150" width="832" height="64" rx="8"/>
+<text class="card-h" x="730" y="1172">Answers and reads</text>
+<rect class="chip" x="730" y="1182" width="75" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1196">emissions</text>
+<rect class="chip" x="811" y="1182" width="75" height="20" rx="4"/>
+<text class="chip-t" x="819" y="1196">diagnosis</text>
+<rect class="chip" x="893" y="1182" width="89" height="20" rx="4"/>
+<text class="chip-t" x="901" y="1196">projections</text>
+<rect class="chip" x="987" y="1182" width="89" height="20" rx="4"/>
+<text class="chip-t" x="995" y="1196">canvas acts</text>
+<rect class="chip" x="1082" y="1182" width="62" height="20" rx="4"/>
+<text class="chip-t" x="1090" y="1196">callers</text>
+<rect class="chip" x="1150" y="1182" width="135" height="20" rx="4"/>
+<text class="chip-t" x="1158" y="1196">built-in workflows</text>
+<rect class="planned" x="720" y="1222" width="832" height="90" rx="8"/>
+<text class="planned-h" x="730" y="1244">Designed, not built</text>
+<rect class="pchip" x="730" y="1254" width="161" height="20" rx="4"/>
+<text class="pchip-t" x="738" y="1268">durable queue + leases</text>
+<rect class="pchip" x="897" y="1254" width="108" height="20" rx="4"/>
+<text class="pchip-t" x="905" y="1268">cron schedules</text>
+<rect class="pchip" x="1012" y="1254" width="194" height="20" rx="4"/>
+<text class="pchip-t" x="1020" y="1268">frontier + map_over fan-out</text>
+<rect class="pchip" x="1212" y="1254" width="95" height="20" rx="4"/>
+<text class="pchip-t" x="1220" y="1268">max_parallel</text>
+<rect class="pchip" x="1313" y="1254" width="115" height="20" rx="4"/>
+<text class="pchip-t" x="1321" y="1268">pools that wait</text>
+<rect class="pchip" x="730" y="1280" width="141" height="20" rx="4"/>
+<text class="pchip-t" x="738" y="1294">per-user fair share</text>
+<rect class="pchip" x="877" y="1280" width="148" height="20" rx="4"/>
+<text class="pchip-t" x="885" y="1294">workers on N servers</text>
+<text class="band-h" x="608" y="914">runtime</text>
+<text class="cap-s" x="608" y="932">scheduler +</text>
+<text class="cap-s" x="608" y="946">plan interpreter</text>
+<rect class="card" x="720" y="1326" width="272" height="168" rx="8"/>
+<text class="card-h" x="730" y="1348">Assistant — llm · sessions</text>
+<rect class="chip" x="730" y="1358" width="56" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1372">intent</text>
+<rect class="chip" x="792" y="1358" width="62" height="20" rx="4"/>
+<text class="chip-t" x="800" y="1372">planner</text>
+<rect class="chip" x="860" y="1358" width="62" height="20" rx="4"/>
+<text class="chip-t" x="868" y="1372">clarify</text>
+<rect class="chip" x="730" y="1384" width="75" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1398">grounding</text>
+<rect class="chip" x="811" y="1384" width="75" height="20" rx="4"/>
+<text class="chip-t" x="819" y="1398">translate</text>
+<rect class="chip" x="893" y="1384" width="49" height="20" rx="4"/>
+<text class="chip-t" x="901" y="1398">draft</text>
+<rect class="chip" x="730" y="1410" width="62" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1424">propose</text>
+<rect class="chip" x="798" y="1410" width="49" height="20" rx="4"/>
+<text class="chip-t" x="806" y="1424">voice</text>
+<rect class="chip" x="853" y="1410" width="69" height="20" rx="4"/>
+<text class="chip-t" x="861" y="1424">sessions</text>
+<rect class="chip" x="730" y="1436" width="75" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1450">anthropic</text>
+<rect class="chip" x="811" y="1436" width="122" height="20" rx="4"/>
+<text class="chip-t" x="819" y="1450">claude_agent_sdk</text>
+<rect class="chip" x="730" y="1462" width="56" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1476">openai</text>
+<rect class="chip" x="792" y="1462" width="56" height="20" rx="4"/>
+<text class="chip-t" x="800" y="1476">ollama</text>
+<rect class="card" x="1000" y="1326" width="272" height="168" rx="8"/>
+<text class="card-h" x="1010" y="1348">Agents</text>
+<rect class="chip" x="1010" y="1358" width="56" height="20" rx="4"/>
+<text class="chip-t" x="1018" y="1372">agents</text>
+<rect class="chip" x="1072" y="1358" width="69" height="20" rx="4"/>
+<text class="chip-t" x="1080" y="1372">registry</text>
+<rect class="chip" x="1146" y="1358" width="69" height="20" rx="4"/>
+<text class="chip-t" x="1154" y="1372">envelope</text>
+<rect class="chip" x="1010" y="1384" width="56" height="20" rx="4"/>
+<text class="chip-t" x="1018" y="1398">skills</text>
+<rect class="chip" x="1072" y="1384" width="102" height="20" rx="4"/>
+<text class="chip-t" x="1080" y="1398">llm_providers</text>
+<rect class="card" x="1280" y="1326" width="272" height="168" rx="8"/>
+<text class="card-h" x="1290" y="1348">Work &amp; plans</text>
+<rect class="chip" x="1290" y="1358" width="82" height="20" rx="4"/>
+<text class="chip-t" x="1298" y="1372">task_plans</text>
+<rect class="chip" x="1378" y="1358" width="36" height="20" rx="4"/>
+<text class="chip-t" x="1386" y="1372">dag</text>
+<rect class="chip" x="1420" y="1358" width="42" height="20" rx="4"/>
+<text class="chip-t" x="1428" y="1372">args</text>
+<rect class="chip" x="1468" y="1358" width="42" height="20" rx="4"/>
+<text class="chip-t" x="1476" y="1372">diff</text>
+<rect class="chip" x="1290" y="1384" width="89" height="20" rx="4"/>
+<text class="chip-t" x="1298" y="1398">yaml_export</text>
+<rect class="chip" x="1385" y="1384" width="42" height="20" rx="4"/>
+<text class="chip-t" x="1393" y="1398">work</text>
+<rect class="card" x="720" y="1502" width="272" height="116" rx="8"/>
+<text class="card-h" x="730" y="1524">Governance — govern</text>
+<rect class="chip" x="730" y="1534" width="49" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1548">rules</text>
+<rect class="chip" x="785" y="1534" width="82" height="20" rx="4"/>
+<text class="chip-t" x="793" y="1548">query_lens</text>
+<rect class="chip" x="873" y="1534" width="56" height="20" rx="4"/>
+<text class="chip-t" x="881" y="1548">impact</text>
+<rect class="chip" x="730" y="1560" width="69" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1574">validate</text>
+<rect class="chip" x="805" y="1560" width="42" height="20" rx="4"/>
+<text class="chip-t" x="813" y="1574">cast</text>
+<rect class="chip" x="853" y="1560" width="82" height="20" rx="4"/>
+<text class="chip-t" x="861" y="1574">addressing</text>
+<rect class="card" x="1000" y="1502" width="272" height="116" rx="8"/>
+<text class="card-h" x="1010" y="1524">Graph model — modeller</text>
+<rect class="chip" x="1010" y="1534" width="95" height="20" rx="4"/>
+<text class="chip-t" x="1018" y="1548">introspector</text>
+<rect class="chip" x="1111" y="1534" width="75" height="20" rx="4"/>
+<text class="chip-t" x="1119" y="1548">validator</text>
+<rect class="chip" x="1010" y="1560" width="75" height="20" rx="4"/>
+<text class="chip-t" x="1018" y="1574">versioner</text>
+<rect class="chip" x="1091" y="1560" width="82" height="20" rx="4"/>
+<text class="chip-t" x="1099" y="1574">reconciler</text>
+<rect class="chip" x="1179" y="1560" width="62" height="20" rx="4"/>
+<text class="chip-t" x="1187" y="1574">staging</text>
+<rect class="chip" x="1010" y="1586" width="75" height="20" rx="4"/>
+<text class="chip-t" x="1018" y="1600">projector</text>
+<rect class="chip" x="1091" y="1586" width="49" height="20" rx="4"/>
+<text class="chip-t" x="1099" y="1600">solve</text>
+<rect class="chip" x="1146" y="1586" width="69" height="20" rx="4"/>
+<text class="chip-t" x="1154" y="1600">starters</text>
+<rect class="card" x="1280" y="1502" width="272" height="116" rx="8"/>
+<text class="card-h" x="1290" y="1524">Graph access</text>
+<rect class="chip" x="1290" y="1534" width="56" height="20" rx="4"/>
+<text class="chip-t" x="1298" y="1548">graphs</text>
+<rect class="chip" x="1352" y="1534" width="42" height="20" rx="4"/>
+<text class="chip-t" x="1360" y="1548">pool</text>
+<rect class="chip" x="1400" y="1534" width="102" height="20" rx="4"/>
+<text class="chip-t" x="1408" y="1548">query_service</text>
+<rect class="chip" x="1290" y="1560" width="82" height="20" rx="4"/>
+<text class="chip-t" x="1298" y="1574">encryption</text>
+<rect class="chip" x="1378" y="1560" width="69" height="20" rx="4"/>
+<text class="chip-t" x="1386" y="1574">explorer</text>
+<rect class="chip" x="1453" y="1560" width="56" height="20" rx="4"/>
+<text class="chip-t" x="1461" y="1574">boards</text>
+<rect class="chip" x="1290" y="1586" width="49" height="20" rx="4"/>
+<text class="chip-t" x="1298" y="1600">setup</text>
+<text class="band-h" x="608" y="1348">apps</text>
+<text class="cap-s" x="608" y="1366">domain modules</text>
+<rect class="card" x="720" y="1632" width="552" height="90" rx="8"/>
+<text class="card-h" x="730" y="1654">connectors — base · cypher · gremlin</text>
+<rect class="chip" x="730" y="1664" width="75" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1678">connector</text>
+<rect class="chip" x="811" y="1664" width="102" height="20" rx="4"/>
+<text class="chip-t" x="819" y="1678">query_builder</text>
+<rect class="chip" x="919" y="1664" width="42" height="20" rx="4"/>
+<text class="chip-t" x="927" y="1678">lens</text>
+<rect class="chip" x="968" y="1664" width="75" height="20" rx="4"/>
+<text class="chip-t" x="976" y="1678">querysets</text>
+<rect class="chip" x="1049" y="1664" width="89" height="20" rx="4"/>
+<text class="chip-t" x="1057" y="1678">serializers</text>
+<rect class="card" x="1280" y="1632" width="272" height="90" rx="8"/>
+<text class="card-h" x="1290" y="1654">loaders · types</text>
+<rect class="chip" x="1290" y="1664" width="36" height="20" rx="4"/>
+<text class="chip-t" x="1298" y="1678">csv</text>
+<rect class="chip" x="1332" y="1664" width="56" height="20" rx="4"/>
+<text class="chip-t" x="1340" y="1678">schema</text>
+<rect class="chip" x="1393" y="1664" width="42" height="20" rx="4"/>
+<text class="chip-t" x="1401" y="1678">data</text>
+<rect class="chip" x="1442" y="1664" width="62" height="20" rx="4"/>
+<text class="chip-t" x="1450" y="1678">filters</text>
+<rect class="chip" x="1290" y="1690" width="42" height="20" rx="4"/>
+<text class="chip-t" x="1298" y="1704">plan</text>
+<rect class="chip" x="1338" y="1690" width="95" height="20" rx="4"/>
+<text class="chip-t" x="1346" y="1704">capabilities</text>
+<text class="band-h" x="608" y="1654">graph</text>
+<text class="cap-s" x="608" y="1672">graph engine</text>
+<rect class="card" x="720" y="1736" width="832" height="90" rx="8"/>
+<text class="card-h" x="730" y="1758">core — imports nothing above it</text>
+<rect class="chip" x="730" y="1768" width="155" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1782">db (SQLAlchemy async)</text>
+<rect class="chip" x="891" y="1768" width="141" height="20" rx="4"/>
+<text class="chip-t" x="899" y="1782">auth (JWT · tokens)</text>
+<rect class="chip" x="1038" y="1768" width="168" height="20" rx="4"/>
+<text class="chip-t" x="1046" y="1782">events (store · NOTIFY)</text>
+<rect class="chip" x="1212" y="1768" width="122" height="20" rx="4"/>
+<text class="chip-t" x="1220" y="1782">telemetry (OTel)</text>
+<rect class="chip" x="1339" y="1768" width="148" height="20" rx="4"/>
+<text class="chip-t" x="1347" y="1782">migrations (Alembic)</text>
+<rect class="chip" x="730" y="1794" width="62" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1808">logging</text>
+<rect class="chip" x="798" y="1794" width="69" height="20" rx="4"/>
+<text class="chip-t" x="806" y="1808">settings</text>
+<rect class="chip" x="873" y="1794" width="75" height="20" rx="4"/>
+<text class="chip-t" x="881" y="1808">redaction</text>
+<rect class="chip" x="954" y="1794" width="69" height="20" rx="4"/>
+<text class="chip-t" x="962" y="1808">querylog</text>
+<text class="band-h" x="608" y="1758">core</text>
+<text class="cap-s" x="608" y="1776">shared kernel</text>
+<path class="edge-faint" d="M706,740 L706,1820" marker-end="url(#arr)"/>
+<rect class="lib" x="720" y="1860" width="832" height="84" rx="8"/>
+<text class="card-h engine-t" x="730" y="1882">integrations/ — separate pip packages, one per database</text>
+<text class="cap" x="730" y="1900">vendor connectors that extend graph/connectors, loaded by dotted path</text>
+<rect class="chip" x="730" y="1912" width="95" height="20" rx="4"/>
+<text class="chip-t" x="738" y="1926">invana-neo4j</text>
+<rect class="chip" x="831" y="1912" width="115" height="20" rx="4"/>
+<text class="chip-t" x="839" y="1926">invana-memgraph</text>
+<rect class="chip" x="952" y="1912" width="115" height="20" rx="4"/>
+<text class="chip-t" x="960" y="1926">invana-arcadedb</text>
+<rect class="chip" x="1073" y="1912" width="128" height="20" rx="4"/>
+<text class="chip-t" x="1081" y="1926">invana-janusgraph</text>
+<rect class="chip" x="1207" y="1912" width="135" height="20" rx="4"/>
+<text class="chip-t" x="1215" y="1926">invana-tinkergraph</text>
+<path class="edge" d="M780,1860 L780,1830" marker-end="url(#arr)"/>
+<text class="edge-t" x="788" y="1848">extends</text>
+<text class="edge-t" x="268" y="458">built from</text>
+<text class="edge-t" x="778" y="586">built from</text>
+<text class="cap-s" x="32" y="1990">Sources: docker-compose.yml · engine/pyproject.toml (import-linter bands) · studio/package.json · design-kit/packages · canvas/packages. Update this diagram when a service, a band or a package changes.</text>
+</svg>
