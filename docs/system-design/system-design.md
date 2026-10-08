@@ -11,6 +11,7 @@
 | Status | Design. Nothing here is built unless the [backend architecture](#10-backend-architecture) marks it built. |
 | Diagrams | [`agent-system-paths.drawio`](agent-system-paths.drawio) — three pages: **Agent system paths** (the board), **Entity detail**, **Backend architecture** |
 | Words | [`../for-developers/terminology.md`](../for-developers/terminology.md), with the departures listed in [§13](#13-conflicts-to-resolve) |
+| Migration | [`migration-plan.md`](migration-plan.md) — how the engine's code moves to this design |
 
 ---
 
