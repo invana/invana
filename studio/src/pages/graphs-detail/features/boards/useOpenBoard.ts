@@ -12,7 +12,7 @@
  *
  * **Only the kinds that bind to a record and read no trace.** `run` and
  * `task_run` both need a `runId` this signature cannot carry
- * ([skills-dashboards.md](../../../../../docs/for-developers/building-studio/skills-dashboards.md)),
+ * ([skills-boards.md](../../../../../docs/for-developers/building-studio/skills-boards.md)),
  * and a context that let them through would be a board opened without the one
  * thing its body checks for ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */

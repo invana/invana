@@ -90,7 +90,7 @@ export function TaskFlowCanvas({
 	const selectedRef = useRef(selectedId);
 	selectedRef.current = selectedId;
 
-	// A caller that rebuilds equal data on every render (a dashboard spec does)
+	// A caller that rebuilds equal data on every render (a board spec does)
 	// must not re-seed the graph and re-run the layout each time.
 	const signature = JSON.stringify(data);
 	const stable = useRef({ signature, data });

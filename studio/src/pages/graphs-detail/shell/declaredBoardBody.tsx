@@ -123,7 +123,7 @@ export function declaredBoardContent(
 				<EmptyState
 					className="h-full"
 					title="This board arrived without a run"
-					description="A run and a step dashboard both read one trace. Open it again from the Runs panel."
+					description="A run and a step board both read one trace. Open it again from the Runs panel."
 				/>
 			);
 		}
@@ -176,7 +176,7 @@ export function declaredBoardContent(
 					openWorkPanel("agents");
 					openAgentPage(id);
 				}}
-				onOpenUsageDashboard={(id) =>
+				onOpenUsageBoard={(id) =>
 					openBoard({ kind: "skill_usage", subjectId: id })
 				}
 			/>

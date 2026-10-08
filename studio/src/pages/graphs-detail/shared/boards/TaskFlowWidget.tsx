@@ -24,12 +24,12 @@ export interface FlowOptions {
 	/** Emitted with `{ itemId }` when a node is picked — opens its step. */
 	openAction?: string;
 	/**
-	 * The canvas's **least** height. A dashboard panel body is content-height,
+	 * The canvas's **least** height. A board panel body is content-height,
 	 * so the panel measures the room left in the page and grows into it.
 	 */
 	height: number;
 	/**
-	 * The flow is the whole tab: no box, and it bleeds over the dashboard
+	 * The flow is the whole tab: no box, and it bleeds over the board
 	 * body's padding to the tab's edges, as the skill page's Flow tab does.
 	 * Absent on a report saved while the flow sat in a titled box.
 	 */
@@ -64,7 +64,7 @@ export function TaskFlowWidget({
 	}
 
 	return (
-		// `-m-3` is the dashboard body's own `p-3`, cancelled.
+		// `-m-3` is the board body's own `p-3`, cancelled.
 		<div ref={ref} className={bleed ? "-m-3" : undefined}>
 			<TaskFlowCanvas
 				data={data}
@@ -84,7 +84,7 @@ const BELOW_BOX = 14;
 
 /**
  * The height from this element's top to the bottom of the page's scroller —
- * the dashboard body, the nearest ancestor that scrolls — never less than
+ * the board body, the nearest ancestor that scrolls — never less than
  * `least`. The flow is the whole tab, so it takes the whole page: the kit pins
  * a row in px and has no way to say *the rest*.
  */

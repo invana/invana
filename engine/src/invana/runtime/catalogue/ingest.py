@@ -103,7 +103,7 @@ async def validate_records(ctx: TaskContext, v: RunVars) -> Out:
     edge_records = _read_records(root / "edges")
     load.total = sum(len(r) for r in node_records.values()) + sum(len(r) for r in edge_records.values())
     # The files this step read, listed as it read them — the Artifacts panel on
-    # its dashboard is this list and nothing else (SR38). `model.json` is one of
+    # its board is this list and nothing else (SR38). `model.json` is one of
     # them when the folder ships one: a reader asking *what did identity come
     # from* is asking about a file.
     if load.model_json:

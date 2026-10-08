@@ -152,7 +152,7 @@ async def get_board_version(
 
 # ── A declared board, addressed by its subject (B9) ──────────────────────────
 #
-# A live dashboard has no row. These three paths are the only ones that need
+# A live board has no row. These three paths are the only ones that need
 # one, so each is create-or-get on `(graph_id, kind, subject_id)` and the client
 # never asks whether a row exists.
 
@@ -189,7 +189,7 @@ async def list_reports(
 ) -> BoardVersionListResponse:
     board = await boards.boards_qs.get_by_subject(session, graph_id=graph.id, kind=kind, subject_id=subject_id)
     # No row means nothing was ever kept — an empty list, not a 404. The live
-    # dashboard is still there; it simply has no reports.
+    # board is still there; it simply has no reports.
     if board is None:
         return BoardVersionListResponse(items=[], total=0)
     items, total = await versions.list_for_board(session, board_id=board.id, limit=limit, offset=offset)

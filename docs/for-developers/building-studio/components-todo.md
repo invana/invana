@@ -16,7 +16,7 @@ artboards need it, whether it is built and whether it has a story.
 |---|---|
 | **Status** | 🔵 not started · 🟡 in progress · ✅ shipped (component **and** story) |
 | **Story** | ✅ one exported story per file under `apps/storybook/stories/…` · 🔵 none yet. A component without a story is not done |
-| **Where** | `ui` = `packages/ui/src/components/ui/` (shadcn-style primitive) · `ui-extended` = composition of primitives, Invana-domain ones included · `tables` · `dashboard` · `canvas-ui` (the **canvas** repo) |
+| **Where** | `ui` = `packages/ui/src/components/ui/` (shadcn-style primitive) · `ui-extended` = composition of primitives, Invana-domain ones included · `tables` · `boards` · `canvas-ui` (the **canvas** repo) |
 
 **Keeping it true.** A component ships → flip its row here, and its row in
 [design-kit-coverage.md](design-kit-coverage.md). An artboard is added that needs something new →
@@ -57,7 +57,7 @@ Feature: [10.5 · see-what-ran](../modules/operate/features/see-what-ran.md).
 
 | # | Component | Where | Change | Boards | Status |
 |---|---|---|---|---|---|
-| U1 | `LayerStrip` | `ui-extended` | **the forecast reading**: `p50` drawn **on** the bar with its Δ, band notes (`3 calls, all inside p95`), and a seam with **no estimate** — dashed, stating so beside its actual | layers · layers.forecast | ✅ |
+| U1 | `Gantt` | `ui-extended` | **the forecast reading**: `p50` drawn **on** the bar with its Δ, band notes (`3 calls, all inside p95`), and a seam with **no estimate** — dashed, stating so beside its actual | layers · layers.forecast | ✅ |
 | U2 | `DataTable` | `tables` | indent rows (a child run under its parent), row selection (accent + inset rule), cell readings — mono · tone · struck | list · list.states · step · step.touched* | ✅ |
 | U3 | `@invana/tables` in Studio | `studio/` | **already a dependency, and already drawn with.** The row was written against a Studio that did not have it; it has, and had before this queue started — `studio/package.json` carries it and four surfaces render `DataTable`: the access-token table, the lifecycle dialog's open-work preview, and the agents' Pools and Ceilings tables. Nothing was installed to close this. What remains is not a dependency but a **screen** — the journal route that draws `list · step · step.touched*` — and that is [the-screens.md](../the-screens.md)'s row, not a component's | list · step · step.touched* | ✅ |
 | U4 | `Legend` | `ui-extended` | swatch kinds `stripe` (the layer bar), `bracket` (a bounded repetition), `rule` (a gate). Today: dot · line · dashed · arrow · ring | in_order · layers · layers.forecast · flow | ✅ |
@@ -65,14 +65,14 @@ Feature: [10.5 · see-what-ran](../modules/operate/features/see-what-ran.md).
 | U7 | `RecordHeader` | `ui-extended` | **the last crumb gives way first.** Every parent crumb was truncating equally, so `runs › run:7d3184f1 › step:9b1c40e2 execute_query` rendered as `ru… › run:7d3184… › step:9b1c40e2 execute_qu…` — and the kind prefix is the one thing [SR54](../modules/operate/features/see-what-ran.md#decisions) says a crumb exists to carry. Found by rendering, not by type-check | every step board | ✅ |
 | U6 | `TaskNode` | `ui-extended` | `readOnly` — a run's picked node gets the ring and **no handles**; handles belong to the draft canvas | flow · flow.step ([SR52](../modules/operate/features/see-what-ran.md#decisions)) | ✅ |
 
-### 1.4 New — `@invana/dashboard` panel kinds
+### 1.4 New — `@invana/boards` panel kinds
 
 A run page is `board.kind = run` ([CV12](../modules/explore/features/boards.md)), so each band
 reaches Studio as a panel spec, never a hand-composed page.
 
 **They ship as `RUN_PANELS`, not as built-in kinds.** `BUILT_IN_PANELS` is eleven kinds that two
 unrelated surfaces each need; these are one surface family's. A consumer draws a run with
-`<Dashboard spec={spec} registry={RUN_PANELS} />`, so a product that only wanted tiles and a log does
+`<Board spec={spec} registry={RUN_PANELS} />`, so a product that only wanted tiles and a log does
 not carry the run vocabulary — and a product that draws runs does not copy the adapter.
 
 | # | Kind | Renders | Note | Status |
@@ -81,10 +81,10 @@ not carry the run vocabulary — and a product that draws runs does not copy the
 | D2 | `touched` | `TouchStrip` (C3) | the summary strip, not an axis | ✅ |
 | D3 | `attempts` | `AttemptClock` (C7) | | ✅ |
 | D4 | `artifacts` | `ArtifactTable` (C8) | | ✅ |
-| D5 | `layers` | `LayerStrip` (U1) | `gantt` stays `TaskGantt`; both drawings are wanted | ✅ |
+| D5 | `layers` | `Gantt` (U1) | `gantt` stays `Gantt`; both drawings are wanted | ✅ |
 | D6 | `lens` | `LayerSection` + `LensRow` | both already ship; the panel kind is what is missing | ✅ |
 | D7 | `clarification` | `ExchangeRecord` (C10) | **not** a change to the built-in `exchange`: that panel draws an exchange of *documents* (a request and a response, as code), and a settled ask is a question, its options and who chose. Two drawings, two kinds | ✅ |
-| D8 | absent panels | `AbsenceNote` (C9) | a `Dashboard` rule, not a per-panel one: a record nobody wrote does not render; one retention purged says **purged** ([SR34](../modules/operate/features/see-what-ran.md#decisions)) | ✅ |
+| D8 | absent panels | `AbsenceNote` (C9) | a `Board` rule, not a per-panel one: a record nobody wrote does not render; one retention purged says **purged** ([SR34](../modules/operate/features/see-what-ran.md#decisions)) | ✅ |
 
 ### 1.5 Not design-kit — the canvas repo
 
@@ -117,7 +117,7 @@ the four it joins.
 |---|---|---|---|
 | `@invana/ui` | 13 | 5 | 18 |
 | `@invana/tables` | — | 2 | 2 |
-| `@invana/dashboard` | 8 | — | 8 |
+| `@invana/boards` | 8 | — | 8 |
 | the canvas repo | — | 3 recipes | 3 |
 | **Shipped** | **21** | **9** | **31 of 31** |
 
@@ -129,9 +129,9 @@ really pointed at is the journal **screen**, which is tracked in [the-screens.md
 
 | # | What | Detail |
 |---|---|---|
-| N1 | **A panel spec's options are strings, never `ReactNode`** | `ArtifactSpec`, `ParticipantSpec` and `ClarificationOption` restate the component props in plain values. A dashboard is fetched, stored beside a plan and diffed; a `ReactNode` survives none of that. The components keep their `ReactNode` props — it is the *spec* that is narrow |
+| N1 | **A panel spec's options are strings, never `ReactNode`** | `ArtifactSpec`, `ParticipantSpec` and `ClarificationOption` restate the component props in plain values. A board is fetched, stored beside a plan and diffed; a `ReactNode` survives none of that. The components keep their `ReactNode` props — it is the *spec* that is narrow |
 | N2 | **A `lens` section carries one of two readings** | `participants` is a **run's** lens — every address the world allowed, each with what this execution did with it ([SR53](../modules/operate/features/see-what-ran.md#decisions)). `rows` is a **world's** — the lenses that narrow a layer, as the Govern drawer reads them. One kind, two questions, and a section that gives both draws both |
 | N3 | **`RunStatusText` reads `running` in the info token** | A dot says *in flight* with motion; a word cannot, and in most themes `primary` and `success` are near neighbours — so a status column that wrote both in the same green would say nothing at a glance. Beside a dot, the dot still pulses |
-| N5 | **Absence is three-way, and the dashboard owns it** | `unrecorded` **drops the panel outright** — while a step is in flight there is no `result.json` box, and one reading *nothing recorded* would claim the step recorded nothing ([SR59](../modules/operate/features/see-what-ran.md#decisions)). `purged` keeps its band and says so ([O6](../modules/operate/spec.md)); `declared-none` keeps its band and says it in the contract's own words (`read_only: true`). A row whose panels all drop does not leave an empty gap |
+| N5 | **Absence is three-way, and the board owns it** | `unrecorded` **drops the panel outright** — while a step is in flight there is no `result.json` box, and one reading *nothing recorded* would claim the step recorded nothing ([SR59](../modules/operate/features/see-what-ran.md#decisions)). `purged` keeps its band and says so ([O6](../modules/operate/spec.md)); `declared-none` keeps its band and says it in the contract's own words (`read_only: true`). A row whose panels all drop does not leave an empty gap |
 | N6 | **None of this is released** | design-kit `v0.0.30` was cut and pushed from a clean `main` earlier today, and Studio pins `^0.0.30` — **this queue is not in it**. Everything above is uncommitted in the design-kit working tree; the components reach Studio only after a `./release.sh` cut ([design-kit release](design-kit-coverage.md)) |
 | N4 | **Open: the linear clock crowds a run whose work is seconds** | On `Layers`, eight seconds of compute inside a three-minute run puts five bars at their floor width around one tick. It is the honest drawing — a bar's width *is* its duration — and `minTrackWidth` spreads it, but a run with a long human wait is still read better folded. The kit's own `where-the-time-went` story documents the same limit |

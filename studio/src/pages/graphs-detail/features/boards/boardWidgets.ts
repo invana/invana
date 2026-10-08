@@ -2,7 +2,7 @@
  * Every panel kind a declared board registers, in one map
  * ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
- * The same argument as [`dashboardIcons`](./dashboardIcons.ts): the spec carries
+ * The same argument as [`boardIcons`](../../shared/boardIcons.ts): the spec carries
  * a **string** and the renderer arrives as a prop, so a document stays JSON and
  * the components it names live in one vocabulary rather than five.
  *
@@ -26,7 +26,7 @@ import {
 } from "@/pages/graphs-detail/features/lenses";
 import { PLAN_CHART_WIDGETS } from "@/pages/graphs-detail/features/plans";
 import { SkillFlowWidget } from "@/pages/graphs-detail/features/skills";
-import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
+import { TaskFlowWidget } from "@/pages/graphs-detail/shared/boards/TaskFlowWidget";
 
 export const DECLARED_WIDGETS = {
 	// The run vocabulary the kit ships — `trace · touched · attempts ·

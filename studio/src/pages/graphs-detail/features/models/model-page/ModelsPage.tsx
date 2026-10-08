@@ -49,8 +49,8 @@ import type {
 	BindingStitch,
 	GraphModelSummary,
 } from "@/pages/graphs-detail/features/models/types";
-import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import { routedAction } from "@/pages/graphs-detail/shared/dashboardSpec";
+import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
+import { routedAction } from "@/pages/graphs-detail/shared/boardSpec";
 import { ApiError } from "@/services/api/client";
 import { ArchiveRefused, PublishConfirm } from "./ModelsDialogs";
 import {
@@ -64,7 +64,7 @@ import {
 import { ShapeSheet } from "./performanceRows";
 import { type ModelsTab, useModelsView } from "./useModelsView";
 
-const ICONS = { ...DASHBOARD_ICONS, plus: Plus, upload: Upload, check: Check };
+const ICONS = { ...BOARD_ICONS, plus: Plus, upload: Upload, check: Check };
 
 /** What each tab waits on until its read ships. */
 const WAITS_ON: Partial<Record<ModelsTab, string>> = {

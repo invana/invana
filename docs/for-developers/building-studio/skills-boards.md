@@ -1,9 +1,9 @@
-# Skills dashboards — three declared boards
+# Skills boards — three declared boards
 
-**What `More` opens from the Skills stack.** The drawer stays the 420px overview; a dashboard is the
+**What `More` opens from the Skills stack.** The drawer stays the 420px overview; a board is the
 page you open deliberately when the drawer is not enough ([CV14](../modules/explore/features/boards.md)).
-Three declared kinds ship here — `skill`, `skill_usage`, `rule` — each a `DashboardSpec` composed from
-one read, laid out by `@invana/dashboard`, bound to one record through `subject_id`.
+Three declared kinds ship here — `skill`, `skill_usage`, `rule` — each a `BoardSpec` composed from
+one read, laid out by `@invana/boards`, bound to one record through `subject_id`.
 
 | | |
 |---|---|
@@ -12,25 +12,25 @@ one read, laid out by `@invana/dashboard`, bound to one record through `subject_
 | Drawn from | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — the drawers `SkillsViewPanel` · `SkillFlow` · `SkillVersions` · `SkillUsage` · `UsageVersions` · `UsageReadings` · `UsageSeams` · `RulesPanel` · `RuleCited` |
 | Drawn as | the boards themselves — `SkillDash` (S6) · `SkillDashDraft` (S7) · `UsageDash` (U5) · `UsageDashStates` (U6) · `RuleDash` (RL5), rows [34r–34t](../the-screens.md) |
 | Pattern | `runBoardSpec` / `stepBoardSpec` ([see-what-ran SR30](../modules/operate/features/see-what-ran.md)) — a pure function of one read, nothing fetching, nothing rendering |
-| Not in scope | authoring a dashboard, a panel Studio invents at runtime, and a dashboard for `bindings` — the Bindings tab is a picker, and a picker is not a reading |
+| Not in scope | authoring a board, a panel Studio invents at runtime, and a board for `bindings` — the Bindings tab is a picker, and a picker is not a reading |
 
 ---
 
-## 1. Why a dashboard, when there is already a drawer
+## 1. Why a board, when there is already a drawer
 
 The Skills stack answers *which skill* in 420px. Every question that needs two numbers side by side —
 *is this playbook being applied, and by whom* — is a table the drawer cannot draw without becoming a
-dashboard in a column.
+board in a column.
 
 | Question | Where it is answered |
 |---|---|
 | Which skill? What does it say? | the drawer — unchanged |
 | What will this playbook engage? | the page's **Flow** tab ([SK16](../modules/skills/features/authoring-a-skill.md#decisions)) |
-| What is this skill, whole — prose, flow, versions, bindings, headline usage | the skill's **page**, `skill:<id>` ([SK17 · SK36](../modules/skills/features/authoring-a-skill.md#decisions)) — not a dashboard |
-| Is it applied, by whom, in which outcomes, and what does the gap mean | **`skill_usage`** dashboard |
-| Was this statement offered, cited, and where | **`rule`** dashboard |
+| What is this skill, whole — prose, flow, versions, bindings, headline usage | the skill's **page**, `skill:<id>` ([SK17 · SK36](../modules/skills/features/authoring-a-skill.md#decisions)) — not a board |
+| Is it applied, by whom, in which outcomes, and what does the gap mean | **`skill_usage`** board |
+| Was this statement offered, cited, and where | **`rule`** board |
 
-**A dashboard never replaces the drawer.** Opening one leaves the stack where it was, so *Retune*'s
+**A board never replaces the drawer.** Opening one leaves the stack where it was, so *Retune*'s
 rule holds here too: the reading opens in `mainSection` and the panel that opened it stays beside it.
 
 ---
@@ -40,7 +40,7 @@ rule holds here too: the reading opens in `mainSection` and the panel that opene
 | Kind | `subject_id` | Reads | Opened from |
 |---|---|---|---|
 | `skill` | a `skills.id` | `GET …/skills/{id}` · `…/versions/{v}/tasks` · `…/versions` · `…/agents` · `…/usage` | `More` on the Skills drawer, drilled in |
-| `skill_usage` | a `skills.id` | `GET …/skills/{id}/usage` | `Usage…` on the `skill` dashboard, and `More` on the drawer's **Usage** tab |
+| `skill_usage` | a `skills.id` | `GET …/skills/{id}/usage` | `Usage…` on the `skill` board, and `More` on the drawer's **Usage** tab |
 | `rule` | a `rules.id` | `GET …/rules/{id}/citations` (+ the rule from the list) | `More` on the Rules drawer, drilled in |
 
 ### SD1 · `skill_usage` is addressed by the skill, not by a version
@@ -51,7 +51,7 @@ job is reading one count against the next — so a board per version would be se
 reading, each holding a seventh of it, and the version bar would have to open a tab to move.
 
 The version is therefore a **view**, not an address: it rides the spec's segmented action like
-`Dashboard ¦ spec.json` does, and the tiles redraw. What the surface may never do is sum across
+`Board ¦ spec.json` does, and the tiles redraw. What the surface may never do is sum across
 versions — *2,786 offers exist across seven texts, and that total is drawn nowhere*
 ([US3](../modules/skills/features/usage.md#decisions)).
 
@@ -76,7 +76,7 @@ three trace-reading kinds are the only ones that set it — which is what `subje
 
 `skill:<id>` renders the skill's page — a record header over `Playbook · Flow · Bindings · Usage ·
 Versions` ([SK17 · SK36](../modules/skills/features/authoring-a-skill.md#decisions)) — and no
-`DashboardSpec` composes it. The tiles, the trigger, the playbook, the flow, what it composed, the
+`BoardSpec` composes it. The tiles, the trigger, the playbook, the flow, what it composed, the
 bindings and the versions each live on a tab, where they can also be edited. `Usage…` is the Usage
 tab's `More`, and it opens `skill_usage:<id>`.
 
@@ -181,7 +181,7 @@ surface adds nothing up.
 ### SD9 · Deactivating stays in the drawer
 
 The dialog that says *what stops* and *what stays* is an act with a consequence to read, and the
-Rules drawer already draws it. The dashboard says `active: false` in the row and offers `Edit`,
+Rules drawer already draws it. The board says `active: false` in the row and offers `Edit`,
 which puts the drawer back on the rule. One place writes; the board reads.
 
 ---
@@ -210,11 +210,11 @@ act on.
 |---|---|
 | `apps/boards/kinds.py` | three `_declared` rows and three literal members |
 | `boardKinds.ts` | three `DeclaredKindSpec`s; `DeclaredKind` gains three members |
-| `GraphDetailPage.tsx` | `OpenBoard.runId` optional ([SD3](#3--skill--the-panel-set)); the `renders: dashboard` branch gains three bodies; the Skills panel gets `onOpenSkillDashboard` · `onOpenUsageDashboard` · `onOpenRuleDashboard` |
-| `features/skills/dashboards/` | the three composers, the three pages, one `shared.ts`, one `index.ts` border |
+| `GraphDetailPage.tsx` | `OpenBoard.runId` optional ([SD3](#3--skill--the-panel-set)); the `renders: declared` branch gains three bodies; the Skills panel gets `onOpenSkillBoard` · `onOpenUsageBoard` · `onOpenRuleBoard` |
+| `features/skills/boards/` | the three composers, the three pages, one `shared.ts`, one `index.ts` border |
 | `SkillsViewPanel.tsx` · `SkillDetail.tsx` · `RulesSection.tsx` | a `More` header action, drilled in only |
 
-**The composers live under `features/skills/`, not under `boards/`.** A dashboard's panels are the
+**The composers live under `features/skills/`, not under `boards/`.** A board's panels are the
 feature's vocabulary — *offered*, *applied*, *cited*, *enough to read* — and the boards folder owns
 the page host, the record and the tab strip ([CV7](../modules/explore/features/boards.md)). Operate
 holds `run` and `task_run` for the same reason.
@@ -238,9 +238,9 @@ holds `run` and `task_run` for the same reason.
 
 | Not building | Because |
 |---|---|
-| A `binding` dashboard | the Bindings tab is a picker — it binds as you click ([BN4](../modules/skills/features/bindings.md)), and a picker is a panel, not a reading |
-| Authoring a dashboard per Graph | panels come from a closed set for the same reason the catalogue is one ([CV13](../modules/explore/features/boards.md)) |
-| Publishing or deactivating from a dashboard | the act belongs where the thing being changed is written ([SD9](#sd9--deactivating-stays-in-the-drawer)) |
+| A `binding` board | the Bindings tab is a picker — it binds as you click ([BN4](../modules/skills/features/bindings.md)), and a picker is a panel, not a reading |
+| Authoring a board per Graph | panels come from a closed set for the same reason the catalogue is one ([CV13](../modules/explore/features/boards.md)) |
+| Publishing or deactivating from a board | the act belongs where the thing being changed is written ([SD9](#sd9--deactivating-stays-in-the-drawer)) |
 | A report of a skill board | a frozen reading is one version of a board ([C9](../modules/explore/features/boards.md)); nothing has asked to freeze a playbook yet |
 | The *outside the lens* tile `SkillUsage` draws | it is a projection of the touch ledger, not of usage ([GV20](../modules/govern/spec.md)) — it belongs to the run, and the board would be reading a second module's record to draw one tile |
 | Per-version offer counts | an offer is written against whatever version was current; nothing on the surface asks for the split (§ 6) |

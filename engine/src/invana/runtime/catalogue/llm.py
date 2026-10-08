@@ -48,7 +48,7 @@ from invana.runtime.catalogue.registry import Arg, Bound, Entry, Type, build
 
 
 def _exchange(outcome) -> dict:
-    """The prompt and the completion, for the step dashboard's Output band.
+    """The prompt and the completion, for the step board's Output band.
 
     **Deliberately undeclared** (SR42). Declaration is what makes an output
     bindable (`orchestration.md` §0.6), so keeping these two off the entry's

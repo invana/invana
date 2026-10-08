@@ -2,7 +2,7 @@
  * The two acts a declared board carries — `Save report` and `Reports`
  * ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
- * A live dashboard reads its subject on every open, so a finished run's numbers
+ * A live board reads its subject on every open, so a finished run's numbers
  * are only *probably* stable and a running one's are not stable at all. Keeping
  * a reading writes the **resolved document** — the spec with the numbers
  * already in it — as a `board_versions` row, and the page becomes
@@ -19,7 +19,7 @@
  * that is not a reading of its subject.
  *
  * `Reports` is the other half of the same pair — *keep this reading*, and
- * *find a kept one* — and it sits beside `Save report` on the dashboard's own
+ * *find a kept one* — and it sits beside `Save report` on the board's own
  * header rather than on the strip, which stays as narrow as it was. The
  * card it opens is drawn by `DeclaredBoard`, because a hook cannot draw.
  */

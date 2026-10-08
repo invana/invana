@@ -58,7 +58,7 @@ class ProposedPlan:
     steps: list[dict] = field(default_factory=list)
     rationale: str = ""
     usage: TokenUsage | None = None
-    #: The call as a reader reads it — drawn as the step dashboard's Output
+    #: The call as a reader reads it — drawn as the step board's Output
     #: band (SR42). Not a declared output: a plan cannot bind a raw prompt.
     exchange: Exchange = field(default_factory=Exchange)
     duration_ms: float = 0.0

@@ -1,7 +1,7 @@
 import { usd } from "@/lib/format";
 
 /**
- * A step dashboard, composed — artboards ([34l–34n](../../../../../../docs/for-developers/the-screens.md)).
+ * A step board, composed — artboards ([34l–34n](../../../../../../docs/for-developers/the-screens.md)).
  *
  * **One shell for every task kind, and Output is the only branch**
  * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md) ·
@@ -45,9 +45,9 @@ import {
 	tileToneOf,
 	toneOf,
 	VIEW_ACTION,
-	VIEW_DASHBOARD,
+	VIEW_BOARD,
 	VIEW_SPEC,
-} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
+} from "@/pages/graphs-detail/features/runs/boards/runBoards";
 
 export const STEP_ACTIONS = {
 	view: VIEW_ACTION,
@@ -75,7 +75,7 @@ export interface StepBoardView {
 	 * ([14.1](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
 	 *
 	 * The run's whole ledger; this composer picks out the rows for this step.
-	 * Absent, the band is **absent** — a step dashboard from before the lens
+	 * Absent, the band is **absent** — a step board from before the lens
 	 * must not grow an empty box claiming the step touched nothing.
 	 */
 	touches?: TouchesResponse;
@@ -106,7 +106,7 @@ export function stepContext(
 	};
 }
 
-/** The one panel kind this dashboard registers beyond the built-ins — Govern's. */
+/** The one panel kind this board registers beyond the built-ins — Govern's. */
 export type StepPanels = WithStepTouch;
 
 export function stepBoardSpec(
@@ -161,7 +161,7 @@ export function stepBoardSpec(
 			},
 			{
 				id: STEP_ACTIONS.view,
-				options: [VIEW_DASHBOARD, VIEW_SPEC],
+				options: [VIEW_BOARD, VIEW_SPEC],
 				value: view,
 			},
 		]),

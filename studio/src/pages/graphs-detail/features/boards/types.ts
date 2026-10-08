@@ -75,7 +75,7 @@ export interface Board extends BoardSummary {
  */
 /**
  * Why a version exists. `report` is the declared half — the act that keeps a
- * live dashboard's numbers ([boards-migration.md](../../../docs/for-developers/building-engine/boards-migration.md)) —
+ * live board's numbers ([boards-migration.md](../../../docs/for-developers/building-engine/boards-migration.md)) —
  * and the other four are a drawn board autosaving.
  */
 export type BoardVersionCause =
@@ -115,7 +115,7 @@ export interface BoardVersionSummary {
  *
  * `snapshot` is the **resolved document**, stored merged and never re-merged:
  * `canvas.exportState()` on a drawn board — restored by handing it back
- * to `canvas.importState()` — or the `DashboardSpec` with its numbers already
+ * to `canvas.importState()` — or the `BoardSpec` with its numbers already
  * in it on a declared one, which is what a **report** is.
  */
 export interface BoardVersion extends BoardVersionSummary {

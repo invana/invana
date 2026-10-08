@@ -1,5 +1,5 @@
 /**
- * The model page as a dashboard document (the-model-page.md).
+ * The model page as a board document (the-model-page.md).
  *
  * One header, then **Overview · Model · Database · Usage · Performance ·
  * Growth** with the `7 · 30 · 90 days` window on the right of the tab strip —

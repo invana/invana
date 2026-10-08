@@ -617,7 +617,7 @@ never carries an id the log has, and the step row is the only one the product re
 ### The runtime's half of it
 
 The runtime **produces** the six outputs above and guarantees they are correlated. Transport,
-formatters, metric instruments, cardinality policy, sampling, retention and dashboards belong to the
+formatters, metric instruments, cardinality policy, sampling, retention and boards belong to the
 [logging, metrics and traces](#) module.
 
 | The runtime guarantees | Detail |
@@ -872,7 +872,7 @@ today. Only the *bundle* needs the deferred machinery.
 | Distributed workers | the runtime is in-process. Scale-out is a deployment question nobody has asked yet |
 | An external orchestrator adapter | none has been written, and the plan-as-data model gives a general executor nothing to do |
 | Alerting — in-app notifications, email, webhooks | a **separate module**. The runtime emits events; what watches them and tells someone is not its concern |
-| Log transport, metric instruments, traces, dashboards | a **separate module**. The runtime records correlated facts; shaping and shipping them is not its concern |
+| Log transport, metric instruments, traces, boards | a **separate module**. The runtime records correlated facts; shaping and shipping them is not its concern |
 | Per-step CPU and memory limits | the runtime is in-process; a pool is how a heavy step is rationed. Real resource isolation is a container's job, not an interpreter's |
 | Pools shared across Graphs | a Graph is the reasoning boundary; capacity never crosses one |
 

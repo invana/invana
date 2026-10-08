@@ -184,7 +184,7 @@ Evidence is the import graph: each file below is imported only from the folder i
 | `work/WorkGraphCanvas.tsx` | the plan, envelope and lineage boards | `src/canvases/layered/` — a renderer, beside `model/` and `taskflow/` |
 | `work/WorkCanvas.tsx` → `PlanCanvas` · `EnvelopeCanvas` · `LineageCanvas` | boards | `projects/` · `agents/` · `agents/` |
 | `skills/taskFlowFromPlan.ts` | skills, workflows | `src/canvases/taskflow/` |
-| `operate/dashboards/TaskFlowPanel.tsx`, `dashboards/shared.ts` | operate, workflows, `shared/dashboardPanels` | `shared/dashboards/` |
+| `operate/boards/TaskFlowPanel.tsx`, `boards/shared.ts` | operate, workflows, `shared/dashboardPanels` | `shared/boards/` |
 | `work/StepRules.tsx` | assistant `TraceDialog`, work | `shared/` |
 | `skills/ProjectRulesSection.tsx`, `RuleParts`, `RulesDrawer` | projects, skills | `rules/` |
 | `agents/PoolsTable.tsx` | graph-settings only | `graphs/` |
@@ -233,7 +233,7 @@ before Studio uses it.
 
 The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `PanelStack` and its
 `PanelStackSection`s; canvas-ui names every region occupant `*ViewPanel` (`LayersViewPanel`,
-`SchemaViewPanel`, `BoardPagesViewPanel`). Studio has no drawers — nothing slides over anything — so
+`SchemaViewPanel`, `Workbook`). Studio has no drawers — nothing slides over anything — so
 *drawer* is retired, and a plain `*Panel` would read as a kit primitive (`PanelStack`, `PanelContent`,
 `TabbedPanel`).
 
@@ -246,7 +246,7 @@ The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `Pane
 | `XDetail` | a drill-in that replaces a section's body | `RunDetailDrawer` → `RunDetail` |
 | `XBoardPage` | anything in `mainSection` | `PlanDashboardPage` · `RunDashboardPage` · `RuleDashboardPage` · `UsageDashboardPage` → `*BoardPage` · `RunsJournalPage` → `RunsBoardPage` · `ComparePage` → `CompareBoardPage` |
 | `XCard` | floats over the canvas | `DeclareStitchPanel` → `DeclareStitchCard`. `LayersPanel` and `StylingPanel` are the kit's `LayersViewPanel` and `StylingViewPanel`; `ExpandFineTunePanel` → `ExpandNeighboursDialog` |
-| `XWidget` | one tile on a board | `TaskFlowPanel` · `SkillFlowPanel` · `RunLensPanel` · `StepTouchPanel` · `BoardHistoryPanel` → `*Widget`; `shared/dashboardPanels.ts` → `dashboardWidgets.ts` |
+| `XWidget` | one tile on a board | `TaskFlowPanel` · `SkillFlowPanel` · `RunLensPanel` · `StepTouchPanel` · `BoardHistoryPanel` → `*Widget`; `shared/dashboardPanels.ts` → `features/boards/boardWidgets.ts` |
 | `XTab` | a tab body, settings or detail | `EventsSection` → `EventsTab` · `GraphSettingsSection` → `GraphTab` · `GraphInfoPanel` → `InfoTab` |
 | `xRows.ts` | row builders, not components | `databaseTab` · `growthTab` · `performanceTab` · `usageTab` → `*Rows` |
 | shared builders | the section factory and its UI state | `shared/TaskDrawer.tsx` (`taskDrawerSection`, `useTaskDrawerUi`) → `shared/StackSection.tsx` (`stackSection`, `useStackSectionUi`) · `shell/useDrawerStack.ts` → `useStackSections.ts` |
@@ -483,7 +483,7 @@ are `scripts/check-names` (Python, no dependencies, runs on every OS), not yet w
 |---|---|
 | a Studio `features/<m>/` has no engine `server/<m>/`, or the reverse (bands, `auth` · `telemetry` · `admin`, and a module with no routes of its own — `setup` — excepted) | Studio · engine |
 | a docs module folder is not in the §2 table | docs |
-| a `.tsx` file under `features/` ends in a suffix outside §5 — `Drawer`, `StackPanel`, `DashboardPage`, or a bare `Panel` | Studio |
+| a `.tsx` file under `features/` ends in a suffix outside §5 — `Drawer`, `StackPanel`, `Dashboard…`, or a bare `Panel` | Studio |
 | a retired word from [terminology.md](terminology.md) §8 appears outside its allowed contexts (§6b) — identifiers, UI copy, docstrings, docs prose. For `Task`: only its Todo sense is flagged (`TaskStatus`, `TaskCreate`, `TaskActivity`, `useTasksQuery`, `tasksApi`, `TaskManager` …); `Task` the TaskPlan node is correct | docs · Studio · engine |
 | a feature link's number differs from the README row it links to | docs |
 
@@ -590,7 +590,7 @@ studio/src/
     └── graphs-detail/
         ├── GraphDetailPage.tsx
         ├── shell/                 leftNav · regions · use<Module>ViewPanel hooks · useLeftSection
-        ├── shared/                StackSection · RecordRow · StepRules · dashboards/
+        ├── shared/                StackSection · RecordRow · StepRules · boards/
         └── features/              one folder per module — each: index.ts · api.ts · queries.ts · types.ts
             │  ── Data
             ├── graphs/            SettingsViewPanel · InfoTab · GraphTab · ConnectionFields · PoolsTable
@@ -694,9 +694,9 @@ studio/src/
         │   ├── RecordRow.tsx                ← WorkRow.tsx
         │   ├── StepRules.tsx                ← features/work/
         │   ├── DetailRows.tsx  ListPanel.tsx  SectionTitle.tsx  statusTone.ts
-        │   ├── dashboardIcons.ts  dashboardWidgets.ts  dashboardSpec.ts   ← dashboardPanels.ts
-        │   └── dashboards/                  TaskFlowWidget.tsx ← operate/dashboards/TaskFlowPanel.tsx
-        │                                    shared.ts ← operate/dashboards/shared.ts
+        │   ├── boardIcons.ts  boardSpec.ts   ← dashboardIcons.ts · dashboardSpec.ts
+        │   └── boards/                  TaskFlowWidget.tsx ← operate/boards/TaskFlowPanel.tsx
+        │                                    shared.ts ← operate/boards/shared.ts
         └── features/
             ├── agents/
             │   ├── index.ts  api.ts  queries.ts  types.ts
@@ -735,7 +735,7 @@ studio/src/
             │   ├── CompareDialog.tsx  CompareBoardPage.tsx ← ComparePage.tsx  ImpactDialog.tsx
             │   ├── RunLensWidget.tsx  StepTouchWidget.tsx   ← RunLensPanel · StepTouchPanel
             │   ├── addressing.ts  narrowing.ts  runLens.ts  runLayers.ts
-            │   └── boards/                  LensBoardPage.tsx · lensBoardSpec.ts   ← dashboards/
+            │   └── boards/                  LensBoardPage.tsx · lensBoardSpec.ts   ← boards/
             ├── models/                      ← connect-and-model/
             │   ├── index.ts  api.ts  queries.ts  types.ts   ← models.ts · schemas.ts · useModels · useSchema
             │   ├── model-editor/            ← model/ — ModelViewPanel · ModelCanvas · propertyTypes · types
@@ -753,7 +753,7 @@ studio/src/
             │   ├── PlansSection.tsx          + PlansSectionBody ← TaskPlansPanel.tsx
             │   ├── CatalogueSection.tsx  PromoteDialog.tsx  PlanFlowCanvas.tsx  planLayers.ts   ← CatalogueDrawer
             │   ├── taskFlowFromTaskPlan.ts  ← taskFlowFromWorkflow.ts
-            │   └── boards/                  ← dashboards/ — PlanBoardPage ← PlanDashboardPage
+            │   └── boards/                  ← boards/ — PlanBoardPage ← PlanDashboardPage
             │                                PlanChartWidgets ← PlanChartPanels (PlanTrendWidget ← WorkTrendPanel)
             │                                planBoardSpec ← planDashboardSpec · planRecordSpecs · PlanRecordPages
             ├── projections/                 ← ask/projections/
@@ -774,7 +774,7 @@ studio/src/
             │   ├── RunsViewPanel.tsx  RunsList.tsx  RunsFilterBar.tsx  useRunsFilters.ts  runSummary.ts   ← RunsPanel
             │   ├── RunDetail.tsx            ← RunDetailDrawer.tsx
             │   ├── RunsBoardPage.tsx        ← RunsJournalPage.tsx
-            │   └── boards/                  ← dashboards/ — RunBoardPage ← RunDashboardPage
+            │   └── boards/                  ← boards/ — RunBoardPage ← RunDashboardPage
             │                                runBoardSpec · stepBoardSpec · taskFlowFromRun · useRunStep · useRunTrace · icons
             ├── graphs/                      ← graph-settings/
             │   ├── index.ts  api.ts  queries.ts  types.ts   ← graphs.ts · health.ts · useGraphs
@@ -788,7 +788,7 @@ studio/src/
                 ├── SkillsViewPanel.tsx  SkillDetail.tsx  SkillBoardPage.tsx   ← SkillsPanel
                 ├── SkillPlaybookTab.tsx  SkillFlowTab.tsx
                 ├── SkillPlaybookEditor.tsx  ← SkillPlanEditor.tsx
-                └── boards/                  ← dashboards/ — SkillFlowWidget ← SkillFlowPanel
+                └── boards/                  ← boards/ — SkillFlowWidget ← SkillFlowPanel
                                              UsageBoardPage ← UsageDashboardPage · usageBoardSpec · shared
 ```
 
@@ -796,7 +796,7 @@ studio/src/
 |---|---|
 | A module's border is `index.ts` | another module imports only from it — [code-shape.md §4.1](building-studio/code-shape.md) |
 | A module owns its API | `api.ts` · `queries.ts` · `types.ts` in the folder. `services/api/work.ts`, `hooks/queries/useWork.ts` and `types/work.ts` stop existing; they held five modules |
-| A sub-folder is a feature | `assistant/answer-surface/`, `models/model-editor/`, `models/model-page/` — named after the feature file, never a shape word. `boards/` inside a module holds its `*BoardPage`s and their specs (was `dashboards/`) |
+| A sub-folder is a feature | `assistant/answer-surface/`, `models/model-editor/`, `models/model-page/` — named after the feature file, never a shape word. `boards/` inside a module holds its `*BoardPage`s and their specs (was `boards/`) |
 | A renderer two modules draw is a canvas | `src/canvases/layered/` joins `model/` and `taskflow/`; the module keeps only the adapter (`PlanCanvas`, `EnvelopeCanvas`, `LineageCanvas`) |
 | No folder for a module with no Studio surface | `imports`, `graph-connectors`, `queries` (until the console, 4.4, ships), `memory`, `reviews`, `schedules`, `runtime`, `tooling`, `design`, `accounts` (it stays in `pages/settings/`) |
 

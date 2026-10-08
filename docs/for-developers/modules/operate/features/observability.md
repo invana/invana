@@ -82,5 +82,5 @@ flowchart TD
 | Not building | Because |
 |---|---|
 | Alerting, paging, on-call | this is a product surface, not a monitoring platform |
-| Custom dashboards | four questions answered well beat a builder |
+| Custom boards | four questions answered well beat a builder |
 | Exporting metrics to a TSDB | the record is the source; export it, not a summary |

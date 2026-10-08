@@ -449,7 +449,7 @@ export interface TraceRead {
 	status: string;
 	/** The ask this run carries — `nl` · `ql` · `import`. */
 	ask_kind: string | null;
-	/** What it was about, in the words the opener wrote — the dashboard's crumb. */
+	/** What it was about, in the words the opener wrote — the board's crumb. */
 	body: string | null;
 	/** The run's own `result.json` — null until the runtime writes one. */
 	result: Record<string, unknown> | null;

@@ -27,7 +27,7 @@ import {
 	useRunTouchesQuery,
 } from "@/pages/graphs-detail/features/lenses";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
-import { DASHBOARD_ICONS } from "@/pages/graphs-detail/features/runs/boards/icons";
+import { BOARD_ICONS } from "@/pages/graphs-detail/features/runs/boards/icons";
 import {
 	RUN_ACTIONS,
 	type RunPanels,
@@ -36,8 +36,8 @@ import {
 } from "@/pages/graphs-detail/features/runs/boards/runBoardSpec";
 import {
 	groupSteps,
-	VIEW_DASHBOARD,
-} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
+	VIEW_BOARD,
+} from "@/pages/graphs-detail/features/runs/boards/runBoards";
 import {
 	STEP_ACTIONS,
 	type StepPanels,
@@ -46,8 +46,8 @@ import {
 	stepContext,
 } from "@/pages/graphs-detail/features/runs/boards/stepBoardSpec";
 import { useRunTrace } from "@/pages/graphs-detail/features/runs/boards/useRunTrace";
-import { routedAction } from "@/pages/graphs-detail/shared/dashboardSpec";
-import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
+import { routedAction } from "@/pages/graphs-detail/shared/boardSpec";
+import { TaskFlowWidget } from "@/pages/graphs-detail/shared/boards/TaskFlowWidget";
 
 export interface RunBoardPageProps {
 	username: string;
@@ -90,7 +90,7 @@ export function RunBoardPage({
 	// Graph had a lens has a trace and no touches.
 	const touches = useRunTouchesQuery(username, graphSlug, runId);
 	const client = useQueryClient();
-	const [view, setView] = useState(VIEW_DASHBOARD);
+	const [view, setView] = useState(VIEW_BOARD);
 	// Both tabs are held here, so the run's is where it was left when a step
 	// closes, and a step's is kept as the reader walks from one to the next.
 	const [runTab, setRunTab] = useState<RunTab>("overview");
@@ -160,7 +160,7 @@ export function RunBoardPage({
 				className="h-full min-h-0"
 				spec={report.spec}
 				registry={REGISTRY}
-				icons={DASHBOARD_ICONS}
+				icons={BOARD_ICONS}
 				onAction={(action, context_) => {
 					const [id, ctx] = routedAction(action, context_);
 					if (report.handle(id)) return;

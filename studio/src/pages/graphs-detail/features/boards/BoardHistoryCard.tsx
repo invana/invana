@@ -5,14 +5,14 @@
  * A drawn board's versions and a declared board's reports are the same
  * reading — *what was kept of this board, newest first* — and they are
  * addressed differently: `boardVersions` by `board_id`, `boardReports` by a
- * `(kind, subject_id)` pair, because a live dashboard has no row until the
+ * `(kind, subject_id)` pair, because a live board has no row until the
  * first report creates one ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  * So the fetch and the act belong to the binding and everything a reader sees
  * belongs here.
  *
  * The row's act differs too, and deliberately: a canvas' version **forks**
  * into a new board, because the one you are standing on is what you would
- * otherwise overwrite; a report **opens**, because the live dashboard is
+ * otherwise overwrite; a report **opens**, because the live board is
  * always there and there is nothing to fork into ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 
@@ -30,7 +30,7 @@ interface BoardHistoryAction {
 }
 
 export interface BoardHistoryCardProps {
-	/** `History` on a canvas, `Reports` on a dashboard. */
+	/** `History` on a canvas, `Reports` on a board. */
 	title: string;
 	onClose: () => void;
 	isLoading: boolean;
@@ -38,7 +38,7 @@ export interface BoardHistoryCardProps {
 	/** Said when nothing was ever kept — the binding's own words. */
 	empty: string;
 	/**
-	 * Above the list. A canvas puts `Save current state` here; a dashboard puts
+	 * Above the list. A canvas puts `Save current state` here; a board puts
 	 * nothing, because `Save report` is on its own header.
 	 */
 	toolbar?: ReactNode;

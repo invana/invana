@@ -112,7 +112,7 @@ sequenceDiagram
     autonumber
     actor Au as Auditor
     participant S as Govern › Guardrails
-    participant R as Run dashboard
+    participant R as Run board
     participant E as Engine
 
     Au->>S: what may this Graph do with its data?
@@ -153,7 +153,7 @@ sequenceDiagram
 | The impact of a save | *Saving this would change 2 of 4 worlds* — each named, with what it loses, before the write. The worlds that **do not** change are named in a sentence under the list, not as diff rows: every mark a diff list has means *something happened here*, and *checked and unaffected* is the opposite claim | `AlertDialog` · `DiffList` |
 | Egress, per destination | What may accompany a call to **this** destination, and what is cut | **`EgressList`** |
 | What an auditor is handed | One object · the rules grouped by layer · who may edit · the history in Events · `lens_snapshot` per run | `PropertyList` |
-| A guardrail's board | A page in `BoardPagesViewPanel`, id `guardrail:<lens_id>`, **titled with the guardrail's name**. The same composer the world board uses, and it says *in force on every run* rather than *34 runs* ([GR14](#decisions)) | `Dashboard` — `properties` · `metrics` · `table` · `text` |
+| A guardrail's board | A page in `Workbook`, id `guardrail:<lens_id>`, **titled with the guardrail's name**. The same composer the world board uses, and it says *in force on every run* rather than *34 runs* ([GR14](#decisions)) | `Board` — `properties` · `metrics` · `table` · `text` |
 | The widest state | A sentence when nothing is set, never an empty table ([SR34](../../operate/features/see-what-ran.md)'s rule, applied to configuration) | `EmptyState` |
 | Agent panel | That agent's own lens — replacing the provider field that D2 removed | **`LensChip`** · **`CastTable`** |
 | Worlds drawer | The sibling above it. Its header names how many rules are in force | |

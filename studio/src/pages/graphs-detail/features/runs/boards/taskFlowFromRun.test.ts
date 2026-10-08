@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { TaskGroup } from "./runDashboards";
+import type { TaskGroup } from "./runBoards";
 import { taskFlowFromRun } from "./taskFlowFromRun";
 
 const group = (id: string, bound: string | null, extra: object = {}) =>

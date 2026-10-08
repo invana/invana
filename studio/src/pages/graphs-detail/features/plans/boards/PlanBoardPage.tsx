@@ -29,9 +29,9 @@ import {
 	usePlanVersionQuery,
 	useTaskPlansQuery,
 } from "@/pages/graphs-detail/features/plans/queries";
-import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import { routedAction } from "@/pages/graphs-detail/shared/dashboardSpec";
-import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
+import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
+import { routedAction } from "@/pages/graphs-detail/shared/boardSpec";
+import { TaskFlowWidget } from "@/pages/graphs-detail/shared/boards/TaskFlowWidget";
 
 const REGISTRY = {
 	flow: TaskFlowWidget,
@@ -138,7 +138,7 @@ export function PlanBoardPage({
 			className="h-full min-h-0"
 			spec={report.spec}
 			registry={REGISTRY}
-			icons={DASHBOARD_ICONS}
+			icons={BOARD_ICONS}
 			onAction={(action, context) => {
 				const [id, ctx] = routedAction(action, context);
 				if (report.handle(id)) return;

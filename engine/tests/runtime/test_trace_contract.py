@@ -1,6 +1,6 @@
 """Every keyword the trace route passes is a field of the model it builds.
 
-`GET …/runs/{id}/trace` is what both dashboards read (see-what-ran.md SR30),
+`GET …/runs/{id}/trace` is what both boards read (see-what-ran.md SR30),
 and it raised a `ValidationError` on every call for as long as it took anyone
 to open one: the `thinking_id` → `parent_run_id` rename landed on the keyword
 argument and not on the field, so `TraceRead(parent_run_id=…)` silently dropped
@@ -50,7 +50,7 @@ def test_the_trace_passes_only_fields_a_step_has() -> None:
     )
 
 
-def test_a_step_carries_what_the_step_dashboard_renders() -> None:
+def test_a_step_carries_what_the_step_board_renders() -> None:
     """SR33 — Input, the bound chip, Where it sits and `result.json`."""
     assert {"args", "bound", "step_key", "lane", "result"} <= set(TraceStep.model_fields)
 
@@ -63,7 +63,7 @@ def test_the_trace_carries_a_spend_and_the_ceiling_it_is_drawn_against() -> None
 
 def test_a_run_is_drawn_against_the_per_run_ceiling_it_froze() -> None:
     """EB13 — the session narrowed the spend per run below the agent's cap, and
-    the run froze that; the dashboard reads the frozen one, not today's cap."""
+    the run froze that; the board reads the frozen one, not today's cap."""
     agent = Agent(name="Analyst", budget={"max_cost_usd_run": 2.0}, effort={}, workflow_spec={})
     narrowed = run_ceilings(TaskRun(params={"max_cost_usd_run": 0.5}), agent)
     assert narrowed["max_cost_usd_run"] == 0.5

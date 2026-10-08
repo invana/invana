@@ -2,7 +2,7 @@ import { usd } from "@/lib/format";
 
 /**
  * **Runs, drawn wide** — the journal as a page in `mainSection`, opened from
- * `Dashboard` on the Runs panel's header (see-what-ran.md * `operate.runs.list`).
+ * `Board` on the Runs panel's header (see-what-ran.md * `operate.runs.list`).
  *
  * The panel and this page read **one query under one set of chips**, so the
  * list beside it and the table here never disagree. What the page adds is

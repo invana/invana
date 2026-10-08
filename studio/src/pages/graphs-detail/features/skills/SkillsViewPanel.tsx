@@ -55,7 +55,7 @@ interface Props {
 	 * stays where it is; the page opens beside it.
 	 */
 	onOpenSkillPage: (skillId: string) => void;
-	onOpenRuleDashboard?: (ruleId: string) => void;
+	onOpenRuleBoard?: (ruleId: string) => void;
 }
 
 export function SkillsViewPanel({
@@ -64,7 +64,7 @@ export function SkillsViewPanel({
 	selectedSkillId,
 	onSelectSkill,
 	onOpenSkillPage,
-	onOpenRuleDashboard,
+	onOpenRuleBoard,
 }: Props) {
 	const [openRuleId, setOpenRuleId] = useState<string | null>(null);
 	const [composingRule, setComposingRule] = useState(false);
@@ -186,13 +186,13 @@ export function SkillsViewPanel({
 							icon: ChevronLeft,
 							onClick: () => setOpenRuleId(null),
 						},
-						...(onOpenRuleDashboard
+						...(onOpenRuleBoard
 							? [
 									{
 										key: "more",
 										name: "Open this rule as a page",
 										icon: Maximize2,
-										onClick: () => onOpenRuleDashboard(openRule.id),
+										onClick: () => onOpenRuleBoard(openRule.id),
 									},
 								]
 							: []),

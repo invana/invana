@@ -227,7 +227,7 @@ class RunTouch(Base):
         return self.direction == TouchDirection.refused.value
 
     def as_reading(self) -> dict[str, Any]:
-        """The shape the run dashboard and `Compare` both read."""
+        """The shape the run board and `Compare` both read."""
         return {
             "seq": self.seq,
             "step_key": self.step_key,

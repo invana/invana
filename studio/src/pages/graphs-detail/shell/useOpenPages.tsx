@@ -319,14 +319,14 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			// exactly what the four-branch ternary did, minus the fighting.
 			content: activeCanvasId === tab.id ? canvasContent : null,
 		})),
-		// The declared boards — a run dashboard and a step's. `renders` is the
+		// The declared boards — a run board and a step's. `renders` is the
 		// only thing that picks the body (boards-migration § 5); the strip, the
 		// title and the close are the same as every other page's.
 		...boards.map((board) => ({
 			id: boardPageId(board.kind, board.subjectId, board.versionId),
 			title: boardTitle(board, titleNames),
 			icon: BOARD_KINDS[board.kind].icon,
-			// A dashboard has nothing to rename, so its tab carries a close `×`
+			// A board has nothing to rename, so its tab carries a close `×`
 			// instead of the Rename / Close menu.
 			closable: true,
 			// Which board this is belongs to the host, so every declared page can

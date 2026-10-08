@@ -99,7 +99,7 @@ Everything the story renders, and nothing else:
 |---|---|
 | Layers | `BackgroundLayer`, `GraphLayer` |
 | Theme | `ThemeBehaviour`, `useStudioCanvasTheme` |
-| Behaviours | pan, wheel zoom, drag node, hover activate, click select, `CollapseExpandBehaviour`, `TextResolutionLODBehaviour`, `TextLODBehaviour`, `HoverElementPreviewBehaviour` |
+| Behaviours | pan, wheel zoom, drag node, hover activate, click select, `CollapseExpandBehaviour`, `TextResolutionLODBehaviour`, `NodeLabelLODBehaviour`, `HoverElementPreviewBehaviour` |
 | Layouts | `ElkLayout` (`elk`) — the only one (GM3) |
 | Header | title · `GraphControlsToolbar` (layout section off) · **Detail** · Settings dock |
 | With `stitching` | a drag moves a type, as in the story; **Shift**-drag arms `DrawEdgeBehaviour` (its dashed rubber band) and turns node drag off while Shift is held. A **Stitch mode** toggle after the toolbar's own items makes that sticky. The declare card docks on the right when a drag is accepted, with no toggle of its own |

@@ -95,7 +95,7 @@ Each needs one read against the kit before it is cut. Named so the pass is finit
 | 646 | `explorer/components/LayersPanel.tsx` | `LayersViewPanel` (canvas-ui) — **done** |
 | 418 | `explorer/components/ExpandFineTunePanel.tsx` | **Keep** — it fetches neighbours from the engine; the kit panels only filter what is drawn. Renamed `ExpandNeighboursDialog` ([module-structure.md](../module-structure.md) §4) |
 | 415 | `modeller/components/PropertyEditor.tsx` | `PropertiesEditor` (canvas-ui) |
-| 269 | `explorer/components/CanvasTabsBar.tsx` | `BoardPagesViewPanel` (canvas-ui) — strip **and** bodies in one column, `keepMounted` |
+| 269 | `explorer/components/CanvasTabsBar.tsx` | `Workbook` (canvas-ui) — strip **and** bodies in one column, `keepMounted` |
 | 193 | `work/WorkCanvasChrome.tsx` | `CanvasMessageBar` + `GraphLegendLayerEditorPanel` (canvas-ui) |
 | 178 | `explorer/components/InspectorPanel.tsx` | `InspectorPanel` · `NodeDetailView` · `EdgeDetailView` (canvas-ui) |
 | — | `explorer/lib/visibility.ts` | The store's native API — `setNodesHidden` · `hiddenNodes` — **done** |
@@ -220,7 +220,7 @@ features/agents/
 | A renderer two modules draw is a canvas | `src/canvases/<name>/`. The module keeps only its adapter — `PlanCanvas` in `projects/`, `EnvelopeCanvas` and `LineageCanvas` in `agents/` |
 | One direction inside a module | A sub-folder imports its parent's types, never the reverse. `models/model-editor/` renders `stitch/`'s block; `stitch/` imports only the selection type back |
 | No `utils/` | A file is named for what it holds — `typeColor.ts`, `propertyTypes.ts`, `runSummary.ts`. A bag named `utils/` is the shape word that hides the most |
-| No module imports the shell | Dependency direction is `shell → features → shared`. A feature that needs the router takes a prop or a hook from `shared/`. Biome `noRestrictedImports` fails a `features/` or `shared/` file that imports `shell/**`, and a `shared/` file that imports any module — `shared/` is the leaf. A dashboard registry that composes several modules' widgets is the host's, in `boards/` |
+| No module imports the shell | Dependency direction is `shell → features → shared`. A feature that needs the router takes a prop or a hook from `shared/`. Biome `noRestrictedImports` fails a `features/` or `shared/` file that imports `shell/**`, and a `shared/` file that imports any module — `shared/` is the leaf. A board registry that composes several modules' widgets is the host's, in `boards/` |
 
 ### 4.1b A module's folder is its module; a sub-folder is one of its features
 
@@ -231,7 +231,7 @@ features/agents/
 | **A sub-folder is a feature, named after its file** | `assistant/answer-surface/` ↔ `the-answer-surface.md` · `models/model-editor/` ↔ `model-editor.md` · `models/stitch/` ↔ `stitch-models.md`. A reader who knows the docs already knows the tree |
 | **A sub-folder may name a screen that spans several features** | `models/model-editor/` holds introspect, domain models, the editor, share and starters, because one screen — the Model panel and the model canvas — draws all five and `ModelPanel` assembles them in one file. The test is the screen, not the file count |
 | **`boards/` inside a module holds its page kinds** | `runs/boards/RunBoardPage.tsx` and its spec. It is the one shape word allowed, because *board* is the product's word for a page in `mainSection` |
-| **Never another shape word** | `templates/`, `renderers/`, `views/`, `dashboards/` say how the code is built, not which feature it is |
+| **Never another shape word** | `templates/`, `renderers/`, `views/`, `boards/` say how the code is built, not which feature it is |
 | **Check the module's vocabulary before coining a name** | [terminology.md](../terminology.md) and the module's `spec.md` decide it, not the shape of the files going in |
 
 ### 4.1c A component's suffix is its role
@@ -240,7 +240,7 @@ One meaning per suffix, and the suffixes are the kit's words ([module-structure.
 
 | Suffix | Is | Example |
 |---|---|---|
-| `XViewPanel` | what fills a region, named for the occupant — canvas-ui's word (`LayersViewPanel`, `BoardPagesViewPanel`) | `RunsViewPanel` · `AssistantViewPanel` · `LensesViewPanel` |
+| `XViewPanel` | what fills a region, named for the occupant — canvas-ui's word (`LayersViewPanel`, `Workbook`) | `RunsViewPanel` · `AssistantViewPanel` · `LensesViewPanel` |
 | `XSection` / `XSectionBody` | one `PanelStackSection` of a view panel / its `content` | `TodosSection` · `PlansSection` · `TodosSectionBody` |
 | `XList` | the rows of a list section | `RunsList` |
 | `XDetail` | a drill-in that replaces a section's body | `RunDetail` · `AgentDetail` |
@@ -253,7 +253,7 @@ One meaning per suffix, and the suffixes are the kit's words ([module-structure.
 `XSection` means one thing: a `PanelStackSection`. A tab body is an `XTab`, never a `*Section`; the regions keep
 the kit's camelCase props (`leftSection`), so a component and a region never share a spelling.
 Retired: `*Drawer` (nothing in Studio is a drawer), `*StackPanel` (a stacked view panel is a `ViewPanel`),
-`*DashboardPage` (a dashboard is a board), and a bare `*Panel` for an occupant (it reads as a kit primitive —
+`*DashboardPage` (a board is a board), and a bare `*Panel` for an occupant (it reads as a kit primitive —
 `PanelStack`, `PanelContent`, `TabbedPanel`).
 
 ### 4.1a How a symbol is named
@@ -479,7 +479,7 @@ Three files carry the whole map, and each is short:
 
 | # | Open question | Needed by |
 |---|---|---|
-| ~~Q1~~ | ~~Release `@invana/canvas` `0.0.12`?~~ — **answered: released.** All `@invana/*` canvas packages are on npm at `0.0.12`, Studio is pinned there, and `canvas-ui` ships `LayersViewPanel` · `BoardPagesViewPanel` · `CanvasControlsToolbar` · `CanvasMessageBar` · `GraphStatusBar` · `InspectorPanel` · `SchemaViewPanel` · `PropertiesEditor` and every editor panel. `@invana/graph` carries the native visibility API. §2.3 is unblocked | ✅ |
+| ~~Q1~~ | ~~Release `@invana/canvas` `0.0.12`?~~ — **answered: released.** All `@invana/*` canvas packages are on npm at `0.0.12`, Studio is pinned there, and `canvas-ui` ships `LayersViewPanel` · `Workbook` · `CanvasControlsToolbar` · `CanvasMessageBar` · `GraphStatusBar` · `InspectorPanel` · `SchemaViewPanel` · `PropertiesEditor` and every editor panel. `@invana/graph` carries the native visibility API. §2.3 is unblocked | ✅ |
 | Q4 | `@invana/forms` — F1 `useForm` re-export, F2 `ObjectField` generic in `TFieldValues`, F3 `FieldConfig` validation (`required` · `rules` · `disabled` · `readOnly`). F3 is what gates converting eleven hand-written forms | Phase 2 |
 | Q2 | Does `features/graphs/` keep that name, or do its surfaces distribute into `connect-and-model` and `identity-and-access`? | Phase 3 |
 | Q3 | `shared/api/` as a staging area, or split every resource into its module in Phase 3? Staging is proposed; splitting up front is a 6,000-line diff | Phase 3 |

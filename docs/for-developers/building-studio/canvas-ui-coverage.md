@@ -113,7 +113,7 @@ Worth stating, because each has been proposed at least once:
 | Theme sync | `CanvasThemeSync` | `apps/CanvasThemeSync.tsx` — drives the engine's `ThemeBehaviour` from `useThemeOptional`. `GraphCanvasApp` mounts one in its default bundle |
 | Canvas settings | `CanvasSettingsEditorPanel` · `CanvasSettingsBrowser` | `editor-panels/canvas-settings/` — introspects the live `layers` / `behaviours` / `layouts` registries and renders `@invana/forms`' `SettingsPanel`. The design-kit piece is already underneath it |
 | Layers browser | `LayersViewPanel` | `view-panels/layers/` |
-| Page/tab strip | `BoardPagesViewPanel` | `view-panels/canvas-pages/` |
+| Page/tab strip | `Workbook` | `view-panels/canvas-pages/` |
 | Header controls | `GraphControlsToolbar` · `…Lite` | `toolbars/` |
 | One-open-at-a-time panels | `useSidePanels` | `hooks/` |
 | Floating card chrome | `Panel` · `PanelContent` | `components/` |

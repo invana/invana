@@ -399,7 +399,7 @@ class TestAModelNamedByARuleBindsTheTypesItDeclares:
 
     def test_the_touch_carries_the_slice_and_the_exclusions_per_type(self, version: GraphVersion) -> None:
         """WO17 — the read's own verdict carries neither, so both come off the
-        compiled lens or the step dashboard renders nothing."""
+        compiled lens or the step board renders nothing."""
         lens = to_effective_like(
             rules=[
                 Rule(

@@ -68,7 +68,7 @@ export function LensDetail({
 	// `source` is dropped on the way into the table. The kit's vocabulary is
 	// `todo · plan · agent · shipped` — *which contributor won* — and a lens read
 	// on its own has exactly one contributor, so answering it here would be
-	// inventing a fact. The run dashboard is where that column has a real value.
+	// inventing a fact. The run board is where that column has a real value.
 	const resolved: CastResolution[] | undefined = rows?.map((row) => ({
 		role: row.role,
 		address: row.address,

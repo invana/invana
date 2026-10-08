@@ -7,8 +7,9 @@
  *    and the engine folder it maps to exists under `engine/src/invana/server/`.
  *    Every engine `server/<m>/` is claimed by a module or listed in `ENGINE_ONLY`.
  * 2. **Suffixes** — a `.tsx` under `features/` never ends in `Drawer`, `StackPanel`,
- *    `DashboardPage`, or a bare `Panel` (a region occupant is `*ViewPanel`).
- * 3. **Retired words** — no identifier contains one. Identifiers are read with the
+ *    `Dashboard…`, or a bare `Panel` (a region occupant is `*ViewPanel`).
+ * 3. **Retired words** — no identifier contains one. `dashboard` is retired: every
+ *    surface is a board (lucide's `LayoutDashboard` icon is the one exception). Identifiers are read with the
  *    TypeScript parser, so strings, JSX text and comments (URL values, storage keys,
  *    test ids, UI copy) are never flagged.
  * 4. **Decision ids** — no comment cites one (`G41`, `SR72`, `(AD2)`). A comment
@@ -72,11 +73,11 @@ const ENGINE_ONLY = {
 	__pycache__: "bytecode",
 };
 
-const RETIRED_SUFFIX = /(Drawer|StackPanel|DashboardPage|(?<!View)Panel)\.tsx$/;
+const RETIRED_SUFFIX = /(Drawer|StackPanel|Dashboard\w*|(?<!View)Panel)\.tsx$/;
 const SUFFIX_ALLOWED = {};
 
 const RETIRED_WORDS =
-	/drawer|StackPanel|DashboardPage|journal|thinking|railItem/i;
+	/drawer|StackPanel|(?<!layout)dashboard|journal|thinking|railItem/i;
 // `file:identifier` pairs that keep a retired word, with the reason.
 const WORD_ALLOWED = {};
 
@@ -133,7 +134,7 @@ function checkSuffixes() {
 		const rel = path.relative(FEATURES, f).split(path.sep).join("/");
 		if (RETIRED_SUFFIX.test(rel) && !(rel in SUFFIX_ALLOWED)) {
 			errors.push(
-				`features/${rel}: retired suffix (Drawer · StackPanel · DashboardPage · bare Panel)`,
+				`features/${rel}: retired suffix (Drawer · StackPanel · Dashboard · bare Panel)`,
 			);
 		}
 	}

@@ -1,5 +1,5 @@
 /**
- * What a run dashboard and a step dashboard agree on.
+ * What a run board and a step board agree on.
  *
  * Both are composed from one `GET …/runs/{id}/trace` ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)),
  * so the status vocabulary, the clock and the "is there a record for this?"
@@ -103,7 +103,7 @@ export function boundOf(step: TraceStepRead): Bound | undefined {
 export { formatCompact as compact } from "@/lib/format";
 /**
  * `omit` · `count` · the view switch · `specPanel` live in
- * `shared/dashboardSpec.ts`: Skills composes declared boards too, and a second
+ * `shared/boardSpec.ts`: Skills composes declared boards too, and a second
  * copy of `omit` is how two modules drift on what *absent* means
  * ([code-shape §4.1](../../../../../../docs/for-developers/building-studio/code-shape.md)).
  * They are re-exported here so this file stays the one import a run composer
@@ -114,9 +114,9 @@ export {
 	omit,
 	specPanel,
 	VIEW_ACTION,
-	VIEW_DASHBOARD,
+	VIEW_BOARD,
 	VIEW_SPEC,
-} from "@/pages/graphs-detail/shared/dashboardSpec";
+} from "@/pages/graphs-detail/shared/boardSpec";
 
 /**
  * A tile's gauge — the value against its ceiling — or `undefined` when there is

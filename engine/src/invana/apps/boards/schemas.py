@@ -108,7 +108,7 @@ class BoardVersionCreate(BaseModel):
     """One frozen reading of a board.
 
     The render state only exists in the client — a drawn board's
-    ``canvas.exportState()``, a declared board's resolved ``DashboardSpec`` —
+    ``canvas.exportState()``, a declared board's resolved ``BoardSpec`` —
     so the client supplies it already merged, and the server never re-merges it
     (B16).
     """

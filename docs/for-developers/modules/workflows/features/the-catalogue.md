@@ -80,7 +80,7 @@ flowchart TD
 | Surface | Shape |
 |---|---|
 | **Catalogue** drawer | The third drawer of the **Tasks** stack ([G33](../../../building-studio/graph-detail-page.md)). While a draft is open it is also the **palette** — drag an entry onto the canvas ([7.7](draft-a-plan.md)). Rows grouped under their bound, the group header carrying the bound and its count. A row is `step_key` (mono) · one-line summary · **how many plans name it**, or `unused`. The main column stays empty and says why an entry opens no page (CA6) |
-| Entry detail | **In the drawer only** (CA6): the bound, then `args`, `outputs` (with roll-up), `requires`, *Used by*, *Agents granted this bound*. There is no dashboard page for an entry |
+| Entry detail | **In the drawer only** (CA6): the bound, then `args`, `outputs` (with roll-up), `requires`, *Used by*, *Agents granted this bound*. There is no board page for an entry |
 | The contract, where it is used | The same fields render as the **contract card** beside a task's parameter form ([7.7](draft-a-plan.md)) — the form is generated from them — and inside a refusal. That is where an entry is actually read |
 | Deep links | A task on a run's canvas and a task on a plan's canvas both link to `?panel=library&section=catalogue&entry=<step_key>` — the refusal message links to the same place |
 
@@ -105,7 +105,7 @@ today. This feature is a **read route over it**, and nothing else.
 | CA2 | **It is rendered from the declaration, never re-described.** No prose copy of an entry's args lives in Studio or in docs; the route serves `registry.py`, and an entry that changes changes here first. |
 | CA3 | **Grouped by bound, not alphabetically.** The bound is what the envelope ceilings and what a refusal names, so the group a person scans is the group the system enforces. |
 | CA4 | **A drawer of Tasks, not an icon.** A run is an execution of a plan; a plan is a composition of catalogue entries — the catalogue is the bottom of that same sentence, and it is where *this run → the plan it ran → the callable that failed* ends ([G33](../../../building-studio/graph-detail-page.md)). |
-| CA6 | **An entry gets a drawer detail, not a page.** Fourteen entries, five or six fields each, and nothing per-entry to chart: a dashboard would be a contract with whitespace around it. The two places an entry is genuinely read are the **parameter form it generates** and the **refusal that names its bound**, and both show the contract in place. Browsing all of them is the drawer's job. |
+| CA6 | **An entry gets a drawer detail, not a page.** Fourteen entries, five or six fields each, and nothing per-entry to chart: a board would be a contract with whitespace around it. The two places an entry is genuinely read are the **parameter form it generates** and the **refusal that names its bound**, and both show the contract in place. Browsing all of them is the drawer's job. |
 | CA7 | **An entry's summary is declared on the entry.** `Entry.summary` is one line in `registry.py`'s declaration, and the route serves it — not a docstring parsed at read time, and not a string in Studio. A golden test refuses an entry without one. |
 | CA5 | **Control flow is not in the catalogue.** `if` · `loop` · `map` · `retry` · `stop` are plan grammar ([§ 5](../../../orchestration.md)); they are documented with the plan, and a person looking for them here is told where they live rather than shown an entry that does not exist. |
 

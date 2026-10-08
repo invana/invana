@@ -337,7 +337,7 @@ class Effective:
     closures: list[Closure] = field(default_factory=list)
     as_of: str | None = None
     #: ``[{id, kind, key, name, version}]`` — which lenses were composed, in
-    #: order. ``name`` is carried as well as ``key`` because the run dashboard
+    #: order. ``name`` is carried as well as ``key`` because the run board
     #: names the world a run *was* asked under, and a rename since must not
     #: change what a past run says about itself
     #: ([GR3](docs/for-developers/modules/govern/features/guardrails.md)).
@@ -430,7 +430,7 @@ def from_snapshot(snapshot: dict[str, Any] | None) -> Effective:
 
     The inverse of :meth:`Effective.as_snapshot`, and it lives beside it so the
     two cannot drift: what the interpreter dispatches under, what the run
-    dashboard reads back and what an auditor is shown are one parse of one
+    board reads back and what an auditor is shown are one parse of one
     document.
 
     A run opened before Govern shipped carries no snapshot, and the widest state

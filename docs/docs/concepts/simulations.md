@@ -226,4 +226,4 @@ WS /ws/simulation-stream
 ## What's Next?
 
 - [Algorithms](algorithms.md) — Use algorithms as simulation inputs
-- [Studio: Simulation Dashboard](../studio/simulation-dashboard.md) — Visual builder
+- [Studio: Simulation Board](../studio/simulation-board.md) — Visual builder

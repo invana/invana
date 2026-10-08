@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-Renders = Literal["canvas", "dashboard"]
+Renders = Literal["canvas", "declared"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,7 +35,7 @@ def _drawn(kind: str, subject: str = "", *, required: bool = False) -> BoardKind
 
 
 def _declared(kind: str, subject: str) -> BoardKindSpec:
-    return BoardKindSpec(kind=kind, renders="dashboard", subject_required=True, subject=subject)
+    return BoardKindSpec(kind=kind, renders="declared", subject_required=True, subject=subject)
 
 
 #: The whole axis. There is no ``dataset`` kind — records are imported *into a
@@ -60,7 +60,7 @@ BOARD_KINDS: dict[str, BoardKindSpec] = {
         # reading somebody can reproduce by opening the same two ids.
         _declared("compare", 'two root task_runs.id joined by ":"'),
         # Skills' three readings
-        # (docs/for-developers/building-studio/skills-dashboards.md). `skill`
+        # (docs/for-developers/building-studio/skills-boards.md). `skill`
         # and `skill_usage` name the same record and are not the same page:
         # one is what the playbook **declares** and will engage, drawn from its
         # plan; the other is what **happened** when it was offered, drawn from
@@ -119,8 +119,8 @@ def renders(kind: str) -> Renders:
 
 
 def is_declared(kind: str) -> bool:
-    return BOARD_KINDS[kind].renders == "dashboard"
+    return BOARD_KINDS[kind].renders == "declared"
 
 
 DRAWN_KINDS = tuple(k for k, s in BOARD_KINDS.items() if s.renders == "canvas")
-DECLARED_KINDS = tuple(k for k, s in BOARD_KINDS.items() if s.renders == "dashboard")
+DECLARED_KINDS = tuple(k for k, s in BOARD_KINDS.items() if s.renders == "declared")

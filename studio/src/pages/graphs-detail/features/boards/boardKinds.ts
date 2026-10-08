@@ -180,7 +180,7 @@ export const CANVAS_KINDS: Record<CanvasKind, CanvasKindSpec> = {
  * on.
  *
  * `kind` stays one flat axis — a declared row simply carries no `nodes`,
- * `edges`, `footer`, `hasLayers` or `writesFromGesture`, because a dashboard
+ * `edges`, `footer`, `hasLayers` or `writesFromGesture`, because a board
  * has no legend and no gesture. That is § 5.1's table, as a union rather than
  * as six fields nobody fills in.
  */
@@ -205,7 +205,7 @@ export type BoardKind = CanvasKind | DeclaredKind;
 
 export interface DeclaredKindSpec {
 	kind: DeclaredKind;
-	renders: "dashboard";
+	renders: "declared";
 	label: string;
 	icon: ElementType;
 	/** Which section opens it. */
@@ -219,16 +219,16 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	// the Graph rather than to a record, so it offers no `Save report`.
 	runs: {
 		kind: "runs",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Runs",
 		icon: LayoutDashboard,
-		// `Dashboard` on the Runs panel's header.
+		// `Board` on the Runs panel's header.
 		panel: "runs",
 		subject: "the graph's slug",
 	},
 	run: {
 		kind: "run",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Run",
 		icon: LayoutDashboard,
 		// `More` on a run in the Runs panel.
@@ -237,7 +237,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	},
 	plan_runs: {
 		kind: "plan_runs",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Plan",
 		icon: LayoutDashboard,
 		// A plan in Library › Plans — its flow with per-task medians and its runs.
@@ -248,7 +248,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	// Studio-only like `runs`: none offers `Save report`.
 	plan_versions: {
 		kind: "plan_versions",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Versions",
 		icon: History,
 		panel: "library",
@@ -256,7 +256,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	},
 	plan_arguments: {
 		kind: "plan_arguments",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Arguments",
 		icon: SlidersHorizontal,
 		panel: "library",
@@ -264,7 +264,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	},
 	plan_export: {
 		kind: "plan_export",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Export YAML",
 		icon: FileCode,
 		panel: "library",
@@ -272,10 +272,10 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	},
 	task_run: {
 		kind: "task_run",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Step",
 		icon: SquareActivity,
-		// A task on the run dashboard's flow — never a list row of its own.
+		// A task on the run board's flow — never a list row of its own.
 		panel: "runs",
 		subject: "one attempt of a task — a child task_runs.id",
 	},
@@ -290,20 +290,20 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	// another, so there is no record behind it to key on.
 	compare: {
 		kind: "compare",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Compare",
 		icon: GitCompareArrows,
-		// `Compare…` in the Worlds section, or the run dashboard's lens band.
+		// `Compare…` in the Worlds section, or the run board's lens band.
 		panel: "govern",
 		subject: 'two root task_runs.id joined by ":"',
 	},
-	// Skills (docs/for-developers/building-studio/skills-dashboards.md).
+	// Skills (docs/for-developers/building-studio/skills-boards.md).
 	// `skill` is the skill's page — it authors, like `agent`. `skill_usage`
 	// names the same record and is **not** the same page: it is what happened
 	// when the skill was offered, drawn from `task_runs`.
 	skill: {
 		kind: "skill",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Skill",
 		icon: Scale,
 		// `Open` on the Skills section's selected row.
@@ -315,7 +315,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	// version would be seven boards each holding a seventh of one reading.
 	skill_usage: {
 		kind: "skill_usage",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Usage",
 		icon: TrendingUp,
 		// `Usage…` on the skill board, or `More` on the section's Usage tab.
@@ -324,7 +324,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	},
 	rule: {
 		kind: "rule",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Rule",
 		icon: Quote,
 		// `More` on the Rules section, drilled in.
@@ -340,7 +340,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	// after the lens, so a strip of four worlds reads as four worlds.
 	world: {
 		kind: "world",
-		renders: "dashboard",
+		renders: "declared",
 		label: "World",
 		icon: Globe,
 		// The Worlds drill-in opens it.
@@ -349,7 +349,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	},
 	guardrail: {
 		kind: "guardrail",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Guardrail",
 		icon: ShieldCheck,
 		// The Guardrails drill-in opens it.
@@ -361,7 +361,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	// strip of three tabs all reading `Agent` has to be clicked through to read.
 	agent: {
 		kind: "agent",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Agent",
 		icon: Bot,
 		// `Open` on the Agents section; the list stays beside it.
@@ -373,7 +373,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	// second board, so its tab reads `All models` or the model's name.
 	models: {
 		kind: "models",
-		renders: "dashboard",
+		renders: "declared",
 		label: "Models",
 		icon: Boxes,
 		// Switching the `leftNav` to Models opens it.
@@ -411,7 +411,7 @@ export interface BoardPageId {
 	/**
 	 * What the page is *of*: the board row for a drawn kind — a drawing is the
 	 * subject of itself — and the subject record for a declared one, which is
-	 * the only address a live dashboard has, because it has no row.
+	 * the only address a live board has, because it has no row.
 	 */
 	id: string;
 	/** Set when the page is a frozen reading. */
@@ -476,7 +476,7 @@ export function declaredPage(
  * trace-reading kinds share, which is why a step board carries it rather than
  * fetching its own (see-what-ran.md).
  *
- * **It is optional, because a skill has no run** (skills-dashboards.md).
+ * **It is optional, because a skill has no run** (skills-boards.md).
  * Carrying a placeholder one would put a fact on the record that nothing wrote
  * and something would eventually read.
  */

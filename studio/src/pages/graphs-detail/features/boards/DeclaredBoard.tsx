@@ -7,7 +7,7 @@
  * knowledge, so it is put here once rather than threaded through six
  * components that have no other use for it. A page gains both acts by calling
  * `useReport(spec)`: `Save report` keeps this reading, `Reports` finds a kept
- * one. They are a pair and they sit together, on the dashboard's **own**
+ * one. They are a pair and they sit together, on the board's **own**
  * header — a canvas' History is a strip control only because a canvas has no
  * header to put one on.
  *
@@ -59,7 +59,7 @@ export function DeclaredBoard({
 		[username, graphSlug, kind, subjectId, onOpenVersion, openReports],
 	);
 
-	// Only while the card is open: a dashboard nobody asked the question of
+	// Only while the card is open: a board nobody asked the question of
 	// should not be fetching a list nobody is reading.
 	const reports = useBoardReportsQuery(
 		username,
@@ -80,7 +80,7 @@ export function DeclaredBoard({
 						isLoading={reports.isLoading}
 						versions={reports.data?.items ?? []}
 						fallbackLabel="Report"
-						empty="No reports of this board yet. A live dashboard re-reads its subject every time it opens — Save report keeps the numbers as they are right now."
+						empty="No reports of this board yet. A live board re-reads its subject every time it opens — Save report keeps the numbers as they are right now."
 						// A report **opens**; it does not restore. There is nothing to
 						// fork into, because the live board is always there.
 						action={(report) => ({

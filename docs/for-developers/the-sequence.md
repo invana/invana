@@ -95,7 +95,7 @@ every row in it is a leftover with no dependents, the Studio track because
 | | |
 |---|---|
 | Ships | [14.1 Worlds](modules/govern/features/worlds.md) · [14.2 Guardrails](modules/govern/features/guardrails.md) · the touch-record half of [10.5](modules/operate/features/see-what-ran.md) |
-| Order | P0 axes → **P2** the `Lens` record (**this is M7**) → P3 interpreter enforcement → P5 Studio · Govern → P4 the touch record → P6 the run dashboard and the rail |
+| Order | P0 axes → **P2** the `Lens` record (**this is M7**) → P3 interpreter enforcement → P5 Studio · Govern → P4 the touch record → P6 the run board and the rail |
 | Records | M7 |
 | Detail | [lens-migration.md](building-engine/lens-migration.md) |
 | Done when | the same question in two worlds gives two answers whose difference is a diff of what each touched, and `Deal.revenue` narrowed out means no query returns it, no aggregate reveals it and no prompt carries it |

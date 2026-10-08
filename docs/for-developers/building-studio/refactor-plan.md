@@ -83,7 +83,7 @@ Where a row here and [module-structure.md](../module-structure.md) §4 *Kit subs
 | `explorer/LayersPanel.tsx` | 646 | `LayersViewPanel` |
 | `explorer/ExpandFineTunePanel.tsx` | 418 | Kept, as `ExpandNeighboursDialog` — it fetches neighbours from the engine; the kit panels only filter what is drawn |
 | `modeller/PropertyEditor.tsx` | 415 | `PropertiesEditor` |
-| `explorer/CanvasTabsBar.tsx` | 269 | `BoardPagesViewPanel`, and with it the four-branch ternary in `mainSection`. The layout is the small half; extracting a `DataBoardPage` that owns one board's state is the work. See [the-shell.md](the-shell.md) › *The Explorer's main region is a page host already* |
+| `explorer/CanvasTabsBar.tsx` | 269 | `Workbook`, and with it the four-branch ternary in `mainSection`. The layout is the small half; extracting a `DataBoardPage` that owns one board's state is the work. See [the-shell.md](the-shell.md) › *The Explorer's main region is a page host already* |
 | `work/WorkCanvasChrome.tsx` | 193 | `CanvasMessageBar` + `GraphLegendLayerEditorPanel` |
 | `explorer/InspectorViewPanel.tsx` | 178 | `ElementInspectorViewPanel`, after the kit gains `isMissing(id)` and `propertyFilter`; a short host passes `renderExtra={ProvenanceBlock}` |
 | `explorer/StylingPanel.tsx` | 190 | `StylingViewPanel` with `apply={false}` — Studio keeps painting |
@@ -109,7 +109,7 @@ three now root on `<GraphCanvas>`, imported under its own name — no `as Canvas
 the component's name is the thing that matters here. Any new canvas whose children use the graph
 hooks roots on `<GraphCanvas>`.
 
-`BoardPagesViewPanel` is the one to study — [the-shell.md](the-shell.md) is the contract it fixes.** It renders the tab strip *and* the page bodies as one
+`Workbook` is the one to study — [the-shell.md](the-shell.md) is the contract it fixes.** It renders the tab strip *and* the page bodies as one
 column, and `keepMounted` means a tab switch is visibility, not a remount — each board keeps its
 camera, layout and selection. It replaces `CanvasTabsBar` *and* the canvas-tab state in
 `useCanvasTabs`. The reference is `canvas-ui/apps/AppLayoutV2` in the canvas Storybook: the canvas-side
@@ -354,7 +354,7 @@ no consumer impact.
 | `shell/GraphDetail.tsx` | `PAGE_OWNED_SECTIONS` · `ALL_NATIVE_SECTIONS` | `PAGE_OWNED_KEYS` · `NATIVE_KEYS` |
 | | `headerRightExtras` · `footerRightExtras` | `headerRight` · `footerRight` |
 | | `statusMetrics` | `footerMetrics` |
-| | `headerPanelControls` | dropped — the toggles move to `BoardPagesViewPanel`'s `headerActions` ([the-shell.md](the-shell.md)) |
+| | `headerPanelControls` | dropped — the toggles move to `Workbook`'s `headerActions` ([the-shell.md](the-shell.md)) |
 | `shell/ConnectionStatusBar.tsx` | `ConnectionStatusBar` | `ConnectionStatus` — the `footer` *is* the bar |
 | `features/explore/assistant/` → **`features/ask/assistant/`** | `AssistantDrawer` · `AssistantDrawerShell` · `useAssistantDrawer` | ✅ done — the shell is **deleted** (its attachment chip belongs to the composer, AD10) and the hook is `shared/useRightSection`. A region hook lives beside `useLeftSection`, not inside one of the region's occupants |
 | `components/header/UserMenu.tsx` | "rail" | `leftNav` |

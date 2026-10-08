@@ -136,7 +136,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			username={username as string}
 			graphSlug={graphSlug as string}
 			onClose={closeLeftPanel}
-			onOpenRunDashboard={(runId, stepId) =>
+			onOpenRunBoard={(runId, stepId) =>
 				openBoard({ kind: "run", subjectId: runId, runId, stepId })
 			}
 			// The journal drawn wide, beside the list.
@@ -176,7 +176,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			onSelectSkill={setSelectedSkillId}
 			// `Open` — the skill's page, and the stack stays.
 			onOpenSkillPage={(id) => openBoard({ kind: "skill", subjectId: id })}
-			onOpenRuleDashboard={(id) => openBoard({ kind: "rule", subjectId: id })}
+			onOpenRuleBoard={(id) => openBoard({ kind: "rule", subjectId: id })}
 		/>
 	) : settingsPanel.section === "govern" ? (
 		// Govern holds Worlds over Guardrails as two sections of one panel,

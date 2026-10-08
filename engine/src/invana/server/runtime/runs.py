@@ -343,10 +343,10 @@ _CEILINGS = (
 
 
 def run_ceilings(run: TaskRun, agent: Agent) -> dict[str, Any]:
-    """Every ceiling the run dashboard draws a spend or a count against.
+    """Every ceiling the run board draws a spend or a count against.
 
     Effort is its own column (EB9) and is read beside the spend ceilings. Every
-    ceiling, not the two the dashboard drew first: a run's spend reads against
+    ceiling, not the two the board drew first: a run's spend reads against
     its **per-run** ceiling, and the month one belongs beside it or neither
     number says its window ([EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
     `max_cost_usd` rides along for one release under its old name.

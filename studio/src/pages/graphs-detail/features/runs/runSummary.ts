@@ -26,7 +26,7 @@ import type { TraceRead } from "@/pages/graphs-detail/features/runs/api";
 import {
 	durationMs,
 	originOf,
-} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
+} from "@/pages/graphs-detail/features/runs/boards/runBoards";
 import type { TraceWindow } from "@/services/telemetry/traceLink";
 
 export interface SummaryRow {

@@ -1,7 +1,7 @@
 """The citation names the query that produced the number.
 
 A digest proves a difference without showing one. Under a world that slices,
-the step dashboard's **Input** band prints the query the plan asked for beside
+the step board's **Input** band prints the query the plan asked for beside
 a row count the *rewritten* query produced — so a reader who copies it out gets
 a different answer. [GV34](docs/for-developers/modules/govern/spec.md) records
 the text that ran, and records it nowhere else.
@@ -39,7 +39,7 @@ def test_a_rewritten_query_records_the_text_that_ran() -> None:
     )
 
     assert record["executed_query"] == _EXECUTED
-    # Both halves, because the step is the only place a dashboard can read
+    # Both halves, because the step is the only place a board can read
     # them: an ask run's `args` carry `read_only` and nothing else.
     assert record["generated_query"] == _GENERATED
     # And the digests still disagree, so the proof and the evidence are both

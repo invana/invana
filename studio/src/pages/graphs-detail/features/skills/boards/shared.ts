@@ -23,7 +23,7 @@ import type {
 
 /** Action ids the three pages answer. The spec carries the string; the page carries the behaviour. */
 export const SKILL_ACTIONS = {
-	/** `Dashboard ¦ spec.json`. */
+	/** `Board ¦ spec.json`. */
 	view: "view",
 	/** Which published version the tiles and the flow are of. */
 	version: "version",

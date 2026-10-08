@@ -1,5 +1,5 @@
 /**
- * The icon names a dashboard spec may use, whichever module composed it.
+ * The icon names a board spec may use, whichever module composed it.
  *
  * `@invana/boards` carries **strings** in the spec and takes the components
  * as a prop, so the package pulls in no icon set of its own and a spec stays
@@ -15,7 +15,7 @@ import {
 	MoreHorizontal,
 } from "lucide-react";
 
-export const DASHBOARD_ICONS = {
+export const BOARD_ICONS = {
 	prev: ChevronLeft,
 	next: ChevronRight,
 	file: FileText,

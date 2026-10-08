@@ -47,7 +47,7 @@ export interface CompareBoardPageProps {
 	graphSlug: string;
 	runA: string;
 	runB: string;
-	/** Open either run's own dashboard — the answers live there, not here. */
+	/** Open either run's own board — the answers live there, not here. */
 	onOpenRun: (runId: string) => void;
 }
 

@@ -17,7 +17,7 @@ class TokenUsage:
 class Exchange:
     """What was sent and what came back, as text — for a reader, not for a plan.
 
-    The step dashboard draws these two as its Output band
+    The step board draws these two as its Output band
     (docs/for-developers/modules/operate/features/see-what-ran.md SR42), so they
     are **truncated on write** with the cut stated in the text: a trace row is
     not where a megabyte of prompt belongs.

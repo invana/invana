@@ -1,7 +1,7 @@
 import { usd } from "@/lib/format";
 
 /**
- * The run dashboard, composed — artboard ([34k](../../../../../../docs/for-developers/the-screens.md)).
+ * The run board, composed — artboard ([34k](../../../../../../docs/for-developers/the-screens.md)).
  *
  * A pure function of one `GET …/runs/{id}/trace` ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
  * tiles · the flow with status on it · the Gantt · what opened the run and
@@ -56,12 +56,12 @@ import {
 	tileToneOf,
 	toneOf,
 	VIEW_ACTION,
-	VIEW_DASHBOARD,
+	VIEW_BOARD,
 	VIEW_SPEC,
-} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
+} from "@/pages/graphs-detail/features/runs/boards/runBoards";
 import { taskFlowFromRun } from "@/pages/graphs-detail/features/runs/boards/taskFlowFromRun";
 import { runSummary } from "@/pages/graphs-detail/features/runs/runSummary";
-import type { WithFlow } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
+import type { WithFlow } from "@/pages/graphs-detail/shared/boards/TaskFlowWidget";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 /** Action ids the page answers. The spec carries the string; the page carries the behaviour. */
@@ -87,7 +87,7 @@ const RUN_TABS = ["overview", "layers", "flow", "touched"] as const;
 export type RunTab = (typeof RUN_TABS)[number];
 
 export interface RunBoardView {
-	/** `Dashboard` or `spec.json`. */
+	/** `Board` or `spec.json`. */
 	view: string;
 	/** The active tab. */
 	tab: RunTab;
@@ -108,12 +108,12 @@ export interface RunBoardView {
 }
 
 /**
- * The panel kinds this dashboard draws beyond the built-ins.
+ * The panel kinds this board draws beyond the built-ins.
  *
  * `RunPanelOptions` is the kit's own run vocabulary — `trace · touched ·
  * attempts · artifacts · lens · clarification` — registered as
  * `RUN_PANELS`. `flow` is the one Studio still owns: a run's plan on a canvas
- * is `@invana/canvas`, which a dashboard package does not depend on.
+ * is `@invana/canvas`, which a board package does not depend on.
  *
  * What stays here is the **composing**: the layers `gantt` and `lens` are
  * drawn by the kit and fed from Govern's ledger, because how a
@@ -148,7 +148,7 @@ export function runBoardSpec(
 		actions: omit([
 			{
 				id: RUN_ACTIONS.view,
-				options: [VIEW_DASHBOARD, VIEW_SPEC],
+				options: [VIEW_BOARD, VIEW_SPEC],
 				value: view,
 			},
 			// Comparing needs a run that has finished — two traces, placed side by
@@ -193,7 +193,7 @@ export function runBoardSpec(
 	};
 
 	// `spec.json` renders the document it is inside — the same spec, in one code
-	// panel — which is what makes "a dashboard is data" checkable rather than
+	// panel — which is what makes "a board is data" checkable rather than
 	// claimed ([boards.md](../../../../../../docs/for-developers/modules/explore/features/boards.md)).
 	return view === VIEW_SPEC
 		? { ...spec, tabs: undefined, rows: [{ panels: [specPanel(spec)] }] }

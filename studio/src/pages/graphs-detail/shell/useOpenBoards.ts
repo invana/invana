@@ -53,7 +53,7 @@ export function useOpenBoards(
 		return out;
 	}, [planLibrary.data]);
 	const libraryPlanKey = useLibraryViewPanel().planKey;
-	// The **declared** boards that are open — a run dashboard, and a step's
+	// The **declared** boards that are open — a run board, and a step's
 	// (see-what-ran.md). They are pages like any other, keyed
 	// `<kind>:<subject_id>`, so the tab strip carries them beside the canvases
 	// and `More` opens one rather than growing the section.

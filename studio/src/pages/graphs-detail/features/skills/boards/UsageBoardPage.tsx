@@ -18,8 +18,8 @@ import {
 	useSkillsQuery,
 	useSkillUsageQuery,
 } from "@/pages/graphs-detail/features/skills/queries";
-import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import { VIEW_DASHBOARD } from "@/pages/graphs-detail/shared/dashboardSpec";
+import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
+import { VIEW_BOARD } from "@/pages/graphs-detail/shared/boardSpec";
 
 export interface UsageBoardPageProps {
 	username: string;
@@ -42,7 +42,7 @@ export function UsageBoardPage({
 	const skills = useSkillsQuery(username, graphSlug);
 	const skill = skills.data?.items.find((s) => s.id === skillId) ?? null;
 	const usage = useSkillUsageQuery(username, graphSlug, skillId);
-	const [view, setView] = useState(VIEW_DASHBOARD);
+	const [view, setView] = useState(VIEW_BOARD);
 	const [version, setVersion] = useState<number | null>(null);
 
 	const spec = useMemo(
@@ -78,7 +78,7 @@ export function UsageBoardPage({
 		<Board
 			className="h-full min-h-0"
 			spec={report.spec}
-			icons={DASHBOARD_ICONS}
+			icons={BOARD_ICONS}
 			onAction={(id, ctx) => {
 				if (report.handle(id)) return;
 				switch (id) {

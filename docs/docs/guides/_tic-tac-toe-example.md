@@ -134,7 +134,7 @@ curl -X POST http://localhost:8000/api/v1/simulations/{sim_id}/run
 
 ### Watch in Real Time
 
-In Studio, open the **Simulation Dashboard** to watch games play out on the graph canvas. Each move highlights the claimed cell and updates the board visualization.
+In Studio, open the **Simulation Board** to watch games play out on the graph canvas. Each move highlights the claimed cell and updates the board visualization.
 
 ## Step 6: Analyze Results
 
@@ -235,4 +235,4 @@ curl -X POST http://localhost:8000/api/v1/simulations/{sim_id}/hypothesis \
 
 - [Running Simulations](_running-simulations.md) — more simulation patterns
 - [Algorithms](../concepts/algorithms.md) — graph algorithms for analysis
-- [Simulation Dashboard](../studio/simulation-dashboard.md) — visualization and monitoring
+- [Simulation Board](../studio/simulation-board.md) — visualization and monitoring

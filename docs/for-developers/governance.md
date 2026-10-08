@@ -38,7 +38,7 @@ receipt. The two halves are one loop ([§1](#1-the-loop)), and the **lens** is w
 | [7](#7-bounds-narrow-never-widen) | Bounds narrow | allow intersects, deny accumulates, per layer |
 | [8](#8-cost--what-was-spent-and-what-was-not) | Cost | spent, avoided, and by layer |
 | [9](#9-one-continuous-flow) | One continuous flow | no wrap, no *continues below*, and bands that expand |
-| [10](#10-the-detail-surface) | The detail surface | the step dashboard, and the bands it grows |
+| [10](#10-the-detail-surface) | The detail surface | the step board, and the bands it grows |
 | [11](#11-plan-and-run-are-two-drawings) | Plan and run | the same layers, deliberately different ground |
 | [12](#12-where-each-decision-lands) | Where each decision lands | question → feature file |
 | [13](#13-what-this-adds-to-the-record) | What this adds | every new column and document, in one table |
@@ -251,7 +251,7 @@ is composed from.
 
 It is the same argument [SR12](modules/operate/features/see-what-ran.md) makes for Runs: *this run →
 its world → retune → run again* stays in one column and never closes what you came from — which is
-exactly what `Retune` on the run dashboard needs ([§10](#10-the-detail-surface)). A fifth icon would
+exactly what `Retune` on the run board needs ([§10](#10-the-detail-surface)). A fifth icon would
 also be the shape [SR7](modules/operate/features/see-what-ran.md) warns about, where an icon per kind
 turned one journal into four panels.
 
@@ -815,7 +815,7 @@ readings of a plan, and it takes a toggle to get to.
 ### The governing figure
 
 The tuning loop needs one number the product does not have: **spend by layer, then by participant.**
-*The llm layer is 94% of the bill and the `extract` role is half of it* is what turns a dashboard into
+*The llm layer is 94% of the bill and the `extract` role is half of it* is what turns a board into
 an edit to the cast. It is a grouping of `cost_usd` by the address the touches already carry — no new
 source ([OB1](modules/operate/features/observability.md)).
 
@@ -893,16 +893,16 @@ never reaches for a cache* is a finding, not an absence.
 from reaching a participant and never reaching for one are the two facts this drawing exists to
 separate, so the mute follows *nothing happened here* and never *something was denied here*.
 
-### The strip is the run dashboard's default
+### The strip is the run board's default
 
-**The dashboard opens on the six bands**, `graph data` and `llm` expanded
+**The board opens on the six bands**, `graph data` and `llm` expanded
 ([D16](#14-decisions-settled)). The unrolled tree, the nesting and the sequence are **toggles over
 the same trace** — no second fetch, no second spec
 ([SR30](modules/operate/features/see-what-ran.md)). The Gantt is not among them: the strip is one
 ([D20](#14-decisions-settled)), so there is no second drawing of duration to keep in step.
 
 Nothing is lost by demoting the Gantt here: [SR13](modules/operate/features/see-what-ran.md) already
-splits the surfaces — *the drawer is an overview, the dashboard is the detail* — and the Gantt is the
+splits the surfaces — *the drawer is an overview, the board is the detail* — and the Gantt is the
 drawer's overview, so *where did the time go* is answered before this page is opened. The question
 this page now answers is *what was this grounded in, what did it touch, and what was refused*.
 
@@ -940,16 +940,16 @@ vertical axis is spent, and expansion needs all of it.
 
 ### The unification worth noticing
 
-**They share a mechanic, not a shape.** `TaskGantt` has time on x and a task per row; the layer flow
+**They share a mechanic, not a shape.** `Gantt` has time on x and a task per row; the layer flow
 has `seq` on x and a band or participant per row. Both scroll horizontally under a frozen label
 column and both take the trace unchanged — but the Gantt's rows *are* its data, while the flow's rows
 **group** its data, expanding, collapsing and capping at `+ n more`; and a step sits in exactly one
 Gantt row while lighting several flow rows.
 
 So they are **two components over one primitive** ([D13](#14-decisions-settled)): the
-frozen-label-column scroller moves into `@invana/ui`, and `TaskGantt` and `TaskLayerFlow` are built
+frozen-label-column scroller moves into `@invana/ui`, and `Gantt` and `TaskLayerFlow` are built
 on it. Each keeps one row model, one expansion behaviour and one meaning for clicking a row — and
-`TaskGantt`, which three surfaces already depend on ([SR21](modules/operate/features/see-what-ran.md)),
+`Gantt`, which three surfaces already depend on ([SR21](modules/operate/features/see-what-ran.md)),
 is not widened to carry the newest drawing in the product.
 
 ---
@@ -1086,14 +1086,14 @@ nav item, and `LLMs` moved to Agents rather than staying in settings* ·
 ([§3.0](#30-kind--a-guardrail-and-a-world-are-one-record)) ·
 **D17 — naming is sharing**: an unnamed lens is private to its run, a named one is the Graph's
 ([§3.0](#30-kind--a-guardrail-and-a-world-are-one-record)) ·
-**D16 — the layer strip is the run dashboard's default**, the other drawings toggles over one trace
+**D16 — the layer strip is the run board's default**, the other drawings toggles over one trace
 ([§9](#9-one-continuous-flow)) ·
 **D15 — a replan is a revision divider inside one strip**, never a second strip
 ([§9](#9-one-continuous-flow)) ·
 **D14 — observed numbers are a switchable layer on the plan drawing**, off by default, stating their
 window and sample once ([§8](#8-cost--what-was-spent-and-what-was-not)) ·
 **D13 — two components over one shared primitive**: the frozen-label scroller moves into
-`@invana/ui`, and `TaskGantt` is not widened ([§9](#9-one-continuous-flow)) ·
+`@invana/ui`, and `Gantt` is not widened ([§9](#9-one-continuous-flow)) ·
 **D12 — everything is recorded, spine included** — the complete ledger on `TaskStream`, a readable
 projection in `result.json`, and `agent` a toggle on the Touches band
 ([§6](#6-the-touch-record)) ·

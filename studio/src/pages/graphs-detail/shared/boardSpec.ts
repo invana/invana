@@ -53,15 +53,15 @@ export function count(n: number): string {
 	return n.toLocaleString();
 }
 
-/** The `Dashboard ¦ spec.json` switch every declared board carries ([see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)). */
+/** The `Board ¦ spec.json` switch every declared board carries ([see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)). */
 export const VIEW_ACTION = "view";
-export const VIEW_DASHBOARD = "Dashboard";
+export const VIEW_BOARD = "Board";
 export const VIEW_SPEC = "spec.json";
 
 /**
  * The one panel `spec.json` renders — the very document being looked at.
  *
- * It is what makes *a dashboard is data* checkable rather than merely claimed:
+ * It is what makes *a board is data* checkable rather than merely claimed:
  * the page can show you the JSON it is, and a panel that could not be
  * serialised would show up here as the hole it is.
  */

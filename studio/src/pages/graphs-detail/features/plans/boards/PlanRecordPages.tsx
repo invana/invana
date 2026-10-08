@@ -22,8 +22,8 @@ import {
 	useTaskPlansQuery,
 } from "@/pages/graphs-detail/features/plans/queries";
 import type { TaskPlanSummary } from "@/pages/graphs-detail/features/plans/types";
-import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import { routedAction } from "@/pages/graphs-detail/shared/dashboardSpec";
+import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
+import { routedAction } from "@/pages/graphs-detail/shared/boardSpec";
 
 interface RecordPageProps {
 	username: string;
@@ -73,7 +73,7 @@ function Frame({
 			className="h-full min-h-0"
 			spec={spec}
 			registry={{}}
-			icons={DASHBOARD_ICONS}
+			icons={BOARD_ICONS}
 			onAction={(action, context) => onAction(...routedAction(action, context))}
 		/>
 	);

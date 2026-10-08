@@ -109,7 +109,7 @@ Studio:
 | `form: human` (not a bound) | **human** |
 
 `cache` is the sixth band and no catalogue entry spends it yet; it is drawn dark, which is the same
-thing the run dashboard does.
+thing the run board does.
 
 ## 7. Studio
 

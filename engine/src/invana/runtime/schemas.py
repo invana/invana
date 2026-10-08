@@ -204,7 +204,7 @@ class TraceStep(BaseModel):
     output: dict | None = None
     error: dict | None = None
     #: The arguments this attempt actually ran with, after ``${…}`` binding —
-    #: what the step dashboard's **Input** band reads (SR33). Distinct from
+    #: what the step board's **Input** band reads (SR33). Distinct from
     #: ``input``: that is the digest a step chose to record, this is the
     #: resolved request.
     args: dict | None = None
@@ -245,7 +245,7 @@ class TraceRead(BaseModel):
     status: str
     #: The ask this run carries — ``nl`` · ``ql`` · ``import``.
     ask_kind: str | None = None
-    #: What it was about, in the words the opener wrote — the dashboard's crumb.
+    #: What it was about, in the words the opener wrote — the board's crumb.
     body: str | None = None
     outcome: str | None = None
     agent_id: str | None = None

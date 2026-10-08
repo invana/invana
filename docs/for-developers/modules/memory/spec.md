@@ -23,7 +23,7 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 | Noun | Is | Is not |
 |---|---|---|
 | **The record** | every run, step, emission, answer and outcome — owned by [Ask](../ask/spec.md), audited by Operate, **read** here | this module's data |
-| **Evidence** | what the record says about how well something worked | a metric dashboard |
+| **Evidence** | what the record says about how well something worked | a metric board |
 | **Recall** | an agent querying prior records mid-run, as a planned step | remembering |
 | **Proposal** | a suggested new version of an artefact, carrying its evidence and a diff | an automatic change |
 | **Consolidation** | a person accepting, editing or rejecting a proposal | training |

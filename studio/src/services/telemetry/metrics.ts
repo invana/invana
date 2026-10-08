@@ -1,6 +1,6 @@
 /**
  * Studio metrics: how long actions and requests take, how the page feels, and
- * how often a live stream drops — as numbers a dashboard can chart, not traces.
+ * how often a live stream drops — as numbers a board can chart, not traces.
  *
  * Usage:
  *

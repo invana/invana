@@ -41,13 +41,13 @@ import {
 	omit,
 	specPanel,
 	VIEW_ACTION,
-	VIEW_DASHBOARD,
+	VIEW_BOARD,
 	VIEW_SPEC,
-} from "@/pages/graphs-detail/shared/dashboardSpec";
+} from "@/pages/graphs-detail/shared/boardSpec";
 
 /** Action ids this page answers. The spec carries the string; the page the behaviour. */
 export const LENS_ACTIONS = {
-	/** `Dashboard ¦ spec.json`. */
+	/** `Board ¦ spec.json`. */
 	view: VIEW_ACTION,
 	/** `Edit` — puts the Govern section back on this lens, drilled in. */
 	edit: "edit",
@@ -64,7 +64,7 @@ const LAYER_LABEL: Record<GovernLayer, string> = {
 };
 
 export interface LensBoardView {
-	/** `Dashboard` or `spec.json`. */
+	/** `Board` or `spec.json`. */
 	view: string;
 	/**
 	 * Whether `Edit` is drawn at all. A guardrail's authoring controls are
@@ -98,7 +98,7 @@ export function lensBoardSpec(
 		actions: omit([
 			{
 				id: LENS_ACTIONS.view,
-				options: [VIEW_DASHBOARD, VIEW_SPEC],
+				options: [VIEW_BOARD, VIEW_SPEC],
 				value: view,
 			},
 			mayEdit

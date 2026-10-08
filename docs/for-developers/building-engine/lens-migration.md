@@ -188,15 +188,15 @@ opened from a schedule reads its world on the schedule ([WO5](../modules/govern/
 
 Two things, and they are independent of each other.
 
-**The run dashboard** — `TaskLayerFlow`, a new component over a new kit primitive:
+**The run board** — `TaskLayerFlow`, a new component over a new kit primitive:
 
 | | |
 |---|---|
 | Primitive | the frozen-label-column horizontal scroller → `@invana/ui` ([D13](../governance.md#14-decisions-settled)) |
 | Component | `TaskLayerFlow` — six bands, `graph data` and `llm` expanded, band caps at `+ n more`, refusals struck in place, role badges, no height encoding |
-| Default | the run dashboard opens on it; Gantt, tree and sequence are toggles over one trace ([D16](../governance.md#14-decisions-settled)) |
+| Default | the run board opens on it; Gantt, tree and sequence are toggles over one trace ([D16](../governance.md#14-decisions-settled)) |
 | Bands | `Touches` · `Slice` · `Egress` · `Attempts` · `Model` · `Cache` on the step page; `Layers touched` · `This run's lens` + **Retune** at run level |
-| `TaskGantt` | **not widened** — two components over one primitive |
+| `Gantt` | **not widened** — two components over one primitive |
 
 **The rail** — a reshape that touches every panel:
 

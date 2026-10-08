@@ -19,7 +19,7 @@
  * tabs for every open page — a canvas, a model, a plan. This page is one body
  * inside it. The five controls that act on *this* canvas — help, layers,
  * styling, history, rename — reach it through {@link BoardPageHandle}, because
- * `BoardHeaderAction` is strip-level and carries no page id.
+ * `WorkbookAction` is strip-level and carries no page id.
  *
  * Layers, Styling and History are **one at a time**: all three are cards pinned
  * to the canvas's top-right corner, so opening one closes the other
@@ -188,7 +188,7 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			[onFork],
 		);
 
-		// The strip's five canvas controls. `BoardHeaderAction.onClick` takes no
+		// The strip's five canvas controls. `WorkbookAction.onClick` takes no
 		// page id, so the shell cannot address this page by argument — it holds
 		// the handle instead and calls straight into it.
 		useImperativeHandle(

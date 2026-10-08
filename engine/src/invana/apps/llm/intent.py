@@ -152,7 +152,7 @@ class Intent:
     #: The rule statements it says it followed. Also a self-report.
     rules_cited: list[str] = field(default_factory=list)
     usage: TokenUsage | None = None
-    #: The call as a reader reads it — drawn as the step dashboard's Output
+    #: The call as a reader reads it — drawn as the step board's Output
     #: band (SR42). Not a declared output: a plan cannot bind a raw prompt.
     exchange: Exchange = field(default_factory=Exchange)
     duration_ms: float = 0.0
@@ -173,7 +173,7 @@ class OutOfScope:
 
     reason: str
     usage: TokenUsage | None = None
-    #: The call as a reader reads it — drawn as the step dashboard's Output
+    #: The call as a reader reads it — drawn as the step board's Output
     #: band (SR42). Not a declared output: a plan cannot bind a raw prompt.
     exchange: Exchange = field(default_factory=Exchange)
     duration_ms: float = 0.0
@@ -200,7 +200,7 @@ class Conversed:
     #: answer (NL14).
     choices: list[Choice] = field(default_factory=list)
     usage: TokenUsage | None = None
-    #: The call as a reader reads it — drawn as the step dashboard's Output
+    #: The call as a reader reads it — drawn as the step board's Output
     #: band (SR42).
     exchange: Exchange = field(default_factory=Exchange)
     duration_ms: float = 0.0

@@ -47,7 +47,7 @@ flowchart TD
 | Not enough runs | "12 runs — too few to read" rather than a misleading percentage |
 | A new version | Counts restart, and the previous version's are kept beside them |
 | Purged window | The counts stand; the run links say the payloads are gone |
-| Nothing wrong | An empty page that says so, not a dashboard of zeroes |
+| Nothing wrong | An empty page that says so, not a board of zeroes |
 
 ## Surfaces
 

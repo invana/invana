@@ -28,7 +28,7 @@ specific things, each of them checkable:
 |---|---|
 | The screen fills `AppLayoutV2`'s `leftSection` · `mainSection` · `rightSection` · `bottomSection` · `footer` ([DS12](modules/platform/features/design-system.md)) | ✅ **Done.** `App.tsx` for the four non-graph routes, and `GraphDetail` for the 36 graph-scoped ones — its hand-built `ResizablePanelGroup` is gone. Verified in the browser: a panel toggle holds the canvas's camera, which is the property the workaround existed to protect |
 | Nothing on the screen is a Studio component that shadows a kit one ([DS17](modules/platform/features/design-system.md)) | 8 files still do: `PanelChrome` · `RecordRow` · `EmissionCard` · `NotAnAnswer` · `TraceDialog` · `EventsTab` · `PlatformEventsPage` · `LayeredCanvas` |
-| Canvas chrome comes from `@invana/canvas-ui` rather than being re-grown | 3 files import it, and only for what moved there in the 0.0.12 bump. `LayersViewPanel`, `BoardPagesViewPanel`, `InspectorPanel` and `PropertiesEditor` are all still hand-written in Studio |
+| Canvas chrome comes from `@invana/canvas-ui` rather than being re-grown | 3 files import it, and only for what moved there in the 0.0.12 bump. `LayersViewPanel`, `Workbook`, `InspectorPanel` and `PropertiesEditor` are all still hand-written in Studio |
 
 Two kit packages are not installed at all: `@invana/tables` (`DataTable`, which batches 3–7 are
 mostly made of) and `@invana/editor` (`MarkdownEditorBlock`, `CodeBlock`).
@@ -138,25 +138,25 @@ composed from is [building-studio/design-kit-coverage.md](building-studio/design
 | 34e | `PlanRetire` | retiring a version — what stops, what keeps reading | Tasks › Plans › retire | [7.7](modules/workflows/features/draft-a-plan.md) | 🔵 | 🔵 | ❌ |
 | 34f | `CatalogueDetail` | an entry as a page — **considered, not built** ([CA6](modules/workflows/features/the-catalogue.md)); the detail is the drawer body and the contract card | Tasks › Catalogue | 🟡 | ⛔ | ❌ |
 | 34g | `RunDetail` | the light drawer — info, the Gantt, a line of log per task — beside the flow | Tasks › Runs › a run | [10.5](modules/operate/features/see-what-ran.md) | 🔵 | 🔵 | ❌ |
-| 34h | `RunDashboard` | what `More` opens — a declared board, `kind = run` | Tasks › Runs › dashboard | [10.5](modules/operate/features/see-what-ran.md) · [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
+| 34h | `RunDashboard` | what `More` opens — a declared board, `kind = run` | Tasks › Runs › board | [10.5](modules/operate/features/see-what-ran.md) · [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
 | 34i | `DrawerRunsList` | version C — the list, a running row live, a child indented | Tasks › Runs | [10.5](modules/operate/features/see-what-ran.md) | 🔵 | ✅ | ❌ |
 | 34i.1 | `DrawerRunsFiltered` | the list with `kind = import · bulk` | Tasks › Runs | [2.2](modules/bring-data-in/features/inspect-what-landed.md) | 🔵 | 🔵 | ❌ |
 | 34i.2 | `DrawerRunLive` | a run in flight — now line, climbing stats, tailing log, Cancel | Tasks › Runs › a run | [10.5](modules/operate/features/see-what-ran.md) | 🔵 | 🟡 | ❌ |
 | 34i.3 | `DrawerRunAll` | a run that finished — stats, the Gantt and the log, all in `leftContent` | Tasks › Runs › a run | [10.5](modules/operate/features/see-what-ran.md) | 🔵 | ✅ | ❌ |
 | 34j | `DrawerRunDebug` | the log filtered to one Task, Performance collapsed | Tasks › Runs › a run | [10.5](modules/operate/features/see-what-ran.md) | 🔵 | ✅ | ❌ |
-| 34k | `RunDash` | the run dashboard — the flow with status, the Gantt, what opened the run | Tasks › Runs › dashboard | [10.5](modules/operate/features/see-what-ran.md) · [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
-| 34l | `StepImport` | a step dashboard — output is graph data written | Tasks › Runs › a task | [10.5](modules/operate/features/see-what-ran.md) | ✅ | ✅ | ❌ |
+| 34k | `RunDash` | the run board — the flow with status, the Gantt, what opened the run | Tasks › Runs › board | [10.5](modules/operate/features/see-what-ran.md) · [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
+| 34l | `StepImport` | a step board — output is graph data written | Tasks › Runs › a task | [10.5](modules/operate/features/see-what-ran.md) | ✅ | ✅ | ❌ |
 | 34m | `StepQuery` | the same shell — output is rows | Tasks › Runs › a task | [10.5](modules/operate/features/see-what-ran.md) | ✅ | ✅ | ❌ |
 | 34n | `StepLlm` | the same shell — output is the prompt and completion | Tasks › Runs › a task | [10.5](modules/operate/features/see-what-ran.md) | ✅ | ✅ | ❌ |
-| 34o | `PlanDash` | the plan dashboard — the flow with per-task medians, arguments, its runs | Tasks › Plans › a plan | [7.1](modules/workflows/features/the-library.md) | 🔵 | 🔵 | ❌ |
+| 34o | `PlanDash` | the plan board — the flow with per-task medians, arguments, its runs | Tasks › Plans › a plan | [7.1](modules/workflows/features/the-library.md) | 🔵 | 🔵 | ❌ |
 | 34p | `PlanStepParams` | a task's parameters, generated from its catalogue contract | Tasks › Plans › draft › a task | [7.7](modules/workflows/features/draft-a-plan.md) | 🔵 | 🔵 | ❌ |
 | 34q | `CatalogueList` | 25 entries grouped by bound, each row carrying how many plans name it | Tasks › Catalogue | [7.6](modules/workflows/features/the-catalogue.md) | ✅ | ✅ | ❌ |
-| 34r | `SkillDash` | **superseded by 34y** — the skill dashboard — the trigger, the playbook, the flow mounted from the Flow tab, and the tab strip that proves the drawer kept its place | Skills › a skill › `More` | [6.1](modules/skills/features/authoring-a-skill.md) · [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
-| 34r.1 | `SkillDashDraft` | **superseded by 34y** — the same board on a **draft** — no tiles, and three bands that say *nothing published yet* rather than reporting a fault ([SD10](building-studio/skills-dashboards.md)) | Skills › a draft › `More` | [6.1](modules/skills/features/authoring-a-skill.md) | ✅ | ✅ | ❌ |
+| 34r | `SkillDash` | **superseded by 34y** — the skill board — the trigger, the playbook, the flow mounted from the Flow tab, and the tab strip that proves the drawer kept its place | Skills › a skill › `More` | [6.1](modules/skills/features/authoring-a-skill.md) · [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
+| 34r.1 | `SkillDashDraft` | **superseded by 34y** — the same board on a **draft** — no tiles, and three bands that say *nothing published yet* rather than reporting a fault ([SD10](building-studio/skills-boards.md)) | Skills › a draft › `More` | [6.1](modules/skills/features/authoring-a-skill.md) | ✅ | ✅ | ❌ |
 | 34y | `skills.skill.page` | the skill's page — a record header over Playbook · Flow · Bindings · Usage · Versions, the drawer's list and quick look beside it ([SK17](modules/skills/features/authoring-a-skill.md)) | Skills › a skill › `Open` | [6.1](modules/skills/features/authoring-a-skill.md) · [6.2](modules/skills/features/bindings.md) · [6.3](modules/skills/features/usage.md) | ✅ | ✅ | ❌ |
-| 34s | `UsageDash` | the usage dashboard — per version, by agent, by outcome, and the bounded step **list**, whose row is a step and not a run ([SD11](building-studio/skills-dashboards.md)) | Skills › a skill › Usage › `More` | [6.3](modules/skills/features/usage.md) | ✅ | ✅ | ❌ |
+| 34s | `UsageDash` | the usage board — per version, by agent, by outcome, and the bounded step **list**, whose row is a step and not a run ([SD11](building-studio/skills-boards.md)) | Skills › a skill › Usage › `More` | [6.3](modules/skills/features/usage.md) | ✅ | ✅ | ❌ |
 | 34s.1 | `UsageDashStates` | the gap as `—` twice — *no data yet* and *too few to read* — the draft's sentence in place of an empty grid, and what the surface never draws | Skills › a skill with no data › Usage | [6.3](modules/skills/features/usage.md) | ✅ | ✅ | ❌ |
-| 34t | `RuleDash` | the rule dashboard — the statement, offered · cited · **never cited**, the row's derived words, the versions with their own counts, and where each was cited | Skills › Rules › a rule › `More` | [6.4](modules/skills/features/rules.md) | ✅ | ✅ | ❌ |
+| 34t | `RuleDash` | the rule board — the statement, offered · cited · **never cited**, the row's derived words, the versions with their own counts, and where each was cited | Skills › Rules › a rule › `More` | [6.4](modules/skills/features/rules.md) | ✅ | ✅ | ❌ |
 | 34u | `BoardActs` | the two acts on a declared board's **own** header — `Save report` and `Reports` — and the strip's `data`-only gate, unchanged ([B21](building-engine/boards-migration.md)) | any declared board | [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
 | 34u.1 | `BoardStrip` | which control belongs to the strip and which to the header, and the one card behind two bindings | — (the argument) | [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
 | 34v | `BoardReports` | the `Reports` card — every reading kept of one board, newest first, a row that **opens** rather than restores ([B22](building-engine/boards-migration.md)) | a declared board › `Reports` | [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
@@ -374,7 +374,7 @@ title, character for character** — the canvas and this table are one string, n
 | `operate.runs.step.states` | In flight, failed on a spent bound, cancelled, recorded nothing, purged by retention and read-only: six readings of the same step shell | [10.5](modules/operate/features/see-what-ran.md) |
 | `operate.runs.step.exchange` | The same step shell when a person was asked: the question, the options, who chose and what the run did next | [10.5](modules/operate/features/see-what-ran.md) |
 
-**What the kit still owes these 16.** Eleven components, five extensions, seven `@invana/dashboard` panel kinds and three canvas items — listed with their build order in [building-studio/design-kit-coverage.md § 7](building-studio/design-kit-coverage.md#7-operate--runs--what-the-16-artboards-need),
+**What the kit still owes these 16.** Eleven components, five extensions, seven `@invana/boards` panel kinds and three canvas items — listed with their build order in [building-studio/design-kit-coverage.md § 7](building-studio/design-kit-coverage.md#7-operate--runs--what-the-16-artboards-need),
 queued with their status in [building-studio/components-todo.md](building-studio/components-todo.md).
 
 **What it supersedes.** `redesignd` drew the argument; this page draws the product. `In order` keeps
@@ -461,7 +461,7 @@ reads a run's ledger from a terminal.
 | W4 | `WorldLadder` | naming publishes, promoting binds | `key` + `name` · `promote` · `duplicate` · `delete` | `AlertDialog` · `CannotAnswerCard` | ✅ | ✅ |
 | G1 | `GovGuardrails` | Govern › Guardrails | `scope` · `can_edit_guardrails` · impact | `LayerSection` · `RuleRow` · `EgressList` · `DiffList` | ✅ | ✅ the drill-in, and a page kind `guardrail:<id>` ([GR14](modules/govern/features/guardrails.md)) |
 | G2 | `GuardrailEdit` | the rule builder | catalogue match resolution | `MatchPreview` · `AddressChip` | ✅ | ✅ |
-| R1 | `RunLens` | the run in six bands | `run_touches`, written by the interpreter | `LayerStrip` · `AddressChip` | ✅ | ✅ |
+| R1 | `RunLens` | the run in six bands | `run_touches`, written by the interpreter | `Gantt` · `AddressChip` | ✅ | ✅ |
 | R2 | `RunLensStep` | one step, generated vs executed | `run_touches.query` from the connector · `sent` from the cut | `EgressList` · `SliceSummary` | ✅ | ✅ |
 | R3 | `GovCompare` | two runs, one question | compare over `run_touches` | `DiffList` · `RecordHeader` | ✅ | ✅ a page kind, `compare:<a>:<b>` |
 | R4 | `Cast` | innermost wins, then checked | `LensRead.cast_resolved` | `CastTable` · `CannotAnswerCard` | ✅ | ✅ |
@@ -488,7 +488,7 @@ Three more on it keep the D1 option comparison and are not screens.
 
 | Artboard | Draws | API | Studio | Shell |
 |---|---|---|---|---|
-| `RunLens` | the run dashboard — six layer bands, the touch record, `This run's lens` ([D16](modules/govern/spec.md)) | 🔵 | 🔵 | ✅ |
+| `RunLens` | the run board — six layer bands, the touch record, `This run's lens` ([D16](modules/govern/spec.md)) | 🔵 | 🔵 | ✅ |
 | `GovWorlds` | Govern › Worlds — the drawer and the world chip | 🔵 | 🔵 | ✅ |
 | `GovWorld` | a world — five layer sections, the slice box | 🔵 | 🔵 | ✅ |
 | `GovGuardrails` | Govern › Guardrails, and what a save would cost ([GR2](modules/govern/features/guardrails.md)) | 🔵 | 🔵 | ✅ |

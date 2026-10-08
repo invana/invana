@@ -16,13 +16,13 @@ export function SkillBoardPage({
 	graphSlug,
 	skillId,
 	onOpenAgent,
-	onOpenUsageDashboard,
+	onOpenUsageBoard,
 }: {
 	username: string;
 	graphSlug: string;
 	skillId: string;
 	onOpenAgent: (agentId: string) => void;
-	onOpenUsageDashboard: (skillId: string) => void;
+	onOpenUsageBoard: (skillId: string) => void;
 }) {
 	// The same list the section reads, so the page and the row never disagree
 	// about version or draft.
@@ -54,7 +54,7 @@ export function SkillBoardPage({
 			editing={editing || skill.is_draft}
 			onEditing={setEditing}
 			onOpenAgent={onOpenAgent}
-			onOpenUsageDashboard={onOpenUsageDashboard}
+			onOpenUsageBoard={onOpenUsageBoard}
 		/>
 	);
 }

@@ -16,7 +16,7 @@ This is [the-shell.md](the-shell.md) made concrete for the graph page, and it su
 | G1 | There is one graph-scoped page component, `GraphDetailPage.tsx`. It composes `AppLayoutV2` and imports no feature module by name |
 | G2 | **`leftNav` carries one icon per `leftSection`, in two groups.** Top — *what you work in*: `Info · Explorer · Model · Skills · Projects · Runs · Library · Govern`. Bottom — *who it runs as, and what on*: `Agents · Events · Settings`, then `UserMenu`. Info leads because it is the graph itself and everything after it is something *in* the graph (G20); that it renders through `SettingsViewPanel` is an implementation fact. A module with several surfaces contributes several icons; `features/` groups the **code**, not the icons. An icon earns its place by being something a person *goes to*, which is why there is no Stitches item (G14) and no Templates item (G38) |
 | G3 | `leftSection` is the active item's own component. Every create, edit, delete and list CTA for that item happens there |
-| G4 | `mainSection` is always `BoardPagesViewPanel`. Nothing else ever renders there |
+| G4 | `mainSection` is always `Workbook`. Nothing else ever renders there |
 | G5 | `rightSection` is the Assistant while it is open, and the Inspector otherwise |
 | G6 | With no page open, `mainSection` shows **the graph page** — a page that cannot be closed, carrying the graph's name, connection state, counts and what was open recently |
 | G7 | A module contributes exactly two things: a `leftSection` component, and the page kinds it can open. Both come through one `GraphFeature` object |
@@ -24,13 +24,13 @@ This is [the-shell.md](the-shell.md) made concrete for the graph page, and it su
 | G9 | Names come from `@invana/design-kit`. The regions are `leftNav` · `leftSection` · `mainSection` · `rightSection` · `bottomSection` · `header` · `footer` — there is no second word for any of them |
 | G17 | **A symbol is renamed when its name is false, not when it is unprefixed** ([code-shape.md](code-shape.md) §4.1a). The folder is the prefix; a noun belongs to whoever the engine says owns it |
 | G10 | A file is named for its role, by the suffixes in [module-structure.md §5](../module-structure.md#5-component-names--one-meaning-per-suffix) — `XViewPanel` fills a region, `XSection` is one `PanelStackSection`, `XBoardPage` is a `mainSection` page, `XWidget` a tile on a board, `XTab` a tab body — and it sits in the folder of the module that owns it, named as the engine names that module |
-| G11 | `GraphDetailPage` is **`Themes/AppV2 › ExplorerShell`**, composed region for region. The single difference is `mainSection`, which is `BoardPagesViewPanel` instead of a hand-built strip over a canvas sibling |
-| G12 | `headerActions` on the strip is **strip-level, not per-page** (`BoardHeaderAction.onClick` takes no page id). The shell composes it per render from the active page's own actions plus its three region toggles |
+| G11 | `GraphDetailPage` is **`Themes/AppV2 › ExplorerShell`**, composed region for region. The single difference is `mainSection`, which is `Workbook` instead of a hand-built strip over a canvas sibling |
+| G12 | `headerActions` on the strip is **strip-level, not per-page** (`WorkbookAction.onClick` takes no page id). The shell composes it per render from the active page's own actions plus its three region toggles |
 | G13 | `bottomSection` carries `bottomSpan: 'main'` — it spans the canvas only, so `leftSection` and `rightSection` stay full height. Its **occupant is per board kind**: the **console** on `data` · `model` · `lineage` · `envelope`, and **parameters** — the selected task's form, contract and validation — on `plan` · `workflow` ([DP11](../modules/workflows/features/draft-a-plan.md#decisions)). A region is a slot, not a thing: the console is one occupant of this one, not its owner |
 | G16 | **One param per region, and its value is the occupant**: `?panel=` is the left column's open section, `?page=` is what fills `mainSection`, `?right=` is who holds `rightSection` — `assistant` · `inspector`, absent means closed, and on a draft board it defaults to `assistant` ([DP12](../modules/workflows/features/draft-a-plan.md#decisions)) — `?bottom=` is who holds `bottomSection` — `console` · `parameters`, absent means closed. The breadcrumb reads the URL back literally — `owner › graph › panel › object`, the panel crumb being the `?panel` value verbatim. A page that is **inside** another draws both — a step under its run, `… › runs › run:7d3184f1 › step:9b1c40e2 execute_query` ([SR54](../modules/operate/features/see-what-ran.md#decisions)). `?settings=` was this param's first name and is still **read**, never written; so are `?ai=` and `?inspector=open` |
 | G15 | **The graph's URL is the graph**: `/u/:username/:graphSlug` renders the page. There is no `/explorer` screen to be on — Explorer is one `leftNav` item of eight, and a URL that names it describes the page by whichever item happened to be first. `/explorer` and `/modeller` redirect to the root, carrying their query string |
 | G45 | **Opening a session opens its canvas and makes it the active page.** Every entry — a row in the assistant's list, a row in the Info panel's recent sessions (G22) — goes through `handleOpenSession`: a canvas already open as a tab is focused, one that exists but is closed is loaded as a tab, and a session with no canvas yet gets one created for it (the restore effect then paints its last query). Whatever page was in front — a declared board, a model, a work canvas, All models — steps behind it; nothing is closed. A session whose canvas cannot be loaded or created still opens its thread, with a toast |
-| G46 | **A dashboard tab closes from the tab; a canvas tab is managed from its caret.** A page whose kind `renders: "dashboard"` carries an inline `×` on its tab — active or not — and no caret menu, because the only other act, `Rename`, does not apply to a board titled by its kind. A canvas page keeps the `Rename` · `Close` caret on the active tab. The graph page has neither (G6) |
+| G46 | **A board tab closes from the tab; a canvas tab is managed from its caret.** A page whose kind `renders: "declared"` carries an inline `×` on its tab — active or not — and no caret menu, because the only other act, `Rename`, does not apply to a board titled by its kind. A canvas page keeps the `Rename` · `Close` caret on the active tab. The graph page has neither (G6) |
 | G44 | **A panel's status bar says where you are and what the panel means; the count slot is for what the drawers do not already print.** `PanelStatusBar` has three slots and they are not interchangeable — `left` is the crumb trail inside the panel, `middle` is a live count a reader would otherwise have to click each row to discover, and `right` is the one-line rule for the surface. The Library's old bar read *Library · Promoted (0) · 9 workflows · authoring: post-MVP*: counts in the crumb slot, and two of them already printed in the drawer headers a few pixels above. So the Library's bar carries `Library` — plus the plan it drilled into, because `&plan=` is where you are ([G42](#1-decisions)) — and *a plan composes the catalogue; a template renders what it produced*, with `middle` deliberately empty. **A status bar belongs to the panel, never to a drawer inside it**: one of three drawers drawing its own was what made the Library the only stacked panel with no bar of its own once that one was removed. |
 | G43 | **A drilled-in drawer's body is the record, and nothing else.** The drill-in replaces the drawer's body ([G33](#1-decisions)) — it does not sit under the list it came from, and the list's own chrome goes with it. `Plans` was drawing the record *beneath* all nine rows, under a footer of acts and a status bar, so the one thing the reader had asked for was the last thing in a scrolling column. Three rules settle it, and `Skills` already follows all three: the body is the detail alone; a list's acts belong to the list, so **Promote a plan…** is a header action on the list and gone while drilled in ([SK27](../modules/skills/features/authoring-a-skill.md)); and an act on the open record — **Export YAML** — sits beside `‹ Back` in the header rather than in the body, because the header is where a drill-in's acts live. **A drawer never draws a status bar.** One belongs to the panel, in `footer.left`; `Plans` carried its own — *Library · Promoted (0) · 9 workflows* — which put panel chrome inside one drawer of three, and repeated the count its own header already shows. |
 | G42 | **Picking a plan opens its page — the page follows `&plan=`, and there is no *open it* step to discover.** Every work panel opens something when a row is selected, and Library's `Plans` drawer opens the plan's page, `plan_runs:<plan_id>`, for the newest version of the key it drilled into ([LB24](../modules/workflows/features/the-library.md#decisions)). One fact has one home: the drawer names what it drilled into in `&plan=`, and the page reads that rather than a second piece of page state a button has to set — so `?panel=library&section=plans&plan=<key>` reopens the page as well as the drawer ([G31](#1-decisions)). **Clearing `&plan=` goes back to the list and leaves the page alone**: a panel opens a page and never closes one, so closing stays the tab's `X`. The `workflow` canvas is reached only from a run, as *the plan it ran*. |
@@ -70,7 +70,7 @@ This is [the-shell.md](the-shell.md) made concrete for the graph page, and it su
 | `header.right` | theme · the Assistant toggle | shell |
 | `leftNav` | ten icons, one per module, plus the settings group and the profile menu | shell, read from the registry |
 | `leftSection` | the active module's component | the module |
-| `mainSection` | `BoardPagesViewPanel` — the open pages, `keepMounted` | shell |
+| `mainSection` | `Workbook` — the open pages, `keepMounted` | shell |
 | `rightSection` | Assistant, else Inspector | `explore` |
 | `bottomSection` | the console ([4.5](../modules/explore/features/the-console.md)) | `explore` |
 | `footer` | `GraphStatusBar` · the active page's own readout · `AppVersion` | shell + the active page |
@@ -89,7 +89,7 @@ region; only `mainSection` changes.
 | `header.rightNavItems` | nodes-in-view readout · `ThemeMenu` · **Assistant** | unchanged; the readout comes from the active page, and Assistant toggles `rightSection` |
 | `leftNav` | `navItem()` × 10 top · 5 bottom · avatar at `bottom` | the same helper, its items read from the registry; the avatar is `UserMenu` |
 | `leftSection` | `TabbedPanel` wrapping `PanelStack` — *Node types · Relationships · Selected* — with a summary line at the bottom and `headerActions` refresh · search · collapse | this **is** Explore's `leftSection`. Every other module composes the same way: one `TabbedPanel`, `PanelStack` sections, its own `headerActions` |
-| **`mainSection`** | a 30px `TabbedPanel` strip with `bodyClassName="hidden"`, and the canvas as a **sibling** below it | **`BoardPagesViewPanel`** — strip and bodies in one component, `keepMounted` |
+| **`mainSection`** | a 30px `TabbedPanel` strip with `bodyClassName="hidden"`, and the canvas as a **sibling** below it | **`Workbook`** — strip and bodies in one component, `keepMounted` |
 | `rightSection` | `TabbedPanel` — *Properties · Design* | the Inspector; the Assistant replaces it while open (G5) |
 | `bottomSpan` · `bottomSection` | `'main'` · the console — *Records · Query* — with a `ContextBar` under it | unchanged ([4.5](../modules/explore/features/the-console.md)) |
 | `footer` | `!h-[25px]` · `StatusDot` + state + counters · label + version | `GraphStatusBar` on the left, `AppVersion` on the right |
@@ -99,7 +99,7 @@ region; only `mainSection` changes.
 
 ExplorerShell keeps the canvas as a **sibling** of the strip precisely so a tab click cannot remount
 it — a hand-built workaround for the thing `keepMounted` does properly. One sibling can hold one
-canvas; `BoardPagesViewPanel` holds as many as are open, each with its own engine, camera and
+canvas; `Workbook` holds as many as are open, each with its own engine, camera and
 selection. That is the whole reason for the swap.
 
 ### Where the strip's controls go
@@ -114,7 +114,7 @@ ExplorerShell puts nine buttons on its strip, and they do not all belong to the 
 | Hide/show `leftSection` · `bottomSection` · `rightSection` | `headerActions` | shell |
 | — | `pageMenuItems`: rename · duplicate · remove | shell |
 
-Because `BoardHeaderAction` carries no page id (G12), a page kind declares its actions in the
+Because `WorkbookAction` carries no page id (G12), a page kind declares its actions in the
 registry and the shell concatenates them:
 
 ```tsx
@@ -243,7 +243,7 @@ G33 states it, and the tabbed alternative is not built.
 |---|---|
 | The panel's top | one header — label, count, search, filter |
 | A drill-in | replaces the panel body; the header becomes `‹ RUNS / orders.csv` |
-| `mainSection` | the run dashboard page, defaulting to the layer strip ([D16](../modules/govern/spec.md)) |
+| `mainSection` | the run board page, defaulting to the layer strip ([D16](../modules/govern/spec.md)) |
 
 **G36 · Every drawer control is a `headerActions` item, and none of them is drawn in the title.**
 `PanelStack` renders a section's `title` **inside** the header's collapse button and its
@@ -265,24 +265,24 @@ Both are drawn, on the two pages of the
 a plan and an entry **as a canvas**, page 2 renders the same three **as a document**. The panel is
 the stack in both; only the main column and where the detail lives differ.
 
-| | A · canvas + dashboard (page 1) | B · document (page 2) | **C · all in the drawer (page 3)** |
+| | A · canvas + board (page 1) | B · document (page 2) | **C · all in the drawer (page 3)** |
 |---|---|---|---|
 | The drawer | **light** — what it is, the Gantt, a line of log per task, then `More` ([SR13](../modules/operate/features/see-what-ran.md)) | stays a list, row selected | **three bands** — Stats · Performance (the Gantt) · Log, the log taking every pixel left |
-| The main column | an **artboard** (the flow, status painted on) or a **dashboard** (`More` — tiles, Gantt, task table, log) | blocks: outcome · tasks · reported · log · chain | whatever you were already on — the run needs nothing from it |
+| The main column | an **artboard** (the flow, status painted on) or a **board** (`More` — tiles, Gantt, task table, log) | blocks: outcome · tasks · reported · log · chain | whatever you were already on — the run needs nothing from it |
 | Answers *what shape was this* | yes, on the artboard | only as a sentence | no — the Gantt answers *when*, not *what shape* |
-| Answers *what exactly happened* | yes, on the dashboard — and it is a page you opened, not a column you are already in | all of it at once, whether you asked or not | the log does, live and filterable — but 420px wide, so lines truncate |
+| Answers *what exactly happened* | yes, on the board — and it is a page you opened, not a column you are already in | all of it at once, whether you asked or not | the log does, live and filterable — but 420px wide, so lines truncate |
 | Cost | two surfaces to build, and a `More` click | a 40-task plan is a long scroll with no shape | no room for a task table or *What landed*; a 40-task Gantt is a scroll inside a band |
-| Reuses | `@invana/canvas` — plus `TaskGantt`, which all three need | the kit's blocks and tables, plus `TaskGantt` | `TaskGantt` + `Terminal` + six `MetricTile`s — **nothing new beyond the Gantt** |
+| Reuses | `@invana/canvas` — plus `Gantt`, which all three need | the kit's blocks and tables, plus `Gantt` | `Gantt` + `Terminal` + six `MetricTile`s — **nothing new beyond the Gantt** |
 
-**C is the cheapest of the three and the one that ships soonest.** It needs no dashboard kind, no
+**C is the cheapest of the three and the one that ships soonest.** It needs no board kind, no
 second surface and no `More`: three bands in the column a person is already in, answering the three
 questions a run is opened with — *what happened* (stats), *where did the time go* (the Gantt), *why*
 (the log, filterable to one task). Picking a Gantt row filters the log to that Task, which is the
 whole debugging loop in one column. What it gives up is room: the task table, *What landed* and the
 reported breakdown have nowhere to live, and the log truncates at 420px.
 
-**C and A are not exclusive.** C is the drawer; A's dashboard is `More` for when 420px is not enough.
-Shipping C first costs nothing if the dashboard follows, because the Gantt, the stats and the log
+**C and A are not exclusive.** C is the drawer; A's board is `More` for when 420px is not enough.
+Shipping C first costs nothing if the board follows, because the Gantt, the stats and the log
 band are the same components either way.
 
 **Drafting is not part of this choice.** A draft is authored on the canvas or as `manifest.yml`
@@ -323,7 +323,7 @@ const LeftSection = FEATURES[feature].LeftSection;
   leftSection={{ defaultSize: "300px", minSize: "240px", maxSize: "900px",
                  content: <LeftSection {...graphRef} onOpen={open} /> }}
   mainSection={{ defaultSize: "600px", minSize: "300px",
-                 content: <BoardPagesViewPanel pages={pages.map(renderPage)}
+                 content: <Workbook pages={pages.map(renderPage)}
                                                 activeId={activeId} onSelect={select}
                                                 pageMenuItems={…} headerActions={…} /> }}
   rightSection={right.key ? rightSections[right.key] : undefined}
@@ -426,7 +426,7 @@ detail yet when it runs.
 |---|---|---|---|
 | 1 | **De-duplicate the shared chrome** against `StatusDot` · `Badge` · `FilterBar` · `FilterChip` · `SectionHeader` · `AgentChip` · `MetricTile` | 🟡 | 8 of 12 kit-name collisions cleared; 4 left, all in the answer surface |
 | 2 | **Move** — `git mv` into `features/`, `@/` everywhere | ✅ | 103 renames · 372 imports on the alias · `build`, `check-types`, `lint` green |
-| 3 | **The page host** — `BoardPagesViewPanel` in `mainSection`; the four-branch ternary, `CanvasTabsBar` and `canvasEmptyHint`'s dead region gone; `GraphHomePage` lands | 🟡 | `keepMounted` is still `false` — flipping it is phase 5 |
+| 3 | **The page host** — `Workbook` in `mainSection`; the four-branch ternary, `CanvasTabsBar` and `canvasEmptyHint`'s dead region gone; `GraphHomePage` lands | 🟡 | `keepMounted` is still `false` — flipping it is phase 5 |
 | 4 | **The registry** — `useGraphLeftNav` reads `FEATURES`; `?page=` lands beside `?panel=` | 🟡 | `?panel=` shipped (G16); the registry and `?page=` have not |
 | 5 | **Push selection down** — each `leftSection` owns its selection; each canvas page owns its engine, so `keepMounted` goes to `true` | ⬜ | `GraphDetailPage.tsx` under 300 lines; a tab switch keeps the camera |
 | 6 | **Routes** — [code-shape.md](code-shape.md) §5, and the console | ⬜ | every page has a URL; a reload lands on it |
@@ -473,7 +473,7 @@ not dead — and stripping `export` from them is churn with no reader benefit.
 
 ### What phase 3 did
 
-`mainSection` is `BoardPagesViewPanel` over a page list: the graph page, one page per open canvas,
+`mainSection` is `Workbook` over a page list: the graph page, one page per open canvas,
 the model, and the work canvas a panel drove. `DataBoardPage` no longer owns a strip — it exposes
 `BoardPageHandle` (`openHelp` · `toggleLayers` · `toggleStyling` · `toggleHistory` · `openRename`) and the shell
 builds `headerActions` from it (G12). `keepMounted` is explicitly `false`, which reproduces today's
@@ -604,6 +604,6 @@ canvas open on top of a panel it is all four.
 |---|---|
 | A second page component for any graph-scoped surface | G1. One page, ten features |
 | Grouping `leftNav` by module | G2. The story's ten icons are the ten icons |
-| Anything but `BoardPagesViewPanel` in `mainSection` | G4 |
+| Anything but `Workbook` in `mainSection` | G4 |
 | A `features/memory/` scaffold | 8.x is not built; an empty folder is not a placeholder |
 | Renaming a component whose name is already true | G10. A name changes when it is false or breaks the suffix rule, never only to add a prefix — `SessionList` inside the Assistant stays `SessionList` |

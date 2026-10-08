@@ -83,7 +83,7 @@ def run_result(run: TaskRun, steps: list[TaskRun]) -> dict[str, Any]:
 
     One line per task and its artifacts in the order they were produced. A
     task's full document is not merged up, because it is already addressable at
-    its own dashboard.
+    its own board.
     """
     timing = {
         "started_at": _iso(run.started_at),

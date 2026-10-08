@@ -1,4 +1,4 @@
-# Simulation Dashboard
+# Simulation Board
 
 !!! info "Draft"
     This page is a placeholder. Content will be added based on implementation design.

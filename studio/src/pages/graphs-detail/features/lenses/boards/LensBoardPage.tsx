@@ -35,8 +35,8 @@ import {
 	useLensQuery,
 } from "@/pages/graphs-detail/features/lenses/queries";
 import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
-import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import { VIEW_DASHBOARD } from "@/pages/graphs-detail/shared/dashboardSpec";
+import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
+import { VIEW_BOARD } from "@/pages/graphs-detail/shared/boardSpec";
 
 export interface LensBoardPageProps {
 	username: string;
@@ -58,7 +58,7 @@ export function LensBoardPage({
 }: LensBoardPageProps) {
 	const detail = useLensQuery(username, graphSlug, lensId);
 	const lenses = useLensesQuery(username, graphSlug);
-	const [view, setView] = useState(VIEW_DASHBOARD);
+	const [view, setView] = useState(VIEW_BOARD);
 
 	const lens = detail.data ?? null;
 	// A world is edited by anyone who can reach the Graph; a guardrail is the
@@ -101,7 +101,7 @@ export function LensBoardPage({
 		<Board
 			className="h-full min-h-0"
 			spec={report.spec}
-			icons={DASHBOARD_ICONS}
+			icons={BOARD_ICONS}
 			onAction={(id, ctx) => {
 				if (report.handle(id)) return;
 				switch (id) {

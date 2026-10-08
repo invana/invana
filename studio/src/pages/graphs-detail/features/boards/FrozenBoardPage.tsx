@@ -16,9 +16,9 @@ import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useQuery } from "@tanstack/react-query";
 import { formatRelativeTime } from "@/lib/time";
-import { DECLARED_WIDGETS } from "@/pages/graphs-detail/features/boards/dashboardWidgets";
+import { DECLARED_WIDGETS } from "@/pages/graphs-detail/features/boards/boardWidgets";
 import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
-import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
+import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
 
 export interface FrozenBoardPageProps {
 	username: string;
@@ -71,7 +71,7 @@ export function FrozenBoardPage({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			{/* Which reading you are looking at. A frozen page that did not say so
-			    would be a live dashboard that had quietly stopped updating. */}
+			    would be a live board that had quietly stopped updating. */}
 			<div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-1.5 text-base text-muted-foreground">
 				<span>
 					A report — the numbers as they were {at}. Nothing here is being
@@ -93,7 +93,7 @@ export function FrozenBoardPage({
 					// composer to tell it which it needs. All of them are
 					// pure, so nothing here re-reads the subject.
 					registry={DECLARED_WIDGETS}
-					icons={DASHBOARD_ICONS}
+					icons={BOARD_ICONS}
 				/>
 			</div>
 		</div>

@@ -70,7 +70,7 @@ nav:
       - Graph Modelling: studio/modelling.md
       - Query Workspace: studio/query-workspace.md
       - Visualization: studio/visualization.md
-      - Simulation Dashboard: studio/simulation-dashboard.md
+      - Simulation Board: studio/simulation-board.md
   - Deployment:
       - Docker: deployment/docker.md
       - Production: deployment/production.md

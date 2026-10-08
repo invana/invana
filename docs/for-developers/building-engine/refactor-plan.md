@@ -80,7 +80,7 @@ it is invisible to every import-aware tool — a linter that only sees this repo
 |---|---|---|
 | **`invana.graph`** | **imported by five separate pip packages** — `invana-neo4j` · `invana-memgraph` · `invana-arcadedb` · `invana-janusgraph` · `invana-tinkergraph`, eleven paths under `connectors/` and `types/`. Also stored in `connections.connector_class` (`String(512)`), returned by `server/routes/models.py`, accepted by `invana loader --connector-path`, shown in admin | it is **not moving anyway** — it is the graph engine and keeps its own band ([migration-plan §3](migration-plan.md#2-the-bands)). But it is a **published Python API**: moving it breaks installed connectors at import time, in packages this repo does not release |
 | `task_key` | `task_runs` column · `RunStepRead` · `studio/src/types/work.ts:343` and three components | rename is a migration plus a frontend change |
-| Span and metric names — `invana.graph`, `invana.llm`, `invana.llm.model_id` | `get_tracer(...)`, `set_attribute(...)` | dashboards and alerts key on them. **Leave them literal even when they no longer match the package path** |
+| Span and metric names — `invana.graph`, `invana.llm`, `invana.llm.model_id` | `get_tracer(...)`, `set_attribute(...)` | boards and alerts key on them. **Leave them literal even when they no longer match the package path** |
 | `"invana.model/1"` · `"invana.bundle/1"` | exported artefact headers | they are format tags, not module paths. Unrelated, and unchanged |
 
 `invana.graph` stays put for a design reason first — it is the graph engine, its own band, and

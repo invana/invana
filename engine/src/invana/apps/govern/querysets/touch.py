@@ -1,4 +1,4 @@
-"""Queries against ``run_touches`` — the run dashboard's reads, and `Compare`'s.
+"""Queries against ``run_touches`` — the run board's reads, and `Compare`'s.
 
 Every one of these is a question the ledger can answer and an index cannot: for
 one run, in ``seq`` order; for two runs, what differed; for a Graph, who ever
@@ -64,7 +64,7 @@ class TouchQuerySet:
         return out
 
     async def counts_for_run(self, session: AsyncSession, run_id: str) -> dict[str, int]:
-        """``{direction: n}`` — the dashboard's *recorded 23 · refused 2 · sent out 0*."""
+        """``{direction: n}`` — the board's *recorded 23 · refused 2 · sent out 0*."""
         stmt = (
             select(RunTouch.direction, func.count(RunTouch.id))
             .where(RunTouch.run_id == run_id)

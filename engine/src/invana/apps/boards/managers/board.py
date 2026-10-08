@@ -124,7 +124,7 @@ class BoardManager:
     ) -> Board:
         """The row behind a declared board, created on first use (B9).
 
-        A live dashboard has no row — it is derived from its subject on every
+        A live board has no row — it is derived from its subject on every
         open. This is the one path that brings one into being, and it is called
         by the act that keeps something: saving a report. One call, so the
         client never asks whether a row exists.

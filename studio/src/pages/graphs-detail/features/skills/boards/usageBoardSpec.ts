@@ -34,12 +34,12 @@ import {
 	omit,
 	specPanel,
 	VIEW_ACTION,
-	VIEW_DASHBOARD,
+	VIEW_BOARD,
 	VIEW_SPEC,
-} from "@/pages/graphs-detail/shared/dashboardSpec";
+} from "@/pages/graphs-detail/shared/boardSpec";
 
 export interface UsageBoardView {
-	/** `Dashboard` or `spec.json`. */
+	/** `Board` or `spec.json`. */
 	view: string;
 	/** Which published version the tiles are of. Null reads the newest. */
 	version: number | null;
@@ -105,7 +105,7 @@ export function usageBoardSpec(
 			{ label: "usage board" },
 		]),
 		actions: omit([
-			{ id: VIEW_ACTION, options: [VIEW_DASHBOARD, VIEW_SPEC], value: view },
+			{ id: VIEW_ACTION, options: [VIEW_BOARD, VIEW_SPEC], value: view },
 			// Every published version, as one decision with several positions —
 			// picking one is a reading, not navigation, so it never opens a tab.
 			usage.versions.length > 1

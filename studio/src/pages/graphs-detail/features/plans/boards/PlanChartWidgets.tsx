@@ -1,8 +1,8 @@
 /**
- * The plan page's two charts as dashboard panels — Studio's registry entries,
+ * The plan page's two charts as board panels — Studio's registry entries,
  * the way `flow` is.
  *
- * A dashboard ships eleven kinds and a twelfth belongs there only when two
+ * A board ships eleven kinds and a twelfth belongs there only when two
  * unrelated surfaces need it; these two are drawn by the kit's charts, and the
  * panels only hand them the spec's data.
  */

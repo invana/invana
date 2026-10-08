@@ -103,12 +103,12 @@ async def test_second_board_for_same_session_is_409(session, graph, user, graph_
 
 
 async def test_renders_is_read_from_the_registry_not_stored():
-    """`canvas | dashboard` is a property of the kind, never a column (B3)."""
+    """`canvas | declared` is a property of the kind, never a column (B3)."""
     assert BOARD_KINDS["data"].renders == "canvas"
-    assert BOARD_KINDS["run"].renders == "dashboard"
+    assert BOARD_KINDS["run"].renders == "declared"
     assert is_declared("run") and not is_declared("model")
     # A declared kind is identified by its subject, so it is always required.
-    assert all(spec.subject_required for spec in BOARD_KINDS.values() if spec.renders == "dashboard")
+    assert all(spec.subject_required for spec in BOARD_KINDS.values() if spec.renders == "declared")
 
 
 async def test_a_data_board_without_a_session_is_rejected(session, graph, user):
@@ -148,7 +148,7 @@ async def test_one_board_per_subject(session, graph, user):
 
 
 async def test_saving_a_report_creates_the_row_and_reuses_it(session, graph, user):
-    """A live dashboard has no row; the first report is what brings one into being (B9)."""
+    """A live board has no row; the first report is what brings one into being (B9)."""
     _, before = await boards.list_for_graph(session, graph_id=graph.id, limit=30, offset=0)
     assert before == 0
 

@@ -1,7 +1,7 @@
 import { usd } from "@/lib/format";
 
 /**
- * The plan page as a dashboard document ([the-library.md](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
+ * The plan page as a board document ([the-library.md](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * A report header naming the version, then **Overview · Layers · Flow ·
  * Activity**, with the `7 · 30 · 90 days` window on the right of the tab strip —
@@ -27,7 +27,7 @@ import type {
 	TaskPlanDetail,
 } from "@/pages/graphs-detail/features/plans/types";
 import { runAddress } from "@/pages/graphs-detail/features/runs";
-import type { FlowOptions } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
+import type { FlowOptions } from "@/pages/graphs-detail/shared/boards/TaskFlowWidget";
 
 export type PlanPanels = PlanChartWidgets & {
 	flow: FlowOptions;

@@ -51,7 +51,7 @@ studio/src/canvases/
 | `initialDetail` | `Detail` | — | `circles` by default, which is what `settings.json` starts on |
 | `selectedId` | `string \| null` | — | the node drawn selected (a ring, no drag handles — [SR52](../modules/operate/features/see-what-ran.md#decisions)) |
 | `onOpenNode` | `(id: string) => void` | — | click on a node. Leave it out and a click only selects |
-| `height` | `number` | — | for a host that gives no height of its own — a dashboard panel body is content-height. Left out, the canvas fills its parent. The run's `TaskFlowWidget` measures the room left in the dashboard's scroller and passes that, never less than 360px, so the Flow tab takes the whole page |
+| `height` | `number` | — | for a host that gives no height of its own — a board panel body is content-height. Left out, the canvas fills its parent. The run's `TaskFlowWidget` measures the room left in the board's scroller and passes that, never less than 360px, so the Flow tab takes the whole page |
 
 `Detail` is `'circles' | 'cards'`.
 
@@ -77,7 +77,7 @@ studio/src/canvases/
 |---|---|---|
 | `BackgroundLayer`, `GraphLayer`, `ThemeBehaviour`, `CanvasThemeSync` | ✅ | ✅, with `useStudioCanvasTheme` in place of `CanvasThemeSync` (TF7) |
 | Pan, wheel zoom, drag node, hover activate, click select | ✅ | ✅ |
-| `TextResolutionLODBehaviour`, `TextLODBehaviour` | ✅ | ✅ |
+| `TextResolutionLODBehaviour`, `NodeLabelLODBehaviour` | ✅ | ✅ |
 | `HoverElementPreviewBehaviour` (node and edge cards) | ✅ | ✅ |
 | `ElkLayout` (`layered`, `RIGHT`) | ✅ | ✅, and it is the only layout |
 | `D3ForceLayout` and the **Layout** select | ✅ | ❌ |
@@ -109,7 +109,7 @@ flowchart LR
 |---|---|---|---|
 | Skill detail › **Flow** tab | `features/skills/SkillFlowTab.tsx`: a one-line header (steps · layers declared), the canvas, then **Composed** | `taskFlowFromPlan(plan)`: the current version's plan | the plan's own `edges`. `binding` stays `binding`, `order` becomes `require` |
 | Skill board › `skillFlow` panel | `features/skills/boards/SkillFlowWidget.tsx` | the same `SkillFlowTab` | the same |
-| Run page › **Flow** tab | `shared/dashboards/TaskFlowWidget.tsx`, still registered as `flow` | `taskFlowFromRun(groups)`: one node per task group, with its status in the hover rows | `sequence`, in `seq` order, until `plan_snapshot` is on the trace ([SR32](../modules/operate/features/see-what-ran.md#decisions)) |
+| Run page › **Flow** tab | `shared/boards/TaskFlowWidget.tsx`, still registered as `flow` | `taskFlowFromRun(groups)`: one node per task group, with its status in the hover rows | `sequence`, in `seq` order, until `plan_snapshot` is on the trace ([SR32](../modules/operate/features/see-what-ran.md#decisions)) |
 
 ### Mapping to the three node types
 

@@ -155,7 +155,7 @@
 <rect class="chip" x="221" y="716" width="89" height="20" rx="4"/>
 <text class="chip-t" x="229" y="730">leftSection</text>
 <rect class="chip" x="315" y="716" width="141" height="20" rx="4"/>
-<text class="chip-t" x="323" y="730">BoardPagesViewPanel</text>
+<text class="chip-t" x="323" y="730">Workbook</text>
 <rect class="chip" x="58" y="742" width="128" height="20" rx="4"/>
 <text class="chip-t" x="66" y="756">GraphDetailChrome</text>
 <rect class="chip" x="192" y="742" width="102" height="20" rx="4"/>
@@ -294,8 +294,8 @@
 <text class="chip-t" x="66" y="1774">editor</text>
 <text class="cap" x="143" y="1774">code and markdown editing — CodeMirror 6</text>
 <rect class="chip" x="58" y="1786" width="75" height="20" rx="4"/>
-<text class="chip-t" x="66" y="1800">dashboard</text>
-<text class="cap" x="143" y="1800">JSON-driven dashboards from kit panels</text>
+<text class="chip-t" x="66" y="1800">board</text>
+<text class="cap" x="143" y="1800">JSON-driven boards from kit panels</text>
 <text class="cap-s" x="58" y="1832">also in the kit — not yet used by Studio</text>
 <rect class="mchip" x="58" y="1840" width="75" height="20" rx="4"/>
 <text class="mchip-t" x="66" y="1854">assistant</text>

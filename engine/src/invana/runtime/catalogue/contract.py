@@ -278,7 +278,7 @@ class TaskContext:
     #: for; the runtime reads it after the step settles.
     planned: list | None = None
     #: The files this step read or wrote, in the order it touched them — what
-    #: the step dashboard's Artifacts panel lists (SR38). It rides the context
+    #: the step board's Artifacts panel lists (SR38). It rides the context
     #: rather than ``Out`` so a step that raises still keeps what it had already
     #: read: *needs input* after reading four files read four files.
     artifacts: list[dict] = field(default_factory=list)
@@ -797,7 +797,7 @@ def _applied(
     bound_by: tuple[str, ...] = (),
     compiled: CompiledLens | None = None,
 ) -> dict:
-    """What the lens did to this query, as the step dashboard reads it back.
+    """What the lens did to this query, as the step board reads it back.
 
     **``select`` and ``properties_excluded`` are keyed by type**
     ([WO17](docs/for-developers/modules/govern/features/worlds.md)). A world that

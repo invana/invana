@@ -119,7 +119,7 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | Term | Means |
 |---|---|
 | **Board** | A named, saved, versioned working surface. One flat `kind` axis of nine: `data · model · plan · workflow · envelope · lineage · run · task_run · plan_runs`. Whether it is *drawn* (on a canvas) or *declared* (panels bound to one record) is **`renders`**, a property of the kind — never a second column. The **plan** and **workflow** kinds both draw a `TaskPlan` — one for a Project's Todos, one for a plan's Tasks. Never "artboard". |
-| **Report** | A **frozen** dashboard — the panels with the numbers as they were, stored merged so it outlives its subject. One version of a board, not a kind of its own. |
+| **Report** | A **frozen** declared board — the panels with the numbers as they were, stored merged so it outlives its subject. One version of a board, not a kind of its own. |
 | **View panel** | The content of one shell region — `ModelViewPanel`, `InspectorViewPanel`, `AssistantViewPanel` — canvas-ui's suffix. A panel is named for the **occupant**, not for its contents: the Assistant holds sessions, so it is `AssistantViewPanel`, not `SessionsViewPanel`. A panel is *what fills* a region, never a region itself, so "the panel" alone names nothing. |
 | **Section** | One collapsible, resizable part of a stacked view panel — the kit's `PanelStackSection`, with its own header, count, search and drill-in. The Agents view panel has two: **Agents** and **LLMs**. Never a *drawer*: nothing in Studio slides over anything. |
 | **Assistant** | The one conversational surface, available everywhere, holding the current selection. Its panel is titled **Ask Assistant** — the noun is *Assistant*, the panel's name says whose. |
@@ -189,6 +189,7 @@ sub-slots, the URL params and the retired words are in
 |---|---|---|
 | Mission · Atlas · Workspace | **Graph** | one container, one word |
 | Bring data in · Connect and model · Operate · Ask · Work · Workflows · Govern — as a **module** name | `imports` · `models` + `graphs` · `runs` + `events` · `assistant` · `projects` · `plans` · `lenses` | a module is named for what it holds ([§ How a module is named](#how-a-module-is-named)); a verb phrase is a feature's register. *Govern* stays the `leftNav` label |
+| Dashboard | **Board** — a *declared* board when the difference matters | every surface is a board: drawn on a canvas or declared from panels (`renders: canvas · declared`). The kit's package is `@invana/boards` and its component `Board`. HyperDX's own dashboards keep their name, since they are that product's word, not ours |
 | Intent | **Instructions** for guidance, **understanding** for the step | the word is ambiguous between the two |
 | Instructions (as a prose blob) | **Rules** | guidance is a list of statements, not a paragraph |
 | Acceptance criteria (as prose) | **Criteria** | each one is a node with a check |

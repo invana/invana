@@ -34,7 +34,7 @@ export { DataBoardPage } from "@/pages/graphs-detail/features/boards/DataBoardPa
 // The wrapper the host mounts every declared page inside — the two acts, and
 // the card one of them opens (boards-migration.md).
 export { DeclaredBoard } from "@/pages/graphs-detail/features/boards/DeclaredBoard";
-// A report — the act that keeps a live dashboard's numbers, and the page that
+// A report — the act that keeps a live board's numbers, and the page that
 // reads one back (boards-migration.md).
 export { FrozenBoardPage } from "@/pages/graphs-detail/features/boards/FrozenBoardPage";
 export {

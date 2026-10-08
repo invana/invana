@@ -11,7 +11,7 @@
  * here for `?section=` to choose between, and the panel keeps the one-header
  * `ListPanelChrome` grammar every other list uses. A drill-in replaces the
  * panel body and turns the header into `‹ RUNS / orders.csv`; `More` opens the
- * run's dashboard as a page.
+ * run's board as a page.
  *
  * The step that crosses into Library is *run → the plan it ran*, and
  * `mainSection` carries it: `keepMounted` keeps the run open beside the plan,
@@ -49,8 +49,8 @@ export interface RunsViewPanelProps {
 	 * `Open the answer` on a drilled-in run — opens its page; with a
 	 * step, that task inside it.
 	 */
-	onOpenRunDashboard?: (runId: string, stepId?: string) => void;
-	/** `Dashboard` on the header — the journal drawn wide, as a page. */
+	onOpenRunBoard?: (runId: string, stepId?: string) => void;
+	/** `Board` on the header — the journal drawn wide, as a page. */
 	onOpenRunsBoard?: () => void;
 	/** `Compare with the plan` — draws the plan a run ran in `mainSection`. */
 	onOpenPlan?: (workflowKey: string) => void;
@@ -59,7 +59,7 @@ export interface RunsViewPanelProps {
 export function RunsViewPanel({
 	username,
 	graphSlug,
-	onOpenRunDashboard,
+	onOpenRunBoard,
 	onOpenRunsBoard,
 	onOpenPlan,
 }: RunsViewPanelProps) {
@@ -146,8 +146,8 @@ export function RunsViewPanel({
 									...(onOpenRunsBoard
 										? [
 												{
-													key: "dashboard",
-													name: "Dashboard",
+													key: "board",
+													name: "Board",
 													icon: LayoutDashboard,
 													onClick: onOpenRunsBoard,
 												},
@@ -184,7 +184,7 @@ export function RunsViewPanel({
 											username={username}
 											graphSlug={graphSlug}
 											runId={runId}
-											onOpenDashboard={onOpenRunDashboard}
+											onOpenBoard={onOpenRunBoard}
 											onOpenPlan={onOpenPlan}
 											onOpenLens={(lens) => reveal(lens.kind, lens.id)}
 										/>

@@ -2,7 +2,7 @@
 
 **The address is the only identifier**
 ([GV4](docs/for-developers/modules/govern/spec.md)): the lens matches on it, the
-ledger records it, the run dashboard expands it. One string instead of five
+ledger records it, the run board expands it. One string instead of five
 shapes of rule, which is why this module is thirty lines of matching and not a
 resolver per layer.
 

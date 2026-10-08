@@ -4,12 +4,12 @@
 //
 // **Beside `boardVersions`, not folded into it.** The two address different
 // things: that one takes a `board_id`, a row that exists; this one takes a
-// `(kind, subject_id)` pair, because a live dashboard has **no row** until the
+// `(kind, subject_id)` pair, because a live board has **no row** until the
 // first report creates it. Folding them together would mean a client that
 // sometimes has an id and sometimes computes one, and a caller that has to know
 // which — which is exactly the question exists to stop anyone asking.
 //
-// What is sent is the **resolved document** — the `DashboardSpec` with the
+// What is sent is the **resolved document** — the `BoardSpec` with the
 // numbers already in it, never the spec plus a subject to re-read. That
 // is what lets a report outlive a pruned `result.json`.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -49,7 +49,7 @@ interface ApiReportList {
 /** What `Save report` sends: the document, and the name somebody chose. */
 export interface ReportCreateBody {
 	label: string;
-	/** The resolved `DashboardSpec` — the reading, with its numbers. */
+	/** The resolved `BoardSpec` — the reading, with its numbers. */
 	snapshot: Record<string, unknown>;
 	/** The argument that produced this reading — `{view, selectedKey}`. */
 	settings?: Record<string, unknown>;

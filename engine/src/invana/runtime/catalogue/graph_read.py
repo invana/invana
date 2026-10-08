@@ -62,7 +62,7 @@ def query_record(result, *, digests: dict[str, str], timeout_s, parameters: bool
     reader runs it — so the query that produced the number is recorded beside
     the one that was asked for ([GV34](docs/for-developers/modules/govern/spec.md)).
 
-    Both, because the step is what the dashboard reads and the generated query
+    Both, because the step is what the board reads and the generated query
     is not otherwise on it: an ask run's `args` carry `read_only` and nothing
     else, the question living on the message. A band that could show only the
     rewritten half would leave a reader comparing it against something they

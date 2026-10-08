@@ -2399,7 +2399,7 @@
         "type": "object"
       },
       "BoardVersionCreate": {
-        "description": "One frozen reading of a board.\n\nThe render state only exists in the client \u2014 a drawn board's\n``canvas.exportState()``, a declared board's resolved ``DashboardSpec`` \u2014\nso the client supplies it already merged, and the server never re-merges it\n(B16).",
+        "description": "One frozen reading of a board.\n\nThe render state only exists in the client \u2014 a drawn board's\n``canvas.exportState()``, a declared board's resolved ``BoardSpec`` \u2014\nso the client supplies it already merged, and the server never re-merges it\n(B16).",
         "properties": {
           "banner": {
             "anyOf": [
@@ -15529,7 +15529,7 @@
         "type": "object"
       },
       "TouchesRead": {
-        "description": "One run's ledger, and the three numbers the dashboard leads with.\n\n``allowed`` is what the frozen lens permits across the catalogue; ``touched``\nis what actually happened. The **difference between the two** is what a\nperson reads when they retune \u2014 three allowed and never touched is *narrow?*,\ntwo refused is *widen, or accept cannot answer deliberately*.",
+        "description": "One run's ledger, and the three numbers the board leads with.\n\n``allowed`` is what the frozen lens permits across the catalogue; ``touched``\nis what actually happened. The **difference between the two** is what a\nperson reads when they retune \u2014 three allowed and never touched is *narrow?*,\ntwo refused is *widen, or accept cannot answer deliberately*.",
         "properties": {
           "allowed": {
             "items": {

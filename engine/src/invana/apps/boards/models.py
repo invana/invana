@@ -18,7 +18,7 @@ Columns are grouped by **lifetime**, which is the only split that pays (B14):
 That is why ``styling`` is its own column: a re-query replaces every node and
 **must not** discard the colours.
 
-A **live dashboard has no row at all** (B9). It is derived from its subject on
+A **live board has no row at all** (B9). It is derived from its subject on
 every open; the row is created lazily by the first act that keeps something — a
 saved report, which is one ``BoardVersion`` with ``cause="report"``.
 """
@@ -117,8 +117,8 @@ class Board(Base):
     title: Mapped[str] = mapped_column(String(255), default="", nullable=False)
     instructions: Mapped[str] = mapped_column(Text, default="", nullable=False)
     #: The person's *reading* of the board — a canvas's backend and magnet, a
-    #: dashboard's open view. Whatever the spec builder takes besides the
-    #: subject belongs here, and nothing else about a live dashboard is stored
+    #: board's open view. Whatever the spec builder takes besides the
+    #: subject belongs here, and nothing else about a live board is stored
     #: at all (B15).
     settings: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     #: Per node/edge-TYPE-NAME visual rules. Name-keyed (not a type FK) so
@@ -145,7 +145,7 @@ class Board(Base):
 
     @property
     def renders(self) -> str:
-        """``canvas`` or ``dashboard`` — read from the registry, never stored."""
+        """``canvas`` or ``declared`` — read from the registry, never stored."""
         spec = BOARD_KINDS.get(self.kind)
         return spec.renders if spec else "canvas"
 
@@ -162,7 +162,7 @@ class BoardVersion(Base):
     A **version** on a drawn board and a **report** on a declared one are the
     same row: the product word is *version*, above and below (B6). What differs
     is only what ``snapshot_gz`` holds — ``canvas.exportState()`` for a drawing,
-    the resolved ``DashboardSpec`` for a report.
+    the resolved ``BoardSpec`` for a report.
 
     A frozen reading is stored **merged and never re-merged** (B16): the report
     carries the numbers inside it, so it renders with no fetch and outlives its
@@ -215,7 +215,7 @@ class BoardVersion(Base):
     label: Mapped[str] = mapped_column(String(255), default="", nullable=False)
 
     #: gzip of the resolved document — ``canvas.exportState()`` or a
-    #: ``DashboardSpec``. It compresses ~5-10x and these accumulate one row per
+    #: ``BoardSpec``. It compresses ~5-10x and these accumulate one row per
     #: meaningful change. Read through the ``snapshot`` property below.
     snapshot_gz: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     source_query: Mapped[str | None] = mapped_column(Text, nullable=True)

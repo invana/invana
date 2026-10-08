@@ -5,7 +5,7 @@ Defines no function (migration-plan §4) — path to view, nothing else.
 
 Two address forms, and the difference is [B9](../../../../../docs/for-developers/building-engine/boards-migration.md):
 ``/{board_id}`` is a board that has a row, ``/{kind}/{subject_id}`` is a declared
-board addressed by what it is *of* — which is the only address a live dashboard
+board addressed by what it is *of* — which is the only address a live board
 has, because it has no row until something is kept.
 """
 

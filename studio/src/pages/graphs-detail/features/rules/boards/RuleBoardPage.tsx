@@ -17,8 +17,8 @@ import {
 	useRuleCitationsQuery,
 	useRulesQuery,
 } from "@/pages/graphs-detail/features/skills";
-import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import { VIEW_DASHBOARD } from "@/pages/graphs-detail/shared/dashboardSpec";
+import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
+import { VIEW_BOARD } from "@/pages/graphs-detail/shared/boardSpec";
 
 export interface RuleBoardPageProps {
 	username: string;
@@ -41,7 +41,7 @@ export function RuleBoardPage({
 	const rules = useRulesQuery(username, graphSlug);
 	const rule = rules.data?.items.find((r) => r.id === ruleId) ?? null;
 	const citations = useRuleCitationsQuery(username, graphSlug, ruleId);
-	const [view, setView] = useState(VIEW_DASHBOARD);
+	const [view, setView] = useState(VIEW_BOARD);
 
 	const spec = useMemo(
 		() => (rule ? ruleBoardSpec(rule, citations.data, { view }) : null),
@@ -73,7 +73,7 @@ export function RuleBoardPage({
 		<Board
 			className="h-full min-h-0"
 			spec={report.spec}
-			icons={DASHBOARD_ICONS}
+			icons={BOARD_ICONS}
 			onAction={(id, ctx) => {
 				if (report.handle(id)) return;
 				switch (id) {

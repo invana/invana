@@ -15,19 +15,19 @@ written.
 
 ## What the canvas story settles
 
-`mainSection` is not a screen. It is **`BoardPagesViewPanel`** — a tab strip and the page bodies as
+`mainSection` is not a screen. It is **`Workbook`** — a tab strip and the page bodies as
 one column:
 
 ```tsx
 mainSection: {
   content: (
-    <BoardPagesViewPanel
+    <Workbook
       pages={pages}            // [{ id, title, icon, content, closable? }]
       activeId={activeId}
       onSelect={setActiveId}
       onAdd={addPage}
       pageMenuItems={[…]}      // rename · duplicate · remove, on the active tab's caret
-      onClose={closePage}      // the `×` on a closable page — a dashboard (graph-detail-page G46)
+      onClose={closePage}      // the `×` on a closable page — a board (graph-detail-page G46)
       headerActions={[…]}      // the left-panel and inspector toggles, pinned right
       className="h-full"
     />
@@ -95,7 +95,7 @@ landing the Console, not a later tidy-up.
 | `header` | `NavHorizontalProps` | `left` · `center` · `right` (+ `*NavItems`) | wordmark · breadcrumb · the camera toolbar · the onboarding cap · theme · Assistant |
 | `leftNav` | `NavVerticalProps` | `top` · `topNavItems` · `middle` · `bottom` · `bottomNavItems` | one icon per module with a `leftSection` panel, exactly one lit |
 | `leftSection` | `SectionConfig` | — | the open view panel — Info · Explorer · Model · Projects · Runs · Library · Govern · Agents · Skills · Events · Settings. **Layers is not here**: it is a canvas control on the page strip ([graph-detail-page.md](graph-detail-page.md) G18) |
-| `mainSection` | `MainSectionConfig` | — | `BoardPagesViewPanel` — the open pages |
+| `mainSection` | `MainSectionConfig` | — | `Workbook` — the open pages |
 | `rightSection` | `SectionConfig` | — | the Inspector, or the Assistant |
 | `bottomSection` | `SectionConfig` | — | the Console |
 | `footer` | `NavHorizontalProps` | `left` · `right` | connection status · counters · version |
@@ -130,7 +130,7 @@ flowchart LR
 
 A component that is a whole region's content is `<Occupant>ViewPanel` — `InspectorViewPanel`,
 `AssistantViewPanel`, `ModelViewPanel` — the suffix canvas-ui gives its own (`LayersViewPanel`,
-`BoardPagesViewPanel`). **A view panel is region content.** It is never a region, so "the panel"
+`Workbook`). **A view panel is region content.** It is never a region, so "the panel"
 alone says nothing; name the occupant or name the region. A view panel that stacks is a `PanelStack`,
 and each of its parts is a **section** (`PanelStackSection`) — never a drawer.
 
@@ -236,7 +236,7 @@ intent and this one as fact:
 | `header` | ✅ | `useAppHeader` — `left` (wordmark · breadcrumb) · `center` (the camera toolbar) · `right` (`rightExtras` · `GitHubStars` · **the onboarding cap, graph-scoped only** · `ThemeMenu` · `FullscreenToggle` · `panelControls`) |
 | `leftNav` | ✅ | `useGraphLeftNav` |
 | `leftSection` | ✅ | the open panel, or `SettingsViewPanel` docked |
-| `mainSection` | ✅ | `BoardPagesViewPanel`, with **`keepMounted={false}`** — only the active page's body is mounted, until each canvas owns its own engine |
+| `mainSection` | ✅ | `Workbook`, with **`keepMounted={false}`** — only the active page's body is mounted, until each canvas owns its own engine |
 | `rightSection` | ✅ | the `?right=` occupant, looked up in the page's `rightSections` registry — `assistant` → `AssistantViewPanel`, `inspector` → `InspectorViewPanel`. Absent → the region is not handed to the kit at all. Each entry carries its own size triple |
 | `bottomSection` | ❌ | — |
 | `footer` | ✅ | `left`: `ConnectionStatusBar` + metrics · `right`: extras + `AppVersion` |
@@ -344,7 +344,7 @@ unchanged. What the strip adds is that opening a second screen does not throw th
 
 ## The Explorer's `mainSection` is a page host already — badly
 
-`BoardPagesViewPanel` **is** the right answer for the Explorer, and an earlier draft of this
+`Workbook` **is** the right answer for the Explorer, and an earlier draft of this
 document argued the opposite on evidence that did not hold up. Two things settle it.
 
 **One. `mainSection` is already a four-branch ternary**, and only one branch can be alive:
@@ -373,7 +373,7 @@ the 2,245-line file is the bill.
 | 1 | Extract **`DataBoardPage`** — one component owning *one* board: its seed, styling, selection, magnet, autosave, history. The nine singular states become its own |
 | 2 | `ModelPage` and `WorkPage` likewise — they are pages, not branches |
 | 3 | `useOpenPages()` owns the open set, the active id and the cap; the URL names the active one |
-| 4 | `mainSection` becomes `BoardPagesViewPanel` over those pages. `CanvasTabsBar` is deleted |
+| 4 | `mainSection` becomes `Workbook` over those pages. `CanvasTabsBar` is deleted |
 | 5 | Each page publishes its engine when active; the lifted `CanvasContext` provides the active one, so the header toolbar and inspector keep resolving *the* canvas |
 
 What `GraphDetailPage` keeps is what is genuinely cross-page: sessions, the assistant, `leftNav`, the

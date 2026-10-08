@@ -69,7 +69,7 @@ class BoardQuerySet:
     ) -> Board | None:
         """The board a declared kind is identified by (B9).
 
-        This is the lookup that makes a live dashboard need no row: its identity
+        This is the lookup that makes a live board need no row: its identity
         is computable, so the row is only ever fetched — or created — when
         something is kept.
         """

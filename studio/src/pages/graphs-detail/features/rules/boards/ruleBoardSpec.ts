@@ -32,12 +32,12 @@ import {
 	omit,
 	specPanel,
 	VIEW_ACTION,
-	VIEW_DASHBOARD,
+	VIEW_BOARD,
 	VIEW_SPEC,
-} from "@/pages/graphs-detail/shared/dashboardSpec";
+} from "@/pages/graphs-detail/shared/boardSpec";
 
 export interface RuleBoardView {
-	/** `Dashboard` or `spec.json`. */
+	/** `Board` or `spec.json`. */
 	view: string;
 }
 
@@ -88,7 +88,7 @@ export function ruleBoardSpec(
 			{ label: "rule board" },
 		]),
 		actions: [
-			{ id: VIEW_ACTION, options: [VIEW_DASHBOARD, VIEW_SPEC], value: view },
+			{ id: VIEW_ACTION, options: [VIEW_BOARD, VIEW_SPEC], value: view },
 			{ id: SKILL_ACTIONS.edit, label: "Edit", variant: "outline" as const },
 		],
 	};

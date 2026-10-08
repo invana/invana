@@ -11,7 +11,7 @@
  * database and the provider behind it — and because five recurrences firing at
  * 08:00 is a question about this Graph, not about any one agent.
  *
- * The live counts sit under the fields rather than on a dashboard elsewhere:
+ * The live counts sit under the fields rather than on a board elsewhere:
  * contention has to be visible where the number that causes it is set.
  */
 

@@ -127,7 +127,7 @@ the engine shapes that have to exist before any of it can be built.
 > | `Nothing leaves` | *How many deals are there in total?* | refused at `understand`, before dispatch: nothing was spent, nothing left. `succeeded / cannot_answer`, never an error ([GV29](../modules/govern/spec.md)) |
 > | `Price-blind` | *Show me 5 deals with all their details* | `RETURN d` rewritten to the permitted projection; `revenue` and `contract_value` are absent from the result, and it is still a node |
 >
-> **The two digests differ, and the step dashboard says so in words.** *The executed query is not the
+> **The two digests differ, and the step board says so in words.** *The executed query is not the
 > generated one — the lens was composed into it before it ran* is on screen against a real touch. So
 > is *This run's lens — EU · H1 2026, as frozen at open*, and the six-band strip over three touches.
 > Until this pass all three panels had only ever drawn their *nothing recorded* state.
@@ -147,7 +147,7 @@ the engine shapes that have to exist before any of it can be built.
 > | What | Why it is invisible |
 > |---|---|
 > | **The slice that was applied** | `applied.select` is written from `Verdict.select`, and a [GV33](../modules/govern/spec.md) world has none — the per-type selects compile into `QueryLens.bounds`. `StepTouchWidget`'s `SliceSummary` branch is therefore dead on exactly the shape a world is authored in. `applied.composed` names the binding, never the bound |
-> | **The executed query's text** | ✅ **closed** ([GV34](../modules/govern/spec.md)). The step records `generated_query` and `executed_query` when — and only when — the lens rewrote the query, and the dashboard draws *The query that ran* under **Input**, showing both and saying which one the graph answered. On the step and never on the touch, so `run_touches` stays an index into the trace rather than a second copy of it. Equal digests record nothing: there the resolved request already is what ran |
+> | **The executed query's text** | ✅ **closed** ([GV34](../modules/govern/spec.md)). The step records `generated_query` and `executed_query` when — and only when — the lens rewrote the query, and the board draws *The query that ran* under **Input**, showing both and saying which one the graph answered. On the step and never on the touch, so `run_touches` stays an index into the trace rather than a second copy of it. Equal digests record nothing: there the resolved request already is what ran |
 > | **What a bound read cost** | `cost_usd` is `null` on every LLM touch, so `COST` reads *tokens only*. That is [OB4](../modules/operate/features/observability.md) working: the demo provider is `claude_agent_sdk` on an `oauth_token`, a **subscription** — not metered per token and not free, so neither number is true and there is none. Correct, and it means the local stack cannot exercise a per-run cost ceiling; an api-key provider can |
 > | **Two worlds that read the same rows** | R4 diffs **addresses**. `EU · H1 2026` against `Price-blind` reads *touched 2 · shared 2 · differed 0* and says so honestly — *whatever differs in the answers does not come from what grounded them* — but one of those two runs sliced `Deal` to 1,283 rows and the other rewrote its projection, and both differences are sitting in `applied` on the shared touch. Compare points the reader at the worlds instead of reading the field that holds the answer |
 
@@ -536,7 +536,7 @@ not 4,902* costs an unsliced execution on every governed read. W1 prints `rows` 
 narrowed it* from the world, the rule and the slice the connector composed.
 
 **`volume` carries `tokens_in` and `tokens_out`, never one `tokens`.** A run that read a lot and
-wrote a little is a different run from its mirror, and they price differently; the step dashboard
+wrote a little is a different run from its mirror, and they price differently; the step board
 adds them for its one-line readout rather than the record losing the difference.
 
 **The query digests are digests, not queries.** The full text lives on the step; `run_touches`

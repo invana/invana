@@ -41,7 +41,7 @@ import {
 	originOf,
 	runAddress,
 	toneOf,
-} from "@/pages/graphs-detail/features/runs/boards/runDashboards";
+} from "@/pages/graphs-detail/features/runs/boards/runBoards";
 import { useRunTrace } from "@/pages/graphs-detail/features/runs/boards/useRunTrace";
 import {
 	planKeyOf,
@@ -59,14 +59,14 @@ export interface RunDetailProps {
 	 * `Open the answer` — opens this run's page; with a step, that task
 	 * open inside it, which is what a waterfall row asks for.
 	 */
-	onOpenDashboard?: (runId: string, stepId?: string) => void;
+	onOpenBoard?: (runId: string, stepId?: string) => void;
 	/** The lens row — opens that world or guardrail in Govern, in `leftSection`. */
 	onOpenLens?: (lens: { id: string; kind: "world" | "guardrail" }) => void;
 	/** `Compare with the plan` — draws the Library plan this run ran in `mainSection`. */
 	onOpenPlan?: (planKey: string) => void;
 }
 
-// The address every crumb uses — defined beside the dashboards that
+// The address every crumb uses — defined beside the boards that
 // share it, re-exported here for the callers that already import it from here.
 export { runAddress };
 
@@ -74,7 +74,7 @@ export function RunDetail({
 	username,
 	graphSlug,
 	runId,
-	onOpenDashboard,
+	onOpenBoard,
 	onOpenPlan,
 	onOpenLens,
 }: RunDetailProps) {
@@ -129,7 +129,7 @@ export function RunDetail({
 				{groups.length ? (
 					<Section
 						title="Waterfall"
-						aside={onOpenDashboard ? "click a task ›" : undefined}
+						aside={onOpenBoard ? "click a task ›" : undefined}
 					>
 						<Gantt
 							rows={waterfallTasks(groups)}
@@ -137,10 +137,10 @@ export function RunDetail({
 							density="compact"
 							showDetail={false}
 							onSelectRow={
-								onOpenDashboard
+								onOpenBoard
 									? (key) => {
 											const group = groups.find((g) => g.key === key);
-											if (group) onOpenDashboard(runId, group.head.id);
+											if (group) onOpenBoard(runId, group.head.id);
 										}
 									: undefined
 							}
@@ -191,10 +191,10 @@ export function RunDetail({
 				) : null}
 			</div>
 
-			{onOpenDashboard || (onOpenPlan && planKey) ? (
+			{onOpenBoard || (onOpenPlan && planKey) ? (
 				<div className="flex shrink-0 gap-2 border-t px-3 py-2.5">
-					{onOpenDashboard ? (
-						<Button onClick={() => onOpenDashboard(runId)}>
+					{onOpenBoard ? (
+						<Button onClick={() => onOpenBoard(runId)}>
 							{isLive(t.status) ? "Follow the run" : "Open the answer"}
 						</Button>
 					) : null}

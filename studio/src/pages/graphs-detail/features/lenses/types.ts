@@ -219,7 +219,7 @@ export interface Touch {
 	/**
 	 * `tokens_in` and `tokens_out` are two numbers on the wire, because a run that
 	 * read a lot and wrote a little is a different run from its mirror — the step
-	 * dashboard adds them for the one-line readout and the record keeps them apart.
+	 * board adds them for the one-line readout and the record keeps them apart.
 	 */
 	volume: {
 		rows?: number;

@@ -213,7 +213,7 @@ class TouchRead(BaseModel):
 
 
 class TouchesRead(BaseModel):
-    """One run's ledger, and the three numbers the dashboard leads with.
+    """One run's ledger, and the three numbers the board leads with.
 
     ``allowed`` is what the frozen lens permits across the catalogue; ``touched``
     is what actually happened. The **difference between the two** is what a

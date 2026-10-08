@@ -55,7 +55,7 @@ export function SkillDetail({
 	editing,
 	onEditing,
 	onOpenAgent,
-	onOpenUsageDashboard,
+	onOpenUsageBoard,
 }: {
 	username: string;
 	graphSlug: string;
@@ -64,7 +64,7 @@ export function SkillDetail({
 	onEditing: (editing: boolean) => void;
 	onOpenAgent?: (id: string) => void;
 	/** `Usage…` — opens `skill_usage:<id>` beside this page. */
-	onOpenUsageDashboard?: (skillId: string) => void;
+	onOpenUsageBoard?: (skillId: string) => void;
 }) {
 	const [tab, setTab] = useState<SkillTab>("playbook");
 	// The **current** version's plan: what a step is offered today (a
@@ -98,11 +98,11 @@ export function SkillDetail({
 					</>
 				}
 				actions={
-					onOpenUsageDashboard && !skill.is_draft ? (
+					onOpenUsageBoard && !skill.is_draft ? (
 						<Button
 							size="sm"
 							variant="ghost"
-							onClick={() => onOpenUsageDashboard(skill.id)}
+							onClick={() => onOpenUsageBoard(skill.id)}
 						>
 							<BarChart3 /> Usage…
 						</Button>
@@ -154,7 +154,7 @@ export function SkillDetail({
 								username={username}
 								graphSlug={graphSlug}
 								skill={skill}
-								onOpenDashboard={onOpenUsageDashboard}
+								onOpenBoard={onOpenUsageBoard}
 							/>
 						),
 					},
@@ -435,12 +435,12 @@ function UsageTab({
 	username,
 	graphSlug,
 	skill,
-	onOpenDashboard,
+	onOpenBoard,
 }: {
 	username: string;
 	graphSlug: string;
 	skill: Skill;
-	onOpenDashboard?: (skillId: string) => void;
+	onOpenBoard?: (skillId: string) => void;
 }) {
 	const usage = useSkillUsageQuery(username, graphSlug, skill.id);
 	if (usage.isLoading) return <Spinner />;
@@ -461,12 +461,12 @@ function UsageTab({
 				}
 				hint="offered is a fact; applied is the model's own report, and nothing more"
 				action={
-					onOpenDashboard ? (
+					onOpenBoard ? (
 						<Button
 							variant="ghost"
 							size="sm"
 							className="h-6 text-base"
-							onClick={() => onOpenDashboard(skill.id)}
+							onClick={() => onOpenBoard(skill.id)}
 						>
 							More
 						</Button>
