@@ -9,8 +9,8 @@
  * the model that declares the label. Advice is a draft change, never a write.
  */
 
+import type { RowSpec } from "@invana/boards";
 import { LineChart } from "@invana/charts";
-import type { RowSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import {
 	Alert,
@@ -94,7 +94,7 @@ export function performanceRows(
 			{
 				panels: [
 					{
-						kind: "metrics",
+						kind: "grid",
 						options: {
 							tiles: ["Queries", "p50", "p95", "Errors", "Slow shapes"].map(
 								(label) => ({
@@ -181,40 +181,37 @@ export function performanceRows(
 		{
 			panels: [
 				{
-					kind: "metrics",
+					kind: "grid",
 					options: {
 						tiles: [
 							{
 								label: "Queries",
 								value: fmtNum(performance.total),
-								caption: one
-									? `touching ${opts.scopeName}`
-									: `${opts.days} days`,
+								delta: one ? `touching ${opts.scopeName}` : `${opts.days} days`,
 							},
 							{
 								label: "p50",
 								value: fmtMs(performance.p50),
-								caption: one ? "" : "half of calls under it",
+								delta: one ? "" : "half of calls under it",
 							},
 							{
 								label: "p95",
 								value: fmtMs(performance.p95),
-								caption:
-									graphP95 != null ? `the Graph's ${fmtMs(graphP95)}` : "",
-								tone: one && slow(performance.p95) ? "warning" : undefined,
+								delta: graphP95 != null ? `the Graph's ${fmtMs(graphP95)}` : "",
+								tone: one && slow(performance.p95) ? "warn" : undefined,
 							},
 							{
 								label: "Errors",
 								value: `${(errorRate * 100).toFixed(1)}%`,
-								caption: `${fmtNum(performance.errors)} of ${fmtNum(performance.total)}`,
-								tone: performance.errors ? "error" : undefined,
+								delta: `${fmtNum(performance.errors)} of ${fmtNum(performance.total)}`,
+								tone: performance.errors ? "bad" : undefined,
 							},
 							{
 								label: "Slow shapes",
 								value: String(performance.slow_shapes),
-								caption:
+								delta:
 									graphP95 != null ? `p95 at or above ${fmtMs(graphP95)}` : "",
-								tone: performance.slow_shapes ? "warning" : undefined,
+								tone: performance.slow_shapes ? "warn" : undefined,
 							},
 						],
 					},
@@ -254,8 +251,7 @@ export function performanceRows(
 							columns={columns}
 							data={performance.shapes}
 							density="compact"
-							bordered={false}
-							enablePagination={false}
+							seamless
 							onRowClick={(r) => opts.onSelect(r.hash)}
 							isRowSelected={(r) => r.hash === opts.selected}
 							emptyState={

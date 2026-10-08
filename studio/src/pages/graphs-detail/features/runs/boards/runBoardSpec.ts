@@ -6,7 +6,7 @@ import { usd } from "@/lib/format";
  * A pure function of one `GET …/runs/{id}/trace` ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
  * tiles · the flow with status on it · the Gantt · what opened the run and
  * `result.json` · the log. Nothing here fetches, nothing here renders — the
- * page does the first and `@invana/dashboard` does the second, and this file is
+ * page does the first and `@invana/boards` does the second, and this file is
  * the whole of what the two have to agree on.
  *
  * Bands with nothing behind them are **absent, not empty**
@@ -17,14 +17,15 @@ import { usd } from "@/lib/format";
  * [see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 
+import type { GanttSpecBar, GanttSpecRow } from "@invana/blocks";
 import type {
-	DashboardSpec,
+	BoardSpec,
 	LogOptions,
 	PanelSpec,
 	RunPanelOptions,
 	TabSpec,
-} from "@invana/dashboard";
-import type { TaskGanttSegment, TaskGanttTask } from "@invana/ui";
+} from "@invana/boards";
+import type { GanttBar, GanttRow } from "@invana/ui";
 import { formatDuration } from "@/lib/time";
 import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
 import {
@@ -41,9 +42,9 @@ import {
 	count,
 	durationMs,
 	ganttStatusOf,
+	gaugeOf,
 	groupSteps,
 	isLive,
-	meterOf,
 	offsetOf,
 	omit,
 	originOf,
@@ -71,7 +72,7 @@ export const RUN_ACTIONS = {
 	selectTask: "select-task",
 	/** A flow card — opens that task inside the run, by step id. */
 	openStep: "open-step",
-	/** A column of the layer strip — opens that task inside the run, by group key. */
+	/** A bar on the layers gantt — opens the task it belongs to, by group key. */
 	selectTouchStep: "select-touch-step",
 	/** The tab strip under the header. */
 	tab: "tab",
@@ -79,8 +80,6 @@ export const RUN_ACTIONS = {
 	retune: "retune",
 	/** Pick the second run, and open `compare:<a>:<b>` as a page. */
 	compare: "compare",
-	/** The layer strip's `Fit` switch — on fits the panel, off scrolls. */
-	layersFit: "layers-fit",
 } as const;
 
 /** The run page's tabs, in order. */
@@ -106,21 +105,20 @@ export interface RunBoardView {
 	touches?: TouchesResponse;
 	/** The world the run froze. Absent reads `Everything`, which is a real one. */
 	lensName?: string | null;
-	/** The layer strip fits the panel's width. Absent reads on. */
-	layersFit?: boolean;
 }
 
 /**
  * The panel kinds this dashboard draws beyond the built-ins.
  *
  * `RunPanelOptions` is the kit's own run vocabulary — `trace · touched ·
- * attempts · artifacts · layers · lens · clarification` — registered as
+ * attempts · artifacts · lens · clarification` — registered as
  * `RUN_PANELS`. `flow` is the one Studio still owns: a run's plan on a canvas
  * is `@invana/canvas`, which a dashboard package does not depend on.
  *
- * What stays here is the **composing**: `layers` and `lens` are drawn by the
- * kit and fed from Govern's ledger, because how a `TouchesResponse` becomes
- * bands and sections is Studio's knowledge, not the kit's.
+ * What stays here is the **composing**: the layers `gantt` and `lens` are
+ * drawn by the kit and fed from Govern's ledger, because how a
+ * `TouchesResponse` becomes rows and sections is Studio's knowledge, not the
+ * kit's.
  */
 export type RunPanels = WithFlow & RunPanelOptions;
 
@@ -130,13 +128,13 @@ const FLOW_HEIGHT = 360;
 
 export function runBoardSpec(
 	trace: TraceRead,
-	{ view, tab, selectedKey, touches, lensName, layersFit }: RunBoardView,
-): DashboardSpec<RunPanels> {
+	{ view, tab, selectedKey, touches, lensName }: RunBoardView,
+): BoardSpec<RunPanels> {
 	const groups = groupSteps(trace.steps);
 	const live = isLive(trace.status);
 	const selected = groups.find((g) => g.key === selectedKey) ?? null;
 
-	const header: DashboardSpec<RunPanels>["header"] = {
+	const header: BoardSpec<RunPanels>["header"] = {
 		tone: toneOf(trace.status),
 		// Addressed, not titled: what was asked is the Overview's first row.
 		crumbs: [runAddress(trace.run_id)],
@@ -185,21 +183,13 @@ export function runBoardSpec(
 		]),
 	};
 
-	const spec: DashboardSpec<RunPanels> = {
+	const spec: BoardSpec<RunPanels> = {
 		title: runTitle(trace),
 		header,
 		rows: [],
 		tab,
 		tabAction: RUN_ACTIONS.tab,
-		tabs: runTabs(
-			trace,
-			groups,
-			selected,
-			selectedKey,
-			touches,
-			lensName,
-			layersFit ?? true,
-		),
+		tabs: runTabs(trace, groups, selected, selectedKey, touches, lensName),
 	};
 
 	// `spec.json` renders the document it is inside — the same spec, in one code
@@ -223,7 +213,6 @@ function runTabs(
 	selectedKey: string | null,
 	touches: TouchesResponse | undefined,
 	lensName: string | null | undefined,
-	layersFit: boolean,
 ): TabSpec<RunPanels>[] {
 	const summary = runSummary(trace, touches);
 	return [
@@ -254,7 +243,7 @@ function runTabs(
 					? {
 							panels: [
 								{
-									kind: "properties" as const,
+									kind: "record" as const,
 									title: "Bounds reached",
 									aside: summary.boundsAside ?? undefined,
 									options: { rows: summary.bounds },
@@ -269,7 +258,7 @@ function runTabs(
 			id: "layers",
 			label: "Layers",
 			rows: touches
-				? [{ panels: [layerStrip(touches, trace, selectedKey, layersFit)] }]
+				? [{ panels: [layerStrip(touches, trace, selectedKey)] }]
 				: [{ panels: [notRecorded("What each step engaged")] }],
 		},
 		{
@@ -315,23 +304,13 @@ function layerStrip(
 	touches: TouchesResponse,
 	trace: TraceRead,
 	selectedKey: string | null,
-	layersFit: boolean,
 ): PanelSpec<RunPanels> {
-	const options = {
-		...layersOptions(touches, trace.steps, {
-			selectedItem: selectedKey,
-			selectAction: RUN_ACTIONS.selectTouchStep,
-		}),
-		// On, every step stays in the panel's width as it is resized; off, the
-		// bars keep a measurable width and the strip scrolls.
-		fit: layersFit,
-	};
-
 	return {
-		kind: "layers",
+		// The panel's id is the action a pick answers — see `routedAction`.
+		id: RUN_ACTIONS.selectTouchStep,
+		kind: "gantt",
 		title: "What each step engaged",
 		aside: `${touches.total} touch${touches.total === 1 ? "" : "es"}`,
-		actions: [{ id: RUN_ACTIONS.layersFit, label: "Fit", pressed: layersFit }],
 		flush: true,
 		// Not an empty track. *Nothing was recorded* and *nothing was touched*
 		// are different facts, and an empty axis says the second while meaning
@@ -344,13 +323,13 @@ function layerStrip(
 					reason: "unrecorded" as const,
 					note: "This run opened before runs of its kind were governed; what it engaged was not recorded.",
 				},
-		options,
+		options: layersOptions(touches, trace.steps, { selected: selectedKey }),
 	};
 }
 
 /** · the counts the retune rests on — allowed · touched · never · refused. */
 function lensTiles(touches: TouchesResponse): PanelSpec<RunPanels> {
-	return { kind: "metrics", options: { tiles: lensSummary(touches) } };
+	return { kind: "grid", options: { tiles: lensSummary(touches) } };
 }
 
 /**
@@ -392,16 +371,16 @@ function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 	const ceilings = trace.budget ?? { max_tokens: null, max_cost_usd: null };
 
 	return {
-		kind: "metrics",
+		kind: "grid",
 		options: {
 			tiles: omit([
 				total
 					? {
 							label: "Tasks",
 							value: `${done} / ${total}`,
-							caption: live ? trace.status : (trace.outcome ?? trace.status),
+							delta: live ? trace.status : (trace.outcome ?? trace.status),
 							tone: tileToneOf(trace.status),
-							meter: total ? done / total : undefined,
+							gauge: total ? { value: done, max: total } : undefined,
 						}
 					: null,
 				ms == null
@@ -409,7 +388,7 @@ function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 					: {
 							label: live ? "Elapsed" : "Duration",
 							value: formatDuration(ms),
-							caption: live ? "still running" : `${total} tasks`,
+							delta: live ? "still running" : `${total} tasks`,
 						},
 				// `8.2k of 40k`, with the meter — and a bare `8.2k` when the run
 				// had no agent, because the ceiling is the agent's.
@@ -419,8 +398,8 @@ function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 							value: ceilings.max_tokens
 								? `${compact(tokens)} of ${compact(ceilings.max_tokens)}`
 								: compact(tokens),
-							caption: `in ${count(trace.tokens_in ?? 0)} · out ${count(trace.tokens_out ?? 0)}`,
-							meter: meterOf(tokens, ceilings.max_tokens),
+							delta: `in ${count(trace.tokens_in ?? 0)} · out ${count(trace.tokens_out ?? 0)}`,
+							gauge: gaugeOf(tokens, ceilings.max_tokens),
 						}
 					: null,
 				// Absent when nothing this run ran had a published rate — never
@@ -431,32 +410,32 @@ function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 							value: ceilings.max_cost_usd
 								? `${usd(trace.cost_usd)} of ${usd(ceilings.max_cost_usd)}`
 								: usd(trace.cost_usd),
-							caption: ceilings.max_cost_usd
+							delta: ceilings.max_cost_usd
 								? "against the agent's ceiling"
 								: "no ceiling on this run",
-							meter: meterOf(trace.cost_usd, ceilings.max_cost_usd),
+							gauge: gaugeOf(trace.cost_usd, ceilings.max_cost_usd),
 						}
 					: null,
 				rows
 					? {
 							label: "Rows",
 							value: count(rows),
-							caption: `${trace.emissions.length} emission${trace.emissions.length === 1 ? "" : "s"}`,
+							delta: `${trace.emissions.length} emission${trace.emissions.length === 1 ? "" : "s"}`,
 						}
 					: null,
 				retried.length
 					? {
 							label: "Retries",
 							value: String(retried.length),
-							caption: retried[0].taskKey,
-							tone: "warning" as const,
+							delta: retried[0].taskKey,
+							tone: "warn" as const,
 						}
 					: null,
 				fanned.length
 					? {
 							label: "Lanes",
 							value: String(Math.max(...fanned.map((g) => g.lanes))),
-							caption: fanned[0].taskKey,
+							delta: fanned[0].taskKey,
 						}
 					: null,
 			]),
@@ -486,7 +465,7 @@ function flow(
  * The waterfall's rows — one per task, on the run's clock. Shared by
  * the Overview and the section, so the two draw one chart.
  */
-export function waterfallTasks(groups: TaskGroup[]): TaskGanttTask[] {
+export function waterfallTasks(groups: TaskGroup[]): GanttRow[] {
 	return groups.map((group) => {
 		const earlier = group.steps.slice(0, -1);
 		return {
@@ -510,6 +489,57 @@ export function waterfallTasks(groups: TaskGroup[]): TaskGanttTask[] {
 	});
 }
 
+/**
+ * The same rows as the `gantt` block reads them — milliseconds from the run's
+ * zero rather than instants, and a result as label/value pairs.
+ */
+function waterfallSpecRows(
+	groups: TaskGroup[],
+	origin: string | null,
+): GanttSpecRow[] {
+	const zero = origin ? Date.parse(origin) : Number.NaN;
+	const span = (bar: GanttBar): GanttSpecBar => {
+		const start = bar.startedAt
+			? Date.parse(String(bar.startedAt))
+			: Number.NaN;
+		const end = bar.finishedAt
+			? Date.parse(String(bar.finishedAt))
+			: Number.NaN;
+		if (Number.isNaN(zero) || Number.isNaN(start))
+			return { status: bar.status };
+		return {
+			status: bar.status,
+			startMs: start - zero,
+			durationMs: Number.isNaN(end) ? undefined : Math.max(0, end - start),
+		};
+	};
+	return waterfallTasks(groups).map((row) => ({
+		key: row.key,
+		label: typeof row.label === "string" ? row.label : undefined,
+		...span(row),
+		attempts: row.attempts?.map(span),
+		log: typeof row.log === "string" ? row.log : undefined,
+		result: pairsOf(row.result),
+		error: row.error
+			? {
+					code: String(row.error.code ?? ""),
+					message: String(row.error.message ?? ""),
+				}
+			: undefined,
+	}));
+}
+
+/** A result object as the card's label/value pairs; nested values as JSON. */
+function pairsOf(result: unknown): Record<string, string | number> | undefined {
+	if (!result || typeof result !== "object") return undefined;
+	return Object.fromEntries(
+		Object.entries(result).map(([k, v]) => [
+			k,
+			typeof v === "number" || typeof v === "string" ? v : JSON.stringify(v),
+		]),
+	);
+}
+
 function performance(
 	trace: TraceRead,
 	groups: TaskGroup[],
@@ -517,18 +547,17 @@ function performance(
 ): PanelSpec<RunPanels> {
 	const origin = originOf(trace);
 	const live = isLive(trace.status);
-	const tasks = waterfallTasks(groups);
 
 	return {
-		id: "performance",
+		// The panel's id is the action a pick answers — see `routedAction`.
+		id: RUN_ACTIONS.selectTask,
 		kind: "gantt",
 		title: "Waterfall — where the time went",
 		aside: performanceAside(groups, selectedKey),
 		options: {
-			tasks,
+			tasks: waterfallSpecRows(groups, origin),
 			density: "comfortable",
-			selectedKey,
-			selectAction: RUN_ACTIONS.selectTask,
+			selected: selectedKey ?? undefined,
 			nowMs:
 				live && origin ? Date.now() - new Date(origin).getTime() : undefined,
 			openEnded: live,
@@ -536,7 +565,7 @@ function performance(
 	};
 }
 
-function segmentOf(step: TraceStepRead): TaskGanttSegment {
+function segmentOf(step: TraceStepRead): GanttBar {
 	return {
 		startedAt: step.started_at ?? undefined,
 		finishedAt: step.finished_at ?? undefined,
@@ -569,7 +598,7 @@ function performanceAside(
 /** What opened the run — the trace's own provenance, not a second record. */
 function input(trace: TraceRead): PanelSpec<RunPanels> {
 	return {
-		kind: "properties",
+		kind: "record",
 		title: "Input · what opened this run",
 		aside: "what the trace recorded",
 		options: {

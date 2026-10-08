@@ -24,7 +24,7 @@
  * of one read, which is what lets `spec.json` show the document the page is.
  */
 
-import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
+import type { BoardSpec, PanelSpec } from "@invana/boards";
 import {
 	GOVERNED_LAYERS,
 	layerSummary,
@@ -77,10 +77,10 @@ export interface LensBoardView {
 export function lensBoardSpec(
 	lens: Lens,
 	{ view, mayEdit }: LensBoardView,
-): DashboardSpec {
+): BoardSpec {
 	const guardrail = lens.kind === "guardrail";
 
-	const header: DashboardSpec["header"] = {
+	const header: BoardSpec["header"] = {
 		crumbs: [guardrail ? "Guardrails" : "Worlds", lens.display_name],
 		chips: omit([
 			{ label: lens.kind },
@@ -107,7 +107,7 @@ export function lensBoardSpec(
 		]),
 	};
 
-	const spec: DashboardSpec = {
+	const spec: BoardSpec = {
 		title: lens.display_name,
 		header,
 		rows: bands(lens),
@@ -138,7 +138,7 @@ function narrows(rule: GovernRule): string {
 	return bits.join(" · ");
 }
 
-function bands(lens: Lens): DashboardSpec["rows"] {
+function bands(lens: Lens): BoardSpec["rows"] {
 	const guardrail = lens.kind === "guardrail";
 	const rules = lens.rules ?? [];
 	const closed = lens.closed_layers ?? [];
@@ -147,17 +147,17 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 	const resolved = lens.cast_resolved ?? [];
 	const denied = resolved.filter((row) => row.address && !row.allowed);
 
-	return omit<DashboardSpec["rows"][number]>([
+	return omit<BoardSpec["rows"][number]>([
 		{
 			panels: [
 				{
-					kind: "metrics",
+					kind: "grid",
 					options: {
 						tiles: omit([
 							{
 								label: "Rules",
 								value: count(rules.length),
-								caption: `${count(rules.filter((r) => r.allow).length)} allow · ${count(
+								delta: `${count(rules.filter((r) => r.allow).length)} allow · ${count(
 									rules.filter((r) => !r.allow).length,
 								)} deny`,
 							},
@@ -168,7 +168,7 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 									: "none",
 								// A layer named here admits only what its rules allow; one
 								// absent is permitted whole.
-								caption: closed.length
+								delta: closed.length
 									? "admit only what a rule allows"
 									: "every layer permitted whole",
 							},
@@ -179,12 +179,12 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 								? {
 										label: "In force",
 										value: "every run",
-										caption: "a guardrail is not a world you pick",
+										delta: "a guardrail is not a world you pick",
 									}
 								: {
 										label: "Runs",
 										value: count(usage?.runs ?? 0),
-										caption: usage?.runs
+										delta: usage?.runs
 											? "asked under this world"
 											: "nobody has asked under it yet",
 									},
@@ -193,7 +193,7 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 								: {
 										label: "Last used",
 										value: since(usage?.last_used_at) ?? "—",
-										caption: usage?.actor_ids?.length
+										delta: usage?.actor_ids?.length
 											? `${count(usage.actor_ids.length)} people`
 											: "no run has picked it",
 									},
@@ -205,7 +205,7 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 		{
 			panels: [
 				{
-					kind: "properties",
+					kind: "record",
 					title: "The record",
 					aside: "one object — what an auditor is handed",
 					options: {
@@ -238,7 +238,7 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 					},
 				} as PanelSpec,
 				{
-					kind: "properties",
+					kind: "record",
 					title: "The five layers",
 					aside: "what each one says about itself",
 					options: {
@@ -266,9 +266,9 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 						options: {
 							columns: [
 								{ key: "match", label: "address", mono: true },
-								{ key: "rule", label: "" },
-								{ key: "narrows", label: "narrows" },
-								{ key: "egress", label: "may send" },
+								{ key: "rule", label: "", mono: true },
+								{ key: "narrows", label: "narrows", mono: true },
+								{ key: "egress", label: "may send", mono: true },
 							],
 							rows: inLayer.map((rule) => ({
 								match: rule.match,
@@ -295,10 +295,10 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 							flush: true,
 							options: {
 								columns: [
-									{ key: "role", label: "role" },
+									{ key: "role", label: "role", mono: true },
 									{ key: "address", label: "resolves to", mono: true },
-									{ key: "source", label: "from" },
-									{ key: "allowed", label: "allowed" },
+									{ key: "source", label: "from", mono: true },
+									{ key: "allowed", label: "allowed", mono: true },
 									{ key: "rule", label: "by", mono: true },
 								],
 								// The resolution is the richer read and supersedes the

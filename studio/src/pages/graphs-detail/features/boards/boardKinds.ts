@@ -27,7 +27,7 @@
  *
  * ## Why this file exists
  *
- * `BoardPagesViewPanel` switches tools, inspector, legend and footer by kind
+ * `Workbook` switches tools, inspector, legend and footer by kind
  * (docs/for-developers/modules/explore/spec.md / docs/for-developers/modules/explore/features/selection-and-the-panel.md), and the selection handler branches by kind too.
  * Keeping the table here means those two never drift, and adding a kind is one
  * entry rather than a hunt.

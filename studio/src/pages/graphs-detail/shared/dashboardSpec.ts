@@ -1,7 +1,7 @@
 /**
  * What every declared board agrees on, whichever module owns it.
  *
- * Four surfaces compose a `DashboardSpec` now — a run and a task run
+ * Four surfaces compose a `BoardSpec` now — a run and a task run
  * ([Runs](../features/runs/boards)), and a skill, its usage and a
  * rule ([Skills](../features/skills/boards) · [Rules](../features/rules/boards)) — and these five helpers were
  * the part of the vocabulary that has nothing to do with runs. Two modules
@@ -13,7 +13,7 @@
  * module that owns that record.
  */
 
-import type { PanelSpec } from "@invana/dashboard";
+import type { ActionContext, ExtraPanels, PanelSpec } from "@invana/boards";
 
 /**
  * Drop the entries that have nothing behind them.
@@ -26,6 +26,26 @@ import type { PanelSpec } from "@invana/dashboard";
  */
 export function omit<T>(items: Array<T | null | undefined | false>): T[] {
 	return items.filter((item): item is T => Boolean(item));
+}
+
+/**
+ * A block panel's pick, as the action its panel names.
+ *
+ * A `table` or `gantt` block sends one action, `select`, with the picked row's
+ * key as `ctx.value`; it cannot carry a page's own action id. So a selectable
+ * panel takes that action id as its `id`, and every board's `onAction` reads
+ * its actions through this: `select` from such a panel becomes the panel's
+ * action, with the key as `itemId` — the same shape a `list` row sends.
+ */
+export function routedAction(
+	id: string,
+	ctx?: ActionContext,
+): [string, ActionContext | undefined] {
+	if (id !== "select" || !ctx?.panelId) return [id, ctx];
+	return [
+		ctx.panelId,
+		{ ...ctx, itemId: ctx.value == null ? undefined : String(ctx.value) },
+	];
 }
 
 /** `1,204` — counts are read, not computed, so they carry their separators. */
@@ -45,8 +65,10 @@ export const VIEW_SPEC = "spec.json";
  * the page can show you the JSON it is, and a panel that could not be
  * serialised would show up here as the hole it is.
  */
-export function specPanel(spec: unknown): PanelSpec {
-	return {
+export function specPanel<X extends ExtraPanels = Record<never, never>>(
+	spec: unknown,
+): PanelSpec<X> {
+	const panel: PanelSpec = {
 		kind: "code",
 		title: "spec.json",
 		aside: "the document this page renders",
@@ -57,4 +79,6 @@ export function specPanel(spec: unknown): PanelSpec {
 			value: JSON.stringify(spec, null, 2),
 		},
 	};
+	// A `code` panel is a built-in, so it is a panel of every board.
+	return panel as PanelSpec<X>;
 }

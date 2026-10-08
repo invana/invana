@@ -24,11 +24,11 @@ import {
 	Button,
 	ClampedText,
 	Eyebrow,
+	Gantt,
 	PropertyList,
 	PropertyRow,
 	RecordHeader,
 	Spinner,
-	TaskGantt,
 	TouchStrip,
 } from "@invana/ui";
 import type { ReactNode } from "react";
@@ -131,12 +131,12 @@ export function RunDetail({
 						title="Waterfall"
 						aside={onOpenDashboard ? "click a task ›" : undefined}
 					>
-						<TaskGantt
-							tasks={waterfallTasks(groups)}
+						<Gantt
+							rows={waterfallTasks(groups)}
 							origin={originOf(t) ?? undefined}
 							density="compact"
 							showDetail={false}
-							onSelectTask={
+							onSelectRow={
 								onOpenDashboard
 									? (key) => {
 											const group = groups.find((g) => g.key === key);

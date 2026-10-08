@@ -1,14 +1,14 @@
 /**
- * The plan page — `plan_runs:<plan_id>` in `BoardPagesViewPanel`
+ * The plan page — `plan_runs:<plan_id>` in `Workbook`
  * ([the-library.md](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * It fetches and answers actions. It composes nothing: `planBoardSpec`
- * builds the document and `@invana/dashboard` draws it. The window, the tab,
+ * builds the document and `@invana/boards` draws it. The window, the tab,
  * the picked step and the Activity filters are this page's reading — held
  * here, never in the URL, because a link to a plan is a link to the plan.
  */
 
-import { Dashboard, type DashboardSpec, RUN_PANELS } from "@invana/dashboard";
+import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useMemo, useState } from "react";
 import { useReport } from "@/pages/graphs-detail/features/boards";
@@ -30,10 +30,10 @@ import {
 	useTaskPlansQuery,
 } from "@/pages/graphs-detail/features/plans/queries";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
+import { routedAction } from "@/pages/graphs-detail/shared/dashboardSpec";
 import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 
 const REGISTRY = {
-	layers: RUN_PANELS.layers,
 	flow: TaskFlowWidget,
 	...PLAN_CHART_WIDGETS,
 };
@@ -98,7 +98,7 @@ export function PlanBoardPage({
 			: undefined,
 	);
 
-	const spec = useMemo((): DashboardSpec<PlanPanels> | null => {
+	const spec = useMemo((): BoardSpec<PlanPanels> | null => {
 		if (!plan.data) return null;
 		return planBoardSpec(
 			{
@@ -134,12 +134,13 @@ export function PlanBoardPage({
 		setView((v) => ({ ...v, ...patch }));
 
 	return (
-		<Dashboard
+		<Board
 			className="h-full min-h-0"
 			spec={report.spec}
 			registry={REGISTRY}
 			icons={DASHBOARD_ICONS}
-			onAction={(id, ctx) => {
+			onAction={(action, context) => {
+				const [id, ctx] = routedAction(action, context);
 				if (report.handle(id)) return;
 				switch (id) {
 					case PLAN_ACTIONS.tab:

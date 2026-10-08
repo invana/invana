@@ -204,7 +204,6 @@ export function AccessTokensTab() {
 				columns={columns}
 				data={listing.tokens}
 				enableSorting
-				enablePagination={false}
 				emptyState={
 					<EmptyState
 						icon={<KeySquare className="size-6" />}

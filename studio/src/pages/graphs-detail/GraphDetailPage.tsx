@@ -1,6 +1,5 @@
 import { CanvasContext } from "@invana/canvas-react";
-import { BoardPagesViewPanel } from "@invana/canvas-ui";
-import { ErrorBoundary } from "@invana/ui";
+import { ErrorBoundary, Workbook } from "@invana/ui";
 import { useCallback, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSessions } from "@/pages/graphs-detail/features/assistant";
@@ -337,10 +336,9 @@ export function GraphDetailPage() {
 						// (graph-detail-page.md the-shell.md).
 						content: (
 							<ErrorBoundary onError={reportBoundaryError}>
-								<BoardPagesViewPanel
+								<Workbook
 									{...strip}
 									addLabel="New canvas"
-									menuLabel="Page options"
 									// Until each canvas owns its own engine, only the active page is
 									// mounted — today's behaviour, now stated rather than emergent.
 									keepMounted={false}

@@ -24,7 +24,7 @@
  * card it opens is drawn by `DeclaredBoard`, because a hook cannot draw.
  */
 
-import type { DashboardSpec, ExtraPanels } from "@invana/dashboard";
+import type { BoardSpec, ExtraPanels } from "@invana/boards";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext } from "react";
 import { toast } from "sonner";
@@ -52,7 +52,7 @@ export const DeclaredBoardContext = createContext<DeclaredBoardValue | null>(
 
 export interface Report<X extends ExtraPanels = Record<never, never>> {
 	/** The composed spec with `Save report` on its header. */
-	spec: DashboardSpec<X>;
+	spec: BoardSpec<X>;
 	/**
 	 * Answers the action if it is one of these two, and says so.
 	 *
@@ -68,12 +68,12 @@ export interface Report<X extends ExtraPanels = Record<never, never>> {
  * built-ins would make `Save report` the thing that erased a page's own panel.
  */
 export function useReport<X extends ExtraPanels>(
-	spec: DashboardSpec<X> | null,
+	spec: BoardSpec<X> | null,
 ): Report<X> | null {
 	const board = useContext(DeclaredBoardContext);
 	const qc = useQueryClient();
 	const save = useMutation({
-		mutationFn: (document: DashboardSpec<X>) => {
+		mutationFn: (document: BoardSpec<X>) => {
 			if (!board) throw new Error("No board to report on.");
 			return boardReportsApi.create(
 				board.username,

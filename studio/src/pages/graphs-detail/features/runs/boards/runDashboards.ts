@@ -12,8 +12,9 @@
  * `$0.00` or `{}`.
  */
 
-import type { ChipSpec, Tone } from "@invana/dashboard";
-import type { Bound, StatusDotProps, TaskGanttStatus } from "@invana/ui";
+import type { GanttSpecStatus, Tone as TileTone } from "@invana/blocks";
+import type { ChipSpec, Tone } from "@invana/boards";
+import type { Bound, StatusDotProps } from "@invana/ui";
 import type {
 	TraceRead,
 	TraceStepRead,
@@ -62,17 +63,20 @@ function chipToneOf(status: string): Tone | undefined {
 	return tone === "queued" || tone == null ? undefined : tone;
 }
 
-/** A tile's tone, which has no `muted` either — an unremarkable tile has none. */
-export function tileToneOf(
-	status: string,
-): "running" | "success" | "warning" | "error" | "info" | undefined {
-	const tone = chipToneOf(status);
-	return tone === "muted" ? undefined : tone;
+/** A tile's tone — good, bad or a warning; an unremarkable tile has none. */
+const TILE_TONES: Partial<Record<string, TileTone>> = {
+	success: "good",
+	error: "bad",
+	warning: "warn",
+};
+
+export function tileToneOf(status: string): TileTone | undefined {
+	return TILE_TONES[toneOf(status) ?? ""];
 }
 
 /** The Gantt's own vocabulary is the engine's, so this is a narrow, not a map. */
-export function ganttStatusOf(status: string): TaskGanttStatus {
-	return status as TaskGanttStatus;
+export function ganttStatusOf(status: string): GanttSpecStatus {
+	return status as GanttSpecStatus;
 }
 
 /** A catalogue bound, when the trace named one the kit can draw. */
@@ -115,19 +119,20 @@ export {
 } from "@/pages/graphs-detail/shared/dashboardSpec";
 
 /**
- * `0`–`1` for a value that has a real ceiling, `undefined` for one that does not.
+ * A tile's gauge — the value against its ceiling — or `undefined` when there is
+ * no real ceiling.
  *
  * [see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md):
  * a spend without its ceiling is a number nobody can act on — so the meter is
  * drawn only when the trace carried a ceiling, and a run over its ceiling still
  * draws a full bar rather than one that overflows the tile.
  */
-export function meterOf(
+export function gaugeOf(
 	value: number,
 	ceiling: number | null | undefined,
-): number | undefined {
+): { value: number; max: number } | undefined {
 	if (!ceiling || ceiling <= 0) return undefined;
-	return Math.min(1, value / ceiling);
+	return { value: Math.min(1, value / ceiling), max: 1 };
 }
 
 /** Milliseconds between two instants, `null` when either is missing. */

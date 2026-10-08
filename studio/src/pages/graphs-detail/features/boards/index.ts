@@ -3,7 +3,7 @@
  * (4.2 [boards]).
  *
  * This file is the border (code-shape.md §4.1). The host in `mainSection` is one
- * `BoardPagesViewPanel`, and the nine kinds in it are owned by four modules
+ * `Workbook`, and the nine kinds in it are owned by four modules
  * (boards.md) — so this folder exports the host and the `data` page body,
  * and takes the others as page kinds rather than importing them.
  */

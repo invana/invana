@@ -1,15 +1,15 @@
 /**
- * The run's ledger, as the **kit's** layer strip reads it.
+ * The run's ledger, as the **kit's** `gantt` block reads it — a row per layer,
+ * opening into its participants, a bar per touch.
  *
  * *As someone reading an answer I am about to act on, I want to see which
  * participants each step engaged and which ones it was refused, in the order it
  * happened, so that "what grounded this" is a drawing rather than a log I
  * reconstruct.*
  *
- * **This file composes; it does not render.** `@invana/dashboard` ships the
- * `layers` panel and `@invana/ui` ships `LayerStrip`, so Studio's job is the
- * one thing neither of them can know: how a `TouchesResponse` and a trace
- * become bands and bars. A renderer here would be a second drawing of the same
+ * **This file composes; it does not render.** `@invana/blocks` ships the
+ * `gantt` block, so Studio's job is the one thing the kit cannot know: how a
+ * `TouchesResponse` and a trace become rows and bars. A renderer here would be a second drawing of the same
  * data, which is what [design-system.md](../../../../../docs/for-developers/modules/platform/features/design-system.md)
  * exists to stop.
  *
@@ -21,32 +21,31 @@
  *   ([governance.md](../../../../../docs/for-developers/governance.md)); this file's part
  *   is to pass refusals through rather than dropping them on the way in.
  * - **A layer nothing touched is muted, never dropped**
- *   ([governance.md](../../../../../docs/for-developers/governance.md)). All six bands
- *   are always passed, because *the run never went near a third party* and
+ *   ([governance.md](../../../../../docs/for-developers/governance.md)). All six layer
+ *   rows are always passed, because *the run never went near a third party* and
  *   *this surface does not show third parties* are different facts about a run.
  * - **The axis is the trace's clock, or it is the ledger's order — never a
  *   guess between them.** A touch has a `seq` and a duration but no start of
  *   its own, so its bar is the window of the **step** it belongs to, read off
  *   `GET …/runs/{id}/trace`. If any touch cannot be placed on that clock the
- *   whole strip falls back to `seq`, because a drawing half on a wall clock and
+ *   whole gantt falls back to `seq`, because a drawing half on a wall clock and
  *   half on an ordinal is a drawing that lies about both
  *   ([design-system.md](../../../../../docs/for-developers/modules/platform/features/design-system.md)).
  *
- * The spine is a band like the rest and says so: `agent` is the runtime doing
- * the participating rather than being a participant, so its wire runs the whole
- * axis and it is never drawn as unspent.
+ * The spine is a row like the rest: `agent` is the runtime doing the
+ * participating rather than being a participant.
  */
 
-import type { LayersOptions } from "@invana/dashboard";
-import type { Layer, LayerItem } from "@invana/ui";
+import type { GanttOptions, GanttSpecBar, GanttSpecRow } from "@invana/blocks";
+import type { Layer } from "@invana/ui";
 import type {
 	Touch,
 	TouchesResponse,
 } from "@/pages/graphs-detail/features/lenses/types";
 import type { TraceStepRead } from "@/pages/graphs-detail/features/runs";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
+import { LAYER_SWATCHES } from "@/ui/layerPalette";
 
-/** Every layer, spine last — the order the bands are read in. */
+/** Every layer, spine last — the order the rows are read in. */
 export const BANDS: Layer[] = [
 	"graph_data",
 	"llm",
@@ -55,6 +54,29 @@ export const BANDS: Layer[] = [
 	"human",
 	"agent",
 ];
+
+/** How a touch's direction reads under its bar. */
+const DIRECTION_LABEL: Record<Touch["direction"], string> = {
+	in: "read",
+	out: "sent",
+	refused: "refused",
+	skipped: "skipped",
+};
+
+/** `read` · `sent` · `refused` — a touch's direction, in the reader's words. */
+export function directionLabel(direction: Touch["direction"]): string {
+	return DIRECTION_LABEL[direction];
+}
+
+/** A bar's key: the step it belongs to, then the touch's `seq` — `fetch#12`. */
+export function touchKey(touch: Pick<Touch, "step_key" | "seq">): string {
+	return `${touch.step_key ?? ""}#${touch.seq}`;
+}
+
+/** The step a bar's key names, as {@link touchKey} wrote it. */
+export function stepKeyOfTouch(key: string): string {
+	return key.slice(0, key.lastIndexOf("#"));
+}
 
 /** Milliseconds from the run opening, or `null` when the step is untimed. */
 function windowOf(
@@ -73,7 +95,7 @@ function windowOf(
 }
 
 /**
- * The ledger, as the strip reads it — one bar per touch, on the row of the
+ * The ledger, as the gantt reads it — one bar per touch, on the row of the
  * participant it spent.
  *
  * Bars are derived from the touches rather than from the trace's tasks: a touch
@@ -84,8 +106,8 @@ function windowOf(
 export function layersOptions(
 	touches: TouchesResponse | undefined,
 	steps: TraceStepRead[] = [],
-	opts: { selectedItem?: string | null; selectAction?: string } = {},
-): LayersOptions {
+	opts: { selected?: string | null } = {},
+): GanttOptions {
 	const ledger = [...(touches?.items ?? [])].sort((a, b) => a.seq - b.seq);
 
 	const byStepKey = new Map<string, TraceStepRead>();
@@ -104,59 +126,65 @@ export function layersOptions(
 	);
 	const elapsed = ledger.length > 0 && windows.every((w) => w !== null);
 
-	const items: LayerItem[] = ledger.map((touch, i) => {
+	const rows = new Map<Layer, Map<string, GanttSpecRow>>();
+	ledger.forEach((touch, i) => {
 		const window = windows[i];
 		// A refusal happens **before dispatch** — it has no span, so it is an
 		// instant at the leading edge of the step it was refused in.
 		const refused = touch.direction === "refused";
 		const span =
 			elapsed && window
-				? refused
-					? { start: window.start }
-					: window
-				: { start: touch.seq, end: touch.seq + 1 };
-		return {
-			id: `${touch.seq}-${touch.address}`,
+				? {
+						startMs: window.start,
+						durationMs: refused
+							? 0
+							: (window.end ?? window.start) - window.start,
+					}
+				: { startMs: touch.seq, durationMs: 1 };
+		const bar: GanttSpecBar = {
+			key: touchKey(touch),
 			label: touch.step_key ?? `seq ${touch.seq}`,
-			layer: touch.layer as Layer,
-			part: touch.address,
-			state: touch.direction,
-			note: touch.participant,
-			ruleMatched: touch.rule_matched ?? undefined,
+			group: touch.layer,
+			note: directionLabel(touch.direction),
+			status: refused
+				? "refused"
+				: touch.direction === "skipped"
+					? "skipped"
+					: undefined,
+			title: touch.rule_matched
+				? `${touch.step_key ?? `seq ${touch.seq}`} · refused by ${touch.rule_matched}`
+				: undefined,
 			...span,
 		};
+		const layer = touch.layer as Layer;
+		const parts = rows.get(layer) ?? new Map<string, GanttSpecRow>();
+		const part = parts.get(touch.address) ?? {
+			key: touch.address,
+			summary:
+				touch.participant === touch.address ? undefined : touch.participant,
+			segments: [],
+		};
+		part.segments?.push(bar);
+		parts.set(touch.address, part);
+		rows.set(layer, parts);
 	});
 
-	const counts = new Map<Layer, number>();
-	const parts = new Map<Layer, Map<string, Touch>>();
-	for (const touch of ledger) {
-		const layer = touch.layer as Layer;
-		counts.set(layer, (counts.get(layer) ?? 0) + 1);
-		const seen = parts.get(layer) ?? new Map<string, Touch>();
-		if (!seen.has(touch.address)) seen.set(touch.address, touch);
-		parts.set(layer, seen);
-	}
-
 	return {
-		bands: BANDS.map((layer) => ({
-			layer,
-			// The note carries the count, so a muted band says *nothing touched*
-			// rather than leaving the reader to infer it from an empty row.
-			note: `${counts.get(layer) ?? 0} touch${counts.get(layer) === 1 ? "" : "es"}`,
-			parts: [...(parts.get(layer)?.values() ?? [])].map((touch) => ({
-				id: touch.address,
-				label: touch.address,
-				note:
-					touch.participant === touch.address ? undefined : touch.participant,
-			})),
-			// The runtime's own dispatches — what the other bands are timed
-			// against, and the one band that is never governed.
-			spine: layer === "agent",
-		})),
-		items,
+		// The note carries the count, so a muted row says *nothing touched*
+		// rather than leaving the reader to infer it from an empty track.
+		tasks: BANDS.map((layer) => {
+			const parts = [...(rows.get(layer)?.values() ?? [])];
+			const n = parts.reduce((sum, p) => sum + (p.segments?.length ?? 0), 0);
+			return {
+				key: layer,
+				label: layer.replace(/_/g, " "),
+				duration: `${n} touch${n === 1 ? "" : "es"}`,
+				open: parts.length > 0,
+				subtasks: parts,
+			};
+		}),
 		scale: elapsed ? "elapsed" : "seq",
-		palette: LAYER_PALETTE,
-		selectedItem: opts.selectedItem,
-		selectAction: opts.selectAction,
+		palette: LAYER_SWATCHES,
+		selected: opts.selected ?? undefined,
 	};
 }

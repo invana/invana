@@ -18,17 +18,17 @@
  * and `EgressList` reads the two differently because they are different claims.
  */
 
-import type { PanelRendererProps } from "@invana/dashboard";
+import type { PanelRendererProps } from "@invana/boards";
 import {
 	AddressChip,
 	type AddressTone,
 	CannotAnswerCard,
 	EgressList,
-	layerItemLabel,
 	PropertyList,
 	PropertyRow,
 	SliceSummary,
 } from "@invana/ui";
+import { directionLabel } from "@/pages/graphs-detail/features/lenses/runLayers";
 import type {
 	Touch,
 	TouchesResponse,
@@ -72,7 +72,7 @@ export function StepTouchWidget({
 					<div className="flex min-w-0 items-baseline gap-2">
 						<AddressChip address={touch.address} tone={TONE[touch.direction]} />
 						<span className="ml-auto shrink-0 text-sm text-muted-foreground">
-							{layerItemLabel(touch.direction)} · seq {touch.seq}
+							{directionLabel(touch.direction)} · seq {touch.seq}
 						</span>
 					</div>
 

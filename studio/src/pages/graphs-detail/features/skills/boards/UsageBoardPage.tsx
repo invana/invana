@@ -8,7 +8,7 @@
  * ([usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  */
 
-import { Dashboard } from "@invana/dashboard";
+import { Board } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useMemo, useState } from "react";
 import { useReport } from "@/pages/graphs-detail/features/boards";
@@ -75,7 +75,7 @@ export function UsageBoardPage({
 	}
 
 	return (
-		<Dashboard
+		<Board
 			className="h-full min-h-0"
 			spec={report.spec}
 			icons={DASHBOARD_ICONS}

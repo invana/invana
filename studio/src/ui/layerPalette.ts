@@ -1,7 +1,7 @@
 /**
  * What each layer is painted with, across every surface that draws one.
  *
- * **The kit ships no hues.** `LayerChip`, `LayerSection` and `LayerStrip` take
+ * **The kit ships no hues.** `LayerChip` and `LayerSection` take
  * a `palette` prop and fall back to the neutral, because which colour means
  * `llm` is a product's decision and not a component's — so this file is where
  * Invana decides, once. It is passed *as a prop* at every call site rather than
@@ -78,3 +78,10 @@ export const LAYER_PALETTE: LayerPalette = {
  * second hand-written table that can drift from the first.
  */
 export const layerSlug = (label: string): string => label.replace(/ /g, "_");
+
+/** Each layer's solid mark, as a gantt's `palette` paints its bars. */
+export const LAYER_SWATCHES: Record<string, string> = Object.fromEntries(
+	Object.entries(LAYER_PALETTE).flatMap(([layer, paint]) =>
+		paint?.swatch ? [[layer, paint.swatch] as const] : [],
+	),
+);

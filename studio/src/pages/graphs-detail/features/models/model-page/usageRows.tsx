@@ -7,8 +7,8 @@
  * were and the number that turns signals on.
  */
 
+import type { RowSpec } from "@invana/boards";
 import { InlineMeter, SegmentedBar, SegmentedBarLegend } from "@invana/charts";
-import type { RowSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Alert, AlertDescription } from "@invana/ui";
 import { formatRelativeTime } from "@/lib/time";
@@ -44,7 +44,7 @@ export function usageRows(
 			{
 				panels: [
 					{
-						kind: "metrics",
+						kind: "grid",
 						options: {
 							tiles: ["Queries", "Callers", "Unused types", "Hot types"].map(
 								(label) => ({ label, value: "…" }),
@@ -152,23 +152,23 @@ export function usageRows(
 	rows.push({
 		panels: [
 			{
-				kind: "metrics",
+				kind: "grid",
 				options: {
 					tiles: [
 						{
 							label: "Queries",
 							value: fmtNum(usage.total),
-							caption: `${opts.days} days · ${fmtNum(usage.total / opts.days)} a day`,
+							delta: `${opts.days} days · ${fmtNum(usage.total / opts.days)} a day`,
 						},
 						{
 							label: "Callers",
 							value: String(callers.length),
-							caption: callerSplit(usage.callers),
+							delta: callerSplit(usage.callers),
 						},
 						{
 							label: "Unused types",
 							value: usage.too_few ? "—" : String(unused.length),
-							caption: usage.too_few
+							delta: usage.too_few
 								? needs
 								: unused
 										.map((s) => s.subject)
@@ -179,7 +179,7 @@ export function usageRows(
 							? {
 									label: "Cold properties",
 									value: usage.too_few ? "—" : String(cold.length),
-									caption: usage.too_few
+									delta: usage.too_few
 										? needs
 										: cold
 												.slice(0, 2)
@@ -189,7 +189,7 @@ export function usageRows(
 							: {
 									label: "Hot types",
 									value: usage.too_few ? "—" : String(hot.length),
-									caption: usage.too_few
+									delta: usage.too_few
 										? needs
 										: hot
 												.map((s) => s.subject)
@@ -197,7 +197,7 @@ export function usageRows(
 												.join(" · ") || "none past 25%",
 									tone:
 										hot.length && !usage.too_few
-											? ("warning" as const)
+											? ("warn" as const)
 											: undefined,
 								},
 					],
@@ -222,8 +222,7 @@ export function usageRows(
 							columns={columns}
 							data={usage.rows}
 							density="compact"
-							bordered={false}
-							enablePagination={false}
+							seamless
 						/>
 					</>
 				),
@@ -284,8 +283,7 @@ export function usageRows(
 							]}
 							data={usage.stitches}
 							density="compact"
-							bordered={false}
-							enablePagination={false}
+							seamless
 						/>
 					),
 				},
@@ -342,8 +340,7 @@ export function usageRows(
 							]}
 							data={usage.properties}
 							density="compact"
-							bordered={false}
-							enablePagination={false}
+							seamless
 						/>
 					) : (
 						<p className="px-3 py-4 text-muted-foreground">

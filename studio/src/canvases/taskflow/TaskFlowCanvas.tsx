@@ -18,7 +18,7 @@ import {
 	GraphLayer,
 	HoverActivateBehaviour,
 	HoverElementPreviewBehaviour,
-	TextLODBehaviour,
+	NodeLabelLODBehaviour,
 	TextResolutionLODBehaviour,
 	ThemeBehaviour,
 	WheelZoomBehaviour,
@@ -235,7 +235,7 @@ export function TaskFlowCanvas({
 				options={{ workerFactory: () => new ElkWorker() }}
 			/>
 			<TextResolutionLODBehaviour id="label-resolution" targetLayerId="graph" />
-			<TextLODBehaviour id="text-lod" targetLayerId="graph" />
+			<NodeLabelLODBehaviour id="text-lod" targetLayerId="graph" />
 			<HoverElementPreviewBehaviour
 				targetLayerId="graph"
 				renderNode={renderTaskNode}

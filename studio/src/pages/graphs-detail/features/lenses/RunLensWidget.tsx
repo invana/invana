@@ -18,7 +18,7 @@
  * Delete this file once no stored board names the kind.
  */
 
-import type { PanelRendererProps } from "@invana/dashboard";
+import type { PanelRendererProps } from "@invana/boards";
 import {
 	AddressChip,
 	Button,

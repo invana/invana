@@ -2,12 +2,12 @@
  * The three readings `⋯` opens on a plan's page — Versions · Arguments ·
  * Export YAML ([the-library.md](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
  *
- * Pure: each builds one `DashboardSpec` from reads the page already made, and
- * `@invana/dashboard` draws it. They are records, not readings over a window,
+ * Pure: each builds one `BoardSpec` from reads the page already made, and
+ * `@invana/boards` draws it. They are records, not readings over a window,
  * so none carries a window switch or `Save report`.
  */
 
-import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
+import type { BoardSpec, PanelSpec } from "@invana/boards";
 import type {
 	PlanVersionDiff,
 	TaskPlanCaller,
@@ -96,7 +96,7 @@ export function planVersionsSpec(
 	versions: TaskPlanSummary[],
 	diffs: Map<number, PlanVersionDiff>,
 	picked: number,
-): DashboardSpec {
+): BoardSpec {
 	const newestFirst = [...versions].sort((a, b) => b.version - a.version);
 	const diff = diffs.get(picked);
 	const detail: PanelSpec = !diff
@@ -120,12 +120,11 @@ export function planVersionsSpec(
 					flush: true,
 					options: {
 						columns: [
-							{ key: "change", label: "change", mono: false },
-							{ key: "step", label: "step" },
-							{ key: "what", label: "what", mono: false },
+							{ key: "change", label: "change" },
+							{ key: "step", label: "step", mono: true },
+							{ key: "what", label: "what" },
 						],
 						rows: diffRows(diff),
-						rowKey: "id",
 					},
 				};
 	return {
@@ -142,15 +141,17 @@ export function planVersionsSpec(
 			{
 				panels: [
 					{
+						// The panel's id is the action a pick answers — see `routedAction`.
+						id: RECORD_ACTIONS.pickVersion,
 						kind: "table",
 						title: "Every version, and how each fared",
 						aside: "a published version is immutable — a change is a new one",
 						flush: true,
 						options: {
 							columns: [
-								{ key: "version", label: "version" },
-								{ key: "changed", label: "what changed", mono: false },
-								{ key: "fared", label: "how it fared", mono: false },
+								{ key: "version", label: "version", mono: true },
+								{ key: "changed", label: "what changed" },
+								{ key: "fared", label: "how it fared" },
 							],
 							rows: newestFirst.map((v) => ({
 								version: `v${v.version}`,
@@ -158,7 +159,6 @@ export function planVersionsSpec(
 								fared: fared(v),
 							})),
 							rowKey: "version",
-							selectAction: RECORD_ACTIONS.pickVersion,
 							selected: `v${picked}`,
 						},
 					},
@@ -175,12 +175,12 @@ export function planArgumentsSpec(
 	ref: string,
 	declared: Record<string, PlanArg>,
 	callers: TaskPlanCaller[],
-): DashboardSpec {
+): BoardSpec {
 	const names = Object.keys(declared);
 	const defaults = Object.fromEntries(
 		names.map((n) => [n, shown(declared[n].default)]),
 	);
-	const rows: DashboardSpec["rows"] = [];
+	const rows: BoardSpec["rows"] = [];
 	if (!names.length) {
 		rows.push({
 			panels: [
@@ -205,10 +205,10 @@ export function planArgumentsSpec(
 						flush: true,
 						options: {
 							columns: [
-								{ key: "name", label: "name" },
-								{ key: "type", label: "type" },
-								{ key: "default", label: "default" },
-								{ key: "decides", label: "what it decides", mono: false },
+								{ key: "name", label: "name", mono: true },
+								{ key: "type", label: "type", mono: true },
+								{ key: "default", label: "default", mono: true },
+								{ key: "decides", label: "what it decides" },
 							],
 							rows: names.map((n) => ({
 								name: n,
@@ -233,8 +233,8 @@ export function planArgumentsSpec(
 						flush: true,
 						options: {
 							columns: [
-								{ key: "caller", label: "caller", mono: false },
-								...names.map((n) => ({ key: n, label: n })),
+								{ key: "caller", label: "caller" },
+								...names.map((n) => ({ key: n, label: n, mono: true })),
 							],
 							rows: [
 								{ caller: "the plan's default", ...defaults },
@@ -270,7 +270,7 @@ export function planArgumentsSpec(
 export function planExportSpec(
 	ref: string,
 	yaml: string | undefined,
-): DashboardSpec {
+): BoardSpec {
 	return {
 		title: `${ref} · export`,
 		header: {

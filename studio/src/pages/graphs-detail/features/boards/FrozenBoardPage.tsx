@@ -9,10 +9,10 @@
  *
  * Nothing is re-merged against today's builder either. Re-merging would give
  * panels the data has nothing for, and data for panels that no longer exist,
- * so the blob renders through the same `<Dashboard>` as it was written.
+ * so the blob renders through the same `<Board>` as it was written.
  */
 
-import { Dashboard, type DashboardSpec } from "@invana/dashboard";
+import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useQuery } from "@tanstack/react-query";
 import { formatRelativeTime } from "@/lib/time";
@@ -65,7 +65,7 @@ export function FrozenBoardPage({
 		);
 	}
 
-	const spec = report.data.snapshot as unknown as DashboardSpec;
+	const spec = report.data.snapshot as unknown as BoardSpec;
 	const at = formatRelativeTime(report.data.createdAt);
 
 	return (
@@ -86,7 +86,7 @@ export function FrozenBoardPage({
 				</button>
 			</div>
 			<div className="min-h-0 flex-1">
-				<Dashboard
+				<Board
 					className="h-full min-h-0"
 					spec={spec}
 					// Every registered kind, not this page's — a report has no

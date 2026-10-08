@@ -341,9 +341,7 @@ export function AgentSkillsTab({
 						columns={skillColumns}
 						data={skills}
 						enableSorting={false}
-						enablePagination={false}
-						enableColumnVisibility={false}
-						bordered={false}
+						seamless
 						density="compact"
 					/>
 				) : (
@@ -501,9 +499,7 @@ export function AgentSkillsTab({
 						columns={callableColumns}
 						data={can.data?.callables ?? []}
 						enableSorting={false}
-						enablePagination={false}
-						enableColumnVisibility={false}
-						bordered={false}
+						seamless
 						density="compact"
 					/>
 				)}

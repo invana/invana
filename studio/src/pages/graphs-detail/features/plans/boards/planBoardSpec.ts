@@ -6,19 +6,14 @@ import { usd } from "@/lib/format";
  * A report header naming the version, then **Overview · Layers · Flow ·
  * Activity**, with the `7 · 30 · 90 days` window on the right of the tab strip —
  * the run page's layout in the plan's tense. This file composes; the page
- * fetches and answers actions, and `@invana/dashboard` draws.
+ * fetches and answers actions, and `@invana/boards` draws.
  */
 
-import type {
-	DashboardSpec,
-	MetricsOptions,
-	PanelSpec,
-	RunPanelOptions,
-	TabSpec,
-} from "@invana/dashboard";
+import type { MetricOptions } from "@invana/blocks";
+import type { BoardSpec, PanelSpec, TabSpec } from "@invana/boards";
 import { formatElapsed } from "@/lib/time";
 import type { PlanChartWidgets } from "@/pages/graphs-detail/features/plans/boards/PlanChartWidgets";
-import { planLayerStrip } from "@/pages/graphs-detail/features/plans/planLayers";
+import { planLayersGantt } from "@/pages/graphs-detail/features/plans/planLayers";
 import {
 	taskFlowFromTaskPlan,
 	WIDE_SPREAD,
@@ -33,11 +28,9 @@ import type {
 } from "@/pages/graphs-detail/features/plans/types";
 import { runAddress } from "@/pages/graphs-detail/features/runs";
 import type { FlowOptions } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 export type PlanPanels = PlanChartWidgets & {
 	flow: FlowOptions;
-	layers: RunPanelOptions["layers"];
 };
 
 export const PLAN_ACTIONS = {
@@ -125,7 +118,7 @@ const when = (iso: string) =>
 export function planBoardSpec(
 	data: PlanPageData,
 	view: PlanView,
-): DashboardSpec<PlanPanels> {
+): BoardSpec<PlanPanels> {
 	const { plan, versions, performance } = data;
 	const tabs: TabSpec<PlanPanels>[] = [
 		{ id: "overview", label: "Overview", rows: overviewRows(data, view) },
@@ -211,34 +204,34 @@ function overviewRows(data: PlanPageData, view: PlanView) {
 		];
 
 	const t = perf.tiles;
-	const tiles: MetricsOptions["tiles"] = [
-		{ label: "runs", value: String(ran), caption: was(t.runs, String) },
+	const tiles: MetricOptions[] = [
+		{ label: "runs", value: String(ran), delta: was(t.runs, String) },
 		{
 			label: "served",
 			value: pct(t.served.value),
-			caption:
+			delta:
 				t.served.value == null ? "none verified" : was(t.served, (v) => pct(v)),
 		},
 		{
 			label: "elapsed p50",
 			value: ms(t.elapsed_p50_ms.value),
-			caption: was(t.elapsed_p50_ms, ms),
+			delta: was(t.elapsed_p50_ms, ms),
 		},
 		{
 			label: "work p50",
 			value: ms(t.work_p50_ms.value),
-			caption: was(t.work_p50_ms, ms),
+			delta: was(t.work_p50_ms, ms),
 		},
 		{
 			label: "cost per run",
 			value: t.cost_per_run.value == null ? "—" : usd(t.cost_per_run.value),
-			caption: t.cost_per_run.value == null ? "not priced" : undefined,
+			delta: t.cost_per_run.value == null ? "not priced" : undefined,
 		},
 		{
 			label: "failed",
 			value: String(t.failed.value ?? 0),
-			caption: was(t.failed, String),
-			tone: (t.failed.value ?? 0) > 0 ? "error" : undefined,
+			delta: was(t.failed, String),
+			tone: (t.failed.value ?? 0) > 0 ? "bad" : undefined,
 		},
 	];
 
@@ -254,7 +247,7 @@ function overviewRows(data: PlanPageData, view: PlanView) {
 		.filter((m) => m.index >= 0);
 
 	const rows: TabSpec<PlanPanels>["rows"] = [
-		{ panels: [{ kind: "metrics", options: { tiles, minTileWidth: 120 } }] },
+		{ panels: [{ kind: "grid", options: { tiles, minTileWidth: 120 } }] },
 		{
 			panels: [
 				{
@@ -293,15 +286,17 @@ function overviewRows(data: PlanPageData, view: PlanView) {
 		panels: [
 			perf.failures.length
 				? {
+						// The panel's id is the action a pick answers — see `routedAction`.
+						id: PLAN_ACTIONS.openRun,
 						kind: "table",
 						title: "Where it fails",
 						aside: `${t.failed.value ?? 0} failed · ${span}`,
 						flush: true,
 						options: {
 							columns: [
-								{ key: "step", label: "step" },
-								{ key: "cause", label: "why" },
-								{ key: "count", label: "runs", align: "right" },
+								{ key: "step", label: "step", mono: true },
+								{ key: "cause", label: "why", mono: true },
+								{ key: "count", label: "runs", align: "right", mono: true },
 							],
 							rows: perf.failures.map((f) => ({
 								step: f.step_key,
@@ -310,7 +305,6 @@ function overviewRows(data: PlanPageData, view: PlanView) {
 								run: f.last_run_id,
 							})),
 							rowKey: "run",
-							selectAction: PLAN_ACTIONS.openRun,
 						},
 					}
 				: {
@@ -328,10 +322,15 @@ function overviewRows(data: PlanPageData, view: PlanView) {
 						flush: true,
 						options: {
 							columns: [
-								{ key: "step", label: "step" },
-								{ key: "bound", label: "bound", mono: false },
-								{ key: "used", label: "used", align: "right" },
-								{ key: "exhausted", label: "exhausted", align: "right" },
+								{ key: "step", label: "step", mono: true },
+								{ key: "bound", label: "bound" },
+								{ key: "used", label: "used", align: "right", mono: true },
+								{
+									key: "exhausted",
+									label: "exhausted",
+									align: "right",
+									mono: true,
+								},
 							],
 							rows: perf.bounds.map((b) => ({
 								step: b.step_key,
@@ -355,21 +354,23 @@ function overviewRows(data: PlanPageData, view: PlanView) {
 function stepsTable(data: PlanPageData, view: PlanView, ran: number): Panel {
 	const measured = new Map(data.performance?.steps.map((s) => [s.step_key, s]));
 	return {
+		// The panel's id is the action a pick answers — see `routedAction`.
+		id: PLAN_ACTIONS.selectStep,
 		kind: "table",
 		title: `Each step, across ${ran} run${ran === 1 ? "" : "s"}`,
 		aside: ran ? "pick a step for its runs" : undefined,
 		flush: true,
 		options: {
 			columns: [
-				{ key: "step", label: "step" },
-				{ key: "layer", label: "layer", mono: false },
-				{ key: "ran_in", label: "ran in", align: "right" },
-				{ key: "p50", label: "p50", align: "right" },
-				{ key: "p95", label: "p95", align: "right" },
-				{ key: "failed", label: "failed", align: "right" },
-				{ key: "retried", label: "retried", align: "right" },
-				{ key: "cost", label: "cost/run", align: "right" },
-				{ key: "share", label: "share of work", align: "right" },
+				{ key: "step", label: "step", mono: true },
+				{ key: "layer", label: "layer" },
+				{ key: "ran_in", label: "ran in", align: "right", mono: true },
+				{ key: "p50", label: "p50", align: "right", mono: true },
+				{ key: "p95", label: "p95", align: "right", mono: true },
+				{ key: "failed", label: "failed", align: "right", mono: true },
+				{ key: "retried", label: "retried", align: "right", mono: true },
+				{ key: "cost", label: "cost/run", align: "right", mono: true },
+				{ key: "share", label: "share of work", align: "right", mono: true },
 			],
 			rows: data.plan.nodes.map((node) => {
 				const s = measured.get(node.id);
@@ -391,8 +392,7 @@ function stepsTable(data: PlanPageData, view: PlanView, ran: number): Panel {
 					share: pct(s?.share_of_work),
 				};
 			}),
-			rowKey: "step",
-			selectAction: ran ? PLAN_ACTIONS.selectStep : undefined,
+			rowKey: ran ? "step" : undefined,
 			selected: view.step,
 		},
 	};
@@ -406,7 +406,7 @@ function stepCard(
 	const slowest = perf.slowest[step.step_key] ?? [];
 	return [
 		{
-			kind: "properties",
+			kind: "record",
 			title: step.step_key,
 			aside: step.layer,
 			width: 320,
@@ -445,19 +445,19 @@ function layersRows(plan: TaskPlanDetail, perf: PlanPerformance | undefined) {
 			.filter((s) => s.p50_ms != null)
 			.map((s) => [s.step_key, ms(s.p50_ms)]),
 	);
-	const { bands, items } = planLayerStrip(plan, p50);
+	const gantt = planLayersGantt(plan, p50);
 	const declared = plan.declared_layers.filter((l) => l.declared).length;
 	return [
 		{
 			panels: [
 				{
-					kind: "layers",
+					kind: "gantt",
 					title: "Layers it declares",
 					aside: `${declared} of ${plan.declared_layers.length}`,
 					flush: true,
-					// The bands arrive **open**: the tab has the width the section did
-					// not.
-					options: { bands, items, scale: "seq", palette: LAYER_PALETTE },
+					// The layer rows arrive **open**: the tab has the width the section
+					// did not.
+					options: gantt,
 				},
 			] as Panel[],
 		},
@@ -511,7 +511,7 @@ function flowRows(
 			panels: [
 				flow,
 				{
-					kind: "properties",
+					kind: "record",
 					title: node.label || node.id,
 					aside: node.layer,
 					width: 320,
@@ -556,7 +556,7 @@ function activityRows(data: PlanPageData, view: PlanView) {
 		{
 			panels: [
 				{
-					kind: "metrics",
+					kind: "grid",
 					options: {
 						tiles: [
 							{ label: "running now", value: String(live?.running ?? 0) },
@@ -618,6 +618,8 @@ function activityRows(data: PlanPageData, view: PlanView) {
 	rows.push({
 		panels: [
 			{
+				// The panel's id is the action a pick answers — see `routedAction`.
+				id: PLAN_ACTIONS.openRun,
 				kind: "table",
 				title: "Runs",
 				aside: `${items.length}${pages.at(-1)?.next_cursor ? "+" : ""} · newest first`,
@@ -625,18 +627,17 @@ function activityRows(data: PlanPageData, view: PlanView) {
 				flush: true,
 				options: {
 					columns: [
-						{ key: "run", label: "run" },
-						{ key: "asked", label: "asked", mono: false },
-						{ key: "called_by", label: "called by", mono: false },
-						{ key: "agent", label: "agent", mono: false },
-						{ key: "status", label: "status", mono: false },
-						{ key: "elapsed", label: "elapsed", align: "right" },
-						{ key: "cost", label: "cost", align: "right" },
-						{ key: "when", label: "when", mono: false },
+						{ key: "run", label: "run", mono: true },
+						{ key: "asked", label: "asked" },
+						{ key: "called_by", label: "called by" },
+						{ key: "agent", label: "agent" },
+						{ key: "status", label: "status" },
+						{ key: "elapsed", label: "elapsed", align: "right", mono: true },
+						{ key: "cost", label: "cost", align: "right", mono: true },
+						{ key: "when", label: "when" },
 					],
 					rows: items.map(runRow),
 					rowKey: "id",
-					selectAction: PLAN_ACTIONS.openRun,
 				},
 			},
 		] as Panel[],

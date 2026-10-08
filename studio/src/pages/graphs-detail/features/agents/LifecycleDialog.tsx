@@ -124,9 +124,7 @@ export function LifecycleDialog({
 										columns={columns}
 										data={items}
 										enableSorting={false}
-										enablePagination={false}
 										// A confirm dialog is not a place to choose columns.
-										enableColumnVisibility={false}
 									/>
 								</div>
 							) : (

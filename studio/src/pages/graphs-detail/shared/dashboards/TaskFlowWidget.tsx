@@ -1,5 +1,5 @@
 /**
- * The run's tasks as a flow — the one panel kind `@invana/dashboard` does not ship.
+ * The run's tasks as a flow — the one panel kind `@invana/boards` does not ship.
  *
  * The package leaves `canvas`/`flow` out on purpose: a renderer that needed
  * `@invana/canvas` would put PixiJS in the bundle of every consumer that only
@@ -9,7 +9,7 @@
  * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 
-import type { PanelRendererProps } from "@invana/dashboard";
+import type { PanelRendererProps } from "@invana/boards";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import {
 	TaskFlowCanvas,

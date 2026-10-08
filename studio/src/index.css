@@ -31,7 +31,7 @@
    `typeColor.ts` keeps its `--color-muted-foreground` fallback for a probe taken
    before the theme class lands; it is no longer what the dots actually resolve
    to. **`src/ui/layerPalette.ts` needs this**: the kit ships no hues — a layer's
-   colour is Invana's decision, passed to `LayerChip`/`LayerSection`/`LayerStrip`
+   colour is Invana's decision, passed to `LayerChip`/`LayerSection`
    as a `palette` prop — and that file spends `data-1`, `-3`, `-6`, `-7`, `-8`.
    Without the palette every layer's dot is transparent: six layers meant to be
    told apart at a glance render identically, which no build gate catches. */
@@ -52,9 +52,11 @@
    classes (e.g. data-[state=checked]:translate-x-5) are never generated and
    the controls render visually frozen. Scan the package explicitly. */
 @source "../node_modules/@invana/forms/dist";
-/* Same for @invana/dashboard (the panel bands) and @invana/editor (the
-   code block its `code` panel renders through) — dist JS only, no CSS. */
-@source "../node_modules/@invana/dashboard/dist";
+/* Same for @invana/boards (the panel bands), @invana/blocks (the blocks a
+   panel draws) and @invana/editor (the code block its `code` panel renders
+   through) — dist JS only, no CSS. */
+@source "../node_modules/@invana/boards/dist";
+@source "../node_modules/@invana/blocks/dist";
 @source "../node_modules/@invana/editor/dist";
 /* And @invana/charts — the chart frames and in-row marks. */
 @source "../node_modules/@invana/charts/dist";

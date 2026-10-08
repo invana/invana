@@ -4,19 +4,19 @@
  * One header, then **Overview · Model · Database · Usage · Performance ·
  * Growth** with the `7 · 30 · 90 days` window on the right of the tab strip —
  * the plan page's layout, read at `All models` or one model. This file
- * composes; `ModelsPage` fetches and answers actions, and `@invana/dashboard`
+ * composes; `ModelsPage` fetches and answers actions, and `@invana/boards`
  * draws. The tabs, their order and their columns never change with the scope:
  * what one scope lacks is a section, not a tab.
  */
 
 import type {
 	ActionSpec,
-	DashboardSpec,
+	BoardSpec,
 	PanelSpec,
 	RowSpec,
 	StagedSpec,
 	TabSpec,
-} from "@invana/dashboard";
+} from "@invana/boards";
 import type { ReactNode } from "react";
 import type { TypeCountsResponse } from "@/pages/graphs-detail/features/explorer";
 import type { ModelFrame } from "@/pages/graphs-detail/features/models/stitch/allModels";
@@ -244,7 +244,7 @@ export function modelsPageSpec(
 	data: ModelsPageData,
 	view: ModelsView,
 	slots: ModelsPageSlots,
-): DashboardSpec {
+): BoardSpec {
 	const anyPublished = data.models.some((m) => m.active_version);
 	const locked = (tab: ModelsTab) =>
 		!anyPublished && LOCKED_UNTIL_PUBLISHED.includes(tab);
@@ -283,7 +283,7 @@ export function modelsPageSpec(
 	};
 }
 
-function header(data: ModelsPageData): DashboardSpec["header"] {
+function header(data: ModelsPageData): BoardSpec["header"] {
 	const { scope, canWrite } = data;
 	if (!scope) {
 		const drafts = data.models.filter((m) => !m.active_version).length;
@@ -330,7 +330,7 @@ function header(data: ModelsPageData): DashboardSpec["header"] {
 	}
 
 	const { model, detail, draft, active, staged: set, published } = scope;
-	const chips: NonNullable<NonNullable<DashboardSpec["header"]>["chips"]> = [];
+	const chips: NonNullable<NonNullable<BoardSpec["header"]>["chips"]> = [];
 	if (draft)
 		chips.push({
 			label: draft.version ? `v${draft.version} · draft` : "draft",
@@ -441,7 +441,7 @@ function overviewRows(
 			{
 				panels: [
 					{
-						kind: "metrics",
+						kind: "grid",
 						options: {
 							tiles: ["Models", "Types", "Records"].map((label) => ({
 								label,
@@ -503,25 +503,25 @@ function overviewAll(
 	]);
 
 	const tiles: Panel = {
-		kind: "metrics",
+		kind: "grid",
 		options: {
 			tiles: [
 				{
 					label: "Models",
 					value: String(data.models.length),
-					caption: drafts
+					delta: drafts
 						? `${published} published · ${drafts} draft`
 						: "all published",
 				},
 				{
 					label: "Types",
 					value: String(nodeTypes + edgeTypes),
-					caption: `${nodeTypes} node · ${edgeTypes} edge`,
+					delta: `${nodeTypes} node · ${edgeTypes} edge`,
 				},
 				{
 					label: "Records",
 					value: records.counted ? num(recordTotal) : "—",
-					caption: records.counted
+					delta: records.counted
 						? (grewBy(data.insights) ?? "nodes and relationships")
 						: "this database does not count",
 				},
@@ -531,22 +531,23 @@ function overviewAll(
 		},
 	};
 	const table: Panel = {
+		// The panel's id is the action a pick answers — see `routedAction`.
+		id: MODELS_ACTIONS.selectModel,
 		kind: "table",
 		title: "Each model",
 		aside: "click a model to read it alone",
 		flush: true,
 		options: {
 			columns: [
-				{ key: "model", label: "model" },
-				{ key: "version", label: "version" },
+				{ key: "model", label: "model", mono: true },
+				{ key: "version", label: "version", mono: true },
 				{ key: "types", label: "types", mono: true, align: "right" },
 				{ key: "records", label: "records", mono: true, align: "right" },
 				...MEASURED_COLUMNS,
-				{ key: "drift", label: "drift" },
+				{ key: "drift", label: "drift", mono: true },
 			],
 			rows,
 			rowKey: "id",
-			selectAction: MODELS_ACTIONS.selectModel,
 		},
 	};
 	return [
@@ -597,18 +598,18 @@ function overviewOne(
 	);
 
 	const tiles: Panel = {
-		kind: "metrics",
+		kind: "grid",
 		options: {
 			tiles: [
 				{
 					label: "Types",
 					value: String(rows.length),
-					caption: `${nodeTypes.length} node · ${edgeTypes.length} edge`,
+					delta: `${nodeTypes.length} node · ${edgeTypes.length} edge`,
 				},
 				{
 					label: "Records",
 					value: records.counted ? num(total) : "—",
-					caption:
+					delta:
 						grewBy(data.insights) ??
 						(scope.active
 							? `v${scope.active.version} active`
@@ -619,7 +620,7 @@ function overviewOne(
 				{
 					label: "Staged",
 					value: scope.draft ? String(scope.staged?.count ?? 0) : "—",
-					caption: scope.draft
+					delta: scope.draft
 						? draftLabel(scope.draft.version)
 						: "no draft open",
 				},
@@ -627,6 +628,8 @@ function overviewOne(
 		},
 	};
 	const table: Panel = {
+		// The panel's id is the action a pick answers — see `routedAction`.
+		id: MODELS_ACTIONS.selectType,
 		kind: "table",
 		title: "Each type",
 		aside: "click a type to open it on the Model tab",
@@ -634,14 +637,13 @@ function overviewOne(
 		options: {
 			columns: [
 				{ key: "type", label: "type", mono: true },
-				{ key: "kind", label: "kind" },
+				{ key: "kind", label: "kind", mono: true },
 				{ key: "records", label: "records", mono: true, align: "right" },
 				{ key: "change", label: "change", mono: true, align: "right" },
 				...MEASURED_COLUMNS,
 			],
 			rows,
 			rowKey: "type",
-			selectAction: MODELS_ACTIONS.selectType,
 		},
 	};
 	return [
@@ -659,7 +661,7 @@ const MEASURED_COLUMNS = [
 		align: "right" as const,
 	},
 	{ key: "p95", label: "p95", mono: true, align: "right" as const },
-	{ key: "signal", label: "signal" },
+	{ key: "signal", label: "signal", mono: true },
 ];
 
 const SIGNAL_TEXT: Record<string, string> = {
@@ -704,19 +706,19 @@ function queryTiles(insights: Insights | undefined, one: boolean) {
 				o.queries_a_day < 10
 					? o.queries_a_day.toFixed(1)
 					: fmtNum(o.queries_a_day),
-			caption: one
+			delta: one
 				? "touching this model"
 				: `over ${insights?.window.replace("d", " days")}`,
 		},
 		{
 			label: "p95",
 			value: fmtMs(o.p95),
-			caption: one
+			delta: one
 				? `the Graph's is ${fmtMs(o.graph_p95)}`
 				: `p50 ${fmtMs(o.p50)}`,
 			tone:
 				one && o.p95 != null && o.graph_p95 != null && o.p95 > o.graph_p95
-					? ("warning" as const)
+					? ("warn" as const)
 					: undefined,
 		},
 	];
@@ -770,10 +772,10 @@ function driftTile(physical: PhysicalSchema | undefined) {
 		{
 			label: "Drift",
 			value: String(drift.total),
-			caption: drift.total
+			delta: drift.total
 				? `${drift.labels} ${drift.labels === 1 ? "type" : "types"} · ${drift.rules} ${drift.rules === 1 ? "index or constraint" : "indexes and constraints"}`
 				: "in sync with the database",
-			tone: drift.total ? ("warning" as const) : undefined,
+			tone: drift.total ? ("warn" as const) : undefined,
 		},
 	];
 }

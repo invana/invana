@@ -6,7 +6,7 @@
  * They fetch and answer actions; `planRecordSpecs` builds each document.
  */
 
-import { Dashboard, type DashboardSpec } from "@invana/dashboard";
+import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
 import { type ReactNode, useMemo, useState } from "react";
 import {
@@ -23,6 +23,7 @@ import {
 } from "@/pages/graphs-detail/features/plans/queries";
 import type { TaskPlanSummary } from "@/pages/graphs-detail/features/plans/types";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
+import { routedAction } from "@/pages/graphs-detail/shared/dashboardSpec";
 
 interface RecordPageProps {
 	username: string;
@@ -50,7 +51,7 @@ function Frame({
 	onAction,
 }: {
 	loading: boolean;
-	spec: DashboardSpec | null;
+	spec: BoardSpec | null;
 	onAction: (id: string, ctx?: { itemId?: string }) => void;
 }): ReactNode {
 	if (loading)
@@ -68,12 +69,12 @@ function Frame({
 			/>
 		);
 	return (
-		<Dashboard
+		<Board
 			className="h-full min-h-0"
 			spec={spec}
 			registry={{}}
 			icons={DASHBOARD_ICONS}
-			onAction={onAction}
+			onAction={(action, context) => onAction(...routedAction(action, context))}
 		/>
 	);
 }

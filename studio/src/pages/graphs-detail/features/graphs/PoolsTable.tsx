@@ -68,9 +68,7 @@ export function PoolsTable({ contention }: PoolsTableProps) {
 					columns={columns}
 					data={contention.pools}
 					enableSorting={false}
-					enablePagination={false}
 					// Two columns, both of which the reader needs: no column chooser.
-					enableColumnVisibility={false}
 				/>
 			) : (
 				// A sentence, never an empty table: no pool configured means every

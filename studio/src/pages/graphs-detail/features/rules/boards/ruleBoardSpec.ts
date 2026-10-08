@@ -17,7 +17,7 @@
  * ([rules.md](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */
 
-import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
+import type { BoardSpec, PanelSpec } from "@invana/boards";
 import type {
 	Rule,
 	RuleCitationsResponse,
@@ -76,8 +76,8 @@ export function ruleBoardSpec(
 	rule: Rule,
 	citations: RuleCitationsResponse | undefined,
 	{ view }: RuleBoardView,
-): DashboardSpec {
-	const header: DashboardSpec["header"] = {
+): BoardSpec {
+	const header: BoardSpec["header"] = {
 		crumbs: ["Rules", ruleTitle(rule)],
 		chips: omit([
 			{ label: rule.kind },
@@ -93,7 +93,7 @@ export function ruleBoardSpec(
 		],
 	};
 
-	const spec: DashboardSpec = {
+	const spec: BoardSpec = {
 		title: ruleTitle(rule),
 		header,
 		rows: bands(rule, citations),
@@ -107,14 +107,14 @@ export function ruleBoardSpec(
 function bands(
 	rule: Rule,
 	citations: RuleCitationsResponse | undefined,
-): DashboardSpec["rows"] {
+): BoardSpec["rows"] {
 	const offered = citations?.offered ?? 0;
 	const cited = citations?.total ?? rule.citations;
 	// Only a fact minus a fact. Without offers this is not a smaller number —
 	// it is not a number at all, and the tile is absent rather than zero.
 	const neverCited = offered > 0 ? offered - cited : null;
 
-	return omit<DashboardSpec["rows"][number]>([
+	return omit<BoardSpec["rows"][number]>([
 		// The statement is the rule, so it is the page's first band rather than
 		// a field in a properties table.
 		{
@@ -128,32 +128,32 @@ function bands(
 		{
 			panels: [
 				{
-					kind: "metrics",
+					kind: "grid",
 					options: {
 						tiles: omit([
 							offered > 0
 								? {
 										label: "Offered",
 										value: count(offered),
-										caption: "steps in scope had it",
+										delta: "steps in scope had it",
 									}
 								: null,
 							{
 								label: "Cited",
 								value: count(cited),
-								caption: "steps said they followed it",
+								delta: "steps said they followed it",
 							},
 							neverCited != null
 								? {
 										label: "Never cited",
 										value: count(neverCited),
-										caption: "not the same as never offered",
+										delta: "not the same as never offered",
 									}
 								: null,
 							{
 								label: "Versions",
 								value: String(citations?.versions.length ?? rule.version),
-								caption: "each immutable once published",
+								delta: "each immutable once published",
 							},
 						]),
 					},
@@ -166,7 +166,7 @@ function bands(
 		{
 			panels: [
 				{
-					kind: "properties",
+					kind: "record",
 					title: "The row",
 					aside: "scope and kind are derived from project_id",
 					options: {
@@ -198,9 +198,9 @@ function bands(
 							options: {
 								columns: [
 									{ key: "version", label: "", mono: true },
-									{ key: "statement", label: "the wording" },
-									{ key: "published", label: "published" },
-									{ key: "cited", label: "cited", align: "right" },
+									{ key: "statement", label: "the wording", mono: true },
+									{ key: "published", label: "published", mono: true },
+									{ key: "cited", label: "cited", align: "right", mono: true },
 								],
 								// Each count is the engine's, per wording — never
 								// tallied from the bounded list below.
@@ -250,9 +250,9 @@ function bands(
 					flush: true,
 					options: {
 						columns: [
-							{ key: "statement", label: "the statement" },
-							{ key: "because", label: "because it…" },
-							{ key: "really", label: "is really" },
+							{ key: "statement", label: "the statement", mono: true },
+							{ key: "because", label: "because it…", mono: true },
+							{ key: "really", label: "is really", mono: true },
 						],
 						rows: NOT_A_RULE,
 					},

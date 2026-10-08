@@ -24,6 +24,7 @@ export { RunLensWidget } from "@/pages/graphs-detail/features/lenses/RunLensWidg
 export {
 	BANDS,
 	layersOptions,
+	stepKeyOfTouch,
 } from "@/pages/graphs-detail/features/lenses/runLayers";
 export {
 	lensSummary,

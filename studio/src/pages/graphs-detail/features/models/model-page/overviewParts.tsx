@@ -4,8 +4,8 @@
  * at All models, p95 against the Graph's at one (the-model-page.md · The tabs).
  */
 
+import type { PanelSpec } from "@invana/boards";
 import { StackedBarChartV } from "@invana/charts";
-import type { PanelSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Button } from "@invana/ui";
 import type {
@@ -125,8 +125,7 @@ export function attentionPanel(
 				columns={columns}
 				data={items}
 				density="compact"
-				bordered={false}
-				enablePagination={false}
+				seamless
 				emptyState={
 					<p className="px-3 py-6 text-muted-foreground">
 						Nothing is flagged in this window.

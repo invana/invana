@@ -186,7 +186,7 @@ export function AgentActivityTab({
 								This agent has not run yet.
 							</p>
 						) : (
-							<Table bordered={false} density="compact">
+							<Table seamless density="compact">
 								<TableHeader>
 									<TableRow>
 										<TableHead>Run</TableHead>

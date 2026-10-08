@@ -1,14 +1,14 @@
 /**
- * The model page — `models:<graph>` in `BoardPagesViewPanel` (the-model-page.md).
+ * The model page — `models:<graph>` in `Workbook` (the-model-page.md).
  *
  * One board, whatever the scope: the scope, the tab and the window are the
  * URL's (`useModelsView`), so the panel beside it and a reload read the same
  * reading. It fetches and answers actions; `modelsPageSpec` composes and
- * `@invana/dashboard` draws. Every write on a model is on this page's header,
+ * `@invana/boards` draws. Every write on a model is on this page's header,
  * never in the panel.
  */
 
-import { Dashboard } from "@invana/dashboard";
+import { Board } from "@invana/boards";
 import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
@@ -50,6 +50,7 @@ import type {
 	GraphModelSummary,
 } from "@/pages/graphs-detail/features/models/types";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
+import { routedAction } from "@/pages/graphs-detail/shared/dashboardSpec";
 import { ApiError } from "@/services/api/client";
 import { ArchiveRefused, PublishConfirm } from "./ModelsDialogs";
 import {
@@ -374,11 +375,12 @@ export function ModelsPage({
 
 	return (
 		<>
-			<Dashboard
+			<Board
 				className="h-full min-h-0"
 				spec={spec}
 				icons={ICONS}
-				onAction={(id, ctx) => {
+				onAction={(action, context) => {
+					const [id, ctx] = routedAction(action, context);
 					switch (id) {
 						case MODELS_ACTIONS.tab:
 							if (ctx?.option) set({ tab: ctx.option as ModelsTab });

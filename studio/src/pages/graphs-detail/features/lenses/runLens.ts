@@ -35,7 +35,7 @@ import type {
 	LensOptions,
 	LensSectionSpec,
 	ParticipantSpec,
-} from "@invana/dashboard";
+} from "@invana/boards";
 import type { Layer } from "@invana/ui";
 import { BANDS } from "@/pages/graphs-detail/features/lenses/runLayers";
 import type {
@@ -173,27 +173,25 @@ export function lensSummary(touches: TouchesResponse | undefined) {
 		{
 			label: "Allowed",
 			value: String(allowed),
-			caption: "participants, by the world",
+			delta: "participants, by the world",
 		},
 		{
 			label: "Touched",
 			value: String(touched),
-			caption: allowed ? `of the ${allowed}` : "nothing was bounded",
-			tone: touched ? ("success" as const) : undefined,
-			meter: allowed ? touched / allowed : undefined,
+			delta: allowed ? `of the ${allowed}` : "nothing was bounded",
+			tone: touched ? ("good" as const) : undefined,
+			gauge: allowed ? { value: touched, max: allowed } : undefined,
 		},
 		{
 			label: "Never touched",
 			value: String(never),
-			caption: never ? "narrow it?" : "everything allowed was spent",
+			delta: never ? "narrow it?" : "everything allowed was spent",
 		},
 		{
 			label: "Refused",
 			value: String(refused),
-			caption: refused
-				? "widen it, or accept no answer"
-				: "nothing was blocked",
-			tone: refused ? ("warning" as const) : undefined,
+			delta: refused ? "widen it, or accept no answer" : "nothing was blocked",
+			tone: refused ? ("warn" as const) : undefined,
 		},
 	];
 }

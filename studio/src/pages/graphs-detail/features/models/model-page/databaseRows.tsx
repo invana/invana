@@ -8,7 +8,7 @@
  * draws no marks.
  */
 
-import type { RowSpec } from "@invana/dashboard";
+import type { RowSpec } from "@invana/boards";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import {
 	Button,
@@ -110,8 +110,7 @@ function table<T>(columns: ColumnDef<T>[], data: T[], empty: string) {
 			columns={columns}
 			data={data}
 			density="compact"
-			bordered={false}
-			enablePagination={false}
+			seamless
 			emptyState={<EmptyState className="py-6" title={empty} />}
 		/>
 	);

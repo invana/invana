@@ -2,19 +2,19 @@
  * The run page — a report header over tabs, and a step opened **inside** it
  * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  *
- * One page in `BoardPagesViewPanel`, `run:<id>`. Without a step it reads the
+ * One page in `Workbook`, `run:<id>`. Without a step it reads the
  * run: `Overview · Layers · Flow · Touched`. With `?step=` it keeps the run's
  * header, puts the step in its crumb and swaps the tab strip for the step's
  * own: `Overview · Touched · Log`. The `run:` crumb is the way back, and the
  * run's tab is where it was left.
  *
  * The page fetches and answers actions. It composes nothing and renders no
- * panel: the two composers build the document, `@invana/dashboard` draws it,
+ * panel: the two composers build the document, `@invana/boards` draws it,
  * and everything a person can do arrives back here as one `onAction(id, ctx)`
  * because a function is not JSON ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 
-import { Dashboard, type DashboardSpec, RUN_PANELS } from "@invana/dashboard";
+import { Board, type BoardSpec, RUN_PANELS } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -23,6 +23,7 @@ import { useReport } from "@/pages/graphs-detail/features/boards";
 import {
 	CompareDialog,
 	StepTouchWidget,
+	stepKeyOfTouch,
 	useRunTouchesQuery,
 } from "@/pages/graphs-detail/features/lenses";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
@@ -45,6 +46,7 @@ import {
 	stepContext,
 } from "@/pages/graphs-detail/features/runs/boards/stepBoardSpec";
 import { useRunTrace } from "@/pages/graphs-detail/features/runs/boards/useRunTrace";
+import { routedAction } from "@/pages/graphs-detail/shared/dashboardSpec";
 import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 
 export interface RunBoardPageProps {
@@ -94,8 +96,6 @@ export function RunBoardPage({
 	const [runTab, setRunTab] = useState<RunTab>("overview");
 	const [stepTab, setStepTab] = useState<StepTab>("overview");
 	const [comparing, setComparing] = useState(false);
-	// The layer strip's `Fit` — a view of this page, not a place a link carries.
-	const [layersFit, setLayersFit] = useState(true);
 
 	const engaged = touches.data?.total ? touches.data : undefined;
 	// A step from another run — a `?step=` left behind as the reader moved to
@@ -104,7 +104,7 @@ export function RunBoardPage({
 		() => (trace.data && stepId ? stepContext(trace.data, stepId) : null),
 		[trace.data, stepId],
 	);
-	const spec = useMemo((): DashboardSpec<PagePanels> | null => {
+	const spec = useMemo((): BoardSpec<PagePanels> | null => {
 		if (!trace.data) return null;
 		// Each composer types its own panel kinds; the page's registry holds both,
 		// so either document widens to the pair. The spec type is not covariant
@@ -121,10 +121,9 @@ export function RunBoardPage({
 					selectedKey: null,
 					touches: engaged,
 					lensName: trace.data.lens_name ?? null,
-					layersFit,
 				});
-		return composed as unknown as DashboardSpec<PagePanels>;
-	}, [trace.data, context, view, stepTab, runTab, engaged, layersFit]);
+		return composed as unknown as BoardSpec<PagePanels>;
+	}, [trace.data, context, view, stepTab, runTab, engaged]);
 
 	// `Save report` on the header, and the act behind it. The document
 	// it keeps is `spec` — this page's reading, resolved, every tab included.
@@ -157,12 +156,13 @@ export function RunBoardPage({
 
 	return (
 		<>
-			<Dashboard
+			<Board
 				className="h-full min-h-0"
 				spec={report.spec}
 				registry={REGISTRY}
 				icons={DASHBOARD_ICONS}
-				onAction={(id, ctx) => {
+				onAction={(action, context_) => {
+					const [id, ctx] = routedAction(action, context_);
 					if (report.handle(id)) return;
 					if (context) {
 						switch (id) {
@@ -198,16 +198,13 @@ export function RunBoardPage({
 							if (ctx?.option) setView(ctx.option);
 							return;
 						case RUN_ACTIONS.selectTask:
-							openTask(ctx?.taskKey);
+							openTask(ctx?.itemId);
 							return;
 						case RUN_ACTIONS.selectTouchStep:
-							openTask(ctx?.itemId);
+							if (ctx?.itemId) openTask(stepKeyOfTouch(ctx.itemId));
 							return;
 						case RUN_ACTIONS.openStep:
 							if (ctx?.itemId) onOpenStep(ctx.itemId);
-							return;
-						case RUN_ACTIONS.layersFit:
-							setLayersFit(ctx?.pressed ?? true);
 							return;
 						case RUN_ACTIONS.retune:
 							onRetune?.();

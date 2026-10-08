@@ -5,7 +5,7 @@
  * document renders whatever it names ([boards-migration.md](../../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 
-import type { PanelRendererProps } from "@invana/dashboard";
+import type { PanelRendererProps } from "@invana/boards";
 import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";
 import type { SkillPlaybookRead } from "@/pages/graphs-detail/features/skills/types";
 

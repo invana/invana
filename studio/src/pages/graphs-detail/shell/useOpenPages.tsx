@@ -1,8 +1,8 @@
 import type {
-	BoardHeaderAction,
-	BoardPage as BoardPageDef,
-	BoardPagesViewPanelProps,
-} from "@invana/canvas-ui";
+	WorkbookAction,
+	WorkbookPage,
+	WorkbookPageMenuItem,
+} from "@invana/ui";
 import {
 	HelpCircle,
 	History,
@@ -97,7 +97,7 @@ export interface OpenPagesDeps {
  * header actions and page menu act on the active page. The data page's body
  * is built here too, with the handle the strip's buttons call into.
  *
- * Returns the props for `BoardPagesViewPanel`; the host sets the rest.
+ * Returns the props for `Workbook`; the host sets the rest.
  */
 export function useOpenPages(deps: OpenPagesDeps) {
 	const {
@@ -191,14 +191,14 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	);
 
 	// The active canvas page's handle. The strip's help / styling / history /
-	// rename buttons act on *this* canvas, but `BoardHeaderAction` carries no
+	// rename buttons act on *this* canvas, but `WorkbookAction` carries no
 	// page id (graph-detail-page.md), so the shell calls into the page
 	// rather than passing one.
 	const boardPageRef = useRef<BoardPageHandle>(null);
 
 	// Clicking a node/edge feeds `selectedId` via <InspectorSelectionBridge>; the
 	// derived `selected` (above) drives the right-side InspectorViewPanel. The strip
-	// above it belongs to `BoardPagesViewPanel` in `mainSection`
+	// above it belongs to `Workbook` in `mainSection`
 	// (graph-detail-page.md), not to this page.
 	const canvasContent = (
 		<DataBoardPage
@@ -291,7 +291,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		planRefById,
 	};
 
-	const pages: BoardPageDef[] = [
+	const pages: WorkbookPage[] = [
 		{
 			id: GRAPH_PAGE_ID,
 			// The page says what it is *showing*. While setup is unfinished the
@@ -425,7 +425,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	// shell's region toggles. A model page therefore never offers
 	// "Styling", and the graph page offers none of them.
 	const isDataBoardPage = parseBoardPageId(activePageId)?.kind === "data";
-	const pageHeaderActions: BoardHeaderAction[] = isDataBoardPage
+	const pageHeaderActions: WorkbookAction[] = isDataBoardPage
 		? [
 				{
 					id: "help",
@@ -456,7 +456,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			]
 		: [];
 
-	const pageMenuItems: BoardPagesViewPanelProps["pageMenuItems"] = [
+	const pageMenuItems: WorkbookPageMenuItem[] = [
 		{
 			id: "rename",
 			label: "Rename",

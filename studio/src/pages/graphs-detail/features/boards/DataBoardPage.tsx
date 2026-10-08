@@ -14,7 +14,7 @@
  * props. Moving that down is what turns this from one instance into one per
  * open canvas, and it is deliberately the next step rather than this one.
  *
- * **The strip is not here.** `mainSection` is `BoardPagesViewPanel`
+ * **The strip is not here.** `mainSection` is `Workbook`
  * (`docs/for-developers/building-studio/graph-detail-page.md`), which owns the
  * tabs for every open page — a canvas, a model, a plan. This page is one body
  * inside it. The five controls that act on *this* canvas — help, layers,

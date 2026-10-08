@@ -6,8 +6,8 @@
  * nothing ever counted draws the never-imported state, never a chart of zeros.
  */
 
+import type { RowSpec } from "@invana/boards";
 import { StackedAreaChart } from "@invana/charts";
-import type { RowSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Button, EmptyState } from "@invana/ui";
 import { Activity, Upload } from "lucide-react";
@@ -82,7 +82,7 @@ export function growthRows(
 			{
 				panels: [
 					{
-						kind: "metrics",
+						kind: "grid",
 						options: {
 							tiles: ["Records", "Writes", "Fastest growing", "Unchanged"].map(
 								(label) => ({ label, value: "…" }),
@@ -228,13 +228,13 @@ export function growthRows(
 		{
 			panels: [
 				{
-					kind: "metrics",
+					kind: "grid",
 					options: {
 						tiles: [
 							{
 								label: "Records",
 								value: num(now),
-								caption: !opened
+								delta: !opened
 									? firstAt
 										? `first counted ${formatRelativeTime(new Date(firstAt))}`
 										: "counted before any write"
@@ -247,12 +247,12 @@ export function growthRows(
 								value: String(
 									growth.writes.imports + growth.writes.stitch_commits,
 								),
-								caption: `${growth.writes.imports} ${growth.writes.imports === 1 ? "import" : "imports"} · ${growth.writes.stitch_commits} ${growth.writes.stitch_commits === 1 ? "stitch commit" : "stitch commits"}`,
+								delta: `${growth.writes.imports} ${growth.writes.imports === 1 ? "import" : "imports"} · ${growth.writes.stitch_commits} ${growth.writes.stitch_commits === 1 ? "stitch commit" : "stitch commits"}`,
 							},
 							{
 								label: "Fastest growing",
 								value: fastest ? fastest.name : "—",
-								caption: fastest
+								delta: fastest
 									? fastestPct != null
 										? `+${Math.round(fastestPct * 100)}%`
 										: `${signed(fastest.change)}, from nothing`
@@ -261,7 +261,7 @@ export function growthRows(
 							{
 								label: "Unchanged",
 								value: unchanged.length ? unchanged[0].name : "—",
-								caption: unchanged.length
+								delta: unchanged.length
 									? unchanged.length === 1
 										? unchanged[0].now
 											? "nothing written"
@@ -308,8 +308,7 @@ export function growthRows(
 							columns={columns}
 							data={growth.rows}
 							density="compact"
-							bordered={false}
-							enablePagination={false}
+							seamless
 						/>
 					),
 				},

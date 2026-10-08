@@ -14,12 +14,8 @@ import { usd } from "@/lib/format";
  * catalogue entry ships a surface by recording one of those shapes.
  */
 
-import type {
-	DashboardSpec,
-	PanelSpec,
-	TableOptions,
-	TabSpec,
-} from "@invana/dashboard";
+import type { Column } from "@invana/blocks";
+import type { BoardSpec, PanelSpec, TabSpec } from "@invana/boards";
 import { formatDuration } from "@/lib/time";
 import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
 import {
@@ -117,11 +113,11 @@ export function stepBoardSpec(
 	trace: TraceRead,
 	{ group, prev, next, groups }: StepContext,
 	{ view, tab, touches }: StepBoardView,
-): DashboardSpec<StepPanels> {
+): BoardSpec<StepPanels> {
 	const step = group.head;
 	const bound = boundOf(step);
 
-	const header: DashboardSpec<StepPanels>["header"] = {
+	const header: BoardSpec<StepPanels>["header"] = {
 		tone: toneOf(step.status),
 		// The run's header, kept: the step is one crumb deeper. The run
 		// crumb is the way back; the step crumb opens every task of the run.
@@ -171,7 +167,7 @@ export function stepBoardSpec(
 		]),
 	};
 
-	const spec: DashboardSpec<StepPanels> = {
+	const spec: BoardSpec<StepPanels> = {
 		title: stepTitle(step),
 		header,
 		rows: [],
@@ -269,13 +265,13 @@ function tiles(trace: TraceRead, group: TaskGroup): PanelSpec {
 		numberAt(out, "row_count");
 
 	return {
-		kind: "metrics",
+		kind: "grid",
 		options: {
 			tiles: omit([
 				{
 					label: "Status",
 					value: step.status,
-					caption:
+					delta:
 						group.attempts > 1 ? `attempt ${group.attempts}` : "first attempt",
 					tone: tileToneOf(step.status),
 				},
@@ -284,23 +280,23 @@ function tiles(trace: TraceRead, group: TaskGroup): PanelSpec {
 					: {
 							label: isLive(step.status) ? "Elapsed" : "Duration",
 							value: formatDuration(ms),
-							caption: shareOfRun(ms, runMs),
+							delta: shareOfRun(ms, runMs),
 						},
 				written != null
 					? {
 							label: "Written",
 							value: count(written),
-							caption: readCaption(out),
+							delta: readCaption(out),
 						}
 					: null,
 				rows != null
-					? { label: "Rows", value: count(rows), caption: "recorded" }
+					? { label: "Rows", value: count(rows), delta: "recorded" }
 					: null,
 				tokens
 					? {
 							label: "Tokens",
 							value: compact(tokens),
-							caption: `in ${count(step.tokens_in ?? 0)} · out ${count(step.tokens_out ?? 0)}`,
+							delta: `in ${count(step.tokens_in ?? 0)} · out ${count(step.tokens_out ?? 0)}`,
 						}
 					: null,
 				// The ceiling belongs to the run, not to one of its tasks — so a
@@ -310,14 +306,14 @@ function tiles(trace: TraceRead, group: TaskGroup): PanelSpec {
 					? {
 							label: "Cost",
 							value: usd(step.cost_usd),
-							caption: shareOfSpend(step.cost_usd, trace.cost_usd),
+							delta: shareOfSpend(step.cost_usd, trace.cost_usd),
 						}
 					: null,
 				group.lanes > 1
 					? {
 							label: "Lanes",
 							value: String(group.lanes),
-							caption: "fanned out",
+							delta: "fanned out",
 						}
 					: null,
 			]),
@@ -370,7 +366,7 @@ function input(step: TraceStepRead): PanelSpec | null {
 	const args = step.args ?? step.input;
 	if (!args || !Object.keys(args).length) return null;
 	return {
-		kind: "properties",
+		kind: "record",
 		title: "Input · the request, resolved",
 		// biome-ignore lint/suspicious/noTemplateCurlyInString: the copy shows the binding syntax itself
 		aside: step.args ? "args after ${…} binding" : "what the step recorded",
@@ -466,9 +462,10 @@ function tableRows(out: Record<string, unknown>): PanelSpec | null {
 		0,
 		8,
 	);
-	const columns: TableOptions["columns"] = keys.map((key) => ({
+	const columns: Column[] = keys.map((key) => ({
 		key,
 		label: key,
+		mono: true,
 		align: sample.every((row) => typeof row[key] === "number")
 			? "right"
 			: "left",
@@ -547,7 +544,7 @@ function graphWritten(out: Record<string, unknown>): PanelSpec | null {
 	const edges = graph && isRecord(graph.edges) ? graph.edges : null;
 
 	return {
-		kind: "properties",
+		kind: "record",
 		title: "Output · graph data",
 		aside: "what this task wrote",
 		options: {
@@ -633,7 +630,7 @@ function artifacts(step: TraceStepRead): PanelSpec | null {
 function whereItSits(trace: TraceRead, group: TaskGroup): PanelSpec {
 	const step = group.head;
 	return {
-		kind: "properties",
+		kind: "record",
 		title: "Where it sits",
 		options: {
 			rows: omit([

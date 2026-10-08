@@ -16,7 +16,7 @@
  * text** ([usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  */
 
-import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
+import type { BoardSpec, PanelSpec } from "@invana/boards";
 import {
 	gapTile,
 	readsAs,
@@ -85,7 +85,7 @@ export function usageBoardSpec(
 	skill: Skill,
 	usage: SkillUsageResponse,
 	{ view, version }: UsageBoardView,
-): DashboardSpec {
+): BoardSpec {
 	const row = versionRow(usage, version);
 	const current = row?.version ?? skill.version;
 	const isCurrent = row?.skill_version_id === usage.current_version_id;
@@ -94,7 +94,7 @@ export function usageBoardSpec(
 	// earlier text* would claim the reader moved off the current one.
 	const published = usage.versions.length > 0;
 
-	const header: DashboardSpec["header"] = {
+	const header: BoardSpec["header"] = {
 		crumbs: ["Skills", skill.name, "usage"],
 		chips: omit([
 			{ label: published ? `v${current}` : skillVersionLabel(skill) },
@@ -123,7 +123,7 @@ export function usageBoardSpec(
 		]),
 	};
 
-	const spec: DashboardSpec = {
+	const spec: BoardSpec = {
 		title: `${skill.name} · usage`,
 		header,
 		rows: bands(usage, row, isCurrent),
@@ -138,35 +138,35 @@ function bands(
 	usage: SkillUsageResponse,
 	row: ReturnType<typeof versionRow>,
 	isCurrent: boolean,
-): DashboardSpec["rows"] {
+): BoardSpec["rows"] {
 	const bound = usage.used_by.length;
 	const gap = gapTile(row);
 
 	const tiles: PanelSpec = {
-		kind: "metrics",
+		kind: "grid",
 		options: {
 			tiles: [
 				{
 					label: "Offered",
 					value: count(row?.offered ?? 0),
-					caption: "steps that had it in context",
+					delta: "steps that had it in context",
 				},
 				{
 					label: "Applied",
 					value: count(row?.applied ?? 0),
-					caption: "steps that reported using it",
+					delta: "steps that reported using it",
 				},
-				{ label: "The gap", value: gap.value, caption: gap.caption },
+				{ label: "The gap", value: gap.value, delta: gap.caption },
 				{
 					label: "Bound to",
 					value: `${bound} agent${bound === 1 ? "" : "s"}`,
-					caption: bound ? "it can reach a step" : "it never reaches a step",
+					delta: bound ? "it can reach a step" : "it never reaches a step",
 				},
 			],
 		},
 	};
 
-	return omit<DashboardSpec["rows"][number]>([
+	return omit<BoardSpec["rows"][number]>([
 		{ panels: [tiles] },
 		// the number is a claim, and the surface says so where the number
 		// is read rather than in a footnote. Absent when nothing has claimed
@@ -213,10 +213,20 @@ function bands(
 							options: {
 								columns: [
 									{ key: "version", label: "", mono: true },
-									{ key: "offered", label: "offered", align: "right" },
-									{ key: "applied", label: "applied", align: "right" },
-									{ key: "gap", label: "gap", align: "right" },
-									{ key: "reads", label: "what it reads as" },
+									{
+										key: "offered",
+										label: "offered",
+										align: "right",
+										mono: true,
+									},
+									{
+										key: "applied",
+										label: "applied",
+										align: "right",
+										mono: true,
+									},
+									{ key: "gap", label: "gap", align: "right", mono: true },
+									{ key: "reads", label: "what it reads as", mono: true },
 								],
 								rows: usage.versions.map((v) => ({
 									version: `v${v.version}`,
@@ -243,10 +253,20 @@ function bands(
 							flush: true,
 							options: {
 								columns: [
-									{ key: "agent", label: "agent" },
-									{ key: "offered", label: "offered", align: "right" },
-									{ key: "applied", label: "applied", align: "right" },
-									{ key: "gap", label: "gap", align: "right" },
+									{ key: "agent", label: "agent", mono: true },
+									{
+										key: "offered",
+										label: "offered",
+										align: "right",
+										mono: true,
+									},
+									{
+										key: "applied",
+										label: "applied",
+										align: "right",
+										mono: true,
+									},
+									{ key: "gap", label: "gap", align: "right", mono: true },
 								],
 								rows: usage.by_agent.map((a) => ({
 									agent: a.agent_name ?? "no agent",
@@ -269,10 +289,20 @@ function bands(
 							flush: true,
 							options: {
 								columns: [
-									{ key: "outcome", label: "the run ended" },
-									{ key: "offered", label: "offered", align: "right" },
-									{ key: "applied", label: "applied", align: "right" },
-									{ key: "gap", label: "gap", align: "right" },
+									{ key: "outcome", label: "the run ended", mono: true },
+									{
+										key: "offered",
+										label: "offered",
+										align: "right",
+										mono: true,
+									},
+									{
+										key: "applied",
+										label: "applied",
+										align: "right",
+										mono: true,
+									},
+									{ key: "gap", label: "gap", align: "right", mono: true },
 								],
 								rows: usage.by_outcome.map((o) => ({
 									outcome: o.outcome ?? "still running",
@@ -327,9 +357,9 @@ function bands(
 					flush: true,
 					options: {
 						columns: [
-							{ key: "shape", label: "the shape" },
-							{ key: "because", label: "because" },
-							{ key: "move", label: "what to do" },
+							{ key: "shape", label: "the shape", mono: true },
+							{ key: "because", label: "because", mono: true },
+							{ key: "move", label: "what to do", mono: true },
 						],
 						rows: READINGS,
 					},

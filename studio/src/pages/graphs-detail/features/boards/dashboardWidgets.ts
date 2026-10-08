@@ -19,7 +19,7 @@
  * report must not be ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 
-import { RUN_PANELS } from "@invana/dashboard";
+import { RUN_PANELS } from "@invana/boards";
 import {
 	RunLensWidget,
 	StepTouchWidget,

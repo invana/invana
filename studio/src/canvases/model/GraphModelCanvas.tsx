@@ -24,8 +24,8 @@ import {
 	GraphLayer,
 	HoverActivateBehaviour,
 	HoverElementPreviewBehaviour,
+	NodeLabelLODBehaviour,
 	type RenderPreference,
-	TextLODBehaviour,
 	TextResolutionLODBehaviour,
 	ThemeBehaviour,
 	WheelZoomBehaviour,
@@ -457,7 +457,7 @@ export function GraphModelCanvas({
 				targetLayerId={MODEL_LAYER_ID}
 			/>
 			{/* Card text is unreadable below 40% zoom — drop it (band lives in `settings.json`). */}
-			<TextLODBehaviour id="text-lod" targetLayerId={MODEL_LAYER_ID} />
+			<NodeLabelLODBehaviour id="text-lod" targetLayerId={MODEL_LAYER_ID} />
 			<HoverElementPreviewBehaviour
 				targetLayerId={MODEL_LAYER_ID}
 				renderNode={renderModelNode}

@@ -103,7 +103,8 @@ test("⋯ opens a plan's versions, arguments and export, each as its own page", 
 	).toBeVisible();
 
 	// Arguments: what it declares, and a caller that tuned it.
-	await page.getByRole("tab", { name: "nl-single@2", exact: true }).click();
+	// A Workbook tab's name carries its close button: `nl-single@2 Close nl-single@2`.
+	await page.getByRole("tab", { name: /^nl-single@2 Close/ }).click();
 	await more.click();
 	await page.getByRole("menuitem", { name: "Arguments" }).click();
 	await expect(page.getByText("What this plan declares")).toBeVisible({
@@ -113,7 +114,8 @@ test("⋯ opens a plan's versions, arguments and export, each as its own page", 
 	await expect(caller).toContainText("false");
 
 	// Export: the version as the engine holds it.
-	await page.getByRole("tab", { name: "nl-single@2", exact: true }).click();
+	// A Workbook tab's name carries its close button: `nl-single@2 Close nl-single@2`.
+	await page.getByRole("tab", { name: /^nl-single@2 Close/ }).click();
 	await more.click();
 	await page.getByRole("menuitem", { name: "Export YAML" }).click();
 	await expect(page.getByRole("button", { name: "Download .yml" })).toBeVisible(
