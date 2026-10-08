@@ -53,7 +53,7 @@
 		"@opentelemetry/sdk-metrics": "2.8.0",
 		"@opentelemetry/sdk-trace-web": "2.8.0",
 		"@tanstack/react-query": "^5.0.0",
-		"axios": "^1.7.0",
+		"axios": "^1.20.0",
 		"elkjs": "^0.9.3",
 		"lucide-react": "^0.475.0",
 		"pixi-viewport": "^6.0.3",
