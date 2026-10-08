@@ -125,7 +125,7 @@ export function attentionPanel(
 				columns={columns}
 				data={items}
 				density="compact"
-				seamless
+				bordered={false}
 				emptyState={
 					<p className="px-3 py-6 text-muted-foreground">
 						Nothing is flagged in this window.

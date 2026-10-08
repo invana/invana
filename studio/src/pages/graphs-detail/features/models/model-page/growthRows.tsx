@@ -308,7 +308,7 @@ export function growthRows(
 							columns={columns}
 							data={growth.rows}
 							density="compact"
-							seamless
+							bordered={false}
 						/>
 					),
 				},

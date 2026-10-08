@@ -215,7 +215,7 @@ export function RunsBoardPage({ username, graphSlug }: RunsBoardPageProps) {
 						}
 					/>
 				) : (
-					<Table seamless density="compact">
+					<Table bordered={false} density="compact">
 						<TableHeader>
 							<TableRow>
 								<TableHead>Run</TableHead>

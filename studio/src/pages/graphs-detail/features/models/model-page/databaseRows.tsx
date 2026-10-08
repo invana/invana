@@ -110,7 +110,7 @@ function table<T>(columns: ColumnDef<T>[], data: T[], empty: string) {
 			columns={columns}
 			data={data}
 			density="compact"
-			seamless
+			bordered={false}
 			emptyState={<EmptyState className="py-6" title={empty} />}
 		/>
 	);

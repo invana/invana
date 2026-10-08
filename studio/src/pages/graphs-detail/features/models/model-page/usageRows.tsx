@@ -222,7 +222,7 @@ export function usageRows(
 							columns={columns}
 							data={usage.rows}
 							density="compact"
-							seamless
+							bordered={false}
 						/>
 					</>
 				),
@@ -283,7 +283,7 @@ export function usageRows(
 							]}
 							data={usage.stitches}
 							density="compact"
-							seamless
+							bordered={false}
 						/>
 					),
 				},
@@ -340,7 +340,7 @@ export function usageRows(
 							]}
 							data={usage.properties}
 							density="compact"
-							seamless
+							bordered={false}
 						/>
 					) : (
 						<p className="px-3 py-4 text-muted-foreground">

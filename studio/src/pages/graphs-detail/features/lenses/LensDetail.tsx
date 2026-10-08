@@ -142,7 +142,7 @@ export function LensDetail({
 				</Eyebrow>
 				<div className="flex min-w-0 flex-col gap-2 pt-1">
 					<CastTable
-						seamless
+						bordered={false}
 						cast={lens.cast as Partial<Record<CastRole, string>>}
 						resolved={resolved}
 						readOnly

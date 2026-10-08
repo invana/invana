@@ -251,7 +251,7 @@ export function performanceRows(
 							columns={columns}
 							data={performance.shapes}
 							density="compact"
-							seamless
+							bordered={false}
 							onRowClick={(r) => opts.onSelect(r.hash)}
 							isRowSelected={(r) => r.hash === opts.selected}
 							emptyState={

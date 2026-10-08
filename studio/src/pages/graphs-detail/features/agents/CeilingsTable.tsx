@@ -151,7 +151,7 @@ export function CeilingsTable({
 }: CeilingsTableProps) {
 	const rows = CEILINGS.filter((c) => c.group === group);
 	return (
-		<Table seamless density="compact">
+		<Table bordered={false} density="compact">
 			<TableBody>
 				{rows.map((c) => {
 					const own = values[c.key];
