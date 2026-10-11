@@ -138,6 +138,7 @@ services:
       - studio-ui-node-modules:/app/packages/ui/node_modules
       - studio-canvases-node-modules:/app/packages/canvases/node_modules
       - studio-shell-node-modules:/app/packages/shell/node_modules
+      - studio-assistant-node-modules:/app/packages/assistant/node_modules
     depends_on:
       - engine
 
@@ -258,3 +259,4 @@ volumes:
   studio-ui-node-modules:
   studio-canvases-node-modules:
   studio-shell-node-modules:
+  studio-assistant-node-modules:

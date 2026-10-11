@@ -6,6 +6,7 @@
 // is enforced (skills/spec.md § 2).
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { OfferedRule } from "@invana-studio/core";
 import type { BindRefusal } from "@invana-studio/ui";
 
 /**
@@ -387,19 +388,7 @@ export interface Rule {
 	updated_at: string;
 }
 
-/**
- * One rule as it reached a step — the wording, and the rule to open
- * ([rules.md](../../../docs/for-developers/modules/skills/features/rules.md)).
- *
- * `statement` is the **version's** wording, resolved by the engine from the
- * `rule_version_id` the step recorded, so rewording the rule never rewrites
- * what a past step was given. `rule_id` is what `More` opens, because a board
- * is bound to the rule rather than to one of its versions.
- */
-export interface OfferedRule {
-	rule_id: string;
-	statement: string;
-}
+export type { OfferedRule };
 
 export interface RuleCreate {
 	statement: string;

@@ -245,8 +245,6 @@ export const CONNECTOR_OPTIONS = [
 	},
 ] as const;
 
-export type { QueryLanguage };
-
 export interface GraphConnectionRead {
 	id: string;
 	graph_id: string | null;

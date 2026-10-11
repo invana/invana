@@ -25,6 +25,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import type { TaskRunSummary } from "@invana-studio/core";
 import { formatRelativeTime } from "@invana-studio/core";
 import { PanelSection } from "@invana-studio/ui";
 import { useState } from "react";
@@ -39,7 +40,6 @@ import type {
 	Agent,
 	AgentMeters,
 } from "@/pages/graphs-detail/features/agents/types";
-import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
 import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 

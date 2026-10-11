@@ -1,10 +1,11 @@
 import { Badge, Button, Skeleton } from "@invana/ui";
+import { RecentSessions } from "@invana-studio/assistant";
 import { useCallback } from "react";
 import { useGraphQuery } from "@/pages/graphs-detail/features/graphs/queries";
-import { RecentSessions } from "@/pages/graphs-detail/features/graphs/RecentSessions";
 import { isSetupComplete } from "@/pages/graphs-detail/features/graphs/types";
 import { SetupTimeline } from "@/pages/graphs-detail/features/setup";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
+import { requestOpenSession } from "@/pages/graphs-detail/shared/useOpenSessionRequest";
 import { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 
 interface Props {
@@ -90,6 +91,7 @@ export function InfoTab({ username, graphSlug }: Props) {
 				username={username}
 				graphSlug={graphSlug}
 				onOpenAssistant={openAssistant}
+				onOpenSession={requestOpenSession}
 			/>
 		</div>
 	);

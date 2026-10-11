@@ -1,9 +1,9 @@
+import type { useSessions } from "@invana-studio/assistant";
+import { sessionsApi } from "@invana-studio/assistant";
 import { ApiError } from "@invana-studio/core";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
-import type { useSessions } from "@/pages/graphs-detail/features/assistant";
-import { sessionsApi } from "@/pages/graphs-detail/features/assistant";
 import { boardsApi } from "@/pages/graphs-detail/features/boards/api";
 import type { CanvasKind } from "@/pages/graphs-detail/features/boards/boardKinds";
 import {
@@ -18,7 +18,7 @@ type Sessions = ReturnType<typeof useSessions>;
 type BoardContents = ReturnType<typeof useBoardVersions>;
 
 /** A data canvas open as a tab, bound 1:1 to the session behind it. */
-export interface OpenCanvasTab {
+interface OpenCanvasTab {
 	id: string;
 	sessionId: string;
 }

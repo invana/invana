@@ -30,6 +30,8 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
+import { StepList, totalDuration } from "@invana-studio/assistant";
+import type { RunNode, TaskRunSummary } from "@invana-studio/core";
 import { formatDuration } from "@invana-studio/core";
 import {
 	DetailBlock,
@@ -48,10 +50,6 @@ import { Check, Undo2, UserCog } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
-	StepList,
-	totalDuration,
-} from "@/pages/graphs-detail/features/assistant";
-import {
 	useTodoActivityQuery,
 	useTodoMutations,
 	useTodoQuery,
@@ -60,10 +58,6 @@ import {
 } from "@/pages/graphs-detail/features/projects/queries";
 import { TodoActivityTree } from "@/pages/graphs-detail/features/projects/TodoActivityTree";
 import type { Todo } from "@/pages/graphs-detail/features/projects/types";
-import type {
-	RunNode,
-	TaskRunSummary,
-} from "@/pages/graphs-detail/features/runs";
 import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 
 /**

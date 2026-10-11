@@ -40,6 +40,10 @@ import {
 	Spinner,
 } from "@invana/ui";
 import {
+	type ProjectionTemplateRead,
+	projectionTemplatesApi,
+} from "@invana-studio/core";
+import {
 	DetailBlock,
 	DetailStatus,
 	PanelSection,
@@ -48,10 +52,6 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import {
-	type ProjectionTemplateRead,
-	projectionTemplatesApi,
-} from "@/pages/graphs-detail/features/runs";
 
 const RESULT_SURFACES = [
 	"table",

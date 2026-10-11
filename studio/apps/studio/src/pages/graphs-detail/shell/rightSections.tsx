@@ -1,17 +1,17 @@
 import { ErrorBoundary } from "@invana/ui";
+import type { useSessions } from "@invana-studio/assistant";
+import { AssistantHost, attachmentFor } from "@invana-studio/assistant";
 import { reportBoundaryError } from "@invana-studio/core";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import type { useSessions } from "@/pages/graphs-detail/features/assistant";
-import { attachmentFor } from "@/pages/graphs-detail/features/assistant";
 import { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer";
 import type { useGraphQuery } from "@/pages/graphs-detail/features/graphs";
 import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
+import { SetupLock } from "@/pages/graphs-detail/features/setup";
 import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import type {
 	RightSectionKey,
 	useRightSection,
 } from "@/pages/graphs-detail/shared/useRightSection";
-import { AssistantHost } from "@/pages/graphs-detail/shell/AssistantHost";
 import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 
 /** What the right side's occupants read from the page that hosts them. */
@@ -97,7 +97,9 @@ export function rightSection(deps: RightSectionDeps) {
 		<AssistantHost
 			connectionMissing={connectionMissing}
 			cannotAnswer={cannotAnswer}
-			graph={graphContainer}
+			renderLock={(gate, surface) => (
+				<SetupLock graph={graphContainer} gate={gate} surface={surface} />
+			)}
 			world={world}
 			onManageWorlds={() => settingsPanel.setSection("govern")}
 			availableLanguages={availableLanguages}

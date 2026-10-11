@@ -26,6 +26,7 @@ import type {
 	TabSpec,
 } from "@invana/boards";
 import type { GanttBar, GanttRow } from "@invana/ui";
+import type { TraceRead, TraceStepRead } from "@invana-studio/core";
 import { formatDuration } from "@invana-studio/core";
 import { LAYER_PALETTE } from "@invana-studio/ui";
 import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
@@ -34,10 +35,6 @@ import {
 	lensSummary,
 	runLensOptions,
 } from "@/pages/graphs-detail/features/lenses";
-import type {
-	TraceRead,
-	TraceStepRead,
-} from "@/pages/graphs-detail/features/runs/api";
 import {
 	compact,
 	count,

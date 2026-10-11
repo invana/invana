@@ -15,14 +15,13 @@ import { usd } from "@invana-studio/core";
  */
 
 import type { TouchItem } from "@invana/ui";
-import type { TraceWindow } from "@invana-studio/core";
+import type { TraceRead, TraceWindow } from "@invana-studio/core";
 import { formatCompact, formatElapsed } from "@invana-studio/core";
 import type {
 	Touch,
 	TouchesResponse,
 } from "@/pages/graphs-detail/features/lenses";
 import { BANDS } from "@/pages/graphs-detail/features/lenses";
-import type { TraceRead } from "@/pages/graphs-detail/features/runs/api";
 import {
 	durationMs,
 	originOf,

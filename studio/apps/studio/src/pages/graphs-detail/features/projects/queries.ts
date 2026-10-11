@@ -7,6 +7,7 @@
  * disagrees with the panel.
  */
 
+import { runsApi } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	projectsApi,
@@ -18,7 +19,6 @@ import type {
 	TodoCreate,
 	TodoUpdate,
 } from "@/pages/graphs-detail/features/projects/types";
-import { runsApi } from "@/pages/graphs-detail/features/runs";
 
 type Scope = { username: string; graphSlug: string };
 

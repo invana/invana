@@ -50,7 +50,6 @@ export type {
 } from "@/pages/graphs-detail/features/boards/types";
 
 export { useBoardVersions } from "@/pages/graphs-detail/features/boards/useBoardVersions";
-export type { OpenCanvasTab } from "@/pages/graphs-detail/features/boards/useCanvasTabs";
 // The data canvases' tabs, one per open session.
 export { useCanvasTabs } from "@/pages/graphs-detail/features/boards/useCanvasTabs";
 export type { RecordBoardKind } from "@/pages/graphs-detail/features/boards/useOpenBoard";

@@ -1,3 +1,4 @@
+import { runsApi } from "@invana-studio/core";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	boardPageId,
@@ -12,7 +13,6 @@ import {
 	useLibraryViewPanel,
 	useTaskPlansQuery,
 } from "@/pages/graphs-detail/features/plans";
-import { runsApi } from "@/pages/graphs-detail/features/runs";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 
 /**

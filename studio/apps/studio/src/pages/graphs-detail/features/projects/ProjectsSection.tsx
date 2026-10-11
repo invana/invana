@@ -41,6 +41,7 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
+import type { TaskRunSummary } from "@invana-studio/core";
 import {
 	DetailBlock,
 	DetailPlaceholder,
@@ -71,7 +72,6 @@ import type {
 	Todo,
 } from "@/pages/graphs-detail/features/projects/types";
 import { ProjectRules } from "@/pages/graphs-detail/features/rules";
-import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
 import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 
 /**

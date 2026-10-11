@@ -37,6 +37,7 @@ import type {
 	GraphCanvas as GraphCanvasEngine,
 	GraphData,
 } from "@invana/graph";
+import { SessionTutorialModal } from "@invana-studio/assistant";
 import type { InteractionRef } from "@invana-studio/core";
 import {
 	forwardRef,
@@ -45,7 +46,6 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { SessionTutorialModal } from "@/pages/graphs-detail/features/assistant";
 import { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardFormDialog";
 import { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardHistoryWidget";
 import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";

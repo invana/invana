@@ -16,7 +16,6 @@ export type {
 	Graph,
 	GraphConnectionCreate,
 	GraphConnectionRead,
-	QueryLanguage,
 	SetupGate,
 	SetupSection,
 	SetupSectionState,

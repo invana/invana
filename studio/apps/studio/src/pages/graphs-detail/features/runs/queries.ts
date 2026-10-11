@@ -1,6 +1,6 @@
+import type { TaskRunSummary } from "@invana-studio/core";
+import { runsApi } from "@invana-studio/core";
 import { useQuery } from "@tanstack/react-query";
-import { runsApi } from "@/pages/graphs-detail/features/runs/api";
-import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
 
 /** What a journal row is, whatever kind of work produced it. */
 type RunKind = "import" | "bulk" | "ask";

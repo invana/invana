@@ -1,10 +1,10 @@
 import type { GraphCanvas } from "@invana/graph";
 import { ErrorBoundary } from "@invana/ui";
+import type { useSessions } from "@invana-studio/assistant";
 import type { QueryResultItem } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents";
-import type { useSessions } from "@/pages/graphs-detail/features/assistant";
 import type {
 	CanvasStyling,
 	OpenBoard,

@@ -16,6 +16,7 @@
 
 import { Board, type BoardSpec, RUN_PANELS } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
+import { runsApi } from "@invana-studio/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -26,7 +27,6 @@ import {
 	stepKeyOfTouch,
 	useRunTouchesQuery,
 } from "@/pages/graphs-detail/features/lenses";
-import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import { BOARD_ICONS } from "@/pages/graphs-detail/features/runs/boards/icons";
 import {
 	RUN_ACTIONS,

@@ -3,6 +3,11 @@ import type {
 	WorkbookPage,
 	WorkbookPageMenuItem,
 } from "@invana/ui";
+import type { useSessions } from "@invana-studio/assistant";
+import {
+	hasSeenSessionTutorial,
+	markSessionTutorialSeen,
+} from "@invana-studio/assistant";
 import {
 	HelpCircle,
 	History,
@@ -19,11 +24,6 @@ import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useMemo, useRef } from "react";
 import { LayeredCanvasHeader } from "@/canvases/layered/LayeredCanvasChrome";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
-import type { useSessions } from "@/pages/graphs-detail/features/assistant";
-import {
-	hasSeenSessionTutorial,
-	markSessionTutorialSeen,
-} from "@/pages/graphs-detail/features/assistant";
 import {
 	BOARD_KINDS,
 	type BoardPageHandle,

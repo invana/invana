@@ -38,12 +38,12 @@
 
 import type { GanttOptions, GanttSpecBar, GanttSpecRow } from "@invana/blocks";
 import type { Layer } from "@invana/ui";
+import type { TraceStepRead } from "@invana-studio/core";
 import { LAYER_SWATCHES } from "@invana-studio/ui";
 import type {
 	Touch,
 	TouchesResponse,
 } from "@/pages/graphs-detail/features/lenses/types";
-import type { TraceStepRead } from "@/pages/graphs-detail/features/runs";
 
 /** Every layer, spine last — the order the rows are read in. */
 export const BANDS: Layer[] = [

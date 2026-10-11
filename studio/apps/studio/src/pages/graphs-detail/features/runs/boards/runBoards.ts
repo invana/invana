@@ -15,10 +15,7 @@
 import type { GanttSpecStatus, Tone as TileTone } from "@invana/blocks";
 import type { ChipSpec, Tone } from "@invana/boards";
 import type { Bound, StatusDotProps } from "@invana/ui";
-import type {
-	TraceRead,
-	TraceStepRead,
-} from "@/pages/graphs-detail/features/runs/api";
+import type { TraceRead, TraceStepRead } from "@invana-studio/core";
 
 /** A run that has not settled — the Gantt grows a now line, Cancel is offered. */
 const LIVE_STATUSES: ReadonlySet<string> = new Set([

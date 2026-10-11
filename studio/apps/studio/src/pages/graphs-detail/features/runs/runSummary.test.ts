@@ -1,6 +1,6 @@
+import type { TraceRead } from "@invana-studio/core";
 import { describe, expect, it } from "vitest";
 import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
-import type { TraceRead } from "@/pages/graphs-detail/features/runs/api";
 import { planKeyOf, runSummary } from "./runSummary";
 
 const trace = (over: Partial<TraceRead> = {}) =>

@@ -136,7 +136,7 @@ Each product package default-exports one object. The app passes the list to the 
 | `features/boards` | `shell` (Workbook, board pages, versions) | `useCanvasTabs` → `explorer` |
 | `features/assistant` | `assistant` | + `useAssistantCanvasBridge`, `AssistantHost` from `shell/` |
 | `graphs-detail/shell/` | `shell` + `apps/studio` | `GraphDetail*` is retired in A13 |
-| `features/runs` · `features/events` · `features/setup` | `shell` | Activity › Runs · Events; set-up checklist |
+| `features/runs` · `features/events` · `features/setup` | `shell` | Activity › Runs · Events; set-up checklist. The run, session and emission records, the runs API and the live run store are in `core`, because the assistant and Activity both read them |
 | `features/explorer` | `explorer` | |
 | `features/models` · `features/lenses` | `modeller` | lenses = worlds + guardrails |
 | `features/rules` | **split** — `RulesSection` → `modeller` · `ProjectRules` → `projects` | |

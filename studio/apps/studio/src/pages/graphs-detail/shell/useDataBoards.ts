@@ -1,15 +1,15 @@
 import { canUseWebGPU } from "@invana/canvas-react";
 import type { GraphCanvas, GraphLayer } from "@invana/graph";
+import type { useSessions } from "@invana-studio/assistant";
+import {
+	sessionsApi,
+	useAssistantCanvasBridge,
+} from "@invana-studio/assistant";
 import type { QueryResponse, QueryResultItem } from "@invana-studio/core";
 import { type Interaction, measureSync } from "@invana-studio/core";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { useSessions } from "@/pages/graphs-detail/features/assistant";
-import {
-	sessionsApi,
-	useAssistantCanvasBridge,
-} from "@/pages/graphs-detail/features/assistant";
 import type {
 	Board,
 	BoardVersionCause,
@@ -31,6 +31,7 @@ import {
 	adaptItems,
 	explorerApi,
 	isCanvasStateSnapshot,
+	resultToItems,
 	useCanvasExpand,
 } from "@/pages/graphs-detail/features/explorer";
 import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
@@ -757,6 +758,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		createCanvas,
 		canvasList,
 		openCanvasTab,
+		resultToItems,
 		restoredRef,
 		backend,
 		magnet,

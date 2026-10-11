@@ -16,16 +16,13 @@ import { usd } from "@invana-studio/core";
 
 import type { Column } from "@invana/blocks";
 import type { BoardSpec, PanelSpec, TabSpec } from "@invana/boards";
+import type { TraceRead, TraceStepRead } from "@invana-studio/core";
 import { formatDuration } from "@invana-studio/core";
 import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
 import {
 	touchesOfStepKey,
 	type WithStepTouch,
 } from "@/pages/graphs-detail/features/lenses";
-import type {
-	TraceRead,
-	TraceStepRead,
-} from "@/pages/graphs-detail/features/runs/api";
 import {
 	boundOf,
 	compact,

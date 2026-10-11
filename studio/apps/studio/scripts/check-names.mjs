@@ -50,7 +50,6 @@ const ENGINE_SERVER = path.join(
 // module's own; a different spelling here is an engine folder not yet renamed.
 const MODULES = {
 	agents: "agents",
-	assistant: "sessions",
 	boards: "boards",
 	events: "events",
 	explorer: "explorer",
@@ -71,6 +70,7 @@ const MODULES = {
 const ENGINE_ONLY = {
 	admin: "platform operations, no Graph page",
 	auth: "accounts, served outside the Graph page",
+	sessions: "served by the @invana-studio/assistant package, outside features/",
 	routes: "shared route helpers",
 	__pycache__: "bytecode",
 };

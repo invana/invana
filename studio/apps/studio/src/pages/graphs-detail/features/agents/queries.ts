@@ -5,6 +5,7 @@
  * `["agents", owner, graph, …]`; a mutation invalidates every agents key.
  */
 
+import { sessionsApi } from "@invana-studio/assistant";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { agentsApi } from "@/pages/graphs-detail/features/agents/api";
 import type {
@@ -13,7 +14,6 @@ import type {
 	LifecycleAct,
 	SoulPreviewRequest,
 } from "@/pages/graphs-detail/features/agents/types";
-import { sessionsApi } from "@/pages/graphs-detail/features/assistant";
 
 type Scope = { username: string; graphSlug: string };
 

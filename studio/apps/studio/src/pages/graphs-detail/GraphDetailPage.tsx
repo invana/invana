@@ -1,10 +1,10 @@
 import { CanvasContext } from "@invana/canvas-react";
 import { ErrorBoundary, Workbook } from "@invana/ui";
+import { AssistantSlotsContext, useSessions } from "@invana-studio/assistant";
 import type { QueryResponse } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
 import { useCallback, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useSessions } from "@/pages/graphs-detail/features/assistant";
 import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
 import {
 	hasOutstandingSetup,
@@ -20,6 +20,7 @@ import { useRunStep } from "@/pages/graphs-detail/features/runs";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
+import { assistantSlots } from "@/pages/graphs-detail/shell/assistantSlots";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { graphDetailChrome } from "@/pages/graphs-detail/shell/GraphDetailChrome";
 import { layeredCanvasBody } from "@/pages/graphs-detail/shell/layeredCanvasBody";
@@ -315,36 +316,42 @@ export function GraphDetailPage() {
 			    whole address is their subject, because the two that read a trace
 			    need a `runId` this signature cannot carry. */}
 			<OpenBoardContext.Provider value={openRecordBoard}>
-				<GraphDetail
-					// The last crumb is what is open — the canvas you are looking at,
-					// named by its session: `ravi › finance › Defence theme — Sep 2026`.
-					// There is no screen crumb before it. `Explorer` used to sit there,
-					// which named the page after one of its eight `leftNav` items
-					// (graph-detail-page.md).
-					objectLabel={
-						activeSessionId ? sessionTitleById.get(activeSessionId) : undefined
-					}
-					{...chrome}
-					leftSection={leftRegion}
-					mainSection={{
-						// One host for every kind of page — the strip and the bodies in one
-						// component, so the tabs cannot drift from what they switch
-						// (graph-detail-page.md the-shell.md).
-						content: (
-							<ErrorBoundary onError={reportBoundaryError}>
-								<Workbook
-									{...strip}
-									addLabel="New canvas"
-									// Until each canvas owns its own engine, only the active page is
-									// mounted — today's behaviour, now stated rather than emergent.
-									keepMounted={false}
-									className="h-full"
-								/>
-							</ErrorBoundary>
-						),
-					}}
-					rightSection={rightSection(regionDeps)}
-				/>
+				{/* What the assistant borrows from this page — banners, boards,
+				    worlds, a step's rules. */}
+				<AssistantSlotsContext.Provider value={assistantSlots}>
+					<GraphDetail
+						// The last crumb is what is open — the canvas you are looking at,
+						// named by its session: `ravi › finance › Defence theme — Sep 2026`.
+						// There is no screen crumb before it. `Explorer` used to sit there,
+						// which named the page after one of its eight `leftNav` items
+						// (graph-detail-page.md).
+						objectLabel={
+							activeSessionId
+								? sessionTitleById.get(activeSessionId)
+								: undefined
+						}
+						{...chrome}
+						leftSection={leftRegion}
+						mainSection={{
+							// One host for every kind of page — the strip and the bodies in one
+							// component, so the tabs cannot drift from what they switch
+							// (graph-detail-page.md the-shell.md).
+							content: (
+								<ErrorBoundary onError={reportBoundaryError}>
+									<Workbook
+										{...strip}
+										addLabel="New canvas"
+										// Until each canvas owns its own engine, only the active page is
+										// mounted — today's behaviour, now stated rather than emergent.
+										keepMounted={false}
+										className="h-full"
+									/>
+								</ErrorBoundary>
+							),
+						}}
+						rightSection={rightSection(regionDeps)}
+					/>
+				</AssistantSlotsContext.Provider>
 			</OpenBoardContext.Provider>
 		</CanvasContext.Provider>
 	);
