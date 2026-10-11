@@ -3,7 +3,6 @@ import settingsJson from "./settings.json";
 import templatesJson from "./templates.json";
 import type { TaskFlowTemplates } from "./types";
 
-export { TaskFlowCanvas } from "./TaskFlowCanvas";
 export * from "./types";
 
 // JSON import widens string-literal unions to `string`; the files are a

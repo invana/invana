@@ -25,10 +25,16 @@ jobs:
       - name: Import linter
         run: cd engine && uv run lint-imports
 
+      # docs/products/migration-plan.md §2 — Allowed imports between Studio packages.
+      # `pnpm lint` runs it too; its own step names the failure.
+      - name: Package boundaries
+        run: cd studio && pnpm check-boundaries
+
       # docs/for-developers/building-studio/code-shape.md §8 — Biome, then names.
       - name: Biome and names check
         run: cd studio && pnpm lint
 
+      # One knip run over every workspace package (studio/knip.json).
       - name: Dead files
         run: cd studio && pnpm knip
 

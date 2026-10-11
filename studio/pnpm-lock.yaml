@@ -14,6 +14,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: 5.0.2
         version: 5.0.2(vitest@5.0.2)
+      knip:
+        specifier: ^6.38.0
+        version: 6.38.0
       turbo:
         specifier: ^2.10.5
         version: 2.11.7
@@ -198,9 +201,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: 5.0.2
         version: 5.0.2(vitest@5.0.2)
-      knip:
-        specifier: ^6.38.0
-        version: 6.38.0
       tailwindcss:
         specifier: ^4.0.0
         version: 4.2.2

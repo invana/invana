@@ -9,12 +9,14 @@
 		"lint": "turbo run lint",
 		"check-types": "turbo run check-types",
 		"test": "vitest run",
-		"knip": "turbo run knip",
+		"knip": "knip --include files,exports,types",
+		"check-boundaries": "node scripts/check-boundaries.mjs",
 		"test:e2e": "pnpm --filter studio test:e2e"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.14",
 		"@vitest/coverage-v8": "5.0.2",
+		"knip": "^6.38.0",
 		"turbo": "^2.10.5",
 		"vitest": "^5.0.2"
 	}

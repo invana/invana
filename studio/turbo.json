@@ -10,7 +10,18 @@
 			"outputs": ["dist/**"]
 		},
 		"lint": {
-			"dependsOn": ["^lint"]
+			"dependsOn": ["^lint", "//#check-boundaries"]
+		},
+		"//#check-boundaries": {
+			"inputs": [
+				"scripts/check-boundaries.mjs",
+				"apps/*/turbo.json",
+				"apps/*/src/**",
+				"packages/*/turbo.json",
+				"packages/*/src/**",
+				"packages/*/package.json",
+				"apps/*/package.json"
+			]
 		},
 		"check-types": {
 			"dependsOn": ["^check-types"]
@@ -18,7 +29,6 @@
 		"//#test": {
 			"cache": false
 		},
-		"knip": {},
 		"dev": {
 			"env": ["VITE_*", "INVANA_DESIGN_KIT", "INVANA_CANVAS"],
 			"cache": false,

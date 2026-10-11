@@ -3,9 +3,6 @@ import settingsJson from "./settings.json";
 import templatesJson from "./templates.json";
 import type { GraphModelTemplates } from "./types";
 
-export { hueSlotForName } from "./config";
-
-export { GraphModelCanvas } from "./GraphModelCanvas";
 export * from "./types";
 
 // JSON import widens string-literal unions to `string`; the files are a

@@ -81,3 +81,7 @@ studio/apps/*/blob-report/
 
 # ─── Migration runner (scripts/migration) ───
 .migration-cache/
+
+# local agent skills (installed per machine)
+.agents/
+skills-lock.json

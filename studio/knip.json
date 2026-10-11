@@ -1,0 +1,25 @@
+{
+	"$schema": "https://unpkg.com/knip@6/schema.json",
+	"workspaces": {
+		".": {
+			"entry": ["scripts/*.mjs"],
+			"project": ["scripts/*.mjs"]
+		},
+		"apps/studio": {
+			"entry": ["scripts/*.mjs"],
+			"project": ["src/**/*.{ts,tsx,css}", "scripts/*.mjs"]
+		},
+		"packages/core": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/ui": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/canvases": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		}
+	}
+}
