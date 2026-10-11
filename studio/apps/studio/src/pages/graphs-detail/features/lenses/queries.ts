@@ -8,8 +8,6 @@
  * invalidates the lens list rather than patching it in place.
  */
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { governApi } from "@/pages/graphs-detail/features/lenses/api";
 import type {
 	CastRole,
 	GovernLayer,
@@ -17,7 +15,9 @@ import type {
 	LensCreate,
 	LensKind,
 	LensUpdate,
-} from "@/pages/graphs-detail/features/lenses/types";
+} from "@invana-studio/core";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { governApi } from "@/pages/graphs-detail/features/lenses/api";
 
 const root = (u: string, g: string) => ["govern", u, g] as const;
 const lensesKey = (u: string, g: string) => [...root(u, g), "lenses"] as const;

@@ -6,6 +6,7 @@
  */
 
 import { request } from "@invana-studio/core";
+import type { EventListResponse } from "@invana-studio/shell";
 import type {
 	Agent,
 	AgentCreate,
@@ -19,7 +20,6 @@ import type {
 	SoulPreview,
 	SoulPreviewRequest,
 } from "@/pages/graphs-detail/features/agents/types";
-import type { EventListResponse } from "@/pages/graphs-detail/features/events";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}`;

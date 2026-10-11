@@ -16,10 +16,7 @@
  * the default.
  */
 
-import type {
-	GovernLayer,
-	Participant,
-} from "@/pages/graphs-detail/features/lenses/types";
+import type { GovernLayer, Participant } from "@invana-studio/core";
 
 /** Any sublayer. One segment — the middle one. */
 export const ANY_SUBLAYER = "*";

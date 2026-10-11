@@ -1,12 +1,12 @@
-import { authApi, useAuthStore } from "@invana-studio/core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
 import type {
 	GraphConnectionCreate,
 	GraphCreate,
 	GraphUpdate,
 	SetupSection,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@invana-studio/core";
+import { authApi, useAuthStore } from "@invana-studio/core";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
 
 /**
  * Re-fetch `/auth/me` and update the auth store. Keeps `user.graphs` in

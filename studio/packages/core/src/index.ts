@@ -32,6 +32,8 @@ export * from "./stores/auth.store";
 export * from "./stores/run.store";
 export * from "./types/auth";
 export * from "./types/emissions";
+export * from "./types/graphs";
+export * from "./types/lenses";
 export * from "./types/product";
 export * from "./types/query";
 export * from "./types/runs";

@@ -14,6 +14,11 @@ import {
 	Skeleton,
 } from "@invana/ui";
 import {
+	type Graph,
+	SETUP_REQUIRED,
+	setupSectionStatus,
+} from "@invana-studio/core";
+import {
 	ChevronLeft,
 	ChevronRight,
 	Folder,
@@ -25,9 +30,6 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
-	type Graph,
-	SETUP_REQUIRED,
-	setupSectionStatus,
 	useDeleteGraphMutation,
 	useGraphsQuery,
 } from "@/pages/graphs-detail/features/graphs";

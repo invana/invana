@@ -22,8 +22,8 @@
  */
 
 import { type ColumnDef, DataTable } from "@invana/tables";
+import type { GraphContention } from "@invana-studio/core";
 import { useMemo } from "react";
-import type { GraphContention } from "@/pages/graphs-detail/features/graphs/types";
 
 type Pool = GraphContention["pools"][number];
 type Queued = GraphContention["queued"][number];

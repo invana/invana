@@ -10,11 +10,11 @@
  */
 
 import { EmptyState, LensRow, Spinner } from "@invana/ui";
+import type { Lens } from "@invana-studio/core";
 import {
 	narrowingsOf,
 	since,
 } from "@/pages/graphs-detail/features/lenses/narrowing";
-import type { Lens } from "@/pages/graphs-detail/features/lenses/types";
 
 export interface LensListProps {
 	items: Lens[];

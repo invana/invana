@@ -1,8 +1,9 @@
 import type { GraphCanvas } from "@invana/graph";
 import { ErrorBoundary } from "@invana/ui";
 import type { useSessions } from "@invana-studio/assistant";
-import type { QueryResultItem } from "@invana-studio/core";
+import type { LensKind, QueryResultItem } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
+import { RunsViewPanel } from "@invana-studio/shell";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents";
 import type {
@@ -10,7 +11,6 @@ import type {
 	OpenBoard,
 } from "@/pages/graphs-detail/features/boards";
 import { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer";
-import type { LensKind } from "@/pages/graphs-detail/features/lenses";
 import { LensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import {
 	type ModelSelection,
@@ -21,7 +21,6 @@ import {
 	taskPlansApi,
 } from "@/pages/graphs-detail/features/plans";
 import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects";
-import { RunsViewPanel } from "@/pages/graphs-detail/features/runs";
 import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills";
 import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";

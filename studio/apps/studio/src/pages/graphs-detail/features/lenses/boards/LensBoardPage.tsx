@@ -24,6 +24,8 @@
 
 import { Board } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
+import type { LensKind } from "@invana-studio/core";
+import { VIEW_BOARD } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
 import { useReport } from "@/pages/graphs-detail/features/boards";
@@ -35,8 +37,6 @@ import {
 	useLensesQuery,
 	useLensQuery,
 } from "@/pages/graphs-detail/features/lenses/queries";
-import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
-import { VIEW_BOARD } from "@/pages/graphs-detail/shared/boardSpec";
 
 export interface LensBoardPageProps {
 	username: string;

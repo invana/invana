@@ -18,6 +18,7 @@
  */
 
 import type { PanelStackSection } from "@invana/ui";
+import type { Lens, LensCreate, Refusal } from "@invana-studio/core";
 import { type StackSectionUi, stackSection } from "@invana-studio/ui";
 import { Globe, Maximize2, Plus } from "lucide-react";
 import { GuardrailsStrip } from "@/pages/graphs-detail/features/lenses/GuardrailsStrip";
@@ -25,11 +26,6 @@ import { LensActions } from "@/pages/graphs-detail/features/lenses/LensActions";
 import { LensDetail } from "@/pages/graphs-detail/features/lenses/LensDetail";
 import { LensEditor } from "@/pages/graphs-detail/features/lenses/LensEditor";
 import { LensList } from "@/pages/graphs-detail/features/lenses/LensList";
-import type {
-	Lens,
-	LensCreate,
-	Refusal,
-} from "@/pages/graphs-detail/features/lenses/types";
 
 /** `&world=new` is the authoring drill-in — a value, not a second param. */
 export const NEW_LENS = "new";

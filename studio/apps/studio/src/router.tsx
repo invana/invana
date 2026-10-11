@@ -1,6 +1,7 @@
 import {
 	ErrorPage,
 	LoginPage,
+	PlatformEventsPage,
 	ProfileSettingsPage,
 	ProtectedRoute,
 	productRoutes,
@@ -9,7 +10,6 @@ import {
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { GraphCreatePage } from "@/pages/graphs/GraphCreatePage";
 import { GraphsListPage } from "@/pages/graphs/GraphsListPage";
-import { PlatformEventsPage } from "@/pages/platform/PlatformEventsPage";
 import { products } from "@/products";
 
 export const router = createBrowserRouter([

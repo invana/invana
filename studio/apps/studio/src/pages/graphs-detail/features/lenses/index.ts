@@ -3,6 +3,9 @@
  *
  * Its own `leftNav` item holding two sections: a guardrail belongs beside
  * the worlds it bounds, and the two are one record.
+ *
+ * The lens and touch records are wire types in `@invana-studio/core`; what a
+ * run touched, as a run's board draws it, is in `@invana-studio/shell`.
  */
 
 export { matches } from "@/pages/graphs-detail/features/lenses/addressing";
@@ -11,7 +14,6 @@ export {
 	CompareBoardPage,
 	parseComparePair,
 } from "@/pages/graphs-detail/features/lenses/CompareBoardPage";
-export { CompareDialog } from "@/pages/graphs-detail/features/lenses/CompareDialog";
 
 export { LensesViewPanel } from "@/pages/graphs-detail/features/lenses/LensesViewPanel";
 export {
@@ -21,25 +23,5 @@ export {
 } from "@/pages/graphs-detail/features/lenses/queries";
 /** Legacy — frozen reports only. See the file. */
 export { RunLensWidget } from "@/pages/graphs-detail/features/lenses/RunLensWidget";
-export {
-	BANDS,
-	layersOptions,
-	stepKeyOfTouch,
-} from "@/pages/graphs-detail/features/lenses/runLayers";
-export {
-	lensSummary,
-	runLensOptions,
-} from "@/pages/graphs-detail/features/lenses/runLens";
-export type { WithStepTouch } from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
-export {
-	StepTouchWidget,
-	touchesOfStepKey,
-} from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
-export type {
-	Lens,
-	LensKind,
-	Touch,
-	TouchesResponse,
-} from "@/pages/graphs-detail/features/lenses/types";
 
 export { useLensesViewPanel } from "@/pages/graphs-detail/features/lenses/useLensesViewPanel";

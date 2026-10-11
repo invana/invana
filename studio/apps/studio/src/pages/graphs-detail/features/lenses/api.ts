@@ -6,7 +6,6 @@
  * enforcement path the module exists not to have.
  */
 
-import { request } from "@invana-studio/core";
 import type {
 	CastRole,
 	CatalogueResponse,
@@ -21,7 +20,8 @@ import type {
 	LensUpdate,
 	TouchesResponse,
 	ValidationResponse,
-} from "@/pages/graphs-detail/features/lenses/types";
+} from "@invana-studio/core";
+import { request } from "@invana-studio/core";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}/govern`;

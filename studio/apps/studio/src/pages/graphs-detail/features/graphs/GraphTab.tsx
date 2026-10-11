@@ -11,6 +11,7 @@ import {
 	Skeleton,
 	TabbedPanel,
 } from "@invana/ui";
+import type { Graph, GraphUpdate } from "@invana-studio/core";
 import { FormError } from "@invana-studio/ui";
 import { Archive, ArchiveRestore, Bot, Database, Info } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
@@ -23,10 +24,6 @@ import {
 	useGraphQuery,
 	useUpdateGraphMutation,
 } from "@/pages/graphs-detail/features/graphs/queries";
-import type {
-	Graph,
-	GraphUpdate,
-} from "@/pages/graphs-detail/features/graphs/types";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /** The tabs, in strip order. `?tab=` carries the open one. */

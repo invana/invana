@@ -411,6 +411,9 @@ importers:
 
   packages/shell:
     dependencies:
+      '@invana-studio/canvases':
+        specifier: workspace:*
+        version: link:../canvases
       '@invana-studio/core':
         specifier: workspace:*
         version: link:../core
@@ -421,6 +424,12 @@ importers:
       '@biomejs/biome':
         specifier: ^2.5.14
         version: 2.5.14
+      '@invana/blocks':
+        specifier: ^0.0.34
+        version: 0.0.34(807217acff4defe9d759588dd55ab739)
+      '@invana/boards':
+        specifier: ^0.0.34
+        version: 0.0.34(6b092dff7c1e89e2da1cdf9611ab695d)
       '@invana/forms':
         specifier: ^0.0.34
         version: 0.0.34(@invana/styling@0.0.34(tailwindcss@4.2.2))(@invana/ui@0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
@@ -436,6 +445,9 @@ importers:
       '@invana/ui':
         specifier: ^0.0.34
         version: 0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.98.0(react@19.2.5)
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
@@ -469,6 +481,9 @@ importers:
       vitest:
         specifier: ^5.0.2
         version: 5.0.2(@opentelemetry/api@1.9.1)(@types/node@25.6.0)(@vitest/coverage-v8@5.0.2)(vite@7.3.2(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.1))
+      zustand:
+        specifier: ^5.0.0
+        version: 5.0.12(@types/react@19.2.14)(immer@11.1.8)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
 
   packages/ui:
     devDependencies:

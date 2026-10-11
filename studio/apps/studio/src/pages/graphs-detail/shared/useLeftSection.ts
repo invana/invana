@@ -43,7 +43,9 @@ export type LeftNavKey =
 	| "runs"
 	| "library"
 	| "govern"
-	| "agents";
+	| "agents"
+	// Activity's tabs that no rail icon writes; `?section=` names the tab.
+	| "activity";
 
 const DEFAULT_SECTION: LeftNavKey = "info";
 
@@ -99,6 +101,7 @@ const STACK_KEYS_OF: Partial<Record<LeftNavKey, readonly string[]>> = {
 	// `agent` is an agent's own surface, `provider` one
 	// configured endpoint and the models it offers.
 	agents: [SECTION_PARAM, "agent", "provider"],
+	activity: [SECTION_PARAM],
 };
 
 // A panel whose content is itself tabbed says which tab through `?tab=`. Only
@@ -130,6 +133,7 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"library",
 	"govern",
 	"agents",
+	"activity",
 ];
 
 // Retired keys, kept as aliases so a bookmark lands on the panel that now holds

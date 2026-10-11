@@ -35,6 +35,7 @@ import {
 	CannotAnswerCard,
 	Eyebrow,
 } from "@invana/ui";
+import type { Lens } from "@invana-studio/core";
 import { ApiError } from "@invana-studio/core";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -44,7 +45,6 @@ import {
 	usePromoteLensMutation,
 	useUpdateLensMutation,
 } from "@/pages/graphs-detail/features/lenses/queries";
-import type { Lens } from "@/pages/graphs-detail/features/lenses/types";
 
 export interface LensActionsProps {
 	username?: string;

@@ -25,17 +25,7 @@
  */
 
 import type { BoardSpec, PanelSpec } from "@invana/boards";
-import {
-	GOVERNED_LAYERS,
-	layerSummary,
-	rulesInLayer,
-	since,
-} from "@/pages/graphs-detail/features/lenses/narrowing";
-import type {
-	GovernLayer,
-	GovernRule,
-	Lens,
-} from "@/pages/graphs-detail/features/lenses/types";
+import type { GovernLayer, GovernRule, Lens } from "@invana-studio/core";
 import {
 	count,
 	omit,
@@ -43,7 +33,13 @@ import {
 	VIEW_ACTION,
 	VIEW_BOARD,
 	VIEW_SPEC,
-} from "@/pages/graphs-detail/shared/boardSpec";
+} from "@invana-studio/shell";
+import {
+	GOVERNED_LAYERS,
+	layerSummary,
+	rulesInLayer,
+	since,
+} from "@/pages/graphs-detail/features/lenses/narrowing";
 
 /** Action ids this page answers. The spec carries the string; the page the behaviour. */
 export const LENS_ACTIONS = {

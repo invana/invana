@@ -13,9 +13,9 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../..');
-const candidates = ['studio/node_modules', 'studio/apps/studio/node_modules'].map((p) => path.join(root, p, 'package.json'));
-const req = createRequire(candidates.find((p) => existsSync(path.dirname(p))) ?? candidates[0]);
-const { chromium } = req('playwright');
+// The app's devDependency is `@playwright/test`, which re-exports `chromium`.
+const req = createRequire(path.join(root, 'studio/apps/studio/package.json'));
+const { chromium } = req('@playwright/test');
 
 const args = process.argv.slice(2);
 const flag = (n) => args.includes(n);

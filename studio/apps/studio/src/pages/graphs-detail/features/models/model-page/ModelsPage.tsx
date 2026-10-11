@@ -11,6 +11,7 @@
 import { Board } from "@invana/boards";
 import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
 import { ApiError } from "@invana-studio/core";
+import { routedAction } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
@@ -51,7 +52,6 @@ import type {
 	BindingStitch,
 	GraphModelSummary,
 } from "@/pages/graphs-detail/features/models/types";
-import { routedAction } from "@/pages/graphs-detail/shared/boardSpec";
 import { ArchiveRefused, PublishConfirm } from "./ModelsDialogs";
 import {
 	LOCKED_UNTIL_PUBLISHED,

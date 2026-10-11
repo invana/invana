@@ -29,6 +29,7 @@ import {
 	LayerSection,
 	RuleRow,
 } from "@invana/ui";
+import type { GovernRule, Lens } from "@invana-studio/core";
 import { LAYER_PALETTE } from "@invana-studio/ui";
 import {
 	GOVERNED_LAYERS,
@@ -36,10 +37,6 @@ import {
 	rulesInLayer,
 } from "@/pages/graphs-detail/features/lenses/narrowing";
 import { useLensQuery } from "@/pages/graphs-detail/features/lenses/queries";
-import type {
-	GovernRule,
-	Lens,
-} from "@/pages/graphs-detail/features/lenses/types";
 
 function ruleKey(rule: GovernRule, i: number): string {
 	return `${rule.match}-${rule.allow ? "a" : "d"}-${i}`;

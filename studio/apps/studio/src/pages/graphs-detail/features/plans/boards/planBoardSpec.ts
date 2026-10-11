@@ -12,6 +12,8 @@ import { usd } from "@invana-studio/core";
 import type { MetricOptions } from "@invana/blocks";
 import type { BoardSpec, PanelSpec, TabSpec } from "@invana/boards";
 import { formatElapsed } from "@invana-studio/core";
+import type { FlowOptions } from "@invana-studio/shell";
+import { runAddress } from "@invana-studio/shell";
 import type { PlanChartWidgets } from "@/pages/graphs-detail/features/plans/boards/PlanChartWidgets";
 import { planLayersGantt } from "@/pages/graphs-detail/features/plans/planLayers";
 import {
@@ -26,8 +28,6 @@ import type {
 	PlanWindow,
 	TaskPlanDetail,
 } from "@/pages/graphs-detail/features/plans/types";
-import { runAddress } from "@/pages/graphs-detail/features/runs";
-import type { FlowOptions } from "@/pages/graphs-detail/shared/boards/TaskFlowWidget";
 
 export type PlanPanels = PlanChartWidgets & {
 	flow: FlowOptions;

@@ -46,6 +46,13 @@ import {
 	MatchPreview,
 	SliceSummary,
 } from "@invana/ui";
+import type {
+	CatalogueResponse,
+	EgressClass,
+	GovernLayer,
+	GovernRule,
+	Participant,
+} from "@invana-studio/core";
 import { LAYER_PALETTE } from "@invana-studio/ui";
 import { useMemo } from "react";
 import {
@@ -59,13 +66,6 @@ import {
 	sublayersIn,
 } from "@/pages/graphs-detail/features/lenses/addressing";
 import { GOVERNED_LAYERS } from "@/pages/graphs-detail/features/lenses/narrowing";
-import type {
-	CatalogueResponse,
-	EgressClass,
-	GovernLayer,
-	GovernRule,
-	Participant,
-} from "@/pages/graphs-detail/features/lenses/types";
 
 /** What may accompany a call across the boundary. The closed set. */
 const EGRESS_CLASSES: { value: EgressClass; label: string }[] = [

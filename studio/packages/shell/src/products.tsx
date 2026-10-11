@@ -20,6 +20,8 @@ export interface ShellRouteHandle {
 	ownsRegions?: boolean;
 	/** This route's level in the breadcrumbs: a label, or one read off the params. */
 	crumb?: string | ((params: Params) => string | undefined);
+	/** The crumb's hover text when its label is shortened — a run's full id. */
+	crumbTitle?: (params: Params) => string | undefined;
 }
 
 const ProductsContext = createContext<ProductDefinition[]>([]);
@@ -62,11 +64,17 @@ export function useActiveProduct(): ProductDefinition | undefined {
  * handle names a `crumb`, each linking to the path that route matched. A
  * tab is a query param, never a route, so switching tabs keeps the trail.
  */
-export function useRouteCrumbs(): { label: string; to: string }[] {
+export function useRouteCrumbs(): {
+	label: string;
+	to: string;
+	title?: string;
+}[] {
 	return useMatches().flatMap((m) => {
-		const { crumb } = handleOf(m);
+		const { crumb, crumbTitle } = handleOf(m);
 		const label = typeof crumb === "function" ? crumb(m.params) : crumb;
-		return label ? [{ label, to: m.pathname }] : [];
+		if (!label) return [];
+		const title = crumbTitle?.(m.params);
+		return [{ label, to: m.pathname, ...(title ? { title } : {}) }];
 	});
 }
 

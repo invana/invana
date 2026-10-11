@@ -20,7 +20,11 @@
  * is redirected to its path before the page renders.
  */
 import type { ProductDefinition } from "@invana-studio/core";
-import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";
+import {
+	ErrorPage,
+	runAddress,
+	type ShellRouteHandle,
+} from "@invana-studio/shell";
 import { Network } from "lucide-react";
 import { lazy, Suspense } from "react";
 import {
@@ -67,9 +71,27 @@ function level(
 		: { path, handle };
 }
 
-/** A section whose records drill in one level down: `runs` › `<run>`. */
-function drillable(path: string, label: string, param: string): RouteObject {
-	return level(path, label, [level(`:${param}`, (p) => p[param])]);
+/**
+ * A section whose records drill in one level down: `runs` › `<run>`. `named`
+ * shortens the record's crumb — a run's UUID reads as `run:740a2f58` — and the
+ * full id stays on hover.
+ */
+function drillable(
+	path: string,
+	label: string,
+	param: string,
+	named?: (id: string) => string,
+): RouteObject {
+	const record: RouteObject = named
+		? {
+				path: `:${param}`,
+				handle: {
+					crumb: (p) => (p[param] ? named(p[param]) : undefined),
+					crumbTitle: (p) => p[param],
+				} satisfies ShellRouteHandle,
+			}
+		: level(`:${param}`, (p) => p[param]);
+	return level(path, label, [record]);
 }
 
 export const legacyGraph: ProductDefinition = {
@@ -104,8 +126,13 @@ export const legacyGraph: ProductDefinition = {
 					drillable("templates", "Templates", "template"),
 				]),
 				level("activity", "Activity", [
-					drillable("runs", "Runs", "run"),
+					level("inbox", "Inbox"),
+					level("approvals", "Approvals"),
+					drillable("runs", "Runs", "run", runAddress),
+					level("schedules", "Schedules"),
 					level("events", "Events"),
+					level("rules", "Rules"),
+					level("channels", "Channels"),
 				]),
 				level("projects", "Projects", [
 					drillable("todos", "Todos", "todo"),

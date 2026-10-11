@@ -84,8 +84,15 @@ const PANEL_PATHS: readonly PanelPath[] = [
 		section: "templates",
 		detail: "template",
 	},
+	// Activity's tabs (the shell's page). Runs and Events keep the panel keys
+	// their rail icons write; the tabs with no panel share one key.
+	{ path: "activity/inbox", panel: "activity", section: "inbox" },
+	{ path: "activity/approvals", panel: "activity", section: "approvals" },
 	{ path: "activity/runs", panel: "runs", detail: "run" },
+	{ path: "activity/schedules", panel: "activity", section: "schedules" },
 	{ path: "activity/events", panel: "events" },
+	{ path: "activity/rules", panel: "activity", section: "rules" },
+	{ path: "activity/channels", panel: "activity", section: "channels" },
 	{
 		path: "projects",
 		panel: "projects",

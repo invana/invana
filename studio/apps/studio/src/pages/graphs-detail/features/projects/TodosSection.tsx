@@ -33,6 +33,7 @@ import {
 import { StepList, totalDuration } from "@invana-studio/assistant";
 import type { RunNode, TaskRunSummary } from "@invana-studio/core";
 import { formatDuration } from "@invana-studio/core";
+import { useRunsQuery } from "@invana-studio/shell";
 import {
 	DetailBlock,
 	DetailProse,
@@ -58,7 +59,6 @@ import {
 } from "@/pages/graphs-detail/features/projects/queries";
 import { TodoActivityTree } from "@/pages/graphs-detail/features/projects/TodoActivityTree";
 import type { Todo } from "@/pages/graphs-detail/features/projects/types";
-import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 
 /**
  * Focus the field the moment it appears. The form only exists because the user

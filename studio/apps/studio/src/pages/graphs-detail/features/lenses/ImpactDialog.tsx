@@ -34,7 +34,7 @@ import {
 	DiffRow,
 	Spinner,
 } from "@invana/ui";
-import type { ImpactResponse } from "@/pages/graphs-detail/features/lenses/types";
+import type { ImpactResponse } from "@invana-studio/core";
 
 export interface ImpactDialogProps {
 	open: boolean;

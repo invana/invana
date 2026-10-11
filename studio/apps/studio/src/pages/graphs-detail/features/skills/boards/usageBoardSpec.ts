@@ -18,6 +18,14 @@
 
 import type { BoardSpec, PanelSpec } from "@invana/boards";
 import {
+	count,
+	omit,
+	specPanel,
+	VIEW_ACTION,
+	VIEW_BOARD,
+	VIEW_SPEC,
+} from "@invana-studio/shell";
+import {
 	gapTile,
 	readsAs,
 	SKILL_ACTIONS,
@@ -29,14 +37,6 @@ import type {
 	Skill,
 	SkillUsageResponse,
 } from "@/pages/graphs-detail/features/skills/types";
-import {
-	count,
-	omit,
-	specPanel,
-	VIEW_ACTION,
-	VIEW_BOARD,
-	VIEW_SPEC,
-} from "@/pages/graphs-detail/shared/boardSpec";
 
 export interface UsageBoardView {
 	/** `Board` or `spec.json`. */

@@ -1,4 +1,5 @@
 import { EmptyState, Spinner } from "@invana/ui";
+import { RunBoardPage, RunsBoardPage, runAddress } from "@invana-studio/shell";
 import type { Dispatch, SetStateAction } from "react";
 import { AgentBoardPage } from "@/pages/graphs-detail/features/agents";
 import {
@@ -26,11 +27,6 @@ import {
 	PlanVersionsPage,
 } from "@/pages/graphs-detail/features/plans";
 import { RuleBoardPage } from "@/pages/graphs-detail/features/rules";
-import {
-	RunBoardPage,
-	RunsBoardPage,
-	runAddress,
-} from "@/pages/graphs-detail/features/runs";
 import {
 	SkillBoardPage,
 	UsageBoardPage,

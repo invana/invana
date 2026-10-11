@@ -25,9 +25,9 @@ import {
 	Spinner,
 	StatusDot,
 } from "@invana/ui";
+import type { Lens } from "@invana-studio/core";
 import { type StackSectionUi, stackSection } from "@invana-studio/ui";
 import { Plus, Sparkles } from "lucide-react";
-import type { Lens } from "@/pages/graphs-detail/features/lenses";
 import {
 	ProviderDetail,
 	providerLabel,

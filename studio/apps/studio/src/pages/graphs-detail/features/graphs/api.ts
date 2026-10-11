@@ -1,4 +1,3 @@
-import { request } from "@invana-studio/core";
 import type {
 	Graph,
 	GraphConnectionCreate,
@@ -8,7 +7,8 @@ import type {
 	GraphListResponse,
 	GraphUpdate,
 	SetupSection,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@invana-studio/core";
+import { request } from "@invana-studio/core";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Graph container API (docs/for-developers/modules/identity-and-access/spec.md)

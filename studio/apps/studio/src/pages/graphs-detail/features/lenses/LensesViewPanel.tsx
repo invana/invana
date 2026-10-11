@@ -36,6 +36,7 @@
  */
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import type { LensCreate, LensKind, Refusal } from "@invana-studio/core";
 import { ApiError } from "@invana-studio/core";
 import { useStackSectionUi } from "@invana-studio/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -48,11 +49,6 @@ import {
 	useLensesQuery,
 	useUpdateLensMutation,
 } from "@/pages/graphs-detail/features/lenses/queries";
-import type {
-	LensCreate,
-	LensKind,
-	Refusal,
-} from "@/pages/graphs-detail/features/lenses/types";
 import {
 	type GovernSectionKey,
 	useLensesViewPanel,

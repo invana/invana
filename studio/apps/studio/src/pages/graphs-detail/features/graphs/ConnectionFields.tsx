@@ -18,6 +18,11 @@
  */
 
 import { Badge, Button, Skeleton } from "@invana/ui";
+import {
+	CONNECTOR_OPTIONS,
+	type GraphConnectionCreate,
+	type GraphConnectionRead,
+} from "@invana-studio/core";
 import { Pencil, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -28,11 +33,6 @@ import {
 	useGraphQuery,
 	usePutGraphConnectionMutation,
 } from "@/pages/graphs-detail/features/graphs/queries";
-import {
-	CONNECTOR_OPTIONS,
-	type GraphConnectionCreate,
-	type GraphConnectionRead,
-} from "@/pages/graphs-detail/features/graphs/types";
 
 interface Props {
 	username: string;

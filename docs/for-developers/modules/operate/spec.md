@@ -105,6 +105,7 @@ Metrics are **derived from the record**. There is no second pipeline to disagree
 | O6 | Retention removes windows, never individual rows — history must stay coherent. |
 | O7 | There is one journal of runs in a Graph — **Runs**. Imports and a Task's `Runs` tab are filters of it, not second implementations. |
 | O8 | Runs lists **runs**; Activity lists **writes**. Neither is derived from the other. |
+| O9 | **The Graph's Activity page is the shell's, at `/u/:user/:graph/activity/<tab>[/:id]`** ([shell.md › Activity](../../../products/shell.md#activity)). It has seven tabs in this order: Inbox · Approvals · Runs · Schedules · Events · Rules · Channels. The tab is a path level, so it is also a crumb. **Runs** is the journal ([O7](#7-cross-feature-decisions), [10.5](features/see-what-ran.md)) and **Events** is the Graph's writes ([O8](#7-cross-feature-decisions), [10.2](features/audit-and-activity.md)). They keep separate tabs, and neither is derived from the other. A tab whose engine records do not exist yet draws the kit's `EmptyState`, saying what it will hold, with one `EmptyStateLock` per thing that unlocks it. It never draws a table with no rows. The page fills `mainSection`, the left, right and bottom regions close, and `leftNav` stays. The bare `/activity` opens Runs, the first tab with records. The header's bell opens Inbox, from any screen inside a Graph |
 
 ## 8. Deliberately absent
 

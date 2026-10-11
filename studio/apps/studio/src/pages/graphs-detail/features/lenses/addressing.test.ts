@@ -1,3 +1,4 @@
+import type { Participant } from "@invana-studio/core";
 import { describe, expect, it } from "vitest";
 import {
 	buildMatch,
@@ -6,7 +7,6 @@ import {
 	splitMatch,
 	sublayersIn,
 } from "./addressing";
-import type { Participant } from "./types";
 
 const p = (address: string) => {
 	const [layer, sublayer, ...name] = address.split("/");

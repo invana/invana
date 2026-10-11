@@ -20,6 +20,7 @@ import { useActiveProduct, useRouteCrumbs } from "../../products";
 import { FullscreenToggle } from "../FullscreenToggle";
 import { GitHubStars } from "../GitHubStars";
 import { ThemeMenu } from "../ThemeMenu";
+import { ActivityBell } from "./ActivityBell";
 import { Launcher } from "./Launcher";
 import { UserMenu } from "./UserMenu";
 
@@ -42,7 +43,7 @@ export interface AppHeaderOptions {
 	rightExtras?: ReactNode;
 	/** Graph-scoped status, before the theme menu (the onboarding cap). */
 	status?: ReactNode;
-	/** The notifications slot. */
+	/** The notifications slot. Defaults to the bell that opens Activity. */
 	notifications?: ReactNode;
 	/** The Assistant toggle, just before the user menu. */
 	assistantToggle?: ReactNode;
@@ -119,7 +120,7 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 				{status}
 				<ThemeMenu />
 				<FullscreenToggle />
-				{notifications}
+				{notifications ?? <ActivityBell />}
 				{assistantToggle}
 				<UserMenu />
 			</div>
@@ -136,6 +137,8 @@ interface Segment {
 	label: string;
 	/** Optional link target. Last segment is unlinked. */
 	to?: string;
+	/** Hover text when the label is shortened; the label otherwise. */
+	title?: string;
 }
 
 /** `lead` names where the levels are — the Graph, or the signed-in user. */
@@ -182,13 +185,13 @@ function HeaderBreadcrumb({ trail }: { trail: Trail }) {
 							<BreadcrumbItem className="min-w-0">
 								{s.to && !isLast ? (
 									<BreadcrumbLink asChild className="truncate">
-										<Link to={s.to} title={s.label}>
+										<Link to={s.to} title={s.title ?? s.label}>
 											{s.label}
 										</Link>
 									</BreadcrumbLink>
 								) : (
 									<BreadcrumbPage
-										title={s.label}
+										title={s.title ?? s.label}
 										className={cn(
 											"truncate",
 											!isLast && "text-muted-foreground",

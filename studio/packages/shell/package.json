@@ -11,27 +11,35 @@
 		"check-types": "tsc --noEmit -p tsconfig.json"
 	},
 	"dependencies": {
+		"@invana-studio/canvases": "workspace:*",
 		"@invana-studio/core": "workspace:*",
 		"@invana-studio/ui": "workspace:*"
 	},
 	"peerDependencies": {
+		"@invana/blocks": "^0.0.34",
+		"@invana/boards": "^0.0.34",
 		"@invana/forms": "^0.0.34",
 		"@invana/styling": "^0.0.34",
 		"@invana/tables": "^0.0.34",
 		"@invana/themes": "^0.0.34",
 		"@invana/ui": "^0.0.34",
+		"@tanstack/react-query": "^5.0.0",
 		"lucide-react": "^0.475.0",
 		"react": "^19.2.0",
 		"react-router-dom": "^7.0.0",
-		"sonner": "^2.0.7"
+		"sonner": "^2.0.7",
+		"zustand": "^5.0.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.14",
+		"@invana/blocks": "^0.0.34",
+		"@invana/boards": "^0.0.34",
 		"@invana/forms": "^0.0.34",
 		"@invana/styling": "^0.0.34",
 		"@invana/tables": "^0.0.34",
 		"@invana/themes": "^0.0.34",
 		"@invana/ui": "^0.0.34",
+		"@tanstack/react-query": "^5.0.0",
 		"@types/react": "^19.0.0",
 		"@types/react-dom": "^19.0.0",
 		"lucide-react": "^0.475.0",
@@ -42,6 +50,7 @@
 		"sonner": "^2.0.7",
 		"typescript": "^6.0.0",
 		"vite": "^7.0.0",
-		"vitest": "^5.0.2"
+		"vitest": "^5.0.2",
+		"zustand": "^5.0.0"
 	}
 }

@@ -1,4 +1,5 @@
 import { TabbedPanel } from "@invana/ui";
+import { EventsTab } from "@invana-studio/shell";
 import {
 	Activity,
 	type Database,
@@ -8,7 +9,6 @@ import {
 	X,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { EventsTab } from "@/pages/graphs-detail/features/events";
 import { GraphTab } from "@/pages/graphs-detail/features/graphs/GraphTab";
 import { InfoTab } from "@/pages/graphs-detail/features/graphs/InfoTab";
 import {
@@ -127,6 +127,8 @@ type SingleTabSection = Exclude<
 	| "govern"
 	| "agents"
 	| "skills"
+	// The shell's Activity page fills `mainSection`; it is never a tab here.
+	| "activity"
 >;
 function isSingleTabSection(s: LeftNavKey): s is SingleTabSection {
 	return s in SINGLE_TAB_SECTIONS;

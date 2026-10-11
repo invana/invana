@@ -35,12 +35,12 @@ import {
 	RecordHeader,
 	Spinner,
 } from "@invana/ui";
-import { useCompareRunsQuery } from "@/pages/graphs-detail/features/lenses/queries";
 import type {
 	AppliedDiff,
 	AppliedField,
 	CompareSide,
-} from "@/pages/graphs-detail/features/lenses/types";
+} from "@invana-studio/core";
+import { useCompareRunsQuery } from "@/pages/graphs-detail/features/lenses/queries";
 
 export interface CompareBoardPageProps {
 	username: string;

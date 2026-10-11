@@ -1,5 +1,5 @@
+import type { LensKind } from "@invana-studio/core";
 import { useCallback } from "react";
-import type { LensKind } from "@/pages/graphs-detail/features/lenses";
 import {
 	LEGACY_PANEL_PARAM,
 	PANEL_PARAM,

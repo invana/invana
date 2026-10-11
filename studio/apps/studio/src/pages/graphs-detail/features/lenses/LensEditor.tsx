@@ -42,6 +42,15 @@ import {
 	RuleRow,
 	Spinner,
 } from "@invana/ui";
+import type {
+	CastRole,
+	GovernLayer,
+	GovernRule,
+	Lens,
+	LensCreate,
+	Participant,
+	Refusal,
+} from "@invana-studio/core";
 import { LAYER_PALETTE } from "@invana-studio/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -57,15 +66,6 @@ import {
 	blankRule,
 	RuleBuilder,
 } from "@/pages/graphs-detail/features/lenses/RuleBuilder";
-import type {
-	CastRole,
-	GovernLayer,
-	GovernRule,
-	Lens,
-	LensCreate,
-	Participant,
-	Refusal,
-} from "@/pages/graphs-detail/features/lenses/types";
 
 export interface LensDraft {
 	name: string;

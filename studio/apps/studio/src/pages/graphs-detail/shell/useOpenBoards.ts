@@ -1,3 +1,4 @@
+import type { LensKind } from "@invana-studio/core";
 import { runsApi } from "@invana-studio/core";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -8,7 +9,6 @@ import {
 	parseBoardPageId,
 	type RecordBoardKind,
 } from "@/pages/graphs-detail/features/boards";
-import type { LensKind } from "@/pages/graphs-detail/features/lenses";
 import {
 	useLibraryViewPanel,
 	useTaskPlansQuery,

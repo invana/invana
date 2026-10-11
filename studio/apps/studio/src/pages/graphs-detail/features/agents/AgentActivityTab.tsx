@@ -27,6 +27,7 @@ import {
 } from "@invana/ui";
 import type { TaskRunSummary } from "@invana-studio/core";
 import { formatRelativeTime } from "@invana-studio/core";
+import { useRunsQuery } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useState } from "react";
 import type { AgentDraft } from "@/pages/graphs-detail/features/agents/agentDraft";
@@ -40,7 +41,6 @@ import type {
 	Agent,
 	AgentMeters,
 } from "@/pages/graphs-detail/features/agents/types";
-import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /** How a run ended, in the reader's words and tone. */

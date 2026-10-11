@@ -12,7 +12,7 @@ import type {
 	GovernLayer,
 	GovernRule,
 	Lens,
-} from "@/pages/graphs-detail/features/lenses/types";
+} from "@invana-studio/core";
 
 /** The five layers a rule may govern. The spine is not one of them. */
 export const GOVERNED_LAYERS: GovernLayer[] = [

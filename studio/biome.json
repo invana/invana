@@ -127,33 +127,6 @@
 			}
 		},
 		{
-			"includes": ["apps/studio/src/pages/graphs-detail/features/events/**"],
-			"linter": {
-				"rules": {
-					"style": {
-						"noRestrictedImports": {
-							"level": "error",
-							"options": {
-								"patterns": [
-									{
-										"group": [
-											"@/pages/graphs-detail/features/*/**",
-											"!@/pages/graphs-detail/features/events/**"
-										],
-										"message": "Import another module through its index.ts (code-shape.md §4.1)."
-									},
-									{
-										"group": ["@/pages/graphs-detail/shell/**"],
-										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
-									}
-								]
-							}
-						}
-					}
-				}
-			}
-		},
-		{
 			"includes": ["apps/studio/src/pages/graphs-detail/features/explorer/**"],
 			"linter": {
 				"rules": {
@@ -384,60 +357,6 @@
 										"group": [
 											"@/pages/graphs-detail/features/*/**",
 											"!@/pages/graphs-detail/features/rules/**"
-										],
-										"message": "Import another module through its index.ts (code-shape.md §4.1)."
-									},
-									{
-										"group": ["@/pages/graphs-detail/shell/**"],
-										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
-									}
-								]
-							}
-						}
-					}
-				}
-			}
-		},
-		{
-			"includes": ["apps/studio/src/pages/graphs-detail/features/runs/**"],
-			"linter": {
-				"rules": {
-					"style": {
-						"noRestrictedImports": {
-							"level": "error",
-							"options": {
-								"patterns": [
-									{
-										"group": [
-											"@/pages/graphs-detail/features/*/**",
-											"!@/pages/graphs-detail/features/runs/**"
-										],
-										"message": "Import another module through its index.ts (code-shape.md §4.1)."
-									},
-									{
-										"group": ["@/pages/graphs-detail/shell/**"],
-										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
-									}
-								]
-							}
-						}
-					}
-				}
-			}
-		},
-		{
-			"includes": ["apps/studio/src/pages/graphs-detail/features/setup/**"],
-			"linter": {
-				"rules": {
-					"style": {
-						"noRestrictedImports": {
-							"level": "error",
-							"options": {
-								"patterns": [
-									{
-										"group": [
-											"@/pages/graphs-detail/features/*/**",
-											"!@/pages/graphs-detail/features/setup/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
 									},

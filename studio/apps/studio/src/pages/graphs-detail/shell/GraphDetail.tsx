@@ -3,10 +3,16 @@ import {
 	MAIN_SECTION,
 	SIDE_SECTION,
 } from "@invana-studio/core";
-import { AppVersion, StudioShellLayout } from "@invana-studio/shell";
+import {
+	ActivityPage,
+	AppVersion,
+	activityOf,
+	StudioShellLayout,
+} from "@invana-studio/shell";
 import type { ReactNode } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { OnboardingCap } from "@/components/header/OnboardingCap";
+import { boardPageId } from "@/pages/graphs-detail/features/boards";
 import {
 	SettingsViewPanel,
 	useGraphConnectionQuery,
@@ -121,6 +127,9 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
  *   `StudioShellLayout` so the header matches every other screen.
  * - SettingsViewPanel takeover: docked replaces `leftSection`; expanded replaces
  *   `mainSection` and hides both `leftSection` and `rightSection`.
+ * - Activity takeover: on `/activity/<tab>[/:id]` the shell's `ActivityPage`
+ *   fills `mainSection` and every other region closes. `leftNav` stays, so the
+ *   `Runs` and `Events` icons open their tabs and close them again.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
  *   and a right cluster (extras + `AppVersion`).
  *
@@ -146,13 +155,16 @@ export function GraphDetail({
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
 	const settingsPanel = useLeftSection();
 	const leftNav = useGraphLeftNav();
+	const navigate = useNavigate();
+	const activity = activityOf(useLocation().pathname);
 
 	// **No mode switch** (docs/for-developers/modules/explore/spec.md). The header is a breadcrumb naming the
 	// graph and the open panel; the levels after the graph come from the routes
 	// the panel's path matched (`products/legacyGraph`), so the breadcrumb is a
 	// reading of the URL: `owner › graph › Agents › LLMs › <provider> › object`.
 	const header = {
-		objectLabel,
+		// What the Workbook holds is not on screen while Activity is.
+		objectLabel: activity ? undefined : objectLabel,
 		rightExtras: headerRightExtras,
 		// The onboarding cap is graph-scoped (setup.md): a Graph has onboarding,
 		// the Graphs list does not.
@@ -188,13 +200,34 @@ export function GraphDetail({
 			graphSlug={graphSlug as string}
 		/>
 	) : undefined;
-	const effectiveLeftSection = leftContent
-		? { ...SIDE_SECTION, content: leftContent }
-		: undefined;
+	const effectiveLeftSection =
+		leftContent && !activity
+			? { ...SIDE_SECTION, content: leftContent }
+			: undefined;
+
+	const activityPage =
+		activity && username && graphSlug ? (
+			<ActivityPage
+				username={username}
+				graphSlug={graphSlug}
+				location={activity}
+				onRetune={() => settingsPanel.setSection("govern")}
+				// The compare board is a Workbook page, so it opens on the Graph.
+				onCompare={(runId, other) =>
+					navigate(
+						`/u/${username}/${graphSlug}?page=${encodeURIComponent(
+							boardPageId("compare", `${runId}:${other}`),
+						)}`,
+					)
+				}
+			/>
+		) : null;
 
 	const effectiveMainSection = {
 		...MAIN_SECTION,
-		content: settingsExpanded ? (
+		content: activityPage ? (
+			activityPage
+		) : settingsExpanded ? (
 			<SettingsViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
@@ -205,12 +238,12 @@ export function GraphDetail({
 	};
 
 	const effectiveRightSection =
-		rightSection && !settingsExpanded
+		rightSection && !settingsExpanded && !activity
 			? { ...SIDE_SECTION, ...rightSection.size, content: rightSection.content }
 			: undefined;
 
 	const effectiveBottomSection =
-		bottomSection && !settingsExpanded
+		bottomSection && !settingsExpanded && !activity
 			? { ...BOTTOM_SECTION, content: bottomSection.content }
 			: undefined;
 

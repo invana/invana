@@ -2,11 +2,11 @@ import { ErrorBoundary } from "@invana/ui";
 import type { useSessions } from "@invana-studio/assistant";
 import { AssistantHost, attachmentFor } from "@invana-studio/assistant";
 import { ASSISTANT_SECTION, reportBoundaryError } from "@invana-studio/core";
+import { SetupLock } from "@invana-studio/shell";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer";
 import type { useGraphQuery } from "@/pages/graphs-detail/features/graphs";
 import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
-import { SetupLock } from "@/pages/graphs-detail/features/setup";
 import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import type {
 	RightSectionKey,

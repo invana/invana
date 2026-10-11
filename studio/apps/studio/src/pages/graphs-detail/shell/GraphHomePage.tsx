@@ -19,16 +19,13 @@
  */
 
 import { PropertyList, PropertyRow, StatusDot } from "@invana/ui";
+import { hasOutstandingSetup } from "@invana-studio/core";
+import { OnboardingWizard, useOnboarding } from "@invana-studio/shell";
 import type { ReactNode } from "react";
 import {
-	hasOutstandingSetup,
 	useGraphConnectionQuery,
 	useGraphQuery,
 } from "@/pages/graphs-detail/features/graphs";
-import {
-	OnboardingWizard,
-	useOnboarding,
-} from "@/pages/graphs-detail/features/setup";
 
 interface GraphHomePageProps {
 	username: string;

@@ -9,14 +9,14 @@ import {
 	type RowConfig,
 } from "@invana/forms";
 import { Button } from "@invana/ui";
+import type { GraphConnectionCreate } from "@invana-studio/core";
+import { CONNECTOR_OPTIONS } from "@invana-studio/core";
 import { FormError } from "@invana-studio/ui";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 // Only `useForm` — @invana/forms re-exports every form *type* Studio needs
 // but not the hook itself, so this is the one react-hook-form import left.
 import { useForm } from "react-hook-form";
-import type { GraphConnectionCreate } from "@/pages/graphs-detail/features/graphs";
-import { CONNECTOR_OPTIONS } from "@/pages/graphs-detail/features/graphs";
 
 interface GraphFormValues {
 	uri: string;

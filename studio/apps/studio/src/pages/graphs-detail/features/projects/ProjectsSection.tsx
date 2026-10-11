@@ -42,6 +42,7 @@ import {
 	TabsTrigger,
 } from "@invana/ui";
 import type { TaskRunSummary } from "@invana-studio/core";
+import { useRunsQuery } from "@invana-studio/shell";
 import {
 	DetailBlock,
 	DetailPlaceholder,
@@ -72,7 +73,6 @@ import type {
 	Todo,
 } from "@/pages/graphs-detail/features/projects/types";
 import { ProjectRules } from "@/pages/graphs-detail/features/rules";
-import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 
 /**
  * Focus the field the moment it appears. The form only exists because the user

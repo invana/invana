@@ -1,9 +1,9 @@
 import { Badge, Button, Skeleton } from "@invana/ui";
 import { RecentSessions } from "@invana-studio/assistant";
+import { isSetupComplete } from "@invana-studio/core";
+import { SetupTimeline } from "@invana-studio/shell";
 import { useCallback } from "react";
 import { useGraphQuery } from "@/pages/graphs-detail/features/graphs/queries";
-import { isSetupComplete } from "@/pages/graphs-detail/features/graphs/types";
-import { SetupTimeline } from "@/pages/graphs-detail/features/setup";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import { requestOpenSession } from "@/pages/graphs-detail/shared/useOpenSessionRequest";
 import { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";

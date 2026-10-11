@@ -9,6 +9,7 @@
 
 import { Board } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
+import { VIEW_BOARD } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
 import { useReport } from "@/pages/graphs-detail/features/boards";
@@ -18,7 +19,6 @@ import {
 	useRuleCitationsQuery,
 	useRulesQuery,
 } from "@/pages/graphs-detail/features/skills";
-import { VIEW_BOARD } from "@/pages/graphs-detail/shared/boardSpec";
 
 export interface RuleBoardPageProps {
 	username: string;

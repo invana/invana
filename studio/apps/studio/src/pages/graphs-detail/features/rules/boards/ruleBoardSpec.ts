@@ -18,6 +18,14 @@
  */
 
 import type { BoardSpec, PanelSpec } from "@invana/boards";
+import {
+	count,
+	omit,
+	specPanel,
+	VIEW_ACTION,
+	VIEW_BOARD,
+	VIEW_SPEC,
+} from "@invana-studio/shell";
 import type {
 	Rule,
 	RuleCitationsResponse,
@@ -27,14 +35,6 @@ import {
 	SKILL_ACTIONS,
 	when,
 } from "@/pages/graphs-detail/features/skills";
-import {
-	count,
-	omit,
-	specPanel,
-	VIEW_ACTION,
-	VIEW_BOARD,
-	VIEW_SPEC,
-} from "@/pages/graphs-detail/shared/boardSpec";
 
 export interface RuleBoardView {
 	/** `Board` or `spec.json`. */
