@@ -76,3 +76,6 @@ studio/e2e/.auth/
 studio/test-results/
 studio/playwright-report/
 studio/blob-report/
+
+# ─── Migration runner (scripts/migration) ───
+.migration-cache/
