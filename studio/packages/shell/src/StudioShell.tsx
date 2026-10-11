@@ -13,9 +13,12 @@
  *   afresh on every navigation.
  *
  * A route whose handle says `ownsRegions` draws every region itself through
- * `<StudioShellLayout>` (today's graph page, which fills `leftSection`,
+ * `<StudioShellLayout>` (a graph product's page, which fills `leftSection`,
  * `rightSection` and `footer` from its own URL state); the shell then
  * provides the registry and adds no layout of its own.
+ *
+ * It also records the graph product that is open, so the Graph's own URL can
+ * return to it (`graphRoutes`).
  */
 import { AppLayoutV2 } from "@invana/themes";
 import { ErrorBoundary } from "@invana/ui";
@@ -25,13 +28,14 @@ import type {
 	ProductIcon,
 } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
-import type { ComponentProps } from "react";
+import { type ComponentProps, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ActionDialogHost } from "./actions";
 import {
 	type AppHeaderOptions,
 	useAppHeader,
 } from "./components/header/useAppHeader";
+import { rememberProduct } from "./lastProduct";
 import {
 	joinPath,
 	ProductsProvider,
@@ -51,7 +55,7 @@ type NavVerticalProps = NonNullable<LayoutProps["leftNav"]>;
  * re-asserts hover on the inactive ones so the override keeps hover feedback.
  * `my-1.5` adds the breathing room the theme's `gap-1` lacks.
  */
-export function leftNavItemClassName(active: boolean): string {
+function leftNavItemClassName(active: boolean): string {
 	return active
 		? "my-1.5 !bg-primary/15 !text-primary !ring-primary/25"
 		: "my-1.5 !bg-transparent !text-foreground !ring-transparent hover:!bg-primary/10 hover:!text-primary hover:!ring-primary/25";
@@ -179,5 +183,9 @@ export function StudioShell({ products }: { products: ProductDefinition[] }) {
 }
 
 function ShellOutlet() {
+	const product = useActiveProduct();
+	useEffect(() => {
+		if (product?.scope === "graph") rememberProduct(product.id);
+	}, [product]);
 	return useRouteOwnsRegions() ? <Outlet /> : <ShellPage />;
 }

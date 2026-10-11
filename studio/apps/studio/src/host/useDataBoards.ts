@@ -43,7 +43,7 @@ import {
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
+import type { useBoardPage } from "@/host/useBoardPage";
 
 // localStorage key persisting the user's render-backend choice across reloads.
 const BACKEND_STORAGE_KEY = "explorer.canvas.backend";

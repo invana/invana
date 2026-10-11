@@ -447,7 +447,7 @@ function flow(
  * The waterfall's rows — one per task, on the run's clock. Shared by
  * the Overview and the section, so the two draw one chart.
  */
-export function waterfallTasks(groups: TaskGroup[]): GanttRow[] {
+function waterfallTasks(groups: TaskGroup[]): GanttRow[] {
 	return groups.map((group) => {
 		const earlier = group.steps.slice(0, -1);
 		return {

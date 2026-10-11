@@ -8,11 +8,11 @@ import type { useRightSection } from "@invana-studio/shell";
 import { Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { LayeredCanvasStatus } from "@/canvases/layered/LayeredCanvasChrome";
-import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
-import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
+import type { useDataBoards } from "@/host/useDataBoards";
+import type { useLayeredCanvas } from "@/host/useLayeredCanvas";
 
 /** What the header controls and the `footer` read from the page that hosts them. */
-export interface GraphDetailChromeDeps {
+export interface HostChromeDeps {
 	username: string | undefined;
 	graphSlug: string | undefined;
 	right: ReturnType<typeof useRightSection>;
@@ -24,12 +24,12 @@ export interface GraphDetailChromeDeps {
 }
 
 /**
- * The Graph page's header controls and `footer` — the assistant's trigger,
+ * The host's header controls and `footer` — the assistant's trigger,
  * the canvas toolbar over a data canvas, the status metrics for whichever
  * canvas is in front, and the canvas message bar. Returned as the
- * `GraphDetail` props they fill.
+ * `HostLayout` props they fill.
  */
-export function graphDetailChrome(deps: GraphDetailChromeDeps) {
+export function hostChrome(deps: HostChromeDeps) {
 	const {
 		username,
 		graphSlug,

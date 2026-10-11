@@ -6,7 +6,7 @@ import {
 	usePageParams,
 } from "@invana-studio/shell";
 import { useCallback, useEffect, useRef } from "react";
-import type { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
+import type { useOpenBoards } from "@/host/useOpenBoards";
 
 /**
  * The Models page — opened when the `leftNav` switches to Models, and brought

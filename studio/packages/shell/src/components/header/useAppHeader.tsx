@@ -22,6 +22,7 @@ import { GitHubStars } from "../GitHubStars";
 import { ThemeMenu } from "../ThemeMenu";
 import { ActivityBell } from "./ActivityBell";
 import { Launcher } from "./Launcher";
+import { GraphOnboardingCap } from "./OnboardingCap";
 import { UserMenu } from "./UserMenu";
 
 export interface AppHeaderOptions {
@@ -41,7 +42,8 @@ export interface AppHeaderOptions {
 	search?: ReactNode;
 	/** Page-specific controls, left of the shared ones. */
 	rightExtras?: ReactNode;
-	/** Graph-scoped status, before the theme menu (the onboarding cap). */
+	/** Graph-scoped status, before the theme menu. Defaults to the onboarding
+	 *  cap inside a Graph. */
 	status?: ReactNode;
 	/** The notifications slot. Defaults to the bell that opens Activity. */
 	notifications?: ReactNode;
@@ -117,7 +119,7 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 				{search}
 				{rightExtras}
 				<GitHubStars />
-				{status}
+				{status ?? <GraphOnboardingCap />}
 				<ThemeMenu />
 				<FullscreenToggle />
 				{notifications ?? <ActivityBell />}

@@ -14,7 +14,7 @@ import { useRuleCitationsQuery, useRulesQuery } from "@invana-studio/core";
 import { useReport, VIEW_BOARD } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
-import { ruleBoardSpec } from "@/pages/graphs-detail/features/rules/boards/ruleBoardSpec";
+import { ruleBoardSpec } from "@/host/rules/ruleBoardSpec";
 
 export interface RuleBoardPageProps {
 	username: string;

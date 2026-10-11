@@ -46,18 +46,18 @@ import {
 	type BoardPageHandle,
 	DataBoardPage,
 	DeclaredBoard,
-} from "@/pages/graphs-detail/features/boards";
+} from "@/host/boards";
 import {
 	type BoardTitleNames,
 	boardTitle,
 	type DeclaredBoardDeps,
 	declaredBoardContent,
-} from "@/pages/graphs-detail/shell/declaredBoardBody";
-import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
-import { canvasEmptyHint } from "@/pages/graphs-detail/shell/layeredCanvasBody";
-import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
-import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
-import type { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
+} from "@/host/declaredBoardBody";
+import { GraphHomePage } from "@/host/GraphHomePage";
+import { canvasEmptyHint } from "@/host/layeredCanvasBody";
+import type { useDataBoards } from "@/host/useDataBoards";
+import type { useLayeredCanvas } from "@/host/useLayeredCanvas";
+import type { useOpenBoards } from "@/host/useOpenBoards";
 
 /** The page that is always open and can never be closed (graph-detail-page.md). */
 const GRAPH_PAGE_ID = "graph";

@@ -1,17 +1,6 @@
 import { TabbedPanel } from "@invana/ui";
-import {
-	EventsTab,
-	type LeftNavKey,
-	useLeftSection,
-} from "@invana-studio/shell";
-import {
-	Activity,
-	type Database,
-	Info,
-	Maximize2,
-	Minimize2,
-	X,
-} from "lucide-react";
+import { type LeftNavKey, useLeftSection } from "@invana-studio/shell";
+import { type Database, Info, Maximize2, Minimize2, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { GraphTab } from "./GraphTab";
 import { InfoTab } from "./InfoTab";
@@ -22,11 +11,9 @@ interface Props {
 }
 
 /**
- * Docked settings sidebar. Each rail-icon section renders as its own
- * `@invana/ui` `TabbedPanel` — most sections have a single tab (the section
- * itself), while Settings hosts four (Basic · Graph · LLMs · Agents, keyed by
- * `?tab=`). Switching between sections is driven by the rail icons via
- * `?panel=<section>` (see `useGraphLeftNav`).
+ * Docked settings sidebar for the Modeller's Graph settings path. Info renders
+ * as a single-tab `@invana/ui` `TabbedPanel`, while Settings hosts its own tabs
+ * (keyed by `?tab=`). The path names the section (`useLeftSection`).
  *
  * The maximize button lives in `headerActions`, and so does the close button
  * (`useLeftSection().close`) — except on Graph settings and Info, whose
@@ -63,8 +50,8 @@ export function SettingsViewPanel({ username, graphSlug }: Props) {
 		);
 	}
 
-	// The top-rail view panels are rendered by the page (GraphDetail), never as
-	// a SettingsViewPanel tab. Guard defensively so the exhaustive section lookup
+	// A product's own panels are rendered by the product host, never as a
+	// SettingsViewPanel tab. Guard defensively so the exhaustive section lookup
 	// below stays sound even if the rail hands us one.
 	if (!isSingleTabSection(section)) return null;
 
@@ -108,20 +95,17 @@ export function SettingsViewPanel({ username, graphSlug }: Props) {
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 
-// Sections whose panel is a single-tab TabbedPanel. Connection is handled
-// separately (above) because it renders a two-tab TabbedPanel; everything
-// else excluded here is a **page-owned** panel (the rail's top group), which
-// GraphDetail renders as its own `leftSection` rather than as a tab.
+// Sections whose panel is a single-tab TabbedPanel. Settings is handled
+// separately (above) because it renders its own tabs; everything else excluded
+// here is a product's own panel, which the product host renders as its own
+// `leftSection`, or a key whose path lands elsewhere (Activity, Explorer).
 type SingleTabSection = Exclude<
 	LeftNavKey,
-	| "connection"
 	| "settings"
 	| "explorer"
 	| "sessions"
-	| "schema"
+	| "events"
 	| "model"
-	| "canvases"
-	| "messages"
 	| "projects"
 	| "runs"
 	| "library"
@@ -135,7 +119,7 @@ type SingleTabSection = Exclude<
 	| "performance"
 	| "concurrency"
 	| "decisions"
-	// The shell's Activity page fills `mainSection`; it is never a tab here.
+	// Activity's tabs are the shell's page; they are never a tab here.
 	| "activity"
 >;
 function isSingleTabSection(s: LeftNavKey): s is SingleTabSection {
@@ -147,7 +131,6 @@ const SINGLE_TAB_SECTIONS: Record<
 	{ label: string; icon: typeof Database }
 > = {
 	info: { label: "Info", icon: Info },
-	events: { label: "Events", icon: Activity },
 };
 
 function SectionContent({
@@ -162,7 +145,5 @@ function SectionContent({
 	switch (section) {
 		case "info":
 			return <InfoTab username={username} graphSlug={graphSlug} />;
-		case "events":
-			return <EventsTab username={username} graphSlug={graphSlug} />;
 	}
 }

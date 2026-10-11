@@ -151,6 +151,10 @@ One binary, `invana`, for every product. Prerequisites are in the [README](READM
 | Without the role | The product opens read-only: actions show disabled with the reason and who can do it. A product a role cannot even read is hidden from the launcher |
 | First run | A new install asks *what are you trying to decide?* and offers three paths: connect a graph database (Modeller drafts a model) · start from data (Datasets) · try a sample Graph (airways or arabidopsis, read-only, with a starter project). Every empty state links to the step that unlocks it; the set-up checklist tracks progress |
 | Runs keep their origin | A run page opened from Agents keeps the Agents wordmark; there is no “Activity” product |
+| The Graph’s own URL | `/u/:user/:graph` opens the graph product this browser last had open, else Explorer, at that product’s landing, carrying the query string (`?right=`, `?page=`, `?onboarding=`). An old `?panel=` link resolves to its path first. The last product is a per-browser convenience; with storage blocked the Graph opens Explorer |
+| Activity is the shell’s route | `/u/:user/:graph/activity/<tab>[/:run]` belongs to no product: the shell draws the Activity page in `mainSection`, with no `leftNav` and no footer, and the wordmark reads *Invana Studio*. The header keeps the bell and the onboarding cap, which are the header’s defaults on every screen inside a Graph |
+| One host draws the graph products | Explorer, Modeller, Projects and Agents render one page from the app — the product host — through their slot’s `Page`, because it composes all four (the Workbook, each product’s `leftSection` panel, the assistant, the Console) and a product may not import another. It reads the open product off the route and the open panel off the path; there is no graph page of its own and no product called *Studio* |
+| Old links resolve before any page reads them | Every route on a Graph wraps its page in the shell’s `CanonicalRoute`, which sends `?panel=`, `?settings=`, `?drawer=` and a product’s bare root to their path (`panelPaths`). The redirect table stays for good; the panel keys it reads are never seen by a page |
 
 ## Not building
 

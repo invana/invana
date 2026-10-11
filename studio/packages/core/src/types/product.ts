@@ -14,14 +14,13 @@
 import type { ComponentType, ReactNode } from "react";
 import type { RouteObject } from "react-router-dom";
 
-/** A product's path segment and launcher key. `legacy-graph` is today's graph page, until its panels move into the five. */
+/** A product's path segment and launcher key. */
 export type ProductId =
 	| "datasets"
 	| "modeller"
 	| "explorer"
 	| "projects"
-	| "agents"
-	| "legacy-graph";
+	| "agents";
 
 /** An icon component — a lucide icon fits. */
 export type ProductIcon = ComponentType<{ className?: string }>;

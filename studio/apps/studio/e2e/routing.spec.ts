@@ -47,17 +47,24 @@ const OLD_PANEL_LINKS: [string, string][] = [
 	["?panel=library&drawer=catalogue", "/agents/plugins/tasks"],
 ];
 
-test("the graph's own URL renders the page", async ({ page }) => {
+test("the Graph's own URL opens the last product, else Explorer", async ({
+	page,
+}) => {
+	// A fresh browser has no last product, so the Graph opens in Explorer.
 	await page.goto(GRAPH);
-
-	// Still here — not bounced to a product.
-	await expect(page).toHaveURL(new RegExp(`${GRAPH}/?$`));
-
-	// `owner › graph`, and nothing after it: nothing is open, so there is no
-	// level to follow the graph.
+	await expect(page).toHaveURL(`${GRAPH}/explorer`);
 	const crumbs = page.getByLabel("Breadcrumb");
 	await expect(crumbs.getByText(slug)).toBeVisible({ timeout: 30_000 });
-	await expect(crumbs.getByText("Explorer", { exact: true })).toHaveCount(0);
+
+	// Once the Modeller has been open, the Graph returns to it, query and all.
+	await page.goto(`${GRAPH}/modeller/rules`);
+	await expect(crumbs.getByText("Rules", { exact: true })).toBeVisible({
+		timeout: 30_000,
+	});
+	await page.goto(`${GRAPH}?right=assistant`);
+	await expect(page).toHaveURL(
+		`${GRAPH}/modeller/global-model?right=assistant`,
+	);
 });
 
 test("every old ?panel= link lands on its path", async ({ page }) => {
@@ -122,22 +129,6 @@ test("a reload on a path lands on the same screen", async ({ page }) => {
 	await expect(page.getByRole("tab", { name: "Info" })).toBeVisible({
 		timeout: 30_000,
 	});
-});
-
-test("a leftNav icon writes its path; the same icon closes it", async ({
-	page,
-}) => {
-	await page.goto(GRAPH);
-	// The icon's `aria-label` — the open panel's header is a `Runs` button too.
-	const runs = page.locator('button[aria-label="Runs"]');
-	await runs.click({ timeout: 30_000 });
-	await expect(page).toHaveURL(`${GRAPH}/activity/runs`);
-	// The address bar moves before the page renders; the crumb is that render.
-	await expect(
-		page.getByLabel("Breadcrumb").getByText("Runs", { exact: true }),
-	).toBeVisible({ timeout: 30_000 });
-	await runs.click();
-	await expect(page).toHaveURL(GRAPH);
 });
 
 test("?right= names who holds the right side", async ({ page }) => {

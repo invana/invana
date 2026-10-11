@@ -23,7 +23,7 @@ import { formatCompact, formatElapsed } from "@invana-studio/core";
 import { durationMs, originOf } from "./boards/runBoards";
 import { BANDS } from "./touches/runLayers";
 
-export interface SummaryRow {
+interface SummaryRow {
 	label: string;
 	value: string;
 	/**

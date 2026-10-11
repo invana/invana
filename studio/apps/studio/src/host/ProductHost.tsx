@@ -23,9 +23,9 @@ import {
 	useModelsQuery,
 } from "@invana-studio/modeller";
 import {
-	ActivitySlotsContext,
 	parseBoardPageId,
 	SetupSlotsContext,
+	useActiveProduct,
 	useLeftSection,
 	useOnboarding,
 	useRightSection,
@@ -33,21 +33,20 @@ import {
 } from "@invana-studio/shell";
 import { useCallback, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
-import { activitySlots } from "@/pages/graphs-detail/shell/activitySlots";
-import { assistantSlots } from "@/pages/graphs-detail/shell/assistantSlots";
-import { consoleSection } from "@/pages/graphs-detail/shell/consoleSection";
-import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
-import { graphDetailChrome } from "@/pages/graphs-detail/shell/GraphDetailChrome";
-import { layeredCanvasBody } from "@/pages/graphs-detail/shell/layeredCanvasBody";
-import { leftSection } from "@/pages/graphs-detail/shell/leftSectionContent";
-import { rightSection } from "@/pages/graphs-detail/shell/rightSections";
-import { setupSlots } from "@/pages/graphs-detail/shell/setupSlots";
-import { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
-import { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
-import { useModelsPage } from "@/pages/graphs-detail/shell/useModelsPage";
-import { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
-import { useOpenPages } from "@/pages/graphs-detail/shell/useOpenPages";
+import { assistantSlots } from "@/host/assistantSlots";
+import { OpenBoardContext } from "@/host/boards";
+import { consoleSection } from "@/host/consoleSection";
+import { HostLayout } from "@/host/HostLayout";
+import { hostChrome } from "@/host/hostChrome";
+import { layeredCanvasBody } from "@/host/layeredCanvasBody";
+import { leftSection } from "@/host/leftSectionContent";
+import { rightSection } from "@/host/rightSections";
+import { setupSlots } from "@/host/setupSlots";
+import { useDataBoards } from "@/host/useDataBoards";
+import { useLayeredCanvas } from "@/host/useLayeredCanvas";
+import { useModelsPage } from "@/host/useModelsPage";
+import { useOpenBoards } from "@/host/useOpenBoards";
+import { useOpenPages } from "@/host/useOpenPages";
 
 /** `invana_neo4j.connector.Neo4jConnector` → `Neo4j`. */
 function databaseName(connectorClass: string): string {
@@ -84,7 +83,16 @@ function startSubtitle(
 	return parts.length ? parts.join(" · ") : undefined;
 }
 
-export function GraphDetailPage() {
+/**
+ * The product host — the one page every graph product's routes draw. It owns
+ * the state the regions share (the open sessions, the canvas, the declared
+ * boards, the layered canvases, the selection) and fills each region for the
+ * open product: the Workbook in `mainSection`, the product's panel in
+ * `leftSection`, the assistant or the inspector on the right and the Console
+ * underneath. The open product is the route's (`useActiveProduct`); the open
+ * panel is the path's (`useLeftSection`).
+ */
+export function ProductHost() {
 	const { username, graphSlug } = useParams<{
 		username: string;
 		graphSlug: string;
@@ -104,7 +112,7 @@ export function GraphDetailPage() {
 	const cannotAnswer =
 		!!graphContainer && !isGateOpen(graphContainer, "answering");
 
-	// The graph page is the setup board until the Graph is ready, so the
+	// The home page is the setup board until the Graph is ready, so the
 	// page strip and the breadcrumb name what is on it rather than the graph it
 	// belongs to.
 	const setupOutstanding = hasOutstandingSetup(graphContainer);
@@ -314,9 +322,11 @@ export function GraphDetailPage() {
 	useOpenLogOnFailure(activeSession, openConsoleLog);
 
 	// The assistant starts centred: with nothing docked on the right and no
-	// left panel open, the graph page is one question box. Sending from it
-	// docks the conversation on the right as the session's canvas opens. A new
-	// session is answered by the Graph's default agent, so the start names it.
+	// left panel open — or in Explorer, which draws no left panel — the home
+	// page is one question box. Sending from it docks the conversation on the
+	// right as the session's canvas opens. A new session is answered by the
+	// Graph's default agent, so the start names it.
+	const explorerOpen = useActiveProduct()?.id === "explorer";
 	const agents = useAgentsQuery(username, graphSlug);
 	const defaultAgent = agents.data?.items.find(
 		(a) => a.id === agents.data?.default_agent_id,
@@ -326,7 +336,7 @@ export function GraphDetailPage() {
 		graphSlug &&
 		!connectionMissing &&
 		!right.is("assistant") &&
-		!settingsPanel.isOpen ? (
+		(explorerOpen || !settingsPanel.isOpen) ? (
 			<AssistantStart
 				username={username}
 				graphSlug={graphSlug}
@@ -385,7 +395,7 @@ export function GraphDetailPage() {
 	});
 
 	// The pill that reopens a closed conversation floats over the data canvas
-	// it belongs to — never over a declared board or the graph page.
+	// it belongs to — never over a declared board or the home page.
 	const dataBoardInFront = parseBoardPageId(strip.activeId)?.kind === "data";
 	const reopenPill =
 		dataBoardInFront && activeSessionId && !right.is("assistant") ? (
@@ -415,7 +425,7 @@ export function GraphDetailPage() {
 		modelName,
 		openConsoleLog,
 	};
-	const chrome = graphDetailChrome({
+	const chrome = hostChrome({
 		username,
 		graphSlug,
 		right,
@@ -427,7 +437,7 @@ export function GraphDetailPage() {
 
 	return (
 		// Lifted context: the live engine reaches the header toolbar, which lives
-		// in GraphDetail's header (a sibling of <Board>, outside its own provider).
+		// in HostLayout's header (a sibling of <Board>, outside its own provider).
 		<CanvasContext.Provider value={canvas}>
 			{/* *Open this board* — for the surfaces that draw a link to one and sit
 			    too deep to be handed a callback: a statement in a trace dialog is
@@ -438,55 +448,53 @@ export function GraphDetailPage() {
 				{/* What the assistant borrows from this page — banners, boards,
 				    worlds, a step's rules. */}
 				<AssistantSlotsContext.Provider value={assistantSlots}>
-					{/* What the runs, events and setup surfaces borrow from this
-					    page — agents, touches, reports, the left section. */}
-					<ActivitySlotsContext.Provider value={activitySlots}>
-						<SetupSlotsContext.Provider value={setupSlots}>
-							<GraphDetail
-								// The last crumb is what is open — the canvas you are looking at,
-								// named by its session: `ravi › finance › Defence theme — Sep 2026`.
-								// There is no screen crumb before it. `Explorer` used to sit there,
-								// which named the page after one of its eight `leftNav` items
-								// (graph-detail-page.md).
-								objectLabel={
-									activeSessionId
-										? sessionTitleById.get(activeSessionId)
-										: undefined
-								}
-								{...chrome}
-								leftSection={leftRegion}
-								mainSection={{
-									// One host for every kind of page — the strip and the bodies in one
-									// component, so the tabs cannot drift from what they switch
-									// (graph-detail-page.md the-shell.md).
-									content: (
-										<ErrorBoundary onError={reportBoundaryError}>
-											<div className="relative h-full">
-												<Workbook
-													{...strip}
-													addLabel="New canvas"
-													// Until each canvas owns its own engine, only the active page is
-													// mounted — today's behaviour, now stated rather than emergent.
-													keepMounted={false}
-													className="h-full"
-												/>
-												{reopenPill}
-											</div>
-										</ErrorBoundary>
-									),
-								}}
-								rightSection={rightSection(regionDeps)}
-								bottomSection={consoleSection({
-									username,
-									graphSlug,
-									console: consoleParam,
-									sessionState,
-									dataBoards,
-									dataBoardInFront,
-								})}
-							/>
-						</SetupSlotsContext.Provider>
-					</ActivitySlotsContext.Provider>
+					{/* What setup borrows from this page — the skip write and the
+					    left section. */}
+					<SetupSlotsContext.Provider value={setupSlots}>
+						<HostLayout
+							// The last crumb is what is open — the canvas you are looking at,
+							// named by its session: `ravi › finance › Defence theme — Sep 2026`.
+							// There is no screen crumb before it. `Explorer` used to sit there,
+							// which named the page after one of its eight `leftNav` items
+							// (graph-detail-page.md).
+							objectLabel={
+								activeSessionId
+									? sessionTitleById.get(activeSessionId)
+									: undefined
+							}
+							{...chrome}
+							leftSection={leftRegion}
+							mainSection={{
+								// One host for every kind of page — the strip and the bodies in one
+								// component, so the tabs cannot drift from what they switch
+								// (graph-detail-page.md the-shell.md).
+								content: (
+									<ErrorBoundary onError={reportBoundaryError}>
+										<div className="relative h-full">
+											<Workbook
+												{...strip}
+												addLabel="New canvas"
+												// Until each canvas owns its own engine, only the active page is
+												// mounted — today's behaviour, now stated rather than emergent.
+												keepMounted={false}
+												className="h-full"
+											/>
+											{reopenPill}
+										</div>
+									</ErrorBoundary>
+								),
+							}}
+							rightSection={rightSection(regionDeps)}
+							bottomSection={consoleSection({
+								username,
+								graphSlug,
+								console: consoleParam,
+								sessionState,
+								dataBoards,
+								dataBoardInFront,
+							})}
+						/>
+					</SetupSlotsContext.Provider>
 				</AssistantSlotsContext.Provider>
 			</OpenBoardContext.Provider>
 		</CanvasContext.Provider>

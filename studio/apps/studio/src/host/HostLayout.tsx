@@ -6,20 +6,15 @@ import {
 } from "@invana-studio/core";
 import { SettingsViewPanel } from "@invana-studio/modeller";
 import {
-	ActivityPage,
 	AppVersion,
-	activityOf,
-	boardPageId,
 	type LeftNavKey,
-	OnboardingCap,
 	StudioShellLayout,
 	useActiveProduct,
 	useLeftSection,
 } from "@invana-studio/shell";
 import type { ReactNode } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
-import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
+import { useParams } from "react-router-dom";
+import { ConnectionStatusBar } from "@/host/ConnectionStatusBar";
 
 // A page hands the shell content, and a size only when its occupant needs one
 // other than the shared side width (the docked assistant).
@@ -28,7 +23,7 @@ interface SectionSlot {
 	size?: { defaultSize: string; minSize: string };
 }
 
-interface GraphDetailProps {
+interface HostLayoutProps {
 	/** The object open on this screen — drawn as the last breadcrumb crumb,
 	 *  after `owner › graph › panel`. Omitted when nothing is open. There is no
 	 *  *screen* crumb: the graph's URL is the page (graph-detail-page.md),
@@ -62,38 +57,19 @@ interface GraphDetailProps {
 	headerCenter?: ReactNode;
 }
 
-// The page-owned panels keyed into the shared `?settings` param. These open via
-// the page's own `leftSection` instead of rendering a SettingsViewPanel tab — so the
-// whole rail stays one single-open accordion.
-//
-// There is one page (docs/for-developers/modules/explore/spec.md), so there is one list: Model
-// plus the work surfaces (docs/for-developers/modules/work/spec.md). The Modeller's `schema` and
-// `messages` keys are aliased onto `model` / `sessions` by `useLeftSection`
-// and never reach here.
-//
-// `sessions` is deliberately absent: it is the assistant, on the right
-// (the-assistant.md). It stays in ALL_NATIVE_SECTIONS below so a
-// stale `?panel=sessions` link is still recognised as page-owned — the page
-// answers it by opening the assistant — rather than docking the SettingsViewPanel.
+// The panels the host draws in its own `leftSection`, keyed into the shared
+// `panel` param. Every other key the path can name — Info and Graph settings —
+// docks the SettingsViewPanel instead. Each is a product's panel: Explorer's
+// type list, the Modeller's, the Agents product's and the Projects product's.
 //
 // `skills` is page-owned rather than a settings section. That is deliberate: a
 // skill is *configured* like a connection but *read* like work — "is this prose
 // doing anything?" is answered by the usage list, which only exists beside the
 // agents and steps it is talking about.
-//
-// This used to be a record keyed by a `GraphDetailSection` ("overview" |
-// "explorer" | "modeller") with one key filled in. There is one page, so it is
-// one list.
 const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"explorer",
 	"model",
 	"projects",
-	// **Execution and definition are two panels**. `runs` is the journal as
-	// one list; `library` is the two-section stack — Plans · Templates. `imports`, `workflows` and `templates` are gone from this list
-	// because they are gone from the product: an import is a `kind` of TaskRun, a
-	// workflow is a reusable TaskPlan, and a projection template is Library's
-	// third section.
-	"runs",
 	"library",
 	"govern",
 	"agents",
@@ -109,54 +85,26 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	// The Projects product's own panel.
 	"decisions",
 ];
-const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
-	"explorer",
-	"sessions",
-	"schema",
-	"model",
-	"canvases",
-	"messages",
-	"projects",
-	"runs",
-	"library",
-	"govern",
-	"agents",
-	"skills",
-	"requests",
-	"rules",
-	"overview",
-	"plugins",
-	"performance",
-	"concurrency",
-	"decisions",
-];
 
 /**
- * The shell for the graph page — one page, at the graph's own URL
- * (graph-detail-page.md). Owns:
+ * The host's layout — the regions every graph product fills, drawn through
+ * `StudioShellLayout` so the header matches every other screen. Owns:
  *
- * - The shell's header slots (breadcrumb, onboarding cap, Assistant toggle)
- *   and its own left rail (`useGraphLeftNav`), drawn through
- *   `StudioShellLayout` so the header matches every other screen.
+ * - The shell's header slots: the breadcrumb's last crumb, the canvas toolbar
+ *   in the centre and the Assistant toggle.
+ * - `leftNav`: none for Explorer, whose `nav` is `null`; the open product's
+ *   rail for the Modeller, Projects and Agents — the shell draws it from the
+ *   product's `nav`.
  * - SettingsViewPanel takeover: docked replaces `leftSection`; expanded replaces
  *   `mainSection` and hides both `leftSection` and `rightSection`.
- * - Activity takeover: on `/activity/<tab>[/:id]` the shell's `ActivityPage`
- *   fills `mainSection` and every other region closes. `leftNav` stays, so the
- *   `Runs` and `Events` icons open their tabs and close them again.
- * - Explorer: while the Explorer product's route is open the page has no
- *   `leftNav` and no `leftSection` — the board and the assistant fill it, and
- *   the canvas toolbar floats over the board instead of sitting in the header.
- * - Modeller, Projects and Agents: while one of these products' routes is open
- *   the `leftNav` is the product's own rail, drawn by the shell from its `nav`
- *   — Global model · Models · Stitches · Requests │ Worlds · Guardrails · Rules
- *   │ Graph settings; Projects · My todos · Decisions; or Overview · Agents ·
- *   Skills │ Library · Plugins · LLMs · Performance │ Settings.
+ * - Explorer: no `leftSection` — the board and the assistant fill it, and the
+ *   canvas toolbar floats over the board instead of sitting in the header.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
  *   and a right cluster (extras + `AppVersion`).
  *
  * Pages provide their own data + content slots; layout/wiring lives here.
  */
-export function GraphDetail({
+export function HostLayout({
 	objectLabel,
 	leftSection,
 	mainSection,
@@ -167,7 +115,7 @@ export function GraphDetail({
 	headerRightExtras,
 	headerPanelControls,
 	headerCenter,
-}: GraphDetailProps) {
+}: HostLayoutProps) {
 	const { username, graphSlug } = useParams<{
 		username: string;
 		graphSlug: string;
@@ -175,43 +123,26 @@ export function GraphDetail({
 
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
 	const settingsPanel = useLeftSection();
-	const leftNav = useGraphLeftNav();
-	const navigate = useNavigate();
-	const activity = activityOf(useLocation().pathname);
-	const product = useActiveProduct()?.id;
-	const explorer = product === "explorer";
-	// The Modeller, Projects and the Agents product draw their own rail.
-	const ownRail =
-		product === "modeller" || product === "projects" || product === "agents";
+	const explorer = useActiveProduct()?.id === "explorer";
 
-	// **No mode switch** (docs/for-developers/modules/explore/spec.md). The header is a breadcrumb naming the
-	// graph and the open panel; the levels after the graph come from the routes
-	// the panel's path matched (`products/legacyGraph`), so the breadcrumb is a
-	// reading of the URL: `owner › graph › Agents › LLMs › <provider> › object`.
+	// The header is a breadcrumb naming the graph and the open panel; the levels
+	// after the graph come from the routes the panel's path matched (each
+	// product's `routes`), so the breadcrumb is a reading of the URL:
+	// `owner › graph › LLMs › <provider> › object`.
 	const header = {
-		// What the Workbook holds is not on screen while Activity is.
-		objectLabel: activity ? undefined : objectLabel,
+		objectLabel,
 		rightExtras: headerRightExtras,
-		// The onboarding cap is graph-scoped (setup.md): a Graph has onboarding,
-		// the Graphs list does not.
-		status:
-			username && graphSlug ? (
-				<OnboardingCap username={username} graphSlug={graphSlug} />
-			) : undefined,
 		assistantToggle: headerPanelControls,
 		center: explorer ? undefined : headerCenter,
 	};
 
-	// The whole left rail shares one `?settings` param. This view's own panel
-	// (AssistantViewPanel / SchemaNav) opens under its native key; every other value
-	// is a bottom-rail settings section that renders the SettingsViewPanel. A value
-	// belonging to the *other* view's native key shows nothing here.
-	const nativeKeys = PAGE_OWNED_SECTIONS;
-	const sectionIsNative = ALL_NATIVE_SECTIONS.includes(settingsPanel.section);
+	// The whole left column shares one `panel` param. A product's own panel
+	// renders the host's `leftSection`; Info and Graph settings render the
+	// SettingsViewPanel.
 	const showNative =
-		settingsPanel.isOpen && nativeKeys.includes(settingsPanel.section);
+		settingsPanel.isOpen && PAGE_OWNED_SECTIONS.includes(settingsPanel.section);
 	const settingsOpen =
-		settingsPanel.isOpen && !sectionIsNative && !!username && !!graphSlug;
+		settingsPanel.isOpen && !showNative && !!username && !!graphSlug;
 	const settingsExpanded = settingsOpen && settingsPanel.expanded;
 	const settingsDocked = settingsOpen && !settingsPanel.expanded;
 
@@ -227,33 +158,13 @@ export function GraphDetail({
 		/>
 	) : undefined;
 	const effectiveLeftSection =
-		leftContent && !activity && !explorer
+		leftContent && !explorer
 			? { ...SIDE_SECTION, content: leftContent }
 			: undefined;
 
-	const activityPage =
-		activity && username && graphSlug ? (
-			<ActivityPage
-				username={username}
-				graphSlug={graphSlug}
-				location={activity}
-				onRetune={() => settingsPanel.setSection("govern")}
-				// The compare board is a Workbook page, so it opens on the Graph.
-				onCompare={(runId, other) =>
-					navigate(
-						`/u/${username}/${graphSlug}?page=${encodeURIComponent(
-							boardPageId("compare", `${runId}:${other}`),
-						)}`,
-					)
-				}
-			/>
-		) : null;
-
 	const effectiveMainSection = {
 		...MAIN_SECTION,
-		content: activityPage ? (
-			activityPage
-		) : settingsExpanded ? (
+		content: settingsExpanded ? (
 			<SettingsViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
@@ -264,12 +175,12 @@ export function GraphDetail({
 	};
 
 	const effectiveRightSection =
-		rightSection && !settingsExpanded && !activity
+		rightSection && !settingsExpanded
 			? { ...SIDE_SECTION, ...rightSection.size, content: rightSection.content }
 			: undefined;
 
 	const effectiveBottomSection =
-		bottomSection && !settingsExpanded && !activity
+		bottomSection && !settingsExpanded
 			? { ...BOTTOM_SECTION, content: bottomSection.content }
 			: undefined;
 
@@ -283,10 +194,6 @@ export function GraphDetail({
 	return (
 		<StudioShellLayout
 			idPrefix="graph-detail"
-			// Explorer draws no `leftNav` (its `nav` is `null`); the Modeller and
-			// Agents draw their own `nav`. Each comes from the shell when this is
-			// left out.
-			leftNav={explorer || ownRail ? undefined : leftNav}
 			header={header}
 			leftSection={effectiveLeftSection}
 			mainSection={effectiveMainSection}

@@ -196,9 +196,9 @@ Each product package default-exports one object. The app passes the list to the 
 | a product root — `modeller` · `agents` · `activity` · `agents/plugins` | its first section |
 | any other value | the Graph root, key dropped |
 
-- Until a panel's product moves, its path renders the graph page with that panel open. One table in Studio, `panelPaths.ts`, converts both ways. The other page params (`?page=`, `?right=`, `?tab=`) stay in the query string.
+- A product's path renders the product host with that product's panel open. One table in Studio, `panelPaths.ts`, converts both ways, and the shell's `CanonicalRoute` applies it before any page renders. The other page params (`?page=`, `?right=`, `?tab=`) stay in the query string.
 - The path holds the stack section that has the height and that section's drill-in. A drill-in held by another section stays in the query string.
-- The Graph root stays the graph page with nothing open. The redirect to the last product, else Explorer, lands with Explorer (A09): today `explorer` opens the type list, and the root does not.
+- The Graph root redirects to the graph product this browser last had open, else Explorer, carrying the query string ([shell.md › Decisions](shell.md#decisions)).
 
 ## 6. Phases
 

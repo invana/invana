@@ -27,9 +27,8 @@ import type {
 	OpenBoard,
 	useLeftSection,
 } from "@invana-studio/shell";
-import { RunsViewPanel } from "@invana-studio/shell";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
+import type { useLayeredCanvas } from "@/host/useLayeredCanvas";
 
 type Sessions = ReturnType<typeof useSessions>;
 
@@ -91,7 +90,6 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		setSelectedProjectKey,
 		setWorkKind,
 		setSelectedAgentId,
-		setSelectedWorkflowKey,
 		selectedStepId,
 		selectedSkillId,
 		setSelectedSkillId,
@@ -135,27 +133,6 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		/>
 	) : settingsPanel.section === "decisions" ? (
 		<DecisionsViewPanel />
-	) : settingsPanel.section === "runs" ? (
-		// **Runs is execution** — the journal, and nothing else, as one list.
-		// Todos are not here: they live under Projects, because a
-		// Todo without its project is a to-do list.
-		<RunsViewPanel
-			username={username as string}
-			graphSlug={graphSlug as string}
-			onClose={closeLeftPanel}
-			onOpenRunBoard={(runId, stepId) =>
-				openBoard({ kind: "run", subjectId: runId, runId, stepId })
-			}
-			// The journal drawn wide, beside the list.
-			onOpenRunsBoard={() =>
-				openBoard({ kind: "runs", subjectId: graphSlug as string })
-			}
-			// The run stays in the section; the plan it ran is drawn beside it.
-			onOpenPlan={(key) => {
-				setSelectedWorkflowKey(key);
-				setWorkKind("workflow");
-			}}
-		/>
 	) : settingsPanel.section === "library" ? (
 		// **Library is definition** — Plans · Templates, stacked, with no panel
 		// header above them: what can be run, and how its output renders.

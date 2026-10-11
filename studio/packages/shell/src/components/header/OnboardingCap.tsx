@@ -1,6 +1,7 @@
 import { ButtonWithTooltip, cn } from "@invana/ui";
 import { hasOutstandingSetup, useGraphQuery } from "@invana-studio/core";
 import { GraduationCap } from "lucide-react";
+import { useOpenGraph } from "../../products";
 import { useOnboarding } from "../../setup/useOnboarding";
 
 /**
@@ -17,7 +18,7 @@ import { useOnboarding } from "../../setup/useOnboarding";
  * *Graduation* is the icon's metaphor only. The state a Graph reaches is
  * **ready** (terminology.md), and no surface here says otherwise.
  */
-export function OnboardingCap({
+function OnboardingCap({
 	username,
 	graphSlug,
 }: {
@@ -42,4 +43,11 @@ export function OnboardingCap({
 			<GraduationCap className="size-4" />
 		</ButtonWithTooltip>
 	);
+}
+
+/** The cap for the open Graph — the header's default `status`. Off a Graph
+ *  there is no onboarding, so there is no cap. */
+export function GraphOnboardingCap() {
+	const graph = useOpenGraph();
+	return graph ? <OnboardingCap {...graph} /> : null;
 }

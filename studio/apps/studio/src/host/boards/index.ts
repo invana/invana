@@ -8,18 +8,18 @@
  * record, its kinds, versions and reports live in `@invana-studio/shell`.
  */
 
-export type { BoardPageHandle } from "@/pages/graphs-detail/features/boards/DataBoardPage";
-export { DataBoardPage } from "@/pages/graphs-detail/features/boards/DataBoardPage";
+export type { BoardPageHandle } from "@/host/boards/DataBoardPage";
+export { DataBoardPage } from "@/host/boards/DataBoardPage";
 // The wrapper the host mounts every declared page inside — the two acts, and
 // the card one of them opens (boards-migration.md).
-export { DeclaredBoard } from "@/pages/graphs-detail/features/boards/DeclaredBoard";
+export { DeclaredBoard } from "@/host/boards/DeclaredBoard";
 // A report — the act that keeps a live board's numbers, and the page that
 // reads one back (boards-migration.md).
-export { FrozenBoardPage } from "@/pages/graphs-detail/features/boards/FrozenBoardPage";
-export type { RecordBoardKind } from "@/pages/graphs-detail/features/boards/useOpenBoard";
+export { FrozenBoardPage } from "@/host/boards/FrozenBoardPage";
+export type { RecordBoardKind } from "@/host/boards/useOpenBoard";
 // *Open this board*, published by the host for the surfaces that draw a link
 // to one (rules.md).
 export {
 	OpenBoardContext,
 	useOpenBoard,
-} from "@/pages/graphs-detail/features/boards/useOpenBoard";
+} from "@/host/boards/useOpenBoard";

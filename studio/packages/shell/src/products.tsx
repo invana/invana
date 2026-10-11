@@ -94,8 +94,7 @@ export function useOpenGraph():
 
 /**
  * Where a product's routes start. A graph product lives under the open Graph;
- * an install product under its own id. `legacy-graph` is today's graph page,
- * so its base is the Graph's own URL.
+ * an install product under its own id.
  */
 export function productBase(
 	product: ProductDefinition,
@@ -103,8 +102,7 @@ export function productBase(
 ): string | undefined {
 	if (product.scope === "install") return `/${product.id}`;
 	if (!graph) return undefined;
-	const root = `/u/${graph.username}/${graph.graphSlug}`;
-	return product.id === "legacy-graph" ? root : `${root}/${product.id}`;
+	return `/u/${graph.username}/${graph.graphSlug}/${product.id}`;
 }
 
 /** Joins a base and a relative path without doubling or dropping a slash. */

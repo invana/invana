@@ -12,7 +12,7 @@ import type {
 } from "@invana-studio/shell";
 import { SetupLock } from "@invana-studio/shell";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
+import type { useDataBoards } from "@/host/useDataBoards";
 
 /** What the right side's occupants read from the page that hosts them. */
 export interface RightSectionDeps {

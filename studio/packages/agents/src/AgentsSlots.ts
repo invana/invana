@@ -1,9 +1,8 @@
 /**
  * What the Agents product borrows from the app that hosts it.
  *
- * - `Page` — the page the product's routes render. It is today's graph page,
- *   which draws every region and still lives in the app; when that page is
- *   retired, the product's own page moves here and the slot goes.
+ * - `Page` — the page the product's routes render: the app's product host,
+ *   which composes every graph product's regions.
  *
  * The app provides `AgentsSlotsContext` once, around the shell, with a
  * module-level object, so the component it carries is the same on every

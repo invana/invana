@@ -5,40 +5,23 @@ import { LEGACY_SECTION_PARAM, SECTION_PARAM } from "./useStackSections";
 // The left panel is a single-open accordion driven by one `panel` param. The
 // URL spells it as a path — `/u/:user/:graph/agents/llms` — and `usePageParams`
 // reads that path back as `panel` and its stack keys (`panelPaths`), so every
-// key below is described as a param even though the address bar shows a path.
-// **No value means no left column** — the Graph's own URL. `explorer` is a key like every other, so
-// the Explorer's type list closes the same way it opens; the resting page is a
-// canvas with the rail beside it and nothing docked.
-// Most values are the bottom-rail settings sections; the rest are page-owned
-// view panels. They share the same param so the whole rail is mutually
-// exclusive with the exact same toggle as the bottom items — the page (via
-// GraphDetail) renders its own panel for these instead of the SettingsViewPanel.
+// key below is the name a path stands for, never something a link carries:
+// an old `?panel=` link, its retired keys included, is redirected to its path
+// before any page reads it (`<CanonicalRoute>`). **No value means no left
+// column.** The product host draws its own panel for a product's key and the
+// SettingsViewPanel for Info and Graph settings.
 //
-// With the work surfaces (docs/for-developers/modules/work/spec.md) the page-owned set is sessions ·
-// model · projects · runs · library · agents — because every new
-// noun opens in the left panel and paints on the canvas rather than getting a
-// page of its own. `schema` and `messages` are leftovers from the one-page decision (docs/for-developers/modules/explore/spec.md): the
-// separate Modeller page is retired, so `schema` redirects onto `model` and
-// `messages` onto `sessions`.
-//
-// **`tasks` and `templates` are gone** (graph-detail-page.md).
-// Execution and definition are two panels — `runs` (the journal, a list) and
-// `library` (Plans · Templates, a stack) — and Templates has no icon
-// of its own any more. Both old keys name surfaces that no longer exist and are
-// **deleted, not redirected**: a stale link lands on the graph page, which is
-// what an unknown `?panel` has always done.
+// A write names a key, and the path it lands on may belong to another place:
+// `runs` and `events` are Activity's tabs, and `sessions` is Explorer with the
+// assistant on the right.
 export type LeftNavKey =
 	| "info"
 	| "explorer"
-	| "connection"
 	| "skills"
 	| "settings"
 	| "events"
 	| "sessions"
-	| "schema"
 	| "model"
-	| "canvases"
-	| "messages"
 	| "projects"
 	| "runs"
 	| "library"
@@ -127,22 +110,17 @@ const STACK_KEYS_OF: Partial<Record<LeftNavKey, readonly string[]>> = {
 // into the next panel.
 export const TAB_PARAM = "tab";
 
-// Allow-list of valid sections. The `panel` search param is user-controlled
-// (and can point at removed sections from stale links/bookmarks), so anything
-// not in this set falls back to DEFAULT_SECTION rather than crashing the render
-// on an undefined section lookup.
+// Allow-list of valid sections. A path the table does not know reads as no
+// key, and anything else falls back to DEFAULT_SECTION rather than crashing the
+// render on an undefined section lookup.
 const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"info",
 	"explorer",
-	"connection",
 	"skills",
 	"settings",
 	"events",
 	"sessions",
-	"schema",
 	"model",
-	"canvases",
-	"messages",
 	"projects",
 	"runs",
 	"library",
@@ -157,41 +135,6 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"decisions",
 	"activity",
 ];
-
-// Retired keys, kept as aliases so a bookmark lands on the panel that now holds
-// the thing it named rather than on nothing. These are values of `?panel`; the
-// param's own old name is handled by LEGACY_PANEL_PARAM above.
-//
-// **`tasks`, `templates`, `imports`, `workflows` and `datasets` are not here,
-// and never will be.** They name surfaces that no longer exist, and the flows
-// behind them are folded into `runs` and `library` in the same slice their
-// panels are deleted — so they are **deleted, not redirected**. A stale
-// link lands on the graph page, which is what an unknown `?panel` has always
-// done. No backward compatibility is kept anywhere in this refactor; a redirect
-// table is a second vocabulary to maintain for links that are weeks old.
-//
-// docs/for-developers/modules/explore/spec.md retired the Modeller page, so its two panel keys now name panels
-// that live on the one page.
-const ALIASES: Partial<Record<string, LeftNavKey>> = {
-	schema: "model",
-	// The providers left Graph settings: a provider is what an agent's cast
-	// resolves against, so it is read where agents are. The old key
-	// lands on the panel that holds them, whose LLMs section is one click down.
-	llms: "agents",
-	// Stitching moved into the Model panel and the union became a page
-	// (stitch-models.md · Surfaces). A bookmark lands on the panel that now
-	// holds it rather than on nothing.
-	links: "model",
-	messages: "sessions",
-	// Layers left the left column: it is a canvas control on the page strip
-	// (graph-detail-page.md). A bookmark lands on the Explorer's type list —
-	// the other panel that reads the canvas beside it.
-	layers: "explorer",
-	// The connection is a field group in the one settings form, not a page of its
-	// own (docs/for-developers/modules/connect-and-model/features/connect-a-database.md).
-	// The key stays as an alias so a bookmark lands on the group rather than 404ing.
-	connection: "settings",
-};
 
 // Expanded (full-width) state is non-URL local store — shared across the
 // hook's consumers via a tiny subscribable. Survives section changes but
@@ -225,10 +168,9 @@ export function useLeftSection() {
 	const raw = params.get(PANEL_PARAM) ?? params.get(LEGACY_PANEL_PARAM);
 	const tab = params.get(TAB_PARAM);
 	const isOpen = raw !== null;
-	const resolved = raw ? (ALIASES[raw] ?? raw) : raw;
 	const section =
-		resolved && KNOWN_SECTIONS.includes(resolved as LeftNavKey)
-			? (resolved as LeftNavKey)
+		raw && KNOWN_SECTIONS.includes(raw as LeftNavKey)
+			? (raw as LeftNavKey)
 			: DEFAULT_SECTION;
 
 	const expanded = useSyncExternalStore(

@@ -1,9 +1,8 @@
 /**
  * What the Modeller borrows from the app that hosts it.
  *
- * - `Page` — the page the Modeller's routes render. It is today's graph page,
- *   which draws every region and still lives in the app; when that page is
- *   retired, the Modeller's own page moves here and the slot goes.
+ * - `Page` — the page the Modeller's routes render: the app's product host,
+ *   which composes every graph product's regions.
  *
  * The app provides `ModellerSlotsContext` once, around the shell, with a
  * module-level object, so the components it carries are the same on every

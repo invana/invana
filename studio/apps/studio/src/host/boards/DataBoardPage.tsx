@@ -61,8 +61,8 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardFormDialog";
-import { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardHistoryWidget";
+import { BoardFormDialog } from "@/host/boards/BoardFormDialog";
+import { BoardHistoryWidget } from "@/host/boards/BoardHistoryWidget";
 
 /**
  * What the strip can ask of the canvas page under it. The shell holds one of

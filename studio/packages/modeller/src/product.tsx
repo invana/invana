@@ -17,8 +17,8 @@
  * | Graph settings | `/modeller/settings` | Basic · Graph · Agents (`?tab=`; `?tab=info` is the Graph's info) |
  *
  * The levels under the product's route have no element of their own, so
- * moving along the rail never remounts the page. The page itself still lives
- * in the app (today's graph page, which draws every region), so the route's
+ * moving along the rail never remounts the page. The page itself is the app's
+ * product host, which composes every graph product's regions, so the route's
  * element is whatever the app puts in `ModellerSlotsContext`.
  */
 import type { ProductDefinition } from "@invana-studio/core";

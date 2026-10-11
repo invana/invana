@@ -18,7 +18,7 @@ import { formatRelativeTime } from "@invana-studio/core";
 import { boardReportsApi } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useQuery } from "@tanstack/react-query";
-import { DECLARED_WIDGETS } from "@/pages/graphs-detail/features/boards/boardWidgets";
+import { DECLARED_WIDGETS } from "@/host/boards/boardWidgets";
 
 export interface FrozenBoardPageProps {
 	username: string;

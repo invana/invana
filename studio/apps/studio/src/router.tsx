@@ -3,9 +3,11 @@ import { ExplorerSlotsContext } from "@invana-studio/explorer";
 import { ModellerSlotsContext } from "@invana-studio/modeller";
 import { ProjectsSlotsContext } from "@invana-studio/projects";
 import {
+	ActivitySlotsContext,
 	ErrorPage,
 	GraphCreatePage,
 	GraphsListPage,
+	graphRoutes,
 	LoginPage,
 	PlatformEventsPage,
 	ProfileSettingsPage,
@@ -14,16 +16,17 @@ import {
 	StudioShell,
 } from "@invana-studio/shell";
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { activitySlots } from "@/host/activitySlots";
+import { ProductHostRoute } from "@/host/ProductHostRoute";
 import { products } from "@/products";
-import { GraphPageRoute } from "@/products/legacyGraph";
 import { modellerSlots } from "@/products/modellerSlots";
 
 // The Explorer's, the Modeller's, the Projects and the Agents product's routes
-// draw today's graph page until it is retired. Projects reads the agents a
+// draw the product host, which composes all four. Projects reads the agents a
 // Todo can be handed to from the Agents product, through its slot.
-const explorerSlots = { Page: GraphPageRoute };
-const agentsSlots = { Page: GraphPageRoute };
-const projectsSlots = { Page: GraphPageRoute, useAgents: useAgentsQuery };
+const explorerSlots = { Page: ProductHostRoute };
+const agentsSlots = { Page: ProductHostRoute };
+const projectsSlots = { Page: ProductHostRoute, useAgents: useAgentsQuery };
 
 export const router = createBrowserRouter([
 	// Public auth pages — no shell, no protection. Self-service registration was
@@ -41,7 +44,11 @@ export const router = createBrowserRouter([
 					<ModellerSlotsContext.Provider value={modellerSlots}>
 						<AgentsSlotsContext.Provider value={agentsSlots}>
 							<ProjectsSlotsContext.Provider value={projectsSlots}>
-								<StudioShell products={products} />
+								{/* Activity is the shell's route, and a run's page in it
+								    names agents and govern records the shell may not import. */}
+								<ActivitySlotsContext.Provider value={activitySlots}>
+									<StudioShell products={products} />
+								</ActivitySlotsContext.Provider>
 							</ProjectsSlotsContext.Provider>
 						</AgentsSlotsContext.Provider>
 					</ModellerSlotsContext.Provider>
@@ -59,6 +66,7 @@ export const router = createBrowserRouter([
 			// /platform/* to avoid the /admin namespace collision with starlette-admin.
 			{ path: "platform/events", element: <PlatformEventsPage /> },
 
+			...graphRoutes,
 			...productRoutes(products),
 
 			{ path: "*", element: <ErrorPage /> },

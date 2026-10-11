@@ -3,10 +3,10 @@
  *
  * Six checks over `src/`, each failing with the file and the name:
  *
- * 1. **Modules** — every `pages/graphs-detail/features/<m>/` is a module in `MODULES`,
+ * 1. **Modules** — every `host/<m>/` is a module in `MODULES`,
  *    and the engine folder it maps to exists under `engine/src/invana/server/`.
  *    Every engine `server/<m>/` is claimed by a module or listed in `ENGINE_ONLY`.
- * 2. **Suffixes** — a `.tsx` under `features/` never ends in `Drawer`, `StackPanel`,
+ * 2. **Suffixes** — a `.tsx` under `host/` never ends in `Drawer`, `StackPanel`,
  *    `Dashboard…`, or a bare `Panel` (a region occupant is `*ViewPanel`).
  * 3. **Retired words** — no identifier contains one. `dashboard` is retired: every
  *    surface is a board (lucide's `LayoutDashboard` icon is the one exception). Identifiers are read with the
@@ -34,7 +34,7 @@ import ts from "typescript";
 
 const STUDIO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = path.join(STUDIO, "src");
-const FEATURES = path.join(SRC, "pages", "graphs-detail", "features");
+const FEATURES = path.join(SRC, "host");
 const ENGINE_SERVER = path.join(
 	STUDIO,
 	"..",
@@ -57,20 +57,20 @@ const MODULES = {
 const ENGINE_ONLY = {
 	admin: "platform operations, no Graph page",
 	auth: "accounts, served outside the Graph page",
-	sessions: "served by the @invana-studio/assistant package, outside features/",
-	events: "served by the @invana-studio/shell package, outside features/",
-	explorer: "served by the @invana-studio/explorer package, outside features/",
-	modeller: "served by the @invana-studio/modeller package, outside features/",
-	govern: "served by the @invana-studio/modeller package, outside features/",
+	sessions: "served by the @invana-studio/assistant package, outside the host",
+	events: "served by the @invana-studio/shell package, outside the host",
+	explorer: "served by the @invana-studio/explorer package, outside the host",
+	modeller: "served by the @invana-studio/modeller package, outside the host",
+	govern: "served by the @invana-studio/modeller package, outside the host",
 	graphs:
-		"served by @invana-studio/core and the Modeller's settings, outside features/",
-	agents: "served by the @invana-studio/agents package, outside features/",
-	skills: "served by the @invana-studio/agents package, outside features/",
-	task_plans: "served by the @invana-studio/agents package, outside features/",
-	runtime: "served by the @invana-studio/agents package, outside features/",
+		"served by @invana-studio/core and the Modeller's settings, outside the host",
+	agents: "served by the @invana-studio/agents package, outside the host",
+	skills: "served by the @invana-studio/agents package, outside the host",
+	task_plans: "served by the @invana-studio/agents package, outside the host",
+	runtime: "served by the @invana-studio/agents package, outside the host",
 	llm_providers:
-		"served by the @invana-studio/agents package, outside features/",
-	work: "served by the @invana-studio/projects package, outside features/",
+		"served by the @invana-studio/agents package, outside the host",
+	work: "served by the @invana-studio/projects package, outside the host",
 	routes: "shared route helpers",
 	__pycache__: "bytecode",
 };
@@ -109,16 +109,16 @@ function checkModules() {
 	const studio = dirs(FEATURES);
 	for (const m of studio) {
 		if (!(m in MODULES)) {
-			errors.push(`features/${m}/ is not a module in MODULES`);
+			errors.push(`host/${m}/ is not a module in MODULES`);
 		} else if (engine && !fs.existsSync(path.join(ENGINE_SERVER, MODULES[m]))) {
 			errors.push(
-				`features/${m}/ maps to engine server/${MODULES[m]}/, which does not exist`,
+				`host/${m}/ maps to engine server/${MODULES[m]}/, which does not exist`,
 			);
 		}
 	}
 	for (const m of Object.keys(MODULES)) {
 		if (!studio.includes(m))
-			errors.push(`MODULES names ${m}, but features/${m}/ does not exist`);
+			errors.push(`MODULES names ${m}, but host/${m}/ does not exist`);
 	}
 	if (!engine) return;
 	const claimed = new Set(Object.values(MODULES));
@@ -136,7 +136,7 @@ function checkSuffixes() {
 		const rel = path.relative(FEATURES, f).split(path.sep).join("/");
 		if (RETIRED_SUFFIX.test(rel) && !(rel in SUFFIX_ALLOWED)) {
 			errors.push(
-				`features/${rel}: retired suffix (Drawer · StackPanel · Dashboard · bare Panel)`,
+				`host/${rel}: retired suffix (Drawer · StackPanel · Dashboard · bare Panel)`,
 			);
 		}
 	}

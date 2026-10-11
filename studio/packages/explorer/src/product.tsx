@@ -11,10 +11,9 @@
  * | `/u/:user/:graph/explorer/:session` | the same, with that session's thread open |
  *
  * The `:session` level has no element of its own, so opening a session never
- * remounts the canvas. The page itself still lives in the app (today's graph
- * page, which draws every region), so the route's element is whatever the app
- * puts in `ExplorerSlotsContext`; when the graph page is retired, the page
- * moves here and the slot goes.
+ * remounts the canvas. The page itself is the app's product host, which
+ * composes every graph product's regions, so the route's element is whatever
+ * the app puts in `ExplorerSlotsContext`.
  */
 import type { ProductDefinition } from "@invana-studio/core";
 import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";

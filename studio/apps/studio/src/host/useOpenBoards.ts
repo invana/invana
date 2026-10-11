@@ -9,8 +9,8 @@ import {
 	parseBoardPageId,
 } from "@invana-studio/shell";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { RecordBoardKind } from "@/pages/graphs-detail/features/boards";
-import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
+import type { RecordBoardKind } from "@/host/boards";
+import { useBoardPage } from "@/host/useBoardPage";
 
 /**
  * The declared boards open in `mainSection`, and which one is in front.

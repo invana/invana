@@ -28,9 +28,9 @@ import {
 	runAddress,
 } from "@invana-studio/shell";
 import type { Dispatch, SetStateAction } from "react";
-import { FrozenBoardPage } from "@/pages/graphs-detail/features/boards";
-import { RuleBoardPage } from "@/pages/graphs-detail/features/rules";
-import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
+import { FrozenBoardPage } from "@/host/boards";
+import { RuleBoardPage } from "@/host/rules";
+import type { useBoardPage } from "@/host/useBoardPage";
 
 /** What a declared board's body reads from the page that hosts it. */
 export interface DeclaredBoardDeps {

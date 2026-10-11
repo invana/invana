@@ -4,4 +4,4 @@
  * records and reads are in `@invana-studio/core`.
  */
 
-export { RuleBoardPage } from "@/pages/graphs-detail/features/rules/boards/RuleBoardPage";
+export { RuleBoardPage } from "@/host/rules/RuleBoardPage";

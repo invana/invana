@@ -22,7 +22,7 @@ import {
 } from "@invana-studio/shell";
 import type { ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { BoardHistoryCard } from "@/pages/graphs-detail/features/boards/BoardHistoryCard";
+import { BoardHistoryCard } from "@/host/boards/BoardHistoryCard";
 
 export interface DeclaredBoardProps {
 	username: string;

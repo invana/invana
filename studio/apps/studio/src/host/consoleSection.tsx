@@ -3,7 +3,7 @@ import { ErrorBoundary } from "@invana/ui";
 import type { useConsoleParam, useSessions } from "@invana-studio/assistant";
 import { ConsolePanel } from "@invana-studio/assistant";
 import { reportBoundaryError } from "@invana-studio/core";
-import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
+import type { useDataBoards } from "@/host/useDataBoards";
 
 /** What the console reads from the page that hosts it. */
 export interface ConsoleSectionDeps {

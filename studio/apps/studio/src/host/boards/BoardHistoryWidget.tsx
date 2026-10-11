@@ -5,7 +5,7 @@ import {
 	useCanvasStatesQuery,
 } from "@invana-studio/shell";
 import { Camera } from "lucide-react";
-import { BoardHistoryCard } from "@/pages/graphs-detail/features/boards/BoardHistoryCard";
+import { BoardHistoryCard } from "@/host/boards/BoardHistoryCard";
 
 interface Props {
 	open: boolean;

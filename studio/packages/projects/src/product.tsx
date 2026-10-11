@@ -11,8 +11,8 @@
  * Projects is the product's root, so a project's key sits right under it, as
  * migration-plan §5 spells it. The levels under the product's route have no
  * element of their own, so moving along the rail never remounts the page. The
- * page itself still lives in the app (today's graph page, which draws every
- * region), so the route's element is whatever the app puts in
+ * page itself is the app's product host, which composes every graph product's
+ * regions, so the route's element is whatever the app puts in
  * `ProjectsSlotsContext`.
  *
  * **Actions.** `projects.addFinding` is registered so other products can ask

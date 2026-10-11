@@ -1,9 +1,8 @@
 /**
  * What the Projects product borrows from the app that hosts it.
  *
- * - `Page` — the page the product's routes render. It is today's graph page,
- *   which draws every region and still lives in the app; when that page is
- *   retired, the product's own page moves here and the slot goes.
+ * - `Page` — the page the product's routes render: the app's product host,
+ *   which composes every graph product's regions.
  * - `useAgents` — the Graph's agents, the people a Todo can be handed to. The
  *   agents list belongs to the Agents product, which this product may not
  *   import, so the host lends its query.
