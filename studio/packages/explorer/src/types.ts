@@ -80,18 +80,3 @@ export type ExpandRequest =
 	| { kind: "neighbors"; body: ExpandNeighborsRequest }
 	| { kind: "by-edge-type"; body: ExpandByEdgeTypeRequest }
 	| { kind: "by-node-type"; body: ExpandByNodeTypeRequest };
-
-/** One type and how many of it the graph holds; `count` is null when the
- *  vendor cannot count (selection-and-the-panel.md). */
-export interface TypeCount {
-	name: string;
-	count: number | null;
-}
-
-/** Every node and edge type in the graph, biggest first. */
-export interface TypeCountsResponse {
-	nodes: TypeCount[];
-	edges: TypeCount[];
-	/** False when the vendor could not count; every `count` is then null. */
-	counted: boolean;
-}

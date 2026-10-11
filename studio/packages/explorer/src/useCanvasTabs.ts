@@ -1,5 +1,6 @@
 import type { useSessions } from "@invana-studio/assistant";
 import { sessionsApi } from "@invana-studio/assistant";
+import type { CanvasBackend } from "@invana-studio/canvases";
 import { ApiError } from "@invana-studio/core";
 import type { Board, CanvasKind, useBoardVersions } from "@invana-studio/shell";
 import {
@@ -10,7 +11,6 @@ import {
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
-import type { CanvasBackend } from "./ExplorerCanvas";
 
 type Sessions = ReturnType<typeof useSessions>;
 type BoardContents = ReturnType<typeof useBoardVersions>;

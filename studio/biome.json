@@ -235,33 +235,6 @@
 			}
 		},
 		{
-			"includes": ["apps/studio/src/pages/graphs-detail/features/models/**"],
-			"linter": {
-				"rules": {
-					"style": {
-						"noRestrictedImports": {
-							"level": "error",
-							"options": {
-								"patterns": [
-									{
-										"group": [
-											"@/pages/graphs-detail/features/*/**",
-											"!@/pages/graphs-detail/features/models/**"
-										],
-										"message": "Import another module through its index.ts (code-shape.md §4.1)."
-									},
-									{
-										"group": ["@/pages/graphs-detail/shell/**"],
-										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
-									}
-								]
-							}
-						}
-					}
-				}
-			}
-		},
-		{
 			"includes": ["apps/studio/src/pages/graphs-detail/features/plans/**"],
 			"linter": {
 				"rules": {

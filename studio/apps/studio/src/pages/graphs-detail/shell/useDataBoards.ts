@@ -5,9 +5,9 @@ import {
 	sessionsApi,
 	useAssistantCanvasBridge,
 } from "@invana-studio/assistant";
+import type { CanvasBackend } from "@invana-studio/canvases";
 import type { QueryResponse, QueryResultItem } from "@invana-studio/core";
 import { type Interaction, measureSync } from "@invana-studio/core";
-import type { CanvasBackend } from "@invana-studio/explorer";
 import {
 	adaptItems,
 	explorerApi,
@@ -16,6 +16,7 @@ import {
 	useCanvasExpand,
 	useCanvasTabs,
 } from "@invana-studio/explorer";
+import { useActiveVersionQuery } from "@invana-studio/modeller";
 import type {
 	Board,
 	BoardVersionCause,
@@ -36,7 +37,6 @@ import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
-import { useActiveVersionQuery } from "@/pages/graphs-detail/features/models";
 import { useOpenSessionRequest } from "@/pages/graphs-detail/shared/useOpenSessionRequest";
 import { usePageParams } from "@/pages/graphs-detail/shared/usePageParams";
 import type { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";

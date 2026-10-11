@@ -81,7 +81,11 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@invana/ui";
-import { readCanvasThemeConfig } from "@invana-studio/canvases";
+import {
+	type CanvasBackend,
+	readCanvasThemeConfig,
+	typeColorNumber,
+} from "@invana-studio/canvases";
 import {
 	endInteraction,
 	type InteractionRef,
@@ -117,7 +121,6 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { labelAt } from "./canvasItems";
-import { typeColorNumber } from "./typeColor";
 import type { ExpandRequest } from "./types";
 
 /** Schema slice that drives the node-expand submenus (docs/for-developers/modules/explore/features/graph-canvas.md). */
@@ -141,11 +144,7 @@ export interface ExpandMenuHandlers {
 // `<Board config>` prop so the option objects stay precisely typed.
 type CanvasConfig = NonNullable<CanvasProps["config"]>;
 
-// PixiJS render backend. The Explorer (see ExplorerPage) defaults to `"webgpu"`
-// when the browser can use it (`canUseWebGPU` — WebGPU API present and not
-// WebKit, where PixiJS WebGPU crashes), else `"webgl"`. The header switcher lets
-// a user flip between them at runtime; the WebGPU option is disabled when unusable.
-export type CanvasBackend = "webgl" | "webgpu";
+// The header switcher's labels; the WebGPU option is disabled when unusable.
 const BACKEND_LABEL: Record<CanvasBackend, string> = {
 	webgl: "WebGL",
 	webgpu: "WebGPU",

@@ -15,6 +15,11 @@ import {
 	reportBoundaryError,
 } from "@invana-studio/core";
 import {
+	ModellerSlotsContext,
+	type ModelSelection,
+	useModelsQuery,
+} from "@invana-studio/modeller";
+import {
 	ActivitySlotsContext,
 	parseBoardPageId,
 	SetupSlotsContext,
@@ -31,8 +36,6 @@ import {
 } from "@/pages/graphs-detail/features/graphs";
 import { useLensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms";
-import type { ModelSelection } from "@/pages/graphs-detail/features/models";
-import { useModelsQuery } from "@/pages/graphs-detail/features/models";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 import { activitySlots } from "@/pages/graphs-detail/shell/activitySlots";
@@ -42,6 +45,7 @@ import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { graphDetailChrome } from "@/pages/graphs-detail/shell/GraphDetailChrome";
 import { layeredCanvasBody } from "@/pages/graphs-detail/shell/layeredCanvasBody";
 import { leftSection } from "@/pages/graphs-detail/shell/leftSectionContent";
+import { modellerSlots } from "@/pages/graphs-detail/shell/modellerSlots";
 import { rightSection } from "@/pages/graphs-detail/shell/rightSections";
 import { setupSlots } from "@/pages/graphs-detail/shell/setupSlots";
 import { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
@@ -443,49 +447,51 @@ export function GraphDetailPage() {
 					    page — agents, touches, reports, the left section. */}
 					<ActivitySlotsContext.Provider value={activitySlots}>
 						<SetupSlotsContext.Provider value={setupSlots}>
-							<GraphDetail
-								// The last crumb is what is open — the canvas you are looking at,
-								// named by its session: `ravi › finance › Defence theme — Sep 2026`.
-								// There is no screen crumb before it. `Explorer` used to sit there,
-								// which named the page after one of its eight `leftNav` items
-								// (graph-detail-page.md).
-								objectLabel={
-									activeSessionId
-										? sessionTitleById.get(activeSessionId)
-										: undefined
-								}
-								{...chrome}
-								leftSection={leftRegion}
-								mainSection={{
-									// One host for every kind of page — the strip and the bodies in one
-									// component, so the tabs cannot drift from what they switch
-									// (graph-detail-page.md the-shell.md).
-									content: (
-										<ErrorBoundary onError={reportBoundaryError}>
-											<div className="relative h-full">
-												<Workbook
-													{...strip}
-													addLabel="New canvas"
-													// Until each canvas owns its own engine, only the active page is
-													// mounted — today's behaviour, now stated rather than emergent.
-													keepMounted={false}
-													className="h-full"
-												/>
-												{reopenPill}
-											</div>
-										</ErrorBoundary>
-									),
-								}}
-								rightSection={rightSection(regionDeps)}
-								bottomSection={consoleSection({
-									username,
-									graphSlug,
-									console: consoleParam,
-									sessionState,
-									dataBoards,
-									dataBoardInFront,
-								})}
-							/>
+							<ModellerSlotsContext.Provider value={modellerSlots}>
+								<GraphDetail
+									// The last crumb is what is open — the canvas you are looking at,
+									// named by its session: `ravi › finance › Defence theme — Sep 2026`.
+									// There is no screen crumb before it. `Explorer` used to sit there,
+									// which named the page after one of its eight `leftNav` items
+									// (graph-detail-page.md).
+									objectLabel={
+										activeSessionId
+											? sessionTitleById.get(activeSessionId)
+											: undefined
+									}
+									{...chrome}
+									leftSection={leftRegion}
+									mainSection={{
+										// One host for every kind of page — the strip and the bodies in one
+										// component, so the tabs cannot drift from what they switch
+										// (graph-detail-page.md the-shell.md).
+										content: (
+											<ErrorBoundary onError={reportBoundaryError}>
+												<div className="relative h-full">
+													<Workbook
+														{...strip}
+														addLabel="New canvas"
+														// Until each canvas owns its own engine, only the active page is
+														// mounted — today's behaviour, now stated rather than emergent.
+														keepMounted={false}
+														className="h-full"
+													/>
+													{reopenPill}
+												</div>
+											</ErrorBoundary>
+										),
+									}}
+									rightSection={rightSection(regionDeps)}
+									bottomSection={consoleSection({
+										username,
+										graphSlug,
+										console: consoleParam,
+										sessionState,
+										dataBoards,
+										dataBoardInFront,
+									})}
+								/>
+							</ModellerSlotsContext.Provider>
 						</SetupSlotsContext.Provider>
 					</ActivitySlotsContext.Provider>
 				</AssistantSlotsContext.Provider>

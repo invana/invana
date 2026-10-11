@@ -4,15 +4,12 @@ import type { useSessions } from "@invana-studio/assistant";
 import type { LensKind, QueryResultItem } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
 import { ExplorerViewPanel } from "@invana-studio/explorer";
+import { type ModelSelection, ModelViewPanel } from "@invana-studio/modeller";
 import type { CanvasStyling, OpenBoard } from "@invana-studio/shell";
 import { RunsViewPanel } from "@invana-studio/shell";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents";
 import { LensesViewPanel } from "@/pages/graphs-detail/features/lenses";
-import {
-	type ModelSelection,
-	ModelViewPanel,
-} from "@/pages/graphs-detail/features/models";
 import {
 	LibraryViewPanel,
 	taskPlansApi,

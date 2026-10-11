@@ -14,7 +14,12 @@
 
 import type { GraphCanvas, GraphLayer, GraphStore } from "@invana/graph";
 import { cn, PanelStack, ScrollArea } from "@invana/ui";
-import type { QueryResultItem } from "@invana-studio/core";
+import { typeDotColor } from "@invana-studio/canvases";
+import {
+	type QueryResultItem,
+	type TypeCount,
+	useTypeCountsQuery,
+} from "@invana-studio/core";
 import type { CanvasStyling } from "@invana-studio/shell";
 import { ListPanelChrome } from "@invana-studio/ui";
 import { Compass, Eye, EyeOff } from "lucide-react";
@@ -27,9 +32,6 @@ import {
 	useState,
 } from "react";
 import { readProvenance } from "./ProvenanceBlock";
-import { useTypeCountsQuery } from "./queries";
-import { typeDotColor } from "./typeColor";
-import type { TypeCount } from "./types";
 
 /**
  * A `PanelStack` section title that carries a count on its right.

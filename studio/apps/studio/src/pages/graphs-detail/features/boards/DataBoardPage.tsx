@@ -39,9 +39,9 @@ import type {
 } from "@invana/graph";
 import { Button, Card } from "@invana/ui";
 import { SessionTutorialModal } from "@invana-studio/assistant";
+import type { CanvasBackend } from "@invana-studio/canvases";
 import type { InteractionRef } from "@invana-studio/core";
 import type {
-	CanvasBackend,
 	ExpandMenuHandlers,
 	ExpandMenuSchema,
 	ExpandRequest,

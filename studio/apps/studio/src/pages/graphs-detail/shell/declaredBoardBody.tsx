@@ -1,5 +1,10 @@
 import { EmptyState, Spinner } from "@invana/ui";
-import type { CanvasBackend } from "@invana-studio/explorer";
+import type { CanvasBackend } from "@invana-studio/canvases";
+import {
+	type ModelSelection,
+	ModelsPage,
+	type useModelsView,
+} from "@invana-studio/modeller";
 import {
 	BOARD_KINDS,
 	boardPageId,
@@ -17,11 +22,6 @@ import {
 	LensBoardPage,
 	parseComparePair,
 } from "@/pages/graphs-detail/features/lenses";
-import {
-	type ModelSelection,
-	ModelsPage,
-	type useModelsView,
-} from "@/pages/graphs-detail/features/models";
 import {
 	PlanArgumentsPage,
 	PlanBoardPage,

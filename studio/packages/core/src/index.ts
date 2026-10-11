@@ -10,6 +10,7 @@
 
 export * from "./hooks/queries/useAppVersion";
 export * from "./hooks/queries/useGitHubStars";
+export * from "./hooks/queries/useTypeCountsQuery";
 export * from "./hooks/useAuth";
 export * from "./hooks/useEventStream";
 export * from "./hooks/useSessionResume";
@@ -38,3 +39,4 @@ export * from "./types/product";
 export * from "./types/query";
 export * from "./types/runs";
 export * from "./types/sessions";
+export * from "./types/typeCounts";

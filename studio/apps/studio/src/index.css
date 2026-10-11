@@ -62,8 +62,10 @@
 @source "../node_modules/@invana/charts/dist";
 /* And @invana/canvas-ui — the canvas chrome (notices, status bar, panels). */
 @source "../node_modules/@invana/canvas-ui/dist";
-/* And the workspace's own packages — their source is outside this app. */
-@source "../../../packages/*/src";
+/* And the workspace's own packages — their source is outside this app. A bare
+   directory: the scanner matches no files for a star-then-src glob.
+   `scripts/check-sources.mjs` fails lint on any `@source` that matches none. */
+@source "../../../packages";
 
 /* No `@theme inline` colour block here any more. It existed because Studio
    imported only the theme files, whose `--color-*` live inside `[data-theme]`

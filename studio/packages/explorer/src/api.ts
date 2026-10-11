@@ -4,7 +4,6 @@ import type {
 	ExpandByNodeTypeRequest,
 	ExpandNeighborsRequest,
 	NeighborExpandResponse,
-	TypeCountsResponse,
 } from "./types";
 
 // Explorer node-expand / graph-traversal APIs (docs/for-developers/modules/explore/features/graph-canvas.md). Three focused,
@@ -38,23 +37,6 @@ export const explorerApi = {
 		request<NeighborExpandResponse>(
 			`/api/v1/u/${username}/${graphSlug}/explorer/expand/by-node-type`,
 			{ method: "POST", body: JSON.stringify(body) },
-		),
-
-	/**
-	 * Node and edge types with graph-wide counts — the Explorer panel's legend
-	 * (selection-and-the-panel.md).
-	 *
-	 * Graph-wide, not canvas-wide: the panel answers "what does this graph hold",
-	 * the status bar answers "what am I looking at". Under a world (`lensId`)
-	 * a type the world denies is absent and every count is taken inside it.
-	 * `counted: false` means the vendor cannot count and every `count`
-	 * is null.
-	 */
-	typeCounts: (username: string, graphSlug: string, lensId?: string | null) =>
-		request<TypeCountsResponse>(
-			`/api/v1/u/${username}/${graphSlug}/explorer/type-counts${
-				lensId ? `?lens_id=${encodeURIComponent(lensId)}` : ""
-			}`,
 		),
 
 	/**

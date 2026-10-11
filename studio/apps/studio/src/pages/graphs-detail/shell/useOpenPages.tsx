@@ -9,6 +9,7 @@ import {
 	markSessionTutorialSeen,
 } from "@invana-studio/assistant";
 import { ExplorerHeaderToolbar } from "@invana-studio/explorer";
+import type { ModelSelection } from "@invana-studio/modeller";
 import {
 	BOARD_KINDS,
 	boardPageId,
@@ -43,7 +44,6 @@ import {
 } from "@/pages/graphs-detail/features/boards";
 import type { useLensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
-import type { ModelSelection } from "@/pages/graphs-detail/features/models";
 import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
 import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import type { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";

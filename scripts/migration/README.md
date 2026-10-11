@@ -43,6 +43,8 @@ Known entry: `plan-page` › *a plan that has run reads across its four tabs* ne
 
 Before studio gates the driver checks the dev stack and runs `docker compose up -d engine studio` if it is down; still down after two minutes, the session is `blocked` without spending a fix round.
 
+A session that recreates the stack runs plain `docker compose up -d …`, never `docker compose -f docker-compose.yml …`. `-f` skips `docker-compose.override.yml`, so Studio loses `INVANA_DESIGN_KIT` / `INVANA_CANVAS` and the `/design-kit` and `/canvas` mounts, and runs on the registry `@invana/*` builds. A review shot on that container compares different kits.
+
 ## Seeing the sessions
 
 | Want | How |

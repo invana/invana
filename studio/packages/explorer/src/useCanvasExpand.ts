@@ -1,5 +1,5 @@
 import type { GraphCanvas, GraphLayer } from "@invana/graph";
-import type { QueryResultItem } from "@invana-studio/core";
+import { type QueryResultItem, useTypeCountsQuery } from "@invana-studio/core";
 import type {
 	CaptureCanvasState,
 	useBoardVersions,
@@ -8,7 +8,6 @@ import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { adaptItems, expandRefusal } from "./canvasItems";
 import { ACTIVE_LAYOUT_ID, type ExpandMenuSchema } from "./ExplorerCanvas";
-import { useTypeCountsQuery } from "./queries";
 import type { ExpandRequest, NeighborExpandResponse } from "./types";
 import { useExpandNode } from "./useExpandNode";
 
