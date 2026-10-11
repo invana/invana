@@ -27,6 +27,7 @@
 		"@invana-studio/core": "workspace:*",
 		"@invana-studio/explorer": "workspace:*",
 		"@invana-studio/modeller": "workspace:*",
+		"@invana-studio/projects": "workspace:*",
 		"@invana-studio/shell": "workspace:*",
 		"@invana-studio/ui": "workspace:*",
 		"@invana/canvas": "^0.0.15",

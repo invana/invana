@@ -18,9 +18,9 @@ import {
 	useAgentsQuery,
 	useTaskPlanQuery,
 } from "@invana-studio/agents";
+import { useProjectPlanQuery } from "@invana-studio/projects";
 import { CANVAS_KINDS } from "@invana-studio/shell";
 import { X } from "lucide-react";
-import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects";
 
 /** What the open work canvas is drawing. One shape per kind, id included. */
 export type LayeredCanvasTarget =

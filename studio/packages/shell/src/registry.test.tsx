@@ -48,6 +48,20 @@ describe("product registry", () => {
 		expect(render("projects.addFinding", [])).toContain("absent");
 	});
 
+	it("returns null for an action its product says is not available yet", () => {
+		const unavailable: ProductDefinition = {
+			...projects,
+			actions: {
+				"projects.addFinding": {
+					label: "Add finding",
+					available: false,
+					run: () => {},
+				},
+			},
+		};
+		expect(render("projects.addFinding", [unavailable])).toContain("absent");
+	});
+
 	it("stamps each product route with its product and keeps its handle", () => {
 		const [route] = productRoutes([projects]);
 		expect(route.handle).toEqual({ crumb: "x", product: "projects" });

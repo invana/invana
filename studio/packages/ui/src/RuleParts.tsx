@@ -14,12 +14,26 @@
  * ([rules.md](docs/for-developers/modules/skills/features/rules.md#decisions)) — and
  * the row takes `readOnly` for the same reason: an inherited invariant is not
  * editable from the project that inherits it ([rules.md](docs/for-developers/modules/skills/features/rules.md#decisions)).
+ *
+ * Both take the fields they draw, not the engine's record, so any rule read
+ * from the rules API fits as it is.
  */
 
 import { Textarea } from "@invana/forms";
 import { Badge, Button } from "@invana/ui";
-import type { Rule } from "@invana-studio/core";
 import { useState } from "react";
+
+/** What a rule row draws. The engine's rule record fits as it is. */
+export interface RuleStatement {
+	statement: string;
+	/** `invariant` · `working` */
+	kind: string;
+	/** `graph` · `project` */
+	scope: string;
+	active: boolean;
+	/** Steps that cited any version of it. */
+	citations: number;
+}
 
 /** Past which length a statement reads as two rules. Nudged, never refused. */
 const LONG = 160;
@@ -31,7 +45,7 @@ export function RuleStatementRow({
 	readOnly,
 	trailing,
 }: {
-	rule: Rule;
+	rule: RuleStatement;
 	onClick?: () => void;
 	/** Drawn as inherited: dimmed, and not a control. */
 	readOnly?: boolean;
@@ -93,7 +107,7 @@ export function RuleStatementForm({
 	onSubmit,
 	onCancel,
 }: {
-	existing?: Rule;
+	existing?: Pick<RuleStatement, "statement">;
 	pending: boolean;
 	onSubmit: (statement: string, done: () => void) => void;
 	onCancel: () => void;

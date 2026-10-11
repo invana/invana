@@ -3,7 +3,7 @@
  * for each dependency, the critical path highlighted. Connect is the one write it
  * makes — dragging card to card adds a dependency.
  *
- * `EnvelopeCanvas` and `LineageCanvas` in `features/agents/` are the other two
+ * `EnvelopeCanvas` and `LineageCanvas` in the Agents product are the other two
  * adapters on the same renderer. A library plan draws on `TaskFlowCanvas` instead.
  */
 
@@ -14,7 +14,7 @@ import {
 } from "@invana-studio/canvases";
 import { taskTone } from "@invana-studio/ui";
 import { useMemo } from "react";
-import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects/queries";
+import { useProjectPlanQuery } from "./queries";
 
 interface Scope {
 	username: string;

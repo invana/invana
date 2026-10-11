@@ -105,6 +105,8 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	{ path: "activity/events", panel: "events" },
 	{ path: "activity/rules", panel: "activity", section: "rules" },
 	{ path: "activity/channels", panel: "activity", section: "channels" },
+	// The Projects rail. Projects and My todos are two sections of one stack;
+	// a project's key sits right under the product's root.
 	{
 		path: "projects",
 		panel: "projects",
@@ -117,6 +119,7 @@ const PANEL_PATHS: readonly PanelPath[] = [
 		section: "todos",
 		detail: "todo",
 	},
+	{ path: "projects/decisions", panel: "decisions" },
 ];
 
 // Info is a tab of Modeller's settings, not a path of its own.

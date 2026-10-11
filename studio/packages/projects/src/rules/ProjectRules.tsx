@@ -27,8 +27,11 @@ import {
 	useSetRuleActiveMutation,
 	useUpdateRuleMutation,
 } from "@invana-studio/core";
-import { RuleStatementForm, RuleStatementRow } from "@invana-studio/modeller";
-import { PanelSection } from "@invana-studio/ui";
+import {
+	PanelSection,
+	RuleStatementForm,
+	RuleStatementRow,
+} from "@invana-studio/ui";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 

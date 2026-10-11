@@ -60,6 +60,16 @@ describe("panelPaths", () => {
 		expect(canonicalRedirect(G, "?panel=llms")).toBe(`${G}/agents/llms`);
 	});
 
+	it("puts a project under the Projects root and Decisions beside My todos", () => {
+		const project = pageParamsOf("projects/p1", "");
+		expect(project.get("section")).toBe("projects");
+		expect(project.get("project")).toBe("p1");
+		expect(pageParamsOf("projects/todos/t1", "").get("todo")).toBe("t1");
+		expect(pageParamsOf("projects/decisions", "").get("panel")).toBe(
+			"decisions",
+		);
+	});
+
 	it("drops a panel key that names nothing", () => {
 		expect(canonicalRedirect(G, "?panel=tasks&page=x")).toBe(`${G}?page=x`);
 		expect(canonicalRedirect("/graphs", "?panel=runs")).toBeNull();

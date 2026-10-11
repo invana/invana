@@ -18,7 +18,7 @@ import type {
 	TodoCreate,
 	TodoListResponse,
 	TodoUpdate,
-} from "@/pages/graphs-detail/features/projects/types";
+} from "./types";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}`;

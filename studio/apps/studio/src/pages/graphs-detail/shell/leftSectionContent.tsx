@@ -21,6 +21,7 @@ import {
 	RequestsViewPanel,
 	RulesViewPanel,
 } from "@invana-studio/modeller";
+import { DecisionsViewPanel, ProjectsViewPanel } from "@invana-studio/projects";
 import type {
 	CanvasStyling,
 	OpenBoard,
@@ -28,7 +29,6 @@ import type {
 } from "@invana-studio/shell";
 import { RunsViewPanel } from "@invana-studio/shell";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 
 type Sessions = ReturnType<typeof useSessions>;
@@ -133,6 +133,8 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			// section, the same way `More` does from Rules.
 			onOpenRule={(ruleId) => openBoard({ kind: "rule", subjectId: ruleId })}
 		/>
+	) : settingsPanel.section === "decisions" ? (
+		<DecisionsViewPanel />
 	) : settingsPanel.section === "runs" ? (
 		// **Runs is execution** — the journal, and nothing else, as one list.
 		// Todos are not here: they live under Projects, because a

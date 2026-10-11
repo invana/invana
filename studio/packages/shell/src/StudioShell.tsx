@@ -89,10 +89,23 @@ function useProductLeftNav(
 	const { groups, bottom } = product.nav;
 	const carried = regionSearch(search);
 
+	// The lit item is the one whose path is the longest match, so an item at
+	// the product's root (`to: ""`) is not also lit under its siblings.
+	const matches = (item: NavItem) => {
+		const target = joinPath(base, item.to);
+		return pathname === target || pathname.startsWith(`${target}/`);
+	};
+	const lit = [...groups.flat(), ...bottom]
+		.filter(matches)
+		.reduce<NavItem | undefined>(
+			(best, item) => (!best || item.to.length > best.to.length ? item : best),
+			undefined,
+		);
+
 	// A separator closes every group but the last.
 	const toItem = (item: NavItem, showSeperator = false) => {
 		const target = joinPath(base, item.to);
-		const active = pathname === target || pathname.startsWith(`${target}/`);
+		const active = item === lit;
 		return {
 			name: item.label,
 			icon: item.icon as ProductIcon,

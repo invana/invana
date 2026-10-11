@@ -119,7 +119,7 @@ Each product package default-exports one object. The app passes the list to the 
 | `ui` | ❌ | — | ❌ | ❌ | ❌ | ❌ | ✅ |
 | `core` | — | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ (non-UI libs only) |
 
-- Cross-product features go through `useAction(id)`. If the target product is not registered, the button does not render.
+- Cross-product features go through `useAction(id)`. If the target product is not registered, or registers the action with `available: false` because it cannot do it yet, the button does not render.
 - A boundary check enforces this table in CI (session A04).
 
 ## 3. Today's code → packages

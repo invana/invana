@@ -48,4 +48,3 @@ export { UsageBoardPage } from "./skills/boards/UsageBoardPage";
 export { useSkillsQuery } from "./skills/queries";
 export { SkillBoardPage } from "./skills/SkillBoardPage";
 export { SkillsViewPanel } from "./skills/SkillsViewPanel";
-export { StepRules } from "./skills/StepRules";

@@ -147,6 +147,12 @@ The type sets the words and the panel that opens first. The records underneath a
 | Simulation | A plugin does the science; Invana runs it, pins inputs, labels output `derived` |
 | Impact | Reach by hop is graph traversal; what-if values need the simulation runtime |
 | Lineage | Built from records, never inferred; every node opens its source |
+| Rail → path | Projects `/projects[/:project]` · My todos `/projects/todos[/:todo]` · Decisions `/projects/decisions`. A project's key sits right under the product root, so `todos` and `decisions` are not usable project keys. The rail lights the longest-matching item |
+| One stack, two rail items | Projects and My todos are the two sections of today's Projects stack (Projects over Todos), as Agents and LLMs share one stack |
+| My todos | Draws today's Todos section: with no project open, every Todo in the Graph. Narrowing it to the signed-in person's todos comes with C02 |
+| Decisions | The kit's `EmptyState` with an *Opens with engine support* lock until B05 records decisions |
+| `projects.addFinding` | Registered with `available: false`, so `useAction` returns `null` and the Explorer's button stays hidden until C02 |
+| Assignees | A Todo's agent picker reads the agents list through `ProjectsSlotsContext.useAgents`, because Projects may not import the Agents product |
 
 ## Not building
 

@@ -40,6 +40,10 @@
 		"packages/agents": {
 			"project": ["src/**/*.{ts,tsx}"],
 			"includeEntryExports": true
+		},
+		"packages/projects": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
 		}
 	}
 }

@@ -8,11 +8,11 @@
  * every render.
  */
 
-import { StepRules } from "@invana-studio/agents";
 import type { AssistantSlots } from "@invana-studio/assistant";
 import { useLensesQuery } from "@invana-studio/core";
 import { matches, useParticipantsQuery } from "@invana-studio/modeller";
 import { useCanvasBannerQuery } from "@invana-studio/shell";
+import { StepRules } from "@invana-studio/ui";
 import { useOpenBoard } from "@/pages/graphs-detail/features/boards";
 
 export const assistantSlots: AssistantSlots = {

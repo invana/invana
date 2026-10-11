@@ -9,16 +9,13 @@
 
 import { runsApi } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-	projectsApi,
-	todosApi,
-} from "@/pages/graphs-detail/features/projects/api";
+import { projectsApi, todosApi } from "./api";
 import type {
 	ProjectCreate,
 	ProjectUpdate,
 	TodoCreate,
 	TodoUpdate,
-} from "@/pages/graphs-detail/features/projects/types";
+} from "./types";
 
 type Scope = { username: string; graphSlug: string };
 

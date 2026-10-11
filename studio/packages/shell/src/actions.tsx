@@ -9,9 +9,10 @@
  * return addFinding ? <Button onClick={() => addFinding.invoke({ text })}>{addFinding.label}</Button> : null;
  * ```
  *
- * When the product that owns the id is not registered, `useAction` returns
- * `null` and the caller renders nothing — a missing product is an absent
- * button, never a dead one. An action either navigates or opens a dialog;
+ * When the product that owns the id is not registered, or registers it with
+ * `available: false` because it cannot do it yet, `useAction` returns `null`
+ * and the caller renders nothing — a missing product is an absent button,
+ * never a dead one. An action either navigates or opens a dialog;
  * `<ActionDialogHost>` (mounted once by `<StudioShell>`) draws the dialog.
  */
 import type {
@@ -54,7 +55,7 @@ export interface ResolvedAction<A> {
 	invoke: (args: A) => void;
 }
 
-/** The action registered under `id`, or `null` when no registered product offers it. */
+/** The action registered under `id`, or `null` when no registered product offers it now. */
 export function useAction<A = unknown>(id: string): ResolvedAction<A> | null {
 	const products = useProducts();
 	const navigate = useNavigate();
@@ -63,7 +64,8 @@ export function useAction<A = unknown>(id: string): ResolvedAction<A> | null {
 	const def = useMemo(() => {
 		for (const product of products) {
 			const found = product.actions?.[id];
-			if (found) return found as ActionDef<A>;
+			if (found)
+				return found.available === false ? null : (found as ActionDef<A>);
 		}
 		return null;
 	}, [products, id]);

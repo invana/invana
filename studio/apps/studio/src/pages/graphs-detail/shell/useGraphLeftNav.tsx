@@ -3,14 +3,7 @@ import {
 	leftNavItemClassName,
 	useLeftSection,
 } from "@invana-studio/shell";
-import {
-	Activity,
-	Compass,
-	type Database,
-	FolderOpen,
-	History,
-	Info,
-} from "lucide-react";
+import { Activity, Compass, type Database, History, Info } from "lucide-react";
 
 interface SectionMeta {
 	key: LeftNavKey;
@@ -43,20 +36,16 @@ const SETTINGS_SECTIONS: SectionMeta[] = [
 // **Model and Govern are not here.** They are the Modeller's — Global model ·
 // Models · Stitches and Worlds · Guardrails on its own rail, reached from the
 // launcher. **Library and Agents are not here either**: they are the Agents
-// product's, on its rail.
+// product's, on its rail; and **Projects** is the Projects product's.
 const VIEW_SECTIONS: SectionMeta[] = [
-	// **The work group is two icons: Projects and Runs**. Projects owns
-	// **Todos** — what a person wrote, under a project or the *No project*
-	// bucket. Runs owns **execution**: the journal, and nothing else, as one
-	// list.
-	{ key: "projects", label: "Projects", icon: FolderOpen },
+	// Runs owns **execution**: the journal, and nothing else, as one list.
 	{ key: "runs", label: "Runs", icon: History },
 ];
 
 /**
  * The one left rail (icon column). Surfaces:
  *
- * - Top: Info, then the page's own panels — Explorer · Projects · Runs.
+ * - Top: Info, then the page's own panels — Explorer · Runs.
  *   **Imports and Workflows have no icons**,
  *   because an import is a `kind` of TaskRun and a workflow is a reusable
  *   TaskPlan, so each was an icon onto a *filter* of a list that already exists

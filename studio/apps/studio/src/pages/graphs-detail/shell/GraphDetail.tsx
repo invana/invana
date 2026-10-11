@@ -106,6 +106,8 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"plugins",
 	"performance",
 	"concurrency",
+	// The Projects product's own panel.
+	"decisions",
 ];
 const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
 	"explorer",
@@ -126,6 +128,7 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
 	"plugins",
 	"performance",
 	"concurrency",
+	"decisions",
 ];
 
 /**
@@ -143,11 +146,11 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
  * - Explorer: while the Explorer product's route is open the page has no
  *   `leftNav` and no `leftSection` — the board and the assistant fill it, and
  *   the canvas toolbar floats over the board instead of sitting in the header.
- * - Modeller and Agents: while either product's route is open the `leftNav`
- *   is the product's own rail, drawn by the shell from its `nav` — Global
- *   model · Models · Stitches · Requests │ Worlds · Guardrails · Rules │ Graph
- *   settings, or Overview · Agents · Skills │ Library · Plugins · LLMs ·
- *   Performance │ Settings.
+ * - Modeller, Projects and Agents: while one of these products' routes is open
+ *   the `leftNav` is the product's own rail, drawn by the shell from its `nav`
+ *   — Global model · Models · Stitches · Requests │ Worlds · Guardrails · Rules
+ *   │ Graph settings; Projects · My todos · Decisions; or Overview · Agents ·
+ *   Skills │ Library · Plugins · LLMs · Performance │ Settings.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
  *   and a right cluster (extras + `AppVersion`).
  *
@@ -177,8 +180,9 @@ export function GraphDetail({
 	const activity = activityOf(useLocation().pathname);
 	const product = useActiveProduct()?.id;
 	const explorer = product === "explorer";
-	// The Modeller and the Agents product draw their own rail.
-	const ownRail = product === "modeller" || product === "agents";
+	// The Modeller, Projects and the Agents product draw their own rail.
+	const ownRail =
+		product === "modeller" || product === "projects" || product === "agents";
 
 	// **No mode switch** (docs/for-developers/modules/explore/spec.md). The header is a breadcrumb naming the
 	// graph and the open panel; the levels after the graph come from the routes

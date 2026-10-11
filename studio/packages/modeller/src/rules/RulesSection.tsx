@@ -24,9 +24,12 @@ import {
 	useSetRuleActiveMutation,
 	useUpdateRuleMutation,
 } from "@invana-studio/core";
-import { PanelSection } from "@invana-studio/ui";
+import {
+	PanelSection,
+	RuleStatementForm,
+	RuleStatementRow,
+} from "@invana-studio/ui";
 import { useState } from "react";
-import { RuleStatementForm, RuleStatementRow } from "./RuleParts";
 
 export function RulesSection({
 	username,

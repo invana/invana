@@ -65,14 +65,9 @@ import {
 	useProjectPlanQuery,
 	useProjectsQuery,
 	useTodosQuery,
-} from "@/pages/graphs-detail/features/projects/queries";
-import type {
-	PlanTodo,
-	Project,
-	ProjectUpdate,
-	Todo,
-} from "@/pages/graphs-detail/features/projects/types";
-import { ProjectRules } from "@/pages/graphs-detail/features/rules";
+} from "./queries";
+import { ProjectRules } from "./rules/ProjectRules";
+import type { PlanTodo, Project, ProjectUpdate, Todo } from "./types";
 
 /**
  * Focus the field the moment it appears. The form only exists because the user

@@ -48,6 +48,8 @@ export interface ActionContext<A = unknown> {
 export interface ActionDef<A = unknown> {
 	label: string;
 	icon?: ProductIcon;
+	/** `false` while the owning product cannot do it yet; callers then render nothing. */
+	available?: boolean;
 	run: (ctx: ActionContext<A>) => void;
 }
 

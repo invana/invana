@@ -30,7 +30,6 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
-import { useAgentsQuery } from "@invana-studio/agents";
 import { StepList, totalDuration } from "@invana-studio/assistant";
 import type { RunNode, TaskRunSummary } from "@invana-studio/core";
 import { formatDuration } from "@invana-studio/core";
@@ -50,15 +49,16 @@ import {
 } from "@invana-studio/ui";
 import { Check, Undo2, UserCog } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useProjectsSlots } from "./ProjectsSlots";
 import {
 	useTodoActivityQuery,
 	useTodoMutations,
 	useTodoQuery,
 	useTodoRunsQuery,
 	useTodosQuery,
-} from "@/pages/graphs-detail/features/projects/queries";
-import { TodoActivityTree } from "@/pages/graphs-detail/features/projects/TodoActivityTree";
-import type { Todo } from "@/pages/graphs-detail/features/projects/types";
+} from "./queries";
+import { TodoActivityTree } from "./TodoActivityTree";
+import type { Todo } from "./types";
 
 /**
  * Focus the field the moment it appears. The form only exists because the user
@@ -132,7 +132,7 @@ export function TodosSectionBody({
 	});
 	const detail = useTodoQuery(username, graphSlug, selectedTaskId ?? undefined);
 	const mutations = useTodoMutations(username, graphSlug);
-	const agents = useAgentsQuery(username, graphSlug);
+	const agents = useProjectsSlots().useAgents(username, graphSlug);
 	// Where each task's run has got to, for the row subline. One list, indexed.
 	const runs = useRunsQuery(username, graphSlug, { limit: 200 });
 	const runByTask = useMemo(() => {
@@ -332,7 +332,7 @@ function TaskDetail({
 	username: string;
 	graphSlug: string;
 	task: Todo;
-	agents: { id: string; name: string; status: string }[];
+	agents: readonly { id: string; name: string; status: string }[];
 	onBack: () => void;
 	onOpenAgent?: (id: string) => void;
 	onOpenRule?: (ruleId: string) => void;

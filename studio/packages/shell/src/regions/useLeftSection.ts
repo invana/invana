@@ -52,6 +52,8 @@ export type LeftNavKey =
 	| "plugins"
 	| "performance"
 	| "concurrency"
+	// The Projects rail's Decisions, a panel of its own.
+	| "decisions"
 	// Activity's tabs that no rail icon writes; `?section=` names the tab.
 	| "activity";
 
@@ -152,6 +154,7 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"plugins",
 	"performance",
 	"concurrency",
+	"decisions",
 	"activity",
 ];
 

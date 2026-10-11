@@ -15,6 +15,8 @@ export * from "./PanelSection";
 export * from "./PanelStatusBar";
 export * from "./PrincipalChip";
 export * from "./RecordRow";
+export * from "./RuleParts";
 export * from "./SectionTitle";
 export * from "./StackSection";
+export * from "./StepRules";
 export * from "./statusTone";

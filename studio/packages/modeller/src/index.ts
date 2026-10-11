@@ -32,6 +32,5 @@ export { useModelsView } from "./models/model-page/useModelsView";
 export { useActiveVersionQuery, useModelsQuery } from "./models/queries";
 export { modeller } from "./product";
 export { RequestsViewPanel } from "./requests/RequestsViewPanel";
-export { RuleStatementForm, RuleStatementRow } from "./rules/RuleParts";
 export { RulesViewPanel } from "./rules/RulesViewPanel";
 export { SettingsViewPanel } from "./settings/SettingsViewPanel";

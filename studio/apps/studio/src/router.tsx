@@ -1,6 +1,7 @@
-import { AgentsSlotsContext } from "@invana-studio/agents";
+import { AgentsSlotsContext, useAgentsQuery } from "@invana-studio/agents";
 import { ExplorerSlotsContext } from "@invana-studio/explorer";
 import { ModellerSlotsContext } from "@invana-studio/modeller";
+import { ProjectsSlotsContext } from "@invana-studio/projects";
 import {
 	ErrorPage,
 	GraphCreatePage,
@@ -17,10 +18,12 @@ import { products } from "@/products";
 import { GraphPageRoute } from "@/products/legacyGraph";
 import { modellerSlots } from "@/products/modellerSlots";
 
-// The Explorer's, the Modeller's and the Agents product's routes draw today's
-// graph page until it is retired.
+// The Explorer's, the Modeller's, the Projects and the Agents product's routes
+// draw today's graph page until it is retired. Projects reads the agents a
+// Todo can be handed to from the Agents product, through its slot.
 const explorerSlots = { Page: GraphPageRoute };
 const agentsSlots = { Page: GraphPageRoute };
+const projectsSlots = { Page: GraphPageRoute, useAgents: useAgentsQuery };
 
 export const router = createBrowserRouter([
 	// Public auth pages — no shell, no protection. Self-service registration was
@@ -37,7 +40,9 @@ export const router = createBrowserRouter([
 				<ExplorerSlotsContext.Provider value={explorerSlots}>
 					<ModellerSlotsContext.Provider value={modellerSlots}>
 						<AgentsSlotsContext.Provider value={agentsSlots}>
-							<StudioShell products={products} />
+							<ProjectsSlotsContext.Provider value={projectsSlots}>
+								<StudioShell products={products} />
+							</ProjectsSlotsContext.Provider>
 						</AgentsSlotsContext.Provider>
 					</ModellerSlotsContext.Provider>
 				</ExplorerSlotsContext.Provider>

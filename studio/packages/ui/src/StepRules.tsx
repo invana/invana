@@ -1,25 +1,29 @@
 /**
  * The rules a step row shows — offered, with the cited ones marked
- * ([rules.md](../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * ([rules.md](../../../../docs/for-developers/modules/skills/features/rules.md)).
  *
  * The same two certainties as a skill, drawn the same way so a reader does not
  * have to learn a second convention: **offered** is a fact about the prompt,
- * **cited** is the model's own claim ([rules.md](../../../../../docs/for-developers/modules/skills/features/rules.md) ·
- * [rules.md](../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * **cited** is the model's own claim.
  *
  * A statement is the row, never an id — an id names nothing a reader can judge,
  * and a rule's identity *is* its wording. Clicking one opens that rule's
- * `kind = rule` board ([rules.md](../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * `kind = rule` board.
  */
 
 import { cn } from "@invana/ui";
-import type { OfferedRule } from "@invana-studio/core";
+
+/** One statement a step was given: the rule's id and its wording then. */
+interface OfferedStatement {
+	rule_id: string;
+	statement: string;
+}
 
 export interface StepRulesProps {
 	/** A fact: these statements were in the prompt. */
-	offered: OfferedRule[];
+	offered: OfferedStatement[];
 	/** A claim: the model says it followed these. */
-	cited: OfferedRule[];
+	cited: OfferedStatement[];
 	/** `More`, in effect — opens the rule's board. Absent where nothing can open one. */
 	onOpenRule?: (ruleId: string) => void;
 }

@@ -9,8 +9,8 @@
  *
  * **Every panel has a path**, under the product that will own it
  * (migration-plan §5): `/u/:user/:graph/activity/runs/<id>`. The Explorer's,
- * the Modeller's and the Agents product's paths are their own products'
- * routes, which draw this page through their slots.
+ * the Modeller's, the Projects and the Agents product's paths are their own
+ * products' routes, which draw this page through their slots.
  * The Graph's route renders the page once, and the paths below it are routes
  * with no element of their own — they exist to match (anything else under the
  * Graph is a 404) and to name each level for the breadcrumbs through
@@ -123,10 +123,6 @@ export const legacyGraph: ProductDefinition = {
 					level("events", "Events"),
 					level("rules", "Rules"),
 					level("channels", "Channels"),
-				]),
-				level("projects", "Projects", [
-					drillable("todos", "Todos", "todo"),
-					level(":project", (p) => p.project),
 				]),
 			],
 		},

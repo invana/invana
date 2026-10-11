@@ -4,9 +4,9 @@ import {
 	PlanFlowCanvas,
 } from "@invana-studio/agents";
 import { ApiError } from "@invana-studio/core";
+import { PlanCanvas } from "@invana-studio/projects";
 import type { LeftNavKey } from "@invana-studio/shell";
 import type { ReactNode } from "react";
-import { PlanCanvas } from "@/pages/graphs-detail/features/projects";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 
 /**
@@ -21,6 +21,7 @@ const EMPTY_HINTS: Partial<Record<LeftNavKey, string>> = {
 		"Pick a model to draw it — its types as nodes, its edge types as the edges between them.",
 	projects:
 		"Pick a project to draw its plan — todos as cards, dependencies left to right.",
+	decisions: "Opens with engine support.",
 	runs: "Pick a run to read it — what it cost, what it touched and what was refused. `Compare with the plan` draws the plan it ran here.",
 	library:
 		"Pick a plan to draw the flow it will run. A template decides what its answer looks like; the catalogue is what it may name at all.",
