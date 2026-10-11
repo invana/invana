@@ -1,4 +1,5 @@
 import { ScrollArea, TabbedPanel } from "@invana/ui";
+import type { QueryResultItem } from "@invana-studio/core";
 import {
 	Network,
 	Paintbrush,
@@ -10,7 +11,6 @@ import {
 	ProvenanceBlock,
 	readProvenance,
 } from "@/pages/graphs-detail/features/explorer/ProvenanceBlock";
-import type { QueryResultItem } from "@/types/query";
 
 interface InspectorViewPanelProps {
 	selected: QueryResultItem | null;

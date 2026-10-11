@@ -45,6 +45,7 @@ import type {
 	GraphLayer as GraphLayerEngine,
 } from "@invana/graph";
 import { useTheme } from "@invana/themes";
+import { SIDE_SECTION } from "@invana-studio/core";
 import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import { Link2, Settings } from "lucide-react";
 import {
@@ -70,7 +71,6 @@ import type {
 	ModelGraphData,
 } from "@/canvases/model/types";
 import { useStudioCanvasTheme } from "@/canvases/theme";
-import { SIDE_SECTION } from "@/lib/sections";
 
 const MODEL_LAYER_ID = "graph";
 const FIT = { fitCamera: { padding: 60 } };

@@ -15,6 +15,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import { ApiError, suppressActionToast } from "@invana-studio/core";
 import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -32,7 +33,6 @@ import type {
 	TypePropertyMappingCreate,
 	TypePropertyMappingResponse,
 } from "@/pages/graphs-detail/features/models/types";
-import { ApiError, suppressActionToast } from "@/services/api/client";
 
 type Cardinality = "SINGLE" | "LIST" | "SET";
 const CARDINALITIES: Cardinality[] = ["SINGLE", "LIST", "SET"];

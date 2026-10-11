@@ -1,5 +1,7 @@
 import { CanvasContext } from "@invana/canvas-react";
 import { ErrorBoundary, Workbook } from "@invana/ui";
+import type { QueryResponse } from "@invana-studio/core";
+import { reportBoundaryError } from "@invana-studio/core";
 import { useCallback, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSessions } from "@/pages/graphs-detail/features/assistant";
@@ -29,8 +31,6 @@ import { useLegacySessionsLink } from "@/pages/graphs-detail/shell/useLegacySess
 import { useModelsPage } from "@/pages/graphs-detail/shell/useModelsPage";
 import { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
 import { useOpenPages } from "@/pages/graphs-detail/shell/useOpenPages";
-import { reportBoundaryError } from "@/services/telemetry/errors";
-import type { QueryResponse } from "@/types/query";
 
 export function GraphDetailPage() {
 	const { username, graphSlug } = useParams<{

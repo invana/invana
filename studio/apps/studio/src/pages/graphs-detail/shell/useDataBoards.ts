@@ -1,5 +1,7 @@
 import { canUseWebGPU } from "@invana/canvas-react";
 import type { GraphCanvas, GraphLayer } from "@invana/graph";
+import type { QueryResponse, QueryResultItem } from "@invana-studio/core";
+import { type Interaction, measureSync } from "@invana-studio/core";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -35,8 +37,6 @@ import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/gra
 import { useOpenSessionRequest } from "@/pages/graphs-detail/shared/useOpenSessionRequest";
 import type { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
-import { type Interaction, measureSync } from "@/services/telemetry/tracer";
-import type { QueryResponse, QueryResultItem } from "@/types/query";
 
 // localStorage key persisting the user's render-backend choice across reloads.
 const BACKEND_STORAGE_KEY = "explorer.canvas.backend";

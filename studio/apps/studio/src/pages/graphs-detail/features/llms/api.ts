@@ -1,3 +1,4 @@
+import { request } from "@invana-studio/core";
 import type {
 	LLMModel,
 	LLMModelCreate,
@@ -8,7 +9,6 @@ import type {
 	LLMProviderListResponse,
 	LLMProviderUpdate,
 } from "@/pages/graphs-detail/features/llms/types";
-import { request } from "@/services/api/client";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}/llm`;

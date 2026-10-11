@@ -1,4 +1,4 @@
-import { usd } from "@/lib/format";
+import { usd } from "@invana-studio/core";
 
 /**
  * A step board, composed — artboards ([34l–34n](../../../../../../docs/for-developers/the-screens.md)).
@@ -16,7 +16,7 @@ import { usd } from "@/lib/format";
 
 import type { Column } from "@invana/blocks";
 import type { BoardSpec, PanelSpec, TabSpec } from "@invana/boards";
-import { formatDuration } from "@/lib/time";
+import { formatDuration } from "@invana-studio/core";
 import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
 import {
 	touchesOfStepKey,

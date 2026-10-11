@@ -1,3 +1,4 @@
+import { request } from "@invana-studio/core";
 import type {
 	CommitResult,
 	ConstraintCreate,
@@ -37,7 +38,6 @@ import type {
 	VersionCreate,
 	VersionSummary,
 } from "@/pages/graphs-detail/features/models/types";
-import { request } from "@/services/api/client";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}/models`;

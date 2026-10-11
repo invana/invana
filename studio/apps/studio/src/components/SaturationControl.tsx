@@ -12,7 +12,7 @@ import {
 	SATURATION_MAX,
 	SATURATION_MIN,
 	useAppearanceStore,
-} from "@/stores/appearance.store";
+} from "@invana-studio/core";
 
 export function SaturationControl({ className }: { className?: string }) {
 	const saturation = useAppearanceStore((s) => s.saturation);

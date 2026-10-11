@@ -7,6 +7,7 @@
  * plan's real edges replace them once `plan_snapshot` is on the trace.
  */
 
+import { formatDuration } from "@invana-studio/core";
 import {
 	type TaskFlowData,
 	type TaskFlowEdge,
@@ -14,7 +15,6 @@ import {
 	taskNodeTypeOf,
 	taskToneOf,
 } from "@/canvases/taskflow";
-import { formatDuration } from "@/lib/time";
 import {
 	durationMs,
 	type TaskGroup,

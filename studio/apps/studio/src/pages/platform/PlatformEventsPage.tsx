@@ -6,11 +6,10 @@ import {
 	SearchInput,
 	Skeleton,
 } from "@invana/ui";
+import { useAuth, useEventStream } from "@invana-studio/core";
 import { Activity, ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useEventStream } from "@/hooks/useEventStream";
 import type { AuditEvent } from "@/pages/graphs-detail/features/events";
 import {
 	EventTypeFilter,

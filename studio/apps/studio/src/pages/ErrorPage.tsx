@@ -1,4 +1,5 @@
 import { Button } from "@invana/ui";
+import { reportError } from "@invana-studio/core";
 import { ArrowLeft, Home, RefreshCw } from "lucide-react";
 import { useEffect } from "react";
 import {
@@ -6,7 +7,6 @@ import {
 	useNavigate,
 	useRouteError,
 } from "react-router-dom";
-import { reportError } from "@/services/telemetry/errors";
 
 export function ErrorPage() {
 	const error = useRouteError();

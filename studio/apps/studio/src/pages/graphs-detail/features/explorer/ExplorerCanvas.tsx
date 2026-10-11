@@ -80,6 +80,11 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@invana/ui";
+import {
+	endInteraction,
+	type InteractionRef,
+	startChild,
+} from "@invana-studio/core";
 // Vite's worker idiom — see LAYOUTS below.
 import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import {
@@ -113,11 +118,6 @@ import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
 import { labelAt } from "@/pages/graphs-detail/features/explorer/canvasItems";
 import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
 import type { ExpandRequest } from "@/pages/graphs-detail/features/explorer/types";
-import {
-	endInteraction,
-	type InteractionRef,
-	startChild,
-} from "@/services/telemetry/tracer";
 
 /** Schema slice that drives the node-expand submenus (docs/for-developers/modules/explore/features/graph-canvas.md). */
 export interface ExpandMenuSchema {

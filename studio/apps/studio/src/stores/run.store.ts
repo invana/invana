@@ -4,6 +4,7 @@
 // moving right now (and keeps the reasoning / diagnosis / result that only
 // ride the stream, so they stay visible after the reply settles).
 
+import type { QueryResponse } from "@invana-studio/core";
 import { create } from "zustand";
 import type { Emission } from "@/pages/graphs-detail/features/assistant";
 import type {
@@ -15,7 +16,6 @@ import type {
 	RunView,
 } from "@/pages/graphs-detail/features/runs";
 import { stepFromFrame } from "@/pages/graphs-detail/features/runs";
-import type { QueryResponse } from "@/types/query";
 
 interface RunState {
 	views: Record<string, RunView>;

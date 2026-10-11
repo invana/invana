@@ -1,6 +1,6 @@
 import { Button } from "@invana/ui";
+import { useGitHubStarsQuery } from "@invana-studio/core";
 import { Github, Star } from "lucide-react";
-import { useGitHubStarsQuery } from "@/hooks/queries/useGitHubStars";
 
 const REPO_URL = "https://github.com/invana/invana";
 

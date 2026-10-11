@@ -36,6 +36,7 @@
  */
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import { ApiError } from "@invana-studio/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { guardrailsSection } from "@/pages/graphs-detail/features/lenses/GuardrailsSection";
@@ -60,7 +61,6 @@ import {
 	worldsSection,
 } from "@/pages/graphs-detail/features/lenses/WorldsSection";
 import { useStackSectionUi } from "@/pages/graphs-detail/shared/StackSection";
-import { ApiError } from "@/services/api/client";
 
 export interface LensesViewPanelProps {
 	username?: string;

@@ -1,4 +1,4 @@
-import { usdWhole } from "@/lib/format";
+import { usdWhole } from "@invana-studio/core";
 /**
  * the ceilings this agent runs inside — **value · what it bounds ·
  * whether anything enforces it**.

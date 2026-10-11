@@ -33,11 +33,11 @@ import {
 	Spinner,
 	StatusDot,
 } from "@invana/ui";
+import { formatDuration } from "@invana-studio/core";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronRight, Copy } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { formatDuration } from "@/lib/time";
 import { useOpenBoard } from "@/pages/graphs-detail/features/boards";
 import {
 	type TraceStepRead,

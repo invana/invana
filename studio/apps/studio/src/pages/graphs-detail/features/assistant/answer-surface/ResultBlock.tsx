@@ -1,4 +1,5 @@
 import { Button } from "@invana/ui";
+import type { QueryResponse } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Network } from "lucide-react";
 import { useState } from "react";
@@ -8,7 +9,6 @@ import { emissionsFromResult } from "@/pages/graphs-detail/features/assistant/an
 import { TraceDialog } from "@/pages/graphs-detail/features/assistant/answer-surface/TraceDialog";
 import type { Emission } from "@/pages/graphs-detail/features/assistant/answer-surface/types";
 import { emissionsApi } from "@/pages/graphs-detail/features/runs";
-import type { QueryResponse } from "@/types/query";
 
 // An assistant reply's result, rendered as the emissions it is
 // (docs/for-developers/modules/ask/features/the-answer-surface.md). Every one

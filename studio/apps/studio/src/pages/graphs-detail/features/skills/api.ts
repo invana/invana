@@ -1,3 +1,4 @@
+import { request } from "@invana-studio/core";
 import type {
 	InlinablePlanListResponse,
 	Rule,
@@ -21,7 +22,6 @@ import type {
 	SkillVersionListResponse,
 	SkillVersionPublish,
 } from "@/pages/graphs-detail/features/skills/types";
-import { request } from "@/services/api/client";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}/skills`;

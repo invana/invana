@@ -9,7 +9,7 @@
 // a reader sees (docs/for-developers/terminology.md · Ask).
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { GraphData } from "@/types/query";
+import type { GraphData } from "@invana-studio/core";
 
 export type EmissionKind =
 	| "subgraph"

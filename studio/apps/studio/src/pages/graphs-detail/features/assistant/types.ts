@@ -9,9 +9,9 @@
 // (docs/for-developers/modules/ask/spec.md); only message metadata is stored, never result payloads.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { QueryMode } from "@invana-studio/core";
 import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 import type { RunNode } from "@/pages/graphs-detail/features/runs";
-import type { QueryMode } from "@/types/query";
 
 type SessionMessageRole = "user" | "assistant";
 

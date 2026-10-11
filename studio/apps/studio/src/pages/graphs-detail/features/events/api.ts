@@ -10,11 +10,11 @@
  * paginated reads.
  */
 
+import { apiClient } from "@invana-studio/core";
 import type {
 	EventListFilters,
 	EventListResponse,
 } from "@/pages/graphs-detail/features/events/types";
-import { apiClient } from "@/services/api/client";
 
 function buildParams(filters: EventListFilters | undefined): URLSearchParams {
 	const params = new URLSearchParams();

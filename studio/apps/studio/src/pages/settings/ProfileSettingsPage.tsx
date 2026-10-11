@@ -11,6 +11,7 @@ import {
 	DialogTitle,
 	NavVerticalItems,
 } from "@invana/ui";
+import { ApiError, authApi, useAuth } from "@invana-studio/core";
 import {
 	AlertTriangle,
 	KeyRound,
@@ -26,10 +27,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { SaturationControl } from "@/components/SaturationControl";
 import { STUDIO_THEMES } from "@/components/studioThemes";
-import { useAuth } from "@/hooks/useAuth";
 import { AccessTokensTab } from "@/pages/settings/AccessTokensTab";
-import { authApi } from "@/services/api/auth";
-import { ApiError } from "@/services/api/client";
 
 const USERNAME_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
 const USERNAME_COOLDOWN_DAYS = 30;

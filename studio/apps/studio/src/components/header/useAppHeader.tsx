@@ -8,13 +8,13 @@ import {
 	cn,
 	Separator,
 } from "@invana/ui";
+import { useAuth } from "@invana-studio/core";
 import { Fragment, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { GitHubStars } from "@/components/GitHubStars";
 import { OnboardingCap } from "@/components/header/OnboardingCap";
 import { ThemeMenu } from "@/components/ThemeMenu";
-import { useAuth } from "@/hooks/useAuth";
 
 interface AppHeaderOptions {
 	/** Last breadcrumb segment for the current page. Defaults to a label

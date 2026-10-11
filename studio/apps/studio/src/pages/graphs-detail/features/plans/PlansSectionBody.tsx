@@ -29,9 +29,9 @@ import {
 	RecordHeader,
 	Spinner,
 } from "@invana/ui";
+import { formatElapsed } from "@invana-studio/core";
 import { Wand2 } from "lucide-react";
 import type { ReactNode } from "react";
-import { formatElapsed } from "@/lib/time";
 import { PromoteDialog } from "@/pages/graphs-detail/features/plans/PromoteDialog";
 import {
 	usePlanDiffQuery,

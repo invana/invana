@@ -15,8 +15,8 @@
 		"check-types": {
 			"dependsOn": ["^check-types"]
 		},
-		"test": {
-			"outputs": ["coverage/**"]
+		"//#test": {
+			"cache": false
 		},
 		"knip": {},
 		"dev": {

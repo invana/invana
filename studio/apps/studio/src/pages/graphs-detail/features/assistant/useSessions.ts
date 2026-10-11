@@ -1,3 +1,5 @@
+import type { QueryResponse, QueryRunPayload } from "@invana-studio/core";
+import { type Action, startAction, useAuthStore } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -19,10 +21,7 @@ import {
 	type RunStreamHandle,
 	runsApi,
 } from "@/pages/graphs-detail/features/runs";
-import { type Action, startAction } from "@/services/telemetry/tracer";
-import { useAuthStore } from "@/stores/auth.store";
 import { useRunStore } from "@/stores/run.store";
-import type { QueryResponse, QueryRunPayload } from "@/types/query";
 
 // A session's title is seeded from its first message so it's never blank —
 // mirrors the engine's `_title_from_text` (64-char cap + ellipsis). Set at

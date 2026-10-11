@@ -5,6 +5,8 @@
 // `GraphConnection` child. URLs: /u/{owner_username}/{slug}.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { QueryLanguage } from "@invana-studio/core";
+
 type GraphContainerStatus = "active" | "archived";
 
 export interface SetupSectionState {
@@ -243,10 +245,7 @@ export const CONNECTOR_OPTIONS = [
 	},
 ] as const;
 
-// "cypher" | "gremlin" — the subset of capabilities Studio's query-language
-// selector understands. Empty/missing means "no constraint reported"; UI
-// falls back to allowing all supported languages.
-export type QueryLanguage = "cypher" | "gremlin";
+export type { QueryLanguage };
 
 export interface GraphConnectionRead {
 	id: string;

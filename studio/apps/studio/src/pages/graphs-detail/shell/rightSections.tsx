@@ -1,4 +1,5 @@
 import { ErrorBoundary } from "@invana/ui";
+import { reportBoundaryError } from "@invana-studio/core";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant";
 import { attachmentFor } from "@/pages/graphs-detail/features/assistant";
@@ -12,7 +13,6 @@ import type {
 } from "@/pages/graphs-detail/shared/useRightSection";
 import { AssistantHost } from "@/pages/graphs-detail/shell/AssistantHost";
 import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
-import { reportBoundaryError } from "@/services/telemetry/errors";
 
 /** What the right side's occupants read from the page that hosts them. */
 export interface RightSectionDeps {

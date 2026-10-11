@@ -1,4 +1,5 @@
 import { ChatSession } from "@invana/ui";
+import type { QueryResponse } from "@invana-studio/core";
 import { useMemo } from "react";
 import { timelineFor } from "@/pages/graphs-detail/features/assistant/SessionStepsTimeline";
 import { SessionThreadWelcome } from "@/pages/graphs-detail/features/assistant/SessionThreadWelcome";
@@ -13,7 +14,6 @@ import {
 	type SessionMessage,
 } from "@/pages/graphs-detail/features/assistant/types";
 import { useRunStore } from "@/stores/run.store";
-import type { QueryResponse } from "@/types/query";
 
 export interface SessionThreadProps {
 	session: Session;

@@ -17,8 +17,8 @@ import {
 	PropertyRow,
 	SegmentedControl,
 } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { useState } from "react";
-import { formatRelativeTime } from "@/lib/time";
 import {
 	type AgentDraft,
 	DEFAULT_VOICE,

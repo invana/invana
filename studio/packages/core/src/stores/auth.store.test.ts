@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import type { AuthUser } from "@/types/auth";
+import type { AuthUser } from "../types/auth";
 import { useAuthStore } from "./auth.store";
 
 const user = { id: "u1", first_name: "Ada", graphs: [] } as unknown as AuthUser;

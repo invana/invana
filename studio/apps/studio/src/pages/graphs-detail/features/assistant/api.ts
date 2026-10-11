@@ -6,6 +6,8 @@
 // the panel/composer/thread components stay unchanged.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { Interaction, QueryResponse } from "@invana-studio/core";
+import { request } from "@invana-studio/core";
 import type {
 	Session,
 	SessionContextTurn,
@@ -16,9 +18,6 @@ import {
 	type ApiTaskRunStep,
 	toRunNode,
 } from "@/pages/graphs-detail/features/runs";
-import { request } from "@/services/api/client";
-import type { Interaction } from "@/services/telemetry/tracer";
-import type { QueryResponse } from "@/types/query";
 
 // ── Wire DTOs (snake_case, as the engine returns) ────────────────────────────
 

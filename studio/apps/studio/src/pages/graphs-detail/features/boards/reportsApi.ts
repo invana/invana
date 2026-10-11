@@ -14,11 +14,11 @@
 // is what lets a report outlive a pruned `result.json`.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { request } from "@invana-studio/core";
 import type {
 	BoardVersion,
 	BoardVersionSummary,
 } from "@/pages/graphs-detail/features/boards/types";
-import { request } from "@/services/api/client";
 
 interface ApiReportSummary {
 	id: string;

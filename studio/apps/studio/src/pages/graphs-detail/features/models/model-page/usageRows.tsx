@@ -11,7 +11,7 @@ import type { RowSpec } from "@invana/boards";
 import { InlineMeter, SegmentedBar, SegmentedBarLegend } from "@invana/charts";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Alert, AlertDescription } from "@invana/ui";
-import { formatRelativeTime } from "@/lib/time";
+import { formatRelativeTime } from "@invana-studio/core";
 import type {
 	Usage,
 	UsageRow,

@@ -58,7 +58,12 @@
 	},
 	"overrides": [
 		{
-			"includes": ["apps/studio/src/**", "!**/*.test.ts", "!**/*.test.tsx"],
+			"includes": [
+				"apps/studio/src/**",
+				"packages/*/src/**",
+				"!**/*.test.ts",
+				"!**/*.test.tsx"
+			],
 			"linter": {
 				"rules": {
 					"suspicious": {

@@ -1,3 +1,9 @@
+import type {
+	QueryResponse,
+	QueryResultItem,
+	QueryRunPayload,
+} from "@invana-studio/core";
+import { type Interaction, startAction } from "@invana-studio/core";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -17,12 +23,6 @@ import type {
 	QueryLanguage,
 	useGraphConnectionQuery,
 } from "@/pages/graphs-detail/features/graphs";
-import { type Interaction, startAction } from "@/services/telemetry/tracer";
-import type {
-	QueryResponse,
-	QueryResultItem,
-	QueryRunPayload,
-} from "@/types/query";
 
 // Fallback when the engine hasn't reported any query languages yet (e.g. the
 // connector class couldn't be loaded server-side). Studio shows both rather

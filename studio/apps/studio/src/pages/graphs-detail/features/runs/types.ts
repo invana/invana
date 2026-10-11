@@ -7,8 +7,8 @@
 // is what the run store keeps while a run is live, folded from the frames.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { QueryResponse } from "@invana-studio/core";
 import type { Emission } from "@/pages/graphs-detail/features/assistant";
-import type { QueryResponse } from "@/types/query";
 
 export type RunStatus =
 	| "queued"

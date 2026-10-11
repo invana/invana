@@ -17,8 +17,8 @@ import {
 	type MarkTone,
 	SectionHeader,
 } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { Database, RefreshCw } from "lucide-react";
-import { formatRelativeTime } from "@/lib/time";
 import type {
 	Drift,
 	PhysicalRule,

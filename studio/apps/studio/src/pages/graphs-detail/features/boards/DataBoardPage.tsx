@@ -37,6 +37,7 @@ import type {
 	GraphCanvas as GraphCanvasEngine,
 	GraphData,
 } from "@invana/graph";
+import type { InteractionRef } from "@invana-studio/core";
 import {
 	forwardRef,
 	useCallback,
@@ -59,7 +60,6 @@ import {
 	ExpandNeighboursDialog,
 	ExplorerCanvas,
 } from "@/pages/graphs-detail/features/explorer";
-import type { InteractionRef } from "@/services/telemetry/tracer";
 
 /**
  * What the strip can ask of the canvas page under it. The shell holds one of

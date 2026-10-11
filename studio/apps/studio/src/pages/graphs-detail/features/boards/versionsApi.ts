@@ -6,13 +6,13 @@
 // DTOs; the Studio UI consumes the camelCase `BoardVersion` shapes (with `Date`s).
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { request } from "@invana-studio/core";
 import type {
 	BoardVersion,
 	BoardVersionCause,
 	BoardVersionSummary,
 	CanvasStyling,
 } from "@/pages/graphs-detail/features/boards/types";
-import { request } from "@/services/api/client";
 
 // ── Wire DTOs (snake_case, as the engine returns) ────────────────────────────
 

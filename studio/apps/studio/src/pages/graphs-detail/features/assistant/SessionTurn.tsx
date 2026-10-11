@@ -9,6 +9,8 @@ import {
 	Eyebrow,
 	Spinner,
 } from "@invana/ui";
+import type { QueryResponse } from "@invana-studio/core";
+import { formatDuration, useTicker } from "@invana-studio/core";
 import {
 	Code,
 	Copy,
@@ -22,8 +24,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useTicker } from "@/hooks/useTicker";
-import { formatDuration } from "@/lib/time";
 import {
 	RunCannotAnswer,
 	RunDiagnosis,
@@ -53,7 +53,6 @@ import {
 	type RunNode,
 } from "@/pages/graphs-detail/features/runs";
 import { useRunStore } from "@/stores/run.store";
-import type { QueryResponse } from "@/types/query";
 
 // ── User turn ─────────────────────────────────────────────────────────────────
 

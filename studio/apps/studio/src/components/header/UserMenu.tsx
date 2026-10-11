@@ -7,9 +7,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@invana/ui";
+import { useAuth } from "@invana-studio/core";
 import { Activity, LogOut, UserCircle, UserCog } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 
 /**
  * Avatar + name dropdown pinned to the very bottom of the left rail

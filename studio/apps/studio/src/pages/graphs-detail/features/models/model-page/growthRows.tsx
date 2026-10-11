@@ -10,8 +10,8 @@ import type { RowSpec } from "@invana/boards";
 import { StackedAreaChart } from "@invana/charts";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Button, EmptyState } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { Activity, Upload } from "lucide-react";
-import { formatRelativeTime } from "@/lib/time";
 import { slotForType } from "@/pages/graphs-detail/features/explorer";
 import type {
 	Growth,

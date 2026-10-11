@@ -38,6 +38,7 @@ import type {
 	GraphData,
 	GraphLayer as GraphLayerEngine,
 } from "@invana/graph";
+import { SIDE_SECTION } from "@invana-studio/core";
 import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import { Settings } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -48,7 +49,6 @@ import type {
 	TaskFlowTemplates,
 } from "@/canvases/taskflow/types";
 import { useStudioCanvasTheme } from "@/canvases/theme";
-import { SIDE_SECTION } from "@/lib/sections";
 
 const LAYOUT = "elk";
 const FIT = { fitCamera: { padding: 60 } };

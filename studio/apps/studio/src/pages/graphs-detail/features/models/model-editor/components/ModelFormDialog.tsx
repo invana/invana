@@ -17,6 +17,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@invana/ui";
+import { ApiError } from "@invana-studio/core";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -27,7 +28,6 @@ import {
 	useUpdateModelMutation,
 } from "@/pages/graphs-detail/features/models/queries";
 import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
-import { ApiError } from "@/services/api/client";
 
 interface Props {
 	open: boolean;

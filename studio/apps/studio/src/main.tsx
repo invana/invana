@@ -1,5 +1,8 @@
 import { ThemeProvider } from "@invana/themes";
 import { Toaster, TooltipProvider } from "@invana/ui";
+// Loading core also loads the auth store, which registers itself with the
+// axios client at module load so request interceptors can read tokens.
+import { reportError, shouldReport } from "@invana-studio/core";
 import {
 	MutationCache,
 	QueryCache,
@@ -12,13 +15,9 @@ import { RouterProvider } from "react-router-dom";
 import { SaturationBridge } from "@/components/SaturationBridge";
 import { ThemeSyncBridge } from "@/components/ThemeSyncBridge";
 import { router } from "@/router";
-import { reportError, shouldReport } from "@/services/telemetry/errors";
 // Side-effect import: register OpenTelemetry-Web (docs/for-developers/modules/platform/features/telemetry.md) before the app
 // renders, so the query→render pipeline is traced from the first interaction.
-import "@/services/telemetry/setup";
-// Side-effect import: the auth store registers itself with the axios client
-// at module load so request interceptors can read tokens.
-import "@/stores/auth.store";
+import "@invana-studio/core/telemetry-setup";
 import "./index.css";
 
 // A query or mutation that failed on the network or with a 5xx is logged as an

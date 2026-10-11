@@ -1,4 +1,4 @@
-import { usd } from "@/lib/format";
+import { usd } from "@invana-studio/core";
 
 /**
  * A run, as the section reads it — **five sections off two reads**
@@ -15,8 +15,8 @@ import { usd } from "@/lib/format";
  */
 
 import type { TouchItem } from "@invana/ui";
-import { formatCompact } from "@/lib/format";
-import { formatElapsed } from "@/lib/time";
+import type { TraceWindow } from "@invana-studio/core";
+import { formatCompact, formatElapsed } from "@invana-studio/core";
 import type {
 	Touch,
 	TouchesResponse,
@@ -27,7 +27,6 @@ import {
 	durationMs,
 	originOf,
 } from "@/pages/graphs-detail/features/runs/boards/runBoards";
-import type { TraceWindow } from "@/services/telemetry/traceLink";
 
 export interface SummaryRow {
 	label: string;

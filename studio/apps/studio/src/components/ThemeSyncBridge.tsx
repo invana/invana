@@ -18,10 +18,9 @@
  */
 
 import { useTheme } from "@invana/themes";
+import type { ThemeSelection } from "@invana-studio/core";
+import { authApi, useAuthStore } from "@invana-studio/core";
 import { useEffect, useRef } from "react";
-import { authApi } from "@/services/api/auth";
-import { useAuthStore } from "@/stores/auth.store";
-import type { ThemeSelection } from "@/types/auth";
 
 const keyOf = (s: ThemeSelection) => `${s.theme}|${s.mode}|${s.accent ?? ""}`;
 

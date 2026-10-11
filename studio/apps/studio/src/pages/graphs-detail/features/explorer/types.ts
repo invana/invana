@@ -1,7 +1,7 @@
 // Node-expand / graph-traversal types (docs/for-developers/modules/explore/features/graph-canvas.md) — mirrors the engine's
 // FilterGroup / SortSpec DSL and the explorer expand request/response schemas.
 
-import type { GraphData } from "@/types/query";
+import type { GraphData } from "@invana-studio/core";
 
 export type FilterOp =
 	| "eq"

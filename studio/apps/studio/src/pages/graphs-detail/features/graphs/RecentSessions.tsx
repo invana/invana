@@ -5,9 +5,9 @@ import {
 	Skeleton,
 	StatusDot,
 } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { useQuery } from "@tanstack/react-query";
 import { MessageSquare } from "lucide-react";
-import { formatRelativeTime } from "@/lib/time";
 import type { Session } from "@/pages/graphs-detail/features/assistant";
 import {
 	sessionsApi,

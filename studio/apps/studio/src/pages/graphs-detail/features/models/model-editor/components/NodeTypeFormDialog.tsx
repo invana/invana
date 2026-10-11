@@ -17,6 +17,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@invana/ui";
+import { ApiError, suppressActionToast } from "@invana-studio/core";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { FormError } from "@/components/forms/FormError";
@@ -26,7 +27,6 @@ import {
 	useUpdateNodeTypeMutation,
 } from "@/pages/graphs-detail/features/models/queries";
 import type { NodeTypeResponse } from "@/pages/graphs-detail/features/models/types";
-import { ApiError, suppressActionToast } from "@/services/api/client";
 
 const INHERIT = "__inherit__";
 

@@ -12,7 +12,7 @@
  */
 
 import { Link } from "@invana/ui";
-import { type TraceWindow, traceUrl } from "@/services/telemetry/traceLink";
+import { type TraceWindow, traceUrl } from "@invana-studio/core";
 
 export function TraceIdValue({
 	id,

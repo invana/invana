@@ -5,6 +5,7 @@
  * route name, so promoting invalidates every plan reading at once.
  */
 
+import { startAction } from "@invana-studio/core";
 import {
 	useInfiniteQuery,
 	useMutation,
@@ -17,7 +18,6 @@ import {
 	taskPlansApi,
 } from "@/pages/graphs-detail/features/plans/api";
 import type { PlanWindow } from "@/pages/graphs-detail/features/plans/types";
-import { startAction } from "@/services/telemetry/tracer";
 
 type Scope = { username: string; graphSlug: string };
 

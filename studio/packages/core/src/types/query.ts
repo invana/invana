@@ -1,4 +1,7 @@
-import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
+// "cypher" | "gremlin" — the subset of capabilities Studio's query-language
+// selector understands. Empty/missing means "no constraint reported"; UI
+// falls back to allowing all supported languages.
+export type QueryLanguage = "cypher" | "gremlin";
 
 // ── Composer payload ──────────────────────────────────────────────────────────
 // What the SessionComposer hands up when the user sends. The panel/hook

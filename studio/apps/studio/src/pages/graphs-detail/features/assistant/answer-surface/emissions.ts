@@ -12,8 +12,8 @@
 // replaced by reading the emissions off the run, and every component below
 // it keeps working — they take an `Emission`, not a `QueryResponse`.
 
+import type { QueryResponse } from "@invana-studio/core";
 import type { Emission } from "@/pages/graphs-detail/features/assistant/answer-surface/types";
-import type { QueryResponse } from "@/types/query";
 
 /** Worded as an answer, not as a count — the engine will carry its own
  *  sentence once emissions are real. */

@@ -1,4 +1,4 @@
-import { usd, usdWhole } from "@/lib/format";
+import { usd, usdWhole } from "@invana-studio/core";
 
 /**
  * Overview — the agent read whole: who it is, its focus, how it thinks,

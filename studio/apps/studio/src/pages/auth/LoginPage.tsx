@@ -9,6 +9,12 @@ import {
 	TabbedPanel,
 } from "@invana/ui";
 import {
+	ApiError,
+	authApi,
+	useAuth,
+	useSessionResume,
+} from "@invana-studio/core";
+import {
 	Container,
 	FlaskConical,
 	GitBranch,
@@ -23,10 +29,6 @@ import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { FormError } from "@/components/forms/FormError";
 import { ModeToggle } from "@/components/ModeToggle";
-import { useAuth } from "@/hooks/useAuth";
-import { useSessionResume } from "@/hooks/useSessionResume";
-import { authApi } from "@/services/api/auth";
-import { ApiError } from "@/services/api/client";
 
 // Capability pillars shown on the brand panel. Phrased as what Invana *is
 // about* — no falsifiable benchmarks (the "100K+ nodes" line deliberately

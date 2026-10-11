@@ -30,9 +30,9 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
+import { formatDuration } from "@invana-studio/core";
 import { Check, Undo2, UserCog } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { formatDuration } from "@/lib/time";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
 	StepList,

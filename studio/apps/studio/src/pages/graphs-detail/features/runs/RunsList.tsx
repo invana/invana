@@ -16,9 +16,12 @@
  */
 
 import { EmptyState, RunRow, Spinner } from "@invana/ui";
-import { useTicker } from "@/hooks/useTicker";
-import { formatCompact } from "@/lib/format";
-import { formatElapsed, formatRelativeTime } from "@/lib/time";
+import {
+	formatCompact,
+	formatElapsed,
+	formatRelativeTime,
+	useTicker,
+} from "@invana-studio/core";
 import type { RunListRow } from "@/pages/graphs-detail/features/runs/queries";
 
 /**

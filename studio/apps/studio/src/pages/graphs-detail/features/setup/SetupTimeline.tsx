@@ -1,7 +1,7 @@
 import { Button, SectionHeader, TimelineEntry, TimelineList } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import { formatRelativeTime } from "@/lib/time";
 import {
 	type Graph,
 	SETUP_REQUIRED,

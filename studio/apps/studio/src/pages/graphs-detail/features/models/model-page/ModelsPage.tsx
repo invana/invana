@@ -10,6 +10,7 @@
 
 import { Board } from "@invana/boards";
 import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
+import { ApiError } from "@invana-studio/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -51,7 +52,6 @@ import type {
 } from "@/pages/graphs-detail/features/models/types";
 import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
 import { routedAction } from "@/pages/graphs-detail/shared/boardSpec";
-import { ApiError } from "@/services/api/client";
 import { ArchiveRefused, PublishConfirm } from "./ModelsDialogs";
 import {
 	LOCKED_UNTIL_PUBLISHED,

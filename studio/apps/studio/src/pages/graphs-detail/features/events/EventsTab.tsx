@@ -11,6 +11,7 @@ import {
 	TimelineFooter,
 	TimelineList,
 } from "@invana/ui";
+import { useEventStream } from "@invana-studio/core";
 import {
 	Activity,
 	AlertCircle,
@@ -28,7 +29,6 @@ import {
 	Wand2,
 } from "lucide-react";
 import { type ReactNode, useMemo, useState } from "react";
-import { useEventStream } from "@/hooks/useEventStream";
 import { EventTypeFilter } from "@/pages/graphs-detail/features/events/EventTypeFilter";
 import { matchesEventSearch } from "@/pages/graphs-detail/features/events/eventSearch";
 import {

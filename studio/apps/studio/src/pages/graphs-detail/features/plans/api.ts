@@ -5,6 +5,8 @@
  * `…/workflows`. Each call is one `request` on the shared client.
  */
 
+import type { Interaction } from "@invana-studio/core";
+import { request } from "@invana-studio/core";
 import type {
 	CatalogueResponse,
 	PlanPerformance,
@@ -14,8 +16,6 @@ import type {
 	TaskPlanDetail,
 	TaskPlanListResponse,
 } from "@/pages/graphs-detail/features/plans/types";
-import { request } from "@/services/api/client";
-import type { Interaction } from "@/services/telemetry/tracer";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}`;

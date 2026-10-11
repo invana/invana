@@ -8,6 +8,7 @@
  * every time, its failure count if above zero, its p95 if the spread is wide.
  */
 
+import { formatElapsed } from "@invana-studio/core";
 import {
 	type TaskFlowData,
 	type TaskFlowEdge,
@@ -17,7 +18,6 @@ import {
 	taskToneOf,
 } from "@/canvases/taskflow";
 import { LAYER_ICON } from "@/canvases/taskflow/taskFlowFromPlan";
-import { formatElapsed } from "@/lib/time";
 import type {
 	PlanPerformance,
 	TaskPlanDetail,

@@ -1,4 +1,4 @@
-import { usd, usdWhole } from "@/lib/format";
+import { usd, usdWhole } from "@invana-studio/core";
 
 /**
  * Activity — what the agent is using and has done: the meters, each
@@ -25,8 +25,8 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { useState } from "react";
-import { formatRelativeTime } from "@/lib/time";
 import type { AgentDraft } from "@/pages/graphs-detail/features/agents/agentDraft";
 import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
 import {

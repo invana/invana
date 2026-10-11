@@ -12,7 +12,6 @@
 		"knip": "knip --include files,exports,types",
 		"format": "biome format --write .",
 		"check-types": "tsc -b --noEmit",
-		"test": "vitest run",
 		"test:e2e": "playwright test",
 		"test:e2e:ui": "playwright test --ui",
 		"test:e2e:report": "playwright show-report"
@@ -23,6 +22,7 @@
 		"@codemirror/legacy-modes": "^6.5.3",
 		"@codemirror/state": "^6.6.0",
 		"@codemirror/view": "^6.41.0",
+		"@invana-studio/core": "workspace:*",
 		"@invana/canvas": "^0.0.15",
 		"@invana/canvas-react": "^0.0.15",
 		"@invana/canvas-ui": "^0.0.15",

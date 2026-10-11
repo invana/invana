@@ -33,15 +33,14 @@ import {
 	EmptyState,
 	Skeleton,
 } from "@invana/ui";
-import { Check, Copy, KeySquare, Plus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
-import { authApi } from "@/services/api/auth";
-import { ApiError } from "@/services/api/client";
 import type {
 	PersonalAccessToken,
 	PersonalAccessTokenList,
-} from "@/types/auth";
+} from "@invana-studio/core";
+import { ApiError, authApi } from "@invana-studio/core";
+import { Check, Copy, KeySquare, Plus } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 const NEVER = "never";
 

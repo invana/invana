@@ -6,7 +6,7 @@
 // Boards are shared across every graph member; a `data` board is additionally
 // backed by the session it was drawn from — provenance, not identity.
 
-import type { QueryResultItem } from "@/types/query";
+import type { QueryResultItem } from "@invana-studio/core";
 
 /** The painted graph, stored verbatim so a canvas reopens without a re-query. */
 export interface CanvasSnapshot {

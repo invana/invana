@@ -4,9 +4,11 @@ import {
 	ChatSessionTaskRow,
 	type ChatSessionTaskStatus,
 } from "@invana/ui";
-import { useTicker } from "@/hooks/useTicker";
-import { formatCompactCount } from "@/lib/format";
-import { formatDuration } from "@/lib/time";
+import {
+	formatCompactCount,
+	formatDuration,
+	useTicker,
+} from "@invana-studio/core";
 import type {
 	RunNode,
 	RunNodeStatus,

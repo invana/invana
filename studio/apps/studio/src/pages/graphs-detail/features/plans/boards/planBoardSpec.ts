@@ -1,4 +1,4 @@
-import { usd } from "@/lib/format";
+import { usd } from "@invana-studio/core";
 
 /**
  * The plan page as a board document ([the-library.md](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
@@ -11,7 +11,7 @@ import { usd } from "@/lib/format";
 
 import type { MetricOptions } from "@invana/blocks";
 import type { BoardSpec, PanelSpec, TabSpec } from "@invana/boards";
-import { formatElapsed } from "@/lib/time";
+import { formatElapsed } from "@invana-studio/core";
 import type { PlanChartWidgets } from "@/pages/graphs-detail/features/plans/boards/PlanChartWidgets";
 import { planLayersGantt } from "@/pages/graphs-detail/features/plans/planLayers";
 import {

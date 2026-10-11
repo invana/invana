@@ -8,12 +8,14 @@
 		"build": "turbo run build",
 		"lint": "turbo run lint",
 		"check-types": "turbo run check-types",
-		"test": "turbo run test",
+		"test": "vitest run",
 		"knip": "turbo run knip",
 		"test:e2e": "pnpm --filter studio test:e2e"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.14",
-		"turbo": "^2.10.5"
+		"@vitest/coverage-v8": "5.0.2",
+		"turbo": "^2.10.5",
+		"vitest": "^5.0.2"
 	}
 }

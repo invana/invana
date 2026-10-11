@@ -1,5 +1,7 @@
 import type { GraphCanvas } from "@invana/graph";
 import { ErrorBoundary } from "@invana/ui";
+import type { QueryResultItem } from "@invana-studio/core";
+import { reportBoundaryError } from "@invana-studio/core";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant";
@@ -23,8 +25,6 @@ import { RunsViewPanel } from "@/pages/graphs-detail/features/runs";
 import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills";
 import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
-import { reportBoundaryError } from "@/services/telemetry/errors";
-import type { QueryResultItem } from "@/types/query";
 
 type Sessions = ReturnType<typeof useSessions>;
 

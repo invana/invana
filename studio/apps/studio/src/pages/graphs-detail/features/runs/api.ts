@@ -8,6 +8,13 @@
 // so a dropped connection replays from where it left off.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import {
+	API_BASE_URL,
+	type Interaction,
+	recordStreamReconnect,
+	request,
+	withTraceparent,
+} from "@invana-studio/core";
 import { ROOT_CONTEXT } from "@opentelemetry/api";
 import type {
 	Emission,
@@ -23,9 +30,6 @@ import type {
 	TaskRunListResponse,
 } from "@/pages/graphs-detail/features/runs/types";
 import type { OfferedRule } from "@/pages/graphs-detail/features/skills";
-import { API_BASE_URL, request } from "@/services/api/client";
-import { recordStreamReconnect } from "@/services/telemetry/metrics";
-import { type Interaction, withTraceparent } from "@/services/telemetry/tracer";
 
 // ── Wire DTOs ────────────────────────────────────────────────────────────────
 

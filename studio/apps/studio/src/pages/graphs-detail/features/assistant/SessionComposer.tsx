@@ -5,17 +5,17 @@ import { groovy } from "@codemirror/legacy-modes/mode/groovy";
 import { Annotation, Compartment, EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
 import { Button, ChatSessionComposer, RichSelect } from "@invana/ui";
+import type {
+	QueryMode,
+	QueryResultItem,
+	QueryRunPayload,
+} from "@invana-studio/core";
 import { ArrowUp, Bot, Paperclip, Square, Timer, X } from "lucide-react";
 import type { ChangeEvent, KeyboardEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@/pages/graphs-detail/features/assistant/types";
 import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
-import type {
-	QueryMode,
-	QueryResultItem,
-	QueryRunPayload,
-} from "@/types/query";
 
 // ── CodeMirror theme ──────────────────────────────────────────────────────────
 // Reads the design-kit colour tokens so the QL editor follows the active theme

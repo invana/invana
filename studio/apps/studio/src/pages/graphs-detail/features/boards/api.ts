@@ -6,6 +6,7 @@
 // panel/dialog components stay unchanged.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { request } from "@invana-studio/core";
 import type {
 	Board,
 	BoardSummary,
@@ -13,7 +14,6 @@ import type {
 	CanvasSnapshot,
 	CanvasStyling,
 } from "@/pages/graphs-detail/features/boards/types";
-import { request } from "@/services/api/client";
 
 // ── Wire DTOs (snake_case, as the engine returns) ────────────────────────────
 

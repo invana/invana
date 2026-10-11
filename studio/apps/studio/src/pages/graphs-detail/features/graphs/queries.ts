@@ -1,3 +1,4 @@
+import { authApi, useAuthStore } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
 import type {
@@ -6,8 +7,6 @@ import type {
 	GraphUpdate,
 	SetupSection,
 } from "@/pages/graphs-detail/features/graphs/types";
-import { authApi } from "@/services/api/auth";
-import { useAuthStore } from "@/stores/auth.store";
 
 /**
  * Re-fetch `/auth/me` and update the auth store. Keeps `user.graphs` in

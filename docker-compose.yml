@@ -134,6 +134,7 @@ services:
       - ./studio:/app
       - studio-node-modules:/app/node_modules
       - studio-app-node-modules:/app/apps/studio/node_modules
+      - studio-core-node-modules:/app/packages/core/node_modules
     depends_on:
       - engine
 
@@ -250,3 +251,4 @@ volumes:
   engine-venv:
   studio-node-modules:
   studio-app-node-modules:
+  studio-core-node-modules:

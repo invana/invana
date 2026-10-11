@@ -17,9 +17,9 @@
  */
 
 import { Button, ScrollArea } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { History, X } from "lucide-react";
 import type { ReactNode } from "react";
-import { formatRelativeTime } from "@/lib/time";
 import type { BoardVersionSummary } from "@/pages/graphs-detail/features/boards/types";
 
 /** What the row's one button does — the half that is not shared. */

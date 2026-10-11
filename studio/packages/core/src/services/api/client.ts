@@ -20,8 +20,8 @@ import axios, {
 	type InternalAxiosRequestConfig,
 } from "axios";
 import { toast } from "sonner";
-import { recordRequest } from "@/services/telemetry/metrics";
-import { type Interaction, startClientSpan } from "@/services/telemetry/tracer";
+import { recordRequest } from "../telemetry/metrics";
+import { type Interaction, startClientSpan } from "../telemetry/tracer";
 
 /** Engine origin — shared with the SSE clients, which can't go through axios. */
 export const API_BASE_URL =

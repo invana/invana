@@ -1,7 +1,7 @@
 import type { CanvasStateSnapshot } from "@invana/canvas";
 import type { GraphData as EngineGraphData } from "@invana/graph";
-import { ApiError } from "@/services/api/client";
-import type { QueryResponse, QueryResultItem } from "@/types/query";
+import type { QueryResponse, QueryResultItem } from "@invana-studio/core";
+import { ApiError } from "@invana-studio/core";
 
 /**
  * A saved canvas state, as the engine will accept it. `canvas_states.snapshot`

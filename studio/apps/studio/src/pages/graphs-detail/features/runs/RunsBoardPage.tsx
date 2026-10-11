@@ -1,4 +1,4 @@
-import { usd } from "@/lib/format";
+import { usd } from "@invana-studio/core";
 
 /**
  * **Runs, drawn wide** — the journal as a page in `mainSection`, opened from
@@ -29,10 +29,8 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import { formatCompact, formatElapsed, useTicker } from "@invana-studio/core";
 import { RefreshCw } from "lucide-react";
-import { useTicker } from "@/hooks/useTicker";
-import { formatCompact } from "@/lib/format";
-import { formatElapsed } from "@/lib/time";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
 	type RunListRow,

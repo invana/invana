@@ -18,7 +18,7 @@ import {
 	WebTracerProvider,
 } from "@opentelemetry/sdk-trace-web";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import { ApiError } from "@/services/api/client";
+import { ApiError } from "../api/client";
 import { reportBoundaryError, reportError, shouldReport } from "./errors";
 import { startAction, withInteraction } from "./tracer";
 

@@ -1,4 +1,4 @@
-import { usdWhole } from "@/lib/format";
+import { usdWhole } from "@invana-studio/core";
 
 /**
  * a spend per run for the thread — the session's settings, opened from

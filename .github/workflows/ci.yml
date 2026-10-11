@@ -105,12 +105,12 @@ jobs:
       - name: Run unit & component tests
         run: |
           cd studio
-          pnpm test -- --coverage
+          pnpm test --coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
-          file: studio/apps/studio/coverage/coverage-final.json
+          file: studio/coverage/coverage-final.json
           flags: studio
           fail_ci_if_error: false
 

@@ -14,8 +14,8 @@
 
 import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { useQuery } from "@tanstack/react-query";
-import { formatRelativeTime } from "@/lib/time";
 import { DECLARED_WIDGETS } from "@/pages/graphs-detail/features/boards/boardWidgets";
 import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
 import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";

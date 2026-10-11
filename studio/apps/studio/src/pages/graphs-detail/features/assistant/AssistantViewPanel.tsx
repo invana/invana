@@ -6,6 +6,8 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 } from "@invana/ui";
+import type { QueryResponse, QueryRunPayload } from "@invana-studio/core";
+import { formatCompactCount } from "@invana-studio/core";
 import {
 	Check,
 	ChevronRight,
@@ -16,7 +18,6 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { formatCompactCount } from "@/lib/format";
 import type { SessionSort } from "@/pages/graphs-detail/features/assistant/api";
 import type { AssistantAttachment } from "@/pages/graphs-detail/features/assistant/SessionComposer";
 import {
@@ -44,7 +45,6 @@ import {
 	ListPanelChrome,
 } from "@/pages/graphs-detail/shared/ListPanel";
 import { useRunStore } from "@/stores/run.store";
-import type { QueryResponse, QueryRunPayload } from "@/types/query";
 
 export interface AssistantViewPanelProps {
 	// Composer

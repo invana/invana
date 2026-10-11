@@ -1,4 +1,3 @@
-import { apiClient } from "@/services/api/client";
 import type {
 	AuthResponse,
 	AuthUser,
@@ -6,7 +5,8 @@ import type {
 	PersonalAccessTokenList,
 	ThemeSelection,
 	UsernameAvailabilityResponse,
-} from "@/types/auth";
+} from "../../types/auth";
+import { apiClient } from "./client";
 
 export const authApi = {
 	usernameAvailable: async (username: string) =>

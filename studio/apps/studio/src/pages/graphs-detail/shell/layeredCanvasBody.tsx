@@ -1,3 +1,4 @@
+import { ApiError } from "@invana-studio/core";
 import type { ReactNode } from "react";
 import {
 	EnvelopeCanvas,
@@ -7,7 +8,6 @@ import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans";
 import { PlanCanvas } from "@/pages/graphs-detail/features/projects";
 import type { LeftNavKey } from "@/pages/graphs-detail/shared/useLeftSection";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
-import { ApiError } from "@/services/api/client";
 
 /**
  * What the main area says when it has nothing to draw.

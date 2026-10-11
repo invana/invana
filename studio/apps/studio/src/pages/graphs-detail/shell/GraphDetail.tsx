@@ -1,9 +1,9 @@
 import { AppLayoutV2 } from "@invana/themes";
+import { MAIN_SECTION, SIDE_SECTION } from "@invana-studio/core";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import { AppVersion } from "@/components/AppVersion";
 import { useAppHeader } from "@/components/header/useAppHeader";
-import { MAIN_SECTION, SIDE_SECTION } from "@/lib/sections";
 import {
 	SettingsViewPanel,
 	useGraphConnectionQuery,

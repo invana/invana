@@ -13,7 +13,7 @@ import {
 	type LineChartMark,
 	StackedBarChartV,
 } from "@invana/charts";
-import { formatElapsed } from "@/lib/time";
+import { formatElapsed } from "@invana-studio/core";
 
 interface DailyRunsOptions {
 	days: { label: string; served: number; failed: number }[];

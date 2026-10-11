@@ -1,5 +1,5 @@
-import { authApi } from "@/services/api/auth";
-import { useAuthStore } from "@/stores/auth.store";
+import { authApi } from "../services/api/auth";
+import { useAuthStore } from "../stores/auth.store";
 
 export function useAuth() {
 	const user = useAuthStore((s) => s.user);

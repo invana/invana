@@ -1,3 +1,4 @@
+import { ApiError } from "@invana-studio/core";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
@@ -12,7 +13,6 @@ import {
 import type { Board } from "@/pages/graphs-detail/features/boards/types";
 import type { useBoardVersions } from "@/pages/graphs-detail/features/boards/useBoardVersions";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
-import { ApiError } from "@/services/api/client";
 
 type Sessions = ReturnType<typeof useSessions>;
 type BoardContents = ReturnType<typeof useBoardVersions>;

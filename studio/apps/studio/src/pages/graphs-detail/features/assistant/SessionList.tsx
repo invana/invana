@@ -1,7 +1,7 @@
 import { Button, ScrollArea } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { Archive, ArchiveRestore, MessageSquare, Pin } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { formatRelativeTime } from "@/lib/time";
 import type { SessionSort } from "@/pages/graphs-detail/features/assistant/api";
 import type { Session } from "@/pages/graphs-detail/features/assistant/types";
 import { useCanvasBannerQuery } from "@/pages/graphs-detail/features/boards";

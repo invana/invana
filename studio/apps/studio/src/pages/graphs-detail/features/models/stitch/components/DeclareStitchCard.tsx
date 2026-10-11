@@ -43,6 +43,7 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
+import { ApiError } from "@invana-studio/core";
 import { useQueries } from "@tanstack/react-query";
 import { HelpCircle, Link2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -59,7 +60,6 @@ import type {
 	LinkKind,
 	StitchPreview,
 } from "@/pages/graphs-detail/features/models/types";
-import { ApiError } from "@/services/api/client";
 
 /** One node type on one published version — what either side of a stitch names. */
 interface TypeOption {

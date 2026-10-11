@@ -1,4 +1,4 @@
-import { useAppVersionQuery } from "@/hooks/queries/useAppVersion";
+import { useAppVersionQuery } from "@invana-studio/core";
 
 /**
  * Engine version chip for page footers. Renders nothing while loading or if

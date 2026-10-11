@@ -5,6 +5,7 @@
  * shared client and returns the engine's shape unchanged.
  */
 
+import { request } from "@invana-studio/core";
 import type {
 	Agent,
 	AgentCreate,
@@ -19,7 +20,6 @@ import type {
 	SoulPreviewRequest,
 } from "@/pages/graphs-detail/features/agents/types";
 import type { EventListResponse } from "@/pages/graphs-detail/features/events";
-import { request } from "@/services/api/client";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}`;

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { healthApi } from "@/services/api/health";
+import { healthApi } from "../../services/api/health";
 
 const KEY = ["app", "health"] as const;
 

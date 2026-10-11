@@ -5,6 +5,7 @@
  * `…/projects` and `…/tasks`. Each call is one `request` on the shared client.
  */
 
+import { request } from "@invana-studio/core";
 import type {
 	Project,
 	ProjectAssignment,
@@ -18,7 +19,6 @@ import type {
 	TodoListResponse,
 	TodoUpdate,
 } from "@/pages/graphs-detail/features/projects/types";
-import { request } from "@/services/api/client";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}`;

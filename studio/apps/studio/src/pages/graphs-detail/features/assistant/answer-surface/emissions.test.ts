@@ -1,5 +1,5 @@
+import type { QueryResponse } from "@invana-studio/core";
 import { describe, expect, it } from "vitest";
-import type { QueryResponse } from "@/types/query";
 import { emissionsFromResult } from "./emissions";
 
 const graph = (nodes: unknown[]) =>

@@ -1,6 +1,6 @@
+import type { QueryResponse } from "@invana-studio/core";
+import { ApiError } from "@invana-studio/core";
 import { describe, expect, it } from "vitest";
-import { ApiError } from "@/services/api/client";
-import type { QueryResponse } from "@/types/query";
 import {
 	adaptItems,
 	expandRefusal,

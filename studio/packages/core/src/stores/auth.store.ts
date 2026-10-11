@@ -10,9 +10,9 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { registerAuthAccess } from "@/services/api/client";
-import { registerTelemetryUser } from "@/services/telemetry/tracer";
-import type { AuthUser } from "@/types/auth";
+import { registerAuthAccess } from "../services/api/client";
+import { registerTelemetryUser } from "../services/telemetry/tracer";
+import type { AuthUser } from "../types/auth";
 
 interface AuthState {
 	user: AuthUser | null;

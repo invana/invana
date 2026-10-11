@@ -100,7 +100,7 @@ export function boundOf(step: TraceStepRead): Bound | undefined {
 
 /** `8.2k` — a token total, which is read as a magnitude rather than a number.
  *  It lives in `@/lib/format` now, because the journal row reads it too. */
-export { formatCompact as compact } from "@/lib/format";
+export { formatCompact as compact } from "@invana-studio/core";
 /**
  * `omit` · `count` · the view switch · `specPanel` live in
  * `shared/boardSpec.ts`: Skills composes declared boards too, and a second
