@@ -28,7 +28,7 @@ import {
 import { useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-import { ModeToggle } from "@/components/ModeToggle";
+import { ModeToggle } from "../../components/ModeToggle";
 
 // Capability pillars shown on the brand panel. Phrased as what Invana *is
 // about* — no falsifiable benchmarks (the "100K+ nodes" line deliberately

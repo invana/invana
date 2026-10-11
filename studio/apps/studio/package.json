@@ -23,6 +23,7 @@
 		"@codemirror/view": "^6.41.0",
 		"@invana-studio/canvases": "workspace:*",
 		"@invana-studio/core": "workspace:*",
+		"@invana-studio/shell": "workspace:*",
 		"@invana-studio/ui": "workspace:*",
 		"@invana/canvas": "^0.0.15",
 		"@invana/canvas-react": "^0.0.15",

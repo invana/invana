@@ -92,7 +92,7 @@ landing the Console, not a later tidy-up.
 
 | Region | Type | Sub-slots | What it holds in Studio |
 |---|---|---|---|
-| `header` | `NavHorizontalProps` | `left` · `center` · `right` (+ `*NavItems`) | wordmark · breadcrumb · the camera toolbar · the onboarding cap · theme · Assistant |
+| `header` | `NavHorizontalProps` | `left` · `center` · `right` (+ `*NavItems`) | launcher · `Invana <Product>` wordmark · breadcrumb · the camera toolbar · the onboarding cap · theme · Assistant · user menu — drawn by `<StudioShell>` (`@invana-studio/shell`) on every screen |
 | `leftNav` | `NavVerticalProps` | `top` · `topNavItems` · `middle` · `bottom` · `bottomNavItems` | one icon per module with a `leftSection` panel, exactly one lit |
 | `leftSection` | `SectionConfig` | — | the open view panel — Info · Explorer · Model · Projects · Runs · Library · Govern · Agents · Skills · Events · Settings. **Layers is not here**: it is a canvas control on the page strip ([graph-detail-page.md](graph-detail-page.md) G18) |
 | `mainSection` | `MainSectionConfig` | — | `Workbook` — the open pages |

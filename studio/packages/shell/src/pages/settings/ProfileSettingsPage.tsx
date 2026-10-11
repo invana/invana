@@ -25,9 +25,9 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { SaturationControl } from "@/components/SaturationControl";
-import { STUDIO_THEMES } from "@/components/studioThemes";
-import { AccessTokensTab } from "@/pages/settings/AccessTokensTab";
+import { SaturationControl } from "../../components/SaturationControl";
+import { STUDIO_THEMES } from "../../components/studioThemes";
+import { AccessTokensTab } from "./AccessTokensTab";
 
 const USERNAME_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
 const USERNAME_COOLDOWN_DAYS = 30;

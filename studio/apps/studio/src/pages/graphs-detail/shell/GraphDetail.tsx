@@ -1,9 +1,8 @@
-import { AppLayoutV2 } from "@invana/themes";
 import { MAIN_SECTION, SIDE_SECTION } from "@invana-studio/core";
+import { AppVersion, StudioShellLayout } from "@invana-studio/shell";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
-import { AppVersion } from "@/components/AppVersion";
-import { useAppHeader } from "@/components/header/useAppHeader";
+import { OnboardingCap } from "@/components/header/OnboardingCap";
 import {
 	SettingsViewPanel,
 	useGraphConnectionQuery,
@@ -44,7 +43,7 @@ interface GraphDetailProps {
 	/** Page-specific header right extras (e.g. Modeller's Introspect +
 	 *  Refresh buttons). */
 	headerRightExtras?: ReactNode;
-	/** Panel collapse/expand toggles, rendered next to the profile menu. */
+	/** The Assistant toggle, the header's slot just before the user menu. */
 	headerPanelControls?: ReactNode;
 	/** Page-specific header center content (e.g. Explorer's canvas toolbar).
 	 *  Most pages won't need this. */
@@ -108,7 +107,9 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
  * The shell for the graph page — one page, at the graph's own URL
  * (graph-detail-page.md). Owns:
  *
- * - The breadcrumb header (`useAppHeader`) and left rail (`useGraphLeftNav`).
+ * - The shell's header slots (breadcrumb, onboarding cap, Assistant toggle)
+ *   and its own left rail (`useGraphLeftNav`), drawn through
+ *   `StudioShellLayout` so the header matches every other screen.
  * - SettingsViewPanel takeover: docked replaces `leftSection`; expanded replaces
  *   `mainSection` and hides both `leftSection` and `rightSection`.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
@@ -142,13 +143,19 @@ export function GraphDetail({
 	// `owner › graph › panel › object`. The panel crumb is the `?panel` value
 	// verbatim, so the breadcrumb is a literal reading of the URL — the two
 	// crumbs before it are identifiers too, the username and the slug.
-	const header = useAppHeader({
+	const header = {
 		pageLabel: settingsPanel.isOpen ? settingsPanel.section : undefined,
 		objectLabel,
 		rightExtras: headerRightExtras,
-		panelControls: headerPanelControls,
+		// The onboarding cap is graph-scoped (setup.md): a Graph has onboarding,
+		// the Graphs list does not.
+		status:
+			username && graphSlug ? (
+				<OnboardingCap username={username} graphSlug={graphSlug} />
+			) : undefined,
+		assistantToggle: headerPanelControls,
 		center: headerCenter,
-	});
+	};
 
 	// The whole left rail shares one `?settings` param. This view's own panel
 	// (AssistantViewPanel / SchemaNav) opens under its native key; every other value
@@ -203,7 +210,7 @@ export function GraphDetail({
 	// because the Explorer nests a canvas app inside main, and the e2e specs
 	// locate panels by id.
 	return (
-		<AppLayoutV2
+		<StudioShellLayout
 			idPrefix="graph-detail"
 			leftNav={leftNav}
 			header={header}

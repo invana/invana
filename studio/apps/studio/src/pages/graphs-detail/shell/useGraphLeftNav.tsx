@@ -1,3 +1,4 @@
+import { leftNavItemClassName } from "@invana-studio/shell";
 import {
 	Activity,
 	Bot,
@@ -12,7 +13,6 @@ import {
 	Shield,
 	Wand2,
 } from "lucide-react";
-import { UserMenu } from "@/components/header/UserMenu";
 import {
 	type LeftNavKey,
 	useLeftSection,
@@ -99,8 +99,8 @@ const VIEW_SECTIONS: SectionMeta[] = [
  *   belongs. Two things are not in this group: Sessions, which is the assistant
  *   on the right, opened from the header; and Layers, which is a control on the
  *   page strip and a card over the canvas (graph-detail-page.md).
- * - Bottom: one icon per settings section (Skills / Events / Settings).
- * - Very bottom (`bottom` slot, below a separator): the user profile menu.
+ * - Bottom: one icon per settings section (Skills / Events / Settings). The
+ *   user menu is in the shell's header, like on every other screen.
  *
  * **There is no mode switch** (docs/for-developers/modules/explore/spec.md). The Explorer / Modeller toggle was
  * the last top-level one in Studio, and it switched *pages* when everything
@@ -114,20 +114,9 @@ const VIEW_SECTIONS: SectionMeta[] = [
 export function useGraphLeftNav() {
 	const settingsPanel = useLeftSection();
 
-	// `my-1.5` adds breathing room between rail items — the theme's own
-	// section wrapper only gives them `gap-1`, which reads as crowded.
-	//
-	// The theme's NavVertical tracks its OWN "last clicked" highlight in internal
-	// state, and renders the top and bottom groups as two *separate* NavItems —
-	// so each keeps its own active item and two icons can look lit at once. We
-	// drive the highlight from our single app state instead, forcing it with `!`
-	// to override the theme's internal one so exactly one rail icon is ever lit.
-	// Inactive items re-assert hover (also with `!`) so the override doesn't kill
-	// hover feedback.
-	const activeClass = (active: boolean) =>
-		active
-			? "my-1.5 !bg-primary/15 !text-primary !ring-primary/25"
-			: "my-1.5 !bg-transparent !text-foreground !ring-transparent hover:!bg-primary/10 hover:!text-primary hover:!ring-primary/25";
+	// The highlight follows the one `?panel` param, so exactly one rail icon is
+	// ever lit (`leftNavItemClassName` overrides the theme's own per-group one).
+	const activeClass = leftNavItemClassName;
 
 	// One toggle for every icon — open the section, or close it if it's already
 	// the open one (identical to the bottom-rail behaviour below).
@@ -163,7 +152,7 @@ export function useGraphLeftNav() {
 	// Each section icon is a toggle: clicking the open section closes the panel,
 	// clicking any other opens/switches to it — the same single `?settings` param
 	// shared with the top view icons keeps the whole rail single-open.
-	const bottomNavItems = SETTINGS_SECTIONS.map((s, i) => {
+	const bottomNavItems = SETTINGS_SECTIONS.map((s) => {
 		const active = settingsPanel.isOpen && settingsPanel.section === s.key;
 		return {
 			name: s.label,
@@ -171,12 +160,9 @@ export function useGraphLeftNav() {
 			iconClassName: "w-5 h-5",
 			tooltipSide: "right" as const,
 			className: activeClass(active),
-			// Separate the settings icons from the profile menu pinned below.
-			showSeperator: i === SETTINGS_SECTIONS.length - 1,
 			onClick: () => toggleSection(s.key),
 		};
 	});
 
-	// Profile menu sits at the very bottom of the rail, below the separator.
-	return { topNavItems, bottomNavItems, bottom: <UserMenu /> };
+	return { topNavItems, bottomNavItems };
 }

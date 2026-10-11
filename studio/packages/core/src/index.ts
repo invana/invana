@@ -28,4 +28,5 @@ export * from "./services/telemetry/tracer";
 export * from "./stores/appearance.store";
 export * from "./stores/auth.store";
 export * from "./types/auth";
+export * from "./types/product";
 export * from "./types/query";

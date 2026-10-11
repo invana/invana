@@ -11,8 +11,8 @@
 import { ThemeSelector } from "@invana/themes";
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@invana/ui";
 import { Monitor, Moon, Palette, Sun } from "lucide-react";
-import { SaturationControl } from "@/components/SaturationControl";
-import { STUDIO_THEMES } from "@/components/studioThemes";
+import { SaturationControl } from "./SaturationControl";
+import { STUDIO_THEMES } from "./studioThemes";
 
 const MODE_ICONS = { light: Sun, dark: Moon, system: Monitor };
 

@@ -11,12 +11,14 @@ import {
 import { useAuth } from "@invana-studio/core";
 import { Fragment, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FullscreenToggle } from "@/components/FullscreenToggle";
-import { GitHubStars } from "@/components/GitHubStars";
-import { OnboardingCap } from "@/components/header/OnboardingCap";
-import { ThemeMenu } from "@/components/ThemeMenu";
+import { useActiveProduct } from "../../products";
+import { FullscreenToggle } from "../FullscreenToggle";
+import { GitHubStars } from "../GitHubStars";
+import { ThemeMenu } from "../ThemeMenu";
+import { Launcher } from "./Launcher";
+import { UserMenu } from "./UserMenu";
 
-interface AppHeaderOptions {
+export interface AppHeaderOptions {
 	/** Last breadcrumb segment for the current page. Defaults to a label
 	 *  derived from the URL (Graphs, New graph, Profile, Settings). The graph
 	 *  page passes none: its URL is the graph (graph-detail-page.md), so
@@ -26,29 +28,31 @@ interface AppHeaderOptions {
 	 *  as the last crumb: `owner › graph › Defence theme`. Omitted when the
 	 *  screen holds nothing yet. */
 	objectLabel?: string;
-	/** Drop the breadcrumb entirely — used when `leftExtras` already names the
-	 *  current view, so the label would just be redundant. The separator still
-	 *  renders before `leftExtras`. */
-	hideBreadcrumb?: boolean;
-	/** Extra content rendered to the right of the breadcrumb on the left side. */
-	leftExtras?: ReactNode;
+	/** The Graph picker slot, after the wordmark. */
+	graphPicker?: ReactNode;
 	/** Center content. Most pages won't need this. */
 	center?: ReactNode;
-	/** Extra controls rendered to the LEFT of ThemeMenu + UserMenu. Use for
-	 *  page-specific buttons (e.g. Modeller's "Introspect" + "Refresh"). */
+	/** The ⌘K slot, first in `header.right`. */
+	search?: ReactNode;
+	/** Page-specific controls, left of the shared ones. */
 	rightExtras?: ReactNode;
-	/** Panel collapse/expand toggles, rendered at the end of the right cluster
-	 *  (e.g. Explorer/Modeller's sessions + inspector toggles). The profile menu
-	 *  no longer lives here — it sits at the bottom of the left rail. */
-	panelControls?: ReactNode;
+	/** Graph-scoped status, before the theme menu (the onboarding cap). */
+	status?: ReactNode;
+	/** The notifications slot. */
+	notifications?: ReactNode;
+	/** The Assistant toggle, just before the user menu. */
+	assistantToggle?: ReactNode;
 }
 
 /**
- * Shared AppLayoutV2 header config. Renders:
+ * The shell's `header`, the same on every screen:
  *
- *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [GitHubStars] [OnboardingCap] [ThemeMenu] [FullscreenToggle] [panelControls]
+ *   [launcher] [Invana <Product>] | [graph picker] breadcrumb   [center]   [⌘K] [rightExtras] [GitHubStars] [status] [ThemeMenu] [FullscreenToggle] [notifications] [assistant] [user menu]
  *
- * Breadcrumb behaviour (after the "Invana Studio" badge):
+ * The wordmark names the open product, and `Invana Studio` where none is
+ * open. Each slot is empty until a page or a later product fills it.
+ *
+ * Breadcrumb behaviour (after the wordmark):
  * - Graph-scoped (`/u/:username/:graphSlug`): `owner › graph`, plus `› object`
  *   when something is open on it.
  * - Otherwise: `@username / pageLabel` (e.g. `@ravi-merugu / Graphs`).
@@ -58,26 +62,21 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 	const {
 		pageLabel,
 		objectLabel,
-		hideBreadcrumb,
-		leftExtras,
+		graphPicker,
 		center,
+		search,
 		rightExtras,
-		panelControls,
+		status,
+		notifications,
+		assistantToggle,
 	} = options;
 	const { pathname } = useLocation();
 	const { user } = useAuth();
+	const product = useActiveProduct();
 
-	// The onboarding cap is graph-scoped (setup.md): a Graph has onboarding,
-	// the Graphs list does not. The route is what says which graph, so the cap is
-	// read off the same match the breadcrumb uses rather than threaded through
-	// every caller.
-	const graphRoute = pathname.match(/^\/u\/([^/]+)\/([^/]+)(?:\/|$)/);
-
-	const segments = hideBreadcrumb
-		? []
-		: computeSegments(pathname, user?.username, pageLabel).concat(
-				objectLabel ? [{ label: objectLabel }] : [],
-			);
+	const segments = computeSegments(pathname, user?.username, pageLabel).concat(
+		objectLabel ? [{ label: objectLabel }] : [],
+	);
 
 	return {
 		// `relative` makes the header bar a positioning context so a `center`
@@ -87,30 +86,32 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 		className: "!h-[38px] relative",
 		left: (
 			<div className="flex items-center gap-2 px-2 min-w-0">
+				<Launcher />
 				<Link
 					to="/graphs"
 					className="font-bold text-xl select-none hover:opacity-80 transition-opacity"
 				>
-					Invana Studio
+					Invana {product?.name ?? "Studio"}
 				</Link>
-				{(segments.length > 0 || leftExtras) && (
+				{(segments.length > 0 || graphPicker) && (
 					<Separator orientation="vertical" className="h-4" />
 				)}
+				{graphPicker}
 				{segments.length > 0 && <HeaderBreadcrumb segments={segments} />}
-				{leftExtras}
 			</div>
 		),
 		center,
 		right: (
 			<div className="flex items-center gap-4 px-2">
+				{search}
 				{rightExtras}
 				<GitHubStars />
-				{graphRoute && (
-					<OnboardingCap username={graphRoute[1]} graphSlug={graphRoute[2]} />
-				)}
+				{status}
 				<ThemeMenu />
 				<FullscreenToggle />
-				{panelControls}
+				{notifications}
+				{assistantToggle}
+				<UserMenu />
 			</div>
 		),
 	};

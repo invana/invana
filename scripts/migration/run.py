@@ -154,7 +154,10 @@ def claude(text: str, sid: str, label: str) -> str:
         cmd.append("--dangerously-skip-permissions")
     else:
         cmd += ["--permission-mode", "acceptEdits", "--allowedTools", *ALLOWED_TOOLS]
-    proc = subprocess.Popen(cmd, cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    # Langfuse (when its Claude Code plugin is enabled) files the session under these tags.
+    env = {**os.environ, "CC_LANGFUSE_TRACE_TAGS": f"migration,{sid},{label}"}
+    proc = subprocess.Popen(cmd, cwd=ROOT, env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, text=True)
 
     def send(msg: str) -> None:
         proc.stdin.write(json.dumps({"type": "user", "message": {"role": "user", "content": msg}}) + "\n")

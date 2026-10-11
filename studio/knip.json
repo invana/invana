@@ -20,6 +20,10 @@
 		"packages/canvases": {
 			"project": ["src/**/*.{ts,tsx}"],
 			"includeEntryExports": true
+		},
+		"packages/shell": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
 		}
 	}
 }

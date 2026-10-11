@@ -3,6 +3,7 @@ import { Toaster, TooltipProvider } from "@invana/ui";
 // Loading core also loads the auth store, which registers itself with the
 // axios client at module load so request interceptors can read tokens.
 import { reportError, shouldReport } from "@invana-studio/core";
+import { SaturationBridge, ThemeSyncBridge } from "@invana-studio/shell";
 import {
 	MutationCache,
 	QueryCache,
@@ -12,8 +13,6 @@ import {
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
-import { SaturationBridge } from "@/components/SaturationBridge";
-import { ThemeSyncBridge } from "@/components/ThemeSyncBridge";
 import { router } from "@/router";
 // Side-effect import: register OpenTelemetry-Web (docs/for-developers/modules/platform/features/telemetry.md) before the app
 // renders, so the query→render pipeline is traced from the first interaction.
