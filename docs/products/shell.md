@@ -26,7 +26,7 @@ Not a product. The layout and the features that appear in all five. Prototype pa
 
 | Rule | Detail |
 |---|---|
-| Levels | Graph › section › item › drill-in |
+| Levels | Graph › section › item › drill-in. An install-wide product (Datasets) has no Graph: `@user` › section › item |
 | Links | Every segment but the last links to its level; the last is plain |
 | Tabs | Not a level — switching tabs keeps the trail |
 | Overlays | ⌘K, notifications, launcher and dialogs keep the trail of the page beneath |

@@ -126,6 +126,10 @@ Reusable knowledge, labelled by where it came from. Prototype page: *Invana Data
 | Observations | Small entry by form or assistant, authored by the person; bulk loads by CLI or API |
 | Gap filling | Estimates never mix into collected data — they land in a separate `generated` dataset |
 | Imports | CLI and API only; this product watches them. No import API exists in the engine today |
+| Imports journal spans Graphs | Runs belong to a Graph and the engine has no install-wide runs list, so the journal reads each readable Graph's runs of kind `import` and `bulk` and merges them newest first; each row names its Graph and opens the run's page in that Graph's Activity. A Graph whose runs cannot be read is counted in the section's status, never silently left out |
+| Imports draws what a run row carries | Tiles: imports, running, failed (last 30 days) and median time of the loads that finished. The timeline is *imports a day* over 30 days. Records written and rejected are not on a run list row, so they are read on the run's page, not totalled here |
+| Before the dataset record | Catalogue, Validation and Standards draw the kit's empty state with a lock per record that opens them — the dataset record for all three, the standard record too for Standards — and a link to Imports, the one section that works today |
+| Launcher position | First: the launcher follows the thinker's path, and gathering comes first |
 | Retraction | Never deleted. The version is marked retracted with a reason; findings, decisions, reports and derived datasets that cite it are flagged; owners get an Inbox item; a rule can block new decisions on retracted data |
 | Refresh | A dataset may carry a refresh schedule (a shared Schedule). Each refresh is a new immutable version with a diff; bound Graphs and findings stay on their version until someone moves them, and are told a newer one exists |
 | Sensitivity | `public · internal · confidential · personal`, on the dataset and optionally tighter on a column. Guardrails read labels (e.g. *personal never leaves the install*, *confidential is not sent to outside LLMs*) |

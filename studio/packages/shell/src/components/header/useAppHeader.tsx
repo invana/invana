@@ -64,7 +64,8 @@ export interface AppHeaderOptions {
  *   level per matched route that names a `handle.crumb` — section › item ›
  *   drill-in — then `› object` when something is open on it. Every level but
  *   the last links to its path; a tab is a query param, so it is never a level.
- * - Otherwise: `@username / pageLabel` (e.g. `@ravi-merugu / Graphs`).
+ * - Otherwise: `@username / pageLabel` (e.g. `@ravi-merugu / Graphs`), or,
+ *   on an install-wide product's route, `@username ›` its route crumbs.
  * - If logged out, the leading user segment is dropped.
  * - More than four levels (`owner › graph` counts as one) collapse to the
  *   first · `…` · the last two; `…` opens a menu of the hidden levels.
@@ -268,8 +269,11 @@ function computeTrail(
 		};
 	}
 
-	// Non-graph routes (/graphs, /graphs/new, /settings/profile, /login, ...)
+	// Non-graph routes (/graphs, /graphs/new, /settings/profile, /login, ...).
+	// An install-wide product's routes name their own levels (`Imports`).
 	const lead = username ? [{ label: `@${username}`, to: "/graphs" }] : [];
+	if (!override && routeCrumbs.length)
+		return { lead, levels: [...routeCrumbs] };
 	const pageLabel = override ?? labelFromPlainPath(pathname);
 	return { lead, levels: pageLabel ? [{ label: pageLabel }] : [] };
 }

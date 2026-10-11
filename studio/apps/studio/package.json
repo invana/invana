@@ -25,6 +25,7 @@
 		"@invana-studio/agents": "workspace:*",
 		"@invana-studio/canvases": "workspace:*",
 		"@invana-studio/core": "workspace:*",
+		"@invana-studio/datasets": "workspace:*",
 		"@invana-studio/explorer": "workspace:*",
 		"@invana-studio/modeller": "workspace:*",
 		"@invana-studio/projects": "workspace:*",
