@@ -1,0 +1,40 @@
+{
+  "projects": [
+    {
+      "key": "drought-tolerant-chickpea",
+      "name": "Drought-tolerant chickpea",
+      "description": "Which cross gives terminal-drought tolerance and a 100-seed weight above 25 g? Pick two parents for the 2026 rabi crossing block, with evidence a reviewer can follow back to the data."
+    },
+    {
+      "key": "support-price",
+      "name": "Raise the chickpea support price by 10%",
+      "description": "What the change reaches: varieties, districts, growers and buyers."
+    },
+    {
+      "key": "wilt-resistance-survey-2025",
+      "name": "Wilt resistance survey 2025",
+      "description": "Which released varieties still resist Fusarium wilt in the field."
+    }
+  ],
+  "todos": [
+    {
+      "title": "Measure 100-seed weight on plots 11–18",
+      "project_key": "drought-tolerant-chickpea",
+      "acceptance": "All 8 plots are weighed at 10% moisture."
+    },
+    {
+      "title": "Find published root-depth data for KAK 2",
+      "project_key": "drought-tolerant-chickpea"
+    },
+    {
+      "title": "Score wilt on the F1 plants",
+      "project_key": "drought-tolerant-chickpea"
+    },
+    {
+      "title": "Reply to the seed bank about the ICC 4958 request"
+    },
+    {
+      "title": "Review 12 conflicts in Variety attributes"
+    }
+  ]
+}

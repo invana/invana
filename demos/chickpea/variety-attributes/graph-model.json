@@ -1,0 +1,462 @@
+{
+  "format": "invana.model/1",
+  "package_id": "invana.dataset.chickpea",
+  "content_hash": "",
+  "name": "Chickpea",
+  "description": "Varieties, the institutes that developed them, their traits and pedigree.",
+  "version": "1.0.0",
+  "model": {
+    "schema_name": "Chickpea",
+    "schema_description": "Varieties, the institutes that developed them, their traits and pedigree.",
+    "validation_mode": "strict",
+    "version": "1.0.0",
+    "axes": {
+      "time": {
+        "property": "year"
+      },
+      "dims": [
+        "seed_type",
+        "kind"
+      ]
+    },
+    "property_keys": [
+      {
+        "name": "name",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The name a variety, institute or trait is known by — the key.",
+        "validation_rules": []
+      },
+      {
+        "name": "kind",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "released · accession — a released variety or a genebank accession.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "released",
+                "accession"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "year",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Year the variety was released.",
+        "validation_rules": []
+      },
+      {
+        "name": "seed_type",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "desi · kabuli · intermediate (CO_338 · Seed type).",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "desi",
+                "kabuli",
+                "intermediate"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "maturity_days",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Days from sowing to maturity.",
+        "validation_rules": [
+          {
+            "rule_type": "range",
+            "params": {
+              "min": 80,
+              "max": 180
+            }
+          }
+        ]
+      },
+      {
+        "name": "hundred_seed_weight_g",
+        "type": "float",
+        "value_cardinality": "SINGLE",
+        "description": "Weight of 100 seeds in grams, at 10% moisture.",
+        "validation_rules": [
+          {
+            "rule_type": "range",
+            "params": {
+              "min": 10,
+              "max": 70
+            }
+          }
+        ]
+      },
+      {
+        "name": "wilt",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Fusarium wilt reaction (CO_338:0000097).",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "resistant",
+                "moderately resistant",
+                "susceptible"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "root_depth_m",
+        "type": "float",
+        "value_cardinality": "SINGLE",
+        "description": "Root depth in metres at 60 days, under terminal drought.",
+        "validation_rules": []
+      },
+      {
+        "name": "short_name",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "How the institute is usually written.",
+        "validation_rules": []
+      },
+      {
+        "name": "city",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Where the institute is.",
+        "validation_rules": []
+      },
+      {
+        "name": "sector",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "university · national institute · international centre.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "university",
+                "national institute",
+                "international centre"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "term_id",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The Crop Ontology term, when the trait has one.",
+        "validation_rules": []
+      },
+      {
+        "name": "unit",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "What the trait is measured in.",
+        "validation_rules": []
+      },
+      {
+        "name": "cross_id",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The cross, as female × male — the key.",
+        "validation_rules": []
+      },
+      {
+        "name": "status",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "proposed · made · parked · dropped.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "proposed",
+                "made",
+                "parked",
+                "dropped"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "season",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The crossing block it belongs to.",
+        "validation_rules": []
+      }
+    ],
+    "node_types": [
+      {
+        "name": "Variety",
+        "description": "A released chickpea variety, or a genebank accession used as a parent.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "kind",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "year",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "seed_type",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "maturity_days",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          },
+          {
+            "property_key": "hundred_seed_weight_g",
+            "default_value": null,
+            "sort_order": 5,
+            "validation_rules": []
+          },
+          {
+            "property_key": "wilt",
+            "default_value": null,
+            "sort_order": 6,
+            "validation_rules": []
+          },
+          {
+            "property_key": "root_depth_m",
+            "default_value": null,
+            "sort_order": 7,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Institute",
+        "description": "Who developed a variety, or holds an accession.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "short_name",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "city",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "sector",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Trait",
+        "description": "Something measured on a variety.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "term_id",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "unit",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Pedigree",
+        "description": "A cross between two parents.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "cross_id",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "status",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "season",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          }
+        ]
+      }
+    ],
+    "edge_types": [
+      {
+        "name": "DEVELOPED_BY",
+        "description": "The institute that bred and released the variety.",
+        "source_node_types": [
+          "Variety"
+        ],
+        "target_node_types": [
+          "Institute"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      },
+      {
+        "name": "CONSERVED_BY",
+        "description": "The genebank that holds the accession.",
+        "source_node_types": [
+          "Variety"
+        ],
+        "target_node_types": [
+          "Institute"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      },
+      {
+        "name": "NOTED_FOR",
+        "description": "A trait the variety is known for.",
+        "source_node_types": [
+          "Variety"
+        ],
+        "target_node_types": [
+          "Trait"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      },
+      {
+        "name": "FEMALE_PARENT",
+        "description": "The seed parent of the cross.",
+        "source_node_types": [
+          "Pedigree"
+        ],
+        "target_node_types": [
+          "Variety"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      },
+      {
+        "name": "MALE_PARENT",
+        "description": "The pollen parent of the cross.",
+        "source_node_types": [
+          "Pedigree"
+        ],
+        "target_node_types": [
+          "Variety"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      }
+    ],
+    "constraints": [
+      {
+        "name": "variety_name_unique",
+        "target_kind": "node_type",
+        "target_label": "Variety",
+        "constraint_type": "unique",
+        "properties": [
+          "name"
+        ]
+      },
+      {
+        "name": "institute_name_unique",
+        "target_kind": "node_type",
+        "target_label": "Institute",
+        "constraint_type": "unique",
+        "properties": [
+          "name"
+        ]
+      },
+      {
+        "name": "trait_name_unique",
+        "target_kind": "node_type",
+        "target_label": "Trait",
+        "constraint_type": "unique",
+        "properties": [
+          "name"
+        ]
+      },
+      {
+        "name": "pedigree_cross_id_unique",
+        "target_kind": "node_type",
+        "target_label": "Pedigree",
+        "constraint_type": "unique",
+        "properties": [
+          "cross_id"
+        ]
+      }
+    ],
+    "indexes": []
+  },
+  "links": []
+}

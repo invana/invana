@@ -16,37 +16,37 @@
    "story": "SH-03",
    "product": "shell",
    "route": "/u/admin/airways/explorer",
-   "state": ""
+   "state": "a Graph whose set-up is not finished: the set-up checklist open"
   },
   "shell.launcher.open": {
    "story": "SH-04",
    "product": "shell",
    "route": "/u/admin/airways/explorer",
-   "state": ""
+   "state": "click the product launcher in the header"
   },
   "shell.breadcrumbs.overflow": {
    "story": "SH-05",
    "product": "shell",
    "route": "/u/admin/airways/explorer",
-   "state": ""
+   "state": "open a finding on branch H2.1 \u00b7 ICC 4958 \u00d7 KAK 2 (needs B05): /u/admin/chickpea/projects/drought-tolerant-chickpea \u203a H2.1 \u203a a finding"
   },
   "shell.command_palette": {
    "story": "SH-06",
    "product": "shell",
    "route": "/u/admin/airways/explorer",
-   "state": ""
+   "state": "press \u2318K"
   },
   "shell.user_menu": {
    "story": "SH-07",
    "product": "shell",
    "route": "/u/admin/airways/explorer",
-   "state": ""
+   "state": "open the user menu, header right"
   },
   "shell.runs": {
    "story": "SH-08",
    "product": "shell",
-   "route": "/u/admin/airways/activity/runs/15",
-   "state": ""
+   "route": "/u/admin/airways/activity/runs",
+   "state": "open the kind, status and product filters"
   },
   "shell.activity.runs": {
    "story": "SH-08",
@@ -58,49 +58,49 @@
    "story": "SH-09",
    "product": "shell",
    "route": "/u/admin/airways/activity/runs/15",
-   "state": ""
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Overview tab"
   },
   "shell.run.touched": {
    "story": "SH-09",
    "product": "shell",
    "route": "/u/admin/airways/activity/runs/15",
-   "state": ""
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Touched tab"
   },
   "shell.run.log": {
    "story": "SH-09",
    "product": "shell",
    "route": "/u/admin/airways/activity/runs/15",
-   "state": ""
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Log tab"
   },
   "shell.run.step": {
    "story": "SH-09",
    "product": "shell",
    "route": "/u/admin/airways/activity/runs/15",
-   "state": ""
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; click a step on its timeline"
   },
   "shell.run.failed": {
    "story": "SH-10",
    "product": "shell",
    "route": "/u/admin/airways/activity/runs/15",
-   "state": ""
+   "state": "15 stands for a failed run's id: Activity \u203a Runs, status failed, open the newest"
   },
   "shell.run.compare": {
    "story": "SH-11",
    "product": "shell",
    "route": "/u/admin/airways/activity/runs/15",
-   "state": ""
+   "state": "two runs of one question in two worlds: select both in Activity \u203a Runs, Compare"
   },
   "shell.activity.approvals": {
    "story": "SH-12",
    "product": "shell",
    "route": "/u/admin/airways/activity/runs",
-   "state": ""
+   "state": "Approvals tab"
   },
   "shell.run.approval": {
    "story": "SH-12",
    "product": "shell",
    "route": "/u/admin/airways/activity/runs/15",
-   "state": ""
+   "state": "15 stands for a run waiting on approval: open it from Approvals (needs B08)"
   },
   "shell.schedules": {
    "story": "SH-13",
@@ -112,13 +112,13 @@
    "story": "SH-13",
    "product": "shell",
    "route": "/u/admin/airways/activity/schedules",
-   "state": ""
+   "state": "New schedule"
   },
   "shell.schedule.detail": {
    "story": "SH-13",
    "product": "shell",
    "route": "/u/admin/airways/activity/schedules",
-   "state": ""
+   "state": "click a schedule"
   },
   "shell.activity.events": {
    "story": "SH-14",
@@ -136,7 +136,7 @@
    "story": "SH-14",
    "product": "shell",
    "route": "/u/admin/airways/activity/events?filter=changes",
-   "state": ""
+   "state": "on a change row, Compare (needs B01)"
   },
   "shell.notifications": {
    "story": "SH-15",
@@ -148,37 +148,37 @@
    "story": "SH-16",
    "product": "shell",
    "route": "/u/admin/airways/activity/inbox",
-   "state": ""
+   "state": "Rules tab (needs B08)"
   },
   "shell.notifications.rule": {
    "story": "SH-16",
    "product": "shell",
    "route": "/u/admin/airways/activity/inbox",
-   "state": ""
+   "state": "Rules tab, click a rule (needs B08)"
   },
   "shell.notifications.channels": {
    "story": "SH-16",
    "product": "shell",
    "route": "/u/admin/airways/activity/inbox",
-   "state": ""
+   "state": "Channels tab (needs B08)"
   },
   "shell.run.rerun": {
    "story": "SH-18",
    "product": "shell",
    "route": "/u/admin/airways/activity/runs/15",
-   "state": ""
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Re-run (needs B02)"
   },
   "shell.first_run": {
    "story": "SH-19",
    "product": "shell",
    "route": "/graphs?first-run",
-   "state": ""
+   "state": "an install with no Graph yet"
   },
   "agents.skills.detail.readonly": {
    "story": "SH-20",
    "product": "shell",
    "route": "/u/admin/airways/agents/skills/answer-nl",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills, signed in as a member without the Agents role (needs B11)"
   },
   "shell.profile": {
    "story": "SH-17",
@@ -190,67 +190,67 @@
    "story": "SH-17",
    "product": "shell",
    "route": "/settings/profile",
-   "state": ""
+   "state": "Access tokens tab"
   },
   "datasets.catalogue": {
    "story": "DS-01",
    "product": "datasets",
    "route": "/datasets/catalogue",
-   "state": ""
+   "state": "needs B03 for its rows"
   },
   "datasets.dataset": {
    "story": "DS-02",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03)"
   },
   "datasets.dataset.provenance": {
    "story": "DS-02",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03); Provenance tab"
   },
   "datasets.dataset.versions": {
    "story": "DS-03",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03); Versions tab"
   },
   "datasets.dataset.used": {
    "story": "DS-03",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03); Used by tab"
   },
   "datasets.record": {
    "story": "DS-04",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03); click JG 11 in the preview"
   },
   "datasets.observe": {
    "story": "DS-05",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03); Add observations"
   },
   "datasets.observe.assistant": {
    "story": "DS-05",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03); Add observations \u203a tell the assistant"
   },
   "datasets.collect": {
    "story": "DS-06",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "Catalogue \u203a Collect with an agent (needs B06b)"
   },
   "datasets.collect.run": {
    "story": "DS-06",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "a collection while it runs (needs B06b)"
   },
   "datasets.validation": {
    "story": "DS-07",
@@ -262,7 +262,7 @@
    "story": "DS-07",
    "product": "datasets",
    "route": "/datasets/validation",
-   "state": ""
+   "state": "click JG 11 \u00b7 maturity days"
   },
   "datasets.standards": {
    "story": "DS-08",
@@ -274,49 +274,49 @@
    "story": "DS-08",
    "product": "datasets",
    "route": "/datasets/standards",
-   "state": ""
+   "state": "click Crop Ontology \u00b7 Chickpea (CO_338) (needs B04)"
   },
   "datasets.standard.attach": {
    "story": "DS-09",
    "product": "datasets",
    "route": "/datasets/standards",
-   "state": ""
+   "state": "on a standard, Attach to a dataset (needs B04)"
   },
   "datasets.dataset.conformance": {
    "story": "DS-09",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03); Conformance tab (needs B04)"
   },
   "datasets.documents": {
    "story": "DS-10",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "a documents dataset (needs B03)"
   },
   "datasets.bind": {
    "story": "DS-11",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03); Bind to a Graph \u203a chickpea"
   },
   "datasets.share": {
    "story": "DS-12",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03); Share"
   },
   "datasets.dataset.retracted": {
    "story": "DS-14",
    "product": "datasets",
    "route": "/datasets/catalogue/variety-attributes",
-   "state": ""
+   "state": "dataset variety-attributes (chickpea; needs B03); a version marked retracted"
   },
   "datasets.standards.import": {
    "story": "DS-15",
    "product": "datasets",
    "route": "/datasets/standards",
-   "state": ""
+   "state": "Import \u203a From SKOS (needs B12)"
   },
   "datasets.imports": {
    "story": "DS-13",
@@ -328,7 +328,7 @@
    "story": "DS-13",
    "product": "datasets",
    "route": "/datasets/imports",
-   "state": ""
+   "state": "click an import while it runs: re-run demos/chickpea/load.py and open its run"
   },
   "modeller.global_model": {
    "story": "MO-01",
@@ -340,7 +340,7 @@
    "story": "MO-01",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/global-model",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "theme dark: user menu \u203a Appearance \u203a Dark"
   },
   "modeller.model.airroutes": {
    "story": "MO-02",
@@ -352,13 +352,13 @@
    "story": "MO-02",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models/airroutes",
-   "state": ""
+   "state": "click node type airport"
   },
   "modeller.global_model.stitch": {
    "story": "MO-03",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/global-model",
-   "state": ""
+   "state": "click a dashed stitch on the board"
   },
   "modeller.stitches": {
    "story": "MO-03",
@@ -370,97 +370,97 @@
    "story": "MO-04",
    "product": "modeller",
    "route": "/graphs/new",
-   "state": ""
+   "state": "New Graph"
   },
   "modeller.draft": {
    "story": "MO-04",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models/airroutes?draft",
-   "state": ""
+   "state": "airroutes with an unpublished draft: change any property, do not publish"
   },
   "modeller.global_model.diff": {
    "story": "MO-05",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/global-model",
-   "state": ""
+   "state": "with a draft on airroutes, Compare"
   },
   "modeller.draft.publish": {
    "story": "MO-05",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models/airroutes?draft",
-   "state": ""
+   "state": "on the draft, Publish"
   },
   "modeller.draft.migration": {
    "story": "MO-05",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models/airroutes?draft",
-   "state": ""
+   "state": "a breaking draft (narrow an enum), Publish (needs B10)"
   },
   "modeller.models.new": {
    "story": "MO-06",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": ""
+   "state": "New model"
   },
   "modeller.models.new.ontology": {
    "story": "MO-15",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "New model \u203a From an ontology (needs B12)"
   },
   "modeller.models.new.ontology.preview": {
    "story": "MO-15",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "New model \u203a From an ontology \u203a pick types \u203a Preview (needs B12)"
   },
   "modeller.models.overview": {
    "story": "MO-07",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": ""
+   "state": "Overview tab"
   },
   "modeller.models.database": {
    "story": "MO-07",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": ""
+   "state": "Database tab"
   },
   "modeller.models.usage": {
    "story": "MO-07",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": ""
+   "state": "Usage tab"
   },
   "modeller.models.performance": {
    "story": "MO-07",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": ""
+   "state": "Performance tab"
   },
   "modeller.models.growth": {
    "story": "MO-07",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": ""
+   "state": "Growth tab"
   },
   "modeller.models.report": {
    "story": "MO-07",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": ""
+   "state": "open a saved report"
   },
   "modeller.model.type.constraint": {
    "story": "MO-08",
    "product": "modeller",
    "route": "/u/admin/chickpea/modeller/models/chickpea/variety",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "Constraints tab; click maturity_days"
   },
   "modeller.model.history": {
    "story": "MO-09",
    "product": "modeller",
    "route": "/u/admin/chickpea/modeller/models/chickpea?tab=history",
-   "state": ""
+   "state": "one version until B01 records more"
   },
   "modeller.worlds": {
    "story": "MO-10",
@@ -472,19 +472,19 @@
    "story": "MO-10",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/worlds",
-   "state": ""
+   "state": "click a world"
   },
   "modeller.guardrails.request": {
    "story": "MO-11",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/guardrails",
-   "state": ""
+   "state": "a request from Explorer that meets a guardrail: open it"
   },
   "modeller.guardrails.edit": {
    "story": "MO-11",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/guardrails",
-   "state": ""
+   "state": "click a guardrail rule"
   },
   "modeller.rules": {
    "story": "MO-12",
@@ -496,7 +496,7 @@
    "story": "MO-12",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/rules",
-   "state": ""
+   "state": "click a rule"
   },
   "modeller.requests": {
    "story": "MO-13",
@@ -514,109 +514,109 @@
    "story": "MO-14",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/settings",
-   "state": ""
+   "state": "Database tab"
   },
   "modeller.settings.members": {
    "story": "MO-14",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/settings",
-   "state": ""
+   "state": "Members tab"
   },
   "explorer.home": {
    "story": "EX-01",
    "product": "explorer",
    "route": "/u/admin/airways/explorer",
-   "state": ""
+   "state": "a new session: empty board, nothing asked"
   },
   "explorer.answer": {
    "story": "EX-02",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d"
   },
   "explorer.answer.node": {
    "story": "EX-02",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; click a node on the board"
   },
   "explorer.answer.dark": {
    "story": "EX-02",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; theme dark: user menu \u203a Appearance \u203a Dark"
   },
   "explorer.answer.chart": {
    "story": "EX-03",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "ask \u201cRoutes out of LHR by carrier, as a bar chart\u201d"
   },
   "explorer.answer.trace": {
    "story": "EX-04",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; How I got this"
   },
   "explorer.answer.cannot": {
    "story": "EX-05",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "ask something the graph holds nothing on, e.g. \u201cWhat did a ticket to JFK cost?\u201d"
   },
   "explorer.answer.guardrail": {
    "story": "EX-06",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "in the Price-blind world, ask for deals by revenue"
   },
   "explorer.answer.schedule": {
    "story": "EX-07",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Schedule this"
   },
   "explorer.answer.scheduled": {
    "story": "EX-07",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Schedule this \u203a confirm"
   },
   "explorer.answer.query": {
    "story": "EX-08",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; composer Cypher, run MATCH (a:airport {code:'LHR'})-[:route]->(b) RETURN a,b LIMIT 25"
   },
   "explorer.answer.query.error": {
    "story": "EX-08",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; composer Cypher, run a query with a syntax error"
   },
   "explorer.tools": {
    "story": "EX-09",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; toolbar expanded"
   },
   "explorer.tools.expand": {
    "story": "EX-09",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; on a node, Expand neighbours"
   },
   "explorer.tools.styling": {
    "story": "EX-09",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Styling and layers"
   },
   "explorer.tools.history": {
    "story": "EX-09",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Canvas history"
   },
   "explorer.sessions": {
    "story": "EX-10",
@@ -628,31 +628,31 @@
    "story": "EX-11",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "a Graph whose set-up is not finished"
   },
   "explorer.answer.to_project": {
    "story": "EX-12",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Add to a project (needs C02)"
   },
   "explorer.answer.closed": {
    "story": "EX-13",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; close the chat with \u2715"
   },
   "explorer.answer.share": {
    "story": "EX-15",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Share"
   },
   "explorer.answer.console": {
    "story": "EX-14",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": ""
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; open the Console"
   },
   "projects.list": {
    "story": "PJ-01",
@@ -663,8 +663,8 @@
   "projects.new": {
    "story": "PJ-02",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "route": "/u/admin/chickpea/projects",
+   "state": "Projects \u203a New project"
   },
   "projects.project": {
    "story": "PJ-03",
@@ -676,61 +676,61 @@
    "story": "PJ-04",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "state": "Branches tab (needs B05)"
   },
   "projects.branch.fork": {
    "story": "PJ-04",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "state": "Branches tab \u203a Fork a branch on H2 (needs B05)"
   },
   "projects.branch": {
    "story": "PJ-05",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "state": "on branch H2.1 \u00b7 ICC 4958 \u00d7 KAK 2 (needs B05)"
   },
   "projects.finding": {
    "story": "PJ-06",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "state": "on branch H2.1 \u00b7 ICC 4958 \u00d7 KAK 2 (needs B05); click \u201cICC 4958 carries the root-depth QTL\u201d"
   },
   "projects.branch.decide": {
    "story": "PJ-07",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "state": "on branch H2.1 \u00b7 ICC 4958 \u00d7 KAK 2 (needs B05); Decide"
   },
   "projects.branch.merge": {
    "story": "PJ-08",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "state": "on branch H2.1 \u00b7 ICC 4958 \u00d7 KAK 2 (needs B05); Merge\u2026"
   },
   "projects.simulate": {
    "story": "PJ-09",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "state": "on branch H2, Simulate crosses (needs B09)"
   },
   "projects.simulate.result": {
    "story": "PJ-09",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "state": "on branch H2, Simulate crosses \u203a Run 4 crosses (needs B09)"
   },
   "projects.impact": {
    "story": "PJ-10",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/support-price",
-   "state": ""
+   "state": "Impact tab (needs B05)"
   },
   "projects.lineage": {
    "story": "PJ-11",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "state": "Lineage tab (needs B05)"
   },
   "projects.todos": {
    "story": "PJ-12",
@@ -742,19 +742,19 @@
    "story": "PJ-12",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/todos",
-   "state": ""
+   "state": "click \u201cMeasure 100-seed weight on plots 11\u201318\u201d"
   },
   "projects.decisions": {
    "story": "PJ-13",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/decisions",
-   "state": ""
+   "state": "needs B05 for its rows"
   },
   "projects.report": {
    "story": "PJ-14",
    "product": "projects",
    "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": ""
+   "state": "Report tab (needs B05)"
   },
   "agents.overview": {
    "story": "AG-01",
@@ -766,7 +766,7 @@
    "story": "AG-01",
    "product": "agents",
    "route": "/u/admin/airways/agents",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "theme dark: user menu \u203a Appearance \u203a Dark"
   },
   "agents.agents": {
    "story": "AG-02",
@@ -778,61 +778,61 @@
    "story": "AG-02",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents",
-   "state": ""
+   "state": "Lineage tab"
   },
   "agents.agent": {
    "story": "AG-03",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents/analyst",
-   "state": ""
+   "state": "analyst stands for an agent's slug: open any agent from Agents"
   },
   "agents.agent.activity": {
    "story": "AG-03",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents/analyst",
-   "state": ""
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Activity tab"
   },
   "agents.agent.instructions": {
    "story": "AG-04",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents/analyst",
-   "state": ""
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Instructions tab (needs B02)"
   },
   "agents.agent.soul": {
    "story": "AG-05",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents/analyst",
-   "state": ""
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Soul tab"
   },
   "agents.agent.thinking": {
    "story": "AG-05",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents/analyst",
-   "state": ""
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Thinking tab"
   },
   "agents.agent.skills": {
    "story": "AG-05",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents/analyst",
-   "state": ""
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Skills & callables tab"
   },
   "agents.agent.envelope": {
    "story": "AG-05",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents/analyst",
-   "state": ""
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Envelope"
   },
   "agents.agent.history": {
    "story": "AG-06",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents/analyst",
-   "state": ""
+   "state": "analyst stands for an agent's slug: open any agent from Agents; History tab"
   },
   "agents.agent.pause": {
    "story": "AG-07",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents/analyst",
-   "state": ""
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Pause or retire"
   },
   "agents.skills": {
    "story": "AG-08",
@@ -844,37 +844,37 @@
    "story": "AG-08",
    "product": "agents",
    "route": "/u/admin/airways/agents/skills/answer-nl",
-   "state": ""
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills"
   },
   "agents.skills.instructions.edit": {
    "story": "AG-08",
    "product": "agents",
    "route": "/u/admin/airways/agents/skills",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills; Edit instructions (needs B02)"
   },
   "agents.skills.evals": {
    "story": "AG-08",
    "product": "agents",
    "route": "/u/admin/airways/agents/skills",
-   "state": ""
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills; Evals tab (needs B02)"
   },
   "agents.skills.plan.regenerated": {
    "story": "AG-08",
    "product": "agents",
    "route": "/u/admin/airways/agents/skills",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills; save an instructions edit (needs B02)"
   },
   "agents.skills.history": {
    "story": "AG-09",
    "product": "agents",
    "route": "/u/admin/airways/agents/skills",
-   "state": ""
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills; History tab"
   },
   "agents.skills.usage": {
    "story": "AG-10",
    "product": "agents",
    "route": "/u/admin/airways/agents/skills",
-   "state": ""
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills; Usage tab"
   },
   "agents.library": {
    "story": "AG-11",
@@ -886,43 +886,43 @@
    "story": "AG-11",
    "product": "agents",
    "route": "/u/admin/airways/agents/library",
-   "state": ""
+   "state": "Plans tab, click a plan"
   },
   "agents.library.plan.overview": {
    "story": "AG-11",
    "product": "agents",
    "route": "/u/admin/airways/agents/library",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "Plans tab, click a plan; Overview tab"
   },
   "agents.library.plan.revisions": {
    "story": "AG-11",
    "product": "agents",
    "route": "/u/admin/airways/agents/library",
-   "state": "set up by hand (dialog, variant or data)"
+   "state": "a run that replanned: its Revisions"
   },
   "agents.library.templates": {
    "story": "AG-12",
    "product": "agents",
    "route": "/u/admin/airways/agents/library",
-   "state": ""
+   "state": "Templates tab"
   },
   "agents.plugins": {
    "story": "AG-13",
    "product": "agents",
    "route": "/u/admin/airways/agents/plugins",
-   "state": ""
+   "state": "needs B06a for its rows"
   },
   "agents.plugins.plugin": {
    "story": "AG-13",
    "product": "agents",
    "route": "/u/admin/airways/agents/plugins",
-   "state": ""
+   "state": "click a plugin (needs B06a)"
   },
   "agents.plugins.task": {
    "story": "AG-13",
    "product": "agents",
    "route": "/u/admin/airways/agents/plugins",
-   "state": ""
+   "state": "click a plugin, then a task type (needs B06a)"
   },
   "agents.llms": {
    "story": "AG-14",

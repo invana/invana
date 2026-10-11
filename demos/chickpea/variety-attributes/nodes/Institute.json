@@ -1,0 +1,56 @@
+[
+  {
+    "id": "I-JNKVV",
+    "properties": {
+      "name": "JNKVV Jabalpur",
+      "short_name": "JNKVV",
+      "city": "Jabalpur",
+      "sector": "university"
+    }
+  },
+  {
+    "id": "I-PDKV",
+    "properties": {
+      "name": "PDKV Akola",
+      "short_name": "PDKV",
+      "city": "Akola",
+      "sector": "university"
+    }
+  },
+  {
+    "id": "I-MPKV",
+    "properties": {
+      "name": "MPKV Rahuri",
+      "short_name": "MPKV",
+      "city": "Rahuri",
+      "sector": "university"
+    }
+  },
+  {
+    "id": "I-IARI",
+    "properties": {
+      "name": "IARI New Delhi",
+      "short_name": "IARI",
+      "city": "New Delhi",
+      "sector": "national institute"
+    }
+  },
+  {
+    "id": "I-ICAR-IIPR",
+    "properties": {
+      "name": "ICAR-IIPR Kanpur",
+      "short_name": "ICAR-IIPR",
+      "city": "Kanpur",
+      "sector": "national institute"
+    }
+  },
+  {
+    "id": "I-ICRISAT",
+    "properties": {
+      "name": "ICRISAT",
+      "short_name": "ICRISAT",
+      "city": "Patancheru",
+      "sector": "international centre"
+    }
+  }
+]

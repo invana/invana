@@ -1,0 +1,66 @@
+{
+  "nodes": {
+    "Variety": {
+      "identity": [
+        "name"
+      ]
+    },
+    "Institute": {
+      "identity": [
+        "name"
+      ]
+    },
+    "Trait": {
+      "identity": [
+        "name"
+      ]
+    },
+    "Pedigree": {
+      "identity": [
+        "cross_id"
+      ]
+    }
+  },
+  "edges": {
+    "DEVELOPED_BY": {
+      "from": [
+        "Variety"
+      ],
+      "to": [
+        "Institute"
+      ]
+    },
+    "CONSERVED_BY": {
+      "from": [
+        "Variety"
+      ],
+      "to": [
+        "Institute"
+      ]
+    },
+    "NOTED_FOR": {
+      "from": [
+        "Variety"
+      ],
+      "to": [
+        "Trait"
+      ]
+    },
+    "FEMALE_PARENT": {
+      "from": [
+        "Pedigree"
+      ],
+      "to": [
+        "Variety"
+      ]
+    },
+    "MALE_PARENT": {
+      "from": [
+        "Pedigree"
+      ],
+      "to": [
+        "Variety"
+      ]
+    }
+  }
+}
