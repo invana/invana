@@ -272,8 +272,14 @@ def run_session(row: dict, max_fix: int) -> bool:
             ok, report = review(row)
             if ok:
                 set_status(sid, "done", "gates green · design review passed")
+                kind = {"A": "refactor", "B": "feat", "C": "feat", "R": "chore"}[sid[0]]
                 sh(["git", "add", "-A"])
-                sh(["git", "commit", "-m", f"migration({sid}): {row['kind']} session\n\nGates green; design review in scripts/migration/reviews/{sid}.md.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"])
+                res = sh(["git", "commit", "-m", f"{kind}(migration): session {sid} ({row['kind']})\n\nGates green; design review in "
+                          f"scripts/migration/reviews/{sid}.md.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"])
+                if res.returncode != 0:
+                    print(res.stdout[-3000:] + res.stderr[-3000:])
+                    set_status(sid, "blocked", "commit refused by pre-commit hooks — see the runner output")
+                    return False
                 return True
             findings = [f"Design review failed:\n{report}"]
         if attempt == max_fix:
