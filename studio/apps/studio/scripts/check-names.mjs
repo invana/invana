@@ -38,6 +38,8 @@ const FEATURES = path.join(SRC, "pages", "graphs-detail", "features");
 const ENGINE_SERVER = path.join(
 	STUDIO,
 	"..",
+	"..",
+	"..",
 	"engine",
 	"src",
 	"invana",

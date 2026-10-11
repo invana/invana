@@ -6,7 +6,7 @@ import { defineConfig, type Plugin } from "vite";
 /**
  * Work against a local `design-kit` checkout instead of the published packages.
  *
- * Opt-in, and off by default — `INVANA_DESIGN_KIT=../../design-kit pnpm dev`.
+ * Opt-in, and off by default — `INVANA_DESIGN_KIT=../../../../design-kit pnpm dev`.
  * Unset (a fresh clone, CI, every contributor who has never cloned design-kit)
  * resolves every `@invana/*` from npm exactly as before, so no local link ever
  * reaches a committed manifest (design-system.md DS3/DS10). The path is read
@@ -62,7 +62,7 @@ const designKitAlias: Record<string, string> = designKitRoot
 	: {};
 
 /**
- * The same hatch for the `canvas` checkout — `INVANA_CANVAS=../../canvas pnpm dev`.
+ * The same hatch for the `canvas` checkout — `INVANA_CANVAS=../../../../canvas pnpm dev`.
  *
  * Identical contract to `INVANA_DESIGN_KIT` (design-system.md DS10): opt-in, off
  * by default, aliases to each package's **build**, and never touches a committed

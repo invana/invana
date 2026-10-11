@@ -69,7 +69,7 @@ export function directionLabel(direction: Touch["direction"]): string {
 }
 
 /** A bar's key: the step it belongs to, then the touch's `seq` — `fetch#12`. */
-export function touchKey(touch: Pick<Touch, "step_key" | "seq">): string {
+function touchKey(touch: Pick<Touch, "step_key" | "seq">): string {
 	return `${touch.step_key ?? ""}#${touch.seq}`;
 }
 

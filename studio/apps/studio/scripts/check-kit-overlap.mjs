@@ -15,14 +15,20 @@
  * checkout can still lint. Reported paths and `ALLOWED` keys are relative to
  * the Studio root.
  *
- * Run: `node scripts/check-kit-overlap.mjs` (part of `pnpm lint`).
+ * Run: `node scripts/check-kit-overlap.mjs` from `apps/studio/` (part of `pnpm lint`).
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 
-const STUDIO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+// The workspace root (`studio/`), three levels above `apps/studio/scripts/`.
+const STUDIO = path.resolve(
+	path.dirname(fileURLToPath(import.meta.url)),
+	"..",
+	"..",
+	"..",
+);
 const WORKSPACE_DIRS = ["packages", "apps"];
 const KIT_PACKAGES = ["ui", "canvas-ui"];
 

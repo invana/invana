@@ -413,6 +413,54 @@ Each session: create the package, `git mv` its folders, give it a `ProductDefini
 | Exit check | `chickpea` appears in `/graphs`; `python3 scripts/migration/screen_map.py` maps every board |
 |---|---|
 
+## R01 — make the e2e suite green · `change`
+
+| | |
+|---|---|
+| Goal | Every e2e spec passes against the dev stack, so `scripts/migration/baseline.json` holds no e2e entries and the e2e gate checks every spec again |
+| Read | `scripts/migration/baseline.json` · the failing specs under the Studio app's `e2e/` · `.migration-cache/R00/fix-2.jsonl` notes in the hand-off below (causes found) |
+
+| # | Step |
+|---|---|
+| 1 | Run the suite (`E2E_GRAPH_PATH=/u/admin/airways`, already set by the driver) and confirm the seven baseline failures |
+| 2 | Locators that design-kit 0.0.33 made ambiguous (icon-only buttons now have names: "Models" matches three) — `exact: true`, or anchor on the drawer header. Fix the spec, never the component |
+| 3 | Specs that need data the dev DB lacks ("How many airports are there?" run, a Report, model boards) — create it in the spec's own setup through the UI or API, so a clean stack passes; never depend on hand-made rows |
+| 4 | `answer-surface` › *a subgraph loaded to the canvas says what it added* — find whether the spec or the surface is wrong; a real Studio bug is fixed in Studio and named in the hand-off |
+| 5 | Run the suite three times in a row; all green each time. Remove the e2e entries from `baseline.json` (keep the knip one unless fixed — `touchKey` loses its `export`) |
+
+| Exit check | `pnpm test:e2e` green three runs in a row; `baseline.json` has no `e2e ›` entry |
+|---|---|
+
+## R02 — genetics example: Arabidopsis replaces chickpea · `change`
+
+| | |
+|---|---|
+| Goal | The Research demo is a public model-organism example, not a beta user's crop: *flowering time under drought in Arabidopsis thaliana*. Chickpea leaves the repo and the product docs |
+| Read | `demos/chickpea/` (R00 — reuse its loader and shape) · `docs/products/` · `scripts/migration/screen_map.py` |
+
+| Chickpea (remove) | Arabidopsis (use) |
+|---|---|
+| Research project *Drought-tolerant chickpea* | *Early flowering under drought* |
+| Policy project *Raise the chickpea support price by 10%* | *Allow gene-edited lines in field trials* |
+| General project *Wilt resistance survey 2025* | *Seed-stock audit 2025* |
+| Dataset `variety-attributes` | `accession-phenotypes` (origin `official`, after 1001 Genomes / AraPheno) |
+| `Variety` — JG 11, KAK 2, ICC 4958 … | `Accession` — Col-0, Ler-1, Cvi-0, C24, Sha, Bur-0, Kas-1, Van-0 |
+| `Institute` — JNKVV, ICRISAT … | `StockCentre` — ABRC, NASC · `Institute` — GMI Vienna, MPI Tübingen, Salk |
+| `Trait` — maturity days (80–180), 100-seed weight, wilt reaction · Crop Ontology CO_338 | `Trait` — days to flowering (15–150), rosette leaf number, drought survival %, δ13C · Plant Trait Ontology (TO) |
+| — | `Gene` — FLC, FRI, FT, DOG1, with `CARRIES` Accession → Gene (allele: functional · loss-of-function) |
+| `Pedigree` — ICC 4958 × KAK 2 … | `Cross` — Col-0 × Cvi-0, Ler-1 × Sha, C24 × Col-0 … (status, generation) |
+| Hypotheses about root depth and wilt | H1 *FRI loss-of-function shortens flowering under drought* · H1.1 *…via lower FLC* · H2 *DOG1 alleles trade flowering for survival* |
+
+| # | Step |
+|---|---|
+| 1 | `demos/arabidopsis/`: models, records, projects, todos, stitches and a loader built from R00's `load.py`, against **its own** database `bolt://host.docker.internal:37688` (container `invana-arabidopsis-neo4j`, password `arabidopsis-demo` — already running). README says it is a demo; values follow public sources loosely |
+| 2 | `git rm -r demos/chickpea/`; if the `admin/chickpea` Graph can be removed through the engine (no hand SQL), remove it; otherwise say so in the hand-off |
+| 3 | Replace every chickpea example in `docs/products/` and `scripts/migration/` with the table above (names exactly as written — the prototype is regenerated with the same ones). The beta user's crop is not named anywhere |
+| 4 | `screen_map.py` `STATE` and routes point at `/u/admin/arabidopsis`; re-run it |
+
+| Exit check | `arabidopsis` appears in `/graphs`; `grep -ri chickpea docs/products scripts/migration demos` returns nothing; `screen_map.py` maps every board |
+|---|---|
+
 ## Track B · Engine
 
 Every B session starts the same way.
@@ -467,8 +515,10 @@ Statuses: `pending` · `in progress` · `partial` · `blocked` · `done`.
 |---|---|---|---|---|---|---|---|
 | R00 | 0 | change | — | `refactor/studio-phase-0` | done | 2026-10-11 | gates green · design review passed |
 | A00 | 0 | change | — | `refactor/studio-phase-0` | done | 2026-10-11 | gates green · design review passed |
-| A01 | 1 | move | A00 | `refactor/studio-phase-1` | pending | | |
-| A02 | 2 | move | A01 | `refactor/studio-phase-2` | pending | | |
+| A01 | 1 | move | A00 | `refactor/studio-phase-1` | done | 2026-10-11 | gates green · design review passed |
+| R01 | 1 | change | A01 | `refactor/studio-phase-1` | pending | | e2e green; empty the baseline |
+| R02 | 1 | change | R01 | `refactor/studio-phase-1` | pending | | Arabidopsis replaces chickpea |
+| A02 | 2 | move | A01, R01, R02 | `refactor/studio-phase-2` | pending | | |
 | A03 | 2 | move | A02 | `refactor/studio-phase-2` | pending | | |
 | A04 | 2 | change | A03 | `refactor/studio-phase-2` | pending | | |
 | A05 | 3 | move+change | A04 | `refactor/studio-phase-3` | pending | | |
@@ -516,6 +566,7 @@ One block per finished session, newest first. What a later session must know tha
 
 | Session | Date | Note |
 |---|---|---|
+| A01 | 2026-10-11 | **Steps 1–11 done; every exit check run.** `pnpm build` · `lint` · `check-types` · `test` (also `test -- --coverage`, as CI runs it) · `knip` all green from `studio/`. Full e2e: 42 pass, 7 fail — exactly the 7 in `baseline.json`. Both hatches booted through `pnpm dev` (turbo) and served modules from the checkouts. `docker compose up -d --build --no-deps studio` serves :8300 (the e2e ran against it). The tag already existed and holds `studio/src/router.tsx`. **Decisions:** (1) `packageManager` is `pnpm@11.7.0` — there was no pin before, but turbo 2 refuses to run without one; 11.7.0 is what wrote today's lockfile. (2) The lockfile keeps every old resolution: its `.` importer was renamed to `apps/studio` before installing. A plain `pnpm install` re-resolves the moved importer and silently bumps `pixi.js` 8.20.1 → 8.22.0 and `react-hook-form` 7.72.1 → 7.87.0, so do the same rename whenever an importer moves (A02, A03). If pnpm says "Already up to date", pass `--config.optimistic-repeat-install=false`. (3) Turbo runs in strict env mode: `VITE_*`, `INVANA_DESIGN_KIT` and `INVANA_CANVAS` are declared as `env` on `build` and `dev`, and `CI` is passed through. A new env var a task reads must be added there, or turbo hides it. (4) `"agentGuidance": false` in `turbo.json`, because turbo otherwise writes `studio/AGENTS.md` whenever an agent runs it. (5) `studio/biome.json` is still the workspace's Biome config (it extends the repo-root `biome.json`), and its override `includes` now read `apps/studio/src/…`. I checked this with a probe file: the `shared/` leaf rule still fires. A02/A03 must re-point these overrides when `src/` moves. (6) **One content edit outside config:** `touchKey` in `lenses/runLayers.ts` is no longer exported (only used in that file; no behaviour change). R00 left it to the next session that touches studio. It also had to go because turbo prefixes knip's output (`studio:knip: …`), which `run.py`'s `failing_items` cannot parse, so a knip failure that is already in the baseline would still fail the gate. The `knip › touchKey` entry in `baseline.json` is now dead. **For later sessions:** `check-kit-overlap.mjs` now resolves `STUDIO` to the workspace root (three levels up), and `check-names.mjs` reaches `engine/` three levels up; both stay in `apps/studio/scripts/`. Root `pnpm dev` is `turbo run dev` and takes no Vite flags; the Makefile and Docker use `pnpm --filter studio dev …`. A new compose volume, `studio-app-node-modules`, covers `apps/studio/node_modules`. **Not done, outside scope:** `.vscode/launch.json` still sets the hatches to `../../design-kit` / `../../canvas`, but from `apps/studio` they need `../../../../…`; editing it needed an approval. Doc links in `src` comments (`../../../../../docs/…`) are two levels short after the move. Docs that cite `studio/src/…` are stale, and so is the `docker-compose.override.yml` comment about `link:` deps (gitignored). Turbo warns "no output files found for task studio#test" when `test` runs without `--coverage`. It is harmless |
 | A00 | 2026-10-11 | **Steps 1–3 done; `pnpm lint` green in `studio/` (2 Biome warnings, pre-existing).** `CLAUDE.md`: rule 9 and *Design rules › Missing component* allow Studio-only compositions in `@invana-studio/ui` under migration-plan §4 (linked), primitives still to design-kit; one line under *Scope* points to `docs/products/`. `check-kit-overlap.mjs` now scans `src/` plus every `packages/<name>/src/` and `apps/<name>/src/` that exists, and resolves `@invana/ui` / `canvas-ui` `dist/` from Studio's root `node_modules` first, then each workspace package's — so A01 needs no change to it as long as the workspace root stays `studio/`. **Changed on purpose:** reported paths and `ALLOWED` keys are now relative to the Studio root (`src/…`, `packages/ui/src/…`), not to `src/`; `ALLOWED` was empty, so nothing broke. Checked with a throwaway `packages/zz-probe/src/Button.tsx` (flagged, then deleted). **For A01:** if the app moves to `apps/studio/` and the workspace root keeps `scripts/`, the script still finds it; if `scripts/` moves into the app, `STUDIO` must point at the workspace root. A04's boundary check is separate and not started here |
 | R00 | 2026-10-11 | **Done.** Ran the *To unblock* load against `invana-chickpea-neo4j` (already up): Chickpea 1.0.0 published, 52 of 52 records written, 3 projects and 5 todos — re-runnable, it merges. `chickpea` shows in Studio's `/graphs` (checked with a signed-in throwaway spec, since deleted). `screen_map.py`: 157 boards mapped, 128 with state. The studio gates now compare against `scripts/migration/baseline.json`, which already lists the e2e failures and knip's `touchKey` from the fix attempts below, so they are not R00's; the fixes those notes name (runner `E2E_GRAPH_PATH`, `zz-verify-*` data and locators, `touchKey`'s export) still need an owner. The chickpea container is not in `docker compose` — after a machine restart, start it again before a design review |
 | R00 | 2026-10-11 | **Fix attempt 1 — nothing fixed; both gate failures predate R00 and sit outside its scope.** R00 changes no file under `studio/` (diff: `demos/chickpea/`, `scripts/migration/`, this doc), so the studio gates read the branch's committed code. `pnpm knip`: `touchKey` in `studio/src/pages/graphs-detail/features/lenses/runLayers.ts:72` is exported but only used in that file — drop the `export` (from c7be2be2, not R00); owner: whichever session next touches studio, or a one-line `chore(studio)` before A01. `pnpm test:e2e`: re-run, the same 14 fail / 35 pass as the driver saw. They need dev data and a graph path, not R00 code — `explorer.ts` defaults to `/u/admin/air-routes-graph`, which this stack lacks (set `E2E_GRAPH_PATH=/u/admin/airways`), and the `zz-verify-*` specs want a run for "How many airports are there?", Reports and model boards in the dev DB. The runner's e2e gate should set `E2E_GRAPH_PATH` and seed or skip the `zz-verify-*` specs — runner work, not R00. R00 itself stays `blocked` on the chickpea database below |

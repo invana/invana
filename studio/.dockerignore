@@ -1,5 +1,6 @@
-node_modules
-dist
-.vite
+**/node_modules
+**/dist
+**/.vite
+**/.turbo
 .pnpm-store
 *.tsbuildinfo

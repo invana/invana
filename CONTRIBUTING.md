@@ -214,10 +214,10 @@ point Studio at your checkout for that run:
 
 ```bash
 cd studio
-INVANA_DESIGN_KIT=../../design-kit pnpm dev     # or pnpm build
+INVANA_DESIGN_KIT=../../../../design-kit pnpm dev     # or pnpm build
 ```
 
-The path is resolved relative to `studio/`, so it works the same on macOS, Linux and Windows.
+The path is resolved relative to `studio/apps/studio/` (where `vite.config.ts` lives), so it works the same on macOS, Linux and Windows.
 `@invana/styling` resolves to its source; the rest resolve to their local `dist`, so run
 `pnpm build` in design-kit after editing them. Unset the variable and everything comes from npm
 again.

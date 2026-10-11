@@ -14,9 +14,11 @@ env/
 
 # ─── Node / Studio ───
 node_modules/
-studio/dist/
+studio/apps/*/dist/
+studio/packages/*/dist/
 *.tsbuildinfo
 .vite/
+.turbo/
 
 # ─── Built Studio assets inside engine (generated) ───
 engine/src/invana/studio/static/*
@@ -72,10 +74,10 @@ docs/site/
 studio/.pnpm-store/
 
 # ─── Studio end-to-end tests ───
-studio/e2e/.auth/
-studio/test-results/
-studio/playwright-report/
-studio/blob-report/
+studio/apps/*/e2e/.auth/
+studio/apps/*/test-results/
+studio/apps/*/playwright-report/
+studio/apps/*/blob-report/
 
 # ─── Migration runner (scripts/migration) ───
 .migration-cache/

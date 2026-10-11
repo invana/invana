@@ -133,6 +133,7 @@ services:
     volumes:
       - ./studio:/app
       - studio-node-modules:/app/node_modules
+      - studio-app-node-modules:/app/apps/studio/node_modules
     depends_on:
       - engine
 
@@ -248,3 +249,4 @@ volumes:
   hyperdx-mongo-data:
   engine-venv:
   studio-node-modules:
+  studio-app-node-modules:

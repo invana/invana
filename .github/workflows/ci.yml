@@ -105,12 +105,12 @@ jobs:
       - name: Run unit & component tests
         run: |
           cd studio
-          pnpm test --coverage
+          pnpm test -- --coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
-          file: studio/coverage/coverage-final.json
+          file: studio/apps/studio/coverage/coverage-final.json
           flags: studio
           fail_ci_if_error: false
 
@@ -127,7 +127,7 @@ jobs:
         run: |
           CHANGED=$(git diff --name-only origin/main...HEAD)
           # Skip changeset check for docs-only or CI-only changes
-          if echo "$CHANGED" | grep -qE '^(engine/src|studio/src)/'; then
+          if echo "$CHANGED" | grep -qE '^(engine/src|studio/(apps|packages)/[^/]+/src)/'; then
             if ! echo "$CHANGED" | grep -q '^\.changeset/'; then
               echo "::error::Missing changeset. Run 'pnpm changeset' to add one."
               exit 1

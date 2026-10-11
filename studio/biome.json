@@ -58,7 +58,7 @@
 	},
 	"overrides": [
 		{
-			"includes": ["src/**", "!**/*.test.ts", "!**/*.test.tsx"],
+			"includes": ["apps/studio/src/**", "!**/*.test.ts", "!**/*.test.tsx"],
 			"linter": {
 				"rules": {
 					"suspicious": {
@@ -68,7 +68,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/agents/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/agents/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -95,7 +95,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/assistant/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/assistant/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -122,7 +122,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/boards/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/boards/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -149,7 +149,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/events/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/events/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -176,7 +176,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/explorer/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/explorer/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -203,7 +203,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/graphs/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/graphs/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -230,7 +230,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/lenses/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/lenses/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -257,7 +257,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/llms/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/llms/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -284,7 +284,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/models/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/models/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -311,7 +311,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/plans/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/plans/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -338,7 +338,9 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/projections/**"],
+			"includes": [
+				"apps/studio/src/pages/graphs-detail/features/projections/**"
+			],
 			"linter": {
 				"rules": {
 					"style": {
@@ -365,7 +367,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/projects/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/projects/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -392,7 +394,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/rules/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/rules/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -419,7 +421,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/runs/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/runs/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -446,7 +448,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/setup/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/setup/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -473,7 +475,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/features/skills/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/features/skills/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -500,7 +502,7 @@
 			}
 		},
 		{
-			"includes": ["src/pages/graphs-detail/shared/**"],
+			"includes": ["apps/studio/src/pages/graphs-detail/shared/**"],
 			"linter": {
 				"rules": {
 					"style": {
