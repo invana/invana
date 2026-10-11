@@ -25,6 +25,7 @@
 
 import { Input, Label, Textarea } from "@invana/forms";
 import { Badge, Button, Spinner } from "@invana/ui";
+import { PanelSection } from "@invana-studio/ui";
 import { PencilLine, Sparkles, SquarePen, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -45,7 +46,6 @@ import type {
 	SkillPlaybookNode,
 	SkillPlaybookRead,
 } from "@/pages/graphs-detail/features/skills/types";
-import { PanelSection } from "@/ui/PanelSection";
 
 /** One line of the playbook, and what it drew. */
 function sentences(content: string): string[] {

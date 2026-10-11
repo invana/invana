@@ -29,9 +29,9 @@ import {
 	SelectValue,
 } from "@invana/forms";
 import { Button } from "@invana/ui";
+import { FormError } from "@invana-studio/ui";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FormError } from "@/components/forms/FormError";
 import {
 	useCreateLLMProviderMutation,
 	useUpdateLLMProviderMutation,

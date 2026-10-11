@@ -11,14 +11,14 @@
  */
 
 import type { EdgeStyle, GraphData, NodeStyle } from "@invana/graph";
-import type { LiveColors } from "@/canvases/model/config";
+import type { LiveColors } from "./config";
 import {
 	MODEL_EMPTY_TYPE,
 	MODEL_FRAME_TYPE,
 	type ModelEdgeData,
 	type ModelFrameData,
 	type ModelGraphData,
-} from "@/canvases/model/types";
+} from "./types";
 
 const STITCH_DASH: [number, number] = [6, 4];
 

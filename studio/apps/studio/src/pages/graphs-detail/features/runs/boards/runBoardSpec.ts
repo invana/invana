@@ -27,6 +27,7 @@ import type {
 } from "@invana/boards";
 import type { GanttBar, GanttRow } from "@invana/ui";
 import { formatDuration } from "@invana-studio/core";
+import { LAYER_PALETTE } from "@invana-studio/ui";
 import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses";
 import {
 	layersOptions,
@@ -62,7 +63,6 @@ import {
 import { taskFlowFromRun } from "@/pages/graphs-detail/features/runs/boards/taskFlowFromRun";
 import { runSummary } from "@/pages/graphs-detail/features/runs/runSummary";
 import type { WithFlow } from "@/pages/graphs-detail/shared/boards/TaskFlowWidget";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 /** Action ids the page answers. The spec carries the string; the page carries the behaviour. */
 export const RUN_ACTIONS = {

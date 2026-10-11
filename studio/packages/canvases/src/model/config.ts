@@ -21,7 +21,7 @@ import {
 	type ModelTypeData,
 	type ModelTypeNode,
 	SCHEMA_CARD,
-} from "@/canvases/model/types";
+} from "./types";
 
 /** `@invana/styling`'s `--color-data-1…8`, used only when a token cannot be read. */
 const FALLBACK_HUES = [

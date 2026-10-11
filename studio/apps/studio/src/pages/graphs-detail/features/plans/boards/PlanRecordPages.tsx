@@ -8,6 +8,7 @@
 
 import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
+import { BOARD_ICONS } from "@invana-studio/ui";
 import { type ReactNode, useMemo, useState } from "react";
 import {
 	planArgumentsSpec,
@@ -22,7 +23,6 @@ import {
 	useTaskPlansQuery,
 } from "@/pages/graphs-detail/features/plans/queries";
 import type { TaskPlanSummary } from "@/pages/graphs-detail/features/plans/types";
-import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
 import { routedAction } from "@/pages/graphs-detail/shared/boardSpec";
 
 interface RecordPageProps {

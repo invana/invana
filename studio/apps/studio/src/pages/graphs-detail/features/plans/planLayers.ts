@@ -11,8 +11,8 @@
  */
 
 import type { GanttOptions, GanttSpecRow } from "@invana/blocks";
+import { LAYER_SWATCHES, layerSlug } from "@invana-studio/ui";
 import type { TaskPlanDetail } from "@/pages/graphs-detail/features/plans/types";
-import { LAYER_SWATCHES, layerSlug } from "@/ui/layerPalette";
 
 export function planLayersGantt(
 	plan: TaskPlanDetail,

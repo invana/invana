@@ -39,6 +39,12 @@ import {
 	PropertyRow,
 	Spinner,
 } from "@invana/ui";
+import {
+	DetailBlock,
+	DetailStatus,
+	PanelSection,
+	RecordRow,
+} from "@invana-studio/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -46,12 +52,6 @@ import {
 	type ProjectionTemplateRead,
 	projectionTemplatesApi,
 } from "@/pages/graphs-detail/features/runs";
-import {
-	DetailBlock,
-	DetailStatus,
-} from "@/pages/graphs-detail/shared/DetailRows";
-import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import { PanelSection } from "@/ui/PanelSection";
 
 const RESULT_SURFACES = [
 	"table",

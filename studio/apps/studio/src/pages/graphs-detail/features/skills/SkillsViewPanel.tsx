@@ -29,6 +29,12 @@ import {
 	PropertyRow,
 	Spinner,
 } from "@invana/ui";
+import {
+	DetailStatus,
+	PanelStatusBar,
+	SectionTitle,
+	StatusCrumb,
+} from "@invana-studio/ui";
 import { ChevronLeft, ChevronRight, Maximize2, Plus } from "lucide-react";
 import { useState } from "react";
 import { RulesSection } from "@/pages/graphs-detail/features/rules";
@@ -40,9 +46,6 @@ import {
 	useSkillUsageQuery,
 } from "@/pages/graphs-detail/features/skills/queries";
 import type { Skill } from "@/pages/graphs-detail/features/skills/types";
-import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
-import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
-import { PanelStatusBar, StatusCrumb } from "@/ui/PanelStatusBar";
 
 interface Props {
 	username: string;

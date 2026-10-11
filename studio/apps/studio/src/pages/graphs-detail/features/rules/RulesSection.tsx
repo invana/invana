@@ -16,6 +16,7 @@
  */
 
 import { Button, Spinner } from "@invana/ui";
+import { PanelSection } from "@invana-studio/ui";
 import { useState } from "react";
 import {
 	RuleStatementForm,
@@ -29,7 +30,6 @@ import {
 	useSetRuleActiveMutation,
 	useUpdateRuleMutation,
 } from "@/pages/graphs-detail/features/skills";
-import { PanelSection } from "@/ui/PanelSection";
 
 export function RulesSection({
 	username,

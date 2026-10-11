@@ -7,10 +7,10 @@
  */
 
 import { Textarea } from "@invana/forms";
+import { PanelSection } from "@invana-studio/ui";
 import type { AgentDraft } from "@/pages/graphs-detail/features/agents/agentDraft";
 import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
 import type { Agent } from "@/pages/graphs-detail/features/agents/types";
-import { PanelSection } from "@/ui/PanelSection";
 
 export function AgentEffortTab({
 	agent,

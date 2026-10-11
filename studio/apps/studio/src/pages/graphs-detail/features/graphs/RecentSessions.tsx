@@ -6,6 +6,7 @@ import {
 	StatusDot,
 } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
+import { ListRow } from "@invana-studio/ui";
 import { useQuery } from "@tanstack/react-query";
 import { MessageSquare } from "lucide-react";
 import type { Session } from "@/pages/graphs-detail/features/assistant";
@@ -13,7 +14,6 @@ import {
 	sessionsApi,
 	sessionsListKey,
 } from "@/pages/graphs-detail/features/assistant";
-import { ListRow } from "@/pages/graphs-detail/shared/ListPanel";
 import { requestOpenSession } from "@/pages/graphs-detail/shared/useOpenSessionRequest";
 
 /** How many rows the panel shows. The assistant holds the rest. */

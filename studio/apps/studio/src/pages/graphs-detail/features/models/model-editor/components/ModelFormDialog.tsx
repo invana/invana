@@ -18,10 +18,10 @@ import {
 	DialogTitle,
 } from "@invana/ui";
 import { ApiError } from "@invana-studio/core";
+import { FormError } from "@invana-studio/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { FormError } from "@/components/forms/FormError";
 import { modelsApi } from "@/pages/graphs-detail/features/models/api";
 import {
 	useCreateModelMutation,

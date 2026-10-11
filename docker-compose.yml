@@ -135,6 +135,8 @@ services:
       - studio-node-modules:/app/node_modules
       - studio-app-node-modules:/app/apps/studio/node_modules
       - studio-core-node-modules:/app/packages/core/node_modules
+      - studio-ui-node-modules:/app/packages/ui/node_modules
+      - studio-canvases-node-modules:/app/packages/canvases/node_modules
     depends_on:
       - engine
 
@@ -252,3 +254,5 @@ volumes:
   studio-node-modules:
   studio-app-node-modules:
   studio-core-node-modules:
+  studio-ui-node-modules:
+  studio-canvases-node-modules:

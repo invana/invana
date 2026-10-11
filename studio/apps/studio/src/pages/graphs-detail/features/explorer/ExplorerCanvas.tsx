@@ -80,6 +80,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@invana/ui";
+import { readCanvasThemeConfig } from "@invana-studio/canvases";
 import {
 	endInteraction,
 	type InteractionRef,
@@ -113,7 +114,6 @@ import {
 	ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { readCanvasThemeConfig } from "@/canvases/theme";
 import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
 import { labelAt } from "@/pages/graphs-detail/features/explorer/canvasItems";
 import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";

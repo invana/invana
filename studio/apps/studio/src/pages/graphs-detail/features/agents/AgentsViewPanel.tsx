@@ -21,6 +21,7 @@
  */
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import { useStackSectionUi } from "@invana-studio/ui";
 import { useEffect, useRef, useState } from "react";
 import {
 	type AgentFilters,
@@ -39,7 +40,6 @@ import {
 	llmsSection,
 	useLLMProvidersQuery,
 } from "@/pages/graphs-detail/features/llms";
-import { useStackSectionUi } from "@/pages/graphs-detail/shared/StackSection";
 
 export interface AgentsViewPanelProps {
 	username: string;

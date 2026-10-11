@@ -41,6 +41,21 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
+import {
+	DetailBlock,
+	DetailPlaceholder,
+	DetailProse,
+	DetailStatus,
+	FilterSelect,
+	humanStatus,
+	ListRow,
+	PanelStatusBar,
+	PrincipalChip,
+	RecordRow,
+	StatusCount,
+	StatusCrumb,
+	taskTone,
+} from "@invana-studio/ui";
 import { Archive, ArchiveRestore, Pencil } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
@@ -58,18 +73,6 @@ import type {
 import { ProjectRules } from "@/pages/graphs-detail/features/rules";
 import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
 import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
-import {
-	DetailBlock,
-	DetailPlaceholder,
-	DetailProse,
-	DetailStatus,
-} from "@/pages/graphs-detail/shared/DetailRows";
-import { ListRow } from "@/pages/graphs-detail/shared/ListPanel";
-import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import { humanStatus, taskTone } from "@/pages/graphs-detail/shared/statusTone";
-import { FilterSelect } from "@/ui/FilterSelect";
-import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
-import { PrincipalChip } from "@/ui/PrincipalChip";
 
 /**
  * Focus the field the moment it appears. The form only exists because the user

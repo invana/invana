@@ -8,6 +8,7 @@ import {
 } from "@invana/ui";
 import type { QueryResponse, QueryRunPayload } from "@invana-studio/core";
 import { formatCompactCount } from "@invana-studio/core";
+import { ListFilterMenu, ListPanelChrome } from "@invana-studio/ui";
 import {
 	Check,
 	ChevronRight,
@@ -40,10 +41,6 @@ import type {
 import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
 import type { RunView } from "@/pages/graphs-detail/features/runs";
-import {
-	ListFilterMenu,
-	ListPanelChrome,
-} from "@/pages/graphs-detail/shared/ListPanel";
 import { useRunStore } from "@/stores/run.store";
 
 export interface AssistantViewPanelProps {

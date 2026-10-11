@@ -6,6 +6,7 @@ import {
 	ObjectField,
 } from "@invana/forms";
 import { Button } from "@invana/ui";
+import { FormError } from "@invana-studio/ui";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useRef } from "react";
 // Only `useForm` — @invana/forms re-exports every form *type* Studio needs
@@ -13,7 +14,6 @@ import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { FormError } from "@/components/forms/FormError";
 import { useCreateGraphMutation } from "@/pages/graphs-detail/features/graphs";
 
 function slugify(input: string): string {

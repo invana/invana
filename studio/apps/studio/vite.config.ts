@@ -211,11 +211,20 @@ export default defineConfig({
 		// `@invana/forms`, so every Studio import loses what the newer kit added
 		// ("does not provide an export named 'ParamRow'"). They are canvas-ui's
 		// peers: there is meant to be exactly one, and it is Studio's.
+		//
+		// The canvas packages are here for the workspace packages: pnpm resolves
+		// `@invana-studio/canvases`' own copy of `canvas-react` / `canvas-ui`
+		// against different peers than the app's, so without this the app and the
+		// package would each load one, with its own React context.
 		dedupe: [
 			"react",
 			"react-dom",
 			"pixi.js",
 			"pixi-viewport",
+			"@invana/canvas",
+			"@invana/canvas-react",
+			"@invana/canvas-ui",
+			"@invana/graph",
 			"@invana/styling",
 			"@invana/ui",
 			"@invana/themes",

@@ -7,6 +7,7 @@
  * adapters on the same renderer. A library plan draws on `TaskFlowCanvas` instead.
  */
 
+import { taskTone } from "@invana-studio/ui";
 import { useMemo } from "react";
 import {
 	LayeredCanvas,
@@ -14,7 +15,6 @@ import {
 	type LayeredNode,
 } from "@/canvases/layered/LayeredCanvas";
 import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects/queries";
-import { taskTone } from "@/pages/graphs-detail/shared/statusTone";
 
 interface Scope {
 	username: string;

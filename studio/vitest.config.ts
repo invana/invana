@@ -17,7 +17,6 @@ export default defineConfig({
 				"packages/core/src/stores/**/*.ts",
 				"packages/core/src/services/telemetry/*.ts",
 				"apps/studio/src/stores/**/*.ts",
-				"apps/studio/src/canvases/taskflow/taskFlowFromPlan.ts",
 				"apps/studio/src/pages/graphs-detail/features/agents/agentDraft.ts",
 				"apps/studio/src/pages/graphs-detail/features/assistant/answer-surface/emissions.ts",
 				"apps/studio/src/pages/graphs-detail/features/boards/boardKinds.ts",
@@ -26,6 +25,7 @@ export default defineConfig({
 				"apps/studio/src/pages/graphs-detail/features/lenses/addressing.ts",
 				"apps/studio/src/pages/graphs-detail/features/plans/taskFlowFromTaskPlan.ts",
 				"apps/studio/src/pages/graphs-detail/features/runs/runSummary.ts",
+				"apps/studio/src/pages/graphs-detail/features/skills/taskFlowFromPlan.ts",
 				"apps/studio/src/pages/graphs-detail/features/runs/boards/taskFlowFromRun.ts",
 			],
 			// The OpenTelemetry SDK boot — browser wiring with no decision in it.

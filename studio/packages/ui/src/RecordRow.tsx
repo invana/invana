@@ -25,8 +25,8 @@
 
 import { cn, StatusDot } from "@invana/ui";
 import type { CSSProperties, ReactNode } from "react";
-import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
-import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
+import { DetailStatus } from "./DetailRows";
+import type { Tone } from "./statusTone";
 
 export function RecordRow({
 	active,

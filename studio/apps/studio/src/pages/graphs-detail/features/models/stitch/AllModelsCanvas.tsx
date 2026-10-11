@@ -15,13 +15,13 @@
  */
 
 import { Button, EmptyState, Spinner } from "@invana/ui";
-import { AlertTriangle, Boxes, Check } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
 import {
 	GraphModelCanvas,
 	graphModelSettings,
 	graphModelTemplates,
-} from "@/canvases/model";
+} from "@invana-studio/canvases";
+import { AlertTriangle, Boxes, Check } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import {
 	useCommitStitchesMutation,

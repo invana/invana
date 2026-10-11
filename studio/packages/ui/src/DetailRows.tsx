@@ -19,7 +19,7 @@
 
 import { AgentChip, Badge, cn, PropertyList } from "@invana/ui";
 import type { ReactNode } from "react";
-import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
+import type { Tone } from "./statusTone";
 
 export function DetailBlock({
 	title,

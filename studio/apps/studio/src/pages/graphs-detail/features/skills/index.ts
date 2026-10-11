@@ -22,13 +22,12 @@ export {
 export { SkillBoardPage } from "@/pages/graphs-detail/features/skills/SkillBoardPage";
 export { SkillsViewPanel } from "@/pages/graphs-detail/features/skills/SkillsViewPanel";
 export { StepRules } from "@/pages/graphs-detail/features/skills/StepRules";
+export { LAYER_ICON } from "@/pages/graphs-detail/features/skills/taskFlowFromPlan";
 export type {
-	BindRefusal,
 	OfferedRule,
 	PlanArg,
 	Rule,
 	RuleCitationsResponse,
 	Skill,
 	SkillLayer,
-	SkillPlaybookRead,
 } from "@/pages/graphs-detail/features/skills/types";

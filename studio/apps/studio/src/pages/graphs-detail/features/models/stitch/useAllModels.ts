@@ -13,9 +13,9 @@
  * the models would put a territory on the canvas nobody can stitch (spec.md §2).
  */
 
+import { hueSlotForName } from "@invana-studio/canvases";
 import { useQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { hueSlotForName } from "@/canvases/model";
 import { modelsApi } from "@/pages/graphs-detail/features/models/api";
 import {
 	useModelLinksQuery,

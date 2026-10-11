@@ -10,6 +10,7 @@
 
 import { Board } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
+import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
 import { useReport } from "@/pages/graphs-detail/features/boards";
 import { SKILL_ACTIONS } from "@/pages/graphs-detail/features/skills/boards/shared";
@@ -18,7 +19,6 @@ import {
 	useSkillsQuery,
 	useSkillUsageQuery,
 } from "@/pages/graphs-detail/features/skills/queries";
-import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
 import { VIEW_BOARD } from "@/pages/graphs-detail/shared/boardSpec";
 
 export interface UsageBoardPageProps {

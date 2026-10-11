@@ -23,14 +23,14 @@
  */
 
 import { Badge, EmptyState, Spinner } from "@invana/ui";
-import { Workflow } from "lucide-react";
-import { useMemo } from "react";
 import {
 	TaskFlowCanvas,
 	taskFlowSettings,
 	taskFlowTemplates,
-} from "@/canvases/taskflow";
-import { taskFlowFromPlan } from "@/canvases/taskflow/taskFlowFromPlan";
+} from "@invana-studio/canvases";
+import { Workflow } from "lucide-react";
+import { useMemo } from "react";
+import { taskFlowFromPlan } from "@/pages/graphs-detail/features/skills/taskFlowFromPlan";
 import type {
 	PlanUse,
 	SkillPlaybookNode,

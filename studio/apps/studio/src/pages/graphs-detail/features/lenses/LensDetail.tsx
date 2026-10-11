@@ -29,6 +29,7 @@ import {
 	LayerSection,
 	RuleRow,
 } from "@invana/ui";
+import { LAYER_PALETTE } from "@invana-studio/ui";
 import {
 	GOVERNED_LAYERS,
 	layerSummary,
@@ -39,8 +40,6 @@ import type {
 	GovernRule,
 	Lens,
 } from "@/pages/graphs-detail/features/lenses/types";
-
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 function ruleKey(rule: GovernRule, i: number): string {
 	return `${rule.match}-${rule.allow ? "a" : "d"}-${i}`;

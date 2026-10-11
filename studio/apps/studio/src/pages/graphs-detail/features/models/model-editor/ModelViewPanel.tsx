@@ -30,6 +30,13 @@ import {
 	SearchInput,
 	Spinner,
 } from "@invana/ui";
+import {
+	PanelStatusBar,
+	RecordRow,
+	SectionTitle,
+	StatusCount,
+	StatusCrumb,
+} from "@invana-studio/ui";
 import { useQueries } from "@tanstack/react-query";
 import {
 	BookOpen,
@@ -61,9 +68,6 @@ import {
 } from "@/pages/graphs-detail/features/models/queries";
 import { useStitchesSection } from "@/pages/graphs-detail/features/models/stitch/useStitchesSection";
 import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
-import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
-import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 
 interface Props {
 	username: string;

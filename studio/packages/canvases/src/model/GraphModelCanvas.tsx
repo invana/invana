@@ -56,21 +56,21 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { useStudioCanvasTheme } from "../theme";
 import {
 	detailPatch,
 	initialConfig,
 	type LiveColors,
 	readLiveColors,
-} from "@/canvases/model/config";
-import { renderModelEdge, renderModelNode } from "@/canvases/model/preview";
-import { decorate } from "@/canvases/model/style";
+} from "./config";
+import { renderModelEdge, renderModelNode } from "./preview";
+import { decorate } from "./style";
 import type {
 	Detail,
 	GraphModelTemplates,
 	ModelCanvasSelection,
 	ModelGraphData,
-} from "@/canvases/model/types";
-import { useStudioCanvasTheme } from "@/canvases/theme";
+} from "./types";
 
 const MODEL_LAYER_ID = "graph";
 const FIT = { fitCamera: { padding: 60 } };

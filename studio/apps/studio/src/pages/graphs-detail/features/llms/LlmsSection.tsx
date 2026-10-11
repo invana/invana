@@ -25,6 +25,7 @@ import {
 	Spinner,
 	StatusDot,
 } from "@invana/ui";
+import { type StackSectionUi, stackSection } from "@invana-studio/ui";
 import { Plus, Sparkles } from "lucide-react";
 import type { Lens } from "@/pages/graphs-detail/features/lenses";
 import {
@@ -33,10 +34,6 @@ import {
 } from "@/pages/graphs-detail/features/llms/ProviderDetail";
 import { ProviderForm } from "@/pages/graphs-detail/features/llms/ProviderForm";
 import type { LLMProvider } from "@/pages/graphs-detail/features/llms/types";
-import {
-	type StackSectionUi,
-	stackSection,
-} from "@/pages/graphs-detail/shared/StackSection";
 
 /** `&provider=new` is the authoring drill-in — a value, not a second param. */
 const NEW_PROVIDER = "new";

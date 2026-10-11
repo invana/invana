@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { SkillPlaybookRead } from "@/pages/graphs-detail/features/skills";
+import type { SkillPlaybookRead } from "@/pages/graphs-detail/features/skills/types";
 import { taskFlowFromPlan } from "./taskFlowFromPlan";
 
 describe("taskFlowFromPlan", () => {

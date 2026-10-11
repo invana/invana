@@ -42,6 +42,7 @@ import {
 	RuleRow,
 	Spinner,
 } from "@invana/ui";
+import { LAYER_PALETTE } from "@invana-studio/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -65,7 +66,6 @@ import type {
 	Participant,
 	Refusal,
 } from "@/pages/graphs-detail/features/lenses/types";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 export interface LensDraft {
 	name: string;

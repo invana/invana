@@ -15,10 +15,10 @@
 import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
+import { BOARD_ICONS } from "@invana-studio/ui";
 import { useQuery } from "@tanstack/react-query";
 import { DECLARED_WIDGETS } from "@/pages/graphs-detail/features/boards/boardWidgets";
 import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
-import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
 
 export interface FrozenBoardPageProps {
 	username: string;

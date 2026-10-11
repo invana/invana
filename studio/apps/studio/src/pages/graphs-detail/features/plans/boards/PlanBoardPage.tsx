@@ -10,6 +10,7 @@
 
 import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
+import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
 import { useReport } from "@/pages/graphs-detail/features/boards";
 import { PLAN_CHART_WIDGETS } from "@/pages/graphs-detail/features/plans/boards/PlanChartWidgets";
@@ -29,7 +30,6 @@ import {
 	usePlanVersionQuery,
 	useTaskPlansQuery,
 } from "@/pages/graphs-detail/features/plans/queries";
-import { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
 import { routedAction } from "@/pages/graphs-detail/shared/boardSpec";
 import { TaskFlowWidget } from "@/pages/graphs-detail/shared/boards/TaskFlowWidget";
 

@@ -37,12 +37,12 @@ import type {
 	ParticipantSpec,
 } from "@invana/boards";
 import type { Layer } from "@invana/ui";
+import { LAYER_PALETTE } from "@invana-studio/ui";
 import { BANDS } from "@/pages/graphs-detail/features/lenses/runLayers";
 import type {
 	Touch,
 	TouchesResponse,
 } from "@/pages/graphs-detail/features/lenses/types";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 /** `graph_data/model/Routes@v4` → `graph_data`. The engine's own split. */
 function layerOf(address: string): Layer {

@@ -15,6 +15,7 @@ import {
 	DropdownMenuSeparator,
 	type PanelStackSection,
 } from "@invana/ui";
+import { type StackSectionUi, stackSection } from "@invana-studio/ui";
 import {
 	ArrowUpFromLine,
 	Download,
@@ -26,10 +27,6 @@ import {
 	PlansSectionBody,
 } from "@/pages/graphs-detail/features/plans/PlansSectionBody";
 import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
-import {
-	type StackSectionUi,
-	stackSection,
-} from "@/pages/graphs-detail/shared/StackSection";
 
 export interface PlansSectionProps {
 	username: string;

@@ -1,5 +1,33 @@
 import { cn } from "@invana/ui";
-import type { BindRefusal } from "@/pages/graphs-detail/features/skills";
+
+/**
+ * What a bind refused on, and what it did **not** check.
+ *
+ * The engine sends the facts unflattened, so the card draws them rather than
+ * printing a sentence. The envelope half names a `step_key` and its `bound`;
+ * the lens half names the `layer`, one `participant` it checked and the `rule`
+ * that denied it.
+ */
+export interface BindRefusal {
+	check: string;
+	message?: string;
+	checked?: string[];
+	not_checked?: string[];
+	/** The envelope half. */
+	step_key?: string;
+	bound?: string;
+	/** The lens half. */
+	layer?: string;
+	/**
+	 * Every band the version's plan declares, in the plan's own order — the
+	 * strip the card draws with `layer` struck through. Absent on an
+	 * envelope refusal, which is about a `step_key` and read no bands.
+	 */
+	layers?: string[];
+	reason?: string;
+	participant?: string | null;
+	rule?: string | null;
+}
 
 /**
  * Why a bind was refused — **one card, drawn wherever the click was**.

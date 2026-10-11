@@ -16,9 +16,9 @@
  */
 
 import { Button, Eyebrow, type Layer, LayerChip } from "@invana/ui";
+import { LAYER_PALETTE } from "@invana-studio/ui";
 import { ruleLayer } from "@/pages/graphs-detail/features/lenses/narrowing";
 import type { Lens } from "@/pages/graphs-detail/features/lenses/types";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 export interface GuardrailsStripProps {
 	guardrails: Lens[];

@@ -9,6 +9,7 @@ import { usd, usdWhole } from "@invana-studio/core";
 
 import { Switch } from "@invana/forms";
 import { Button, Progress, PropertyList, PropertyRow } from "@invana/ui";
+import { PanelSection } from "@invana-studio/ui";
 import { Shield } from "lucide-react";
 import type { ReactNode } from "react";
 import type { AgentTab } from "@/pages/graphs-detail/features/agents/AgentDetail";
@@ -23,7 +24,6 @@ import {
 } from "@/pages/graphs-detail/features/agents/queries";
 import type { Agent } from "@/pages/graphs-detail/features/agents/types";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
-import { PanelSection } from "@/ui/PanelSection";
 
 /** The two switches the Overview carries. Keys are the engine's. */
 const POLICY_FIELDS: { key: string; label: string; hint: string }[] = [

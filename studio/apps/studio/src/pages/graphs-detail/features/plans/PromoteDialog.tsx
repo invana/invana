@@ -26,11 +26,11 @@ import {
 	Spinner,
 } from "@invana/ui";
 import { ApiError } from "@invana-studio/core";
+import { DetailStatus } from "@invana-studio/ui";
 import { useState } from "react";
 import { usePromoteTaskPlanMutation } from "@/pages/graphs-detail/features/plans/queries";
 import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
 import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
-import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 
 /** `nl-compare` — a key is the contract, so it is constrained like one. */
 const KEY_PATTERN = /^[a-z][a-z0-9-]{1,62}$/;

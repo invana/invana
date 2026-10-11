@@ -16,16 +16,13 @@ import {
 	DropdownMenuSeparator,
 	type PanelStackSection,
 } from "@invana/ui";
+import { type StackSectionUi, stackSection } from "@invana-studio/ui";
 import { Plus, Table2 } from "lucide-react";
 import {
 	TemplatesCount,
 	TemplatesSectionBody,
 	TemplateTrail,
 } from "@/pages/graphs-detail/features/projections/TemplatesSectionBody";
-import {
-	type StackSectionUi,
-	stackSection,
-} from "@/pages/graphs-detail/shared/StackSection";
 
 /** `kind` and `surface` — the two columns this list is narrowed on (§3a). */
 const TEMPLATE_KINDS = ["result", "prompt"] as const;

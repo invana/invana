@@ -42,13 +42,9 @@ import { SIDE_SECTION } from "@invana-studio/core";
 import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import { Settings } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { renderTaskEdge, renderTaskNode } from "@/canvases/taskflow/preview";
-import type {
-	Detail,
-	TaskFlowData,
-	TaskFlowTemplates,
-} from "@/canvases/taskflow/types";
-import { useStudioCanvasTheme } from "@/canvases/theme";
+import { useStudioCanvasTheme } from "../theme";
+import { renderTaskEdge, renderTaskNode } from "./preview";
+import type { Detail, TaskFlowData, TaskFlowTemplates } from "./types";
 
 const LAYOUT = "elk";
 const FIT = { fitCamera: { padding: 60 } };

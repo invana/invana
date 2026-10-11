@@ -11,11 +11,11 @@ import {
 	Skeleton,
 	TabbedPanel,
 } from "@invana/ui";
+import { FormError } from "@invana-studio/ui";
 import { Archive, ArchiveRestore, Bot, Database, Info } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { FormError } from "@/components/forms/FormError";
 import { ConcurrencyFields } from "@/pages/graphs-detail/features/graphs/ConcurrencyFields";
 import { ConnectionFields } from "@/pages/graphs-detail/features/graphs/ConnectionFields";
 import {

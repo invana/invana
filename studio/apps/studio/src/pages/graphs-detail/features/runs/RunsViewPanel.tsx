@@ -19,6 +19,13 @@
  */
 
 import { PanelStack } from "@invana/ui";
+import {
+	PanelStatusBar,
+	StatusCount,
+	StatusCrumb,
+	stackSection,
+	useStackSectionUi,
+} from "@invana-studio/ui";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { LayoutDashboard, RefreshCw } from "lucide-react";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
@@ -35,11 +42,6 @@ import { RunsFilterBar } from "@/pages/graphs-detail/features/runs/RunsFilterBar
 import { RunsList } from "@/pages/graphs-detail/features/runs/RunsList";
 import { useRunsFilters } from "@/pages/graphs-detail/features/runs/useRunsFilters";
 import { useRunsViewPanel } from "@/pages/graphs-detail/features/runs/useRunsViewPanel";
-import {
-	stackSection,
-	useStackSectionUi,
-} from "@/pages/graphs-detail/shared/StackSection";
-import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 
 export interface RunsViewPanelProps {
 	username: string;

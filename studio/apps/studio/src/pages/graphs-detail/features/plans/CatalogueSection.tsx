@@ -18,14 +18,14 @@ import {
 	PropertyRow,
 	Spinner,
 } from "@invana/ui";
+import {
+	RecordRow,
+	type StackSectionUi,
+	stackSection,
+} from "@invana-studio/ui";
 import { BookMarked } from "lucide-react";
 import { useCatalogueQuery } from "@/pages/graphs-detail/features/plans/queries";
 import type { CatalogueEntry } from "@/pages/graphs-detail/features/plans/types";
-import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import {
-	type StackSectionUi,
-	stackSection,
-} from "@/pages/graphs-detail/shared/StackSection";
 
 export interface CatalogueSectionProps {
 	username: string;

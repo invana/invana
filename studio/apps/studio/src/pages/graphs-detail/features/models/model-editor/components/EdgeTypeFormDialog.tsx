@@ -18,9 +18,9 @@ import {
 	DialogTitle,
 } from "@invana/ui";
 import { ApiError, suppressActionToast } from "@invana-studio/core";
+import { FormError } from "@invana-studio/ui";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { FormError } from "@/components/forms/FormError";
 import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
 import {
 	useCreateEdgeTypeMutation,

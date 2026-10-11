@@ -7,4 +7,4 @@
  * This file stays so a run composer's import does not have to know that.
  */
 
-export { BOARD_ICONS } from "@/pages/graphs-detail/shared/boardIcons";
+export { BOARD_ICONS } from "@invana-studio/ui";

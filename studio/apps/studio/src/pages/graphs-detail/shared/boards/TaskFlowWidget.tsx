@@ -10,13 +10,13 @@
  */
 
 import type { PanelRendererProps } from "@invana/boards";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import {
 	TaskFlowCanvas,
 	type TaskFlowData,
 	taskFlowSettings,
 	taskFlowTemplates,
-} from "@/canvases/taskflow";
+} from "@invana-studio/canvases";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 export interface FlowOptions {
 	data: TaskFlowData;

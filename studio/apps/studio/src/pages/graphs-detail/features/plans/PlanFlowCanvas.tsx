@@ -9,13 +9,13 @@
  */
 
 import { EmptyState, Spinner } from "@invana/ui";
-import { Workflow } from "lucide-react";
-import { useMemo } from "react";
 import {
 	TaskFlowCanvas,
 	taskFlowSettings,
 	taskFlowTemplates,
-} from "@/canvases/taskflow";
+} from "@invana-studio/canvases";
+import { Workflow } from "lucide-react";
+import { useMemo } from "react";
 import { useTaskPlanQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { taskFlowFromTaskPlan } from "@/pages/graphs-detail/features/plans/taskFlowFromTaskPlan";
 

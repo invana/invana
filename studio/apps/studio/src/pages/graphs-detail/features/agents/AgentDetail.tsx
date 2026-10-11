@@ -20,6 +20,7 @@
  */
 
 import { Button, RecordHeader, TabbedPanel } from "@invana/ui";
+import { agentTone, DetailStatus, humanStatus } from "@invana-studio/ui";
 import { Eye, Lock, Play, Save, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AgentActivityTab } from "@/pages/graphs-detail/features/agents/AgentActivityTab";
@@ -39,11 +40,6 @@ import type {
 	Agent,
 	AgentUpdate,
 } from "@/pages/graphs-detail/features/agents/types";
-import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
-import {
-	agentTone,
-	humanStatus,
-} from "@/pages/graphs-detail/shared/statusTone";
 
 /**
  * Every step the interpreter knows. The allow-list is drawn against this whole

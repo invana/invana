@@ -8,7 +8,6 @@
  * every time, its failure count if above zero, its p95 if the spread is wide.
  */
 
-import { formatElapsed } from "@invana-studio/core";
 import {
 	type TaskFlowData,
 	type TaskFlowEdge,
@@ -16,12 +15,13 @@ import {
 	type TaskFlowState,
 	taskNodeTypeOf,
 	taskToneOf,
-} from "@/canvases/taskflow";
-import { LAYER_ICON } from "@/canvases/taskflow/taskFlowFromPlan";
+} from "@invana-studio/canvases";
+import { formatElapsed } from "@invana-studio/core";
 import type {
 	PlanPerformance,
 	TaskPlanDetail,
 } from "@/pages/graphs-detail/features/plans/types";
+import { LAYER_ICON } from "@/pages/graphs-detail/features/skills";
 
 type StepMeasures = PlanPerformance["steps"][number];
 

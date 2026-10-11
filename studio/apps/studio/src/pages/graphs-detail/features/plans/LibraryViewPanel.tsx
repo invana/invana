@@ -36,6 +36,11 @@
  */
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import {
+	PanelStatusBar,
+	StatusCrumb,
+	useStackSectionUi,
+} from "@invana-studio/ui";
 import { useEffect, useRef, useState } from "react";
 import { catalogueSection } from "@/pages/graphs-detail/features/plans/CatalogueSection";
 import { plansSection } from "@/pages/graphs-detail/features/plans/PlansSection";
@@ -44,8 +49,6 @@ import {
 	useLibraryViewPanel,
 } from "@/pages/graphs-detail/features/plans/useLibraryViewPanel";
 import { templatesSection } from "@/pages/graphs-detail/features/projections";
-import { useStackSectionUi } from "@/pages/graphs-detail/shared/StackSection";
-import { PanelStatusBar, StatusCrumb } from "@/ui/PanelStatusBar";
 
 export interface LibraryViewPanelProps {
 	username: string;

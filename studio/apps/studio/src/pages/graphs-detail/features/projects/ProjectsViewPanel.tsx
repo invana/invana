@@ -13,6 +13,7 @@
  */
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import { stackSection, useStackSectionUi } from "@invana-studio/ui";
 import { FolderOpen, ListTodo, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ProjectsSectionBody } from "@/pages/graphs-detail/features/projects/ProjectsSection";
@@ -22,10 +23,6 @@ import {
 } from "@/pages/graphs-detail/features/projects/queries";
 import { TodosSectionBody } from "@/pages/graphs-detail/features/projects/TodosSection";
 import { useProjectsViewPanel } from "@/pages/graphs-detail/features/projects/useProjectsViewPanel";
-import {
-	stackSection,
-	useStackSectionUi,
-} from "@/pages/graphs-detail/shared/StackSection";
 
 export interface ProjectsViewPanelProps {
 	username: string;

@@ -20,6 +20,7 @@
  */
 
 import { Button, Spinner } from "@invana/ui";
+import { PanelSection } from "@invana-studio/ui";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import {
@@ -33,7 +34,6 @@ import {
 	useSetRuleActiveMutation,
 	useUpdateRuleMutation,
 } from "@/pages/graphs-detail/features/skills";
-import { PanelSection } from "@/ui/PanelSection";
 
 export function ProjectRules({
 	username,

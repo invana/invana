@@ -26,6 +26,7 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
+import { PanelSection } from "@invana-studio/ui";
 import { useState } from "react";
 import type { AgentDraft } from "@/pages/graphs-detail/features/agents/agentDraft";
 import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
@@ -41,7 +42,6 @@ import type {
 import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
 import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
-import { PanelSection } from "@/ui/PanelSection";
 
 /** How a run ended, in the reader's words and tone. */
 function outcomeOf(run: TaskRunSummary): { text: string; tone: string } {

@@ -18,15 +18,15 @@
  */
 
 import { Button, EmptyState } from "@invana/ui";
-import { PanelBottomClose } from "lucide-react";
-import { useMemo, useState } from "react";
 import {
 	GraphModelCanvas,
 	graphModelSettings,
 	graphModelTemplates,
 	hueSlotForName,
 	type ModelCanvasSelection,
-} from "@/canvases/model";
+} from "@invana-studio/canvases";
+import { PanelBottomClose } from "lucide-react";
+import { useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import { EdgeTypeDetail } from "@/pages/graphs-detail/features/models/model-editor/components/EdgeTypeDetail";

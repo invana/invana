@@ -30,6 +30,15 @@ import {
 	Spinner,
 } from "@invana/ui";
 import { formatElapsed } from "@invana-studio/core";
+import {
+	AgentChipRow,
+	DetailBlock,
+	DetailProse,
+	DetailStatus,
+	LAYER_PALETTE,
+	layerSlug,
+	RecordRow,
+} from "@invana-studio/ui";
 import { Wand2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { PromoteDialog } from "@/pages/graphs-detail/features/plans/PromoteDialog";
@@ -46,14 +55,6 @@ import type {
 	TaskPlanSummary,
 } from "@/pages/graphs-detail/features/plans/types";
 import type { SkillLayer } from "@/pages/graphs-detail/features/skills";
-import {
-	AgentChipRow,
-	DetailBlock,
-	DetailProse,
-	DetailStatus,
-} from "@/pages/graphs-detail/shared/DetailRows";
-import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import { LAYER_PALETTE, layerSlug } from "@/ui/layerPalette";
 
 /** The reader's spelling back to the address segment the kit's components take.
  *

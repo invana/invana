@@ -31,6 +31,7 @@ import {
 	Spinner,
 	TouchStrip,
 } from "@invana/ui";
+import { LAYER_PALETTE } from "@invana-studio/ui";
 import type { ReactNode } from "react";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses";
@@ -49,7 +50,6 @@ import {
 	type SummaryRow,
 } from "@/pages/graphs-detail/features/runs/runSummary";
 import { TraceIdValue } from "@/pages/graphs-detail/features/runs/TraceIdValue";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 export interface RunDetailProps {
 	username: string;

@@ -18,6 +18,7 @@ import {
 	SegmentedControl,
 } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
+import { PanelSection } from "@invana-studio/ui";
 import { useState } from "react";
 import {
 	type AgentDraft,
@@ -29,7 +30,6 @@ import type {
 	Agent,
 	SoulTraits,
 } from "@/pages/graphs-detail/features/agents/types";
-import { PanelSection } from "@/ui/PanelSection";
 
 /** Two columns at 760px of page, one below — a container query, not the viewport. */
 const TWO_COLUMNS =

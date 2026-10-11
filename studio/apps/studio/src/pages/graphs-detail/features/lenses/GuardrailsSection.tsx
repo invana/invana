@@ -24,6 +24,7 @@
  */
 
 import type { PanelStackSection } from "@invana/ui";
+import { type StackSectionUi, stackSection } from "@invana-studio/ui";
 import { Maximize2, Plus, ShieldCheck } from "lucide-react";
 import { LensActions } from "@/pages/graphs-detail/features/lenses/LensActions";
 import { LensDetail } from "@/pages/graphs-detail/features/lenses/LensDetail";
@@ -35,10 +36,6 @@ import type {
 	Refusal,
 } from "@/pages/graphs-detail/features/lenses/types";
 import { NEW_LENS } from "@/pages/graphs-detail/features/lenses/WorldsSection";
-import {
-	type StackSectionUi,
-	stackSection,
-} from "@/pages/graphs-detail/shared/StackSection";
 
 export interface GuardrailsSectionProps {
 	ui: StackSectionUi;

@@ -41,6 +41,19 @@ import {
 	Spinner,
 	StatusDot,
 } from "@invana/ui";
+import {
+	agentTone,
+	DetailBlock,
+	DetailProse,
+	DetailStatus,
+	FilterSelect,
+	PanelStatusBar,
+	RecordRow,
+	type StackSectionUi,
+	StatusCount,
+	StatusCrumb,
+	stackSection,
+} from "@invana-studio/ui";
 import { Bot, ChevronRight, Plus, Shield } from "lucide-react";
 import { useMemo } from "react";
 import {
@@ -52,19 +65,6 @@ import type {
 	Agent,
 	AgentEdge,
 } from "@/pages/graphs-detail/features/agents/types";
-import {
-	DetailBlock,
-	DetailProse,
-	DetailStatus,
-} from "@/pages/graphs-detail/shared/DetailRows";
-import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import {
-	type StackSectionUi,
-	stackSection,
-} from "@/pages/graphs-detail/shared/StackSection";
-import { agentTone } from "@/pages/graphs-detail/shared/statusTone";
-import { FilterSelect } from "@/ui/FilterSelect";
-import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 
 const KIND_OPTIONS = ["seeded", "authored", "spawned"].map((value) => ({
 	value,

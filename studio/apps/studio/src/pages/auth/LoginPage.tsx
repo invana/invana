@@ -14,6 +14,7 @@ import {
 	useAuth,
 	useSessionResume,
 } from "@invana-studio/core";
+import { FormError } from "@invana-studio/ui";
 import {
 	Container,
 	FlaskConical,
@@ -27,7 +28,6 @@ import {
 import { useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-import { FormError } from "@/components/forms/FormError";
 import { ModeToggle } from "@/components/ModeToggle";
 
 // Capability pillars shown on the brand panel. Phrased as what Invana *is

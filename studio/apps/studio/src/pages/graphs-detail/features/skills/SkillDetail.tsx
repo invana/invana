@@ -23,6 +23,12 @@
  */
 
 import { Badge, Button, RecordHeader, Spinner, TabbedPanel } from "@invana/ui";
+import {
+	asBindRefusal,
+	BindRefusalCard,
+	DetailStatus,
+	PanelSection,
+} from "@invana-studio/ui";
 import { BarChart3, GitBranch } from "lucide-react";
 import { useState } from "react";
 import { useAgentMutations } from "@/pages/graphs-detail/features/agents";
@@ -42,9 +48,6 @@ import type {
 	SkillAgentStanding,
 	SkillUsageVersion,
 } from "@/pages/graphs-detail/features/skills/types";
-import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
-import { asBindRefusal, BindRefusalCard } from "@/ui/BindRefusalCard";
-import { PanelSection } from "@/ui/PanelSection";
 
 export type SkillTab = "playbook" | "flow" | "bindings" | "usage" | "versions";
 

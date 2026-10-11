@@ -46,6 +46,7 @@ import {
 	MatchPreview,
 	SliceSummary,
 } from "@invana/ui";
+import { LAYER_PALETTE } from "@invana-studio/ui";
 import { useMemo } from "react";
 import {
 	type AddressParts,
@@ -65,7 +66,6 @@ import type {
 	GovernRule,
 	Participant,
 } from "@/pages/graphs-detail/features/lenses/types";
-import { LAYER_PALETTE } from "@/ui/layerPalette";
 
 /** What may accompany a call across the boundary. The closed set. */
 const EGRESS_CLASSES: { value: EgressClass; label: string }[] = [

@@ -1,4 +1,5 @@
 import { Button, type PanelStackSection } from "@invana/ui";
+import { RecordRow, SectionTitle } from "@invana-studio/ui";
 import { Check, Link2, Plus, Trash2, Undo2 } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models/model-editor/types";
@@ -19,8 +20,6 @@ import type {
 	LinkKind,
 	ModelLink,
 } from "@/pages/graphs-detail/features/models/types";
-import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
 
 /**
  * Scrolls its row into view the moment it becomes the marked one.

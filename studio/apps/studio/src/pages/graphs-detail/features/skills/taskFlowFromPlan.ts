@@ -10,11 +10,11 @@ import {
 	type TaskFlowNode,
 	taskNodeTypeOf,
 	taskToneOf,
-} from "@/canvases/taskflow";
+} from "@invana-studio/canvases";
 import type {
 	SkillLayer,
 	SkillPlaybookRead,
-} from "@/pages/graphs-detail/features/skills";
+} from "@/pages/graphs-detail/features/skills/types";
 
 /** A layer's icon on the canvas — shared with the library's plans. */
 export const LAYER_ICON: Record<SkillLayer, string> = {

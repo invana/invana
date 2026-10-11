@@ -30,6 +30,7 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { formatCompact, formatElapsed, useTicker } from "@invana-studio/core";
+import { PanelSection } from "@invana-studio/ui";
 import { RefreshCw } from "lucide-react";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
@@ -43,7 +44,6 @@ import {
 } from "@/pages/graphs-detail/features/runs/RunsList";
 import { useRunsFilters } from "@/pages/graphs-detail/features/runs/useRunsFilters";
 import { useRunsViewPanel } from "@/pages/graphs-detail/features/runs/useRunsViewPanel";
-import { PanelSection } from "@/ui/PanelSection";
 
 const LIVE = ["queued", "running", "awaiting_input", "awaiting_approval"];
 const WAITING = ["awaiting_input", "awaiting_approval"];

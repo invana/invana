@@ -1,12 +1,12 @@
 import type { CanvasConfig } from "@invana/canvas";
-import type { GraphModelTemplates } from "@/canvases/model/types";
 import settingsJson from "./settings.json";
 import templatesJson from "./templates.json";
+import type { GraphModelTemplates } from "./types";
 
-export { hueSlotForName } from "@/canvases/model/config";
+export { hueSlotForName } from "./config";
 
-export { GraphModelCanvas } from "@/canvases/model/GraphModelCanvas";
-export * from "@/canvases/model/types";
+export { GraphModelCanvas } from "./GraphModelCanvas";
+export * from "./types";
 
 // JSON import widens string-literal unions to `string`; the files are a
 // `CanvasConfig` and three patches of one, so the casts only narrow them back.

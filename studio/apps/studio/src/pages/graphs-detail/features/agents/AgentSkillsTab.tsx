@@ -22,6 +22,11 @@ import {
 	DropdownMenuTrigger,
 	Spinner,
 } from "@invana/ui";
+import {
+	asBindRefusal,
+	BindRefusalCard,
+	PanelSection,
+} from "@invana-studio/ui";
 import { Ban, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ALL_TASKS } from "@/pages/graphs-detail/features/agents/AgentDetail";
@@ -38,8 +43,6 @@ import type {
 import { useCatalogueQuery } from "@/pages/graphs-detail/features/plans";
 import type { Skill } from "@/pages/graphs-detail/features/skills";
 import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
-import { asBindRefusal, BindRefusalCard } from "@/ui/BindRefusalCard";
-import { PanelSection } from "@/ui/PanelSection";
 
 /** Chips a Needs cell draws before folding the rest into `+N`. */
 const NEEDS_SHOWN = 3;

@@ -28,7 +28,7 @@ import {
 	type ModelGraphEdge,
 	type ModelProperty,
 	type ModelTypeNode,
-} from "@/canvases/model";
+} from "@invana-studio/canvases";
 import type {
 	EdgeTypeResponse,
 	ModelLink,

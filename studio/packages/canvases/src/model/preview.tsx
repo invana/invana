@@ -9,7 +9,7 @@ import {
 	MODEL_FRAME_TYPE,
 	type ModelEdgeData,
 	type ModelTypeData,
-} from "@/canvases/model/types";
+} from "./types";
 
 /** A type's hover card — its description and one row per property. */
 export function renderModelNode(node: GraphNode) {

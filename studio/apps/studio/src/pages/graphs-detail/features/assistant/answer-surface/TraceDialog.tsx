@@ -34,6 +34,7 @@ import {
 	StatusDot,
 } from "@invana/ui";
 import { formatDuration } from "@invana-studio/core";
+import { stepTone } from "@invana-studio/ui";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronRight, Copy } from "lucide-react";
 import { useState } from "react";
@@ -44,7 +45,6 @@ import {
 	traceApi,
 } from "@/pages/graphs-detail/features/runs";
 import { StepRules } from "@/pages/graphs-detail/features/skills";
-import { stepTone } from "@/pages/graphs-detail/shared/statusTone";
 
 interface Props {
 	open: boolean;

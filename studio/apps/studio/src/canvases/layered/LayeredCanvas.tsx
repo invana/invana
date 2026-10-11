@@ -61,18 +61,18 @@ import type {
 import { ElkLayout } from "@invana/graph-layout-elkjs";
 import { useTheme } from "@invana/themes";
 import { cn, Legend, LegendItem, type LegendSwatchKind } from "@invana/ui";
+import { readCanvasThemeConfig } from "@invana-studio/canvases";
+import type { Tone } from "@invana-studio/ui";
 // Vite's worker idiom: `?worker` makes the bundler emit the ELK solver as a
 // worker asset and hand back a constructor. See {@link newElkLayout} for why
 // the layout package's own default factory cannot be used.
 import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import { MousePointer2, Spline } from "lucide-react";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { readCanvasThemeConfig } from "@/canvases/theme";
 import {
 	CANVAS_KINDS,
 	type CanvasKind,
 } from "@/pages/graphs-detail/features/boards";
-import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
 
 const LAYER_ID = "graph";
 const LAYOUT_ID = "work-layered";
