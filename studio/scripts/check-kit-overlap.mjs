@@ -7,9 +7,13 @@
  * use the kit's, or name Studio's for what it holds.
  *
  * Reads each package's published `dist/index.d.ts` for its export names, then
- * every `export function|const|class <Capitalised>` in Studio's `.tsx` files.
- * A package that is not built (no `dist/`) is skipped with a note rather than
- * failed, so a fresh checkout can still lint.
+ * every `export function|const|class <Capitalised>` in Studio's `.tsx` files:
+ * the app's `src/` and, in the workspace, each `packages/<name>/src/` and
+ * `apps/<name>/src/` that exists. The kit is resolved from Studio's root
+ * `node_modules` first, then from each workspace package's. A package that is
+ * not built (no `dist/`) is skipped with a note rather than failed, so a fresh
+ * checkout can still lint. Reported paths and `ALLOWED` keys are relative to
+ * the Studio root.
  *
  * Run: `node scripts/check-kit-overlap.mjs` (part of `pnpm lint`).
  */
@@ -19,24 +23,34 @@ import { fileURLToPath } from "node:url";
 import ts from "typescript";
 
 const STUDIO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SRC = path.join(STUDIO, "src");
+const WORKSPACE_DIRS = ["packages", "apps"];
 const KIT_PACKAGES = ["ui", "canvas-ui"];
 
 // `file:Name` pairs that share a kit name on purpose, with the reason.
 const ALLOWED = {};
 
-function kitNames() {
+// Studio's root, then each `packages/<name>` and `apps/<name>` that exists.
+function workspaceRoots() {
+	const roots = [STUDIO];
+	for (const dir of WORKSPACE_DIRS) {
+		const base = path.join(STUDIO, dir);
+		if (!fs.existsSync(base)) continue;
+		for (const e of fs.readdirSync(base, { withFileTypes: true })) {
+			if (e.isDirectory()) roots.push(path.join(base, e.name));
+		}
+	}
+	return roots;
+}
+
+function kitNames(roots) {
 	const names = new Map();
 	for (const pkg of KIT_PACKAGES) {
-		const file = path.join(
-			STUDIO,
-			"node_modules",
-			"@invana",
-			pkg,
-			"dist",
-			"index.d.ts",
-		);
-		if (!fs.existsSync(file)) {
+		const file = roots
+			.map((root) =>
+				path.join(root, "node_modules", "@invana", pkg, "dist", "index.d.ts"),
+			)
+			.find((f) => fs.existsSync(f));
+		if (!file) {
 			console.warn(`check-kit-overlap: @invana/${pkg} is not built; skipped`);
 			continue;
 		}
@@ -70,7 +84,7 @@ function studioComponents(root) {
 				/^export (?:function|const|class) ([A-Z]\w*)/gm,
 			)) {
 				out.push({
-					file: path.relative(SRC, p).split(path.sep).join("/"),
+					file: path.relative(STUDIO, p).split(path.sep).join("/"),
 					name: m[1],
 				});
 			}
@@ -79,8 +93,12 @@ function studioComponents(root) {
 	return out;
 }
 
-const kit = kitNames();
-const errors = studioComponents(SRC)
+const roots = workspaceRoots();
+const kit = kitNames(roots);
+const errors = roots
+	.map((root) => path.join(root, "src"))
+	.filter((src) => fs.existsSync(src))
+	.flatMap((src) => studioComponents(src))
 	.filter(({ file, name }) => kit.has(name) && !(`${file}:${name}` in ALLOWED))
 	.map(
 		({ file, name }) =>
