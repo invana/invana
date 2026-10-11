@@ -51,7 +51,10 @@ test("a rejected query is a diagnosis, never an answer", async ({ page }) => {
 	await ask(page, "MATCH (((");
 
 	// The engine names what happened and offers the next step (diagnosis.py).
-	await expect(page.getByText(/rejected the query/i)).toBeVisible({
+	// The console's Log carries the same line, so the card is read on its own.
+	await expect(
+		page.getByTestId("diagnosis").getByText(/rejected the query/i),
+	).toBeVisible({
 		timeout: 30_000,
 	});
 	await expect(

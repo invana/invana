@@ -3,7 +3,7 @@ import type {
 	WorkbookPage,
 	WorkbookPageMenuItem,
 } from "@invana/ui";
-import type { useSessions } from "@invana-studio/assistant";
+import type { useConsoleParam, useSessions } from "@invana-studio/assistant";
 import {
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,
@@ -13,6 +13,8 @@ import {
 	History,
 	Home,
 	Layers,
+	PanelBottomClose,
+	PanelBottomOpen,
 	PanelRightClose,
 	PanelRightOpen,
 	Pencil,
@@ -85,6 +87,10 @@ export interface OpenPagesDeps {
 	backToList: ReturnType<typeof useSessions>["backToList"];
 	right: ReturnType<typeof useRightSection>;
 	toggleInspector: () => void;
+	/** The assistant's centred start, for the graph page; absent while docked. */
+	homeStart?: ReactNode;
+	/** `?console=` — the strip's Console toggle on a data canvas. */
+	console: ReturnType<typeof useConsoleParam>;
 }
 
 /**
@@ -125,6 +131,8 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		backToList,
 		right,
 		toggleInspector,
+		homeStart,
+		console: consoleParam,
 	} = deps;
 	const {
 		boards,
@@ -307,6 +315,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 					username={username as string}
 					graphSlug={graphSlug as string}
 					hint={canvasEmptyHint(settingsSection)}
+					start={homeStart}
 				/>
 			),
 		},
@@ -452,6 +461,14 @@ export function useOpenPages(deps: OpenPagesDeps) {
 					label: "History",
 					icon: History,
 					onClick: () => boardPageRef.current?.toggleHistory(),
+				},
+				{
+					// The console describes this canvas's drawing, so its toggle is
+					// a strip control of the data canvas, beside the inspector's.
+					id: "console",
+					label: consoleParam.tab ? "Hide console" : "Show console",
+					icon: consoleParam.tab ? PanelBottomClose : PanelBottomOpen,
+					onClick: consoleParam.toggle,
 				},
 			]
 		: [];

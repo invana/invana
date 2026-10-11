@@ -109,7 +109,7 @@ this map.** Feature numbers do not change.
 | 4.1 | [Graph canvas](modules/explore/features/graph-canvas.md) | Pan · zoom · select · style; 100K nodes | ✅ | — | ✅ | S9b |
 | 4.2 | [Boards](modules/explore/features/boards.md) | Named, saved, versioned working surfaces — drawn or declared | ✅ | — | ✅ | S9 |
 | 4.3 | [Selection and the panel](modules/explore/features/selection-and-the-panel.md) | The canvas selects; the panel states the fact | ✅ | — | ✅ | S12 |
-| 4.4 | [The console](modules/explore/features/the-console.md) | The rows and the query under the canvas that drew them | ✅ | — | 🔵 | S12f |
+| 4.4 | [The console](modules/explore/features/the-console.md) | The rows and the query under the canvas that drew them | ✅ | — | ✅ | S12f |
 
 ## 5 · [Agents](modules/agents/spec.md)
 

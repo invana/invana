@@ -1,7 +1,7 @@
 import { ErrorBoundary } from "@invana/ui";
 import type { useSessions } from "@invana-studio/assistant";
 import { AssistantHost, attachmentFor } from "@invana-studio/assistant";
-import { reportBoundaryError } from "@invana-studio/core";
+import { ASSISTANT_SECTION, reportBoundaryError } from "@invana-studio/core";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer";
 import type { useGraphQuery } from "@/pages/graphs-detail/features/graphs";
@@ -34,6 +34,8 @@ export interface RightSectionDeps {
 	closeInspector: () => void;
 	/** A model's name by id, for an element's provenance line. */
 	modelName: (id: string) => string | undefined;
+	/** Open the console on Log — a failed reply's *Open the log*. */
+	openConsoleLog: () => void;
 }
 
 /**
@@ -57,6 +59,7 @@ export function rightSection(deps: RightSectionDeps) {
 		setAttachmentDetached,
 		closeInspector,
 		modelName,
+		openConsoleLog,
 	} = deps;
 	const {
 		sessions,
@@ -120,6 +123,7 @@ export function rightSection(deps: RightSectionDeps) {
 			onSetFeedback={setFeedback}
 			results={resultsByMessageId}
 			onLoadToCanvas={handleLoadToCanvasClick}
+			onOpenLog={openConsoleLog}
 			onRefresh={refresh}
 			isRefreshing={isRefreshing}
 			onClose={right.close}
@@ -141,9 +145,13 @@ export function rightSection(deps: RightSectionDeps) {
 	// stopped competing for the side the moment one param named which of them
 	// holds it; closing it closes the region rather than restoring the other
 	// (the-assistant.md).
-	const rightSections: Record<RightSectionKey, { content: ReactNode }> = {
+	const rightSections: Record<
+		RightSectionKey,
+		{ content: ReactNode; size?: typeof ASSISTANT_SECTION }
+	> = {
 		assistant: {
 			content: assistantContent,
+			size: ASSISTANT_SECTION,
 		},
 		inspector: {
 			content: (

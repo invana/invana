@@ -44,16 +44,19 @@ export function graphDetailChrome(deps: GraphDetailChromeDeps) {
 	return {
 		// One assistant, reachable from every surface. The trigger sits
 		// in the header's panel controls, after fullscreen — a persistent
-		// control, so it keeps one name wherever you are.
+		// control, so it keeps one name wherever you are: `Assistant`, pressed
+		// while it holds the right side.
 		headerPanelControls: (
 			<Button
 				variant="ghost"
-				size="icon"
-				className={cn("h-7 w-7", right.is("assistant") && "text-primary")}
+				size="sm"
+				className={cn(right.is("assistant") && "text-primary")}
+				aria-pressed={right.is("assistant")}
 				onClick={() => right.toggle("assistant")}
 				title={right.is("assistant") ? "Close the assistant" : "Ask about this"}
 			>
 				<Sparkles className="h-4 w-4" />
+				Assistant
 			</Button>
 		),
 		headerCenter:

@@ -16,6 +16,7 @@
  * is the thing this param exists to remove.
  */
 
+import { useUpdateSearchParams } from "@invana-studio/core";
 import { useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -54,7 +55,8 @@ export interface RightSection {
 }
 
 export function useRightSection(): RightSection {
-	const [params, setParams] = useSearchParams();
+	const [params] = useSearchParams();
+	const update = useUpdateSearchParams();
 	const raw = params.get(RIGHT_PARAM);
 	const key = KNOWN_KEYS.includes(raw as RightSectionKey)
 		? (raw as RightSectionKey)
@@ -62,18 +64,20 @@ export function useRightSection(): RightSection {
 			? readLegacy(params)
 			: null;
 
+	// Through the composing writer, so a param another region writes in the
+	// same beat (`?console=`) survives this one.
 	const write = useCallback(
-		(next: RightSectionKey | null) => {
-			const search = new URLSearchParams(params);
-			if (next === null) search.delete(RIGHT_PARAM);
-			else search.set(RIGHT_PARAM, next);
-			// Every write drops the legacy keys, so two params can never disagree
-			// about which occupant is on screen.
-			search.delete(LEGACY_ASSISTANT_PARAM);
-			search.delete(LEGACY_INSPECTOR_PARAM);
-			setParams(search, { replace: true });
-		},
-		[params, setParams],
+		(next: RightSectionKey | null) =>
+			update((search) => {
+				if (next === null) search.delete(RIGHT_PARAM);
+				else search.set(RIGHT_PARAM, next);
+				// Every write drops the legacy keys, so two params can never disagree
+				// about which occupant is on screen.
+				search.delete(LEGACY_ASSISTANT_PARAM);
+				search.delete(LEGACY_INSPECTOR_PARAM);
+				return search;
+			}),
+		[update],
 	);
 
 	return {

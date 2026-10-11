@@ -76,23 +76,59 @@ export function RunCannotAnswer({
  * Built from the failure itself, never invented: the cause, the step, the
  * query. The next steps are the only actions on it — there is no "try
  * again" that quietly re-asks a different question.
+ *
+ * The card states the error's first line, clamped to two. A database error
+ * can list every keyword it expected, which in a docked chat wraps into a wall; the
+ * whole of it is the console's Log, which *Open the log* opens where the page
+ * has one.
  */
 export function RunDiagnosis({
 	diagnosis,
 	onRetry,
 	onFocusComposer,
 	onRoute,
+	onOpenLog,
 	className,
 }: {
 	diagnosis: Diagnosis;
 	onRetry?: () => void;
 	onFocusComposer?: () => void;
 	onRoute?: (route: string) => void;
+	onOpenLog?: () => void;
 	className?: string;
 }) {
 	const evidence = Object.entries(diagnosis.evidence ?? {}).filter(
 		([, value]) => value !== null && value !== undefined && value !== "",
 	);
+	const [firstLine] = diagnosis.summary.trim().split("\n");
+	const nextSteps = diagnosis.suggestions.map((s) => (
+		<Button
+			key={s.label}
+			variant="outline"
+			size="sm"
+			className="h-7 px-3 font-normal"
+			onClick={() => {
+				if (s.action?.retry) onRetry?.();
+				else if (s.action?.focus_composer) onFocusComposer?.();
+				else if (s.route) onRoute?.(s.route);
+			}}
+		>
+			{s.label}
+		</Button>
+	));
+	if (onOpenLog) {
+		nextSteps.push(
+			<Button
+				key="open-the-log"
+				variant="ghost"
+				size="sm"
+				className="h-7 px-3 font-normal"
+				onClick={onOpenLog}
+			>
+				Open the log
+			</Button>,
+		);
+	}
 
 	return (
 		<DiagnosisCard
@@ -115,27 +151,11 @@ export function RunDiagnosis({
 					</dl>
 				) : undefined
 			}
-			actions={
-				diagnosis.suggestions.length > 0
-					? diagnosis.suggestions.map((s) => (
-							<Button
-								key={s.label}
-								variant="outline"
-								size="sm"
-								className="h-7 px-3 font-normal"
-								onClick={() => {
-									if (s.action?.retry) onRetry?.();
-									else if (s.action?.focus_composer) onFocusComposer?.();
-									else if (s.route) onRoute?.(s.route);
-								}}
-							>
-								{s.label}
-							</Button>
-						))
-					: undefined
-			}
+			actions={nextSteps.length > 0 ? nextSteps : undefined}
 		>
-			{diagnosis.summary}
+			<span className="line-clamp-2" title={diagnosis.summary}>
+				{firstLine}
+			</span>
 		</DiagnosisCard>
 	);
 }

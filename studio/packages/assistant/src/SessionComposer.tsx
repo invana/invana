@@ -85,10 +85,9 @@ const LANGUAGE_EXTENSION: Record<
 	gremlin: StreamLanguage.define(groovy),
 };
 
-const ASK_KIND_OPTIONS = [
-	{ value: "nl", label: "Natural language" },
-	{ value: "ql", label: "Query language" },
-];
+// The ask kind's value for a natural-language ask; a query's value is its
+// language, so one switch reads Ask · Cypher · Gremlin.
+const ASK_KIND = "ask";
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -239,6 +238,8 @@ export interface SessionComposerProps {
 	onRemoveAttachment?: () => void;
 	/** The world picker — placed between the ask kind and the agent. */
 	worldControl?: ReactNode;
+	/** Told whenever the ask kind flips, so the status bar can show its keys. */
+	onAskKindChange?: (mode: QueryMode) => void;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -266,9 +267,14 @@ export function SessionComposer({
 	attachment,
 	onRemoveAttachment,
 	worldControl,
+	onAskKindChange,
 }: SessionComposerProps) {
 	const isModeller = surface === "modeller";
 	const [mode, setMode] = useState<QueryMode>("nl");
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reported on a flip only, not when the callback's identity changes
+	useEffect(() => {
+		onAskKindChange?.(mode);
+	}, [mode]);
 	const [language, setLanguage] = useState<QueryLanguage>(defaultLanguage);
 	const [llmProviderId, setLlmProviderId] = useState<string>("");
 	const [nlQuery, setNlQuery] = useState("");
@@ -392,14 +398,26 @@ export function SessionComposer({
 		setLlmProviderId(llmProviders[0]?.id ?? "");
 	}, [llmProviders, llmProviderId]);
 
-	const languageOptions = useMemo(
-		() =>
-			availableLanguages.map((value) => ({
+	// Ask, then each language the connector speaks.
+	const askKindOptions = useMemo(
+		() => [
+			{ value: ASK_KIND, label: "Ask" },
+			...availableLanguages.map((value) => ({
 				value,
 				label: LANGUAGE_LABEL[value],
 			})),
+		],
 		[availableLanguages],
 	);
+	const askKind = mode === "nl" ? ASK_KIND : language;
+	const pickAskKind = (value: string) => {
+		if (value === ASK_KIND) {
+			setMode("nl");
+			return;
+		}
+		setMode("ql");
+		setLanguage(value as QueryLanguage);
+	};
 
 	// ── Mount CodeMirror whenever the QL surface is shown ────────────────────
 	// The editor is rebuilt from `qlDocRef` each time the mode flips to QL and
@@ -412,17 +430,17 @@ export function SessionComposer({
 		const state = EditorState.create({
 			doc: qlDocRef.current,
 			extensions: [
-				// Enter submits, Shift-Enter inserts a newline — listed before
-				// defaultKeymap so it wins over CM's default Enter binding.
+				// ⌘↵ runs and ↵ is a newline — a query is multi-line text. Listed
+				// before defaultKeymap so they win over its Enter binding.
 				keymap.of([
 					{
-						key: "Enter",
+						key: "Mod-Enter",
 						run: () => {
 							handleRunRef.current();
 							return true;
 						},
 					},
-					{ key: "Shift-Enter", run: insertNewlineAndIndent },
+					{ key: "Enter", run: insertNewlineAndIndent },
 					// ↑/↓ walk the prompt history, but only from the first/last line so
 					// they keep their normal cursor movement inside a multi-line query.
 					{
@@ -546,9 +564,10 @@ export function SessionComposer({
 	const noLlmProviders = llmProviders.every((p) => p.models.length === 0);
 
 	// ── Toolbar (shared by both input surfaces) ──────────────────────────────
-	// Mode + language on the left, timeout + attach on the right. The mode
-	// select and buttons stay fixed; the second control absorbs the leftover
-	// width.
+	// Ask kind on the left, timeout + attach on the right (the ⌘↵ hint is the
+	// status bar's, via `onAskKindChange`). The
+	// kind select and buttons stay fixed; the second control absorbs the
+	// leftover width.
 	//
 	// **There is no LLM picker here** (docs/for-developers/modules/agents/spec.md). The session names an
 	// *agent*, and the agent carries the provider and the model — so the one
@@ -558,8 +577,8 @@ export function SessionComposer({
 	// offers the picker instead of quietly answering with a different mind.
 
 	// Every control is the kit's inline `RichSelect`, opening upward:
-	// ask kind · world · (agent | query language) — the agent last, because it
-	// is who answers, and the world is where it looks.
+	// ask kind (Ask · Cypher · Gremlin) · world · agent — the agent last,
+	// because it is who answers, and the world is where it looks.
 	const toolbarStart = (
 		<>
 			{/* Modeller sessions author a model — NL only, so the kind is hidden
@@ -570,14 +589,14 @@ export function SessionComposer({
 					side="top"
 					triggerAriaLabel="Ask mode"
 					triggerClassName="shrink-0"
-					value={mode}
-					onChange={(v) => setMode(v as QueryMode)}
-					options={ASK_KIND_OPTIONS}
+					value={askKind}
+					onChange={(v) => pickAskKind(v as string)}
+					options={askKindOptions}
 				/>
 			)}
 			{worldControl}
-			{mode === "nl" ? (
-				noLlmProviders ? (
+			{mode === "nl" &&
+				(noLlmProviders ? (
 					<span className="text-muted-foreground px-1 truncate">
 						No model — add one in Agents › LLMs.
 					</span>
@@ -600,21 +619,7 @@ export function SessionComposer({
 					<span className="truncate px-1 text-muted-foreground">
 						No agent bound to this session.
 					</span>
-				)
-			) : languageOptions.length <= 1 ? (
-				<span className="inline-flex items-center h-7 px-2 text-muted-foreground truncate">
-					{LANGUAGE_LABEL[language]}
-				</span>
-			) : (
-				<RichSelect
-					appearance="inline"
-					side="top"
-					triggerAriaLabel="Query language"
-					value={language}
-					onChange={(v) => setLanguage(v as QueryLanguage)}
-					options={languageOptions}
-				/>
-			)}
+				))}
 		</>
 	);
 

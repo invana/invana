@@ -1,4 +1,8 @@
-import { MAIN_SECTION, SIDE_SECTION } from "@invana-studio/core";
+import {
+	BOTTOM_SECTION,
+	MAIN_SECTION,
+	SIDE_SECTION,
+} from "@invana-studio/core";
 import { AppVersion, StudioShellLayout } from "@invana-studio/shell";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
@@ -14,10 +18,11 @@ import {
 import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
 import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
 
-// A page hands the shell content only; the shell owns every region's size, so
-// the left panel, docked settings, the assistant and the inspector all open alike.
+// A page hands the shell content, and a size only when its occupant needs one
+// other than the shared side width (the docked assistant).
 interface SectionSlot {
 	content: ReactNode;
+	size?: { defaultSize: string; minSize: string };
 }
 
 interface GraphDetailProps {
@@ -35,6 +40,10 @@ interface GraphDetailProps {
 	/** Right auxiliary panel (e.g. Inspector / DetailPanel). Hidden when
 	 *  settings is expanded so the panel owns the full content width. */
 	rightSection?: SectionSlot;
+	/** The console, under the canvas only (`bottomSpan: "main"`) — the left
+	 *  and right sections stay full height beside it. Hidden with the rest
+	 *  when settings is expanded. */
+	bottomSection?: SectionSlot;
 	/** Slot inside ConnectionStatusBar (left of footer) for page-specific
 	 *  counters — "0 nodes · 0 relationships · 0 queries", etc. */
 	statusMetrics?: ReactNode;
@@ -122,6 +131,7 @@ export function GraphDetail({
 	leftSection,
 	mainSection,
 	rightSection,
+	bottomSection,
 	statusMetrics,
 	footerRightExtras,
 	headerRightExtras,
@@ -196,7 +206,12 @@ export function GraphDetail({
 
 	const effectiveRightSection =
 		rightSection && !settingsExpanded
-			? { ...SIDE_SECTION, content: rightSection.content }
+			? { ...SIDE_SECTION, ...rightSection.size, content: rightSection.content }
+			: undefined;
+
+	const effectiveBottomSection =
+		bottomSection && !settingsExpanded
+			? { ...BOTTOM_SECTION, content: bottomSection.content }
 			: undefined;
 
 	// The shell owns the layout. It keeps `mainSection` mounted at a
@@ -214,6 +229,8 @@ export function GraphDetail({
 			leftSection={effectiveLeftSection}
 			mainSection={effectiveMainSection}
 			rightSection={effectiveRightSection}
+			bottomSection={effectiveBottomSection}
+			bottomSpan="main"
 			footer={{
 				className: "!h-[25px]",
 				left: (

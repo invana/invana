@@ -122,6 +122,9 @@ export interface AssistantTurnProps {
 	onVote: (messageId: string, value: "up" | "down" | null) => void;
 	result: QueryResponse | null | undefined;
 	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
+	/** Open the console on Log, where a failed query's whole error is read.
+	 *  Absent where the page has no console. */
+	onOpenLog?: () => void;
 }
 
 /**
@@ -227,6 +230,7 @@ function SettledTurn({
 	onLoadToCanvas,
 	loadedToCanvas,
 	isLatest,
+	onOpenLog,
 }: AssistantTurnProps) {
 	const view = useRunStore((s) =>
 		message.runId ? s.views[message.runId] : undefined,
@@ -523,6 +527,7 @@ function SettledTurn({
 								message.sourceQuery ? () => onRerun(message.id) : onTypeInstead
 							}
 							onFocusComposer={onTypeInstead}
+							onOpenLog={onOpenLog}
 						/>
 					)}
 					{showQuery && sourceQuery && (

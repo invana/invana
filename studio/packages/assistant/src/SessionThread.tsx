@@ -24,6 +24,8 @@ export interface SessionThreadProps {
 	onTypeInstead: () => void;
 	onVote: (messageId: string, value: "up" | "down" | null) => void;
 	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
+	/** Open the console on Log — offered on a failed reply. */
+	onOpenLog?: () => void;
 }
 
 /**
@@ -47,6 +49,7 @@ export function SessionThread({
 	onTypeInstead,
 	onVote,
 	onLoadToCanvas,
+	onOpenLog,
 }: SessionThreadProps) {
 	const runViews = useRunStore((s) => s.views);
 
@@ -165,6 +168,7 @@ export function SessionThread({
 							onVote={onVote}
 							result={results[message.id]}
 							onLoadToCanvas={onLoadToCanvas}
+							onOpenLog={onOpenLog}
 						/>
 					</div>
 				);

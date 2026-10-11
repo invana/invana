@@ -8,7 +8,7 @@ import { expect, type Page } from "@playwright/test";
 
 export const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 
-/** Open the Explorer with the composer in query-language mode. */
+/** Open the Explorer with the composer on Cypher. */
 export async function openExplorer(page: Page) {
 	// The composer lives in the assistant, which is the `assistant` occupant of
 	// the right side (`?right=`) — Sessions is not a left-rail panel
@@ -21,9 +21,9 @@ export async function openExplorer(page: Page) {
 	// already where these specs need it.
 	const mode = page.getByRole("button", { name: "Ask mode" });
 	await expect(mode).toBeVisible({ timeout: 30_000 });
-	if ((await mode.textContent())?.includes("Natural")) {
+	if (!(await mode.textContent())?.includes("Cypher")) {
 		await mode.click();
-		await page.getByRole("menuitemradio", { name: "Query language" }).click();
+		await page.getByRole("menuitemradio", { name: "Cypher" }).click();
 	}
 
 	// The composer is a contenteditable, not an <input> — it has no placeholder

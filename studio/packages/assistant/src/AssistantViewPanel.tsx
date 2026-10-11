@@ -8,6 +8,7 @@ import {
 } from "@invana/ui";
 import type {
 	QueryLanguage,
+	QueryMode,
 	QueryResponse,
 	QueryRunPayload,
 	RunView,
@@ -69,6 +70,9 @@ export interface AssistantViewPanelProps {
 	/** Project a graph result onto the canvas (logs a `load` turn, docs/for-developers/modules/explore/features/boards.md). The
 	 *  message is the reply the result belongs to — its query is what was loaded. */
 	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
+	/** Open the console on Log — offered on a failed reply where the page has
+	 *  a console. */
+	onOpenLog?: () => void;
 	/** Refetch sessions from the engine (header refresh control). */
 	onRefresh: () => void;
 	/** True while a refetch is in flight — spins the refresh icon. */
@@ -141,6 +145,7 @@ export function AssistantViewPanel({
 	onSetFeedback,
 	results,
 	onLoadToCanvas,
+	onOpenLog,
 	onRefresh,
 	isRefreshing,
 	onClose,
@@ -163,6 +168,8 @@ export function AssistantViewPanel({
 	// Bumped to focus the composer when the user picks "let me type instead" on a
 	// clarification (docs/for-developers/modules/ask/features/clarifying-questions.md).
 	const [composerFocus, setComposerFocus] = useState(0);
+	// The composer's ask kind — a query's keys differ from an ask's.
+	const [askMode, setAskMode] = useState<QueryMode>("nl");
 	// Chat (the transcript) or Tasks (every step of every reply) —.
 	const [view, setView] = useState<"chat" | "tasks">("chat");
 	// The "what do the dots mean" legend, opened from the header help icon.
@@ -434,6 +441,12 @@ export function AssistantViewPanel({
 			<span>esc stop</span>
 			<span>↓ tasks</span>
 		</>
+	) : askMode === "ql" ? (
+		<>
+			<span>⌘↵ run</span>
+			<span>↵ newline</span>
+			<span>↑↓ history</span>
+		</>
 	) : (
 		<>
 			<span>↵ send</span>
@@ -483,6 +496,7 @@ export function AssistantViewPanel({
 				attachment={attachment}
 				onRemoveAttachment={onRemoveAttachment}
 				worldControl={worldControl}
+				onAskKindChange={setAskMode}
 			/>
 			<ChatSessionStatusBar
 				className="pt-0"
@@ -585,6 +599,7 @@ export function AssistantViewPanel({
 									onTypeInstead={handleTypeInstead}
 									onVote={handleVote}
 									onLoadToCanvas={onLoadToCanvas}
+									onOpenLog={onOpenLog}
 								/>
 							)}
 						</>

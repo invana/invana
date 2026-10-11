@@ -1,11 +1,22 @@
 import { CanvasContext } from "@invana/canvas-react";
 import { ErrorBoundary, Workbook } from "@invana/ui";
-import { AssistantSlotsContext, useSessions } from "@invana-studio/assistant";
+import {
+	AssistantReopenPill,
+	AssistantSlotsContext,
+	AssistantStart,
+	useConsoleParam,
+	useOpenLogOnFailure,
+	useSessions,
+} from "@invana-studio/assistant";
 import type { QueryResponse } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
 import { useCallback, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
+import {
+	OpenBoardContext,
+	parseBoardPageId,
+} from "@/pages/graphs-detail/features/boards";
 import {
 	hasOutstandingSetup,
 	isGateOpen,
@@ -21,6 +32,7 @@ import { useOnboarding } from "@/pages/graphs-detail/features/setup";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 import { assistantSlots } from "@/pages/graphs-detail/shell/assistantSlots";
+import { consoleSection } from "@/pages/graphs-detail/shell/consoleSection";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { graphDetailChrome } from "@/pages/graphs-detail/shell/GraphDetailChrome";
 import { layeredCanvasBody } from "@/pages/graphs-detail/shell/layeredCanvasBody";
@@ -31,6 +43,41 @@ import { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 import { useModelsPage } from "@/pages/graphs-detail/shell/useModelsPage";
 import { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
 import { useOpenPages } from "@/pages/graphs-detail/shell/useOpenPages";
+
+/** `invana_neo4j.connector.Neo4jConnector` → `Neo4j`. */
+function databaseName(connectorClass: string): string {
+	return (
+		connectorClass
+			.split(".")
+			.pop()
+			?.replace(/Connector$/, "") || ""
+	);
+}
+
+/**
+ * The line under the centred start: what the Graph is, then what the engine
+ * reports of it — its models and whether its database is live. Nothing the
+ * engine does not report (there are no record totals on a Graph).
+ */
+function startSubtitle(
+	description: string | null | undefined,
+	modelCount: number | undefined,
+	connection: { status: string; connector_class: string } | null | undefined,
+): string | undefined {
+	const db = connection ? databaseName(connection.connector_class) : "";
+	const parts = [
+		description?.trim() || null,
+		modelCount != null
+			? `${modelCount} ${modelCount === 1 ? "model" : "models"}`
+			: null,
+		connection
+			? connection.status === "ACTIVE"
+				? `live on ${db || "its database"}`
+				: `${db || "database"} not reachable`
+			: null,
+	].filter(Boolean);
+	return parts.length ? parts.join(" · ") : undefined;
+}
 
 export function GraphDetailPage() {
 	const { username, graphSlug } = useParams<{
@@ -251,6 +298,57 @@ export function GraphDetailPage() {
 		openWorkPanel,
 	);
 
+	// `?console=` — the console under the data canvas. A query that fails while
+	// the page watches opens it on Log, where the failing line is.
+	const consoleParam = useConsoleParam();
+	const openConsoleTab = consoleParam.open;
+	const openConsoleLog = useCallback(
+		() => openConsoleTab("log"),
+		[openConsoleTab],
+	);
+	useOpenLogOnFailure(activeSession, openConsoleLog);
+
+	// The assistant starts centred: with nothing docked on the right and no
+	// left panel open, the graph page is one question box. Sending from it
+	// docks the conversation on the right as the session's canvas opens. A new
+	// session is answered by the Graph's default agent, so the start names it.
+	const agents = useAgentsQuery(username, graphSlug);
+	const defaultAgent = agents.data?.items.find(
+		(a) => a.id === agents.data?.default_agent_id,
+	);
+	const homeStart =
+		username &&
+		graphSlug &&
+		!connectionMissing &&
+		!right.is("assistant") &&
+		!settingsPanel.isOpen ? (
+			<AssistantStart
+				username={username}
+				graphSlug={graphSlug}
+				graphName={graphContainer?.name ?? graphSlug}
+				subtitle={startSubtitle(
+					graphContainer?.description,
+					modelList.data?.length,
+					graph,
+				)}
+				availableLanguages={dataBoards.availableLanguages}
+				defaultLanguage={dataBoards.defaultLanguage}
+				llmProviders={llmProviders}
+				agentName={defaultAgent?.name ?? null}
+				agentStatus={defaultAgent?.status ?? null}
+				world={world}
+				onManageWorlds={() => settingsPanel.setSection("govern")}
+				onRun={(payload) => {
+					right.open("assistant");
+					void dataBoards.handleRun(payload);
+				}}
+				onStop={sessionState.stop}
+				isRunning={sessionState.isRunning}
+				onOpenAssistant={() => right.open("assistant")}
+				onOpenSession={dataBoards.handleOpenSession}
+			/>
+		) : undefined;
+
 	// The pages open in `mainSection`, the active one, and the strip's actions.
 	const strip = useOpenPages({
 		username,
@@ -277,7 +375,22 @@ export function GraphDetailPage() {
 		backToList,
 		right,
 		toggleInspector,
+		homeStart,
+		console: consoleParam,
 	});
+
+	// The pill that reopens a closed conversation floats over the data canvas
+	// it belongs to — never over a declared board or the graph page.
+	const dataBoardInFront = parseBoardPageId(strip.activeId)?.kind === "data";
+	const reopenPill =
+		dataBoardInFront && activeSessionId && !right.is("assistant") ? (
+			<div className="absolute right-16 bottom-4 z-10">
+				<AssistantReopenPill
+					title={sessionTitleById.get(activeSessionId) ?? ""}
+					onOpen={() => right.open("assistant")}
+				/>
+			</div>
+		) : null;
 
 	// The right side's occupant, and the header controls and `footer`.
 	const regionDeps = {
@@ -295,6 +408,7 @@ export function GraphDetailPage() {
 		setAttachmentDetached,
 		closeInspector,
 		modelName,
+		openConsoleLog,
 	};
 	const chrome = graphDetailChrome({
 		username,
@@ -338,18 +452,29 @@ export function GraphDetailPage() {
 							// (graph-detail-page.md the-shell.md).
 							content: (
 								<ErrorBoundary onError={reportBoundaryError}>
-									<Workbook
-										{...strip}
-										addLabel="New canvas"
-										// Until each canvas owns its own engine, only the active page is
-										// mounted — today's behaviour, now stated rather than emergent.
-										keepMounted={false}
-										className="h-full"
-									/>
+									<div className="relative h-full">
+										<Workbook
+											{...strip}
+											addLabel="New canvas"
+											// Until each canvas owns its own engine, only the active page is
+											// mounted — today's behaviour, now stated rather than emergent.
+											keepMounted={false}
+											className="h-full"
+										/>
+										{reopenPill}
+									</div>
 								</ErrorBoundary>
 							),
 						}}
 						rightSection={rightSection(regionDeps)}
+						bottomSection={consoleSection({
+							username,
+							graphSlug,
+							console: consoleParam,
+							sessionState,
+							dataBoards,
+							dataBoardInFront,
+						})}
 					/>
 				</AssistantSlotsContext.Provider>
 			</OpenBoardContext.Provider>

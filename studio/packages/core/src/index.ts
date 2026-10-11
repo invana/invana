@@ -14,6 +14,7 @@ export * from "./hooks/useAuth";
 export * from "./hooks/useEventStream";
 export * from "./hooks/useSessionResume";
 export * from "./hooks/useTicker";
+export * from "./hooks/useUpdateSearchParams";
 export * from "./lib/format";
 export * from "./lib/sections";
 export * from "./lib/time";

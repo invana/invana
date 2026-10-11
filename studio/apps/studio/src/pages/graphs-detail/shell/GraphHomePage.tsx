@@ -19,6 +19,7 @@
  */
 
 import { PropertyList, PropertyRow, StatusDot } from "@invana/ui";
+import type { ReactNode } from "react";
 import {
 	hasOutstandingSetup,
 	useGraphConnectionQuery,
@@ -34,12 +35,16 @@ interface GraphHomePageProps {
 	graphSlug: string;
 	/** What to do next, in the vocabulary of the open `leftSection`. */
 	hint: string;
+	/** The assistant's centred start — one question box — drawn instead of the
+	 *  identity card while the assistant is not docked on the right. */
+	start?: ReactNode;
 }
 
 export function GraphHomePage({
 	username,
 	graphSlug,
 	hint,
+	start,
 }: GraphHomePageProps) {
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
 	const { data: graph } = useGraphQuery(username, graphSlug);
@@ -63,6 +68,17 @@ export function GraphHomePage({
 				username={username}
 				graphSlug={graphSlug}
 			/>
+		);
+	}
+
+	// A ready Graph starts with the question box: asking is what the page is
+	// for once setup is done. Docked on the right, the assistant already has a
+	// composer, so the page goes back to the identity card below.
+	if (start) {
+		return (
+			<div className="flex h-full w-full flex-col items-center justify-center overflow-auto p-6">
+				{start}
+			</div>
 		);
 	}
 
