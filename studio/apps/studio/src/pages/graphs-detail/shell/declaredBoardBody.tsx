@@ -1,14 +1,16 @@
 import { EmptyState, Spinner } from "@invana/ui";
-import { RunBoardPage, RunsBoardPage, runAddress } from "@invana-studio/shell";
-import type { Dispatch, SetStateAction } from "react";
-import { AgentBoardPage } from "@/pages/graphs-detail/features/agents";
+import type { CanvasBackend } from "@invana-studio/explorer";
 import {
 	BOARD_KINDS,
 	boardPageId,
-	FrozenBoardPage,
 	type OpenBoard,
-} from "@/pages/graphs-detail/features/boards";
-import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
+	RunBoardPage,
+	RunsBoardPage,
+	runAddress,
+} from "@invana-studio/shell";
+import type { Dispatch, SetStateAction } from "react";
+import { AgentBoardPage } from "@/pages/graphs-detail/features/agents";
+import { FrozenBoardPage } from "@/pages/graphs-detail/features/boards";
 import type { useLensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import {
 	CompareBoardPage,

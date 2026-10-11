@@ -12,7 +12,7 @@ import type {
 	BoardVersionCause,
 	BoardVersionSummary,
 	CanvasStyling,
-} from "@/pages/graphs-detail/features/boards/types";
+} from "./types";
 
 // ── Wire DTOs (snake_case, as the engine returns) ────────────────────────────
 

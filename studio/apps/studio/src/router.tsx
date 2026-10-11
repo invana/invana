@@ -1,3 +1,4 @@
+import { ExplorerSlotsContext } from "@invana-studio/explorer";
 import {
 	ErrorPage,
 	LoginPage,
@@ -11,6 +12,10 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { GraphCreatePage } from "@/pages/graphs/GraphCreatePage";
 import { GraphsListPage } from "@/pages/graphs/GraphsListPage";
 import { products } from "@/products";
+import { GraphPageRoute } from "@/products/legacyGraph";
+
+// The Explorer's routes draw today's graph page until it is retired.
+const explorerSlots = { Page: GraphPageRoute };
 
 export const router = createBrowserRouter([
 	// Public auth pages — no shell, no protection. Self-service registration was
@@ -24,7 +29,9 @@ export const router = createBrowserRouter([
 		path: "/",
 		element: (
 			<ProtectedRoute>
-				<StudioShell products={products} />
+				<ExplorerSlotsContext.Provider value={explorerSlots}>
+					<StudioShell products={products} />
+				</ExplorerSlotsContext.Provider>
 			</ProtectedRoute>
 		),
 		errorElement: <ErrorPage />,

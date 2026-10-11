@@ -1,26 +1,16 @@
 import type { GraphCanvas, GraphLayer } from "@invana/graph";
 import type { QueryResultItem } from "@invana-studio/core";
-import { useCallback, useMemo } from "react";
-import { toast } from "sonner";
 import type {
 	CaptureCanvasState,
 	useBoardVersions,
-} from "@/pages/graphs-detail/features/boards";
-import {
-	adaptItems,
-	expandRefusal,
-} from "@/pages/graphs-detail/features/explorer/canvasItems";
-import {
-	ACTIVE_LAYOUT_ID,
-	type ExpandMenuSchema,
-} from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
-import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
-import type {
-	ExpandRequest,
-	NeighborExpandResponse,
-} from "@/pages/graphs-detail/features/explorer/types";
-import { useExpandNode } from "@/pages/graphs-detail/features/explorer/useExpandNode";
-import { useActiveVersionQuery } from "@/pages/graphs-detail/features/models";
+} from "@invana-studio/shell";
+import { useCallback, useMemo } from "react";
+import { toast } from "sonner";
+import { adaptItems, expandRefusal } from "./canvasItems";
+import { ACTIVE_LAYOUT_ID, type ExpandMenuSchema } from "./ExplorerCanvas";
+import { useTypeCountsQuery } from "./queries";
+import type { ExpandRequest, NeighborExpandResponse } from "./types";
+import { useExpandNode } from "./useExpandNode";
 
 /** What node expansion reads from the data canvas it grows. */
 export interface CanvasExpandDeps {
@@ -35,6 +25,19 @@ export interface CanvasExpandDeps {
 	threadWorldId: string | null;
 	/** Refetches the thread, so an expansion shows as a turn. */
 	refresh: () => void;
+	/** The Graph's active model version; undefined while it loads. */
+	activeVersion: ActiveModel | undefined;
+}
+
+/** What expansion reads off the active model: its types and property keys. */
+interface ActiveModel {
+	node_types: { name: string }[];
+	edge_types: {
+		name: string;
+		source_node_types: string[];
+		target_node_types: string[];
+	}[];
+	property_keys: { name: string }[];
 }
 
 /**
@@ -56,6 +59,7 @@ export function useCanvasExpand(deps: CanvasExpandDeps) {
 		activeSessionId,
 		threadWorldId,
 		refresh,
+		activeVersion,
 	} = deps;
 
 	// ── Node expand / graph traversal (docs/for-developers/modules/explore/features/graph-canvas.md) ────────────────────────────────
@@ -216,7 +220,6 @@ export function useCanvasExpand(deps: CanvasExpandDeps) {
 	// counts, and edge types the world allows whose both ends it allows too. The
 	// active model supplies each edge's endpoints. The Model panel loads its own
 	// version, because it may be looking at a draft.
-	const { data: activeVersion } = useActiveVersionQuery(username, graphSlug);
 	const { data: worldTypes } = useTypeCountsQuery(
 		username,
 		graphSlug,

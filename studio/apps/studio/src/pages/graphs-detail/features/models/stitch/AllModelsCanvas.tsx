@@ -20,9 +20,9 @@ import {
 	graphModelSettings,
 	graphModelTemplates,
 } from "@invana-studio/canvases";
+import type { CanvasBackend } from "@invana-studio/explorer";
 import { AlertTriangle, Boxes, Check } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import {
 	useCommitStitchesMutation,
 	useDiscardStitchesMutation,

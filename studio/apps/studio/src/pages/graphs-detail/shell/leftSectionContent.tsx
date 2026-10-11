@@ -3,14 +3,11 @@ import { ErrorBoundary } from "@invana/ui";
 import type { useSessions } from "@invana-studio/assistant";
 import type { LensKind, QueryResultItem } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
+import { ExplorerViewPanel } from "@invana-studio/explorer";
+import type { CanvasStyling, OpenBoard } from "@invana-studio/shell";
 import { RunsViewPanel } from "@invana-studio/shell";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents";
-import type {
-	CanvasStyling,
-	OpenBoard,
-} from "@/pages/graphs-detail/features/boards";
-import { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer";
 import { LensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import {
 	type ModelSelection,

@@ -37,10 +37,25 @@ import type {
 	GraphCanvas as GraphCanvasEngine,
 	GraphData,
 } from "@invana/graph";
+import { Button, Card } from "@invana/ui";
 import { SessionTutorialModal } from "@invana-studio/assistant";
 import type { InteractionRef } from "@invana-studio/core";
+import type {
+	CanvasBackend,
+	ExpandMenuHandlers,
+	ExpandMenuSchema,
+	ExpandRequest,
+	NeighborExpandResponse,
+} from "@invana-studio/explorer";
+import {
+	ExpandNeighboursDialog,
+	ExplorerCanvas,
+} from "@invana-studio/explorer";
+import type { CanvasStyling } from "@invana-studio/shell";
+import { Wrench } from "lucide-react";
 import {
 	forwardRef,
+	type ReactNode,
 	useCallback,
 	useImperativeHandle,
 	useMemo,
@@ -48,18 +63,6 @@ import {
 } from "react";
 import { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardFormDialog";
 import { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardHistoryWidget";
-import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
-import type {
-	CanvasBackend,
-	ExpandMenuHandlers,
-	ExpandMenuSchema,
-	ExpandRequest,
-	NeighborExpandResponse,
-} from "@/pages/graphs-detail/features/explorer";
-import {
-	ExpandNeighboursDialog,
-	ExplorerCanvas,
-} from "@/pages/graphs-detail/features/explorer";
 
 /**
  * What the strip can ask of the canvas page under it. The shell holds one of
@@ -120,6 +123,33 @@ export interface BoardPageProps {
 	/** Auto-open the tutorial on a user's very first session. */
 	tutorialSeen: boolean;
 	onTutorialSeen: () => void;
+
+	/** The canvas toolbar, floated top-left behind *Tools*; absent, it stays
+	 *  in the header. */
+	tools?: ReactNode;
+}
+
+/**
+ * The board's floating tools: compact — one *Tools* toggle — until it is on,
+ * then the canvas toolbar stacked under it.
+ */
+function FloatingTools({ children }: { children: ReactNode }) {
+	const [on, setOn] = useState(false);
+	return (
+		<Card className="flex flex-col items-center gap-1 p-1">
+			<Button
+				variant={on ? "secondary" : "ghost"}
+				size="icon-sm"
+				aria-label="Tools"
+				aria-pressed={on}
+				title={on ? "Hide the tools" : "Show the tools"}
+				onClick={() => setOn((v) => !v)}
+			>
+				<Wrench />
+			</Button>
+			{on && children}
+		</Card>
+	);
 }
 
 export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
@@ -151,6 +181,7 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			isSaving,
 			tutorialSeen,
 			onTutorialSeen,
+			tools,
 		},
 		ref,
 	) {
@@ -212,6 +243,11 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			<div className="flex h-full w-full flex-col overflow-hidden">
 				<div className="relative min-h-0 w-full flex-1 overflow-hidden">
 					<RendererCapabilityBanner />
+					{tools && canvas && (
+						<Panel position="top-left" offset={12} zIndex={20}>
+							<FloatingTools>{tools}</FloatingTools>
+						</Panel>
+					)}
 					<ExplorerCanvas
 						data={seedData}
 						onReady={onReady}

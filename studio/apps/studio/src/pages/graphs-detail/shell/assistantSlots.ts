@@ -9,10 +9,8 @@
  */
 
 import type { AssistantSlots } from "@invana-studio/assistant";
-import {
-	useCanvasBannerQuery,
-	useOpenBoard,
-} from "@/pages/graphs-detail/features/boards";
+import { useCanvasBannerQuery } from "@invana-studio/shell";
+import { useOpenBoard } from "@/pages/graphs-detail/features/boards";
 import {
 	matches,
 	useLensesQuery,

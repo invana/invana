@@ -25,10 +25,10 @@ import {
 	hueSlotForName,
 	type ModelCanvasSelection,
 } from "@invana-studio/canvases";
+import type { CanvasBackend } from "@invana-studio/explorer";
 import { ConfirmDialog } from "@invana-studio/shell";
 import { PanelBottomClose } from "lucide-react";
 import { useMemo, useState } from "react";
-import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import { EdgeTypeDetail } from "@/pages/graphs-detail/features/models/model-editor/components/EdgeTypeDetail";
 import { EdgeTypeFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/EdgeTypeFormDialog";
 import { NodeTypeDetail } from "@/pages/graphs-detail/features/models/model-editor/components/NodeTypeDetail";

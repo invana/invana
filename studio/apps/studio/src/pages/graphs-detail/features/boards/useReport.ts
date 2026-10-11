@@ -25,11 +25,10 @@
  */
 
 import type { BoardSpec, ExtraPanels } from "@invana/boards";
+import { boardReportsApi, boardReportsKey } from "@invana-studio/shell";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext } from "react";
 import { toast } from "sonner";
-import { boardReportsKey } from "@/pages/graphs-detail/features/boards/queries";
-import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
 
 /** The two action ids a declared board's header carries. */
 const SAVE_REPORT_ACTION = "save-report";

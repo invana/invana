@@ -8,6 +8,16 @@ import {
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,
 } from "@invana-studio/assistant";
+import { ExplorerHeaderToolbar } from "@invana-studio/explorer";
+import {
+	BOARD_KINDS,
+	boardPageId,
+	CANVAS_KINDS,
+	type CanvasKind,
+	declaredPage,
+	parseBoardPageId,
+	useActiveProduct,
+} from "@invana-studio/shell";
 import {
 	HelpCircle,
 	History,
@@ -27,15 +37,9 @@ import { useMemo, useRef } from "react";
 import { LayeredCanvasHeader } from "@/canvases/layered/LayeredCanvasChrome";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
-	BOARD_KINDS,
 	type BoardPageHandle,
-	boardPageId,
-	CANVAS_KINDS,
-	type CanvasKind,
 	DataBoardPage,
 	DeclaredBoard,
-	declaredPage,
-	parseBoardPageId,
 } from "@/pages/graphs-detail/features/boards";
 import type { useLensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
@@ -149,7 +153,9 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		canvas,
 		handleReady,
 		magnet,
+		toggleMagnet,
 		backend,
+		setBackend,
 		openTabs,
 		createCanvasState,
 		isRestoring,
@@ -203,6 +209,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	// page id (graph-detail-page.md), so the shell calls into the page
 	// rather than passing one.
 	const boardPageRef = useRef<BoardPageHandle>(null);
+	const explorerOpen = useActiveProduct()?.id === "explorer";
 
 	// Clicking a node/edge feeds `selectedId` via <InspectorSelectionBridge>; the
 	// derived `selected` (above) drives the right-side InspectorViewPanel. The strip
@@ -239,6 +246,18 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			isSaving={createCanvasState.isPending}
 			tutorialSeen={hasSeenSessionTutorial()}
 			onTutorialSeen={markSessionTutorialSeen}
+			tools={
+				// Explorer has no header toolbar: its tools float over the board.
+				explorerOpen ? (
+					<ExplorerHeaderToolbar
+						orientation="vertical"
+						magnet={magnet}
+						onToggleMagnet={toggleMagnet}
+						backend={backend}
+						onBackendChange={setBackend}
+					/>
+				) : undefined
+			}
 		/>
 	);
 

@@ -18,9 +18,9 @@
 
 import { Button, ScrollArea } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
+import type { BoardVersionSummary } from "@invana-studio/shell";
 import { History, X } from "lucide-react";
 import type { ReactNode } from "react";
-import type { BoardVersionSummary } from "@/pages/graphs-detail/features/boards/types";
 
 /** What the row's one button does — the half that is not shared. */
 interface BoardHistoryAction {

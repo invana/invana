@@ -3,10 +3,10 @@ import {
 	GraphStatusBar as CanvasStatusBar,
 } from "@invana/canvas-ui";
 import { Button, cn } from "@invana/ui";
+import { ExplorerHeaderToolbar } from "@invana-studio/explorer";
 import { Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { LayeredCanvasStatus } from "@/canvases/layered/LayeredCanvasChrome";
-import { ExplorerHeaderToolbar } from "@/pages/graphs-detail/features/explorer";
 import type { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";

@@ -16,10 +16,10 @@
  * here, over whatever page is open, and the hook only opens it.
  */
 
+import { useBoardReportsQuery } from "@invana-studio/shell";
 import type { ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { BoardHistoryCard } from "@/pages/graphs-detail/features/boards/BoardHistoryCard";
-import { useBoardReportsQuery } from "@/pages/graphs-detail/features/boards/queries";
 import { DeclaredBoardContext } from "@/pages/graphs-detail/features/boards/useReport";
 
 export interface DeclaredBoardProps {

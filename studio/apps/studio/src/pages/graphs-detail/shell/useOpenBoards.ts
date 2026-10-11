@@ -1,14 +1,14 @@
 import type { LensKind } from "@invana-studio/core";
 import { runsApi } from "@invana-studio/core";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	boardPageId,
 	DECLARED_KINDS,
 	type DeclaredKind,
 	type OpenBoard,
 	parseBoardPageId,
-	type RecordBoardKind,
-} from "@/pages/graphs-detail/features/boards";
+} from "@invana-studio/shell";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { RecordBoardKind } from "@/pages/graphs-detail/features/boards";
 import {
 	useLibraryViewPanel,
 	useTaskPlansQuery,

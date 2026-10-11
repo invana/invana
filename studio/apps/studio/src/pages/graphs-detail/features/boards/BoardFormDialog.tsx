@@ -9,11 +9,10 @@ import {
 	DialogTitle,
 } from "@invana/ui";
 import { ApiError } from "@invana-studio/core";
+import { boardsApi, useUpdateCanvasMutation } from "@invana-studio/shell";
 import { FormError } from "@invana-studio/ui";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { boardsApi } from "@/pages/graphs-detail/features/boards/api";
-import { useUpdateCanvasMutation } from "@/pages/graphs-detail/features/boards/queries";
 
 interface Props {
 	open: boolean;

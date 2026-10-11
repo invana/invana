@@ -7,35 +7,38 @@ import {
 } from "@invana-studio/assistant";
 import type { QueryResponse, QueryResultItem } from "@invana-studio/core";
 import { type Interaction, measureSync } from "@invana-studio/core";
-import type { Dispatch, MutableRefObject, SetStateAction } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import type {
-	Board,
-	BoardVersionCause,
-	CanvasStyling,
-	CanvasKind as DataBoardsCanvasKind,
-} from "@/pages/graphs-detail/features/boards";
-import {
-	boardsApi,
-	boardVersionsApi,
-	captureBanner,
-	STATE_THUMB_MAX_EDGE,
-	useBoardVersions,
-	useCanvasTabs,
-	useCreateCanvasStateMutation,
-	useUpdateCanvasMutation,
-} from "@/pages/graphs-detail/features/boards";
-import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
+import type { CanvasBackend } from "@invana-studio/explorer";
 import {
 	adaptItems,
 	explorerApi,
 	isCanvasStateSnapshot,
 	resultToItems,
 	useCanvasExpand,
-} from "@/pages/graphs-detail/features/explorer";
+	useCanvasTabs,
+} from "@invana-studio/explorer";
+import type {
+	Board,
+	BoardVersionCause,
+	CanvasStyling,
+	CanvasKind as DataBoardsCanvasKind,
+} from "@invana-studio/shell";
+import {
+	boardsApi,
+	boardVersionsApi,
+	captureBanner,
+	STATE_THUMB_MAX_EDGE,
+	useActiveProduct,
+	useBoardVersions,
+	useCreateCanvasStateMutation,
+	useUpdateCanvasMutation,
+} from "@invana-studio/shell";
+import type { Dispatch, MutableRefObject, SetStateAction } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
+import { useActiveVersionQuery } from "@/pages/graphs-detail/features/models";
 import { useOpenSessionRequest } from "@/pages/graphs-detail/shared/useOpenSessionRequest";
+import { usePageParams } from "@/pages/graphs-detail/shared/usePageParams";
 import type { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 
@@ -715,7 +718,41 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		clearOpenSessionRequest();
 	}, [openSessionRequest, handleOpenSession, clearOpenSessionRequest]);
 
-	// Node expansion — growing the active canvas under the thread's world.
+	// On the Explorer the open session is the path's last level,
+	// `/explorer/<session>`, so a reload or a shared link reopens its thread.
+	// A path naming a session the page has not opened opens it; opening,
+	// starting or leaving a thread rewrites the path in place.
+	const explorerOpen = useActiveProduct()?.id === "explorer";
+	const [pageParams, setPageParams] = usePageParams();
+	const sessionInPath = explorerOpen ? pageParams.get("session") : null;
+	const activeSessionRef = useRef(activeSessionId);
+	activeSessionRef.current = activeSessionId;
+	const openSessionRef = useRef(handleOpenSession);
+	openSessionRef.current = handleOpenSession;
+	useEffect(() => {
+		if (sessionInPath && sessionInPath !== activeSessionRef.current) {
+			openSessionRef.current(sessionInPath);
+		}
+	}, [sessionInPath]);
+	const shownSession = useRef(activeSessionId);
+	useEffect(() => {
+		if (shownSession.current === activeSessionId) return;
+		shownSession.current = activeSessionId;
+		if (!explorerOpen) return;
+		setPageParams(
+			(prev) => {
+				const next = new URLSearchParams(prev);
+				if (activeSessionId) next.set("session", activeSessionId);
+				else next.delete("session");
+				return next;
+			},
+			{ replace: true },
+		);
+	}, [explorerOpen, activeSessionId, setPageParams]);
+
+	// Node expansion — growing the active canvas under the thread's world. The
+	// active model offers the expand menus only the types it declares.
+	const { data: activeVersion } = useActiveVersionQuery(username, graphSlug);
 	const { runExpand, expandSchema, propertyKeys, expandHandlers } =
 		useCanvasExpand({
 			username,
@@ -726,6 +763,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 			activeSessionId,
 			threadWorldId,
 			refresh,
+			activeVersion,
 		});
 
 	// The ask — sending it, and painting and restoring what it returns.

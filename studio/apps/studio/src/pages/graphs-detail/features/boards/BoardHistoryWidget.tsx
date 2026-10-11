@@ -1,11 +1,11 @@
 import { Button } from "@invana/ui";
-import { Camera } from "lucide-react";
-import { BoardHistoryCard } from "@/pages/graphs-detail/features/boards/BoardHistoryCard";
+import type { BoardVersionSummary } from "@invana-studio/shell";
 import {
 	useCanvasStateBannerQuery,
 	useCanvasStatesQuery,
-} from "@/pages/graphs-detail/features/boards/queries";
-import type { BoardVersionSummary } from "@/pages/graphs-detail/features/boards/types";
+} from "@invana-studio/shell";
+import { Camera } from "lucide-react";
+import { BoardHistoryCard } from "@/pages/graphs-detail/features/boards/BoardHistoryCard";
 
 interface Props {
 	open: boolean;

@@ -4,12 +4,9 @@ import {
 	type BoardListOptions,
 	type BoardUpdateBody,
 	boardsApi,
-} from "@/pages/graphs-detail/features/boards/api";
-import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
-import {
-	boardVersionsApi,
-	type CanvasStateCreateBody,
-} from "@/pages/graphs-detail/features/boards/versionsApi";
+} from "./api";
+import { boardReportsApi } from "./reportsApi";
+import { boardVersionsApi, type CanvasStateCreateBody } from "./versionsApi";
 
 const CANVASES_KEY = ["canvases"] as const;
 const canvasesKey = (username: string, graphSlug: string) =>

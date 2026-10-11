@@ -203,14 +203,34 @@ def status_of(sid: str) -> str:
     return next((r["status"] for r in read_log() if r["id"] == sid), "")
 
 
+BASELINE_TAMPERED = ("`scripts/migration/baseline.json` belongs to the driver and your change to it was reverted. "
+                     "A failure is fixed, never baselined; if it truly cannot pass on this stack, say why in the hand-off note.")
+
+
+def reclaim(sid: str) -> None:
+    """Undo what only the driver may decide: a session's own `done`, and edits to the baseline."""
+    if status_of(sid) == "done":
+        print(f"  {sid} marked itself done — the driver decides that; back to in progress")
+        set_status(sid, "in progress")
+    if sh(["git", "diff", "--quiet", "HEAD", "--", str(BASELINE.relative_to(ROOT))]).returncode != 0:
+        print(f"  {sid} edited baseline.json — reverted")
+        sh(["git", "checkout", "HEAD", "--", str(BASELINE.relative_to(ROOT))])
+        TAMPERED.add(sid)
+
+
+TAMPERED: set[str] = set()
+
+
 def build_until_handoffs_end(sid: str, first_prompt: str, label: str, max_handoffs: int = 8) -> None:
     """Run a session; while it ends `partial` (a hand-off), continue in a fresh session from the note."""
     claude(first_prompt, sid, label)
+    reclaim(sid)
     for n in range(1, max_handoffs + 1):
         if status_of(sid) != "partial":
             return
         print(f"  {sid} handed off — continuing in session {n + 1}")
         claude(prompt("continue", ID=sid), sid, f"{label}-cont{n}")
+        reclaim(sid)
     if status_of(sid) == "partial":
         raise RuntimeError(f"{sid} still partial after {max_handoffs} hand-offs")
 
@@ -371,6 +391,9 @@ def run_session(row: dict, max_fix: int) -> bool:
             set_status(sid, "blocked", "dev stack down — `docker compose up -d engine studio`, then re-run")
             return False
         findings = run_gates(sid)
+        if sid in TAMPERED:
+            findings.insert(0, BASELINE_TAMPERED)
+            TAMPERED.discard(sid)
         if not findings:
             ok, report = review(row)
             if ok:

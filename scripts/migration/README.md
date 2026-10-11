@@ -37,6 +37,10 @@ python3 scripts/migration/run.py                       # everything, stopping on
 
 The gates were not green before the migration started. `baseline.json` lists what knip and e2e already fail on at `pre-products-migrations` (taken by `--baseline`, which refuses if `studio/` has changed). A knip or e2e gate passes when every failure it reports is in the baseline; a session is asked to fix only failures that are new. Keys survive a file move: `e2e › <spec file> › <title>`, `knip › <section> › <symbol>`.
 
+Only the driver changes the baseline. A session that edits `baseline.json` has the edit reverted and is told to fix the failure instead; a session that marks its own row `done` is set back to `in progress` — `done` comes after the driver's gates and review.
+
+Known entry: `plan-page` › *a plan that has run reads across its four tabs* needs an LLM-backed ask to have run; a stack with no LLM provider cannot pass it.
+
 Before studio gates the driver checks the dev stack and runs `docker compose up -d engine studio` if it is down; still down after two minutes, the session is `blocked` without spending a fix round.
 
 ## Seeing the sessions

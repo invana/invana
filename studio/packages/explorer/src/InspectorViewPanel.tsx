@@ -10,7 +10,7 @@ import {
 	isProvenanceKey,
 	ProvenanceBlock,
 	readProvenance,
-} from "@/pages/graphs-detail/features/explorer/ProvenanceBlock";
+} from "./ProvenanceBlock";
 
 interface InspectorViewPanelProps {
 	selected: QueryResultItem | null;

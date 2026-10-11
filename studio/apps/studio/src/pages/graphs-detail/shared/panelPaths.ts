@@ -43,7 +43,7 @@ interface PanelPath {
 
 // Stacks list their sections in stack order, so the first is the default.
 const PANEL_PATHS: readonly PanelPath[] = [
-	{ path: "explorer", panel: "explorer" },
+	{ path: "explorer", panel: "explorer", detail: "session" },
 	{ path: "modeller/settings", panel: "settings" },
 	{ path: "modeller/global-model", panel: "model" },
 	{

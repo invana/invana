@@ -17,8 +17,8 @@ import type {
 	StagedSpec,
 	TabSpec,
 } from "@invana/boards";
+import type { TypeCountsResponse } from "@invana-studio/explorer";
 import type { ReactNode } from "react";
-import type { TypeCountsResponse } from "@/pages/graphs-detail/features/explorer";
 import type { ModelFrame } from "@/pages/graphs-detail/features/models/stitch/allModels";
 import type {
 	GraphModelResponse,

@@ -11,14 +11,14 @@
 import { Board } from "@invana/boards";
 import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
 import { ApiError } from "@invana-studio/core";
+import type { CanvasBackend } from "@invana-studio/explorer";
+import { useTypeCountsQuery } from "@invana-studio/explorer";
 import { routedAction } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
-import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer";
 import {
 	graphsApi,
 	useGraphConnectionQuery,

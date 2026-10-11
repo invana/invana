@@ -7,12 +7,13 @@ import {
 	ActivityPage,
 	AppVersion,
 	activityOf,
+	boardPageId,
 	StudioShellLayout,
+	useActiveProduct,
 } from "@invana-studio/shell";
 import type { ReactNode } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { OnboardingCap } from "@/components/header/OnboardingCap";
-import { boardPageId } from "@/pages/graphs-detail/features/boards";
 import {
 	SettingsViewPanel,
 	useGraphConnectionQuery,
@@ -130,6 +131,9 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
  * - Activity takeover: on `/activity/<tab>[/:id]` the shell's `ActivityPage`
  *   fills `mainSection` and every other region closes. `leftNav` stays, so the
  *   `Runs` and `Events` icons open their tabs and close them again.
+ * - Explorer: while the Explorer product's route is open the page has no
+ *   `leftNav` and no `leftSection` — the board and the assistant fill it, and
+ *   the canvas toolbar floats over the board instead of sitting in the header.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
  *   and a right cluster (extras + `AppVersion`).
  *
@@ -157,6 +161,7 @@ export function GraphDetail({
 	const leftNav = useGraphLeftNav();
 	const navigate = useNavigate();
 	const activity = activityOf(useLocation().pathname);
+	const explorer = useActiveProduct()?.id === "explorer";
 
 	// **No mode switch** (docs/for-developers/modules/explore/spec.md). The header is a breadcrumb naming the
 	// graph and the open panel; the levels after the graph come from the routes
@@ -173,7 +178,7 @@ export function GraphDetail({
 				<OnboardingCap username={username} graphSlug={graphSlug} />
 			) : undefined,
 		assistantToggle: headerPanelControls,
-		center: headerCenter,
+		center: explorer ? undefined : headerCenter,
 	};
 
 	// The whole left rail shares one `?settings` param. This view's own panel
@@ -201,7 +206,7 @@ export function GraphDetail({
 		/>
 	) : undefined;
 	const effectiveLeftSection =
-		leftContent && !activity
+		leftContent && !activity && !explorer
 			? { ...SIDE_SECTION, content: leftContent }
 			: undefined;
 
@@ -257,7 +262,8 @@ export function GraphDetail({
 	return (
 		<StudioShellLayout
 			idPrefix="graph-detail"
-			leftNav={leftNav}
+			// Explorer draws no `leftNav`: the product's `nav` is `null`.
+			leftNav={explorer ? undefined : leftNav}
 			header={header}
 			leftSection={effectiveLeftSection}
 			mainSection={effectiveMainSection}

@@ -1,5 +1,5 @@
+import { boardPageId } from "@invana-studio/shell";
 import { useCallback, useEffect, useRef } from "react";
-import { boardPageId } from "@/pages/graphs-detail/features/boards";
 import { useModelsView } from "@/pages/graphs-detail/features/models";
 import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import type { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";

@@ -50,6 +50,9 @@ importers:
       '@invana-studio/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@invana-studio/explorer':
+        specifier: workspace:*
+        version: link:../../packages/explorer
       '@invana-studio/shell':
         specifier: workspace:*
         version: link:../../packages/shell
@@ -409,6 +412,97 @@ importers:
         specifier: ^5.0.0
         version: 5.0.12(@types/react@19.2.14)(immer@11.1.8)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
 
+  packages/explorer:
+    dependencies:
+      '@invana-studio/assistant':
+        specifier: workspace:*
+        version: link:../assistant
+      '@invana-studio/canvases':
+        specifier: workspace:*
+        version: link:../canvases
+      '@invana-studio/core':
+        specifier: workspace:*
+        version: link:../core
+      '@invana-studio/shell':
+        specifier: workspace:*
+        version: link:../shell
+      '@invana-studio/ui':
+        specifier: workspace:*
+        version: link:../ui
+      elkjs:
+        specifier: ^0.9.3
+        version: 0.9.3
+    devDependencies:
+      '@biomejs/biome':
+        specifier: ^2.5.14
+        version: 2.5.14
+      '@invana/canvas':
+        specifier: ^0.0.15
+        version: 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas-react':
+        specifier: ^0.0.15
+        version: 0.0.15(560bcd8c6270f6272e44eb4e8afa3d6f)
+      '@invana/canvas-ui':
+        specifier: ^0.0.15
+        version: 0.0.15(346146bc46074049494311e97138a006)
+      '@invana/forms':
+        specifier: ^0.0.34
+        version: 0.0.34(@invana/styling@0.0.34(tailwindcss@4.2.2))(@invana/ui@0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
+      '@invana/graph':
+        specifier: ^0.0.15
+        version: 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/graph-layout-d3-force':
+        specifier: ^0.0.15
+        version: 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/graph-layout-elkjs':
+        specifier: ^0.0.15
+        version: 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/styling':
+        specifier: ^0.0.34
+        version: 0.0.34(tailwindcss@4.2.2)
+      '@invana/themes':
+        specifier: ^0.0.34
+        version: 0.0.34(@invana/styling@0.0.34(tailwindcss@4.2.2))(@invana/ui@0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/ui':
+        specifier: ^0.0.34
+        version: 0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.98.0(react@19.2.5)
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.2.3(@types/react@19.2.14)
+      lucide-react:
+        specifier: ^0.475.0
+        version: 0.475.0(react@19.2.5)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.5
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.5(react@19.2.5)
+      react-hook-form:
+        specifier: 7.72.1
+        version: 7.72.1(react@19.2.5)
+      react-router-dom:
+        specifier: ^7.0.0
+        version: 7.14.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      typescript:
+        specifier: ^6.0.0
+        version: 6.0.2
+      vite:
+        specifier: ^7.0.0
+        version: 7.3.2(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.1)
+      vitest:
+        specifier: ^5.0.2
+        version: 5.0.2(@opentelemetry/api@1.9.1)(@types/node@25.6.0)(@vitest/coverage-v8@5.0.2)(vite@7.3.2(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.1))
+
   packages/shell:
     dependencies:
       '@invana-studio/canvases':
@@ -433,6 +527,9 @@ importers:
       '@invana/forms':
         specifier: ^0.0.34
         version: 0.0.34(@invana/styling@0.0.34(tailwindcss@4.2.2))(@invana/ui@0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
+      '@invana/graph':
+        specifier: ^0.0.15
+        version: 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       '@invana/styling':
         specifier: ^0.0.34
         version: 0.0.34(tailwindcss@4.2.2)
@@ -3906,6 +4003,23 @@ snapshots:
       - '@types/react'
       - react
       - use-sync-external-store
+
+  '@invana/canvas-ui@0.0.15(346146bc46074049494311e97138a006)':
+    dependencies:
+      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas-react': 0.0.15(560bcd8c6270f6272e44eb4e8afa3d6f)
+      '@invana/forms': 0.0.34(@invana/styling@0.0.34(tailwindcss@4.2.2))(@invana/ui@0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
+      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/graph-layout-d3-force': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/styling': 0.0.34(tailwindcss@4.2.2)
+      '@invana/themes': 0.0.34(@invana/styling@0.0.34(tailwindcss@4.2.2))(@invana/ui@0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/ui': 0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      lucide-react: 0.475.0(react@19.2.5)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      react-hook-form: 7.72.1(react@19.2.5)
+    optionalDependencies:
+      '@invana/boards': 0.0.34(6b092dff7c1e89e2da1cdf9611ab695d)
 
   '@invana/canvas-ui@0.0.15(7355914273891cdd5466ec5ec3cbf6b4)':
     dependencies:

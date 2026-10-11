@@ -9,3 +9,5 @@ Execute migration session {{ID}} from docs/products/migration-sessions.md. You a
 7. When done, leave the log row status as it is (the driver marks `done` after its own gates and the design review) and add a hand-off note row for {{ID}}: what a later session must know that the code does not say.
 
 Standing rules: tokens, never currency, anywhere. Record exact model versions on runs. Templates stay out of prompts. Studio UI is composed from @invana/* and tokens only. Do not run graph-database tests unless INVANA_ALLOW_GRAPH_TESTS=1 is set in your environment.
+
+Never edit `scripts/migration/baseline.json` and never set your own log row to `done` — both belong to the driver, which reverts them.

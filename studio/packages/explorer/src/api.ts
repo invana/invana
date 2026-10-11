@@ -5,7 +5,7 @@ import type {
 	ExpandNeighborsRequest,
 	NeighborExpandResponse,
 	TypeCountsResponse,
-} from "@/pages/graphs-detail/features/explorer/types";
+} from "./types";
 
 // Explorer node-expand / graph-traversal APIs (docs/for-developers/modules/explore/features/graph-canvas.md). Three focused,
 // individually-triggerable read-only endpoints under the graph prefix.

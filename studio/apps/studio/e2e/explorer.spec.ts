@@ -23,9 +23,7 @@ test("the workflow runs in front of the reader, step by step", async ({
 	}
 });
 
-test("a session survives a reload; its answer does not — yet", async ({
-	page,
-}) => {
+test("a session and its answer survive a reload", async ({ page }) => {
 	// Unique per run: every run leaves its sessions behind, and a repeated ask
 	// would match a previous run's row in the session list as well as this one.
 	const alias = `n_${Date.now()}`;
@@ -33,18 +31,35 @@ test("a session survives a reload; its answer does not — yet", async ({
 	await ask(page, query);
 
 	await expect(emission(page, "table")).toBeVisible({ timeout: 30_000 });
+	// The open session is the path's last level.
+	await expect(page).toHaveURL(/\/explorer\/[^/?]+/);
 	const url = page.url();
 
 	await page.goto(url);
 
-	// The ask and its steps are records, and come back. It reads twice — once as
-	// the session's name in the list, once in the thread.
+	// The ask, its steps and its emission are records: the path reopens the
+	// thread, and the answer comes back with it.
 	await expect(page.getByText(query).first()).toBeVisible({ timeout: 30_000 });
+	await expect(emission(page, "table")).toBeVisible({ timeout: 30_000 });
+});
 
-	// The emission is not — it is held in the page until the engine persists
-	// emissions (AS10). This assertion is the seam: when 3.3's API lands, it
-	// fails, and the decision and this spec change together.
-	await expect(emission(page)).toHaveCount(0);
+test("the Explorer has no leftNav; its tools float over the board", async ({
+	page,
+}) => {
+	await ask(page, "RETURN 1 AS one");
+	await expect(emission(page)).toBeVisible({ timeout: 30_000 });
+
+	// The graph page's leftNav icons are not drawn on the Explorer.
+	await expect(page.getByRole("button", { name: "Runs" })).toHaveCount(0);
+
+	// Compact until Tools is on; then the canvas toolbar is under it.
+	const tools = page.getByRole("button", { name: "Tools" });
+	await expect(tools).toBeVisible();
+	const runLayout = page.getByRole("button", { name: "Run layout" });
+	await expect(runLayout).toHaveCount(0);
+	await tools.click();
+	await expect(tools).toHaveAttribute("aria-pressed", "true");
+	await expect(runLayout.first()).toBeVisible();
 });
 
 test("a rejected query is a diagnosis, never an answer", async ({ page }) => {

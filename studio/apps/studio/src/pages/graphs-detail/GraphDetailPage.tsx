@@ -16,6 +16,7 @@ import {
 } from "@invana-studio/core";
 import {
 	ActivitySlotsContext,
+	parseBoardPageId,
 	SetupSlotsContext,
 	useOnboarding,
 	useRunStep,
@@ -23,10 +24,7 @@ import {
 import { useCallback, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
-import {
-	OpenBoardContext,
-	parseBoardPageId,
-} from "@/pages/graphs-detail/features/boards";
+import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,

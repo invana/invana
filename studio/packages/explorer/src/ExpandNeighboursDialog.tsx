@@ -20,7 +20,7 @@ import {
 } from "@invana/ui";
 import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { ExpandMenuSchema } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
+import type { ExpandMenuSchema } from "./ExplorerCanvas";
 import type {
 	ExpandDirection,
 	ExpandRequest,
@@ -30,7 +30,7 @@ import type {
 	NeighborExpandResponse,
 	SortDirection,
 	SortSpec,
-} from "@/pages/graphs-detail/features/explorer/types";
+} from "./types";
 
 const ANY = "__any__";
 

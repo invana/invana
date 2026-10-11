@@ -47,8 +47,11 @@ const LazyFallback = () => (
 	<div className="p-8 text-muted-foreground">Loading…</div>
 );
 
-/** The graph page, after any old link is sent to its path. */
-function GraphPageRoute() {
+/**
+ * The graph page, after any old link is sent to its path. Explorer's routes
+ * draw it too, through `ExplorerSlotsContext`, until the page is retired.
+ */
+export function GraphPageRoute() {
 	const { pathname, search } = useLocation();
 	const target = canonicalRedirect(pathname, search);
 	if (target) return <Navigate to={target} replace />;
@@ -110,7 +113,6 @@ export const legacyGraph: ProductDefinition = {
 			errorElement: <ErrorPage />,
 			children: [
 				{ index: true },
-				level("explorer", "Explorer"),
 				level("modeller", "Modeller", [
 					level("settings", "Settings"),
 					level("global-model", "Global model"),

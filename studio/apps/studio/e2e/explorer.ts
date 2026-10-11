@@ -12,10 +12,9 @@ export const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 export async function openExplorer(page: Page) {
 	// The composer lives in the assistant, which is the `assistant` occupant of
 	// the right side (`?right=`) — Sessions is not a left-rail panel
-	// (the-assistant.md AD1/AD7).
-	// The graph's own URL is the page (graph-detail-page.md G15); `/explorer` is
-	// a redirect now, and going straight there saves the hop.
-	await page.goto(`${GRAPH}?right=assistant`);
+	// (the-assistant.md AD1/AD7). The Explorer is its own product, at
+	// `/explorer`.
+	await page.goto(`${GRAPH}/explorer?right=assistant`);
 
 	// The mode is remembered between visits, so switch only when it is not
 	// already where these specs need it.

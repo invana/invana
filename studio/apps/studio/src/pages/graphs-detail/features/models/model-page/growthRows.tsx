@@ -11,8 +11,8 @@ import { StackedAreaChart } from "@invana/charts";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Button, EmptyState } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
+import { slotForType } from "@invana-studio/explorer";
 import { Activity, Upload } from "lucide-react";
-import { slotForType } from "@/pages/graphs-detail/features/explorer";
 import type {
 	Growth,
 	GrowthRow,

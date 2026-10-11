@@ -68,6 +68,9 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | Decision | Detail |
 |---|---|
 | Tools on demand | Hidden by default; the user menu can keep them always shown |
+| Where the tools float | A card at the board's top-left: one *Tools* toggle, and the canvas toolbar stacked under it while on. The toggle is per visit, not in the URL. The renderer switch is a setting, so the floating bar leaves it out. Layers, Styling and History stay as the board's tab-strip controls |
+| Paths | `/u/:user/:graph/explorer` is the product. `/explorer/:session` is the open thread: opening, starting or leaving a thread rewrites it in place, and a reload or a shared link reopens the thread with its answer. The `:session` level has no element of its own, so it never remounts the board. Crumbs: `owner › graph › session:<short id>`. The wordmark names the product, so there is no `Explorer` crumb |
+| Lock | `gate` is the `answering` set-up step, the step the assistant's lock names today |
 | Chat starts centred | An empty board shows one question box in the middle, with suggestions and saved views |
 | Chat docks right | The first question moves the conversation into a panel on the right; the board keeps the drawing |
 | Everything answers in the chat | Answers, charts’ words, refusals, cannot-answer, traces and confirmations arrive as chat messages |

@@ -13,7 +13,7 @@ import type {
 	CanvasPositions,
 	CanvasSnapshot,
 	CanvasStyling,
-} from "@/pages/graphs-detail/features/boards/types";
+} from "./types";
 
 // ── Wire DTOs (snake_case, as the engine returns) ────────────────────────────
 

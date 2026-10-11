@@ -51,7 +51,6 @@ const ENGINE_SERVER = path.join(
 const MODULES = {
 	agents: "agents",
 	boards: "boards",
-	explorer: "explorer",
 	graphs: "graphs",
 	lenses: "govern",
 	llms: "llm_providers",
@@ -69,6 +68,7 @@ const ENGINE_ONLY = {
 	auth: "accounts, served outside the Graph page",
 	sessions: "served by the @invana-studio/assistant package, outside features/",
 	events: "served by the @invana-studio/shell package, outside features/",
+	explorer: "served by the @invana-studio/explorer package, outside features/",
 	routes: "shared route helpers",
 	__pycache__: "bytecode",
 };

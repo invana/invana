@@ -71,6 +71,7 @@ import { D3ForceLayout as D3ForceLayoutEngine } from "@invana/graph-layout-d3-fo
 import { ElkLayout } from "@invana/graph-layout-elkjs";
 import { useTheme } from "@invana/themes";
 import {
+	cn,
 	type MenuItem,
 	RichSelect,
 	type RichSelectOption,
@@ -86,6 +87,7 @@ import {
 	type InteractionRef,
 	startChild,
 } from "@invana-studio/core";
+import type { CanvasStyling } from "@invana-studio/shell";
 // Vite's worker idiom — see LAYOUTS below.
 import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import {
@@ -114,10 +116,9 @@ import {
 	ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
-import { labelAt } from "@/pages/graphs-detail/features/explorer/canvasItems";
-import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
-import type { ExpandRequest } from "@/pages/graphs-detail/features/explorer/types";
+import { labelAt } from "./canvasItems";
+import { typeColorNumber } from "./typeColor";
+import type { ExpandRequest } from "./types";
 
 /** Schema slice that drives the node-expand submenus (docs/for-developers/modules/explore/features/graph-canvas.md). */
 export interface ExpandMenuSchema {
@@ -1017,6 +1018,8 @@ interface ExplorerHeaderToolbarProps {
 	/** Active render backend; the switcher select reflects + sets it. */
 	backend: CanvasBackend;
 	onBackendChange: (backend: CanvasBackend) => void;
+	/** Horizontal in the header; vertical where it floats over the board. */
+	orientation?: "horizontal" | "vertical";
 }
 
 /**
@@ -1035,9 +1038,11 @@ export function ExplorerHeaderToolbar({
 	showSelectMode = true,
 	backend,
 	onBackendChange,
+	orientation,
 }: ExplorerHeaderToolbarProps) {
 	return (
 		<HeaderToolbarItems
+			orientation={orientation}
 			magnet={magnet}
 			onToggleMagnet={onToggleMagnet}
 			showMagnet={showMagnet}
@@ -1057,6 +1062,7 @@ function HeaderToolbarItems({
 	showSelectMode = true,
 	backend,
 	onBackendChange,
+	orientation = "horizontal",
 }: ExplorerHeaderToolbarProps) {
 	// Live engine — the toolbar only renders once it's live, so this is non-null.
 	const canvas = useCanvas();
@@ -1065,6 +1071,7 @@ function HeaderToolbarItems({
 	// (`canUseWebGPU` — API present and not WebKit, where PixiJS WebGPU crashes).
 	// The engine still downgrades to WebGL at init if the adapter can't initialise.
 	const webgpuAvailable = canUseWebGPU();
+	const vertical = orientation === "vertical";
 
 	// Selection mode (click / brush / lasso). Single source of truth for the
 	// canvas: picking one arms its drag-select behaviour and disables the others.
@@ -1151,7 +1158,8 @@ function HeaderToolbarItems({
 									return (
 										<span className="flex items-center gap-2">
 											<Icon className="size-4" />
-											{selected[0]?.label ?? "Select"}
+											{/* A vertical bar has room for the icon only. */}
+											{vertical ? null : (selected[0]?.label ?? "Select")}
 										</span>
 									);
 								}}
@@ -1175,6 +1183,8 @@ function HeaderToolbarItems({
 				<ToggleGroup
 					type="single"
 					size="sm"
+					orientation={orientation}
+					className={cn(vertical && "flex-col")}
 					value={layout}
 					// Radix fires `""` when the active item is re-clicked; ignore that
 					// so a layout is always selected.
@@ -1286,5 +1296,9 @@ function HeaderToolbarItems({
 			: []),
 	];
 
-	return <ToolbarItems items={items} orientation="horizontal" />;
+	// The renderer is a setting, not a tool: the floating bar leaves it out.
+	const shown = vertical
+		? items.filter((i) => i.key !== "renderer" && i.key !== "d7")
+		: items;
+	return <ToolbarItems items={shown} orientation={orientation} />;
 }

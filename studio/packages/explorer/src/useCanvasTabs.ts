@@ -1,18 +1,16 @@
 import type { useSessions } from "@invana-studio/assistant";
 import { sessionsApi } from "@invana-studio/assistant";
 import { ApiError } from "@invana-studio/core";
+import type { Board, CanvasKind, useBoardVersions } from "@invana-studio/shell";
+import {
+	boardsApi,
+	useBoardsQuery,
+	useCreateCanvasMutation,
+} from "@invana-studio/shell";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
-import { boardsApi } from "@/pages/graphs-detail/features/boards/api";
-import type { CanvasKind } from "@/pages/graphs-detail/features/boards/boardKinds";
-import {
-	useBoardsQuery,
-	useCreateCanvasMutation,
-} from "@/pages/graphs-detail/features/boards/queries";
-import type { Board } from "@/pages/graphs-detail/features/boards/types";
-import type { useBoardVersions } from "@/pages/graphs-detail/features/boards/useBoardVersions";
-import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
+import type { CanvasBackend } from "./ExplorerCanvas";
 
 type Sessions = ReturnType<typeof useSessions>;
 type BoardContents = ReturnType<typeof useBoardVersions>;

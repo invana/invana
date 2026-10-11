@@ -15,10 +15,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { request } from "@invana-studio/core";
-import type {
-	BoardVersion,
-	BoardVersionSummary,
-} from "@/pages/graphs-detail/features/boards/types";
+import type { BoardVersion, BoardVersionSummary } from "./types";
 
 interface ApiReportSummary {
 	id: string;

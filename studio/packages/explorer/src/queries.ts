@@ -2,7 +2,7 @@
 // Explorer panel's legend and the expand menus' vocabulary (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
 
 import { useQuery } from "@tanstack/react-query";
-import { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
+import { explorerApi } from "./api";
 
 const TYPE_COUNTS_KEY = ["type-counts"] as const;
 
