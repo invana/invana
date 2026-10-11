@@ -6,7 +6,7 @@ import { expect, type Page } from "@playwright/test";
  * Kept together so a change to the composer moves one file, not every spec.
  */
 
-export const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/air-routes-graph";
+export const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 
 /** Open the Explorer with the composer in query-language mode. */
 export async function openExplorer(page: Page) {

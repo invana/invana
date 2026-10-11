@@ -6,9 +6,7 @@ stack has to be up and the Graph has to hold data before a run.
 
 ```bash
 docker compose up -d                       # engine · studio · postgres · neo4j
-cd engine && uv run invana loader ../demos/airways/air-routes \
-  --uri bolt://localhost:7687 --username neo4j --password testpassword \
-  --connector invana_neo4j.Neo4jConnector
+# load demos/airways as the Graph `airways` — demos/airways/README.md walks it
 cd studio && pnpm exec playwright install chromium   # first run only
 pnpm test:e2e
 ```
@@ -30,8 +28,13 @@ install chromium` installs both.
 | Variable | Default | What |
 |---|---|---|
 | `E2E_BASE_URL` | `http://localhost:8300` | Where Studio is served |
-| `E2E_GRAPH_PATH` | `/u/admin/air-routes-graph` | The Graph the specs ask against |
+| `E2E_GRAPH_PATH` | `/u/admin/airways` | The Graph the specs ask against — `demos/airways` loaded as `airways` |
+| `E2E_API_URL` | `http://localhost:8200` | The engine, for the records a spec makes for itself |
 | `E2E_USERNAME` · `E2E_PASSWORD` | `admin` · `change_me_please` | The dev superuser `invana init` provisions |
+
+A spec never reads a row somebody made by hand. A run, a report or a rule it
+needs is made in the spec — by asking, by driving Studio, or through
+`e2e/api.ts` — so a stack with only `demos/airways` loaded passes.
 
 The sign-in runs once, in the `setup` project, and every spec reuses its
 `storageState`. Specs run serially: they drive one engine and one graph

@@ -1,43 +1,48 @@
 /**
- * Verification for the model-board pass — **not a repo test**. Untracked.
- * Proves ME25 · ME26 against the running stack and this dev Graph.
+ * The model's board (ME25 · ME26), against `demos/airways`.
  */
 import { expect, type Page, test } from "@playwright/test";
+import { GRAPH } from "./explorer";
 
-const GRAPH = "/u/admin/airways";
+const MODEL = "NewsArticles";
 
-/** Drill into the first model in the Models panel, and answer with its name. */
-async function openFirstModel(page: Page) {
+/** Read one model from the Models panel — a row click opens its board. */
+async function openModel(page: Page) {
 	await page.setViewportSize({ width: 1600, height: 1000 });
 	await page.goto(`${GRAPH}?panel=model`);
-	const row = page
-		.locator("button")
-		.filter({ hasText: /active|never published/ })
-		.first();
-	await expect(row).toBeVisible({ timeout: 30_000 });
-	const name = ((await row.innerText()) ?? "").split("\n")[0].trim();
-	await row.click();
-	return name;
+	const row = page.getByRole("button", { name: new RegExp(`^${MODEL}`) });
+	await expect(row.first()).toBeVisible({ timeout: 30_000 });
+	await row.first().click();
 }
 
 test("ME26 — the model's board is a tab named for the model", async ({
 	page,
 }) => {
-	const name = await openFirstModel(page);
+	await openModel(page);
 
-	// The strip names the model, never the kind.
-	await expect(page.getByRole("tab", { name })).toBeVisible({
-		timeout: 20_000,
-	});
+	// The board strip — the one holding the Graph's own tab — names the model,
+	// never the kind. The page's inner tabs (`Overview · Model · …`) are not it.
+	const slug = GRAPH.split("/").at(-1) as string;
+	const strip = page
+		.getByRole("tablist")
+		.filter({ has: page.getByRole("tab", { name: slug, exact: true }) });
+	await expect(strip.getByRole("tab", { name: new RegExp(MODEL) })).toBeVisible(
+		{ timeout: 20_000 },
+	);
 	await expect(
-		page.getByRole("tab", { name: "Model", exact: true }),
+		strip.getByRole("tab", { name: "Model", exact: true }),
 	).toHaveCount(0);
 });
 
 test("ME25 — the board draws the model, not an empty viewport", async ({
 	page,
 }) => {
-	await openFirstModel(page);
+	await openModel(page);
+	// `Open` turns the page to the Model tab, where the model is drawn.
+	await page.getByRole("button", { name: "Open", exact: true }).click();
+	await expect(
+		page.getByRole("tab", { name: "Model", exact: true }),
+	).toHaveAttribute("aria-selected", "true", { timeout: 20_000 });
 	// The solve is un-animated: it settles, redraws and frames in one beat.
 	await page.waitForTimeout(8000);
 

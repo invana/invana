@@ -85,9 +85,13 @@ export function ResultBlock({
 			}),
 	});
 
+	// The stored subgraph says what the step produced, not whether this person
+	// has loaded it — that is the reply's own fact, so it overrides the record.
 	const emissions: Emission[] =
 		scoped && persisted.data?.length
-			? persisted.data
+			? persisted.data.map((e) =>
+					e.kind === "subgraph" ? { ...e, onCanvas } : e,
+				)
 			: emissionsFromResult(result, { onCanvas });
 
 	return (

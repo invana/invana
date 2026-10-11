@@ -104,6 +104,7 @@ chose the rendering.
 | AS12 | A reply whose run was never recorded — an older row, or one whose run was pruned — still renders, by folding one emission out of the query result it carries. It names no template, because none chose the rendering (AS9). |
 | AS13 | **A reload renders the record; nothing re-runs on load.** Opening a session, switching a tab and refreshing the page all read what is stored — the reply's emissions and the board's snapshot — and ask the graph nothing. Freshness is a user action (AS14), never a side effect of arriving on a page: a query that re-runs itself spends against the graph on every refresh and can quietly answer differently from the answer on screen, with nothing saying so. |
 | AS14 | **A re-run is a new run, and it leaves the prior record intact.** Re-running writes a new run with its own emissions rather than reopening the reply's — so a re-run that fails shows a failure *next to* the answer it was re-checking, instead of erasing it. The emission header carries when its records were read and the re-run that reads them again. |
+| AS15 | **Whether a subgraph is on the canvas is the reply's fact, not the record's.** The stored subgraph emission says what the step produced; the reply knows whether the person loaded it (its click, or the thread's `load` turn). Until then the reply carries the *Load to canvas* offer and no subgraph card. |
 
 > ⚠ **AS14 is half-built.** A re-run today writes a new run but re-points the
 > reply at it, so the prior emissions are orphaned and a failed re-run leaves the
