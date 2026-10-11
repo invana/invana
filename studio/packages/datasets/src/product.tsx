@@ -63,6 +63,14 @@ export const datasets: ProductDefinition = {
 		],
 		bottom: [],
 	},
+	commands: [
+		{
+			id: "bring-data-in",
+			label: "Bring data in",
+			keywords: ["import", "load", "bulk", "upload"],
+			to: "imports",
+		},
+	],
 	routes: [
 		{
 			path: "datasets",

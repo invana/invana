@@ -18,6 +18,8 @@ import {
 	activityPath,
 } from "./activityPath";
 import { EventsTab } from "./events/EventsTab";
+import { InboxTab } from "./inbox/InboxTab";
+import { useInbox } from "./inbox/useInbox";
 import { RunBoardPage } from "./runs/boards/RunBoardPage";
 import { useRunStep } from "./runs/boards/useRunStep";
 import { RunsBoardPage } from "./runs/RunsBoardPage";
@@ -57,19 +59,10 @@ const ICONS: Record<ActivityTab, React.ElementType> = {
 const NOT_YET: Partial<
 	Record<ActivityTab, { title: string; description: string; locks: string[] }>
 > = {
-	inbox: {
-		title: "Nothing in your inbox yet",
-		description:
-			"What needs you in any product lands here, each with its next step: a failed run, a run waiting on you, a request to see something.",
-		locks: [
-			"Opens when the engine records notifications",
-			"Fills from the rules you set",
-		],
-	},
 	approvals: {
 		title: "No approvals yet",
 		description:
-			"Anything a run would send outside Invana waits here, showing exactly what it will send, until an approver says yes or no. A run waiting on a person today shows in Runs.",
+			"Anything a run would send outside Invana waits here, showing exactly what it will send, until an approver says yes or no. A run waiting on a person's answer shows in the Inbox.",
 		locks: ["Opens when schedules can send outside Invana"],
 	},
 	schedules: {
@@ -102,6 +95,8 @@ const NOT_YET: Partial<
  * at `/activity/runs/<run>`, its step riding in `&step=`. The run page owns
  * `mainSection` — the tab strip steps aside and the breadcrumb
  * (`Activity › Runs › run:…`) is the way back up.
+ * **Inbox** is what needs a person — runs waiting on an answer and recent
+ * failures, until the engine records notifications.
  * **Events** is the Graph's writes. A tab whose records the engine does not
  * keep yet draws the kit's `EmptyState`, with one lock per thing that opens
  * it — never an empty table.
@@ -121,6 +116,8 @@ export function ActivityPage({
 	const { stepId, openStep } = useRunStep();
 	const graph = { username, graphSlug };
 	const { tab, runId } = location;
+	// The Inbox tab carries its count; the other tabs have no source for one yet.
+	const inbox = useInbox(graph);
 
 	const body = (value: ActivityTab): ReactNode => {
 		if (value === "runs") {
@@ -145,6 +142,7 @@ export function ActivityPage({
 		if (value === "events") {
 			return <EventsTab username={username} graphSlug={graphSlug} />;
 		}
+		if (value === "inbox") return <InboxTab graph={graph} />;
 		const empty = NOT_YET[value];
 		return empty ? (
 			<EmptyState
@@ -175,7 +173,11 @@ export function ActivityPage({
 			}
 			tabs={ACTIVITY_TABS.map((value) => ({
 				value,
-				label: LABELS[value],
+				name: LABELS[value],
+				label:
+					value === "inbox" && inbox.items.length
+						? `${LABELS.inbox} · ${inbox.items.length}`
+						: LABELS[value],
 				icon: ICONS[value],
 				content: value === tab ? body(value) : null,
 			}))}

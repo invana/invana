@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import type { Params, RouteObject } from "react-router-dom";
 import { useModellerSlots } from "./ModellerSlots";
+import { searchModeller } from "./search";
 
 function ModellerRoute() {
 	const { Page } = useModellerSlots();
@@ -103,6 +104,15 @@ export const modeller: ProductDefinition = {
 			},
 		],
 	},
+	search: searchModeller,
+	commands: [
+		{
+			id: "graph-info",
+			label: "Graph info",
+			keywords: ["connection", "database", "about"],
+			to: "settings?tab=info",
+		},
+	],
 	routes: [
 		{
 			path: "u/:username/:graphSlug/modeller",

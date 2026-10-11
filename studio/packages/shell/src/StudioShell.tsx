@@ -18,7 +18,7 @@
  * provides the registry and adds no layout of its own.
  *
  * It also records the graph product that is open, so the Graph's own URL can
- * return to it (`graphRoutes`).
+ * return to it (`graphRoutes`), and hosts ⌘K over every screen.
  */
 import { AppLayoutV2 } from "@invana/themes";
 import { ErrorBoundary } from "@invana/ui";
@@ -36,6 +36,7 @@ import {
 	useAppHeader,
 } from "./components/header/useAppHeader";
 import { rememberProduct } from "./lastProduct";
+import { CommandPaletteProvider } from "./palette/CommandPalette";
 import {
 	joinPath,
 	ProductsProvider,
@@ -176,7 +177,9 @@ export function StudioShell({ products }: { products: ProductDefinition[] }) {
 	return (
 		<ProductsProvider products={products}>
 			<ActionDialogHost>
-				<ShellOutlet />
+				<CommandPaletteProvider>
+					<ShellOutlet />
+				</CommandPaletteProvider>
 			</ActionDialogHost>
 		</ProductsProvider>
 	);

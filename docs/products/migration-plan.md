@@ -104,7 +104,8 @@ Each product package default-exports one object. The app passes the list to the 
 | `nav` | `{ groups: NavItem[][], bottom: NavItem[] }` \| `null` | The icon rail (`leftNav`); `null` for Explorer |
 | `landing` | path | Where the launcher and the Graph name go |
 | `actions` | `Record<string, ActionDef>` | Things other products may invoke (e.g. `projects.addFinding`) — a dialog or a navigation |
-| `commands` | `CommandDef[]` | Entries for ⌘K |
+| `commands` | `CommandDef[]` | Entries for ⌘K, beside the rail's sections |
+| `search` | `(graph) => Promise<SearchHit[]>` | The records ⌘K matches names against, read from the product's own list endpoints |
 | `gate` | `(setup) => Lock \| null` | Locks the product until a set-up step is done (Explorer today) |
 
 ### Allowed imports

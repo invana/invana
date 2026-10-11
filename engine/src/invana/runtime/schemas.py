@@ -80,8 +80,8 @@ class TaskRunSummary(BaseModel):
     id: str
     workflow_key: str
     status: str
-    #: What kind of work this run is — ``ask`` · ``import`` · ``bulk``. Null on
-    #: a child run, which is what makes it a root-only fact.
+    #: What kind of work this run is — ``nl`` · ``ql`` · ``canvas`` · ``import``
+    #: · ``bulk`` · ``stitch``. Null on a child run, a root-only fact.
     kind: str | None = None
     #: What it was about, in the words the opener wrote — *Import news-tv*. A
     #: journal row names what changed the graph without a second request.

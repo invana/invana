@@ -12,6 +12,7 @@ import type {
 	QueryRunPayload,
 	Session,
 } from "@invana-studio/core";
+import { useAskRequest } from "@invana-studio/core";
 import { ArrowUp, Bot, Paperclip, Square, Timer, X } from "lucide-react";
 import type { ChangeEvent, KeyboardEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -352,6 +353,18 @@ export function SessionComposer({
 	useEffect(() => {
 		if (focusSignal) rootRef.current?.querySelector("textarea")?.focus();
 	}, [focusSignal]);
+
+	// A question handed over from ⌘K: into the input, focused, never sent.
+	const { request: askRequest, clear: clearAskRequest } = useAskRequest();
+	useEffect(() => {
+		if (!askRequest) return;
+		setMode("nl");
+		setNlQuery(askRequest.text);
+		clearAskRequest();
+		requestAnimationFrame(() =>
+			rootRef.current?.querySelector("textarea")?.focus(),
+		);
+	}, [askRequest, clearAskRequest]);
 
 	// The session we've already restored the mode/model for — guards against
 	// re-applying over the user's manual switches within the same session.

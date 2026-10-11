@@ -24,6 +24,7 @@ import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";
 import { FolderOpen, Gavel, ListTodo } from "lucide-react";
 import type { Params, RouteObject } from "react-router-dom";
 import { useProjectsSlots } from "./ProjectsSlots";
+import { searchProjects } from "./search";
 
 function ProjectsRoute() {
 	const { Page } = useProjectsSlots();
@@ -59,6 +60,7 @@ export const projects: ProductDefinition = {
 		],
 		bottom: [],
 	},
+	search: searchProjects,
 	routes: [
 		{
 			path: "u/:username/:graphSlug/projects",

@@ -19,6 +19,7 @@ import type { ProductDefinition } from "@invana-studio/core";
 import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";
 import { Telescope } from "lucide-react";
 import { type ComponentType, createContext, useContext } from "react";
+import { searchExplorer } from "./search";
 
 /** What the Explorer still borrows from the app: the page it draws. */
 interface ExplorerSlots {
@@ -45,6 +46,15 @@ export const explorer: ProductDefinition = {
 	scope: "graph",
 	landing: "",
 	nav: null,
+	search: searchExplorer,
+	commands: [
+		{
+			id: "new-conversation",
+			label: "New conversation",
+			keywords: ["ask", "chat", "board"],
+			to: "",
+		},
+	],
 	routes: [
 		{
 			path: "u/:username/:graphSlug/explorer",

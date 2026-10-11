@@ -29,8 +29,9 @@ import {
 	Search,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { FirstRun } from "./FirstRun";
 
 const PAGE_SIZE = 6;
 
@@ -149,6 +150,7 @@ function GraphRow({
 
 export function GraphsListPage() {
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 	// Fetch active + archived in one go; the Active/Archived toggle splits them
 	// client-side. Archived graphs are hidden from the default view.
 	const { data, isLoading, isError, error } = useGraphsQuery(true);
@@ -196,6 +198,14 @@ export function GraphsListPage() {
 	const openGraph = (graph: Graph) => {
 		navigate(`/u/${graph.owner_username}/${graph.slug}`);
 	};
+
+	// A member with no Graph starts at the first run, not at an empty list.
+	if (
+		searchParams.has("first-run") ||
+		(!isLoading && !isError && allGraphs.length === 0)
+	) {
+		return <FirstRun graphs={activeGraphs} />;
+	}
 
 	const handleDelete = () => {
 		if (!deleteTarget) return;
@@ -334,12 +344,6 @@ export function GraphsListPage() {
 								{error instanceof Error
 									? error.message
 									: "Failed to load graphs"}
-							</p>
-						)}
-
-						{!isLoading && !isError && allGraphs.length === 0 && (
-							<p className="text-muted-foreground">
-								No graphs yet — create one to get started.
 							</p>
 						)}
 

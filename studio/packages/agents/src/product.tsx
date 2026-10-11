@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import type { Params, RouteObject } from "react-router-dom";
 import { useAgentsSlots } from "./AgentsSlots";
+import { searchAgents } from "./search";
 
 function AgentsRoute() {
 	const { Page } = useAgentsSlots();
@@ -93,6 +94,21 @@ export const agents: ProductDefinition = {
 			{ id: "settings", label: "Settings", icon: Settings, to: "settings" },
 		],
 	},
+	search: searchAgents,
+	commands: [
+		{
+			id: "templates",
+			label: "Templates",
+			keywords: ["projection", "library"],
+			to: "library/templates",
+		},
+		{
+			id: "task-catalogue",
+			label: "Task catalogue",
+			keywords: ["tasks", "plugins"],
+			to: "plugins/tasks",
+		},
+	],
 	routes: [
 		{
 			path: "u/:username/:graphSlug/agents",

@@ -8,6 +8,7 @@
  * `@invana-studio/core/telemetry-setup`.
  */
 
+export * from "./hooks/askRequest";
 export * from "./hooks/queries/useAppVersion";
 export * from "./hooks/queries/useGitHubStars";
 export * from "./hooks/queries/useGraphQueries";

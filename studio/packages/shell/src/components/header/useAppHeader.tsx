@@ -16,6 +16,7 @@ import {
 import { useAuth } from "@invana-studio/core";
 import { Fragment, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { SearchTrigger } from "../../palette/CommandPalette";
 import { useActiveProduct, useRouteCrumbs } from "../../products";
 import { FullscreenToggle } from "../FullscreenToggle";
 import { GitHubStars } from "../GitHubStars";
@@ -38,7 +39,7 @@ export interface AppHeaderOptions {
 	graphPicker?: ReactNode;
 	/** Center content. Most pages won't need this. */
 	center?: ReactNode;
-	/** The ⌘K slot, first in `header.right`. */
+	/** The ⌘K slot, first in `header.right`. Defaults to the search field that opens the palette. */
 	search?: ReactNode;
 	/** Page-specific controls, left of the shared ones. */
 	rightExtras?: ReactNode;
@@ -117,7 +118,7 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 		center,
 		right: (
 			<div className="flex items-center gap-4 px-2">
-				{search}
+				{search ?? <SearchTrigger />}
 				{rightExtras}
 				<GitHubStars />
 				{status ?? <GraphOnboardingCap />}

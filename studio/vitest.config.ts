@@ -20,6 +20,8 @@ export default defineConfig({
 				"packages/datasets/src/imports/journal.ts",
 				"packages/modeller/src/govern/addressing.ts",
 				"packages/shell/src/activity/events/eventSearch.ts",
+				"packages/shell/src/activity/inbox/inbox.ts",
+				"packages/shell/src/palette/rank.ts",
 				"packages/shell/src/activity/runs/runSummary.ts",
 				"packages/shell/src/activity/runs/boards/taskFlowFromRun.ts",
 				"packages/agents/src/agents/agentDraft.ts",

@@ -155,7 +155,7 @@ export interface TaskRunSummary {
 	id: string;
 	workflow_key: string;
 	status: string;
-	/** What kind of work — `ask` · `import` · `bulk`. Null on a child run. */
+	/** What kind of work — `nl` · `ql` · `canvas` · `import` · `bulk` · `stitch`. Null on a child run. */
 	kind: string | null;
 	/** What it was about, as the opener wrote it — `Import news-tv`. */
 	body: string | null;

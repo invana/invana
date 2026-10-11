@@ -63,6 +63,26 @@ interface CommandDef {
 	to: string;
 }
 
+/** A Graph, as a product's search is handed it. */
+export interface GraphRef {
+	username: string;
+	graphSlug: string;
+}
+
+/** One record ⌘K can open. */
+export interface SearchHit {
+	id: string;
+	/** The record's name — what a query is matched against. */
+	label: string;
+	/** What it is, right-aligned: `model`, `agent · paused`. */
+	detail?: string;
+	icon?: ProductIcon;
+	/** Path relative to the product's base. */
+	to: string;
+	/** `related` — matched on meaning, not on the name; drawn below every name. */
+	match?: "name" | "related";
+}
+
 /** The Graph's set-up state a gate reads. */
 interface ProductSetup {
 	isGateOpen: (gate: string) => boolean;
@@ -90,6 +110,12 @@ export interface ProductDefinition {
 	landing: string;
 	actions?: Record<string, ActionDef>;
 	commands?: CommandDef[];
+	/**
+	 * The records ⌘K matches names against, read from the product's own list
+	 * endpoints. Called once each time the palette opens — with the open Graph
+	 * for a graph product, which is not asked off a Graph.
+	 */
+	search?: (graph: GraphRef) => Promise<SearchHit[]>;
 	/** Locks the product until a set-up step is done. */
 	gate?: (setup: ProductSetup) => ProductLock | null;
 }
