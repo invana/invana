@@ -17,6 +17,7 @@ Runs [docs/products/migration-sessions.md](../../docs/products/migration-session
 ```bash
 docker compose up -d                                   # Studio on :8300 for the design review
 python3 scripts/migration/screen_map.py                # board → route map (re-run after docs change)
+python3 scripts/migration/run.py --baseline            # once, on untouched studio/: what already fails
 python3 scripts/migration/run.py --dry-run             # what runs next
 python3 scripts/migration/run.py --track A             # overnight: the Studio restructure
 python3 scripts/migration/run.py                       # everything, stopping on the first blocked session
@@ -26,9 +27,17 @@ python3 scripts/migration/run.py                       # everything, stopping on
 |---|---|---|
 | `INVANA_MIGRATION_CONTEXT_LIMIT` | `300000` | context tokens before a hand-off |
 | `INVANA_MIGRATION_STUDIO_URL` | `http://localhost:8300` | where the reviewer screenshots |
+| `INVANA_MIGRATION_ENGINE_URL` | `http://localhost:8200` | engine checked (`/health`) before studio gates |
+| `E2E_GRAPH_PATH` | `/u/admin/airways` | the Graph e2e specs open; inherited by headless sessions |
 | `INVANA_MIGRATION_USER` / `_PASSWORD` | `admin` / `change_me_please` | Studio sign-in for live shots |
 | `INVANA_MIGRATION_GRAPH_DB` | unset | an **isolated** graph database for engine tests, e.g. `bolt://localhost:27687` from `docker run -d --name invana-migration-neo4j -p 27687:7687 -e NEO4J_AUTH=neo4j/testpassword neo4j:5-community`; unset = graph-DB tests are skipped (they flush the database) |
 | `INVANA_MIGRATION_SANDBOX` | unset | `1` only inside a disposable container: skips permission prompts entirely |
+
+## Baseline
+
+The gates were not green before the migration started. `baseline.json` lists what knip and e2e already fail on at `pre-products-migrations` (taken by `--baseline`, which refuses if `studio/` has changed). A knip or e2e gate passes when every failure it reports is in the baseline; a session is asked to fix only failures that are new. Keys survive a file move: `e2e › <spec file> › <title>`, `knip › <section> › <symbol>`.
+
+Before studio gates the driver checks the dev stack and runs `docker compose up -d engine studio` if it is down; still down after two minutes, the session is `blocked` without spending a fix round.
 
 ## Seeing the sessions
 
@@ -36,7 +45,7 @@ python3 scripts/migration/run.py                       # everything, stopping on
 |---|---|
 | Every Claude session the run started | `.migration-cache/sessions.md` — migration session, step (build · resume · fix · review), `claude -r <id>`, peak context |
 | Open one | `claude -r <session-id>` or pick it from `claude --resume` |
-| Watch one live | `tail -f .migration-cache/<ID>/<step>.jsonl` |
+| Watch one live | `tail -f .migration-cache/<ID>/<step>.jsonl` — or the transcript `~/.claude/projects/<project>/<session-id>.jsonl`, which is written as it goes |
 | Overall progress | `tail -f .migration-cache/run.log` |
 
 ## Interrupted?
@@ -57,5 +66,6 @@ Run it again. A session left `in progress` or `partial` on its branch resumes fr
 |---|---|
 | A session fails gates or review after 3 fix rounds | `blocked` |
 | A session needs more than 8 hand-offs | `blocked` |
+| The dev stack is down and will not start | `blocked` |
 | The working tree has someone else's uncommitted changes | — (refuses to start) |
 | Nothing left whose dependencies are done | — |

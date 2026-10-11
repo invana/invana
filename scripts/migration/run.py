@@ -47,6 +47,10 @@ SESSIONS = ROOT / "docs" / "products" / "migration-sessions.md"
 REVIEWS = HERE / "reviews"
 CACHE = ROOT / ".migration-cache"
 STUDIO_URL = os.environ.get("INVANA_MIGRATION_STUDIO_URL", "http://localhost:8300")
+ENGINE_URL = os.environ.get("INVANA_MIGRATION_ENGINE_URL", "http://localhost:8200")
+BASELINE = HERE / "baseline.json"
+# e2e specs default to a Graph this stack lacks; set here so headless sessions inherit it too.
+os.environ.setdefault("E2E_GRAPH_PATH", "/u/admin/airways")
 
 # Tools a headless session may use. Widen deliberately; never `--dangerously-skip-permissions`
 # outside a disposable container (set INVANA_MIGRATION_SANDBOX=1 there).
@@ -230,7 +234,7 @@ def gate_commands(sid: str) -> list[tuple[list[str], Path, dict]]:
     if turbo:
         base = [(["pnpm", "turbo", "run", "lint", "check-types", "test"], studio, {}), (["pnpm", "knip"], studio, {})]
     if sid not in ("A00",):
-        base.append((["pnpm", "test:e2e"], studio, {}))
+        base.append((["pnpm", "test:e2e", "--reporter=line"], studio, {}))
     return base
 
 
@@ -241,13 +245,90 @@ def graph_db_env() -> dict:
             "NEO4J_DATABASE": "neo4j"}
 
 
-def run_gates(sid: str) -> list[str]:
-    failures = []
+FAILED_TEST = re.compile(r"^\s+\[\w+\] › (\S+?):\d+:\d+ › (.+?)[\s─]*$")
+KNIP_SECTION = re.compile(r"^([A-Z][a-z]+(?: [a-z]+)*) \(\d+\)$")
+
+
+def failing_items(cmd: list[str], output: str) -> set[str]:
+    """What a knip or e2e run reports as failing, keyed so a moved file keeps its key.
+
+    e2e: ``spec file name › test title`` from the line reporter's summary.
+    knip: ``section › symbol``. Any other command returns an empty set.
+    """
+    items: set[str] = set()
+    if "test:e2e" in cmd:
+        in_failed = False
+        for line in output.splitlines():
+            if re.match(r"^\s+\d+ failed$", line):
+                in_failed = True
+                continue
+            m = FAILED_TEST.match(line) if in_failed else None
+            if m:
+                items.add(f"e2e › {Path(m.group(1)).name} › {m.group(2)}")
+            elif in_failed:
+                in_failed = False
+    elif "knip" in cmd:
+        section = ""
+        for line in output.splitlines():
+            if m := KNIP_SECTION.match(line.strip()):
+                section = m.group(1)
+            elif section and line.strip() and not line.startswith(("$", "[", " ")):
+                items.add(f"knip › {section} › {line.split()[0]}")
+    return items
+
+
+def gate_failures(sid: str) -> tuple[list[str], set[str]]:
+    """Run the gates; return the failure reports and every knip/e2e item seen failing."""
+    failures, seen = [], set()
+    baseline = set(json.loads(BASELINE.read_text())) if BASELINE.exists() else set()
     for cmd, cwd, env in gate_commands(sid):
         res = sh(cmd, cwd, env)
-        if res.returncode != 0:
-            failures.append(f"`{' '.join(cmd)}` failed:\n```\n{(res.stdout + res.stderr)[-4000:]}\n```")
-    return failures
+        if res.returncode == 0:
+            continue
+        out = res.stdout + res.stderr
+        items = failing_items(cmd, out)
+        seen |= items
+        new = items - baseline
+        if items and not new:
+            print(f"  {' '.join(cmd)}: only failures already in the baseline ({len(items)}) — passes")
+            continue
+        detail = ("\n\nNew since the baseline (fix these; the rest already failed before the migration):\n"
+                  + "\n".join(f"- {i}" for i in sorted(new))) if new else ""
+        failures.append(f"`{' '.join(cmd)}` failed:{detail}\n```\n{out[-4000:]}\n```")
+    return failures, seen
+
+
+def run_gates(sid: str) -> list[str]:
+    return gate_failures(sid)[0]
+
+
+def write_baseline() -> int:
+    """Record what knip and e2e already fail on, on code the migration has not touched yet."""
+    if sh(["git", "diff", "--quiet", "pre-products-migrations", "--", "studio/"]).returncode != 0:
+        print("studio/ differs from pre-products-migrations — a baseline must be taken on untouched code")
+        return 1
+    if not ensure_stack():
+        return 1
+    _, seen = gate_failures("R00")
+    BASELINE.write_text(json.dumps(sorted(seen), indent=2, ensure_ascii=False) + "\n")
+    print(f"baseline: {len(seen)} known failures → {BASELINE.relative_to(ROOT)}")
+    return 0
+
+
+def ensure_stack(wait: int = 120) -> bool:
+    """e2e and the design review need the dev stack; start it if it is down."""
+    def up() -> bool:
+        return all(sh(["curl", "-sf", "-o", "/dev/null", url]).returncode == 0
+                   for url in (STUDIO_URL, f"{ENGINE_URL}/health"))
+    if up():
+        return True
+    sh(["docker", "compose", "up", "-d", "engine", "studio"])
+    for _ in range(wait // 5):
+        subprocess.run(["sleep", "5"])
+        if up():
+            return True
+    print(f"  dev stack is down ({STUDIO_URL}, {ENGINE_URL}/health) and did not come up")
+    return False
 
 
 # ── design review ──────────────────────────────────────────────────────────
@@ -283,6 +364,9 @@ def run_session(row: dict, max_fix: int) -> bool:
         return False
 
     for attempt in range(max_fix + 1):
+        if not sid.startswith("B") and not ensure_stack():
+            set_status(sid, "blocked", "dev stack down — `docker compose up -d engine studio`, then re-run")
+            return False
         findings = run_gates(sid)
         if not findings:
             ok, report = review(row)
@@ -317,7 +401,10 @@ def main() -> int:
     ap.add_argument("--max-fix", type=int, default=3)
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--track", choices=["A", "B", "C", "R"], help="only sessions of this track")
+    ap.add_argument("--baseline", action="store_true", help="record what knip and e2e already fail on, then exit")
     args = ap.parse_args()
+    if args.baseline:
+        return write_baseline()
     while True:
         rows = [r for r in read_log() if not args.track or r["id"].startswith(args.track)
                 or r["status"] == "done"]

@@ -1,0 +1,10 @@
+[
+  "e2e › answer-surface.spec.ts › a subgraph loaded to the canvas says what it added",
+  "e2e › zz-verify-model-board.spec.ts › ME26 — the model's board is a tab named for the model",
+  "e2e › zz-verify-models-stack.spec.ts › ME17 — the Models panel is the stack, with no chrome above it",
+  "e2e › zz-verify-models-stack.spec.ts › ME18 — picking a model drills the first drawer in",
+  "e2e › zz-verify-pass.spec.ts › B22 — a report row opens; it does not restore",
+  "e2e › zz-verify-pass.spec.ts › RU13 — a statement closes the trace and opens the rule board",
+  "e2e › zz-verify-pass.spec.ts › skill board carries both acts",
+  "knip › Unused exports › touchKey"
+]
