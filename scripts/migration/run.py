@@ -157,7 +157,7 @@ def claude(text: str, sid: str, label: str) -> str:
         proc.stdin.flush()
 
     send(text)
-    warned, result, peak = False, "", 0
+    warned, result, peak, session_id = False, "", 0, ""
     with open(CACHE / sid / f"{label}.jsonl", "w") as log:
         for line in proc.stdout:
             log.write(line)
@@ -165,6 +165,9 @@ def claude(text: str, sid: str, label: str) -> str:
                 event = json.loads(line)
             except json.JSONDecodeError:
                 continue
+            if not session_id and event.get("session_id"):
+                session_id = event["session_id"]
+                print(f"  {label}: session {session_id}  (open with: claude -r {session_id})")
             if event.get("type") == "assistant":
                 u = event["message"].get("usage") or {}
                 ctx = u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + u.get("cache_creation_input_tokens", 0)
@@ -179,6 +182,13 @@ def claude(text: str, sid: str, label: str) -> str:
     proc.stdin.close()
     proc.wait()
     print(f"  {label}: peak context {peak:,} tokens{' · handed off' if warned else ''}")
+    index = CACHE / "sessions.md"
+    if not index.exists():
+        index.write_text("| Migration session | Step | Claude session | Peak context | Handed off | Finished |\n"
+                         "|---|---|---|---|---|---|\n")
+    with open(index, "a") as f:
+        f.write(f"| {sid} | {label} | `claude -r {session_id}` | {peak:,} | {'yes' if warned else ''} | "
+                f"{dt.datetime.now().strftime('%Y-%m-%d %H:%M')} |\n")
     return result
 
 
@@ -225,8 +235,10 @@ def gate_commands(sid: str) -> list[tuple[list[str], Path, dict]]:
 
 
 def graph_db_env() -> dict:
-    uri = os.environ["INVANA_MIGRATION_GRAPH_DB"]
-    return {"NEO4J_URI": uri, "INVANA_NEO4J_URI": uri}
+    """The isolated database engine tests run against — never the developer's."""
+    return {"NEO4J_URI": os.environ["INVANA_MIGRATION_GRAPH_DB"], "NEO4J_USERNAME": "neo4j",
+            "NEO4J_PASSWORD": os.environ.get("INVANA_MIGRATION_GRAPH_PASSWORD", "testpassword"),
+            "NEO4J_DATABASE": "neo4j"}
 
 
 def run_gates(sid: str) -> list[str]:
@@ -253,15 +265,19 @@ def review(row: dict) -> tuple[bool, str]:
 def run_session(row: dict, max_fix: int) -> bool:
     sid = row["id"]
     print(f"\n━━ {sid} · {row['kind']} · needs {', '.join(row['needs']) or '—'}")
-    if not git_clean():
+    current = sh(["git", "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+    resuming = row["status"] in ("in progress", "partial") and current == row["branch"]
+    if not git_clean() and not resuming:
         print("  working tree not clean — refusing to start over someone's uncommitted work")
         return False
     ensure_branch(row["branch"])
     set_status(sid, "in progress")
-    if sid.startswith(("A", "C")) and row["kind"].startswith("move"):
+    if not resuming and sid.startswith(("A", "C")) and row["kind"].startswith("move"):
         sh(["node", "scripts/migration/shoot.mjs", "--live", "--smoke", "--out", f".migration-cache/{sid}/before"])
     try:
-        build_until_handoffs_end(sid, prompt("build", ID=sid), "build")
+        # An interrupted run picks up where it stopped, from the work on disk and the hand-off notes.
+        first, label = (prompt("continue", ID=sid), "resume") if resuming else (prompt("build", ID=sid), "build")
+        build_until_handoffs_end(sid, first, label)
     except RuntimeError as exc:
         set_status(sid, "blocked", str(exc))
         return False
@@ -298,7 +314,7 @@ def run_session(row: dict, max_fix: int) -> bool:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--only", help="run just this session id")
-    ap.add_argument("--max-fix", type=int, default=2)
+    ap.add_argument("--max-fix", type=int, default=3)
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--track", choices=["A", "B", "C", "R"], help="only sessions of this track")
     args = ap.parse_args()
