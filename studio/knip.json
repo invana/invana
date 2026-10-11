@@ -36,6 +36,10 @@
 		"packages/modeller": {
 			"project": ["src/**/*.{ts,tsx}"],
 			"includeEntryExports": true
+		},
+		"packages/agents": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
 		}
 	}
 }

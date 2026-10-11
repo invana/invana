@@ -38,7 +38,7 @@
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
 import type { LensCreate, LensKind, Refusal } from "@invana-studio/core";
-import { ApiError } from "@invana-studio/core";
+import { ApiError, useLensesQuery } from "@invana-studio/core";
 import { useStackSectionUi } from "@invana-studio/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -47,7 +47,6 @@ import { ImpactDialog } from "./ImpactDialog";
 import {
 	useCreateLensMutation,
 	useGuardrailImpactMutation,
-	useLensesQuery,
 	useUpdateLensMutation,
 } from "./queries";
 import {

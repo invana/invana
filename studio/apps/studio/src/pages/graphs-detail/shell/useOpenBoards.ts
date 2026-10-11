@@ -1,3 +1,4 @@
+import { useLibraryViewPanel, useTaskPlansQuery } from "@invana-studio/agents";
 import type { LensKind } from "@invana-studio/core";
 import { runsApi } from "@invana-studio/core";
 import {
@@ -9,10 +10,6 @@ import {
 } from "@invana-studio/shell";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RecordBoardKind } from "@/pages/graphs-detail/features/boards";
-import {
-	useLibraryViewPanel,
-	useTaskPlansQuery,
-} from "@/pages/graphs-detail/features/plans";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 
 /**

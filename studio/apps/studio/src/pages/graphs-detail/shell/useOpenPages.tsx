@@ -3,17 +3,18 @@ import type {
 	WorkbookPage,
 	WorkbookPageMenuItem,
 } from "@invana/ui";
+import { useAgentsQuery, useSkillsQuery } from "@invana-studio/agents";
 import type { useConsoleParam, useSessions } from "@invana-studio/assistant";
 import {
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,
 } from "@invana-studio/assistant";
+import { useLensesQuery } from "@invana-studio/core";
 import { ExplorerHeaderToolbar } from "@invana-studio/explorer";
 import type {
 	ModelSelection,
 	useLensesViewPanel,
 } from "@invana-studio/modeller";
-import { useLensesQuery } from "@invana-studio/modeller";
 import type { useLeftSection, useRightSection } from "@invana-studio/shell";
 import {
 	BOARD_KINDS,
@@ -41,13 +42,11 @@ import {
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useMemo, useRef } from "react";
 import { LayeredCanvasHeader } from "@/canvases/layered/LayeredCanvasChrome";
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
 	type BoardPageHandle,
 	DataBoardPage,
 	DeclaredBoard,
 } from "@/pages/graphs-detail/features/boards";
-import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
 import {
 	type BoardTitleNames,
 	boardTitle,

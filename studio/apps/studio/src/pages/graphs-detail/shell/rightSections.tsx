@@ -1,4 +1,5 @@
 import { ErrorBoundary } from "@invana/ui";
+import type { LLMProvider } from "@invana-studio/agents";
 import type { useSessions } from "@invana-studio/assistant";
 import { AssistantHost, attachmentFor } from "@invana-studio/assistant";
 import type { useGraphQuery } from "@invana-studio/core";
@@ -11,7 +12,6 @@ import type {
 } from "@invana-studio/shell";
 import { SetupLock } from "@invana-studio/shell";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
 import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 
 /** What the right side's occupants read from the page that hosts them. */

@@ -11,6 +11,7 @@
 export * from "./hooks/queries/useAppVersion";
 export * from "./hooks/queries/useGitHubStars";
 export * from "./hooks/queries/useGraphQueries";
+export * from "./hooks/queries/useLensesQuery";
 export * from "./hooks/queries/useRuleQueries";
 export * from "./hooks/queries/useTypeCountsQuery";
 export * from "./hooks/useAuth";
@@ -25,6 +26,7 @@ export * from "./services/api/auth";
 export * from "./services/api/client";
 export * from "./services/api/graphs";
 export * from "./services/api/health";
+export * from "./services/api/lenses";
 export * from "./services/api/rules";
 export * from "./services/api/runs";
 export * from "./services/telemetry/errors";

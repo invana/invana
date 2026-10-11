@@ -49,15 +49,9 @@ const ENGINE_SERVER = path.join(
 // Studio module → the engine `server/` folder that serves it. The target name is the
 // module's own; a different spelling here is an engine folder not yet renamed.
 const MODULES = {
-	agents: "agents",
 	boards: "boards",
-	graphs: "graphs",
-	llms: "llm_providers",
-	plans: "task_plans",
-	projections: "runtime",
 	projects: "work",
 	rules: "rules",
-	skills: "skills",
 };
 
 // Engine `server/` folders that are not a Studio module.
@@ -69,6 +63,14 @@ const ENGINE_ONLY = {
 	explorer: "served by the @invana-studio/explorer package, outside features/",
 	modeller: "served by the @invana-studio/modeller package, outside features/",
 	govern: "served by the @invana-studio/modeller package, outside features/",
+	graphs:
+		"served by @invana-studio/core and the Modeller's settings, outside features/",
+	agents: "served by the @invana-studio/agents package, outside features/",
+	skills: "served by the @invana-studio/agents package, outside features/",
+	task_plans: "served by the @invana-studio/agents package, outside features/",
+	runtime: "served by the @invana-studio/agents package, outside features/",
+	llm_providers:
+		"served by the @invana-studio/agents package, outside features/",
 	routes: "shared route helpers",
 	__pycache__: "bytecode",
 };

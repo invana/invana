@@ -1,3 +1,4 @@
+import { AgentsSlotsContext } from "@invana-studio/agents";
 import { ExplorerSlotsContext } from "@invana-studio/explorer";
 import { ModellerSlotsContext } from "@invana-studio/modeller";
 import {
@@ -16,9 +17,10 @@ import { products } from "@/products";
 import { GraphPageRoute } from "@/products/legacyGraph";
 import { modellerSlots } from "@/products/modellerSlots";
 
-// The Explorer's and the Modeller's routes draw today's graph page until it
-// is retired.
+// The Explorer's, the Modeller's and the Agents product's routes draw today's
+// graph page until it is retired.
 const explorerSlots = { Page: GraphPageRoute };
+const agentsSlots = { Page: GraphPageRoute };
 
 export const router = createBrowserRouter([
 	// Public auth pages — no shell, no protection. Self-service registration was
@@ -34,7 +36,9 @@ export const router = createBrowserRouter([
 			<ProtectedRoute>
 				<ExplorerSlotsContext.Provider value={explorerSlots}>
 					<ModellerSlotsContext.Provider value={modellerSlots}>
-						<StudioShell products={products} />
+						<AgentsSlotsContext.Provider value={agentsSlots}>
+							<StudioShell products={products} />
+						</AgentsSlotsContext.Provider>
 					</ModellerSlotsContext.Provider>
 				</ExplorerSlotsContext.Provider>
 			</ProtectedRoute>

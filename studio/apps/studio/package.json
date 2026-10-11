@@ -22,6 +22,7 @@
 		"@codemirror/state": "^6.6.0",
 		"@codemirror/view": "^6.41.0",
 		"@invana-studio/assistant": "workspace:*",
+		"@invana-studio/agents": "workspace:*",
 		"@invana-studio/canvases": "workspace:*",
 		"@invana-studio/core": "workspace:*",
 		"@invana-studio/explorer": "workspace:*",

@@ -141,6 +141,7 @@ services:
       - studio-assistant-node-modules:/app/packages/assistant/node_modules
       - studio-explorer-node-modules:/app/packages/explorer/node_modules
       - studio-modeller-node-modules:/app/packages/modeller/node_modules
+      - studio-agents-node-modules:/app/packages/agents/node_modules
     depends_on:
       - engine
 
@@ -264,3 +265,4 @@ volumes:
   studio-assistant-node-modules:
   studio-explorer-node-modules:
   studio-modeller-node-modules:
+  studio-agents-node-modules:

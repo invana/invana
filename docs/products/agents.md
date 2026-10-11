@@ -107,6 +107,18 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | Model versions | Models are listed by the provider’s exact version name (`claude-opus-5-5`, `claude-opus-5-6`). An agent, skill or judge **pins** a version; a provider releasing a new one changes nothing until a person moves it. Moving is a change with evals first, kept in History |
 | Tokens, never currency | Budgets, limits and usage are in tokens. No dollar or other currency amounts anywhere, since what a token costs depends on each customer’s subscription |
 | Degradation | An alert fires when p95 passes 1.5× its 7-day baseline for 3 runs; it names the change that preceded it |
+| Rail → path | Overview `/agents/overview` · Agents `/agents/agents[/:agent]` · Skills `/agents/skills` · Library `/agents/library[/:plan]` and `/agents/library/templates[/:template]` · Plugins `/agents/plugins[/tasks/:entry]` · LLMs `/agents/llms[/:provider]` · Performance `/agents/performance` · Settings `/agents/settings`. The product has no crumb of its own, because the wordmark reads *Invana Agents* |
+| Landing | The bare `/agents` lands on Agents. It is the first rail item with something to read, while Overview is still empty |
+| Agents and LLMs | Two sections of one stack, as today. Each rail item focuses its own section and keeps its own path |
+| Library | Plans over Templates. Templates sits under Library's path, so Library's rail item stays lit there |
+| Plugins | The plugin registry over the task catalogue. The registry section is the kit's `EmptyState` with *Opens with engine support* until the engine's plugin module exists. The catalogue moved here from Library, because plugins bring the task types. An old `?panel=library&section=catalogue` link lands on `/agents/plugins/tasks` |
+| Overview, Performance | Kit `EmptyState` with *Opens with engine support*. Overview points to Activity › Runs for runs that broke or wait |
+| Settings | The Graph's concurrency ceiling and its pools. These left the Modeller's Graph settings, which keeps Basic · Graph |
+| Rules | Not listed under Skills. A Graph's rules are the Modeller's Rules |
+| Plan page | It shows no cost in currency. Tokens per plan replace it once the engine reports them |
+| Agent budgets | An agent's list row, quick look and Overview › Limits read its token budget (`up to 8k tokens a run`), or *no token budget yet*. Activity has no spend tile; its runs table shows tokens per run. The Limits › Budget table lists `max_tokens` only. The engine's money ceilings stay on the record and are not drawn, until budgets are kept in tokens |
+| Main area | Each rail item has its own empty-main line. Overview and Performance read *Opens with engine support*, Plugins *Pick a task type…*, Settings *Settings have no canvas…* |
+| LLMs | Until AG-14 builds its own page, LLMs is the Agents stack focused on its LLMs section |
 
 ## Not building
 

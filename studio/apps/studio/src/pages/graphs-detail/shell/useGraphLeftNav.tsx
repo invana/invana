@@ -5,14 +5,11 @@ import {
 } from "@invana-studio/shell";
 import {
 	Activity,
-	Bot,
 	Compass,
 	type Database,
 	FolderOpen,
 	History,
 	Info,
-	Library,
-	Wand2,
 } from "lucide-react";
 
 interface SectionMeta {
@@ -27,7 +24,7 @@ const SETTINGS_SECTIONS: SectionMeta[] = [
 	// **Info is not here.** It is the first icon of the top group: it is the
 	// graph itself — name, readiness, what has been happening — not a thing you
 	// configure, and it is what a person wants on arriving (graph-detail-page.md).
-	{ key: "skills", label: "Skills", icon: Wand2 },
+	// Skills is not here: it is the Agents product's, on its own rail.
 	// Events (docs/for-developers/modules/operate/features/audit-and-activity.md) — the graph's audit log.
 	{ key: "events", label: "Events", icon: Activity },
 	// Settings is not here: Graph settings is the Modeller's, at the bottom of
@@ -45,34 +42,26 @@ const SETTINGS_SECTIONS: SectionMeta[] = [
 //
 // **Model and Govern are not here.** They are the Modeller's — Global model ·
 // Models · Stitches and Worlds · Guardrails on its own rail, reached from the
-// launcher.
+// launcher. **Library and Agents are not here either**: they are the Agents
+// product's, on its rail.
 const VIEW_SECTIONS: SectionMeta[] = [
-	// **The work group is three icons: Projects, Runs and Library**.
-	// Projects owns **Todos** — what a person wrote, under a project or the *No
-	// project* bucket. Runs owns **execution**: the journal, and nothing
-	// else, as one list. Library owns **definition**: Plans ·
-	// Catalogue · Templates — what can be run, the closed vocabulary it is
-	// written in, and how its output renders.
+	// **The work group is two icons: Projects and Runs**. Projects owns
+	// **Todos** — what a person wrote, under a project or the *No project*
+	// bucket. Runs owns **execution**: the journal, and nothing else, as one
+	// list.
 	{ key: "projects", label: "Projects", icon: FolderOpen },
 	{ key: "runs", label: "Runs", icon: History },
-	// **Templates has no item of its own**. A projection template is to an
-	// answer what a plan is to a run — both are definitions, both are promoted
-	// from what served — so it is Library's third section rather than a place you
-	// go. It is the same rule applies to Stitches.
-	{ key: "library", label: "Library", icon: Library },
-	{ key: "agents", label: "Agents", icon: Bot },
 ];
 
 /**
  * The one left rail (icon column). Surfaces:
  *
- * - Top: Info, then the page's own panels — Explorer · Projects · Runs ·
- *   Library · Agents. **Imports and Workflows have no icons**,
+ * - Top: Info, then the page's own panels — Explorer · Projects · Runs.
+ *   **Imports and Workflows have no icons**,
  *   because an import is a `kind` of TaskRun and a workflow is a reusable
  *   TaskPlan, so each was an icon onto a *filter* of a list that already exists
  *   — and an icon per filter is how one journal became four panels. An import is
- *   reached in **Runs**, a workflow in **Library › Plans**. **Templates has no
- *   icon either**: it is Library's third section.
+ *   reached in **Runs**, a workflow in **Agents › Library › Plans**.
  *   Every one is a `?panel` key, so the whole rail is a single-open accordion
  *   with one mechanism. Info
  *   is the exception that proves it: it still renders through `SettingsViewPanel`,
@@ -80,7 +69,7 @@ const VIEW_SECTIONS: SectionMeta[] = [
  *   belongs. Two things are not in this group: Sessions, which is the assistant
  *   on the right, opened from the header; and Layers, which is a control on the
  *   page strip and a card over the canvas (graph-detail-page.md).
- * - Bottom: one icon per settings section (Skills / Events). The
+ * - Bottom: one icon per settings section (Events). The
  *   user menu is in the shell's header, like on every other screen.
  *
  * **There is no mode switch** (docs/for-developers/modules/explore/spec.md). The Explorer / Modeller toggle was

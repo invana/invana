@@ -1,5 +1,15 @@
 import type { GraphCanvas } from "@invana/graph";
 import { ErrorBoundary } from "@invana/ui";
+import {
+	AgentsSettingsViewPanel,
+	AgentsViewPanel,
+	LibraryViewPanel,
+	OverviewViewPanel,
+	PerformanceViewPanel,
+	PluginsViewPanel,
+	SkillsViewPanel,
+	taskPlansApi,
+} from "@invana-studio/agents";
 import type { useSessions } from "@invana-studio/assistant";
 import type { LensKind, QueryResultItem } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
@@ -18,13 +28,7 @@ import type {
 } from "@invana-studio/shell";
 import { RunsViewPanel } from "@invana-studio/shell";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents";
-import {
-	LibraryViewPanel,
-	taskPlansApi,
-} from "@/pages/graphs-detail/features/plans";
 import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects";
-import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 
 type Sessions = ReturnType<typeof useSessions>;
@@ -151,9 +155,8 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			}}
 		/>
 	) : settingsPanel.section === "library" ? (
-		// **Library is definition** — Plans · Catalogue · Templates, stacked,
-		// with no panel header above them: what can be run, the
-		// closed vocabulary it is written in, and how its output renders.
+		// **Library is definition** — Plans · Templates, stacked, with no panel
+		// header above them: what can be run, and how its output renders.
 		<LibraryViewPanel
 			username={username as string}
 			graphSlug={graphSlug as string}
@@ -177,7 +180,6 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			onSelectSkill={setSelectedSkillId}
 			// `Open` — the skill's page, and the stack stays.
 			onOpenSkillPage={(id) => openBoard({ kind: "skill", subjectId: id })}
-			onOpenRuleBoard={(id) => openBoard({ kind: "rule", subjectId: id })}
 		/>
 	) : settingsPanel.section === "govern" ? (
 		// Govern holds Worlds over Guardrails as two sections of one panel,
@@ -202,6 +204,21 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		/>
 	) : settingsPanel.section === "requests" ? (
 		<RequestsViewPanel />
+	) : settingsPanel.section === "overview" ? (
+		<OverviewViewPanel />
+	) : settingsPanel.section === "plugins" ? (
+		// The plugin registry over the task catalogue a plan is written in.
+		<PluginsViewPanel
+			username={username as string}
+			graphSlug={graphSlug as string}
+		/>
+	) : settingsPanel.section === "performance" ? (
+		<PerformanceViewPanel />
+	) : settingsPanel.section === "concurrency" ? (
+		<AgentsSettingsViewPanel
+			username={username as string}
+			graphSlug={graphSlug as string}
+		/>
 	) : settingsPanel.section === "agents" ? (
 		// Agents holds the agents over the LLMs as two sections of one panel
 		// — a provider is what an agent's cast resolves against,

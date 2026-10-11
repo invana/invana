@@ -21,11 +21,11 @@ export default defineConfig({
 				"packages/shell/src/activity/events/eventSearch.ts",
 				"packages/shell/src/activity/runs/runSummary.ts",
 				"packages/shell/src/activity/runs/boards/taskFlowFromRun.ts",
-				"apps/studio/src/pages/graphs-detail/features/agents/agentDraft.ts",
+				"packages/agents/src/agents/agentDraft.ts",
+				"packages/agents/src/plans/taskFlowFromTaskPlan.ts",
+				"packages/agents/src/skills/taskFlowFromPlan.ts",
 				"apps/studio/src/pages/graphs-detail/features/boards/boardKinds.ts",
 				"apps/studio/src/pages/graphs-detail/features/explorer/canvasItems.ts",
-				"apps/studio/src/pages/graphs-detail/features/plans/taskFlowFromTaskPlan.ts",
-				"apps/studio/src/pages/graphs-detail/features/skills/taskFlowFromPlan.ts",
 			],
 			// The OpenTelemetry SDK boot — browser wiring with no decision in it.
 			exclude: [

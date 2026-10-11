@@ -18,7 +18,6 @@ export { LensBoardPage } from "./govern/boards/LensBoardPage";
 export { CompareBoardPage, parseComparePair } from "./govern/CompareBoardPage";
 export { LensesViewPanel } from "./govern/LensesViewPanel";
 export {
-	useLensesQuery,
 	useParticipantsQuery,
 	useRunTouchesQuery,
 } from "./govern/queries";
@@ -35,5 +34,4 @@ export { modeller } from "./product";
 export { RequestsViewPanel } from "./requests/RequestsViewPanel";
 export { RuleStatementForm, RuleStatementRow } from "./rules/RuleParts";
 export { RulesViewPanel } from "./rules/RulesViewPanel";
-export { useRulesSection } from "./rules/useRulesSection";
 export { SettingsViewPanel } from "./settings/SettingsViewPanel";

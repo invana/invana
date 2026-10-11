@@ -28,12 +28,15 @@ const OLD_PANEL_LINKS: [string, string][] = [
 	["?panel=links", "/modeller/global-model"],
 	["?panel=skills", "/agents/skills"],
 	["?panel=agents", "/agents/agents"],
-	["?panel=llms", "/agents/agents"],
+	["?panel=llms", "/agents/llms"],
 	["?panel=agents&section=llms&provider=p1", "/agents/llms/p1"],
 	["?panel=library", "/agents/library"],
 	["?panel=library&section=plans&plan=nl-single", "/agents/library/nl-single"],
 	["?panel=library&section=catalogue&entry=k1", "/agents/plugins/tasks/k1"],
-	["?panel=library&section=templates&template=t1", "/agents/templates/t1"],
+	[
+		"?panel=library&section=templates&template=t1",
+		"/agents/library/templates/t1",
+	],
 	["?panel=runs&run=r1", "/activity/runs/r1"],
 	["?panel=events", "/activity/events"],
 	["?panel=projects&project=p1", "/projects/p1"],
@@ -91,19 +94,17 @@ test("the breadcrumbs are the path's levels, each a link up", async ({
 	await expect(page).toHaveURL(`${GRAPH}/activity/runs`);
 });
 
-test("a trail deeper than four levels collapses its middle", async ({
-	page,
-}) => {
-	// graph › Agents › Plugins › Tasks › entry: the graph, `…`, the last two.
+test("an Agents trail names each level and walks back up", async ({ page }) => {
+	// graph › Plugins › Tasks › entry: the product has no crumb of its own,
+	// since the wordmark reads `Invana Agents`.
 	await page.goto(`${GRAPH}/agents/plugins/tasks/k1`);
 	const crumbs = page.getByLabel("Breadcrumb");
 	await expect(crumbs.getByText("k1", { exact: true })).toBeVisible({
 		timeout: 30_000,
 	});
-	await expect(crumbs.getByText("Plugins", { exact: true })).toHaveCount(0);
-	await crumbs.getByRole("button", { name: "Show hidden levels" }).click();
-	await page.getByRole("menuitem", { name: "Plugins" }).click();
-	await expect(page).toHaveURL(`${GRAPH}/agents/plugins/tasks`);
+	await expect(crumbs.getByText("Agents", { exact: true })).toHaveCount(0);
+	await crumbs.getByRole("link", { name: "Plugins" }).click();
+	await expect(page).toHaveURL(`${GRAPH}/agents/plugins`);
 });
 
 test("a reload on a path lands on the same screen", async ({ page }) => {

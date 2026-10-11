@@ -97,7 +97,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | One Models panel, three readings | Global model, Models and Stitches share the Models panel; Global model and Stitches open the board on its Model tab, Models on Overview |
 | Stitches | Read on the global canvas, where a stitch is declared, until a stitch list exists |
 | Requests | An empty state with a lock until the engine records requests — never an empty list |
-| Agents tab in Graph settings | Drawn through the app's `AgentsSettings` slot until the Agents product owns it |
+| Graph settings tabs | Basic · Graph. The Graph's concurrency is the Agents product's, in Agents › Settings |
 | A rail move keeps the regions | A rail click carries `right`, `console` and `page`, so the docked chat, the Console and the Workbook's page stay open; the panel's own keys are dropped |
 | No ✕ on a rail panel | Graph settings has no close control: its path is the panel, and closing it would leave the Modeller |
 | Guardrails leads on its rail item | The Govern stack puts Guardrails first on `/guardrails`, Worlds first on `/worlds` |

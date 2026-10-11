@@ -89,8 +89,7 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"model",
 	"projects",
 	// **Execution and definition are two panels**. `runs` is the journal as
-	// one list; `library` is the three-section stack — Plans · Catalogue ·
-	// Templates. `imports`, `workflows` and `templates` are gone from this list
+	// one list; `library` is the two-section stack — Plans · Templates. `imports`, `workflows` and `templates` are gone from this list
 	// because they are gone from the product: an import is a `kind` of TaskRun, a
 	// workflow is a reusable TaskPlan, and a projection template is Library's
 	// third section.
@@ -102,6 +101,11 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	// The Modeller's requests and rules.
 	"requests",
 	"rules",
+	// The Agents product's own panels.
+	"overview",
+	"plugins",
+	"performance",
+	"concurrency",
 ];
 const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
 	"explorer",
@@ -118,6 +122,10 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
 	"skills",
 	"requests",
 	"rules",
+	"overview",
+	"plugins",
+	"performance",
+	"concurrency",
 ];
 
 /**
@@ -135,9 +143,11 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
  * - Explorer: while the Explorer product's route is open the page has no
  *   `leftNav` and no `leftSection` — the board and the assistant fill it, and
  *   the canvas toolbar floats over the board instead of sitting in the header.
- * - Modeller: while the Modeller product's route is open the `leftNav` is the
- *   product's own rail (Global model · Models · Stitches · Requests │ Worlds ·
- *   Guardrails · Rules │ Graph settings), drawn by the shell from its `nav`.
+ * - Modeller and Agents: while either product's route is open the `leftNav`
+ *   is the product's own rail, drawn by the shell from its `nav` — Global
+ *   model · Models · Stitches · Requests │ Worlds · Guardrails · Rules │ Graph
+ *   settings, or Overview · Agents · Skills │ Library · Plugins · LLMs ·
+ *   Performance │ Settings.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
  *   and a right cluster (extras + `AppVersion`).
  *
@@ -167,7 +177,8 @@ export function GraphDetail({
 	const activity = activityOf(useLocation().pathname);
 	const product = useActiveProduct()?.id;
 	const explorer = product === "explorer";
-	const modeller = product === "modeller";
+	// The Modeller and the Agents product draw their own rail.
+	const ownRail = product === "modeller" || product === "agents";
 
 	// **No mode switch** (docs/for-developers/modules/explore/spec.md). The header is a breadcrumb naming the
 	// graph and the open panel; the levels after the graph come from the routes
@@ -268,9 +279,10 @@ export function GraphDetail({
 	return (
 		<StudioShellLayout
 			idPrefix="graph-detail"
-			// Explorer draws no `leftNav` (its `nav` is `null`); the Modeller draws
-			// its own `nav`. Both come from the shell when this is left out.
-			leftNav={explorer || modeller ? undefined : leftNav}
+			// Explorer draws no `leftNav` (its `nav` is `null`); the Modeller and
+			// Agents draw their own `nav`. Each comes from the shell when this is
+			// left out.
+			leftNav={explorer || ownRail ? undefined : leftNav}
 			header={header}
 			leftSection={effectiveLeftSection}
 			mainSection={effectiveMainSection}

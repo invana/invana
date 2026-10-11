@@ -24,11 +24,11 @@
 
 import { Board } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
-import type { LensKind } from "@invana-studio/core";
+import { type LensKind, useLensesQuery } from "@invana-studio/core";
 import { useReport, VIEW_BOARD } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
-import { useLensesQuery, useLensQuery } from "../queries";
+import { useLensQuery } from "../queries";
 import { LENS_ACTIONS, lensBoardSpec } from "./lensBoardSpec";
 
 export interface LensBoardPageProps {

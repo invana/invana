@@ -15,8 +15,6 @@ import type {
 	ImpactResponse,
 	Lens,
 	LensCreate,
-	LensKind,
-	LensListResponse,
 	LensUpdate,
 	TouchesResponse,
 	ValidationResponse,
@@ -41,23 +39,8 @@ function query(params: Record<string, string | boolean | undefined>): string {
 
 export const governApi = {
 	// ── Lenses — worlds and guardrails, one record ──────────────────────────
-	/**
-	 * `kind` filters; omitted returns both. `includeUnnamed` brings in the
-	 * lenses attached to a run and private to whoever ran it — off by default,
-	 * because naming is what puts one in the Graph's Worlds list.
-	 */
-	listLenses: (
-		u: string,
-		g: string,
-		opts: { kind?: LensKind; includeUnnamed?: boolean } = {},
-	) =>
-		request<LensListResponse>(
-			`${base(u, g)}/lenses${query({
-				kind: opts.kind,
-				include_unnamed: opts.includeUnnamed,
-			})}`,
-		),
-
+	// The list is core's `lensesApi.list`; the reads and writes of one lens
+	// are here.
 	getLens: (u: string, g: string, id: string) =>
 		request<Lens>(`${base(u, g)}/lenses/${id}`),
 

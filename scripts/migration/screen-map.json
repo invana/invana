@@ -843,8 +843,8 @@
   "agents.skills.detail": {
    "story": "AG-08",
    "product": "agents",
-   "route": "/u/admin/airways/agents/skills/answer-nl",
-   "state": "answer-nl stands for a skill's slug: open any skill from Skills"
+   "route": "/u/admin/airways/agents/skills",
+   "state": "open any skill from Skills: it opens as ?page=skill:<id> on the list path, which has no :skill level"
   },
   "agents.skills.instructions.edit": {
    "story": "AG-08",

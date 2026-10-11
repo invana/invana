@@ -7,13 +7,13 @@
  * adapters on the same renderer. A library plan draws on `TaskFlowCanvas` instead.
  */
 
-import { taskTone } from "@invana-studio/ui";
-import { useMemo } from "react";
 import {
 	LayeredCanvas,
 	type LayeredEdge,
 	type LayeredNode,
-} from "@/canvases/layered/LayeredCanvas";
+} from "@invana-studio/canvases";
+import { taskTone } from "@invana-studio/ui";
+import { useMemo } from "react";
 import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects/queries";
 
 interface Scope {

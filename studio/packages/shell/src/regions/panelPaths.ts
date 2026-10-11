@@ -64,14 +64,16 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	},
 	{ path: "modeller/rules", panel: "rules" },
 	{ path: "modeller/settings", panel: "settings" },
-	{ path: "agents/skills", panel: "skills" },
+	// The Agents rail. Agents and LLMs are two sections of one stack, so each
+	// keeps its own path; Templates is Library's second section, under its path.
+	{ path: "agents/overview", panel: "overview" },
 	{
 		path: "agents/agents",
 		panel: "agents",
 		section: "agents",
 		detail: "agent",
 	},
-	{ path: "agents/llms", panel: "agents", section: "llms", detail: "provider" },
+	{ path: "agents/skills", panel: "skills" },
 	{
 		path: "agents/library",
 		panel: "library",
@@ -79,17 +81,21 @@ const PANEL_PATHS: readonly PanelPath[] = [
 		detail: "plan",
 	},
 	{
-		path: "agents/plugins/tasks",
-		panel: "library",
-		section: "catalogue",
-		detail: "entry",
-	},
-	{
-		path: "agents/templates",
+		path: "agents/library/templates",
 		panel: "library",
 		section: "templates",
 		detail: "template",
 	},
+	{ path: "agents/plugins", panel: "plugins", section: "plugins" },
+	{
+		path: "agents/plugins/tasks",
+		panel: "plugins",
+		section: "catalogue",
+		detail: "entry",
+	},
+	{ path: "agents/llms", panel: "agents", section: "llms", detail: "provider" },
+	{ path: "agents/performance", panel: "performance" },
+	{ path: "agents/settings", panel: "concurrency" },
 	// Activity's tabs (the shell's page). Runs and Events keep the panel keys
 	// their rail icons write; the tabs with no panel share one key.
 	{ path: "activity/inbox", panel: "activity", section: "inbox" },
@@ -122,7 +128,6 @@ const INFO_TAB = "info";
 const LEVEL_LANDINGS: Record<string, string> = {
 	modeller: "modeller/global-model",
 	agents: "agents/agents",
-	"agents/plugins": "agents/plugins/tasks",
 	activity: "activity/runs",
 };
 
@@ -134,6 +139,17 @@ const ALIASES: Record<string, string> = {
 	layers: "explorer",
 	canvases: "explorer",
 	connection: "settings",
+};
+
+// An alias that also names the section it meant, when the link names none.
+const ALIAS_SECTIONS: Record<string, string> = {
+	llms: "llms",
+};
+
+// A section that left its panel, as `panel:section` → the panel that holds it
+// now. The Catalogue was Library's; it is Plugins'.
+const SECTION_MOVES: Record<string, string> = {
+	"library:catalogue": "plugins",
 };
 
 // Sessions live in the assistant: the link opens Explorer with it on the right.
@@ -216,7 +232,18 @@ export function pageUrlOf(params: URLSearchParams): {
 		return { tail: INFO_PATH, search };
 	}
 
-	const panel = ALIASES[raw] ?? raw;
+	const aliased = ALIASES[raw] ?? raw;
+	if (
+		ALIAS_SECTIONS[raw] &&
+		!search.has(SECTION) &&
+		!search.has(LEGACY_SECTION)
+	)
+		search.set(SECTION, ALIAS_SECTIONS[raw]);
+	const moved =
+		SECTION_MOVES[
+			`${aliased}:${search.get(SECTION) ?? search.get(LEGACY_SECTION)}`
+		];
+	const panel = moved ?? aliased;
 	const entries = PANEL_PATHS.filter((e) => e.panel === panel);
 	if (entries.length === 0) return { tail: "", search };
 

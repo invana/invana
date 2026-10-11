@@ -1,8 +1,8 @@
+import type { AgentEdge } from "@invana-studio/agents";
 import type { LeftNavKey } from "@invana-studio/shell";
 import { CANVAS_KINDS, type CanvasKind } from "@invana-studio/shell";
 import { useEffect, useState } from "react";
 import type { LayeredCanvasTarget } from "@/canvases/layered/LayeredCanvasChrome";
-import type { AgentEdge } from "@/pages/graphs-detail/features/agents";
 import { useTodoMutations } from "@/pages/graphs-detail/features/projects";
 
 /**

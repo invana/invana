@@ -21,7 +21,7 @@ test("the plan panel draws the four bands of a plan", async ({ page }) => {
 	await expect(page.getByText("nl-single@2").first()).toBeVisible({
 		timeout: 20_000,
 	});
-	await expect(page.getByText("published")).toBeVisible();
+	await expect(page.getByText("published").first()).toBeVisible();
 	await expect(page.getByText("The plan")).toBeVisible();
 	// The layers it engages are one line of *The plan*, not a band of their own.
 	await expect(page.getByText("engages")).toBeVisible();

@@ -13,13 +13,13 @@
  */
 
 import { cn } from "@invana/ui";
-import { CANVAS_KINDS } from "@invana-studio/shell";
-import { X } from "lucide-react";
 import {
 	useAgentLineageQuery,
 	useAgentsQuery,
-} from "@/pages/graphs-detail/features/agents";
-import { useTaskPlanQuery } from "@/pages/graphs-detail/features/plans";
+	useTaskPlanQuery,
+} from "@invana-studio/agents";
+import { CANVAS_KINDS } from "@invana-studio/shell";
+import { X } from "lucide-react";
 import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects";
 
 /** What the open work canvas is drawing. One shape per kind, id included. */

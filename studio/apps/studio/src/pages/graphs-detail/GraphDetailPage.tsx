@@ -1,5 +1,6 @@
 import { CanvasContext } from "@invana/canvas-react";
 import { ErrorBoundary, Workbook } from "@invana/ui";
+import { useAgentsQuery, useLLMProvidersQuery } from "@invana-studio/agents";
 import {
 	AssistantReopenPill,
 	AssistantSlotsContext,
@@ -32,9 +33,7 @@ import {
 } from "@invana-studio/shell";
 import { useCallback, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
-import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms";
 import { activitySlots } from "@/pages/graphs-detail/shell/activitySlots";
 import { assistantSlots } from "@/pages/graphs-detail/shell/assistantSlots";
 import { consoleSection } from "@/pages/graphs-detail/shell/consoleSection";

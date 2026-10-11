@@ -1,11 +1,11 @@
-import { ApiError } from "@invana-studio/core";
-import type { LeftNavKey } from "@invana-studio/shell";
-import type { ReactNode } from "react";
 import {
 	EnvelopeCanvas,
 	LineageCanvas,
-} from "@/pages/graphs-detail/features/agents";
-import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans";
+	PlanFlowCanvas,
+} from "@invana-studio/agents";
+import { ApiError } from "@invana-studio/core";
+import type { LeftNavKey } from "@invana-studio/shell";
+import type { ReactNode } from "react";
 import { PlanCanvas } from "@/pages/graphs-detail/features/projects";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 
@@ -16,28 +16,36 @@ import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCan
  * only honest empty state is *which row to pick*, phrased in the vocabulary
  * of the panel you are actually looking at.
  */
+const EMPTY_HINTS: Partial<Record<LeftNavKey, string>> = {
+	model:
+		"Pick a model to draw it — its types as nodes, its edge types as the edges between them.",
+	projects:
+		"Pick a project to draw its plan — todos as cards, dependencies left to right.",
+	runs: "Pick a run to read it — what it cost, what it touched and what was refused. `Compare with the plan` draws the plan it ran here.",
+	library:
+		"Pick a plan to draw the flow it will run. A template decides what its answer looks like; the catalogue is what it may name at all.",
+	agents: "Pick an agent to draw who created it and what it has worked on.",
+	skills:
+		"A skill has no canvas of its own — open a session, project or agent and the skill panel stays beside it.",
+	govern:
+		"A world has no canvas of its own — it is the bound whatever you open next runs inside.",
+	rules:
+		"Open a rule to read it here — how often steps were offered it, cited it and never cited it.",
+	requests:
+		"A request has no canvas of its own — each one names the type or property it asks the model for.",
+	settings:
+		"Graph settings have no canvas — the form beside is the whole of it.",
+	overview: "Opens with engine support.",
+	performance: "Opens with engine support.",
+	plugins: "Pick a task type to read what it does and which plans use it.",
+	concurrency: "Settings have no canvas — everything is in the form beside.",
+};
+
 export function canvasEmptyHint(settingsSection: LeftNavKey): string {
-	return settingsSection === "model"
-		? "Pick a model to draw it — its types as nodes, its edge types as the edges between them."
-		: settingsSection === "projects"
-			? "Pick a project to draw its plan — todos as cards, dependencies left to right."
-			: settingsSection === "runs"
-				? "Pick a run to read it — what it cost, what it touched and what was refused. `Compare with the plan` draws the plan it ran here."
-				: settingsSection === "library"
-					? "Pick a plan to draw the flow it will run. A template decides what its answer looks like; the catalogue is what it may name at all."
-					: settingsSection === "agents"
-						? "Pick an agent to draw who created it and what it has worked on."
-						: settingsSection === "skills"
-							? "A skill has no canvas of its own — open a session, project or agent and the skill panel stays beside it."
-							: settingsSection === "govern"
-								? "A world has no canvas of its own — it is the bound whatever you open next runs inside."
-								: settingsSection === "rules"
-									? "Open a rule to read it here — how often steps were offered it, cited it and never cited it."
-									: settingsSection === "requests"
-										? "A request has no canvas of its own — each one names the type or property it asks the model for."
-										: settingsSection === "settings"
-											? "Graph settings have no canvas — the form beside is the whole of it."
-											: "Open a session or start a new one to see its canvas.";
+	return (
+		EMPTY_HINTS[settingsSection] ??
+		"Open a session or start a new one to see its canvas."
+	);
 }
 
 /**

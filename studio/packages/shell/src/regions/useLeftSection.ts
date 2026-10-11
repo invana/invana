@@ -23,7 +23,7 @@ import { LEGACY_SECTION_PARAM, SECTION_PARAM } from "./useStackSections";
 //
 // **`tasks` and `templates` are gone** (graph-detail-page.md).
 // Execution and definition are two panels — `runs` (the journal, a list) and
-// `library` (Plans · Catalogue · Templates, a stack) — and Templates has no icon
+// `library` (Plans · Templates, a stack) — and Templates has no icon
 // of its own any more. Both old keys name surfaces that no longer exist and are
 // **deleted, not redirected**: a stale link lands on the graph page, which is
 // what an unknown `?panel` has always done.
@@ -47,6 +47,11 @@ export type LeftNavKey =
 	// The Modeller's requests and rules.
 	| "requests"
 	| "rules"
+	// The Agents rail items that are panels of their own.
+	| "overview"
+	| "plugins"
+	| "performance"
+	| "concurrency"
 	// Activity's tabs that no rail icon writes; `?section=` names the tab.
 	| "activity";
 
@@ -67,8 +72,8 @@ export const PANEL_PARAM = "panel";
 export const LEGACY_PANEL_PARAM = "settings";
 
 // A stacked panel's own keys (useStackSections): which section holds the height,
-// and what is drilled into inside it. **Library** (Plans ·
-// Catalogue · Templates) and **Projects** (Projects · Todos) are the two stacks;
+// and what is drilled into inside it. **Library** (Plans · Templates),
+// **Plugins** (Plugins · Catalogue) and **Projects** (Projects · Todos) are stacks;
 // **Runs** is a list, so it carries `run` and no `sectionKey`. These are
 // dropped whenever the section changes, exactly as `?tab=` is — a run left in
 // the URL under a different rail icon names a body that is not on screen.
@@ -93,7 +98,9 @@ export const STACK_PARAMS = [
 const STACK_KEYS_OF: Partial<Record<LeftNavKey, readonly string[]>> = {
 	// Runs takes no `?section=` — one list, so there is nothing to choose between.
 	runs: ["run"],
-	library: [SECTION_PARAM, "plan", "entry", "template"],
+	library: [SECTION_PARAM, "plan", "template"],
+	// **Plugins** — the registry over the task catalogue; `entry` is a task type.
+	plugins: [SECTION_PARAM, "entry"],
 	projects: [SECTION_PARAM, "project", "todo"],
 	// **Govern** is the third stack — Worlds over Guardrails. Both keys
 	// name a `Lens` id, because a guardrail and a world are one record separated
@@ -141,6 +148,10 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"agents",
 	"requests",
 	"rules",
+	"overview",
+	"plugins",
+	"performance",
+	"concurrency",
 	"activity",
 ];
 

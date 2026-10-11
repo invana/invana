@@ -1,4 +1,13 @@
 import { EmptyState, Spinner } from "@invana/ui";
+import {
+	AgentBoardPage,
+	PlanArgumentsPage,
+	PlanBoardPage,
+	PlanExportPage,
+	PlanVersionsPage,
+	SkillBoardPage,
+	UsageBoardPage,
+} from "@invana-studio/agents";
 import type { CanvasBackend } from "@invana-studio/canvases";
 import type { useLensesViewPanel } from "@invana-studio/modeller";
 import {
@@ -19,19 +28,8 @@ import {
 	runAddress,
 } from "@invana-studio/shell";
 import type { Dispatch, SetStateAction } from "react";
-import { AgentBoardPage } from "@/pages/graphs-detail/features/agents";
 import { FrozenBoardPage } from "@/pages/graphs-detail/features/boards";
-import {
-	PlanArgumentsPage,
-	PlanBoardPage,
-	PlanExportPage,
-	PlanVersionsPage,
-} from "@/pages/graphs-detail/features/plans";
 import { RuleBoardPage } from "@/pages/graphs-detail/features/rules";
-import {
-	SkillBoardPage,
-	UsageBoardPage,
-} from "@/pages/graphs-detail/features/skills";
 import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 
 /** What a declared board's body reads from the page that hosts it. */

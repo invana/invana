@@ -30,6 +30,7 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
+import { useAgentsQuery } from "@invana-studio/agents";
 import { StepList, totalDuration } from "@invana-studio/assistant";
 import type { RunNode, TaskRunSummary } from "@invana-studio/core";
 import { formatDuration } from "@invana-studio/core";
@@ -49,7 +50,6 @@ import {
 } from "@invana-studio/ui";
 import { Check, Undo2, UserCog } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
 	useTodoActivityQuery,
 	useTodoMutations,

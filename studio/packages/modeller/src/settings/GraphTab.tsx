@@ -19,15 +19,14 @@ import {
 } from "@invana-studio/core";
 import { useLeftSection } from "@invana-studio/shell";
 import { FormError } from "@invana-studio/ui";
-import { Archive, ArchiveRestore, Bot, Database, Info } from "lucide-react";
+import { Archive, ArchiveRestore, Database, Info } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useModellerSlots } from "../ModellerSlots";
 import { ConnectionFields } from "./ConnectionFields";
 
 /** The tabs, in strip order. `?tab=` carries the open one. */
-const SETTINGS_TABS = ["basic", "graph", "agents"] as const;
+const SETTINGS_TABS = ["basic", "graph"] as const;
 type SettingsTab = (typeof SETTINGS_TABS)[number];
 
 interface Props {
@@ -38,15 +37,16 @@ interface Props {
 }
 
 /**
- * The settings panel — **four tabs, one per question a person arrives with**
+ * The settings panel — **one tab per question a person arrives with**
  * (`Graph · settings` hi-fi).
  *
  * | Tab | What it answers | Fields |
  * |---|---|---|
  * | Basic | what is this graph called, and what is it for | name · description · instructions · archive |
  * | Graph | what database does it read | the connection |
- * | LLMs | what does it think with | the providers |
- * | Agents | how hard may they run here | concurrency |
+ *
+ * What the Graph's agents think with (`Agents › LLMs`) and how hard they may
+ * run (`Agents › Settings`) are the Agents product's.
  *
  * One flat form of everything was the earlier shape, and it read as a junk
  * section: a name sat above a connection string sat above a ceiling on
@@ -69,8 +69,7 @@ interface Props {
  * **Instructions are a Basic field, saved with the name and the description.**
  * What a graph is for is the third thing anyone asks after what it is called and
  * what is in it, and all three are the same answer written at three lengths — so
- * they are one form with one Save. Agents is left with the one thing that is
- * genuinely about running agents rather than describing the graph: the ceiling.
+ * they are one form with one Save.
  *
  * Gone with this split: `objectives` and `success_criteria`. Those belong to a
  * Project, not a Graph — a Graph is a bounded domain and has no goals of its
@@ -84,7 +83,6 @@ export function GraphTab({ username, graphSlug, headerActions }: Props) {
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
 	const { tab, setSection } = useLeftSection();
 	const mutation = useUpdateGraphMutation();
-	const { AgentsSettings } = useModellerSlots();
 
 	// A connection that never connected is not "saved" — the chip says which.
 	const connectionState: ConnectionState = !connection
@@ -170,20 +168,6 @@ export function GraphTab({ username, graphSlug, headerActions }: Props) {
 								the first save
 							</TabRule>
 							<ConnectionFields username={username} graphSlug={graphSlug} />
-						</>
-					)),
-				},
-				{
-					value: "agents",
-					label: "Agents",
-					icon: Bot,
-					content: content(() => (
-						<>
-							<TabRule>
-								A budget bounds one agent. This bounds the Graph — the database
-								it queries and the provider behind it.
-							</TabRule>
-							<AgentsSettings username={username} graphSlug={graphSlug} />
 						</>
 					)),
 				},

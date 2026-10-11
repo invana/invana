@@ -1,6 +1,7 @@
 /**
  * `@invana-studio/canvases` — canvas compositions more than one product draws:
- * the model canvas and the task-flow canvas, plus the theme bridge, the render
+ * the model canvas, the task-flow canvas and the layered canvas (plan,
+ * workflow, envelope and lineage), plus the theme bridge, the render
  * backend and the type colours every canvas kind shares.
  *
  * Names are listed, not starred: both canvases declare a `Detail` level type,
@@ -9,6 +10,11 @@
  */
 
 export type { CanvasBackend } from "./backend";
+export {
+	LayeredCanvas,
+	type LayeredEdge,
+	type LayeredNode,
+} from "./layered/LayeredCanvas";
 export { graphModelSettings, graphModelTemplates } from "./model";
 export { hueSlotForName } from "./model/config";
 export { GraphModelCanvas } from "./model/GraphModelCanvas";

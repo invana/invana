@@ -20,10 +20,9 @@
  */
 
 import { RUN_PANELS } from "@invana/boards";
+import { PLAN_CHART_WIDGETS, SkillFlowWidget } from "@invana-studio/agents";
 import { RunLensWidget } from "@invana-studio/modeller";
 import { StepTouchWidget, TaskFlowWidget } from "@invana-studio/shell";
-import { PLAN_CHART_WIDGETS } from "@/pages/graphs-detail/features/plans";
-import { SkillFlowWidget } from "@/pages/graphs-detail/features/skills";
 
 export const DECLARED_WIDGETS = {
 	// The run vocabulary the kit ships — `trace · touched · attempts ·

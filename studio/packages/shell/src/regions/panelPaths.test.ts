@@ -48,6 +48,18 @@ describe("panelPaths", () => {
 		);
 	});
 
+	it("gives each Agents rail item its own path", () => {
+		expect(canonicalRedirect(`${G}/agents`, "")).toBe(`${G}/agents/agents`);
+		expect(pageParamsOf("agents/settings", "").get("panel")).toBe(
+			"concurrency",
+		);
+		const template = pageParamsOf("agents/library/templates/t1", "");
+		expect(template.get("section")).toBe("templates");
+		expect(template.get("template")).toBe("t1");
+		expect(canonicalRedirect(`${G}/agents/plugins`, "")).toBeNull();
+		expect(canonicalRedirect(G, "?panel=llms")).toBe(`${G}/agents/llms`);
+	});
+
 	it("drops a panel key that names nothing", () => {
 		expect(canonicalRedirect(G, "?panel=tasks&page=x")).toBe(`${G}?page=x`);
 		expect(canonicalRedirect("/graphs", "?panel=runs")).toBeNull();

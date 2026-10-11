@@ -9,12 +9,12 @@
 
 import { Board } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
+import { SKILL_ACTIONS } from "@invana-studio/agents";
 import { useRuleCitationsQuery, useRulesQuery } from "@invana-studio/core";
 import { useReport, VIEW_BOARD } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
 import { ruleBoardSpec } from "@/pages/graphs-detail/features/rules/boards/ruleBoardSpec";
-import { SKILL_ACTIONS } from "@/pages/graphs-detail/features/skills";
 
 export interface RuleBoardPageProps {
 	username: string;

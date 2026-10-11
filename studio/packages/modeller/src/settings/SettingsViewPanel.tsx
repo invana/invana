@@ -130,6 +130,10 @@ type SingleTabSection = Exclude<
 	| "skills"
 	| "requests"
 	| "rules"
+	| "overview"
+	| "plugins"
+	| "performance"
+	| "concurrency"
 	// The shell's Activity page fills `mainSection`; it is never a tab here.
 	| "activity"
 >;

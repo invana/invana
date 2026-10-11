@@ -8,9 +8,9 @@
  * `nav` is `null` — the `leftNav` is the page's, not a list of product routes.
  *
  * **Every panel has a path**, under the product that will own it
- * (migration-plan §5): `/u/:user/:graph/agents/llms`, `/activity/runs/<id>`.
- * The Explorer's and the Modeller's paths are their own products' routes,
- * which draw this page through their slots.
+ * (migration-plan §5): `/u/:user/:graph/activity/runs/<id>`. The Explorer's,
+ * the Modeller's and the Agents product's paths are their own products'
+ * routes, which draw this page through their slots.
  * The Graph's route renders the page once, and the paths below it are routes
  * with no element of their own — they exist to match (anything else under the
  * Graph is a 404) and to name each level for the breadcrumbs through
@@ -115,14 +115,6 @@ export const legacyGraph: ProductDefinition = {
 			errorElement: <ErrorPage />,
 			children: [
 				{ index: true },
-				level("agents", "Agents", [
-					level("skills", "Skills"),
-					drillable("agents", "Agents", "agent"),
-					drillable("llms", "LLMs", "provider"),
-					drillable("library", "Library", "plan"),
-					level("plugins", "Plugins", [drillable("tasks", "Tasks", "entry")]),
-					drillable("templates", "Templates", "template"),
-				]),
 				level("activity", "Activity", [
 					level("inbox", "Inbox"),
 					level("approvals", "Approvals"),

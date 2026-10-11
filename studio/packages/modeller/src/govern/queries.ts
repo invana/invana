@@ -13,7 +13,6 @@ import type {
 	GovernLayer,
 	GovernRule,
 	LensCreate,
-	LensKind,
 	LensUpdate,
 } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -25,19 +24,8 @@ const catalogueKey = (u: string, g: string) =>
 	[...root(u, g), "participants"] as const;
 
 // ── Queries ────────────────────────────────────────────────────────────────
-
-export function useLensesQuery(
-	username?: string,
-	graphSlug?: string,
-	opts: { kind?: LensKind; includeUnnamed?: boolean } = {},
-) {
-	return useQuery({
-		queryKey: [...lensesKey(username ?? "", graphSlug ?? ""), opts] as const,
-		queryFn: () =>
-			governApi.listLenses(username as string, graphSlug as string, opts),
-		enabled: !!username && !!graphSlug,
-	});
-}
+// The lens list is core's `useLensesQuery`, keyed under `lensesKey`, so the
+// mutations below refresh it.
 
 export function useLensQuery(
 	username?: string,

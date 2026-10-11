@@ -14,11 +14,11 @@
  */
 
 import { cn } from "@invana/ui";
+import { StepRules } from "@invana-studio/agents";
 import { stepTone } from "@invana-studio/ui";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { type CSSProperties, useState } from "react";
 import type { ActivityNode } from "@/pages/graphs-detail/features/projects/types";
-import { StepRules } from "@/pages/graphs-detail/features/skills";
 
 export interface TodoActivityTreeProps {
 	nodes: ActivityNode[];
