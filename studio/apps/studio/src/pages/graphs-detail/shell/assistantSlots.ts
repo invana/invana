@@ -9,13 +9,13 @@
  */
 
 import type { AssistantSlots } from "@invana-studio/assistant";
-import { useCanvasBannerQuery } from "@invana-studio/shell";
-import { useOpenBoard } from "@/pages/graphs-detail/features/boards";
 import {
 	matches,
 	useLensesQuery,
 	useParticipantsQuery,
-} from "@/pages/graphs-detail/features/lenses";
+} from "@invana-studio/modeller";
+import { useCanvasBannerQuery } from "@invana-studio/shell";
+import { useOpenBoard } from "@/pages/graphs-detail/features/boards";
 import { StepRules } from "@/pages/graphs-detail/features/skills";
 
 export const assistantSlots: AssistantSlots = {

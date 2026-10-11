@@ -29,18 +29,16 @@ import {
 	PropertyRow,
 	Spinner,
 } from "@invana/ui";
+import { useRulesSection } from "@invana-studio/modeller";
 import {
 	DetailStatus,
 	PanelStatusBar,
 	SectionTitle,
 	StatusCrumb,
 } from "@invana-studio/ui";
-import { ChevronLeft, ChevronRight, Maximize2, Plus } from "lucide-react";
-import { useState } from "react";
-import { RulesSection } from "@/pages/graphs-detail/features/rules";
+import { ChevronRight, Plus } from "lucide-react";
 import {
 	useCreateSkillMutation,
-	useRulesQuery,
 	useSkillAgentsQuery,
 	useSkillsQuery,
 	useSkillUsageQuery,
@@ -69,11 +67,12 @@ export function SkillsViewPanel({
 	onOpenSkillPage,
 	onOpenRuleBoard,
 }: Props) {
-	const [openRuleId, setOpenRuleId] = useState<string | null>(null);
-	const [composingRule, setComposingRule] = useState(false);
-	const rules = useRulesQuery(username, graphSlug);
-	const openRule =
-		(rules.data?.items ?? []).find((r) => r.id === openRuleId) ?? null;
+	// The Graph's invariants — the Modeller's Rules section, kept under Skills.
+	const rulesSection = useRulesSection({
+		username,
+		graphSlug,
+		onOpenRuleBoard,
+	});
 
 	const skills = useSkillsQuery(username, graphSlug);
 	const create = useCreateSkillMutation(username, graphSlug);
@@ -164,63 +163,7 @@ export function SkillsViewPanel({
 			actionsOnHover: false,
 			content: skillsBody(),
 		},
-		{
-			id: "rules",
-			// The drill-in **is** the header — the trail as text, and the act on
-			// the right.
-			title: openRule ? (
-				<span className="flex min-w-0 items-center gap-1">
-					<span className="text-muted-foreground uppercase">Rules</span>
-					<span className="text-muted-foreground opacity-60">/</span>
-					<Badge variant="secondary" className="shrink-0">
-						{openRule.kind} · v{openRule.version}
-					</Badge>
-				</span>
-			) : (
-				<SectionTitle count={(rules.data?.items ?? []).length}>
-					Rules
-				</SectionTitle>
-			),
-			headerActions: openRule
-				? [
-						{
-							key: "back",
-							name: "Back to rules",
-							icon: ChevronLeft,
-							onClick: () => setOpenRuleId(null),
-						},
-						...(onOpenRuleBoard
-							? [
-									{
-										key: "more",
-										name: "Open this rule as a page",
-										icon: Maximize2,
-										onClick: () => onOpenRuleBoard(openRule.id),
-									},
-								]
-							: []),
-					]
-				: composingRule
-					? []
-					: [
-							{
-								name: "New invariant",
-								icon: Plus,
-								onClick: () => setComposingRule(true),
-							},
-						],
-			actionsOnHover: false,
-			content: (
-				<RulesSection
-					username={username}
-					graphSlug={graphSlug}
-					openRuleId={openRuleId}
-					onOpenRule={setOpenRuleId}
-					composing={composingRule}
-					onComposing={setComposingRule}
-				/>
-			),
-		},
+		rulesSection,
 	];
 
 	return (

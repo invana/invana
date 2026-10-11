@@ -1,4 +1,5 @@
 import { ApiError } from "@invana-studio/core";
+import type { LeftNavKey } from "@invana-studio/shell";
 import type { ReactNode } from "react";
 import {
 	EnvelopeCanvas,
@@ -6,7 +7,6 @@ import {
 } from "@/pages/graphs-detail/features/agents";
 import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans";
 import { PlanCanvas } from "@/pages/graphs-detail/features/projects";
-import type { LeftNavKey } from "@/pages/graphs-detail/shared/useLeftSection";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 
 /**
@@ -31,7 +31,13 @@ export function canvasEmptyHint(settingsSection: LeftNavKey): string {
 							? "A skill has no canvas of its own — open a session, project or agent and the skill panel stays beside it."
 							: settingsSection === "govern"
 								? "A world has no canvas of its own — it is the bound whatever you open next runs inside."
-								: "Open a session or start a new one to see its canvas.";
+								: settingsSection === "rules"
+									? "Open a rule to read it here — how often steps were offered it, cited it and never cited it."
+									: settingsSection === "requests"
+										? "A request has no canvas of its own — each one names the type or property it asks the model for."
+										: settingsSection === "settings"
+											? "Graph settings have no canvas — the form beside is the whole of it."
+											: "Open a session or start a new one to see its canvas.";
 }
 
 /**

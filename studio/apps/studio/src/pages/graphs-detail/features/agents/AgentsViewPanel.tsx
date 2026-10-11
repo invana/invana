@@ -21,6 +21,7 @@
  */
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import { useLensesQuery } from "@invana-studio/modeller";
 import { useStackSectionUi } from "@invana-studio/ui";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -35,7 +36,6 @@ import {
 	type AgentsSectionKey,
 	useAgentsViewPanel,
 } from "@/pages/graphs-detail/features/agents/useAgentsViewPanel";
-import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
 import {
 	llmsSection,
 	useLLMProvidersQuery,

@@ -4,10 +4,10 @@ import {
 } from "@invana/canvas-ui";
 import { Button, cn } from "@invana/ui";
 import { ExplorerHeaderToolbar } from "@invana-studio/explorer";
+import type { useRightSection } from "@invana-studio/shell";
 import { Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { LayeredCanvasStatus } from "@/canvases/layered/LayeredCanvasChrome";
-import type { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 

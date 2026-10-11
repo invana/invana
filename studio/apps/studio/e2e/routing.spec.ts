@@ -109,9 +109,11 @@ test("a trail deeper than four levels collapses its middle", async ({
 test("a reload on a path lands on the same screen", async ({ page }) => {
 	await page.goto(`${GRAPH}/modeller/settings?tab=info`);
 	const crumbs = page.getByLabel("Breadcrumb");
-	await expect(crumbs.getByText("Settings", { exact: true })).toBeVisible({
-		timeout: 30_000,
-	});
+	await expect(crumbs.getByText("Graph settings", { exact: true })).toBeVisible(
+		{
+			timeout: 30_000,
+		},
+	);
 	await expect(page.getByRole("tab", { name: "Info" })).toBeVisible();
 
 	await page.reload();

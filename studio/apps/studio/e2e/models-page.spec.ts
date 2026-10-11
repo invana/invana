@@ -10,8 +10,10 @@ import { ask } from "./explorer";
 
 const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 
+// The Modeller's Models rail item: the models board on Overview. A bare
+// `?panel=model` lands on Global model, which reads the Model tab.
 async function openModels(page: Page) {
-	await page.goto(`${GRAPH}?panel=model`);
+	await page.goto(`${GRAPH}/modeller/models`);
 	await expect(page.getByRole("tab", { name: "All models" })).toBeVisible({
 		timeout: 30_000,
 	});

@@ -10,6 +10,8 @@
 
 export * from "./hooks/queries/useAppVersion";
 export * from "./hooks/queries/useGitHubStars";
+export * from "./hooks/queries/useGraphQueries";
+export * from "./hooks/queries/useRuleQueries";
 export * from "./hooks/queries/useTypeCountsQuery";
 export * from "./hooks/useAuth";
 export * from "./hooks/useEventStream";
@@ -21,7 +23,9 @@ export * from "./lib/sections";
 export * from "./lib/time";
 export * from "./services/api/auth";
 export * from "./services/api/client";
+export * from "./services/api/graphs";
 export * from "./services/api/health";
+export * from "./services/api/rules";
 export * from "./services/api/runs";
 export * from "./services/telemetry/errors";
 export * from "./services/telemetry/metrics";
@@ -37,6 +41,7 @@ export * from "./types/graphs";
 export * from "./types/lenses";
 export * from "./types/product";
 export * from "./types/query";
+export * from "./types/rules";
 export * from "./types/runs";
 export * from "./types/sessions";
 export * from "./types/typeCounts";

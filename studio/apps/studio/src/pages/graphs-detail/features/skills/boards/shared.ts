@@ -13,9 +13,9 @@
  * of one read, which is what lets `spec.json` show the document the page is.
  */
 
+import type { Rule } from "@invana-studio/core";
 import { formatRelativeTime } from "@invana-studio/core";
 import type {
-	Rule,
 	Skill,
 	SkillUsageResponse,
 	SkillUsageVersion,

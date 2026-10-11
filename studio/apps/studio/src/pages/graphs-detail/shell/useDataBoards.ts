@@ -6,7 +6,11 @@ import {
 	useAssistantCanvasBridge,
 } from "@invana-studio/assistant";
 import type { CanvasBackend } from "@invana-studio/canvases";
-import type { QueryResponse, QueryResultItem } from "@invana-studio/core";
+import type {
+	QueryResponse,
+	QueryResultItem,
+	useGraphConnectionQuery,
+} from "@invana-studio/core";
 import { type Interaction, measureSync } from "@invana-studio/core";
 import {
 	adaptItems,
@@ -22,6 +26,7 @@ import type {
 	BoardVersionCause,
 	CanvasStyling,
 	CanvasKind as DataBoardsCanvasKind,
+	useRightSection,
 } from "@invana-studio/shell";
 import {
 	boardsApi,
@@ -31,15 +36,13 @@ import {
 	useActiveProduct,
 	useBoardVersions,
 	useCreateCanvasStateMutation,
+	useOpenSessionRequest,
+	usePageParams,
 	useUpdateCanvasMutation,
 } from "@invana-studio/shell";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
-import { useOpenSessionRequest } from "@/pages/graphs-detail/shared/useOpenSessionRequest";
-import { usePageParams } from "@/pages/graphs-detail/shared/usePageParams";
-import type { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 
 // localStorage key persisting the user's render-backend choice across reloads.

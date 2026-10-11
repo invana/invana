@@ -9,6 +9,10 @@
  * the platform's), the header's bell, and setup's board, lesson,
  * timeline and lock. What they borrow from the graph page arrives through
  * `ActivitySlotsContext` and `SetupSlotsContext`.
+ *
+ * So do the Graph list and the regions every graph-scoped product reads: the
+ * open `leftSection` panel and its stack keys, who holds `rightSection`, and
+ * the page's params read off its path (`regions/`).
  */
 
 export * from "./actions";
@@ -47,7 +51,6 @@ export {
 } from "./boards/boardSpec";
 export { captureBanner, STATE_THUMB_MAX_EDGE } from "./boards/captureBanner";
 export {
-	boardReportsKey,
 	useBoardReportsQuery,
 	useBoardsQuery,
 	useCanvasBannerQuery,
@@ -68,17 +71,41 @@ export type {
 	CaptureCanvasState,
 } from "./boards/types";
 export { useBoardVersions } from "./boards/useBoardVersions";
+export { DeclaredBoardContext, useReport } from "./boards/useReport";
 export { boardVersionsApi } from "./boards/versionsApi";
 export * from "./components/AppVersion";
 export * from "./components/ConfirmDialog";
+export { OnboardingCap } from "./components/header/OnboardingCap";
 export * from "./components/ProtectedRoute";
 export * from "./components/SaturationBridge";
 export * from "./components/ThemeSyncBridge";
 export * from "./pages/auth/LoginPage";
 export * from "./pages/ErrorPage";
+export { GraphCreatePage } from "./pages/graphs/GraphCreatePage";
+export { GraphForm } from "./pages/graphs/GraphForm";
+export { GraphsListPage } from "./pages/graphs/GraphsListPage";
 export { PlatformEventsPage } from "./pages/platform/PlatformEventsPage";
 export * from "./pages/settings/ProfileSettingsPage";
 export * from "./products";
+export { canonicalRedirect } from "./regions/panelPaths";
+export {
+	LEGACY_PANEL_PARAM,
+	type LeftNavKey,
+	PANEL_PARAM,
+	STACK_PARAMS,
+	TAB_PARAM,
+	useLeftSection,
+} from "./regions/useLeftSection";
+export {
+	requestOpenSession,
+	useOpenSessionRequest,
+} from "./regions/useOpenSessionRequest";
+export { usePageParams } from "./regions/usePageParams";
+export {
+	type RightSectionKey,
+	useRightSection,
+} from "./regions/useRightSection";
+export { SECTION_PARAM, useStackSections } from "./regions/useStackSections";
 export * from "./StudioShell";
 export { OnboardingWizard } from "./setup/OnboardingWizard";
 export { SetupLock } from "./setup/SetupLock";

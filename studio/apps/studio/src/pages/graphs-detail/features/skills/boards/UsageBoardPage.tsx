@@ -10,10 +10,9 @@
 
 import { Board } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
-import { VIEW_BOARD } from "@invana-studio/shell";
+import { useReport, VIEW_BOARD } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
-import { useReport } from "@/pages/graphs-detail/features/boards";
 import { SKILL_ACTIONS } from "@/pages/graphs-detail/features/skills/boards/shared";
 import { usageBoardSpec } from "@/pages/graphs-detail/features/skills/boards/usageBoardSpec";
 import {

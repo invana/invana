@@ -1,17 +1,8 @@
 /**
- * The graphs module's public surface — the only file another module imports.
- *
- * The Graph record, its setup state and the gates over it are wire types in
- * `@invana-studio/core`.
+ * What is left of the graphs module: the Graph's concurrency ceiling and its
+ * pools, until the Agents product's settings take them. The Graph record and
+ * its reads are in `@invana-studio/core`; the Graph's settings are the
+ * Modeller's.
  */
 
-export { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
-export {
-	useCreateGraphMutation,
-	useDeleteGraphMutation,
-	useGraphConnectionQuery,
-	useGraphQuery,
-	useGraphsQuery,
-	useSetupSectionMutation,
-} from "@/pages/graphs-detail/features/graphs/queries";
-export { SettingsViewPanel } from "@/pages/graphs-detail/features/graphs/SettingsViewPanel";
+export { ConcurrencyFields } from "@/pages/graphs-detail/features/graphs/ConcurrencyFields";

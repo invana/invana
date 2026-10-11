@@ -15,11 +15,14 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
-import { ApiError, suppressActionToast } from "@invana-studio/core";
+import {
+	ApiError,
+	suppressActionToast,
+	useGraphConnectionQuery,
+} from "@invana-studio/core";
 import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useModellerSlots } from "../../../ModellerSlots";
 import {
 	useCreatePropertyKeyMutation,
 	useUpdateEdgeTypeMutation,
@@ -90,7 +93,6 @@ export function PropertyEditor({
 	const updateEdge = useUpdateEdgeTypeMutation(ctx.username, ctx.graphSlug);
 	const createKey = useCreatePropertyKeyMutation(ctx.username, ctx.graphSlug);
 	const updateKey = useUpdatePropertyKeyMutation(ctx.username, ctx.graphSlug);
-	const { useGraphConnectionQuery } = useModellerSlots();
 	const { data: connection } = useGraphConnectionQuery(
 		ctx.username,
 		ctx.graphSlug,

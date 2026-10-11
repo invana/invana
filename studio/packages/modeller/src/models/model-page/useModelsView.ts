@@ -6,10 +6,14 @@
  * it. The tab and the window ride beside them, so a reload lands on the same
  * reading. Absent means the default — `All models`, Overview, 30 days — so a
  * bare link to the page is the landscape.
+ *
+ * The default tab is the Modeller rail item's: on Global model and Stitches
+ * the page opens on the Model tab, the canvas of every published model; on
+ * Models, and anywhere outside the Modeller, it opens on Overview.
  */
 
 import { useCallback, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMatch, useSearchParams } from "react-router-dom";
 
 export const MODELS_TABS = [
 	"overview",
@@ -29,6 +33,9 @@ const OPEN = "model_open";
 const TAB = "models_tab";
 const WINDOW = "models_window";
 
+/** The Modeller rail items whose reading is the canvas of every model. */
+const CANVAS_ITEMS = new Set(["global-model", "stitches"]);
+
 export interface ModelsView {
 	/** The model the page reads, or `null` for All models. */
 	scope: string | null;
@@ -40,6 +47,10 @@ export interface ModelsView {
 
 export function useModelsView() {
 	const [params, setParams] = useSearchParams();
+	const item = useMatch("/u/:username/:graphSlug/modeller/:item/*")?.params
+		.item;
+	const defaultTab: ModelsTab =
+		item && CANVAS_ITEMS.has(item) ? "model" : "overview";
 
 	const view = useMemo((): ModelsView => {
 		const tab = params.get(TAB) as ModelsTab | null;
@@ -49,10 +60,10 @@ export function useModelsView() {
 			scope,
 			open: !!scope && params.get(OPEN) === "1",
 			// The params are user-controlled; a stale value reads as the default.
-			tab: tab && MODELS_TABS.includes(tab) ? tab : "overview",
+			tab: tab && MODELS_TABS.includes(tab) ? tab : defaultTab,
 			window: window && MODELS_WINDOWS.includes(window) ? window : "30d",
 		};
-	}, [params]);
+	}, [params, defaultTab]);
 
 	/**
 	 * Write the reading. `extra` writes other keys in the same update — `page`
@@ -71,7 +82,7 @@ export function useModelsView() {
 					if ("scope" in patch) write(SCOPE, patch.scope ?? null);
 					if ("open" in patch) write(OPEN, patch.open ? "1" : null);
 					if ("tab" in patch)
-						write(TAB, patch.tab === "overview" ? null : (patch.tab ?? null));
+						write(TAB, patch.tab === defaultTab ? null : (patch.tab ?? null));
 					if ("window" in patch)
 						write(
 							WINDOW,
@@ -86,7 +97,7 @@ export function useModelsView() {
 				{ replace: true },
 			);
 		},
-		[setParams],
+		[setParams, defaultTab],
 	);
 
 	return { view, set };

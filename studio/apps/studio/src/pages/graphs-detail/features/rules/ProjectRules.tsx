@@ -20,20 +20,17 @@
  */
 
 import { Button, Spinner } from "@invana/ui";
-import { PanelSection } from "@invana-studio/ui";
-import { Plus } from "lucide-react";
-import { useState } from "react";
-import {
-	RuleStatementForm,
-	RuleStatementRow,
-} from "@/pages/graphs-detail/features/rules/RuleParts";
-import type { Rule } from "@/pages/graphs-detail/features/skills";
+import type { Rule } from "@invana-studio/core";
 import {
 	useCreateProjectRuleMutation,
 	useProjectRulesQuery,
 	useSetRuleActiveMutation,
 	useUpdateRuleMutation,
-} from "@/pages/graphs-detail/features/skills";
+} from "@invana-studio/core";
+import { RuleStatementForm, RuleStatementRow } from "@invana-studio/modeller";
+import { PanelSection } from "@invana-studio/ui";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 
 export function ProjectRules({
 	username,

@@ -52,7 +52,6 @@ const MODULES = {
 	agents: "agents",
 	boards: "boards",
 	graphs: "graphs",
-	lenses: "govern",
 	llms: "llm_providers",
 	plans: "task_plans",
 	projections: "runtime",
@@ -69,6 +68,7 @@ const ENGINE_ONLY = {
 	events: "served by the @invana-studio/shell package, outside features/",
 	explorer: "served by the @invana-studio/explorer package, outside features/",
 	modeller: "served by the @invana-studio/modeller package, outside features/",
+	govern: "served by the @invana-studio/modeller package, outside features/",
 	routes: "shared route helpers",
 	__pycache__: "bytecode",
 };

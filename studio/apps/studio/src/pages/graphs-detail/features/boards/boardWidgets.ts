@@ -20,8 +20,8 @@
  */
 
 import { RUN_PANELS } from "@invana/boards";
+import { RunLensWidget } from "@invana-studio/modeller";
 import { StepTouchWidget, TaskFlowWidget } from "@invana-studio/shell";
-import { RunLensWidget } from "@/pages/graphs-detail/features/lenses";
 import { PLAN_CHART_WIDGETS } from "@/pages/graphs-detail/features/plans";
 import { SkillFlowWidget } from "@/pages/graphs-detail/features/skills";
 

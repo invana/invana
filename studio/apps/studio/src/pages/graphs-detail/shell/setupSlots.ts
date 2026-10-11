@@ -8,9 +8,9 @@
  * every render.
  */
 
+import { useSetupSectionMutation } from "@invana-studio/core";
 import type { SetupSlots } from "@invana-studio/shell";
-import { useSetupSectionMutation } from "@/pages/graphs-detail/features/graphs";
-import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
+import { useLeftSection } from "@invana-studio/shell";
 
 /** The left column's `setSection`, and nothing else of it. */
 function useOpenSection() {

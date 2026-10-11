@@ -1,17 +1,17 @@
 import { ErrorBoundary } from "@invana/ui";
 import type { useSessions } from "@invana-studio/assistant";
 import { AssistantHost, attachmentFor } from "@invana-studio/assistant";
+import type { useGraphQuery } from "@invana-studio/core";
 import { ASSISTANT_SECTION, reportBoundaryError } from "@invana-studio/core";
 import { InspectorViewPanel } from "@invana-studio/explorer";
-import { SetupLock } from "@invana-studio/shell";
-import type { Dispatch, ReactNode, SetStateAction } from "react";
-import type { useGraphQuery } from "@/pages/graphs-detail/features/graphs";
-import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
-import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import type {
 	RightSectionKey,
+	useLeftSection,
 	useRightSection,
-} from "@/pages/graphs-detail/shared/useRightSection";
+} from "@invana-studio/shell";
+import { SetupLock } from "@invana-studio/shell";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
+import type { LLMProvider } from "@/pages/graphs-detail/features/llms";
 import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 
 /** What the right side's occupants read from the page that hosts them. */

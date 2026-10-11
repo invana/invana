@@ -23,5 +23,3 @@ export {
 	OpenBoardContext,
 	useOpenBoard,
 } from "@/pages/graphs-detail/features/boards/useOpenBoard";
-
-export { useReport } from "@/pages/graphs-detail/features/boards/useReport";

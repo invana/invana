@@ -9,6 +9,8 @@
  *
  * **Every panel has a path**, under the product that will own it
  * (migration-plan §5): `/u/:user/:graph/agents/llms`, `/activity/runs/<id>`.
+ * The Explorer's and the Modeller's paths are their own products' routes,
+ * which draw this page through their slots.
  * The Graph's route renders the page once, and the paths below it are routes
  * with no element of their own — they exist to match (anything else under the
  * Graph is a 404) and to name each level for the breadcrumbs through
@@ -21,6 +23,7 @@
  */
 import type { ProductDefinition } from "@invana-studio/core";
 import {
+	canonicalRedirect,
 	ErrorPage,
 	runAddress,
 	type ShellRouteHandle,
@@ -33,7 +36,6 @@ import {
 	type RouteObject,
 	useLocation,
 } from "react-router-dom";
-import { canonicalRedirect } from "@/pages/graphs-detail/shared/panelPaths";
 
 // Lazy-loaded — the graph page carries the heaviest UI (graph rendering). Lazy
 // keeps the auth + settings flows snappy and isolates any canvas-side
@@ -113,12 +115,6 @@ export const legacyGraph: ProductDefinition = {
 			errorElement: <ErrorPage />,
 			children: [
 				{ index: true },
-				level("modeller", "Modeller", [
-					level("settings", "Settings"),
-					level("global-model", "Global model"),
-					drillable("worlds", "Worlds", "world"),
-					drillable("guardrails", "Guardrails", "guardrail"),
-				]),
 				level("agents", "Agents", [
 					level("skills", "Skills"),
 					drillable("agents", "Agents", "agent"),

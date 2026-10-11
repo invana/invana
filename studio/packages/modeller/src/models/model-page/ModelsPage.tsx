@@ -11,14 +11,18 @@
 import { Board } from "@invana/boards";
 import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
 import type { CanvasBackend } from "@invana-studio/canvases";
-import { ApiError, useTypeCountsQuery } from "@invana-studio/core";
+import {
+	ApiError,
+	graphsApi,
+	useGraphConnectionQuery,
+	useTypeCountsQuery,
+} from "@invana-studio/core";
 import { routedAction } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useModellerSlots } from "../../ModellerSlots";
 import { modelsApi } from "../api";
 import { DeleteModelDialog } from "../model-editor/components/DeleteModelDialog";
 import { ImportModelDialog } from "../model-editor/components/ImportModelDialog";
@@ -106,7 +110,6 @@ export function ModelsPage({
 	const { frames } = useAllModels(username, graphSlug);
 	const allLinks = useModelLinksQuery(username, graphSlug);
 	const counts = useTypeCountsQuery(username, graphSlug);
-	const { useGraphConnectionQuery, introspectConnection } = useModellerSlots();
 	const connection = useGraphConnectionQuery(username, graphSlug);
 
 	const scoped = authored.find((m) => m.id === view.scope) ?? null;
@@ -176,7 +179,7 @@ export function ModelsPage({
 	const discardOne = useDiscardStagedChangeMutation(username, graphSlug);
 	const update = useUpdateModelMutation(username, graphSlug);
 	const introspect = useMutation({
-		mutationFn: () => introspectConnection(username, graphSlug),
+		mutationFn: () => graphsApi.introspectConnection(username, graphSlug),
 		onSettled: () =>
 			queryClient.invalidateQueries({
 				queryKey: ["schemas", username, graphSlug, "physical"],

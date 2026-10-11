@@ -1,6 +1,9 @@
 import { ExplorerSlotsContext } from "@invana-studio/explorer";
+import { ModellerSlotsContext } from "@invana-studio/modeller";
 import {
 	ErrorPage,
+	GraphCreatePage,
+	GraphsListPage,
 	LoginPage,
 	PlatformEventsPage,
 	ProfileSettingsPage,
@@ -9,12 +12,12 @@ import {
 	StudioShell,
 } from "@invana-studio/shell";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { GraphCreatePage } from "@/pages/graphs/GraphCreatePage";
-import { GraphsListPage } from "@/pages/graphs/GraphsListPage";
 import { products } from "@/products";
 import { GraphPageRoute } from "@/products/legacyGraph";
+import { modellerSlots } from "@/products/modellerSlots";
 
-// The Explorer's routes draw today's graph page until it is retired.
+// The Explorer's and the Modeller's routes draw today's graph page until it
+// is retired.
 const explorerSlots = { Page: GraphPageRoute };
 
 export const router = createBrowserRouter([
@@ -30,7 +33,9 @@ export const router = createBrowserRouter([
 		element: (
 			<ProtectedRoute>
 				<ExplorerSlotsContext.Provider value={explorerSlots}>
-					<StudioShell products={products} />
+					<ModellerSlotsContext.Provider value={modellerSlots}>
+						<StudioShell products={products} />
+					</ModellerSlotsContext.Provider>
 				</ExplorerSlotsContext.Provider>
 			</ProtectedRoute>
 		),

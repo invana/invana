@@ -1,10 +1,15 @@
 import { EmptyState, Spinner } from "@invana/ui";
 import type { CanvasBackend } from "@invana-studio/canvases";
+import type { useLensesViewPanel } from "@invana-studio/modeller";
 import {
+	CompareBoardPage,
+	LensBoardPage,
 	type ModelSelection,
 	ModelsPage,
+	parseComparePair,
 	type useModelsView,
 } from "@invana-studio/modeller";
+import type { useLeftSection } from "@invana-studio/shell";
 import {
 	BOARD_KINDS,
 	boardPageId,
@@ -16,12 +21,6 @@ import {
 import type { Dispatch, SetStateAction } from "react";
 import { AgentBoardPage } from "@/pages/graphs-detail/features/agents";
 import { FrozenBoardPage } from "@/pages/graphs-detail/features/boards";
-import type { useLensesViewPanel } from "@/pages/graphs-detail/features/lenses";
-import {
-	CompareBoardPage,
-	LensBoardPage,
-	parseComparePair,
-} from "@/pages/graphs-detail/features/lenses";
 import {
 	PlanArgumentsPage,
 	PlanBoardPage,
@@ -33,7 +32,6 @@ import {
 	SkillBoardPage,
 	UsageBoardPage,
 } from "@/pages/graphs-detail/features/skills";
-import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 
 /** What a declared board's body reads from the page that hosts it. */

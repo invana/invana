@@ -2,26 +2,22 @@ import {
 	BOTTOM_SECTION,
 	MAIN_SECTION,
 	SIDE_SECTION,
+	useGraphConnectionQuery,
 } from "@invana-studio/core";
+import { SettingsViewPanel } from "@invana-studio/modeller";
 import {
 	ActivityPage,
 	AppVersion,
 	activityOf,
 	boardPageId,
+	type LeftNavKey,
+	OnboardingCap,
 	StudioShellLayout,
 	useActiveProduct,
+	useLeftSection,
 } from "@invana-studio/shell";
 import type { ReactNode } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { OnboardingCap } from "@/components/header/OnboardingCap";
-import {
-	SettingsViewPanel,
-	useGraphConnectionQuery,
-} from "@/pages/graphs-detail/features/graphs";
-import {
-	type LeftNavKey,
-	useLeftSection,
-} from "@/pages/graphs-detail/shared/useLeftSection";
 import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
 import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
 
@@ -103,6 +99,9 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"govern",
 	"agents",
 	"skills",
+	// The Modeller's requests and rules.
+	"requests",
+	"rules",
 ];
 const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
 	"explorer",
@@ -117,6 +116,8 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
 	"govern",
 	"agents",
 	"skills",
+	"requests",
+	"rules",
 ];
 
 /**
@@ -134,6 +135,9 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
  * - Explorer: while the Explorer product's route is open the page has no
  *   `leftNav` and no `leftSection` — the board and the assistant fill it, and
  *   the canvas toolbar floats over the board instead of sitting in the header.
+ * - Modeller: while the Modeller product's route is open the `leftNav` is the
+ *   product's own rail (Global model · Models · Stitches · Requests │ Worlds ·
+ *   Guardrails · Rules │ Graph settings), drawn by the shell from its `nav`.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
  *   and a right cluster (extras + `AppVersion`).
  *
@@ -161,7 +165,9 @@ export function GraphDetail({
 	const leftNav = useGraphLeftNav();
 	const navigate = useNavigate();
 	const activity = activityOf(useLocation().pathname);
-	const explorer = useActiveProduct()?.id === "explorer";
+	const product = useActiveProduct()?.id;
+	const explorer = product === "explorer";
+	const modeller = product === "modeller";
 
 	// **No mode switch** (docs/for-developers/modules/explore/spec.md). The header is a breadcrumb naming the
 	// graph and the open panel; the levels after the graph come from the routes
@@ -262,8 +268,9 @@ export function GraphDetail({
 	return (
 		<StudioShellLayout
 			idPrefix="graph-detail"
-			// Explorer draws no `leftNav`: the product's `nav` is `null`.
-			leftNav={explorer ? undefined : leftNav}
+			// Explorer draws no `leftNav` (its `nav` is `null`); the Modeller draws
+			// its own `nav`. Both come from the shell when this is left out.
+			leftNav={explorer || modeller ? undefined : leftNav}
 			header={header}
 			leftSection={effectiveLeftSection}
 			mainSection={effectiveMainSection}

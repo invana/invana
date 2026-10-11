@@ -181,33 +181,6 @@
 			}
 		},
 		{
-			"includes": ["apps/studio/src/pages/graphs-detail/features/lenses/**"],
-			"linter": {
-				"rules": {
-					"style": {
-						"noRestrictedImports": {
-							"level": "error",
-							"options": {
-								"patterns": [
-									{
-										"group": [
-											"@/pages/graphs-detail/features/*/**",
-											"!@/pages/graphs-detail/features/lenses/**"
-										],
-										"message": "Import another module through its index.ts (code-shape.md §4.1)."
-									},
-									{
-										"group": ["@/pages/graphs-detail/shell/**"],
-										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
-									}
-								]
-							}
-						}
-					}
-				}
-			}
-		},
-		{
 			"includes": ["apps/studio/src/pages/graphs-detail/features/llms/**"],
 			"linter": {
 				"rules": {
@@ -359,33 +332,6 @@
 											"!@/pages/graphs-detail/features/skills/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
-									},
-									{
-										"group": ["@/pages/graphs-detail/shell/**"],
-										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
-									}
-								]
-							}
-						}
-					}
-				}
-			}
-		},
-		{
-			"includes": ["apps/studio/src/pages/graphs-detail/shared/**"],
-			"linter": {
-				"rules": {
-					"style": {
-						"noRestrictedImports": {
-							"level": "error",
-							"options": {
-								"patterns": [
-									{
-										"group": [
-											"@/pages/graphs-detail/features",
-											"@/pages/graphs-detail/features/**"
-										],
-										"message": "shared/ is the leaf — it imports no module (code-shape.md §4)."
 									},
 									{
 										"group": ["@/pages/graphs-detail/shell/**"],

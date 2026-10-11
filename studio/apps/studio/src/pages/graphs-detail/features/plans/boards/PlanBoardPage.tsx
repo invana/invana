@@ -10,10 +10,9 @@
 
 import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
-import { routedAction, TaskFlowWidget } from "@invana-studio/shell";
+import { routedAction, TaskFlowWidget, useReport } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
-import { useReport } from "@/pages/graphs-detail/features/boards";
 import { PLAN_CHART_WIDGETS } from "@/pages/graphs-detail/features/plans/boards/PlanChartWidgets";
 import {
 	ALL,

@@ -1,7 +1,11 @@
 import { useModelsView } from "@invana-studio/modeller";
-import { boardPageId } from "@invana-studio/shell";
+import type { useLeftSection } from "@invana-studio/shell";
+import {
+	boardPageId,
+	SECTION_PARAM,
+	usePageParams,
+} from "@invana-studio/shell";
 import { useCallback, useEffect, useRef } from "react";
-import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import type { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
 
 /**
@@ -21,7 +25,9 @@ export function useModelsPage(
 	 * `leftNav` to Models opens the `models` board, whatever the scope. It fires
 	 * on the transition into the panel and nothing else, so closing the page with
 	 * its X while the panel is open leaves it closed — a page that reopened
-	 * itself would be a page you cannot close.
+	 * itself would be a page you cannot close. Moving along the Modeller's rail
+	 * between Global model, Models and Stitches is such a transition too: each is
+	 * a reading of the page, so each brings it forward.
 	 */
 	const modelsView = useModelsView().view;
 	const openModelsPage = useCallback(() => {
@@ -40,12 +46,14 @@ export function useModelsPage(
 		setActiveBoardId(id);
 		return { page: id, step: null };
 	}, [graphSlug, setActiveBoardId, setBoards]);
-	const wasModels = useRef(false);
+	const [params] = usePageParams();
+	const reading =
+		settingsSection === "model" ? (params.get(SECTION_PARAM) ?? "") : null;
+	const wasReading = useRef<string | null>(null);
 	useEffect(() => {
-		const isModels = settingsSection === "model";
-		if (isModels && !wasModels.current) openModelsPage();
-		wasModels.current = isModels;
-	}, [settingsSection, openModelsPage]);
+		if (reading !== null && reading !== wasReading.current) openModelsPage();
+		wasReading.current = reading;
+	}, [reading, openModelsPage]);
 
 	return { modelsView, showModelsPage };
 }

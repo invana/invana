@@ -1,5 +1,5 @@
+import { useStackSections } from "@invana-studio/shell";
 import { useCallback } from "react";
-import { useStackSections } from "@/pages/graphs-detail/shared/useStackSections";
 
 // The **Library** panel is a stack of three sections, not a tabbed panel
 // (graph-detail-page.md). All three are on screen at once; `?section=`

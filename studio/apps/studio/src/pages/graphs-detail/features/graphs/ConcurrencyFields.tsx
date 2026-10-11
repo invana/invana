@@ -25,15 +25,15 @@ import {
 	SelectValue,
 } from "@invana/forms";
 import { Button } from "@invana/ui";
+import {
+	graphsApi,
+	useGraphQuery,
+	useUpdateGraphMutation,
+} from "@invana-studio/core";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
 import { PoolsTable } from "@/pages/graphs-detail/features/graphs/PoolsTable";
-import {
-	useGraphQuery,
-	useUpdateGraphMutation,
-} from "@/pages/graphs-detail/features/graphs/queries";
 
 interface Props {
 	username: string;

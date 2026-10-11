@@ -9,25 +9,13 @@ export {
 	when,
 } from "@/pages/graphs-detail/features/skills/boards/shared";
 export { UsageBoardPage } from "@/pages/graphs-detail/features/skills/boards/UsageBoardPage";
-export {
-	useCreateProjectRuleMutation,
-	useCreateRuleMutation,
-	useProjectRulesQuery,
-	useRuleCitationsQuery,
-	useRulesQuery,
-	useSetRuleActiveMutation,
-	useSkillsQuery,
-	useUpdateRuleMutation,
-} from "@/pages/graphs-detail/features/skills/queries";
+export { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
 export { SkillBoardPage } from "@/pages/graphs-detail/features/skills/SkillBoardPage";
 export { SkillsViewPanel } from "@/pages/graphs-detail/features/skills/SkillsViewPanel";
 export { StepRules } from "@/pages/graphs-detail/features/skills/StepRules";
 export { LAYER_ICON } from "@/pages/graphs-detail/features/skills/taskFlowFromPlan";
 export type {
-	OfferedRule,
 	PlanArg,
-	Rule,
-	RuleCitationsResponse,
 	Skill,
 	SkillLayer,
 } from "@/pages/graphs-detail/features/skills/types";

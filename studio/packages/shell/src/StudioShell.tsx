@@ -57,16 +57,37 @@ export function leftNavItemClassName(active: boolean): string {
 		: "my-1.5 !bg-transparent !text-foreground !ring-transparent hover:!bg-primary/10 hover:!text-primary hover:!ring-primary/25";
 }
 
+/**
+ * The params a rail move carries: the regions that outlive `leftSection` — the
+ * docked chat (`right`), the Console (`console`) and the Workbook's focused
+ * page (`page`). Everything else in the query string belongs to the panel being
+ * left, so it is dropped.
+ */
+const REGION_PARAMS = ["right", "console", "page"] as const;
+
+/** `search` reduced to the region params, as a `?…` suffix or `""`. */
+function regionSearch(search: string): string {
+	const from = new URLSearchParams(search);
+	const kept = new URLSearchParams();
+	for (const key of REGION_PARAMS) {
+		const value = from.get(key);
+		if (value !== null) kept.set(key, value);
+	}
+	const query = kept.toString();
+	return query ? `?${query}` : "";
+}
+
 /** The open product's `nav` as the theme's `leftNav`, or none. */
 function useProductLeftNav(
 	product: ProductDefinition | undefined,
 ): NavVerticalProps | undefined {
 	const graph = useOpenGraph();
-	const { pathname } = useLocation();
+	const { pathname, search } = useLocation();
 	const navigate = useNavigate();
 	const base = product && productBase(product, graph);
 	if (!product?.nav || !base) return undefined;
 	const { groups, bottom } = product.nav;
+	const carried = regionSearch(search);
 
 	// A separator closes every group but the last.
 	const toItem = (item: NavItem, showSeperator = false) => {
@@ -79,7 +100,7 @@ function useProductLeftNav(
 			tooltipSide: "right" as const,
 			className: leftNavItemClassName(active),
 			showSeperator,
-			onClick: () => navigate(target),
+			onClick: () => navigate(`${target}${carried}`),
 		};
 	};
 	return {

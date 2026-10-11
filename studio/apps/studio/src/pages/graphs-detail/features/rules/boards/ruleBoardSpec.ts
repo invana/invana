@@ -18,6 +18,7 @@
  */
 
 import type { BoardSpec, PanelSpec } from "@invana/boards";
+import type { Rule, RuleCitationsResponse } from "@invana-studio/core";
 import {
 	count,
 	omit,
@@ -26,10 +27,6 @@ import {
 	VIEW_BOARD,
 	VIEW_SPEC,
 } from "@invana-studio/shell";
-import type {
-	Rule,
-	RuleCitationsResponse,
-} from "@/pages/graphs-detail/features/skills";
 import {
 	ruleTitle,
 	SKILL_ACTIONS,

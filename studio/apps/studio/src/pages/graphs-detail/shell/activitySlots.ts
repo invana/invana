@@ -9,14 +9,13 @@
  * every render.
  */
 
-import type { ActivitySlots } from "@invana-studio/shell";
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
-import { useReport } from "@/pages/graphs-detail/features/boards";
 import {
 	useLensesViewPanel,
 	useRunTouchesQuery,
-} from "@/pages/graphs-detail/features/lenses";
-import { usePageParams } from "@/pages/graphs-detail/shared/usePageParams";
+} from "@invana-studio/modeller";
+import type { ActivitySlots } from "@invana-studio/shell";
+import { usePageParams, useReport } from "@invana-studio/shell";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 
 export const activitySlots: ActivitySlots = {
 	useAgents: useAgentsQuery,

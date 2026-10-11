@@ -6,7 +6,7 @@
  * work schemas field for field.
  */
 
-import type { OfferedRule } from "@/pages/graphs-detail/features/skills";
+import type { OfferedRule } from "@invana-studio/core";
 
 // ── Projects ─────────────────────────────────────────────────────────────────
 
