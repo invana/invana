@@ -1,22 +1,22 @@
 {
   "format": "invana.model/1",
-  "package_id": "invana.dataset.chickpea",
+  "package_id": "invana.dataset.arabidopsis",
   "content_hash": "",
-  "name": "Chickpea",
-  "description": "Varieties, the institutes that developed them, their traits and pedigree.",
+  "name": "Arabidopsis",
+  "description": "Accessions, the centres that hold them, the genes they carry, their traits and crosses.",
   "version": "1.0.0",
   "model": {
-    "schema_name": "Chickpea",
-    "schema_description": "Varieties, the institutes that developed them, their traits and pedigree.",
+    "schema_name": "Arabidopsis",
+    "schema_description": "Accessions, the centres that hold them, the genes they carry, their traits and crosses.",
     "validation_mode": "strict",
     "version": "1.0.0",
     "axes": {
-      "time": {
-        "property": "year"
+      "geo": {
+        "property": "country",
+        "vocab": "iso2"
       },
       "dims": [
-        "seed_type",
-        "kind"
+        "habit"
       ]
     },
     "property_keys": [
@@ -24,143 +24,112 @@
         "name": "name",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "The name a variety, institute or trait is known by — the key.",
+        "description": "The name an accession, centre, institute, trait or gene is known by — the key.",
         "validation_rules": []
       },
       {
-        "name": "kind",
+        "name": "stock_id",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "released · accession — a released variety or a genebank accession.",
+        "description": "The stock centre's catalogue number.",
+        "validation_rules": []
+      },
+      {
+        "name": "country",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Two-letter country code — where it was collected, or where the centre is.",
+        "validation_rules": []
+      },
+      {
+        "name": "habit",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "rapid cycling · winter annual — whether it flowers without vernalization.",
         "validation_rules": [
           {
             "rule_type": "enum",
             "params": {
               "values": [
-                "released",
-                "accession"
+                "rapid cycling",
+                "winter annual"
               ]
             }
           }
         ]
       },
       {
-        "name": "year",
+        "name": "days_to_flowering",
         "type": "integer",
         "value_cardinality": "SINGLE",
-        "description": "Year the variety was released.",
-        "validation_rules": []
-      },
-      {
-        "name": "seed_type",
-        "type": "string",
-        "value_cardinality": "SINGLE",
-        "description": "desi · kabuli · intermediate (CO_338 · Seed type).",
-        "validation_rules": [
-          {
-            "rule_type": "enum",
-            "params": {
-              "values": [
-                "desi",
-                "kabuli",
-                "intermediate"
-              ]
-            }
-          }
-        ]
-      },
-      {
-        "name": "maturity_days",
-        "type": "integer",
-        "value_cardinality": "SINGLE",
-        "description": "Days from sowing to maturity.",
+        "description": "Days from sowing to the first open flower, long days, under drought.",
         "validation_rules": [
           {
             "rule_type": "range",
             "params": {
-              "min": 80,
-              "max": 180
+              "min": 15,
+              "max": 150
             }
           }
         ]
       },
       {
-        "name": "hundred_seed_weight_g",
-        "type": "float",
+        "name": "rosette_leaf_number",
+        "type": "integer",
         "value_cardinality": "SINGLE",
-        "description": "Weight of 100 seeds in grams, at 10% moisture.",
+        "description": "Rosette leaves at bolting.",
         "validation_rules": [
           {
             "rule_type": "range",
             "params": {
-              "min": 10,
-              "max": 70
+              "min": 4,
+              "max": 100
             }
           }
         ]
       },
       {
-        "name": "wilt",
-        "type": "string",
-        "value_cardinality": "SINGLE",
-        "description": "Fusarium wilt reaction (CO_338:0000097).",
-        "validation_rules": [
-          {
-            "rule_type": "enum",
-            "params": {
-              "values": [
-                "resistant",
-                "moderately resistant",
-                "susceptible"
-              ]
-            }
-          }
-        ]
-      },
-      {
-        "name": "root_depth_m",
+        "name": "drought_survival_pct",
         "type": "float",
         "value_cardinality": "SINGLE",
-        "description": "Root depth in metres at 60 days, under terminal drought.",
-        "validation_rules": []
+        "description": "Plants that recover after 14 days without water, in percent.",
+        "validation_rules": [
+          {
+            "rule_type": "range",
+            "params": {
+              "min": 0,
+              "max": 100
+            }
+          }
+        ]
       },
       {
-        "name": "short_name",
-        "type": "string",
+        "name": "delta13c",
+        "type": "float",
         "value_cardinality": "SINGLE",
-        "description": "How the institute is usually written.",
-        "validation_rules": []
+        "description": "Carbon isotope ratio δ13C, in ‰ — less negative is more water-use efficient.",
+        "validation_rules": [
+          {
+            "rule_type": "range",
+            "params": {
+              "min": -36,
+              "max": -24
+            }
+          }
+        ]
       },
       {
         "name": "city",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "Where the institute is.",
+        "description": "Where the centre or institute is.",
         "validation_rules": []
-      },
-      {
-        "name": "sector",
-        "type": "string",
-        "value_cardinality": "SINGLE",
-        "description": "university · national institute · international centre.",
-        "validation_rules": [
-          {
-            "rule_type": "enum",
-            "params": {
-              "values": [
-                "university",
-                "national institute",
-                "international centre"
-              ]
-            }
-          }
-        ]
       },
       {
         "name": "term_id",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "The Crop Ontology term, when the trait has one.",
+        "description": "The Plant Trait Ontology (TO) term, when the trait has one.",
         "validation_rules": []
       },
       {
@@ -169,6 +138,37 @@
         "value_cardinality": "SINGLE",
         "description": "What the trait is measured in.",
         "validation_rules": []
+      },
+      {
+        "name": "locus",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The TAIR locus id, e.g. AT5G10140.",
+        "validation_rules": []
+      },
+      {
+        "name": "function",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "What the gene does, in one line.",
+        "validation_rules": []
+      },
+      {
+        "name": "allele",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "functional · loss-of-function — the allele the accession carries.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "functional",
+                "loss-of-function"
+              ]
+            }
+          }
+        ]
       },
       {
         "name": "cross_id",
@@ -197,17 +197,29 @@
         ]
       },
       {
-        "name": "season",
+        "name": "generation",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "The crossing block it belongs to.",
-        "validation_rules": []
+        "description": "How far the cross has gone: F1 · F2 · F3 · RIL.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "F1",
+                "F2",
+                "F3",
+                "RIL"
+              ]
+            }
+          }
+        ]
       }
     ],
     "node_types": [
       {
-        "name": "Variety",
-        "description": "A released chickpea variety, or a genebank accession used as a parent.",
+        "name": "Accession",
+        "description": "A natural Arabidopsis thaliana line, collected in the wild and kept as seed stock.",
         "parent_type": null,
         "is_abstract": false,
         "validation_mode": null,
@@ -219,43 +231,43 @@
             "validation_rules": []
           },
           {
-            "property_key": "kind",
+            "property_key": "stock_id",
             "default_value": null,
             "sort_order": 1,
             "validation_rules": []
           },
           {
-            "property_key": "year",
+            "property_key": "country",
             "default_value": null,
             "sort_order": 2,
             "validation_rules": []
           },
           {
-            "property_key": "seed_type",
+            "property_key": "habit",
             "default_value": null,
             "sort_order": 3,
             "validation_rules": []
           },
           {
-            "property_key": "maturity_days",
+            "property_key": "days_to_flowering",
             "default_value": null,
             "sort_order": 4,
             "validation_rules": []
           },
           {
-            "property_key": "hundred_seed_weight_g",
+            "property_key": "rosette_leaf_number",
             "default_value": null,
             "sort_order": 5,
             "validation_rules": []
           },
           {
-            "property_key": "wilt",
+            "property_key": "drought_survival_pct",
             "default_value": null,
             "sort_order": 6,
             "validation_rules": []
           },
           {
-            "property_key": "root_depth_m",
+            "property_key": "delta13c",
             "default_value": null,
             "sort_order": 7,
             "validation_rules": []
@@ -263,8 +275,8 @@
         ]
       },
       {
-        "name": "Institute",
-        "description": "Who developed a variety, or holds an accession.",
+        "name": "StockCentre",
+        "description": "A seed bank that holds and sends out accessions.",
         "parent_type": null,
         "is_abstract": false,
         "validation_mode": null,
@@ -276,28 +288,49 @@
             "validation_rules": []
           },
           {
-            "property_key": "short_name",
+            "property_key": "city",
             "default_value": null,
             "sort_order": 1,
             "validation_rules": []
           },
           {
-            "property_key": "city",
+            "property_key": "country",
             "default_value": null,
             "sort_order": 2,
             "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Institute",
+        "description": "A lab that sequenced or phenotyped accessions.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
           },
           {
-            "property_key": "sector",
+            "property_key": "city",
             "default_value": null,
-            "sort_order": 3,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "country",
+            "default_value": null,
+            "sort_order": 2,
             "validation_rules": []
           }
         ]
       },
       {
         "name": "Trait",
-        "description": "Something measured on a variety.",
+        "description": "Something measured on an accession.",
         "parent_type": null,
         "is_abstract": false,
         "validation_mode": null,
@@ -323,8 +356,35 @@
         ]
       },
       {
-        "name": "Pedigree",
-        "description": "A cross between two parents.",
+        "name": "Gene",
+        "description": "A gene whose alleles differ between accessions.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "locus",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "function",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Cross",
+        "description": "A cross between two accessions.",
         "parent_type": null,
         "is_abstract": false,
         "validation_mode": null,
@@ -348,7 +408,7 @@
             "validation_rules": []
           },
           {
-            "property_key": "season",
+            "property_key": "generation",
             "default_value": null,
             "sort_order": 3,
             "validation_rules": []
@@ -358,22 +418,22 @@
     ],
     "edge_types": [
       {
-        "name": "DEVELOPED_BY",
-        "description": "The institute that bred and released the variety.",
+        "name": "HELD_BY",
+        "description": "The stock centre that holds the accession's seed.",
         "source_node_types": [
-          "Variety"
+          "Accession"
         ],
         "target_node_types": [
-          "Institute"
+          "StockCentre"
         ],
-        "multiplicity": "MANY2ONE",
+        "multiplicity": "MULTI",
         "property_mappings": []
       },
       {
-        "name": "CONSERVED_BY",
-        "description": "The genebank that holds the accession.",
+        "name": "SEQUENCED_BY",
+        "description": "The lab that sequenced the accession's genome.",
         "source_node_types": [
-          "Variety"
+          "Accession"
         ],
         "target_node_types": [
           "Institute"
@@ -383,9 +443,40 @@
       },
       {
         "name": "NOTED_FOR",
-        "description": "A trait the variety is known for.",
+        "description": "A trait the accession is known for.",
         "source_node_types": [
-          "Variety"
+          "Accession"
+        ],
+        "target_node_types": [
+          "Trait"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      },
+      {
+        "name": "CARRIES",
+        "description": "An allele of a gene the accession carries.",
+        "source_node_types": [
+          "Accession"
+        ],
+        "target_node_types": [
+          "Gene"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": [
+          {
+            "property_key": "allele",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "AFFECTS",
+        "description": "A trait the gene is known to change.",
+        "source_node_types": [
+          "Gene"
         ],
         "target_node_types": [
           "Trait"
@@ -397,10 +488,10 @@
         "name": "FEMALE_PARENT",
         "description": "The seed parent of the cross.",
         "source_node_types": [
-          "Pedigree"
+          "Cross"
         ],
         "target_node_types": [
-          "Variety"
+          "Accession"
         ],
         "multiplicity": "MANY2ONE",
         "property_mappings": []
@@ -409,10 +500,10 @@
         "name": "MALE_PARENT",
         "description": "The pollen parent of the cross.",
         "source_node_types": [
-          "Pedigree"
+          "Cross"
         ],
         "target_node_types": [
-          "Variety"
+          "Accession"
         ],
         "multiplicity": "MANY2ONE",
         "property_mappings": []
@@ -420,9 +511,18 @@
     ],
     "constraints": [
       {
-        "name": "variety_name_unique",
+        "name": "accession_name_unique",
         "target_kind": "node_type",
-        "target_label": "Variety",
+        "target_label": "Accession",
+        "constraint_type": "unique",
+        "properties": [
+          "name"
+        ]
+      },
+      {
+        "name": "stockcentre_name_unique",
+        "target_kind": "node_type",
+        "target_label": "StockCentre",
         "constraint_type": "unique",
         "properties": [
           "name"
@@ -447,9 +547,18 @@
         ]
       },
       {
-        "name": "pedigree_cross_id_unique",
+        "name": "gene_name_unique",
         "target_kind": "node_type",
-        "target_label": "Pedigree",
+        "target_label": "Gene",
+        "constraint_type": "unique",
+        "properties": [
+          "name"
+        ]
+      },
+      {
+        "name": "cross_cross_id_unique",
+        "target_kind": "node_type",
+        "target_label": "Cross",
         "constraint_type": "unique",
         "properties": [
           "cross_id"

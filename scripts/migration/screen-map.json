@@ -28,7 +28,7 @@
    "story": "SH-05",
    "product": "shell",
    "route": "/u/admin/airways/explorer",
-   "state": "open a finding on branch H2.1 \u00b7 ICC 4958 \u00d7 KAK 2 (needs B05): /u/admin/chickpea/projects/drought-tolerant-chickpea \u203a H2.1 \u203a a finding"
+   "state": "open a finding on branch H1.1 \u00b7 \u2026via lower FLC (needs B05): /u/admin/arabidopsis/projects/early-flowering-under-drought \u203a H1.1 \u203a a finding"
   },
   "shell.command_palette": {
    "story": "SH-06",
@@ -201,55 +201,55 @@
   "datasets.dataset": {
    "story": "DS-02",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03)"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03)"
   },
   "datasets.dataset.provenance": {
    "story": "DS-02",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03); Provenance tab"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Provenance tab"
   },
   "datasets.dataset.versions": {
    "story": "DS-03",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03); Versions tab"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Versions tab"
   },
   "datasets.dataset.used": {
    "story": "DS-03",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03); Used by tab"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Used by tab"
   },
   "datasets.record": {
    "story": "DS-04",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03); click JG 11 in the preview"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03); click Col-0 in the preview"
   },
   "datasets.observe": {
    "story": "DS-05",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03); Add observations"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Add observations"
   },
   "datasets.observe.assistant": {
    "story": "DS-05",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03); Add observations \u203a tell the assistant"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Add observations \u203a tell the assistant"
   },
   "datasets.collect": {
    "story": "DS-06",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
+   "route": "/datasets/catalogue/accession-phenotypes",
    "state": "Catalogue \u203a Collect with an agent (needs B06b)"
   },
   "datasets.collect.run": {
    "story": "DS-06",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
+   "route": "/datasets/catalogue/accession-phenotypes",
    "state": "a collection while it runs (needs B06b)"
   },
   "datasets.validation": {
@@ -262,7 +262,7 @@
    "story": "DS-07",
    "product": "datasets",
    "route": "/datasets/validation",
-   "state": "click JG 11 \u00b7 maturity days"
+   "state": "click Col-0 \u00b7 days to flowering (needs B03)"
   },
   "datasets.standards": {
    "story": "DS-08",
@@ -274,7 +274,7 @@
    "story": "DS-08",
    "product": "datasets",
    "route": "/datasets/standards",
-   "state": "click Crop Ontology \u00b7 Chickpea (CO_338) (needs B04)"
+   "state": "click Plant Trait Ontology (TO) (needs B04)"
   },
   "datasets.standard.attach": {
    "story": "DS-09",
@@ -285,32 +285,32 @@
   "datasets.dataset.conformance": {
    "story": "DS-09",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03); Conformance tab (needs B04)"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Conformance tab (needs B04)"
   },
   "datasets.documents": {
    "story": "DS-10",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
+   "route": "/datasets/catalogue/accession-phenotypes",
    "state": "a documents dataset (needs B03)"
   },
   "datasets.bind": {
    "story": "DS-11",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03); Bind to a Graph \u203a chickpea"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Bind to a Graph \u203a arabidopsis"
   },
   "datasets.share": {
    "story": "DS-12",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03); Share"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Share"
   },
   "datasets.dataset.retracted": {
    "story": "DS-14",
    "product": "datasets",
-   "route": "/datasets/catalogue/variety-attributes",
-   "state": "dataset variety-attributes (chickpea; needs B03); a version marked retracted"
+   "route": "/datasets/catalogue/accession-phenotypes",
+   "state": "dataset accession-phenotypes (arabidopsis; needs B03); a version marked retracted"
   },
   "datasets.standards.import": {
    "story": "DS-15",
@@ -328,7 +328,7 @@
    "story": "DS-13",
    "product": "datasets",
    "route": "/datasets/imports",
-   "state": "click an import while it runs: re-run demos/chickpea/load.py and open its run"
+   "state": "click an import while it runs: re-run demos/arabidopsis/load.py and open its run"
   },
   "modeller.global_model": {
    "story": "MO-01",
@@ -453,13 +453,13 @@
   "modeller.model.type.constraint": {
    "story": "MO-08",
    "product": "modeller",
-   "route": "/u/admin/chickpea/modeller/models/chickpea/variety",
-   "state": "Constraints tab; click maturity_days"
+   "route": "/u/admin/arabidopsis/modeller/models/arabidopsis/accession",
+   "state": "Constraints tab; click days_to_flowering"
   },
   "modeller.model.history": {
    "story": "MO-09",
    "product": "modeller",
-   "route": "/u/admin/chickpea/modeller/models/chickpea?tab=history",
+   "route": "/u/admin/arabidopsis/modeller/models/arabidopsis?tab=history",
    "state": "one version until B01 records more"
   },
   "modeller.worlds": {
@@ -657,103 +657,103 @@
   "projects.list": {
    "story": "PJ-01",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects",
+   "route": "/u/admin/arabidopsis/projects",
    "state": ""
   },
   "projects.new": {
    "story": "PJ-02",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects",
+   "route": "/u/admin/arabidopsis/projects",
    "state": "Projects \u203a New project"
   },
   "projects.project": {
    "story": "PJ-03",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
    "state": ""
   },
   "projects.project.branches": {
    "story": "PJ-04",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
    "state": "Branches tab (needs B05)"
   },
   "projects.branch.fork": {
    "story": "PJ-04",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": "Branches tab \u203a Fork a branch on H2 (needs B05)"
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "Branches tab \u203a Fork a branch on H1 (needs B05)"
   },
   "projects.branch": {
    "story": "PJ-05",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": "on branch H2.1 \u00b7 ICC 4958 \u00d7 KAK 2 (needs B05)"
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "on branch H1.1 \u00b7 \u2026via lower FLC (needs B05)"
   },
   "projects.finding": {
    "story": "PJ-06",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": "on branch H2.1 \u00b7 ICC 4958 \u00d7 KAK 2 (needs B05); click \u201cICC 4958 carries the root-depth QTL\u201d"
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "on branch H1.1 \u00b7 \u2026via lower FLC (needs B05); click \u201cCol-0 carries a loss-of-function FRI allele\u201d"
   },
   "projects.branch.decide": {
    "story": "PJ-07",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": "on branch H2.1 \u00b7 ICC 4958 \u00d7 KAK 2 (needs B05); Decide"
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "on branch H1.1 \u00b7 \u2026via lower FLC (needs B05); Decide"
   },
   "projects.branch.merge": {
    "story": "PJ-08",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
-   "state": "on branch H2.1 \u00b7 ICC 4958 \u00d7 KAK 2 (needs B05); Merge\u2026"
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "on branch H1.1 \u00b7 \u2026via lower FLC (needs B05); Merge\u2026"
   },
   "projects.simulate": {
    "story": "PJ-09",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
    "state": "on branch H2, Simulate crosses (needs B09)"
   },
   "projects.simulate.result": {
    "story": "PJ-09",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
    "state": "on branch H2, Simulate crosses \u203a Run 4 crosses (needs B09)"
   },
   "projects.impact": {
    "story": "PJ-10",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/support-price",
+   "route": "/u/admin/arabidopsis/projects/gene-edited-field-trials",
    "state": "Impact tab (needs B05)"
   },
   "projects.lineage": {
    "story": "PJ-11",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
    "state": "Lineage tab (needs B05)"
   },
   "projects.todos": {
    "story": "PJ-12",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/todos",
+   "route": "/u/admin/arabidopsis/projects/todos",
    "state": ""
   },
   "projects.todo": {
    "story": "PJ-12",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/todos",
-   "state": "click \u201cMeasure 100-seed weight on plots 11\u201318\u201d"
+   "route": "/u/admin/arabidopsis/projects/todos",
+   "state": "click \u201cScore days to flowering on trays 11\u201318\u201d"
   },
   "projects.decisions": {
    "story": "PJ-13",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/decisions",
+   "route": "/u/admin/arabidopsis/projects/decisions",
    "state": "needs B05 for its rows"
   },
   "projects.report": {
    "story": "PJ-14",
    "product": "projects",
-   "route": "/u/admin/chickpea/projects/drought-tolerant-chickpea",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
    "state": "Report tab (needs B05)"
   },
   "agents.overview": {

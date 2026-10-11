@@ -149,7 +149,7 @@ One binary, `invana`, for every product. Prerequisites are in the [README](READM
 | Search ranking | Exact and prefix matches on names and ids first, instant. When they find little, meaning-based matches fill in (vector index where the graph database has one), labelled *related*. Beyond that, *Ask the assistant* |
 | Roles per Graph | Viewer (ask, read) · Contributor (projects, observations, schedules) · Builder (agents, skills, evals) · Modeller (models, publish, rules, guardrails) · Owner (members, settings, approving breaking changes). A person may hold several; private projects add their own people on top |
 | Without the role | The product opens read-only: actions show disabled with the reason and who can do it. A product a role cannot even read is hidden from the launcher |
-| First run | A new install asks *what are you trying to decide?* and offers three paths: connect a graph database (Modeller drafts a model) · start from data (Datasets) · try a sample Graph (airways or chickpea, read-only, with a starter project). Every empty state links to the step that unlocks it; the set-up checklist tracks progress |
+| First run | A new install asks *what are you trying to decide?* and offers three paths: connect a graph database (Modeller drafts a model) · start from data (Datasets) · try a sample Graph (airways or arabidopsis, read-only, with a starter project). Every empty state links to the step that unlocks it; the set-up checklist tracks progress |
 | Runs keep their origin | A run page opened from Agents keeps the Agents wordmark; there is no “Activity” product |
 
 ## Not building

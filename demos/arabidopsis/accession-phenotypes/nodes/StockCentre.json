@@ -1,0 +1,18 @@
+[
+  {
+    "id": "S-ABRC",
+    "properties": {
+      "name": "ABRC",
+      "city": "Columbus",
+      "country": "US"
+    }
+  },
+  {
+    "id": "S-NASC",
+    "properties": {
+      "name": "NASC",
+      "city": "Nottingham",
+      "country": "GB"
+    }
+  }
+]

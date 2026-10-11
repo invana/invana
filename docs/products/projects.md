@@ -1,6 +1,6 @@
 # Invana Projects — pursue and decide
 
-For anyone on a quest: a scientist validating a hypothesis, a government testing a policy, an investor testing a thesis, a marketer testing a position. Prototype page: *Invana Projects › Pursue and decide*. Examples: a chickpea crossing quest (Research), a support-price change (Policy), a futures position (Investment).
+For anyone on a quest: a scientist validating a hypothesis, a government testing a policy, an investor testing a thesis, a marketer testing a position. Prototype page: *Invana Projects › Pursue and decide*. Examples: an Arabidopsis flowering-time quest (Research), allowing gene-edited lines in field trials (Policy), a futures position (Investment).
 
 | | |
 |---|---|

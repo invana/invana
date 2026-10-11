@@ -1,0 +1,106 @@
+[
+  {
+    "id": "A-Col-0",
+    "properties": {
+      "name": "Col-0",
+      "stock_id": "CS76778",
+      "country": "US",
+      "habit": "rapid cycling",
+      "days_to_flowering": 28,
+      "rosette_leaf_number": 12,
+      "drought_survival_pct": 35.0,
+      "delta13c": -30.1
+    }
+  },
+  {
+    "id": "A-Ler-1",
+    "properties": {
+      "name": "Ler-1",
+      "stock_id": "CS76164",
+      "country": "DE",
+      "habit": "rapid cycling",
+      "days_to_flowering": 24,
+      "rosette_leaf_number": 9,
+      "drought_survival_pct": 30.0,
+      "delta13c": -30.6
+    }
+  },
+  {
+    "id": "A-Cvi-0",
+    "properties": {
+      "name": "Cvi-0",
+      "stock_id": "CS76116",
+      "country": "CV",
+      "habit": "rapid cycling",
+      "days_to_flowering": 32,
+      "rosette_leaf_number": 14,
+      "drought_survival_pct": 62.0,
+      "delta13c": -28.4
+    }
+  },
+  {
+    "id": "A-C24",
+    "properties": {
+      "name": "C24",
+      "stock_id": "CS76106",
+      "country": "PT",
+      "habit": "rapid cycling",
+      "days_to_flowering": 41,
+      "rosette_leaf_number": 18,
+      "drought_survival_pct": 55.0,
+      "delta13c": -28.9
+    }
+  },
+  {
+    "id": "A-Sha",
+    "properties": {
+      "name": "Sha",
+      "stock_id": "CS76227",
+      "country": "TJ",
+      "habit": "rapid cycling",
+      "days_to_flowering": 30,
+      "rosette_leaf_number": 13,
+      "drought_survival_pct": 48.0,
+      "delta13c": -29.2
+    }
+  },
+  {
+    "id": "A-Bur-0",
+    "properties": {
+      "name": "Bur-0",
+      "stock_id": "CS76105",
+      "country": "IE",
+      "habit": "winter annual",
+      "days_to_flowering": 96,
+      "rosette_leaf_number": 52,
+      "drought_survival_pct": 40.0,
+      "delta13c": -29.8
+    }
+  },
+  {
+    "id": "A-Kas-1",
+    "properties": {
+      "name": "Kas-1",
+      "stock_id": "CS76150",
+      "country": "IN",
+      "habit": "winter annual",
+      "days_to_flowering": 112,
+      "rosette_leaf_number": 61,
+      "drought_survival_pct": 58.0,
+      "delta13c": -28.1
+    }
+  },
+  {
+    "id": "A-Van-0",
+    "properties": {
+      "name": "Van-0",
+      "stock_id": "CS76297",
+      "country": "CA",
+      "habit": "rapid cycling",
+      "days_to_flowering": 36,
+      "rosette_leaf_number": 15,
+      "drought_survival_pct": 33.0,
+      "delta13c": -30.3
+    }
+  }
+]

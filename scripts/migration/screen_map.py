@@ -7,8 +7,8 @@ says how to reach a board that is not simply its route's landing view — the ta
 selection, theme or data it needs, and the engine session a board waits on. It lives in
 ``STATE`` below, so regenerating never loses it.
 
-Data: ``/u/admin/airways`` is demos/airways; ``/u/admin/chickpea`` and the variety-attributes
-dataset are demos/chickpea (``demos/chickpea/load.py``). A route segment that stands for an
+Data: ``/u/admin/airways`` is demos/airways; ``/u/admin/arabidopsis`` and the accession-phenotypes
+dataset are demos/arabidopsis (``demos/arabidopsis/load.py``). A route segment that stands for an
 id (``15``, ``routes-out-of-lhr``, ``analyst``, ``answer-nl``) is named in its board's state.
 
 Exits non-zero when a board has no route, or is a variant with no state.
@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "docs" / "products"
 G = "/u/admin/airways"
-CK = "/u/admin/chickpea"
+AR = "/u/admin/arabidopsis"
 ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.login", "/login"), ("shell.graphs", "/graphs"), ("shell.first_run", "/graphs?first-run"),
     ("shell.profile", "/settings/profile"), ("shell.runs", f"{G}/activity/runs"), ("shell.run", f"{G}/activity/runs/15"),
@@ -33,16 +33,16 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("shell", f"{G}/explorer"),
     ("datasets.catalogue", "/datasets/catalogue"), ("datasets.validation", "/datasets/validation"),
     ("datasets.standard", "/datasets/standards"), ("datasets.imports", "/datasets/imports"),
-    ("datasets", "/datasets/catalogue/variety-attributes"),
+    ("datasets", "/datasets/catalogue/accession-phenotypes"),
     ("modeller.global_model", f"{G}/modeller/global-model"), ("modeller.models", f"{G}/modeller/models"),
-    ("modeller.model.type.constraint", f"{CK}/modeller/models/chickpea/variety"), ("modeller.model.history", f"{CK}/modeller/models/chickpea?tab=history"),
+    ("modeller.model.type.constraint", f"{AR}/modeller/models/arabidopsis/accession"), ("modeller.model.history", f"{AR}/modeller/models/arabidopsis?tab=history"),
     ("modeller.model", f"{G}/modeller/models/airroutes"), ("modeller.stitches", f"{G}/modeller/stitches"),
     ("modeller.worlds", f"{G}/modeller/worlds"), ("modeller.guardrails", f"{G}/modeller/guardrails"),
     ("modeller.rules", f"{G}/modeller/rules"), ("modeller.requests", f"{G}/modeller/requests"),
     ("modeller.settings", f"{G}/modeller/settings"), ("modeller.connect", "/graphs/new"), ("modeller.draft", f"{G}/modeller/models/airroutes?draft"),
     ("explorer.sessions", f"{G}/explorer?history"), ("explorer.home", f"{G}/explorer"), ("explorer", f"{G}/explorer/routes-out-of-lhr"),
-    ("projects.list", f"{CK}/projects"), ("projects.new", f"{CK}/projects"), ("projects.todo", f"{CK}/projects/todos"), ("projects.decisions", f"{CK}/projects/decisions"),
-    ("projects.impact", f"{CK}/projects/support-price"), ("projects", f"{CK}/projects/drought-tolerant-chickpea"),
+    ("projects.list", f"{AR}/projects"), ("projects.new", f"{AR}/projects"), ("projects.todo", f"{AR}/projects/todos"), ("projects.decisions", f"{AR}/projects/decisions"),
+    ("projects.impact", f"{AR}/projects/gene-edited-field-trials"), ("projects", f"{AR}/projects/early-flowering-under-drought"),
     ("agents.overview", f"{G}/agents"), ("agents.agents", f"{G}/agents/agents"), ("agents.agent", f"{G}/agents/agents/analyst"),
     ("agents.skills.detail", f"{G}/agents/skills/answer-nl"), ("agents.skills", f"{G}/agents/skills"),
     ("agents.library", f"{G}/agents/library"), ("agents.plugins", f"{G}/agents/plugins"), ("agents.llms", f"{G}/agents/llms"),
@@ -53,14 +53,14 @@ ROUTES = [  # first match wins: (board prefix, route template)
 RUN = "15 stands for a run id: Activity › Runs, open the newest succeeded run"
 SESSION = "routes-out-of-lhr stands for a session id: ask “Which routes out of LHR grew last quarter?”"
 DARK = "theme dark: user menu › Appearance › Dark"
-DATASET = "dataset variety-attributes (chickpea; needs B03)"
-BRANCH = "on branch H2.1 · ICC 4958 × KAK 2 (needs B05)"
+DATASET = "dataset accession-phenotypes (arabidopsis; needs B03)"
+BRANCH = "on branch H1.1 · …via lower FLC (needs B05)"
 AGENT = "analyst stands for an agent's slug: open any agent from Agents"
 SKILL = "answer-nl stands for a skill's slug: open any skill from Skills"
 STATE = {  # board → how to reach it from its route; a board absent here is its route's landing view
     "shell.onboarding": "a Graph whose set-up is not finished: the set-up checklist open",
     "shell.launcher.open": "click the product launcher in the header",
-    "shell.breadcrumbs.overflow": f"open a finding {BRANCH}: /u/admin/chickpea/projects/drought-tolerant-chickpea › H2.1 › a finding",
+    "shell.breadcrumbs.overflow": f"open a finding {BRANCH}: /u/admin/arabidopsis/projects/early-flowering-under-drought › H1.1 › a finding",
     "shell.command_palette": "press ⌘K",
     "shell.user_menu": "open the user menu, header right",
     "shell.runs": "open the kind, status and product filters",
@@ -87,21 +87,21 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "datasets.dataset.provenance": f"{DATASET}; Provenance tab",
     "datasets.dataset.versions": f"{DATASET}; Versions tab",
     "datasets.dataset.used": f"{DATASET}; Used by tab",
-    "datasets.record": f"{DATASET}; click JG 11 in the preview",
+    "datasets.record": f"{DATASET}; click Col-0 in the preview",
     "datasets.observe": f"{DATASET}; Add observations",
     "datasets.observe.assistant": f"{DATASET}; Add observations › tell the assistant",
     "datasets.collect": "Catalogue › Collect with an agent (needs B06b)",
     "datasets.collect.run": "a collection while it runs (needs B06b)",
-    "datasets.validation.item": "click JG 11 · maturity days",
-    "datasets.standard": "click Crop Ontology · Chickpea (CO_338) (needs B04)",
+    "datasets.validation.item": "click Col-0 · days to flowering (needs B03)",
+    "datasets.standard": "click Plant Trait Ontology (TO) (needs B04)",
     "datasets.standard.attach": "on a standard, Attach to a dataset (needs B04)",
     "datasets.dataset.conformance": f"{DATASET}; Conformance tab (needs B04)",
     "datasets.documents": "a documents dataset (needs B03)",
-    "datasets.bind": f"{DATASET}; Bind to a Graph › chickpea",
+    "datasets.bind": f"{DATASET}; Bind to a Graph › arabidopsis",
     "datasets.share": f"{DATASET}; Share",
     "datasets.dataset.retracted": f"{DATASET}; a version marked retracted",
     "datasets.standards.import": "Import › From SKOS (needs B12)",
-    "datasets.imports.run": "click an import while it runs: re-run demos/chickpea/load.py and open its run",
+    "datasets.imports.run": "click an import while it runs: re-run demos/arabidopsis/load.py and open its run",
     "modeller.global_model.dark": DARK,
     "modeller.model.type": "click node type airport",
     "modeller.global_model.stitch": "click a dashed stitch on the board",
@@ -119,7 +119,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "modeller.models.performance": "Performance tab",
     "modeller.models.growth": "Growth tab",
     "modeller.models.report": "open a saved report",
-    "modeller.model.type.constraint": "Constraints tab; click maturity_days",
+    "modeller.model.type.constraint": "Constraints tab; click days_to_flowering",
     "modeller.model.history": "one version until B01 records more",
     "modeller.worlds.board": "click a world",
     "modeller.guardrails.request": "a request from Explorer that meets a guardrail: open it",
@@ -150,16 +150,16 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "explorer.answer.console": f"{SESSION}; open the Console",
     "projects.new": "Projects › New project",
     "projects.project.branches": "Branches tab (needs B05)",
-    "projects.branch.fork": "Branches tab › Fork a branch on H2 (needs B05)",
+    "projects.branch.fork": "Branches tab › Fork a branch on H1 (needs B05)",
     "projects.branch": BRANCH,
-    "projects.finding": f"{BRANCH}; click “ICC 4958 carries the root-depth QTL”",
+    "projects.finding": f"{BRANCH}; click “Col-0 carries a loss-of-function FRI allele”",
     "projects.branch.decide": f"{BRANCH}; Decide",
     "projects.branch.merge": f"{BRANCH}; Merge…",
     "projects.simulate": "on branch H2, Simulate crosses (needs B09)",
     "projects.simulate.result": "on branch H2, Simulate crosses › Run 4 crosses (needs B09)",
     "projects.impact": "Impact tab (needs B05)",
     "projects.lineage": "Lineage tab (needs B05)",
-    "projects.todo": "click “Measure 100-seed weight on plots 11–18”",
+    "projects.todo": "click “Score days to flowering on trays 11–18”",
     "projects.decisions": "needs B05 for its rows",
     "projects.report": "Report tab (needs B05)",
     "agents.overview.dark": DARK,

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "X-Col-0xCvi-0",
+    "properties": {
+      "cross_id": "Col-0 × Cvi-0",
+      "name": "Col-0 × Cvi-0",
+      "status": "made",
+      "generation": "RIL"
+    }
+  },
+  {
+    "id": "X-Ler-1xSha",
+    "properties": {
+      "cross_id": "Ler-1 × Sha",
+      "name": "Ler-1 × Sha",
+      "status": "made",
+      "generation": "F2"
+    }
+  },
+  {
+    "id": "X-C24xCol-0",
+    "properties": {
+      "cross_id": "C24 × Col-0",
+      "name": "C24 × Col-0",
+      "status": "made",
+      "generation": "F1"
+    }
+  },
+  {
+    "id": "X-Bur-0xCol-0",
+    "properties": {
+      "cross_id": "Bur-0 × Col-0",
+      "name": "Bur-0 × Col-0",
+      "status": "proposed",
+      "generation": "F1"
+    }
+  },
+  {
+    "id": "X-Kas-1xLer-1",
+    "properties": {
+      "cross_id": "Kas-1 × Ler-1",
+      "name": "Kas-1 × Ler-1",
+      "status": "parked",
+      "generation": "F1"
+    }
+  }
+]

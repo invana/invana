@@ -1,0 +1,41 @@
+[
+  {
+    "id": "T-DTF",
+    "properties": {
+      "name": "Days to flowering",
+      "term_id": "TO:0000344",
+      "unit": "days"
+    }
+  },
+  {
+    "id": "T-RLN",
+    "properties": {
+      "name": "Rosette leaf number",
+      "term_id": "TO:0000391",
+      "unit": "count"
+    }
+  },
+  {
+    "id": "T-DS",
+    "properties": {
+      "name": "Drought survival",
+      "term_id": "TO:0000276",
+      "unit": "%"
+    }
+  },
+  {
+    "id": "T-D13C",
+    "properties": {
+      "name": "δ13C",
+      "unit": "‰"
+    }
+  },
+  {
+    "id": "T-DORM",
+    "properties": {
+      "name": "Seed dormancy",
+      "term_id": "TO:0000253",
+      "unit": "days"
+    }
+  }
+]

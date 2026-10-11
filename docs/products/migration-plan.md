@@ -166,10 +166,10 @@ Each product package default-exports one object. The app passes the list to the 
 | Graph home | `/graphs` | unchanged |
 | Explorer | `/u/:user/:graph/explorer[/:session]` | `/u/admin/airways/explorer` |
 | Modeller | `/u/:user/:graph/modeller/<section>[/:id]` | `/u/admin/airways/modeller/models/airroutes` |
-| Projects | `/u/:user/:graph/projects/<section>[/:id[/branches/:b]]` | `/u/admin/chickpea/projects/dtc/branches/h2-1` |
+| Projects | `/u/:user/:graph/projects/<section>[/:id[/branches/:b]]` | `/u/admin/arabidopsis/projects/early-flowering-under-drought/branches/h1-1` |
 | Agents | `/u/:user/:graph/agents/<section>[/:id]` | `/u/admin/airways/agents/skills/answer-nl` |
 | Activity | `/u/:user/:graph/activity/<tab>[/:id]` | `/u/admin/airways/activity/runs/15` |
-| Datasets | `/datasets/<section>[/:id]` | `/datasets/catalogue/variety-attributes` (install scope, no Graph) |
+| Datasets | `/datasets/<section>[/:id]` | `/datasets/catalogue/accession-phenotypes` (install scope, no Graph) |
 
 - The Graph root `/u/:user/:graph` redirects to the user’s last product, else Explorer.
 - Tabs inside a page are `?tab=`, not a path level — matching the breadcrumb rule.

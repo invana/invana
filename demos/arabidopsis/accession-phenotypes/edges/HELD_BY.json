@@ -1,0 +1,42 @@
+[
+  {
+    "from": "A-Col-0",
+    "to": "S-ABRC"
+  },
+  {
+    "from": "A-Ler-1",
+    "to": "S-ABRC"
+  },
+  {
+    "from": "A-Cvi-0",
+    "to": "S-ABRC"
+  },
+  {
+    "from": "A-C24",
+    "to": "S-ABRC"
+  },
+  {
+    "from": "A-Van-0",
+    "to": "S-ABRC"
+  },
+  {
+    "from": "A-Col-0",
+    "to": "S-NASC"
+  },
+  {
+    "from": "A-Sha",
+    "to": "S-NASC"
+  },
+  {
+    "from": "A-Bur-0",
+    "to": "S-NASC"
+  },
+  {
+    "from": "A-Kas-1",
+    "to": "S-NASC"
+  },
+  {
+    "from": "A-C24",
+    "to": "S-NASC"
+  }
+]

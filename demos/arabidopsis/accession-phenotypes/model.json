@@ -1,6 +1,11 @@
 {
   "nodes": {
-    "Variety": {
+    "Accession": {
+      "identity": [
+        "name"
+      ]
+    },
+    "StockCentre": {
       "identity": [
         "name"
       ]
@@ -15,24 +20,29 @@
         "name"
       ]
     },
-    "Pedigree": {
+    "Gene": {
+      "identity": [
+        "name"
+      ]
+    },
+    "Cross": {
       "identity": [
         "cross_id"
       ]
     }
   },
   "edges": {
-    "DEVELOPED_BY": {
+    "HELD_BY": {
       "from": [
-        "Variety"
+        "Accession"
       ],
       "to": [
-        "Institute"
+        "StockCentre"
       ]
     },
-    "CONSERVED_BY": {
+    "SEQUENCED_BY": {
       "from": [
-        "Variety"
+        "Accession"
       ],
       "to": [
         "Institute"
@@ -40,7 +50,23 @@
     },
     "NOTED_FOR": {
       "from": [
-        "Variety"
+        "Accession"
+      ],
+      "to": [
+        "Trait"
+      ]
+    },
+    "CARRIES": {
+      "from": [
+        "Accession"
+      ],
+      "to": [
+        "Gene"
+      ]
+    },
+    "AFFECTS": {
+      "from": [
+        "Gene"
       ],
       "to": [
         "Trait"
@@ -48,18 +74,18 @@
     },
     "FEMALE_PARENT": {
       "from": [
-        "Pedigree"
+        "Cross"
       ],
       "to": [
-        "Variety"
+        "Accession"
       ]
     },
     "MALE_PARENT": {
       "from": [
-        "Pedigree"
+        "Cross"
       ],
       "to": [
-        "Variety"
+        "Accession"
       ]
     }
   }

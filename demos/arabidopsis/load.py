@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Load the chickpea demo into one Graph, against one graph database, and nothing else.
+"""Load the Arabidopsis demo into one Graph, against one graph database, and nothing else.
 
 The airways walkthrough has two Studio visits — New Graph and Publish — because neither
 has a CLI. This script does those two through the engine's own managers, and everything
@@ -16,8 +16,8 @@ The URI is stored on the Graph, so give one the engine can reach. ``host.docker.
 reaches the host from a container and, with Docker Desktop, from the host too — one URI
 then serves a host CLI and a Dockerised engine alike:
 
-    uv run --project engine --extra all python demos/chickpea/load.py \\
-        --graph admin/chickpea --uri bolt://host.docker.internal:37687 \\
+    uv run --project engine --extra all python demos/arabidopsis/load.py \\
+        --graph admin/arabidopsis --uri bolt://host.docker.internal:37688 \\
         --db-user neo4j --db-password <secret>
 
 Safe to re-run: the Graph, the model and the projects are created only when absent, and
@@ -37,8 +37,8 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 HERE = Path(__file__).resolve().parent
-DATASET = "variety-attributes"
-MODEL = "Chickpea"
+DATASET = "accession-phenotypes"
+MODEL = "Arabidopsis"
 CONNECTOR = "invana_neo4j.connector.Neo4jConnector"
 # One machine, three spellings: the host, and the host as a container sees it.
 LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "host.docker.internal"}
@@ -99,7 +99,7 @@ async def prepare_graph(opts: argparse.Namespace) -> None:
             for other in await connections.list_all(session):
                 if (graph is None or other.graph_id != graph.id) and server_of(other.uri, other.database) == target:
                     raise Refused(
-                        f"{opts.uri} is already the database of another Graph. Point the chickpea Graph at its own "
+                        f"{opts.uri} is already the database of another Graph. Point the Arabidopsis Graph at its own "
                         "database — sharing one mixes both Graphs' records."
                     )
 
@@ -233,8 +233,8 @@ async def seed_work(graph_ref: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    parser.add_argument("--graph", required=True, help="<username>/<slug>, e.g. admin/chickpea")
-    parser.add_argument("--uri", required=True, help="The graph database this Graph owns, e.g. bolt://localhost:37687")
+    parser.add_argument("--graph", required=True, help="<username>/<slug>, e.g. admin/arabidopsis")
+    parser.add_argument("--uri", required=True, help="The graph database this Graph owns, e.g. bolt://localhost:37688")
     parser.add_argument("--database", default=None, help="Database on that server (default: the server's own)")
     parser.add_argument("--connector", default=CONNECTOR, help=f"Connector class (default: {CONNECTOR})")
     parser.add_argument("--db-user", default=None)

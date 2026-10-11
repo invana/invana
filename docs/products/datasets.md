@@ -1,6 +1,6 @@
 # Invana Datasets — gather the data
 
-Reusable knowledge, labelled by where it came from. Prototype page: *Invana Datasets › Gather the data*. Example: a chickpea breeder’s variety data.
+Reusable knowledge, labelled by where it came from. Prototype page: *Invana Datasets › Gather the data*. Example: a plant-genetics lab’s Arabidopsis accession phenotypes.
 
 | | |
 |---|---|
@@ -63,7 +63,7 @@ Reusable knowledge, labelled by where it came from. Prototype page: *Invana Data
 
 | Origin | Example | Who is the author |
 |---|---|---|
-| `official` | UniProt, a genebank, a national variety release list | the publishing organisation |
+| `official` | UniProt, a stock centre, the 1001 Genomes project | the publishing organisation |
 | `collected` | rows gathered from web pages by an agent | each page’s author; the agent is *collected by* |
 | `generated` | AI-filled gaps, synthetic rows | the agent and its run |
 | `observed` | a researcher’s field measurements | the person |
@@ -93,7 +93,7 @@ Reusable knowledge, labelled by where it came from. Prototype page: *Invana Data
 | Rule | Modeller › Rules | publish, share, findings, decisions | block · warn · report |
 
 - A range used once is a constraint; a range or vocabulary many datasets share is a standard.
-- Packs Invana ships: Crop Ontology (CO_338), MIAPPE, Darwin Core, ISO 3166, IAB Content Taxonomy. Labs author their own.
+- Packs Invana ships: Plant Trait Ontology (TO), MIAPPE, Darwin Core, ISO 3166, IAB Content Taxonomy. Labs author their own.
 
 ## CLI
 

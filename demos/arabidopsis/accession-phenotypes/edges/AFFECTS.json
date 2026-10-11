@@ -1,0 +1,26 @@
+[
+  {
+    "from": "G-FLC",
+    "to": "T-DTF"
+  },
+  {
+    "from": "G-FRI",
+    "to": "T-DTF"
+  },
+  {
+    "from": "G-FT",
+    "to": "T-DTF"
+  },
+  {
+    "from": "G-FLC",
+    "to": "T-RLN"
+  },
+  {
+    "from": "G-DOG1",
+    "to": "T-DORM"
+  },
+  {
+    "from": "G-DOG1",
+    "to": "T-DS"
+  }
+]
