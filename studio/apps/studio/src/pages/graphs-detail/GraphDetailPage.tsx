@@ -27,7 +27,6 @@ import { leftSection } from "@/pages/graphs-detail/shell/leftSectionContent";
 import { rightSection } from "@/pages/graphs-detail/shell/rightSections";
 import { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 import { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
-import { useLegacySessionsLink } from "@/pages/graphs-detail/shell/useLegacySessionsLink";
 import { useModelsPage } from "@/pages/graphs-detail/shell/useModelsPage";
 import { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
 import { useOpenPages } from "@/pages/graphs-detail/shell/useOpenPages";
@@ -111,9 +110,6 @@ export function GraphDetailPage() {
 	// `&step=` — the task open inside the focused run page.
 	const runStep = useRunStep().stepId;
 
-	// Which model the Model panel has open, and which of its types is selected —
-	// the selection drives the form that spans the main column (model-editor.md).
-	useLegacySessionsLink(settingsPanel);
 	// The attachment is the canvas selection until someone takes it off — asked
 	// without it, and the thread records that.
 	const [attachmentDetached, setAttachmentDetached] = useState(false);

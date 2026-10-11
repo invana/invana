@@ -8,6 +8,10 @@ const GRAPH = "/u/admin/airways";
 const WORLD = "EU · H1 2026";
 const GUARDRAIL = "Airways guardrails";
 
+/** The world drilled into — the segment after `/modeller/worlds/`, or null. */
+const worldInPath = (url: string) =>
+	new URL(url).pathname.match(/\/modeller\/worlds\/([^/]+)$/)?.[1] ?? null;
+
 test("WO15 — drilling into a world opens a board named for the world", async ({
 	page,
 }) => {
@@ -22,7 +26,7 @@ test("WO15 — drilling into a world opens a board named for the world", async (
 
 	// **The drill-in survives the board opening.** The two are two keys of one
 	// URL, and the drawer header still reads `WORLDS / EU · H1 2026`.
-	expect(new URL(page.url()).searchParams.get("world")).toBeTruthy();
+	expect(worldInPath(page.url())).toBeTruthy();
 	// The drilled header — `WORLDS / EU · H1 2026`. (The kit's icon-only header
 	// actions carry no accessible name, so `‹ Back` is not locatable by role.)
 	await expect(page.getByText(WORLD).first()).toBeVisible();
@@ -63,7 +67,7 @@ test("WO15 — a cold link with a drill-in arrives with its board open", async (
 	await expect(page.getByText("The record", { exact: true })).toBeVisible({
 		timeout: 20_000,
 	});
-	const lensId = new URL(page.url()).searchParams.get("world");
+	const lensId = worldInPath(page.url());
 
 	// The drill-in alone — no `?page=`. The board is opened by what is drilled
 	// into, so a shared link lands on both.
@@ -102,10 +106,9 @@ test("WO16 — Edit puts the section back on the lens, drilled in", async ({
 	await page.getByRole("button", { name: "Edit", exact: true }).click();
 
 	const url = new URL(page.url());
-	expect(url.searchParams.get("panel")).toBe("govern");
-	expect(url.searchParams.get("section")).toBe("worlds");
+	expect(worldInPath(page.url())).toBeTruthy();
+	expect(url.searchParams.has("panel")).toBe(false);
 	expect(url.searchParams.has("drawer")).toBe(false);
-	expect(url.searchParams.get("world")).toBeTruthy();
 });
 
 test("spec.json — the board can show the document it is", async ({ page }) => {

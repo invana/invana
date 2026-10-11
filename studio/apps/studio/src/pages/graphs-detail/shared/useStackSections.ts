@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { usePageParams } from "./usePageParams";
 
 // A **stacked panel** says which section holds the column's height through
 // `?section=`, and what is drilled into through one key per record
@@ -64,7 +64,7 @@ export function useStackSections<D extends string>({
 	sectionKeys,
 	detailParam,
 }: StackSectionsSpec<D>): StackSections<D> {
-	const [params, setParams] = useSearchParams();
+	const [params, setParams] = usePageParams();
 
 	// The first section leads: in a stack each section is the definition of the one
 	// above it, so the top one is the question a person arrives with (§3a).

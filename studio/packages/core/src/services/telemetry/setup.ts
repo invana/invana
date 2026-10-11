@@ -144,11 +144,7 @@ function setupMetrics(resource: ReturnType<typeof studioResource>): void {
 	const report =
 		(name: WebVital) =>
 		({ value }: { value: number }) =>
-			recordWebVital(
-				name,
-				value,
-				moduleOf(window.location.pathname, window.location.search),
-			);
+			recordWebVital(name, value, moduleOf(window.location.pathname));
 	onLCP(report("lcp"));
 	onINP(report("inp"));
 	onCLS(report("cls"));

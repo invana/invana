@@ -1,9 +1,12 @@
 import { useCallback, useSyncExternalStore } from "react";
-import { useSearchParams } from "react-router-dom";
+import { usePageParams } from "./usePageParams";
 import { LEGACY_SECTION_PARAM, SECTION_PARAM } from "./useStackSections";
 
-// The left panel is a single-open accordion driven by one `?panel` param.
-// **No value means no left column.** `explorer` is a key like every other, so
+// The left panel is a single-open accordion driven by one `panel` param. The
+// URL spells it as a path — `/u/:user/:graph/agents/llms` — and `usePageParams`
+// reads that path back as `panel` and its stack keys (`panelPaths`), so every
+// key below is described as a param even though the address bar shows a path.
+// **No value means no left column** — the Graph's own URL. `explorer` is a key like every other, so
 // the Explorer's type list closes the same way it opens; the resting page is a
 // canvas with the rail beside it and nothing docked.
 // Most values are the bottom-rail settings sections; the rest are page-owned
@@ -192,7 +195,7 @@ const setExpandedState = (v: boolean) => {
  * two keys never disagree about which panel is open.
  */
 export function useLeftSection() {
-	const [params, setParams] = useSearchParams();
+	const [params, setParams] = usePageParams();
 	const raw = params.get(PANEL_PARAM) ?? params.get(LEGACY_PANEL_PARAM);
 	const tab = params.get(TAB_PARAM);
 	const isOpen = raw !== null;

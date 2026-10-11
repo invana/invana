@@ -178,19 +178,27 @@ Each product package default-exports one object. The app passes the list to the 
 
 | `?panel=` | → |
 |---|---|
-| `info` · `connection` · `settings` | `modeller/settings` |
-| `explorer` · `canvases` · `sessions` · `messages` | `explorer` (sessions open in the chat history) |
-| `schema` · `model` | `modeller/global-model` |
+| `info` | `modeller/settings?tab=info` |
+| `connection` · `settings` | `modeller/settings` |
+| `explorer` · `canvases` · `layers` | `explorer` |
+| `sessions` · `messages` | `explorer?right=assistant` (sessions open in the chat history) |
+| `schema` · `model` · `links` | `modeller/global-model` |
 | `skills` | `agents/skills` |
-| `agents` (+ `agent`, `provider`) | `agents/agents[/:agent]` · `agents/llms` |
-| `library` (+ `plan`, `template`) | `agents/library[/:plan]` |
+| `agents` · `llms` (+ `agent`, `provider`) | `agents/agents[/:agent]` · `agents/llms[/:provider]` |
+| `library` (+ `plan`) | `agents/library[/:plan]` |
 | `library` + `entry` (a catalogue entry) | `agents/plugins/tasks/:key` |
+| `library` + `template` | `agents/templates[/:template]` |
 | `runs` (+ `run`) | `activity/runs[/:run]` |
 | `events` | `activity/events` |
 | `projects` (+ `project`, `todo`) | `projects[/:project]` · `projects/todos/:todo` |
 | `govern` (+ `world`, `guardrail`) | `modeller/worlds[/:world]` · `modeller/guardrails[/:guardrail]` |
-| legacy `?settings=` | as today, onto the same targets |
-| `/explorer` · `/modeller` paths | already redirect; repoint at the new targets |
+| legacy `?settings=` · `?drawer=` | as today, onto the same targets |
+| a product root — `modeller` · `agents` · `activity` · `agents/plugins` | its first section |
+| any other value | the Graph root, key dropped |
+
+- Until a panel's product moves, its path renders the graph page with that panel open. One table in Studio, `panelPaths.ts`, converts both ways. The other page params (`?page=`, `?right=`, `?tab=`) stay in the query string.
+- The path holds the stack section that has the height and that section's drill-in. A drill-in held by another section stays in the query string.
+- The Graph root stays the graph page with nothing open. The redirect to the last product, else Explorer, lands with Explorer (A09): today `explorer` opens the type list, and the root does not.
 
 ## 6. Phases
 

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { usePageParams } from "@/pages/graphs-detail/shared/usePageParams";
 
 // **Runs takes no `?section=`** — it is a list, not a stack (graph-detail-page.md).
 // One journal of every TaskRun in the Graph, and the definitions a
@@ -21,7 +21,7 @@ const RUN_PARAM = "run";
  * - `openRun(id)` — drill in; `null` goes back to the journal.
  */
 export function useRunsViewPanel() {
-	const [params, setParams] = useSearchParams();
+	const [params, setParams] = usePageParams();
 	const runId = params.get(RUN_PARAM);
 
 	// The functional form of `setParams`, so the writer is **stable across

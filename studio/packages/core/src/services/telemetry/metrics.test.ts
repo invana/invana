@@ -35,10 +35,11 @@ describe("routeTemplate", () => {
 
 describe("moduleOf", () => {
 	it("names the module on a Graph's page, and anything else is other", () => {
-		expect(moduleOf("/u/ravi/airways", "?panel=library")).toBe("plans");
-		expect(moduleOf("/u/ravi/airways", "")).toBe("explorer");
+		expect(moduleOf("/u/ravi/airways/agents/library/nl-single")).toBe("plans");
+		expect(moduleOf("/u/ravi/airways/projects/todos/t1")).toBe("projects");
+		expect(moduleOf("/u/ravi/airways")).toBe("explorer");
 		expect(moduleOf("/somewhere/unknown")).toBe("other");
-		expect(moduleOf("/u/ravi/airways", "?panel=not-a-panel")).toBe("other");
+		expect(moduleOf("/u/ravi/airways/not-a-product")).toBe("other");
 	});
 });
 

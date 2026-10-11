@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
 import type { LensKind } from "@/pages/graphs-detail/features/lenses";
 import {
 	LEGACY_PANEL_PARAM,
@@ -7,6 +6,7 @@ import {
 	STACK_PARAMS,
 	TAB_PARAM,
 } from "@/pages/graphs-detail/shared/useLeftSection";
+import { usePageParams } from "@/pages/graphs-detail/shared/usePageParams";
 import {
 	SECTION_PARAM,
 	useStackSections,
@@ -54,7 +54,7 @@ export function useLensesViewPanel() {
 		sectionKeys: GOVERN_SECTION_KEYS,
 		detailParam: GOVERN_DETAIL_PARAM,
 	});
-	const [, setParams] = useSearchParams();
+	const [, setParams] = usePageParams();
 
 	// **`Edit` on a lens board, in one write**. The panel, the section and
 	// the drill-in are three keys and one act, and writing them as two calls

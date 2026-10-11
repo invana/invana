@@ -2,10 +2,10 @@ import { expect, test } from "@playwright/test";
 import { GRAPH } from "./explorer";
 
 /**
- * The graph's URL is the graph (graph-detail-page.md G15).
+ * Every panel has a path, under the product that will own it
+ * (migration-plan §5), and every old `?panel=` link lands on that path.
  *
- * `/explorer` and `/modeller` shipped and are bookmarked, so they redirect
- * rather than 404 — and they carry their query string across, which is the part
+ * A redirect carries the rest of the query string across, which is the part
  * worth a test: a bookmark is a URL *plus* its params, and a redirect that
  * drops them lands the reader on an empty state instead of the thing the link
  * was about.
@@ -13,51 +13,128 @@ import { GRAPH } from "./explorer";
 
 const slug = GRAPH.split("/").pop() as string;
 
+// Every `?panel=` value the graph page has read, and the path it lands on.
+const OLD_PANEL_LINKS: [string, string][] = [
+	["?panel=info", "/modeller/settings?tab=info"],
+	["?panel=connection", "/modeller/settings"],
+	["?panel=settings", "/modeller/settings"],
+	["?panel=explorer", "/explorer"],
+	["?panel=canvases", "/explorer"],
+	["?panel=layers", "/explorer"],
+	["?panel=sessions", "/explorer?right=assistant"],
+	["?panel=messages", "/explorer?right=assistant"],
+	["?panel=schema", "/modeller/global-model"],
+	["?panel=model", "/modeller/global-model"],
+	["?panel=links", "/modeller/global-model"],
+	["?panel=skills", "/agents/skills"],
+	["?panel=agents", "/agents/agents"],
+	["?panel=llms", "/agents/agents"],
+	["?panel=agents&section=llms&provider=p1", "/agents/llms/p1"],
+	["?panel=library", "/agents/library"],
+	["?panel=library&section=plans&plan=nl-single", "/agents/library/nl-single"],
+	["?panel=library&section=catalogue&entry=k1", "/agents/plugins/tasks/k1"],
+	["?panel=library&section=templates&template=t1", "/agents/templates/t1"],
+	["?panel=runs&run=r1", "/activity/runs/r1"],
+	["?panel=events", "/activity/events"],
+	["?panel=projects&project=p1", "/projects/p1"],
+	["?panel=projects&section=todos&todo=t1", "/projects/todos/t1"],
+	["?panel=govern&section=worlds&world=w1", "/modeller/worlds/w1"],
+	["?panel=govern&section=guardrails&guardrail=g1", "/modeller/guardrails/g1"],
+	["?settings=agents", "/agents/agents"],
+	["?panel=library&drawer=catalogue", "/agents/plugins/tasks"],
+];
+
 test("the graph's own URL renders the page", async ({ page }) => {
 	await page.goto(GRAPH);
 
-	// Still here — not bounced to a screen name.
+	// Still here — not bounced to a product.
 	await expect(page).toHaveURL(new RegExp(`${GRAPH}/?$`));
 
-	// `owner › graph`, and nothing after it: the graph names where you are, so
-	// there is no screen crumb to follow it. Scoped to the breadcrumb — Explorer
-	// is still one of the ten `leftNav` items (G2), and its panel is still
-	// labelled; what it is no longer is the name of the page.
+	// `owner › graph`, and nothing after it: nothing is open, so there is no
+	// level to follow the graph.
 	const crumbs = page.getByLabel("Breadcrumb");
 	await expect(crumbs.getByText(slug)).toBeVisible({ timeout: 30_000 });
 	await expect(crumbs.getByText("Explorer", { exact: true })).toHaveCount(0);
 });
 
-test("/explorer redirects to the graph and keeps its query string", async ({
+test("every old ?panel= link lands on its path", async ({ page }) => {
+	for (const [from, to] of OLD_PANEL_LINKS) {
+		await page.goto(`${GRAPH}${from}`);
+		await expect(page, from).toHaveURL(`${GRAPH}${to}`);
+	}
+});
+
+test("an old link keeps the rest of its query string", async ({ page }) => {
+	await page.goto(`${GRAPH}/explorer?panel=agents&right=assistant`);
+	await expect(page).toHaveURL(`${GRAPH}/agents/agents?right=assistant`);
+	await expect(page.getByRole("button", { name: "Ask mode" })).toBeVisible({
+		timeout: 30_000,
+	});
+});
+
+test("a product's root opens its first section", async ({ page }) => {
+	await page.goto(`${GRAPH}/modeller`);
+	await expect(page).toHaveURL(`${GRAPH}/modeller/global-model`);
+	await page.goto(`${GRAPH}/activity`);
+	await expect(page).toHaveURL(`${GRAPH}/activity/runs`);
+});
+
+test("the breadcrumbs are the path's levels, each a link up", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}/explorer?panel=agents`);
-	await expect(page).toHaveURL(`${GRAPH}?panel=agents`);
-});
-
-test("/modeller redirects to the graph's model panel", async ({ page }) => {
-	await page.goto(`${GRAPH}/modeller`);
-	await expect(page).toHaveURL(`${GRAPH}?panel=model`);
-});
-
-test("the open panel is the third crumb", async ({ page }) => {
-	await page.goto(`${GRAPH}?panel=model`);
-
-	// Verbatim from the URL (G16), after the two identifiers that precede it.
+	await page.goto(`${GRAPH}/activity/events`);
 	const crumbs = page.getByLabel("Breadcrumb");
-	await expect(crumbs.getByText("model", { exact: true })).toBeVisible({
+	await expect(crumbs.getByText("Events", { exact: true })).toBeVisible({
+		timeout: 30_000,
+	});
+	await crumbs.getByRole("link", { name: "Activity" }).click();
+	await expect(page).toHaveURL(`${GRAPH}/activity/runs`);
+});
+
+test("a trail deeper than four levels collapses its middle", async ({
+	page,
+}) => {
+	// graph › Agents › Plugins › Tasks › entry: the graph, `…`, the last two.
+	await page.goto(`${GRAPH}/agents/plugins/tasks/k1`);
+	const crumbs = page.getByLabel("Breadcrumb");
+	await expect(crumbs.getByText("k1", { exact: true })).toBeVisible({
+		timeout: 30_000,
+	});
+	await expect(crumbs.getByText("Plugins", { exact: true })).toHaveCount(0);
+	await crumbs.getByRole("button", { name: "Show hidden levels" }).click();
+	await page.getByRole("menuitem", { name: "Plugins" }).click();
+	await expect(page).toHaveURL(`${GRAPH}/agents/plugins/tasks`);
+});
+
+test("a reload on a path lands on the same screen", async ({ page }) => {
+	await page.goto(`${GRAPH}/modeller/settings?tab=info`);
+	const crumbs = page.getByLabel("Breadcrumb");
+	await expect(crumbs.getByText("Settings", { exact: true })).toBeVisible({
+		timeout: 30_000,
+	});
+	await expect(page.getByRole("tab", { name: "Info" })).toBeVisible();
+
+	await page.reload();
+	await expect(page).toHaveURL(`${GRAPH}/modeller/settings?tab=info`);
+	await expect(page.getByRole("tab", { name: "Info" })).toBeVisible({
 		timeout: 30_000,
 	});
 });
 
-test("a legacy ?settings link still opens its panel", async ({ page }) => {
-	// The param was renamed, not re-pointed: `?settings=` is read so a bookmark
-	// keeps working, and the crumb proves the panel actually opened.
-	await page.goto(`${GRAPH}?settings=agents`);
-	const crumbs = page.getByLabel("Breadcrumb");
-	await expect(crumbs.getByText("agents", { exact: true })).toBeVisible({
-		timeout: 30_000,
-	});
+test("a leftNav icon writes its path; the same icon closes it", async ({
+	page,
+}) => {
+	await page.goto(GRAPH);
+	// The icon's `aria-label` — the open panel's header is a `Runs` button too.
+	const runs = page.locator('button[aria-label="Runs"]');
+	await runs.click({ timeout: 30_000 });
+	await expect(page).toHaveURL(`${GRAPH}/activity/runs`);
+	// The address bar moves before the page renders; the crumb is that render.
+	await expect(
+		page.getByLabel("Breadcrumb").getByText("Runs", { exact: true }),
+	).toBeVisible({ timeout: 30_000 });
+	await runs.click();
+	await expect(page).toHaveURL(GRAPH);
 });
 
 test("?right= names who holds the right side", async ({ page }) => {
@@ -81,11 +158,11 @@ test("a legacy ?ai link opens the assistant", async ({ page }) => {
 });
 
 test("opening the assistant does not cost the open panel", async ({ page }) => {
-	// Two axes, two params (explore/spec.md E8): the left panel is `?panel=`,
-	// the right side is `?right=`, and neither write disturbs the other.
-	await page.goto(`${GRAPH}?panel=model&right=assistant`);
+	// Two axes: the left panel is the path, the right side is `?right=`, and
+	// neither write disturbs the other.
+	await page.goto(`${GRAPH}/modeller/global-model?right=assistant`);
 	const crumbs = page.getByLabel("Breadcrumb");
-	await expect(crumbs.getByText("model", { exact: true })).toBeVisible({
+	await expect(crumbs.getByText("Global model", { exact: true })).toBeVisible({
 		timeout: 30_000,
 	});
 	await expect(page.getByRole("button", { name: "Ask mode" })).toBeVisible();

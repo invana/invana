@@ -138,13 +138,10 @@ export function GraphDetail({
 	const leftNav = useGraphLeftNav();
 
 	// **No mode switch** (docs/for-developers/modules/explore/spec.md). The header is a breadcrumb naming the
-	// graph and the open panel; the view crumb follows the rail, so it answers
-	// "where am I?" without being a second way to navigate.
-	// `owner › graph › panel › object`. The panel crumb is the `?panel` value
-	// verbatim, so the breadcrumb is a literal reading of the URL — the two
-	// crumbs before it are identifiers too, the username and the slug.
+	// graph and the open panel; the levels after the graph come from the routes
+	// the panel's path matched (`products/legacyGraph`), so the breadcrumb is a
+	// reading of the URL: `owner › graph › Agents › LLMs › <provider> › object`.
 	const header = {
-		pageLabel: settingsPanel.isOpen ? settingsPanel.section : undefined,
 		objectLabel,
 		rightExtras: headerRightExtras,
 		// The onboarding cap is graph-scoped (setup.md): a Graph has onboarding,

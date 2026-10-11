@@ -10,7 +10,7 @@
  */
 import type { ProductDefinition, ProductId } from "@invana-studio/core";
 import { createContext, type ReactNode, useContext } from "react";
-import { type RouteObject, useMatches } from "react-router-dom";
+import { type Params, type RouteObject, useMatches } from "react-router-dom";
 
 /** What a route's `handle` may carry for the shell. */
 export interface ShellRouteHandle {
@@ -18,7 +18,8 @@ export interface ShellRouteHandle {
 	product?: ProductId;
 	/** The route draws every region itself; the shell adds no layout around it. */
 	ownsRegions?: boolean;
-	crumb?: string;
+	/** This route's level in the breadcrumbs: a label, or one read off the params. */
+	crumb?: string | ((params: Params) => string | undefined);
 }
 
 const ProductsContext = createContext<ProductDefinition[]>([]);
@@ -54,6 +55,19 @@ export function useActiveProduct(): ProductDefinition | undefined {
 		.filter(Boolean)
 		.at(-1);
 	return products.find((p) => p.id === id);
+}
+
+/**
+ * The open route's levels, outermost first — one per matched route whose
+ * handle names a `crumb`, each linking to the path that route matched. A
+ * tab is a query param, never a route, so switching tabs keeps the trail.
+ */
+export function useRouteCrumbs(): { label: string; to: string }[] {
+	return useMatches().flatMap((m) => {
+		const { crumb } = handleOf(m);
+		const label = typeof crumb === "function" ? crumb(m.params) : crumb;
+		return label ? [{ label, to: m.pathname }] : [];
+	});
 }
 
 /** Whether the open route draws its own regions. */

@@ -1,17 +1,22 @@
 import {
 	Breadcrumb,
+	BreadcrumbEllipsis,
 	BreadcrumbItem,
 	BreadcrumbLink,
 	BreadcrumbList,
 	BreadcrumbPage,
 	BreadcrumbSeparator,
 	cn,
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
 	Separator,
 } from "@invana/ui";
 import { useAuth } from "@invana-studio/core";
 import { Fragment, type ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useActiveProduct } from "../../products";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useActiveProduct, useRouteCrumbs } from "../../products";
 import { FullscreenToggle } from "../FullscreenToggle";
 import { GitHubStars } from "../GitHubStars";
 import { ThemeMenu } from "../ThemeMenu";
@@ -19,14 +24,13 @@ import { Launcher } from "./Launcher";
 import { UserMenu } from "./UserMenu";
 
 export interface AppHeaderOptions {
-	/** Last breadcrumb segment for the current page. Defaults to a label
-	 *  derived from the URL (Graphs, New graph, Profile, Settings). The graph
-	 *  page passes none: its URL is the graph (graph-detail-page.md), so
-	 *  `owner › graph` already names where you are. */
+	/** Replaces the levels after the lead. Defaults to the matched routes'
+	 *  crumbs on a Graph, and a label from the URL elsewhere (Graphs, New
+	 *  graph, Profile). */
 	pageLabel?: string;
 	/** The object open on this screen — the canvas, the model, the agent. Drawn
-	 *  as the last crumb: `owner › graph › Defence theme`. Omitted when the
-	 *  screen holds nothing yet. */
+	 *  as the last crumb: `owner › graph › Explorer › Defence theme`. Omitted
+	 *  when the screen holds nothing yet. */
 	objectLabel?: string;
 	/** The Graph picker slot, after the wordmark. */
 	graphPicker?: ReactNode;
@@ -53,10 +57,15 @@ export interface AppHeaderOptions {
  * open. Each slot is empty until a page or a later product fills it.
  *
  * Breadcrumb behaviour (after the wordmark):
- * - Graph-scoped (`/u/:username/:graphSlug`): `owner › graph`, plus `› object`
- *   when something is open on it.
+ * - Graph-scoped (`/u/:username/:graphSlug/…`): `owner › graph`, then one
+ *   level per matched route that names a `handle.crumb` — section › item ›
+ *   drill-in — then `› object` when something is open on it. Every level but
+ *   the last links to its path; a tab is a query param, so it is never a level.
  * - Otherwise: `@username / pageLabel` (e.g. `@ravi-merugu / Graphs`).
  * - If logged out, the leading user segment is dropped.
+ * - More than four levels (`owner › graph` counts as one) collapse to the
+ *   first · `…` · the last two; `…` opens a menu of the hidden levels.
+ * - A long name truncates; its full text is on hover.
  */
 export function useAppHeader(options: AppHeaderOptions = {}) {
 	const {
@@ -73,10 +82,11 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 	const { pathname } = useLocation();
 	const { user } = useAuth();
 	const product = useActiveProduct();
+	const routeCrumbs = useRouteCrumbs();
 
-	const segments = computeSegments(pathname, user?.username, pageLabel).concat(
-		objectLabel ? [{ label: objectLabel }] : [],
-	);
+	const trail = computeTrail(pathname, user?.username, pageLabel, routeCrumbs);
+	if (objectLabel) trail.levels.push({ label: objectLabel });
+	const hasTrail = trail.lead.length + trail.levels.length > 0;
 
 	return {
 		// `relative` makes the header bar a positioning context so a `center`
@@ -93,11 +103,11 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 				>
 					Invana {product?.name ?? "Studio"}
 				</Link>
-				{(segments.length > 0 || graphPicker) && (
+				{(hasTrail || graphPicker) && (
 					<Separator orientation="vertical" className="h-4" />
 				)}
 				{graphPicker}
-				{segments.length > 0 && <HeaderBreadcrumb segments={segments} />}
+				{hasTrail && <HeaderBreadcrumb trail={trail} />}
 			</div>
 		),
 		center,
@@ -126,11 +136,30 @@ interface Segment {
 	label: string;
 	/** Optional link target. Last segment is unlinked. */
 	to?: string;
-	/** Render in muted style? Default true; the last (current) segment is bolder. */
-	muted?: boolean;
 }
 
-function HeaderBreadcrumb({ segments }: { segments: Segment[] }) {
+/** `lead` names where the levels are — the Graph, or the signed-in user. */
+interface Trail {
+	lead: Segment[];
+	levels: Segment[];
+}
+
+/** Levels shown before the middle collapses, the lead counting as one. */
+const MAX_LEVELS = 4;
+
+const SEPARATOR_CLASS =
+	"shrink-0 text-muted-foreground/60 [&>svg]:h-3.5 [&>svg]:w-3.5";
+
+function HeaderBreadcrumb({ trail }: { trail: Trail }) {
+	const { lead, levels } = trail;
+	const levelCount = (lead.length > 0 ? 1 : 0) + levels.length;
+	const collapse = levelCount > MAX_LEVELS;
+	const hidden = collapse ? levels.slice(0, -2) : [];
+	const shown = collapse ? levels.slice(-2) : levels;
+	const segments = [...lead, ...shown];
+	// The `…` sits after the lead, before the last two levels.
+	const ellipsisAt = collapse ? lead.length : -1;
+
 	return (
 		<Breadcrumb className="min-w-0 font-semibold">
 			<BreadcrumbList className="flex-nowrap gap-1 sm:gap-1">
@@ -143,16 +172,23 @@ function HeaderBreadcrumb({ segments }: { segments: Segment[] }) {
 								i
 							}`}
 						>
-							{i > 0 && (
-								<BreadcrumbSeparator className="shrink-0 text-muted-foreground/60 [&>svg]:h-3.5 [&>svg]:w-3.5" />
+							{i === ellipsisAt && (
+								<>
+									<BreadcrumbSeparator className={SEPARATOR_CLASS} />
+									<HiddenLevels levels={hidden} />
+								</>
 							)}
+							{i > 0 && <BreadcrumbSeparator className={SEPARATOR_CLASS} />}
 							<BreadcrumbItem className="min-w-0">
 								{s.to && !isLast ? (
 									<BreadcrumbLink asChild className="truncate">
-										<Link to={s.to}>{s.label}</Link>
+										<Link to={s.to} title={s.label}>
+											{s.label}
+										</Link>
 									</BreadcrumbLink>
 								) : (
 									<BreadcrumbPage
+										title={s.label}
 										className={cn(
 											"truncate",
 											!isLast && "text-muted-foreground",
@@ -170,69 +206,67 @@ function HeaderBreadcrumb({ segments }: { segments: Segment[] }) {
 	);
 }
 
+/** The collapsed middle of a long trail: `…`, opening a menu of its levels. */
+function HiddenLevels({ levels }: { levels: Segment[] }) {
+	const navigate = useNavigate();
+	return (
+		<BreadcrumbItem>
+			<DropdownMenu>
+				<DropdownMenuTrigger aria-label="Show hidden levels">
+					<BreadcrumbEllipsis className="h-4 w-4" />
+				</DropdownMenuTrigger>
+				<DropdownMenuContent side="bottom" align="start">
+					{levels.map((level) => (
+						<DropdownMenuItem
+							key={`${level.to ?? ""}-${level.label}`}
+							onSelect={() => level.to && navigate(level.to)}
+						>
+							{level.label}
+						</DropdownMenuItem>
+					))}
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</BreadcrumbItem>
+	);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
-// Path → segments
+// Path → trail
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Derive the breadcrumb segments from the URL. The `pageLabel` arg overrides
- * the last segment when callers want something more specific than the URL
- * yields (e.g. "Settings · LLMs" instead of just "Settings").
+ * Derive the trail from the URL and the matched routes' crumbs. The
+ * `pageLabel` arg overrides the levels when callers want something more
+ * specific than the URL yields.
  */
-function computeSegments(
+function computeTrail(
 	pathname: string,
 	username: string | undefined,
-	override?: string,
-): Segment[] {
-	const graphMatch = pathname.match(/^\/u\/([^/]+)\/([^/]+)(?:\/(.+?))?\/?$/);
+	override: string | undefined,
+	routeCrumbs: Segment[],
+): Trail {
+	const graphMatch = pathname.match(/^\/u\/([^/]+)\/([^/]+)(?:\/.*)?$/);
 	if (graphMatch) {
-		const [, owner, graphSlug, rest] = graphMatch;
-		const graphRoot = `/u/${owner}/${graphSlug}`;
-		// `owner › graph › screen`. The owner and the graph are **not** dropped:
+		const [, owner, graphSlug] = graphMatch;
+		// `owner › graph › …`. The owner and the graph are **not** dropped:
 		// every graph-scoped screen is inside a graph, and a header that does not
 		// name it leaves the URL as the only way to tell which one you are in.
 		// This is what the hi-fi draws (`ExplorerHiFi`), and what both shell
 		// references draw — design-kit's `Themes/AppV2 › ExplorerShell` and
 		// canvas-ui's `apps/AppLayoutV2`.
-		const trail: Segment[] = [
-			{ label: owner, to: "/graphs" },
-			{ label: graphSlug, to: graphRoot },
-		];
-		return trail.concat(
-			override ? [{ label: override }] : graphRestSegments(rest, graphRoot),
-		);
+		return {
+			lead: [
+				{ label: owner, to: "/graphs" },
+				{ label: graphSlug, to: `/u/${owner}/${graphSlug}` },
+			],
+			levels: override ? [{ label: override }] : [...routeCrumbs],
+		};
 	}
 
 	// Non-graph routes (/graphs, /graphs/new, /settings/profile, /login, ...)
-	const segments: Segment[] = [];
-	if (username) {
-		segments.push({ label: `@${username}`, to: "/graphs" });
-	}
+	const lead = username ? [{ label: `@${username}`, to: "/graphs" }] : [];
 	const pageLabel = override ?? labelFromPlainPath(pathname);
-	if (pageLabel) {
-		segments.push({ label: pageLabel });
-	}
-	return segments;
-}
-
-/** Map the path tail under /u/:owner/:graphSlug to breadcrumb segments. */
-function graphRestSegments(
-	rest: string | undefined,
-	graphRoot: string,
-): Segment[] {
-	// The graph's own URL *is* the page (graph-detail-page.md), so a missing
-	// tail adds no third crumb — `owner › graph` already names where you are.
-	// The page passes a `pageLabel` override for what is open on it.
-	if (!rest) return [];
-	if (rest === "settings") return [{ label: "Settings" }];
-	const settingsSub = rest.match(/^settings\/(.+)$/);
-	if (settingsSub) {
-		return [
-			{ label: "Settings", to: `${graphRoot}/settings` },
-			{ label: capitalize(settingsSub[1]) },
-		];
-	}
-	return [{ label: capitalize(rest) }];
+	return { lead, levels: pageLabel ? [{ label: pageLabel }] : [] };
 }
 
 function labelFromPlainPath(pathname: string): string | undefined {
@@ -240,8 +274,4 @@ function labelFromPlainPath(pathname: string): string | undefined {
 	if (pathname === "/graphs/new") return "New graph";
 	if (pathname.startsWith("/settings/profile")) return "Profile";
 	return undefined;
-}
-
-function capitalize(s: string): string {
-	return s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
 }

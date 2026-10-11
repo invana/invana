@@ -141,7 +141,7 @@ function typeOf(error: unknown): string {
 /** The module on screen, or `other` where there is no page (a test, a worker). */
 function currentModule(): string {
 	if (typeof window === "undefined") return "other";
-	return moduleOf(window.location.pathname, window.location.search);
+	return moduleOf(window.location.pathname);
 }
 
 /**

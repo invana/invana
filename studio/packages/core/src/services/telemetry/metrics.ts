@@ -316,34 +316,40 @@ export function routeTemplate(url: string): string {
 	return `/${out.join("/")}`;
 }
 
-/** A Graph page's `?panel` value → the Studio module it opens. */
-const PANEL_MODULES: Record<string, string> = {
+/**
+ * A path under a Graph → the Studio module it opens. Keyed by the product
+ * segment, or by `product/section` where a product holds several modules.
+ */
+const PATH_MODULES: Record<string, string> = {
 	explorer: "explorer",
-	model: "model",
-	schema: "model",
-	runs: "runs",
-	library: "plans",
+	"modeller/global-model": "model",
+	"modeller/worlds": "govern",
+	"modeller/guardrails": "govern",
+	"agents/skills": "skills",
+	"agents/agents": "agents",
+	"agents/llms": "agents",
+	"agents/library": "plans",
+	"agents/plugins": "plans",
+	"agents/templates": "plans",
+	"activity/runs": "runs",
 	projects: "projects",
-	govern: "govern",
-	agents: "agents",
-	skills: "skills",
-	sessions: "assistant",
-	messages: "assistant",
 };
 
 /**
  * The Studio module on screen for a location — a bounded label for web vitals.
  *
- * On a Graph's page the open `?panel` names it, and with none the page is the
- * Explorer's canvas. Outside a Graph the first path segment names it. Anything
- * unrecognised is `other`, so the label set never grows with the URL.
+ * On a Graph the path after it names the module, and the Graph's own URL is
+ * the Explorer's canvas. Outside a Graph the first path segment names it.
+ * Anything unrecognised is `other`, so the label set never grows with the URL.
  */
-export function moduleOf(pathname: string, search = ""): string {
+export function moduleOf(pathname: string): string {
 	const segments = pathname.split("/").filter(Boolean);
 	if (segments[0] === "u" && segments.length >= 3) {
-		const panel = new URLSearchParams(search).get("panel");
-		if (!panel) return segments.length === 3 ? "explorer" : "other";
-		return PANEL_MODULES[panel] ?? "other";
+		const [product, section] = segments.slice(3);
+		if (!product) return "explorer";
+		return (
+			PATH_MODULES[`${product}/${section}`] ?? PATH_MODULES[product] ?? "other"
+		);
 	}
 	switch (segments[0]) {
 		case "graphs":
