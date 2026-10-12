@@ -55,7 +55,7 @@ os.environ.setdefault("E2E_GRAPH_PATH", "/u/admin/airways")
 # Tools a headless session may use. Widen deliberately; never `--dangerously-skip-permissions`
 # outside a disposable container (set INVANA_MIGRATION_SANDBOX=1 there).
 ALLOWED_TOOLS = [
-    "Read", "Edit", "Write", "Glob", "Grep",
+    "Read", "Edit", "Write", "Glob", "Grep", "Agent",
     "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(git mv *)", "Bash(git show *)",
     "Bash(pnpm *)", "Bash(node *)", "Bash(npx playwright *)",
     "Bash(uv run *)", "Bash(python3 *)", "Bash(make *)", "Bash(docker compose *)",

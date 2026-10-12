@@ -6,6 +6,7 @@ Runs [docs/products/migration-sessions.md](../../docs/products/migration-session
 |---|---|---|
 | Pick | `run.py` | the first `pending` row in the log whose *Needs* are `done` (`--track A` limits to one track) |
 | Build | headless `claude -p` | `prompts/build.md` for that session, in a fresh context |
+| Team | the build, fix and review sessions | [`prompts/team.md`](prompts/team.md): the lead writes decisions and the shared contract alone, then splits surfaces across up to 3 sub-agents in this checkout, one writer per file; wiring, contract and docs stay with the lead |
 | Hand-off | `run.py` | past **300k** context tokens (`INVANA_MIGRATION_CONTEXT_LIMIT`) it asks the agent to stop cleanly and write a hand-off; a new session continues from `prompts/continue.md` |
 | Gates | `run.py` itself | lint · types · tests · knip · e2e (Studio) or ruff · tests (engine) |
 | Design review | a separate `claude -p` | `prompts/review.md` → `reviews/<ID>.md`, first line `VERDICT: PASS` or `FAIL` |

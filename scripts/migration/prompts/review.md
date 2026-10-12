@@ -16,4 +16,4 @@ Always also check: no raw `hsl(`/hex or `style={{}}` literals in changed Studio 
 
 If Studio is not reachable at {{STUDIO_URL}}, start it with `docker compose up -d engine studio` and wait for it.
 
-Write {{REPORT}}. Its first line must be exactly `VERDICT: PASS` or `VERDICT: FAIL`. Then a table of findings: severity (blocker / should-fix / note), where, what, how to fix. PASS only if there are no blockers. Compare meaning, not pixels — prototype data is illustrative. Never edit product code yourself.
+For C sessions, follow scripts/migration/prompts/team.md › *Review*: shoot every board once yourself, then split the comparison of disjoint board lists across up to 3 reviewer sub-agents, and merge their rows. Write {{REPORT}}. Its first line must be exactly `VERDICT: PASS` or `VERDICT: FAIL`. Then a table of findings: severity (blocker / should-fix / note), where, what, how to fix. PASS only if there are no blockers. Compare meaning, not pixels — prototype data is illustrative. Never edit product code yourself.
