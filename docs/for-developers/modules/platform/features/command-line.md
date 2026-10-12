@@ -38,6 +38,10 @@ Studio.
 | `invana models import --ontology <file\|url> [--types A,B] [--dry-run]` | An RDFS / OWL ontology, schema.org included, as a draft model with its import report — [1.10](../../connect-and-model/features/ontology-import.md) |
 | `invana models starters` | Lists the shipped starter models |
 | `invana models publish [--dry-run]` | Publishes a draft: additive at once, breaking through a [publish review](../../connect-and-model/features/publish-review.md) whose preview runs inline |
+| `invana plugins list · show` | Every plugin — core, simulator, tool — with its version, whether it is installed and enabled, and its task types; `show` prints one as JSON — [13.12](tool-plugins.md) |
+| `invana plugins enable · disable <name>` | Switches a tool plugin, as `--user`; only an install Admin may, and a core or simulator plugin is always on — [13.12](tool-plugins.md) |
+| `invana tasks show <key>[@version]` | One task type's manifest, its plugin and its runs in the last 30 days, as JSON — [13.12](tool-plugins.md) |
+| `invana worker` | Runs tool steps from the `tools` queue under `executor = "procrastinate"`; heartbeats and reaps silent jobs — [13.12](tool-plugins.md) |
 | `invana loader` | Loads a flat CSV straight through the connector; `--graph` supplies the connection and journals it as a `bulk` run — [2.1](../../bring-data-in/features/load-data.md) |
 
 ## Capabilities

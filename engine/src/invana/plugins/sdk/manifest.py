@@ -175,6 +175,23 @@ class FlowManifest:
 
 
 @dataclass(frozen=True, slots=True)
+class SkillManifest:
+    """A skill a plugin ships — instructions only; its plan is generated, never packaged.
+
+    Seeded into every Graph by name, like the built-in playbook. ``version``
+    is the skill's own; a changed text is ``version + 1``.
+    """
+
+    slug: str
+    name: str
+    instructions: str
+    version: int = 1
+    when_to_use: str = ""
+    description: str = ""
+    plugin: str = ""
+
+
+@dataclass(frozen=True, slots=True)
 class PluginManifest:
     """A plugin, as its ``plugin.toml`` declares it."""
 

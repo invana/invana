@@ -114,8 +114,11 @@ async def lifespan(app: FastAPI):
         # docs/for-developers/modules/ask/features/streaming-and-the-workflow.md — the inline run runtime: one asyncio
         # task per session ask.
         # Startup fails whatever a previous process left mid-flight.
+        from invana.activity.managers import ApprovalSendGate
         from invana.runtime.interpreter import TaskRuntime
 
+        # A `send` step (mail.send) waits on an approval in the inbox.
+        TaskRuntime.send_gate = ApprovalSendGate()
         task_runtime = TaskRuntime(
             session_factory=session_factory, manager=manager, encryption_key=settings.encryption_key
         )
@@ -194,6 +197,7 @@ def create_app() -> FastAPI:
     from invana.server.llm_providers.routes import llm_providers_router
     from invana.server.members.routes import members_router
     from invana.server.notifications.routes import notifications_router
+    from invana.server.plugins.routes import plugins_router, task_types_router
     from invana.server.routes.auth import auth_router
     from invana.server.routes.events import events_router, graph_events_router
     from invana.server.routes.model_links import model_links_router
@@ -278,6 +282,8 @@ def create_app() -> FastAPI:
     app.include_router(graph_router)
     app.include_router(members_router)
     app.include_router(search_router)
+    app.include_router(plugins_router)
+    app.include_router(task_types_router)
     app.include_router(llm_providers_router)
     app.include_router(govern_router)
     app.include_router(skills_router)

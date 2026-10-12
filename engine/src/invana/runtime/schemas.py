@@ -512,3 +512,93 @@ class EvalDrift(BaseModel):
 
 class EvalDriftResponse(BaseModel):
     run_ids: list[str]
+
+
+# ── Plugins (docs/for-developers/modules/platform/features/tool-plugins.md) ──
+
+
+class PluginBase(BaseModel):
+    """What a plugin is and whether it may run — shared by the summary and the detail."""
+
+    name: str
+    #: ``core`` · ``simulator`` · ``tool``.
+    kind: str
+    version: str
+    title: str = ""
+    #: The pip extra that installs it; empty for a core plugin.
+    extra: str = ""
+    #: False for a tool plugin whose extra is missing.
+    installed: bool
+    enabled: bool
+    #: Whether an install Admin may enable or disable it — tool plugins only.
+    switchable: bool
+
+
+class PluginSummary(PluginBase):
+    """One plugin as the registry lists it, with how much it declares."""
+
+    task_types: int
+    skills: int
+    flows: int
+
+
+class PluginListResponse(BaseModel):
+    #: Core, then simulator, then tool plugins — the registry's load order.
+    items: list[PluginSummary]
+    total: int
+
+
+class TaskArgRead(BaseModel):
+    type: str
+    required: bool
+    default: object | None = None
+
+
+class TaskManifestRead(BaseModel):
+    """One task type's manifest, as declared on disk."""
+
+    key: str
+    version: str
+    summary: str
+    bound: str
+    side_effect: str
+    args: dict[str, TaskArgRead]
+    outputs: dict[str, str]
+    requires: list[str]
+    resources: list[str]
+    timeout_s: int | None = None
+    retries: int | None = None
+
+
+class PluginFlowRead(BaseModel):
+    key: str
+    version: int
+    kind: str
+    description: str
+
+
+class PluginSkillRead(BaseModel):
+    slug: str
+    name: str
+    version: int
+    when_to_use: str
+    description: str
+
+
+class PluginDetail(PluginBase):
+    """A plugin and everything it declares; the lists are empty when it is not installed."""
+
+    #: Names the plugin's task types may resolve in a worker — never their values.
+    secrets: list[str]
+    task_types: list[TaskManifestRead]
+    flows: list[PluginFlowRead]
+    skills: list[PluginSkillRead]
+
+
+class TaskTypeRead(TaskManifestRead):
+    """One task type, its plugin, and how often it ran."""
+
+    #: ``name@version`` of the plugin that declares it.
+    plugin: str
+    #: Run nodes that named this key in the last 30 days.
+    runs_30d: int

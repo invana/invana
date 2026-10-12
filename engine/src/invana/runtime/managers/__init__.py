@@ -6,6 +6,7 @@ from invana.runtime.managers.catalogue import CatalogueManager
 from invana.runtime.managers.dataset_bind import DatasetBindManager
 from invana.runtime.managers.evals import EvalManager
 from invana.runtime.managers.plan_performance import PlanPerformanceManager
+from invana.runtime.managers.plugins import PluginManager
 from invana.runtime.managers.rule_checks import RuleCheckManager
 from invana.runtime.managers.rule_citations import RuleCitationManager
 from invana.runtime.managers.simulation import SimulationManager
@@ -23,6 +24,7 @@ __all__ = [
     "DatasetBindManager",
     "EvalManager",
     "PlanPerformanceManager",
+    "PluginManager",
     "RuleCheckManager",
     "RuleCitationManager",
     "SimulationManager",

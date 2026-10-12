@@ -9,7 +9,7 @@ built the envelope and the call, then benchmarked three queues under the same wo
 |---|---|
 | Index | [13.11](../../../README.md#13--platform) · Slice **B14** |
 | Module | [Platform](../spec.md) |
-| API / CLI / Studio | — / — / — — engine only; workers start in B06b |
+| API / CLI / Studio | — / — / — — engine only; workers run tool steps from [13.12](tool-plugins.md) |
 | Related | [the runtime](runtime.md) §2 · [plugins](plugins.md) · [products › plugins §5–§8](../../../../products/plugins.md#7-ready-for-n-workers) |
 
 > **As** an operator whose fan-outs outgrow one process, **I want** to start more workers and have
@@ -58,7 +58,7 @@ sequenceDiagram
 |---|---|
 | Step state on `RunVars` | Does not cross a process. `v.query`, `v.result`, `v.intent` set by one step are gone for the next step on another worker; only outputs and `${steps.x.y}` bindings travel. The NL chain (understand → translate → validate → execute → shape) stays inline until its steps hand over through outputs |
 | Frames from a worker | Land in `task_stream` (the emitter writes by run id), but the live broadcaster is per process — an SSE subscriber on the API process sees them only when the stream reader polls the table |
-| A redelivered write | Same idempotency key; a write task type checks it before writing (B06b adds the check to the `*_write` task types) |
+| A redelivered write | Same idempotency key; the worker returns the outcome already recorded for it rather than running the task type again ([13.12](tool-plugins.md) TP6) |
 | A task type that overruns | Its manifest's `timeout_s` ends it as a `transient` failure, cause `task_timeout`, inline and in a worker alike |
 | A worker on an older engine | `key@version` it does not carry → `defect · unknown_task_type`; it never runs a neighbouring version |
 | The worker's transaction | `RebuiltContexts` commits when the task type returns and rolls back when it raises — the worker owns it, as a request does |
@@ -143,9 +143,7 @@ procrastinate — and losing a dead worker's envelopes does not depend on the da
 
 | Not building | Because |
 |---|---|
-| A worker process and `invana worker` | B06b — tool plugins are the first steps that must run in workers |
-| procrastinate as an engine dependency | B06b adds it with the worker; this slice installs it only for the benchmark |
-| Signal and failure wire forms | B06b, with the first remote step (DE7) |
+| A worker process, `invana worker`, procrastinate as the `workers` extra, the wire forms | built in [13.12 Tool plugins](tool-plugins.md) — tool steps are the first to run in workers |
 | Moving the NL chain to workers | its steps hand over through `RunVars`; DE8 |
 | Routing envelopes to resource pools (GPU, `sim.*`) | later — one pool until a plugin declares `gpu` |
 | Celery, RQ, Temporal, Arq | not in the shortlist the product doc set |

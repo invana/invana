@@ -8,8 +8,21 @@ executor carries it. Two context sources feed that one call:
 
 | Source | Used by | The live world comes from |
 |---|---|---|
-| :class:`InlineContexts` | the ``inline`` executor — today's only one | the pass that is running, handed over as is |
-| :class:`RebuiltContexts` | a worker in another process | the envelope's ids: run row → :meth:`TaskRuntime.run_vars` |
+| :class:`InlineContexts` | every step run in the API process | the running pass, handed over as is |
+| :class:`RebuiltContexts` | ``invana worker``, a queued tool step | the envelope's ids → :meth:`TaskRuntime.run_vars` |
+
+:func:`_dispatch` decides where one step runs, in this order
+(docs/for-developers/modules/platform/features/tool-plugins.md):
+
+| Step | Runs |
+|---|---|
+| A **tool** plugin's, not enabled | nowhere: ``blocked · plugin_disabled``, naming ``invana plugins enable`` |
+| A tool plugin's, under ``procrastinate`` | on the ``tools`` queue; the pass polls the outcome row |
+| Any other — every core step, every step under ``inline`` | ``run_envelope`` in this process |
+
+Only tool steps go to the queue: core steps hand state to each other on
+``RunVars``, which does not cross a process. The ``send`` approval gate is the
+interpreter's, before ``_dispatch`` is reached.
 
 Inline dispatch resolves the task type through ``TASKS`` — the seam tests
 substitute a step on — so routing through the envelope changes nothing a run
@@ -22,10 +35,15 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
 
-from invana.plugins import load_plugins
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from invana.core.settings import settings
+from invana.plugins import load_plugins, queue
 from invana.plugins.envelope import TaskEnvelope
+from invana.plugins.sdk.manifest import TaskManifest
 from invana.plugins.worker import run_envelope
-from invana.runtime.catalogue import TASKS, RunVars, TaskContext
+from invana.runtime.catalogue import TASKS, RunVars, TaskContext, TaskFailure
+from invana.runtime.managers.plugins import PluginManager
 from invana.runtime.models import TaskRun
 from invana.runtime.querysets.task_run import TaskRunQuerySet
 from invana.runtime.stream import Emitter
@@ -104,15 +122,63 @@ class RebuiltContexts:
             await db.commit()
 
 
+#: A tool step's own limit when its manifest declares none.
+TOOL_TIMEOUT_S = 300
+#: How long a queued tool step may wait for a worker on top of its own limit:
+#: one reaper cycle (60 s) plus the stall window (10 s), with room to spare,
+#: so a job retried off a dead worker still lands inside it.
+QUEUE_WAIT_S = 120
+
+
+def tool_manifest(task_key: str) -> TaskManifest | None:
+    """The manifest of ``task_key`` when a **tool** plugin declares it, else None."""
+    registry = load_plugins()
+    manifest = registry.task(task_key)
+    plugin = registry.plugins.get(manifest.plugin) if manifest else None
+    return manifest if plugin is not None and plugin.manifest.kind == "tool" else None
+
+
+async def refuse_disabled(db: AsyncSession, manifest: TaskManifest) -> None:
+    """Raise ``blocked · plugin_disabled`` unless the manifest's plugin is enabled on this install."""
+    if await PluginManager().is_enabled(db, manifest.plugin):
+        return
+    raise TaskFailure(
+        cls="blocked",
+        cause="plugin_disabled",
+        message=(
+            f"The plugin {manifest.plugin} is not enabled on this install. "
+            f"An install Admin enables it: invana plugins enable {manifest.plugin}"
+        ),
+        short="plugin disabled",
+        evidence={"plugin": manifest.plugin, "task": manifest.key},
+    )
+
+
 async def _dispatch(task_key: str, ctx: TaskContext, v: RunVars):
-    """Run one step in-process, through the same call a worker makes.
+    """Run one step — on the ``tools`` queue for a tool step under ``procrastinate``, else in-process.
+
+    A tool step whose plugin is not enabled fails before any context opens.
+    Queued, the pass commits first, because the worker reads the run and the
+    step from their committed rows; the outcome a worker records is raised or
+    returned here exactly as the inline call would have.
 
     Any task that reaches for the graph can raise ``HTTPException`` — a graph
     with no connection, or one that isn't active. ``run_envelope`` turns those
     into a diagnosis with a "Check the connection" route rather than a crashed
     run reading "something went wrong inside the engine".
     """
+    manifest = tool_manifest(task_key)
+    if manifest is not None:
+        await refuse_disabled(ctx.db, manifest)
     envelope = envelope_for(ctx.step, v)
+    if manifest is not None and settings.executor == "procrastinate":
+        await ctx.db.commit()
+        await queue.defer(envelope)
+        return await queue.await_outcome(
+            envelope,
+            session_factory=ctx.runtime._factory,
+            timeout_s=(manifest.timeout_s or TOOL_TIMEOUT_S) + QUEUE_WAIT_S,
+        )
     return await run_envelope(envelope, contexts=InlineContexts(ctx, v), resolve=lambda _env: TASKS.get(task_key))
 
 

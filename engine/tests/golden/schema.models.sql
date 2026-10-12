@@ -331,6 +331,16 @@ CREATE INDEX ix_emissions_message_id ON emissions (message_id);
 
 CREATE INDEX ix_emissions_run_id ON emissions (run_id);
 
+CREATE TABLE envelope_outcomes (
+	idempotency_key VARCHAR(160) NOT NULL, 
+	run_id VARCHAR(36) NOT NULL, 
+	outcome JSON NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (idempotency_key)
+);
+
+CREATE INDEX ix_envelope_outcomes_run_id ON envelope_outcomes (run_id);
+
 CREATE TABLE eval_budgets (
 	graph_id VARCHAR(36) NOT NULL, 
 	monthly_tokens INTEGER, 
@@ -827,6 +837,14 @@ CREATE TABLE personal_access_tokens (
 CREATE UNIQUE INDEX ix_personal_access_tokens_token_hash ON personal_access_tokens (token_hash);
 
 CREATE INDEX ix_personal_access_tokens_user_id ON personal_access_tokens (user_id);
+
+CREATE TABLE plugin_states (
+	name VARCHAR(128) NOT NULL, 
+	enabled BOOLEAN NOT NULL, 
+	changed_by_id VARCHAR(36), 
+	changed_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (name)
+);
 
 CREATE TABLE project_assignments (
 	id VARCHAR(36) NOT NULL, 

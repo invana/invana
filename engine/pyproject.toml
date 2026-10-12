@@ -51,10 +51,25 @@ telemetry = [
 # The genomic prediction simulator plugin. Standard library only, so empty; the
 # extra is its install name (docs/for-developers/modules/work/features/simulation.md).
 sim-genomic = []
+# The tool plugins. Standard library plus httpx (a core dependency), so empty; each
+# extra is its plugin's install name (docs/for-developers/modules/platform/features/tool-plugins.md).
+tools-web = []
+tools-mail = []
+tools-science = []
+# The distributed executor (`INVANA_EXECUTOR=procrastinate`, `invana worker`). Postgres-only,
+# so a SQLite dev install never needs it (docs/for-developers/modules/platform/features/tool-plugins.md).
+workers = [
+    "procrastinate>=3.10",
+    "psycopg[binary,pool]>=3.2",
+]
 all = [
     "invana-engine[server]",
     "invana-engine[telemetry]",
     "invana-engine[sim-genomic]",
+    "invana-engine[tools-web]",
+    "invana-engine[tools-mail]",
+    "invana-engine[tools-science]",
+    "invana-engine[workers]",
 ]
 
 [dependency-groups]
@@ -159,6 +174,8 @@ ignore = [
 "src/invana/plugins/core/llm/**" = ["PLC0415"]
 "src/invana/plugins/core/pure/**" = ["PLC0415"]
 "src/invana/plugins/core/work_write/**" = ["PLC0415"]
+# procrastinate is the optional `workers` extra; the queue imports it on first use.
+"src/invana/plugins/queue.py" = ["PLC0415"]
 # Alembic revisions import the registry lazily so the seed and the runtime
 # cannot drift; a top-level import would run at Alembic discovery time.
 "src/invana/core/migrations/versions/*" = ["PLC0415"]

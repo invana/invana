@@ -202,3 +202,51 @@ class ApprovalManager:
             actor_id=actor,
             details={"title": row.title, "status": row.status, "subject_kind": row.subject_kind, **extra},
         )
+
+
+class ApprovalSendGate:
+    """The runtime's send gate over the approvals inbox: one approval per held ``send`` step.
+
+    The runtime sits below the inbox, so it names only the gate's shape; each
+    front-end installs this one on ``TaskRuntime.send_gate`` when it builds a
+    runtime (the API at start-up, the CLI in ``with_runtime``). ``request``
+    asks the one approver the runtime names, with the step's frozen args as the
+    payload; ``decision`` reads the approval back fresh — the run's session may
+    have seen it before the decision — with the decider's username for the
+    *declined by* sentence.
+    """
+
+    approvals = ApprovalManager()
+
+    async def request(
+        self,
+        db: AsyncSession,
+        *,
+        graph_id: str,
+        run_id: str,
+        step_id: str,
+        title: str,
+        payload: dict,
+        approver_id: str,
+        deadline_s: int,
+    ) -> str:
+        row = await self.approvals.request(
+            db,
+            graph_id=graph_id,
+            subject_kind="step",
+            subject_id=step_id,
+            title=title,
+            payload=payload,
+            approver_ids=[approver_id] if approver_id else [],
+            deadline_s=deadline_s,
+            requested_by_id=None,
+            run_id=run_id,
+        )
+        return row.id
+
+    async def decision(self, db: AsyncSession, *, approval_id: str) -> tuple[str, str]:
+        row = await db.get(Approval, approval_id, populate_existing=True)
+        if row is None:
+            return "expired", ""
+        who = await db.get(User, row.decided_by_id) if row.decided_by_id else None
+        return row.status, who.username if who else ""

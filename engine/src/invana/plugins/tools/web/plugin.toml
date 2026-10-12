@@ -1,0 +1,12 @@
+# A tool plugin: loads when its extra is installed, runs only once an install
+# Admin enables it. `web_search` is a SearXNG base URL, read in the worker.
+name = "invana.tools.web"
+version = "0.1.0"
+kind = "tool"
+title = "Web"
+engine = "*"
+extra = "tools-web"
+secrets = ["web_search"]
+tasks = ["web.search", "web.fetch", "web.download_and_extract"]
+flows = []
+skills = ["collect-dataset"]

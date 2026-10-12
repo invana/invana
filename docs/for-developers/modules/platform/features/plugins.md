@@ -9,7 +9,7 @@ builds itself from the manifests once at start-up and is then frozen.
 |---|---|
 | Index | [13.9](../../../README.md#13--platform) · Slice **B06a** |
 | Module | [Platform](../spec.md) |
-| API / CLI / Studio | — / — / — — the engine layout only; the Plugins registry surface is C03, `invana plugins` is B06b |
+| API / CLI / Studio | — / — / — — the engine layout only; the registry API and `invana plugins` are [13.12](tool-plugins.md), the Plugins surface is C03 |
 | Related | [the runtime](runtime.md) · [read the catalogue](../../workflows/features/the-catalogue.md) · [products › plugins](../../../../products/plugins.md) |
 
 > **As** an engine developer adding a task type, **I want** one folder with its manifest and its code,
@@ -105,13 +105,13 @@ flowchart LR
 | PL12 | **The simulator contract is checked at load.** Its task type is `bound = "none"`, `side_effect = "read"`, takes `spec: obj` · `inputs: list` · `seed: int` (all required) and declares `ranked: list` · `summary: obj`; a plugin that breaks any of it stops the process with its manifest named. |
 | PL13 | **A simulator reads data only through `read_inputs(ctx)`.** It gets the records of the versions Invana pinned, after their content hash is checked and a retraction refused. It never queries the graph or another dataset. |
 | PL14 | **A simulator's task type is in the registry like any other** — the catalogue lists it, the interpreter dispatches it, and a plan may name it only where an envelope allows it. The closed **core** set stays the count the catalogue test holds; a simulator adds to the registry, not to it. |
-| PL15 | **A task type's key may carry its plugin's prefix** (`sim.genomic_prediction`); the folder is the last segment, so the module path stays importable. Core keys have no prefix. |
+| PL15 | **A task type's key may carry its plugin's prefix** (`sim.genomic_prediction`); the folder is the last segment, so the module path stays importable — or the whole key with dots as underscores where two keys of one plugin end alike (`uniprot.get` → `uniprot_get/`). Core keys have no prefix. |
+| PL16 | **A plugin lists its `skills` beside its `tasks` and `flows`.** `skills/<slug>/skill.toml` + `instructions.md`, loaded into `LoadedPlugin.skills`; a folder the list does not name is a load error, as for tasks (PL8). |
 ## Not building
 
 | Not building | Because |
 |---|---|
-| Tool and MCP plugins | B06b and B07 |
-| `invana plugins …` CLI and the Agents › Plugins surface | B06b · C03 |
-| Enabling or disabling a plugin | B06b — until then a simulator loads whenever it is installed |
+| MCP plugins | B07 |
+| Tool plugins, `invana plugins …`, enabling a plugin, skills in a plugin | [13.12 Tool plugins](tool-plugins.md) |
+| The Agents › Plugins surface | C03 |
 | Hot-loading a plugin | the registry is frozen per process |
-| Skills shipped inside a plugin | skills stay seeded from `runtime/managers/skill_seed.py` until a tool plugin ships one |

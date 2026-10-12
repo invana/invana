@@ -6,6 +6,7 @@ of their own; they move here as each is converted.
 
 from invana.runtime.querysets.emission import EmissionQuerySet
 from invana.runtime.querysets.evals import EvalQuerySet
+from invana.runtime.querysets.plugins import EnvelopeOutcomeQuerySet, PluginStateQuerySet
 from invana.runtime.querysets.task_run import TaskRunQuerySet
 
-__all__ = ["EmissionQuerySet", "EvalQuerySet", "TaskRunQuerySet"]
+__all__ = ["EmissionQuerySet", "EnvelopeOutcomeQuerySet", "EvalQuerySet", "PluginStateQuerySet", "TaskRunQuerySet"]

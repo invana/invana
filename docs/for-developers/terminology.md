@@ -179,6 +179,7 @@ sub-slots, the URL params and the retired words are in
 | **Project report** | A project written up from its records and published as frozen versions. Not a *Report* board ([§5](#5-working-surfaces)). |
 | **Simulation** | One run of a **simulator** on a branch, over pinned dataset versions and a seed; its result is ranked and always `derived` — a prediction, never an observation. Numbered per project (`s1`). [9.8](modules/work/features/simulation.md) |
 | **Simulator** | A plugin of kind `simulator` that does a domain's science (genomic prediction first); Invana runs it, never computes a figure itself. Not a *simulation* — the simulator is the model, a simulation is one use of it. |
+| **Tool plugin** | A plugin of kind `tool` that reaches outside Invana — the web, mail, a science source — as task types; installed by its extra, run only while an install Admin has **enabled** it, and in a worker when one runs. [13.12](modules/platform/features/tool-plugins.md) |
 | **Objective** | One statement of what a Project is for. |
 | **Criterion** | One checkable statement of "done", with how it is checked: `query · agent · human`. |
 | **Outcome** | A criterion's finding on one Todo, with its evidence: met · unmet · needs a human. Not a **verdict** — that is a person answering a paused Task. |

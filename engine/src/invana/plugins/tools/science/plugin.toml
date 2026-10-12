@@ -1,0 +1,12 @@
+# A tool plugin: loads when its extra is installed, runs only once an install
+# Admin enables it. Every source it reads is public, so it declares no secret.
+name = "invana.tools.science"
+version = "0.1.0"
+kind = "tool"
+title = "Science sources"
+engine = "*"
+extra = "tools-science"
+secrets = []
+tasks = ["pubmed.search", "uniprot.get", "pubchem.get"]
+flows = []
+skills = []

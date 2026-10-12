@@ -20,7 +20,7 @@ import logging
 import random
 import time
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, ClassVar, Protocol
 
 from sqlalchemy import select
 from sqlalchemy.exc import OperationalError, ProgrammingError
@@ -50,7 +50,9 @@ from invana.core.events.services import emit_event
 from invana.core.querylog import calling_as
 from invana.core.telemetry.recorders import add_run_active, record_run, record_run_admitted
 from invana.core.telemetry.spans import add_event, current_ids, current_span_context, set_current
+from invana.plugins import load_plugins
 from invana.plugins.core.ingest.records import LoadRefused, connector_for
+from invana.plugins.sdk.manifest import SideEffect
 from invana.runtime.callers import caller_for
 from invana.runtime.catalogue import (
     CannotAnswer,
@@ -67,7 +69,7 @@ from invana.runtime.catalogue import (
 from invana.runtime.contention import AgentAtCeiling, AgentSlots, GraphSlots, PoolSlots, Refused
 from invana.runtime.delegation import cost_rollup, descendants
 from invana.runtime.diagnosis import diagnose, internal_failure
-from invana.runtime.executor import _dispatch
+from invana.runtime.executor import _dispatch, refuse_disabled, tool_manifest
 from invana.runtime.governing import Governor
 from invana.runtime.interpreter.bindings import resolve as resolve_bindings
 from invana.runtime.interpreter.payloads import (
@@ -100,6 +102,34 @@ _IMPORT_PLAN_KEYS = frozenset({LOAD_PLAN_KEY, BULK_PLAN_KEY})
 
 log = logging.getLogger(__name__)
 
+#: How long a ``send`` step's approval waits for its approver.
+SEND_APPROVAL_DEADLINE_S = 86400
+
+
+class SendGate(Protocol):
+    """Where a ``send`` step's approval is asked for and read back.
+
+    The approvals inbox sits above the runtime, so the runtime names only this
+    shape and the edge that owns the inbox installs one on
+    :attr:`TaskRuntime.send_gate`. ``decision`` returns the approval's status
+    (``pending · approved · declined · expired``) and who decided it, by name.
+    """
+
+    async def request(
+        self,
+        db: AsyncSession,
+        *,
+        graph_id: str,
+        run_id: str,
+        step_id: str,
+        title: str,
+        payload: dict,
+        approver_id: str,
+        deadline_s: int,
+    ) -> str: ...
+
+    async def decision(self, db: AsyncSession, *, approval_id: str) -> tuple[str, str]: ...
+
 
 def _seconds_since(then: datetime | None) -> float:
     """Seconds from *then* to now, never negative; a naive time is read as UTC."""
@@ -112,6 +142,11 @@ def _seconds_since(then: datetime | None) -> float:
 
 class TaskRuntime:
     """Runs runs in-process. Created in the app lifespan; stubbed in route tests."""
+
+    #: The approvals inbox a ``send`` step holds on, installed process-wide by
+    #: the edge that owns it. With none installed a ``send`` step is refused,
+    #: never sent unapproved.
+    send_gate: ClassVar[SendGate | None] = None
 
     def __init__(
         self,
@@ -196,6 +231,25 @@ class TaskRuntime:
         task = asyncio.create_task(self._run(run_id), name=f"invana.run.{run_id}")
         self._tasks[run_id] = task
         task.add_done_callback(lambda t: self._tasks.pop(run_id, None))
+
+    async def resume_after_decision(self, run_id: str) -> bool:
+        """Continue a run held on a ``send`` approval once that approval is decided.
+
+        Called after the decision has committed. The run goes back to queued
+        and resumes at the held step — the same step row, so the pass reads the
+        decision through the approval id the row carries: approved sends,
+        declined fails the step as *not sent*. Returns False, doing nothing, for
+        a run that is not held on an approval.
+        """
+        async with self._factory() as db:
+            th = await TaskRunQuerySet().get(db, run_id)
+            if th is None or th.status != RunStatus.awaiting_input.value or not (th.cursor or {}).get("approval"):
+                return False
+            th.status = RunStatus.queued.value
+            th.finished_at = None
+            await db.commit()
+        self.submit(run_id)
+        return True
 
     async def run_inline(self, run_id: str) -> None:
         """Run a committed run in the caller's own request, and return when it settles.
@@ -747,6 +801,9 @@ class TaskRuntime:
     ) -> str:
         """Returns the metric status label: ok · clarify · cannot_answer · conversed · error.
 
+        ``clarify`` is any pause for a person — a question, or a ``send`` step
+        held on its approval.
+
         The list of steps is read from ``run_nodes`` each pass rather than
         from a static workflow, because a *Plan* step appends to it mid-run.
         That is the whole difference between a planned workflow and a fixed
@@ -773,6 +830,8 @@ class TaskRuntime:
                 await emitter.emit("step.started", _step_payload(row))
                 ctx = TaskContext(db=db, manager=self._manager, emitter=emitter, step=row, runtime=self)
                 try:
+                    if await self._hold_for_send(db, emitter, th, row, v, i):
+                        return "clarify"
                     with step_span(row, attempt):
                         out = await _dispatch(step.task_key, ctx, v)
                 except CannotAnswer as cannot:
@@ -924,6 +983,79 @@ class TaskRuntime:
             i += 1
         await self._finish_ok(db, emitter, th, v, assistant)
         return "ok"
+
+    async def _hold_for_send(
+        self, db: AsyncSession, emitter: Emitter, th: TaskRun, row: TaskRun, v: RunVars, i: int
+    ) -> bool:
+        """Hold a ``send`` step on an approval until a person decides; True when the run is now held.
+
+        Nothing leaves Invana without a named person. The first pass that
+        reaches the step asks the run's actor — else the Graph's owner — with
+        the args frozen as the approval's payload, and records the approval id
+        on the step row. A resumed pass runs the same row, so it reads the
+        decision by that id: approved → the step dispatches; still pending →
+        held again, no second request; declined or expired → ``blocked ·
+        send_declined``, nothing sent. A disabled plugin is refused before
+        anyone is asked.
+
+        The hold is the clarification's suspension — row ``needs_input``, run
+        ``awaiting_input``, a cursor naming the step — and not a clarification:
+        an unattended run waits on its approver rather than ending.
+        """
+        manifest = load_plugins().task(row.task_key)
+        if manifest is None or manifest.side_effect is not SideEffect.send:
+            return False
+        tool = tool_manifest(row.task_key)
+        if tool is not None:
+            await refuse_disabled(db, tool)
+        gate = self.send_gate
+        if gate is None:
+            raise TaskFailure(
+                cls="blocked",
+                cause="approvals_unavailable",
+                message="This process has no approvals inbox to hold a send step on; nothing was sent.",
+                short="no approvals inbox",
+            )
+        approval_id = (row.output or {}).get("approval_id")
+        if approval_id:
+            status, who = await gate.decision(db, approval_id=approval_id)
+            if status == "approved":
+                return False
+            if status in {"declined", "expired"}:
+                raise TaskFailure(
+                    cls="blocked",
+                    cause="send_declined",
+                    message=(
+                        f"Declined by {who or 'its approver'}; nothing was sent."
+                        if status == "declined"
+                        else "The approval expired before anyone decided; nothing was sent."
+                    ),
+                    short="not sent",
+                    evidence={"approval_id": approval_id, "status": status},
+                )
+        else:
+            args = dict(row.args or {})
+            subject = args.get("subject") or row.label or row.task_key
+            approval_id = await gate.request(
+                db,
+                graph_id=th.graph_id,
+                run_id=th.id,
+                step_id=row.id,
+                title=f"Send: {subject}",
+                payload=args,
+                approver_id=v.actor_id or (v.graph.created_by_id if v.graph else ""),
+                deadline_s=SEND_APPROVAL_DEADLINE_S,
+            )
+            row.output = {**(row.output or {}), "approval_id": approval_id}
+        row.status = RunStatus.needs_input.value
+        row.finished_at = _now()
+        row.detail = "awaiting approval"
+        th.status = RunStatus.awaiting_input.value
+        th.cursor = {"step": i, "approval": approval_id}
+        await db.commit()
+        await emitter.emit("step.needs_input", _step_payload(row))
+        await emitter.emit("approval.requested", {"approval_id": approval_id, "step_id": row.id})
+        return True
 
     # ── what a row spent, and what it recorded ────────────────────────────────
 

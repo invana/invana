@@ -13793,6 +13793,233 @@
         "title": "PlanVersionDiff",
         "type": "object"
       },
+      "PluginDetail": {
+        "description": "A plugin and everything it declares; the lists are empty when it is not installed.",
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "extra": {
+            "default": "",
+            "title": "Extra",
+            "type": "string"
+          },
+          "flows": {
+            "items": {
+              "$ref": "#/components/schemas/PluginFlowRead"
+            },
+            "title": "Flows",
+            "type": "array"
+          },
+          "installed": {
+            "title": "Installed",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "secrets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Secrets",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSkillRead"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "switchable": {
+            "title": "Switchable",
+            "type": "boolean"
+          },
+          "task_types": {
+            "items": {
+              "$ref": "#/components/schemas/TaskManifestRead"
+            },
+            "title": "Task Types",
+            "type": "array"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "version",
+          "installed",
+          "enabled",
+          "switchable",
+          "secrets",
+          "task_types",
+          "flows",
+          "skills"
+        ],
+        "title": "PluginDetail",
+        "type": "object"
+      },
+      "PluginFlowRead": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "version",
+          "kind",
+          "description"
+        ],
+        "title": "PluginFlowRead",
+        "type": "object"
+      },
+      "PluginListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "PluginListResponse",
+        "type": "object"
+      },
+      "PluginSkillRead": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "when_to_use": {
+            "title": "When To Use",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "version",
+          "when_to_use",
+          "description"
+        ],
+        "title": "PluginSkillRead",
+        "type": "object"
+      },
+      "PluginSummary": {
+        "description": "One plugin as the registry lists it, with how much it declares.",
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "extra": {
+            "default": "",
+            "title": "Extra",
+            "type": "string"
+          },
+          "flows": {
+            "title": "Flows",
+            "type": "integer"
+          },
+          "installed": {
+            "title": "Installed",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "skills": {
+            "title": "Skills",
+            "type": "integer"
+          },
+          "switchable": {
+            "title": "Switchable",
+            "type": "boolean"
+          },
+          "task_types": {
+            "title": "Task Types",
+            "type": "integer"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "version",
+          "installed",
+          "enabled",
+          "switchable",
+          "task_types",
+          "skills",
+          "flows"
+        ],
+        "title": "PluginSummary",
+        "type": "object"
+      },
       "PreviewRequest": {
         "description": "One join rule, counted before anything is declared.\n\nThe same shape for both kinds: an anchor asks *are these the same entity*\nand a relationship asks *where does the edge attach*, and both are answered\nby the one question \u2014 which value on this side equals which on that one.",
         "properties": {
@@ -21112,6 +21339,33 @@
         "title": "TaskActivityResponse",
         "type": "object"
       },
+      "TaskArgRead": {
+        "properties": {
+          "default": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "required"
+        ],
+        "title": "TaskArgRead",
+        "type": "object"
+      },
       "TaskCreate": {
         "properties": {
           "acceptance": {
@@ -21225,6 +21479,94 @@
           "total"
         ],
         "title": "TaskListResponse",
+        "type": "object"
+      },
+      "TaskManifestRead": {
+        "description": "One task type's manifest, as declared on disk.",
+        "properties": {
+          "args": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TaskArgRead"
+            },
+            "title": "Args",
+            "type": "object"
+          },
+          "bound": {
+            "title": "Bound",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "outputs": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Outputs",
+            "type": "object"
+          },
+          "requires": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requires",
+            "type": "array"
+          },
+          "resources": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Resources",
+            "type": "array"
+          },
+          "retries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retries"
+          },
+          "side_effect": {
+            "title": "Side Effect",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "timeout_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timeout S"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "version",
+          "summary",
+          "bound",
+          "side_effect",
+          "args",
+          "outputs",
+          "requires",
+          "resources"
+        ],
+        "title": "TaskManifestRead",
         "type": "object"
       },
       "TaskPlanDetail": {
@@ -22312,6 +22654,104 @@
           "status"
         ],
         "title": "TaskRunSummary",
+        "type": "object"
+      },
+      "TaskTypeRead": {
+        "description": "One task type, its plugin, and how often it ran.",
+        "properties": {
+          "args": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TaskArgRead"
+            },
+            "title": "Args",
+            "type": "object"
+          },
+          "bound": {
+            "title": "Bound",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "outputs": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Outputs",
+            "type": "object"
+          },
+          "plugin": {
+            "title": "Plugin",
+            "type": "string"
+          },
+          "requires": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requires",
+            "type": "array"
+          },
+          "resources": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Resources",
+            "type": "array"
+          },
+          "retries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retries"
+          },
+          "runs_30d": {
+            "title": "Runs 30D",
+            "type": "integer"
+          },
+          "side_effect": {
+            "title": "Side Effect",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "timeout_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timeout S"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "version",
+          "summary",
+          "bound",
+          "side_effect",
+          "args",
+          "outputs",
+          "requires",
+          "resources",
+          "plugin",
+          "runs_30d"
+        ],
+        "title": "TaskTypeRead",
         "type": "object"
       },
       "TaskUpdate": {
@@ -26441,6 +26881,173 @@
         ]
       }
     },
+    "/api/v1/plugins": {
+      "get": {
+        "operationId": "list_plugins_api_v1_plugins_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Plugins",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
+    "/api/v1/plugins/{name}": {
+      "get": {
+        "operationId": "get_plugin_api_v1_plugins__name__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Plugin",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
+    "/api/v1/plugins/{name}/disable": {
+      "post": {
+        "operationId": "disable_plugin_api_v1_plugins__name__disable_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Disable Plugin",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
+    "/api/v1/plugins/{name}/enable": {
+      "post": {
+        "operationId": "enable_plugin_api_v1_plugins__name__enable_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Enable Plugin",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
     "/api/v1/rules": {
       "get": {
         "description": "Every install rule, active and inactive, in offer order.",
@@ -27273,6 +27880,53 @@
         "summary": "Get Version",
         "tags": [
           "standards"
+        ]
+      }
+    },
+    "/api/v1/task-types/{ref}": {
+      "get": {
+        "operationId": "get_task_type_api_v1_task_types__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskTypeRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Task Type",
+        "tags": [
+          "plugins"
         ]
       }
     },

@@ -56,11 +56,11 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 
 | ID | Capability | Blocks | Note |
 |---|---|---|---|
-| P-01 | Tool plugin runtime | AG-13 · DS-06 · SH-13 · PJ-09 | Plugins live in the engine (`invana/plugins/tools/`), dependencies as optional extras; each method registers a catalogue entry in the third-party layer |
+| P-01 | Tool plugin runtime | AG-13 · DS-06 · SH-13 · PJ-09 | ✅ B06b (engine) — [13.12 Tool plugins](../for-developers/modules/platform/features/tool-plugins.md): one extra each, Admin-enabled, run in workers under procrastinate. Plugins live in the engine (`invana/plugins/tools/`), dependencies as optional extras; each method registers a catalogue entry in the third-party layer |
 | P-02 | MCP client | AG-13 | Connect an MCP server; its tools become task types in an `mcp` plugin |
-| P-03 | Web search and fetch tools | DS-06 · SH-13 | Honour robots.txt; every row cites its URL |
-| P-04 | Mail tools (read, send) | SH-13 | `mail.send` always asks for approval |
-| P-05 | Science-source tools (PubMed, UniProt, PubChem, genebanks) | DS-06 · DS-10 | Official origin where the source is the author |
+| P-03 | Web search and fetch tools | DS-06 · SH-13 | ✅ B06b (engine) — `web.search` (SearXNG) · `web.fetch` · `web.download_and_extract`. Honour robots.txt; every row cites its URL |
+| P-04 | Mail tools (read, send) | SH-13 | ✅ B06b (engine) — `mail.read` · `mail.send`, held on an approval in the inbox. `mail.send` always asks for approval |
+| P-05 | Science-source tools (PubMed, UniProt, PubChem, genebanks) | DS-06 · DS-10 | ✅ B06b (engine) — `pubmed.search` · `uniprot.get` · `pubchem.get`; genebanks not yet. Official origin where the source is the author |
 | P-06 | Simulation runtime | PJ-09 · PJ-10 (what-if values) | ✅ B09 — [9.8 Simulation](../for-developers/modules/work/features/simulation.md). Reach-by-hops in PJ-10 is plain traversal and is not blocked |
 | P-07 | Domain simulator plugins (e.g. genomic prediction) | PJ-09 | ✅ B09 — the simulator contract ([13.9](../for-developers/modules/platform/features/plugins.md) PL11–PL15) and `sim.genomic_prediction`. The plugin does the science; Invana runs it, pins inputs, labels output derived |
 | P-08 | Dataset record: origin, author chain, licence, versions, hash | all of Datasets | Revives the retired term *Dataset* |

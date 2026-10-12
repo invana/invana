@@ -21,7 +21,7 @@ import enum
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from invana.core.models import Base
@@ -495,3 +495,38 @@ class EvalBudget(Base):
     graph_id: Mapped[str] = mapped_column(String(36), ForeignKey("graphs.id", ondelete="CASCADE"), primary_key=True)
     #: Null is no ceiling.
     monthly_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+
+class PluginState(Base):
+    """Whether an install Admin has enabled a tool plugin
+    (docs/for-developers/modules/platform/features/tool-plugins.md).
+
+    No row is *disabled*: a tool plugin is off until someone switches it on.
+    Core and simulator plugins have no row — they are always on.
+    """
+
+    __tablename__ = "plugin_states"
+
+    #: The plugin's name, e.g. ``invana.tools.web``.
+    name: Mapped[str] = mapped_column(String(128), primary_key=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    #: The Admin who last switched it.
+    changed_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class EnvelopeOutcome(Base):
+    """What a worker made of one envelope — ``Out``, a failure or a signal, as tagged JSON.
+
+    Keyed by the envelope's idempotency key, so the API process finds the
+    outcome it is waiting on, and a redelivered envelope returns the recorded
+    outcome instead of running its task type twice.
+    """
+
+    __tablename__ = "envelope_outcomes"
+
+    #: ``run_id:node_id:attempt``.
+    idempotency_key: Mapped[str] = mapped_column(String(160), primary_key=True)
+    run_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    outcome: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)

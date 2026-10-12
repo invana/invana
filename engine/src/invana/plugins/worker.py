@@ -63,6 +63,14 @@ def _timeout_s(envelope: TaskEnvelope) -> float | None:
     return float(manifest.timeout_s) if manifest and manifest.timeout_s else None
 
 
+def _secrets(envelope: TaskEnvelope) -> tuple[str, ...]:
+    """The secret names the task type's plugin declares — all ``ctx.secret`` will hand out."""
+    registry = load_plugins()
+    manifest = registry.task(envelope.task)
+    plugin = registry.plugins.get(manifest.plugin) if manifest else None
+    return plugin.manifest.secrets if plugin else ()
+
+
 async def run_envelope(
     envelope: TaskEnvelope,
     *,
@@ -87,6 +95,7 @@ async def run_envelope(
     timeout_s = _timeout_s(envelope)
     async with contexts.open(envelope) as (ctx, v):
         ctx.idempotency_key = envelope.idempotency_key
+        ctx.secrets = _secrets(envelope)
         limit = asyncio.timeout(timeout_s)
         try:
             async with limit:

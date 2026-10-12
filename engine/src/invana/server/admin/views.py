@@ -77,10 +77,12 @@ from invana.core.auth.models import PersonalAccessToken, RefreshToken, User
 from invana.core.events.models import Event
 from invana.runtime.models import (
     Emission,
+    EnvelopeOutcome,
     EvalBudget,
     EvalCase,
     EvalResult,
     EvalSet,
+    PluginState,
     ProjectionTemplate,
     TaskPrompt,
     TaskRun,
@@ -135,6 +137,7 @@ from invana.server.notifications.admin import (
     NotificationRuleView,
     NotificationView,
 )
+from invana.server.plugins.admin import EnvelopeOutcomeView, PluginStateView
 from invana.server.rules.admin import RuleVersionView, RuleView
 from invana.server.runtime.admin import (
     EmissionView,
@@ -406,6 +409,19 @@ def mount_admin(app: FastAPI) -> None:
                 NotificationDeliveryView(NotificationDelivery, label="Deliveries", icon="fa fa-paper-plane"),
                 NotificationCursorView(NotificationCursor, label="Cursors", icon="fa fa-bookmark"),
                 ApprovalView(Approval, label="Approvals", icon="fa fa-stamp"),
+            ],
+        ),
+    )
+
+    # ── Plugins (docs/for-developers/modules/platform/features/tool-plugins.md)
+    # ──────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Plugins",
+            icon="fa fa-plug",
+            views=[
+                PluginStateView(PluginState, label="Plugin states", icon="fa fa-toggle-on"),
+                EnvelopeOutcomeView(EnvelopeOutcome, label="Envelope outcomes", icon="fa fa-envelope-open"),
             ],
         ),
     )

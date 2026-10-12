@@ -102,10 +102,16 @@ async def as_user(user_ref: str):
 
 @asynccontextmanager
 async def with_runtime():
-    """An in-process ``TaskRuntime`` over its own engine and graph connections."""
+    """An in-process ``TaskRuntime`` over its own engine and graph connections.
+
+    A ``send`` step held here waits on the same approvals inbox the API uses.
+    """
+    from invana.activity.managers import ApprovalSendGate
     from invana.apps.graphs.pool import GraphConnectionManager
     from invana.core.settings import settings
     from invana.runtime.interpreter import TaskRuntime
+
+    TaskRuntime.send_gate = ApprovalSendGate()
 
     engine = await create_db_engine()
     factory = create_session_factory(engine)

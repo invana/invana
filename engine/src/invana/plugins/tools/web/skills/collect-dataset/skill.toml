@@ -1,0 +1,4 @@
+name = "Collect a dataset from the web"
+version = 1
+when_to_use = "when someone asks to gather data that lives on the web — a published table, a downloadable file, a list on a set of pages"
+description = "Find the source, read it, download the data and return it as rows that each cite where they came from."

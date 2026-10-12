@@ -1,0 +1,17 @@
+key = "web.search"
+version = "0.1.0"
+summary = "Search the web through the install's SearXNG and return titled, cited results."
+bound = "network"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+timeout_s = 30
+retries = 2
+
+[args]
+query = { type = "str", required = true }
+limit = { type = "int", default = 10 }
+
+[outputs]
+results = "list"
+searched_at = "str"

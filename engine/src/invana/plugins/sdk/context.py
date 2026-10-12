@@ -15,6 +15,7 @@ The shared failure builders live here too: every step group turns the same
 from __future__ import annotations
 
 import hashlib
+import os
 import re
 from dataclasses import dataclass, field
 from typing import Any
@@ -217,6 +218,36 @@ class TaskContext:
     runtime: Any = None
     #: ``run_id:node_id:attempt`` of the envelope being run; a write checks it before writing.
     idempotency_key: str | None = None
+    #: The secret names the running task type's plugin declares; set by ``run_envelope``.
+    secrets: tuple[str, ...] = ()
+
+    def secret(self, name: str) -> str:
+        """One declared secret, read from this process's ``INVANA_SECRET_<NAME>``.
+
+        Secrets never ride an envelope: a worker resolves them from its own
+        environment, and only for names the plugin's ``plugin.toml`` declares.
+        An undeclared name is a defect in the plugin; a declared one that is not
+        set is ``blocked`` — the operator sets it on the worker.
+        """
+        if name not in self.secrets:
+            raise TaskFailure(
+                cls="defect",
+                cause="secret_undeclared",
+                message=f"The task type asked for the secret '{name}', which its plugin does not declare.",
+                short="secret not declared",
+                evidence={"secret": name},
+            )
+        env = f"INVANA_SECRET_{name.upper()}"
+        value = os.environ.get(env, "")
+        if not value:
+            raise TaskFailure(
+                cls="blocked",
+                cause="secret_missing",
+                message=f"The secret '{name}' is not set. Set {env} where the worker runs.",
+                short="secret missing",
+                evidence={"secret": name, "env": env},
+            )
+        return value
 
     def artifact(self, name: str, *, direction: str, summary: str | None = None) -> None:
         """Record one file this step read or wrote.
