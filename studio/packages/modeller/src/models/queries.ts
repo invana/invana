@@ -1,3 +1,4 @@
+import { suppressActionToast } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { modelsApi, schemasApi } from "./api";
 import type {
@@ -13,6 +14,7 @@ import type {
 	ModelLinkDeclare,
 	NodeTypeCreate,
 	NodeTypeUpdate,
+	OntologyImportRequest,
 	PropertyKeyCreate,
 	PropertyKeyUpdate,
 } from "./types";
@@ -426,6 +428,25 @@ export const useImportModelMutation = (u: string, g: string) =>
 		g,
 		(body: { artefact?: ModelArtefact; starter?: string; name?: string }) =>
 			modelsApi.importModel(u, g, body),
+	);
+
+/**
+ * An ontology preview — the import with `dry_run`. It writes nothing, so it
+ * invalidates nothing, and its envelope message is not toasted: the dialog
+ * draws the report instead.
+ */
+export const usePreviewOntologyMutation = (u: string, g: string) =>
+	useMutation({
+		mutationFn: (body: Omit<OntologyImportRequest, "dry_run">) =>
+			suppressActionToast(() =>
+				modelsApi.importOntology(u, g, { ...body, dry_run: true }),
+			),
+	});
+
+/** An ontology as a new draft model; the models list re-reads. */
+export const useImportOntologyMutation = (u: string, g: string) =>
+	useModelMutation(u, g, (body: Omit<OntologyImportRequest, "dry_run">) =>
+		modelsApi.importOntology(u, g, { ...body, dry_run: false }),
 	);
 
 // ── Links and the global model (stitch-models.md) ──────────────────────────

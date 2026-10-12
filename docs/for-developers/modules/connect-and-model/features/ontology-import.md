@@ -9,7 +9,7 @@ Nothing publishes until a person does.
 |---|---|
 | Index | [1.10](../../../README.md#1--connect-and-model) · Slice **B12** (P-19) |
 | Module | [Connect and model](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [share-a-model](share-a-model.md) · [domain-models](domain-models.md) · [stitch-models](stitch-models.md) · [skos-import](../../bring-data-in/features/skos-import.md) · products: [modeller.md](../../../../products/modeller.md) MO-15 · MO-F14 |
 
 > **As** a modeller, **I want** to start a model from an ontology — schema.org, RDFS or OWL — and see
@@ -64,7 +64,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| `modeller.models.new.ontology` · `…ontology.preview` | Studio, C08 — pick types, read the report, import |
+| `modeller.models.new.ontology` · `…ontology.preview` | Studio, C08 — Models `⋯` › *From an ontology*: one dialog, pick then preview, *Open as a draft* (`model-editor/components/OntologyImportDialog.tsx`) |
 | `invana models import --graph g --ontology <file\|url> [--types A,B] [--as name] [--format] [--lang] [--dry-run]` | CLI — reads the file or fetches the URL, then the same manager |
 
 ## Engine
@@ -124,6 +124,11 @@ flowchart TD
 | OI10 | **Labels pick a language** — the asked one, then untagged, then any, in that order; names are made identifiers, a clash gets `_2`. |
 | OI11 | **A source IRI is provenance, not shape.** It is in the content hash only when set, so an artefact without IRIs hashes as before. |
 | OI12 | **The preview is the import with nothing written** — same mapping, same report. |
+| OI13 | **Studio reads the ontology; the engine still never fetches.** The Source is *schema.org* (its current JSON-LD release), a URL, or a file; the browser reads it and sends the text. A server that does not let a browser read it is named, with *download the file and choose File*. |
+| OI14 | **One dialog, two steps — pick, then preview.** The text lives in the dialog's memory only; nothing survives a reload, because a 20 MB document has no place in a URL. *Back* keeps the picks. |
+| OI15 | **The picker is the all-classes preview.** After a read, a `dry_run` with no types lists the classes with their property counts; none picked imports every class. Which types a pick pulls in is shown on the preview (`came_with`), not before it. |
+| OI16 | **Above 500 classes the picker takes names.** The engine refuses the all-classes preview there and no route lists classes, so the user names the types (name, label or IRI); an unknown name is the engine's 422. |
+| OI17 | **The preview reads as a mapping** — source → becomes → note: node types (properties, *came with*, inherited), edge types (source → target), stitch suggestions (*you confirm it in Stitches*), skips with their reasons. A taken name is asked for again beside the name field; a type the database cannot hold is named, and the draft still lands. |
 
 ## Not building
 
@@ -136,3 +141,4 @@ flowchart TD
 | Upgrading an imported model from a newer ontology | an ontology import always creates; a later version is a new import or an edit |
 | Confirming a suggestion into a stitch | a person does it in Stitch models (1.6); the report only proposes |
 | Records from an ontology's individuals | a model, not data — records come in through 2.1 |
+| A listed picker above 500 classes | no route lists classes; the picker takes names there (OI16) |

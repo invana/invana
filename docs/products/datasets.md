@@ -36,7 +36,7 @@ Reusable knowledge, labelled by where it came from. Prototype page: *Invana Data
 | DS-F13 | Imports journal and ingestion timeline (CLI and API loads) | Moves (from Modeller) | DS-13 |
 | DS-F14 | Retraction — a version marked retracted with a reason; everything citing it flagged | New · Blocked · P-08 P-13 | DS-14 |
 | DS-F15 | Scheduled refresh → new version, consumers stay pinned | New · Blocked · P-08 | DS-03 |
-| DS-F17 | Import a standard from **SKOS** (concept scheme → terms and allowed values); JSON-LD, Turtle or RDF/XML | New · engine ✅ B12, Studio C08 | DS-15 |
+| DS-F17 | Import a standard from **SKOS** (concept scheme → terms and allowed values); JSON-LD, Turtle or RDF/XML | ✅ B12 · C08 | DS-15 |
 | DS-F16 | Sensitivity labels per dataset and column, read by guardrails | New · Blocked · P-08 | DS-01 · DS-02 |
 
 ## User stories
@@ -122,6 +122,7 @@ Reusable knowledge, labelled by where it came from. Prototype page: *Invana Data
 | Sharing | Only me · my lab · everyone in the install. Anyone may share their own dataset; a licence is required |
 | Retracting | Only an install Admin retracts; the publisher can request it |
 | SKOS import | A concept scheme becomes a standard: concepts → terms, `skos:prefLabel` → name, `skos:broader` → hierarchy, `skos:notation` → code. The source IRI is kept on each term. First semantic import Invana supports |
+| SKOS import in Studio | *Import from SKOS* on Standards: the browser reads a file or URL (the engine never fetches), a read previews at once, several schemes become a picker, the name is editable — [2.8](../for-developers/modules/bring-data-in/features/skos-import.md) SK8–SK11 |
 | Versions | Immutable; a fix is a new version; a finding cites the exact version |
 | Observations | Small entry by form or assistant, authored by the person; bulk loads by CLI or API |
 | Gap filling | Estimates never mix into collected data — they land in a separate `generated` dataset |

@@ -9,7 +9,7 @@ the first semantic import Invana supports.
 |---|---|
 | Index | [2.8](../../../README.md#2--bring-data-in) · Slice **B12** (P-19) |
 | Module | [Bring data in](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [standards](standards.md) · [ontology-import](../../connect-and-model/features/ontology-import.md) · products: [datasets.md](../../../../products/datasets.md) DS-15 · DS-F17 |
 
 > **As** a curator, **I want** to import a standard from a SKOS vocabulary, **so that** published
@@ -63,7 +63,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| `datasets.standards.import` | Studio, C08 — upload, preview, import |
+| `datasets.standards.import` | Studio, C08 — *Import from SKOS* on the Standards page: a dialog that reads a file or URL, previews and imports (`standards/ImportSkosDialog.tsx`) |
 | `invana standards import --skos <file\|url> [--scheme IRI] [--publisher p] [--name n] [--format] [--lang] [--why] [--dry-run] [--user u]` | CLI — reads the file or fetches the URL, then the same manager |
 
 ## Engine
@@ -98,6 +98,10 @@ flowchart TD
 | SK5 | **The source IRI is kept** on each term and value, and is part of the terms' hash. |
 | SK6 | **Reading is shared with the ontology import** — formats, detection, the 20 MB cap, never fetching, labels by language ([ontology-import](../../connect-and-model/features/ontology-import.md) OI3 · OI4 · OI10). |
 | SK7 | **The preview is the import with nothing written.** |
+| SK8 | **Studio reads the vocabulary; the engine still never fetches.** The dialog's Source is a file or a URL the browser fetches itself, its text sent as `content`. A server that does not let a browser read it is named, with *download the file and choose File*. Text over 20 MB is refused before it is sent. |
+| SK9 | **Reading previews.** A read runs the `dry_run` at once; the dialog shows what it found (scheme, concepts, levels), the name it publishes under, the SKOS → standard mapping, the terms, and the report's notes and skips. *Import as a standard* stays disabled until a preview succeeds. |
+| SK10 | **Several schemes are a choice, not an error.** The 422 that lists the file's schemes becomes a *Concept scheme* picker; choosing one previews again with `scheme`. |
+| SK11 | **The name is editable; the publisher is the caller.** It defaults to the slug of the scheme's title. An import lands on the standard's page — created, versioned, or *Nothing changed* when the terms are identical. |
 
 ## Not building
 

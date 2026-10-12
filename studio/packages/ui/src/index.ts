@@ -14,6 +14,7 @@ export * from "./layerPalette";
 export * from "./PanelSection";
 export * from "./PanelStatusBar";
 export * from "./PrincipalChip";
+export * from "./RdfSourceField";
 export * from "./RecordRow";
 export * from "./RuleParts";
 export * from "./SectionTitle";

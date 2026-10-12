@@ -234,6 +234,56 @@ export interface StandardCreate {
 	why?: string;
 }
 
+// ── SKOS import (skos-import.md) ─────────────────────────────────────────────
+
+type RdfFormat = "turtle" | "json-ld" | "rdf-xml";
+
+/** One thing an import skipped, or did in a way worth saying. */
+interface ImportNote {
+	iri?: string | null;
+	subject: string;
+	/** `duplicate_code` · `no_label` · `related` … */
+	kind: string;
+	message: string;
+}
+
+interface SkosReport {
+	format: RdfFormat;
+	triples: number;
+	/** `{ terms: 3, values: 41 }` */
+	mapped: { terms?: number; values?: number };
+	skipped: ImportNote[];
+	skipped_count: number;
+	notes: ImportNote[];
+	notes_count: number;
+}
+
+export interface SkosImportRequest {
+	content: string;
+	format?: RdfFormat;
+	/** The concept scheme's IRI; needed when the file holds several. */
+	scheme?: string;
+	publisher?: string;
+	name?: string;
+	lang?: string;
+	why?: string;
+	dry_run?: boolean;
+}
+
+export interface SkosImportResult {
+	/** `publisher/name` the import writes to — or would. */
+	address: string;
+	scheme_iri: string | null;
+	title: string;
+	terms: StandardTerm[];
+	/** Absent on a dry run. */
+	standard?: Standard | null;
+	/** Absent on a dry run, and when the terms were unchanged. */
+	version?: { version: number; address: string } | null;
+	unchanged: boolean;
+	report: SkosReport;
+}
+
 export interface Violation {
 	key: string;
 	term: string;

@@ -35,6 +35,7 @@ import type {
 	DatasetUpdate,
 	DatasetVersion,
 	DatasetVersionListResponse,
+	SkosImportRequest,
 	StandardCreate,
 } from "./types";
 
@@ -281,6 +282,24 @@ export function useCreateStandard() {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: (data: StandardCreate) => standardsApi.create(data),
+		onSuccess: () => qc.invalidateQueries({ queryKey: ["standards"] }),
+	});
+}
+
+/** A SKOS preview — the import with `dry_run`; it writes nothing, so it invalidates nothing. */
+export function usePreviewSkos() {
+	return useMutation({
+		mutationFn: (data: Omit<SkosImportRequest, "dry_run">) =>
+			standardsApi.importSkos({ ...data, dry_run: true }),
+	});
+}
+
+/** A SKOS import — creates the standard, mints its next version, or writes nothing when unchanged. */
+export function useImportSkos() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: (data: Omit<SkosImportRequest, "dry_run">) =>
+			standardsApi.importSkos({ ...data, dry_run: false }),
 		onSuccess: () => qc.invalidateQueries({ queryKey: ["standards"] }),
 	});
 }

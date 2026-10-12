@@ -178,7 +178,7 @@
    "story": "SH-20",
    "product": "shell",
    "route": "/u/admin/airways/agents/skills/answer-nl",
-   "state": "answer-nl stands for a skill's slug: open any skill from Skills, signed in as a member without the Agents role (needs B11)"
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills, signed in as e2e-viewer (a viewer on the Graph; e2e/roles-agents.spec.ts makes the account, its password is in e2e/members.ts)"
   },
   "shell.profile": {
    "story": "SH-17",
@@ -316,7 +316,7 @@
    "story": "DS-15",
    "product": "datasets",
    "route": "/datasets/standards",
-   "state": "Import \u203a From SKOS (needs B12)"
+   "state": "Import from SKOS \u203a File: demos/arabidopsis/semantic/plant-traits.skos.ttl (the preview)"
   },
   "datasets.imports": {
    "story": "DS-13",
@@ -406,13 +406,13 @@
    "story": "MO-15",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": "New model \u203a From an ontology (needs B12)"
+   "state": "More actions \u203a From an ontology \u203a File: demos/arabidopsis/semantic/schema-org-subset.ttl; tick Person, Organization, Product"
   },
   "modeller.models.new.ontology.preview": {
    "story": "MO-15",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": "New model \u203a From an ontology \u203a pick types \u203a Preview (needs B12)"
+   "state": "the same, then Preview"
   },
   "modeller.models.overview": {
    "story": "MO-07",
@@ -514,13 +514,13 @@
    "story": "MO-14",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/settings",
-   "state": "Database tab"
+   "state": "Database tab (?tab=graph)"
   },
   "modeller.settings.members": {
    "story": "MO-14",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/settings",
-   "state": "Members tab"
+   "state": "Members tab (?tab=members)"
   },
   "explorer.home": {
    "story": "EX-01",

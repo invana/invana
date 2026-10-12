@@ -4,7 +4,9 @@
  * write, each with how many datasets claim it.
  *
  * The search is the server's (`q`). *Write a standard* opens the dialog and,
- * once v1 is published, the new standard's page. A row opens the standard.
+ * once v1 is published, the new standard's page. *Import from SKOS* reads a
+ * vocabulary, previews it and opens the standard it created or versioned
+ * (DS-15, board `datasets.standards.import`). A row opens the standard.
  */
 
 import {
@@ -22,13 +24,14 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { PanelSection } from "@invana-studio/ui";
-import { Library, PenLine } from "lucide-react";
+import { FileDown, Library, PenLine } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DatasetRef } from "../api";
 import { Page, PageBody } from "../parts";
 import { useClaims, useStandardsQuery } from "../queries";
 import type { Standard } from "../types";
+import { ImportSkosDialog } from "./ImportSkosDialog";
 import { WriteStandardDialog } from "./WriteStandardDialog";
 
 /** `/datasets/standards/<publisher>/<name>` */
@@ -66,6 +69,7 @@ export function StandardsPage() {
 	const navigate = useNavigate();
 	const [q, setQ] = useState("");
 	const [writing, setWriting] = useState(false);
+	const [importing, setImporting] = useState(false);
 	const library = useStandardsQuery(q.trim() || undefined);
 	const counts = useClaimCounts();
 	const items = library.data?.items ?? [];
@@ -81,10 +85,20 @@ export function StandardsPage() {
 					</Badge>
 				}
 				actions={
-					<Button size="sm" onClick={() => setWriting(true)}>
-						<PenLine />
-						Write a standard
-					</Button>
+					<>
+						<Button
+							size="sm"
+							variant="outline"
+							onClick={() => setImporting(true)}
+						>
+							<FileDown />
+							Import from SKOS
+						</Button>
+						<Button size="sm" onClick={() => setWriting(true)}>
+							<PenLine />
+							Write a standard
+						</Button>
+					</>
 				}
 			/>
 			<PageBody>
@@ -114,7 +128,7 @@ export function StandardsPage() {
 						<EmptyState
 							icon={<Library className="size-6" />}
 							title={q ? "No standard matches" : "No standards yet"}
-							description="Write your lab's own, or import a SKOS vocabulary with `invana standards import --skos <file>`."
+							description="Write your lab's own, or import a published SKOS vocabulary."
 						/>
 					) : (
 						<Table bordered={false} density="compact">
@@ -162,6 +176,16 @@ export function StandardsPage() {
 					open
 					onClose={() => setWriting(false)}
 					onCreated={(s) => navigate(standardPath(s))}
+				/>
+			) : null}
+			{importing ? (
+				<ImportSkosDialog
+					open
+					onClose={() => setImporting(false)}
+					onImported={(r) => {
+						const [publisher = "", name = ""] = r.address.split("/");
+						navigate(standardPath({ publisher, name }));
+					}}
 				/>
 			) : null}
 		</Page>

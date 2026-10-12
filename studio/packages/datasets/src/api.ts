@@ -25,6 +25,8 @@ import type {
 	ModelSummary,
 	ModelVersionTypes,
 	RecordChangeLog,
+	SkosImportRequest,
+	SkosImportResult,
 	Standard,
 	StandardCreate,
 	StandardListResponse,
@@ -137,6 +139,10 @@ export const standardsApi = {
 
 	create: (data: StandardCreate) =>
 		request<Standard>(STANDARDS, json("POST", data)),
+
+	/** A SKOS concept scheme → a standard; `dry_run` previews and writes nothing. */
+	importSkos: (data: SkosImportRequest) =>
+		request<SkosImportResult>(`${STANDARDS}/import/skos`, json("POST", data)),
 };
 
 function graphBase(username: string, graphSlug: string): string {

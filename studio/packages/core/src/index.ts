@@ -23,6 +23,7 @@ export * from "./hooks/useTicker";
 export * from "./hooks/useUpdateSearchParams";
 export * from "./lib/access";
 export * from "./lib/format";
+export * from "./lib/rdfSource";
 export * from "./lib/sections";
 export * from "./lib/time";
 export * from "./services/api/auth";

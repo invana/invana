@@ -362,6 +362,94 @@ export interface ModelImportResult {
 	publishable: boolean;
 }
 
+// ── Ontology import (ontology-import.md) ────────────────────────────────────
+
+type RdfFormat = "turtle" | "json-ld" | "rdf-xml";
+
+/** One thing an import skipped, or did in a way worth saying. */
+interface ImportNote {
+	iri?: string | null;
+	subject: string;
+	/** `restriction` · `no_domain` · `flattened` … */
+	kind: string;
+	message: string;
+}
+
+export interface MappedType {
+	name: string;
+	iri: string;
+	kind: "node" | "edge";
+	/** `Person.birthPlace` — the property that brought an unpicked type in. */
+	came_with?: string | null;
+	properties: string[];
+	inherited: { property: string; from_type: string }[];
+}
+
+interface StitchSuggestion {
+	kind: "same_as" | "equivalent_class" | "equivalent_property";
+	name: string;
+	iri: string;
+	target_iri: string;
+}
+
+export interface OntologyReport {
+	format: RdfFormat;
+	triples: number;
+	mapped: { node_types: number; edge_types: number; property_keys: number };
+	types: MappedType[];
+	skipped: ImportNote[];
+	skipped_count: number;
+	notes: ImportNote[];
+	notes_count: number;
+	suggestions: StitchSuggestion[];
+}
+
+/** The draft an ontology import creates — or would; the artefact's model shape. */
+interface OntologyDraft {
+	schema_name: string;
+	schema_description?: string | null;
+	property_keys: {
+		name: string;
+		type: string;
+		description?: string | null;
+		source_iri?: string | null;
+	}[];
+	node_types: {
+		name: string;
+		description?: string | null;
+		property_mappings: { property_key: string; sort_order?: number }[];
+		source_iri?: string | null;
+	}[];
+	edge_types: {
+		name: string;
+		description?: string | null;
+		source_node_types: string[];
+		target_node_types: string[];
+		source_iri?: string | null;
+	}[];
+}
+
+export interface OntologyImportRequest {
+	content: string;
+	format?: RdfFormat;
+	/** Class names, local names or IRIs; omitted, every class (at most 500). */
+	types?: string[];
+	/** The model's name in this Graph; omitted, the ontology's label. */
+	name?: string;
+	lang?: string;
+	dry_run?: boolean;
+}
+
+export interface OntologyImportResult {
+	/** Absent on a dry run. */
+	model?: GraphModelResponse | null;
+	version?: GraphVersionResponse | null;
+	draft: OntologyDraft;
+	report: OntologyReport;
+	unsupported_property_types: UnsupportedPropertyType[];
+	publishable: boolean;
+}
+
 export interface SchemaDiff {
 	added_property_keys: string[];
 	removed_property_keys: string[];

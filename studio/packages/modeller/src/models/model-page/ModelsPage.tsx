@@ -34,6 +34,7 @@ import { modelsApi } from "../api";
 import { DeleteModelDialog } from "../model-editor/components/DeleteModelDialog";
 import { ImportModelDialog } from "../model-editor/components/ImportModelDialog";
 import { ModelFormDialog } from "../model-editor/components/ModelFormDialog";
+import { OntologyImportDialog } from "../model-editor/components/OntologyImportDialog";
 import { ModelCanvas } from "../model-editor/ModelCanvas";
 import type { ModelSelection } from "../model-editor/types";
 import {
@@ -210,6 +211,7 @@ export function ModelsPage({
 		null,
 	);
 	const [importing, setImporting] = useState(false);
+	const [fromOntology, setFromOntology] = useState(false);
 	const [deleting, setDeleting] = useState<GraphModelSummary | null>(null);
 	const [publishing, setPublishing] = useState(false);
 	const [refused, setRefused] = useState<{
@@ -407,6 +409,8 @@ export function ModelsPage({
 		switch (item) {
 			case "starters":
 				return setImporting(true);
+			case "ontology":
+				return setFromOntology(true);
 			case "introspect":
 				return introspect.mutate();
 			case "rename":
@@ -518,6 +522,21 @@ export function ModelsPage({
 					set({ scope: modelId, open: true, tab: "model" }, { panel: "model" });
 				}}
 			/>
+			{fromOntology ? (
+				<OntologyImportDialog
+					open
+					username={username}
+					graphSlug={graphSlug}
+					onClose={() => setFromOntology(false)}
+					onImported={(modelId) => {
+						setFromOntology(false);
+						set(
+							{ scope: modelId, open: true, tab: "model" },
+							{ panel: "model" },
+						);
+					}}
+				/>
+			) : null}
 			<DeleteModelDialog
 				model={deleting}
 				username={username}

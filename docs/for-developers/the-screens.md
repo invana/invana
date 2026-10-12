@@ -689,7 +689,23 @@ builds them in `@invana-studio/datasets` (migration session C01). Decisions are 
 | `datasets.bind` | DS-11 | *Bind to a Graph* on the dataset header | ✅ |
 | `datasets.share` | DS-12 | *Share* on the dataset header — only me · the install | ✅ |
 | `datasets.imports` · `datasets.imports.run` | DS-13 | `/datasets/imports` | ✅ |
-| `datasets.standards.import` | DS-15 | C08 | 🔵 |
+
+---
+
+## Beyond the 42 · Semantic imports
+
+The SKOS and ontology import boards of the *Invana Products* prototype (DS-15 · MO-15,
+`.design/canvas-products/p_round3.py`), as Studio builds them in `@invana-studio/datasets` and
+`@invana-studio/modeller` (migration session C08). Both are dialogs over their list page; the source
+field is `RdfSourceField` in `@invana-studio/ui`. Decisions are in
+[2.8](modules/bring-data-in/features/skos-import.md) SK8–SK11 and
+[1.10](modules/connect-and-model/features/ontology-import.md) OI13–OI17.
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `datasets.standards.import` | DS-15 | `/datasets/standards` › *Import from SKOS* — read, preview, import | ✅ |
+| `modeller.models.new.ontology` | MO-15 | `/modeller/models` › `⋯` › *From an ontology* — read, pick types (names above 500 classes) | ✅ |
+| `modeller.models.new.ontology.preview` | MO-15 | the same › *Preview* — the mapping, skips and suggestions; *Open as a draft* | ✅ |
 
 ---
 

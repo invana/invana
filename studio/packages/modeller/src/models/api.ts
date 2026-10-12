@@ -25,6 +25,8 @@ import type {
 	NodeTypeCreate,
 	NodeTypeResponse,
 	NodeTypeUpdate,
+	OntologyImportRequest,
+	OntologyImportResult,
 	PhysicalSchema,
 	ProjectionPlan,
 	PropertyKeyCreate,
@@ -304,6 +306,12 @@ export const modelsApi = {
 		g: string,
 		body: { artefact?: ModelArtefact; starter?: string; name?: string },
 	) => post(`${base(u, g)}/import`, body) as Promise<ModelImportResult>,
+	/** An ontology as a draft model; `dry_run` previews and writes nothing. */
+	importOntology: (u: string, g: string, body: OntologyImportRequest) =>
+		post(
+			`${base(u, g)}/import/ontology`,
+			body,
+		) as Promise<OntologyImportResult>,
 	upgradeModel: (
 		u: string,
 		g: string,

@@ -70,6 +70,7 @@ export const MODELS_ACTIONS = {
 /** What `⋯` holds, per scope and state (the-model-page.md · The page). */
 const MODELS_MENU = {
 	starters: "Starter models",
+	ontology: "From an ontology",
 	introspect: "Introspect",
 	rename: "Rename",
 	exportModel: "Export",
@@ -338,7 +339,7 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 						icon: "upload",
 						variant: "outline",
 					},
-					menu(["starters", "introspect"]),
+					menu(["starters", "ontology", "introspect"]),
 				],
 				canWrite,
 			),

@@ -34,7 +34,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | MO-F11 | Rules at install, Graph or project scope | New · Blocked · P-12 | MO-12 |
 | MO-F12 | Requests inbox | New | MO-13 |
 | MO-F13 | Graph settings — basic, database, members and roles | In Studio (members and roles, C07) | MO-14 |
-| MO-F14 | New model from an ontology — **RDFS / OWL subset, including schema.org**; JSON-LD, Turtle or RDF/XML; pick types, preview, open as a draft | New · engine ✅ B12, Studio C08 | MO-15 |
+| MO-F14 | New model from an ontology — **RDFS / OWL subset, including schema.org**; JSON-LD, Turtle or RDF/XML; pick types, preview, open as a draft | ✅ B12 · C08 | MO-15 |
 | MO-F15 | Constraints from **SHACL**; schema from **GQL graph types** (ISO/IEC 39075) | Later | — |
 
 ## User stories
@@ -90,6 +90,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | Breaking data changes | A breaking publish generates a migration run: affected counts, sample before/after, records that would fail. It runs after approval; failures go to Datasets › Validation. Nothing changes silently |
 | Rules show impact | A rule shows what it would have stopped in the last 30 days before it saves |
 | Semantic imports | Invana keeps its own model; every import maps into it. Order: SKOS (in Datasets), then the RDFS/OWL subset with schema.org, then SHACL, then GQL graph types. Import only for now — the source IRI kept on every type and property makes export cheap later |
+| Ontology import in Studio | Models `⋯` › *From an ontology*: one dialog, pick then preview; schema.org · URL · file read by the browser; the all-classes preview is the picker, and above 500 classes the picker takes names — [1.10](../for-developers/modules/connect-and-model/features/ontology-import.md) OI13–OI17 |
 | OWL mapping | `owl:Class` → node type · datatype property → property (XSD → Invana type) · object property → edge type (domain → range) · `rdfs:subClassOf` → **flattened**, inherited properties noted with their source · labels and comments → names and descriptions · `owl:sameAs` / `equivalentClass` → stitch **suggestions** a person confirms · restrictions, inference and complex class expressions → **skipped and listed** in the import report |
 | schema.org | Choose the types you need; the types they depend on come with them |
 | Model in the settings modal | Read-only; editing hands off to the canvas |
