@@ -1921,6 +1921,74 @@
         "title": "AuthResponse",
         "type": "object"
       },
+      "AuthorKind": {
+        "enum": [
+          "organisation",
+          "page",
+          "person",
+          "agent",
+          "run"
+        ],
+        "title": "AuthorKind",
+        "type": "string"
+      },
+      "AuthorRole": {
+        "enum": [
+          "original",
+          "collected_by",
+          "modified_by",
+          "validated_by"
+        ],
+        "title": "AuthorRole",
+        "type": "string"
+      },
+      "AuthorStep": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/AuthorKind"
+          },
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "ref": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "role": {
+            "$ref": "#/components/schemas/AuthorRole"
+          }
+        },
+        "required": [
+          "role",
+          "kind",
+          "name"
+        ],
+        "title": "AuthorStep",
+        "type": "object"
+      },
       "BoardCreate": {
         "description": "Create a board.\n\n``kind`` is set here and never changes (B1). ``session_id`` is provenance,\nnot identity \u2014 a ``data`` board is created from a session, every other kind\nfrom its subject (B4).",
         "properties": {
@@ -3181,10 +3249,21 @@
               "rule",
               "plan",
               "agent",
-              "model"
+              "model",
+              "dataset"
             ],
             "title": "Record Kind",
             "type": "string"
+          },
+          "records": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RecordsSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "schema_diff": {
             "anyOf": [
@@ -3218,7 +3297,8 @@
           "basis": {
             "enum": [
               "pinned",
-              "window"
+              "window",
+              "bound"
             ],
             "title": "Basis",
             "type": "string"
@@ -3863,6 +3943,855 @@
           "work_p50_ms"
         ],
         "title": "DailyRow",
+        "type": "object"
+      },
+      "DatasetBindingCreate": {
+        "properties": {
+          "dataset": {
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Dataset",
+            "type": "string"
+          },
+          "model": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Model",
+            "type": "string"
+          },
+          "type": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dataset",
+          "model",
+          "type"
+        ],
+        "title": "DatasetBindingCreate",
+        "type": "object"
+      },
+      "DatasetBindingListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetBindingRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "DatasetBindingListResponse",
+        "type": "object"
+      },
+      "DatasetBindingRead": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "bound_at": {
+            "format": "date-time",
+            "title": "Bound At",
+            "type": "string"
+          },
+          "bound_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bound By Id"
+          },
+          "graph_id": {
+            "title": "Graph Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "model_id": {
+            "title": "Model Id",
+            "type": "string"
+          },
+          "model_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Name"
+          },
+          "newer_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Newer Version"
+          },
+          "retracted": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Retraction"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "type_name": {
+            "title": "Type Name",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "graph_id",
+          "model_id",
+          "model_name",
+          "type_name",
+          "address",
+          "version",
+          "run_id",
+          "bound_by_id",
+          "bound_at",
+          "retracted"
+        ],
+        "title": "DatasetBindingRead",
+        "type": "object"
+      },
+      "DatasetCreate": {
+        "properties": {
+          "column_sensitivity": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Sensitivity"
+            },
+            "title": "Column Sensitivity",
+            "type": "object"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "key_column": {
+            "default": "id",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Key Column",
+            "type": "string"
+          },
+          "name": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,62}$",
+            "title": "Name",
+            "type": "string"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Origin"
+          },
+          "publisher": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9][a-z0-9-]{0,62}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publisher"
+          },
+          "sensitivity": {
+            "$ref": "#/components/schemas/Sensitivity",
+            "default": "internal"
+          },
+          "title": {
+            "default": "",
+            "maxLength": 255,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "origin"
+        ],
+        "title": "DatasetCreate",
+        "type": "object"
+      },
+      "DatasetListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "DatasetListResponse",
+        "type": "object"
+      },
+      "DatasetRead": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "author_chain": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Author Chain",
+            "type": "array"
+          },
+          "column_sensitivity": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Column Sensitivity",
+            "type": "object"
+          },
+          "content_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Hash"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Id"
+          },
+          "current_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Version"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key_column": {
+            "title": "Key Column",
+            "type": "string"
+          },
+          "licence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Licence"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "publisher": {
+            "title": "Publisher",
+            "type": "string"
+          },
+          "record_count": {
+            "title": "Record Count",
+            "type": "integer"
+          },
+          "refresh_schedule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refresh Schedule"
+          },
+          "refresh_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refresh Source"
+          },
+          "sensitivity": {
+            "title": "Sensitivity",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "visibility": {
+            "title": "Visibility",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "address",
+          "publisher",
+          "name",
+          "title",
+          "description",
+          "origin",
+          "key_column",
+          "visibility",
+          "sensitivity",
+          "column_sensitivity",
+          "refresh_schedule",
+          "refresh_source",
+          "created_by_id",
+          "created_at",
+          "updated_at",
+          "current_version",
+          "licence",
+          "author_chain",
+          "record_count",
+          "content_hash"
+        ],
+        "title": "DatasetRead",
+        "type": "object"
+      },
+      "DatasetRecordPage": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetRecordRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "address",
+          "items",
+          "total",
+          "offset",
+          "limit"
+        ],
+        "title": "DatasetRecordPage",
+        "type": "object"
+      },
+      "DatasetRecordRead": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provenance"
+          },
+          "values": {
+            "additionalProperties": true,
+            "title": "Values",
+            "type": "object"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "version",
+          "values",
+          "provenance"
+        ],
+        "title": "DatasetRecordRead",
+        "type": "object"
+      },
+      "DatasetRetract": {
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "DatasetRetract",
+        "type": "object"
+      },
+      "DatasetUpdate": {
+        "description": "Metadata. None of it is a version; an omitted field is unchanged.",
+        "properties": {
+          "column_sensitivity": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/Sensitivity"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Column Sensitivity"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "refresh_schedule": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refresh Schedule"
+          },
+          "refresh_source": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refresh Source"
+          },
+          "sensitivity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Sensitivity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Visibility"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "DatasetUpdate",
+        "type": "object"
+      },
+      "DatasetVersionCreate": {
+        "properties": {
+          "author_chain": {
+            "items": {
+              "$ref": "#/components/schemas/AuthorStep"
+            },
+            "title": "Author Chain",
+            "type": "array"
+          },
+          "derived_from": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Derived From",
+            "type": "array"
+          },
+          "licence": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Licence",
+            "type": "string"
+          },
+          "records": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "minItems": 1,
+            "title": "Records",
+            "type": "array"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "licence",
+          "records"
+        ],
+        "title": "DatasetVersionCreate",
+        "type": "object"
+      },
+      "DatasetVersionListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetVersionRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "DatasetVersionListResponse",
+        "type": "object"
+      },
+      "DatasetVersionRead": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "author_chain": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Author Chain",
+            "type": "array"
+          },
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "content_hash": {
+            "title": "Content Hash",
+            "type": "string"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "derived_from": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Derived From",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "licence": {
+            "title": "Licence",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "published_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published By Id"
+          },
+          "record_count": {
+            "title": "Record Count",
+            "type": "integer"
+          },
+          "retracted": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Retraction"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "retracted_inputs": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Retracted Inputs",
+            "type": "array"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "id",
+          "dataset_id",
+          "address",
+          "version",
+          "content_hash",
+          "licence",
+          "author_chain",
+          "columns",
+          "record_count",
+          "source",
+          "derived_from",
+          "why",
+          "published_by_id",
+          "published_at",
+          "retracted"
+        ],
+        "title": "DatasetVersionRead",
+        "type": "object"
+      },
+      "DatasetVersionRef": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "version_id": {
+            "title": "Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "address",
+          "version_id",
+          "dataset_id"
+        ],
+        "title": "DatasetVersionRef",
+        "type": "object"
+      },
+      "DatasetVersionUsage": {
+        "description": "Where one version is cited \u2014 read, never stored.",
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "bindings": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetBindingRead"
+            },
+            "title": "Bindings",
+            "type": "array"
+          },
+          "derived": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetVersionRef"
+            },
+            "title": "Derived",
+            "type": "array"
+          },
+          "retracted": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Retraction"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "address",
+          "retracted",
+          "bindings",
+          "derived"
+        ],
+        "title": "DatasetVersionUsage",
         "type": "object"
       },
       "DayValue": {
@@ -9011,6 +9940,18 @@
         "title": "OperationResponse",
         "type": "object"
       },
+      "Origin": {
+        "description": "Where a dataset came from, and so who its author is.",
+        "enum": [
+          "official",
+          "collected",
+          "generated",
+          "observed",
+          "derived"
+        ],
+        "title": "Origin",
+        "type": "string"
+      },
       "Overview": {
         "properties": {
           "attention": {
@@ -10473,6 +11414,25 @@
         "title": "PromoteRequest",
         "type": "object"
       },
+      "PropertyChange": {
+        "properties": {
+          "after": {
+            "title": "After"
+          },
+          "before": {
+            "title": "Before"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          }
+        },
+        "required": [
+          "property"
+        ],
+        "title": "PropertyChange",
+        "type": "object"
+      },
       "PropertyKeyCreate": {
         "properties": {
           "description": {
@@ -10769,6 +11729,93 @@
         "title": "QueryResponse",
         "type": "object"
       },
+      "RecordChange": {
+        "properties": {
+          "actor_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Id"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "added",
+              "changed",
+              "removed"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "properties": {
+            "items": {
+              "$ref": "#/components/schemas/PropertyChange"
+            },
+            "title": "Properties",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "version",
+          "at",
+          "actor_id",
+          "why",
+          "kind",
+          "properties"
+        ],
+        "title": "RecordChange",
+        "type": "object"
+      },
+      "RecordChangeLog": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RecordChange"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "address",
+          "key",
+          "items"
+        ],
+        "title": "RecordChangeLog",
+        "type": "object"
+      },
       "RecordHistory": {
         "description": "Every version of one record, newest first.",
         "properties": {
@@ -10793,7 +11840,8 @@
               "rule",
               "plan",
               "agent",
-              "model"
+              "model",
+              "dataset"
             ],
             "title": "Record Kind",
             "type": "string"
@@ -10876,6 +11924,30 @@
           }
         },
         "title": "RecordOperation",
+        "type": "object"
+      },
+      "RecordsSummary": {
+        "description": "How two versions of a dataset differ, counted by record key.",
+        "properties": {
+          "added": {
+            "title": "Added",
+            "type": "integer"
+          },
+          "changed": {
+            "title": "Changed",
+            "type": "integer"
+          },
+          "removed": {
+            "title": "Removed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "added",
+          "removed",
+          "changed"
+        ],
+        "title": "RecordsSummary",
         "type": "object"
       },
       "RefreshRequest": {
@@ -11159,6 +12231,44 @@
           }
         },
         "title": "RetireRequest",
+        "type": "object"
+      },
+      "Retraction": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By Id"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "at",
+          "by_id",
+          "reason"
+        ],
+        "title": "Retraction",
         "type": "object"
       },
       "RuleCitation": {
@@ -12217,6 +13327,17 @@
         ],
         "title": "SendMessageResponse",
         "type": "object"
+      },
+      "Sensitivity": {
+        "description": "Ordered loosest first \u2014 a column may be tighter than its dataset, never looser.",
+        "enum": [
+          "public",
+          "internal",
+          "confidential",
+          "personal"
+        ],
+        "title": "Sensitivity",
+        "type": "string"
       },
       "SessionContextTurn": {
         "description": "One prior turn in the conversation context sent to the model (docs/for-developers/modules/ask/spec.md \u00b7\ndocs/for-developers/modules/ask/features/reasoning-trace.md).\n\nStructured so the UI can render with hierarchy rather than one blob. A turn is\neither a query turn (``query`` set) or a clarification turn (``question`` set,\ndocs/for-developers/modules/ask/features/clarifying-questions.md). Same turns ``_assemble_history`` replays to the\nmodel.",
@@ -18052,6 +19173,14 @@
         "title": "Vertex",
         "type": "object"
       },
+      "Visibility": {
+        "enum": [
+          "private",
+          "install"
+        ],
+        "title": "Visibility",
+        "type": "string"
+      },
       "WarningRead": {
         "properties": {
           "code": {
@@ -18652,6 +19781,993 @@
         "summary": "Username Available",
         "tags": [
           "auth"
+        ]
+      }
+    },
+    "/api/v1/datasets": {
+      "get": {
+        "description": "The catalogue: every dataset the caller may read, newest first.",
+        "operationId": "list_datasets_api_v1_datasets_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Origin"
+            }
+          },
+          {
+            "in": "query",
+            "name": "publisher",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Publisher"
+            }
+          },
+          {
+            "description": "A Graph as <username>/<slug>.",
+            "in": "query",
+            "name": "bound_in",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A Graph as <username>/<slug>.",
+              "title": "Bound In"
+            }
+          },
+          {
+            "description": "Text in the name, title or description.",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Text in the name, title or description.",
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Datasets",
+        "tags": [
+          "datasets"
+        ]
+      },
+      "post": {
+        "description": "A private dataset with no version yet.",
+        "operationId": "create_dataset_api_v1_datasets_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Dataset",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}": {
+      "get": {
+        "operationId": "get_dataset_api_v1_datasets__publisher___name__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Dataset",
+        "tags": [
+          "datasets"
+        ]
+      },
+      "patch": {
+        "description": "Title, description, sharing, labels and the refresh schedule \u2014 never a version.",
+        "operationId": "update_dataset_api_v1_datasets__publisher___name__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Dataset",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/history": {
+      "get": {
+        "description": "Every version of the dataset, newest first: who, when, why, what changed\nagainst the one before, and the loads that bound it.",
+        "operationId": "dataset_history_api_v1_datasets__publisher___name__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordHistory"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Dataset History",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/history/compare": {
+      "get": {
+        "description": "Two versions of the dataset: licence, author chain, columns and the records summary.",
+        "operationId": "compare_dataset_versions_api_v1_datasets__publisher___name__history_compare_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The version to read to.",
+            "in": "query",
+            "name": "b",
+            "required": true,
+            "schema": {
+              "description": "The version to read to.",
+              "title": "B",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The version to read from; omitted is the one before b.",
+            "in": "query",
+            "name": "a",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The version to read from; omitted is the one before b.",
+              "title": "A"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeCompare"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Compare Dataset Versions",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/records/{key}": {
+      "get": {
+        "operationId": "get_record_api_v1_datasets__publisher___name__records__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Omitted is the current version.",
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Omitted is the current version.",
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetRecordRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Record",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/records/{key}/history": {
+      "get": {
+        "description": "Every version that added, changed or removed one record, newest first.",
+        "operationId": "record_history_api_v1_datasets__publisher___name__records__key__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordChangeLog"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Record History",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/versions": {
+      "get": {
+        "operationId": "list_versions_api_v1_datasets__publisher___name__versions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetVersionListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Versions",
+        "tags": [
+          "datasets"
+        ]
+      },
+      "post": {
+        "description": "The next immutable version, from the records in the body.",
+        "operationId": "publish_version_api_v1_datasets__publisher___name__versions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetVersionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Publish Version",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/versions/{version}": {
+      "get": {
+        "operationId": "get_version_api_v1_datasets__publisher___name__versions__version__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Version",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/versions/{version}/records": {
+      "get": {
+        "description": "One version's records, ordered by key.",
+        "operationId": "list_records_api_v1_datasets__publisher___name__versions__version__records_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetRecordPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Records",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/versions/{version}/retract": {
+      "post": {
+        "description": "Mark one version withdrawn \u2014 an install Admin's act. It stays readable.",
+        "operationId": "retract_version_api_v1_datasets__publisher___name__versions__version__retract_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetRetract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Retract Version",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/versions/{version}/used": {
+      "get": {
+        "description": "The bindings and derived versions that cite one version.",
+        "operationId": "version_used_api_v1_datasets__publisher___name__versions__version__used_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetVersionUsage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Version Used",
+        "tags": [
+          "datasets"
         ]
       }
     },
@@ -22401,6 +24517,136 @@
         "summary": "Get Contention",
         "tags": [
           "graphs"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/dataset-bindings": {
+      "get": {
+        "description": "The Graph's dataset bindings, each with its version, run, retraction and newer version.",
+        "operationId": "list_bindings_api_v1_u__username___graphSlug__dataset_bindings_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetBindingListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Bindings",
+        "tags": [
+          "datasets"
+        ]
+      },
+      "post": {
+        "description": "Bind one dataset version into a model as a node type \u2014 201, then follow the load run.",
+        "operationId": "bind_dataset_api_v1_u__username___graphSlug__dataset_bindings_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetBindingCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetBindingRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Bind Dataset",
+        "tags": [
+          "datasets"
         ]
       }
     },

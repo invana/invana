@@ -74,7 +74,7 @@ Six greppable checks enforce this in `tests/golden/test_code_shape.py`, each wit
 **Deleting an entry is how a conversion is finished**; adding one means the map is wrong, and
 `migration-plan.md` changes first.
 
-Still old-shape, and knowingly so: parts of `runtime/`, `server/datasets/views.py`, and
+Still old-shape, and knowingly so: parts of `runtime/`, and
 `server/routes/{models,model_links,schemas}.py`. Follow whichever shape the package you are editing
 already has, and do not half-convert one in passing.
 

@@ -79,6 +79,9 @@ studio/apps/*/test-results/
 studio/apps/*/playwright-report/
 studio/apps/*/blob-report/
 
+# ─── Bound dataset versions, written for their loads (INVANA_DATASET_DIR) ───
+.invana/
+
 # ─── Migration runner (scripts/migration) ───
 .migration-cache/
 

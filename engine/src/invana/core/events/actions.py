@@ -187,6 +187,14 @@ WORKFLOW_PROMOTE = "workflow.promote"  # a served plan became a library entry
 # ────────────────────────────────────────────
 DATASET_IMPORT = "dataset.import"
 
+# ── Datasets, above Graphs (docs/for-developers/modules/bring-data-in/features/datasets.md)
+# A dataset's events carry no graph_id; only a bind belongs to a Graph.
+DATASET_CREATE = "dataset.create"
+DATASET_VERSION = "dataset.version"  # mints a version
+DATASET_UPDATE = "dataset.update"  # metadata — never a version
+DATASET_RETRACT = "dataset.retract"
+DATASET_BIND = "dataset.bind"
+
 # ── Setup ─────────────────────────────────────────────────────────────────────
 SETUP_COMPLETE = "setup.complete"
 SETUP_SKIP = "setup.skip"
@@ -272,5 +280,6 @@ CHANGE_ACTIONS_BY_TARGET: dict[str, frozenset[str]] = {
     TARGET_AGENT: frozenset({AGENT_CREATE, AGENT_UPDATE, AGENT_SOUL_SET}),
     # An import and an upgrade land as drafts; only publishing mints a version.
     TARGET_MODEL: frozenset({MODEL_ACTIVATE, MODEL_COMMIT}),
+    TARGET_DATASET: frozenset({DATASET_VERSION}),
 }
 CHANGE_ACTIONS: frozenset[str] = frozenset().union(*CHANGE_ACTIONS_BY_TARGET.values())

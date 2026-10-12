@@ -6,7 +6,7 @@ the tables that already hold them. So a record's history is assembled, never
 stored: the version rows say *what*, the minting events say *who, when and
 why*, and the runs say *what happened after*.
 
-Five kinds, each read from its own place:
+Six kinds, each read from its own place:
 
 ==========  ==========================  =================================
 kind        versions                    effect after
@@ -16,11 +16,14 @@ kind        versions                    effect after
 ``plan``    ``task_plans`` by key       roots run on that plan version
 ``agent``   its update events           roots run on that agent version
 ``model``   ``graph_versions``          the Graph's roots while published
+``dataset`` ``dataset_versions``        the loads that bound the version
 ==========  ==========================  =================================
 
 An agent keeps no version rows, so its versions — and what changed in each —
 are read back from the ``diff`` its update events carry. A model is not pinned
-on runs, so its effect is a window and says so (``basis="window"``).
+on runs, so its effect is a window and says so (``basis="window"``). A dataset
+belongs to no Graph: it is read with ``graph_id=None``, and its effect is the
+bind loads its ``dataset.bind`` events name, in any Graph (``basis="bound"``).
 
 Usage::
 
@@ -28,8 +31,10 @@ Usage::
     history = await changes.history(session, graph_id=g.id, record_kind="skill", record_id=skill.id)
     compare = await changes.compare(session, graph_id=g.id, record_kind="skill", record_id=skill.id, a="1", b="3")
 
-A record in another Graph, or a kind that is not versioned, raises
-``NotFoundError`` — absent, never forbidden.
+A record in another Graph, a kind that is not versioned, or a dataset read
+under a Graph (or a Graph's record read without one) raises ``NotFoundError`` —
+absent, never forbidden. Who may read a dataset is the caller's check, made
+before it asks.
 
 Band 4: it reads ``events`` (core), every app's version rows, and ``task_runs``
 (runtime) — which no lower band may join.
@@ -44,8 +49,10 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.activity.schemas import ChangeCompare, ChangeEffect, ChangeEntry, ChangeField, RecordHistory
+from invana.activity.schemas import ChangeCompare, ChangeEffect, ChangeEntry, ChangeField, RecordHistory, RecordsSummary
 from invana.apps.agents.managers import AgentManager
+from invana.apps.datasets.content import records_summary
+from invana.apps.datasets.querysets import DatasetQuerySet, DatasetRecordQuerySet, DatasetVersionQuerySet
 from invana.apps.modeller.models import GraphVersion
 from invana.apps.modeller.store import ModelStore
 from invana.apps.modeller.versioner import compute_diff
@@ -70,7 +77,14 @@ TARGETS: dict[str, str] = {
     "plan": actions.TARGET_WORKFLOW,
     "agent": actions.TARGET_AGENT,
     "model": actions.TARGET_MODEL,
+    "dataset": actions.TARGET_DATASET,
 }
+
+# The kinds above Graphs, read with ``graph_id=None``.
+_ABOVE_GRAPHS = frozenset({"dataset"})
+
+# A dataset version's fields that compare as before → after.
+_DATASET_FIELDS = ("licence", "author_chain", "columns")
 
 # A skill version's text — the fields a step was offered.
 _SKILL_TEXT = ("description", "content", "when_to_use")
@@ -130,6 +144,9 @@ class ChangeLogManager:
     plans_qs = TaskPlanQuerySet()
     skill_versions_qs = SkillVersionQuerySet()
     rule_versions_qs = RuleVersionQuerySet()
+    datasets_qs = DatasetQuerySet()
+    dataset_versions_qs = DatasetVersionQuerySet()
+    dataset_records_qs = DatasetRecordQuerySet()
     skills = SkillManager()
     rules = RuleManager()
     agents = AgentManager()
@@ -137,7 +154,9 @@ class ChangeLogManager:
 
     # ── the reads ────────────────────────────────────────────────────────────
 
-    async def history(self, session: AsyncSession, *, graph_id: str, record_kind: str, record_id: str) -> RecordHistory:
+    async def history(
+        self, session: AsyncSession, *, graph_id: str | None, record_kind: str, record_id: str
+    ) -> RecordHistory:
         """Every version of one record, newest first, each with who made it,
         why, a one-line summary against the version before it, and the effect
         after."""
@@ -174,7 +193,7 @@ class ChangeLogManager:
         return RecordHistory(record_kind=record.kind, record_id=record.id, name=record.name, items=items)
 
     async def compare(
-        self, session: AsyncSession, *, graph_id: str, record_kind: str, record_id: str, a: str | None, b: str
+        self, session: AsyncSession, *, graph_id: str | None, record_kind: str, record_id: str, a: str | None, b: str
     ) -> ChangeCompare:
         """Two versions, from ``a`` to ``b``. ``a`` omitted is the version
         before ``b``; ``a`` newer than ``b`` reads the change backwards."""
@@ -189,9 +208,9 @@ class ChangeLogManager:
 
     # ── loading a record's versions ──────────────────────────────────────────
 
-    async def _load(self, session: AsyncSession, *, graph_id: str, kind: str, record_id: str) -> _Record:
-        if kind not in TARGETS:
-            raise NotFoundError(f"'{kind}' is not a versioned record.")
+    async def _load(self, session: AsyncSession, *, graph_id: str | None, kind: str, record_id: str) -> _Record:
+        if kind not in TARGETS or (kind in _ABOVE_GRAPHS) != (graph_id is None):
+            raise NotFoundError(f"'{kind}' is not a versioned record here.")
         record = await getattr(self, f"_load_{kind}")(session, graph_id, record_id)
         events = await self.events_qs.for_targets(
             session,
@@ -273,6 +292,14 @@ class ChangeLogManager:
         ]
         return _Record("model", model.id, model.name, [model.id], versions)
 
+    async def _load_dataset(self, session: AsyncSession, graph_id: None, record_id: str) -> _Record:
+        dataset = await self.datasets_qs.get(session, record_id)
+        if dataset is None:
+            raise NotFoundError("Dataset not found.")
+        rows = sorted(await self.dataset_versions_qs.list_for_dataset(session, dataset.id), key=lambda r: r.version)
+        versions = [_Version(str(r.version), r.id, r.published_at, r.published_by_id, why=r.why, row=r) for r in rows]
+        return _Record("dataset", dataset.id, dataset.address, [dataset.id], versions)
+
     # ── one version's parts ──────────────────────────────────────────────────
 
     @staticmethod
@@ -299,7 +326,12 @@ class ChangeLogManager:
         return version.why
 
     async def _effect(
-        self, session: AsyncSession, graph_id: str, record: _Record, version: _Version, following: _Version | None
+        self,
+        session: AsyncSession,
+        graph_id: str | None,
+        record: _Record,
+        version: _Version,
+        following: _Version | None,
     ) -> ChangeEffect:
         until = following.at if following is not None else None
         basis = "pinned"
@@ -315,6 +347,11 @@ class ChangeLogManager:
             counts = await self.runs_qs.effect_of_roots(
                 session, graph_id=graph_id, agent=(record.id, int(version.label))
             )
+        elif record.kind == "dataset":
+            basis = "bound"
+            counts = await self.runs_qs.effect_of_roots(
+                session, graph_id=None, run_ids=await self._bind_runs(session, record, version)
+            )
         else:
             basis = "window"
             counts = await self.runs_qs.effect_of_roots(session, graph_id=graph_id, since=version.at, until=until)
@@ -329,6 +366,29 @@ class ChangeLogManager:
             until=until,
         )
 
+    async def _bind_runs(self, session: AsyncSession, record: _Record, version: _Version) -> list[str]:
+        """The load runs the ``dataset.bind`` events of one version name, in
+        every Graph — read from the events, because a binding moved to a later
+        version no longer holds this one."""
+        events = await self.events_qs.for_targets(
+            session,
+            graph_id=None,
+            any_graph=True,
+            target_kind=actions.TARGET_DATASET,
+            target_ids=[record.id],
+            actions=frozenset({actions.DATASET_BIND}),
+        )
+        runs = [
+            (e.details or {}).get("run_id") for e in events if str((e.details or {}).get("version")) == version.label
+        ]
+        return sorted({r for r in runs if r})
+
+    async def _records(self, session: AsyncSession, version: _Version | None) -> dict[str, Any]:
+        if version is None:
+            return {}
+        rows = await self.dataset_records_qs.all_for_version(session, version.id or "")
+        return {r.key: (r.values, r.provenance) for r in rows}
+
     # ── the diff ─────────────────────────────────────────────────────────────
 
     async def _diff(self, session: AsyncSession, record: _Record, a: _Version | None, b: _Version) -> ChangeCompare:
@@ -336,6 +396,7 @@ class ChangeLogManager:
         fields: list[ChangeField] = []
         plan = None
         schema_diff = None
+        records = None
 
         if record.kind == "skill":
             for name in _SKILL_TEXT:
@@ -359,6 +420,14 @@ class ChangeLogManager:
                     fields.append(_field("description", a.row.description, b.row.description, la, b.label))
         elif record.kind == "agent":
             fields = self._agent_fields(record, a, b)
+        elif record.kind == "dataset":
+            for name in _DATASET_FIELDS:
+                before = getattr(a.row, name) if a is not None else None
+                after = getattr(b.row, name)
+                if before != after:
+                    fields.append(_field(name, before, after, la, b.label))
+            added, removed, changed = records_summary(await self._records(session, a), await self._records(session, b))
+            records = RecordsSummary(added=added, removed=removed, changed=changed)
         else:
             older = await self.models.get_version(session, a.id) if a is not None else GraphVersion()
             newer = await self.models.get_version(session, b.id)
@@ -369,8 +438,9 @@ class ChangeLogManager:
             record_id=record.id,
             a=la,
             b=b.label,
-            summary=self._summary(a, b, fields, plan, schema_diff),
+            summary=self._summary(a, b, fields, plan, schema_diff, records),
             fields=fields,
+            records=records,
             plan=plan,
             schema_diff=schema_diff,
         )
@@ -420,12 +490,14 @@ class ChangeLogManager:
         )
 
     @staticmethod
-    def _summary(a, b, fields, plan, schema_diff) -> str:
+    def _summary(a, b, fields, plan, schema_diff, records) -> str:
         if a is None:
             return "the first version"
         if a is b:
             return "the same version"
         parts = [f"{f.field} changed" for f in fields]
+        if records is not None and (records.added or records.removed or records.changed):
+            parts.insert(0, f"{records.added} added · {records.removed} removed · {records.changed} changed")
         if plan is not None and plan.summary != "the same steps":
             parts.append(f"plan: {plan.summary}")
         if schema_diff is not None:

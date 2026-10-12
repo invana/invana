@@ -121,6 +121,104 @@ CREATE TABLE constraint_definitions (
 	CONSTRAINT uq_version_constraint UNIQUE NULLS DISTINCT (version_id, name)
 );
 
+CREATE TABLE dataset_bindings (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	model_id VARCHAR(36) NOT NULL, 
+	dataset_id VARCHAR(36) NOT NULL, 
+	dataset_version_id VARCHAR(36) NOT NULL, 
+	type_name VARCHAR(255) NOT NULL, 
+	run_id VARCHAR(36), 
+	bound_by_id VARCHAR(36), 
+	bound_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT dataset_bindings_pkey PRIMARY KEY (id), 
+	CONSTRAINT dataset_bindings_bound_by_id_fkey FOREIGN KEY(bound_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT dataset_bindings_dataset_id_fkey FOREIGN KEY(dataset_id) REFERENCES datasets (id) ON DELETE CASCADE, 
+	CONSTRAINT dataset_bindings_dataset_version_id_fkey FOREIGN KEY(dataset_version_id) REFERENCES dataset_versions (id) ON DELETE CASCADE, 
+	CONSTRAINT dataset_bindings_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT dataset_bindings_model_id_fkey FOREIGN KEY(model_id) REFERENCES graph_models (id) ON DELETE CASCADE, 
+	CONSTRAINT dataset_bindings_run_id_fkey FOREIGN KEY(run_id) REFERENCES task_runs (id) ON DELETE SET NULL, 
+	CONSTRAINT uq_dataset_binding_target UNIQUE NULLS DISTINCT (graph_id, model_id, dataset_id, type_name)
+);
+
+CREATE INDEX ix_dataset_bindings_dataset_id ON dataset_bindings (dataset_id);
+
+CREATE INDEX ix_dataset_bindings_dataset_version_id ON dataset_bindings (dataset_version_id);
+
+CREATE INDEX ix_dataset_bindings_graph_id ON dataset_bindings (graph_id);
+
+CREATE INDEX ix_dataset_bindings_model_id ON dataset_bindings (model_id);
+
+CREATE TABLE dataset_records (
+	id VARCHAR(36) NOT NULL, 
+	version_id VARCHAR(36) NOT NULL, 
+	key VARCHAR(255) NOT NULL, 
+	values JSON NOT NULL, 
+	provenance JSON, 
+	CONSTRAINT dataset_records_pkey PRIMARY KEY (id), 
+	CONSTRAINT dataset_records_version_id_fkey FOREIGN KEY(version_id) REFERENCES dataset_versions (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_dataset_record_key UNIQUE NULLS DISTINCT (version_id, key)
+);
+
+CREATE INDEX ix_dataset_records_version_id ON dataset_records (version_id);
+
+CREATE TABLE dataset_versions (
+	id VARCHAR(36) NOT NULL, 
+	dataset_id VARCHAR(36) NOT NULL, 
+	version INTEGER NOT NULL, 
+	content_hash VARCHAR(80) NOT NULL, 
+	licence VARCHAR(255) NOT NULL, 
+	author_chain JSON NOT NULL, 
+	columns JSON NOT NULL, 
+	record_count INTEGER NOT NULL, 
+	source TEXT, 
+	derived_from JSON NOT NULL, 
+	why VARCHAR(500), 
+	published_by_id VARCHAR(36), 
+	published_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	retracted_at TIMESTAMP WITH TIME ZONE, 
+	retracted_by_id VARCHAR(36), 
+	retraction_reason VARCHAR(500), 
+	CONSTRAINT dataset_versions_pkey PRIMARY KEY (id), 
+	CONSTRAINT dataset_versions_dataset_id_fkey FOREIGN KEY(dataset_id) REFERENCES datasets (id) ON DELETE CASCADE, 
+	CONSTRAINT dataset_versions_published_by_id_fkey FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT dataset_versions_retracted_by_id_fkey FOREIGN KEY(retracted_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT uq_dataset_version_number UNIQUE NULLS DISTINCT (dataset_id, version)
+);
+
+CREATE INDEX ix_dataset_versions_content_hash ON dataset_versions (content_hash);
+
+CREATE INDEX ix_dataset_versions_dataset_id ON dataset_versions (dataset_id);
+
+CREATE TABLE datasets (
+	id VARCHAR(36) NOT NULL, 
+	publisher VARCHAR(63) NOT NULL, 
+	name VARCHAR(63) NOT NULL, 
+	title VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	origin VARCHAR(16) NOT NULL, 
+	key_column VARCHAR(255) NOT NULL, 
+	visibility VARCHAR(16) NOT NULL, 
+	sensitivity VARCHAR(16) NOT NULL, 
+	column_sensitivity JSON NOT NULL, 
+	refresh_schedule VARCHAR(128), 
+	refresh_source TEXT, 
+	current_version_id VARCHAR(36), 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT datasets_pkey PRIMARY KEY (id), 
+	CONSTRAINT datasets_created_by_id_fkey FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT fk_datasets_current_version FOREIGN KEY(current_version_id) REFERENCES dataset_versions (id) ON DELETE SET NULL, 
+	CONSTRAINT uq_dataset_address UNIQUE NULLS DISTINCT (publisher, name)
+);
+
+CREATE INDEX ix_datasets_created_by_id ON datasets (created_by_id);
+
+CREATE INDEX ix_datasets_origin ON datasets (origin);
+
+CREATE INDEX ix_datasets_publisher ON datasets (publisher);
+
 CREATE TABLE edge_type_definitions (
 	id VARCHAR(36) NOT NULL, 
 	version_id VARCHAR(36) NOT NULL, 

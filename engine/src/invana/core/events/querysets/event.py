@@ -58,22 +58,28 @@ class EventQuerySet:
         return (await session.execute(stmt)).scalar_one_or_none()
 
     async def for_targets(
-        self, session: AsyncSession, *, graph_id: str, target_kind: str, target_ids: list[str], actions: frozenset[str]
+        self,
+        session: AsyncSession,
+        *,
+        graph_id: str | None,
+        target_kind: str,
+        target_ids: list[str],
+        actions: frozenset[str],
+        any_graph: bool = False,
     ) -> list[Event]:
         """One record's events of the given actions, oldest first — what a
-        record's history reads its who, when and why from."""
+        record's history reads its who, when and why from.
+
+        ``graph_id`` None reads the events of a record above Graphs (a
+        dataset's, which carry none); ``any_graph`` drops the Graph filter, for
+        the events a Graph-scoped act writes about such a record.
+        """
         if not target_ids:
             return []
-        stmt = (
-            select(Event)
-            .where(
-                Event.graph_id == graph_id,
-                Event.target_kind == target_kind,
-                Event.target_id.in_(target_ids),
-                Event.action.in_(sorted(actions)),
-            )
-            .order_by(Event.created_at, Event.id)
-        )
+        where = [Event.target_kind == target_kind, Event.target_id.in_(target_ids), Event.action.in_(sorted(actions))]
+        if not any_graph:
+            where.append(Event.graph_id.is_(None) if graph_id is None else Event.graph_id == graph_id)
+        stmt = select(Event).where(*where).order_by(Event.created_at, Event.id)
         return list((await session.execute(stmt)).scalars().all())
 
     async def list_page(

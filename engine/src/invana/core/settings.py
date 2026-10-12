@@ -72,6 +72,9 @@ class Settings(BaseSettings):
     # whether a username is taken, so cap scraping cost. 0 disables the limit.
     auth_username_available_rate_limit_per_minute: int = 30
 
+    # Where a bound dataset version's records are written for its load, by content hash.
+    dataset_dir: str = ".invana/datasets"
+
     # URL Studio is served from — used to build user-facing links (e.g. login).
     studio_base_url: str = "http://localhost:8300"
 

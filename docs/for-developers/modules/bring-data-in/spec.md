@@ -12,7 +12,7 @@ failure vocabulary — and everything it writes carries the record it came from.
 | | |
 |---|---|
 | Index | [§2 · Bring data in](../../README.md#2--bring-data-in) |
-| Features | [load-data](features/load-data.md) · [inspect-what-landed](features/inspect-what-landed.md) · [load-a-bundle](features/load-a-bundle.md) |
+| Features | [load-data](features/load-data.md) · [inspect-what-landed](features/inspect-what-landed.md) · [load-a-bundle](features/load-a-bundle.md) · [datasets](features/datasets.md) · [retract-and-refresh](features/retract-and-refresh.md) · [bind-a-dataset](features/bind-a-dataset.md) |
 | Depends on | [Connect and model](../connect-and-model/spec.md) (a dataset binds to a model) · [Platform](../platform/features/runtime.md) (an import is a run the runtime walks) · [Workflows](../workflows/spec.md) (its plans are builtin library versions) |
 | Depended on by | everything that answers from data |
 
@@ -22,7 +22,7 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 
 | Noun | Is | Is not |
 |---|---|---|
-| **Dataset** | externally produced records conforming to exactly one model | a connection to a source |
+| **Dataset** | install-wide, versioned tables from one source under one authorship; a Graph binds a version into a model ([2.4](features/datasets.md)) | a connection to a source · the records one load brought (those are the model's) |
 | **Import run** | one load of a dataset — a Todo of kind `import` | a background job |
 | **Validation report** | per-record accept or reject, with reasons | a summary count |
 | **Provenance** | the dataset record every written node and edge points back to | a timestamp |

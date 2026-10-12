@@ -74,6 +74,33 @@ async def on_graph(graph_ref: str, user_ref: str | None):
 
 
 @asynccontextmanager
+async def as_user(user_ref: str):
+    """Yield ``(session, actor)`` for a command above Graphs — a dataset's.
+
+    The same transaction and refusal rules as ``on_graph``; there is no Graph
+    owner to default to, so ``--user`` is always named.
+    """
+    engine = await create_db_engine()
+    factory = create_session_factory(engine)
+    try:
+        async with factory() as session:
+            try:
+                actor = await _auth.find_user_by_email_or_username(session, identifier=user_ref)
+                if actor is None:
+                    raise click.UsageError(f"No user {user_ref!r}.")
+                yield session, actor
+                await session.commit()
+            except InvanaError as exc:
+                await session.rollback()
+                raise refusal(exc) from exc
+            except BaseException:
+                await session.rollback()
+                raise
+    finally:
+        await engine.dispose()
+
+
+@asynccontextmanager
 async def with_runtime():
     """An in-process ``TaskRuntime`` over its own engine and graph connections."""
     from invana.apps.graphs.pool import GraphConnectionManager

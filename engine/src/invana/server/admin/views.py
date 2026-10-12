@@ -10,6 +10,7 @@ from starlette_admin.contrib.sqla import Admin
 
 from invana.apps.agents.models import Agent
 from invana.apps.boards.models import Board, BoardVersion
+from invana.apps.datasets.models import Dataset, DatasetBinding, DatasetRecord, DatasetVersion
 from invana.apps.govern.models import Lens, RunTouch
 from invana.apps.graphs.models import Graph, GraphConnection, GraphMember
 from invana.apps.llm_providers.models import LLMModel, LLMProvider
@@ -61,6 +62,7 @@ from invana.server.auth.admin import (
     UserView,
 )
 from invana.server.boards.admin import BoardVersionView, BoardView
+from invana.server.datasets.admin import DatasetBindingView, DatasetRecordView, DatasetVersionView, DatasetView
 from invana.server.evals.admin import EvalBudgetView, EvalCaseView, EvalResultView, EvalSetView
 from invana.server.events.admin import EventView
 from invana.server.govern.admin import LensView, RunTouchView
@@ -299,6 +301,21 @@ def mount_admin(app: FastAPI) -> None:
             views=[
                 BoardView(Board, label="Boards", icon="fa fa-diagram-project"),
                 BoardVersionView(BoardVersion, label="Board versions", icon="fa fa-clock-rotate-left"),
+            ],
+        ),
+    )
+
+    # ── Datasets, above Graphs (docs/for-developers/modules/bring-data-in/features/datasets.md)
+    # ──────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Datasets",
+            icon="fa fa-table",
+            views=[
+                DatasetView(Dataset, label="Datasets", icon="fa fa-table"),
+                DatasetVersionView(DatasetVersion, label="Dataset versions", icon="fa fa-clock-rotate-left"),
+                DatasetRecordView(DatasetRecord, label="Dataset records", icon="fa fa-list"),
+                DatasetBindingView(DatasetBinding, label="Dataset bindings", icon="fa fa-link"),
             ],
         ),
     )

@@ -53,9 +53,6 @@ def _code(p: Path) -> str:
 _QUERY = re.compile(r"\b(?:select|sa_update|sa_delete)\s*\(")
 
 QUERIES_ALLOWED = {
-    # datasets' views were moved for the band, not yet converted. They go with
-    # the /datasets routes (task-model-migration § 6.7).
-    "server/datasets/views.py",
     # the runtime's own split (planner · state · stream) is its own change
     "runtime/services.py",
     "runtime/stream.py",
@@ -121,7 +118,6 @@ COMMIT_ALLOWED = {
     "runtime/contention.py",
     "server/runtime/runs.py",
     "server/runtime/templates.py",
-    "server/datasets/views.py",
     "server/routes/models.py",
     "server/routes/model_links.py",
     "server/routes/auth.py",
@@ -134,6 +130,8 @@ COMMIT_ALLOWED = {
     "server/skills/views.py",
     # An eval run is opened and then submitted, the same shape as a draw.
     "server/evals/views.py",
+    # Binding a dataset version opens its load run and then submits it, the same shape.
+    "server/datasets/views.py",
     "server/admin/auth.py",
     "runtime/catalogue/records.py",
     # A CLI command is not serving a request: it opens its own session and owns
@@ -223,7 +221,6 @@ EMIT_ALLOWED = {
     "server/task_plans/views.py",
     "server/runtime/runs.py",
     "server/runtime/templates.py",
-    "server/datasets/views.py",
     "cli/commands/stitches.py",
     "runtime/catalogue/records.py",
     "runtime/catalogue/stitching.py",

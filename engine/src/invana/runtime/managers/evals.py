@@ -76,9 +76,7 @@ from invana.runtime.models import (
     TaskRun,
     TriggeredBy,
 )
-from invana.runtime.planning import opening_for
 from invana.runtime.querysets import EmissionQuerySet, EvalQuerySet
-from invana.runtime.services import _queue_opening, _queue_steps, freeze_lens, resolve_endpoint
 from invana.runtime.workflows import NL_QUERY
 
 #: Over live by more than this, tokens or p95 warn at the gate.
@@ -548,6 +546,15 @@ class EvalManager:
     async def _open_case(
         self, db: AsyncSession, *, root: TaskRun, case: EvalCase, side: str, picked: Candidate, agent, seq: int
     ) -> TaskRun:
+        # planning and services both import this package, so either at module level is a cycle.
+        from invana.runtime.planning import opening_for  # noqa: PLC0415
+        from invana.runtime.services import (  # noqa: PLC0415
+            _queue_opening,
+            _queue_steps,
+            freeze_lens,
+            resolve_endpoint,
+        )
+
         frozen = await freeze_lens(db, graph_id=root.graph_id, agent_id=agent.id if agent else None, lens_id=None)
         provider = await resolve_endpoint(
             db,

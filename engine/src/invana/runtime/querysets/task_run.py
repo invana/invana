@@ -504,9 +504,10 @@ class TaskRunQuerySet:
         self,
         session: AsyncSession,
         *,
-        graph_id: str,
+        graph_id: str | None,
         agent: tuple[str, int] | None = None,
         plan: tuple[str, str] | None = None,
+        run_ids: list[str] | None = None,
         since: datetime | None = None,
         until: datetime | None = None,
     ) -> tuple[int, int, int, int]:
@@ -515,11 +516,19 @@ class TaskRunQuerySet:
 
         Exactly one way in: ``agent`` is ``(agent_id, agent_version)``; ``plan``
         is ``(task_plan_id, "template:<key>@<v>")``, the two ways a library plan
-        is run (:meth:`roots_for_plan`); neither is the Graph's roots queued in
-        ``[since, until)``, the window a model version was published for.
+        is run (:meth:`roots_for_plan`); ``run_ids`` names the roots outright —
+        a dataset version's bind loads, in any Graph, so ``graph_id`` is None;
+        none of these is the Graph's roots queued in ``[since, until)``, the
+        window a model version was published for.
         """
-        where = [TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_(None)]
-        if agent is not None:
+        where = [TaskRun.parent_run_id.is_(None)]
+        if graph_id is not None:
+            where.append(TaskRun.graph_id == graph_id)
+        if run_ids is not None:
+            if not run_ids:
+                return 0, 0, 0, 0
+            where.append(TaskRun.id.in_(run_ids))
+        elif agent is not None:
             where += [TaskRun.agent_id == agent[0], TaskRun.agent_version == agent[1]]
         elif plan is not None:
             where.append(or_(TaskRun.task_plan_id == plan[0], TaskRun.plan_origin == plan[1]))

@@ -16,15 +16,15 @@ from invana.apps.modeller.schemas import SchemaDiff
 from invana.apps.task_plans.schemas import PlanVersionDiff
 from invana.core.events.models import ActorKind
 
-RecordKind = Literal["skill", "rule", "plan", "agent", "model"]
+RecordKind = Literal["skill", "rule", "plan", "agent", "model", "dataset"]
 
 
 class ChangeEffect(BaseModel):
     """What ran on a version — counted, never estimated. Tokens, never currency."""
 
     #: ``pinned``: runs that recorded this version · ``window``: the Graph's runs
-    #: while it was the published one (a model is not pinned on runs).
-    basis: Literal["pinned", "window"]
+    #: while it was the published one · ``bound``: the loads that bound it.
+    basis: Literal["pinned", "window", "bound"]
     runs: int
     failed: int
     tokens_in: int
@@ -71,6 +71,14 @@ class ChangeField(BaseModel):
     lines: list[str] = []
 
 
+class RecordsSummary(BaseModel):
+    """How two versions of a dataset differ, counted by record key."""
+
+    added: int
+    removed: int
+    changed: int
+
+
 class ChangeCompare(BaseModel):
     """Two versions of one record, from ``a`` to ``b``.
 
@@ -84,6 +92,8 @@ class ChangeCompare(BaseModel):
     b: str
     summary: str
     fields: list[ChangeField]
+    #: The records added, removed and changed, for a dataset.
+    records: RecordsSummary | None = None
     #: The plan diff, for a plan or for a skill whose two versions drew plans.
     plan: PlanVersionDiff | None = None
     #: The schema diff, for a model.
