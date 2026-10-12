@@ -178,6 +178,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 10.3 | [Observability](modules/operate/features/observability.md) | Query and LLM metrics, cost and latency | 🔵 | — | 🔵 | S11 |
 | 10.4 | [External-agent API](modules/operate/features/external-agent-api.md) | Scoped tokens; retrieval with provenance | 🔵 | — | 🔵 | S10 |
 | 10.5 | [See what ran](modules/operate/features/see-what-ran.md) | **Runs** — every run in the Graph, children nested; Imports is a filter of it | 🟡 | — | 🟡 | S14 |
+| 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | 🔵 | B01 |
 
 
 ## 11 · [Identity and access](modules/identity-and-access/spec.md)
@@ -259,11 +260,11 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 42 | 15 | 15 | 3 |
-| CLI | 4 | 4 | 2 | 65 |
-| Studio | 33 | 15 | 20 | 7 |
+| API | 43 | 15 | 15 | 3 |
+| CLI | 4 | 4 | 3 | 65 |
+| Studio | 33 | 15 | 21 | 7 |
 
-Seventy-five features. **These counts are the tables above, counted** — if a cell is flipped, they
+Seventy-six features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 

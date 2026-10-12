@@ -47,6 +47,8 @@ class SkillUpdate(BaseModel):
     description: str | None = None
     content: str | None = None
     when_to_use: str | None = None
+    #: Why — carried on the event that mints the version, never inferred.
+    why: str | None = Field(default=None, max_length=500)
 
 
 class SkillVersionPublish(BaseModel):
@@ -55,6 +57,8 @@ class SkillVersionPublish(BaseModel):
     description: str | None = None
     content: str | None = None
     when_to_use: str | None = None
+    #: Why — carried on the event that mints the version, never inferred.
+    why: str | None = Field(default=None, max_length=500)
 
 
 class SkillVersionRead(BaseModel):
@@ -418,6 +422,8 @@ class RuleUpdate(BaseModel):
 
     statement: str | None = Field(default=None, min_length=1)
     order: int | None = None
+    #: Why — carried on the event that mints the version, never inferred.
+    why: str | None = Field(default=None, max_length=500)
 
 
 class RuleVersionRead(BaseModel):

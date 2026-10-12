@@ -249,3 +249,18 @@ TARGET_AGENT = "agent"
 TARGET_THINKING = "run"
 TARGET_WORKFLOW = "workflow"
 TARGET_TOKEN = "personal_access_token"
+
+
+# ── The change log (docs/for-developers/modules/operate/features/change-log.md)
+# ──────────────────────────────────────────
+# The actions that mint a version of a versioned record, by target kind. The
+# change log is the events list narrowed to these — never a second record.
+CHANGE_ACTIONS_BY_TARGET: dict[str, frozenset[str]] = {
+    TARGET_SKILL: frozenset({SKILL_CREATE, SKILL_PUBLISH}),
+    TARGET_RULE: frozenset({RULE_CREATE, RULE_PUBLISH}),
+    TARGET_WORKFLOW: frozenset({WORKFLOW_PROMOTE}),
+    TARGET_AGENT: frozenset({AGENT_CREATE, AGENT_UPDATE, AGENT_SOUL_SET}),
+    # An import and an upgrade land as drafts; only publishing mints a version.
+    TARGET_MODEL: frozenset({MODEL_ACTIVATE, MODEL_COMMIT}),
+}
+CHANGE_ACTIONS: frozenset[str] = frozenset().union(*CHANGE_ACTIONS_BY_TARGET.values())

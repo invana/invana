@@ -322,7 +322,15 @@ class AgentManager:
                     target_id=agent.id,
                     graph_id=agent.graph_id,
                     actor_id=actor.id,
-                    details={"name": agent.name, "changed": rest, "version": agent.version},
+                    details={
+                        "name": agent.name,
+                        "changed": rest,
+                        "version": agent.version,
+                        # Before and after — the agent keeps no version rows,
+                        # so this is the only place an earlier version survives.
+                        "diff": {f: changed[f] for f in rest},
+                        "why": payload.why,
+                    },
                 )
             if voice:
                 await emit_event(
@@ -332,15 +340,17 @@ class AgentManager:
                     target_id=agent.id,
                     graph_id=agent.graph_id,
                     actor_id=actor.id,
-                    # The dials are small and closed, so they ride in full; the
-                    # soul is a document, so the event says its size and the
-                    # agent version holds the text.
+                    # The dials ride in full beside the soul's size; ``diff``
+                    # holds the before and after, text included, because the
+                    # agent keeps no version rows to hold it instead.
                     details={
                         "name": agent.name,
                         "changed": voice,
                         "version": agent.version,
                         "soul_traits": agent.soul_traits,
                         "soul_chars": len(agent.soul or ""),
+                        "diff": {f: changed[f] for f in voice},
+                        "why": payload.why,
                     },
                 )
         return agent

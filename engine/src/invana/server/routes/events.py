@@ -119,13 +119,19 @@ async def list_graph_events(
     skill: str | None = Query(default=None),
     action_prefix: str | None = Query(default=None),
     action: list[str] | None = Query(default=None),
+    changes: bool = Query(default=False, description="Only the events that mint a version — the change log."),
     since: datetime | None = Query(default=None),
     until: datetime | None = Query(default=None),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> EventListResponse:
-    """Events for this graph only. Any graph member."""
+    """Events for this graph only. Any graph member.
+
+    ``changes=true`` is the change log: only the events that mint a version of
+    a versioned record, composed with every other filter
+    (docs/for-developers/modules/operate/features/change-log.md).
+    """
     return await EventStore().list_page(
         session,
         filters=EventFilter(
@@ -139,6 +145,7 @@ async def list_graph_events(
             skill_id=skill,
             action_prefix=action_prefix,
             actions=action,
+            changes=changes,
             since=since,
             until=until,
         ),

@@ -12,7 +12,7 @@ makes "who recommended what, citing what, on behalf of whom" answerable.
 | | |
 |---|---|
 | Index | [§10 · Operate](../../README.md#10--operate) |
-| Features | [schedules](features/schedules.md) · [audit-and-activity](features/audit-and-activity.md) · [observability](features/observability.md) · [external-agent-api](features/external-agent-api.md) · [see-what-ran](features/see-what-ran.md) |
+| Features | [schedules](features/schedules.md) · [audit-and-activity](features/audit-and-activity.md) · [observability](features/observability.md) · [external-agent-api](features/external-agent-api.md) · [see-what-ran](features/see-what-ran.md) · [change-log](features/change-log.md) |
 | Depends on | every module emits into it |
 | Depended on by | [Memory](../memory/spec.md) (evidence reads the record) |
 

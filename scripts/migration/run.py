@@ -247,7 +247,9 @@ def gate_commands(sid: str) -> list[tuple[list[str], Path, dict]]:
     studio = ROOT / "studio"
     turbo = (studio / "turbo.json").exists()
     if sid.startswith("B"):
-        env = {"INVANA_ALLOW_GRAPH_TESTS": "1"} if os.environ.get("INVANA_MIGRATION_GRAPH_DB") else {}
+        # Telemetry off, as in CI: its global httpx instrumentation and log handlers break the telemetry tests.
+        env = {"INVANA_ALLOW_GRAPH_TESTS": "1", "INVANA_TELEMETRY_ENABLED": "false"} \
+            if os.environ.get("INVANA_MIGRATION_GRAPH_DB") else {}
         cmds = [(["uv", "run", "ruff", "check", "."], ROOT / "engine", {})]
         if env:  # graph-DB tests only against the isolated database (README › Isolation)
             cmds.append((["uv", "run", "pytest", "tests/", "-x", "-q"], ROOT / "engine", {**env, **graph_db_env()}))
@@ -263,7 +265,9 @@ def gate_commands(sid: str) -> list[tuple[list[str], Path, dict]]:
 
 def graph_db_env() -> dict:
     """The isolated database engine tests run against — never the developer's."""
-    return {"NEO4J_URI": os.environ["INVANA_MIGRATION_GRAPH_DB"], "NEO4J_USERNAME": "neo4j",
+    uri = os.environ["INVANA_MIGRATION_GRAPH_DB"]
+    port = uri.rsplit(":", 1)[-1].split("/")[0]  # the tests' is-it-up probe reads NEO4J_PORT, not the URI
+    return {"NEO4J_URI": uri, "NEO4J_PORT": port, "NEO4J_USERNAME": "neo4j",
             "NEO4J_PASSWORD": os.environ.get("INVANA_MIGRATION_GRAPH_PASSWORD", "testpassword"),
             "NEO4J_DATABASE": "neo4j"}
 

@@ -1479,6 +1479,18 @@
             ],
             "title": "Soul Traits"
           },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          },
           "workflow_spec": {
             "anyOf": [
               {
@@ -3029,6 +3041,293 @@
           "total"
         ],
         "title": "CatalogueResponse",
+        "type": "object"
+      },
+      "ChangeCompare": {
+        "description": "Two versions of one record, from ``a`` to ``b``.\n\n``a`` is null when ``b`` is the first version \u2014 compared against nothing,\nwhich is not the same as an empty diff.",
+        "properties": {
+          "a": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "A"
+          },
+          "b": {
+            "title": "B",
+            "type": "string"
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/ChangeField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "plan": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanVersionDiff"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_kind": {
+            "enum": [
+              "skill",
+              "rule",
+              "plan",
+              "agent",
+              "model"
+            ],
+            "title": "Record Kind",
+            "type": "string"
+          },
+          "schema_diff": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SchemaDiff"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_kind",
+          "record_id",
+          "a",
+          "b",
+          "summary",
+          "fields"
+        ],
+        "title": "ChangeCompare",
+        "type": "object"
+      },
+      "ChangeEffect": {
+        "description": "What ran on a version \u2014 counted, never estimated. Tokens, never currency.",
+        "properties": {
+          "basis": {
+            "enum": [
+              "pinned",
+              "window"
+            ],
+            "title": "Basis",
+            "type": "string"
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          },
+          "since": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
+          },
+          "tokens_in": {
+            "title": "Tokens In",
+            "type": "integer"
+          },
+          "tokens_out": {
+            "title": "Tokens Out",
+            "type": "integer"
+          },
+          "until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Until"
+          }
+        },
+        "required": [
+          "basis",
+          "runs",
+          "failed",
+          "tokens_in",
+          "tokens_out",
+          "since",
+          "until"
+        ],
+        "title": "ChangeEffect",
+        "type": "object"
+      },
+      "ChangeEntry": {
+        "description": "One version of a record, with the change that minted it.",
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "actor_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Id"
+          },
+          "actor_kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActorKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "actor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Name"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "effect": {
+            "$ref": "#/components/schemas/ChangeEffect"
+          },
+          "event_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Id"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          },
+          "version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version Id"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "version",
+          "version_id",
+          "at",
+          "action",
+          "event_id",
+          "actor_id",
+          "actor_kind",
+          "actor_name",
+          "why",
+          "summary",
+          "effect"
+        ],
+        "title": "ChangeEntry",
+        "type": "object"
+      },
+      "ChangeField": {
+        "description": "One field, before and after. ``lines`` is a unified diff for text fields.",
+        "properties": {
+          "after": {
+            "title": "After"
+          },
+          "before": {
+            "title": "Before"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "lines": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Lines",
+            "type": "array"
+          }
+        },
+        "required": [
+          "field"
+        ],
+        "title": "ChangeField",
         "type": "object"
       },
       "ChangePasswordRequest": {
@@ -9385,6 +9684,18 @@
           "run_id": {
             "title": "Run Id",
             "type": "string"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
           }
         },
         "required": [
@@ -9688,6 +9999,45 @@
           "row_count"
         ],
         "title": "QueryResponse",
+        "type": "object"
+      },
+      "RecordHistory": {
+        "description": "Every version of one record, newest first.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ChangeEntry"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_kind": {
+            "enum": [
+              "skill",
+              "rule",
+              "plan",
+              "agent",
+              "model"
+            ],
+            "title": "Record Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_kind",
+          "record_id",
+          "name",
+          "items"
+        ],
+        "title": "RecordHistory",
         "type": "object"
       },
       "RecordOperation": {
@@ -10355,6 +10705,18 @@
               }
             ],
             "title": "Statement"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
           }
         },
         "title": "RuleUpdate",
@@ -12831,6 +13193,18 @@
               }
             ],
             "title": "When To Use"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
           }
         },
         "title": "SkillUpdate",
@@ -13211,6 +13585,18 @@
               }
             ],
             "title": "When To Use"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
           }
         },
         "title": "SkillVersionPublish",
@@ -21008,7 +21394,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/events": {
       "get": {
-        "description": "Events for this graph only. Any graph member.",
+        "description": "Events for this graph only. Any graph member.\n\n``changes=true`` is the change log: only the events that mint a version of\na versioned record, composed with every other filter\n(docs/for-developers/modules/operate/features/change-log.md).",
         "operationId": "list_graph_events_api_v1_u__username___graphSlug__events_get",
         "parameters": [
           {
@@ -21210,6 +21596,18 @@
                 }
               ],
               "title": "Action"
+            }
+          },
+          {
+            "description": "Only the events that mint a version \u2014 the change log.",
+            "in": "query",
+            "name": "changes",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only the events that mint a version \u2014 the change log.",
+              "title": "Changes",
+              "type": "boolean"
             }
           },
           {
@@ -22655,6 +23053,197 @@
         "summary": "List Touches",
         "tags": [
           "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/history/{record_kind}/{record_id}": {
+      "get": {
+        "description": "Every version of one record, newest first: who, when, why, what changed\nagainst the one before, and the effect after.",
+        "operationId": "record_history_api_v1_u__username___graphSlug__history__record_kind___record_id__get",
+        "parameters": [
+          {
+            "description": "skill \u00b7 rule \u00b7 plan \u00b7 agent \u00b7 model",
+            "in": "path",
+            "name": "record_kind",
+            "required": true,
+            "schema": {
+              "description": "skill \u00b7 rule \u00b7 plan \u00b7 agent \u00b7 model",
+              "title": "Record Kind",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The record's id; a plan's key.",
+            "in": "path",
+            "name": "record_id",
+            "required": true,
+            "schema": {
+              "description": "The record's id; a plan's key.",
+              "title": "Record Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordHistory"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Record History",
+        "tags": [
+          "change-log"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/history/{record_kind}/{record_id}/compare": {
+      "get": {
+        "description": "Two versions of one record, side by side.",
+        "operationId": "compare_versions_api_v1_u__username___graphSlug__history__record_kind___record_id__compare_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "record_kind",
+            "required": true,
+            "schema": {
+              "title": "Record Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "record_id",
+            "required": true,
+            "schema": {
+              "title": "Record Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The version to read to.",
+            "in": "query",
+            "name": "b",
+            "required": true,
+            "schema": {
+              "description": "The version to read to.",
+              "title": "B",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The version to read from; omitted is the one before b.",
+            "in": "query",
+            "name": "a",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The version to read from; omitted is the one before b.",
+              "title": "A"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeCompare"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Compare Versions",
+        "tags": [
+          "change-log"
         ]
       }
     },

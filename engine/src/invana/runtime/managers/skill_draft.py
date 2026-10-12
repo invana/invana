@@ -741,7 +741,9 @@ class SkillDraftManager:
         """
         draft = await self.ensure_draft(session, skill=skill)
         await self.skills.update_draft(session, draft=draft, payload=payload)
-        published = await self.skills.publish_draft(session, skill=skill, draft=draft, actor_id=actor_id)
+        published = await self.skills.publish_draft(
+            session, skill=skill, draft=draft, actor_id=actor_id, why=payload.why
+        )
         plan = await self.plans_qs.get(session, published.plan_id)
         if plan is not None:
             # Provenance, N:M — the skill version this plan was drawn from (SK8).
@@ -773,7 +775,7 @@ class SkillDraftManager:
             # it should use: write the text onto it and publish that.
             await self.skills.update_draft(session, draft=draft, payload=wanted)
             await self.skills.update(session, skill=skill, payload=SkillUpdate(name=payload.name), actor_id=actor_id)
-            await self.skills.publish_draft(session, skill=skill, draft=draft, actor_id=actor_id)
+            await self.skills.publish_draft(session, skill=skill, draft=draft, actor_id=actor_id, why=payload.why)
             plan = await self.plans_qs.get(session, draft.plan_id)
             if plan is not None:
                 plan.source_skill_version_ids = [draft.id]

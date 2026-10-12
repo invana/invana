@@ -474,6 +474,79 @@ class TaskRunQuerySet:
         )
         return list((await session.execute(stmt)).scalars().all())
 
+    # ── the effect after a change (change-log.md) ─────────────────────────────
+
+    async def effect_of_steps(
+        self, session: AsyncSession, *, graph_id: str, offered: str, version_id: str
+    ) -> tuple[int, int, int, int]:
+        """``(runs, failed, tokens_in, tokens_out)`` over the steps offered one
+        skill or rule version. ``offered`` is ``"skills"`` or ``"rules"``.
+
+        The step is the unit here, because the step is what was offered the
+        version and what spent the tokens. The match is the quoted-substring
+        test :meth:`skill_version_counts` explains.
+        """
+        column = TaskRun.skills_offered if offered == "skills" else TaskRun.rules_offered
+        stmt = select(
+            func.count(),
+            func.count().filter(TaskRun.status == RunStatus.failed.value),
+            func.coalesce(func.sum(TaskRun.tokens_in), 0),
+            func.coalesce(func.sum(TaskRun.tokens_out), 0),
+        ).where(
+            TaskRun.graph_id == graph_id,
+            TaskRun.parent_run_id.is_not(None),
+            column.cast(Text).like(f'%"{version_id}"%'),
+        )
+        runs, failed, tokens_in, tokens_out = (await session.execute(stmt)).one()
+        return int(runs or 0), int(failed or 0), int(tokens_in or 0), int(tokens_out or 0)
+
+    async def effect_of_roots(
+        self,
+        session: AsyncSession,
+        *,
+        graph_id: str,
+        agent: tuple[str, int] | None = None,
+        plan: tuple[str, str] | None = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
+    ) -> tuple[int, int, int, int]:
+        """``(runs, failed, tokens_in, tokens_out)`` over the roots that ran on
+        one version — tokens summed over each root and its own steps.
+
+        Exactly one way in: ``agent`` is ``(agent_id, agent_version)``; ``plan``
+        is ``(task_plan_id, "template:<key>@<v>")``, the two ways a library plan
+        is run (:meth:`roots_for_plan`); neither is the Graph's roots queued in
+        ``[since, until)``, the window a model version was published for.
+        """
+        where = [TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_(None)]
+        if agent is not None:
+            where += [TaskRun.agent_id == agent[0], TaskRun.agent_version == agent[1]]
+        elif plan is not None:
+            where.append(or_(TaskRun.task_plan_id == plan[0], TaskRun.plan_origin == plan[1]))
+        if since is not None:
+            where.append(TaskRun.queued_at >= since)
+        if until is not None:
+            where.append(TaskRun.queued_at < until)
+
+        runs, failed = (
+            await session.execute(
+                select(func.count(), func.count().filter(TaskRun.status == RunStatus.failed.value)).where(*where)
+            )
+        ).one()
+        if not runs:
+            return 0, 0, 0, 0
+        # Same table inside and out, so correlation is switched off explicitly.
+        roots = select(TaskRun.id).where(*where).correlate(None)
+        tokens_in, tokens_out = (
+            await session.execute(
+                select(
+                    func.coalesce(func.sum(TaskRun.tokens_in), 0),
+                    func.coalesce(func.sum(TaskRun.tokens_out), 0),
+                ).where(or_(TaskRun.id.in_(roots), TaskRun.parent_run_id.in_(roots)))
+            )
+        ).one()
+        return int(runs), int(failed or 0), int(tokens_in or 0), int(tokens_out or 0)
+
     async def add(self, session: AsyncSession, run: TaskRun) -> TaskRun:
         session.add(run)
         await session.flush()

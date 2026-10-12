@@ -166,7 +166,7 @@ class SkillManager:
         return draft
 
     async def publish_draft(
-        self, session: AsyncSession, *, skill: Skill, draft: SkillVersion, actor_id: str
+        self, session: AsyncSession, *, skill: Skill, draft: SkillVersion, actor_id: str, why: str | None = None
     ) -> SkillVersion:
         """Stamp the draft and move the head — text, answers and plan, one act."""
         if not draft.is_draft:
@@ -191,7 +191,7 @@ class SkillManager:
             target_id=skill.id,
             graph_id=skill.graph_id,
             actor_id=actor_id,
-            details={"name": skill.name, "version": draft.version, "changed": changed},
+            details={"name": skill.name, "version": draft.version, "changed": changed, "why": why},
         )
         return draft
 
@@ -246,7 +246,7 @@ class SkillManager:
             target_id=skill.id,
             graph_id=skill.graph_id,
             actor_id=actor_id,
-            details={"name": skill.name, "version": number, "changed": changed},
+            details={"name": skill.name, "version": number, "changed": changed, "why": payload.why},
         )
         return version
 
@@ -352,7 +352,7 @@ class SkillManager:
             await self.publish(
                 session,
                 skill=skill,
-                payload=SkillVersionPublish(**wanted),
+                payload=SkillVersionPublish(**wanted, why=payload.why),
                 actor_id=actor_id,
                 plan_id=plan_id,
             )

@@ -44,6 +44,8 @@ class AgentUpdate(BaseModel):
     # leaves it alone.
     soul: str | None = None
     soul_traits: dict[str, str] | None = None
+    #: Why — carried on the event that mints the version, never inferred.
+    why: str | None = Field(default=None, max_length=500)
 
 
 class AgentRead(BaseModel):

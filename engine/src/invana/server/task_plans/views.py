@@ -176,7 +176,7 @@ async def promote(
         graph_id=graph.id,
         run_id=payload.run_id,
         actor_id=user.id,
-        details={"key": workflow.key, "version": workflow.version},
+        details={"key": workflow.key, "version": workflow.version, "why": payload.why},
     )
     read = TaskPlanRead.model_validate(workflow)
     read.step_count = len(await library.workflows_qs.tasks_for(session, plan_id=workflow.id))

@@ -87,7 +87,9 @@ class RuleManager:
         )
         return rule
 
-    async def publish(self, session: AsyncSession, *, rule: Rule, statement: str, actor_id: str) -> RuleVersion:
+    async def publish(
+        self, session: AsyncSession, *, rule: Rule, statement: str, actor_id: str, why: str | None = None
+    ) -> RuleVersion:
         """Mint the next version and point the rule at it."""
         number = await self.versions_qs.highest_version(session, rule.id) + 1
         version = RuleVersion(rule_id=rule.id, version=number, statement=statement, published_by_id=actor_id)
@@ -102,7 +104,7 @@ class RuleManager:
             target_id=rule.id,
             graph_id=rule.graph_id,
             actor_id=actor_id,
-            details={"statement": statement, "version": number},
+            details={"statement": statement, "version": number, "why": why},
         )
         return version
 
@@ -115,7 +117,7 @@ class RuleManager:
         # Resending the same wording is not a publish: an identical version
         # would restart the citation count for no reason.
         if payload.statement is not None and payload.statement != rule.statement:
-            await self.publish(session, rule=rule, statement=payload.statement, actor_id=actor_id)
+            await self.publish(session, rule=rule, statement=payload.statement, actor_id=actor_id, why=payload.why)
         return rule
 
     async def set_active(self, session: AsyncSession, *, rule: Rule, active: bool, actor_id: str) -> Rule:

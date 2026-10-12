@@ -178,6 +178,7 @@ def create_app() -> FastAPI:
     from invana.server.govern.routes import govern_router
     from invana.server.graphs.routes import graph_router, graphs_collection_router
     from invana.server.health import health_router
+    from invana.server.history.routes import history_router
     from invana.server.llm_providers.routes import llm_providers_router
     from invana.server.routes.auth import auth_router
     from invana.server.routes.events import events_router, graph_events_router
@@ -272,6 +273,7 @@ def create_app() -> FastAPI:
     app.include_router(explorer_router)
     app.include_router(events_router)
     app.include_router(graph_events_router)
+    app.include_router(history_router)
 
     # Proxy the studio's browser OTLP/HTTP span export to the collector.
     # Always mounted: the studio exports on its own gate, so a route that
