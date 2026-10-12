@@ -10,6 +10,7 @@ import type {
 	Dataset,
 	DatasetBinding,
 	DatasetBindingListResponse,
+	DatasetHistory,
 	DatasetListResponse,
 	DatasetRecord,
 	DatasetRecordPage,
@@ -92,6 +93,9 @@ export const datasetsApi = {
 		request<RecordChangeLog>(
 			`${one(d)}/records/${encodeURIComponent(key)}/history`,
 		),
+
+	/** The dataset's versions with who made each — the change log's names. */
+	history: (d: DatasetRef) => request<DatasetHistory>(`${one(d)}/history`),
 
 	/** What changed between two versions — the change log's compare. */
 	compare: (d: DatasetRef, a: number, b: number) =>

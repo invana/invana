@@ -24,11 +24,11 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | MO-F1 | Global model canvas, drill-in, dark theme | In Studio (union schema) | MO-01 · MO-02 |
 | MO-F2 | Stitches — declare, inspect, crossed by queries | In Studio | MO-03 |
 | MO-F3 | Connect a database, drafted model | In Studio | MO-04 |
-| MO-F4 | Version compare on the map; publish with who-reads-it; breaking publishes previewed as a migration run and approved by another member | In Studio (publish) · New (map diff, migration, approval) · Blocked · P-13 (approvals) | MO-05 |
+| MO-F4 | Version compare on the map; publish with who-reads-it; breaking publishes previewed as a migration run and approved by another member | In Studio (C04) — the map draws no per-type diff marks | MO-05 |
 | MO-F5 | New model from a description, a file or a starter | In Studio | MO-06 |
 | MO-F6 | Model dashboards — overview, database drift, usage, performance, growth, saved report | In Studio | MO-07 |
 | MO-F7 | Constraints on properties; values named by a standard | New | MO-08 |
-| MO-F8 | Model history with effect downstream | New · Blocked · P-09 | MO-09 |
+| MO-F8 | Model history with effect downstream | In Studio (C04) | MO-09 |
 | MO-F9 | Worlds | In Studio | MO-10 |
 | MO-F10 | Guardrails and the requests they cause | In Studio | MO-11 |
 | MO-F11 | Rules at install, Graph or project scope | New · Blocked · P-12 | MO-12 |
@@ -102,6 +102,10 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | No ✕ on a rail panel | Graph settings has no close control: its path is the panel, and closing it would leave the Modeller |
 | Guardrails leads on its rail item | The Govern stack puts Guardrails first on `/guardrails`, Worlds first on `/worlds` |
 | Main area with no board | Requests, Rules and Graph settings each say in one line what their main area is for, in Modeller words |
+| Model history | The model page gains a **History** tab (`models_tab=history`), after Growth: version · when · by · what changed · why · effect after, from `history/model/<id>`. A model's effect is a `window`, so the column says *while published*. The header action *Compare vA and vB* (the two newest) and each row's *Compare* open the shell's compare page. With All models in scope the tab lists every model's versions with a Model column, newest first |
+| Publish asks the engine first | *Publish* reads `GET …/draft/review` before the confirm opens. **Additive**: the staged changes, what the database is asked to hold, and *Who reads `<model>`* — the stitches on the model and the datasets bound to it — with *None of them break: the change only adds and widens*; *Publish vN* commits. **Breaking**: the confirm turns into *Publish `<model>` — breaking*, *needs approval from another owner*: a banner naming each breaking change and its reason, the changes as a table, who reads it, a *Why* field, and *Request approval* (`POST …/publish`). A commit that still answers 409 `breaking_publish_needs_review` opens the same breaking confirm |
+| The review in the confirm | After *Request approval* the confirm reads the review until it settles: *previewing* (the preview run, linked), then the migration table — per type: records scanned of total · affected · would fail — and *waiting on approval* in Activity › Approvals. Before the request, the confirm's migration table reads *counted after you request approval* in Outcome for a breaking change, and a type's property and the bare key it reads are one line (`airport.region`, not also `region`). The migration runs after approval, as a run you can watch; nothing changes before. A refusal (no other owner, an open review) is drawn as the kit's `RefusalCard` with the engine's message |
+| Compare on the map | When a model has a draft, the global canvas carries a **Comparing** bar: `<model> vActive → vN draft` · *+ added · ~ changed · − removed* from `draft/review` · *Review and publish*, which opens that model's publish confirm. With several drafts a select picks the model. The map itself is not re-coloured: the canvas library has no per-type diff marks yet, so the counts and the confirm carry the diff. The bar is pinned to the canvas panel's visible bottom (`sticky`), so it stays on screen however tall the canvas and the union list draw |
 
 ## Not building
 

@@ -2,7 +2,7 @@
  * The model page as a board document (the-model-page.md).
  *
  * One header, then **Overview · Model · Database · Usage · Performance ·
- * Growth** with the `7 · 30 · 90 days` window on the right of the tab strip —
+ * Growth · History** with the `7 · 30 · 90 days` window on the right of the tab strip —
  * the plan page's layout, read at `All models` or one model. This file
  * composes; `ModelsPage` fetches and answers actions, and `@invana/boards`
  * draws. The tabs, their order and their columns never change with the scope:
@@ -64,6 +64,7 @@ export const MODELS_ACTIONS = {
 	publish: "publish",
 	discardDraft: "discard-draft",
 	discardOne: "discard-one",
+	compare: "compare",
 } as const;
 
 /** What `⋯` holds, per scope and state (the-model-page.md · The page). */
@@ -84,6 +85,7 @@ const TAB_LABEL: Record<ModelsTab, string> = {
 	usage: "Usage",
 	performance: "Performance",
 	growth: "Growth",
+	history: "History",
 };
 
 const WINDOW_LABEL: Record<ModelsWindow, string> = {
@@ -95,12 +97,13 @@ export const windowOf = (label: string): ModelsWindow | undefined =>
 	MODELS_WINDOWS.find((w) => WINDOW_LABEL[w] === label);
 
 /** A declaration and a mirror have no window. */
-const UNWINDOWED: ModelsTab[] = ["model", "database"];
+const UNWINDOWED: ModelsTab[] = ["model", "database", "history"];
 /** Nothing to count before a model is published (the-model-page.md seams). */
 export const LOCKED_UNTIL_PUBLISHED: ModelsTab[] = [
 	"usage",
 	"performance",
 	"growth",
+	"history",
 ];
 
 export interface ModelsScope {
@@ -108,6 +111,8 @@ export interface ModelsScope {
 	detail: GraphModelResponse | undefined;
 	draft: VersionSummary | null;
 	active: VersionSummary | null;
+	/** The published version before the active one — what *Compare* reads from. */
+	previous: string | null;
 	/** The staged set while a draft is open. */
 	staged: StagedSet | null;
 	/** The active version was ever published — Archive, else Delete. */
@@ -148,6 +153,8 @@ export interface ModelsPageSlots {
 	performance: Pick<PerformanceRowsOptions, "selected" | "onSelect">;
 	/** A Needs-attention row's link to its tab. */
 	onTab: (tab: ModelsTab) => void;
+	/** The model's versions — every model's, with All models in scope. */
+	history: ReactNode;
 }
 
 /** One tab's rows — only the open tab is composed. */
@@ -211,6 +218,14 @@ function tabRows(
 						},
 					)
 				: [notMeasuredRow(slots, id)];
+		case "history":
+			return [
+				{
+					panels: [
+						{ kind: "text", options: { text: "" }, render: slots.history },
+					],
+				},
+			];
 	}
 }
 
@@ -329,7 +344,18 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 		};
 	}
 
-	const { model, detail, draft, active, staged: set, published } = scope;
+	const { model, detail, draft, active, previous, staged: set } = scope;
+	const { published } = scope;
+	const compare: ActionSpec[] =
+		active && previous
+			? [
+					{
+						id: MODELS_ACTIONS.compare,
+						label: `Compare v${previous} and v${active.version}`,
+						variant: "outline",
+					},
+				]
+			: [];
 	const chips: NonNullable<NonNullable<BoardSpec["header"]>["chips"]> = [];
 	if (draft)
 		chips.push({
@@ -368,6 +394,7 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 						label: "Discard draft",
 						variant: "outline",
 					},
+					...compare,
 					menu(["rename", "exportModel", retire]),
 				]
 			: [
@@ -378,6 +405,7 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 						variant: "outline",
 						disabled: !active,
 					},
+					...compare,
 					menu(["rename", retire]),
 				];
 

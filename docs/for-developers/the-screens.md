@@ -748,6 +748,28 @@ the skill are pages in `mainSection`; a plugin and a task type are two more (`pl
 
 ---
 
+## Beyond the 42 · Change log and publish review
+
+The shared change log and the Modeller's publish review of the *Invana Products* prototype (SH-14 ·
+MO-09 · DS-04 · MO-05), as Studio builds them in `@invana-studio/shell`, `@invana-studio/modeller`
+and `@invana-studio/datasets` (migration session C04). Decisions are in
+[products/shell.md](../products/shell.md#decisions) · [products/modeller.md](../products/modeller.md#decisions) ·
+[products/datasets.md](../products/datasets.md#decisions) and the feature files
+[10.6](modules/operate/features/change-log.md) · [1.9](modules/connect-and-model/features/publish-review.md).
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `shell.activity.events` | SH-14 | `/activity/events` — the *Changes* toggle leads the filter bar | ✅ |
+| `shell.events.changes` | SH-14 | `/activity/events?filter=changes` — Product and Who filters, *Compare* per row | ✅ |
+| `shell.change.compare` | SH-14 | `/activity/changes/<kind>/<record>?a=&b=` — no *Restore* (the change log only reads) | ✅ |
+| `modeller.model.history` | MO-09 | `/modeller/models?model=<id>&models_tab=history` | ✅ |
+| `datasets.record` | DS-04 | `/datasets/catalogue/<publisher>/<name>/records/<key>` — the change log names who | ✅ |
+| `modeller.global_model.diff` | MO-05 | `/modeller/global-model` with a draft — the Comparing bar; the map is not re-coloured | 🟡 |
+| `modeller.draft.publish` | MO-05 | `/modeller/models?model=<id>` › *Publish* — additive, with *Who reads* | ✅ |
+| `modeller.draft.migration` | MO-05 | the same › *Publish* on a breaking draft — *Request approval*, then the review | ✅ |
+
+---
+
 ## The other direction — every feature, and the screen that draws it
 
 So a feature file can be opened next to the drawing that shows it.
@@ -758,6 +780,7 @@ So a feature file can be opened next to the drawing that shows it.
 | 1.3 | Domain models | ✅ | ✅ | S3 | `ModellerHiFi` | ✅ |
 | 1.4 | Model editor | ✅ | ✅ | S3 | `ModellerHiFi` · `ModellerSessionHiFi` · `ModelEditBottomHiFi` | ✅ |
 | 1.6 | Stitch models | ✅ | ✅ | S7 | `StitchHiFi` | ✅ |
+| 1.9 | Publish review | ✅ | ✅ | B10 · C04 | `modeller.draft.publish` · `modeller.draft.migration` · `modeller.global_model.diff` | ✅ |
 | 2.1 | Load data | ✅ | ✅ | S6 | `ImportRunHiFi` | ✅ |
 | 2.2 | Inspect what landed | ✅ | ✅ | S6 | `DatasetsHiFi` | ✅ |
 | 2.4 | Datasets | ✅ | ✅ | B03 · C01 | `datasets.catalogue` · `datasets.dataset` (+ tabs) · `datasets.record` · `datasets.observe` · `datasets.share` | ✅ |
@@ -796,6 +819,7 @@ So a feature file can be opened next to the drawing that shows it.
 | 10.1 | Schedules | 🔵 | 🔵 | S9.5 | `SchedulesHiFi` | 🔵 |
 | 10.3 | Observability | 🔵 | 🔵 | S11 | `AgentStatsHiFi` | 🔵 |
 | 10.5 | See what ran | 🔵 | 🔵 | S14 | `RunDetail` · `DrawerRunsList` · `DrawerRunLive` · `DrawerRunAll` · `DrawerRunDebug` · `RunDash` · `StepImport` · `StepQuery` · `StepLlm` · `RunLens` | 🔵 · ✅ |
+| 10.6 | Change log | ✅ | ✅ | B01 · C04 | `shell.events.changes` · `shell.change.compare` · `modeller.model.history` · `datasets.record` | ✅ |
 | 13.3 | Command line | — | — | — | `CliHiFi` | — |
 | 13.7 | Setup | ✅ | 🟡 | S13 | `SetupPageHiFi` · `SetupBlockedHiFi` · `SetupReadyHiFi` · `SetupLocksHiFi` | 🟡 |
 | 14.1 | Worlds | 🔵 | 🔵 | S16 | `GovWorlds` · `GovWorld` · `GovCompare` | 🔵 |

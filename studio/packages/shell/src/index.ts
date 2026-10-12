@@ -19,7 +19,9 @@
 export * from "./actions";
 export type { ActivitySlots } from "./activity/ActivitySlots";
 export { ActivitySlotsContext } from "./activity/ActivitySlots";
-export { activityPath } from "./activity/activityPath";
+export { activityPath, comparePath } from "./activity/activityPath";
+export type { ChangeEntry } from "./activity/changes/history";
+export { effectLine, useRecordHistories } from "./activity/changes/history";
 export type { EventListResponse } from "./activity/events/types";
 export { RunBoardPage } from "./activity/runs/boards/RunBoardPage";
 export { runAddress } from "./activity/runs/boards/runBoards";

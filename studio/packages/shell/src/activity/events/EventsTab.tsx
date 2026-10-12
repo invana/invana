@@ -10,6 +10,7 @@ import {
 	TimelineEntry,
 	TimelineFooter,
 	TimelineList,
+	Toggle,
 } from "@invana/ui";
 import { useEventStream } from "@invana-studio/core";
 import {
@@ -29,6 +30,8 @@ import {
 	Wand2,
 } from "lucide-react";
 import { type ReactNode, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { ChangesList } from "../changes/ChangesList";
 import { TraceIdValue } from "../runs/TraceIdValue";
 import { EventTypeFilter } from "./EventTypeFilter";
 import { matchesEventSearch } from "./eventSearch";
@@ -61,8 +64,50 @@ interface Props {
  * column would eat a third of the width. `Load older` sits in the
  * `TimelineFooter` so the rail runs into it, which is what says the history
  * continues past what is loaded.
+ *
+ * The **Changes** chip leads the bar: on, the tab is the change log
+ * (`?filter=changes`, so a link or a reload lands on it) — `ChangesList`.
  */
 export function EventsTab({ username, graphSlug }: Props) {
+	const [params, setParams] = useSearchParams();
+	const changes = params.get("filter") === "changes";
+	const toggle = (
+		<Toggle
+			variant="outline"
+			size="sm"
+			pressed={changes}
+			onPressedChange={() =>
+				setParams(
+					(prev) => {
+						const next = new URLSearchParams(prev);
+						if (changes) next.delete("filter");
+						else next.set("filter", "changes");
+						return next;
+					},
+					{ replace: true },
+				)
+			}
+		>
+			Changes
+		</Toggle>
+	);
+
+	// SSE live tail — invalidates the events queries on each incoming row so
+	// the list head refreshes without polling.
+	useEventStream({ scope: "graph", username, graphSlug });
+
+	return changes ? (
+		<ChangesList username={username} graphSlug={graphSlug} toggle={toggle} />
+	) : (
+		<AllEvents username={username} graphSlug={graphSlug} toggle={toggle} />
+	);
+}
+
+function AllEvents({
+	username,
+	graphSlug,
+	toggle,
+}: Props & { toggle: ReactNode }) {
 	const [actions, setActions] = useState<string[]>([]);
 	const [statuses, setStatuses] = useState<string[]>([]);
 	const [search, setSearch] = useState("");
@@ -70,10 +115,6 @@ export function EventsTab({ username, graphSlug }: Props) {
 	const query = useGraphEventsQuery(username, graphSlug, {
 		actions: actions.length > 0 ? actions : undefined,
 	});
-
-	// SSE live tail — invalidates the queryKey on each incoming row so the
-	// list head refreshes without polling.
-	useEventStream({ scope: "graph", username, graphSlug });
 
 	const all = useMemo(
 		() => query.data?.pages.flatMap((p) => p.items) ?? [],
@@ -97,6 +138,7 @@ export function EventsTab({ username, graphSlug }: Props) {
 				className="rounded-sm border"
 				summary={`${visible.length.toLocaleString()} shown`}
 			>
+				{toggle}
 				<EventTypeFilter value={actions} onChange={setActions} />
 				<StatusFilter value={statuses} onChange={setStatuses} />
 			</FilterBar>

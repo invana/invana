@@ -3,6 +3,7 @@ import type {
 	CommitResult,
 	ConstraintCreate,
 	ConstraintResponse,
+	DatasetBindingRef,
 	EdgeTypeCreate,
 	EdgeTypeResponse,
 	EdgeTypeUpdate,
@@ -29,6 +30,10 @@ import type {
 	PropertyKeyCreate,
 	PropertyKeyResponse,
 	PropertyKeyUpdate,
+	PublishClassification,
+	PublishOutcome,
+	PublishRequest,
+	PublishReview,
 	SchemaDiff,
 	ShapeCard,
 	StagedSet,
@@ -271,6 +276,21 @@ export const modelsApi = {
 		post(`${base(u, g)}/${id}/commit`, {
 			version: version ?? null,
 		}) as Promise<CommitResult>,
+
+	// ── Publish review (publish-review.md) ───────────────────────────────────
+	/** Additive or breaking, change by change — reads only. */
+	draftReview: (u: string, g: string, id: string) =>
+		request<PublishClassification>(`${base(u, g)}/${id}/draft/review`),
+	/** Additive publishes now; breaking opens a review that waits on another owner. */
+	publish: (u: string, g: string, id: string, data: PublishRequest) =>
+		post(`${base(u, g)}/${id}/publish`, data) as Promise<PublishOutcome>,
+	publishReview: (u: string, g: string, id: string, reviewId: string) =>
+		request<PublishReview>(`${base(u, g)}/${id}/publish-reviews/${reviewId}`),
+	/** The Graph's dataset bindings — a model's readers, beside its stitches. */
+	datasetBindings: (u: string, g: string) =>
+		request<{ items: DatasetBindingRef[] }>(
+			`${graphBase(u, g)}/dataset-bindings`,
+		),
 
 	// ── Portability (share-a-model.md) ───────────────────────────────────────
 	starters: (u: string, g: string) =>

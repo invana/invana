@@ -54,4 +54,6 @@ export interface EventListFilters {
 	actions?: string[];
 	since?: string;
 	until?: string;
+	/** Only the events that minted a version — the change log. */
+	changes?: boolean;
 }

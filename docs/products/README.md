@@ -64,7 +64,7 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 | P-06 | Simulation runtime | PJ-09 · PJ-10 (what-if values) | ✅ B09 — [9.8 Simulation](../for-developers/modules/work/features/simulation.md). Reach-by-hops in PJ-10 is plain traversal and is not blocked |
 | P-07 | Domain simulator plugins (e.g. genomic prediction) | PJ-09 | ✅ B09 — the simulator contract ([13.9](../for-developers/modules/platform/features/plugins.md) PL11–PL15) and `sim.genomic_prediction`. The plugin does the science; Invana runs it, pins inputs, labels output derived |
 | P-08 | Dataset record: origin, author chain, licence, versions, hash | all of Datasets | Revives the retired term *Dataset* |
-| P-09 | Change log over every versioned record | SH-14 · AG-06 · AG-09 · MO-09 · DS-04 | Who, when, why, diff, effect after |
+| P-09 | Change log over every versioned record | SH-14 · AG-06 · AG-09 · MO-09 · DS-04 | ✅ B01 · C04 (Studio: the Events tab's Changes filter, the compare page, a model's History, a record's change log naming who) — Who, when, why, diff, effect after |
 | P-10 | Project records: type, Branch, Finding (with stance), Verdict, Decision (supersede), Proposal, Report, merge | all of Projects | Projects stay flat; branches live inside |
 | P-11 | Generated or packaged TaskPlans | AG-08 · AG-11 · SH-13 | ✅ C03 (Studio: a skill's plan generated from its instructions, what a publish regenerated, revisions in runs) — Users never author plans: `generated` from instructions or `packaged` in a plugin pack; retire user-authored |
 | P-12 | Install-wide scope for rules and standards | MO-12 · DS-08 | No tenancy; the install is the scope |
@@ -76,7 +76,7 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 | P-19 | Semantic imports | DS-F17 · MO-F14 | ✅ B12 (engine) — [2.8 SKOS import](../for-developers/modules/bring-data-in/features/skos-import.md) · [1.10 Ontology import](../for-developers/modules/connect-and-model/features/ontology-import.md). SKOS → standards; RDFS/OWL subset (incl. schema.org) → draft models; JSON-LD · Turtle · RDF/XML; import reports list what was skipped. Studio is C08 |
 | P-20 | Intent-ranked templates | EX answers · AG-12 | ✅ B13 (engine) — [3.4 Projections](../for-developers/modules/ask/features/projections.md) P13–P14. The intent classifier returns `prefer: chart \| table \| graph`; `select_template` ranks by it instead of substring-matching the raw question. Small |
 | P-21 | Distributed execution | thousands of tasks, failover, Kubernetes | **Required:** N workers scale runs and tasks per second; a worker can die without losing work. Tasks travel as serialisable envelopes ([plugins.md](plugins.md#7-ready-for-n-workers)). The executor (procrastinate · Dramatiq · Prefect) is chosen by benchmark; `inline` stays the single-machine default |
-| P-16 | Breaking-publish review and migration runs | MO-05 | ✅ B10 — [1.9 Publish review](../for-developers/modules/connect-and-model/features/publish-review.md). Additive publishes go straight through; breaking ones preview a migration run and need another owner’s approval |
+| P-16 | Breaking-publish review and migration runs | MO-05 | ✅ B10 · C04 (Studio: the Publish confirm asks the engine, names who reads the model, and a breaking draft requests approval) — [1.9 Publish review](../for-developers/modules/connect-and-model/features/publish-review.md). Additive publishes go straight through; breaking ones preview a migration run and need another owner’s approval |
 
 ## Terms this plan adds or changes
 

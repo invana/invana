@@ -26,6 +26,7 @@ function buildParams(filters: EventListFilters | undefined): URLSearchParams {
 	}
 	if (filters.since) params.set("since", filters.since);
 	if (filters.until) params.set("until", filters.until);
+	if (filters.changes) params.set("changes", "true");
 	return params;
 }
 

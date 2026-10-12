@@ -155,6 +155,10 @@ const SECTION_MOVES: Record<string, string> = {
 	"library:catalogue": "plugins",
 };
 
+// Pages of Activity with no panel behind them — the change log and a change's
+// compare. Their path is already canonical; the Activity route reads it.
+const OWN_PAGES = /^activity\/changes(?:\/|$)/;
+
 // Sessions live in the assistant: the link opens Explorer with it on the right.
 const ASSISTANT_PANELS = new Set(["sessions", "messages"]);
 
@@ -292,6 +296,7 @@ export function canonicalRedirect(
 ): string | null {
 	const split = splitGraphPath(pathname);
 	if (!split) return null;
+	if (OWN_PAGES.test(split.tail)) return null;
 	const target = pageUrlOf(pageParamsOf(split.tail, search));
 	const targetPath = target.tail ? `${split.root}/${target.tail}` : split.root;
 	const samePath =

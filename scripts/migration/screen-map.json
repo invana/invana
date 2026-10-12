@@ -135,8 +135,8 @@
   "shell.change.compare": {
    "story": "SH-14",
    "product": "shell",
-   "route": "/u/admin/airways/activity/events?filter=changes",
-   "state": "on a change row, Compare (needs B01)"
+   "route": "/u/admin/airways/activity/changes/agent/a1",
+   "state": "a1 stands for an agent id with two versions: on its change row, Compare"
   },
   "shell.notifications": {
    "story": "SH-15",
@@ -375,8 +375,8 @@
   "modeller.draft": {
    "story": "MO-04",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/models/airroutes?draft",
-   "state": "airroutes with an unpublished draft: change any property, do not publish"
+   "route": "/u/admin/airways/modeller/models?model=m1",
+   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, with an unpublished draft: change any property, do not publish"
   },
   "modeller.global_model.diff": {
    "story": "MO-05",
@@ -387,14 +387,14 @@
   "modeller.draft.publish": {
    "story": "MO-05",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/models/airroutes?draft",
-   "state": "on the draft, Publish"
+   "route": "/u/admin/airways/modeller/models?model=m1",
+   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, on the draft: Publish"
   },
   "modeller.draft.migration": {
    "story": "MO-05",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/models/airroutes?draft",
-   "state": "a breaking draft (narrow an enum), Publish (needs B10)"
+   "route": "/u/admin/airways/modeller/models?model=m1",
+   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, a breaking draft (remove a property): Publish"
   },
   "modeller.models.new": {
    "story": "MO-06",
@@ -459,8 +459,8 @@
   "modeller.model.history": {
    "story": "MO-09",
    "product": "modeller",
-   "route": "/u/admin/arabidopsis/modeller/models/arabidopsis?tab=history",
-   "state": "one version until B01 records more"
+   "route": "/u/admin/airways/modeller/models?model=m1&models_tab=history",
+   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board"
   },
   "modeller.worlds": {
    "story": "MO-10",

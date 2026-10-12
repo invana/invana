@@ -24,7 +24,7 @@ Reusable knowledge, labelled by where it came from. Prototype page: *Invana Data
 | DS-F1 | Catalogue — filter by origin, standard, licence, publisher, bound-in Graph | New · Blocked · P-08 | DS-01 |
 | DS-F2 | Dataset page — preview, origin, author chain, licence, validation status | New · Blocked · P-08 | DS-02 |
 | DS-F3 | Versions — immutable, hashed; where each version is used | New · Blocked · P-08 | DS-03 |
-| DS-F4 | Record page — values, record-level origin exceptions, change log of properties | New · Blocked · P-09 | DS-04 |
+| DS-F4 | Record page — values, record-level origin exceptions, change log of properties | In Studio (C04) | DS-04 |
 | DS-F5 | Observations — a few rows by form or by telling the assistant | New | DS-05 |
 | DS-F6 | Collect with an agent — sources, tools, gap fill as a separate generated dataset | New · Blocked · P-01 P-03 P-05 | DS-06 |
 | DS-F7 | Validation queue — conflicts with official data, constraint and standard violations | New | DS-07 |
@@ -140,6 +140,7 @@ Reusable knowledge, labelled by where it came from. Prototype page: *Invana Data
 | Refresh | A dataset may carry a refresh schedule (a shared Schedule). Each refresh is a new immutable version with a diff; bound Graphs and findings stay on their version until someone moves them, and are told a newer one exists |
 | Sensitivity | `public · internal · confidential · personal`, on the dataset and optionally tighter on a column. Guardrails read labels (e.g. *personal never leaves the install*, *confidential is not sent to outside LLMs*) |
 | Registry seams | `publisher/name`, content hash, references by version — see [README](README.md#open-registry-later) |
+| A record's change log names who | The record page's *Change log* reads *when · who · what changed · why* per version. The record log carries only an actor id, so the name comes from the dataset's own history (`/datasets/…/history`), matched by version |
 
 ## Not building
 

@@ -17,6 +17,7 @@ import {
 	type ActivityTab,
 	activityPath,
 } from "./activityPath";
+import { ComparePage } from "./changes/ComparePage";
 import { EventsTab } from "./events/EventsTab";
 import { InboxTab } from "./inbox/InboxTab";
 import { useInbox } from "./inbox/useInbox";
@@ -97,7 +98,10 @@ const NOT_YET: Partial<
  * (`Activity › Runs › run:…`) is the way back up.
  * **Inbox** is what needs a person — runs waiting on an answer and recent
  * failures, until the engine records notifications.
- * **Events** is the Graph's writes. A tab whose records the engine does not
+ * **Events** is the Graph's writes; its Changes filter is the change log, and
+ * a change's compare (`/activity/changes/<kind>/<record>`) opens inside it,
+ * with the tab strip kept and Events lit.
+ * A tab whose records the engine does not
  * keep yet draws the kit's `EmptyState`, with one lock per thing that opens
  * it — never an empty table.
  *
@@ -115,7 +119,7 @@ export function ActivityPage({
 	const navigate = useNavigate();
 	const { stepId, openStep } = useRunStep();
 	const graph = { username, graphSlug };
-	const { tab, runId } = location;
+	const { tab, runId, change } = location;
 	// The Inbox tab carries its count; the other tabs have no source for one yet.
 	const inbox = useInbox(graph);
 
@@ -140,7 +144,16 @@ export function ActivityPage({
 			);
 		}
 		if (value === "events") {
-			return <EventsTab username={username} graphSlug={graphSlug} />;
+			return change ? (
+				<ComparePage
+					username={username}
+					graphSlug={graphSlug}
+					kind={change.kind}
+					recordId={change.id}
+				/>
+			) : (
+				<EventsTab username={username} graphSlug={graphSlug} />
+			);
 		}
 		if (value === "inbox") return <InboxTab graph={graph} />;
 		const empty = NOT_YET[value];

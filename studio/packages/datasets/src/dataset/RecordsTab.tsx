@@ -3,8 +3,9 @@
  * one **record** with its change log (board `datasets.record`, DS-04).
  *
  * A record shows its values, its provenance exception where it has one, and
- * every version that changed it: property, before → after, when and why. The
- * log is read from the versions, so a fix is never silent.
+ * every version that changed it: property, before → after, who, when and why.
+ * The log is read from the versions, so a fix is never silent; who published
+ * each version comes from the dataset's own history.
  */
 
 import {
@@ -26,6 +27,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { cell, dayLabel } from "../labels";
 import { PageBody, ReadState } from "../parts";
 import {
+	useDatasetHistoryQuery,
 	useRecordHistoryQuery,
 	useRecordQuery,
 	useRecordsQuery,
@@ -122,6 +124,10 @@ export function RecordPage() {
 	const { key = "" } = useParams();
 	const record = useRecordQuery(ref, key);
 	const history = useRecordHistoryQuery(ref, key);
+	const versions = useDatasetHistoryQuery(ref);
+	const who = new Map(
+		(versions.data?.items ?? []).map((v) => [v.version, v.actor_name]),
+	);
 
 	if (!record.data) {
 		return <ReadState loading={record.isLoading} error={record.error} />;
@@ -136,8 +142,8 @@ export function RecordPage() {
 					title={key}
 					action={
 						<span className="text-sm text-muted-foreground">
-							v{record.data.version} · of{" "}
-							{dataset.record_count.toLocaleString()}
+							v{record.data.version} · one of{" "}
+							{dataset.record_count.toLocaleString()} records
 						</span>
 					}
 				>
@@ -180,6 +186,9 @@ export function RecordPage() {
 											{dayLabel(c.at)}
 										</TableCell>
 										<TableCell className="font-mono">v{c.version}</TableCell>
+										<TableCell className="whitespace-nowrap">
+											{who.get(String(c.version)) ?? "—"}
+										</TableCell>
 										<TableCell className="font-mono">
 											{c.kind === "changed"
 												? c.properties.map(change).join(" · ")

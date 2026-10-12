@@ -22,6 +22,7 @@ export const MODELS_TABS = [
 	"usage",
 	"performance",
 	"growth",
+	"history",
 ] as const;
 export type ModelsTab = (typeof MODELS_TABS)[number];
 

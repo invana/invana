@@ -352,6 +352,62 @@ export const useCommitDraftMutation = (u: string, g: string) =>
 			modelsApi.commit(u, g, modelId, version),
 	);
 
+// ── Publish review (publish-review.md) ─────────────────────────────────────
+
+/** Additive or breaking — read when the Publish confirm opens, and by the compare bar. */
+export function useDraftReviewQuery(
+	username: string,
+	graphSlug: string,
+	modelId: string | null | undefined,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: ["models", username, graphSlug, modelId, "draft-review"] as const,
+		queryFn: () =>
+			modelsApi.draftReview(username, graphSlug, modelId as string),
+		enabled: !!modelId && enabled,
+		retry: false,
+	});
+}
+
+/** One review, re-read until it leaves `previewing` — the preview lands on it. */
+export function usePublishReviewQuery(
+	username: string,
+	graphSlug: string,
+	modelId: string,
+	reviewId: string | null,
+) {
+	return useQuery({
+		queryKey: ["models", username, graphSlug, modelId, "review", reviewId],
+		queryFn: () =>
+			modelsApi.publishReview(username, graphSlug, modelId, reviewId as string),
+		enabled: !!reviewId,
+		refetchInterval: (q) =>
+			q.state.data?.status === "previewing" ? 2_000 : false,
+	});
+}
+
+export const usePublishMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, why }: { modelId: string; why?: string }) =>
+			modelsApi.publish(u, g, modelId, { why: why ?? "" }),
+	);
+
+/** The datasets bound into the Graph — which of them read a model is the caller's filter. */
+export function useDatasetBindingsQuery(
+	username: string,
+	graphSlug: string,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: ["dataset-bindings", username, graphSlug] as const,
+		queryFn: () => modelsApi.datasetBindings(username, graphSlug),
+		enabled,
+	});
+}
+
 // ── Portability (share-a-model.md · starter-models.md) ─────────────────────
 
 export function useStartersQuery(username?: string, graphSlug?: string) {

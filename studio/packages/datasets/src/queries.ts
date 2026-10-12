@@ -87,6 +87,14 @@ export function useRecordHistoryQuery(d: DatasetRef, key: string) {
 	});
 }
 
+/** The dataset's versions, each with who published it. */
+export function useDatasetHistoryQuery(d: DatasetRef) {
+	return useQuery({
+		queryKey: dsKey(d, "history"),
+		queryFn: () => datasetsApi.history(d),
+	});
+}
+
 /**
  * What cites the given versions of one dataset, merged into one read. The
  * engine answers per version, so this fans out under one hook; the page sees

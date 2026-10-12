@@ -17,11 +17,12 @@ import {
 	useGraphConnectionQuery,
 	useTypeCountsQuery,
 } from "@invana-studio/core";
-import { routedAction } from "@invana-studio/shell";
+import { comparePath, routedAction } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { modelsApi } from "../api";
 import { DeleteModelDialog } from "../model-editor/components/DeleteModelDialog";
@@ -47,7 +48,14 @@ import {
 } from "../queries";
 import { AllModelsCanvas } from "../stitch/AllModelsCanvas";
 import { useAllModels } from "../stitch/useAllModels";
-import type { Advice, BindingStitch, GraphModelSummary } from "../types";
+import type {
+	Advice,
+	BindingStitch,
+	GraphModelSummary,
+	VersionSummary,
+} from "../types";
+import { DraftCompareBar } from "./DraftCompareBar";
+import { ModelHistory } from "./ModelHistory";
 import { ArchiveRefused, PublishConfirm } from "./ModelsDialogs";
 import {
 	LOCKED_UNTIL_PUBLISHED,
@@ -98,6 +106,7 @@ export function ModelsPage({
 	onOpenRun?: (runId: string) => void;
 }) {
 	const { view, set } = useModelsView();
+	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const models = useModelsQuery(username, graphSlug);
 	const authored = useMemo(
@@ -171,6 +180,7 @@ export function ModelsPage({
 	const versions = useModelVersionsQuery(username, graphSlug, scoped?.id);
 	const draft = versions.data?.find((v) => v.status === "draft") ?? null;
 	const active = versions.data?.find((v) => v.status === "active") ?? null;
+	const previous = previousVersion(versions.data ?? [], active);
 	const staged = useStagedSetQuery(username, graphSlug, scoped?.id, !!draft);
 
 	const createDraft = useCreateDraftMutation(username, graphSlug);
@@ -207,6 +217,7 @@ export function ModelsPage({
 				detail: detail.data,
 				draft,
 				active,
+				previous,
 				staged: draft ? (staged.data ?? null) : null,
 				published: !!(
 					scoped.active_version ||
@@ -258,11 +269,25 @@ export function ModelsPage({
 					canWrite={canWrite}
 				/>
 			) : (
-				<AllModelsCanvas
-					username={username}
-					graphSlug={graphSlug}
-					backend={backend}
-				/>
+				<div className="flex h-full min-h-0 flex-col">
+					<AllModelsCanvas
+						username={username}
+						graphSlug={graphSlug}
+						backend={backend}
+					/>
+					{canWrite ? (
+						<DraftCompareBar
+							username={username}
+							graphSlug={graphSlug}
+							models={authored}
+							onReview={(modelId) => {
+								// The confirm opens once the model's draft is read.
+								set({ scope: modelId, open: true, tab: "model" });
+								setPublishing(true);
+							}}
+						/>
+					) : null}
+				</div>
 			),
 			notMeasured: (tab) => (
 				<EmptyState
@@ -272,6 +297,14 @@ export function ModelsPage({
 				/>
 			),
 			performance: { selected: shape, onSelect: setShape },
+			history: (
+				<ModelHistory
+					username={username}
+					graphSlug={graphSlug}
+					models={scoped ? [scoped] : authored.filter((m) => m.active_version)}
+					all={!scoped}
+				/>
+			),
 			onTab: (tab) => set({ tab }),
 			growth: {
 				canWrite,
@@ -423,6 +456,17 @@ export function ModelsPage({
 							);
 						case MODELS_ACTIONS.publish:
 							return setPublishing(true);
+						case MODELS_ACTIONS.compare:
+							return (
+								scoped &&
+								active?.version &&
+								navigate(
+									comparePath({ username, graphSlug }, "model", scoped.id, {
+										a: previous,
+										b: active.version,
+									}),
+								)
+							);
 						case MODELS_ACTIONS.discardDraft:
 							return scoped && discardAll.mutate(scoped.id);
 						case MODELS_ACTIONS.discardOne:
@@ -485,6 +529,24 @@ export function ModelsPage({
 									setPublishing(false);
 									toast.success(`${scoped.name} published.`);
 								},
+								// The draft turned breaking since the confirm read it:
+								// read it again, and the confirm becomes the breaking one.
+								onError: (err) => {
+									const body =
+										err instanceof ApiError
+											? (err.detail as { error?: string } | undefined)
+											: undefined;
+									if (body?.error === "breaking_publish_needs_review")
+										queryClient.invalidateQueries({
+											queryKey: [
+												"models",
+												username,
+												graphSlug,
+												scoped.id,
+												"draft-review",
+											],
+										});
+								},
 							},
 						)
 					}
@@ -512,6 +574,26 @@ export function ModelsPage({
 				onClose={() => setRefused(null)}
 			/>
 		</>
+	);
+}
+
+/** The published version before the active one, by when each was published. */
+function previousVersion(
+	versions: VersionSummary[],
+	active: VersionSummary | null,
+): string | null {
+	if (!active) return null;
+	const at = (v: VersionSummary) => v.activated_at ?? v.created_at;
+	return (
+		versions
+			.filter(
+				(v) =>
+					v.status !== "draft" &&
+					v.version &&
+					v.id !== active.id &&
+					at(v) <= at(active),
+			)
+			.sort((a, b) => at(b).localeCompare(at(a)))[0]?.version ?? null
 	);
 }
 

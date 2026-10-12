@@ -7,6 +7,98 @@ type VersionStatus = "draft" | "active" | "archived";
 // mirroring the physical DB; `studio` = authored in the Modeller; `yaml` = YAML-managed.
 type ModelOrigin = "studio" | "yaml" | "introspected";
 
+// ── Publish review (publish-review.md) ─────────────────────────────────────
+
+export interface PublishChange {
+	kind: string;
+	target_kind:
+		| "node_type"
+		| "edge_type"
+		| "property_key"
+		| "constraint"
+		| "index";
+	/** The node or edge type it is on; null for a property key or an index. */
+	type: string | null;
+	property: string | null;
+	breaking: boolean;
+	/** `removed property`, `narrowed property`, `additive`. */
+	reason: string;
+}
+
+export interface PublishClassification {
+	classification: "additive" | "breaking";
+	/** The published version it was read against; null before a first publish. */
+	base_version: string | null;
+	draft_version_id: string;
+	changes: PublishChange[];
+}
+
+export interface PublishRequest {
+	why?: string;
+	/** Usernames; each an owner other than the requester. Empty is every other owner. */
+	approvers?: string[];
+}
+
+/** One touched type in a migration run's scan — counts of what was read. */
+interface MigrationTypeScan {
+	kind: "node" | "edge";
+	type: string;
+	total: number;
+	scanned: number;
+	affected: number;
+	would_fail: number;
+	removed: boolean;
+	changes: string[];
+}
+
+interface MigrationScan {
+	scan_limit: number;
+	types: MigrationTypeScan[];
+	affected: number;
+	would_fail: number;
+}
+
+type PublishReviewStatus =
+	| "previewing"
+	| "pending"
+	| "migrating"
+	| "published"
+	| "failed"
+	| "declined"
+	| "expired"
+	| "stale";
+
+export interface PublishReview {
+	id: string;
+	model_id: string;
+	classification: "additive" | "breaking";
+	changes: PublishChange[];
+	/** The preview run's scan — null while it runs. */
+	preview: MigrationScan | null;
+	why: string;
+	approval_id: string | null;
+	preview_run_id: string | null;
+	run_id: string | null;
+	published_version: string | null;
+	status: PublishReviewStatus;
+	reason: string | null;
+}
+
+export interface PublishOutcome {
+	outcome: "published" | "review";
+	version: string | null;
+	review: PublishReview | null;
+}
+
+/** The part of a dataset binding that says who reads a model. */
+export interface DatasetBindingRef {
+	id: string;
+	model_id: string;
+	type_name: string;
+	/** `publisher/name@v`. */
+	address: string;
+}
+
 export interface VersionSummary {
 	id: string;
 	model_id: string;

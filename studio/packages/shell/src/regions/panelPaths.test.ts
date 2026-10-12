@@ -36,6 +36,9 @@ describe("panelPaths", () => {
 			canonicalRedirect(`${G}/modeller/settings`, "?right=assistant&tab=info"),
 		).toBeNull();
 		expect(canonicalRedirect(G, "")).toBeNull();
+		expect(
+			canonicalRedirect(`${G}/activity/changes/agent/a1`, "?a=1&b=2"),
+		).toBeNull();
 	});
 
 	it("keeps each Modeller reading of the Model panel on its own path", () => {

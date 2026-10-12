@@ -7,7 +7,7 @@ read from the records that already hold the versions and the events that minted 
 |---|---|
 | Index | [10.6](../../../README.md#10--operate) · Slice **B01** (P-09) |
 | Module | [Operate](../spec.md) |
-| API / CLI / Studio | ✅ / 🔵 / 🟡 |
+| API / CLI / Studio | ✅ / 🔵 / ✅ |
 | Related | [audit-and-activity](audit-and-activity.md) · [see-what-ran](see-what-ran.md) · products: [shell.md](../../../../products/shell.md) SH-14 · [agents.md](../../../../products/agents.md) AG-06 · AG-09 · [modeller.md](../../../../products/modeller.md) MO-09 |
 
 > **As** an auditor, **I want** every change to anything versioned, with its effect after, and any two
@@ -56,10 +56,11 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Activity › Events › Changes | The Events tab's filter; rows are events (C04) |
+| Activity › Events › Changes | `/activity/events?filter=changes` — the Events tab's *Changes* toggle; rows are change events with Product and Who filters (`shell.events.changes` · `packages/shell/src/activity/changes/ChangesList.tsx`) |
+| Compare | `/activity/changes/<kind>/<record>?a=&b=` — two versions side by side, inside Events (`shell.change.compare` · `packages/shell/src/activity/changes/ComparePage.tsx`) |
 | Agent page › History · Skill page › History | The record's changes — version · when · by · what changed · why · after (C03 AG-06 · AG-09) |
-| History panel | On the other record pages and opened from a change row (C04, MO-09) |
-| Compare | Two versions side by side (C04 `shell.change.compare`) |
+| Model page › History | Every published version of the models in scope, each opening Compare (`modeller.model.history` · `packages/modeller/src/models/model-page/ModelHistory.tsx`) |
+| Dataset record › Change log | when · version · who · what changed · why (`datasets.record` · `packages/datasets/src/dataset/RecordsTab.tsx`) |
 
 ## Engine
 
@@ -110,6 +111,7 @@ flowchart TD
 | CL9 | **Compare `a` omitted is "against the one before"**; `a` older than `b` is not required — the diff reads from `a` to `b`. Drafts are never versions. |
 | CL10 | **Restore is not here.** Restoring makes a new version through the record's own write (shell.md); the change log only reads. |
 | CL11 | **The agent and skill pages read their own history; the shared surfaces are C04.** Their History tabs read `history/<kind>/<id>`, and the skill's Plan tab reads its compare against the version before; Activity › Changes and the compare board stay with the shell ([agents.md › Decisions](../../../../products/agents.md#decisions) *Agent history* · *Skill history*). |
+| CL12 | **Studio draws one change log and one compare for every product.** The change log is the Events tab's *Changes* filter, a change's compare is a path under Activity, and a model's History and a dataset record's change log open the same compare; the rules are in [shell.md › Decisions](../../../../products/shell.md#decisions) *The Changes filter* · *The compare page* · *One compare for every product*. |
 
 ## Not building
 

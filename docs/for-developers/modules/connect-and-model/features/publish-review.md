@@ -8,7 +8,7 @@ that would fail — and publishes only after **another member** approves it. Not
 |---|---|
 | Index | [1.9](../../../README.md#1--connect-and-model) · Slice **B10** |
 | Module | [Connect and model](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Product | [modeller.md › Decisions](../../../../products/modeller.md#decisions) — *Publish review* · *Breaking data changes* · MO-05 · P-16 |
 | Related | [domain-models](domain-models.md) · [model-editor](model-editor.md) · [approvals](../../operate/features/approvals.md) · [change-log](../../operate/features/change-log.md) · [roles](../../identity-and-access/features/roles.md) |
 
@@ -110,8 +110,9 @@ sequenceDiagram
 
 | Surface | Shape |
 |---|---|
-| Publish confirm (Studio, C04) | Reads `GET …/draft/review`; additive shows *Publish*, breaking shows *Request review* with the changes |
-| Review (Studio, C04) | `modeller.draft.migration` — the preview, the approvers, the state |
+| Publish confirm | `modeller.draft.publish` — reads `GET …/draft/review`; additive shows the staged changes, the projection and *Who reads*, then *Publish vN*; breaking shows *— breaking*, the changes, *Who reads*, a why and *Request approval* (`packages/modeller/src/models/model-page/ModelsDialogs.tsx`) |
+| Review | `modeller.draft.migration` — the same confirm after the request: the preview run, the migration table, then *waiting on approval*, linked to the runs and Approvals |
+| Comparing bar | `modeller.global_model.diff` — over the global canvas when a model has a draft: its counts and *Review and publish* (`packages/modeller/src/models/model-page/DraftCompareBar.tsx`) |
 | Activity › Approvals | The approval's `payload` is the impact list, frozen at request |
 | CLI | `invana models publish --graph g --name m [--dry-run] [--why …] [--approver u …] [--user u]` — `--user` is required without `--dry-run` (a review names its requester); the preview runs inline, then one clock step raises the approval |
 
@@ -147,6 +148,7 @@ sequenceDiagram
 | PB10 | **The clock moves a review.** It settles previews into approvals, opens the migration run after an approval, and marks a review `failed` when either run ends without its result. Approving or declining wakes it, so the run opens (or the review ends) within a tick. |
 | PB11 | **A reviewed publish is the same publish.** SemVer bump, content hash and `model.commit` (with `review_id` and `why`), so the [change log](../../operate/features/change-log.md) reads it like any other. |
 | PB12 | **Who reads it** is the datasets bound to a touched type and the stitches on a touched type. Runs do not pin model versions, so a run is not a reader. |
+| PB13 | **Studio asks the engine before it confirms.** The Publish confirm branches on `draft/review`, a commit refused with `breaking_publish_needs_review` re-reads it, and Studio names the readers from the stitches and dataset bindings on the model; the rules are in [modeller.md › Decisions](../../../../products/modeller.md#decisions) *Publish asks the engine first* · *The review in the confirm* · *Compare on the map*. |
 
 ## Not building
 
@@ -156,5 +158,4 @@ sequenceDiagram
 | A loosened guardrail as a breaking publish | guardrails are not part of a model version and save on their own path ([guardrails](../../govern/features/guardrails.md)) |
 | Withdrawing a review | decline it, or change the draft — it goes stale |
 | Extrapolated counts | a number nobody read is a guess |
-| The Studio surfaces | C04 builds them |
 | Drift re-runs after a reviewed publish | the evals drift trigger fires from the HTTP publish only; the clock does not reach it |

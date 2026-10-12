@@ -75,7 +75,7 @@ this map.** Feature numbers do not change.
 | 1.6 | [Stitch models](modules/connect-and-model/features/stitch-models.md) | Anchors and relationships; the global model is derived | ✅ | ✅ | ✅ | S7 |
 | 1.7 | [Starter models](modules/connect-and-model/features/starter-models.md) | Importable models to begin from — memory, provenance — renamed on arrival | ✅ | ✅ | ✅ | S7 |
 | 1.8 | [The model page](modules/connect-and-model/features/the-model-page.md) | One page, six tabs — Overview · Model · Database · Usage · Performance · Growth — with the model as a filter; is it used, is it slow, how has it grown | ✅ | — | ✅ | S-TBD |
-| 1.9 | [Publish review](modules/connect-and-model/features/publish-review.md) | Additive publishes now; breaking is previewed as a migration run and published after another owner approves | ✅ | ✅ | 🔵 | B10 |
+| 1.9 | [Publish review](modules/connect-and-model/features/publish-review.md) | Additive publishes now; breaking is previewed as a migration run and published after another owner approves | ✅ | ✅ | ✅ | B10 |
 | 1.10 | [Import an ontology](modules/connect-and-model/features/ontology-import.md) | RDFS / OWL subset, schema.org included — JSON-LD, Turtle, RDF/XML — into a draft model; flattened, source IRIs kept, an import report of what was skipped | ✅ | ✅ | 🔵 | B12 |
 
 ## 2 · [Bring data in](modules/bring-data-in/spec.md)
@@ -191,7 +191,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 10.3 | [Observability](modules/operate/features/observability.md) | Query and LLM metrics, cost and latency | 🔵 | — | 🔵 | S11 |
 | 10.4 | [External-agent API](modules/operate/features/external-agent-api.md) | Scoped tokens; retrieval with provenance | 🔵 | — | 🔵 | S10 |
 | 10.5 | [See what ran](modules/operate/features/see-what-ran.md) | **Runs** — every run in the Graph, children nested; Imports is a filter of it | 🟡 | — | 🟡 | S14 |
-| 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | 🟡 | B01 |
+| 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | ✅ | B01 |
 | 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | 🔵 | B08 |
 | 10.8 | [Approvals](modules/operate/features/approvals.md) | Anything sent outside waits for a named approver; a reminder at half-time; at the deadline *expired, not sent* | ✅ | ✅ | 🔵 | B08 |
 
@@ -283,13 +283,13 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 |---|---|---|---|---|
 | API | 62 | 19 | 15 | 5 |
 | CLI | 23 | 10 | 3 | 65 |
-| Studio | 45 | 20 | 28 | 8 |
+| Studio | 47 | 19 | 27 | 8 |
 
 A hundred and one features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 
-- Modules 3 · 4 are closed: **Ask · Explore**. **Connect and model reopened at 1.9 and grew 1.10** — the publish review (B10) and the ontology import (B12) ship API and CLI; Studio draws them in C04 and C08. **Agents reopened at 5.1 · 5.2 · 5.3 · 5.7** — S16 moves the model off the agent and onto the lens. What is left is 2.3, 5's four rows, and 6–14.
+- Modules 3 · 4 are closed: **Ask · Explore**. **Connect and model reopened at 1.9 and grew 1.10** — the publish review (B10) and the ontology import (B12) ship API and CLI; Studio draws 1.9 (C04), and 1.10 waits on C08. **Agents reopened at 5.1 · 5.2 · 5.3 · 5.7** — S16 moves the model off the agent and onto the lens. What is left is 2.3, 5's four rows, and 6–14.
 - **Bring data in reopened at 2.3 and grew 2.4–2.8**, the dataset record above Graphs (B03), the standards it is scored against (B04) and the SKOS import that makes one (B12). **Rules (6.4) reopened in Studio**: B04 added install scope and checked rules, which Studio does not draw yet. Its two shipped features are done; the bundle load is new scope, and it is the flow the runtime's deferred frontier, lanes and `uses` were waiting for ([13.8 §21](modules/platform/features/runtime.md)).
 - Studio is no longer the lagging side for the closed four; the remaining 🟡 and 🔵 sit in Skills, Workflows, Memory, Work and Operate.
 

@@ -9,7 +9,13 @@
  * page (the Graphs list, profile) matches none, so no product is open there.
  */
 import type { ProductDefinition, ProductId } from "@invana-studio/core";
-import { createContext, type ReactNode, useContext } from "react";
+import { type QueryKey, useQueryClient } from "@tanstack/react-query";
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useSyncExternalStore,
+} from "react";
 import { type Params, type RouteObject, useMatches } from "react-router-dom";
 
 /** What a route's `handle` may carry for the shell. */
@@ -22,6 +28,16 @@ export interface ShellRouteHandle {
 	crumb?: string | ((params: Params) => string | undefined);
 	/** The crumb's hover text when its label is shortened — a run's full id. */
 	crumbTitle?: (params: Params) => string | undefined;
+	/**
+	 * A label read from a query the page runs itself — a record's name once
+	 * its read lands. Until then, and when it fails, `crumb` stands in.
+	 */
+	crumbFrom?: (params: Params) => CrumbSource | undefined;
+}
+
+interface CrumbSource {
+	queryKey: QueryKey;
+	label: (data: unknown) => string | undefined;
 }
 
 const ProductsContext = createContext<ProductDefinition[]>([]);
@@ -63,14 +79,29 @@ export function useActiveProduct(): ProductDefinition | undefined {
  * The open route's levels, outermost first — one per matched route whose
  * handle names a `crumb`, each linking to the path that route matched. A
  * tab is a query param, never a route, so switching tabs keeps the trail.
+ *
+ * The deepest route with a `crumbFrom` is labelled from the query cache: the
+ * trail only reads what its page already fetched, and re-renders when that
+ * read lands. It never fetches, so it adds no request and no second observer.
  */
 export function useRouteCrumbs(): {
 	label: string;
 	to: string;
 	title?: string;
 }[] {
-	return useMatches().flatMap((m) => {
+	const matches = useMatches();
+	const client = useQueryClient();
+	const named = [...matches].reverse().find((m) => handleOf(m).crumbFrom);
+	const source = named ? handleOf(named).crumbFrom?.(named.params) : undefined;
+	const data = useSyncExternalStore(
+		(onChange) => client.getQueryCache().subscribe(onChange),
+		() => (source ? client.getQueryData(source.queryKey) : undefined),
+	);
+	const read = source && data !== undefined ? source.label(data) : undefined;
+
+	return matches.flatMap((m) => {
 		const { crumb, crumbTitle } = handleOf(m);
+		if (m === named && read) return [{ label: read, to: m.pathname }];
 		const label = typeof crumb === "function" ? crumb(m.params) : crumb;
 		if (!label) return [];
 		const title = crumbTitle?.(m.params);

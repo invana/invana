@@ -3,6 +3,8 @@
  * (engine `apps/datasets` and `apps/standards` schemas), as Studio reads them.
  */
 
+import type { ChangeEntry } from "@invana-studio/shell";
+
 export type Origin =
 	| "official"
 	| "collected"
@@ -138,6 +140,14 @@ export interface RecordChangeLog {
 	address: string;
 	key: string;
 	items: RecordChange[];
+}
+
+/** The dataset's versions as the change log reads them, newest first. */
+export interface DatasetHistory {
+	record_kind: "dataset";
+	record_id: string;
+	name: string;
+	items: ChangeEntry[];
 }
 
 export interface DatasetBinding {

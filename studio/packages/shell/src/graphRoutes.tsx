@@ -6,7 +6,9 @@
  * - `/u/:user/:graph` opens the product this browser last had open on a
  *   Graph, else Explorer, carrying the query string across — so `?right=`,
  *   `?page=` and `?onboarding=` land in the product.
- * - `/u/:user/:graph/activity/<tab>[/:run]` is the shell's Activity page.
+ * - `/u/:user/:graph/activity/<tab>[/:run]` is the shell's Activity page, and
+ *   `/activity/changes/<kind>/<record>` a change's compare inside it; the bare
+ *   `/activity/changes` is the change log, Events with its Changes filter.
  *   Its levels are routes with no element of their own: they exist to match
  *   (anything else under Activity is a 404) and to name each level for the
  *   breadcrumbs through `handle.crumb`.
@@ -25,7 +27,12 @@ import {
 	useNavigate,
 } from "react-router-dom";
 import { ActivityPage } from "./activity/ActivityPage";
-import { activityOf } from "./activity/activityPath";
+import { activityOf, changesPath } from "./activity/activityPath";
+import {
+	historyKey,
+	type RecordHistory,
+	type RecordKind,
+} from "./activity/changes/history";
 import { runAddress } from "./activity/runs/boards/runBoards";
 import { boardPageId } from "./boards/boardKinds";
 import { lastProduct } from "./lastProduct";
@@ -74,6 +81,8 @@ function ActivityRoute() {
 	const graph = useOpenGraph();
 	const { setSection } = useLeftSection();
 	const location = activityOf(pathname);
+	if (graph && /\/activity\/changes\/?$/.test(pathname))
+		return <Navigate to={changesPath(graph)} replace />;
 	if (!graph || !location) return null;
 	const { username, graphSlug } = graph;
 	return (
@@ -127,6 +136,10 @@ function drillable(
 	return level(path, label, [record]);
 }
 
+/** A UUID reads by its first block; a key (a plan's) is already short. */
+const shortId = (id: string) =>
+	/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id) ? id.slice(0, 8) : id;
+
 export const graphRoutes: RouteObject[] = [
 	{
 		path: "u/:username/:graphSlug",
@@ -147,6 +160,27 @@ export const graphRoutes: RouteObject[] = [
 					drillable("runs", "Runs", "run", runAddress),
 					level("schedules", "Schedules"),
 					level("events", "Events"),
+					level("changes", "Changes", [
+						{
+							path: ":kind/:record",
+							handle: {
+								// The record's name once the page has read it; its id until then.
+								crumb: (p) => p.record && `${p.kind}:${shortId(p.record)}`,
+								crumbTitle: (p) => p.record,
+								crumbFrom: (p) =>
+									p.username && p.graphSlug && p.kind && p.record
+										? {
+												queryKey: historyKey(
+													{ username: p.username, graphSlug: p.graphSlug },
+													p.kind as RecordKind,
+													p.record,
+												),
+												label: (data) => (data as RecordHistory).name,
+											}
+										: undefined,
+							} satisfies ShellRouteHandle,
+						},
+					]),
 					level("rules", "Rules"),
 					level("channels", "Channels"),
 				]),
