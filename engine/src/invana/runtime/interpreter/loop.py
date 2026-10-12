@@ -702,14 +702,16 @@ class TaskRuntime:
     async def _rules_for(self, db: AsyncSession, *, run: TaskRun, graph_id: str) -> list[Rule]:
         """The statements always true in this run's scope.
 
-        The order is fixed (skills/spec.md § 4): the Graph's invariants, then
-        the working rules of the Project this run's Todo belongs to. A session
-        ask belongs to no Project and is offered the invariants alone.
+        The order is fixed (skills/spec.md § 4): the install's rules, the
+        Graph's invariants, then the working rules of the Project this run's
+        Todo belongs to. A session ask belongs to no Project and is offered the
+        install rules and the invariants alone.
 
         Only **active** rules — deactivating is how a rule stops applying, and
         the versions and past citations stay exactly where they are (RU4).
         """
-        invariants = await self._rules.invariants(db, graph_id=graph_id, active_only=True)
+        install = await self._rules.install(db, active_only=True)
+        invariants = [*install, *await self._rules.invariants(db, graph_id=graph_id, active_only=True)]
         if not run.todo_id:
             return invariants
         todo = await db.get(Todo, run.todo_id)

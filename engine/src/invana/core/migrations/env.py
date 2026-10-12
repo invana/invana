@@ -12,7 +12,14 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from invana.apps.agents.models import Agent  # noqa: F401
 from invana.apps.boards.models import Board, BoardVersion  # noqa: F401
-from invana.apps.datasets.models import Dataset, DatasetBinding, DatasetRecord, DatasetVersion  # noqa: F401
+from invana.apps.datasets.models import (  # noqa: F401
+    Dataset,
+    DatasetBinding,
+    DatasetConformance,
+    DatasetRecord,
+    DatasetStandard,
+    DatasetVersion,
+)
 from invana.apps.graphs.models import (  # noqa: F401
     Graph,
     GraphConnection,
@@ -27,6 +34,7 @@ from invana.apps.skills.models import (
     SkillBinding,  # noqa: F401
     SkillVersion,  # noqa: F401
 )
+from invana.apps.standards.models import Standard, StandardVersion  # noqa: F401
 from invana.apps.task_plans.models import Task as PlanTask  # noqa: F401
 from invana.apps.task_plans.models import TaskPlan  # noqa: F401
 from invana.apps.work.models import (  # noqa: F401

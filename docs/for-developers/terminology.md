@@ -55,7 +55,7 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 |---|---|
 | **Graph** | The bounded domain and the reasoning boundary. An agent never crosses it. One Graph binds to exactly one graph database. |
 | **Graph settings** | The Graph's own configuration, in four tabs: **Basic** · **Graph** (the connection) · **LLMs** (the providers) · **Agents** (the ceiling). Nothing else is settings. |
-| **Rule** | One statement that is always true. `invariant` on a Graph, `working` on a Project. |
+| **Rule** | One statement that is always true, scoped `install`, `graph` (an **invariant**) or `project` (a **working** rule). Offered to steps; a rule with a **check** is also enforced `block · warn · report` at the acts the check names. [6.4](modules/skills/features/rules.md) |
 | **Library** | The **definitions** a run is built from: reusable **plans**, the closed **catalogue** of callables, and projection **templates**. One `leftNav` item, three sections ([G41](building-studio/graph-detail-page.md)). It widens the older sense of *the library*, which named the plan list alone. Never the journal — that is **Runs**. |
 | **Skill** | A playbook an agent may be offered — named, described, with a "when to use". Offered, never forced. |
 | **Versioned record** | A record whose published form is immutable, so a change mints a new **version**: a skill, a rule, a plan, an agent, a model, a dataset. A draft is not a version. [10.6](modules/operate/features/change-log.md) |
@@ -94,6 +94,8 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Records** | Externally produced data, conforming to exactly one model, handed to Invana. They are the model's — there is no record between the model and its data ([BD16](modules/bring-data-in/spec.md)). |
 | **Dataset** | Tables from one source under one authorship, install-wide — above Graphs. Named `publisher/name`; its versions are immutable and hashed; a Graph **binds** a version into one of its models. Carries an **origin** (`official · collected · generated · observed · derived`), an author chain, a licence and sensitivity labels. [2.4](modules/bring-data-in/features/datasets.md) |
 | **Retracted** | A dataset version withdrawn with a reason — kept, never deleted, and everything citing it is flagged. [2.5](modules/bring-data-in/features/retract-and-refresh.md) |
+| **Standard** | A versioned, install-wide set of terms, each with a type, whether it is required, and its allowed values; a pack or org-authored. A dataset **claims** one pinned version. [2.7](modules/bring-data-in/features/standards.md) |
+| **Conformance** | A dataset version's score against a standard it claims — conforming records over all — with its violations. [2.7](modules/bring-data-in/features/standards.md) |
 | **Import run** | One load of a dataset — a **TaskRun** of a TaskPlan with `kind = import`. It inherits the runtime, trace, retries and failure vocabulary. |
 | **Bulk run** | One `invana loader` load — a TaskRun of a `kind = bulk` plan with a single `bulk_write` Task. Validated per record and traceable to a source record is what an **import** is; a bulk run is neither, and the kind is what says so. |
 | **Bundle** | A folder of datasets that belong together, with `stitches.json` naming them and the rules between them. Loading one is a workflow, not a new kind. |

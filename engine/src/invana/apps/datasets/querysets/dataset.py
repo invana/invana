@@ -1,4 +1,5 @@
-"""Queries against ``datasets``, ``dataset_versions``, ``dataset_records`` and ``dataset_bindings``.
+"""Queries against ``datasets``, ``dataset_versions``, ``dataset_records``, ``dataset_bindings``,
+``dataset_standards`` and ``dataset_conformance``.
 
 A queryset answers *which rows*, never *whether* — visibility is passed in as
 the caller's id, and what a caller may do with a row is the manager's rule.
@@ -9,7 +10,15 @@ from __future__ import annotations
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.datasets.models import Dataset, DatasetBinding, DatasetRecord, DatasetVersion, Visibility
+from invana.apps.datasets.models import (
+    Dataset,
+    DatasetBinding,
+    DatasetConformance,
+    DatasetRecord,
+    DatasetStandard,
+    DatasetVersion,
+    Visibility,
+)
 
 
 class DatasetQuerySet:
@@ -163,3 +172,44 @@ class DatasetBindingQuerySet:
         session.add(binding)
         await session.flush()
         return binding
+
+
+class DatasetStandardQuerySet:
+    async def for_dataset(self, session: AsyncSession, dataset_id: str) -> list[DatasetStandard]:
+        stmt = (
+            select(DatasetStandard)
+            .where(DatasetStandard.dataset_id == dataset_id)
+            .order_by(DatasetStandard.attached_at, DatasetStandard.id)
+        )
+        return list((await session.execute(stmt)).scalars().all())
+
+    async def get_pair(self, session: AsyncSession, *, dataset_id: str, standard_id: str) -> DatasetStandard | None:
+        stmt = select(DatasetStandard).where(
+            DatasetStandard.dataset_id == dataset_id, DatasetStandard.standard_id == standard_id
+        )
+        return (await session.execute(stmt)).scalar_one_or_none()
+
+    async def add(self, session: AsyncSession, row: DatasetStandard) -> DatasetStandard:
+        session.add(row)
+        await session.flush()
+        return row
+
+    async def delete(self, session: AsyncSession, row: DatasetStandard) -> None:
+        await session.delete(row)
+        await session.flush()
+
+
+class DatasetConformanceQuerySet:
+    async def get_pair(
+        self, session: AsyncSession, *, dataset_version_id: str, standard_version_id: str
+    ) -> DatasetConformance | None:
+        stmt = select(DatasetConformance).where(
+            DatasetConformance.dataset_version_id == dataset_version_id,
+            DatasetConformance.standard_version_id == standard_version_id,
+        )
+        return (await session.execute(stmt)).scalar_one_or_none()
+
+    async def add(self, session: AsyncSession, row: DatasetConformance) -> DatasetConformance:
+        session.add(row)
+        await session.flush()
+        return row

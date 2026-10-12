@@ -9,6 +9,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from invana.apps.datasets.models import AuthorKind, AuthorRole, Origin, Sensitivity, Visibility
+from invana.apps.standards.models import Enforcement
 
 SLUG = r"^[a-z0-9][a-z0-9-]{0,62}$"
 
@@ -86,6 +87,8 @@ class DatasetVersionRead(BaseModel):
     retracted: Retraction | None
     #: The inputs in ``derived_from`` that are retracted, by address.
     retracted_inputs: list[str] = []
+    #: What the act that minted it was warned of; empty on a plain read.
+    warnings: list[str] = []
 
 
 class DatasetVersionListResponse(BaseModel):
@@ -115,6 +118,8 @@ class DatasetRead(BaseModel):
     author_chain: list[dict[str, Any]]
     record_count: int
     content_hash: str | None
+    #: What the act that returned it was warned of; empty on a plain read.
+    warnings: list[str] = []
 
 
 class DatasetListResponse(BaseModel):
@@ -186,6 +191,8 @@ class DatasetBindingRead(BaseModel):
     retracted: Retraction | None
     #: The dataset's current version, while it is newer than the bound one.
     newer_version: int | None = None
+    #: What the bind was warned of; empty on a plain read.
+    warnings: list[str] = []
 
 
 class DatasetBindingListResponse(BaseModel):
@@ -200,3 +207,63 @@ class DatasetVersionUsage(BaseModel):
     retracted: Retraction | None
     bindings: list[DatasetBindingRead]
     derived: list[DatasetVersionRef]
+
+
+class DatasetStandardCreate(BaseModel):
+    """Claim a standard: ``publisher/name[@v]`` — the current version when none is named."""
+
+    standard: str = Field(..., min_length=3, max_length=200)
+    mode: Enforcement = Enforcement.warn
+    #: ``{term: column}``; omitted, every term maps to the column of its name.
+    mapping: dict[str, str] | None = None
+
+
+class Violation(BaseModel):
+    key: str
+    term: str
+    kind: Literal["missing", "not_allowed", "wrong_type"]
+    value: Any = None
+
+
+class ConformanceRead(BaseModel):
+    """One dataset version scored against one standard version."""
+
+    #: ``publisher/name@v`` of the dataset version.
+    dataset: str
+    #: ``publisher/name@v`` of the standard version.
+    standard: str
+    mode: Enforcement
+    record_count: int
+    conforming: int
+    score: float
+    conforms: bool
+    violation_count: int
+    #: The first 50; ``violation_count`` is the whole.
+    violations: list[Violation]
+    checked_at: datetime
+
+
+class ConformanceListResponse(BaseModel):
+    items: list[ConformanceRead]
+    total: int
+
+
+class DatasetStandardRead(BaseModel):
+    """A standard a dataset claims, pinned to one version."""
+
+    #: ``publisher/name@v``.
+    standard: str
+    version: int
+    #: The standard's current version, while it is newer than the pinned one.
+    newer_version: int | None = None
+    mode: Enforcement
+    mapping: dict[str, str]
+    attached_by_id: str | None
+    attached_at: datetime
+    #: The current dataset version's score; null before the first version.
+    conformance: ConformanceRead | None = None
+
+
+class DatasetStandardListResponse(BaseModel):
+    items: list[DatasetStandardRead]
+    total: int

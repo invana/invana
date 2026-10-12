@@ -2,9 +2,18 @@
 
 from invana.apps.datasets.querysets.dataset import (
     DatasetBindingQuerySet,
+    DatasetConformanceQuerySet,
     DatasetQuerySet,
     DatasetRecordQuerySet,
+    DatasetStandardQuerySet,
     DatasetVersionQuerySet,
 )
 
-__all__ = ["DatasetBindingQuerySet", "DatasetQuerySet", "DatasetRecordQuerySet", "DatasetVersionQuerySet"]
+__all__ = [
+    "DatasetBindingQuerySet",
+    "DatasetConformanceQuerySet",
+    "DatasetQuerySet",
+    "DatasetRecordQuerySet",
+    "DatasetStandardQuerySet",
+    "DatasetVersionQuerySet",
+]

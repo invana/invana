@@ -149,6 +149,27 @@ CREATE INDEX ix_dataset_bindings_graph_id ON dataset_bindings (graph_id);
 
 CREATE INDEX ix_dataset_bindings_model_id ON dataset_bindings (model_id);
 
+CREATE TABLE dataset_conformance (
+	id VARCHAR(36) NOT NULL, 
+	dataset_version_id VARCHAR(36) NOT NULL, 
+	standard_version_id VARCHAR(36) NOT NULL, 
+	mapping JSON NOT NULL, 
+	record_count INTEGER NOT NULL, 
+	conforming INTEGER NOT NULL, 
+	score DOUBLE PRECISION NOT NULL, 
+	violation_count INTEGER NOT NULL, 
+	violations JSON NOT NULL, 
+	checked_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT dataset_conformance_pkey PRIMARY KEY (id), 
+	CONSTRAINT dataset_conformance_dataset_version_id_fkey FOREIGN KEY(dataset_version_id) REFERENCES dataset_versions (id) ON DELETE CASCADE, 
+	CONSTRAINT dataset_conformance_standard_version_id_fkey FOREIGN KEY(standard_version_id) REFERENCES standard_versions (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_dataset_conformance_pair UNIQUE NULLS DISTINCT (dataset_version_id, standard_version_id)
+);
+
+CREATE INDEX ix_dataset_conformance_dataset_version_id ON dataset_conformance (dataset_version_id);
+
+CREATE INDEX ix_dataset_conformance_standard_version_id ON dataset_conformance (standard_version_id);
+
 CREATE TABLE dataset_records (
 	id VARCHAR(36) NOT NULL, 
 	version_id VARCHAR(36) NOT NULL, 
@@ -161,6 +182,27 @@ CREATE TABLE dataset_records (
 );
 
 CREATE INDEX ix_dataset_records_version_id ON dataset_records (version_id);
+
+CREATE TABLE dataset_standards (
+	id VARCHAR(36) NOT NULL, 
+	dataset_id VARCHAR(36) NOT NULL, 
+	standard_id VARCHAR(36) NOT NULL, 
+	standard_version_id VARCHAR(36) NOT NULL, 
+	mode VARCHAR(8) NOT NULL, 
+	mapping JSON NOT NULL, 
+	attached_by_id VARCHAR(36), 
+	attached_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT dataset_standards_pkey PRIMARY KEY (id), 
+	CONSTRAINT dataset_standards_attached_by_id_fkey FOREIGN KEY(attached_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT dataset_standards_dataset_id_fkey FOREIGN KEY(dataset_id) REFERENCES datasets (id) ON DELETE CASCADE, 
+	CONSTRAINT dataset_standards_standard_id_fkey FOREIGN KEY(standard_id) REFERENCES standards (id) ON DELETE CASCADE, 
+	CONSTRAINT dataset_standards_standard_version_id_fkey FOREIGN KEY(standard_version_id) REFERENCES standard_versions (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_dataset_standard UNIQUE NULLS DISTINCT (dataset_id, standard_id)
+);
+
+CREATE INDEX ix_dataset_standards_dataset_id ON dataset_standards (dataset_id);
+
+CREATE INDEX ix_dataset_standards_standard_id ON dataset_standards (standard_id);
 
 CREATE TABLE dataset_versions (
 	id VARCHAR(36) NOT NULL, 
@@ -699,6 +741,8 @@ CREATE TABLE rule_versions (
 	statement TEXT DEFAULT ''::text NOT NULL, 
 	published_by_id VARCHAR(36), 
 	published_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	"check" JSON, 
+	mode VARCHAR(8), 
 	CONSTRAINT rule_versions_pkey PRIMARY KEY (id), 
 	CONSTRAINT rule_versions_published_by_id_fkey FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL, 
 	CONSTRAINT rule_versions_rule_id_fkey FOREIGN KEY(rule_id) REFERENCES rules (id) ON DELETE CASCADE, 
@@ -709,7 +753,7 @@ CREATE INDEX ix_rule_versions_rule_id ON rule_versions (rule_id);
 
 CREATE TABLE rules (
 	id VARCHAR(36) NOT NULL, 
-	graph_id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36), 
 	project_id VARCHAR(36), 
 	active BOOLEAN DEFAULT true NOT NULL, 
 	"order" INTEGER DEFAULT 0 NOT NULL, 
@@ -912,6 +956,48 @@ CREATE TABLE skills (
 );
 
 CREATE INDEX ix_skills_graph_id ON skills (graph_id);
+
+CREATE TABLE standard_versions (
+	id VARCHAR(36) NOT NULL, 
+	standard_id VARCHAR(36) NOT NULL, 
+	version INTEGER NOT NULL, 
+	terms JSON NOT NULL, 
+	content_hash VARCHAR(80) NOT NULL, 
+	why VARCHAR(500), 
+	published_by_id VARCHAR(36), 
+	published_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT standard_versions_pkey PRIMARY KEY (id), 
+	CONSTRAINT standard_versions_published_by_id_fkey FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT standard_versions_standard_id_fkey FOREIGN KEY(standard_id) REFERENCES standards (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_standard_version_number UNIQUE NULLS DISTINCT (standard_id, version)
+);
+
+CREATE INDEX ix_standard_versions_content_hash ON standard_versions (content_hash);
+
+CREATE INDEX ix_standard_versions_standard_id ON standard_versions (standard_id);
+
+CREATE TABLE standards (
+	id VARCHAR(36) NOT NULL, 
+	publisher VARCHAR(63) NOT NULL, 
+	name VARCHAR(63) NOT NULL, 
+	title VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	origin VARCHAR(16) NOT NULL, 
+	current_version_id VARCHAR(36), 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT standards_pkey PRIMARY KEY (id), 
+	CONSTRAINT fk_standards_current_version FOREIGN KEY(current_version_id) REFERENCES standard_versions (id) ON DELETE SET NULL, 
+	CONSTRAINT standards_created_by_id_fkey FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT uq_standard_address UNIQUE NULLS DISTINCT (publisher, name)
+);
+
+CREATE INDEX ix_standards_created_by_id ON standards (created_by_id);
+
+CREATE INDEX ix_standards_origin ON standards (origin);
+
+CREATE INDEX ix_standards_publisher ON standards (publisher);
 
 CREATE TABLE task_plans (
 	id VARCHAR(36) NOT NULL, 

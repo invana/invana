@@ -42,6 +42,7 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.datasets.content import columns_of, content_hash, normalise, property_changes
+from invana.apps.datasets.managers.conformance import ConformanceManager
 from invana.apps.datasets.models import (
     AuthorKind,
     AuthorRole,
@@ -109,6 +110,7 @@ class DatasetManager:
     bindings_qs = DatasetBindingQuerySet()
     graphs_qs = GraphQuerySet()
     models_qs = GraphModelQuerySet()
+    claims = ConformanceManager()
 
     # ── who may ──────────────────────────────────────────────────────────────
 
@@ -466,7 +468,8 @@ class DatasetManager:
     async def publish_version(
         self, session: AsyncSession, *, dataset: Dataset, payload: DatasetVersionCreate, actor: User
     ) -> DatasetVersion:
-        """Mint the next version from its records — refused when nothing changed."""
+        """Mint the next version from its records — refused when nothing changed,
+        or when a standard the dataset claims with ``block`` would break."""
         self.require_owner(dataset, actor, "add a version")
         rows = normalise(payload.records, key_column=dataset.key_column)
         digest = content_hash(rows)
@@ -477,6 +480,7 @@ class DatasetManager:
         current = await self.current(session, dataset)
         if current is not None and current.content_hash == digest:
             raise ConflictError(f"unchanged — the records match {dataset.address}@{current.version}.")
+        scored = await self.claims.gate(session, dataset=dataset, rows=rows)
 
         number = await self.versions_qs.highest_version(session, dataset.id) + 1
         version = DatasetVersion(
@@ -499,6 +503,7 @@ class DatasetManager:
         )
         dataset.current_version_id = version.id
         await session.flush()
+        await self.claims.record(session, version=version, scored=scored)
         await emit_event(
             session,
             action=actions.DATASET_VERSION,

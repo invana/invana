@@ -17,6 +17,13 @@ class RuleQuerySet:
     async def get(self, session: AsyncSession, rule_id: str) -> Rule | None:
         return (await session.execute(select(Rule).where(Rule.id == rule_id))).scalar_one_or_none()
 
+    async def install(self, session: AsyncSession, *, active_only: bool = False) -> list[Rule]:
+        """The install's rules — ``graph_id IS NULL``."""
+        stmt = select(Rule).where(Rule.graph_id.is_(None))
+        if active_only:
+            stmt = stmt.where(Rule.active.is_(True))
+        return list((await session.execute(stmt.order_by(Rule.order, Rule.created_at))).scalars().all())
+
     async def invariants(self, session: AsyncSession, *, graph_id: str, active_only: bool = False) -> list[Rule]:
         """A Graph's own rules — ``project_id IS NULL``."""
         stmt = select(Rule).where(Rule.graph_id == graph_id, Rule.project_id.is_(None))
@@ -30,9 +37,10 @@ class RuleQuerySet:
             stmt = stmt.where(Rule.active.is_(True))
         return list((await session.execute(stmt.order_by(Rule.order, Rule.created_at))).scalars().all())
 
-    async def next_order(self, session: AsyncSession, *, graph_id: str, project_id: str | None) -> int:
+    async def next_order(self, session: AsyncSession, *, graph_id: str | None, project_id: str | None) -> int:
         """One past the highest in the same list, so a new rule lands at the end."""
-        stmt = select(func.max(Rule.order)).where(Rule.graph_id == graph_id)
+        stmt = select(func.max(Rule.order))
+        stmt = stmt.where(Rule.graph_id == graph_id) if graph_id else stmt.where(Rule.graph_id.is_(None))
         stmt = stmt.where(Rule.project_id == project_id) if project_id else stmt.where(Rule.project_id.is_(None))
         return ((await session.execute(stmt)).scalar_one_or_none() or 0) + 1
 

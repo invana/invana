@@ -14,6 +14,8 @@ table                  holds
 ``dataset_versions``   licence, author chain, columns, hash — immutable
 ``dataset_records``    one keyed row of one version
 ``dataset_bindings``   a version bound into a Graph's model
+``dataset_standards``  a standard the dataset claims, pinned to one version
+``dataset_conformance`` a version's score against a standard version
 =====================  ====================================================
 
 Retraction marks a version and never deletes it, so nothing here cascades
@@ -26,9 +28,10 @@ import enum
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
+from invana.apps.standards import models as _standards  # noqa: F401 — the tables a claim points at
 from invana.core.models import Base
 
 
@@ -206,3 +209,56 @@ class DatasetBinding(Base):
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     bound_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class DatasetStandard(Base):
+    """A standard one dataset claims — one pinned version, a mapping, a mode."""
+
+    __tablename__ = "dataset_standards"
+    __table_args__ = (UniqueConstraint("dataset_id", "standard_id", name="uq_dataset_standard"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    dataset_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("datasets.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    standard_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("standards.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    #: Pinned; a newer standard version never moves it.
+    standard_version_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("standard_versions.id", ondelete="CASCADE"), nullable=False
+    )
+    #: ``block · warn · report``.
+    mode: Mapped[str] = mapped_column(String(8), nullable=False)
+    #: ``{term: column}``.
+    mapping: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    attached_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    attached_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class DatasetConformance(Base):
+    """One dataset version scored against one standard version. Derived — recomputed in place."""
+
+    __tablename__ = "dataset_conformance"
+    __table_args__ = (
+        UniqueConstraint("dataset_version_id", "standard_version_id", name="uq_dataset_conformance_pair"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    dataset_version_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("dataset_versions.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    standard_version_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("standard_versions.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    #: The mapping it was scored under.
+    mapping: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    record_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    conforming: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    score: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
+    violation_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    #: ``[{key, term, kind, value?}]`` — the first 50.
+    violations: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    checked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)

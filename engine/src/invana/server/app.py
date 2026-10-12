@@ -187,12 +187,13 @@ def create_app() -> FastAPI:
     from invana.server.routes.model_links import model_links_router
     from invana.server.routes.models import models_router
     from invana.server.routes.schemas import schemas_router
-    from invana.server.rules.routes import rules_router
+    from invana.server.rules.routes import install_rules_router, rules_router
     from invana.server.runtime.catalogue import catalogue_router
     from invana.server.runtime.runs import runs_router
     from invana.server.runtime.templates import templates_router
     from invana.server.sessions.routes import sessions_router
     from invana.server.skills.routes import skills_router
+    from invana.server.standards.routes import standards_router
     from invana.server.task_plans.routes import task_plans_router
     from invana.server.work.routes import projects_router, tasks_router
 
@@ -259,6 +260,7 @@ def create_app() -> FastAPI:
     app.include_router(govern_router)
     app.include_router(skills_router)
     app.include_router(rules_router)
+    app.include_router(install_rules_router)
     app.include_router(agents_router)
     app.include_router(atlas_agent_router)
     app.include_router(projects_router)
@@ -279,6 +281,7 @@ def create_app() -> FastAPI:
     app.include_router(evals_router)
     app.include_router(datasets_router)
     app.include_router(dataset_bindings_router)
+    app.include_router(standards_router)
 
     # Proxy the studio's browser OTLP/HTTP span export to the collector.
     # Always mounted: the studio exports on its own gate, so a route that

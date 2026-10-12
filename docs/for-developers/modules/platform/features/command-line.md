@@ -24,6 +24,8 @@ Studio.
 | `invana version` | The engine version and every installed connector |
 | `invana records import` | Loads a folder of records into a model |
 | `invana datasets list · show · import · versions · diff · history · share · retract · refresh · bind` | The install's datasets: import a CSV or JSON file as the next version, read versions and change logs, share, retract (Admin), set or fire a refresh, bind a version into a Graph's model — [2.4](../../bring-data-in/features/datasets.md) · [2.5](../../bring-data-in/features/retract-and-refresh.md) · [2.6](../../bring-data-in/features/bind-a-dataset.md) |
+| `invana standards list · show · apply · attach · detach · check` | The install's standards: apply a standard file as its next version, attach one to a dataset with a mode (`block · warn · report`), score a dataset version against it — [2.7](../../bring-data-in/features/standards.md) |
+| `invana rules list · show · apply` | The install's rules, or a Graph's with `--graph`: list, show every version, apply a rule file (a check and a mode included) — [6.4](../../skills/features/rules.md) |
 | `invana models export · import · upgrade` | Moves a domain model between Graphs |
 | `invana models starters` | Lists the shipped starter models |
 | `invana loader` | Loads a flat CSV straight through the connector; `--graph` supplies the connection and journals it as a `bulk` run — [2.1](../../bring-data-in/features/load-data.md) |

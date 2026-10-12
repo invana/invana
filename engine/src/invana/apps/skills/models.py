@@ -315,21 +315,23 @@ class Rule(Base):
 
     A **skill** is a playbook that may be offered; a **rule** is a statement that
     is always true. Both are authored once and reach a step as discrete items
-    with ids — and neither is enforced. A rule that must be enforced is an
-    envelope bound or a criterion, not a rule
-    ([RU5](docs/for-developers/modules/skills/features/rules.md)).
+    with ids, and a step's citation of either is never enforcement. A rule whose
+    current version carries a **check** is also read at the acts that check
+    names, and its **mode** says whether a failure blocks, warns or reports
+    (docs/for-developers/modules/skills/features/rules.md).
 
-    **One axis** ([RU6](docs/for-developers/modules/skills/features/rules.md)):
-    a rule always belongs to a Graph, and a ``project_id`` is what makes it a
-    working rule rather than an invariant. ``scope`` and ``kind`` are read off
-    that one column, so ``scope='graph', kind='working'`` is not representable.
+    **The scope is read off two columns, never stored**: no ``graph_id`` is an
+    ``install`` rule, a ``graph_id`` alone a Graph's invariant, a
+    ``project_id`` a working rule — so a scope that disagrees with its columns
+    is not representable.
     """
 
     __tablename__ = "rules"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    graph_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("graphs.id", ondelete="CASCADE"), nullable=False, index=True
+    #: Null on an install rule. CASCADE — a Graph's rules go with it.
+    graph_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("graphs.id", ondelete="CASCADE"), nullable=True, index=True
     )
     #: Set on a working rule; null on an invariant. CASCADE — a project's rules
     #: go with the project, and the Graph's invariants are untouched.
@@ -370,7 +372,9 @@ class Rule(Base):
 
     @property
     def scope(self) -> str:
-        return "project" if self.project_id else "graph"
+        if self.project_id:
+            return "project"
+        return "graph" if self.graph_id else "install"
 
     @property
     def kind(self) -> str:
@@ -383,6 +387,14 @@ class Rule(Base):
     @property
     def statement(self) -> str:
         return self.current_version.statement if self.current_version is not None else ""
+
+    @property
+    def check(self) -> dict | None:
+        return self.current_version.check if self.current_version is not None else None
+
+    @property
+    def mode(self) -> str | None:
+        return self.current_version.mode if self.current_version is not None else None
 
 
 class RuleVersion(Base):
@@ -406,6 +418,10 @@ class RuleVersion(Base):
     #: ([RU1](docs/for-developers/modules/skills/features/rules.md)) — which is
     #: a nudge on the surface, not a length the column refuses.
     statement: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    #: ``{kind, …params}`` from a closed vocabulary; null on a rule that is only offered.
+    check: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    #: ``block · warn · report``; set exactly when ``check`` is.
+    mode: Mapped[str | None] = mapped_column(String(8), nullable=True)
 
     published_by_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True

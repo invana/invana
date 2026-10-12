@@ -139,6 +139,6 @@ flowchart TD
 | Guardrails reading sensitivity labels | the lens's `graph data` layer reads them when a guardrail first names one; the labels are stored and served now |
 | Per-cell provenance | record level plus the change log covers it |
 | Documents datasets | P-05, products DS-F10 |
-| Validation status and the review queue | products DS-F7; standards and conformance are B04 |
+| Validation status and the review queue | products DS-F7; standards and conformance are [2.7](standards.md) |
 | Sharing across installs · `pack`/`unpack` | the open registry, later |
 | Streamed or chunked upload over HTTP | bulk loads go through the CLI |

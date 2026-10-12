@@ -3674,6 +3674,89 @@
         "title": "CompareSideRead",
         "type": "object"
       },
+      "ConformanceListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConformanceRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "ConformanceListResponse",
+        "type": "object"
+      },
+      "ConformanceRead": {
+        "description": "One dataset version scored against one standard version.",
+        "properties": {
+          "checked_at": {
+            "format": "date-time",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "conforming": {
+            "title": "Conforming",
+            "type": "integer"
+          },
+          "conforms": {
+            "title": "Conforms",
+            "type": "boolean"
+          },
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Enforcement"
+          },
+          "record_count": {
+            "title": "Record Count",
+            "type": "integer"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "standard": {
+            "title": "Standard",
+            "type": "string"
+          },
+          "violation_count": {
+            "title": "Violation Count",
+            "type": "integer"
+          },
+          "violations": {
+            "items": {
+              "$ref": "#/components/schemas/Violation"
+            },
+            "title": "Violations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "dataset",
+          "standard",
+          "mode",
+          "record_count",
+          "conforming",
+          "score",
+          "conforms",
+          "violation_count",
+          "violations",
+          "checked_at"
+        ],
+        "title": "ConformanceRead",
+        "type": "object"
+      },
       "ConstraintCreate": {
         "properties": {
           "constraint_type": {
@@ -4079,6 +4162,14 @@
           "version": {
             "title": "Version",
             "type": "integer"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
           }
         },
         "required": [
@@ -4313,6 +4404,14 @@
           "visibility": {
             "title": "Visibility",
             "type": "string"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
           }
         },
         "required": [
@@ -4427,6 +4526,131 @@
           "reason"
         ],
         "title": "DatasetRetract",
+        "type": "object"
+      },
+      "DatasetStandardCreate": {
+        "description": "Claim a standard: ``publisher/name[@v]`` \u2014 the current version when none is named.",
+        "properties": {
+          "mapping": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mapping"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Enforcement",
+            "default": "warn"
+          },
+          "standard": {
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Standard",
+            "type": "string"
+          }
+        },
+        "required": [
+          "standard"
+        ],
+        "title": "DatasetStandardCreate",
+        "type": "object"
+      },
+      "DatasetStandardListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetStandardRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "DatasetStandardListResponse",
+        "type": "object"
+      },
+      "DatasetStandardRead": {
+        "description": "A standard a dataset claims, pinned to one version.",
+        "properties": {
+          "attached_at": {
+            "format": "date-time",
+            "title": "Attached At",
+            "type": "string"
+          },
+          "attached_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attached By Id"
+          },
+          "conformance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConformanceRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mapping": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Mapping",
+            "type": "object"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Enforcement"
+          },
+          "newer_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Newer Version"
+          },
+          "standard": {
+            "title": "Standard",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "standard",
+          "version",
+          "mode",
+          "mapping",
+          "attached_by_id",
+          "attached_at"
+        ],
+        "title": "DatasetStandardRead",
         "type": "object"
       },
       "DatasetUpdate": {
@@ -4697,6 +4921,14 @@
           "version": {
             "title": "Version",
             "type": "integer"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
           },
           "why": {
             "anyOf": [
@@ -5296,6 +5528,16 @@
         ],
         "title": "EmissionRead",
         "type": "object"
+      },
+      "Enforcement": {
+        "description": "What a broken bound does to the act that broke it.",
+        "enum": [
+          "block",
+          "warn",
+          "report"
+        ],
+        "title": "Enforcement",
+        "type": "string"
       },
       "EvalBudgetRead": {
         "properties": {
@@ -12271,6 +12513,63 @@
         "title": "Retraction",
         "type": "object"
       },
+      "RuleCheck": {
+        "description": "A rule's machine half, from a closed vocabulary \u2014 ``invana.apps.skills.checks``.",
+        "properties": {
+          "allowed": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allowed"
+          },
+          "kind": {
+            "enum": [
+              "dataset.conforms",
+              "dataset.licence"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "min_score": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Score"
+          },
+          "standard": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "RuleCheck",
+        "type": "object"
+      },
       "RuleCitation": {
         "description": "One step that cited this rule, and which wording it read.",
         "properties": {
@@ -12376,6 +12675,26 @@
       },
       "RuleCreate": {
         "properties": {
+          "check": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RuleCheck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Enforcement"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "order": {
             "anyOf": [
               {
@@ -12475,6 +12794,16 @@
             "title": "Active",
             "type": "boolean"
           },
+          "check": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RuleCheck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "citations": {
             "default": 0,
             "title": "Citations",
@@ -12497,8 +12826,15 @@
             "title": "Current Version Id"
           },
           "graph_id": {
-            "title": "Graph Id",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graph Id"
           },
           "id": {
             "title": "Id",
@@ -12507,6 +12843,16 @@
           "kind": {
             "title": "Kind",
             "type": "string"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Enforcement"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "order": {
             "title": "Order",
@@ -12561,6 +12907,26 @@
       "RuleUpdate": {
         "description": "A rewording, a reorder, or both.\n\nChanging the statement publishes the next version; ``order`` and ``active``\nare properties of the rule and are edited in place\n([RU4](docs/for-developers/modules/skills/features/rules.md)).",
         "properties": {
+          "check": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RuleCheck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Enforcement"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "order": {
             "anyOf": [
               {
@@ -12658,9 +13024,29 @@
       },
       "RuleVersionRead": {
         "properties": {
+          "check": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RuleCheck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "id": {
             "title": "Id",
             "type": "string"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Enforcement"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "published_at": {
             "format": "date-time",
@@ -15827,6 +16213,371 @@
         "title": "StagedSet",
         "type": "object"
       },
+      "StandardCreate": {
+        "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "name": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,62}$",
+            "title": "Name",
+            "type": "string"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/StandardOrigin",
+            "default": "authored"
+          },
+          "publisher": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9][a-z0-9-]{0,62}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publisher"
+          },
+          "terms": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/StandardTerm"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terms"
+          },
+          "title": {
+            "default": "",
+            "maxLength": 255,
+            "title": "Title",
+            "type": "string"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "StandardCreate",
+        "type": "object"
+      },
+      "StandardListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StandardRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "StandardListResponse",
+        "type": "object"
+      },
+      "StandardOrigin": {
+        "enum": [
+          "pack",
+          "authored"
+        ],
+        "title": "StandardOrigin",
+        "type": "string"
+      },
+      "StandardRead": {
+        "description": "The standard with its current version's terms flattened in.",
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "content_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Hash"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Id"
+          },
+          "current_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Version"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/StandardOrigin"
+          },
+          "publisher": {
+            "title": "Publisher",
+            "type": "string"
+          },
+          "terms": {
+            "items": {
+              "$ref": "#/components/schemas/StandardTerm"
+            },
+            "title": "Terms",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "address",
+          "publisher",
+          "name",
+          "title",
+          "description",
+          "origin",
+          "current_version",
+          "terms",
+          "content_hash",
+          "created_by_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "StandardRead",
+        "type": "object"
+      },
+      "StandardTerm": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "required": {
+            "default": false,
+            "title": "Required",
+            "type": "boolean"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TermType",
+            "default": "text"
+          },
+          "values": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/TermValue"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "StandardTerm",
+        "type": "object"
+      },
+      "StandardVersionCreate": {
+        "properties": {
+          "terms": {
+            "items": {
+              "$ref": "#/components/schemas/StandardTerm"
+            },
+            "minItems": 1,
+            "title": "Terms",
+            "type": "array"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "terms"
+        ],
+        "title": "StandardVersionCreate",
+        "type": "object"
+      },
+      "StandardVersionListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StandardVersionRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "StandardVersionListResponse",
+        "type": "object"
+      },
+      "StandardVersionRead": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "content_hash": {
+            "title": "Content Hash",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "published_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published By Id"
+          },
+          "standard_id": {
+            "title": "Standard Id",
+            "type": "string"
+          },
+          "terms": {
+            "items": {
+              "$ref": "#/components/schemas/StandardTerm"
+            },
+            "title": "Terms",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "id",
+          "standard_id",
+          "address",
+          "version",
+          "terms",
+          "content_hash",
+          "why",
+          "published_by_id",
+          "published_at"
+        ],
+        "title": "StandardVersionRead",
+        "type": "object"
+      },
       "StarterSummary": {
         "description": "What the picker lists, without loading the whole artefact.",
         "properties": {
@@ -17650,6 +18401,44 @@
         "title": "TemplateUpdate",
         "type": "object"
       },
+      "TermType": {
+        "enum": [
+          "text",
+          "integer",
+          "number",
+          "boolean",
+          "date"
+        ],
+        "title": "TermType",
+        "type": "string"
+      },
+      "TermValue": {
+        "properties": {
+          "code": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Code",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "TermValue",
+        "type": "object"
+      },
       "ThemePreference": {
         "description": "The studio theme selection stored under `preferences.theme`\n(docs/for-developers/modules/platform/features/theming.md).",
         "properties": {
@@ -19173,6 +19962,37 @@
         "title": "Vertex",
         "type": "object"
       },
+      "Violation": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "missing",
+              "not_allowed",
+              "wrong_type"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "term": {
+            "title": "Term",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "key",
+          "term",
+          "kind"
+        ],
+        "title": "Violation",
+        "type": "object"
+      },
       "Visibility": {
         "enum": [
           "private",
@@ -19992,7 +20812,7 @@
         ]
       },
       "patch": {
-        "description": "Title, description, sharing, labels and the refresh schedule \u2014 never a version.",
+        "description": "Title, description, sharing, labels and the refresh schedule \u2014 never a version.\n\nSharing it with the install reads the install's checked rules first.",
         "operationId": "update_dataset_api_v1_datasets__publisher___name__patch",
         "parameters": [
           {
@@ -20350,6 +21170,196 @@
         ]
       }
     },
+    "/api/v1/datasets/{publisher}/{name}/standards": {
+      "get": {
+        "description": "The standards the dataset claims, each with the current version's score.",
+        "operationId": "list_standards_api_v1_datasets__publisher___name__standards_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetStandardListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Standards",
+        "tags": [
+          "datasets"
+        ]
+      },
+      "post": {
+        "description": "Claim a standard version with a mapping and a mode, or move an existing claim.",
+        "operationId": "attach_standard_api_v1_datasets__publisher___name__standards_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetStandardCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetStandardRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Attach Standard",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/standards/{standard_publisher}/{standard_name}": {
+      "delete": {
+        "description": "Stop claiming a standard. Past conformance rows stay with their versions.",
+        "operationId": "detach_standard_api_v1_datasets__publisher___name__standards__standard_publisher___standard_name__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "standard_publisher",
+            "required": true,
+            "schema": {
+              "title": "Standard Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "standard_name",
+            "required": true,
+            "schema": {
+              "title": "Standard Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Detach Standard",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
     "/api/v1/datasets/{publisher}/{name}/versions": {
       "get": {
         "operationId": "list_versions_api_v1_datasets__publisher___name__versions_get",
@@ -20406,7 +21416,7 @@
         ]
       },
       "post": {
-        "description": "The next immutable version, from the records in the body.",
+        "description": "The next immutable version, from the records in the body \u2014 refused by a\nstandard the dataset claims with ``block``, warned of by one claimed with ``warn``.",
         "operationId": "publish_version_api_v1_datasets__publisher___name__versions_post",
         "parameters": [
           {
@@ -20532,6 +21542,73 @@
           }
         ],
         "summary": "Get Version",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/versions/{version}/conformance": {
+      "get": {
+        "description": "One version scored against each standard the dataset claims.",
+        "operationId": "version_conformance_api_v1_datasets__publisher___name__versions__version__conformance_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConformanceListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Version Conformance",
         "tags": [
           "datasets"
         ]
@@ -21087,6 +22164,686 @@
         "summary": "Create Graph",
         "tags": [
           "graphs"
+        ]
+      }
+    },
+    "/api/v1/rules": {
+      "get": {
+        "description": "Every install rule, active and inactive, in offer order.",
+        "operationId": "list_install_rules_api_v1_rules_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Install Rules",
+        "tags": [
+          "rules"
+        ]
+      },
+      "post": {
+        "description": "An install rule \u2014 offered in every Graph, and checked where its check says.",
+        "operationId": "create_install_rule_api_v1_rules_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Install Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rules/{rule_id}": {
+      "get": {
+        "operationId": "get_install_rule_api_v1_rules__rule_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Install Rule",
+        "tags": [
+          "rules"
+        ]
+      },
+      "patch": {
+        "description": "Reword, re-check or reorder it. A new statement, check or mode publishes the next version.",
+        "operationId": "update_install_rule_api_v1_rules__rule_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Install Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rules/{rule_id}/activate": {
+      "post": {
+        "operationId": "activate_install_rule_api_v1_rules__rule_id__activate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Activate Install Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rules/{rule_id}/deactivate": {
+      "post": {
+        "description": "Stop offering and checking it. Its versions and past checks stay.",
+        "operationId": "deactivate_install_rule_api_v1_rules__rule_id__deactivate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Deactivate Install Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rules/{rule_id}/versions": {
+      "get": {
+        "operationId": "list_install_rule_versions_api_v1_rules__rule_id__versions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleVersionListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Install Rule Versions",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/standards": {
+      "get": {
+        "description": "The library: every standard in the install, by address.",
+        "operationId": "list_standards_api_v1_standards_get",
+        "parameters": [
+          {
+            "description": "pack or authored.",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "pack or authored.",
+              "title": "Origin"
+            }
+          },
+          {
+            "description": "Text in the name, title or description.",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Text in the name, title or description.",
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Standards",
+        "tags": [
+          "standards"
+        ]
+      },
+      "post": {
+        "description": "A standard, and its v1 when the body carries terms.",
+        "operationId": "create_standard_api_v1_standards_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StandardCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Standard",
+        "tags": [
+          "standards"
+        ]
+      }
+    },
+    "/api/v1/standards/{publisher}/{name}": {
+      "get": {
+        "operationId": "get_standard_api_v1_standards__publisher___name__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Standard",
+        "tags": [
+          "standards"
+        ]
+      }
+    },
+    "/api/v1/standards/{publisher}/{name}/versions": {
+      "get": {
+        "operationId": "list_versions_api_v1_standards__publisher___name__versions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardVersionListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Versions",
+        "tags": [
+          "standards"
+        ]
+      },
+      "post": {
+        "description": "The next immutable version. Datasets that claim an earlier one keep it.",
+        "operationId": "publish_version_api_v1_standards__publisher___name__versions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StandardVersionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Publish Version",
+        "tags": [
+          "standards"
+        ]
+      }
+    },
+    "/api/v1/standards/{publisher}/{name}/versions/{version}": {
+      "get": {
+        "operationId": "get_version_api_v1_standards__publisher___name__versions__version__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Version",
+        "tags": [
+          "standards"
         ]
       }
     },
@@ -32484,7 +34241,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/projects/{key}/rules": {
       "get": {
-        "description": "This Project's working rules, and the Graph invariants it inherits.\n\nThe inherited half is returned rather than merged: they are read-only here\nand the panel shows them above, greyed \u2014 a project that edits an invariant\nis editing the Graph, which is a different act on a different surface.",
+        "description": "This Project's working rules, and the install rules and Graph invariants it inherits.\n\nThe inherited half is returned rather than merged: they are read-only here\nand the panel shows them above, greyed \u2014 a project that edits an invariant\nis editing the Graph, which is a different act on a different surface.",
         "operationId": "list_working_rules_api_v1_u__username___graphSlug__projects__key__rules_get",
         "parameters": [
           {
@@ -32631,7 +34388,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/rules": {
       "get": {
-        "description": "Every invariant on this Graph, active and inactive, in offer order.",
+        "description": "Every invariant on this Graph, active and inactive, in offer order, and the install rules above them.",
         "operationId": "list_invariants_api_v1_u__username___graphSlug__rules_get",
         "parameters": [
           {

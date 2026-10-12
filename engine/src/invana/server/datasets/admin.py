@@ -1,4 +1,4 @@
-"""starlette-admin views for datasets, their versions, records and bindings.
+"""starlette-admin views for datasets, their versions, records, bindings, claims and scores.
 
 Versions and records are read-only: a version is immutable, and an edit here
 would change content its hash no longer describes.
@@ -61,3 +61,23 @@ class DatasetRecordView(ModelView):
 
 class DatasetBindingView(ModelView):
     fields = ["id", "graph_id", "model_id", "dataset_id", "dataset_version_id", "type_name", "run_id", "bound_at"]
+
+
+class DatasetStandardView(ModelView):
+    fields = ["id", "dataset_id", "standard_id", "standard_version_id", "mode", "mapping", "attached_at"]
+
+
+class DatasetConformanceView(ModelView):
+    fields = [
+        "id",
+        "dataset_version_id",
+        "standard_version_id",
+        "record_count",
+        "conforming",
+        "score",
+        "violation_count",
+        "checked_at",
+    ]
+    # Derived from the records; recomputed by the engine, never edited.
+    can_create = False
+    can_edit = False

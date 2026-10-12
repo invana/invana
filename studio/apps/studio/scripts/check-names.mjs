@@ -74,6 +74,8 @@ const ENGINE_ONLY = {
 	history: "the change log; no Studio surface reads it yet",
 	evals: "eval sets and runs; no Studio surface reads them yet",
 	datasets: "dataset records; the Datasets product reads them from C01",
+	standards:
+		"standards and conformance; the Datasets product reads them from C01",
 	routes: "shared route helpers",
 	__pycache__: "bytecode",
 };

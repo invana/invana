@@ -12,6 +12,9 @@ GET ``/{publisher}/{name}/records/{key}``          one record (current version b
 GET ``/{publisher}/{name}/records/{key}/history``  the record's change log
 GET ``/{publisher}/{name}/history``                the dataset's versions, as the change log
 GET ``/{publisher}/{name}/history/compare``        two of its versions
+GET · POST ``/{publisher}/{name}/standards``       the standards it claims · claim one
+DELETE ``/{publisher}/{name}/standards/{p}/{n}``   stop claiming one
+GET ``/{publisher}/{name}/versions/{v}/conformance`` one version scored against each claim
 =================================================  ==========================================
 
 A Graph binds a version under ``/api/v1/u/{username}/{graphSlug}/dataset-bindings``
@@ -26,12 +29,15 @@ from fastapi import APIRouter, status
 
 from invana.activity.schemas import ChangeCompare, RecordHistory
 from invana.apps.datasets.schemas import (
+    ConformanceListResponse,
     DatasetBindingListResponse,
     DatasetBindingRead,
     DatasetListResponse,
     DatasetRead,
     DatasetRecordPage,
     DatasetRecordRead,
+    DatasetStandardListResponse,
+    DatasetStandardRead,
     DatasetVersionListResponse,
     DatasetVersionRead,
     DatasetVersionUsage,
@@ -59,6 +65,16 @@ datasets_router.get(f"{_ONE}/records/{{key}}", response_model=DatasetRecordRead)
 datasets_router.get(f"{_ONE}/records/{{key}}/history", response_model=RecordChangeLog)(views.record_history)
 datasets_router.get(f"{_ONE}/history", response_model=RecordHistory)(views.dataset_history)
 datasets_router.get(f"{_ONE}/history/compare", response_model=ChangeCompare)(views.compare_dataset_versions)
+datasets_router.get(f"{_ONE}/standards", response_model=DatasetStandardListResponse)(views.list_standards)
+datasets_router.post(f"{_ONE}/standards", response_model=DatasetStandardRead, status_code=status.HTTP_201_CREATED)(
+    views.attach_standard
+)
+datasets_router.delete(
+    f"{_ONE}/standards/{{standard_publisher}}/{{standard_name}}", status_code=status.HTTP_204_NO_CONTENT
+)(views.detach_standard)
+datasets_router.get(f"{_ONE}/versions/{{version}}/conformance", response_model=ConformanceListResponse)(
+    views.version_conformance
+)
 
 dataset_bindings_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/dataset-bindings", tags=["datasets"])
 

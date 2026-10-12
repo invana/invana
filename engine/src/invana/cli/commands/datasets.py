@@ -41,15 +41,17 @@ from typing import Any
 import click
 
 from invana.activity.managers import ChangeLogManager
-from invana.apps.datasets.managers import DatasetManager, parse_ref
+from invana.apps.datasets.managers import ConformanceManager, DatasetManager, parse_ref
 from invana.apps.datasets.schemas import AuthorStep, DatasetCreate, DatasetUpdate, DatasetVersionCreate
 from invana.cli.context import as_user, on_graph, with_runtime
 from invana.core.errors import NotFoundError
-from invana.runtime.managers import DatasetBindManager
+from invana.runtime.managers import DatasetBindManager, RuleCheckManager
 
 _datasets = DatasetManager()
+_claims = ConformanceManager()
 _changes = ChangeLogManager()
 _binds = DatasetBindManager()
+_checks = RuleCheckManager()
 
 
 def read_records(path: str) -> list[dict[str, Any]]:
@@ -172,6 +174,8 @@ def import_(
             )
             minted = await _datasets.publish_version(session, dataset=dataset, payload=payload, actor=actor)
             click.echo(f"{dataset.address}@{minted.version}\t{minted.record_count} records\t{minted.content_hash}")
+            for line in await _claims.warnings(session, dataset=dataset, version=minted):
+                click.echo(f"warning: {line}", err=True)
 
     asyncio.run(go())
 
@@ -252,8 +256,12 @@ def share(ref: str, visibility: str, user_ref: str) -> None:
     async def go() -> None:
         async with as_user(user_ref) as (session, actor):
             dataset, _ = await _datasets.get_by_ref(session, ref=ref, reader=actor)
-            await _datasets.update(session, dataset=dataset, payload=DatasetUpdate(visibility=visibility), actor=actor)
+            _, warnings = await _checks.share(
+                session, dataset=dataset, payload=DatasetUpdate(visibility=visibility), actor=actor
+            )
             click.echo(f"{dataset.address}\t{dataset.visibility}")
+            for line in warnings:
+                click.echo(f"warning: {line}", err=True)
 
     asyncio.run(go())
 
@@ -326,11 +334,13 @@ def bind(ref: str, graph_ref: str, model_name: str, type_name: str, user_ref: st
     async def go() -> None:
         async with on_graph(graph_ref, user_ref) as (session, graph, actor):
             model_id = await _binds.model_named(session, graph=graph, name=model_name)
-            binding, run = await _binds.bind(
+            binding, run, warnings = await _binds.bind(
                 session, graph=graph, ref=ref, model_id=model_id, type_name=type_name, actor=actor
             )
             run_id = run.id
             click.echo(f"bound {ref} → {model_name}.{binding.type_name}\trun {run_id}")
+            for line in warnings:
+                click.echo(f"warning: {line}", err=True)
         async with with_runtime() as runtime:
             await runtime.run_inline(run_id)
         async with on_graph(graph_ref, user_ref) as (session, graph, _):

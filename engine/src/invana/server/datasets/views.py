@@ -8,6 +8,10 @@ read the dataset.
 
 A binding is the one Graph-scoped act: ``bind`` opens the load in the request's
 transaction, commits, and submits the run to the runtime.
+
+Sharing and binding read the checked rules (``RuleCheckManager``); a rule that
+warns comes back in the response's ``warnings``, and so does a standard the
+dataset claims with ``warn`` when a new version breaks it.
 """
 
 from __future__ import annotations
@@ -17,8 +21,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.managers import ChangeLogManager
 from invana.activity.schemas import ChangeCompare, RecordHistory
-from invana.apps.datasets.managers import DatasetManager
+from invana.apps.datasets.managers import ConformanceManager, DatasetManager
 from invana.apps.datasets.schemas import (
+    ConformanceListResponse,
     DatasetBindingCreate,
     DatasetBindingListResponse,
     DatasetBindingRead,
@@ -28,6 +33,9 @@ from invana.apps.datasets.schemas import (
     DatasetRecordPage,
     DatasetRecordRead,
     DatasetRetract,
+    DatasetStandardCreate,
+    DatasetStandardListResponse,
+    DatasetStandardRead,
     DatasetUpdate,
     DatasetVersionCreate,
     DatasetVersionListResponse,
@@ -39,12 +47,14 @@ from invana.apps.graphs.models import Graph, GraphMember
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
-from invana.runtime.managers import DatasetBindManager
+from invana.runtime.managers import DatasetBindManager, RuleCheckManager
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 datasets = DatasetManager()
 changes = ChangeLogManager()
 binds = DatasetBindManager()
+claims = ConformanceManager()
+checks = RuleCheckManager()
 
 
 async def list_datasets(
@@ -87,10 +97,15 @@ async def update_dataset(
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> DatasetRead:
-    """Title, description, sharing, labels and the refresh schedule — never a version."""
+    """Title, description, sharing, labels and the refresh schedule — never a version.
+
+    Sharing it with the install reads the install's checked rules first.
+    """
     dataset = await datasets.get(session, publisher=publisher, name=name, reader=user)
-    await datasets.update(session, dataset=dataset, payload=payload, actor=user)
-    return await datasets.read(session, dataset)
+    dataset, warnings = await checks.share(session, dataset=dataset, payload=payload, actor=user)
+    read = await datasets.read(session, dataset)
+    read.warnings = warnings
+    return read
 
 
 async def list_versions(
@@ -112,10 +127,13 @@ async def publish_version(
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> DatasetVersionRead:
-    """The next immutable version, from the records in the body."""
+    """The next immutable version, from the records in the body — refused by a
+    standard the dataset claims with ``block``, warned of by one claimed with ``warn``."""
     dataset = await datasets.get(session, publisher=publisher, name=name, reader=user)
     version = await datasets.publish_version(session, dataset=dataset, payload=payload, actor=user)
-    return await datasets.read_version(session, dataset=dataset, version=version)
+    read = await datasets.read_version(session, dataset=dataset, version=version)
+    read.warnings = await claims.warnings(session, dataset=dataset, version=version)
+    return read
 
 
 async def get_version(
@@ -222,6 +240,59 @@ async def compare_dataset_versions(
     return await changes.compare(session, graph_id=None, record_kind="dataset", record_id=dataset.id, a=a, b=b)
 
 
+async def list_standards(
+    publisher: str = Path(...),
+    name: str = Path(...),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> DatasetStandardListResponse:
+    """The standards the dataset claims, each with the current version's score."""
+    dataset = await datasets.get(session, publisher=publisher, name=name, reader=user)
+    rows = await claims.attachments(session, dataset=dataset)
+    items = [await claims.read_attachment(session, dataset=dataset, claim=c) for c in rows]
+    return DatasetStandardListResponse(items=items, total=len(items))
+
+
+async def attach_standard(
+    payload: DatasetStandardCreate,
+    publisher: str = Path(...),
+    name: str = Path(...),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> DatasetStandardRead:
+    """Claim a standard version with a mapping and a mode, or move an existing claim."""
+    dataset = await datasets.get(session, publisher=publisher, name=name, reader=user)
+    claim = await claims.attach(session, dataset=dataset, payload=payload, actor=user)
+    return await claims.read_attachment(session, dataset=dataset, claim=claim)
+
+
+async def detach_standard(
+    publisher: str = Path(...),
+    name: str = Path(...),
+    standard_publisher: str = Path(...),
+    standard_name: str = Path(...),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> None:
+    """Stop claiming a standard. Past conformance rows stay with their versions."""
+    dataset = await datasets.get(session, publisher=publisher, name=name, reader=user)
+    await claims.detach(session, dataset=dataset, ref=f"{standard_publisher}/{standard_name}", actor=user)
+
+
+async def version_conformance(
+    publisher: str = Path(...),
+    name: str = Path(...),
+    version: int = Path(..., ge=1),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ConformanceListResponse:
+    """One version scored against each standard the dataset claims."""
+    dataset = await datasets.get(session, publisher=publisher, name=name, reader=user)
+    row = await datasets.get_version(session, dataset=dataset, version=version)
+    items = await claims.conformance(session, dataset=dataset, version=row)
+    return ConformanceListResponse(items=items, total=len(items))
+
+
 async def list_bindings(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
@@ -241,10 +312,11 @@ async def bind_dataset(
     session: AsyncSession = Depends(get_session),
 ) -> DatasetBindingRead:
     """Bind one dataset version into a model as a node type — 201, then follow the load run."""
-    binding, run = await binds.bind(
+    binding, run, warnings = await binds.bind(
         session, graph=graph, ref=payload.dataset, model_id=payload.model, type_name=payload.type, actor=user
     )
     read = await datasets.read_binding(session, binding)
+    read.warnings = warnings
     await session.commit()
     request.app.state.task_runtime.submit(run.id)
     return read

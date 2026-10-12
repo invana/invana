@@ -86,6 +86,7 @@ this map.** Feature numbers do not change.
 | 2.4 | [Datasets](modules/bring-data-in/features/datasets.md) | Install-wide `publisher/name` records — origin, author chain, licence, sensitivity, sharing; immutable hashed versions; a record's change log | ✅ | 🟡 | 🔵 | B03 |
 | 2.5 | [Retract and refresh](modules/bring-data-in/features/retract-and-refresh.md) | A version retracted with a reason and everything citing it flagged; a refresh schedule mints new versions while consumers stay pinned | ✅ | 🟡 | 🔵 | B03 |
 | 2.6 | [Bind a dataset](modules/bring-data-in/features/bind-a-dataset.md) | A Graph binds one dataset version into a model as an ordinary load run; told when a newer one exists | 🟡 | 🟡 | 🔵 | B03 |
+| 2.7 | [Standards and conformance](modules/bring-data-in/features/standards.md) | Install-wide versioned standards — terms, types, allowed values; a dataset claims one pinned version and is scored against it, enforced block · warn · report | ✅ | ✅ | 🔵 | B04 |
 
 ## 3 · [Ask](modules/ask/spec.md)
 
@@ -141,7 +142,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 6.1 | [Authoring a skill](modules/skills/features/authoring-a-skill.md) | Four fields, drawn as a plan — the Playbook and Flow tabs | ✅ | — | ✅ | S5 · M8 |
 | 6.2 | [Offer a skill to an agent](modules/skills/features/bindings.md) | Which agent may be offered which skill | ✅ | — | ✅ | S12c |
 | 6.3 | [Where a skill was used](modules/skills/features/usage.md) | Where a skill was offered, and where it was reported applied | ✅ | — | ✅ | S12c |
-| 6.4 | [Rules](modules/skills/features/rules.md) | Graph invariants and project working rules, offered as statements | ✅ | — | ✅ | S12b |
+| 6.4 | [Rules](modules/skills/features/rules.md) | Install rules, Graph invariants and project working rules, offered as statements; a rule with a check is enforced block · warn · report at the acts it names | ✅ | ✅ | 🟡 | S12b · B04 |
 | 6.5 | [Instructions, publish and roll back](modules/skills/features/instructions-publish-rollback.md) | `instructions.md` drafts on skills and agents; publish regenerates the plan; one-act rollback; plans generated or packaged | 🟡 | 🟡 | 🔵 | B02 |
 | 6.6 | [Evals](modules/skills/features/evals.md) | Eval sets with rule checks and a labelled judge; the publish gate; drift re-runs; an eval token budget | ✅ | 🟡 | 🔵 | B02 |
 
@@ -211,7 +212,7 @@ provider row and its models, and reopens four rows below. The shapes:
 |---|---|---|---|---|---|---|
 | 13.1 | [Design system](modules/platform/features/design-system.md) | Studio builds from `@invana/design-kit`, never beside it | — | — | 🟡 | — |
 | 13.2 | [Theming](modules/platform/features/theming.md) | Light · dark · theme variants, everywhere | — | — | ✅ | — |
-| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · models · loader` | — | 🟡 | — | — |
+| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · standards · rules · models · loader` | — | 🟡 | — | — |
 | 13.4 | [Logging](modules/platform/features/logging.md) | One call at startup; plain or JSON; every line carries its trace; lifecycle, not chatter | ✅ | ✅ | — | S1 |
 | 13.5 | [Telemetry](modules/platform/features/telemetry.md) | Traces, metrics and logs for everything a person or the system does — one trace per action from the Studio click through runs, queries and model calls, metrics that open it, logs that carry it; optional | ✅ | ✅ | ✅ | S1 |
 | 13.6 | [Admin and health](modules/platform/features/admin-and-health.md) | A generated browser over app state, and a readiness probe | ✅ | — | — | S1 |
@@ -265,16 +266,16 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 47 | 19 | 16 | 3 |
-| CLI | 6 | 10 | 3 | 66 |
-| Studio | 37 | 16 | 26 | 6 |
+| API | 48 | 19 | 16 | 3 |
+| CLI | 8 | 10 | 3 | 65 |
+| Studio | 36 | 17 | 27 | 6 |
 
-Eighty-five features. **These counts are the tables above, counted** — if a cell is flipped, they
+Eighty-six features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 
 - Modules 1 · 3 · 4 are closed: **Connect and model · Ask · Explore**. **Agents reopened at 5.1 · 5.2 · 5.3 · 5.7** — S16 moves the model off the agent and onto the lens. What is left is 2.3, 5's four rows, and 6–14.
-- **Bring data in reopened at 2.3 and grew 2.4–2.6**, the dataset record above Graphs (B03). Its two shipped features are done; the bundle load is new scope, and it is the flow the runtime's deferred frontier, lanes and `uses` were waiting for ([13.8 §21](modules/platform/features/runtime.md)).
+- **Bring data in reopened at 2.3 and grew 2.4–2.7**, the dataset record above Graphs (B03) and the standards it is scored against (B04). **Rules (6.4) reopened in Studio**: B04 added install scope and checked rules, which Studio does not draw yet. Its two shipped features are done; the bundle load is new scope, and it is the flow the runtime's deferred frontier, lanes and `uses` were waiting for ([13.8 §21](modules/platform/features/runtime.md)).
 - Studio is no longer the lagging side for the closed four; the remaining 🟡 and 🔵 sit in Skills, Workflows, Memory, Work and Operate.
 
 ## Shipped

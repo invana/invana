@@ -17,14 +17,16 @@ a skill draw and an eval run already have.
 Usage::
 
     binds = DatasetBindManager()
-    binding, run = await binds.bind(session, graph=g, ref="abrc/accessions@2", model_id=m.id,
-                                    type_name="Accession", actor=user)
+    binding, run, warnings = await binds.bind(session, graph=g, ref="abrc/accessions@2", model_id=m.id,
+                                              type_name="Accession", actor=user)
     await session.commit()
     runtime.submit(run.id)
 
-Four refusals: a dataset the binder cannot read and a model not in this Graph
-read as absent (404); a retracted version, and a load the prologue refuses (no
-published model version, no connection, a read-only one), are 409.
+Five refusals: a dataset the binder cannot read and a model not in this Graph
+read as absent (404); a retracted version, a checked rule that blocks the bind,
+and a load the prologue refuses (no published model version, no connection, a
+read-only one), are 409. A rule that warns lets the bind through and its line
+comes back in ``warnings``.
 """
 
 from __future__ import annotations
@@ -41,12 +43,14 @@ from invana.apps.datasets.querysets import DatasetBindingQuerySet, DatasetRecord
 from invana.apps.datasets.schemas import DatasetBindingRead
 from invana.apps.graphs.models import Graph
 from invana.apps.modeller.querysets import GraphModelQuerySet
+from invana.apps.skills.checks import ACT_DATASET_BIND
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.services import emit_event
 from invana.core.settings import settings
 from invana.runtime.catalogue.records import LoadRefused
+from invana.runtime.managers.rule_checks import RuleCheckManager
 from invana.runtime.models import TaskRun
 from invana.runtime.querysets.task_run import TaskRunQuerySet
 
@@ -59,6 +63,7 @@ class DatasetBindManager:
     records_qs = DatasetRecordQuerySet()
     models_qs = GraphModelQuerySet()
     runs_qs = TaskRunQuerySet()
+    checks = RuleCheckManager()
 
     async def list(self, session: AsyncSession, *, graph: Graph) -> list[DatasetBindingRead]:
         """The Graph's bindings, newest first, each flagged as it reads now."""
@@ -79,9 +84,10 @@ class DatasetBindManager:
 
     async def bind(
         self, session: AsyncSession, *, graph: Graph, ref: str, model_id: str, type_name: str, actor: User
-    ) -> tuple[DatasetBinding, TaskRun]:
+    ) -> tuple[DatasetBinding, TaskRun, list[str]]:
         """Open the load of one version into one model as one node type, and
-        record the binding — moving it when this dataset already feeds that type."""
+        record the binding — moving it when this dataset already feeds that type.
+        The third item is what a ``warn`` rule said about the bind."""
         from invana.runtime.services import open_load_run  # noqa: PLC0415 — services imports the managers
 
         dataset, number = await self.datasets.get_by_ref(session, ref=ref, reader=actor)
@@ -96,6 +102,9 @@ class DatasetBindManager:
         type_name = type_name.strip()
         if not type_name or "/" in type_name or "`" in type_name or type_name.startswith("."):
             raise ValidationError(f"{type_name!r} is not a node type name.")
+        warnings = await self.checks.enforce(
+            session, act=ACT_DATASET_BIND, graph_id=graph.id, dataset=dataset, version=version, actor=actor
+        )
 
         root = await self._materialise(session, dataset=dataset, version=version, type_name=type_name)
         try:
@@ -151,7 +160,7 @@ class DatasetBindManager:
             actor_id=actor.id,
             details=details,
         )
-        return binding, run
+        return binding, run, warnings
 
     async def _materialise(
         self, session: AsyncSession, *, dataset: Dataset, version: DatasetVersion, type_name: str

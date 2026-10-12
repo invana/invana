@@ -10,7 +10,14 @@ from starlette_admin.contrib.sqla import Admin
 
 from invana.apps.agents.models import Agent
 from invana.apps.boards.models import Board, BoardVersion
-from invana.apps.datasets.models import Dataset, DatasetBinding, DatasetRecord, DatasetVersion
+from invana.apps.datasets.models import (
+    Dataset,
+    DatasetBinding,
+    DatasetConformance,
+    DatasetRecord,
+    DatasetStandard,
+    DatasetVersion,
+)
 from invana.apps.govern.models import Lens, RunTouch
 from invana.apps.graphs.models import Graph, GraphConnection, GraphMember
 from invana.apps.llm_providers.models import LLMModel, LLMProvider
@@ -38,6 +45,7 @@ from invana.apps.skills.models import (
     SkillVersion,
     SkillVersionClarification,
 )
+from invana.apps.standards.models import Standard, StandardVersion
 from invana.apps.task_plans.models import Task as PlanTask
 from invana.apps.task_plans.models import TaskPlan
 from invana.apps.work.models import Project, ProjectAssignment, Task, TaskDependency
@@ -62,7 +70,14 @@ from invana.server.auth.admin import (
     UserView,
 )
 from invana.server.boards.admin import BoardVersionView, BoardView
-from invana.server.datasets.admin import DatasetBindingView, DatasetRecordView, DatasetVersionView, DatasetView
+from invana.server.datasets.admin import (
+    DatasetBindingView,
+    DatasetConformanceView,
+    DatasetRecordView,
+    DatasetStandardView,
+    DatasetVersionView,
+    DatasetView,
+)
 from invana.server.evals.admin import EvalBudgetView, EvalCaseView, EvalResultView, EvalSetView
 from invana.server.events.admin import EventView
 from invana.server.govern.admin import LensView, RunTouchView
@@ -106,6 +121,7 @@ from invana.server.skills.admin import (
     SkillVersionView,
     SkillView,
 )
+from invana.server.standards.admin import StandardVersionView, StandardView
 from invana.server.task_plans.admin import PlanTaskView, TaskPlanView
 from invana.server.work.admin import (
     ProjectAssignmentView,
@@ -316,6 +332,10 @@ def mount_admin(app: FastAPI) -> None:
                 DatasetVersionView(DatasetVersion, label="Dataset versions", icon="fa fa-clock-rotate-left"),
                 DatasetRecordView(DatasetRecord, label="Dataset records", icon="fa fa-list"),
                 DatasetBindingView(DatasetBinding, label="Dataset bindings", icon="fa fa-link"),
+                DatasetStandardView(DatasetStandard, label="Dataset standards", icon="fa fa-ruler"),
+                DatasetConformanceView(DatasetConformance, label="Dataset conformance", icon="fa fa-check-double"),
+                StandardView(Standard, label="Standards", icon="fa fa-ruler-combined"),
+                StandardVersionView(StandardVersion, label="Standard versions", icon="fa fa-clock-rotate-left"),
             ],
         ),
     )

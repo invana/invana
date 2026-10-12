@@ -84,12 +84,13 @@ AGENT_SKILL_BOUND = "agent.skill_bound"
 AGENT_SKILL_UNBOUND = "agent.skill_unbound"
 
 # ── Rules (docs/for-developers/modules/skills/features/rules.md) ──────────────
-# A statement that is always true in its scope. Offered and cited, never
-# enforced — there is no ``rule.enforce`` because a rule does not fire.
+# A statement that is always true in its scope, offered and cited. A rule with
+# a check is also read at acts; a failed warn or report is a ``rule.check``.
 RULE_CREATE = "rule.create"
 RULE_PUBLISH = "rule.publish"
 RULE_ACTIVATE = "rule.activate"
 RULE_DEACTIVATE = "rule.deactivate"
+RULE_CHECK = "rule.check"
 # The model reported following the skill on a step (docs/for-developers/modules/work/spec.md — a
 # self-report, labelled as one; ``skill.invoke`` needs executable skills).
 SKILL_APPLY = "skill.apply"
@@ -194,6 +195,12 @@ DATASET_VERSION = "dataset.version"  # mints a version
 DATASET_UPDATE = "dataset.update"  # metadata — never a version
 DATASET_RETRACT = "dataset.retract"
 DATASET_BIND = "dataset.bind"
+DATASET_STANDARD_ATTACH = "dataset.standard_attach"
+DATASET_STANDARD_DETACH = "dataset.standard_detach"
+
+# ── Standards, above Graphs (docs/for-developers/modules/bring-data-in/features/standards.md)
+STANDARD_CREATE = "standard.create"
+STANDARD_VERSION = "standard.version"  # mints a version
 
 # ── Setup ─────────────────────────────────────────────────────────────────────
 SETUP_COMPLETE = "setup.complete"
@@ -256,6 +263,7 @@ TARGET_MODEL = "graph_model"
 TARGET_MODEL_LINK = "model_link"
 TARGET_PROJECTION_TEMPLATE = "projection_template"
 TARGET_DATASET = "dataset"
+TARGET_STANDARD = "standard"
 TARGET_USER = "user"
 TARGET_QUERY = "query"
 TARGET_SESSION = "session"

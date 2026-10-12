@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
+
+from invana.apps.standards.models import Enforcement
 
 
 class OfferedRule(BaseModel):
@@ -343,10 +346,25 @@ class SkillListResponse(BaseModel):
 # ── Rules ─────────────────────────────────────────────────────────────────────
 
 
+class RuleCheck(BaseModel):
+    """A rule's machine half, from a closed vocabulary — ``invana.apps.skills.checks``."""
+
+    kind: Literal["dataset.conforms", "dataset.licence"]
+    #: ``dataset.conforms``: the standard as ``publisher/name``.
+    standard: str | None = Field(default=None, max_length=200)
+    #: ``dataset.conforms``: the lowest score that passes; 1 when omitted.
+    min_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    #: ``dataset.licence``: the licences that pass, compared case-blind.
+    allowed: list[str] | None = None
+
+
 class RuleCreate(BaseModel):
     statement: str = Field(..., min_length=1)
     #: Where it lands in the assembled context. Omitted, it goes last.
     order: int | None = None
+    check: RuleCheck | None = None
+    #: What a failed check does; ``warn`` when a check is given without one.
+    mode: Enforcement | None = None
 
 
 class RuleUpdate(BaseModel):
@@ -359,6 +377,9 @@ class RuleUpdate(BaseModel):
 
     statement: str | None = Field(default=None, min_length=1)
     order: int | None = None
+    #: Sent as null, it removes the check (and the mode) in the next version.
+    check: RuleCheck | None = None
+    mode: Enforcement | None = None
     #: Why — carried on the event that mints the version, never inferred.
     why: str | None = Field(default=None, max_length=500)
 
@@ -370,6 +391,8 @@ class RuleVersionRead(BaseModel):
     rule_id: str
     version: int
     statement: str
+    check: RuleCheck | None = None
+    mode: Enforcement | None = None
     published_by_id: str | None
     published_at: datetime
 
@@ -390,8 +413,10 @@ class RuleRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    graph_id: str
+    #: Null on an install rule.
+    graph_id: str | None
     project_id: str | None
+    #: ``install · graph · project``.
     scope: str
     kind: str
     active: bool
@@ -399,6 +424,8 @@ class RuleRead(BaseModel):
     version: int
     current_version_id: str | None
     statement: str
+    check: RuleCheck | None = None
+    mode: Enforcement | None = None
     #: Steps that cited any version of this rule — the number under the
     #: statement on the drawer row. `0` on a rule nothing has used yet.
     citations: int = 0
@@ -459,5 +486,6 @@ class RuleCitationsResponse(BaseModel):
 class RuleListResponse(BaseModel):
     items: list[RuleRead]
     total: int
-    #: On a Project's list: the Graph invariants it inherits, read-only (C3).
+    #: Read-only rules from wider scopes, in assembly order: on a Graph's list
+    #: the install rules; on a Project's, the install rules then the Graph's.
     inherited: list[RuleRead] = Field(default_factory=list)

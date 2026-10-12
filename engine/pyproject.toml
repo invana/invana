@@ -257,6 +257,7 @@ layers = [
     "invana.apps.llm",
     "invana.apps.llm_providers",
     "invana.apps.datasets",
+    "invana.apps.standards",
     "invana.apps.graphs",
     "invana.apps.modeller",
 ]
