@@ -115,6 +115,9 @@ MODEL_DISCARD = "model.discard"
 MODEL_EXPORT = "model.export"
 MODEL_IMPORT = "model.import"
 MODEL_UPGRADE = "model.upgrade"
+# A breaking publish asked for review, and each end that is not a publish — the
+# status rides in details (docs/for-developers/modules/connect-and-model/features/publish-review.md)
+MODEL_REVIEW = "model.review"
 
 # ── Model links (docs/for-developers/modules/connect-and-model/features/stitch-models.md)
 # ──────────────────────────────────────────

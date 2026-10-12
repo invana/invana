@@ -8,7 +8,7 @@ A Graph holds many, and each one travels.
 | Index | [1.3](../../../README.md#1--connect-and-model) · Slice **S3** |
 | Module | [Connect and model](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [model-editor](model-editor.md) · [share-a-model](share-a-model.md) · [stitch-models](stitch-models.md) |
+| Related | [model-editor](model-editor.md) · [share-a-model](share-a-model.md) · [stitch-models](stitch-models.md) · [publish-review](publish-review.md) |
 
 > **As** someone describing a domain, **I want** to model it once and reuse it, **so that** the second
 > Graph that needs `NewsArticles` does not retype a single property.
@@ -65,7 +65,7 @@ flowchart TD
 | `model_versions` | node types, edge types, property keys, constraints; immutable once published |
 | `model_versions.axes` | **new** — `{time: {property}, geo: {property, vocab}, dims: [property, …]}`, default `{}`. What a [world](../../govern/features/worlds.md) may slice this model along ([GV14](../../govern/spec.md)) |
 | Capability resolution | server version → available property types, per connector |
-| Routes | `…/models*` · `…/models/{id}/versions*` · `POST …/models/{id}/publish` |
+| Routes | `…/models*` · `…/models/{id}/versions*` · `POST …/models/{id}/publish` — additive now, breaking through a [review](publish-review.md) |
 | Events | `model.created · updated · published` |
 
 ## Decisions

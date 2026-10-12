@@ -6,6 +6,7 @@ from invana.activity.managers.channels import ChannelManager
 from invana.activity.managers.clock import Clock, Tick
 from invana.activity.managers.delivery import DeliveryManager
 from invana.activity.managers.notifications import EventMatcher, InboxManager, NotificationRuleManager
+from invana.activity.managers.publish_reviews import PublishReviewManager
 from invana.activity.managers.schedules import ScheduleManager
 from invana.activity.managers.search import SearchManager
 from invana.activity.managers.task_read import TaskReadManager
@@ -20,6 +21,7 @@ __all__ = [
     "EventMatcher",
     "InboxManager",
     "NotificationRuleManager",
+    "PublishReviewManager",
     "ScheduleManager",
     "SearchManager",
     "TaskReadManager",

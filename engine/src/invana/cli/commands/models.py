@@ -10,16 +10,24 @@ committed, and another Graph imports or upgrades from it.
     invana models import    --graph ravi/other   --file marketdata.json [--as MarketDataV2]
     invana models import    --graph ravi/other   --starter memory
     invana models upgrade   --graph ravi/other   --name MarketData --file marketdata.json
+    invana models publish   --graph ravi/finance --name MarketData --user ravi [--dry-run] [--why …] [--approver …]
+
+`publish` is the one command here that is not about files: it publishes the
+draft in this Graph — an additive change at once, a breaking one through a
+publish review (docs/for-developers/modules/connect-and-model/features/publish-review.md).
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import click
 
+from invana.activity.managers.publish_reviews import PublishReviewManager
+from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.graphs.querysets import GraphQuerySet
 from invana.apps.modeller import starters as starter_models
 from invana.apps.modeller.portability import (
@@ -29,11 +37,19 @@ from invana.apps.modeller.portability import (
     import_artefact,
     upgrade_model,
 )
+from invana.apps.modeller.schemas import ModelPublishRequest
 from invana.apps.modeller.store import ModelStore
 from invana.apps.modeller.versioner import compute_diff
+from invana.core.auth.querysets import UserQuerySet
 from invana.core.db import create_db_engine, create_session_factory
+from invana.core.errors import InvanaError
+from invana.core.settings import settings
+from invana.runtime.interpreter import TaskRuntime
+from invana.runtime.models import TaskRun
+from invana.runtime.querysets import TaskRunQuerySet
 
 _store = ModelStore()
+_reviews = PublishReviewManager()
 
 
 @click.group("models")
@@ -274,3 +290,143 @@ def upgrade_cmd(graph_ref: str, name: str, file: str | None, starter: str | None
             click.echo(f"  {label}: +{len(added)} -{len(removed)} ~{len(modified)}")
     for blocker in blockers:
         click.echo(f"  cannot publish: {blocker['property_key']} is {blocker['type']}")
+
+
+def _detail(exc: InvanaError) -> str:
+    detail = exc.detail
+    if isinstance(detail, dict):
+        return str(detail.get("message") or detail.get("error") or detail)
+    return str(detail)
+
+
+def _change_lines(changes) -> None:
+    for change in changes:
+        mark = "breaking" if change.breaking else "additive"
+        click.echo(f"  {mark:<9} {change.reason}")
+
+
+def _scan_lines(preview: dict) -> None:
+    """The preview's scan, one line per touched type."""
+    types = preview.get("types") or []
+    if not types:
+        click.echo("  The change touches no records.")
+        return
+    width = max(len(t["type"]) for t in types)
+    click.echo(f"  {'TYPE'.ljust(width)}  {'SCANNED/TOTAL':<15} AFFECTED  WOULD FAIL")
+    for t in types:
+        scanned = f"{t['scanned']:,}/{t['total']:,}"
+        gone = "  (type removed)" if t.get("removed") else ""
+        click.echo(f"  {t['type'].ljust(width)}  {scanned:<15} {t['affected']:>8}  {t['would_fail']:>10}{gone}")
+    click.echo(f"  At most {preview.get('scan_limit', 0):,} records are scanned per type; no record was written.")
+
+
+async def _publish(
+    graph_ref: str, name: str, user_ref: str | None, *, dry_run: bool, why: str, approvers: list[str]
+) -> dict:
+    """Classify the draft, publish it if additive, and otherwise run its preview inline.
+
+    A real request opens a review; once its preview settles, one clock step
+    raises the approval, so a terminal does not wait on a server's clock. A
+    migration run that step opens runs inline too, as the clock would submit it.
+    """
+    username, slug = _split_graph_ref(graph_ref)
+    engine = await create_db_engine()
+    session_factory = create_session_factory(engine)
+    manager = GraphConnectionManager(session_factory=session_factory, encryption_key=settings.encryption_key)
+    await manager.startup()
+    runtime = TaskRuntime(session_factory=session_factory, manager=manager, encryption_key=settings.encryption_key)
+    done: dict = {}
+    try:
+        async with session_factory() as session:
+            graph = await GraphQuerySet().get_by_owner_username_and_slug(session, owner_username=username, slug=slug)
+            if graph is None:
+                raise click.UsageError(f"Graph {graph_ref!r} not found.")
+            model = await _model_by_name(session, graph.id, name)
+            user = None
+            if user_ref:
+                user = await UserQuerySet().get_by_username_or_email(session, user_ref)
+                if user is None:
+                    raise click.UsageError(f"No user {user_ref!r}.")
+            elif not dry_run:
+                raise click.UsageError("A publish needs --user: a review names who asked for it.")
+            try:
+                if dry_run:
+                    done["classification"], run_id = await _reviews.dry_run(
+                        session, graph=graph, model=model, actor_id=user.id if user else None
+                    )
+                else:
+                    request = ModelPublishRequest(why=why, approvers=approvers)
+                    done["outcome"], run_id = await _reviews.publish(
+                        session, graph=graph, model=model, user=user, payload=request
+                    )
+            except InvanaError as exc:
+                raise click.ClickException(_detail(exc)) from exc
+            model_id = model.id
+            await session.commit()
+
+        if run_id is None:
+            return done
+        click.echo(f"run {run_id}")
+        await runtime.run_inline(run_id)
+
+        opened: list[str] = []
+        async with session_factory() as session:
+            root = await session.get(TaskRun, run_id)
+            nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
+            out = next((n.output or {} for n in nodes if n.task_key == "migrate_model"), {})
+            done.update(status=root.status, error=(root.error or {}).get("message"), preview=out.get("preview"))
+            if not dry_run:
+                opened = await _reviews.advance_due(session, now=datetime.now(UTC))
+                await session.commit()
+        for opened_id in opened:
+            await runtime.run_inline(opened_id)
+        if not dry_run:
+            async with session_factory() as session:
+                model = await _store.get_graph_model(session, model_id)
+                done["review"] = await _reviews.get(session, model=model, review_id=done["outcome"].review.id)
+        return done
+    finally:
+        await manager.shutdown()
+        await engine.dispose()
+
+
+@models_cmd.command("publish")
+@click.option("--graph", "graph_ref", required=True, help="Graph as <username>/<slug>.")
+@click.option("--name", required=True, help="Model whose draft to publish.")
+@click.option("--dry-run", is_flag=True, help="Classify and preview; open no review and publish nothing.")
+@click.option("--why", default="", help="Why the change; the change log and the approver read it.")
+@click.option("--approver", "approvers", multiple=True, help="An owner to approve a breaking change; repeatable.")
+@click.option("--user", "user_ref", default=None, help="Who publishes, by username or email.")
+def publish_cmd(
+    graph_ref: str, name: str, dry_run: bool, why: str, approvers: tuple[str, ...], user_ref: str | None
+) -> None:
+    """Publish a model's draft: an additive change now, a breaking one through a review."""
+    done = asyncio.run(_publish(graph_ref, name, user_ref, dry_run=dry_run, why=why, approvers=list(approvers)))
+
+    if dry_run:
+        found = done["classification"]
+        click.echo(f"{name}: {found.classification} against {found.base_version or 'nothing published'}.")
+        _change_lines(found.changes)
+        if found.classification == "additive":
+            click.echo("It would publish at once: no review, no migration.")
+            return
+        if done.get("status") != "succeeded" or not done.get("preview"):
+            raise click.ClickException(done.get("error") or f"The preview {done.get('status')}.")
+        _scan_lines(done["preview"])
+        click.echo("Nothing was published. Without --dry-run this opens a review for the other owners.")
+        return
+
+    outcome = done["outcome"]
+    if outcome.outcome == "published":
+        click.echo(f"{name} {outcome.version} published; the change is additive.")
+        return
+    click.echo(f"{name}: breaking. Publish review {outcome.review.id}.")
+    _change_lines(c for c in outcome.review.changes if c.breaking)
+    if done.get("preview"):
+        _scan_lines(done["preview"])
+    review = done["review"]
+    if review.status == "pending":
+        click.echo(f"Waiting on approval {review.approval_id} from {len(review.approver_ids)} owner(s).")
+        click.echo("  invana approvals list")
+    else:
+        click.echo(f"Review {review.status}: {review.reason or 'open the run for why'}.")

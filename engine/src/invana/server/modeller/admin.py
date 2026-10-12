@@ -185,3 +185,31 @@ class GraphQueryLogView(ModelView):
         StringField("touched_from", label="Touched from"),
     ]
     search_fields = ["shape_text"]
+
+
+class ModelPublishReviewView(ModelView):
+    fields = [
+        "id",
+        "graph_id",
+        "model_id",
+        "version_id",
+        "base_version_id",
+        StringField("classification", label="Classification"),
+        StringField("status", label="Status"),
+        "changes",
+        "preview",
+        "result",
+        "why",
+        "approver_ids",
+        "approval_id",
+        "preview_run_id",
+        "run_id",
+        "published_version",
+        "reason",
+        "requested_by_id",
+        "created_at",
+        "updated_at",
+    ]
+    can_create = False
+    can_edit = False
+    can_delete = False

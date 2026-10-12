@@ -75,6 +75,7 @@ this map.** Feature numbers do not change.
 | 1.6 | [Stitch models](modules/connect-and-model/features/stitch-models.md) | Anchors and relationships; the global model is derived | ✅ | ✅ | ✅ | S7 |
 | 1.7 | [Starter models](modules/connect-and-model/features/starter-models.md) | Importable models to begin from — memory, provenance — renamed on arrival | ✅ | ✅ | ✅ | S7 |
 | 1.8 | [The model page](modules/connect-and-model/features/the-model-page.md) | One page, six tabs — Overview · Model · Database · Usage · Performance · Growth — with the model as a filter; is it used, is it slow, how has it grown | ✅ | — | ✅ | S-TBD |
+| 1.9 | [Publish review](modules/connect-and-model/features/publish-review.md) | Additive publishes now; breaking is previewed as a migration run and published after another owner approves | ✅ | ✅ | 🔵 | B10 |
 
 ## 2 · [Bring data in](modules/bring-data-in/spec.md)
 
@@ -275,15 +276,15 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 57 | 19 | 15 | 4 |
-| CLI | 18 | 10 | 3 | 64 |
-| Studio | 36 | 17 | 35 | 7 |
+| API | 58 | 19 | 15 | 4 |
+| CLI | 19 | 10 | 3 | 64 |
+| Studio | 36 | 17 | 36 | 7 |
 
-Ninety-five features. **These counts are the tables above, counted** — if a cell is flipped, they
+Ninety-six features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 
-- Modules 1 · 3 · 4 are closed: **Connect and model · Ask · Explore**. **Agents reopened at 5.1 · 5.2 · 5.3 · 5.7** — S16 moves the model off the agent and onto the lens. What is left is 2.3, 5's four rows, and 6–14.
+- Modules 3 · 4 are closed: **Ask · Explore**. **Connect and model reopened at 1.9** — the publish review (B10) ships API and CLI; Studio draws it in C04. **Agents reopened at 5.1 · 5.2 · 5.3 · 5.7** — S16 moves the model off the agent and onto the lens. What is left is 2.3, 5's four rows, and 6–14.
 - **Bring data in reopened at 2.3 and grew 2.4–2.7**, the dataset record above Graphs (B03) and the standards it is scored against (B04). **Rules (6.4) reopened in Studio**: B04 added install scope and checked rules, which Studio does not draw yet. Its two shipped features are done; the bundle load is new scope, and it is the flow the runtime's deferred frontier, lanes and `uses` were waiting for ([13.8 §21](modules/platform/features/runtime.md)).
 - Studio is no longer the lagging side for the closed four; the remaining 🟡 and 🔵 sit in Skills, Workflows, Memory, Work and Operate.
 

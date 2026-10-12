@@ -39,6 +39,7 @@ from invana.apps.modeller.models import (
     GraphVersion,
     IndexDefinition,
     ModelLink,
+    ModelPublishReview,
     NodeTypeDefinition,
     PropertyKeyDefinition,
     SchemaProjection,
@@ -119,6 +120,7 @@ from invana.server.modeller.admin import (
     GraphVersionView,
     IndexDefinitionView,
     ModelLinkView,
+    ModelPublishReviewView,
     NodeTypeDefinitionView,
     PropertyKeyDefinitionView,
     SchemaProjectionView,
@@ -294,6 +296,7 @@ def mount_admin(app: FastAPI) -> None:
                 ModelLinkView(ModelLink, label="Model links"),
                 TypeCountSnapshotView(TypeCountSnapshot, label="Count snapshots"),
                 GraphQueryLogView(GraphQueryLog, label="Query log"),
+                ModelPublishReviewView(ModelPublishReview, label="Publish reviews"),
             ],
         ),
     )

@@ -1,0 +1,10 @@
+key = "model-migration"
+version = 1
+kind = "model"
+description = "Preview a breaking model change, or publish it once a review is approved, under the Graph's guardrails."
+intents = []
+
+[[steps]]
+id = "migrate_model"
+task = "migrate_model"
+label = "Migrate"

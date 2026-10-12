@@ -80,6 +80,8 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 |---|---|
 | **Domain model** | A model authored against a domain, not a Graph — so it exports, imports and upgrades. One published version at a time. |
 | **Draft** | An unpublished model version. Authoring happens here; published versions are read-only. |
+| **Publish review** | What a **breaking** publish goes through: a preview **migration run**, then another owner's **approval**, then the migration run that publishes. An **additive** change publishes without one. Breaking means removed or narrowed, never added. [1.9](modules/connect-and-model/features/publish-review.md) |
+| **Migration run** | The run a publish review is: `model-migration@1`. Previewing, it counts what a breaking change touches and which records would fail; applied, it publishes the version and lists the records that fail. **It never rewrites a record.** [1.9](modules/connect-and-model/features/publish-review.md) |
 | **Anchor** | A declared link saying two types are the same entity (`Publisher.code ≡ Sponsor.publisher_code`), resolved by a key on each side. It links; it never merges. |
 | **Relationship link** | A declared cross-model edge type (`Article -[MENTIONS]-> Drug`). Its endpoints come from a key on each side *or* from a dataset — never both. Never inferred. |
 | **Global model** | The read-time union of every published model plus its links. Derived, never stored, never edited. The **widest** grounding context — what a run sees when no lens narrows it. |

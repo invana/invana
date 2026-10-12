@@ -73,7 +73,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | `invana models list` · `starters` · `export` · `import` · `upgrade` | models in a Graph; shipped starters; move models as files | ✅ exists |
 | `invana models import --ontology <file\|url> [--types A,B]` | a draft model from RDFS / OWL / schema.org | New · P-19 |
 | `invana models diff --name <m> v1 v2` · `history --name <m>` | compare versions; who changed what | New · P-09 |
-| `invana models publish --name <m> [--dry-run]` | publish; `--dry-run` says additive or breaking and previews the migration | New · P-16 |
+| `invana models publish --name <m> [--dry-run]` | publish; `--dry-run` says additive or breaking and previews the migration | ✅ B10 |
 | `invana stitches apply` · `list` · `resolve` · `commit` · `discard` | declare and manage stitches | ✅ exists |
 | `invana govern apply` · `list` · `show` | worlds and guardrails as files | ✅ exists |
 | `invana rules list` · `apply --file` · `show` | rules at install, Graph or project scope | New · P-12 |

@@ -30,7 +30,7 @@ CORE = {t.key for p in load_plugins().plugins.values() if p.manifest.kind == "co
 #: The core set's size. Growth belongs in reusable TaskPlans, not here — so
 #: changing this number is a decision, and the decision goes in
 #: `building-engine/task-model-migration.md` § 6.1 first.
-ENTRY_COUNT = 28
+ENTRY_COUNT = 29
 
 #: Core plugins that declare task types, and the one bound each of them names.
 BOUND_PLUGINS = {

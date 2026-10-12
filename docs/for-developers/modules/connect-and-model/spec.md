@@ -125,6 +125,7 @@ arrival.
 | CM9 | The only thing `setup_state` **stores** is a skip. A required section cannot be skipped, so it has no stored state at all; an optional one is `done` (derived), `skipped` (stored) or `todo`. `POST /setup/{section}` takes `skip` and `reset`, and reset clears the skip rather than un-doing the work. |
 | CM10 | **Projecting a model's DDL is a run.** Publishing pushes constraints and indexes through `project_model` (bound `schema_write`), not through the projector called from a route — the one schema write that still reached the database with no run behind it. |
 | CM11 | **Every model surface is a tab of one page, and the model is a filter on it.** Overview · Model · Database · Usage · Performance · Growth, read at `All models` or one model; the panel lists models and a model's types, and every act on a model sits on the page header ([MP1 · MP2 · MP4](features/the-model-page.md#decisions)). |
+| CM12 | **A breaking publish needs a review.** Commit, activate and publish classify the draft against the published version; an additive draft publishes, a breaking one is refused on the direct paths and goes through a [publish review](features/publish-review.md) — a preview migration run, another owner's approval, then the migration run that publishes. |
 
 ## 6a. The drawn states
 

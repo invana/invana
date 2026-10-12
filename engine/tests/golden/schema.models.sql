@@ -656,6 +656,47 @@ CREATE TABLE model_links (
 
 CREATE INDEX ix_model_links_graph_id ON model_links (graph_id);
 
+CREATE TABLE model_publish_reviews (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	model_id VARCHAR(36) NOT NULL, 
+	version_id VARCHAR(36) NOT NULL, 
+	base_version_id VARCHAR(36), 
+	draft_hash VARCHAR(64) NOT NULL, 
+	classification VARCHAR(16) NOT NULL, 
+	changes JSON NOT NULL, 
+	preview JSON, 
+	result JSON, 
+	why TEXT NOT NULL, 
+	approver_ids JSON NOT NULL, 
+	deadline_s INTEGER NOT NULL, 
+	requested_by_id VARCHAR(36), 
+	approval_id VARCHAR(36), 
+	preview_run_id VARCHAR(36), 
+	run_id VARCHAR(36), 
+	published_version VARCHAR(32), 
+	status VARCHAR(16) NOT NULL, 
+	reason TEXT, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(model_id) REFERENCES graph_models (id) ON DELETE CASCADE, 
+	FOREIGN KEY(version_id) REFERENCES graph_versions (id) ON DELETE CASCADE, 
+	FOREIGN KEY(base_version_id) REFERENCES graph_versions (id) ON DELETE SET NULL, 
+	FOREIGN KEY(requested_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(preview_run_id) REFERENCES task_runs (id) ON DELETE SET NULL, 
+	FOREIGN KEY(run_id) REFERENCES task_runs (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_model_publish_reviews_approval_id ON model_publish_reviews (approval_id);
+
+CREATE INDEX ix_model_publish_reviews_graph_id ON model_publish_reviews (graph_id);
+
+CREATE INDEX ix_model_publish_reviews_model_id ON model_publish_reviews (model_id);
+
+CREATE INDEX ix_model_publish_reviews_status ON model_publish_reviews (status);
+
 CREATE TABLE node_type_definitions (
 	id VARCHAR(36) NOT NULL, 
 	version_id VARCHAR(36) NOT NULL, 

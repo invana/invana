@@ -3,7 +3,9 @@
 docs/for-developers/modules/operate/spec.md · features/notifications.md.
 One ``tick(now)`` does, in order: fire due and queued schedules, deliver the
 scheduled runs that settled, match new events against the rules, remind and
-expire approvals, and send what is pending. Each step is idempotent on a unique
+expire approvals, move publish reviews along (a settled preview asks for its
+approval, a decided approval opens or ends the migration), and send what is
+pending. Each step is idempotent on a unique
 key or a row lock, so a restart or a second engine process repeats nothing::
 
     run_ids = await Clock().tick(session, now=datetime.now(UTC))
@@ -22,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.activity.managers.approvals import ApprovalManager
 from invana.activity.managers.delivery import DeliveryManager
 from invana.activity.managers.notifications import EventMatcher
+from invana.activity.managers.publish_reviews import PublishReviewManager
 from invana.activity.managers.schedules import ScheduleManager
 
 
@@ -43,6 +46,7 @@ class Clock:
     matcher = EventMatcher()
     approvals = ApprovalManager()
     deliveries = DeliveryManager()
+    reviews = PublishReviewManager()
 
     async def tick(self, session: AsyncSession, *, now: datetime) -> Tick:
         done = Tick()
@@ -51,5 +55,6 @@ class Clock:
         done.events = await self.matcher.match_new(session, now=now)
         done.reminded = await self.approvals.remind_due(session, now=now)
         done.expired = await self.approvals.expire_due(session, now=now)
+        done.run_ids += await self.reviews.advance_due(session, now=now)
         done.sent, done.failed = await self.deliveries.send_pending(session, now=now)
         return done

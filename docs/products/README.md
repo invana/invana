@@ -76,7 +76,7 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 | P-19 | Semantic imports | DS-F17 · MO-F14 | SKOS → standards; RDFS/OWL subset (incl. schema.org) → draft models; JSON-LD · Turtle · RDF/XML; import reports list what was skipped |
 | P-20 | Intent-ranked templates | EX answers · AG-12 | The intent classifier returns `prefer: chart \| table \| graph`; `select_template` ranks by it instead of substring-matching the raw question. Small |
 | P-21 | Distributed execution | thousands of tasks, failover, Kubernetes | **Required:** N workers scale runs and tasks per second; a worker can die without losing work. Tasks travel as serialisable envelopes ([plugins.md](plugins.md#7-ready-for-n-workers)). The executor (procrastinate · Dramatiq · Prefect) is chosen by benchmark; `inline` stays the single-machine default |
-| P-16 | Breaking-publish review and migration runs | MO-05 | Additive publishes go straight through; breaking ones preview a migration run and need another member’s approval |
+| P-16 | Breaking-publish review and migration runs | MO-05 | ✅ B10 — [1.9 Publish review](../for-developers/modules/connect-and-model/features/publish-review.md). Additive publishes go straight through; breaking ones preview a migration run and need another owner’s approval |
 
 ## Terms this plan adds or changes
 

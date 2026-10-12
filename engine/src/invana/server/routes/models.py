@@ -20,7 +20,11 @@ GET    /{model_id}/versions                list versions
 POST   /{model_id}/versions                create a draft (optional based_on)
 GET    /{model_id}/active-version          active version (full tree)
 GET    /{model_id}/versions/{vid}          a version (full tree)
-POST   /{model_id}/versions/{vid}/activate activate a draft
+POST   /{model_id}/versions/{vid}/activate activate a draft (refused when breaking)
+
+GET    /{model_id}/draft/review            additive or breaking, change by change
+POST   /{model_id}/publish                 publish additive now; breaking opens a review
+GET    /{model_id}/publish-reviews[/{id}]  the model's publish reviews
 
 # type authoring — only on a draft version (ModelStore._ensure_draft → 409)
 POST/PATCH/DELETE /{model_id}/versions/{vid}/node-types[/{id}]
@@ -36,13 +40,14 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, sta
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.activity.managers import PublishReviewManager
 from invana.apps.graphs.compatibility import supported_property_type_values
 from invana.apps.graphs.managers import GraphManager
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.graphs.pool import GraphUnavailableError
 from invana.apps.modeller import starters as starter_models
 from invana.apps.modeller.json_io import SchemaExporter
-from invana.apps.modeller.managers import InsightsManager, ModelLifecycleManager
+from invana.apps.modeller.managers import InsightsManager, ModelLifecycleManager, PublishManager
 from invana.apps.modeller.models import GraphModel, GraphVersion
 from invana.apps.modeller.portability import (
     ImportRefused,
@@ -67,6 +72,10 @@ from invana.apps.modeller.schemas import (
     IndexCreate,
     IndexResponse,
     Insights,
+    ModelPublishClassification,
+    ModelPublishOutcome,
+    ModelPublishRequest,
+    ModelPublishReviewRead,
     NodeTypeCreate,
     NodeTypeResponse,
     NodeTypeUpdate,
@@ -99,6 +108,8 @@ models_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/models", tags
 
 _store = ModelStore()
 _lifecycle = ModelLifecycleManager()
+_publishing = PublishManager()
+_reviews = PublishReviewManager()
 
 
 # ---------------------------------------------------------------------------
@@ -606,6 +617,7 @@ async def activate_version(
     session: AsyncSession = Depends(get_session),
 ) -> ActionResponse[VersionResponse]:
     await _get_model_or_404(session, graph.id, model_id)
+    await _publishing.refuse_breaking(session, version_id=version_id)
     try:
         activated = await Versioner(_store).activate(session, version_id=version_id, override_version=payload.version)
     except ValueError as exc:
@@ -1131,6 +1143,7 @@ async def commit_draft(
             HTTPStatus.CONFLICT,
             detail={"error": "nothing_staged", "message": staged.reason},
         )
+    await _publishing.refuse_breaking(session, version_id=draft.id)
 
     try:
         published = await Versioner(_store).activate(session, version_id=draft.id, override_version=payload.version)
@@ -1324,3 +1337,72 @@ async def diff_version(
             classification="major",
         )
     return compute_diff(base, target)
+
+
+# ---------------------------------------------------------------------------
+# Publish review (publish-review.md)
+# ---------------------------------------------------------------------------
+
+
+@models_router.get("/{model_id}/draft/review", response_model=ModelPublishClassification)
+async def review_draft(
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ModelPublishClassification:
+    """Whether publishing the draft is additive or breaking, change by change. Reads only."""
+    model = await _get_model_or_404(session, graph.id, model_id)
+    return await _publishing.classify_draft(session, model=model)
+
+
+@models_router.post("/{model_id}/publish", response_model=ActionResponse[ModelPublishOutcome])
+async def publish_model(
+    payload: ModelPublishRequest,
+    request: Request,
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[ModelPublishOutcome]:
+    """Publish the draft: an additive one now, a breaking one through a review.
+
+    A review opens its preview migration run, committed and then submitted
+    here; the clock asks the Graph's other owners for approval once the
+    preview has settled, and opens the migration run after one approves.
+    """
+    model = await _get_model_or_404(session, graph.id, model_id)
+    outcome, run_id = await _reviews.publish(session, graph=graph, model=model, user=user, payload=payload)
+    if run_id is None:
+        await drift_after(request, session, graph_id=graph.id, trigger="model_publish")
+        await session.commit()
+        return action(f"{model.name} {outcome.version} published.", outcome)
+    await session.commit()
+    request.app.state.task_runtime.submit(run_id)
+    return action(
+        f"{model.name} has breaking changes — previewing the migration, then another owner approves it.", outcome
+    )
+
+
+@models_router.get("/{model_id}/publish-reviews", response_model=list[ModelPublishReviewRead])
+async def list_publish_reviews(
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> list[ModelPublishReviewRead]:
+    model = await _get_model_or_404(session, graph.id, model_id)
+    return [ModelPublishReviewRead.model_validate(r) for r in await _reviews.list(session, model=model)]
+
+
+@models_router.get("/{model_id}/publish-reviews/{review_id}", response_model=ModelPublishReviewRead)
+async def get_publish_review(
+    model_id: str = Path(...),
+    review_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ModelPublishReviewRead:
+    model = await _get_model_or_404(session, graph.id, model_id)
+    return ModelPublishReviewRead.model_validate(await _reviews.get(session, model=model, review_id=review_id))

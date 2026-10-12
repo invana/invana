@@ -247,6 +247,29 @@
         "title": "ActionResponse[ModelImportResult]",
         "type": "object"
       },
+      "ActionResponse_ModelPublishOutcome_": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ModelPublishOutcome"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ActionResponse[ModelPublishOutcome]",
+        "type": "object"
+      },
       "ActionResponse_ModelUpgradeResult_": {
         "properties": {
           "data": {
@@ -11031,6 +11054,393 @@
           "version"
         ],
         "title": "ModelImportResult",
+        "type": "object"
+      },
+      "ModelPublishChange": {
+        "description": "One change in a draft against the published version, and whether it breaks.",
+        "properties": {
+          "breaking": {
+            "title": "Breaking",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "property": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Property"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "target_kind": {
+            "enum": [
+              "node_type",
+              "edge_type",
+              "property_key",
+              "constraint",
+              "index"
+            ],
+            "title": "Target Kind",
+            "type": "string"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          }
+        },
+        "required": [
+          "kind",
+          "target_kind",
+          "breaking",
+          "reason"
+        ],
+        "title": "ModelPublishChange",
+        "type": "object"
+      },
+      "ModelPublishClassification": {
+        "properties": {
+          "base_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Version"
+          },
+          "base_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Version Id"
+          },
+          "changes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ModelPublishChange"
+            },
+            "title": "Changes",
+            "type": "array"
+          },
+          "classification": {
+            "enum": [
+              "additive",
+              "breaking"
+            ],
+            "title": "Classification",
+            "type": "string"
+          },
+          "draft_version_id": {
+            "title": "Draft Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "classification",
+          "draft_version_id"
+        ],
+        "title": "ModelPublishClassification",
+        "type": "object"
+      },
+      "ModelPublishOutcome": {
+        "properties": {
+          "outcome": {
+            "enum": [
+              "published",
+              "review"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ModelPublishReviewRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version Id"
+          }
+        },
+        "required": [
+          "outcome"
+        ],
+        "title": "ModelPublishOutcome",
+        "type": "object"
+      },
+      "ModelPublishRequest": {
+        "properties": {
+          "approvers": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Approvers",
+            "type": "array"
+          },
+          "deadline_s": {
+            "default": 259200,
+            "maximum": 2592000.0,
+            "minimum": 3600.0,
+            "title": "Deadline S",
+            "type": "integer"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "why": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "title": "ModelPublishRequest",
+        "type": "object"
+      },
+      "ModelPublishReviewRead": {
+        "properties": {
+          "approval_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approval Id"
+          },
+          "approver_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Approver Ids",
+            "type": "array"
+          },
+          "base_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Version Id"
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/ModelPublishChange"
+            },
+            "title": "Changes",
+            "type": "array"
+          },
+          "classification": {
+            "enum": [
+              "additive",
+              "breaking"
+            ],
+            "title": "Classification",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "model_id": {
+            "title": "Model Id",
+            "type": "string"
+          },
+          "preview": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preview"
+          },
+          "preview_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preview Run Id"
+          },
+          "published_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published Version"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "requested_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requested By Id"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "status": {
+            "enum": [
+              "previewing",
+              "pending",
+              "migrating",
+              "published",
+              "failed",
+              "declined",
+              "expired",
+              "stale"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version_id": {
+            "title": "Version Id",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "model_id",
+          "version_id",
+          "base_version_id",
+          "classification",
+          "changes",
+          "preview",
+          "result",
+          "why",
+          "approver_ids",
+          "requested_by_id",
+          "approval_id",
+          "preview_run_id",
+          "run_id",
+          "published_version",
+          "status",
+          "reason",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ModelPublishReviewRead",
         "type": "object"
       },
       "ModelUpgradeResult": {
@@ -35384,6 +35794,76 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/draft/review": {
+      "get": {
+        "description": "Whether publishing the draft is additive or breaking, change by change. Reads only.",
+        "operationId": "review_draft_api_v1_u__username___graphSlug__models__model_id__draft_review_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelPublishClassification"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Review Draft",
+        "tags": [
+          "models"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/models/{model_id}/draft/staged": {
       "get": {
         "operationId": "get_staged_set_api_v1_u__username___graphSlug__models__model_id__draft_staged_get",
@@ -35613,6 +36093,237 @@
           }
         ],
         "summary": "Export Model",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/publish": {
+      "post": {
+        "description": "Publish the draft: an additive one now, a breaking one through a review.\n\nA review opens its preview migration run, committed and then submitted\nhere; the clock asks the Graph's other owners for approval once the\npreview has settled, and opens the migration run after one approves.",
+        "operationId": "publish_model_api_v1_u__username___graphSlug__models__model_id__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelPublishRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse_ModelPublishOutcome_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Publish Model",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/publish-reviews": {
+      "get": {
+        "operationId": "list_publish_reviews_api_v1_u__username___graphSlug__models__model_id__publish_reviews_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelPublishReviewRead"
+                  },
+                  "title": "Response List Publish Reviews Api V1 U  Username   Graphslug  Models  Model Id  Publish Reviews Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Publish Reviews",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/publish-reviews/{review_id}": {
+      "get": {
+        "operationId": "get_publish_review_api_v1_u__username___graphSlug__models__model_id__publish_reviews__review_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "review_id",
+            "required": true,
+            "schema": {
+              "title": "Review Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelPublishReviewRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Publish Review",
         "tags": [
           "models"
         ]

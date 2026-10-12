@@ -724,3 +724,76 @@ class ShapeCard(BaseModel):
     advice: list[Advice]
     #: False — this connector cannot explain, and advice is *not available* (MP39).
     explains: bool
+
+
+# ---------------------------------------------------------------------------
+# Publish review (docs/for-developers/modules/connect-and-model/features/publish-review.md)
+# ---------------------------------------------------------------------------
+
+PublishClass = Literal["additive", "breaking"]
+ReviewStatus = Literal["previewing", "pending", "migrating", "published", "failed", "declined", "expired", "stale"]
+
+
+class ModelPublishChange(BaseModel):
+    """One change in a draft against the published version, and whether it breaks."""
+
+    kind: str
+    target_kind: Literal["node_type", "edge_type", "property_key", "constraint", "index"]
+    #: The node or edge type it is on; ``None`` for a property key or an index.
+    type: str | None = None
+    #: The property, the constraint's properties, or the endpoint types a narrowing removed.
+    property: str | None = None
+    breaking: bool
+    reason: str
+
+
+class ModelPublishClassification(BaseModel):
+    classification: PublishClass
+    #: The published version it was classified against; ``None`` before a first publish.
+    base_version: str | None = None
+    base_version_id: str | None = None
+    draft_version_id: str
+    changes: list[ModelPublishChange] = []
+
+
+class ModelPublishRequest(BaseModel):
+    why: str = Field(default="", max_length=500)
+    #: A SemVer to publish as, in place of the bump the classification implies.
+    version: str | None = None
+    #: Usernames; each an owner and not the requester. Empty means every other owner.
+    approvers: list[str] = []
+    deadline_s: int = Field(default=259200, ge=3600, le=30 * 86400)
+
+
+class ModelPublishReviewRead(BaseModel):
+    id: str
+    model_id: str
+    version_id: str
+    base_version_id: str | None
+    classification: PublishClass
+    changes: list[ModelPublishChange]
+    #: The preview run's scan — ``None`` while it runs.
+    preview: dict[str, Any] | None
+    #: The migration run's scan and what it published.
+    result: dict[str, Any] | None
+    why: str
+    approver_ids: list[str]
+    requested_by_id: str | None
+    approval_id: str | None
+    preview_run_id: str | None
+    run_id: str | None
+    published_version: str | None
+    status: ReviewStatus
+    reason: str | None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ModelPublishOutcome(BaseModel):
+    outcome: Literal["published", "review"]
+    #: The published version, when ``outcome`` is ``published``.
+    version: str | None = None
+    version_id: str | None = None
+    review: ModelPublishReviewRead | None = None

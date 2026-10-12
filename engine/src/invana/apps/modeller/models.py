@@ -14,6 +14,8 @@ Tables
 - ``schema_projections``         — records of DDL pushed to graph databases
 - ``model_links``                — declared anchors and relationship links between two
                                    published versions (stitch-models.md)
+- ``model_publish_reviews``      — a breaking publish waiting on its preview, an approval
+                                   and the migration run (publish-review.md)
 """
 
 from __future__ import annotations
@@ -533,4 +535,53 @@ class GraphQueryLog(Base):
     __table_args__ = (
         sa_Index("ix_graph_query_log_graph_at", "graph_id", "at"),
         sa_Index("ix_graph_query_log_graph_shape", "graph_id", "shape_hash"),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Publish review (docs/for-developers/modules/connect-and-model/features/publish-review.md)
+# ---------------------------------------------------------------------------
+
+
+class ModelPublishReview(Base):
+    """One breaking publish, from its preview to the migration run that publishes it — or not.
+
+    The draft and the published version it was classified against are pinned by
+    id and by the draft's content hash, so the migration publishes exactly what
+    the approver saw or nothing (``stale``). ``changes`` is the classification,
+    ``preview`` the preview run's scan and ``result`` the migration run's.
+    """
+
+    __tablename__ = "model_publish_reviews"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    graph_id: Mapped[str] = mapped_column(ForeignKey("graphs.id", ondelete="CASCADE"), nullable=False, index=True)
+    model_id: Mapped[str] = mapped_column(ForeignKey("graph_models.id", ondelete="CASCADE"), nullable=False, index=True)
+    #: The draft under review.
+    version_id: Mapped[str] = mapped_column(ForeignKey("graph_versions.id", ondelete="CASCADE"), nullable=False)
+    #: The published version it was classified against.
+    base_version_id: Mapped[str | None] = mapped_column(
+        ForeignKey("graph_versions.id", ondelete="SET NULL"), nullable=True
+    )
+    draft_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    classification: Mapped[str] = mapped_column(String(16), nullable=False, default="breaking")
+    changes: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    preview: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    why: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    #: Asked for at request; resolved to user ids, all owners but the requester.
+    approver_ids: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    deadline_s: Mapped[int] = mapped_column(Integer, nullable=False, default=259200)
+    requested_by_id: Mapped[str | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    #: The approval row (Activity's); no foreign key, because Activity sits above the modeller.
+    approval_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+    preview_run_id: Mapped[str | None] = mapped_column(ForeignKey("task_runs.id", ondelete="SET NULL"), nullable=True)
+    run_id: Mapped[str | None] = mapped_column(ForeignKey("task_runs.id", ondelete="SET NULL"), nullable=True)
+    published_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="previewing", index=True)
+    #: Why it ended without a publish, in words a person reads.
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False
     )

@@ -12,6 +12,7 @@ from invana.apps.modeller.querysets.graph_version import GraphVersionQuerySet
 from invana.apps.modeller.querysets.index import IndexQuerySet
 from invana.apps.modeller.querysets.node_type import NodeTypeQuerySet
 from invana.apps.modeller.querysets.property_key import PropertyKeyQuerySet
+from invana.apps.modeller.querysets.publish_review import PublishReviewQuerySet
 from invana.apps.modeller.querysets.schema_projection import SchemaProjectionQuerySet
 
 __all__ = [
@@ -22,6 +23,7 @@ __all__ = [
     "IndexQuerySet",
     "NodeTypeQuerySet",
     "PropertyKeyQuerySet",
+    "PublishReviewQuerySet",
     "SchemaProjectionQuerySet",
     "VersionScopedQuerySet",
 ]

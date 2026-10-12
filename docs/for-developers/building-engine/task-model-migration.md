@@ -202,7 +202,7 @@ Grouped by the bound it spends, because **the group is what the envelope ceiling
 Roughly twenty-five entries, and the count is meant to stay near it — growth belongs in reusable
 TaskPlans, not in new callables.
 
-### 6.1 The catalogue as it actually is — twenty-eight entries
+### 6.1 The catalogue as it actually is — twenty-nine entries
 
 `runtime/catalogue/registry.py` is the declaration; one module per bound holds the callables. **The
 keys do not change in M1.** They are stored in `thinking_steps.task_key` and read by Studio, so
@@ -230,6 +230,7 @@ adds its one task type to the catalogue beside them and is not counted here.
 | `expand_neighbours` | `graph_read` | `vertex_id` str · `direction` str · `edge_label` str · `neighbor_label` str · `filters` obj · `sort` list · `limit` int · `offset` int | `nodes` list · `edges` list · `metadata` obj · `total` int · `has_more` bool | — |
 | `understand_ask` | `schema_write` | — | `model_id` str · `draft_version_id` str | — |
 | `validate_proposal` | `schema_write` | — | `counts` obj · `draft_version_id` str | `propose_model` |
+| `migrate_model` | `schema_write` | `model_id` str · `version_id` str · `base_version_id` str · `review_id` str · `apply` bool | `classification` str · `preview` obj · `published_version` str · `failed` int | — |
 | `spawn_agent` | `work_write` | `name` str · `instructions` str · `allow` list · `skill_ids` list · `budget` obj · `lens_id` str · `lifetime` str | `agent_id` str · `name` str · `depth` int | — |
 | `delegate` | `work_write` | `agent_id` str · `body` str | `child_thinking_id` str · `status` str | — |
 | `create_task` | `work_write` | `title` str · `body` str | `task_id` str | — |
@@ -280,6 +281,13 @@ list and a reopened canvas's check both read the graph, so both run under the pi
 ([SP11](../modules/explore/features/selection-and-the-panel.md) ·
 [GC14](../modules/explore/features/graph-canvas.md)). They are not folded into one: one counts the
 graph, the other checks a list of ids, and their outputs share nothing.
+
+**`migrate_model` is the twenty-ninth, and a model's one schema write behind a review.** A breaking
+publish is previewed and then applied as `model-migration@1` under the Graph's guardrails
+([PB3 · PB7](../modules/connect-and-model/features/publish-review.md)). Preview and apply are one entry
+with `apply` as an arg, because they scan the same records with the same validator and the apply's scan
+*is* its failure list; what differs is only whether the version is published at the end. It spends
+`schema_write`: it changes what the model says and writes no record.
 
 The write loop itself never needed moving: it is `CSVLoader` in `invana/graph/loaders/`, band 1, and
 `cli/commands/loader.py` only assembled its config. The entry calls the same loader the CLI did.

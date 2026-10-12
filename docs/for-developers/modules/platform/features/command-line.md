@@ -35,6 +35,7 @@ Studio.
 | `invana search "<text>"` | The ⌘K search from a terminal, as `--user`, over every Graph they are in or one `--graph` — [13.10](search.md) |
 | `invana models export · import · upgrade` | Moves a domain model between Graphs |
 | `invana models starters` | Lists the shipped starter models |
+| `invana models publish [--dry-run]` | Publishes a draft: additive at once, breaking through a [publish review](../../connect-and-model/features/publish-review.md) whose preview runs inline |
 | `invana loader` | Loads a flat CSV straight through the connector; `--graph` supplies the connection and journals it as a `bulk` run — [2.1](../../bring-data-in/features/load-data.md) |
 
 ## Capabilities

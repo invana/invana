@@ -9,7 +9,7 @@ sent** — never auto-approved.
 | Index | [10.8](../../../README.md#10--operate) · Slice **B08** |
 | Module | [Operate](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / 🔵 |
-| Related | [notifications](notifications.md) · [schedules](schedules.md) · [review](../../work/features/review.md) · [the runtime](../../platform/features/runtime.md) §10 · products [shell.md › Decisions](../../../../products/shell.md#decisions) SH-12 |
+| Related | [notifications](notifications.md) · [schedules](schedules.md) · [publish review](../../connect-and-model/features/publish-review.md) · [review](../../work/features/review.md) · [the runtime](../../platform/features/runtime.md) §10 · products [shell.md › Decisions](../../../../products/shell.md#decisions) SH-12 |
 
 > **As** an approver, **I want** to see exactly what a run will send before it goes, **so that**
 > nothing leaves without a person.
@@ -68,7 +68,7 @@ flowchart TD
 
 | Thing | Shape |
 |---|---|
-| `approvals` | `graph_id` · `subject_kind (delivery)` · `subject_id` · `run_id` · `schedule_id` · `title` · `payload` · `approver_ids[]` · `requested_by_id` · `deadline_at` · `reminded_at` · `status (pending · approved · declined · expired)` · `decided_by_id` · `decided_at` · `note` |
+| `approvals` | `graph_id` · `subject_kind (delivery · model_publish)` · `subject_id` · `run_id` · `schedule_id` · `title` · `payload` · `approver_ids[]` · `requested_by_id` · `deadline_at` · `reminded_at` · `status (pending · approved · declined · expired)` · `decided_by_id` · `decided_at` · `note` |
 | Routes | `GET …/approvals` (`?status=` · `?mine=true`) · `GET …/approvals/{id}` · `POST …/approvals/{id}/approve` · `POST …/approvals/{id}/decline` (tag `approvals`) |
 | Events | `approval.request · approve · decline · expire · remind` |
 | CLI | `invana approvals list · approve · decline` |
@@ -83,6 +83,7 @@ flowchart TD
 | AP4 | An approval holds **deliveries**, not a run: the run has already settled, so refusing costs nothing and the run's own status is unchanged. The deliveries carry the state — `held` → `pending` → `sent`, or `declined` · `expired`. |
 | AP5 | The `payload` is the rendered message as each channel will receive it, frozen at request. Approving sends that, never a re-render. |
 | AP6 | Writing an approval decision is the `ask` area (viewer): the approver list, not a Graph role, is the bound. |
+| AP7 | **A breaking model publish is the second subject** (`model_publish`, subject = the [publish review](../../connect-and-model/features/publish-review.md)). It holds a publish, not deliveries: the payload is the impact list, approving lets the clock open the migration run, and declining or expiry leaves the draft unpublished. The approvers are the Graph's owners other than the requester. |
 
 ## Not building
 

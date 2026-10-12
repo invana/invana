@@ -1164,6 +1164,8 @@ STITCH_COMMIT_PLAN_KEY = "stitch-commit"
 STITCH_WITHDRAW_PLAN_KEY = "stitch-withdraw"
 #: The builtin that counts what stitch rules resolve — a read (ST43).
 STITCH_PREVIEW_PLAN_KEY = "stitch-preview"
+#: The builtin a publish review previews and applies a breaking model change with.
+MODEL_MIGRATION_PLAN_KEY = "model-migration"
 
 
 _store = ModelStore()
@@ -1513,6 +1515,53 @@ async def open_simulation_run(
         ask_kind="simulate",
         body=body,
         params=params,
+        workflow_key=selected.ref,
+        task_plan_id=selected.plan_id,
+        plan_origin=f"template:{selected.ref}",
+        triggered_by=TriggeredBy.user.value,
+        on_behalf_of_user_id=actor_id,
+        status=RunStatus.queued.value,
+        **await freeze_lens(db, graph_id=graph.id, agent_id=None, lens_id=None),
+    )
+    db.add(run)
+    await db.flush()
+    run.plan_revision = 1
+    run.plan_snapshot = plan_payload(steps, source=run.plan_origin or "", version=1)
+    await queue_plan_steps(db, run=run, message_id=None, steps=steps, start_seq=0)
+    return run
+
+
+async def open_model_migration_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    model_name: str,
+    args: dict,
+    actor_id: str | None,
+) -> TaskRun:
+    """Open the migration run a publish review is — previewing or applying, one step.
+
+    **A breaking publish is a run** (docs/for-developers/modules/connect-and-model/features/publish-review.md):
+    the Graph's guardrails are frozen on it, no agent and no world, the same as
+    a stitch. ``args`` name the model, the draft, the published version it was
+    classified against, the review and ``apply``. Left queued; the caller
+    commits and submits.
+    """
+    selected = await select_plan_by_key(db, graph_id=graph.id, key=MODEL_MIGRATION_PLAN_KEY)
+    if selected is None:
+        raise RuntimeError(f"The plan library has no populated {MODEL_MIGRATION_PLAN_KEY!r}.")
+    steps = [
+        dataclasses.replace(step, args={**step.args, **args})
+        for step in (PlanStep.parse(dict(s), index=i) for i, s in enumerate(selected.steps))
+    ]
+    verb = "Publish" if args.get("apply") else "Preview"
+    run = TaskRun(
+        graph_id=graph.id,
+        author_id=actor_id,
+        author_kind="user" if actor_id else "system",
+        ask_kind="model_migration",
+        body=f"{verb} the breaking change to {model_name}",
+        params=dict(args),
         workflow_key=selected.ref,
         task_plan_id=selected.plan_id,
         plan_origin=f"template:{selected.ref}",

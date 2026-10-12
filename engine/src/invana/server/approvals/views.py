@@ -2,11 +2,13 @@
 
 Parse, call one manager, serialise. Deciding is the ``ask`` area for the guard;
 the approver list, not a Graph role, is the bound, and the manager enforces it.
+A decision wakes the clock once the request has committed, so what waited on
+it — a publish review's migration run — moves without waiting for a tick.
 """
 
 from __future__ import annotations
 
-from fastapi import Depends, Path, Query
+from fastapi import BackgroundTasks, Depends, Path, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.managers import ApprovalManager
@@ -18,6 +20,12 @@ from invana.core.db import get_session
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 _approvals = ApprovalManager()
+
+
+def _wake_clock(request: Request, background: BackgroundTasks) -> None:
+    clock = getattr(request.app.state, "clock", None)
+    if clock is not None:
+        background.add_task(clock.wake)
 
 
 async def list_approvals(
@@ -43,6 +51,8 @@ async def get_approval(
 
 async def approve(
     payload: ApprovalDecide,
+    request: Request,
+    background: BackgroundTasks,
     approval_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
@@ -52,11 +62,14 @@ async def approve(
     row = await _approvals.decide(
         session, graph=graph, approval_id=approval_id, user=user, approve=True, note=payload.note
     )
+    _wake_clock(request, background)
     return ApprovalRead.model_validate(row)
 
 
 async def decline(
     payload: ApprovalDecide,
+    request: Request,
+    background: BackgroundTasks,
     approval_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
@@ -66,4 +79,5 @@ async def decline(
     row = await _approvals.decide(
         session, graph=graph, approval_id=approval_id, user=user, approve=False, note=payload.note
     )
+    _wake_clock(request, background)
     return ApprovalRead.model_validate(row)
