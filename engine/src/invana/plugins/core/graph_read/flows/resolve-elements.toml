@@ -1,0 +1,10 @@
+key = "resolve-elements"
+version = 1
+kind = "canvas"
+description = "Check a reopened canvas against the graph, under its world (GC14)."
+intents = []
+
+[[steps]]
+id = "resolve_elements"
+task = "resolve_elements"
+label = "Resolve"

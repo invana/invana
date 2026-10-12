@@ -1,0 +1,20 @@
+# The fast path writes *without* validating — that is what makes it fast and what
+# makes it unauditable. `write_graph` declares `requires: validate_records`, so
+# this plan names `bulk_write`, which declares no `requires`, and states what
+# actually happens.
+#
+# `bundle-import@1` is not packaged yet: it needs `map_over` — a lane per model,
+# and **one** stitch after the fan-out. Written flat it would be a single-model
+# plan with a manifest check bolted on, and its stitch would resolve over a
+# partial graph. `map_over` is designed and not built (orchestration.md § 12).
+
+key = "bulk-load"
+version = 1
+kind = "bulk"
+description = "Write a CSV folder straight through the connector — fast, and validating nothing."
+intents = []
+
+[[steps]]
+id = "bulk_write"
+task = "bulk_write"
+label = "Load"

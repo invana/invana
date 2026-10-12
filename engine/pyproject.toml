@@ -147,11 +147,11 @@ ignore = [
 "src/invana/apps/work/managers/task.py" = ["PLC0415"]
 "src/invana/apps/sessions/managers/session.py" = ["PLC0415"]
 "src/invana/runtime/interpreter/loop.py" = ["PLC0415"]
-# The catalogue is band 3 and `delegation` / `planning` / `services` sit beside it:
-# a top-level import would close the cycle the closed set exists to prevent.
-"src/invana/runtime/catalogue/llm.py" = ["PLC0415"]
-"src/invana/runtime/catalogue/pure.py" = ["PLC0415"]
-"src/invana/runtime/catalogue/work_write.py" = ["PLC0415"]
+# Task types share band 3 with `delegation` / `planning` / `services`, which import
+# the catalogue: a top-level import would close the cycle.
+"src/invana/plugins/core/llm/**" = ["PLC0415"]
+"src/invana/plugins/core/pure/**" = ["PLC0415"]
+"src/invana/plugins/core/work_write/**" = ["PLC0415"]
 # Alembic revisions import the registry lazily so the seed and the runtime
 # cannot drift; a top-level import would run at Alembic discovery time.
 "src/invana/core/migrations/versions/*" = ["PLC0415"]
@@ -197,6 +197,7 @@ forbidden_modules = [
     "invana.graph",
     "invana.apps",
     "invana.runtime",
+    "invana.plugins",
     "invana.server",
     "invana.cli",
 ]
@@ -221,7 +222,8 @@ type = "layers"
 layers = [
     "invana.cli : invana.server",
     "invana.activity",
-    "invana.runtime",
+    # Task types use the runtime's stream and governor; the runtime dispatches them.
+    "invana.runtime : invana.plugins",
     "invana.apps",
     "invana.graph",
     "invana.core",

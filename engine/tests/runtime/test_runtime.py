@@ -18,11 +18,11 @@ from invana.apps.llm.intent import Choice
 from invana.apps.sessions.managers import SessionManager
 from invana.apps.sessions.models import SessionMessage
 from invana.apps.sessions.schemas import SendMessage
+from invana.plugins.core.llm.shared import _askable
 from invana.runtime import catalogue as task_registry
 from invana.runtime import services as run_services
 from invana.runtime import workflows
 from invana.runtime.catalogue import CannotAnswer, Converse, NeedsInput, Out, TaskFailure
-from invana.runtime.catalogue.llm import _askable
 from invana.runtime.interpreter import TaskRuntime
 from invana.runtime.models import TaskRun
 from invana.runtime.stream import replay

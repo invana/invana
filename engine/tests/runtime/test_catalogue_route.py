@@ -19,8 +19,8 @@ from invana.apps.task_plans.models import Task, TaskPlan
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.plugins.sdk.manifest import Bound
 from invana.runtime.catalogue import CATALOGUE
-from invana.runtime.catalogue.registry import Bound
 from invana.server.app import create_app
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 

@@ -1,0 +1,6 @@
+name = "invana.core.pure"
+kind = "core"
+engine = "*"
+secrets = []
+tasks = ["validate_query", "shape_for_canvas", "verify_result", "await_delegations"]
+flows = []

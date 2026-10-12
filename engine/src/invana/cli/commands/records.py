@@ -30,7 +30,7 @@ from invana.apps.graphs.querysets import GraphQuerySet
 from invana.apps.sessions.models import SessionMessage  # noqa: F401
 from invana.core.auth.querysets import UserQuerySet
 from invana.core.db import create_db_engine, create_session_factory
-from invana.runtime.catalogue.records import LoadRefused
+from invana.plugins.core.ingest.records import LoadRefused
 
 
 @click.group("records")
@@ -248,7 +248,7 @@ def check_cmd(path: str, as_json: bool) -> None:
     Exits non-zero when a rule resolves nothing, or when a rule that did not declare
     itself `partial` leaves values unresolved.
     """
-    from invana.runtime.catalogue.bundle import BundleError, check
+    from invana.plugins.core.ingest.bundle import BundleError, check
 
     try:
         report = check(Path(path))

@@ -1,0 +1,18 @@
+key = "understand_intent"
+version = "1.0.0"
+summary = "Work out what an ask means here, before any query is written."
+bound = "llm"
+side_effect = "read"
+requires = []
+resources = ["llm"]
+
+[args]
+
+[outputs]
+kind = "str"
+summary = "str"
+refs = "list"
+expects = "list"
+confidence = "float"
+question = "str"
+options = "list"

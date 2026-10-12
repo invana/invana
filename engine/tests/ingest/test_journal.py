@@ -171,9 +171,9 @@ class TestBulkLoad:
         assert entry.requires == ()
 
     async def test_the_bulk_plan_is_one_step_and_says_which_kind_it_is(self, session):
-        from invana.apps.agents.registry import TEMPLATES
+        from invana.plugins import load_plugins
 
-        plan = TEMPLATES["bulk-load"]
+        plan = load_plugins().flows["bulk-load"]
         assert plan.kind == "bulk"
         assert [s["task"] for s in plan.steps] == ["bulk_write"]
 

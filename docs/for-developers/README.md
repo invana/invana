@@ -218,6 +218,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 13.6 | [Admin and health](modules/platform/features/admin-and-health.md) | A generated browser over app state, and a readiness probe | ✅ | — | — | S1 |
 | 13.7 | [Setup](modules/platform/features/setup.md) | Four required steps in four features — the onboarding wizard, created to answering | ✅ | — | 🟡 | S13 |
 | 13.8 | [The runtime](modules/platform/features/runtime.md) | The workhorse: plan graph · frontier · signals · pools · approvals · what it emits | 🟡 | — | — | S15 |
+| 13.9 | [Plugins](modules/platform/features/plugins.md) | Every task type in a plugin — `plugin.yaml`, a manifest beside each task's code, packaged flows; one frozen registry; each Task records its task version | — | — | — | B06a |
 
 ---
 
@@ -236,7 +237,7 @@ touch record that makes the declaration checkable. Decisions: [governance.md](go
 `lenses` and `run_touches` exist, the rule grammar and its three laws are enforced, the ladder and
 both authoring refusals work, and the routes serve. Past that, a lens now **runs**: the interpreter
 checks an address before dispatch and refuses in place
-([`catalogue/contract.py`](../../engine/src/invana/runtime/catalogue/contract.py) `engage` · `engaged`),
+([`plugins/sdk/context.py`](../../engine/src/invana/plugins/sdk/context.py) `engage` · `engaged`),
 writes the touch after the call (`touched`) and decides egress per crossing (`egress_for`); the
 openCypher connector composes the predicate and rewrites the projection
 ([`connectors/cypher/lens.py`](../../engine/src/invana/graph/connectors/cypher/lens.py)), refusing

@@ -13,8 +13,8 @@ How the catalogue (today's built-in steps) and the new tools become one versione
 
 | Word | Means |
 |---|---|
-| **Plugin** | A folder of task types, skills and flows, with a `plugin.yaml` manifest. Versioned as a whole |
-| **Task type** | One callable the runtime can run — e.g. `web.fetch`. Declared by its **task manifest** (`manifest.yaml`) beside its code (`run.py`). Versioned on its own |
+| **Plugin** | A folder of task types, skills and flows, with a `plugin.toml` manifest. Versioned as a whole |
+| **Task type** | One callable the runtime can run — e.g. `web.fetch`. Declared by its **task manifest** (`manifest.toml`) beside its code (`run.py`). Versioned on its own |
 | **Task** | Unchanged (`terminology.md`): a node in a TaskPlan. A Task **uses** a task type; its TaskRun is one execution |
 | Retired | *pack* and *catalogue entry* — the catalogue is the registry of task types |
 
@@ -59,13 +59,13 @@ engine/src/invana/plugins/
 
 ```
 plugins/tools/web/
-├── plugin.yaml              name · version · kind · engine range · extra · secrets
+├── plugin.toml              name · version · kind · engine range · extra · secrets
 ├── tasks/
 │   ├── fetch/
-│   │   ├── manifest.yaml    the task manifest
+│   │   ├── manifest.toml    the task manifest
 │   │   └── run.py           async def run(ctx, vars) -> Out
 │   ├── search/
-│   │   ├── manifest.yaml
+│   │   ├── manifest.toml
 │   │   └── run.py
 │   └── download_and_extract/    a composite task type — fixed steps in code, one task
 ├── skills/
@@ -83,34 +83,40 @@ plugins/tools/web/
 
 ## 3. The manifests
 
-```yaml
-# plugins/tools/web/plugin.yaml
-name: invana.tools.web
-version: 1.2.0
-kind: tool                  # core | tool | simulator | mcp
-engine: ">=0.9,<1.0"
-extra: tools-web
-secrets: []                 # e.g. [smtp] for mail
+```toml
+# plugins/tools/web/plugin.toml
+name = "invana.tools.web"
+version = "1.2.0"
+kind = "tool"                 # core | tool | simulator | mcp
+engine = ">=0.9,<1.0"
+extra = "tools-web"
+secrets = []                  # e.g. ["smtp"] for mail
+tasks = ["fetch", "search", "download_and_extract"]
+flows = []
 ```
 
-```yaml
-# plugins/tools/web/tasks/fetch/manifest.yaml
-key: web.fetch
-version: 1.1.0
-summary: Read one page and cite its URL.
-bound: network
-side_effect: read           # read | write | send — send always needs approval
-args:
-  url: { type: str, required: true }
-outputs:
-  text: str
-  links: list
-  fetched_at: str
-requires: []
-timeout_s: 30
-retries: 2
-resources: [cpu]            # llm | cpu | gpu
+```toml
+# plugins/tools/web/tasks/fetch/manifest.toml
+key = "web.fetch"
+version = "1.1.0"
+summary = "Read one page and cite its URL."
+bound = "network"
+side_effect = "read"          # read | write | send — send always needs approval
+requires = []
+timeout_s = 30
+retries = 2
+resources = ["cpu"]           # llm | cpu | gpu
+
+[args]
+url = { type = "str", required = true }
+
+[outputs]
+text = "str"
+links = "list"
+fetched_at = "str"
 ```
+
+Manifests are TOML, read with the standard library's `tomllib` — no parser dependency, and comments survive ([13.9 PL7](../for-developers/modules/platform/features/plugins.md#decisions)). A core plugin's `plugin.toml` carries no `version`: it is the engine's.
 
 | Task manifest field | New? | Why |
 |---|---|---|

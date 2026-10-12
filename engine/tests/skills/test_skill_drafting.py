@@ -17,6 +17,7 @@ from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.schemas import SkillCreate, SkillVersionPublish
 from invana.apps.task_plans.managers import TaskPlanManager
 from invana.core.auth.models import User
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.managers import SkillDraftManager
 from invana.runtime.planning import resolve_plan
@@ -242,7 +243,7 @@ async def test_a_sentence_that_names_a_library_plan_draws_its_rows_flat_and_tune
     came from, with the argument the sentence tunes — and the composition is
     recorded on the plan."""
     skill, draft = await _draft_of(session, graph, user, "Inlined", "Answer it, writes allowed. Tell the desk.")
-    await plans.ensure_seeded(session, graph_id=graph.id, requires=_REQUIRES)
+    await plans.ensure_seeded(session, graph_id=graph.id, flows=load_plugins().flows.values(), requires=_REQUIRES)
     offered = {p.ref for p in await drafts.inlinable(session, graph_id=graph.id)}
     assert "nl-single@2" in offered, "the planner is offered the library"
     drafted = _drafted(
@@ -299,7 +300,7 @@ async def test_a_plan_that_cannot_be_inlined_refuses_the_draw_by_name(
     """An argument the plan does not declare is a typo, and an unknown plan is
     not on offer; either settles the draw with the reason and writes nothing."""
     _skill, draft = await _draft_of(session, graph, user, "Typo", "Answer it.")
-    await plans.ensure_seeded(session, graph_id=graph.id, requires=_REQUIRES)
+    await plans.ensure_seeded(session, graph_id=graph.id, flows=load_plugins().flows.values(), requires=_REQUIRES)
     drafted = _drafted(
         DraftedSentence(span="Answer it.", kind="step", candidates=(Candidate(task=task, label="A", tune=tune),))
     )

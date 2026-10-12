@@ -1,0 +1,20 @@
+key = "spawn_agent"
+version = "1.0.0"
+summary = "Create a helper agent under this agent's ceiling."
+bound = "work_write"
+side_effect = "write"
+requires = []
+resources = ["cpu"]
+
+[args]
+name = { type = "str" }
+instructions = { type = "str" }
+allow = { type = "list" }
+skill_ids = { type = "list" }
+budget = { type = "obj" }
+lifetime = { type = "str", default = "ephemeral" }
+
+[outputs]
+agent_id = "str"
+name = "str"
+depth = "int"

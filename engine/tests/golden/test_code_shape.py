@@ -59,7 +59,7 @@ QUERIES_ALLOWED = {
     "runtime/emissions.py",
     "runtime/projections.py",
     "runtime/delegation.py",
-    "runtime/catalogue/pure.py",
+    "plugins/core/pure/tasks/await_delegations/run.py",
     "runtime/interpreter/loop.py",
     "runtime/managers/agent_lifecycle.py",
     "runtime/managers/task_plan_runs.py",
@@ -133,7 +133,7 @@ COMMIT_ALLOWED = {
     # Binding a dataset version opens its load run and then submits it, the same shape.
     "server/datasets/views.py",
     "server/admin/auth.py",
-    "runtime/catalogue/records.py",
+    "plugins/core/ingest/records.py",
     # A CLI command is not serving a request: it opens its own session and owns
     # the transaction itself. §18.1 binds the *request*, and there isn't one.
     "cli/commands/records.py",
@@ -222,20 +222,22 @@ EMIT_ALLOWED = {
     "server/runtime/runs.py",
     "server/runtime/templates.py",
     "cli/commands/stitches.py",
-    "runtime/catalogue/records.py",
-    "runtime/catalogue/stitching.py",
+    "plugins/core/ingest/records.py",
+    "plugins/core/ingest/stitching.py",
     "apps/graphs/pool.py",
     "runtime/services.py",
     "runtime/delegation.py",
     "runtime/interpreter/loop.py",
-    "runtime/catalogue/work_write.py",
+    "plugins/core/work_write/tasks/delegate/run.py",
+    "plugins/core/work_write/tasks/create_task/run.py",
     "runtime/managers/agent_lifecycle.py",
     # a failed credential check is recorded where it is detected
     "core/auth/deps.py",
     "apps/graphs/query_service.py",
-    # catalogue steps emit their own trace as they run
-    "runtime/catalogue/llm.py",
-    "runtime/catalogue/schema_write.py",
+    # task types emit their own trace as they run
+    "plugins/core/llm/shared.py",
+    "plugins/core/llm/tasks/translate_thought/run.py",
+    "plugins/core/schema_write/tasks/validate_proposal/run.py",
 }
 
 

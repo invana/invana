@@ -9,7 +9,7 @@ import json
 
 import pytest
 
-from invana.runtime.catalogue.bundle import BundleError, check, check_dataset, read_manifest
+from invana.plugins.core.ingest.bundle import BundleError, check, check_dataset, read_manifest
 
 
 def write_bundle(root, manifest, datasets):

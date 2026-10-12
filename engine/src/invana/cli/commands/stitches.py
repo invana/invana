@@ -35,8 +35,8 @@ from invana.core.events import actions as event_actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
 from invana.core.settings import settings
-from invana.runtime.catalogue.bundle import MANIFEST, BundleError
-from invana.runtime.catalogue.stitching import Applied, apply_bundle
+from invana.plugins.core.ingest.bundle import MANIFEST, BundleError
+from invana.plugins.core.ingest.stitching import Applied, apply_bundle
 
 _store = ModelStore()
 

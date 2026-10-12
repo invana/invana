@@ -1161,6 +1161,7 @@ CREATE TABLE tasks (
 	key VARCHAR(64) NOT NULL, 
 	form VARCHAR(16) NOT NULL, 
 	step_key VARCHAR(64), 
+	task_version VARCHAR(32), 
 	title VARCHAR(255) NOT NULL, 
 	body TEXT NOT NULL, 
 	args JSON NOT NULL, 

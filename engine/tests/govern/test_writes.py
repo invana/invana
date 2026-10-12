@@ -13,7 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from invana.apps.govern.managers.touch import TouchManager
 from invana.apps.graphs.models import Graph
 from invana.apps.modeller.models import GraphModel, GraphVersion
-from invana.runtime.catalogue.contract import CannotAnswer, RunVars, TaskContext, Writes
+from invana.plugins.sdk.context import RunVars, TaskContext, Writes
+from invana.plugins.sdk.errors import CannotAnswer
 from invana.runtime.governing import Governor
 from invana.runtime.models import TaskRun
 from invana.runtime.stream import Emitter

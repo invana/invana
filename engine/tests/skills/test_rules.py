@@ -15,7 +15,7 @@ from invana.apps.skills.managers import RuleManager
 from invana.apps.skills.schemas import RuleCreate, RuleUpdate
 from invana.apps.work.models import Project
 from invana.core.auth.models import User
-from invana.runtime.catalogue.contract import RunVars, cited_rule_version_ids, offered_rule_version_ids
+from invana.plugins.sdk.context import RunVars, cited_rule_version_ids, offered_rule_version_ids
 
 rules = RuleManager()
 

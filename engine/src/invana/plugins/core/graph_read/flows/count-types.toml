@@ -1,0 +1,10 @@
+key = "count-types"
+version = 1
+kind = "canvas"
+description = "Count the types the canvas's world holds (SP11)."
+intents = []
+
+[[steps]]
+id = "count_types"
+task = "count_types"
+label = "Count types"

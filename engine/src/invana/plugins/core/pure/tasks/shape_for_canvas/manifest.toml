@@ -1,0 +1,18 @@
+key = "shape_for_canvas"
+version = "1.0.0"
+summary = "Turn query records into an emission for the canvas, through a template."
+bound = "none"
+side_effect = "read"
+requires = ["execute_graph_query"]
+resources = ["cpu"]
+
+[args]
+
+[outputs]
+nodes = "int"
+edges = "int"
+result_type = "str"
+emission_id = "str"
+emission_kind = "str"
+template_id = "str"
+single_value = "bool"

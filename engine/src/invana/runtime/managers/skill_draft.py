@@ -60,6 +60,7 @@ from invana.apps.task_plans.managers.task_plan import TaskPlanManager, explode
 from invana.apps.task_plans.models import PlanKind, PlanOrigin, Task, TaskForm, TaskPlan
 from invana.apps.task_plans.querysets import TaskPlanQuerySet
 from invana.core.errors import ConflictError, NotFoundError, ValidationError
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.layers import layer_for, ordered_layers
 from invana.runtime.managers.evals import EvalManager
@@ -129,6 +130,7 @@ _COPIED_TASK_FIELDS = (
     "key",
     "form",
     "step_key",
+    "task_version",
     "title",
     "body",
     "assignee_kind",
@@ -392,7 +394,13 @@ class SkillDraftManager:
         # (`select_plan_by_key`): a Graph whose library has never been listed
         # has no rows to offer, and a row seeded before its template declared
         # an argument holds `{}` while its own steps bind it.
-        await self.library.ensure_seeded(session, graph_id=graph_id, requires=_requires())
+        await self.library.ensure_seeded(
+            session,
+            graph_id=graph_id,
+            flows=load_plugins().flows.values(),
+            requires=_requires(),
+            versions=load_plugins().versions(),
+        )
 
         plans = await self.plans_qs.list_for_graph(session, graph_id=graph_id)
         newest: dict[str, TaskPlan] = {}
@@ -877,7 +885,12 @@ class SkillDraftManager:
                 rejected=errors,
             )
 
-        exploded = {t.key: t for t in explode("", [s.as_dict() for s in validated], requires=_requires())}
+        exploded = {
+            t.key: t
+            for t in explode(
+                "", [s.as_dict() for s in validated], requires=_requires(), versions=load_plugins().versions()
+            )
+        }
         rows: list[Task] = []
         for key in order:
             task = exploded.get(key)

@@ -47,7 +47,7 @@ from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
 from invana.core.settings import settings
-from invana.runtime.catalogue.records import LoadRefused
+from invana.plugins.core.ingest.records import LoadRefused
 from invana.runtime.models import RunRole, RunStatus, TaskRun, TriggeredBy
 from invana.runtime.planning import opening_for, plan_payload, queue_plan_steps, select_plan_by_key
 from invana.runtime.querysets import TaskRunQuerySet

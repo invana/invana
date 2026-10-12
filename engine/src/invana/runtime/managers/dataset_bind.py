@@ -49,7 +49,7 @@ from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.services import emit_event
 from invana.core.settings import settings
-from invana.runtime.catalogue.records import LoadRefused
+from invana.plugins.core.ingest.records import LoadRefused
 from invana.runtime.managers.rule_checks import RuleCheckManager
 from invana.runtime.models import TaskRun
 from invana.runtime.querysets.task_run import TaskRunQuerySet

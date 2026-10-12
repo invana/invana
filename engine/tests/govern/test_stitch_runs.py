@@ -16,8 +16,8 @@ from invana.apps.graphs.models import Graph, GraphConnection
 from invana.apps.modeller import links as link_service
 from invana.apps.modeller.models import GraphModel, GraphVersion, ModelLink
 from invana.core.errors import ConflictError, PermissionDeniedError
-from invana.runtime.catalogue import stitching
-from invana.runtime.catalogue.contract import CannotAnswer
+from invana.plugins.core.ingest import stitching
+from invana.plugins.sdk.errors import CannotAnswer
 from invana.runtime.models import RunStatus
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.services import open_stitch_commit_run, open_stitch_preview_run, open_stitch_withdraw_run

@@ -11,9 +11,11 @@ from __future__ import annotations
 import pytest
 
 from invana.apps.agents.envelope import Envelope, PlanRejected, apply_pins, validate_plan
-from invana.apps.agents.registry import EXPLORER, NL_SINGLE
+from invana.apps.agents.registry import EXPLORER
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 
+NL_SINGLE = load_plugins().flows["nl-single"]
 ENVELOPE = Envelope.from_spec(EXPLORER.workflow_spec)
 
 

@@ -163,6 +163,8 @@ class Task(Base):
     form: Mapped[str] = mapped_column(String(16), default=TaskForm.callable.value, nullable=False)
     #: Callable only, and only from the closed catalogue.
     step_key: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    #: The task type's version when this row was written; null before it was recorded.
+    task_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
     title: Mapped[str] = mapped_column(String(255), default="", nullable=False)
     body: Mapped[str] = mapped_column(Text, default="", nullable=False)

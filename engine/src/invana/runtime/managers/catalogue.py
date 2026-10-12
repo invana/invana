@@ -10,8 +10,8 @@ from __future__ import annotations
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.task_plans.querysets import TaskPlanQuerySet
+from invana.plugins.sdk.manifest import Bound, Entry
 from invana.runtime.catalogue import CATALOGUE
-from invana.runtime.catalogue.registry import Bound, Entry
 from invana.runtime.schemas import (
     CatalogueArgRead,
     CatalogueEntryRead,

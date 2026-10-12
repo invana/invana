@@ -12,10 +12,13 @@ run the real path — explode, then draw — rather than deriving on read.
 
 from __future__ import annotations
 
-from invana.apps.agents.registry import NL_COMPARE, NL_SINGLE
 from invana.apps.task_plans.dag import dag_for
 from invana.apps.task_plans.managers.task_plan import explode
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
+
+NL_SINGLE = load_plugins().flows["nl-single"]
+NL_COMPARE = load_plugins().flows["nl-compare"]
 
 #: `requires` is the catalogue's, handed down the way the runtime hands it —
 #: the picture is materialised against the same line the validator enforces.

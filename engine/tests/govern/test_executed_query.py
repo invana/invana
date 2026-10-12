@@ -12,7 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from invana.graph.types import ComposedQuery, query_digest
-from invana.runtime.catalogue.graph_read import query_record
+from invana.plugins.core.graph_read.shared import query_record
 
 _GENERATED = "MATCH (d:Deal) RETURN count(d)"
 _EXECUTED = "MATCH (d:Deal) WHERE d.geo IN ['IE','DE'] RETURN count(d)"

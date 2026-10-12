@@ -50,6 +50,7 @@ from invana.core.events.services import emit_event
 from invana.core.querylog import calling_as
 from invana.core.telemetry.recorders import add_run_active, record_run, record_run_admitted
 from invana.core.telemetry.spans import add_event, current_ids, current_span_context, set_current
+from invana.plugins.core.ingest.records import LoadRefused, connector_for
 from invana.runtime.callers import caller_for
 from invana.runtime.catalogue import (
     CannotAnswer,
@@ -63,7 +64,6 @@ from invana.runtime.catalogue import (
     load_global_model,
     load_grounding,
 )
-from invana.runtime.catalogue.records import LoadRefused, connector_for
 from invana.runtime.contention import AgentAtCeiling, AgentSlots, GraphSlots, PoolSlots, Refused
 from invana.runtime.delegation import cost_rollup, descendants
 from invana.runtime.diagnosis import diagnose, internal_failure

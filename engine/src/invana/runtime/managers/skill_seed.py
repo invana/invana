@@ -31,6 +31,7 @@ from invana.apps.task_plans.managers.task_plan import explode
 from invana.apps.task_plans.models import PlanKind, PlanOrigin, TaskPlan
 from invana.apps.task_plans.querysets import TaskPlanQuerySet
 from invana.core.events.models import ActorKind
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 
 NAME = "Answer in natural language"
@@ -133,7 +134,7 @@ class BuiltinSkillSeeder:
             ),
         )
         steps = [step(key, **args) for key, args, _span in STEPS]
-        tasks = explode(plan.id, steps, requires=_requires())
+        tasks = explode(plan.id, steps, requires=_requires(), versions=load_plugins().versions())
         spans = {key: span for key, _args, span in STEPS}
         for task in tasks:
             task.source_span = spans.get(task.step_key or "")

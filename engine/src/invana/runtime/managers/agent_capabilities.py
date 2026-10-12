@@ -21,8 +21,8 @@ from invana.apps.agents.models import Agent
 from invana.apps.agents.schemas import AgentCallableRow, AgentSkillRow, AgentSkillsAndCallables
 from invana.apps.task_plans.models import Task, TaskForm
 from invana.apps.task_plans.querysets import TaskPlanQuerySet
+from invana.plugins.sdk.manifest import Bound
 from invana.runtime.catalogue import CATALOGUE
-from invana.runtime.catalogue.registry import Bound
 from invana.runtime.managers.skill_usage import MIN_OFFERS_TO_READ
 from invana.runtime.querysets import TaskRunQuerySet
 
