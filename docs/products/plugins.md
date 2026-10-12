@@ -186,7 +186,7 @@ The plugin contract is what makes horizontal scaling possible, whichever executo
 
 ```mermaid
 flowchart LR
-    API["API + orchestrator<br/>plan · validate · frontier · approvals"] -->|TaskEnvelope| Q["executor queue<br/>(chosen by B14)"]
+    API["API + orchestrator<br/>plan · validate · frontier · approvals"] -->|TaskEnvelope| Q["executor queue<br/>(procrastinate, on Postgres)"]
     Q --> W1["worker 1<br/>core + tools-web"]
     Q --> W2["worker 2<br/>core + tools-web"]
     Q --> W3["worker N<br/>core + sim-genomic · GPU"]
@@ -224,6 +224,6 @@ flowchart LR
 
 | Item | Where |
 |---|---|
-| procrastinate vs Dramatiq vs Prefect | B14 benchmark |
+| procrastinate vs Dramatiq vs Prefect | Decided by the B14 benchmark: procrastinate — [13.11 Distributed execution](../for-developers/modules/platform/features/distributed-execution.md) |
 | Third-party plugin packages outside the engine | Later — plugins live in-engine for now |
 | Hot-loading plugins without a restart | Not building — the registry is frozen per process |

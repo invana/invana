@@ -215,6 +215,8 @@ class TaskContext:
     #: The runtime, so a ``delegate`` step can start its child. Typed loosely
     #: to keep the task layer from importing the adapter it runs under.
     runtime: Any = None
+    #: ``run_id:node_id:attempt`` of the envelope being run; a write checks it before writing.
+    idempotency_key: str | None = None
 
     def artifact(self, name: str, *, direction: str, summary: str | None = None) -> None:
         """Record one file this step read or wrote.

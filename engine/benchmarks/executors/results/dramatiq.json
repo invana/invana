@@ -1,0 +1,94 @@
+{
+  "executor": "dramatiq",
+  "runs": {
+    "1": {
+      "idle_worker_rss_mb": 233.8,
+      "throughput": {
+        "done": 1000,
+        "seconds": 4.59,
+        "pids": 1,
+        "dups": 0,
+        "settled": true,
+        "send_s": 0.294,
+        "backlog_at_send_end": 1000,
+        "tasks_per_s": 217.9
+      },
+      "fanout": {
+        "done": 220,
+        "seconds": 30.836,
+        "pids": 1,
+        "dups": 0,
+        "settled": true,
+        "ideal_s": 30.0,
+        "efficiency": 0.973
+      },
+      "latency": {
+        "p50_ms": 6.5,
+        "p95_ms": 16.8
+      }
+    },
+    "3": {
+      "idle_worker_rss_mb": 232.4,
+      "throughput": {
+        "done": 1000,
+        "seconds": 2.003,
+        "pids": 3,
+        "dups": 0,
+        "settled": true,
+        "send_s": 0.315,
+        "backlog_at_send_end": 1000,
+        "tasks_per_s": 499.3
+      },
+      "fanout": {
+        "done": 220,
+        "seconds": 10.628,
+        "pids": 3,
+        "dups": 0,
+        "settled": true,
+        "ideal_s": 10.0,
+        "efficiency": 0.941
+      },
+      "latency": {
+        "p50_ms": 4.8,
+        "p95_ms": 10.3
+      }
+    },
+    "9": {
+      "idle_worker_rss_mb": 236.1,
+      "throughput": {
+        "done": 1000,
+        "seconds": 1.038,
+        "pids": 9,
+        "dups": 0,
+        "settled": true,
+        "send_s": 0.279,
+        "backlog_at_send_end": 938,
+        "tasks_per_s": 963.4
+      },
+      "fanout": {
+        "done": 220,
+        "seconds": 4.227,
+        "pids": 9,
+        "dups": 0,
+        "settled": true,
+        "ideal_s": 3.33,
+        "efficiency": 0.789
+      },
+      "latency": {
+        "p50_ms": 4.7,
+        "p95_ms": 17.4
+      }
+    }
+  },
+  "kill": {
+    "done": 220,
+    "seconds": 15.376,
+    "pids": 3,
+    "dups": 0,
+    "settled": true,
+    "lost": 0,
+    "recovered_after_kill_s": 13.27,
+    "requeued_by_reaper": null,
+    "pids_before_kill": 3
+  }
+}

@@ -499,26 +499,9 @@ class TaskRuntime:
             if th.started_at is None:
                 record_run_admitted(**labels, queue_wait_s=_seconds_since(th.queued_at))
             started = time.perf_counter()
-            # The ask is the run's own columns — there is no second row.
-            run_ask = th
-            graph = await db.get(Graph, th.graph_id)
-            assert run_ask and graph
-            # A task-triggered or delegated run has no session and no
-            # reply row. Everything below tolerates both being None, which is
-            # what makes "a task is worked through as runs" true rather
-            # than aspirational.
-            sess = await db.get(Session, run_ask.session_id) if run_ask.session_id else None
-            assistant = await db.get(SessionMessage, th.assistant_message_id) if th.assistant_message_id else None
-            user_msg = None
-            if sess is not None and assistant is not None:
-                user_msg = (
-                    await db.execute(
-                        select(SessionMessage).where(
-                            SessionMessage.session_id == sess.id, SessionMessage.seq == assistant.seq - 1
-                        )
-                    )
-                ).scalar_one_or_none()
-
+            # A cursor exists only after a pause for input, so it is also how a
+            # run knows it is *resuming* — from this step.
+            start_index = int((th.cursor or {}).get("step", 0))
             # **Lenient, because a library plan is the normal case now**
             # (task-model-migration § 6.5). `workflow_key` on an import run is
             # `dataset-import@1`, which `WORKFLOWS` does not hold and is not
@@ -527,93 +510,7 @@ class TaskRuntime:
             # ingestion running inline — the run raised `KeyError` before a
             # single node was dispatched.
             wf = WORKFLOWS.get(th.workflow_key)
-            # A cursor exists only after a pause for input, so it is also how a
-            # run knows it is *resuming*: this pass answers `question`, and
-            # `prompt` below is the answer the user gave.
-            cursor = th.cursor or {}
-            start_index = int(cursor.get("step", 0))
-            answering = cursor.get("question")
-            params = run_ask.params or {}
-            mode = run_ask.ask_kind
-
-            agent = await db.get(Agent, th.agent_id) if th.agent_id else None
-            provider = await self._provider_for(db, th=run_ask)
-            # An eval replay names the candidate it replays: a skill version in
-            # place of the head, or an agent's draft instructions.
-            replay = params.get("eval") or {}
-            skills = await self._skills_for(db, agent=agent, graph_id=graph.id, replay=replay)
-            rules = await self._rules_for(db, run=th, graph_id=graph.id)
-            history = (
-                context_turns(
-                    await SessionMessageQuerySet().list_recent_messages(
-                        db, session_id=sess.id, before_seq=user_msg.seq, limit=_HISTORY_TURNS * 2
-                    )
-                )
-                if sess is not None and user_msg is not None
-                else []
-            )
-            v = RunVars(
-                graph=graph,
-                sess=sess,
-                actor_id=run_ask.author_id or "",
-                encryption_key=self._key,
-                user_message_id=user_msg.id if user_msg else "",
-                user_seq=user_msg.seq if user_msg else 0,
-                assistant_message_id=assistant.id if assistant else "",
-                mode=mode,
-                prompt=(user_msg.content if user_msg else run_ask.body),
-                # A `ql` run **is** its query, and the query is the ask's body —
-                # not the user row's content. On a re-run the reply's user row
-                # still holds the natural-language question that was translated
-                # once, and `ql-query` has no translate step to do it again, so
-                # reading the row here would send English to the driver.
-                query=(run_ask.body if mode == "ql" else None),
-                answering=answering,
-                language=params.get("language"),
-                timeout_s=params.get("timeout_s"),
-                parameters=params.get("parameters"),
-                provider=provider,
-                history=history,
-                grounding=await load_grounding(db, graph.id) if th.workflow_key != "modeller-generate" else None,
-                global_model=await load_global_model(db, graph.id) if th.workflow_key != "modeller-generate" else None,
-                skills=skills,
-                rules=rules,
-                # The Graph's, then the agent's own focus (AG13).
-                instructions=layered_instructions(
-                    graph.instructions,
-                    replay.get("instructions", agent.instructions if agent else ""),
-                ),
-                # The voice this run speaks with, fixed at open like the lens
-                # (SO6). No agent is still a voice — the default one (SO3).
-                soul=voice_for(agent.soul if agent else "", agent.soul_traits if agent else {}),
-                agent=agent,
-                envelope=Envelope.from_spec(agent.workflow_spec, effort=agent.effective_effort) if agent else None,
-                run=th,
-                # The lens this run froze at open ([GV26]) — read, never
-                # recomposed ([GV8]). It is built once, here, so every step of
-                # the run is checked against the same document, and a guardrail
-                # tightened mid-run cannot change what this one was allowed to
-                # rest on (docs/for-developers/modules/govern/spec.md).
-                governor=Governor.for_run(th),
-                # The Graph's pools, so a crossing can take a slot in one
-                # ([CC8](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
-                # Handed down on the run's vars for the same reason the governor
-                # is: process state belongs to the thing that owns the process.
-                pools=self._pools,
-                # A load's stages hand each other records, and the plan carries
-                # only counts and ids (LD21). The prologue settled these before
-                # the run was queued, so this rebuilds the holder rather than
-                # deciding anything (LD20).
-                load=(
-                    LoadVars(
-                        root=str(params.get("root") or ""),
-                        model_id=str(params.get("model_id") or ""),
-                        version_id=str(params.get("version_id") or ""),
-                    )
-                    if mode == "import"
-                    else None
-                ),
-            )
+            v, assistant = await self.run_vars(db, th)
 
             th.status = RunStatus.running.value
             th.started_at = _now()
@@ -631,7 +528,7 @@ class TaskRuntime:
                         "message_id": assistant.id if assistant else None,
                         "workflow": th.workflow_key,
                         "agent_id": th.agent_id,
-                        "agent": agent.name if agent else None,
+                        "agent": v.agent.name if v.agent else None,
                         "task_id": th.todo_id,
                         "started_at": th.started_at,
                     },
@@ -651,6 +548,124 @@ class TaskRuntime:
                 # A crash is logged once, by the run span, with its traceback.
                 if not crashed:
                     log_run_ended(th, outcome, duration_s)
+
+    async def run_vars(self, db: AsyncSession, th: TaskRun) -> tuple[RunVars, SessionMessage | None]:
+        """Everything a step reads about its run, rebuilt from the run row's ids.
+
+        The pass calls it once before its loop; a worker calls it for each
+        envelope it is handed, so a step sees the same Graph, session, provider,
+        skills, rules, voice and frozen lens wherever it runs. Returns the vars
+        and the reply row they write into (None for a task-triggered run).
+
+        It reads and does not commit; the one column it may set is
+        ``model_version``, through :meth:`_provider_for`.
+        """
+        run_ask = th
+        graph = await db.get(Graph, th.graph_id)
+        assert run_ask and graph
+        # A task-triggered or delegated run has no session and no
+        # reply row. Everything below tolerates both being None, which is
+        # what makes "a task is worked through as runs" true rather
+        # than aspirational.
+        sess = await db.get(Session, run_ask.session_id) if run_ask.session_id else None
+        assistant = await db.get(SessionMessage, th.assistant_message_id) if th.assistant_message_id else None
+        user_msg = None
+        if sess is not None and assistant is not None:
+            user_msg = (
+                await db.execute(
+                    select(SessionMessage).where(
+                        SessionMessage.session_id == sess.id, SessionMessage.seq == assistant.seq - 1
+                    )
+                )
+            ).scalar_one_or_none()
+
+        # A cursor exists only after a pause for input, so it is also how a
+        # run knows it is *resuming*: this pass answers `question`, and
+        # `prompt` below is the answer the user gave.
+        cursor = th.cursor or {}
+        answering = cursor.get("question")
+        params = run_ask.params or {}
+        mode = run_ask.ask_kind
+
+        agent = await db.get(Agent, th.agent_id) if th.agent_id else None
+        provider = await self._provider_for(db, th=run_ask)
+        # An eval replay names the candidate it replays: a skill version in
+        # place of the head, or an agent's draft instructions.
+        replay = params.get("eval") or {}
+        skills = await self._skills_for(db, agent=agent, graph_id=graph.id, replay=replay)
+        rules = await self._rules_for(db, run=th, graph_id=graph.id)
+        history = (
+            context_turns(
+                await SessionMessageQuerySet().list_recent_messages(
+                    db, session_id=sess.id, before_seq=user_msg.seq, limit=_HISTORY_TURNS * 2
+                )
+            )
+            if sess is not None and user_msg is not None
+            else []
+        )
+        v = RunVars(
+            graph=graph,
+            sess=sess,
+            actor_id=run_ask.author_id or "",
+            encryption_key=self._key,
+            user_message_id=user_msg.id if user_msg else "",
+            user_seq=user_msg.seq if user_msg else 0,
+            assistant_message_id=assistant.id if assistant else "",
+            mode=mode,
+            prompt=(user_msg.content if user_msg else run_ask.body),
+            # A `ql` run **is** its query, and the query is the ask's body —
+            # not the user row's content. On a re-run the reply's user row
+            # still holds the natural-language question that was translated
+            # once, and `ql-query` has no translate step to do it again, so
+            # reading the row here would send English to the driver.
+            query=(run_ask.body if mode == "ql" else None),
+            answering=answering,
+            language=params.get("language"),
+            timeout_s=params.get("timeout_s"),
+            parameters=params.get("parameters"),
+            provider=provider,
+            history=history,
+            grounding=await load_grounding(db, graph.id) if th.workflow_key != "modeller-generate" else None,
+            global_model=await load_global_model(db, graph.id) if th.workflow_key != "modeller-generate" else None,
+            skills=skills,
+            rules=rules,
+            # The Graph's, then the agent's own focus (AG13).
+            instructions=layered_instructions(
+                graph.instructions,
+                replay.get("instructions", agent.instructions if agent else ""),
+            ),
+            # The voice this run speaks with, fixed at open like the lens
+            # (SO6). No agent is still a voice — the default one (SO3).
+            soul=voice_for(agent.soul if agent else "", agent.soul_traits if agent else {}),
+            agent=agent,
+            envelope=Envelope.from_spec(agent.workflow_spec, effort=agent.effective_effort) if agent else None,
+            run=th,
+            # The lens this run froze at open ([GV26]) — read, never
+            # recomposed ([GV8]). It is built once, here, so every step of
+            # the run is checked against the same document, and a guardrail
+            # tightened mid-run cannot change what this one was allowed to
+            # rest on (docs/for-developers/modules/govern/spec.md).
+            governor=Governor.for_run(th),
+            # The Graph's pools, so a crossing can take a slot in one
+            # ([CC8](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
+            # Handed down on the run's vars for the same reason the governor
+            # is: process state belongs to the thing that owns the process.
+            pools=self._pools,
+            # A load's stages hand each other records, and the plan carries
+            # only counts and ids (LD21). The prologue settled these before
+            # the run was queued, so this rebuilds the holder rather than
+            # deciding anything (LD20).
+            load=(
+                LoadVars(
+                    root=str(params.get("root") or ""),
+                    model_id=str(params.get("model_id") or ""),
+                    version_id=str(params.get("version_id") or ""),
+                )
+                if mode == "import"
+                else None
+            ),
+        )
+        return v, assistant
 
     async def _provider_for(self, db: AsyncSession, *, th: TaskRun):
         """The endpoint this run calls — what it recorded, else what its lens casts.

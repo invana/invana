@@ -79,7 +79,7 @@ flowchart LR
 | `outputs` | `{name: type}` | the type is the lane roll-up |
 | `requires` | list of keys | ordered before it in any plan |
 | `resources` | list of `llm · cpu · gpu` | `llm` for the `llm` bound, else `cpu` |
-| `timeout_s` · `retries` | int, optional | declared only; no executor reads them yet |
+| `timeout_s` · `retries` | int, optional | `timeout_s` applied by `run_envelope()`; `retries` declared only |
 | `spec` | `{name: {type, required, default, label}}` | a simulator's spec fields; empty on every other task type |
 
 | Column | Type | Notes |
@@ -95,7 +95,7 @@ flowchart LR
 | PL3 | **A core plugin's version is the engine's.** `plugin.toml` for `kind: core` carries no `version`; the loader reads the installed engine version. |
 | PL4 | **`run.py` keeps the task's own function name** and binds `run` to it, so stack traces, tests and re-exports keep the names they had. |
 | PL5 | **`TASKS` is a mutable dict derived from the frozen registry.** Tests substitute steps on it; the registry's own mappings are read-only. |
-| PL6 | **`timeout_s` and `retries` are declared, not applied.** The executor applies them when B14 picks one; applying them now would change behaviour. |
+| PL6 | **`timeout_s` is applied by `run_envelope()`; `retries` stays declared** — retry policy is the orchestrator's ([13.11](distributed-execution.md) DE5). |
 | PL7 | **Manifests are TOML**, read with the standard library's `tomllib`. A YAML parser would be a new core dependency for the same tables; TOML also keeps comments, so a flow carries its own rationale. |
 | PL8 | **`plugin.toml` lists its `tasks` and `flows` in order.** The order is the catalogue's listing order, and a folder on disk the list does not name is a load error rather than a silently skipped task type. |
 | PL9 | **Every core task type starts at `1.0.0`;** `side_effect` is `write` for the `graph_write · schema_write · ingest · work_write` bounds and `read` otherwise; `resources` is `llm` for the `llm` bound and `cpu` otherwise. |
@@ -111,7 +111,6 @@ flowchart LR
 | Not building | Because |
 |---|---|
 | Tool and MCP plugins | B06b and B07 |
-| `TaskEnvelope` · `worker.run_envelope()` | B14 |
 | `invana plugins …` CLI and the Agents › Plugins surface | B06b · C03 |
 | Enabling or disabling a plugin | B06b — until then a simulator loads whenever it is installed |
 | Hot-loading a plugin | the registry is frozen per process |

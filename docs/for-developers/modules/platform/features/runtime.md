@@ -55,13 +55,13 @@ one of its tasks — full infrastructure cost, nothing back.
 | **Planner** | which plan runs — selected by intent, generated when nothing fits, expanded, then validated against the envelope | `planning.py` |
 | **Interpreter** | what happens next — the frontier, the control signals, suspend and resume | `runtime.py` `_loop` |
 | **Catalogue** | what a step *is* — the closed set of callables, each with a declared input schema | `tasks.py` |
-| **Executor** | *where* a step runs. One protocol, one implementation: in-process asyncio | `runtime.py` dispatch |
+| **Executor** | *where* a step runs. Every step is a `TaskEnvelope` called by `run_envelope()`; the only executor running is in-process asyncio ([13.11](distributed-execution.md)) | `executor.py` · `plugins/worker.py` |
 | **State** | the run, its lanes and its attempts, durably | `models.py` · `services.py` |
 | **Artifacts** | what a step produced that is too big for a row | — |
 | **Stream** | what the reader sees, in order | `stream.py` |
 
-The executor stays one function behind one protocol. It grows a registry the day someone actually
-swaps it, and not before.
+The executor stays one call — `run_envelope()` — behind one protocol. procrastinate is chosen as the
+distributed one ([13.11](distributed-execution.md)); it is built the day a step must run in a worker (B06b), and not before.
 
 ## 3. Todo, plan, run
 
@@ -788,7 +788,7 @@ directions.
 | RP24d | Telemetry is optional. Nothing in the product degrades with no collector configured. |
 | RP25 | A step row holds digests; raw payloads are **artifacts** it cites. The word is *artifact*, never *asset*. |
 | RP26 | Attempts and lanes are rows. A failed attempt is never overwritten. |
-| RP27 | The executor is one protocol and one implementation. It grows a registry when someone swaps it, not in anticipation. |
+| RP27 | The executor is one protocol — `run_envelope()` over a `TaskEnvelope` — and one running implementation, in-process. The distributed one (procrastinate, [13.11](distributed-execution.md)) is built when a step must run in a worker, not in anticipation. |
 | RP28 | The catalogue is closed. Nothing third-party registers a step. |
 | RP29 | **Every kind runs here.** `ask` · `import` · `bulk` · `stitch` · `enrich` are units of intent that select a plan. The interpreter, the frontier, the step rows, the logs, the events and the journal are the same for all of them. |
 | RP29a | **Every run has a plan, including the trivial ones.** A bulk load is a one-step plan, not an exception. Weaker guarantees are properties of a step, never of the run machinery. |
@@ -857,7 +857,7 @@ today. Only the *bundle* needs the deferred machinery.
 
 | Not built | Because |
 |---|---|
-| A second executor | one protocol, one implementation. The seam is designed; scaffolding it before a swap is the framework mistake |
+| A second executor | chosen in [13.11](distributed-execution.md), built in B06b with the first steps that must run in workers |
 | A plugin-registerable catalogue | the closed set *is* the policy |
 | Arbitrary user callbacks (`on_failure` hooks) | events are the extension point, and a notification rule reads them. Running user code inside the interpreter reopens everything the envelope closed |
 | A memory backend interface | memory is the graph. `recall_by_query` is a step that queries it and cites records |

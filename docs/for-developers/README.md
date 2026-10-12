@@ -59,7 +59,7 @@ this map.** Feature numbers do not change.
 | Work | `projects` 9.1 · 9.2 · 9.4 · 9.5 · 9.6 · 9.7 · 9.8 |
 | Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 · `notifications` 10.7 · 10.8 |
 | Governance | `lenses` 14.x · `events` 10.2 |
-| Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
+| Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 13.11 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
 
 ---
 
@@ -230,6 +230,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 13.8 | [The runtime](modules/platform/features/runtime.md) | The workhorse: plan graph · frontier · signals · pools · approvals · what it emits | 🟡 | — | — | S15 |
 | 13.9 | [Plugins](modules/platform/features/plugins.md) | Every task type in a plugin — `plugin.yaml`, a manifest beside each task's code, packaged flows; one frozen registry; each Task records its task version | — | — | — | B06a |
 | 13.10 | [Search](modules/platform/features/search.md) | One name search over every Graph and dataset you may open, filtered by access, exact → prefix → contains | ✅ | ✅ | 🔵 | B11 |
+| 13.11 | [Distributed execution](modules/platform/features/distributed-execution.md) | Every step as a `TaskEnvelope`, called by one `run_envelope()` that rebuilds its context from ids; procrastinate chosen as the distributed executor by benchmark | — | — | — | B14 |
 
 ---
 
