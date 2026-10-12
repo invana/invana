@@ -58,6 +58,22 @@ export interface AssistantSlots {
 	useAddToProject: () =>
 		| ((answer: { runId: string; statement: string }) => void)
 		| null;
+	/**
+	 * Shares an answer with members, or exports it — or `null` where no
+	 * product offers it, and the turn draws no button.
+	 */
+	useShareAnswer: () => ((answer: SharedAnswer) => void) | null;
+}
+
+/** One settled answer, as *Share* hands it on. */
+export interface SharedAnswer {
+	sessionId: string;
+	messageId: string;
+	runId: string;
+	question: string;
+	answer: string;
+	/** The world the run was frozen in, named as it was. */
+	worldName?: string;
 }
 
 export const AssistantSlotsContext = createContext<AssistantSlots | null>(null);

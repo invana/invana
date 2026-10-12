@@ -11,7 +11,10 @@
  * | `/u/:user/:graph/explorer/:session` | the same, with that session's thread open |
  *
  * The `:session` level has no element of its own, so opening a session never
- * remounts the canvas. The page itself is the app's product host, which
+ * remounts the canvas. `explorer.shareAnswer` is the one act it offers other
+ * packages: the assistant's *Share* on a reply opens its dialog.
+ *
+ * The page itself is the app's product host, which
  * composes every graph product's regions, so the route's element is whatever
  * the app puts in `ExplorerSlotsContext`.
  */
@@ -20,6 +23,8 @@ import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";
 import { Telescope } from "lucide-react";
 import { type ComponentType, createContext, useContext } from "react";
 import { searchExplorer } from "./search";
+import { ShareAnswerDialog } from "./share/ShareAnswerDialog";
+import type { ShareAnswerArgs } from "./types";
 
 /** What the Explorer still borrows from the app: the page it draws. */
 interface ExplorerSlots {
@@ -74,6 +79,18 @@ export const explorer: ProductDefinition = {
 			],
 		},
 	],
+	actions: {
+		// Share an answer with members — a live link or a frozen snapshot — or
+		// export it as a file for anyone else.
+		"explorer.shareAnswer": {
+			label: "Share",
+			run: ({ args, openDialog }) => {
+				openDialog((close) => (
+					<ShareAnswerDialog args={args as ShareAnswerArgs} onClose={close} />
+				));
+			},
+		},
+	},
 	// Answers need a Graph that can answer — the set-up step the assistant's
 	// lock names today.
 	gate: (setup) =>

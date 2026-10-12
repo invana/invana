@@ -34,6 +34,7 @@ export { ExplorerSlotsContext, explorer } from "./product";
 export type {
 	ExpandRequest,
 	NeighborExpandResponse,
+	ShareAnswerArgs,
 } from "./types";
 export { useCanvasExpand } from "./useCanvasExpand";
 // The data canvases' tabs, one per open session.

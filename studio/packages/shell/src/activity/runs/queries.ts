@@ -1,6 +1,6 @@
-import type { TaskRunSummary } from "@invana-studio/core";
+import type { RerunVersions, TaskRunSummary } from "@invana-studio/core";
 import { runsApi } from "@invana-studio/core";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /** What a journal row is, whatever kind of work produced it. */
 type RunKind = "import" | "bulk" | "ask";
@@ -159,5 +159,37 @@ export function useRunsQuery(
 		queryFn: () =>
 			runsApi.list(username as string, graphSlug as string, filters),
 		enabled: enabled && !!username && !!graphSlug,
+	});
+}
+
+/**
+ * The run's own record — what the trace leaves out: the model version it
+ * called, the run it re-ran and the ask it carries. Settled facts, so it is
+ * read once per page and not polled.
+ */
+export function useRunRecordQuery(
+	username: string,
+	graphSlug: string,
+	runId: string,
+) {
+	return useQuery({
+		queryKey: ["runs", username, graphSlug, runId, "record"] as const,
+		queryFn: () => runsApi.get(username, graphSlug, runId),
+		enabled: Boolean(username && graphSlug && runId),
+		staleTime: 30_000,
+	});
+}
+
+/**
+ * Re-run a settled ask on the versions it recorded, or on today's. The new
+ * run joins the journal, so the run lists are refreshed.
+ */
+export function useRerunMutation(username: string, graphSlug: string) {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: (args: { runId: string; versions: RerunVersions }) =>
+			runsApi.rerun(username, graphSlug, args.runId, args.versions),
+		onSuccess: () =>
+			qc.invalidateQueries({ queryKey: ["runs", username, graphSlug] }),
 	});
 }

@@ -817,6 +817,18 @@ RO13–RO18, [9.7 private projects](modules/work/features/private-projects.md) P
 | `modeller.settings.database` | MO-14 | `/modeller/settings?tab=graph` — the connection, labelled *Database* |✅ |
 | `projects.new` people | PJ-02 | *New project* › People and agents — the Graph's other members and its agents |✅ |
 
+## Beyond the 42 · Runs and sharing
+
+Re-run on the run page and *Share* on an answer, from the *Invana Products* prototype (SH-18 · EX-15),
+as Studio builds them in migration session C09. Decisions are in
+[5.9 pinned model versions](modules/agents/features/pinned-model-versions.md) PV12–PV15 and
+[4.5 share an answer](modules/explore/features/share-an-answer.md) SA1–SA11.
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `shell.run.rerun` | SH-18 | `/activity/runs/<id>` › *Re-run…* — *Ran with* (model version · agent · world), same or current versions; no skill or dataset rows | ✅ |
+| `explorer.answer.share` | EX-15 | *Share* on an answer's reply line — live link · frozen snapshot (`/explorer?page=run:<id>@<version>`) · PNG · CSV · Markdown | ✅ |
+
 ---
 
 ## The other direction — every feature, and the screen that draws it
@@ -877,6 +889,7 @@ So a feature file can be opened next to the drawing that shows it.
 | 14.2 | Guardrails | 🔵 | 🔵 | S16 | `GovGuardrails` | 🔵 |
 | 2.3 | Load a bundle | 🔵 | 🔵 | S15 | `Main` (BundleLoad) | 🔵 |
 | 4.4 | The console | ✅ | 🔵 | S12f | `Console` | 🔵 |
+| 4.5 | Share an answer | ✅ | ✅ | C09 | `explorer.answer.share` | ✅ |
 | 8.1 | Evidence | 🔵 | 🔵 | S12c | `Evidence` | 🔵 |
 | 8.2 | Recall by query | 🔵 | 🔵 | S9d | `Recall` | 🔵 |
 | 10.2 | Audit and activity | 🟡 | 🟡 | S5.5 · S12a | `Events` | 🟡 |

@@ -597,6 +597,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.5.14
         version: 2.5.14
+      '@invana/boards':
+        specifier: ^0.0.34
+        version: 0.0.34(6b092dff7c1e89e2da1cdf9611ab695d)
       '@invana/canvas':
         specifier: ^0.0.15
         version: 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))

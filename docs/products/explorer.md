@@ -30,7 +30,7 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | EX-F8 | Sessions — the chat’s history, opened from the chat header | In Studio (sessions) · New (in the chat) | EX-10 |
 | EX-F9 | Locked until set up | In Studio | EX-11 |
 | EX-F10 | Add an answer to a project branch — *Add to a project* on the reply line ([projects.md](projects.md) › `projects.addFinding`) | In Studio | EX-12 |
-| EX-F13 | Share — live link or frozen snapshot for members; PNG · CSV · Markdown export | New | EX-15 |
+| EX-F13 | Share — live link or frozen snapshot for members; PNG · CSV · Markdown export | In Studio (C09) | EX-15 |
 | EX-F12 | Console — records · query · log under the board, resizable, Table or JSON | New (the-console.md exists, not wired) | EX-08 · EX-14 |
 | EX-F11 | Assistant chat — centred to start, docked right once a conversation begins, closable | In Studio (chat) · New (centred start, close) | EX-01 · EX-02 · EX-13 |
 
@@ -82,7 +82,7 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | A failed query | The chat says why and offers a fix; the console opens on Log with the failing line; the board is untouched |
 | Console | `AppLayoutV2` `bottomSection`, `bottomSpan: "main"` — under the canvas only, the chat stays full height. Resizable by its grip, collapsible, tabs Records · Query · Log, Records as Table or JSON, Re-run. Per [the-console.md](../for-developers/modules/explore/features/the-console.md), plus Log |
 | Sessions | Live in the chat’s history, not a second side panel |
-| Sharing | Members get a live link (same board and chat) or a frozen snapshot (board image, answer, citations, dataset versions). Outside people get an exported file, never access; guardrails apply to what exports carry |
+| Sharing | Members get a live link (same board and chat) or a frozen snapshot (board image, answer, citations, dataset versions). Outside people get an exported file, never access; guardrails apply to what exports carry. The snapshot is a report on the answer's run, opened at `/explorer?page=run:<id>@<version>`; its board is kept as its records, and its datasets are the bindings when it was taken ([4.5](../for-developers/modules/explore/features/share-an-answer.md) SA1–SA11) |
 | Off entirely | The user menu switches the assistant off in every product (SH-07) |
 | Schedules | “Schedule this” creates a shared schedule; the toast links to Activity › Schedules |
 | Into a project | An answer becomes a finding with its evidence (records, queries, dataset versions) attached |

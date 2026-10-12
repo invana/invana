@@ -68,7 +68,7 @@ Not a product. The layout and the features that appear in all five. Prototype pa
 | SH-F4 | ⌘K palette | New | SH-06 |
 | SH-F5 | User menu: hide assistant, tools always shown | New | SH-07 |
 | SH-F6 | Runs journal and the run page | In Studio | SH-08 · SH-09 · SH-10 · SH-11 |
-| SH-F12 | Re-run on the same or current versions | New · Blocked · P-17 | SH-18 |
+| SH-F12 | Re-run on the same or current versions | In Studio (C09) | SH-18 |
 | SH-F13 | First run — three ways in | New | SH-19 |
 | SH-F14 | Read-only without the role, acts say who can | In Studio (C07) | SH-20 |
 | SH-F7 | Approvals | New | SH-12 |
@@ -123,7 +123,7 @@ One binary, `invana`, for every product. Prerequisites are in the [README](READM
 | `invana graphs list` · `create` · `show` · `archive` | Graphs you can open | New |
 | `invana members list` · `add --role` · `remove` | Graph roles: viewer · contributor · builder · modeller · owner | New · P-18 |
 | `invana runs list` · `show` · `log` · `cancel` | the journal across products | New |
-| `invana runs rerun <id> --same-versions \| --current` | reproduce on the versions it used, or compare on current | New · P-17 |
+| `invana runs rerun <id> --same-versions \| --current` | reproduce on the versions it used, or compare on current | New · P-17 (the route ships, the command does not) |
 | `invana schedules list` · `create --file` · `show` · `pause` · `resume` · `run-now` · `delete` | shared schedules, with delivery and missed-firing policy | ✅ B08 |
 | `invana approvals list` · `approve` · `decline` | what waits on you | ✅ B08 |
 | `invana events list [--changes]` · `tail` | every write; `--changes` is the change log | New · P-09 |
@@ -143,7 +143,7 @@ One binary, `invana`, for every product. Prerequisites are in the [README](READM
 | Approval deadlines | Each approval names its approvers and a deadline; a reminder goes at half-time; at the deadline the run ends *expired, not sent* — never auto-approved — and the Inbox says so |
 | Missed firings | Run once on recovery, marked catch-up; the rest are listed as skipped. A schedule can choose *run every missed one* or *skip* |
 | Runs record their versions | Every run stores the exact model version, skill and plan revision, world and data versions it used |
-| Re-run | Choose *the same versions* (reproduce) or *current versions* (compare); a run on current versions opens the comparison when it finishes |
+| Re-run | Choose *the same versions* (reproduce) or *current versions* (compare); a run on current versions opens the comparison when it finishes. *Ran with* names only what the run recorded — model version, agent, world; skill and dataset versions are not on the run record ([5.9](../for-developers/modules/agents/features/pinned-model-versions.md) PV12–PV15) |
 | Tokens, never currency | Every budget, limit, usage figure and alert is in tokens |
 | Search (⌘K) | Covers everything you can open — records, models and types, datasets, projects, branches, findings, agents, skills, runs, schedules — plus actions and *Ask the assistant*. Results are grouped by product and filtered by access, so private projects show only to their people |
 | Search ranking | Exact and prefix matches on names and ids first, instant. When they find little, meaning-based matches fill in (vector index where the graph database has one), labelled *related*. Beyond that, *Ask the assistant* |

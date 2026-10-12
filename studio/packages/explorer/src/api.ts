@@ -1,5 +1,6 @@
 import { request } from "@invana-studio/core";
 import type {
+	BoundDataset,
 	ExpandByEdgeTypeRequest,
 	ExpandByNodeTypeRequest,
 	ExpandNeighborsRequest,
@@ -63,4 +64,26 @@ export const explorerApi = {
 				}),
 			},
 		),
+
+	/**
+	 * The dataset versions the Graph has bound, as they stand now — what a
+	 * snapshot names as the data it was taken over.
+	 */
+	datasetBindings: async (
+		username: string,
+		graphSlug: string,
+	): Promise<BoundDataset[]> => {
+		const d = await request<{
+			items: {
+				address: string;
+				type_name: string;
+				model_name: string | null;
+			}[];
+		}>(`/api/v1/u/${username}/${graphSlug}/dataset-bindings`);
+		return d.items.map((b) => ({
+			address: b.address,
+			typeName: b.type_name,
+			modelName: b.model_name,
+		}));
+	},
 };

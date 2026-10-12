@@ -39,7 +39,7 @@ async def execute_graph_query(ctx: TaskContext, v: RunVars) -> Out:
             query=v.query,
             parameters=v.parameters,
             actor_id=v.actor_id,
-            session_id=v.sess.id,
+            session_id=v.sess.id if v.sess else None,
             timeout_s=v.timeout_s,
             lens=crossing.lens,
         )

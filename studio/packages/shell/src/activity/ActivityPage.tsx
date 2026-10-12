@@ -127,6 +127,7 @@ export function ActivityPage({
 					onOpenStep={openStep}
 					onRetune={onRetune}
 					onCompare={onCompare ? (other) => onCompare(runId, other) : undefined}
+					onOpenRun={(id) => navigate(activityPath(graph, "runs", id))}
 				/>
 			) : (
 				<RunsBoardPage

@@ -64,6 +64,12 @@ interface ApiTaskRun {
 	/** The trace the run recorded under; null when telemetry was off. */
 	trace_id?: string | null;
 	stream_seq: number;
+	/** The ask a root carries — `nl` · `ql` · `import`; null on a step. */
+	ask_kind?: string | null;
+	/** The provider's version name the run called; null for one that called none. */
+	model_version?: string | null;
+	/** The root run this one re-ran. */
+	rerun_of_run_id?: string | null;
 	steps: ApiTaskRunStep[];
 }
 
@@ -76,6 +82,23 @@ export interface TaskRun {
 	steps: RunNode[];
 	/** The run this row is a step of; absent on a root. */
 	parentRunId?: string;
+	/** The ask a root carries — `nl` · `ql` · `import`. */
+	askKind?: string;
+	/** The exact model version the run called; absent for one that called none. */
+	modelVersion?: string;
+	/** The root run this one re-ran. */
+	rerunOfRunId?: string;
+}
+
+/** Which versions a re-run replays: the ones the run recorded, or today's. */
+export type RerunVersions = "same" | "current";
+
+/** A re-run, opened: the new root run, linked to the one it re-ran. */
+export interface RunRerunResult {
+	runId: string;
+	rerunOfRunId: string;
+	/** The model version the new run will call; absent for one that calls none. */
+	modelVersion?: string;
 }
 
 export function toRunNode(s: ApiTaskRunStep): RunNode {
@@ -205,6 +228,35 @@ export const runsApi = {
 			// whose trace it is in — the one read a step board opened cold makes
 			// before it reads anything else.
 			parentRunId: d.parent_run_id ?? undefined,
+			askKind: d.ask_kind ?? undefined,
+			modelVersion: d.model_version ?? undefined,
+			rerunOfRunId: d.rerun_of_run_id ?? undefined,
+		};
+	},
+
+	/**
+	 * Re-run a settled ask as a new root run — on the versions it recorded
+	 * (`same`) or on today's (`current`). The original is never touched; a
+	 * version no longer offered is a 409 whose message names it.
+	 */
+	rerun: async (
+		username: string,
+		graphSlug: string,
+		id: string,
+		versions: RerunVersions,
+	): Promise<RunRerunResult> => {
+		const d = await request<{
+			run_id: string;
+			rerun_of_run_id: string;
+			model_version?: string | null;
+		}>(`${base(username, graphSlug)}/${id}/rerun`, {
+			method: "POST",
+			body: JSON.stringify({ versions }),
+		});
+		return {
+			runId: d.run_id,
+			rerunOfRunId: d.rerun_of_run_id,
+			modelVersion: d.model_version ?? undefined,
 		};
 	},
 

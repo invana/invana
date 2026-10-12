@@ -169,6 +169,7 @@ export function SessionThread({
 							result={results[message.id]}
 							onLoadToCanvas={onLoadToCanvas}
 							onOpenLog={onOpenLog}
+							sessionId={session.id}
 						/>
 					</div>
 				);

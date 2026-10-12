@@ -18,11 +18,15 @@ import { Board, type BoardSpec, RUN_PANELS } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
 import { runsApi } from "@invana-studio/core";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { routedAction } from "../../../boards/boardSpec";
 import { TaskFlowWidget } from "../../../boards/TaskFlowWidget";
 import { useActivitySlots } from "../../ActivitySlots";
+import { useRunRecordQuery } from "../queries";
+import { expectCompare, takeCompare } from "../rerun/pendingCompare";
+import { RerunDialog } from "../rerun/RerunDialog";
+import { isRerunnable } from "../rerun/rerunChoice";
 import { CompareDialog } from "../touches/CompareDialog";
 import { stepKeyOfTouch } from "../touches/runLayers";
 import { StepTouchWidget } from "../touches/StepTouchWidget";
@@ -33,7 +37,7 @@ import {
 	type RunTab,
 	runBoardSpec,
 } from "./runBoardSpec";
-import { groupSteps, VIEW_BOARD } from "./runBoards";
+import { groupSteps, isLive, runAddress, VIEW_BOARD } from "./runBoards";
 import {
 	STEP_ACTIONS,
 	type StepPanels,
@@ -58,6 +62,12 @@ export interface RunBoardPageProps {
 	onRetune?: () => void;
 	/** Open `compare:<this>:<that>` as a page once the second run is picked. */
 	onCompare?: (otherRunId: string) => void;
+	/**
+	 * Open another run's page in place of this one — where a re-run lands once
+	 * the engine has opened it. Absent, *Re-run…* still opens the run and says
+	 * so, but the reader stays here.
+	 */
+	onOpenRun?: (runId: string) => void;
 }
 
 /** A run's panel kinds, and a step's — one page draws both. */
@@ -77,6 +87,7 @@ export function RunBoardPage({
 	onOpenStep,
 	onRetune,
 	onCompare,
+	onOpenRun,
 }: RunBoardPageProps) {
 	const { useReport, useRunTouches } = useActivitySlots();
 	const trace = useRunTrace(username, graphSlug, runId);
@@ -91,6 +102,29 @@ export function RunBoardPage({
 	const [runTab, setRunTab] = useState<RunTab>("overview");
 	const [stepTab, setStepTab] = useState<StepTab>("overview");
 	const [comparing, setComparing] = useState(false);
+	const [rerunning, setRerunning] = useState(false);
+	// The run's own row — whether it is a root, and what it re-ran. The trace
+	// carries neither.
+	const record = useRunRecordQuery(username, graphSlug, runId);
+	const rerunOf = record.data?.rerunOfRunId ?? null;
+	const rerunnable = Boolean(
+		trace.data &&
+			record.data &&
+			isRerunnable({
+				status: trace.data.status,
+				askKind: trace.data.ask_kind ?? record.data.askKind,
+				parentRunId: record.data.parentRunId,
+			}),
+	);
+
+	// A re-run on current versions opens its comparison when it settles — once,
+	// and only in the browser that asked for it.
+	const settled = Boolean(trace.data && !isLive(trace.data.status));
+	useEffect(() => {
+		if (!settled) return;
+		const original = takeCompare(runId);
+		if (original) onCompare?.(original);
+	}, [settled, runId, onCompare]);
 
 	const engaged = touches.data?.total ? touches.data : undefined;
 	// A step from another run — a `?step=` left behind as the reader moved to
@@ -116,9 +150,20 @@ export function RunBoardPage({
 					selectedKey: null,
 					touches: engaged,
 					lensName: trace.data.lens_name ?? null,
+					rerunnable,
+					rerunOf,
 				});
 		return composed as unknown as BoardSpec<PagePanels>;
-	}, [trace.data, context, view, stepTab, runTab, engaged]);
+	}, [
+		trace.data,
+		context,
+		view,
+		stepTab,
+		runTab,
+		engaged,
+		rerunnable,
+		rerunOf,
+	]);
 
 	// `Save report` on the header, and the act behind it. The document
 	// it keeps is `spec` — this page's reading, resolved, every tab included.
@@ -207,6 +252,12 @@ export function RunBoardPage({
 						case RUN_ACTIONS.compare:
 							setComparing(true);
 							return;
+						case RUN_ACTIONS.rerun:
+							setRerunning(true);
+							return;
+						case RUN_ACTIONS.compareOriginal:
+							if (rerunOf) onCompare?.(rerunOf);
+							return;
 						case RUN_ACTIONS.cancel:
 							void runsApi
 								.cancel(username, graphSlug, runId)
@@ -235,6 +286,21 @@ export function RunBoardPage({
 				onPick={(other) => {
 					setComparing(false);
 					onCompare?.(other);
+				}}
+			/>
+			<RerunDialog
+				open={rerunning}
+				onOpenChange={setRerunning}
+				username={username}
+				graphSlug={graphSlug}
+				trace={data}
+				onRerun={(newRunId, versions) => {
+					setRerunning(false);
+					// Owed before navigating, so the new page finds it on its
+					// first settled read.
+					if (versions === "current") expectCompare(newRunId, runId);
+					if (onOpenRun) onOpenRun(newRunId);
+					else toast.success(`Re-running as ${runAddress(newRunId)}`);
 				}}
 			/>
 		</>

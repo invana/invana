@@ -7,7 +7,7 @@ from invana.apps.llm.grounding import render_rules, render_skills
 from invana.apps.llm.translate import Clarification, nl_to_query
 from invana.core.events import actions
 from invana.core.events.services import emit_event
-from invana.plugins.core.llm.shared import _clarify_event, _exchange, _options
+from invana.plugins.core.llm.shared import _clarify_event, _event_target, _exchange, _options
 from invana.plugins.sdk.context import (
     Out,
     RunVars,
@@ -106,8 +106,7 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
     await emit_event(
         ctx.db,
         action=actions.LLM_TRANSLATE,
-        target_kind=actions.TARGET_SESSION,
-        target_id=v.sess.id,
+        **_event_target(v),
         graph_id=v.graph.id,
         actor_id=v.actor_id,
         details={

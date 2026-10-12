@@ -16,6 +16,7 @@ export { AssistantReopenPill } from "./AssistantReopenPill";
 export {
 	type AssistantSlots,
 	AssistantSlotsContext,
+	type SharedAnswer,
 } from "./AssistantSlots";
 export { AssistantStart } from "./AssistantStart";
 export { sessionsApi } from "./api";

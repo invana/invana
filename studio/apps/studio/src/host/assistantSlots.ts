@@ -1,16 +1,18 @@
 /**
  * What the graph page lends the assistant: a board's banner and a rule's board
  * (boards), a step's rules (skills), the worlds a thread can be set to
- * (lenses), and keeping an answer as a finding (projects, through the action
- * registry). The assistant package may import none of these modules, so the
- * page hands them in through `AssistantSlotsContext`.
+ * (lenses), keeping an answer as a finding (projects) and sharing it
+ * (explorer), both through the action registry. The assistant package may
+ * import none of these modules, so the page hands them in through
+ * `AssistantSlotsContext`.
  *
  * One module-level object, so the hooks it carries are the same functions on
  * every render.
  */
 
-import type { AssistantSlots } from "@invana-studio/assistant";
+import type { AssistantSlots, SharedAnswer } from "@invana-studio/assistant";
 import { useLensesQuery } from "@invana-studio/core";
+import type { ShareAnswerArgs } from "@invana-studio/explorer";
 import { matches, useParticipantsQuery } from "@invana-studio/modeller";
 import { useAction, useCanvasBannerQuery } from "@invana-studio/shell";
 import { StepRules } from "@invana-studio/ui";
@@ -42,6 +44,23 @@ function useAddToProject() {
 	return invoke && username && graphSlug ? add : null;
 }
 
+/** `explorer.shareAnswer`, bound to the open Graph — null when nothing offers it. */
+function useShareAnswer() {
+	const { username, graphSlug } = useParams();
+	const action = useAction<ShareAnswerArgs>("explorer.shareAnswer");
+	const invoke = action?.invoke;
+	const share = useCallback(
+		(answer: SharedAnswer) =>
+			invoke?.({
+				username: username as string,
+				graphSlug: graphSlug as string,
+				...answer,
+			}),
+		[invoke, username, graphSlug],
+	);
+	return invoke && username && graphSlug ? share : null;
+}
+
 export const assistantSlots: AssistantSlots = {
 	useBoardBanner: useCanvasBannerQuery,
 	useOpenBoard,
@@ -50,4 +69,5 @@ export const assistantSlots: AssistantSlots = {
 	useParticipants: useParticipantsQuery,
 	matches,
 	useAddToProject,
+	useShareAnswer,
 };

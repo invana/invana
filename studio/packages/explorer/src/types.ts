@@ -75,6 +75,34 @@ export interface NeighborExpandResponse {
 	run_id?: string | null;
 }
 
+/**
+ * What `explorer.shareAnswer` is handed: one settled answer, where it lives,
+ * and the words it was asked and answered in.
+ */
+export interface ShareAnswerArgs {
+	username: string;
+	graphSlug: string;
+	/** The thread the answer is in — the live link opens it. */
+	sessionId: string;
+	/** The reply's own message, kept on a snapshot as the answer it froze. */
+	messageId: string;
+	/** The run behind the answer — its emissions, and the snapshot's subject. */
+	runId: string;
+	/** What was asked, as typed. */
+	question: string;
+	/** The reply's sentence. */
+	answer: string;
+	/** The world the run was frozen in, named as it was; absent is Everything. */
+	worldName?: string;
+}
+
+/** One dataset version the Graph has bound — `publisher/name@v`, into a type. */
+export interface BoundDataset {
+	address: string;
+	typeName: string;
+	modelName: string | null;
+}
+
 /** Discriminated request handed to `useExpandNode` — picks the focused endpoint. */
 export type ExpandRequest =
 	| { kind: "neighbors"; body: ExpandNeighborsRequest }

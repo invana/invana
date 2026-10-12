@@ -30,6 +30,27 @@ export interface FrozenBoardPageProps {
 	onOpenLive: () => void;
 }
 
+/**
+ * The read of one report. Frozen, so it is fetched once and never refetched:
+ * a poll here would be the live read the page exists not to make. The header's
+ * trail reads the same key, so naming the page costs no second request.
+ */
+export function boardReportQuery(
+	username: string,
+	graphSlug: string,
+	kind: string,
+	subjectId: string,
+	versionId: string,
+) {
+	return {
+		queryKey: ["board-report", username, graphSlug, kind, subjectId, versionId],
+		queryFn: () =>
+			boardReportsApi.get(username, graphSlug, kind, subjectId, versionId),
+		staleTime: Number.POSITIVE_INFINITY,
+		refetchOnWindowFocus: false,
+	};
+}
+
 export function FrozenBoardPage({
 	username,
 	graphSlug,
@@ -38,15 +59,9 @@ export function FrozenBoardPage({
 	versionId,
 	onOpenLive,
 }: FrozenBoardPageProps) {
-	// A frozen reading never changes, so it is fetched once and never refetched:
-	// a poll here would be the live read this page exists not to make.
-	const report = useQuery({
-		queryKey: ["board-report", username, graphSlug, kind, subjectId, versionId],
-		queryFn: () =>
-			boardReportsApi.get(username, graphSlug, kind, subjectId, versionId),
-		staleTime: Number.POSITIVE_INFINITY,
-		refetchOnWindowFocus: false,
-	});
+	const report = useQuery(
+		boardReportQuery(username, graphSlug, kind, subjectId, versionId),
+	);
 
 	if (report.isLoading) {
 		return (

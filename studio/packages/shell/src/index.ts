@@ -53,6 +53,7 @@ export {
 } from "./boards/boardSpec";
 export { captureBanner, STATE_THUMB_MAX_EDGE } from "./boards/captureBanner";
 export {
+	boardReportsKey,
 	useBoardReportsQuery,
 	useBoardsQuery,
 	useCanvasBannerQuery,

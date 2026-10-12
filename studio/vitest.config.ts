@@ -27,6 +27,8 @@ export default defineConfig({
 				"packages/shell/src/palette/rank.ts",
 				"packages/shell/src/activity/runs/runSummary.ts",
 				"packages/shell/src/activity/runs/boards/taskFlowFromRun.ts",
+				"packages/shell/src/activity/runs/rerun/rerunChoice.ts",
+				"packages/explorer/src/share/shareAnswer.ts",
 				"packages/agents/src/agents/agentDraft.ts",
 				"packages/agents/src/plans/taskFlowFromTaskPlan.ts",
 				"packages/agents/src/skills/taskFlowFromPlan.ts",

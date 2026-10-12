@@ -42,6 +42,7 @@ import { layeredCanvasBody } from "@/host/layeredCanvasBody";
 import { leftSection } from "@/host/leftSectionContent";
 import { rightSection } from "@/host/rightSections";
 import { setupSlots } from "@/host/setupSlots";
+import { useBoardPageTrail } from "@/host/useBoardPageTrail";
 import { useDataBoards } from "@/host/useDataBoards";
 import { useLayeredCanvas } from "@/host/useLayeredCanvas";
 import { useModelsPage } from "@/host/useModelsPage";
@@ -262,12 +263,16 @@ export function ProductHost() {
 		openBoards,
 	);
 	// A project's page and the Decisions page, opened by the Projects rail.
-	const { openProjectPage, pageTrail } = useProjectsPage(
+	const { openProjectPage, pageTrail: projectTrail } = useProjectsPage(
 		username,
 		graphSlug,
 		settingsSection,
 		openBoards,
 	);
+	// A shared snapshot and a compare open on `?page=` alone, so they name
+	// their own place in the trail.
+	const boardTrail = useBoardPageTrail(username, graphSlug, boardPage.pageId);
+	const pageTrail = projectTrail.length ? projectTrail : boardTrail;
 	// A dataset a project cites lives in Datasets, outside the graph's products.
 	const navigate = useNavigate();
 	const openDataset = useCallback(

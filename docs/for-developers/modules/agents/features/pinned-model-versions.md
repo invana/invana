@@ -62,7 +62,7 @@ flowchart TD
 | Agents › LLMs | Models by version name; each model row names the agents pinned to it (C03). Skills and judges on the row, and LLMs as its own page, are C10 |
 | Agent page › Thinking | *Model version*: none, or an exact version; moving it is its own act with a why, gated (C03) |
 | Skill page › Instructions | The draft's model version, published with the next version (C03) |
-| Run page | *Re-run* with *same versions* · *current versions* (SH-18, C09) |
+| Run page | *Re-run…* on the header of a settled root ask → the re-run dialog: *Ran with* (model version · agent version · world), *The same versions — reproduce it* · *Current versions — compare*, Cancel · Re-run. A re-run's page carries *Compare with the original* (SH-18, C09) |
 | CLI | `invana llms list` · `models <endpoint>` print the addresses a pin takes; `invana agents pin <agent> --model <address>` passes the eval gate on the new pin first |
 
 ## Engine
@@ -98,7 +98,12 @@ flowchart TD
 | PV8 | **A person's pick for one ask is innermost.** The composer's model pick names the model for that ask only; it outranks the pins, and it is lens-checked like them. It moves no pin and mints no version. |
 | PV9 | **The skill pin is the plan's.** A run whose plan was drawn from a skill version calls that version's pin; a run on a generated plan reads the agent's. |
 | PV11 | **Studio cannot clear a pin.** `PATCH …/agents/{id}` reads `model_pin: null` as *unchanged*, so Thinking offers a move between versions and no *none* once one is set ([agents.md › Decisions](../../../../products/agents.md#decisions) *Model pins*). |
-| PV10 | **Re-run takes a settled ask.** An `nl` or `ql` root that is no longer queued, running or waiting. It opens as a run of its own, in no session, so the original reply is never rewritten. `same` pins the recorded `model_version` and copies the frozen lens; the plan is drawn afresh. Replaying plan revision 0 and the offered skill versions waits for the run page that shows them (SH-18). |
+| PV10 | **Re-run takes a settled ask.** An `nl` or `ql` root that is no longer queued, running or waiting. It opens as a run of its own, in no session, so the original reply is never rewritten; every task an ask runs reads its session as optional, and a model call's audit event points at the run when there is no session. `same` pins the recorded `model_version` and copies the frozen lens; the plan is drawn afresh. Replaying plan revision 0 and the offered skill versions waits for the run page that shows them (SH-18). |
+
+| PV12 | **Re-run is the run page's act, and only where the engine takes it.** *Re-run…* is on the header of a root `nl` or `ql` run that has settled; a step, an import or a live run has none. It opens a dialog whose *Re-run on* is a segmented control — *The same versions — reproduce it* · *Current versions — compare* — the control the Share dialog uses for its one choice; the request is `POST …/runs/{id}/rerun {versions}`, and a 409 is shown in the dialog in the engine's own words (`version_not_offered` names the version). |
+| PV13 | ***Ran with* shows what the run recorded, nothing else**: the model version (or *not recorded*; a `ql` run *calls no model*), the agent and its version, the world as frozen. The skill version and dataset versions are not on the run record, so they are not drawn; *current* names no versions ahead of time, because they are resolved when the run opens. |
+| PV14 | ***The same versions* is disabled, with its reason, on an `nl` run that recorded none** — the refusal the engine would give, said before the click. |
+| PV15 | **A re-run opens its own page; a re-run on current versions opens the comparison when it finishes.** The browser that asked holds the pair in memory and opens `compare:<re-run>:<original>` once the new run settles on its page. A reload loses only the automatic opening: a re-run's page always carries *Compare with the original*. The comparison's trail is *Graph › Activity › Runs › run:<a> · run:<b>*. |
 
 ## Not building
 

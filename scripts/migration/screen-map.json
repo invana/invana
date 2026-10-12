@@ -166,7 +166,7 @@
    "story": "SH-18",
    "product": "shell",
    "route": "/u/admin/airways/activity/runs/15",
-   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Re-run (needs B02)"
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run that answered a question or a query; Re-run\u2026 on its header"
   },
   "shell.first_run": {
    "story": "SH-19",
@@ -646,7 +646,7 @@
    "story": "EX-15",
    "product": "explorer",
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
-   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Share"
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Share on the reply line, beside Add to a project"
   },
   "explorer.answer.console": {
    "story": "EX-14",

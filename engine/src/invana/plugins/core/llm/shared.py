@@ -21,6 +21,18 @@ from invana.plugins.sdk.context import (
 )
 
 
+def _event_target(v: RunVars) -> dict:
+    """Where a model call's audit event points: the session, else the run.
+
+    A run opened outside a session — a re-run from the Runs page — has no
+    thread to point at, so its events land on the run itself.
+    """
+    if v.sess is not None:
+        return {"target_kind": actions.TARGET_SESSION, "target_id": v.sess.id}
+    assert v.run is not None
+    return {"target_kind": actions.TARGET_THINKING, "target_id": v.run.id}
+
+
 def _exchange(outcome) -> dict:
     """The prompt and the completion, for the step board's Output band.
 
@@ -122,8 +134,7 @@ async def _clarify_event(ctx: TaskContext, v: RunVars, *, question: str, usage, 
     await emit_event(
         ctx.db,
         action=actions.LLM_TRANSLATE,
-        target_kind=actions.TARGET_SESSION,
-        target_id=v.sess.id,
+        **_event_target(v),
         graph_id=v.graph.id,
         actor_id=v.actor_id,
         details={

@@ -29,6 +29,7 @@ import {
 	ListTree,
 	Network,
 	RotateCw,
+	Share2,
 	ThumbsDown,
 	ThumbsUp,
 	Waypoints,
@@ -128,6 +129,8 @@ export interface AssistantTurnProps {
 	/** Open the console on Log, where a failed query's whole error is read.
 	 *  Absent where the page has no console. */
 	onOpenLog?: () => void;
+	/** The thread this turn is in — what *Share*'s live link opens. */
+	sessionId?: string;
 }
 
 /**
@@ -234,6 +237,7 @@ function SettledTurn({
 	loadedToCanvas,
 	isLatest,
 	onOpenLog,
+	sessionId,
 }: AssistantTurnProps) {
 	const view = useRunStore((s) =>
 		message.runId ? s.views[message.runId] : undefined,
@@ -321,7 +325,9 @@ function SettledTurn({
 	// 👍/👎 rate a real answer — not canvas operations, which aren't the model's
 	// answer to a question (docs/for-developers/modules/explore/features/boards.md).
 	const canVote = !!message.sourceQuery && !message.operation;
-	const addToProject = useAssistantSlots().useAddToProject();
+	const slots = useAssistantSlots();
+	const addToProject = slots.useAddToProject();
+	const shareAnswer = slots.useShareAnswer();
 	const sourceQuery = message.sourceQuery ?? view?.query?.query;
 
 	const copy = () => {
@@ -434,11 +440,39 @@ function SettledTurn({
 				Add to a project
 			</Button>
 		) : null;
+	// The same answer, shared with members as a link or a snapshot, or exported
+	// for anyone else — an offer on the same line, after keeping it.
+	const share =
+		shareAnswer &&
+		canVote &&
+		answerRunId &&
+		sessionId &&
+		!isStopped &&
+		message.status !== "error" ? (
+			<Button
+				variant="ghost"
+				size="sm"
+				className="shrink-0 font-normal"
+				onClick={() =>
+					shareAnswer({
+						sessionId,
+						messageId: message.id,
+						runId: answerRunId,
+						question: prompt ?? message.content,
+						answer: message.content,
+						worldName: message.lensName,
+					})
+				}
+			>
+				<Share2 />
+				Share
+			</Button>
+		) : null;
 
 	const offers = graph && !loaded;
 	const replyBody = message.refusal ? (
 		<CastRefusalCard refusal={message.refusal} />
-	) : offers || keep ? (
+	) : offers || keep || share ? (
 		<span className="flex flex-wrap items-center gap-x-3 gap-y-1">
 			{!sentenceEchoed && <span className="min-w-0">{message.content}</span>}
 			{offers ? (
@@ -450,6 +484,7 @@ function SettledTurn({
 				/>
 			) : null}
 			{keep}
+			{share}
 		</span>
 	) : sentenceEchoed ? null : (
 		message.content

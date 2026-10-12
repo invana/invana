@@ -50,6 +50,10 @@ export interface ReportCreateBody {
 	snapshot: Record<string, unknown>;
 	/** The argument that produced this reading — `{view, selectedKey}`. */
 	settings?: Record<string, unknown>;
+	/** A PNG data URL — the reading's thumbnail in the Reports list. */
+	banner?: string;
+	/** The answer this reading was kept from, when it was kept from one. */
+	message_id?: string;
 }
 
 function toSummary(r: ApiReportSummary): BoardVersionSummary {

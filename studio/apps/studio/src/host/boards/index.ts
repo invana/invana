@@ -15,7 +15,10 @@ export { DataBoardPage } from "@/host/boards/DataBoardPage";
 export { DeclaredBoard } from "@/host/boards/DeclaredBoard";
 // A report — the act that keeps a live board's numbers, and the page that
 // reads one back (boards-migration.md).
-export { FrozenBoardPage } from "@/host/boards/FrozenBoardPage";
+export {
+	boardReportQuery,
+	FrozenBoardPage,
+} from "@/host/boards/FrozenBoardPage";
 export type { RecordBoardKind } from "@/host/boards/useOpenBoard";
 // *Open this board*, published by the host for the surfaces that draw a link
 // to one (rules.md).

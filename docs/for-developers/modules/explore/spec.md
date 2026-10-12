@@ -7,7 +7,7 @@ whatever kind of thing is being drawn.
 | | |
 |---|---|
 | Index | [§4 · Explore](../../README.md#4--explore) |
-| Features | [graph-canvas](features/graph-canvas.md) · [canvases](features/boards.md) · [selection-and-the-panel](features/selection-and-the-panel.md) · [the-console](features/the-console.md) |
+| Features | [graph-canvas](features/graph-canvas.md) · [canvases](features/boards.md) · [selection-and-the-panel](features/selection-and-the-panel.md) · [the-console](features/the-console.md) · [share-an-answer](features/share-an-answer.md) |
 | Depends on | [Ask](../ask/spec.md) (answers land on a canvas) · [Connect and model](../connect-and-model/spec.md) (what the shapes mean) |
 | Depended on by | [Work](../work/spec.md) (the Plan canvas) · [Agents](../agents/spec.md) (lineage, envelope) |
 

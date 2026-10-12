@@ -5,7 +5,7 @@ both are readable without leaving the canvas that drew them.
 
 | | |
 |---|---|
-| Index | [4.5](../../../README.md#4--explore) · Slice **S12f** |
+| Index | [4.4](../../../README.md#4--explore) · Slice **S12f** |
 | Module | [Explore](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [graph-canvas](graph-canvas.md) · [selection-and-the-panel](selection-and-the-panel.md) · [the-answer-surface](../../ask/features/the-answer-surface.md) · [write-queries](../../ask/features/write-queries.md) |

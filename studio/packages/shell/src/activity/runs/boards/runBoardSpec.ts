@@ -75,6 +75,10 @@ export const RUN_ACTIONS = {
 	retune: "retune",
 	/** Pick the second run, and open `compare:<a>:<b>` as a page. */
 	compare: "compare",
+	/** Open the re-run dialog — the same versions or current ones. */
+	rerun: "rerun",
+	/** On a re-run's page — open `compare:<this>:<original>`. */
+	compareOriginal: "compare-original",
 } as const;
 
 /** The run page's tabs, in order. */
@@ -100,6 +104,10 @@ export interface RunBoardView {
 	touches?: TouchesResponse;
 	/** The world the run froze. Absent reads `Everything`, which is a real one. */
 	lensName?: string | null;
+	/** True on a settled root ask the engine would re-run. */
+	rerunnable?: boolean;
+	/** The run this one re-ran, when it is a re-run. */
+	rerunOf?: string | null;
 }
 
 /**
@@ -123,7 +131,15 @@ const FLOW_HEIGHT = 360;
 
 export function runBoardSpec(
 	trace: TraceRead,
-	{ view, tab, selectedKey, touches, lensName }: RunBoardView,
+	{
+		view,
+		tab,
+		selectedKey,
+		touches,
+		lensName,
+		rerunnable,
+		rerunOf,
+	}: RunBoardView,
 ): BoardSpec<RunPanels> {
 	const groups = groupSteps(trace.steps);
 	const live = isLive(trace.status);
@@ -155,6 +171,25 @@ export function runBoardSpec(
 						label: "Compare\u2026",
 						variant: "ghost" as const,
 					},
+			// A re-run is a new root run beside this one, offered only on a
+			// settled ask the engine takes.
+			rerunnable
+				? {
+						id: RUN_ACTIONS.rerun,
+						label: "Re-run…",
+						variant: "ghost" as const,
+					}
+				: null,
+			// A re-run is read against what it re-ran, so the way to that
+			// pairing is always on its page — not only the comparison that
+			// opens by itself when it finishes.
+			rerunOf
+				? {
+						id: RUN_ACTIONS.compareOriginal,
+						label: "Compare with the original",
+						variant: "ghost" as const,
+					}
+				: null,
 			// Narrowing opens Govern beside the run rather than inside a band
 			// — it acts on the next run, not on this reading of this one,
 			// which is why it sits with the page's other acts. Absent when

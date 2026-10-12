@@ -117,6 +117,7 @@ this map.** Feature numbers do not change.
 | 4.2 | [Boards](modules/explore/features/boards.md) | Named, saved, versioned working surfaces — drawn or declared | ✅ | — | ✅ | S9 |
 | 4.3 | [Selection and the panel](modules/explore/features/selection-and-the-panel.md) | The canvas selects; the panel states the fact | ✅ | — | ✅ | S12 |
 | 4.4 | [The console](modules/explore/features/the-console.md) | The rows and the query under the canvas that drew them | ✅ | — | ✅ | S12f |
+| 4.5 | [Share an answer](modules/explore/features/share-an-answer.md) | A live link or a frozen snapshot for members; PNG · CSV · Markdown for anyone else | ✅ | 🔵 | ✅ | C09 |
 
 ## 5 · [Agents](modules/agents/spec.md)
 
@@ -282,15 +283,15 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 62 | 19 | 15 | 6 |
-| CLI | 23 | 10 | 3 | 66 |
-| Studio | 54 | 20 | 19 | 9 |
+| API | 63 | 19 | 15 | 6 |
+| CLI | 23 | 10 | 4 | 66 |
+| Studio | 55 | 20 | 19 | 9 |
 
-A hundred and two features. **These counts are the tables above, counted** — if a cell is flipped, they
+A hundred and three features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 
-- Modules 3 · 4 are closed: **Ask · Explore**. **Connect and model reopened at 1.9 and grew 1.10** — the publish review (B10) and the ontology import (B12) ship API and CLI; Studio draws 1.9 (C04) and 1.10 (C08). **Agents reopened at 5.1 · 5.2 · 5.3 · 5.7** — S16 moves the model off the agent and onto the lens. What is left is 2.3, 5's four rows, and 6–14.
+- Modules 3 · 4 are closed: **Ask · Explore** — Explore grew **4.5**, sharing an answer, drawn in Studio by C09 over routes it already had. **Connect and model reopened at 1.9 and grew 1.10** — the publish review (B10) and the ontology import (B12) ship API and CLI; Studio draws 1.9 (C04) and 1.10 (C08). **Agents reopened at 5.1 · 5.2 · 5.3 · 5.7** — S16 moves the model off the agent and onto the lens. What is left is 2.3, 5's four rows, and 6–14.
 - **Bring data in reopened at 2.3 and grew 2.4–2.8**, the dataset record above Graphs (B03), the standards it is scored against (B04) and the SKOS import that makes one (B12, drawn in Studio by C08). **Rules (6.4) reopened in Studio**: B04 added install scope and checked rules, which Studio does not draw yet. Its two shipped features are done; the bundle load is new scope, and it is the flow the runtime's deferred frontier, lanes and `uses` were waiting for ([13.8 §21](modules/platform/features/runtime.md)).
 - Studio is no longer the lagging side for the closed four; the remaining 🟡 and 🔵 sit in Skills, Workflows, Memory, Work and Operate.
 

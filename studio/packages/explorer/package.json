@@ -19,6 +19,7 @@
 		"elkjs": "^0.9.3"
 	},
 	"peerDependencies": {
+		"@invana/boards": "^0.0.34",
 		"@invana/canvas": "^0.0.15",
 		"@invana/canvas-react": "^0.0.15",
 		"@invana/canvas-ui": "^0.0.15",
@@ -37,6 +38,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.14",
+		"@invana/boards": "^0.0.34",
 		"@invana/canvas": "^0.0.15",
 		"@invana/canvas-react": "^0.0.15",
 		"@invana/canvas-ui": "^0.0.15",

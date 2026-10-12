@@ -25,6 +25,16 @@ export function formatRelativeTime(date: Date): string {
 	return date.toLocaleDateString();
 }
 
+/** A moment as a person reads it, in their own time: "Oct 2, 9:29 PM". */
+export function formatShortDateTime(date: Date): string {
+	return date.toLocaleString(undefined, {
+		month: "short",
+		day: "numeric",
+		hour: "numeric",
+		minute: "2-digit",
+	});
+}
+
 /** A whole run's clock: "840ms" / "1.4s" / "2m 5s" / "1h 12m".
  *
  *  Distinct from {@link formatDuration}, whose subject is one step and which

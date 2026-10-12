@@ -162,6 +162,8 @@ export function declaredBoardContent(
 						runId,
 					})
 				}
+				// A re-run opens as its own run page, beside this one.
+				onOpenRun={(id) => openBoard({ kind: "run", subjectId: id, runId: id })}
 			/>
 		);
 	}
