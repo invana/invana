@@ -49,13 +49,14 @@ flowchart TD
 
 ## Surfaces
 
-Studio is C02 (`projects.new` visibility) and C07 (private projects in the access views).
+Studio is C02 (`projects.new` visibility) and C07 (people at create, who is on it in the header, ⌘K).
 
 | Surface | Consumes |
 |---|---|
-| New project · `NewProjectDialog` (C02) | `POST …/projects` `visibility` · `POST …/assignments` for the agents picked |
+| New project · `NewProjectDialog` | `POST …/projects` `visibility` · `GET …/members` · `POST …/assignments` for the people (`user`) and agents picked |
 | Project details · the Projects stack's Details tab (C02) | `PATCH …/projects/{key}` `visibility` · `question` |
-| Project page header (C02) | `visibility` as *Graph members* or *people only* |
+| Project page header | `visibility` as *Graph members*, or *people only:* and the names on it |
+| ⌘K | the projects and todos lists, already without the hidden ones |
 | CLI | `invana projects create --private` |
 
 ## Engine
@@ -76,7 +77,8 @@ Studio is C02 (`projects.new` visibility) and C07 (private projects in the acces
 | PP4 | Graph owners and install Admins are not exempt. Whoever should see a private project is put on it. |
 | PP5 | Turning a project private staffs the person doing it, so it is never left with nobody on it; the last person cannot be unstaffed. |
 | PP6 | Agent runs read projects through their own principals; per-project access is enforced on the people-facing API, search and the Graph's event feed. |
-| PP7 | Studio staffs only agents at create; the creator is staffed by the engine. Other people are not offered, because the Graph's member list carries no user id to staff them by — an engine follow-up. |
+| PP7 | New project offers the Graph's other members by name (from `GET …/members`, staffed by `user_id`) and its agents; the creator is staffed by the engine and is not offered. On a private project the people picked are its access list. |
+| PP8 | A private project's header reads *people only:* and the names staffed on it, so whoever is on it sees who else can. |
 
 ## Not building
 

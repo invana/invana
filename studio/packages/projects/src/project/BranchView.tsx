@@ -23,6 +23,7 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { humanStatus, RecordRow, taskTone } from "@invana-studio/ui";
 import { FlaskConical, Gavel, GitFork, GitMerge, Plus } from "lucide-react";
 import { useState } from "react";
@@ -134,15 +135,17 @@ export function BranchView({
 				actions={
 					frozen ? null : (
 						<>
-							<Button
+							<ActButton
+								area="work"
 								size="sm"
 								disabled={closed}
 								onClick={() => onDecide(b.number)}
 							>
 								<Gavel />
 								Decide
-							</Button>
-							<Button
+							</ActButton>
+							<ActButton
+								area="work"
 								variant="outline"
 								size="sm"
 								disabled={closed}
@@ -150,8 +153,9 @@ export function BranchView({
 							>
 								<GitMerge />
 								Merge…
-							</Button>
-							<Button
+							</ActButton>
+							<ActButton
+								area="work"
 								variant="outline"
 								size="sm"
 								disabled={closed}
@@ -159,9 +163,10 @@ export function BranchView({
 							>
 								<GitFork />
 								Fork
-							</Button>
+							</ActButton>
 							{onSimulate ? (
-								<Button
+								<ActButton
+									area="work"
 									variant="outline"
 									size="sm"
 									disabled={closed}
@@ -169,7 +174,7 @@ export function BranchView({
 								>
 									<FlaskConical />
 									Simulate
-								</Button>
+								</ActButton>
 							) : null}
 						</>
 					)
@@ -216,14 +221,15 @@ export function BranchView({
 							count={d.findings.length}
 							actions={
 								frozen || closed ? null : (
-									<Button
+									<ActButton
+										area="work"
 										variant="ghost"
 										size="sm"
 										onClick={() => setAdding(true)}
 									>
 										<Plus />
 										Add {evidenceWord(project).toLowerCase()}
-									</Button>
+									</ActButton>
 								)
 							}
 						>
@@ -384,7 +390,8 @@ function Proposals({
 							actions={
 								frozen ? null : (
 									<>
-										<Button
+										<ActButton
+											area="work"
 											variant="ghost"
 											size="sm"
 											disabled={resolve.isPending}
@@ -393,8 +400,9 @@ function Proposals({
 											}
 										>
 											Reject
-										</Button>
-										<Button
+										</ActButton>
+										<ActButton
+											area="work"
 											size="sm"
 											disabled={resolve.isPending}
 											onClick={() =>
@@ -408,7 +416,7 @@ function Proposals({
 											}
 										>
 											{p.kind === "fork" ? "Accept fork" : "Accept decision"}
-										</Button>
+										</ActButton>
 									</>
 								)
 							}
@@ -456,10 +464,15 @@ function Todos({
 			count={mine.length}
 			actions={
 				frozen ? null : (
-					<Button variant="ghost" size="sm" onClick={() => setTitle("")}>
+					<ActButton
+						area="work"
+						variant="ghost"
+						size="sm"
+						onClick={() => setTitle("")}
+					>
 						<Plus />
 						New todo
-					</Button>
+					</ActButton>
 				)
 			}
 		>

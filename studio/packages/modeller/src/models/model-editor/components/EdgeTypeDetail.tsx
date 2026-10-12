@@ -1,4 +1,6 @@
-import { Badge, Button, Separator } from "@invana/ui";
+import { Badge, Separator } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
+
 import { Pencil, Trash2 } from "lucide-react";
 import type {
 	ConstraintResponse,
@@ -58,13 +60,23 @@ export function EdgeTypeDetail({
 					<Badge variant="secondary">edge type</Badge>
 					{editable && (
 						<div className="ml-auto flex items-center gap-1">
-							<Button variant="ghost" size="sm" onClick={onEdit}>
+							<ActButton
+								area="model"
+								variant="ghost"
+								size="sm"
+								onClick={onEdit}
+							>
 								<Pencil className="w-3.5 h-3.5 mr-1" />
 								Edit
-							</Button>
-							<Button variant="ghost" size="sm" onClick={onDelete}>
+							</ActButton>
+							<ActButton
+								area="model"
+								variant="ghost"
+								size="sm"
+								onClick={onDelete}
+							>
 								<Trash2 className="w-3.5 h-3.5" />
-							</Button>
+							</ActButton>
 						</div>
 					)}
 				</div>
@@ -114,7 +126,8 @@ export function EdgeTypeDetail({
 				<div className="flex items-center justify-between mb-2">
 					<h3 className="font-semibold">Properties</h3>
 					{!editable && canEditViaDraft && (
-						<Button
+						<ActButton
+							area="model"
 							variant="outline"
 							size="sm"
 							onClick={onEditViaDraft}
@@ -123,7 +136,7 @@ export function EdgeTypeDetail({
 						>
 							<Pencil className="w-3.5 h-3.5 mr-1" />
 							{creatingDraft ? "Creating draft…" : "Create draft to edit"}
-						</Button>
+						</ActButton>
 					)}
 				</div>
 				{editable && ctx ? (

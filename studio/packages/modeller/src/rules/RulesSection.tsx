@@ -15,7 +15,7 @@
  * does not stop being true. There is no delete control.
  */
 
-import { Button, Spinner } from "@invana/ui";
+import { Spinner } from "@invana/ui";
 import type { Rule } from "@invana-studio/core";
 import {
 	useCreateRuleMutation,
@@ -24,6 +24,7 @@ import {
 	useSetRuleActiveMutation,
 	useUpdateRuleMutation,
 } from "@invana-studio/core";
+import { ActButton } from "@invana-studio/shell";
 import {
 	PanelSection,
 	RuleStatementForm,
@@ -117,13 +118,14 @@ function RuleDetail({
 			<PanelSection
 				title="Statement"
 				action={
-					<button
-						type="button"
+					<ActButton
+						area="model"
+						variant="ghost"
+						size="xs"
 						onClick={() => setEditing((v) => !v)}
-						className="text-base text-muted-foreground hover:text-foreground"
 					>
 						{editing ? "cancel" : "reword"}
-					</button>
+					</ActButton>
 				}
 				hint="rewording publishes the next version; steps that cited the old one still read the old one"
 			>
@@ -178,7 +180,8 @@ function RuleDetail({
 				title={rule.active ? "Offered to every step in scope" : "Not offered"}
 				hint="deactivating is not deleting — the versions and the citations stay"
 			>
-				<Button
+				<ActButton
+					area="model"
 					size="sm"
 					variant="outline"
 					className="h-7 text-base"
@@ -188,7 +191,7 @@ function RuleDetail({
 					}
 				>
 					{rule.active ? "Stop offering it" : "Offer it again"}
-				</Button>
+				</ActButton>
 			</PanelSection>
 		</div>
 	);

@@ -17,7 +17,7 @@
  * it returns is the **physical mirror**, never the model (introspect-a-database.md).
  */
 
-import { Badge, Button, Skeleton } from "@invana/ui";
+import { Badge, Skeleton } from "@invana/ui";
 import {
 	CONNECTOR_OPTIONS,
 	type GraphConnectionCreate,
@@ -27,7 +27,7 @@ import {
 	useGraphQuery,
 	usePutGraphConnectionMutation,
 } from "@invana-studio/core";
-import { GraphForm } from "@invana-studio/shell";
+import { ActButton, GraphForm } from "@invana-studio/shell";
 import { Pencil, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -138,11 +138,17 @@ export function ConnectionFields({ username, graphSlug }: Props) {
 				</Row>
 			</dl>
 			<div className="flex items-center gap-2">
-				<Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+				<ActButton
+					area="settings"
+					variant="outline"
+					size="sm"
+					onClick={() => setIsEditing(true)}
+				>
 					<Pencil className="mr-1.5 h-3.5 w-3.5" />
 					Edit
-				</Button>
-				<Button
+				</ActButton>
+				<ActButton
+					area="model"
 					variant="outline"
 					size="sm"
 					onClick={introspect}
@@ -151,7 +157,7 @@ export function ConnectionFields({ username, graphSlug }: Props) {
 				>
 					<Sparkles className="mr-1.5 h-3.5 w-3.5" />
 					{introspecting ? "Reading…" : "Introspect"}
-				</Button>
+				</ActButton>
 			</div>
 			<Capabilities connection={connection} />
 			<p className="text-sm text-muted-foreground">

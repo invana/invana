@@ -113,13 +113,12 @@ export interface LensListResponse {
 	items: Lens[];
 	total: number;
 	/**
-	 * `graph_members.can_edit_guardrails` for whoever asked — the one
-	 * field-level permission in the product. It rides on this list because the
-	 * section reads the list exactly once; a second request would let the bound
-	 * and the right to edit it arrive at different moments.
+	 * Whether whoever asked holds the modeller role — the `model` area of
+	 * `…/access`, carried on the list so the bound and the right to edit it
+	 * arrive together.
 	 *
-	 * **The rules render for everyone either way**. This decides whether
-	 * the authoring controls are drawn at all — absent, never disabled.
+	 * **The rules render for everyone either way**. Without the role the
+	 * authoring acts show disabled, naming the role and who holds it.
 	 */
 	may_edit_guardrails: boolean;
 }

@@ -787,6 +787,20 @@ SH-16), as Studio builds them in `@invana-studio/shell` (migration session C05).
 | `shell.notifications.rule` | SH-16 | `/activity/rules` › a rule (`?new=1` opens *New rule*) — events only, no metric condition or preview | ✅ |
 | `shell.notifications.channels` | SH-16 | `/activity/channels` — Teams listed *not connected* | ✅ |
 
+## Beyond the 42 · Roles and access
+
+Read-only views and Graph settings › Members of the *Invana Products* prototype (SH-20 · MO-14 · PJ-02),
+as Studio builds them in migration session C07. Decisions are in [11.6 roles](modules/identity-and-access/features/roles.md)
+RO13–RO18, [9.7 private projects](modules/work/features/private-projects.md) PP7–PP8 and
+[13.10 search](modules/platform/features/search.md) SE7.
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `agents.skills.detail.readonly` | SH-20 | page `skill:<id>` as a member without `builder` — the notice, *Edit instructions* disabled; no *Request access* |✅ |
+| `modeller.settings.members` | MO-14 | `/modeller/settings?tab=members` — members, roles, *Add member*, the Roles key; no agent rows, no LLMs tab |✅ |
+| `modeller.settings.database` | MO-14 | `/modeller/settings?tab=graph` — the connection, labelled *Database* |✅ |
+| `projects.new` people | PJ-02 | *New project* › People and agents — the Graph's other members and its agents |✅ |
+
 ---
 
 ## The other direction — every feature, and the screen that draws it

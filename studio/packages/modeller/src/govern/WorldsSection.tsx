@@ -18,7 +18,7 @@
  */
 
 import type { PanelStackSection } from "@invana/ui";
-import type { Lens, LensCreate, Refusal } from "@invana-studio/core";
+import type { Gate, Lens, LensCreate, Refusal } from "@invana-studio/core";
 import { type StackSectionUi, stackSection } from "@invana-studio/ui";
 import { Globe, Maximize2, Plus } from "lucide-react";
 import { GuardrailsStrip } from "./GuardrailsStrip";
@@ -26,6 +26,7 @@ import { LensActions } from "./LensActions";
 import { LensDetail } from "./LensDetail";
 import { LensEditor } from "./LensEditor";
 import { LensList } from "./LensList";
+import { gateSectionAction } from "./sectionGate";
 
 /** `&world=new` is the authoring drill-in — a value, not a second param. */
 export const NEW_LENS = "new";
@@ -49,8 +50,8 @@ export interface WorldsSectionProps {
 	onOpenBoard?: (id: string) => void;
 	/** Give the Guardrails section the height — the strip's one control. */
 	onReadGuardrails: () => void;
-	/** Whether the promote control is drawn at all. */
-	mayEditGuardrails: boolean;
+	/** The `model` area — authoring a world needs it. */
+	gate: Gate;
 	/** Which world is being edited in place, and how to say so. */
 	editingId: string | null;
 	onEdit: (id: string | null) => void;
@@ -72,7 +73,7 @@ export function worldsSection({
 	onOpenWorld,
 	onOpenBoard,
 	onReadGuardrails,
-	mayEditGuardrails,
+	gate,
 	editingId,
 	onEdit,
 	onSave,
@@ -112,12 +113,15 @@ export function worldsSection({
 					: undefined,
 			// The one thing this section creates, in the section that owns it.
 			headerActions: [
-				{
-					key: "new",
-					name: "New world",
-					icon: Plus,
-					onClick: () => onOpenWorld(NEW_LENS),
-				},
+				gateSectionAction(
+					{
+						key: "new",
+						name: "New world",
+						icon: Plus,
+						onClick: () => onOpenWorld(NEW_LENS),
+					},
+					gate,
+				),
 			],
 			defaultSize,
 			children: () => {
@@ -153,7 +157,6 @@ export function worldsSection({
 									username={username}
 									graphSlug={graphSlug}
 									lens={drilled}
-									mayEditGuardrails={mayEditGuardrails}
 									onEdit={() => onEdit(drilled.id)}
 									onGone={() => onOpenWorld(null)}
 									onOpen={(id) => onOpenWorld(id)}

@@ -20,6 +20,7 @@ import {
 	Button,
 	SegmentedControl,
 } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { FormError, RecordRow } from "@invana-studio/ui";
 import { Download, Printer, RefreshCw, Save, Send } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -89,7 +90,8 @@ export function ReportTab({
 									onValueChange={(v) => setMode(v as "read" | "edit")}
 								/>
 							) : null}
-							<Button
+							<ActButton
+								area="work"
 								variant="ghost"
 								size="sm"
 								disabled={m.generate.isPending}
@@ -99,8 +101,9 @@ export function ReportTab({
 								{saved
 									? "Regenerate from the records"
 									: "Draft from the records"}
-							</Button>
-							<Button
+							</ActButton>
+							<ActButton
+								area="work"
 								variant="outline"
 								size="sm"
 								disabled={!dirty || m.saveDraft.isPending}
@@ -108,7 +111,7 @@ export function ReportTab({
 							>
 								<Save />
 								Save draft
-							</Button>
+							</ActButton>
 						</>
 					) : null
 				}
@@ -222,7 +225,8 @@ export function ReportTab({
 							Markdown
 						</Button>
 						{frozen ? null : (
-							<Button
+							<ActButton
+								area="work"
 								size="sm"
 								disabled={!saved || dirty || m.publish.isPending}
 								title={
@@ -238,7 +242,7 @@ export function ReportTab({
 							>
 								<Send />
 								Publish v{next}
-							</Button>
+							</ActButton>
 						)}
 					</div>
 					{versions.length ? null : (

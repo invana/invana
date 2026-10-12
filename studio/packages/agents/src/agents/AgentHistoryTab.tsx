@@ -10,7 +10,7 @@
  * evals like a publish. Nothing is rewritten.
  */
 
-import { Button } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { useState } from "react";
 import { ChangesTable } from "../changes/ChangesTable";
 import { GatedActDialog } from "../evals/GatedActDialog";
@@ -40,13 +40,14 @@ export function AgentHistoryTab({
 				recordId={agent.id}
 				act={(e, latest) =>
 					!latest && e.summary.includes("instructions") ? (
-						<Button
+						<ActButton
+							area="build"
 							size="xs"
 							variant="ghost"
 							onClick={() => setRestoring(Number(e.version))}
 						>
 							Restore
-						</Button>
+						</ActButton>
 					) : null
 				}
 			/>

@@ -1,14 +1,14 @@
 /**
- * TanStack Query hooks over the inbox, rules, channels, approvals and the
- * Graph's members. Keys start with the area — `["notifications" | "approvals"
- * | "members", owner, graph]` — so the bell, the Inbox and the tabs share one
- * read and one invalidation each.
+ * TanStack Query hooks over the inbox, rules, channels and approvals, and
+ * the names of the member ids they store. Keys start with the area —
+ * `["notifications" | "approvals", owner, graph]` — so the bell, the Inbox and
+ * the tabs share one read and one invalidation each.
  */
 
-import { type GraphRef, useAuth } from "@invana-studio/core";
+import { type GraphRef, useAuth, useMembersQuery } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { approvalsApi, membersApi, notificationsApi } from "./api";
+import { approvalsApi, notificationsApi } from "./api";
 import type {
 	ChannelWrite,
 	NotificationRuleUpdate,
@@ -28,8 +28,6 @@ const notificationKeys = {
 		[...notificationKeys.all(g), "channels"] as const,
 	approvals: (g: GraphRef | undefined) =>
 		["approvals", g?.username, g?.graphSlug] as const,
-	members: (g: GraphRef | undefined) =>
-		["members", g?.username, g?.graphSlug] as const,
 };
 
 /** My notifications on this Graph, newest first, with the unread count. */
@@ -161,15 +159,6 @@ export function useDecideApproval(graph: GraphRef) {
 			});
 			void qc.invalidateQueries({ queryKey: notificationKeys.inbox(graph) });
 		},
-	});
-}
-
-export function useMembersQuery(graph: GraphRef | undefined) {
-	return useQuery({
-		queryKey: notificationKeys.members(graph),
-		queryFn: () => membersApi.list(graph as GraphRef),
-		enabled: !!graph,
-		staleTime: 60_000,
 	});
 }
 

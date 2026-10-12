@@ -78,8 +78,9 @@ const ENGINE_ONLY = {
 	datasets: "served by the @invana-studio/datasets package, outside the host",
 	standards: "served by the @invana-studio/datasets package, outside the host",
 	members:
-		"members and Graph roles; @invana-studio/shell names member ids from it, outside the host",
-	search: "access-filtered search; ⌘K reads it from C07",
+		"members and Graph roles, served by @invana-studio/core and the Modeller's settings, outside the host",
+	search:
+		"access-filtered name search for the CLI; ⌘K reads the products' own lists, already filtered by access",
 	schedules: "served by the @invana-studio/shell package, outside the host",
 	notifications: "served by the @invana-studio/shell package, outside the host",
 	approvals: "served by the @invana-studio/shell package, outside the host",

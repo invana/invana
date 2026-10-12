@@ -34,6 +34,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { Database, ExternalLink, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AddFindingDialog } from "../project/AddFindingDialog";
@@ -144,14 +145,15 @@ export function SimulationView({
 							</Button>
 						) : null}
 						{s.status === "succeeded" ? (
-							<Button
+							<ActButton
+								area="work"
 								variant="outline"
 								size="sm"
 								onClick={() => setSaving(true)}
 							>
 								<Database />
 								Save as dataset
-							</Button>
+							</ActButton>
 						) : null}
 					</>
 				}
@@ -333,7 +335,8 @@ function RankedTable({
 								);
 							})}
 							<TableCell className="text-right">
-								<Button
+								<ActButton
+									area="work"
 									variant="outline"
 									size="sm"
 									onClick={() =>
@@ -344,7 +347,7 @@ function RankedTable({
 								>
 									<Plus />
 									Add finding
-								</Button>
+								</ActButton>
 							</TableCell>
 						</TableRow>
 					);

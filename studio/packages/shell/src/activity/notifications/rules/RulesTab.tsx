@@ -16,7 +16,6 @@
 import { Switch } from "@invana/forms";
 import {
 	Badge,
-	Button,
 	EmptyState,
 	Item,
 	ItemActions,
@@ -33,6 +32,8 @@ import { FormError } from "@invana-studio/ui";
 import { ListChecks, Plus } from "lucide-react";
 import { Fragment, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ActButton } from "../../../access/ActButton";
+import { useAccess } from "../../../access/useAccess";
 import { refusalOf } from "../api";
 import {
 	useChannelsQuery,
@@ -76,10 +77,10 @@ export function RulesTab({ graph }: { graph: GraphRef }) {
 					title="Rules"
 					count={rules.data?.total}
 					actions={
-						<Button size="sm" onClick={newRule}>
+						<ActButton area="settings" size="sm" onClick={newRule}>
 							<Plus />
 							New rule
-						</Button>
+						</ActButton>
 					}
 				/>
 				{rules.isLoading ? (
@@ -92,10 +93,10 @@ export function RulesTab({ graph }: { graph: GraphRef }) {
 						title="No rules yet"
 						description="A rule tells people when something happens on this Graph — a run fails, an approval waits — in the Inbox or on a channel."
 						actions={
-							<Button size="sm" onClick={newRule}>
+							<ActButton area="settings" size="sm" onClick={newRule}>
 								<Plus />
 								New rule
-							</Button>
+							</ActButton>
 						}
 					/>
 				) : (
@@ -136,6 +137,7 @@ function RuleRow({
 	const nameOf = useMemberName(graph);
 	const channels = useChannelsQuery(graph).data?.items ?? [];
 	const update = useUpdateRule(graph);
+	const settings = useAccess().gate("settings");
 	const on = rule.channel_ids.map(
 		(id) => channels.find((c) => c.id === id)?.name ?? "a removed channel",
 	);
@@ -171,7 +173,9 @@ function RuleRow({
 				<Switch
 					aria-label={`${rule.name} enabled`}
 					checked={rule.enabled}
-					disabled={update.isPending}
+					disabled={update.isPending || !settings.allowed}
+					title={settings.reason ?? undefined}
+					aria-description={settings.reason ?? undefined}
 					onCheckedChange={(enabled) =>
 						update.mutate({ id: rule.id, body: { enabled } })
 					}

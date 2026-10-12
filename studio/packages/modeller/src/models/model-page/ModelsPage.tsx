@@ -17,7 +17,13 @@ import {
 	useGraphConnectionQuery,
 	useTypeCountsQuery,
 } from "@invana-studio/core";
-import { comparePath, routedAction } from "@invana-studio/shell";
+import {
+	ActButton,
+	comparePath,
+	ReadOnlyNotice,
+	routedAction,
+	useAccess,
+} from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
@@ -226,8 +232,12 @@ export function ModelsPage({
 			}
 		: null;
 
+	// Without the `model` role the header's writes show disabled, not absent.
+	const modelGate = useAccess().gate("model");
+	const writable = canWrite && modelGate.allowed;
+
 	// ⌘↵ opens the Publish confirm, as the staged bar says.
-	const canPublish = canWrite && !!draft && !!staged.data?.can_commit;
+	const canPublish = writable && !!draft && !!staged.data?.can_commit;
 	useEffect(() => {
 		if (!canPublish) return;
 		const onKey = (e: KeyboardEvent) => {
@@ -253,7 +263,7 @@ export function ModelsPage({
 			insights: insights.data,
 			insightsLoading: insights.isLoading,
 			scope,
-			canWrite,
+			canWrite: writable,
 			loading: models.isLoading,
 		},
 		view,
@@ -340,16 +350,24 @@ export function ModelsPage({
 										Open the draft
 									</Button>
 								) : (
-									<Button onClick={() => setEditing("new")}>
+									<ActButton area="model" onClick={() => setEditing("new")}>
 										<Plus /> New model
-									</Button>
+									</ActButton>
 								)}
-								<Button variant="outline" onClick={() => setImporting(true)}>
+								<ActButton
+									area="model"
+									variant="outline"
+									onClick={() => setImporting(true)}
+								>
 									<Upload /> Import
-								</Button>
-								<Button variant="ghost" onClick={() => setImporting(true)}>
+								</ActButton>
+								<ActButton
+									area="model"
+									variant="ghost"
+									onClick={() => setImporting(true)}
+								>
 									<BookOpen /> Starter models
-								</Button>
+								</ActButton>
 							</>
 						) : null
 					}
@@ -403,9 +421,10 @@ export function ModelsPage({
 	};
 
 	return (
-		<>
+		<div className="flex h-full min-h-0 flex-col">
+			<ReadOnlyNotice area="model" noun="model" />
 			<Board
-				className="h-full min-h-0"
+				className="min-h-0 flex-1"
 				spec={spec}
 				icons={ICONS}
 				onAction={(action, context) => {
@@ -573,7 +592,7 @@ export function ModelsPage({
 				}}
 				onClose={() => setRefused(null)}
 			/>
-		</>
+		</div>
 	);
 }
 

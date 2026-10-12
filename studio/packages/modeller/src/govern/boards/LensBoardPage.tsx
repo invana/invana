@@ -6,15 +6,11 @@
  * ([spec.md](../../../../../../docs/for-developers/modules/govern/spec.md) ·
  * [worlds.md](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
  *
- * Two reads, and the page draws on the first. The detail read is what carries
- * the usage and the **resolved** cast — *innermost wins, then the address is
- * checked against the effective rules*
+ * The detail read is what carries the usage and the **resolved** cast —
+ * *innermost wins, then the address is checked against the effective rules*
  * ([spec.md](../../../../../../docs/for-developers/modules/govern/spec.md)) is a
- * composition against the guardrails only the server can do — and the list read
- * is where `may_edit_guardrails` rides
- * ([guardrails.md](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)),
- * so the permission never lands at a different moment from the rules it
- * governs.
+ * composition against the guardrails only the server can do. Editing is the
+ * `model` role's; without it `Edit` shows disabled.
  *
  * **The board reads; the acts stay in the section**
  * ([worlds.md](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
@@ -24,8 +20,8 @@
 
 import { Board } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
-import { type LensKind, useLensesQuery } from "@invana-studio/core";
-import { useReport, VIEW_BOARD } from "@invana-studio/shell";
+import type { LensKind } from "@invana-studio/core";
+import { useAccess, useReport, VIEW_BOARD } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
 import { useLensQuery } from "../queries";
@@ -50,17 +46,12 @@ export function LensBoardPage({
 	onEdit,
 }: LensBoardPageProps) {
 	const detail = useLensQuery(username, graphSlug, lensId);
-	const lenses = useLensesQuery(username, graphSlug);
 	const [view, setView] = useState(VIEW_BOARD);
 
 	const lens = detail.data ?? null;
-	// A world is edited by anyone who can reach the Graph; a guardrail is the
-	// product's one field-level permission, and without it the control
-	// is absent rather than greyed.
-	const mayEdit =
-		lens?.kind === "guardrail"
-			? (lenses.data?.may_edit_guardrails ?? false)
-			: true;
+	// Editing a world or a guardrail is the `model` role's; without it `Edit`
+	// shows disabled rather than going missing.
+	const mayEdit = useAccess().gate("model").allowed;
 
 	const spec = useMemo(
 		() => (lens ? lensBoardSpec(lens, { view, mayEdit }) : null),

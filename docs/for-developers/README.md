@@ -206,7 +206,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 11.3 | [Sessions](modules/identity-and-access/features/sessions.md) | Short access token, revocable rotating refresh | ✅ | — | 🟡 | S1 |
 | 11.4 | [Membership](modules/identity-and-access/features/membership.md) | Who may open a Graph; add, re-role and remove members | ✅ | ✅ | ✅ | S1 |
 | 11.5 | [Personal access tokens](modules/identity-and-access/features/personal-access-tokens.md) | A long-lived credential that carries your identity; revocable, shown once | ✅ | — | ✅ | S1 |
-| 11.6 | [Roles](modules/identity-and-access/features/roles.md) | Graph roles viewer · contributor · builder · modeller · owner, enforced on every graph route; install Admin; a refusal names who can | ✅ | ✅ | 🔵 | B11 |
+| 11.6 | [Roles](modules/identity-and-access/features/roles.md) | Graph roles viewer · contributor · builder · modeller · owner, enforced on every graph route; install Admin; a refusal names who can | ✅ | ✅ | ✅ | B11 |
 
 ## 12 · [Graph connectors](modules/graph-connectors/spec.md)
 
@@ -230,7 +230,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 13.7 | [Setup](modules/platform/features/setup.md) | Four required steps in four features — the onboarding wizard, created to answering | ✅ | — | 🟡 | S13 |
 | 13.8 | [The runtime](modules/platform/features/runtime.md) | The workhorse: plan graph · frontier · signals · pools · approvals · what it emits | 🟡 | — | — | S15 |
 | 13.9 | [Plugins](modules/platform/features/plugins.md) | Every task type in a plugin — `plugin.yaml`, a manifest beside each task's code, packaged flows; one frozen registry; each Task records its task version | — | — | — | B06a |
-| 13.10 | [Search](modules/platform/features/search.md) | One name search over every Graph and dataset you may open, filtered by access, exact → prefix → contains | ✅ | ✅ | 🔵 | B11 |
+| 13.10 | [Search](modules/platform/features/search.md) | One name search over every Graph and dataset you may open, filtered by access, exact → prefix → contains | ✅ | ✅ | — | B11 |
 | 13.11 | [Distributed execution](modules/platform/features/distributed-execution.md) | Every step as a `TaskEnvelope`, called by one `run_envelope()` that rebuilds its context from ids; procrastinate chosen as the distributed executor by benchmark | — | — | — | B14 |
 | 13.12 | [Tool plugins](modules/platform/features/tool-plugins.md) | `tools/web` · `tools/mail` · `tools/science` as optional extras, Admin-enabled, run in workers; `send` waits for an approval; the plugin registry over API and CLI | ✅ | ✅ | ✅ | B06b |
 | 13.13 | [MCP plugins](modules/platform/features/mcp-plugins.md) | An MCP server's tools as task types in an `mcp` plugin, frozen when an Admin adds the server; refreshed by hand, loaded at start-up, switched like a tool plugin | ✅ | ✅ | 🔵 | B07 |
@@ -284,7 +284,7 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 |---|---|---|---|---|
 | API | 62 | 19 | 15 | 6 |
 | CLI | 23 | 10 | 3 | 66 |
-| Studio | 51 | 20 | 23 | 8 |
+| Studio | 52 | 20 | 21 | 9 |
 
 A hundred and two features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse

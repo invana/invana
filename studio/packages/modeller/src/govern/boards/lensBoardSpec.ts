@@ -62,11 +62,7 @@ const LAYER_LABEL: Record<GovernLayer, string> = {
 export interface LensBoardView {
 	/** `Board` or `spec.json`. */
 	view: string;
-	/**
-	 * Whether `Edit` is drawn at all. A guardrail's authoring controls are
-	 * **absent** without the permission, never greyed
-	 * ([guardrails.md](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
-	 */
+	/** Whether `Edit` is enabled — it is drawn either way, disabled without the role. */
 	mayEdit: boolean;
 }
 
@@ -97,9 +93,12 @@ export function lensBoardSpec(
 				options: [VIEW_BOARD, VIEW_SPEC],
 				value: view,
 			},
-			mayEdit
-				? { id: LENS_ACTIONS.edit, label: "Edit", variant: "outline" as const }
-				: null,
+			{
+				id: LENS_ACTIONS.edit,
+				label: "Edit",
+				variant: "outline" as const,
+				disabled: !mayEdit,
+			},
 		]),
 	};
 

@@ -14,13 +14,14 @@
  * It does not write a model. Authoring is the model canvas, on a draft.
  */
 
-import { Button, EmptyState, Spinner } from "@invana/ui";
+import { EmptyState, Spinner } from "@invana/ui";
 import {
 	type CanvasBackend,
 	GraphModelCanvas,
 	graphModelSettings,
 	graphModelTemplates,
 } from "@invana-studio/canvases";
+import { ActButton, useAccess } from "@invana-studio/shell";
 import { AlertTriangle, Boxes, Check } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import {
@@ -47,6 +48,7 @@ export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 	);
 	const commit = useCommitStitchesMutation(username, graphSlug);
 	const discard = useDiscardStitchesMutation(username, graphSlug);
+	const modelGate = useAccess().gate("model");
 
 	const build = useMemo(
 		() => buildAllModelsData(frames, links),
@@ -68,6 +70,8 @@ export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 	/** The drag names both ends; the card declares, the drag never does. */
 	const onStitch = useCallback(
 		(source: string, target: string): string | null => {
+			// Declaring a stitch is the model role's; the drag says so, not the card.
+			if (modelGate.reason) return modelGate.reason;
 			const from = parseMemberId(source);
 			const to = parseMemberId(target);
 			if (!from || !to)
@@ -87,7 +91,7 @@ export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 			});
 			return null;
 		},
-		[versionOf],
+		[versionOf, modelGate.reason],
 	);
 
 	if (isError) {
@@ -138,22 +142,24 @@ export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 						</span>
 					</span>
 					<span className="flex-1" />
-					<Button
+					<ActButton
+						area="model"
 						size="xs"
 						onClick={() => commit.mutate(undefined as never)}
 						disabled={commit.isPending}
 					>
 						<Check />
 						Commit
-					</Button>
-					<Button
+					</ActButton>
+					<ActButton
+						area="model"
 						size="xs"
 						variant="ghost"
 						onClick={() => discard.mutate(undefined)}
 						disabled={discard.isPending}
 					>
 						Discard
-					</Button>
+					</ActButton>
 				</div>
 			) : null}
 

@@ -37,6 +37,7 @@ import {
 } from "@invana/ui";
 import type { Lens } from "@invana-studio/core";
 import { ApiError } from "@invana-studio/core";
+import { ActButton } from "@invana-studio/shell";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -50,8 +51,6 @@ export interface LensActionsProps {
 	username?: string;
 	graphSlug?: string;
 	lens: Lens;
-	/** Absent, every write control is absent with it. */
-	mayEditGuardrails: boolean;
 	onEdit: () => void;
 	/** Where to go once this row stops being the thing on screen. */
 	onGone: () => void;
@@ -63,7 +62,6 @@ export function LensActions({
 	username,
 	graphSlug,
 	lens,
-	mayEditGuardrails,
 	onEdit,
 	onGone,
 	onOpen,
@@ -88,26 +86,6 @@ export function LensActions({
 					? error.message
 					: "The write was refused.",
 		);
-
-	const isGuardrail = lens.kind === "guardrail";
-	// A guardrail's every write is the one field-level permission in the product.
-	// A world's are not — anyone who may read the Graph may make one.
-	const mayWrite = !isGuardrail || mayEditGuardrails;
-
-	if (!mayWrite) {
-		return (
-			<section className="flex min-w-0 flex-col gap-1">
-				<Eyebrow>Editing</Eyebrow>
-				{/* Absent, never disabled: a greyed button promises a screen this
-				    person cannot reach, and a bound nobody may read is a bound
-				    nobody can work within. */}
-				<p className="pt-1 text-sm text-muted-foreground">
-					The rules above are in force on every run and are readable by every
-					member. Changing them is a permission somebody in this Graph holds.
-				</p>
-			</section>
-		);
-	}
 
 	return (
 		<section className="flex min-w-0 flex-col gap-1">
@@ -157,10 +135,16 @@ export function LensActions({
 					</div>
 				) : (
 					<div className="flex flex-wrap gap-2">
-						<Button variant="outline" size="sm" onClick={onEdit}>
+						<ActButton
+							area="model"
+							variant="outline"
+							size="sm"
+							onClick={onEdit}
+						>
 							Edit rules
-						</Button>
-						<Button
+						</ActButton>
+						<ActButton
+							area="model"
 							variant="outline"
 							size="sm"
 							onClick={() => {
@@ -169,8 +153,9 @@ export function LensActions({
 							}}
 						>
 							{lens.is_named ? "Rename" : "Name it"}
-						</Button>
-						<Button
+						</ActButton>
+						<ActButton
+							area="model"
 							variant="outline"
 							size="sm"
 							disabled={duplicate.isPending}
@@ -189,9 +174,10 @@ export function LensActions({
 							}
 						>
 							Duplicate
-						</Button>
-						{lens.kind === "world" && mayEditGuardrails ? (
-							<Button
+						</ActButton>
+						{lens.kind === "world" ? (
+							<ActButton
+								area="model"
 								variant="outline"
 								size="sm"
 								disabled={promote.isPending}
@@ -209,25 +195,19 @@ export function LensActions({
 								}
 							>
 								Promote to guardrail
-							</Button>
+							</ActButton>
 						) : null}
-						<Button
+						<ActButton
+							area="model"
 							variant="ghost"
 							size="sm"
 							className="text-destructive"
 							onClick={() => setConfirmDelete(true)}
 						>
 							Delete
-						</Button>
+						</ActButton>
 					</div>
 				)}
-
-				{lens.kind === "world" && !mayEditGuardrails ? (
-					<p className="text-sm text-muted-foreground">
-						Making this a guardrail — in force on every run — is a permission
-						somebody in this Graph holds.
-					</p>
-				) : null}
 			</div>
 
 			<AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>

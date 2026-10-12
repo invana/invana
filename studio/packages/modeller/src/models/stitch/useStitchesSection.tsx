@@ -1,4 +1,5 @@
-import { Button, type PanelStackSection } from "@invana/ui";
+import type { PanelStackSection } from "@invana/ui";
+import { ActButton, gateItem, useAccess } from "@invana-studio/shell";
 import { RecordRow, SectionTitle } from "@invana-studio/ui";
 import { Check, Link2, Plus, Trash2, Undo2 } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
@@ -104,6 +105,7 @@ export function useStitchesSection({
 	const remove = useRemoveLinkMutation(username, graphSlug);
 	const commit = useCommitStitchesMutation(username, graphSlug);
 	const discard = useDiscardStitchesMutation(username, graphSlug);
+	const modelGate = useAccess().gate("model");
 
 	// Both directions. `Article ≡ Stock` is the same fact whether you are looking
 	// at the news model or the market one.
@@ -157,7 +159,7 @@ export function useStitchesSection({
 							icon: Undo2,
 							onClick: () => discard.mutate(undefined),
 						},
-					]
+					].map((item) => gateItem(item, modelGate))
 				: []),
 			// One control, one word. The kind is a segmented control *inside* the
 			// card, so a person picks between two types they can see rather
@@ -172,7 +174,7 @@ export function useStitchesSection({
 							icon: Plus,
 							onClick: () => setDeclaring("anchor"),
 						},
-					]
+					].map((item) => gateItem(item, modelGate))
 				: []),
 		],
 		content: (
@@ -187,14 +189,15 @@ export function useStitchesSection({
 									: "No stitches. Two models meet only where somebody says they meet — pick a type on each side, and the count of what resolves comes back before anything is declared."}
 						</p>
 						{canDeclare ? (
-							<Button
+							<ActButton
+								area="model"
 								size="xs"
 								variant="outline"
 								onClick={() => setDeclaring("anchor")}
 							>
 								<Plus />
 								Declare a stitch
-							</Button>
+							</ActButton>
 						) : null}
 					</div>
 				) : (
@@ -225,14 +228,15 @@ export function useStitchesSection({
 								}${link.description ? ` · ${link.description}` : ""}`}
 								status={link.status === "staged" ? "staged" : link.kind}
 								actions={
-									<Button
+									<ActButton
+										area="model"
 										variant="ghost"
 										size="icon-xs"
 										title="Remove this stitch — the union stops spanning that pair"
 										onClick={() => setRemoving(link)}
 									>
 										<Trash2 />
-									</Button>
+									</ActButton>
 								}
 							/>
 						</HighlightOnMount>

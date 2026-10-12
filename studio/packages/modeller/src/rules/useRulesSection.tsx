@@ -12,6 +12,7 @@
 
 import { Badge, type PanelStackSection } from "@invana/ui";
 import { useRulesQuery } from "@invana-studio/core";
+import { gateItem, useAccess } from "@invana-studio/shell";
 import { SectionTitle } from "@invana-studio/ui";
 import { ChevronLeft, Maximize2, Plus } from "lucide-react";
 import { useState } from "react";
@@ -30,6 +31,7 @@ export function useRulesSection({
 	const [openRuleId, setOpenRuleId] = useState<string | null>(null);
 	const [composing, setComposing] = useState(false);
 	const rules = useRulesQuery(username, graphSlug);
+	const modelGate = useAccess().gate("model");
 	const openRule =
 		(rules.data?.items ?? []).find((r) => r.id === openRuleId) ?? null;
 
@@ -70,11 +72,14 @@ export function useRulesSection({
 			: composing
 				? []
 				: [
-						{
-							name: "New invariant",
-							icon: Plus,
-							onClick: () => setComposing(true),
-						},
+						gateItem(
+							{
+								name: "New invariant",
+								icon: Plus,
+								onClick: () => setComposing(true),
+							},
+							modelGate,
+						),
 					],
 		actionsOnHover: false,
 		content: (

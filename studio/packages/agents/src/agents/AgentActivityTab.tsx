@@ -25,7 +25,7 @@ import {
 } from "@invana/ui";
 import type { TaskRunSummary } from "@invana-studio/core";
 import { formatCompact, formatRelativeTime } from "@invana-studio/core";
-import { useLeftSection, useRunsQuery } from "@invana-studio/shell";
+import { ActButton, useLeftSection, useRunsQuery } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useState } from "react";
 import type { AgentDraft } from "./agentDraft";
@@ -248,13 +248,14 @@ export function AgentActivityTab({
 						card
 						title="Limits"
 						action={
-							<Button
+							<ActButton
+								area="build"
 								size="sm"
 								variant="ghost"
 								onClick={() => setEditingLimits(!editingLimits)}
 							>
 								{editingLimits ? "Done" : "Edit"}
-							</Button>
+							</ActButton>
 						}
 					>
 						<Eyebrow>Budget</Eyebrow>

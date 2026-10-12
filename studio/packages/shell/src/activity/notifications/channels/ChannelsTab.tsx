@@ -17,7 +17,6 @@
 
 import {
 	Badge,
-	Button,
 	Item,
 	ItemActions,
 	ItemContent,
@@ -31,6 +30,7 @@ import type { GraphRef } from "@invana-studio/core";
 import { FormError } from "@invana-studio/ui";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { ActButton } from "../../../access/ActButton";
 import { ConfirmDialog } from "../../../components/ConfirmDialog";
 import { refusalOf } from "../api";
 import { CHANNEL_KIND_LABEL } from "../DeliveryPicker";
@@ -52,10 +52,14 @@ export function ChannelsTab({ graph }: { graph: GraphRef }) {
 					title="Channels"
 					count={channels.data?.total}
 					actions={
-						<Button size="sm" onClick={() => setAdding(true)}>
+						<ActButton
+							area="settings"
+							size="sm"
+							onClick={() => setAdding(true)}
+						>
 							<Plus />
 							Add channel
-						</Button>
+						</ActButton>
 					}
 				/>
 				<ItemGroup className="gap-2">
@@ -122,7 +126,8 @@ function ChannelRow({ graph, channel }: { graph: GraphRef; channel: Channel }) {
 						{channel.reason || "not ready"}
 					</span>
 				)}
-				<Button
+				<ActButton
+					area="settings"
 					variant="ghost"
 					size="sm"
 					aria-label={`Remove ${channel.name}`}
@@ -130,7 +135,7 @@ function ChannelRow({ graph, channel }: { graph: GraphRef; channel: Channel }) {
 					onClick={() => setConfirming(true)}
 				>
 					Remove
-				</Button>
+				</ActButton>
 			</ItemActions>
 			{remove.error ? (
 				<FormError className="basis-full" error={refusalOf(remove.error)} />

@@ -40,6 +40,7 @@ import {
 	Spinner,
 	TabbedPanel,
 } from "@invana/ui";
+import { ActButton, ReadOnlyNotice } from "@invana-studio/shell";
 import {
 	asBindRefusal,
 	BindRefusalCard,
@@ -133,6 +134,9 @@ export function SkillDetail({
 					) : null
 				}
 			/>
+			<div className="shrink-0 px-3.5 pt-3.5 empty:hidden">
+				<ReadOnlyNotice area="build" noun="skill" />
+			</div>
 
 			<TabbedPanel
 				className="min-h-0 flex-1 border-0 bg-transparent shadow-none"
@@ -337,13 +341,14 @@ function SkillHistoryTab({
 								</Button>
 							) : null}
 							{latest ? null : (
-								<Button
+								<ActButton
+									area="build"
 									size="sm"
 									variant="ghost"
 									onClick={() => setRestoring(v)}
 								>
 									Restore v{v}
-								</Button>
+								</ActButton>
 							)}
 						</div>
 					);
@@ -488,7 +493,8 @@ function BindingsTab({
 				>
 					{agent.agent_name}
 				</button>
-				<Button
+				<ActButton
+					area="build"
 					size="sm"
 					variant={isBound ? "ghost" : "outline"}
 					className="h-6 shrink-0 text-base"
@@ -510,7 +516,7 @@ function BindingsTab({
 					}}
 				>
 					{isBound ? "Unbind" : agent.refusal ? "Refused" : "Bind"}
-				</Button>
+				</ActButton>
 			</div>
 			{agent.refusal || (clicked && refusedFor === agent.agent_id) ? (
 				<BindRefusalCard

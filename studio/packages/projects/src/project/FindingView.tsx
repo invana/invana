@@ -23,6 +23,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { RecordRow } from "@invana-studio/ui";
 import { Check, GitBranch } from "lucide-react";
 import {
@@ -105,14 +106,15 @@ export function FindingView({
 				}
 				actions={
 					f.reviewed_by_id || project.status === "archived" ? null : (
-						<Button
+						<ActButton
+							area="work"
 							size="sm"
 							disabled={review.isPending}
 							onClick={() => review.mutate(f.number)}
 						>
 							<Check />
 							Review
-						</Button>
+						</ActButton>
 					)
 				}
 			/>

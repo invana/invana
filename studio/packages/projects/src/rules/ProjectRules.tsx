@@ -19,7 +19,7 @@
  * section is never an empty context.
  */
 
-import { Button, Spinner } from "@invana/ui";
+import { Spinner } from "@invana/ui";
 import type { Rule } from "@invana-studio/core";
 import {
 	useCreateProjectRuleMutation,
@@ -27,6 +27,7 @@ import {
 	useSetRuleActiveMutation,
 	useUpdateRuleMutation,
 } from "@invana-studio/core";
+import { ActButton, useAccess } from "@invana-studio/shell";
 import {
 	PanelSection,
 	RuleStatementForm,
@@ -60,7 +61,8 @@ export function ProjectRules({
 			hint="offered to every step in this project, after the Graph's invariants"
 			action={
 				frozen ? null : (
-					<Button
+					<ActButton
+						area="model"
 						size="sm"
 						variant="ghost"
 						className="h-6 text-base"
@@ -68,7 +70,7 @@ export function ProjectRules({
 					>
 						<Plus className="size-3" />
 						{composing ? "Cancel" : "New working rule"}
-					</Button>
+					</ActButton>
 				)
 			}
 		>
@@ -155,6 +157,7 @@ function OwnRule({
 	const [editing, setEditing] = useState(false);
 	const reword = useUpdateRuleMutation(username, graphSlug);
 	const setActive = useSetRuleActiveMutation(username, graphSlug);
+	const model = useAccess().gate("model");
 
 	if (editing)
 		return (
@@ -179,15 +182,18 @@ function OwnRule({
 					<div className="mt-1 flex items-center gap-2">
 						<button
 							type="button"
-							className="text-base text-muted-foreground hover:text-foreground"
+							className="text-base text-muted-foreground hover:text-foreground disabled:opacity-50"
+							disabled={!model.allowed}
+							title={model.reason ?? undefined}
 							onClick={() => setEditing(true)}
 						>
 							reword
 						</button>
 						<button
 							type="button"
-							className="text-base text-muted-foreground hover:text-foreground"
-							disabled={setActive.isPending}
+							className="text-base text-muted-foreground hover:text-foreground disabled:opacity-50"
+							disabled={setActive.isPending || !model.allowed}
+							title={model.reason ?? undefined}
 							onClick={() =>
 								setActive.mutate({ id: rule.id, active: !rule.active })
 							}

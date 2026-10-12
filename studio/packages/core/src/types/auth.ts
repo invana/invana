@@ -1,11 +1,14 @@
 /** Shared auth + graph membership types. Must mirror engine schemas (docs/for-developers/modules/identity-and-access/spec.md).
- *  Membership is binary (docs/for-developers/modules/identity-and-access/features/membership.md) — there is no per-graph role. */
+ *  Each membership carries the Graph roles held there (docs/for-developers/modules/identity-and-access/features/roles.md). */
+
+import type { GraphRole } from "./access";
 
 interface GraphMembership {
 	graph_id: string;
 	graph_name: string;
 	graph_slug: string;
 	owner_username: string;
+	roles: GraphRole[];
 }
 
 /** The studio theme selection persisted under `preferences.theme` (docs/for-developers/modules/platform/features/theming.md).

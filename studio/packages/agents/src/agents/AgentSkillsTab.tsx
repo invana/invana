@@ -22,6 +22,7 @@ import {
 	DropdownMenuTrigger,
 	Spinner,
 } from "@invana/ui";
+import { ActButton, useAccess } from "@invana-studio/shell";
 import {
 	asBindRefusal,
 	BindRefusalCard,
@@ -91,6 +92,7 @@ export function AgentSkillsTab({
 	const bindings = bindingsCost(graphSkills, agent.skill_ids ?? []);
 
 	const [editing, setEditing] = useState(false);
+	const build = useAccess().gate("build");
 	/**
 	 * The envelope as raw text. The stored envelope is JSON, so it is edited in
 	 * the shape it is saved in. `null` = closed. Held apart from the draft so an
@@ -218,7 +220,8 @@ export function AgentSkillsTab({
 				// A skill that lacks a callable is unbound from its band below.
 				cell: ({ row }) =>
 					row.original.missing.length ? null : (
-						<Button
+						<ActButton
+							area="build"
 							size="sm"
 							variant="ghost"
 							disabled={isBinding}
@@ -228,7 +231,7 @@ export function AgentSkillsTab({
 							}}
 						>
 							Unbind
-						</Button>
+						</ActButton>
 					),
 			},
 		],
@@ -295,39 +298,49 @@ export function AgentSkillsTab({
 				card
 				title="Skills"
 				action={
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button size="sm" variant="ghost" disabled={isBinding}>
-								<Plus /> Bind skill
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							{unbound.length ? (
-								unbound.map((skill) => (
-									<DropdownMenuItem
-										key={skill.id}
-										onSelect={() => {
-											// The refusal belongs under the skill that raised it, so
-											// the pick is remembered before it is sent.
-											setRefusedFor(skill.id);
-											onBindSkill(skill.id);
-										}}
-									>
-										{skill.name}
-										{/* A bound draft is bound and offered to nothing until
+					// A disabled trigger opens nothing, so without the role the act is
+					// drawn as the gated button alone, carrying the reason.
+					build.allowed ? (
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button size="sm" variant="ghost" disabled={isBinding}>
+									<Plus /> Bind skill
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								{unbound.length ? (
+									unbound.map((skill) => (
+										<DropdownMenuItem
+											key={skill.id}
+											onSelect={() => {
+												// The refusal belongs under the skill that raised it, so
+												// the pick is remembered before it is sent.
+												setRefusedFor(skill.id);
+												onBindSkill(skill.id);
+											}}
+										>
+											{skill.name}
+											{/* A bound draft is bound and offered to nothing until
 										    it is published. */}
-										{skill.is_draft ? (
-											<span className="ml-1 text-muted-foreground">draft</span>
-										) : null}
+											{skill.is_draft ? (
+												<span className="ml-1 text-muted-foreground">
+													draft
+												</span>
+											) : null}
+										</DropdownMenuItem>
+									))
+								) : (
+									<DropdownMenuItem disabled>
+										Every skill in this Graph is bound
 									</DropdownMenuItem>
-								))
-							) : (
-								<DropdownMenuItem disabled>
-									Every skill in this Graph is bound
-								</DropdownMenuItem>
-							)}
-						</DropdownMenuContent>
-					</DropdownMenu>
+								)}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					) : (
+						<ActButton area="build" size="sm" variant="ghost">
+							<Plus /> Bind skill
+						</ActButton>
+					)
 				}
 			>
 				{can.isLoading ? (
@@ -357,14 +370,16 @@ export function AgentSkillsTab({
 							<span className="font-mono">{s.missing.join(" and ")}</span>,
 							which this envelope does not allow
 						</span>
-						<Button
+						<ActButton
+							area="build"
 							size="sm"
 							variant="outline"
 							onClick={() => setEditing(true)}
 						>
 							Edit envelope
-						</Button>
-						<Button
+						</ActButton>
+						<ActButton
+							area="build"
 							size="sm"
 							variant="ghost"
 							disabled={isBinding}
@@ -374,7 +389,7 @@ export function AgentSkillsTab({
 							}}
 						>
 							Unbind
-						</Button>
+						</ActButton>
 					</Alert>
 				))}
 				{refusal && refusedSkill ? (
@@ -402,7 +417,8 @@ export function AgentSkillsTab({
 						<Button size="sm" variant="ghost" onClick={onOpenEnvelope}>
 							Draw it
 						</Button>
-						<Button
+						<ActButton
+							area="build"
 							size="sm"
 							variant="ghost"
 							onClick={() => {
@@ -411,7 +427,7 @@ export function AgentSkillsTab({
 							}}
 						>
 							{editing ? "Done" : "Edit envelope"}
-						</Button>
+						</ActButton>
 					</span>
 				}
 			>
@@ -505,9 +521,14 @@ export function AgentSkillsTab({
 				card
 				title="Plans it may pick"
 				action={
-					<Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
+					<ActButton
+						area="build"
+						size="sm"
+						variant="ghost"
+						onClick={() => setEditing(true)}
+					>
 						Edit
-					</Button>
+					</ActButton>
 				}
 			>
 				{can.data?.plans.length ? (

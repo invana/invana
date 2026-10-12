@@ -33,7 +33,7 @@ import {
 import { StepList, totalDuration } from "@invana-studio/assistant";
 import type { RunNode, TaskRunSummary } from "@invana-studio/core";
 import { formatDuration } from "@invana-studio/core";
-import { useRunsQuery } from "@invana-studio/shell";
+import { ActButton, useAccess, useRunsQuery } from "@invana-studio/shell";
 import {
 	DetailBlock,
 	DetailProse,
@@ -345,6 +345,7 @@ function TaskDetail({
 	const [note, setNote] = useState("");
 	const [rejecting, setRejecting] = useState(false);
 	const [reassigning, setReassigning] = useState(false);
+	const work = useAccess().gate("work");
 
 	const activity = useTodoActivityQuery(username, graphSlug, task.id);
 	const runs = useTodoRunsQuery(username, graphSlug, task.run_ids);
@@ -472,6 +473,8 @@ function TaskDetail({
 							Assignee
 							<select
 								value={task.assignee_id ?? ""}
+								disabled={!work.allowed}
+								title={work.reason ?? undefined}
 								onChange={(e) => {
 									mutations.update.mutate({
 										id: task.id,
@@ -614,10 +617,15 @@ function TaskDetail({
 			<CardFooter className="shrink-0 flex-wrap gap-2 border-t">
 				{canAccept ? (
 					<>
-						<Button size="sm" onClick={() => mutations.accept.mutate(task.id)}>
+						<ActButton
+							area="work"
+							size="sm"
+							onClick={() => mutations.accept.mutate(task.id)}
+						>
 							<Check /> Accept
-						</Button>
-						<Button
+						</ActButton>
+						<ActButton
+							area="work"
 							size="sm"
 							variant="outline"
 							onClick={() => {
@@ -626,13 +634,14 @@ function TaskDetail({
 							}}
 						>
 							<Undo2 /> Reject with note
-						</Button>
+						</ActButton>
 					</>
 				) : null}
 				{task.status !== "done" && task.status !== "cancelled" ? (
 					<>
 						<span className="flex-1" />
-						<Button
+						<ActButton
+							area="work"
 							size="sm"
 							variant="ghost"
 							onClick={() => {
@@ -641,7 +650,7 @@ function TaskDetail({
 							}}
 						>
 							<UserCog /> Reassign
-						</Button>
+						</ActButton>
 					</>
 				) : null}
 			</CardFooter>

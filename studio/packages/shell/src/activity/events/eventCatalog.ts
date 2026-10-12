@@ -127,7 +127,11 @@ export const EVENT_CATEGORIES: EventCategory[] = [
 	{
 		key: "member",
 		label: "Members",
-		types: [{ action: "member.add", label: "Added" }],
+		types: [
+			{ action: "member.add", label: "Added" },
+			{ action: "member.roles", label: "Roles changed" },
+			{ action: "member.remove", label: "Removed" },
+		],
 	},
 	{
 		key: "setup",

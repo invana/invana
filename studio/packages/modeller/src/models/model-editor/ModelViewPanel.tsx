@@ -30,6 +30,7 @@ import {
 	SearchInput,
 	Spinner,
 } from "@invana/ui";
+import { ActButton, gateItem, useAccess } from "@invana-studio/shell";
 import {
 	PanelStatusBar,
 	RecordRow,
@@ -174,6 +175,7 @@ function ModelListView({
 	const [creating, setCreating] = useState(false);
 	const [importing, setImporting] = useState(false);
 	const restore = useUpdateModelMutation(username, graphSlug);
+	const modelGate = useAccess().gate("model");
 
 	const match = (m: GraphModelSummary) =>
 		!search || m.name.toLowerCase().includes(search.toLowerCase());
@@ -222,7 +224,7 @@ function ModelListView({
 								icon: BookOpen,
 								onClick: () => setImporting(true),
 							},
-						]
+						].map((item) => gateItem(item, modelGate))
 					: []),
 				{
 					key: "search",
@@ -312,7 +314,8 @@ function ModelListView({
 								pinActions
 								actions={
 									canWrite ? (
-										<Button
+										<ActButton
+											area="model"
 											size="sm"
 											variant="ghost"
 											disabled={restore.isPending}
@@ -327,7 +330,7 @@ function ModelListView({
 											}
 										>
 											Restore
-										</Button>
+										</ActButton>
 									) : null
 								}
 							/>
@@ -422,6 +425,7 @@ function ModelDetail({
 		openVersionId ?? undefined,
 	);
 	const staged = useStagedSetQuery(username, graphSlug, model.id, !!draft);
+	const modelGate = useAccess().gate("model");
 
 	// Adding is authoring, and authoring is on a draft: `+ add` is on the
 	// two type sections while one is open, and `Edit` on the page opens one.
@@ -491,12 +495,15 @@ function ModelDetail({
 			title: <SectionTitle count={nodeTypes.length}>Node types</SectionTitle>,
 			headerActions: ctx
 				? [
-						{
-							key: "add",
-							name: "Add a node type",
-							icon: Plus,
-							onClick: () => setAdding("node"),
-						},
+						gateItem(
+							{
+								key: "add",
+								name: "Add a node type",
+								icon: Plus,
+								onClick: () => setAdding("node"),
+							},
+							modelGate,
+						),
 					]
 				: [],
 			actionsOnHover: false,
@@ -528,12 +535,15 @@ function ModelDetail({
 			title: <SectionTitle count={edgeTypes.length}>Edge types</SectionTitle>,
 			headerActions: ctx
 				? [
-						{
-							key: "add",
-							name: "Declare an edge type",
-							icon: Plus,
-							onClick: () => setAdding("edge"),
-						},
+						gateItem(
+							{
+								key: "add",
+								name: "Declare an edge type",
+								icon: Plus,
+								onClick: () => setAdding("edge"),
+							},
+							modelGate,
+						),
 					]
 				: [],
 			actionsOnHover: false,

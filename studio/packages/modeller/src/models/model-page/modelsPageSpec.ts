@@ -324,23 +324,24 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 							variant: "outline",
 						},
 					],
-			actions: canWrite
-				? [
-						{
-							id: MODELS_ACTIONS.newModel,
-							label: "New model",
-							icon: "plus",
-							variant: "default",
-						},
-						{
-							id: MODELS_ACTIONS.importModel,
-							label: "Import",
-							icon: "upload",
-							variant: "outline",
-						},
-						menu(["starters", "introspect"]),
-					]
-				: [],
+			actions: readOnly(
+				[
+					{
+						id: MODELS_ACTIONS.newModel,
+						label: "New model",
+						icon: "plus",
+						variant: "default",
+					},
+					{
+						id: MODELS_ACTIONS.importModel,
+						label: "Import",
+						icon: "upload",
+						variant: "outline",
+					},
+					menu(["starters", "introspect"]),
+				],
+				canWrite,
+			),
 		};
 	}
 
@@ -370,50 +371,41 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 	if (!canWrite) chips.push({ label: "read only", variant: "secondary" });
 
 	const retire: ModelsMenuItem = published ? "archive" : "delete";
-	const actions: ActionSpec[] = !canWrite
+	const actions: ActionSpec[] = draft
 		? [
+				{
+					id: MODELS_ACTIONS.publish,
+					label: draft.version ? `Publish v${draft.version}` : "Publish",
+					icon: "check",
+					variant: "default",
+					// The act says why rather than going quiet (the-model-page.md seams).
+					disabled: !set?.can_commit,
+				},
+				{
+					id: MODELS_ACTIONS.discardDraft,
+					label: "Discard draft",
+					variant: "outline",
+				},
+				...compare,
+				menu(["rename", "exportModel", retire]),
+			]
+		: [
+				{ id: MODELS_ACTIONS.edit, label: "Edit", variant: "default" },
 				{
 					id: MODELS_ACTIONS.exportModel,
 					label: "Export",
 					variant: "outline",
 					disabled: !active,
 				},
-			]
-		: draft
-			? [
-					{
-						id: MODELS_ACTIONS.publish,
-						label: draft.version ? `Publish v${draft.version}` : "Publish",
-						icon: "check",
-						variant: "default",
-						// The act says why rather than going quiet (the-model-page.md seams).
-						disabled: !set?.can_commit,
-					},
-					{
-						id: MODELS_ACTIONS.discardDraft,
-						label: "Discard draft",
-						variant: "outline",
-					},
-					...compare,
-					menu(["rename", "exportModel", retire]),
-				]
-			: [
-					{ id: MODELS_ACTIONS.edit, label: "Edit", variant: "default" },
-					{
-						id: MODELS_ACTIONS.exportModel,
-						label: "Export",
-						variant: "outline",
-						disabled: !active,
-					},
-					...compare,
-					menu(["rename", retire]),
-				];
+				...compare,
+				menu(["rename", retire]),
+			];
 
 	return {
 		crumbs: ["Models", model.name],
 		crumbActions: [MODELS_ACTIONS.allModels, undefined],
 		chips,
-		actions,
+		actions: readOnly(actions, canWrite),
 		// One line; `More` for the rest.
 		description: model.description || "No description.",
 		details: [
@@ -427,6 +419,33 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 			{ label: "Updated", value: new Date(model.updated_at).toLocaleString() },
 		],
 	};
+}
+
+/** The acts that only read — export and compare — which a reader keeps. */
+const READS: ReadonlySet<string> = new Set([
+	MODELS_ACTIONS.exportModel,
+	MODELS_ACTIONS.compare,
+]);
+const READ_ITEMS: ReadonlySet<string> = new Set<ModelsMenuItem>([
+	"exportModel",
+]);
+
+/**
+ * The header's acts for a member without the `model` role: every write stays
+ * on the header, disabled, so the page reads the same to everyone — the
+ * notice above the page says which role it needs and who holds it. A menu
+ * keeps its read-only items, and is disabled only when none are left.
+ */
+function readOnly(actions: ActionSpec[], canWrite: boolean): ActionSpec[] {
+	if (canWrite) return actions;
+	return actions.map((a) => {
+		if (READS.has(a.id)) return a;
+		if (a.menu) {
+			const options = (a.options ?? []).filter((o) => READ_ITEMS.has(o));
+			return options.length ? { ...a, options } : { ...a, disabled: true };
+		}
+		return { ...a, disabled: true };
+	});
 }
 
 function menu(items: ModelsMenuItem[]): ActionSpec {

@@ -43,6 +43,7 @@ import {
 	type ProjectionTemplateRead,
 	projectionTemplatesApi,
 } from "@invana-studio/core";
+import { ActButton } from "@invana-studio/shell";
 import {
 	DetailBlock,
 	DetailStatus,
@@ -321,16 +322,18 @@ function TemplateRow({
 				template.shipped ? undefined : (
 					<span className="flex items-center gap-1">
 						{template.status === "draft" ? (
-							<Button
+							<ActButton
+								area="build"
 								size="sm"
 								variant="ghost"
 								className="h-6 px-1.5 text-sm"
 								onClick={onPublish}
 							>
 								Publish
-							</Button>
+							</ActButton>
 						) : null}
-						<Button
+						<ActButton
+							area="build"
 							size="sm"
 							variant="ghost"
 							className="h-6 px-1.5"
@@ -338,7 +341,7 @@ function TemplateRow({
 							title="Remove — refused while answers still cite it"
 						>
 							<Trash2 className="h-3.5 w-3.5" />
-						</Button>
+						</ActButton>
 					</span>
 				)
 			}
@@ -399,12 +402,13 @@ function TemplateDetail({
 			{template.shipped ? null : (
 				<CardFooter className="shrink-0 flex-wrap gap-2 border-t">
 					{template.status === "draft" ? (
-						<Button size="sm" onClick={onPublish}>
+						<ActButton area="build" size="sm" onClick={onPublish}>
 							Publish
-						</Button>
+						</ActButton>
 					) : null}
 					<span className="flex-1" />
-					<Button
+					<ActButton
+						area="build"
 						size="sm"
 						variant="ghost"
 						onClick={onDelete}
@@ -412,7 +416,7 @@ function TemplateDetail({
 					>
 						<Trash2 className="mr-1.5 h-3.5 w-3.5" />
 						Remove
-					</Button>
+					</ActButton>
 				</CardFooter>
 			)}
 		</div>

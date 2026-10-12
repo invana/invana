@@ -21,6 +21,7 @@
  */
 
 import { Button, RecordHeader, TabbedPanel } from "@invana/ui";
+import { ActButton, ReadOnlyNotice } from "@invana-studio/shell";
 import { agentTone, DetailStatus, humanStatus } from "@invana-studio/ui";
 import { Eye, Lock, Play, Save, Star } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -126,7 +127,8 @@ export function AgentDetail({
 	// Discard · Save, as drawn — it answers the tab's sample ask in both voices.
 	const previewButton =
 		tab === "soul" ? (
-			<Button
+			<ActButton
+				area="build"
 				size="sm"
 				variant="outline"
 				disabled={soulPreview.preview.isPending}
@@ -134,7 +136,7 @@ export function AgentDetail({
 			>
 				<Eye />
 				{soulPreview.preview.isPending ? "Asking…" : "Preview"}
-			</Button>
+			</ActButton>
 		) : null;
 
 	const changes = useMemo(() => changesOf(agent, draft), [agent, draft]);
@@ -178,37 +180,49 @@ export function AgentDetail({
 							{/* A spec that does not parse must not be savable: the
 							    structured fields still hold the last valid document, so
 							    Save would write something the editor is not showing. */}
-							<Button
+							<ActButton
+								area="build"
 								size="sm"
 								disabled={isSaving || specError !== null}
 								onClick={() => onSave(changes)}
 							>
 								<Save />{" "}
 								{isSaving ? "Saving…" : tab === "soul" ? "Save soul" : "Save"}
-							</Button>
+							</ActButton>
 						</>
 					) : (
 						<>
 							{previewButton}
 							{/* Only an agent that answers asks can be the default. */}
 							{!isDefault && agent.status === "active" && agent.answers_asks ? (
-								<Button size="sm" variant="ghost" onClick={onSetDefault}>
+								<ActButton
+									area="settings"
+									size="sm"
+									variant="ghost"
+									onClick={onSetDefault}
+								>
 									<Star /> Make default
-								</Button>
+								</ActButton>
 							) : null}
 							{agent.status === "retired" ? null : (
 								<>
-									<Button
+									<ActButton
+										area="build"
 										size="sm"
 										variant="ghost"
 										onClick={agent.status === "paused" ? onResume : onPause}
 									>
 										{agent.status === "paused" ? <Play /> : <Lock />}
 										{agent.status === "paused" ? "Resume" : "Pause"}
-									</Button>
-									<Button size="sm" variant="ghost" onClick={onRetire}>
+									</ActButton>
+									<ActButton
+										area="build"
+										size="sm"
+										variant="ghost"
+										onClick={onRetire}
+									>
 										Retire
-									</Button>
+									</ActButton>
 								</>
 							)}
 						</>
@@ -223,6 +237,9 @@ export function AgentDetail({
 						: "the engine refused this edit."}
 				</p>
 			) : null}
+			<div className="shrink-0 px-3.5 pt-3.5 empty:hidden">
+				<ReadOnlyNotice area="build" noun="agent" />
+			</div>
 
 			{/* The kit's underline tab strip, as drawn. Its card border is
 			    the page's own, so it is dropped here. */}

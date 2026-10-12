@@ -21,6 +21,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { FormError, PanelSection } from "@invana-studio/ui";
 import { Plus, Sparkles, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -84,7 +85,8 @@ export function EvalSetPanel({
 			hint={`${active} active · replayed before every publish`}
 			action={
 				<span className="flex gap-1">
-					<Button
+					<ActButton
+						area="build"
 						size="xs"
 						variant="ghost"
 						disabled={m.propose.isPending}
@@ -94,10 +96,15 @@ export function EvalSetPanel({
 						{m.propose.isPending
 							? "Proposing…"
 							: "Propose from the instructions"}
-					</Button>
-					<Button size="xs" variant="outline" onClick={() => setAdding(true)}>
+					</ActButton>
+					<ActButton
+						area="build"
+						size="xs"
+						variant="outline"
+						onClick={() => setAdding(true)}
+					>
 						<Plus /> Add a case
-					</Button>
+					</ActButton>
 				</span>
 			}
 		>
@@ -211,16 +218,18 @@ export function EvalSetPanel({
 								</TableCell>
 								<TableCell className="whitespace-nowrap">
 									{c.status === "proposed" ? (
-										<Button
+										<ActButton
+											area="build"
 											size="xs"
 											variant="ghost"
 											disabled={m.acceptCase.isPending}
 											onClick={() => m.acceptCase.mutate(c.id)}
 										>
 											Accept
-										</Button>
+										</ActButton>
 									) : null}
-									<Button
+									<ActButton
+										area="build"
 										size="xs"
 										variant="ghost"
 										aria-label={`Delete ${c.question}`}
@@ -228,7 +237,7 @@ export function EvalSetPanel({
 										onClick={() => m.deleteCase.mutate(c.id)}
 									>
 										<Trash2 />
-									</Button>
+									</ActButton>
 								</TableCell>
 							</TableRow>
 						))}

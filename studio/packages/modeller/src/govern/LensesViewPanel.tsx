@@ -16,9 +16,8 @@
  * **One query, split by `kind`.** A guardrail and a world are one record
  * separated by `kind`, so both sections read one list rather than two
  * endpoints — a second fetch would be the second enforcement path this module
- * exists not to have. The same response carries `may_edit_guardrails`, which is
- * why the permission never lands at a different moment from the rules it
- * governs.
+ * exists not to have. Authoring either is the `model` role's: without it the
+ * acts show disabled, with who to ask.
  *
  * **The panel owns the write.** Both sections author the same record through the
  * same two mutations, and the guardrail save is the one that has to ask what it
@@ -39,6 +38,7 @@
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
 import type { LensCreate, LensKind, Refusal } from "@invana-studio/core";
 import { ApiError, useLensesQuery } from "@invana-studio/core";
+import { useAccess } from "@invana-studio/shell";
 import { useStackSectionUi } from "@invana-studio/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -100,10 +100,7 @@ export function LensesViewPanel({
 		};
 	}, [data]);
 
-	// Absent until the list answers. Defaulting to `true` would draw controls
-	// for a second and then take them away, which reads as a permission being
-	// revoked while somebody watches.
-	const mayEditGuardrails = data?.may_edit_guardrails ?? false;
+	const modelGate = useAccess().gate("model");
 
 	const isSaving = create.isPending || update.isPending;
 
@@ -232,7 +229,7 @@ export function LensesViewPanel({
 		onOpenWorld: govern.openWorld,
 		onOpenBoard: onOpenBoard ? (id) => onOpenBoard("world", id) : undefined,
 		onReadGuardrails: () => govern.focus("guardrails"),
-		mayEditGuardrails,
+		gate: modelGate,
 		editingId,
 		onEdit: setEditingId,
 		onSave,
@@ -250,7 +247,7 @@ export function LensesViewPanel({
 		guardrailId: govern.guardrailId,
 		onOpenGuardrail: govern.openGuardrail,
 		onOpenBoard: onOpenBoard ? (id) => onOpenBoard("guardrail", id) : undefined,
-		mayEditGuardrails,
+		gate: modelGate,
 		editingId,
 		onEdit: setEditingId,
 		onSave,

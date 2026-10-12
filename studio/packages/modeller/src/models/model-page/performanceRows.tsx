@@ -27,6 +27,7 @@ import {
 	SheetTitle,
 	Spinner,
 } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { Plus } from "lucide-react";
 import type { GrowthMark, Performance, ShapeCard, ShapeRow } from "../types";
 import {
@@ -361,13 +362,14 @@ export function ShapeSheet({
 										{canWrite && a.model_id ? (
 											<>
 												<span>
-													<Button
+													<ActButton
+														area="model"
 														size="sm"
 														disabled={staging}
 														onClick={() => onStage(a)}
 													>
 														<Plus /> Add index to draft
-													</Button>
+													</ActButton>
 												</span>
 												<span className="text-muted-foreground">
 													Stages{" "}

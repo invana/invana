@@ -20,7 +20,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@invana/forms";
-import { Button, PropertyList, PropertyRow } from "@invana/ui";
+import { PropertyList, PropertyRow } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useState } from "react";
 import { GatedActDialog } from "../evals/GatedActDialog";
@@ -131,13 +132,14 @@ function ModelPin({
 					kept in History.
 				</p>
 				{picked ? (
-					<Button
+					<ActButton
+						area="build"
 						size="xs"
 						className="self-start"
 						onClick={() => setConfirming(true)}
 					>
 						Move to {picked}
-					</Button>
+					</ActButton>
 				) : null}
 			</div>
 			<GatedActDialog

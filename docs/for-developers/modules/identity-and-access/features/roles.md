@@ -8,7 +8,7 @@ Admin**.
 |---|---|
 | Index | [11.6](../../../README.md#11--identity-and-access) · Slice **B11** |
 | Module | [Identity and access](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Product | [shell.md › Decisions](../../../../products/shell.md#decisions) — *Roles per Graph* · *Without the role* · P-18 |
 | Related | [membership](membership.md) · [search](../../platform/features/search.md) · [guardrails](../../govern/features/guardrails.md) · [rules](../../skills/features/rules.md) · [datasets](../../bring-data-in/features/datasets.md) |
 
@@ -88,7 +88,10 @@ flowchart TD
 | `GET …/access` | `{roles, areas: [{area, role, allowed, holders}]}` |
 | `/auth/me` | `graphs[].roles` |
 | CLI | `invana members list · add --role · set-roles --role · remove` ([13.3](../../platform/features/command-line.md)) |
-| Studio | C07 — SH-20 read-only views, MO-14 members and roles. Not built here |
+| Studio · access | `useAccess()` (shell) reads `GET …/access` once per Graph, key `["access", owner, graph]`; `gateOf` (core) turns an area into allowed · role · holders · reason |
+| Studio · a gated act | `ActButton area=…` (shell) — the kit `Button`, or disabled with the reason as tooltip and accessible description; `gateItem(item, gate)` does the same for a panel header action |
+| Studio · a read-only surface | `ReadOnlyNotice area noun` (shell) — *You can read this skill. Editing needs the builder role — ask ravi.* (board `agents.skills.detail.readonly`) |
+| Studio · Members | Graph settings › **Members** tab (Modeller, board `modeller.settings.members`): member · roles · since, *Edit* roles, *Remove*, *Add member*; a **Roles** key below it |
 
 ## Engine
 
@@ -118,6 +121,12 @@ flowchart TD
 | RO10 | The install Admin is `users.is_superuser`, which already gates install rules, standards, every dataset and retraction. It grants no Graph role and no Graph access. |
 | RO11 | The CLI holds database credentials and acts as the `--user` it names; role enforcement is the API's. `invana members` refuses what the manager refuses — an unknown role, a person with no account, the last owner. |
 | RO12 | Existing members keep what they had: the creator becomes `owner`, everyone else `contributor · builder · modeller`. |
+| RO13 | Studio reads `…/access` once per Graph (60 s stale) and draws from it. Until it loads, or when it fails, every act is enabled: the engine re-checks every write and its refusal still names the role and the holders. |
+| RO14 | An act without its role is **disabled, never hidden**. Its tooltip and accessible description read *Needs the `<role>` role — ask `<holders>`.* The reader is left out of the holders; past three names it reads *a, b or N others*. |
+| RO15 | What is gated is the **entry act** of an area — the button that opens an authoring dialog or writes straight away (*New agent*, *Edit instructions*, *Publish*, *New project*, *Save*). A dialog's own submit is not gated again: its entry already was. Area by product follows the engine table: Agents' agents, skills, evals, plans, templates and plugins → `build`; LLM providers → `settings`; Modeller's models, stitches, rules and guardrails → `model`, its Graph settings and Members → `settings`; Projects' projects, findings, decisions, todos → `work`; Activity's schedules → `work`, rules and channels → `settings`. Asking is every member's. Datasets are install-scoped and keep B03's checks; a plugin's enable and disable are install-wide (`/api/v1/plugins…`) and gated by no Graph role. *Save as dataset* on a simulation is gated as `work`, the act that starts it, though the dataset route itself is install-wide. |
+| RO16 | A detail surface whose main act is gated opens with one line, `ReadOnlyNotice`: *You can read this `<noun>`. Editing needs the `<role>` role — ask `<names>`.* Shown only where the board draws it — a skill, an agent, a model, a project — not on every list. |
+| RO17 | Graph settings gains a **Members** tab: one row per member — name, roles as badges, *since* — and for an owner *Edit* (the five roles as a checkbox set; `viewer` always held) and *Remove* (confirmed). *Add member* takes an email or a username and roles. Below it a **Roles** key: role · what it may change. The last owner's refusal (409) and an unknown account (404) show in the dialog, in the engine's words. Without `owner` the tab reads, its acts disabled per RO14. |
+| RO18 | Graph settings' connection tab is labelled **Database** (its `?tab=graph` key unchanged), so the strip reads Basic · Database · Members as the product names them. |
 
 ## Not building
 
@@ -129,4 +138,5 @@ flowchart TD
 | Role-aware agents | agents are principals bounded by an envelope ([MB5](membership.md)) |
 | Hiding a product a role cannot read | every role reads every product today |
 | Invitations | as in [membership](membership.md) |
-| Studio surfaces | C07 builds them |
+| *Request access* on a read-only surface | there is no access-request flow (no invitations); the notice names who to ask |
+| Agents in the Members table | agents are principals bounded by an envelope, not members holding roles |

@@ -1,5 +1,5 @@
 /**
- * Notifications, approvals and members API clients
+ * Notifications and approvals API clients
  * (docs/for-developers/modules/operate/features/notifications.md ·
  * approvals.md).
  *
@@ -7,7 +7,6 @@
  * |---|---|
  * | `notificationsApi` | `/notifications` (the inbox) · `/read` · `/rules` · `/channels` |
  * | `approvalsApi` | `/approvals` · `/{id}/approve` · `/{id}/decline` |
- * | `membersApi` | `/members` — names the member ids rules and schedules store |
  */
 
 import { ApiError, apiClient, type GraphRef } from "@invana-studio/core";
@@ -19,7 +18,6 @@ import type {
 	ChannelListResponse,
 	ChannelWrite,
 	InboxResponse,
-	MemberListResponse,
 	NotificationRule,
 	NotificationRuleListResponse,
 	NotificationRuleUpdate,
@@ -116,13 +114,6 @@ export const approvalsApi = {
 				{ note },
 			)
 		).data;
-	},
-};
-
-export const membersApi = {
-	async list(g: GraphRef): Promise<MemberListResponse> {
-		return (await apiClient.get<MemberListResponse>(`${graphBase(g)}/members`))
-			.data;
 	},
 };
 

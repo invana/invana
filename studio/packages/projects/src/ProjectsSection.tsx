@@ -43,7 +43,7 @@ import {
 	TabsTrigger,
 } from "@invana/ui";
 import type { TaskRunSummary } from "@invana-studio/core";
-import { useRunsQuery } from "@invana-studio/shell";
+import { ActButton, useRunsQuery } from "@invana-studio/shell";
 import {
 	DetailBlock,
 	DetailPlaceholder,
@@ -911,7 +911,8 @@ function ProjectDetailsTab({
 			 * not showing.
 			 */}
 			<div className="flex flex-wrap items-center gap-2">
-				<Button
+				<ActButton
+					area="work"
 					size="sm"
 					variant="outline"
 					disabled={project.status === "archived"}
@@ -923,25 +924,27 @@ function ProjectDetailsTab({
 					onClick={start}
 				>
 					<Pencil /> Edit
-				</Button>
+				</ActButton>
 				{project.status === "archived" ? (
-					<Button
+					<ActButton
+						area="work"
 						size="sm"
 						variant="ghost"
 						title="Move it back to active — its tasks become writable again"
 						onClick={onUnarchive}
 					>
 						<ArchiveRestore /> Unarchive
-					</Button>
+					</ActButton>
 				) : (
-					<Button
+					<ActButton
+						area="work"
 						size="sm"
 						variant="ghost"
 						title="Freeze it — its tasks become read-only, and it keeps its place in the list"
 						onClick={onArchive}
 					>
 						<Archive /> Archive
-					</Button>
+					</ActButton>
 				)}
 			</div>
 			{/*

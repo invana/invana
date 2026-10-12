@@ -24,12 +24,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@invana/forms";
-import { Button } from "@invana/ui";
 import {
 	graphsApi,
 	useGraphQuery,
 	useUpdateGraphMutation,
 } from "@invana-studio/core";
+import { ActButton } from "@invana-studio/shell";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -130,7 +130,8 @@ export function ConcurrencyFields({ username, graphSlug }: Props) {
 			) : null}
 
 			{dirty ? (
-				<Button
+				<ActButton
+					area="settings"
 					size="sm"
 					onClick={() =>
 						mutation.mutate(
@@ -148,7 +149,7 @@ export function ConcurrencyFields({ username, graphSlug }: Props) {
 					disabled={mutation.isPending}
 				>
 					Save the ceiling
-				</Button>
+				</ActButton>
 			) : null}
 		</div>
 	);

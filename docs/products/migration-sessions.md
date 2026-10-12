@@ -565,7 +565,7 @@ Statuses: `pending` · `in progress` · `partial` · `blocked` · `done`.
 | C04 | 9 | change | A08, B01, R00 | `feat/studio-change-log` | done | 2026-10-12 | gates green · design review passed |
 | C05 | 9 | change | A15, B08, R00 | `feat/studio-schedules-notifications` | done | 2026-10-13 | gates green · design review passed |
 | C06 | 9 | change | B09, R00 | `feat/studio-simulation` | done | 2026-10-13 | gates green · design review passed |
-| C07 | 9 | change | A15, B11, R00 | `feat/studio-roles` | pending | | |
+| C07 | 9 | change | A15, B11, R00 | `feat/studio-roles` | done | 2026-10-13 | gates green · design review passed |
 | C08 | 9 | change | C01, A10b, B12, R00 | `feat/studio-semantic-imports` | pending | | SKOS first |
 | C09 | 9 | change | A09, A08, B02, R00 | `feat/studio-rerun-and-share` | pending | | |
 | C10 | 9 | change | A11, B15, R00 | `feat/studio-agents-overview` | pending | | |

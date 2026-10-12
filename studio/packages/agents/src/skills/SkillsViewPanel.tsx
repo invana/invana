@@ -25,6 +25,7 @@ import {
 	PropertyRow,
 	Spinner,
 } from "@invana/ui";
+import { gateItem, useAccess } from "@invana-studio/shell";
 import {
 	DetailStatus,
 	PanelStatusBar,
@@ -62,6 +63,7 @@ export function SkillsViewPanel({
 }: Props) {
 	const skills = useSkillsQuery(username, graphSlug);
 	const create = useCreateSkillMutation(username, graphSlug);
+	const build = useAccess().gate("build");
 	const items = skills.data?.items ?? [];
 	const selected = items.find((s) => s.id === selectedSkillId) ?? null;
 
@@ -140,11 +142,7 @@ export function SkillsViewPanel({
 			// The header's one action area carries the act the section is for.
 			// The section does not drill in — the detail is the page.
 			headerActions: [
-				{
-					name: "New skill",
-					icon: Plus,
-					onClick: newSkill,
-				},
+				gateItem({ name: "New skill", icon: Plus, onClick: newSkill }, build),
 			],
 			actionsOnHover: false,
 			content: skillsBody(),

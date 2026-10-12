@@ -14,6 +14,7 @@
 
 import { Textarea } from "@invana/forms";
 import { Badge, Button, PropertyList, PropertyRow } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { PencilLine, Play, Send, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -78,9 +79,14 @@ export function AgentInstructionsTab({
 					}
 					action={
 						editing ? null : (
-							<Button size="xs" variant="ghost" onClick={startEdit}>
+							<ActButton
+								area="build"
+								size="xs"
+								variant="ghost"
+								onClick={startEdit}
+							>
 								<PencilLine /> {hasDraft ? "Edit the draft" : "Edit"}
-							</Button>
+							</ActButton>
 						)
 					}
 				>
@@ -132,25 +138,31 @@ export function AgentInstructionsTab({
 							<Badge size="xs" variant="soft" tone="warning">
 								draft · nothing runs on it
 							</Badge>
-							<Button
+							<ActButton
+								area="build"
 								size="xs"
 								variant="outline"
 								disabled={evals.open.isPending}
 								onClick={runEvals}
 							>
 								<Play /> Run the evals
-							</Button>
-							<Button size="xs" onClick={() => setPublishing(true)}>
+							</ActButton>
+							<ActButton
+								area="build"
+								size="xs"
+								onClick={() => setPublishing(true)}
+							>
 								<Send /> Publish
-							</Button>
-							<Button
+							</ActButton>
+							<ActButton
+								area="build"
 								size="xs"
 								variant="ghost"
 								disabled={m.discardDraft.isPending}
 								onClick={() => m.discardDraft.mutate(agent.id)}
 							>
 								<Trash2 /> Discard draft
-							</Button>
+							</ActButton>
 						</div>
 					) : null}
 				</PanelSection>

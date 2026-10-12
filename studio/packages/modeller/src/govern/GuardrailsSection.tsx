@@ -24,13 +24,14 @@
  */
 
 import type { PanelStackSection } from "@invana/ui";
-import type { Lens, LensCreate, Refusal } from "@invana-studio/core";
+import type { Gate, Lens, LensCreate, Refusal } from "@invana-studio/core";
 import { type StackSectionUi, stackSection } from "@invana-studio/ui";
 import { Maximize2, Plus, ShieldCheck } from "lucide-react";
 import { LensActions } from "./LensActions";
 import { LensDetail } from "./LensDetail";
 import { LensEditor } from "./LensEditor";
 import { LensList } from "./LensList";
+import { gateSectionAction } from "./sectionGate";
 import { NEW_LENS } from "./WorldsSection";
 
 export interface GuardrailsSectionProps {
@@ -48,8 +49,8 @@ export interface GuardrailsSectionProps {
 	 * the bound is not the permission ([guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
 	 */
 	onOpenBoard?: (id: string) => void;
-	/** The one field-level permission in the product. */
-	mayEditGuardrails: boolean;
+	/** The `model` area — authoring a guardrail needs it. */
+	gate: Gate;
 	editingId: string | null;
 	onEdit: (id: string | null) => void;
 	onSave: (payload: LensCreate, lensId?: string) => void;
@@ -68,7 +69,7 @@ export function guardrailsSection({
 	guardrailId,
 	onOpenGuardrail,
 	onOpenBoard,
-	mayEditGuardrails,
+	gate,
 	editingId,
 	onEdit,
 	onSave,
@@ -106,18 +107,18 @@ export function guardrailsSection({
 							},
 						]
 					: undefined,
-			// Absent without the permission, never disabled — a greyed `+` promises
-			// a form this person cannot submit.
-			headerActions: mayEditGuardrails
-				? [
-						{
-							key: "new",
-							name: "New guardrail",
-							icon: Plus,
-							onClick: () => onOpenGuardrail(NEW_LENS),
-						},
-					]
-				: undefined,
+			// Without the role it shows disabled, with who to ask.
+			headerActions: [
+				gateSectionAction(
+					{
+						key: "new",
+						name: "New guardrail",
+						icon: Plus,
+						onClick: () => onOpenGuardrail(NEW_LENS),
+					},
+					gate,
+				),
+			],
 			defaultSize,
 			children: () => {
 				if (authoring || editing) {
@@ -152,7 +153,6 @@ export function guardrailsSection({
 									username={username}
 									graphSlug={graphSlug}
 									lens={drilled}
-									mayEditGuardrails={mayEditGuardrails}
 									onEdit={() => onEdit(drilled.id)}
 									onGone={() => onOpenGuardrail(null)}
 									onOpen={(id) => onOpenGuardrail(id)}

@@ -33,7 +33,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | MO-F10 | Guardrails and the requests they cause | In Studio | MO-11 |
 | MO-F11 | Rules at install, Graph or project scope | New · Blocked · P-12 | MO-12 |
 | MO-F12 | Requests inbox | New | MO-13 |
-| MO-F13 | Graph settings — basic, database, members and roles | In Studio · New (roles) · Blocked · P-18 | MO-14 |
+| MO-F13 | Graph settings — basic, database, members and roles | In Studio (members and roles, C07) | MO-14 |
 | MO-F14 | New model from an ontology — **RDFS / OWL subset, including schema.org**; JSON-LD, Turtle or RDF/XML; pick types, preview, open as a draft | New · engine ✅ B12, Studio C08 | MO-15 |
 | MO-F15 | Constraints from **SHACL**; schema from **GQL graph types** (ISO/IEC 39075) | Later | — |
 

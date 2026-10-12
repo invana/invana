@@ -46,10 +46,15 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@invana/ui";
-import type { GraphRef } from "@invana-studio/core";
+import {
+	GRAPH_ROLES,
+	type GraphRef,
+	useMembersQuery,
+} from "@invana-studio/core";
 import { FormError } from "@invana-studio/ui";
 import { Check, Plus } from "lucide-react";
 import { useState } from "react";
+import { ActButton } from "../../../access/ActButton";
 import { ConfirmDialog } from "../../../components/ConfirmDialog";
 import { refusalOf } from "../api";
 import { DeliveryPicker } from "../DeliveryPicker";
@@ -57,10 +62,9 @@ import {
 	useCreateRule,
 	useDeleteRule,
 	useMemberName,
-	useMembersQuery,
 	useUpdateRule,
 } from "../queries";
-import { GRAPH_ROLES, type NotificationRule, type RuleMatch } from "../types";
+import type { NotificationRule, RuleMatch } from "../types";
 import {
 	ANY_RUN_FAILS,
 	RULE_EVENT_CATEGORIES,
@@ -348,24 +352,26 @@ export function RuleDialog({ graph, rule, onClose }: RuleDialogProps) {
 
 				<DialogFooter>
 					{rule && (
-						<Button
+						<ActButton
+							area="settings"
 							variant="ghost"
 							className="mr-auto text-destructive"
 							disabled={pending}
 							onClick={() => setConfirming(true)}
 						>
 							Delete
-						</Button>
+						</ActButton>
 					)}
 					<Button variant="ghost" onClick={onClose}>
 						Cancel
 					</Button>
-					<Button
+					<ActButton
+						area="settings"
 						disabled={!name.trim() || events.length === 0 || pending}
 						onClick={save}
 					>
 						Save rule
-					</Button>
+					</ActButton>
 				</DialogFooter>
 
 				{rule && (

@@ -22,8 +22,10 @@
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
 import { useLensesQuery } from "@invana-studio/core";
+import { useAccess } from "@invana-studio/shell";
 import { useStackSectionUi } from "@invana-studio/ui";
 import { useEffect, useRef, useState } from "react";
+import { gateSection } from "../gateSection";
 import { llmsSection } from "../llms/LlmsSection";
 import { useLLMProvidersQuery } from "../llms/queries";
 import {
@@ -66,6 +68,7 @@ export function AgentsViewPanel({
 }: AgentsViewPanelProps) {
 	const agents = useAgentsViewPanel();
 	const ui = useStackSectionUi();
+	const { gate } = useAccess();
 	const providers = useLLMProvidersQuery(username, graphSlug);
 	const lenses = useLensesQuery(username, graphSlug);
 	// Held here, not in the list: the funnel in the section's header and the
@@ -136,34 +139,42 @@ export function AgentsViewPanel({
 			className="h-full"
 			headerHeight={30}
 			sections={[
-				agentsSection({
-					ui,
-					filters,
-					onFilters: setFilters,
-					count,
-					username,
-					graphSlug,
-					onOpenAgentPage,
-					selectedAgentId,
-					onSelectAgent,
-					selectedEdge,
-					onOpenLineage,
-					onOpenTask,
-					onNewAgent,
-					defaultSize: size("agents"),
-				}),
-				llmsSection({
-					ui,
-					username,
-					graphSlug,
-					items: providers.data?.items ?? [],
-					isLoading: providers.isLoading,
-					error: providers.error,
-					lenses: lenses.data?.items ?? [],
-					providerId: agents.providerId,
-					onOpenProvider: agents.openProvider,
-					defaultSize: size("llms"),
-				}),
+				gateSection(
+					agentsSection({
+						ui,
+						filters,
+						onFilters: setFilters,
+						count,
+						username,
+						graphSlug,
+						onOpenAgentPage,
+						selectedAgentId,
+						onSelectAgent,
+						selectedEdge,
+						onOpenLineage,
+						onOpenTask,
+						onNewAgent,
+						defaultSize: size("agents"),
+					}),
+					["new"],
+					gate("build"),
+				),
+				gateSection(
+					llmsSection({
+						ui,
+						username,
+						graphSlug,
+						items: providers.data?.items ?? [],
+						isLoading: providers.isLoading,
+						error: providers.error,
+						lenses: lenses.data?.items ?? [],
+						providerId: agents.providerId,
+						onOpenProvider: agents.openProvider,
+						defaultSize: size("llms"),
+					}),
+					["new"],
+					gate("settings"),
+				),
 			]}
 		/>
 	);

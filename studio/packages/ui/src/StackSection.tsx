@@ -103,6 +103,10 @@ export interface StackSectionSpec {
 		/** `animate-spin` on a refresh while it fetches. */
 		iconClassName?: string;
 		onClick: () => void;
+		/** Drawn disabled — an act the member's role does not allow. */
+		disabled?: boolean;
+		/** Replaces `name` as the tooltip; says why it is disabled. */
+		tooltip?: string;
 	}[];
 	/**
 	 * Actions for the **drilled-in** header, beside `‹ Back` — an act on the one
@@ -116,6 +120,10 @@ export interface StackSectionSpec {
 		/** `animate-spin` on a refresh while it fetches. */
 		iconClassName?: string;
 		onClick: () => void;
+		/** Drawn disabled — an act the member's role does not allow. */
+		disabled?: boolean;
+		/** Replaces `name` as the tooltip; says why it is disabled. */
+		tooltip?: string;
 	}[];
 	/** Enables this section's own search toggle. */
 	searchable?: boolean;
@@ -276,6 +284,8 @@ function sectionActions(
 		icon: a.icon,
 		iconClassName: a.iconClassName,
 		onClick: a.onClick,
+		disabled: a.disabled,
+		tooltip: a.tooltip,
 	}));
 
 	if (spec.searchable) {

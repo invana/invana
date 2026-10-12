@@ -35,12 +35,14 @@
  */
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import { useAccess } from "@invana-studio/shell";
 import {
 	PanelStatusBar,
 	StatusCrumb,
 	useStackSectionUi,
 } from "@invana-studio/ui";
 import { useEffect, useRef, useState } from "react";
+import { gateSection } from "../gateSection";
 import { templatesSection } from "../projections/TemplatesSection";
 import { plansSection } from "./PlansSection";
 import {
@@ -66,6 +68,7 @@ export function LibraryViewPanel({
 }: LibraryViewPanelProps) {
 	const library = useLibraryViewPanel();
 	const ui = useStackSectionUi();
+	const build = useAccess().gate("build");
 
 	// Filters are per section and in-memory: they narrow a list, and a narrowed
 	// list is not a place — `?section=` and the drill-in keys are what a link
@@ -115,37 +118,45 @@ export function LibraryViewPanel({
 					className="h-full"
 					headerHeight={30}
 					sections={[
-						plansSection({
-							username,
-							graphSlug,
-							ui,
-							planKey: library.planKey,
-							onOpenPlan: library.openPlan,
-							selectedStepId,
-							onOpenAgent,
-							promoting: promotingPlan,
-							onPromoting: setPromotingPlan,
-							exportUrl: planExportUrl,
-							kindFilter: planKind,
-							onKindFilter: setPlanKind,
-							sourceFilter: planSource,
-							onSourceFilter: setPlanSource,
-							defaultSize: size("plans"),
-						}),
-						templatesSection({
-							username,
-							graphSlug,
-							ui,
-							templateId: library.templateId,
-							onOpenTemplate: library.openTemplate,
-							authoring: authoringTemplate,
-							onAuthoring: setAuthoringTemplate,
-							kindFilter: templateKind,
-							onKindFilter: setTemplateKind,
-							surfaceFilter: templateSurface,
-							onSurfaceFilter: setTemplateSurface,
-							defaultSize: size("templates"),
-						}),
+						gateSection(
+							plansSection({
+								username,
+								graphSlug,
+								ui,
+								planKey: library.planKey,
+								onOpenPlan: library.openPlan,
+								selectedStepId,
+								onOpenAgent,
+								promoting: promotingPlan,
+								onPromoting: setPromotingPlan,
+								exportUrl: planExportUrl,
+								kindFilter: planKind,
+								onKindFilter: setPlanKind,
+								sourceFilter: planSource,
+								onSourceFilter: setPlanSource,
+								defaultSize: size("plans"),
+							}),
+							["promote"],
+							build,
+						),
+						gateSection(
+							templatesSection({
+								username,
+								graphSlug,
+								ui,
+								templateId: library.templateId,
+								onOpenTemplate: library.openTemplate,
+								authoring: authoringTemplate,
+								onAuthoring: setAuthoringTemplate,
+								kindFilter: templateKind,
+								onKindFilter: setTemplateKind,
+								surfaceFilter: templateSurface,
+								onSurfaceFilter: setTemplateSurface,
+								defaultSize: size("templates"),
+							}),
+							["new"],
+							build,
+						),
 					]}
 				/>
 			</div>

@@ -23,6 +23,7 @@ import {
 	PropertyRow,
 	RecordHeader,
 } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { ArrowLeft, Check, PencilLine } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -104,9 +105,13 @@ export function SkillInstructionsTab({
 							>
 								<ArrowLeft /> Back to edit
 							</Button>
-							<Button size="xs" onClick={() => setPublishing(true)}>
+							<ActButton
+								area="build"
+								size="xs"
+								onClick={() => setPublishing(true)}
+							>
 								<Check /> Publish v{next}
-							</Button>
+							</ActButton>
 						</>
 					}
 				/>
@@ -180,9 +185,11 @@ export function SkillInstructionsTab({
 				<span className="text-muted-foreground">
 					{skill.when_to_use || "Offered on every ask — no *when to use* yet."}
 				</span>
-				<Button size="xs" className="ms-auto" onClick={() => onEditing(true)}>
-					<PencilLine /> Edit instructions
-				</Button>
+				<span className="ms-auto">
+					<ActButton area="build" size="xs" onClick={() => onEditing(true)}>
+						<PencilLine /> Edit instructions
+					</ActButton>
+				</span>
 			</div>
 			<div className="grid items-start gap-2.5 @[760px]:grid-cols-2">
 				<PanelSection card title="instructions.md" hint={`v${skill.version}`}>

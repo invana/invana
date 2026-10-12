@@ -12,7 +12,13 @@
  * catalogue, never Todos.
  */
 
-import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import {
+	PanelStack,
+	type PanelStackHandle,
+	type PanelStackSection,
+} from "@invana/ui";
+import type { Gate } from "@invana-studio/core";
+import { gateItem, useAccess } from "@invana-studio/shell";
 import { stackSection, useStackSectionUi } from "@invana-studio/ui";
 import { FolderOpen, ListTodo, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -42,6 +48,7 @@ export function ProjectsViewPanel({
 }: ProjectsViewPanelProps) {
 	const projects = useProjectsViewPanel();
 	const ui = useStackSectionUi();
+	const work = useAccess().gate("work");
 	const [creatingProject, setCreatingProject] = useState(false);
 	const [creatingTodo, setCreatingTodo] = useState(false);
 	// The drill-in's trail names the project, not its key.
@@ -77,97 +84,105 @@ export function ProjectsViewPanel({
 			className="h-full"
 			headerHeight={30}
 			sections={[
-				stackSection(
-					{
-						id: "projects",
-						label: "Projects",
-						icon: FolderOpen,
-						count: <ProjectsCount username={username} graphSlug={graphSlug} />,
-						trail: projects.projectKey
-							? (projectName ?? projects.projectKey)
-							: undefined,
-						onBack: () => {
-							projects.openProject(null);
-							onProjectChange?.(null);
+				gateNew(
+					stackSection(
+						{
+							id: "projects",
+							label: "Projects",
+							icon: FolderOpen,
+							count: (
+								<ProjectsCount username={username} graphSlug={graphSlug} />
+							),
+							trail: projects.projectKey
+								? (projectName ?? projects.projectKey)
+								: undefined,
+							onBack: () => {
+								projects.openProject(null);
+								onProjectChange?.(null);
+							},
+							searchable: true,
+							searchPlaceholder: "Search projects",
+							headerActions: [
+								{
+									key: "new",
+									name: "New project",
+									icon: Plus,
+									onClick: () => setCreatingProject((v) => !v),
+								},
+							],
+							defaultSize: size("projects"),
+							children: ({ search }) => (
+								<ProjectsSectionBody
+									username={username}
+									graphSlug={graphSlug}
+									search={search}
+									creating={creatingProject}
+									onCreating={setCreatingProject}
+									selectedProjectKey={projects.projectKey}
+									onSelectProject={(key) => {
+										projects.openProject(key);
+										onProjectChange?.(key);
+									}}
+									selectedTaskId={projects.todoId}
+									onSelectTask={projects.openTodo}
+									onOpenTask={projects.openTodo}
+									onOpenAgent={onOpenAgent}
+									onTabChange={(tab) => {
+										if (tab === "plan" && projects.projectKey)
+											onOpenPlanCanvas?.(projects.projectKey);
+									}}
+								/>
+							),
 						},
-						searchable: true,
-						searchPlaceholder: "Search projects",
-						headerActions: [
-							{
-								key: "new",
-								name: "New project",
-								icon: Plus,
-								onClick: () => setCreatingProject((v) => !v),
-							},
-						],
-						defaultSize: size("projects"),
-						children: ({ search }) => (
-							<ProjectsSectionBody
-								username={username}
-								graphSlug={graphSlug}
-								search={search}
-								creating={creatingProject}
-								onCreating={setCreatingProject}
-								selectedProjectKey={projects.projectKey}
-								onSelectProject={(key) => {
-									projects.openProject(key);
-									onProjectChange?.(key);
-								}}
-								selectedTaskId={projects.todoId}
-								onSelectTask={projects.openTodo}
-								onOpenTask={projects.openTodo}
-								onOpenAgent={onOpenAgent}
-								onTabChange={(tab) => {
-									if (tab === "plan" && projects.projectKey)
-										onOpenPlanCanvas?.(projects.projectKey);
-								}}
-							/>
-						),
-					},
-					ui,
+						ui,
+					),
+					work,
 				),
-				stackSection(
-					{
-						id: "todos",
-						label: projects.projectKey ? "Todos" : "My todos",
-						icon: ListTodo,
-						count: (
-							<TodosCount
-								username={username}
-								graphSlug={graphSlug}
-								projectKey={projects.projectKey}
-							/>
-						),
-						trail: projects.todoId ?? undefined,
-						onBack: () => projects.openTodo(null),
-						searchable: true,
-						searchPlaceholder: "Search todos",
-						headerActions: [
-							{
-								key: "new",
-								name: "New todo",
-								icon: Plus,
-								onClick: () => setCreatingTodo((v) => !v),
-							},
-						],
-						defaultSize: size("todos"),
-						children: ({ search }) => (
-							<TodosSectionBody
-								username={username}
-								graphSlug={graphSlug}
-								search={search}
-								creating={creatingTodo}
-								onCreating={setCreatingTodo}
-								selectedTaskId={projects.todoId}
-								onSelectTask={projects.openTodo}
-								projectKey={projects.projectKey}
-								onProjectContext={onProjectChange}
-								onOpenAgent={onOpenAgent}
-								onOpenRule={onOpenRule}
-							/>
-						),
-					},
-					ui,
+				gateNew(
+					stackSection(
+						{
+							id: "todos",
+							label: projects.projectKey ? "Todos" : "My todos",
+							icon: ListTodo,
+							count: (
+								<TodosCount
+									username={username}
+									graphSlug={graphSlug}
+									projectKey={projects.projectKey}
+								/>
+							),
+							trail: projects.todoId ?? undefined,
+							onBack: () => projects.openTodo(null),
+							searchable: true,
+							searchPlaceholder: "Search todos",
+							headerActions: [
+								{
+									key: "new",
+									name: "New todo",
+									icon: Plus,
+									onClick: () => setCreatingTodo((v) => !v),
+								},
+							],
+							defaultSize: size("todos"),
+							children: ({ search }) => (
+								<TodosSectionBody
+									username={username}
+									graphSlug={graphSlug}
+									search={search}
+									creating={creatingTodo}
+									onCreating={setCreatingTodo}
+									selectedTaskId={projects.todoId}
+									onSelectTask={projects.openTodo}
+									projectKey={projects.projectKey}
+									onProjectContext={onProjectChange}
+									onOpenAgent={onOpenAgent}
+									onOpenRule={onOpenRule}
+								/>
+							),
+						},
+						ui,
+					),
+					work,
 				),
 			]}
 		/>
@@ -206,4 +221,23 @@ function TodosCount({
 	if (items.length === 0) return null;
 	const review = items.filter((t) => t.status === "review").length;
 	return <>{review ? `${items.length} · ${review} in review` : items.length}</>;
+}
+
+/**
+ * A section's own *new* act, drawn as the member's role allows it. The gate is
+ * applied to the built section because `stackSection` rebuilds its header
+ * items from the spec; search, filter and back stay open to every member.
+ */
+function gateNew(section: PanelStackSection, gate: Gate): PanelStackSection {
+	if (gate.allowed || !section.headerActions) return section;
+	return {
+		...section,
+		headerActions: section.headerActions.map((item) =>
+			// The kit draws an item with no `onClick` as static text, not a
+			// button; a no-op keeps it a disabled button found by its name.
+			item.key === "new"
+				? { ...gateItem(item, gate), onClick: () => {} }
+				: item,
+		),
+	};
 }

@@ -16,6 +16,8 @@
  * the page's params read off its path (`regions/`).
  */
 
+export { ActButton, ReadOnlyNotice } from "./access/ActButton";
+export { gateItem, useAccess } from "./access/useAccess";
 export * from "./actions";
 export type { ActivitySlots } from "./activity/ActivitySlots";
 export { ActivitySlotsContext } from "./activity/ActivitySlots";

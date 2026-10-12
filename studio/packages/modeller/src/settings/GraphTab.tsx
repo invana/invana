@@ -17,16 +17,20 @@ import {
 	useGraphQuery,
 	useUpdateGraphMutation,
 } from "@invana-studio/core";
-import { useLeftSection } from "@invana-studio/shell";
+import { ActButton, useLeftSection } from "@invana-studio/shell";
 import { FormError } from "@invana-studio/ui";
-import { Archive, ArchiveRestore, Database, Info } from "lucide-react";
+import { Archive, ArchiveRestore, Database, Info, Users } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ConnectionFields } from "./ConnectionFields";
+import { MembersTab } from "./MembersTab";
 
-/** The tabs, in strip order. `?tab=` carries the open one. */
-const SETTINGS_TABS = ["basic", "graph"] as const;
+/**
+ * The tabs, in strip order. `?tab=` carries the open one; the connection's key
+ * stays `graph` under its *Database* label, so older links still land on it.
+ */
+const SETTINGS_TABS = ["basic", "graph", "members"] as const;
 type SettingsTab = (typeof SETTINGS_TABS)[number];
 
 interface Props {
@@ -43,7 +47,8 @@ interface Props {
  * | Tab | What it answers | Fields |
  * |---|---|---|
  * | Basic | what is this graph called, and what is it for | name · description · instructions · archive |
- * | Graph | what database does it read | the connection |
+ * | Database | what database does it read | the connection |
+ * | Members | who is on it, and what each may change | members · roles |
  *
  * What the Graph's agents think with (`Agents › LLMs`) and how hard they may
  * run (`Agents › Settings`) are the Agents product's.
@@ -159,7 +164,7 @@ export function GraphTab({ username, graphSlug, headerActions }: Props) {
 				},
 				{
 					value: "graph",
-					label: "Graph",
+					label: "Database",
 					icon: Database,
 					content: content(() => (
 						<>
@@ -171,12 +176,18 @@ export function GraphTab({ username, graphSlug, headerActions }: Props) {
 						</>
 					)),
 				},
+				{
+					value: "members",
+					label: "Members",
+					icon: Users,
+					content: body(<MembersTab graph={{ username, graphSlug }} />),
+				},
 			]}
 		/>
 	);
 }
 
-/** Whether the connection has been proved, for the chip on the Graph tab. */
+/** Whether the connection has been proved, for the chip on the Database tab. */
 type ConnectionState = "tested" | "untested" | "unset";
 
 const STATE_COPY: Record<ConnectionState, { label: string; tone: string }> = {
@@ -310,9 +321,9 @@ function BasicForm({
 				/>
 
 				<FormError error={error} />
-				<Button type="submit" disabled={pending}>
+				<ActButton area="settings" type="submit" disabled={pending}>
 					{pending ? "Saving…" : "Save"}
-				</Button>
+				</ActButton>
 			</form>
 		</Form>
 	);
@@ -350,7 +361,8 @@ function ArchivePanel({
 						: "Hides this graph from your graph list — it moves to the Archived filter. It stays reachable by link and remains queryable, and you can unarchive it anytime."}
 				</p>
 			</div>
-			<Button
+			<ActButton
+				area="settings"
 				variant="outline"
 				className="shrink-0"
 				disabled={pending}
@@ -367,7 +379,7 @@ function ArchivePanel({
 						Archive
 					</>
 				)}
-			</Button>
+			</ActButton>
 
 			<Dialog
 				open={confirmOpen}

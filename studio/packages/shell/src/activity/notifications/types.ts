@@ -1,7 +1,7 @@
 /**
  * Wire shapes of the inbox, notification rules, channels and approvals
  * (docs/for-developers/modules/operate/features/notifications.md ·
- * approvals.md), and the Graph's members that name the ids they store.
+ * approvals.md).
  *
  * In-app is not a channel: a rule's `in_app` and a schedule's
  * `deliver_in_app` write inbox rows; channels are only what leaves Invana.
@@ -129,28 +129,5 @@ export interface Approval {
 
 export interface ApprovalListResponse {
 	items: Approval[];
-	total: number;
-}
-
-/** A Graph role, lowest to highest. */
-export const GRAPH_ROLES = [
-	"viewer",
-	"contributor",
-	"builder",
-	"modeller",
-	"owner",
-] as const;
-
-interface Member {
-	user_id: string;
-	username: string;
-	first_name: string;
-	last_name: string | null;
-	roles: string[];
-	added_at: string;
-}
-
-export interface MemberListResponse {
-	items: Member[];
 	total: number;
 }

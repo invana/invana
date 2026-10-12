@@ -5,7 +5,11 @@
  *
  * The header names the project and what is true of it — its type, who can see
  * it, how many branches, whether a decision is open — over the question it
- * decides and the people on it. Its tabs read the project six ways:
+ * decides and the people on it. A private project's header reads *people
+ * only:* and the names staffed on it — people as the Graph's member list names
+ * them, agents by their own names — because that list is who can open it. A
+ * member without the `work` role reads the page under a read-only notice, its
+ * acts drawn disabled with who to ask. Its tabs read the project six ways:
  * **Overview** where the quest stands, **Branches** the tree of inquiry,
  * **Impact** what an option reaches over the graph, **Decisions** what was
  * decided on it, **Lineage** how a decision got here, **Report** the
@@ -25,6 +29,8 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
+import { useMembersQuery } from "@invana-studio/core";
+import { ActButton, ReadOnlyNotice } from "@invana-studio/shell";
 import { FileText, FlaskConical, GitFork } from "lucide-react";
 import { useState } from "react";
 import { ImpactTab } from "../impact/ImpactTab";
@@ -81,6 +87,7 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 	const query = useProjectQuery(username, graphSlug, projectKey);
 	const records = useProjectRecords(ref);
 	const staff = useAssignmentsQuery(ref);
+	const members = useMembersQuery({ username, graphSlug });
 	const report = useReportQuery(ref);
 	const view = useProjectView();
 	const [act, setAct] = useState<Act>(null);
@@ -104,10 +111,17 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 			b.status !== "merged",
 	);
 	const frozen = project.status === "archived";
+	// A person by the name the Graph's member list knows them by; an agent by its own.
+	const byUserId = new Map(
+		(members.data?.items ?? []).map((m) => [
+			m.user_id,
+			m.first_name || m.username,
+		]),
+	);
 	const people = (staff.data?.items ?? []).map((a) =>
 		a.principal_kind === "agent"
-			? `${a.principal_name ?? "an agent"}`
-			: (a.principal_name ?? "someone"),
+			? (a.principal_name ?? "an agent")
+			: (byUserId.get(a.principal_id) ?? a.principal_name ?? "someone"),
 	);
 
 	const openAct = (next: Act) => setAct(next);
@@ -189,7 +203,7 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 						</Badge>
 						<Badge variant="outline" tone="muted" size="xs">
 							{project.visibility === "private"
-								? "people only"
+								? `people only: ${people.join(", ") || "you"}`
 								: "Graph members"}
 						</Badge>
 						<Badge variant="outline" tone="muted" size="xs">
@@ -218,7 +232,8 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 							Report
 						</Button>
 						{canSimulate ? (
-							<Button
+							<ActButton
+								area="work"
 								variant="outline"
 								size="sm"
 								disabled={frozen}
@@ -226,23 +241,27 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 							>
 								<FlaskConical />
 								Simulate
-							</Button>
+							</ActButton>
 						) : null}
-						<Button
+						<ActButton
+							area="work"
 							size="sm"
 							disabled={frozen}
 							onClick={() => openAct({ kind: "fork", branch: root })}
 						>
 							<GitFork />
 							Fork a branch
-						</Button>
+						</ActButton>
 					</>
 				}
 			/>
+			<div className="px-4 pt-2 empty:hidden">
+				<ReadOnlyNotice area="work" noun="project" />
+			</div>
 			<p className="truncate px-4 pt-2 text-sm text-muted-foreground">
 				{[
 					project.question || project.description || "No question written yet",
-					people.join(", "),
+					project.visibility === "private" ? null : people.join(", "),
 				]
 					.filter(Boolean)
 					.join(" · ")}

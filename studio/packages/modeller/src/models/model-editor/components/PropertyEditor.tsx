@@ -20,6 +20,7 @@ import {
 	suppressActionToast,
 	useGraphConnectionQuery,
 } from "@invana-studio/core";
+import { ActButton } from "@invana-studio/shell";
 import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -263,7 +264,8 @@ export function PropertyEditor({
 									<TableCell>{m.property_key.value_cardinality}</TableCell>
 									<TableCell className="text-right">
 										<div className="flex items-center justify-end gap-0.5">
-											<Button
+											<ActButton
+												area="model"
 												variant="ghost"
 												size="icon"
 												className="h-7 w-7"
@@ -272,8 +274,9 @@ export function PropertyEditor({
 												onClick={() => startEdit(m)}
 											>
 												<Pencil className="w-3 h-3" />
-											</Button>
-											<Button
+											</ActButton>
+											<ActButton
+												area="model"
 												variant="ghost"
 												size="icon"
 												className="h-7 w-7"
@@ -282,7 +285,7 @@ export function PropertyEditor({
 												onClick={() => onRemove(m.property_key.name)}
 											>
 												<Trash2 className="w-3 h-3" />
-											</Button>
+											</ActButton>
 										</div>
 									</TableCell>
 								</TableRow>
@@ -307,10 +310,15 @@ export function PropertyEditor({
 
 			{!adding && editingId === null && (
 				<div>
-					<Button variant="outline" size="sm" onClick={startAdd}>
+					<ActButton
+						area="model"
+						variant="outline"
+						size="sm"
+						onClick={startAdd}
+					>
 						<Plus className="w-3.5 h-3.5 mr-1" />
 						Add property
-					</Button>
+					</ActButton>
 				</div>
 			)}
 		</div>

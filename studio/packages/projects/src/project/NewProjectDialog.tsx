@@ -7,9 +7,11 @@
  * decision are called. Three types can be made today; the others are drawn
  * and switched off, because the engine refuses them.
  *
- * **Who works on it.** The person making it is staffed by the engine. Agents
- * picked here are staffed once the project exists. Other people are not
- * offered: the Graph's member list carries no user id to staff them by.
+ * **Who works on it.** The person making it is staffed by the engine, so is
+ * not offered. The Graph's other members (by name) and its agents are one
+ * checkbox list; everyone picked is staffed once the project exists — a person
+ * by their `user_id`, an agent by its id. On a private project that list is
+ * who can open it.
  *
  * Rules are not asked for here. A project's own rules are written on its
  * Details tab, once there is a project to bind them to.
@@ -28,6 +30,7 @@ import {
 	ToggleGroup,
 	ToggleGroupItem,
 } from "@invana/ui";
+import { useAuth, useMembersQuery } from "@invana-studio/core";
 import { FormError } from "@invana-studio/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -36,6 +39,9 @@ import { useProjectsSlots } from "../ProjectsSlots";
 import { useProjectMutations } from "../queries";
 import { LAUNCHED_TYPES, TYPES } from "../records/words";
 import type { Project, ProjectType, Visibility } from "../types";
+
+/** Who to staff: what `projectsApi.staff` takes. */
+type Principal = { principal_kind: "user" | "agent"; principal_id: string };
 
 const VISIBILITY: { value: Visibility; label: string }[] = [
 	{ value: "graph", label: "Graph members" },
@@ -60,6 +66,23 @@ export function NewProjectDialog({
 	const agents = (useAgents(username, graphSlug).data?.items ?? []).filter(
 		(a) => a.status !== "archived",
 	);
+	const me = useAuth().user?.username;
+	const members = (
+		useMembersQuery({ username, graphSlug }).data?.items ?? []
+	).filter((m) => m.username !== me);
+	// One list, people first: a key is `user:<user_id>` or `agent:<id>`.
+	const choices: { key: string; label: string; principal: Principal }[] = [
+		...members.map((m) => ({
+			key: `user:${m.user_id}`,
+			label: m.first_name || m.username,
+			principal: { principal_kind: "user" as const, principal_id: m.user_id },
+		})),
+		...agents.map((a) => ({
+			key: `agent:${a.id}`,
+			label: a.name,
+			principal: { principal_kind: "agent" as const, principal_id: a.id },
+		})),
+	];
 	const { create } = useProjectMutations(username, graphSlug);
 	const [type, setType] = useState<ProjectType>("research");
 	const [question, setQuestion] = useState("");
@@ -99,12 +122,11 @@ export function NewProjectDialog({
 				visibility,
 			});
 			await Promise.all(
-				[...staffed].map((id) =>
-					projectsApi.staff(username, graphSlug, project.key, {
-						principal_kind: "agent",
-						principal_id: id,
-					}),
-				),
+				choices
+					.filter((c) => staffed.has(c.key))
+					.map((c) =>
+						projectsApi.staff(username, graphSlug, project.key, c.principal),
+					),
 			);
 			qc.invalidateQueries({ queryKey: ["projects", username, graphSlug] });
 			onCreated?.(project);
@@ -205,27 +227,27 @@ export function NewProjectDialog({
 					<div className="flex flex-col gap-1.5">
 						<Label>People and agents</Label>
 						<p className="text-sm text-muted-foreground">
-							You are on it. Pick the agents that work on it too.
+							You are on it. Pick the people and agents who work on it too.
 						</p>
-						{agents.length ? (
+						{choices.length ? (
 							<div className="flex flex-wrap gap-x-4 gap-y-1.5">
-								{agents.map((a) => (
+								{choices.map((c) => (
 									<Label
-										key={a.id}
+										key={c.key}
 										className="flex items-center gap-1.5 font-normal"
 									>
 										<Checkbox
-											checked={staffed.has(a.id)}
+											checked={staffed.has(c.key)}
 											onCheckedChange={(on) =>
 												setStaffed((prev) => {
 													const next = new Set(prev);
-													if (on) next.add(a.id);
-													else next.delete(a.id);
+													if (on) next.add(c.key);
+													else next.delete(c.key);
 													return next;
 												})
 											}
 										/>
-										{a.name}
+										{c.label}
 									</Label>
 								))}
 							</div>

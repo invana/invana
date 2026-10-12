@@ -7,7 +7,7 @@ above them — filtered by access before it is ranked. ⌘K and `invana search` 
 |---|---|
 | Index | [13.10](../../../README.md#13--platform) · Slice **B11** |
 | Module | [Platform](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / — |
 | Product | [shell.md › Decisions](../../../../products/shell.md#decisions) — *Search (⌘K)* · *Search ranking* · *⌘K and access* · P-18 |
 | Related | [roles](../../identity-and-access/features/roles.md) · [membership](../../identity-and-access/features/membership.md) · [datasets](../../bring-data-in/features/datasets.md) |
 
@@ -60,7 +60,7 @@ flowchart TD
 | `GET /api/v1/search` | `q` (required, trimmed, 1–200 chars) · `graph?` · `limit?` → `{query, hits: [SearchHit]}` |
 | `SearchHit` | `kind` · `id` · `name` · `graph?` (`user/slug`) · `product?` (`explorer` · `modeller` · `agents` · `projects` · `datasets`) · `match` (`exact` · `prefix` · `contains`) |
 | CLI | `invana search` — one line per hit: kind, name, Graph, id |
-| Studio | ⌘K reads it in C07; until then it matches the lists it already fetches ([shell.md](../../../../products/shell.md#decisions)) |
+| Studio | Not read — ⌘K matches the products' own lists, which the engine already filters by access (SE7) |
 
 ## Engine
 
@@ -80,6 +80,7 @@ flowchart TD
 | SE4 | Ranking is name-only: exact, prefix, contains, then the name. Meaning-based *related* hits wait for a vector index ([12.4](../../graph-connectors/features/vector-search.md)). |
 | SE5 | `graph=` naming a Graph the reader is not in is 404, as every Graph route reads a scoping refusal. |
 | SE6 | The Graph's own records (an airport, a gene) are not searched; that is the graph database's, through Explorer. |
+| SE7 | Studio's ⌘K does not read this route. It matches names over the lists each product already reads, and every one is scoped by the engine: the Graphs list to memberships, the projects and todos lists to the private projects the reader is staffed on. A hit here carries a row id, while Studio opens a project by its key and a skill by its slug, so wiring it would cost a second read per hit. If ⌘K ever reads it, the hit grows the key or slug its page opens by. |
 
 ## Not building
 
@@ -89,4 +90,4 @@ flowchart TD
 | Runs, schedules, findings, branches | runs are found by their Graph's journal; schedules and project records arrive with B08 and B05, which add their kinds |
 | Searching node and edge data | the graph database's job, through Explorer |
 | Search history or saved searches | not asked for |
-| Studio ⌘K wiring | C07 |
+| Studio ⌘K reading this route | SE7 — a hit carries a row id, and Studio opens a project by key and a skill by slug |

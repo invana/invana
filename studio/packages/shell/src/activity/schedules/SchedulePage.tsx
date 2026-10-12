@@ -40,6 +40,7 @@ import { ApiError, type GraphRef } from "@invana-studio/core";
 import { FormError, PanelSection } from "@invana-studio/ui";
 import { CalendarClock, Pause, Pencil, Play, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { ActButton } from "../../access/ActButton";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { refusalOf } from "../notifications/api";
 import { CHANNEL_KIND_LABEL } from "../notifications/DeliveryPicker";
@@ -173,7 +174,8 @@ function ScheduleBody({
 				}
 				actions={
 					<>
-						<Button
+						<ActButton
+							area="work"
 							variant="outline"
 							size="sm"
 							disabled={runNow.isPending}
@@ -181,9 +183,10 @@ function ScheduleBody({
 						>
 							<Play />
 							Run now
-						</Button>
+						</ActButton>
 						{paused ? (
-							<Button
+							<ActButton
+								area="work"
 								variant="ghost"
 								size="sm"
 								disabled={resume.isPending}
@@ -191,9 +194,10 @@ function ScheduleBody({
 							>
 								<Play />
 								Resume
-							</Button>
+							</ActButton>
 						) : (
-							<Button
+							<ActButton
+								area="work"
 								variant="ghost"
 								size="sm"
 								disabled={pause.isPending}
@@ -201,20 +205,26 @@ function ScheduleBody({
 							>
 								<Pause />
 								Pause
-							</Button>
+							</ActButton>
 						)}
-						<Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
+						<ActButton
+							area="work"
+							variant="ghost"
+							size="sm"
+							onClick={() => setEditing(true)}
+						>
 							<Pencil />
 							Edit
-						</Button>
-						<Button
+						</ActButton>
+						<ActButton
+							area="work"
 							variant="ghost"
 							size="sm"
 							onClick={() => setConfirming(true)}
 						>
 							<Trash2 />
 							Delete
-						</Button>
+						</ActButton>
 					</>
 				}
 			/>

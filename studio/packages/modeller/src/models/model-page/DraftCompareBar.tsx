@@ -24,7 +24,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@invana/forms";
-import { Button, Card } from "@invana/ui";
+import { Card } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { useQueries } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -99,9 +100,13 @@ export function DraftCompareBar({
 			{current.review.classification === "breaking" ? (
 				<span className="text-warning">breaking</span>
 			) : null}
-			<Button size="sm" onClick={() => onReview(current.model.id)}>
+			<ActButton
+				area="model"
+				size="sm"
+				onClick={() => onReview(current.model.id)}
+			>
 				Review and publish
-			</Button>
+			</ActButton>
 		</Card>
 	);
 }

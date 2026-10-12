@@ -32,6 +32,7 @@ import {
 import type { GraphRef } from "@invana-studio/core";
 import { CalendarClock, Plus } from "lucide-react";
 import { type ReactNode, useState } from "react";
+import { ActButton } from "../../access/ActButton";
 import { ComingUp } from "./ComingUp";
 import { cronWords, nextIn } from "./cron";
 import { useFiringsQuery, useSchedulesQuery } from "./queries";
@@ -50,10 +51,10 @@ export function SchedulesTab({ graph, onOpenSchedule }: SchedulesTabProps) {
 	const [creating, setCreating] = useState(false);
 
 	const newButton = (
-		<Button size="sm" onClick={() => setCreating(true)}>
+		<ActButton area="work" size="sm" onClick={() => setCreating(true)}>
 			<Plus />
 			New schedule
-		</Button>
+		</ActButton>
 	);
 	const dialog = (
 		<ScheduleDialog

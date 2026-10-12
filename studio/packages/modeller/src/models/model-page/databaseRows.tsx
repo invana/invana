@@ -10,14 +10,9 @@
 
 import type { RowSpec } from "@invana/boards";
 import { type ColumnDef, DataTable } from "@invana/tables";
-import {
-	Button,
-	EmptyState,
-	MarkChip,
-	type MarkTone,
-	SectionHeader,
-} from "@invana/ui";
+import { EmptyState, MarkChip, type MarkTone, SectionHeader } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
+import { ActButton } from "@invana-studio/shell";
 import { Database, RefreshCw } from "lucide-react";
 import type {
 	Drift,
@@ -138,13 +133,14 @@ export function databaseRows(
 	opts: DatabaseRowsOptions,
 ): RowSpec[] {
 	const introspect = opts.canWrite ? (
-		<Button
+		<ActButton
+			area="model"
 			variant="outline"
 			disabled={opts.introspecting}
 			onClick={opts.onIntrospect}
 		>
 			<RefreshCw /> Introspect
-		</Button>
+		</ActButton>
 	) : null;
 
 	if (loading || !physical)

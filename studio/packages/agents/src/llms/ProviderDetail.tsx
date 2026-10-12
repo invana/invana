@@ -30,6 +30,7 @@ import {
 	SectionHeader,
 	StatusDot,
 } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { useMutation } from "@tanstack/react-query";
 import { Check, Loader2, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
@@ -143,10 +144,16 @@ export function ProviderDetail({
 			</PropertyList>
 
 			<div className="flex flex-wrap items-center gap-2">
-				<Button size="sm" variant="outline" onClick={() => setEditing(true)}>
+				<ActButton
+					area="settings"
+					size="sm"
+					variant="outline"
+					onClick={() => setEditing(true)}
+				>
 					Edit
-				</Button>
-				<Button
+				</ActButton>
+				<ActButton
+					area="settings"
 					size="sm"
 					variant="outline"
 					disabled={ping.kind === "testing"}
@@ -156,9 +163,10 @@ export function ProviderDetail({
 						<Loader2 className="size-3.5 animate-spin" />
 					) : null}
 					Ping
-				</Button>
+				</ActButton>
 				<span className="flex-1" />
-				<Button
+				<ActButton
+					area="settings"
 					size="sm"
 					variant="ghost"
 					disabled={remove.isPending}
@@ -174,7 +182,7 @@ export function ProviderDetail({
 				>
 					<Trash2 className="size-3.5" />
 					Remove
-				</Button>
+				</ActButton>
 			</div>
 
 			{/* The ping is a run, and its answer is a fact about this endpoint —
@@ -197,10 +205,15 @@ export function ProviderDetail({
 			<SectionHeader
 				title="Models"
 				actions={
-					<Button size="sm" variant="ghost" onClick={() => setAdding(true)}>
+					<ActButton
+						area="settings"
+						size="sm"
+						variant="ghost"
+						onClick={() => setAdding(true)}
+					>
 						<Plus className="size-3.5" />
 						Offer one
-					</Button>
+					</ActButton>
 				}
 			/>
 
@@ -288,7 +301,8 @@ function ModelRow({
 				/>
 				<AddressChip address={model.address} className="min-w-0" />
 				<span className="flex-1" />
-				<Button
+				<ActButton
+					area="settings"
 					variant="ghost"
 					size="icon"
 					className="size-6"
@@ -297,7 +311,7 @@ function ModelRow({
 					onClick={onRemove}
 				>
 					<Trash2 className="size-3.5" />
-				</Button>
+				</ActButton>
 			</div>
 
 			<p className="text-sm text-muted-foreground">
