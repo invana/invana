@@ -72,7 +72,7 @@ async def list_agents(
         # One grouped read for the whole list, not one per row: the meter is
         # on every row, and a query per agent would be the shape the composite
         # index was built to avoid.
-        spend_this_month=await lifecycle.spend_this_month(session, graph_id=graph.id),
+        tokens_this_month=await lifecycle.tokens_this_month(session, graph_id=graph.id),
     )
 
 

@@ -116,13 +116,11 @@ class AgentRead(BaseModel):
 class AgentListResponse(BaseModel):
     items: list[AgentRead]
     total: int
-    #: ``{agent_id: usd}`` since the first of the month — what the list draws
-    #: against ``max_cost_usd_month`` (C10). A **sidecar map, not a field on the
-    #: agent**: it is a grouped read over ``task_runs``, which this band may not
-    #: touch, and an agent with no priced run is absent rather than zero — a
-    #: subscription publishes no per-token rate, so *nothing spent* and *nothing
-    #: known* are different facts (OB4).
-    spend_this_month: dict[str, float] = Field(default_factory=dict)
+    #: ``{agent_id: tokens}`` since the first of the month — what the list draws
+    #: against ``max_tokens_month``. A **sidecar map, not a field on the agent**:
+    #: it is a grouped read over ``task_runs``, which this band may not touch.
+    #: An agent with no run is absent and reads ``0``.
+    tokens_this_month: dict[str, int] = Field(default_factory=dict)
     # The graph's default agent — what a new session binds when nothing is picked.
     default_agent_id: str | None = None
 
@@ -367,13 +365,13 @@ class SoulPreviewResponse(BaseModel):
 class AgentMeters(BaseModel):
     """What the agent is using now, each beside the limit that caps it (AG23).
 
-    Spend is absent — not zero — when no run this month was priced (AG11).
+    Usage and budgets are in tokens, never currency.
     """
 
     agent_id: str
-    spend_this_month: float | None = None
-    max_cost_usd_month: float | None = None
-    max_cost_usd_run: float | None = None
+    tokens_this_month: int = 0
+    max_tokens_month: int | None = None
+    max_tokens_run: int | None = None
     running: int = 0
     queued: int = 0
     max_concurrent_runs: int | None = None
@@ -387,6 +385,7 @@ class AgentMeters(BaseModel):
     max_children: int | None = None
     max_depth: int | None = None
     max_fanout: int | None = None
+    #: ``max_tokens_run`` under its old name, answered for one release.
     max_tokens: int | None = None
 
 

@@ -1306,6 +1306,7 @@ CREATE TABLE sessions (
 	agent_id VARCHAR(36), 
 	lens_id VARCHAR(36), 
 	max_cost_usd_run DOUBLE PRECISION, 
+	max_tokens_run INTEGER, 
 	CONSTRAINT sessions_pkey PRIMARY KEY (id), 
 	CONSTRAINT fk_sessions_model_id FOREIGN KEY(model_id) REFERENCES graph_models (id) ON DELETE SET NULL, 
 	CONSTRAINT sessions_created_by_id_fkey FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE CASCADE, 

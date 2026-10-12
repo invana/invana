@@ -233,9 +233,9 @@ async def open_turn(
             "llm_model_id": provider.model_row_id if provider else None,
             "timeout_s": payload.timeout_s,
             "parameters": payload.parameters,
-            # The thread's spend per run, frozen under the agent's own cap
+            # The thread's tokens per run, frozen under the agent's own budget
             # ([AS5](docs/for-developers/modules/ask/spec.md) · AG25).
-            "max_cost_usd_run": spend_per_run(sess, agent),
+            "max_tokens_run": tokens_per_run(sess, agent),
         },
         workflow_key=wf.key,
         assistant_message_id=assistant_msg.id,
@@ -344,10 +344,10 @@ async def session_world(db: AsyncSession, *, sess: Session) -> str | None:
     return lens.id if lens is not None and lens.graph_id == sess.graph_id else None
 
 
-def spend_per_run(sess: Session | None, agent: Agent | None) -> float | None:
-    """The thread's spend per run, never above the agent's standing cap (AG24)."""
-    cap = agent.effective_budget.get("max_cost_usd_run") if agent is not None else None
-    own = sess.max_cost_usd_run if sess is not None else None
+def tokens_per_run(sess: Session | None, agent: Agent | None) -> int | None:
+    """The thread's tokens per run, never above the agent's standing budget (AG24)."""
+    cap = agent.effective_budget.get("max_tokens_run") if agent is not None else None
+    own = sess.max_tokens_run if sess is not None else None
     if own is None:
         return cap
     return own if cap is None else min(own, cap)

@@ -357,6 +357,8 @@ async def switch_emission_template(
 
 
 _CEILINGS = (
+    "max_tokens_run",
+    "max_tokens_month",
     "max_tokens",
     "max_steps",
     "max_cost_usd",
@@ -370,23 +372,27 @@ _CEILINGS = (
 
 
 def run_ceilings(run: TaskRun, agent: Agent) -> dict[str, Any]:
-    """Every ceiling the run board draws a spend or a count against.
+    """Every ceiling the run board draws a token count or a count against.
 
-    Effort is its own column (EB9) and is read beside the spend ceilings. Every
-    ceiling, not the two the board drew first: a run's spend reads against
-    its **per-run** ceiling, and the month one belongs beside it or neither
-    number says its window ([EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
-    `max_cost_usd` rides along for one release under its old name.
+    Effort is its own column (EB9) and is read beside the token budgets. Every
+    ceiling, not the two the board drew first: a run's tokens read against its
+    **per-run** budget, and the month one belongs beside it or neither number
+    says its window ([EB8](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+    `max_tokens` is `max_tokens_run` under its old name, and the money keys are
+    answered as the row stores them — both for one release.
 
-    **The per-run ceiling is the one this run froze** — the session's spend per
-    run, already clamped to the agent's cap — never the agent's cap as it reads
-    today. A run is drawn against the bound it opened with (AG25 · EB13).
+    **The per-run budget is the one this run froze** — the session's tokens per
+    run, already clamped to the agent's budget — never the agent's budget as it
+    reads today. A run is drawn against the bound it opened with (AG25 · EB13).
+    A run opened before tokens were frozen keeps the money cap it froze.
     """
     effective = {**agent.effective_budget, **agent.effective_effort}
     ceilings = {key: effective.get(key) for key in _CEILINGS}
-    frozen = (run.params or {}).get("max_cost_usd_run")
-    if frozen is not None:
-        ceilings["max_cost_usd_run"] = frozen
+    params = run.params or {}
+    if params.get("max_tokens_run") is not None:
+        ceilings["max_tokens_run"] = ceilings["max_tokens"] = params["max_tokens_run"]
+    if params.get("max_cost_usd_run") is not None:
+        ceilings["max_cost_usd_run"] = params["max_cost_usd_run"]
     return ceilings
 
 

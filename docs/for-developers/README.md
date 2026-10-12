@@ -130,7 +130,7 @@ provider row and its models, and reopens four rows below. The shapes:
 |---|---|---|---|---|---|---|
 | 5.1 | [Providers and models](modules/agents/features/providers-and-models.md) | A provider row per Graph, holding its models; ping it. **No default — the cast picks** | 🟡 | — | 🟡 | S5 · **S16** |
 | 5.2 | [Author an agent](modules/agents/features/author-an-agent.md) | Author an agent; give it skills and the callables they need, standing limits, a way of thinking and a voice. The world comes with the work | 🟡 | — | 🟡 | S12c · **S16** |
-| 5.3 | [Set what an agent may run](modules/agents/features/envelope-and-budget.md) | What an agent may run, with what arguments, at what cost | 🟡 | — | 🟡 | S12c · **S16** |
+| 5.3 | [Set what an agent may run](modules/agents/features/envelope-and-budget.md) | What an agent may run, with what arguments, and its token budgets — a run and a month | 🟡 | — | 🟡 | S12c · **S16** |
 | 5.4 | [Delegation](modules/agents/features/delegation.md) | Agents that spawn agents, bounded by the parent | ✅ | — | ✅ | S12d |
 | 5.5 | [Pause, resume, retire](modules/agents/features/lifecycle.md) | Pause · resume · retire; the row stays so lineage resolves | ✅ | — | 🟡 | S12c |
 | 5.6 | [Who spawned whom](modules/agents/features/lineage.md) | Who authored whom, who spawned whom, on what run | ✅ | — | ✅ | S12c |

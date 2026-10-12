@@ -294,8 +294,8 @@ class TraceRead(BaseModel):
     #: The ceilings this run was dispatched under — the agent's effective
     #: budget (SR41 · [EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
     #: ``None`` on a run with no agent, which has no ceiling to draw against.
-    #: ``max_cost_usd`` is the old name for ``max_cost_usd_month`` and is sent
-    #: for one release, so a reader that has not moved yet still sees a number.
+    #: Token budgets; ``max_tokens`` is ``max_tokens_run`` under its old name
+    #: and the money keys are answered as stored, both for one release.
     budget: dict | None = None
     #: The run's own ``result.json`` — the roll-up of its tasks' (SR39).
     result: dict | None = None

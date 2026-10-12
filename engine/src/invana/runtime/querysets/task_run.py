@@ -43,47 +43,51 @@ class TaskRunQuerySet:
         )
         return bool(result.rowcount)
 
-    # ── what an agent has spent ──────────────────────────────────────────────
+    # ── what an agent has used ───────────────────────────────────────────────
 
-    async def spend_by_agent(self, session: AsyncSession, *, graph_id: str, since: datetime) -> dict[str, float]:
-        """``{agent_id: usd}`` over a window — what the list draws against the
-        month ceiling ([C10](docs/for-developers/modules/agents/features/author-an-agent.md)).
+    @staticmethod
+    def _agent_tokens(since: datetime):
+        """Tokens per agent over its root runs that started since ``since``,
+        each root's own and its steps', keyed by the root's agent.
+
+        The root carries the agent; a step is counted through its root, so a
+        step that carries no ``agent_id`` of its own is not lost. Eval runs are
+        left out: they draw on the Graph's eval budget, shown apart.
+        """
+        root = aliased(TaskRun)
+        used = func.coalesce(func.sum(func.coalesce(TaskRun.tokens_in, 0) + func.coalesce(TaskRun.tokens_out, 0)), 0)
+        return (
+            select(root.agent_id, used)
+            .select_from(TaskRun)
+            .join(root, or_(TaskRun.id == root.id, TaskRun.parent_run_id == root.id))
+            .where(
+                root.agent_id.is_not(None),
+                root.parent_run_id.is_(None),
+                root.started_at >= since,
+                root.role != RunRole.evaluate.value,
+            )
+            .group_by(root.agent_id)
+        ), root
+
+    async def tokens_by_agent(self, session: AsyncSession, *, graph_id: str, since: datetime) -> dict[str, int]:
+        """``{agent_id: tokens}`` over a window — what the list draws against
+        the month budget.
 
         A grouped read, never a counter column: a counter can disagree with the
         runs it counts. It rides ``ix_task_runs_agent_started``, which is why
         the window is on ``started_at`` and not on ``queued_at`` — a run that
-        queued in March and ran in April spent April's dollars.
-
-        An agent with no priced run is **absent**, not zero: a subscription
-        endpoint publishes no per-token rate, so ``cost_usd`` is ``NULL`` and
-        *nothing was spent* and *nothing is known* are different facts
-        ([OB4](docs/for-developers/modules/operate/features/observability.md)).
+        queued in March and ran in April used April's tokens. An agent with no
+        run in the window is absent; a reader takes that as ``0``.
         """
-        rows = await session.execute(
-            select(TaskRun.agent_id, func.sum(TaskRun.cost_usd))
-            .where(
-                TaskRun.graph_id == graph_id,
-                TaskRun.agent_id.is_not(None),
-                TaskRun.started_at >= since,
-                TaskRun.cost_usd.is_not(None),
-            )
-            .group_by(TaskRun.agent_id)
-        )
-        return {agent_id: float(total) for agent_id, total in rows.all() if agent_id and total is not None}
+        stmt, root = self._agent_tokens(since)
+        rows = await session.execute(stmt.where(root.graph_id == graph_id))
+        return {agent_id: int(total) for agent_id, total in rows.all() if agent_id}
 
-    async def spend_for_agent(self, session: AsyncSession, *, agent_id: str, since: datetime) -> float | None:
-        """One agent's :meth:`spend_by_agent` — ``None`` when no run in the
-        window was priced, for the same reason the list leaves it out (OB4)."""
-        total = (
-            await session.execute(
-                select(func.sum(TaskRun.cost_usd)).where(
-                    TaskRun.agent_id == agent_id,
-                    TaskRun.started_at >= since,
-                    TaskRun.cost_usd.is_not(None),
-                )
-            )
-        ).scalar_one()
-        return float(total) if total is not None else None
+    async def tokens_for_agent(self, session: AsyncSession, *, agent_id: str, since: datetime) -> int:
+        """One agent's :meth:`tokens_by_agent`, ``0`` when it ran nothing."""
+        stmt, root = self._agent_tokens(since)
+        row = (await session.execute(stmt.where(root.agent_id == agent_id))).first()
+        return int(row[1]) if row else 0
 
     async def root_count_for_agent(self, session: AsyncSession, *, agent_id: str, since: datetime) -> int:
         """Runs this agent opened since ``since`` — roots only, by when they

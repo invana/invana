@@ -61,11 +61,12 @@ def test_the_trace_carries_a_spend_and_the_ceiling_it_is_drawn_against() -> None
     assert {"cost_usd", "budget"} <= set(TraceRead.model_fields)
 
 
-def test_a_run_is_drawn_against_the_per_run_ceiling_it_froze() -> None:
-    """EB13 — the session narrowed the spend per run below the agent's cap, and
-    the run froze that; the board reads the frozen one, not today's cap."""
-    agent = Agent(name="Analyst", budget={"max_cost_usd_run": 2.0}, effort={}, workflow_spec={})
-    narrowed = run_ceilings(TaskRun(params={"max_cost_usd_run": 0.5}), agent)
-    assert narrowed["max_cost_usd_run"] == 0.5
-    # A run opened before the column existed reads the agent's cap.
-    assert run_ceilings(TaskRun(params={}), agent)["max_cost_usd_run"] == 2.0
+def test_a_run_is_drawn_against_the_per_run_budget_it_froze() -> None:
+    """EB13 — the session narrowed the tokens per run below the agent's budget,
+    and the run froze that; the board reads the frozen one, not today's."""
+    agent = Agent(name="Analyst", budget={"max_tokens_run": 20_000}, effort={}, workflow_spec={})
+    narrowed = run_ceilings(TaskRun(params={"max_tokens_run": 5_000}), agent)
+    assert narrowed["max_tokens_run"] == narrowed["max_tokens"] == 5_000
+    assert narrowed["max_tokens_month"] == 5_000_000
+    # A run that froze nothing reads the agent's budget.
+    assert run_ceilings(TaskRun(params={}), agent)["max_tokens_run"] == 20_000

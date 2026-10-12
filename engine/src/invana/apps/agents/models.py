@@ -68,17 +68,14 @@ class AgentLifetime(enum.StrEnum):
 # Defaults live here rather than in the column so a missing key in an older row
 # reads the same as an explicit one (``effective_budget`` merges over these).
 DEFAULT_BUDGET: dict[str, int | float] = {
-    # No steps, replans or clarifications: those are effort, not money
+    # No steps, replans or clarifications: those are effort, not spend
     # (``DEFAULT_EFFORT`` · EB9).
     "max_children": 3,
     "max_depth": 2,
-    "max_tokens": 200_000,
-    # Spend, in two windows. A per-run ceiling and a per-month one side by side
-    # is why the month one is named
-    # ([EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md)) —
-    # `max_cost_usd` never said which window it bounded.
-    "max_cost_usd_month": 5.0,
-    "max_cost_usd_run": 2.0,
+    # Tokens, in two windows, each named by it — never currency: what a token
+    # costs depends on the customer's subscription.
+    "max_tokens_month": 5_000_000,
+    "max_tokens_run": 200_000,
     # Lanes a `map_over` may open, refused **at validation** rather than mid-run
     # (EB2). Nothing dispatches a fanned-out node yet, so nothing reads this
     # today; it is declared because a ceiling the record does not carry is one
@@ -90,14 +87,14 @@ DEFAULT_BUDGET: dict[str, int | float] = {
     "max_concurrent_runs": 3,
 }
 
-#: The name ``max_cost_usd_month`` had before it said which window it bounded.
-#: Read for one release, so a row configured today keeps its ceiling across the
-#: rename (data-model § 8 #4).
-_LEGACY_MONTH_KEY = "max_cost_usd"
+#: The name ``max_tokens_run`` had before the month budget sat beside it. Read
+#: for one release and answered back, so neither a row nor a reader that has not
+#: moved loses its number.
+_LEGACY_RUN_KEY = "max_tokens"
 
 #: How hard an agent tries before it stops
 #: ([EB9](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
-#: Not money, so not ``budget``; it decides what runs, so not the soul.
+#: Not spend, so not ``budget``; it decides what runs, so not the soul.
 DEFAULT_EFFORT: dict[str, int] = {
     "max_steps": 24,
     "max_replans": 1,
@@ -234,18 +231,22 @@ class Agent(Base):
     def effective_budget(self) -> dict:
         """The ceilings this agent runs inside, defaults filled in.
 
-        **Both names for the month ceiling are read, for one release.** A row
-        written before the rename carries `max_cost_usd`, and it means the
-        month — so it wins where the new name is absent, and the old name is
-        answered back so a reader that has not moved yet still sees a number
-        rather than nothing. Neither half of that is permanent: the release
-        after this one drops both lines (data-model § 8 #4).
+        **Both names for the run budget are read, for one release.** A row
+        written before the month budget existed carries `max_tokens`, and it
+        means the run. Where a row carries both, the smaller binds — a ceiling
+        read two ways never widens — and the old name is answered back so a
+        reader that has not moved yet still sees a number.
+
+        Money keys a row still carries pass through as stored and bound
+        nothing; no default carries them. The release after this one drops
+        both the money keys and the old run name.
         """
         own = self.budget or {}
         budget = {**DEFAULT_BUDGET, **own}
-        if _LEGACY_MONTH_KEY in own and "max_cost_usd_month" not in own:
-            budget["max_cost_usd_month"] = own[_LEGACY_MONTH_KEY]
-        budget.setdefault(_LEGACY_MONTH_KEY, budget["max_cost_usd_month"])
+        named = [own[key] for key in ("max_tokens_run", _LEGACY_RUN_KEY) if own.get(key) is not None]
+        if named:
+            budget["max_tokens_run"] = min(named)
+        budget[_LEGACY_RUN_KEY] = budget["max_tokens_run"]
         return budget
 
     @property

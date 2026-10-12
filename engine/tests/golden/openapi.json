@@ -985,11 +985,11 @@
             "title": "Items",
             "type": "array"
           },
-          "spend_this_month": {
+          "tokens_this_month": {
             "additionalProperties": {
-              "type": "number"
+              "type": "integer"
             },
-            "title": "Spend This Month",
+            "title": "Tokens This Month",
             "type": "object"
           },
           "total": {
@@ -1005,7 +1005,7 @@
         "type": "object"
       },
       "AgentMeters": {
-        "description": "What the agent is using now, each beside the limit that caps it (AG23).\n\nSpend is absent \u2014 not zero \u2014 when no run this month was priced (AG11).",
+        "description": "What the agent is using now, each beside the limit that caps it (AG23).\n\nUsage and budgets are in tokens, never currency.",
         "properties": {
           "agent_id": {
             "title": "Agent Id",
@@ -1037,28 +1037,6 @@
               }
             ],
             "title": "Max Concurrent Runs"
-          },
-          "max_cost_usd_month": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Max Cost Usd Month"
-          },
-          "max_cost_usd_run": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Max Cost Usd Run"
           },
           "max_depth": {
             "anyOf": [
@@ -1093,6 +1071,28 @@
             ],
             "title": "Max Tokens"
           },
+          "max_tokens_month": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens Month"
+          },
+          "max_tokens_run": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens Run"
+          },
           "queued": {
             "default": 0,
             "title": "Queued",
@@ -1118,16 +1118,10 @@
             "title": "Spawned This Month",
             "type": "integer"
           },
-          "spend_this_month": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Spend This Month"
+          "tokens_this_month": {
+            "default": 0,
+            "title": "Tokens This Month",
+            "type": "integer"
           }
         },
         "required": [
@@ -17783,6 +17777,17 @@
             ],
             "title": "Agent Max Cost Usd Run"
           },
+          "agent_max_tokens_run": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Max Tokens Run"
+          },
           "agent_name": {
             "anyOf": [
               {
@@ -17873,6 +17878,17 @@
               }
             ],
             "title": "Max Cost Usd Run"
+          },
+          "max_tokens_run": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens Run"
           },
           "message_count": {
             "title": "Message Count",
@@ -18238,6 +18254,17 @@
             ],
             "title": "Agent Max Cost Usd Run"
           },
+          "agent_max_tokens_run": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Max Tokens Run"
+          },
           "agent_name": {
             "anyOf": [
               {
@@ -18328,6 +18355,17 @@
               }
             ],
             "title": "Max Cost Usd Run"
+          },
+          "max_tokens_run": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens Run"
           },
           "message_count": {
             "title": "Message Count",
@@ -18434,6 +18472,18 @@
               }
             ],
             "title": "Max Cost Usd Run"
+          },
+          "max_tokens_run": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens Run"
           },
           "pinned": {
             "anyOf": [

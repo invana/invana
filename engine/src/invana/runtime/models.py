@@ -127,8 +127,8 @@ class TaskRun(Base):
         # root of a run has no parent and no lane, so it is excluded rather
         # than squeezed into the same uniqueness.
         UniqueConstraint("parent_run_id", "task_id", "lane", "iteration", "attempt", name="uq_task_run_attempt"),
-        # *$1.84 of $40.00 this month* is a windowed ``SUM(cost_usd)`` per agent
-        # ([§ 5.1](docs/for-developers/building-engine/govern-and-agents-data-model.md)),
+        # *1.2M of 5M tokens this month* is a windowed ``SUM`` of tokens per agent
+        # ([EB15](docs/for-developers/modules/agents/features/envelope-and-budget.md)),
         # never a counter column — a counter can disagree with the runs it
         # counts. Without the second column the window is a scan of every run
         # the agent has ever done.

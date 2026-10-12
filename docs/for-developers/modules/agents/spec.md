@@ -197,7 +197,7 @@ erDiagram
         string id               PK
         string agent_id         FK "one agent per session"
         string lens_id          FK "default world - null = Everything"
-        float  max_cost_usd_run    "capped by the agent's own"
+        int    max_tokens_run      "capped by the agent's own"
     }
     TASKRUN {
         string id             PK

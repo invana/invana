@@ -58,17 +58,18 @@ async def test_an_ask_runs_in_the_sessions_world_unless_it_narrows_for_itself(se
     assert (await _ask(session, sess, graph, user)).lens_id is None
 
 
-async def test_a_guardrail_is_refused_and_the_spend_is_clamped_to_the_agents(session, graph, user):
+async def test_a_guardrail_is_refused_and_the_tokens_are_clamped_to_the_agents(session, graph, user):
     sess = await sessions.create_session(session, graph=graph, user_id=user.id, title="t")
     rail = await _lens(session, graph, kind=LensKind.guardrail.value, name="House rules")
 
     with pytest.raises(ValidationError, match="guardrail"):
         await sessions.update_session(session, sess=sess, bounds={"lens_id": rail.id}, actor_id=user.id)
 
-    await sessions.update_session(session, sess=sess, bounds={"max_cost_usd_run": 99.0}, actor_id=user.id)
-    assert sess.max_cost_usd_run == 2.0  # the seeded agent's DEFAULT_BUDGET cap
+    await sessions.update_session(session, sess=sess, bounds={"max_tokens_run": 10_000_000}, actor_id=user.id)
+    assert sess.max_tokens_run == 200_000  # the seeded agent's DEFAULT_BUDGET run budget
     th = await _ask(session, sess, graph, user)
-    assert th.params["max_cost_usd_run"] == 2.0
+    assert th.params["max_tokens_run"] == 200_000
+    assert "max_cost_usd_run" not in th.params
 
 
 async def test_an_ask_a_guardrail_refuses_names_its_world_role_address_and_bound(session, graph, user):

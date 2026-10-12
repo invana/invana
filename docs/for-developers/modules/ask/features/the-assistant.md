@@ -26,7 +26,7 @@ selection already in hand. Not a page you navigate to and re-explain yourself on
 | C7 | Closing does not cancel | A run continues and can be watched from the thread |
 | C8 | **The session remembers its world** | The world chip in the composer, beside the ask kind, reads the open session's world; picking one sets it for every ask in the thread, or for the next ask only ([AS5](../spec.md#7b-a-session-executes-through-plans-always)) |
 | C9 | **Each turn says what it ran in** | A turn shows the world it was frozen with, so a thread that moved between worlds reads honestly |
-| C10 | **A spend per run for the thread** | In the session's settings, opened from the thread header; capped by the agent's own `max_cost_usd_run` |
+| C10 | **A token budget per run for the thread** | In the session's settings, opened from the thread header; capped by the agent's own `max_tokens_run` |
 
 ## Journey
 
@@ -107,7 +107,7 @@ flowchart TD
 
 | Thing | Shape |
 |---|---|
-| Sessions | one per subject; it resumes rather than starting fresh · `lens_id?` and `max_cost_usd_run?` are its defaults ([AS5](../spec.md#7b-a-session-executes-through-plans-always)) |
+| Sessions | one per subject; it resumes rather than starting fresh · `lens_id?` and `max_tokens_run?` are its defaults ([AS5](../spec.md#7b-a-session-executes-through-plans-always)) |
 | Attachment | the selection passed as context on the todo |
 | Routes | the ordinary ask routes; the assistant is a surface, not an API |
 
@@ -140,7 +140,7 @@ flowchart TD
 | AD24 | **The ask kind is one switch: Ask · Cypher · Gremlin.** A language is a kind of ask, not a second control under a *Query language* kind. Only the languages the connector speaks are offered. In a query, `⌘↵` runs and `↵` is a newline, because a query is multi-line text; in Ask, `↵` sends. The keys are named in the chat's status bar, which follows the ask kind, not in the composer's toolbar, which a docked chat has no width for. The query and its outcome are turns in the thread, like any ask. |
 | AD25 | **A failed query opens the console on Log.** The reply says why; the console shows the failing step and its error, so the line is read where the rows would have been. Only a failure that lands while the page is open does this — reopening an old thread never moves the console. A first query that fails from the centred start still docks the chat: `?right=` and `?console=` write through one writer that builds on the newest query string, so neither drops the other. The reply's card states the error's first line and offers **Open the log**; the whole error is the Log's. |
 | AD26 | **The docked assistant opens at 440px.** It reads queries, replies and error cards; at the shared 280px side width a query wraps word by word. Its occupant carries its own size; the inspector and left panels keep the shared width. |
-| AD21 | **The spend per run is clamped on write and frozen on the run.** `PATCH` stores `min(asked, agent's max_cost_usd_run)`; `open_turn` freezes the same `min` into `task_runs.params.max_cost_usd_run`. The summary carries `agent_max_cost_usd_run` so the settings popover can say the value was clamped. |
+| AD21 | **The tokens per run are clamped on write and frozen on the run.** `PATCH` stores `min(asked, agent's max_tokens_run)`; `open_turn` freezes the same `min` into `task_runs.params.max_tokens_run`. The summary carries `agent_max_tokens_run` so the settings popover can say the value was clamped. `max_cost_usd_run` is still accepted and answered for one release and bounds nothing ([EB8](../../agents/features/envelope-and-budget.md#decisions)). |
 
 ## Not building
 

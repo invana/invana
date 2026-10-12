@@ -134,10 +134,12 @@ class Session(Base):
 
     # The bounds the work brings (docs/for-developers/modules/ask/spec.md AS5):
     # the world every ask in the thread starts in — null is *Everything* — and
-    # its spend per run, capped by the agent's own. **No FK on the world**: a
+    # its tokens per run, capped by the agent's own. **No FK on the world**: a
     # deleted world leaves its id so the chip can say it is gone, rather than
     # reading *Everything* as if nobody had picked one.
     lens_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    max_tokens_run: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: Read and answered for one release; bounds nothing.
     max_cost_usd_run: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     title: Mapped[str] = mapped_column(String(255), default="", nullable=False)

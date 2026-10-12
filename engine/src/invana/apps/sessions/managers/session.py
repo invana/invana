@@ -202,9 +202,9 @@ class SessionManager:
     ) -> Session:
         """Apply a partial update (only the provided fields) to a session.
 
-        ``bounds`` carries ``lens_id`` and ``max_cost_usd_run`` only when they
+        ``bounds`` carries ``lens_id`` and ``max_tokens_run`` only when they
         were sent, because null is a value for both: *Everything*, and *the
-        agent's cap* ([AS5](docs/for-developers/modules/ask/spec.md)).
+        agent's budget* ([AS5](docs/for-developers/modules/ask/spec.md)).
 
         Changing the agent takes effect on the **next** run_ask — earlier runs
         keep the agent they ran under, because ``runs.agent_id`` is the record
@@ -237,11 +237,12 @@ class SessionManager:
         return sess
 
     async def _set_bounds(self, session: AsyncSession, *, sess: Session, bounds: dict, actor_id: str | None) -> None:
-        """The thread's world and spend per run — what the next ask starts in.
+        """The thread's world and tokens per run — what the next ask starts in.
 
         A guardrail is refused: it is in force on every run already, so picking
-        one would read as a bound that changes nothing. A spend above the
-        agent's own cap is clamped to it, never refused (AS5).
+        one would read as a bound that changes nothing. Tokens above the
+        agent's own ``max_tokens_run`` are clamped to it, never refused (AS5).
+        ``max_cost_usd_run`` is still stored for one release and bounds nothing.
         """
         from invana.apps.agents.managers import AgentManager
         from invana.apps.govern.managers import LensManager
@@ -258,16 +259,19 @@ class SessionManager:
                     )
             changed["lens_id"] = {"before": sess.lens_id, "after": lens_id}
             sess.lens_id = lens_id
-        if "max_cost_usd_run" in bounds:
-            spend = bounds["max_cost_usd_run"]
-            if spend is not None and sess.agent_id:
+        if "max_tokens_run" in bounds:
+            tokens = bounds["max_tokens_run"]
+            if tokens is not None and sess.agent_id:
                 agent = await AgentManager().agents_qs.get(session, sess.agent_id)
-                cap = agent.effective_budget.get("max_cost_usd_run") if agent is not None else None
+                cap = agent.effective_budget.get("max_tokens_run") if agent is not None else None
                 if cap is not None:
-                    spend = min(float(spend), float(cap))
-            if spend != sess.max_cost_usd_run:
-                changed["max_cost_usd_run"] = {"before": sess.max_cost_usd_run, "after": spend}
-                sess.max_cost_usd_run = spend
+                    tokens = min(int(tokens), int(cap))
+            if tokens != sess.max_tokens_run:
+                changed["max_tokens_run"] = {"before": sess.max_tokens_run, "after": tokens}
+                sess.max_tokens_run = tokens
+        if "max_cost_usd_run" in bounds and bounds["max_cost_usd_run"] != sess.max_cost_usd_run:
+            changed["max_cost_usd_run"] = {"before": sess.max_cost_usd_run, "after": bounds["max_cost_usd_run"]}
+            sess.max_cost_usd_run = bounds["max_cost_usd_run"]
         if changed:
             await emit_event(
                 session,

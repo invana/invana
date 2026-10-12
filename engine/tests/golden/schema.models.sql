@@ -1287,6 +1287,7 @@ CREATE TABLE sessions (
 	model_id VARCHAR(36), 
 	agent_id VARCHAR(36), 
 	lens_id VARCHAR(36), 
+	max_tokens_run INTEGER, 
 	max_cost_usd_run FLOAT, 
 	title VARCHAR(255) NOT NULL, 
 	pinned BOOLEAN NOT NULL, 

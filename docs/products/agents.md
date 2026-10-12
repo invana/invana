@@ -116,7 +116,7 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | Settings | The Graph's concurrency ceiling and its pools. These left the Modeller's Graph settings, which keeps Basic · Graph |
 | Rules | Not listed under Skills. A Graph's rules are the Modeller's Rules |
 | Plan page | It shows no cost in currency. Tokens per plan replace it once the engine reports them |
-| Agent budgets | An agent's list row, quick look and Overview › Limits read its token budget (`up to 8k tokens a run`), or *no token budget yet*. Activity has no spend tile; its runs table shows tokens per run. The Limits › Budget table lists `max_tokens` only. The engine's money ceilings stay on the record and are not drawn, until budgets are kept in tokens |
+| Agent budgets | An agent's list row, quick look and Overview › Limits read its token budget (`up to 8k tokens a run`), or *no token budget yet*. Activity has no spend tile; its runs table shows tokens per run, and its meter reads tokens this month against the month budget. The Limits › Budget table lists `max_tokens_run` and `max_tokens_month`. The engine keeps both budgets in tokens ([EB8 · EB14 · EB15](../for-developers/modules/agents/features/envelope-and-budget.md#decisions)) |
 | Main area | Each rail item has its own empty-main line. Overview and Performance read *Opens with engine support*, Plugins *Pick a task type…*, Settings *Settings have no canvas…* |
 | LLMs | Until AG-14 builds its own page, LLMs is the Agents stack focused on its LLMs section |
 

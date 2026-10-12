@@ -110,8 +110,10 @@ class SessionUpdate(BaseModel):
     #: ([AS5](docs/for-developers/modules/ask/spec.md)). **Omitted and null
     #: differ**: null puts the thread back in *Everything*.
     lens_id: str | None = Field(default=None, max_length=36)
-    #: The thread's spend per run, clamped to the agent's `max_cost_usd_run` on
-    #: write. **Omitted and null differ**: null falls back to the agent's cap.
+    #: The thread's tokens per run, clamped to the agent's `max_tokens_run` on
+    #: write. **Omitted and null differ**: null falls back to the agent's budget.
+    max_tokens_run: int | None = Field(default=None, gt=0)
+    #: Accepted and stored for one release; bounds nothing.
     max_cost_usd_run: float | None = Field(default=None, gt=0)
 
 
@@ -201,7 +203,10 @@ class SessionSummary(BaseModel):
     lens_id: str | None = None
     lens_name: str | None = None
     lens_missing: bool = False
-    #: The thread's spend per run, and the agent's cap it is held under.
+    #: The thread's tokens per run, and the agent's budget it is held under.
+    max_tokens_run: int | None = None
+    agent_max_tokens_run: int | None = None
+    #: Answered as stored for one release; bounds nothing.
     max_cost_usd_run: float | None = None
     agent_max_cost_usd_run: float | None = None
     title: str

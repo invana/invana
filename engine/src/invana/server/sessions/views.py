@@ -66,7 +66,7 @@ async def _summary(session: AsyncSession, sess: Session) -> SessionSummary:
 
 
 async def _with_bounds(session: AsyncSession, rows: list[tuple[SessionSummary, Agent | None]]) -> list[SessionSummary]:
-    """Name the agent, the thread's world and the agent's spend cap on each row.
+    """Name the agent, the thread's world and the agent's run budget on each row.
 
     One read of the worlds for the whole list. A world id with no row behind it
     was deleted since: the chip reads *Everything* and says the world is gone
@@ -77,6 +77,7 @@ async def _with_bounds(session: AsyncSession, rows: list[tuple[SessionSummary, A
         if agent is not None:
             summary.agent_name = agent.name
             summary.agent_status = agent.status
+            summary.agent_max_tokens_run = agent.effective_budget.get("max_tokens_run")
             summary.agent_max_cost_usd_run = agent.effective_budget.get("max_cost_usd_run")
         if summary.lens_id:
             if summary.lens_id in names:
@@ -215,7 +216,7 @@ async def update_session(
         archived=payload.archived,
         agent_id=payload.agent_id,
         actor_id=user.id,
-        bounds=payload.model_dump(include={"lens_id", "max_cost_usd_run"} & payload.model_fields_set),
+        bounds=payload.model_dump(include={"lens_id", "max_tokens_run", "max_cost_usd_run"} & payload.model_fields_set),
     )
     await session.commit()
     await session.refresh(sess)

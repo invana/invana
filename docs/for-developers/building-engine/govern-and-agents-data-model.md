@@ -580,6 +580,10 @@ Migration `000000000049` (the lens) and `000000000053` (the provider).
 Renaming `max_cost_usd` → `max_cost_usd_month` is a JSON key change in `DEFAULT_BUDGET`, and
 `effective_budget` reads both for one release so old rows keep their ceiling.
 
+> **The money ceilings are now token budgets** — `max_tokens_month` and `max_tokens_run`
+> ([EB8](../modules/agents/features/envelope-and-budget.md#decisions) · EB14 · EB15). The table above
+> is the record of the A2 pass; the envelope-and-budget feature file holds the current keys.
+
 ### 5.2 `llm_providers` splits in two
 
 Migration `000000000053`. **This is the breaking one.** Today one row is one *provider + model*;
@@ -770,6 +774,7 @@ six months out needs.
 | `51` | `graph_versions.axes` · `graphs.pools` | ✅ built |
 | `52` | `task_plans.uses` · `tasks.source_plan_key` | ✅ built — Skills' work, not this pass's. The slot was taken while the split waited on its sign-offs |
 | `53` | `llm_providers.name` · `llm_models` · backfill · seeded cast · **drop** `model_id` · `is_default` · `agents.llm_config_id` | ✅ built. Both directions are exercised against a scratch database by `tests/golden/test_provider_split.py` |
+| `77` | `sessions.max_tokens_run` — the token budget per run. `sessions.max_cost_usd_run` stays for one release and bounds nothing | ✅ built — [EB8](../modules/agents/features/envelope-and-budget.md#decisions) · EB14. Purely additive |
 | `54` | `agents.soul` · `soul_traits` · `effort` · `agents.lens_id` → an agent guardrail, then dropped · `sessions.lens_id` · `sessions.max_cost_usd_run` · rename `workflow_spec` → `envelope` · `templates` → `plans` · `policy` spawn keys → a pin | 🔵 — 5.8 · EB9 · EB10 · DG11. `effort` is backfilled from `workflow_spec` then `budget`; the down path copies every key back |
 
 **The provider split moved from `50` to `53`, and that is the point.** It is the one irreversible
