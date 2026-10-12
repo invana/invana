@@ -15,6 +15,17 @@ type ParamsUpdate =
 	| URLSearchParams
 	| ((prev: URLSearchParams) => URLSearchParams);
 
+// The URL the last write asked for, until its navigation settles.
+let pending: string | null = null;
+
+/** The page params of the newest URL: the pending write's, else the browser's. */
+function latestParams(): URLSearchParams {
+	const here = window.location.pathname + window.location.search;
+	if (pending !== null && here === pending) pending = null;
+	const url = new URL(pending ?? here, window.location.origin);
+	return pageParamsOf(splitGraphPath(url.pathname)?.tail ?? "", url.search);
+}
+
 /**
  * `useSearchParams` for the graph page's panel state, which lives in the path.
  *
@@ -25,8 +36,13 @@ type ParamsUpdate =
  * drill-ins use this; every other page param (`?page=`, `?right=`, `?tab=`)
  * keeps `useSearchParams`, whose writes leave the path alone.
  *
- * The setter is stable, and a functional update reads the params the previous
- * write produced, so two writes in one handler compose.
+ * The setter is stable, and a functional update reads the newest URL — the one
+ * the previous write produced while its navigation is still settling, else the
+ * browser's own — never the params of this hook's last render. The router
+ * commits a navigation as a transition, so an urgent render can run on the
+ * old location: building on it would drop a param another region just wrote
+ * (`?right=assistant`, docked as an ask opens its session). Two writes in one
+ * handler compose the same way.
  */
 export function usePageParams(): [
 	URLSearchParams,
@@ -39,16 +55,20 @@ export function usePageParams(): [
 	const tail = split?.tail ?? "";
 
 	const params = useMemo(() => pageParamsOf(tail, search), [tail, search]);
-	const latest = useRef(params);
-	latest.current = params;
 	const rootRef = useRef(root);
 	rootRef.current = root;
 
 	const setParams = useCallback(
 		(next: ParamsUpdate, options?: NavigateOptions) => {
-			const value = typeof next === "function" ? next(latest.current) : next;
-			latest.current = value;
-			navigate(joinPageUrl(rootRef.current, pageUrlOf(value)), options);
+			const value = typeof next === "function" ? next(latestParams()) : next;
+			const url = joinPageUrl(rootRef.current, pageUrlOf(value));
+			pending = url;
+			navigate(url, options);
+			// A navigation that never settles (superseded, redirected) stops
+			// shadowing the browser's URL after one task.
+			setTimeout(() => {
+				if (pending === url) pending = null;
+			}, 0);
 		},
 		[navigate],
 	);

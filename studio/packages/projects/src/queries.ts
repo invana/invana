@@ -7,7 +7,7 @@
  * disagrees with the panel.
  */
 
-import { runsApi } from "@invana-studio/core";
+import { runsApi, useAuthStore } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectsApi, todosApi } from "./api";
 import type {
@@ -36,6 +36,20 @@ export function useProjectsQuery(
 		queryKey: projectsKey(scope),
 		queryFn: () => projectsApi.list(scope.username, scope.graphSlug),
 		enabled: !!username && !!graphSlug,
+	});
+}
+
+export function useProjectQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	key: string | undefined,
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQuery({
+		queryKey: projectsKey(scope, [key, "read"]),
+		queryFn: () =>
+			projectsApi.get(scope.username, scope.graphSlug, key as string),
+		enabled: !!username && !!graphSlug && !!key,
 	});
 }
 
@@ -96,6 +110,15 @@ export function useTodosQuery(
 		queryFn: () => todosApi.list(scope.username, scope.graphSlug, filters),
 		enabled: !!username && !!graphSlug && enabled,
 	});
+}
+
+/**
+ * What the Todos section lists: a project's Todos when one is open, and
+ * otherwise the signed-in person's — *My todos*.
+ */
+export function useTodosScope(projectKey: string | null) {
+	const me = useAuthStore((s) => s.user?.id);
+	return projectKey ? { project: projectKey } : { assignee: me };
 }
 
 export function useTodoQuery(

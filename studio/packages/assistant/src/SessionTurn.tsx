@@ -1,4 +1,5 @@
 import {
+	Button,
 	ChatSessionActivityRow,
 	type ChatSessionActivityStatus,
 	ChatSessionActivitySubLine,
@@ -23,6 +24,7 @@ import {
 import {
 	Code,
 	Copy,
+	FolderPlus,
 	Info,
 	ListTree,
 	Network,
@@ -33,6 +35,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAssistantSlots } from "./AssistantSlots";
 import { RunCannotAnswer, RunDiagnosis } from "./answer-surface/NotAnAnswer";
 import {
 	LoadToCanvasAction,
@@ -318,6 +321,7 @@ function SettledTurn({
 	// 👍/👎 rate a real answer — not canvas operations, which aren't the model's
 	// answer to a question (docs/for-developers/modules/explore/features/boards.md).
 	const canVote = !!message.sourceQuery && !message.operation;
+	const addToProject = useAssistantSlots().useAddToProject();
 	const sourceQuery = message.sourceQuery ?? view?.query?.query;
 
 	const copy = () => {
@@ -408,17 +412,44 @@ function SettledTurn({
 		<StepTrace step={s} onClose={() => setOpenTraceId(null)} />
 	);
 
+	// A real answer can be kept as evidence on a project's branch, its run
+	// cited, so the finding stands on what the answer stood on. It is an offer
+	// on the reply's own line, beside the load offer.
+	const answerRunId = message.runId;
+	const keep =
+		addToProject &&
+		canVote &&
+		answerRunId &&
+		!isStopped &&
+		message.status !== "error" ? (
+			<Button
+				variant="ghost"
+				size="sm"
+				className="shrink-0 font-normal"
+				onClick={() =>
+					addToProject({ runId: answerRunId, statement: message.content })
+				}
+			>
+				<FolderPlus />
+				Add to a project
+			</Button>
+		) : null;
+
+	const offers = graph && !loaded;
 	const replyBody = message.refusal ? (
 		<CastRefusalCard refusal={message.refusal} />
-	) : graph && !loaded ? (
+	) : offers || keep ? (
 		<span className="flex flex-wrap items-center gap-x-3 gap-y-1">
 			{!sentenceEchoed && <span className="min-w-0">{message.content}</span>}
-			<LoadToCanvasAction
-				onLoad={() => {
-					onLoadToCanvas(graph, message);
-					setClicked(true);
-				}}
-			/>
+			{offers ? (
+				<LoadToCanvasAction
+					onLoad={() => {
+						onLoadToCanvas(graph, message);
+						setClicked(true);
+					}}
+				/>
+			) : null}
+			{keep}
 		</span>
 	) : sentenceEchoed ? null : (
 		message.content

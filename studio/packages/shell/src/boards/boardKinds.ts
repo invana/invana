@@ -38,6 +38,8 @@ import {
 	Boxes,
 	Database,
 	FileCode,
+	FolderOpen,
+	Gavel,
 	GitBranch,
 	GitCompareArrows,
 	Globe,
@@ -199,7 +201,9 @@ export type DeclaredKind =
 	| "world"
 	| "guardrail"
 	| "agent"
-	| "models";
+	| "models"
+	| "project"
+	| "decisions";
 
 export type BoardKind = CanvasKind | DeclaredKind;
 
@@ -378,6 +382,29 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		icon: Boxes,
 		// Switching the `leftNav` to Models opens it.
 		panel: "model",
+		subject: "the graph's slug",
+	},
+	// A project's one page — its tabs, and a branch or a finding drilled into
+	// (projects.md). Studio-only and titled with the project's name, like
+	// `agent`; the tab and the drill-in ride in the URL beside `?page=`.
+	project: {
+		kind: "project",
+		renders: "declared",
+		label: "Project",
+		icon: FolderOpen,
+		// A project opened in the Projects stack.
+		panel: "projects",
+		subject: "a project key",
+	},
+	// Every decision across the Graph's projects. Studio-only and bound to the
+	// Graph, like `runs`.
+	decisions: {
+		kind: "decisions",
+		renders: "declared",
+		label: "Decisions",
+		icon: Gavel,
+		// Switching the `leftNav` to Decisions opens it.
+		panel: "decisions",
 		subject: "the graph's slug",
 	},
 };

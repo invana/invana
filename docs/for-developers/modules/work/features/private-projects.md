@@ -6,7 +6,7 @@ A project is visible to every member of its Graph, or only to the people and age
 |---|---|
 | Index | [9.7](../../../README.md#9--work) · B05 |
 | Module | [Work](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Product | [products/projects.md › Visibility](../../../../products/projects.md#visibility) PJ-02 · P-14 |
 | Related | [roles](../../identity-and-access/features/roles.md) · [search](../../platform/features/search.md) · [projects-and-tasks](projects-and-tasks.md) |
 
@@ -53,8 +53,9 @@ Studio is C02 (`projects.new` visibility) and C07 (private projects in the acces
 
 | Surface | Consumes |
 |---|---|
-| New project | `POST …/projects` `visibility` |
-| Project details | `PATCH …/projects/{key}` `visibility` |
+| New project · `NewProjectDialog` (C02) | `POST …/projects` `visibility` · `POST …/assignments` for the agents picked |
+| Project details · the Projects stack's Details tab (C02) | `PATCH …/projects/{key}` `visibility` · `question` |
+| Project page header (C02) | `visibility` as *Graph members* or *people only* |
 | CLI | `invana projects create --private` |
 
 ## Engine
@@ -75,6 +76,7 @@ Studio is C02 (`projects.new` visibility) and C07 (private projects in the acces
 | PP4 | Graph owners and install Admins are not exempt. Whoever should see a private project is put on it. |
 | PP5 | Turning a project private staffs the person doing it, so it is never left with nobody on it; the last person cannot be unstaffed. |
 | PP6 | Agent runs read projects through their own principals; per-project access is enforced on the people-facing API, search and the Graph's event feed. |
+| PP7 | Studio staffs only agents at create; the creator is staffed by the engine. Other people are not offered, because the Graph's member list carries no user id to staff them by — an engine follow-up. |
 
 ## Not building
 

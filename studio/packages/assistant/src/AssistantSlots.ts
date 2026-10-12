@@ -51,6 +51,13 @@ export interface AssistantSlots {
 	) => { data?: { items: readonly { address: string }[] } };
 	/** Whether a world's rule pattern names an address. */
 	matches: (pattern: string, address: string) => boolean;
+	/**
+	 * Keeps an answer as a finding on a project's branch, its run cited — or
+	 * `null` where no product offers it, and the turn draws no button.
+	 */
+	useAddToProject: () =>
+		| ((answer: { runId: string; statement: string }) => void)
+		| null;
 }
 
 export const AssistantSlotsContext = createContext<AssistantSlots | null>(null);

@@ -693,6 +693,36 @@ builds them in `@invana-studio/datasets` (migration session C01). Decisions are 
 
 ---
 
+## Beyond the 42 · Projects
+
+The `projects.*` boards of the *Invana Products* prototype (`.design/canvas-products/p_projects.py`),
+as Studio builds them in `@invana-studio/projects` (migration session C02). A project and Decisions
+are pages in `mainSection`; the page's tab and drill-in ride in the query beside `?page=`. Decisions
+are in [products/projects.md](../products/projects.md#decisions) and the work feature files
+[9.5](modules/work/features/branches-and-decisions.md) · [9.6](modules/work/features/project-reports.md) ·
+[9.7](modules/work/features/private-projects.md).
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `projects.list` | PJ-01 | `/projects` — the Projects stack | ✅ |
+| `projects.new` | PJ-02 | *New project* on the stack's Projects header | ✅ |
+| `projects.project` | PJ-03 | `/projects/<key>` → page `project:<key>` | ✅ |
+| `projects.project.branches` | PJ-04 | `…?view=branches` | ✅ |
+| `projects.branch.fork` | PJ-04 | *Fork a branch* · a branch's *Fork* | ✅ |
+| `projects.branch` | PJ-05 | `…&branch=<n>` — Work · Findings · History; no Runs or Schedules tab | 🟡 |
+| `projects.finding` | PJ-06 | `…&finding=<n>` | ✅ |
+| `projects.branch.decide` | PJ-07 | a branch's *Decide* | ✅ |
+| `projects.branch.merge` | PJ-08 | a branch's *Merge…* | ✅ |
+| `projects.simulate` · `projects.simulate.result` | PJ-09 | C06 | 🔵 |
+| `projects.impact` | PJ-10 | C06 | 🔵 |
+| `projects.lineage` | PJ-11 | `…?view=lineage&decision=<n>` | ✅ |
+| `projects.todos` · `projects.todo` | PJ-12 | `/projects/todos[/<id>]` — *My todos* | ✅ |
+| `projects.decisions` | PJ-13 | `/projects/decisions` → page `decisions:<graph>` | ✅ |
+| `projects.report` | PJ-14 | `…?view=report` | ✅ |
+| `explorer.answer.to_project` | EX-12 | *Add to a project* on an answer's reply line | ✅ |
+
+---
+
 ## The other direction — every feature, and the screen that draws it
 
 So a feature file can be opened next to the drawing that shows it.

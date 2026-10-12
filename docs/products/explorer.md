@@ -29,7 +29,7 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | EX-F7 | Manual tools — expand, styling and layers, canvas history | In Studio | EX-09 |
 | EX-F8 | Sessions — the chat’s history, opened from the chat header | In Studio (sessions) · New (in the chat) | EX-10 |
 | EX-F9 | Locked until set up | In Studio | EX-11 |
-| EX-F10 | Add an answer to a project branch | New · Blocked · P-10 | EX-12 |
+| EX-F10 | Add an answer to a project branch — *Add to a project* on the reply line ([projects.md](projects.md) › `projects.addFinding`) | In Studio | EX-12 |
 | EX-F13 | Share — live link or frozen snapshot for members; PNG · CSV · Markdown export | New | EX-15 |
 | EX-F12 | Console — records · query · log under the board, resizable, Table or JSON | New (the-console.md exists, not wired) | EX-08 · EX-14 |
 | EX-F11 | Assistant chat — centred to start, docked right once a conversation begins, closable | In Studio (chat) · New (centred start, close) | EX-01 · EX-02 · EX-13 |

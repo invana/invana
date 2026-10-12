@@ -18,6 +18,7 @@ import {
 	parseComparePair,
 	type useModelsView,
 } from "@invana-studio/modeller";
+import { DecisionsPage, ProjectPage } from "@invana-studio/projects";
 import type { useLeftSection } from "@invana-studio/shell";
 import {
 	BOARD_KINDS,
@@ -50,6 +51,10 @@ export interface DeclaredBoardDeps {
 	backend: CanvasBackend;
 	modelSelection: ModelSelection | null;
 	setModelSelection: Dispatch<SetStateAction<ModelSelection | null>>;
+	/** A project's page, on a branch when one is named. */
+	openProjectPage: (key: string, branch?: number | null) => void;
+	/** Leave the graph's products for a dataset in Datasets. */
+	openDataset: (address: string) => void;
 }
 
 /**
@@ -75,6 +80,8 @@ export function declaredBoardContent(
 		backend,
 		modelSelection,
 		setModelSelection,
+		openProjectPage,
+		openDataset,
 	} = deps;
 
 	// A task opens inside its run: the page stays, `&step=` moves.
@@ -262,6 +269,30 @@ export function declaredBoardContent(
 		);
 	}
 
+	// A project's page — its tabs, a branch and a finding. What it cites
+	// opens where it lives: a run as its board, a dataset in Datasets.
+	if (board.kind === "project") {
+		return (
+			<ProjectPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				projectKey={board.subjectId}
+				onOpenRun={(id) => openBoard({ kind: "run", subjectId: id, runId: id })}
+				onOpenDataset={openDataset}
+			/>
+		);
+	}
+
+	if (board.kind === "decisions") {
+		return (
+			<DecisionsPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				onOpenProject={openProjectPage}
+			/>
+		);
+	}
+
 	if (board.kind === "compare") {
 		const pair = parseComparePair(board.subjectId);
 		return pair ? (
@@ -320,11 +351,12 @@ export interface BoardTitleNames {
 	agentNameById: Map<string, string>;
 	skillNameById: Map<string, string>;
 	planRefById: Map<string, string>;
+	projectNameByKey: Map<string, string>;
 }
 
 /**
  * A declared tab's title. Most kinds are titled by their kind — one skill
- * board, and the crumb inside says which record. A lens and an agent are titled
+ * board, and the crumb inside says which record. A lens, an agent and a project are titled
  * by name, and a run by its address, `run:3c414b9f`, so two open runs are two
  * readable tabs.
  */
@@ -336,6 +368,7 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 		agentNameById,
 		skillNameById,
 		planRefById,
+		projectNameByKey,
 	} = names;
 	return (
 		// One board, titled by its scope — `All models` or `AirRoutes`.
@@ -351,15 +384,17 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 					: board.kind === "skill"
 						? (skillNameById.get(board.subjectId) ??
 							BOARD_KINDS[board.kind].label)
-						: board.kind === "run"
-							? runAddress(board.subjectId)
-							: board.kind === "plan_runs"
-								? (planRefById.get(board.subjectId) ??
-									BOARD_KINDS[board.kind].label)
-								: board.kind === "plan_versions" ||
-										board.kind === "plan_arguments" ||
-										board.kind === "plan_export"
-									? `${planRefById.get(board.subjectId) ?? "plan"} · ${BOARD_KINDS[board.kind].label.toLowerCase()}`
-									: BOARD_KINDS[board.kind].label
+						: board.kind === "project"
+							? (projectNameByKey.get(board.subjectId) ?? board.subjectId)
+							: board.kind === "run"
+								? runAddress(board.subjectId)
+								: board.kind === "plan_runs"
+									? (planRefById.get(board.subjectId) ??
+										BOARD_KINDS[board.kind].label)
+									: board.kind === "plan_versions" ||
+											board.kind === "plan_arguments" ||
+											board.kind === "plan_export"
+										? `${planRefById.get(board.subjectId) ?? "plan"} · ${BOARD_KINDS[board.kind].label.toLowerCase()}`
+										: BOARD_KINDS[board.kind].label
 	);
 }

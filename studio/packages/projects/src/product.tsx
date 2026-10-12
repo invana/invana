@@ -6,7 +6,7 @@
  * |---|---|---|
  * | Projects | `/projects[/:project]` | the Projects stack on Projects |
  * | My todos | `/projects/todos[/:todo]` | the Projects stack on Todos |
- * | Decisions | `/projects/decisions` | every decision across projects — empty until the engine records them |
+ * | Decisions | `/projects/decisions` | every decision across projects, as a page in `mainSection` with no left column |
  *
  * Projects is the product's root, so a project's key sits right under it, as
  * migration-plan §5 spells it. The levels under the product's route have no
@@ -15,15 +15,17 @@
  * regions, so the route's element is whatever the app puts in
  * `ProjectsSlotsContext`.
  *
- * **Actions.** `projects.addFinding` is registered so other products can ask
- * for it by id, and is not available until findings exist — so the Explorer's
- * button stays hidden.
+ * **Actions.** `projects.addFinding` keeps an answer as a finding: it opens
+ * *Add a finding* with the project and branch to pick, the answer's sentence
+ * as the statement and its run as the cite (explorer.md EX-12). Other products
+ * ask for it by id and never import this one.
  */
 import type { ProductDefinition } from "@invana-studio/core";
 import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";
 import { FolderOpen, Gavel, ListTodo } from "lucide-react";
 import type { Params, RouteObject } from "react-router-dom";
 import { useProjectsSlots } from "./ProjectsSlots";
+import { AddFindingDialog } from "./project/AddFindingDialog";
 import { searchProjects } from "./search";
 
 function ProjectsRoute() {
@@ -78,10 +80,26 @@ export const projects: ProductDefinition = {
 	],
 	actions: {
 		"projects.addFinding": {
-			label: "Add finding",
-			available: false,
-			// Never invoked while unavailable: `useAction` hands callers nothing.
-			run: () => {},
+			label: "Add to a project",
+			run: ({ args, openDialog }) => {
+				const { username, graphSlug, runId, statement } = args as {
+					username: string;
+					graphSlug: string;
+					runId: string;
+					statement: string;
+				};
+				openDialog((close) => (
+					<AddFindingDialog
+						open
+						onClose={close}
+						username={username}
+						graphSlug={graphSlug}
+						from="from this answer"
+						initial={{ statement, cites: [{ kind: "run", ref: runId }] }}
+						evidence={`It keeps this answer's evidence: the run ${runId.slice(0, 8)}, with its query and the records it read.`}
+					/>
+				));
+			},
 		},
 	},
 };

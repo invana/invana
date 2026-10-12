@@ -8,7 +8,7 @@ the rules in force. Agents **propose**; people decide.
 |---|---|
 | Index | [9.5](../../../README.md#9--work) · B05 |
 | Module | [Work](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Product | [products/projects.md](../../../../products/projects.md) PJ-F1 · PJ-F2 · PJ-F3 · PJ-F4 · PJ-F5 |
 | Related | [projects-and-tasks](projects-and-tasks.md) · [project-reports](project-reports.md) · [private-projects](private-projects.md) · [rules](../../skills/features/rules.md) · [datasets](../../bring-data-in/features/datasets.md) |
 
@@ -71,17 +71,20 @@ flowchart TD
 
 ## Surfaces
 
-Studio is [C02](../../../../products/migration-sessions.md#track-c--new-product-ui) — boards
-`projects.project.branches` · `projects.branch` · `projects.branch.fork` · `projects.finding` ·
-`projects.branch.decide` · `projects.branch.merge` · `projects.decisions`.
+Studio is [C02](../../../../products/migration-sessions.md#track-c--new-product-ui), in
+`@invana-studio/projects` `src/project/`. A project is the declared board `project:<key>` in
+`mainSection`; its tab and drill-ins ride in the query (`view · branch · finding · decision`).
 
-| Surface | Consumes |
-|---|---|
-| Branch tree | `GET …/projects/{key}/branches` |
-| Branch page | `GET …/branches/{n}` — findings with stance, the balance, decisions, proposals |
-| Decide | `POST …/branches/{n}/decisions` |
-| Decisions rail item | `GET …/decisions` |
-| CLI | `invana branches · findings · proposals` |
+| Surface | Board | Consumes |
+|---|---|---|
+| Project page · `ProjectPage` | `projects.project` | `GET …/projects/{key}` · `…/branches` · each `…/branches/{n}` · `…/assignments` |
+| Branch tree · `BranchTree` | `projects.project.branches` | `GET …/projects/{key}/branches` |
+| Fork · `ForkDialog` | `projects.branch.fork` | `POST …/branches/{n}/fork` |
+| Branch page · `BranchView` | `projects.branch` | `GET …/branches/{n}` — findings with stance, the balance, decisions, proposals · `POST …/proposals/{n}/accept\|reject` · `POST …/tasks` with `branch` |
+| Finding · `FindingView` · `AddFindingDialog` | `projects.finding` | `GET …/findings/{n}` · `POST …/findings/{n}/review` · `POST …/branches/{n}/findings` |
+| Decide and merge · `DecideDialog` | `projects.branch.decide` · `projects.branch.merge` | `POST …/branches/{n}/decisions` |
+| Decisions page · `DecisionsPage` | `projects.decisions` | `GET …/decisions` · each project's `…/assignments` for *By* |
+| CLI | — | `invana branches · findings · proposals` |
 
 ## Engine
 
@@ -118,6 +121,8 @@ Studio is [C02](../../../../products/migration-sessions.md#track-c--new-product-
 | BD13 | Verdicts and decisions are always a person's: no route takes an agent as the decider. |
 | BD14 | Merge needs `into` (another branch of the same project, not dropped or merged) and optionally the finding numbers to carry; with none named, every finding on the source is carried. |
 | BD15 | The Graph's decisions list (`GET …/decisions`) is a read across projects, filtered to the projects the reader may see ([9.7](private-projects.md)). |
+| BD16 | Studio fills in what the engine requires rather than asking: *Decide* addresses every contradicting finding and supersedes the current decision. A rule's 409 is drawn as a refusal card naming the findings, with *Remove fN from the cites*; reviewing one is the finding page's *Review*. |
+| BD17 | Studio draws the Branches tab as a tree on the layered canvas — fork edges, a dashed edge into the branch a merge went into, a dropped branch hollow — and a merge's dialog asks only *What moves*, which is also what the decision cites. A project, branch and finding are levels of the shell's breadcrumb, named for what they are, never their key. |
 
 ## Not building
 

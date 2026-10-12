@@ -15,6 +15,7 @@ import type {
 	ModelSelection,
 	useLensesViewPanel,
 } from "@invana-studio/modeller";
+import { useProjectsQuery } from "@invana-studio/projects";
 import type { useLeftSection, useRightSection } from "@invana-studio/shell";
 import {
 	BOARD_KINDS,
@@ -87,6 +88,8 @@ export interface OpenPagesDeps {
 	modelsView: BoardTitleNames["modelsView"];
 	modelName: BoardTitleNames["modelName"];
 	planRefById: BoardTitleNames["planRefById"];
+	openProjectPage: DeclaredBoardDeps["openProjectPage"];
+	openDataset: DeclaredBoardDeps["openDataset"];
 	renameSession: ReturnType<typeof useSessions>["renameSession"];
 	backToList: ReturnType<typeof useSessions>["backToList"];
 	right: ReturnType<typeof useRightSection>;
@@ -131,6 +134,8 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		modelsView,
 		modelName,
 		planRefById,
+		openProjectPage,
+		openDataset,
 		renameSession,
 		backToList,
 		right,
@@ -202,6 +207,13 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	const skillNameById = useMemo(
 		() => new Map((skillsList.data?.items ?? []).map((s) => [s.id, s.name])),
 		[skillsList.data],
+	);
+
+	// And a project's page for the project.
+	const projectsList = useProjectsQuery(username, graphSlug);
+	const projectNameByKey = useMemo(
+		() => new Map((projectsList.data?.items ?? []).map((p) => [p.key, p.name])),
+		[projectsList.data],
 	);
 
 	// The active canvas page's handle. The strip's help / styling / history /
@@ -308,6 +320,8 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		backend,
 		modelSelection,
 		setModelSelection,
+		openProjectPage,
+		openDataset,
 	};
 	const titleNames: BoardTitleNames = {
 		modelsView,
@@ -316,6 +330,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		agentNameById,
 		skillNameById,
 		planRefById,
+		projectNameByKey,
 	};
 
 	const pages: WorkbookPage[] = [

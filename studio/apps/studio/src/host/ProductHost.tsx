@@ -32,7 +32,7 @@ import {
 	useRunStep,
 } from "@invana-studio/shell";
 import { useCallback, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { assistantSlots } from "@/host/assistantSlots";
 import { OpenBoardContext } from "@/host/boards";
 import { consoleSection } from "@/host/consoleSection";
@@ -47,6 +47,7 @@ import { useLayeredCanvas } from "@/host/useLayeredCanvas";
 import { useModelsPage } from "@/host/useModelsPage";
 import { useOpenBoards } from "@/host/useOpenBoards";
 import { useOpenPages } from "@/host/useOpenPages";
+import { useProjectsPage } from "@/host/useProjectsPage";
 
 /** `invana_neo4j.connector.Neo4jConnector` → `Neo4j`. */
 function databaseName(connectorClass: string): string {
@@ -215,6 +216,13 @@ export function ProductHost() {
 		boardPage.setPageId(null);
 		setWorkKind(kind);
 	};
+	// A project's plan canvas, likewise — the Plan tab draws it in front of
+	// the project's page it was opened beside.
+	const showPlanCanvas = () => {
+		setActiveBoardId(null);
+		boardPage.setPageId(null);
+		setWorkKind("plan");
+	};
 
 	// The open `?panel` key, read in several places below (which canvas kind the
 	// panel owns, which panel the left column draws).
@@ -252,6 +260,20 @@ export function ProductHost() {
 		graphSlug,
 		settingsSection,
 		openBoards,
+	);
+	// A project's page and the Decisions page, opened by the Projects rail.
+	const { openProjectPage, pageTrail } = useProjectsPage(
+		username,
+		graphSlug,
+		settingsSection,
+		openBoards,
+	);
+	// A dataset a project cites lives in Datasets, outside the graph's products.
+	const navigate = useNavigate();
+	const openDataset = useCallback(
+		(address: string) =>
+			navigate(`/datasets/catalogue/${address.split("@")[0]}`),
+		[navigate],
 	);
 
 	// The data canvases, the ask, and everything that draws on them.
@@ -292,6 +314,7 @@ export function ProductHost() {
 		openWorkPanel,
 		openAgentPage,
 		showAgentCanvas,
+		showPlanCanvas,
 		modelSelection,
 		setModelSelection,
 		showModelsPage,
@@ -386,6 +409,8 @@ export function ProductHost() {
 		modelsView,
 		modelName,
 		planRefById,
+		openProjectPage,
+		openDataset,
 		renameSession,
 		backToList,
 		right,
@@ -462,6 +487,9 @@ export function ProductHost() {
 									? sessionTitleById.get(activeSessionId)
 									: undefined
 							}
+							// A project's page names its own levels: Projects › the project
+							// › its branch › the finding.
+							pageTrail={pageTrail}
 							{...chrome}
 							leftSection={leftRegion}
 							mainSection={{

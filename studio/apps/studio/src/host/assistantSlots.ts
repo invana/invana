@@ -1,7 +1,8 @@
 /**
  * What the graph page lends the assistant: a board's banner and a rule's board
- * (boards), a step's rules (skills), and the worlds a thread can be set to
- * (lenses). The assistant package may import none of these modules, so the
+ * (boards), a step's rules (skills), the worlds a thread can be set to
+ * (lenses), and keeping an answer as a finding (projects, through the action
+ * registry). The assistant package may import none of these modules, so the
  * page hands them in through `AssistantSlotsContext`.
  *
  * One module-level object, so the hooks it carries are the same functions on
@@ -11,9 +12,35 @@
 import type { AssistantSlots } from "@invana-studio/assistant";
 import { useLensesQuery } from "@invana-studio/core";
 import { matches, useParticipantsQuery } from "@invana-studio/modeller";
-import { useCanvasBannerQuery } from "@invana-studio/shell";
+import { useAction, useCanvasBannerQuery } from "@invana-studio/shell";
 import { StepRules } from "@invana-studio/ui";
+import { useCallback } from "react";
+import { useParams } from "react-router-dom";
 import { useOpenBoard } from "@/host/boards";
+
+interface AddFindingArgs {
+	username: string;
+	graphSlug: string;
+	runId: string;
+	statement: string;
+}
+
+/** `projects.addFinding`, bound to the open Graph — null when nothing offers it. */
+function useAddToProject() {
+	const { username, graphSlug } = useParams();
+	const action = useAction<AddFindingArgs>("projects.addFinding");
+	const invoke = action?.invoke;
+	const add = useCallback(
+		(answer: { runId: string; statement: string }) =>
+			invoke?.({
+				username: username as string,
+				graphSlug: graphSlug as string,
+				...answer,
+			}),
+		[invoke, username, graphSlug],
+	);
+	return invoke && username && graphSlug ? add : null;
+}
 
 export const assistantSlots: AssistantSlots = {
 	useBoardBanner: useCanvasBannerQuery,
@@ -22,4 +49,5 @@ export const assistantSlots: AssistantSlots = {
 	useWorlds: useLensesQuery,
 	useParticipants: useParticipantsQuery,
 	matches,
+	useAddToProject,
 };

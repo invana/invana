@@ -8,7 +8,7 @@
  * tests prove is Studio's threading of a real response, not the engine's read.
  */
 import { expect, type Page, test } from "@playwright/test";
-import { askForRun, graphApi, ruleWithStatement, skillNamed } from "./api";
+import { askForRun, graphApi, me, ruleWithStatement, skillNamed } from "./api";
 import { GRAPH } from "./explorer";
 
 const STATEMENT = "Airport codes are IATA, never ICAO.";
@@ -128,7 +128,8 @@ test("RU12 — a Todo's Activity tab draws offered and marks cited", async ({
 	const title = `E2E activity ${Date.now()}`;
 	const todo = await graphApi<{ id: string }>(page, "/tasks", {
 		method: "POST",
-		data: { title },
+		// With no project open the section lists *My todos*, so it is assigned.
+		data: { title, assignee_kind: "user", assignee_id: me() },
 	});
 	// Two steps were offered the same statement and only `Understand` cited it,
 	// so the mark is the whole difference between them. No clean stack runs an

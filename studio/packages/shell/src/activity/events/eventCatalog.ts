@@ -107,6 +107,23 @@ export const EVENT_CATEGORIES: EventCategory[] = [
 		types: [{ action: "dataset.import", label: "Imported" }],
 	},
 	{
+		// A project's records — branches, findings, decisions, proposals and its
+		// report. Every one targets the project, so they read as one area.
+		key: "project",
+		label: "Projects",
+		types: [
+			{ action: "branch.fork", label: "Branch forked" },
+			{ action: "finding.add", label: "Finding added" },
+			{ action: "finding.review", label: "Finding reviewed" },
+			{ action: "decision.record", label: "Decision recorded" },
+			{ action: "proposal.submit", label: "Proposal submitted" },
+			{ action: "proposal.accept", label: "Proposal accepted" },
+			{ action: "proposal.reject", label: "Proposal rejected" },
+			{ action: "report.generate", label: "Report drafted" },
+			{ action: "report.publish", label: "Report published" },
+		],
+	},
+	{
 		key: "member",
 		label: "Members",
 		types: [{ action: "member.add", label: "Added" }],

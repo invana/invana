@@ -29,6 +29,9 @@ interface HostLayoutProps {
 	 *  *screen* crumb: the graph's URL is the page (graph-detail-page.md),
 	 *  so what follows the graph is the open panel, then what it opened. */
 	objectLabel?: string;
+	/** The focused page's own levels — `Projects › a project › H2 › f1` —
+	 *  in place of the route's crumbs. */
+	pageTrail?: { label: string; to?: string; title?: string }[];
 	/** Page-side left panel. Shown only while a page-owned `?settings` key is
 	 *  open; a settings section docks the SettingsViewPanel here instead, and
 	 *  nothing open means no left column. */
@@ -106,6 +109,7 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
  */
 export function HostLayout({
 	objectLabel,
+	pageTrail,
 	leftSection,
 	mainSection,
 	rightSection,
@@ -131,6 +135,7 @@ export function HostLayout({
 	// `owner › graph › LLMs › <provider> › object`.
 	const header = {
 		objectLabel,
+		pageTrail,
 		rightExtras: headerRightExtras,
 		assistantToggle: headerPanelControls,
 		center: explorer ? undefined : headerCenter,

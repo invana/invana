@@ -7,12 +7,22 @@
 
 import { request } from "@invana-studio/core";
 import type {
+	Branch,
+	BranchDetail,
+	Decision,
+	DecisionCreate,
+	Finding,
+	FindingCreate,
+	LineageDataset,
 	Project,
 	ProjectAssignment,
 	ProjectCreate,
 	ProjectListResponse,
 	ProjectPlan,
 	ProjectUpdate,
+	Proposal,
+	Report,
+	ReportVersion,
 	Todo,
 	TodoActivity,
 	TodoCreate,
@@ -80,6 +90,138 @@ export const projectsApi = {
 	/** The Plan tab and the Plan canvas are two renderings of this one call. */
 	plan: (username: string, graphSlug: string, key: string) =>
 		request<ProjectPlan>(`${base(username, graphSlug)}/projects/${key}/plan`),
+};
+
+/**
+ * A project's records — branches, findings, decisions, proposals and its
+ * report. Every one is addressed by its number inside the project.
+ */
+export const recordsApi = {
+	branches: (username: string, graphSlug: string, key: string) =>
+		request<{ items: Branch[]; total: number }>(
+			`${base(username, graphSlug)}/projects/${key}/branches`,
+		),
+
+	branch: (username: string, graphSlug: string, key: string, n: number) =>
+		request<BranchDetail>(
+			`${base(username, graphSlug)}/projects/${key}/branches/${n}`,
+		),
+
+	fork: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		n: number,
+		titles: string[],
+	) =>
+		request<{ items: Branch[]; total: number }>(
+			`${base(username, graphSlug)}/projects/${key}/branches/${n}/fork`,
+			{ method: "POST", ...json({ titles }) },
+		),
+
+	addFinding: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		n: number,
+		data: FindingCreate,
+	) =>
+		request<Finding>(
+			`${base(username, graphSlug)}/projects/${key}/branches/${n}/findings`,
+			{ method: "POST", ...json(data) },
+		),
+
+	finding: (username: string, graphSlug: string, key: string, n: number) =>
+		request<Finding>(
+			`${base(username, graphSlug)}/projects/${key}/findings/${n}`,
+		),
+
+	review: (username: string, graphSlug: string, key: string, n: number) =>
+		request<Finding>(
+			`${base(username, graphSlug)}/projects/${key}/findings/${n}/review`,
+			{ method: "POST" },
+		),
+
+	decide: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		n: number,
+		data: DecisionCreate,
+	) =>
+		request<Decision>(
+			`${base(username, graphSlug)}/projects/${key}/branches/${n}/decisions`,
+			{ method: "POST", ...json(data) },
+		),
+
+	decisions: (username: string, graphSlug: string, key: string) =>
+		request<{ items: Decision[]; total: number }>(
+			`${base(username, graphSlug)}/projects/${key}/decisions`,
+		),
+
+	/** Every decision on the Graph the reader may see, newest first. */
+	graphDecisions: (username: string, graphSlug: string) =>
+		request<{ items: Decision[]; total: number }>(
+			`${base(username, graphSlug)}/decisions`,
+		),
+
+	resolveProposal: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		n: number,
+		act: "accept" | "reject",
+	) =>
+		request<Proposal>(
+			`${base(username, graphSlug)}/projects/${key}/proposals/${n}/${act}`,
+			{ method: "POST", ...json({ note: "" }) },
+		),
+
+	report: (username: string, graphSlug: string, key: string) =>
+		request<Report>(`${base(username, graphSlug)}/projects/${key}/report`),
+
+	saveDraft: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		draft: string,
+	) =>
+		request<Report>(`${base(username, graphSlug)}/projects/${key}/report`, {
+			method: "PUT",
+			...json({ draft }),
+		}),
+
+	generate: (username: string, graphSlug: string, key: string) =>
+		request<Report>(
+			`${base(username, graphSlug)}/projects/${key}/report/generate`,
+			{ method: "POST" },
+		),
+
+	publish: (username: string, graphSlug: string, key: string) =>
+		request<ReportVersion>(
+			`${base(username, graphSlug)}/projects/${key}/report/publish`,
+			{ method: "POST" },
+		),
+
+	reportVersion: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		version: number,
+	) =>
+		request<ReportVersion>(
+			`${base(username, graphSlug)}/projects/${key}/report/versions/${version}`,
+		),
+
+	/**
+	 * A cited dataset as lineage reads it — its origin and who wrote it. An
+	 * install-wide record, read here rather than through the Datasets product,
+	 * which this product may not import.
+	 */
+	dataset: (publisher: string, name: string) =>
+		request<LineageDataset>(
+			`/api/v1/datasets/${encodeURIComponent(publisher)}/${encodeURIComponent(name)}`,
+		),
 };
 
 export const todosApi = {

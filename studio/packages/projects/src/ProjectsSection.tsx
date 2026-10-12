@@ -35,6 +35,7 @@ import {
 	FilterBar,
 	PropertyList,
 	PropertyRow,
+	SegmentedControl,
 	Spinner,
 	Tabs,
 	TabsContent,
@@ -60,14 +61,22 @@ import {
 } from "@invana-studio/ui";
 import { Archive, ArchiveRestore, Pencil } from "lucide-react";
 import { useMemo, useState } from "react";
+import { NewProjectDialog } from "./project/NewProjectDialog";
 import {
 	useProjectMutations,
 	useProjectPlanQuery,
 	useProjectsQuery,
 	useTodosQuery,
 } from "./queries";
+import { typeLabel } from "./records/words";
 import { ProjectRules } from "./rules/ProjectRules";
-import type { PlanTodo, Project, ProjectUpdate, Todo } from "./types";
+import type {
+	PlanTodo,
+	Project,
+	ProjectUpdate,
+	Todo,
+	Visibility,
+} from "./types";
 
 /**
  * Focus the field the moment it appears. The form only exists because the user
@@ -126,8 +135,6 @@ export function ProjectsSectionBody({
 	onOpenAgent,
 	onTabChange,
 }: Props) {
-	const [name, setName] = useState("");
-
 	const projects = useProjectsQuery(username, graphSlug);
 	const mutations = useProjectMutations(username, graphSlug);
 	const plan = useProjectPlanQuery(
@@ -165,36 +172,13 @@ export function ProjectsSectionBody({
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
-			{creating && !selected ? (
-				<form
-					className="flex gap-1.5 border-b px-3 py-2"
-					onSubmit={(e) => {
-						e.preventDefault();
-						if (!name.trim()) return;
-						mutations.create.mutate(
-							{ name: name.trim() },
-							{
-								onSuccess: (project) => {
-									setName("");
-									onCreating(false);
-									onSelectProject(project.key);
-								},
-							},
-						);
-					}}
-				>
-					<input
-						ref={focusOnMount}
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-						placeholder="Project name"
-						className="min-w-0 flex-1 rounded-sm border bg-background px-2 py-1.5 text-base"
-					/>
-					<Button type="submit" size="sm" className="h-7 text-base">
-						Create
-					</Button>
-				</form>
-			) : null}
+			<NewProjectDialog
+				open={creating && !selected}
+				onClose={() => onCreating(false)}
+				username={username}
+				graphSlug={graphSlug}
+				onCreated={(project) => onSelectProject(project.key)}
+			/>
 
 			{selected ? (
 				<ProjectDetail
@@ -778,10 +762,14 @@ function ProjectDetailsTab({
 	const [editing, setEditing] = useState(false);
 	const [name, setName] = useState(project.name);
 	const [description, setDescription] = useState(project.description);
+	const [question, setQuestion] = useState(project.question);
+	const [visibility, setVisibility] = useState(project.visibility);
 
 	const start = () => {
 		setName(project.name);
 		setDescription(project.description);
+		setQuestion(project.question);
+		setVisibility(project.visibility);
 		setEditing(true);
 	};
 
@@ -792,8 +780,14 @@ function ProjectDetailsTab({
 				onSubmit={(e) => {
 					e.preventDefault();
 					if (!name.trim()) return;
-					onUpdate({ name: name.trim(), description: description.trim() }, () =>
-						setEditing(false),
+					onUpdate(
+						{
+							name: name.trim(),
+							description: description.trim(),
+							question: question.trim(),
+							visibility,
+						},
+						() => setEditing(false),
 					);
 				}}
 			>
@@ -808,6 +802,16 @@ function ProjectDetailsTab({
 					/>
 				</div>
 				<div className="flex flex-col gap-1.5">
+					<Label htmlFor="project-question">Question</Label>
+					<Textarea
+						id="project-question"
+						rows={2}
+						value={question}
+						onChange={(e) => setQuestion(e.target.value)}
+						placeholder="What this project sets out to decide"
+					/>
+				</div>
+				<div className="flex flex-col gap-1.5">
 					<Label htmlFor="project-purpose">Purpose</Label>
 					<Textarea
 						id="project-purpose"
@@ -815,6 +819,17 @@ function ProjectDetailsTab({
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
 						placeholder="What this project is for — the goal every agent on it plans from."
+					/>
+				</div>
+				<div className="flex flex-col gap-1.5">
+					<Label>Who can see it</Label>
+					<SegmentedControl
+						options={[
+							{ value: "graph", label: "Graph members" },
+							{ value: "private", label: "Only the people on it" },
+						]}
+						value={visibility}
+						onValueChange={(v) => setVisibility(v as Visibility)}
 					/>
 				</div>
 				<div className="flex items-center gap-2">
@@ -839,6 +854,21 @@ function ProjectDetailsTab({
 			<PropertyList labelWidth={92}>
 				<PropertyRow label="key" mono>
 					{project.key}
+				</PropertyRow>
+				<PropertyRow label="type">{typeLabel(project.type)}</PropertyRow>
+				<PropertyRow label="question">
+					{project.question ? (
+						<span className="whitespace-pre-line">{project.question}</span>
+					) : (
+						<span className="text-muted-foreground">
+							No question written yet
+						</span>
+					)}
+				</PropertyRow>
+				<PropertyRow label="who can see">
+					{project.visibility === "private"
+						? "only the people on it"
+						: "Graph members"}
 				</PropertyRow>
 				<PropertyRow label="purpose">
 					{project.description ? (

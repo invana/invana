@@ -7,7 +7,7 @@ frozen versions that cite the dataset versions behind them.
 |---|---|
 | Index | [9.6](../../../README.md#9--work) · B05 |
 | Module | [Work](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Product | [products/projects.md › Reports](../../../../products/projects.md#reports) PJ-F10 · PJ-14 |
 | Related | [branches-and-decisions](branches-and-decisions.md) · [retract-and-refresh](../../bring-data-in/features/retract-and-refresh.md) |
 
@@ -50,12 +50,12 @@ flowchart LR
 
 ## Surfaces
 
-Studio is C02 — board `projects.report`.
+Studio is C02 — board `projects.report`, the project page's Report tab (`ReportTab`, `?view=report`).
 
 | Surface | Consumes |
 |---|---|
 | Report tab | `GET …/projects/{key}/report` · `PUT …/report` · `POST …/report/generate` · `POST …/report/publish` |
-| A version | `GET …/report/versions/{v}` · `…/export` |
+| A version | `GET …/report/versions/{v}` |
 | CLI | `invana reports generate · publish · export` |
 
 ## Engine
@@ -76,6 +76,8 @@ Studio is C02 — board `projects.report`.
 | RP3 | A version freezes its body and the dataset versions cited by the project's findings at publish time. Nothing changes a published version. |
 | RP4 | The retraction notice is read, never stored: a version read names every cited dataset version retracted since. |
 | RP5 | The engine exports Markdown. PDF is the Studio's print of the rendered version. |
+| RP6 | Studio's *Markdown* downloads the version body (or the draft) as it is read, with no second request; *Publish vN* stays off while the draft has unsaved edits, because what is published is the saved draft. |
+| RP7 | Studio reads the draft and every version rendered: the template's Markdown subset in the kit's typography, a finding's trailing cites as numbered marks listed once under *Cites* (a run as `run 8195c5e8`). *Read · Edit* switches the draft to its Markdown. |
 
 ## Not building
 

@@ -21,7 +21,7 @@ import {
 	RequestsViewPanel,
 	RulesViewPanel,
 } from "@invana-studio/modeller";
-import { DecisionsViewPanel, ProjectsViewPanel } from "@invana-studio/projects";
+import { ProjectsViewPanel } from "@invana-studio/projects";
 import type {
 	CanvasStyling,
 	OpenBoard,
@@ -46,6 +46,8 @@ export interface LeftSectionDeps {
 	) => void;
 	openAgentPage: (id: string) => void;
 	showAgentCanvas: (kind: "envelope" | "lineage", id: string) => void;
+	/** The project's plan canvas, brought in front of any focused page. */
+	showPlanCanvas: () => void;
 	modelSelection: ModelSelection | null;
 	setModelSelection: Dispatch<SetStateAction<ModelSelection | null>>;
 	showModelsPage: () => Record<string, string | null>;
@@ -75,6 +77,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		openWorkPanel,
 		openAgentPage,
 		showAgentCanvas,
+		showPlanCanvas,
 		modelSelection,
 		setModelSelection,
 		showModelsPage,
@@ -121,7 +124,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 				setSelectedProjectKey(key);
 				if (!key) setWorkKind(null);
 			}}
-			onOpenPlanCanvas={() => setWorkKind("plan")}
+			onOpenPlanCanvas={showPlanCanvas}
 			onOpenAgent={(id) => {
 				setSelectedAgentId(id);
 				setWorkKind("lineage");
@@ -131,8 +134,6 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			// section, the same way `More` does from Rules.
 			onOpenRule={(ruleId) => openBoard({ kind: "rule", subjectId: ruleId })}
 		/>
-	) : settingsPanel.section === "decisions" ? (
-		<DecisionsViewPanel />
 	) : settingsPanel.section === "library" ? (
 		// **Library is definition** — Plans · Templates, stacked, with no panel
 		// header above them: what can be run, and how its output renders.

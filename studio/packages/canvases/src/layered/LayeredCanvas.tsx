@@ -20,6 +20,8 @@
  * | `workflow` | required order | order · `${steps.X.y}` binding | no |
  * | `envelope` | allowed vs not | a `require` precondition | no |
  * | `lineage` | causal depth | authored · spawned · delegated-for | no |
+ * | `branches` | fork depth | a fork · a merge (dashed) | no |
+ * | `provenance` | author → dataset · run → finding → decision | a cite · authorship | no |
  *
  * **The canvas law still holds** (docs/for-developers/modules/agents/features/lineage.md): it selects and draws. Exactly
  * one kind writes, `plan`, and only where the geometry *is* the datum —
@@ -85,6 +87,8 @@ type LayeredKind =
 	| "workflow"
 	| "envelope"
 	| "lineage"
+	| "branches"
+	| "provenance"
 	| "data"
 	| "model";
 
@@ -698,6 +702,28 @@ const LEGENDS: Record<LayeredKind, { keys: LegendKey[]; note: string }> = {
 		// each — so the legend says which, rather than leaving a user to find out
 		// by being navigated somewhere they did not expect.
 		note: "An agent selects into the agents list. A task opens in Tasks — this panel has no row for it. A person has no surface in MVP. An edge is an event: selecting one says what happened, for whom, and why.",
+	},
+	branches: {
+		keys: [
+			{ swatch: "node", tone: "success", label: "pursuing" },
+			{ swatch: "node", tone: "info", label: "open · merged" },
+			{ swatch: "node", tone: "muted", label: "parked" },
+			{ swatch: "node", tone: "error", dashed: true, label: "dropped" },
+			{ swatch: "edge", label: "forked" },
+			{ swatch: "edge", dashed: true, label: "merged into" },
+		],
+		note: "A branch sits right of the one it was forked from. Click a branch to open it; fork, decide and merge from its page.",
+	},
+	provenance: {
+		keys: [
+			{ swatch: "node", tone: "muted", label: "original author" },
+			{ swatch: "node", tone: "info", label: "dataset · run" },
+			{ swatch: "node", tone: "warning", label: "finding, not reviewed" },
+			{ swatch: "node", tone: "success", label: "reviewed finding · decision" },
+			{ swatch: "edge", label: "cited by" },
+			{ swatch: "edge", dashed: true, label: "authored" },
+		],
+		note: "Read left to right: who first wrote the data, the datasets and runs it reached, the findings that cite them, the decision. Click a node to open it.",
 	},
 	data: { keys: [], note: "" },
 	model: { keys: [], note: "" },

@@ -15,7 +15,7 @@ import { ask, GRAPH } from "./explorer";
 
 const API = process.env.E2E_API_URL ?? "http://localhost:8200";
 
-function token(): string {
+function authState(): { accessToken: string; user: { id: string } } {
 	const path = test.info().project.use.storageState as string;
 	const state = JSON.parse(readFileSync(path, "utf8"));
 	const auth = state.origins
@@ -24,14 +24,26 @@ function token(): string {
 				o.localStorage,
 		)
 		.find((i: { name: string }) => i.name === "invana.auth");
-	return JSON.parse(auth.value).state.accessToken;
+	return JSON.parse(auth.value).state;
+}
+
+function token(): string {
+	return authState().accessToken;
+}
+
+/** The signed-in user's id — what *My todos* filters its assignee by. */
+export function me(): string {
+	return authState().user.id;
 }
 
 /** Call a Graph-scoped route (`/rules`, `/skills`, …) as the signed-in user. */
 export async function graphApi<T>(
 	page: Page,
 	path: string,
-	init: { method?: "GET" | "POST" | "DELETE"; data?: unknown } = {},
+	init: {
+		method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+		data?: unknown;
+	} = {},
 ): Promise<T> {
 	const res = await page.request.fetch(`${API}/api/v1${GRAPH}${path}`, {
 		method: init.method ?? "GET",
@@ -42,6 +54,14 @@ export async function graphApi<T>(
 		true,
 	);
 	return res.status() === 204 ? (undefined as T) : res.json();
+}
+
+/** The status a Graph-scoped GET answers with — for polling until a record reads back. */
+export async function graphStatus(page: Page, path: string): Promise<number> {
+	const res = await page.request.get(`${API}/api/v1${GRAPH}${path}`, {
+		headers: { Authorization: `Bearer ${token()}` },
+	});
+	return res.status();
 }
 
 /**

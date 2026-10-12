@@ -15,9 +15,10 @@ test("the workflow runs in front of the reader, step by step", async ({
 }) => {
 	await ask(page, "RETURN 1 AS one");
 
-	// C2: the steps are the surface while a run is live, not a spinner.
+	// C2: the steps are the surface while a run is live, not a spinner. The
+	// running step is also echoed above the composer, so it can match twice.
 	for (const step of ["Plan", "Validate", "Execute", "Project", "Verify"]) {
-		await expect(page.getByText(step, { exact: true })).toBeVisible({
+		await expect(page.getByText(step, { exact: true }).first()).toBeVisible({
 			timeout: 30_000,
 		});
 	}

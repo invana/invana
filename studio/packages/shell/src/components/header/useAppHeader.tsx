@@ -35,6 +35,9 @@ export interface AppHeaderOptions {
 	 *  as the last crumb: `owner › graph › Explorer › Defence theme`. Omitted
 	 *  when the screen holds nothing yet. */
 	objectLabel?: string;
+	/** The levels after the lead when the focused page names its own —
+	 *  `Projects › a project › H2 › f1`. Wins over the route's crumbs. */
+	pageTrail?: HeaderLevel[];
 	/** The Graph picker slot, after the wordmark. */
 	graphPicker?: ReactNode;
 	/** Center content. Most pages won't need this. */
@@ -76,6 +79,7 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 	const {
 		pageLabel,
 		objectLabel,
+		pageTrail,
 		graphPicker,
 		center,
 		search,
@@ -89,7 +93,12 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 	const product = useActiveProduct();
 	const routeCrumbs = useRouteCrumbs();
 
-	const trail = computeTrail(pathname, user?.username, pageLabel, routeCrumbs);
+	const trail = computeTrail(
+		pathname,
+		user?.username,
+		pageLabel,
+		pageTrail?.length ? pageTrail : routeCrumbs,
+	);
 	if (objectLabel) trail.levels.push({ label: objectLabel });
 	const hasTrail = trail.lead.length + trail.levels.length > 0;
 
@@ -136,14 +145,17 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 // Breadcrumb
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface Segment {
+/** One level of the header's trail. */
+interface HeaderLevel {
 	/** Display text. */
 	label: string;
-	/** Optional link target. Last segment is unlinked. */
+	/** Optional link target — a path, with a query when the level is one. Last segment is unlinked. */
 	to?: string;
 	/** Hover text when the label is shortened; the label otherwise. */
 	title?: string;
 }
+
+type Segment = HeaderLevel;
 
 /** `lead` names where the levels are — the Graph, or the signed-in user. */
 interface Trail {

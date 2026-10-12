@@ -56,6 +56,7 @@ import {
 	useTodoQuery,
 	useTodoRunsQuery,
 	useTodosQuery,
+	useTodosScope,
 } from "./queries";
 import { TodoActivityTree } from "./TodoActivityTree";
 import type { Todo } from "./types";
@@ -127,9 +128,11 @@ export function TodosSectionBody({
 	const [statusFilter, setStatusFilter] = useState("");
 	const [assigneeFilter, setAssigneeFilter] = useState("");
 
-	const list = useTodosQuery(username, graphSlug, {
-		project: projectKey ?? undefined,
-	});
+	const list = useTodosQuery(
+		username,
+		graphSlug,
+		useTodosScope(projectKey ?? null),
+	);
 	const detail = useTodoQuery(username, graphSlug, selectedTaskId ?? undefined);
 	const mutations = useTodoMutations(username, graphSlug);
 	const agents = useProjectsSlots().useAgents(username, graphSlug);

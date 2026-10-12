@@ -17,7 +17,7 @@ import { stackSection, useStackSectionUi } from "@invana-studio/ui";
 import { FolderOpen, ListTodo, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ProjectsSectionBody } from "./ProjectsSection";
-import { useProjectsQuery, useTodosQuery } from "./queries";
+import { useProjectsQuery, useTodosQuery, useTodosScope } from "./queries";
 import { TodosSectionBody } from "./TodosSection";
 import { useProjectsViewPanel } from "./useProjectsViewPanel";
 
@@ -44,6 +44,10 @@ export function ProjectsViewPanel({
 	const ui = useStackSectionUi();
 	const [creatingProject, setCreatingProject] = useState(false);
 	const [creatingTodo, setCreatingTodo] = useState(false);
+	// The drill-in's trail names the project, not its key.
+	const projectName = useProjectsQuery(username, graphSlug).data?.items?.find(
+		(p) => p.key === projects.projectKey,
+	)?.name;
 
 	// `PanelStack` reads `defaultSize` at **mount**, so this is the opening split
 	// only — after that the column's shape belongs to whoever dragged it.
@@ -79,7 +83,9 @@ export function ProjectsViewPanel({
 						label: "Projects",
 						icon: FolderOpen,
 						count: <ProjectsCount username={username} graphSlug={graphSlug} />,
-						trail: projects.projectKey ?? undefined,
+						trail: projects.projectKey
+							? (projectName ?? projects.projectKey)
+							: undefined,
 						onBack: () => {
 							projects.openProject(null);
 							onProjectChange?.(null);
@@ -123,7 +129,7 @@ export function ProjectsViewPanel({
 				stackSection(
 					{
 						id: "todos",
-						label: "Todos",
+						label: projects.projectKey ? "Todos" : "My todos",
 						icon: ListTodo,
 						count: (
 							<TodosCount
@@ -183,8 +189,8 @@ function ProjectsCount({
 }
 
 /**
- * `12 · 3 in review`. With no project drilled into this counts every Todo in
- * the Graph — the *No project* bucket included.
+ * `12 · 3 in review`. With no project drilled into this counts the signed-in
+ * person's Todos — *My todos*.
  */
 function TodosCount({
 	username,
@@ -195,9 +201,7 @@ function TodosCount({
 	graphSlug: string;
 	projectKey: string | null;
 }) {
-	const list = useTodosQuery(username, graphSlug, {
-		project: projectKey ?? undefined,
-	});
+	const list = useTodosQuery(username, graphSlug, useTodosScope(projectKey));
 	const items = list.data?.items ?? [];
 	if (items.length === 0) return null;
 	const review = items.filter((t) => t.status === "review").length;
