@@ -35,12 +35,17 @@ from typing import Any
 
 import click
 
+from invana.cli.commands.agents import agents_cmd
+from invana.cli.commands.evals import evals_cmd
 from invana.cli.commands.govern import govern_cmd
 from invana.cli.commands.init import init_cmd
+from invana.cli.commands.llms import llms_cmd
 from invana.cli.commands.loader import loader_cmd
 from invana.cli.commands.migrate import migrate_cmd
 from invana.cli.commands.models import models_cmd
+from invana.cli.commands.plans import plans_cmd
 from invana.cli.commands.records import records_cmd
+from invana.cli.commands.skills import skills_cmd
 from invana.cli.commands.start import start_cmd
 from invana.cli.commands.stitches import stitches_cmd
 from invana.cli.commands.users import users_cmd
@@ -201,3 +206,8 @@ app.add_command(models_cmd)
 app.add_command(records_cmd)
 app.add_command(stitches_cmd)
 app.add_command(govern_cmd)
+app.add_command(skills_cmd)
+app.add_command(agents_cmd)
+app.add_command(evals_cmd)
+app.add_command(llms_cmd)
+app.add_command(plans_cmd)

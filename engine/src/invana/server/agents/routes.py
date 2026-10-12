@@ -30,6 +30,10 @@ agents_router.post("", response_model=AgentRead, status_code=status.HTTP_201_CRE
 agents_router.get("/{agent_id}", response_model=AgentRead)(views.get_agent)
 agents_router.patch("/{agent_id}", response_model=AgentRead)(views.update_agent)
 agents_router.delete("/{agent_id}", status_code=status.HTTP_204_NO_CONTENT)(views.delete_agent)
+agents_router.patch("/{agent_id}/draft", response_model=AgentRead)(views.write_agent_draft)
+agents_router.delete("/{agent_id}/draft", response_model=AgentRead)(views.discard_agent_draft)
+agents_router.post("/{agent_id}/publish", response_model=AgentRead)(views.publish_agent_instructions)
+agents_router.post("/{agent_id}/rollback", response_model=AgentRead)(views.rollback_agent_instructions)
 # GET previews the act, POST performs it — the same pair on both acts that
 # disturb open work (LC8 · LC10). Resume has no GET: it takes nothing away.
 agents_router.get("/{agent_id}/pause", response_model=LifecyclePreview)(views.preview_pause)

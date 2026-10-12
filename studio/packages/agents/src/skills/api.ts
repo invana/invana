@@ -1,11 +1,9 @@
 import { request } from "@invana-studio/core";
 import type {
-	InlinablePlanListResponse,
 	Skill,
 	SkillAgentsResponse,
 	SkillCreate,
 	SkillDraft,
-	SkillDraftTaskWrite,
 	SkillDrawStarted,
 	SkillListResponse,
 	SkillPlaybookRead,
@@ -70,23 +68,6 @@ export const skillsApi = {
 			method: "DELETE",
 		}),
 
-	/**
-	 * Hand-edit the draft's plan. The rows are replaced wholesale and the plan
-	 * becomes `authored`, after which redrawing from the prose is offered rather
-	 * than automatic. Bounded by the catalogue, not by an agent's envelope
-	 * — an agent refuses at bind time.
-	 */
-	writeDraftTasks: (
-		username: string,
-		graphSlug: string,
-		id: string,
-		tasks: SkillDraftTaskWrite[],
-	) =>
-		request<SkillDraft>(`${base(username, graphSlug)}/${id}/draft/tasks`, {
-			method: "PATCH",
-			body: JSON.stringify({ tasks }),
-		}),
-
 	/** Draw the playbook as a plan — a `role = plan` run. */
 	draw: (username: string, graphSlug: string, id: string) =>
 		request<SkillDrawStarted>(`${base(username, graphSlug)}/${id}/draft/draw`, {
@@ -104,12 +85,6 @@ export const skillsApi = {
 		request<SkillDraft>(
 			`${base(username, graphSlug)}/${id}/draft/clarifications/${clarificationId}`,
 			{ method: "POST", body: JSON.stringify({ answer }) },
-		),
-
-	/** The library plans a skill may inline, each with what it offers. */
-	inlinable: (username: string, graphSlug: string) =>
-		request<InlinablePlanListResponse>(
-			`${base(username, graphSlug)}/inlinable`,
 		),
 
 	/** Bound, refused and not bound — the refusals are the engine's dry run. */

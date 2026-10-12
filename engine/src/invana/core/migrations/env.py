@@ -40,7 +40,15 @@ from invana.core.auth.models import RefreshToken, User  # noqa: F401
 from invana.core.events.models import Event  # noqa: F401
 from invana.core.models import Base
 from invana.core.settings import settings
-from invana.runtime.models import TaskPrompt, TaskRun, TaskStream  # noqa: F401
+from invana.runtime.models import (  # noqa: F401
+    EvalBudget,
+    EvalCase,
+    EvalResult,
+    EvalSet,
+    TaskPrompt,
+    TaskRun,
+    TaskStream,
+)
 
 config = context.config
 

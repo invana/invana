@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -61,6 +62,10 @@ class TaskRunRead(BaseModel):
     stream_seq: int
     #: The trace the run was started in — opens it in the collector's UI.
     trace_id: str | None = None
+    #: The provider's version name the run called; null for one that called none.
+    model_version: str | None = None
+    #: The root run this one re-ran.
+    rerun_of_run_id: str | None = None
     steps: list[RunNodeRead] = []
 
 
@@ -138,6 +143,20 @@ class ResumeTaskRun(BaseModel):
 class CancelResponse(BaseModel):
     id: str
     status: str
+
+
+class RunRerun(BaseModel):
+    """Re-run a settled ask on the versions it recorded, or on today's."""
+
+    versions: Literal["same", "current"] = "same"
+
+
+class RunRerunResponse(BaseModel):
+    run_id: str
+    rerun_of_run_id: str
+    #: The provider's version name the new run will call; null for one that calls none.
+    model_version: str | None = None
+    stream_url: str
 
 
 # ── Emissions (docs/for-developers/modules/ask/features/the-answer-surface.md) ──
@@ -358,3 +377,138 @@ class CatalogueResponse(BaseModel):
     #: Grouped by bound, in the bound's declared order, then by key (CA3).
     items: list[CatalogueEntryRead]
     total: int
+
+
+# ── Evals (docs/for-developers/modules/skills/features/evals.md) ──
+
+
+class EvalCheck(BaseModel):
+    """One rule check — ``kind`` and, where the kind takes one, its ``value``."""
+
+    kind: Literal[
+        "cites_records",
+        "names_world",
+        "cannot_answer",
+        "guardrail_holds",
+        "expected_records",
+        "max_tokens",
+        "max_latency_ms",
+    ]
+    value: str | int | list[str] | None = None
+
+
+class EvalSetWrite(BaseModel):
+    judge_model_pin: str | None = Field(default=None, max_length=255)
+    rubric: str | None = None
+
+
+class EvalCaseRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    question: str
+    checks: list[EvalCheck]
+    label: Literal["passing", "failing"]
+    status: Literal["proposed", "active", "retired"]
+    source_run_id: str | None = None
+    created_by_id: str | None = None
+    created_at: datetime | None = None
+
+
+class EvalSetRead(BaseModel):
+    #: Null until the set is first written.
+    id: str | None = None
+    subject_kind: Literal["skill", "agent"]
+    subject_id: str
+    judge_model_pin: str | None = None
+    rubric: str | None = None
+    cases: list[EvalCaseRead] = Field(default_factory=list)
+
+
+class EvalCaseWrite(BaseModel):
+    question: str = Field(min_length=1)
+    checks: list[EvalCheck] = Field(default_factory=list)
+    label: Literal["passing", "failing"] = "passing"
+    #: True for the assistant's starter set — it waits for a person to accept it.
+    proposed: bool = False
+
+
+class EvalCaseUpdate(BaseModel):
+    question: str | None = Field(default=None, min_length=1)
+    checks: list[EvalCheck] | None = None
+    label: Literal["passing", "failing"] | None = None
+    status: Literal["proposed", "active", "retired"] | None = None
+
+
+class EvalRunOpen(BaseModel):
+    side: Literal["live", "draft", "both"] = "both"
+    #: A rollback's candidate: the version it would restore.
+    version: int | None = Field(default=None, ge=1)
+    #: A pin move's candidate: the address the pin would move to.
+    model_pin: str | None = Field(default=None, max_length=255)
+    trigger: Literal["manual", "publish", "rollback", "pin"] = "manual"
+
+
+class EvalRunRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    status: str
+    outcome: str | None = None
+    detail: str = ""
+    triggered_by: str
+    params: dict
+    result: dict | None = None
+    queued_at: datetime | None = None
+    finished_at: datetime | None = None
+
+
+class EvalResultRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    eval_case_id: str
+    case_run_id: str | None = None
+    side: Literal["live", "draft"]
+    hard: dict[str, str]
+    #: The labelled judge's 0-5 — never part of the hard count.
+    judged: float | None = None
+    tokens: int
+    latency_ms: int
+    answer_digest: str
+
+
+class EvalRunDetail(EvalRunRead):
+    results: list[EvalResultRead] = Field(default_factory=list)
+
+
+class EvalRunOpened(BaseModel):
+    run_id: str
+    status: str
+    detail: str = ""
+
+
+class EvalPromote(BaseModel):
+    run_id: str
+    subject_kind: Literal["skill", "agent"]
+    subject_id: str
+    label: Literal["passing", "failing"]
+    #: Omitted on a passing case: the checks are read from the run.
+    checks: list[EvalCheck] | None = None
+
+
+class EvalBudgetRead(BaseModel):
+    #: Null is no ceiling.
+    monthly_tokens: int | None = None
+    spent: int = 0
+
+
+class EvalBudgetWrite(BaseModel):
+    monthly_tokens: int | None = Field(default=None, ge=0)
+
+
+class EvalDrift(BaseModel):
+    trigger: Literal["nightly", "model_publish", "world_change", "pin_moved"] = "nightly"
+
+
+class EvalDriftResponse(BaseModel):
+    run_ids: list[str]

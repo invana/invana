@@ -63,7 +63,7 @@ Feature: [10.5 · see-what-ran](../modules/operate/features/see-what-ran.md).
 | U4 | `Legend` | `ui-extended` | swatch kinds `stripe` (the layer bar), `bracket` (a bounded repetition), `rule` (a gate). Today: dot · line · dashed · arrow · ring | in_order · layers · layers.forecast · flow | ✅ |
 | U5 | `FilterChip` | `ui-extended` | closable (`since: today ×`), and the bar's own summary (`interactive runs hidden`) | list · list.states · every panel | ✅ |
 | U7 | `RecordHeader` | `ui-extended` | **the last crumb gives way first.** Every parent crumb was truncating equally, so `runs › run:7d3184f1 › step:9b1c40e2 execute_query` rendered as `ru… › run:7d3184… › step:9b1c40e2 execute_qu…` — and the kind prefix is the one thing [SR54](../modules/operate/features/see-what-ran.md#decisions) says a crumb exists to carry. Found by rendering, not by type-check | every step board | ✅ |
-| U6 | `TaskNode` | `ui-extended` | `readOnly` — a run's picked node gets the ring and **no handles**; handles belong to the draft canvas | flow · flow.step ([SR52](../modules/operate/features/see-what-ran.md#decisions)) | ✅ |
+| U6 | `TaskNode` | `ui-extended` | `readOnly` — a run's picked node gets the ring and **no handles**; nothing edits a plan by hand ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3) | flow · flow.step ([SR52](../modules/operate/features/see-what-ran.md#decisions)) | ✅ |
 
 ### 1.4 New — `@invana/boards` panel kinds
 

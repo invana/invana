@@ -75,7 +75,7 @@ export type SkillLayer =
 /** What the section row and the Flow tab's badge need without a second call. */
 interface SkillPlaybookSummary {
 	plan_id: string;
-	/** `generated` when the planner drew it, `authored` after a hand-edit. */
+	/** `generated` · `packaged` · `promoted`; `authored` on rows written before. */
 	origin: string;
 	step_count: number;
 	layers: SkillLayer[];
@@ -132,29 +132,11 @@ export interface PlanUse {
 	latest_version: number;
 }
 
-/** A library plan a skill may inline, and what it offers a caller. */
-export interface InlinablePlan {
-	key: string;
-	version: number;
-	/** `nl-single@1` — what a `uses` row names. */
-	ref: string;
-	name: string;
-	description: string;
-	kind: string;
-	step_count: number;
-	layers: SkillLayer[];
-	args_schema: Record<string, PlanArg>;
-}
-
 /** One declared argument — what it is, and what it is unless a caller says. */
 export interface PlanArg {
 	type: "str" | "int" | "bool";
 	default?: unknown;
 	label?: string;
-}
-
-export interface InlinablePlanListResponse {
-	items: InlinablePlan[];
 }
 
 // ── the draft, and the question it is waiting on ────────────────────────────
@@ -178,43 +160,6 @@ export interface SkillClarification {
 }
 
 /**
- * One step a hand-edit may name. The engine sends the set with the draft: the
- * catalogue is closed and Studio cannot see it, so a list of step keys written
- * here would be a second copy to keep in step.
- */
-export interface SkillStepChoice {
-	step_key: string;
-	label: string;
-	bound: string;
-	layer: SkillLayer;
-	/** Steps that must be ordered before it. */
-	requires: string[];
-}
-
-/**
- * One row of a hand-edited plan. Row-level, not a flow editor: which step, what
- * it is called, what it takes. The edges are materialised by the engine from
- * the bindings and the catalogue's `requires`.
- */
-export interface SkillDraftTaskWrite {
-	key?: string | null;
-	/**
-	 * `callable` names a catalogue entry; `human` names none; `uses`
-	 * names a library **plan**, whose rows the engine copies in before it
-	 * validates anything.
-	 */
-	form: "callable" | "human" | "uses";
-	step_key?: string | null;
-	title?: string;
-	args?: Record<string, unknown>;
-	/** Kept so the Playbook tab still maps prose to steps after an edit. */
-	source_span?: string | null;
-	/** `uses` rows only: which plan, and what this composition tunes. */
-	uses?: string | null;
-	uses_args?: Record<string, unknown>;
-}
-
-/**
  * The version being written, the plan being drawn, and the question waiting on
  * an answer. A draft is a version row with no `published_at`.
  */
@@ -230,8 +175,6 @@ export interface SkillDraft {
 	 * a run that died. The next draw that writes rows clears it.
 	 */
 	refusal: SkillDrawRefusal | null;
-	/** What a hand-edit may name — the catalogue, in the section's words. */
-	vocabulary: SkillStepChoice[];
 }
 
 /**

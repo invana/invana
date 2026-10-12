@@ -21,6 +21,8 @@ CREATE TABLE agents (
 	soul TEXT DEFAULT ''::text NOT NULL, 
 	soul_traits JSON DEFAULT '{}'::json NOT NULL, 
 	effort JSON DEFAULT '{}'::json NOT NULL, 
+	model_pin VARCHAR(255), 
+	instructions_draft TEXT, 
 	CONSTRAINT agents_pkey PRIMARY KEY (id), 
 	CONSTRAINT agents_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	CONSTRAINT agents_parent_agent_id_fkey FOREIGN KEY(parent_agent_id) REFERENCES agents (id) ON DELETE SET NULL, 
@@ -151,6 +153,68 @@ CREATE TABLE emissions (
 CREATE INDEX ix_emissions_message_id ON emissions (message_id);
 
 CREATE INDEX ix_emissions_thinking_id ON emissions (run_id);
+
+CREATE TABLE eval_budgets (
+	graph_id VARCHAR(36) NOT NULL, 
+	monthly_tokens INTEGER, 
+	CONSTRAINT eval_budgets_pkey PRIMARY KEY (graph_id), 
+	CONSTRAINT eval_budgets_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
+CREATE TABLE eval_cases (
+	id VARCHAR(36) NOT NULL, 
+	eval_set_id VARCHAR(36) NOT NULL, 
+	question TEXT NOT NULL, 
+	checks JSON NOT NULL, 
+	label VARCHAR(16) NOT NULL, 
+	status VARCHAR(16) NOT NULL, 
+	source_run_id VARCHAR(36), 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE, 
+	CONSTRAINT eval_cases_pkey PRIMARY KEY (id), 
+	CONSTRAINT eval_cases_created_by_id_fkey FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT eval_cases_eval_set_id_fkey FOREIGN KEY(eval_set_id) REFERENCES eval_sets (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_eval_cases_eval_set_id ON eval_cases (eval_set_id);
+
+CREATE TABLE eval_results (
+	id VARCHAR(36) NOT NULL, 
+	eval_run_id VARCHAR(36) NOT NULL, 
+	eval_case_id VARCHAR(36) NOT NULL, 
+	case_run_id VARCHAR(36), 
+	side VARCHAR(8) NOT NULL, 
+	hard JSON NOT NULL, 
+	judged DOUBLE PRECISION, 
+	tokens INTEGER NOT NULL, 
+	latency_ms INTEGER NOT NULL, 
+	answer_digest VARCHAR(64) NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE, 
+	CONSTRAINT eval_results_pkey PRIMARY KEY (id), 
+	CONSTRAINT eval_results_case_run_id_fkey FOREIGN KEY(case_run_id) REFERENCES task_runs (id) ON DELETE SET NULL, 
+	CONSTRAINT eval_results_eval_case_id_fkey FOREIGN KEY(eval_case_id) REFERENCES eval_cases (id) ON DELETE CASCADE, 
+	CONSTRAINT eval_results_eval_run_id_fkey FOREIGN KEY(eval_run_id) REFERENCES task_runs (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_eval_result_side UNIQUE NULLS DISTINCT (eval_run_id, eval_case_id, side)
+);
+
+CREATE INDEX ix_eval_results_eval_case_id ON eval_results (eval_case_id);
+
+CREATE INDEX ix_eval_results_eval_run_id ON eval_results (eval_run_id);
+
+CREATE TABLE eval_sets (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	subject_kind VARCHAR(16) NOT NULL, 
+	subject_id VARCHAR(36) NOT NULL, 
+	judge_model_pin VARCHAR(255), 
+	rubric TEXT, 
+	created_at TIMESTAMP WITH TIME ZONE, 
+	CONSTRAINT eval_sets_pkey PRIMARY KEY (id), 
+	CONSTRAINT eval_sets_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_eval_set_subject UNIQUE NULLS DISTINCT (subject_kind, subject_id)
+);
+
+CREATE INDEX ix_eval_sets_graph_id ON eval_sets (graph_id);
 
 CREATE TABLE events (
 	id VARCHAR(36) NOT NULL, 
@@ -722,6 +786,9 @@ CREATE TABLE skill_versions (
 	published_at TIMESTAMP WITH TIME ZONE, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	plan_id VARCHAR(36) NOT NULL, 
+	restored_from_version INTEGER, 
+	model_pin VARCHAR(255), 
+	drawn_digest VARCHAR(64), 
 	CONSTRAINT skill_versions_pkey PRIMARY KEY (id), 
 	CONSTRAINT fk_skill_versions_plan FOREIGN KEY(plan_id) REFERENCES task_plans (id) ON DELETE RESTRICT, 
 	CONSTRAINT skill_versions_published_by_id_fkey FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL, 
@@ -756,7 +823,7 @@ CREATE TABLE task_plans (
 	name VARCHAR(255) DEFAULT ''::character varying NOT NULL, 
 	description TEXT DEFAULT ''::text NOT NULL, 
 	kind VARCHAR(16) DEFAULT 'ask'::character varying NOT NULL, 
-	origin VARCHAR(16) DEFAULT 'builtin'::character varying NOT NULL, 
+	origin VARCHAR(16) DEFAULT 'packaged'::character varying NOT NULL, 
 	intent JSON NOT NULL, 
 	todo_id VARCHAR(36), 
 	args_schema JSON NOT NULL, 
@@ -859,7 +926,10 @@ CREATE TABLE task_runs (
 	rules_cited JSON DEFAULT '[]'::json NOT NULL, 
 	trace_id VARCHAR(32), 
 	root_span_id VARCHAR(16), 
+	model_version VARCHAR(255), 
+	rerun_of_run_id VARCHAR(36), 
 	CONSTRAINT task_runs_pkey PRIMARY KEY (id), 
+	CONSTRAINT fk_task_runs_rerun_of_run_id FOREIGN KEY(rerun_of_run_id) REFERENCES task_runs (id) ON DELETE SET NULL, 
 	CONSTRAINT task_runs_assistant_message_id_fkey FOREIGN KEY(assistant_message_id) REFERENCES session_messages (id) ON DELETE SET NULL, 
 	CONSTRAINT task_runs_author_id_fkey FOREIGN KEY(author_id) REFERENCES users (id) ON DELETE SET NULL, 
 	CONSTRAINT task_runs_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 

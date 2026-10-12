@@ -22,7 +22,7 @@ from invana.apps.graphs.schemas import (
 )
 from invana.apps.setup.sections import _mark_section
 from invana.core.auth.models import User
-from invana.core.errors import ConflictError
+from invana.core.errors import ConflictError, NotFoundError
 from invana.core.events import actions
 from invana.core.events.services import diff_changed_fields, emit_event
 
@@ -92,6 +92,18 @@ class GraphManager:
             details={"via": "graph.create"},
         )
 
+        return graph
+
+    async def get_by_ref(self, session: AsyncSession, *, ref: str) -> Graph:
+        """The Graph a ``<username>/<slug>`` names — how the CLI is told which Graph to act on."""
+        username, _, slug = ref.partition("/")
+        graph = (
+            await self.graphs_qs.get_by_owner_username_and_slug(session, owner_username=username, slug=slug)
+            if slug
+            else None
+        )
+        if graph is None:
+            raise NotFoundError(f"Graph {ref!r} not found. Name it as <username>/<slug>.")
         return graph
 
     async def list_graphs_for_user(

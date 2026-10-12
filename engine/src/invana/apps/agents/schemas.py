@@ -44,7 +44,27 @@ class AgentUpdate(BaseModel):
     # leaves it alone.
     soul: str | None = None
     soul_traits: dict[str, str] | None = None
+    #: Read by set-ness: an address pins the model, ``null`` hands it back to the cast.
+    model_pin: str | None = Field(default=None, max_length=255)
     #: Why — carried on the event that mints the version, never inferred.
+    why: str | None = Field(default=None, max_length=500)
+
+
+class AgentDraftWrite(BaseModel):
+    """The agent's unpublished instructions, written whole."""
+
+    instructions: str
+
+
+class AgentPublish(BaseModel):
+    #: Why — carried on the ``agent.update`` the publish writes.
+    why: str | None = Field(default=None, max_length=500)
+
+
+class AgentRollback(BaseModel):
+    """Restore the instructions as they were at an earlier agent version."""
+
+    version: int = Field(ge=1)
     why: str | None = Field(default=None, max_length=500)
 
 
@@ -60,6 +80,8 @@ class AgentRead(BaseModel):
     status: str
     lifetime: str
     instructions: str
+    #: Unpublished instructions; null is no draft open.
+    instructions_draft: str | None = None
     workflow_spec: dict[str, Any]
     # Read through `skill_bindings` (BN6). Present here because the skills badge
     # and the bindings picker both need it; not writable on this object.
@@ -70,6 +92,8 @@ class AgentRead(BaseModel):
     guardrail_id: str | None = None
     guardrail_name: str | None = None
     budget: dict[str, Any]
+    #: The model address this agent thinks with; null lets the cast decide.
+    model_pin: str | None = None
     #: As stored — a missing key is the default. ``effective_effort`` is what a
     #: run reads, with the one-release fallbacks filled in (EB9).
     effort: dict[str, Any]

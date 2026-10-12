@@ -35,16 +35,18 @@ def _new_id() -> str:
 class PlanOrigin(enum.StrEnum):
     """How a plan came to exist.
 
-    Three of these are the library's badge ([LB5](docs/for-developers/modules/workflows/features/the-library.md));
-    ``generated`` is the fourth and is deliberately **not** listed there — a
-    one-off plan belongs to its Todo and is read from the run that ran it,
+    Plans are generated or packaged; nobody draws one
+    ([6.5](docs/for-developers/modules/skills/features/instructions-publish-rollback.md)).
+    New rows are written ``packaged``, ``generated`` or ``promoted``. A one-off
+    ``generated`` plan belongs to its Todo and is read from the run that ran it,
     because browsing plans that can never be selected again makes the library a
-    log ([LB6](docs/for-developers/modules/workflows/features/the-library.md)).
+    log ([the library](docs/for-developers/modules/workflows/features/the-library.md)).
     """
 
-    #: Shipped with Invana, re-seeded from the registry at startup.
-    builtin = "builtin"
-    #: A person drafted and published it.
+    #: Ships with Invana or a plugin pack; seeded read-only at startup.
+    packaged = "packaged"
+    #: Corrected by hand on a skill's draft. That edit is retiring; rows that
+    #: carry it keep it.
     authored = "authored"
     #: Drafted by the planner for one Todo. Never listed, never re-selected.
     generated = "generated"
@@ -103,7 +105,7 @@ class TaskPlan(Base):
     name: Mapped[str] = mapped_column(String(255), default="", nullable=False)
     description: Mapped[str] = mapped_column(Text, default="", nullable=False)
     kind: Mapped[str] = mapped_column(String(16), default=PlanKind.ask.value, nullable=False, index=True)
-    origin: Mapped[str] = mapped_column(String(16), default=PlanOrigin.builtin.value, nullable=False, index=True)
+    origin: Mapped[str] = mapped_column(String(16), default=PlanOrigin.packaged.value, nullable=False, index=True)
     #: Which `intent.kind` values this plan serves — what matches it to a Todo.
     intent: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     #: Set when `origin = generated`: the Todo this plan was drafted for.

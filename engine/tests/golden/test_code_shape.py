@@ -132,6 +132,8 @@ COMMIT_ALLOWED = {
     # session — the same shape `server/sessions/views.py` above already has
     # (building-engine/skills-draw-as-plans.md).
     "server/skills/views.py",
+    # An eval run is opened and then submitted, the same shape as a draw.
+    "server/evals/views.py",
     "server/admin/auth.py",
     "runtime/catalogue/records.py",
     # A CLI command is not serving a request: it opens its own session and owns
@@ -148,6 +150,10 @@ COMMIT_ALLOWED = {
     # `invana govern apply` declares a Graph's guardrails and worlds from a
     # file, in one transaction — the same shape as `stitches apply` above.
     "cli/commands/govern.py",
+    # The session every skills · agents · evals · llms · plans command opens:
+    # it commits once the command returns, and before an eval run or a draw is
+    # worked in-process, which reads the rows in its own session.
+    "cli/context.py",
     # the app factory commits during startup wiring, before any request exists
     "server/app.py",
 }

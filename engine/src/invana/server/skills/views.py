@@ -21,17 +21,16 @@ from invana.apps.agents.schemas import SkillUsageResponse
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.schemas import (
-    InlinablePlanListResponse,
     SkillAgentsResponse,
     SkillAgentStanding,
     SkillClarificationAnswer,
     SkillCreate,
     SkillDraftRead,
-    SkillDraftTasksWrite,
     SkillDrawStarted,
     SkillListResponse,
     SkillPlanRead,
     SkillRead,
+    SkillRollback,
     SkillUpdate,
     SkillVersionDiff,
     SkillVersionListResponse,
@@ -43,7 +42,6 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.runtime import services as run_services
 from invana.runtime.managers import SkillBindManager, SkillDraftManager, SkillUsageManager
-from invana.runtime.planning import resolve_plan
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 skills = SkillManager()
@@ -141,9 +139,31 @@ async def publish_skill_version(
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> SkillVersionRead:
-    """Publish the next version. Fields left out carry over from the current one."""
+    """Publish the draft as the next version. Fields left out carry over.
+
+    Refused with 409 unless the draft's plan was drawn from the exact text being
+    published — draw after the last edit, then publish.
+    """
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
     version = await drafts.publish(session, skill=skill, payload=payload, actor_id=user.id)
+    return SkillVersionRead.model_validate(version)
+
+
+async def rollback_skill(
+    payload: SkillRollback,
+    skill_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> SkillVersionRead:
+    """Restore an earlier version as the next one — its text and a copy of its plan.
+
+    Nothing is rewritten: the restore is a new published version that names the
+    one it copied. Refused while a draft is open, and for the current version.
+    """
+    skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
+    version = await drafts.rollback(session, skill=skill, version=payload.version, actor_id=user.id, why=payload.why)
     return SkillVersionRead.model_validate(version)
 
 
@@ -185,30 +205,6 @@ async def discard_skill_draft(
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
     await drafts.discard_draft(session, skill=skill)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-async def write_skill_draft_tasks(
-    payload: SkillDraftTasksWrite,
-    skill_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_member),
-    graph: Graph = Depends(resolve_graph_by_username_slug),
-    session: AsyncSession = Depends(get_session),
-) -> SkillDraftRead:
-    """Hand-edit the draft's plan, and take ownership of it.
-
-    The rows are replaced wholesale, and `task_plans.origin` flips to
-    `authored` — after which redrawing from the prose is **offered, never
-    automatic**, and says what it would discard
-    ([SK7](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
-
-    What is checked is the **catalogue**, not an agent's envelope: a skill
-    belongs to no agent, so *may this agent call this step* is checked where
-    the agent is known — at bind time
-    ([SK28](docs/for-developers/modules/skills/features/authoring-a-skill.md) ·
-    [BN5](docs/for-developers/modules/skills/features/bindings.md)).
-    """
-    skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
-    return await drafts.write_tasks(session, skill=skill, tasks=payload.tasks, validate=resolve_plan)
 
 
 async def draw_skill_draft(
@@ -308,20 +304,6 @@ async def diff_skill_version(
     """
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
     return await skills.diff_version(session, skill=skill, version=version)
-
-
-async def inlinable_plans(
-    _: GraphMember = Depends(require_graph_member),
-    graph: Graph = Depends(resolve_graph_by_username_slug),
-    session: AsyncSession = Depends(get_session),
-) -> InlinablePlanListResponse:
-    """The library plans a skill may inline, each with what it offers a caller.
-
-    One read for the picker **and** the tuning, because they are one act: a
-    person who inlines `nl-single@1` decides its `read_only` in the same breath
-    ([LB19](docs/for-developers/modules/workflows/features/the-library.md)).
-    """
-    return InlinablePlanListResponse(items=await drafts.inlinable(session, graph_id=graph.id))
 
 
 async def skill_agents(

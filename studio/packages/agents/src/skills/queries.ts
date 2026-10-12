@@ -1,10 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { skillsApi } from "./api";
-import type {
-	SkillCreate,
-	SkillDraftTaskWrite,
-	SkillVersionPublish,
-} from "./types";
+import type { SkillCreate, SkillVersionPublish } from "./types";
 
 const key = (username: string, graphSlug: string) =>
 	["skills", username, graphSlug] as const;
@@ -82,22 +78,6 @@ export function useSkillDraftQuery(
 }
 
 /**
- * The library plans a skill may inline. A Graph-level list, not a skill's, so
- * it is keyed above the skill and shared by every editor open on one.
- */
-export function useInlinablePlansQuery(
-	username: string,
-	graphSlug: string,
-	enabled = true,
-) {
-	return useQuery({
-		queryKey: [...key(username, graphSlug), "inlinable"] as const,
-		queryFn: () => skillsApi.inlinable(username, graphSlug),
-		enabled,
-	});
-}
-
-/**
  * Where this skill stands with every agent — bound, refused, not bound.
  *
  * The refusals come from the engine running both bind checks as a dry run,
@@ -154,28 +134,6 @@ export function useDiscardDraftMutation(
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: () => skillsApi.discardDraft(username, graphSlug, skillId),
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: key(username, graphSlug) });
-		},
-	});
-}
-
-/**
- * Hand-edit the draft's plan — the correction the prose cannot make.
- *
- * The plan becomes `authored`, so the section row's origin badge moves and a
- * redraw becomes an offer that says what it discards. The whole subtree
- * is invalidated because the list row carries the plan summary too.
- */
-export function useWriteDraftTasksMutation(
-	username: string,
-	graphSlug: string,
-	skillId: string,
-) {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: (tasks: SkillDraftTaskWrite[]) =>
-			skillsApi.writeDraftTasks(username, graphSlug, skillId, tasks),
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: key(username, graphSlug) });
 		},

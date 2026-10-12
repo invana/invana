@@ -17,6 +17,7 @@ from invana.core.auth.models import User
 from invana.core.errors import NotFoundError
 from invana.core.events.models import Event
 from invana.runtime.managers import SkillDraftManager
+from tests.skills.drawn import draw, publish_drawn
 
 skills = SkillManager()
 drafts = SkillDraftManager()
@@ -42,10 +43,13 @@ async def test_creating_a_skill_mints_v1_and_points_the_head_at_it(
     assert skill.when_to_use == "w"
 
 
-async def test_editing_the_prose_publishes_the_next_version_and_leaves_the_last_alone(
+async def test_edited_prose_publishes_the_next_version_once_drawn_and_leaves_the_last_alone(
     session: AsyncSession, graph: Graph, user: User
 ) -> None:
-    """SK2 — a published version is immutable, and the previous one still resolves."""
+    """SK2 — a published version is immutable, and the previous one still resolves.
+
+    Editing writes the draft and publishes nothing; the drawn draft publishes.
+    """
     skill = await drafts.create(
         session,
         graph_id=graph.id,
@@ -55,6 +59,11 @@ async def test_editing_the_prose_publishes_the_next_version_and_leaves_the_last_
     )
 
     await drafts.update(session, skill=skill, payload=SkillUpdate(content="second"), actor_id=user.id)
+    assert skill.version == 1 and skill.content == "first"
+    assert (await skills.get_draft(session, skill=skill)).content == "second"
+
+    await draw(session, skill=skill)
+    await drafts.publish(session, skill=skill, payload=SkillVersionPublish(), actor_id=user.id)
 
     assert skill.version == 2
     assert skill.content == "second"
@@ -93,7 +102,7 @@ async def test_publishing_explicitly_carries_over_what_it_does_not_send(
         publish=True,
     )
 
-    version = await drafts.publish(
+    version = await publish_drawn(
         session,
         skill=skill,
         payload=SkillVersionPublish(when_to_use="only on Tuesdays"),

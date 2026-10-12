@@ -88,6 +88,7 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events import actions as event_actions
 from invana.core.events.services import emit_event
+from invana.server.evals.views import drift_after
 from invana.server.graphs.deps import (
     require_graph_member,
     resolve_graph_by_username_slug,
@@ -596,6 +597,7 @@ async def get_version(
 @models_router.post("/{model_id}/versions/{version_id}/activate", response_model=ActionResponse[VersionResponse])
 async def activate_version(
     payload: VersionActivate,
+    request: Request,
     model_id: str = Path(...),
     version_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
@@ -617,7 +619,7 @@ async def activate_version(
         actor_id=user.id,
         details={"version": activated.version},
     )
-    await session.commit()
+    await drift_after(request, session, graph_id=graph.id, trigger="model_publish")
     return action("Model published.", await _full_version(session, activated.id))
 
 
@@ -1113,6 +1115,7 @@ async def discard_staged_change(
 @models_router.post("/{model_id}/commit", response_model=ActionResponse[CommitResult])
 async def commit_draft(
     payload: CommitRequest,
+    request: Request,
     model_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
@@ -1157,7 +1160,7 @@ async def commit_draft(
             "changes": [c.id for c in staged.changes],
         },
     )
-    await session.commit()
+    await drift_after(request, session, graph_id=graph.id, trigger="model_publish")
     return action(
         f"{staged.count} changes committed — {model.name} {published.version} published.",
         CommitResult(

@@ -7,10 +7,9 @@ cascade-from-Graph. Names are unique per Graph.
 
 **The skill is the identity; the version is the text.** ``skills`` owns
 ``graph_id · name · current_version_id`` and nothing a person writes; every word
-of the playbook lives on an immutable ``skill_versions`` row. Editing publishes
+of the playbook lives on an immutable ``skill_versions`` row. Publishing mints
 the next version rather than overwriting the last, because a step records the
-version it was offered and a trace has to resolve it forever
-([SK2 · SK3](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+version it was offered and a trace has to resolve it forever.
 
 ``skill_bindings`` is where an agent is offered a skill
 ([BN6](docs/for-developers/modules/skills/features/bindings.md)). It lives here rather than
@@ -28,13 +27,27 @@ other.
 
 from __future__ import annotations
 
+import hashlib
 import uuid
+from dataclasses import dataclass
 from datetime import UTC, datetime
 
 from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from invana.core.models import Base
+
+
+def text_digest(*, description: str, content: str, when_to_use: str) -> str:
+    """The sha256 of the words a plan is drawn from.
+
+    A draw stamps it on the draft, and publish compares it with the draft's
+    text at that moment: a mismatch means the plan was drawn from an earlier
+    text. The three fields are joined with a separator no prose contains, so
+    moving a sentence from one field to the next changes the digest.
+    """
+    joined = "\x1f".join((description or "", content or "", when_to_use or ""))
+    return hashlib.sha256(joined.encode()).hexdigest()
 
 
 def _utcnow() -> datetime:
@@ -181,12 +194,55 @@ class SkillVersion(Base):
     #: Publishing stamps it, moves `skills.current_version_id`, and the row is
     #: immutable from then on.
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    #: The earlier version a rollback copied; null for one somebody wrote.
+    restored_from_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: The model address a run on this version's plan calls; frozen at publish.
+    model_pin: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    #: sha256 of the text the plan was last drawn from; null until a draw.
+    drawn_digest: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
 
     @property
     def is_draft(self) -> bool:
         return self.published_at is None
+
+    @property
+    def is_drawn(self) -> bool:
+        """Whether the plan was drawn from the text as it reads now."""
+        return self.drawn_digest == self.digest()
+
+    def digest(self) -> str:
+        return text_digest(description=self.description, content=self.content, when_to_use=self.when_to_use)
+
+
+@dataclass(frozen=True, slots=True)
+class SkillAtVersion:
+    """A skill read at a version other than its head — what an eval's draft side offers.
+
+    The same attributes prompt assembly reads off a ``Skill``, so a replay can
+    offer an unpublished draft without moving the head or touching the row.
+    """
+
+    id: str
+    graph_id: str
+    name: str
+    current_version_id: str
+    description: str
+    content: str
+    when_to_use: str
+
+    @classmethod
+    def of(cls, skill: Skill, version: SkillVersion) -> SkillAtVersion:
+        return cls(
+            id=skill.id,
+            graph_id=skill.graph_id,
+            name=skill.name,
+            current_version_id=version.id,
+            description=version.description,
+            content=version.content,
+            when_to_use=version.when_to_use,
+        )
 
 
 class SkillVersionClarification(Base):

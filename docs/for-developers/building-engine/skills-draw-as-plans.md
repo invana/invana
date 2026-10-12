@@ -86,7 +86,6 @@ step the catalogue does not declare.
 | `PATCH …/skills/{id}/draft` | edit the draft's four fields. Never touches a published version |
 | `POST …/skills/{id}/draft/draw` | opens the `role=plan` run → `{run_id}`; Studio streams it on the existing run stream |
 | `POST …/skills/{id}/draft/clarifications/{cid}` | records the answer and returns the draft. It opens **no** run — the one that asked has settled ([SK26](../modules/skills/features/authoring-a-skill.md#decisions)), and the surface opens the next draw with what comes back ([SK30](../modules/skills/features/authoring-a-skill.md#decisions)) |
-| `PATCH …/skills/{id}/draft/tasks` | hand-edit the plan — the rows are replaced wholesale and `task_plans.origin` flips to `authored` ([SK7](../modules/skills/features/authoring-a-skill.md#decisions)). Bounded by the **catalogue**, not by an agent's envelope ([SK28](../modules/skills/features/authoring-a-skill.md#decisions)); an empty list is refused as *that is a rule, not a skill* |
 | `POST …/skills/{id}/versions` | **publishes the draft** — text, answers and plan as one act |
 | `GET …/skills/{id}/versions/{v}/tasks` | the plan as `nodes` + `edges`, each node carrying its `layer` and `source_span` — what the Flow and Playbook tabs read |
 
@@ -136,8 +135,8 @@ Each is reproducible from a clean checkout before the next starts.
 | **8b** ✅ | The seeded builtin skill | a fresh Graph has *Answer in natural language* v1, published, with five tasks and a `source_span` on each |
 | **8c** ✅ | `draft_plan`, the `role=plan` run, and clarifications | **Done.** Drawing a two-reading playbook records one clarification, writes no tasks until it is answered, records the answer, and a redraw never re-asks |
 | **8d** ✅ | Studio: the header action, the crumb, Playbook, Flow, the draft and its card | **Done.** A person writes a playbook, draws it, answers a question, publishes v1, and reads its flow in six layers — without leaving the drawer |
-| **8e** ✅ | The hand-edit, and the envelope half of [BN5](../modules/skills/features/bindings.md#decisions) | **Done.** `PATCH …/draft/tasks` writes the rows and takes ownership of the plan; binding a skill whose plan names a `step_key` the agent's envelope forbids is refused at bind time, naming the step, its bound, and which checks ran |
-| **8f** ✅ | What the first live draw found | **Done.** `draft_skill_plan` had never made a real call. It does the three counted cases correctly — one reading draws a step with its span, two stop and ask, a sentence nothing can express becomes a person's, and *Be concise.* draws nothing. What it found was on the **other** side: a plan that does not hold together settles with its reasons instead of failing on the envelope's name ([SK31](../modules/skills/features/authoring-a-skill.md#decisions)), the plan a draft is born with is `generated` so `authored` still means a person wrote it ([SK29](../modules/skills/features/authoring-a-skill.md#decisions)), answering opens the next draw ([SK30](../modules/skills/features/authoring-a-skill.md#decisions)), and `drawing_run_id` is filled |
+| **8e** ✅ — the hand-edit route is gone ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3) | The hand-edit, and the envelope half of [BN5](../modules/skills/features/bindings.md#decisions) | **Done.** `PATCH …/draft/tasks` writes the rows and takes ownership of the plan; binding a skill whose plan names a `step_key` the agent's envelope forbids is refused at bind time, naming the step, its bound, and which checks ran |
+| **8f** ✅ | What the first live draw found | **Done.** `draft_skill_plan` had never made a real call. It does the three counted cases correctly — one reading draws a step with its span, two stop and ask, a sentence nothing can express becomes a person's, and *Be concise.* draws nothing. What it found was on the **other** side: a plan that does not hold together settles with its reasons instead of failing on the envelope's name ([SK31](../modules/skills/features/authoring-a-skill.md#decisions)), the plan a draft is born with is `generated` ([SK29](../modules/skills/features/authoring-a-skill.md#decisions)), answering opens the next draw ([SK30](../modules/skills/features/authoring-a-skill.md#decisions)), and `drawing_run_id` is filled |
 
 ## 9. Both halves of a bind
 
@@ -158,7 +157,7 @@ and *a lens exists only on a run*. Both are gone, so both halves run.
 
 | Not building | Because |
 |---|---|
-| A bespoke flow **editor** | the plan canvas already draws a `TaskPlan`; the hand-edit here is row-level, and authoring a reusable plan is Library › Plans ([SK18](../modules/skills/features/authoring-a-skill.md#decisions)) |
-| Generating prose from a hand-edited flow | two generators pointing at each other is a drift machine |
+| A bespoke flow **editor** | the plan canvas already draws a `TaskPlan`, and nobody edits a plan by hand ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3) |
+| Generating prose from a flow | two generators pointing at each other is a drift machine |
 | `uses:` composition (`S4`) | it needs a plan-level include; the column that records it is `source_skill_version_ids`, and the surface is the next pass |
 | Redrawing on every keystroke | half a sentence is not an instruction |

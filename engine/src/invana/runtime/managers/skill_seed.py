@@ -121,7 +121,7 @@ class BuiltinSkillSeeder:
                 name=NAME,
                 description=DESCRIPTION,
                 kind=PlanKind.ask.value,
-                origin=PlanOrigin.builtin.value,
+                origin=PlanOrigin.packaged.value,
                 intent=[],
                 args_schema={},
                 source_skill_version_ids=[],

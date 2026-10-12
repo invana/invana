@@ -1176,7 +1176,7 @@ when what was being marked is that they repeated.
 | `DataTable` | `@invana/tables` | **indent rows** (a child run under its parent), **row selection** (accent + inset rule), and cell readings — mono · tone · struck. `density="compact"` and `groupBy` already ship. **Studio does not depend on `@invana/tables` yet** — install it | list · list.states · step · step.touched* |
 | `Legend` | `@invana/ui` | swatch kinds `stripe` (the layer bar), `bracket` (a bounded repetition), `rule` (a gate). Today: dot · line · dashed · arrow · ring | in_order · layers · layers.forecast · flow |
 | `FilterBar` / `FilterChip` | `@invana/ui` | a **closable** chip (`since: today ×`) and the bar's own summary (`interactive runs hidden`) | list · list.states · every panel |
-| `TaskNode` | `@invana/ui` | `readOnly` — a run's picked node gets the ring and **no handles**; handles belong to the draft canvas | flow · flow.step ([SR52](../modules/operate/features/see-what-ran.md#decisions)) |
+| `TaskNode` | `@invana/ui` | `readOnly` — a run's picked node gets the ring and **no handles**; nothing edits a plan by hand ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3) | flow · flow.step ([SR52](../modules/operate/features/see-what-ran.md#decisions)) |
 
 ### 7.4 `@invana/boards` — the panel kinds a run page is made of
 

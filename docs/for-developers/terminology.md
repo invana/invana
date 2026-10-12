@@ -60,6 +60,10 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Skill** | A playbook an agent may be offered — named, described, with a "when to use". Offered, never forced. |
 | **Versioned record** | A record whose published form is immutable, so a change mints a new **version**: a skill, a rule, a plan, an agent, a model (and a dataset, with P-08). A draft is not a version. [10.6](modules/operate/features/change-log.md) |
 | **Change log** | Every version of every versioned record — who, when, why, the diff, the effect after. It is the Events list narrowed to the events that mint a version, never a second record. A **change** is one such event. Never "audit log" for this narrower list, never "revision history". |
+| **Instructions** | A skill's or agent's `instructions.md` — the prose a person writes and owns. A plan is generated from it; nobody draws one. [6.5](modules/skills/features/instructions-publish-rollback.md) |
+| **Packaged plan** | A plan that ships with Invana or a plugin pack, `origin = packaged`: seeded, read-only. The other two origins are `generated` and `promoted`. [6.5](modules/skills/features/instructions-publish-rollback.md) |
+| **Eval set** | A skill's or agent's fixed questions, each with **checks**: rule checks are hard and counted; a **judged** score comes from a pinned judge model and is labelled, never mixed with them. [6.6](modules/skills/features/evals.md) |
+| **Pin** | An exact model version name an agent, skill version or judge thinks with — `claude-opus-5-5`, never an alias. Moving one is a change. [5.9](modules/agents/features/pinned-model-versions.md) |
 | **Graph connector** | The package that speaks to one graph database — `invana-neo4j`, `invana-janusgraph`. Always qualified. |
 | **Setup** | The *sequence* a Graph walks from created to answering — four required steps and two optional ones, derived from facts and never ticked. [13.7](modules/platform/features/setup.md) |
 | **Onboarding wizard** | The *surface* that walks it: the stepper and the selected step's lesson, on the graph page. Reopened any time from the graduation cap in `header.right`. Setup is the state; the onboarding wizard is where you walk it. Never "the setup wizard", never "the tour", never "onboarding flow" |
@@ -98,7 +102,7 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | Term | Means |
 |---|---|
 | **Todo** | What a person wrote — the only thing a user authors. Prose, criteria, an optional assignee and due date. It has no status of its own: its state derives from its runs, and only acceptance is stored. [§6](#6-work) |
-| **TaskPlan** | A flow of Tasks — the thing that carries a Todo out. Three origins: `authored` · `generated` · `promoted`. A **reusable** TaskPlan is what the product calls a **workflow**. |
+| **TaskPlan** | A flow of Tasks — the thing that carries a Todo out. Three origins: `generated` · `packaged` · `promoted`; `authored` is read on older rows, never written. A **reusable** TaskPlan is what the product calls a **workflow**. |
 | **Task** | One node inside a TaskPlan: `callable` · `composite` · `human`. **Never a thing a user authors** — a Task cannot exist outside a plan. Users see *step*; the record is a `Task`. |
 | **Step** | A Task in the role of a child — the authoring format writes `steps:`. A role, not a second record. |
 | **TaskRun** | One execution. Its `role` says what the execution is for: `execute` · `plan` · `evaluate`. A delegated child is a TaskRun carrying `parent_run_id`. The word is now literal — a run is a TaskRun. |

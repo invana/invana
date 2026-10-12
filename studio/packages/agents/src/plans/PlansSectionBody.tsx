@@ -94,7 +94,7 @@ function Band({
  *
  * `generated` is not here: a one-off plan belongs to its Todo and is never
  * listed, so filtering by it would offer an always-empty list. */
-export const PLAN_SOURCES = ["builtin", "authored", "promoted"] as const;
+export const PLAN_SOURCES = ["packaged", "authored", "promoted"] as const;
 
 /** The intent family a plan's key names. */
 export const PLAN_KINDS = ["nl", "ql"] as const;
@@ -214,7 +214,7 @@ export function PlansSectionBody({
 										// A candidate is a plan that served but nobody has
 										// promoted; drawing it quiet keeps the library's own
 										// entries the ones a reader reaches for first.
-										tone={workflow.origin === "builtin" ? "info" : "muted"}
+										tone={workflow.origin === "packaged" ? "info" : "muted"}
 										title={
 											<span className="font-mono">
 												{workflow.key}@{workflow.version}
@@ -223,7 +223,7 @@ export function PlansSectionBody({
 										// Only a non-seeded entry earns a badge: labelling every
 										// row `seeded` would make the column noise.
 										status={
-											workflow.origin === "builtin"
+											workflow.origin === "packaged"
 												? undefined
 												: workflow.origin
 										}

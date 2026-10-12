@@ -28,7 +28,7 @@ def _plan(template) -> TaskPlan:
         name=template.key,
         description=template.description,
         kind=PlanKind.ask.value,
-        origin=PlanOrigin.builtin.value,
+        origin=PlanOrigin.packaged.value,
         intent=list(template.intents),
     )
 

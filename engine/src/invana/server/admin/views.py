@@ -44,6 +44,10 @@ from invana.core.auth.models import PersonalAccessToken, RefreshToken, User
 from invana.core.events.models import Event
 from invana.runtime.models import (
     Emission,
+    EvalBudget,
+    EvalCase,
+    EvalResult,
+    EvalSet,
     ProjectionTemplate,
     TaskPrompt,
     TaskRun,
@@ -57,6 +61,7 @@ from invana.server.auth.admin import (
     UserView,
 )
 from invana.server.boards.admin import BoardVersionView, BoardView
+from invana.server.evals.admin import EvalBudgetView, EvalCaseView, EvalResultView, EvalSetView
 from invana.server.events.admin import EventView
 from invana.server.govern.admin import LensView, RunTouchView
 from invana.server.graphs.admin import (
@@ -260,6 +265,10 @@ def mount_admin(app: FastAPI) -> None:
                 EmissionView(Emission, label="Emissions", icon="fa fa-square-poll-vertical"),
                 ProjectionTemplateView(ProjectionTemplate, label="Projection templates", icon="fa fa-table-cells"),
                 TaskPromptView(TaskPrompt, label="Run prompts", icon="fa fa-circle-check"),
+                EvalSetView(EvalSet, label="Eval sets", icon="fa fa-vial"),
+                EvalCaseView(EvalCase, label="Eval cases", icon="fa fa-list-ol"),
+                EvalResultView(EvalResult, label="Eval results", icon="fa fa-square-check"),
+                EvalBudgetView(EvalBudget, label="Eval budgets", icon="fa fa-gauge"),
             ],
         ),
     )

@@ -218,7 +218,6 @@ const ROUTE_WORDS = new Set([
 	"impact",
 	"import",
 	"indexes",
-	"inlinable",
 	"insights",
 	"introspect",
 	"lenses",

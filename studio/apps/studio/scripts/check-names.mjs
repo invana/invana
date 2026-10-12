@@ -71,6 +71,8 @@ const ENGINE_ONLY = {
 	llm_providers:
 		"served by the @invana-studio/agents package, outside the host",
 	work: "served by the @invana-studio/projects package, outside the host",
+	history: "the change log; no Studio surface reads it yet",
+	evals: "eval sets and runs; no Studio surface reads them yet",
 	routes: "shared route helpers",
 	__pycache__: "bytecode",
 };

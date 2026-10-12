@@ -18,6 +18,12 @@ at the middle of an ordering every backfilled row was seeded into from its
 published rate, and *which model answers when nobody said* would depend on
 whether a row predates the split.
 
+**Pins.** An agent or a skill version may name the exact model it thinks with,
+as the same address a cast holds. A pin narrows and the lens still bounds: a
+pin the Graph no longer offers, or one the lens denies, refuses the run rather
+than falling back to another model. A pin never names an alias — pinning
+``*-latest`` would pin nothing.
+
 **Removal** ([PM11](docs/for-developers/modules/agents/features/providers-and-models.md)).
 A model a cast names cannot quietly stop existing — the refusal names the
 worlds, and the recourse is to retune them first. A model nothing names says so,
@@ -38,7 +44,7 @@ from invana.apps.govern.cast import shipped_cast
 from invana.apps.govern.catalogue import Catalogue
 from invana.apps.govern.models import Lens
 from invana.apps.govern.querysets import LensQuerySet
-from invana.apps.govern.rules import Effective, Role
+from invana.apps.govern.rules import Decision, Effective, Role
 from invana.apps.llm.pricing import rate_for
 from invana.apps.llm_providers.endpoint import LLM_LAYER, LLMEndpoint, split_address
 from invana.apps.llm_providers.managers import LLMProviderManager
@@ -50,6 +56,9 @@ from invana.core.errors import ConflictError, ValidationError
 #: Kinds whose calls spend no API dollars and leave the machine for nothing —
 #: the one ordering the price list cannot express.
 _LOCAL_KINDS = (LLMProviderKind.ollama, LLMProviderKind.local)
+
+#: Model ids that name a moving target rather than a version.
+_ALIAS_SUFFIXES = ("-latest", ":latest")
 
 
 class NoEndpointError(ValidationError):
@@ -71,6 +80,7 @@ class LLMEndpointManager:
         effective: Effective | None = None,
         role: Role | str = Role.decide,
         prefer_model_row_id: str | None = None,
+        pins: tuple[str | None, ...] = (),
     ) -> LLMEndpoint:
         """The endpoint this run calls, or a 422 naming what is missing.
 
@@ -78,6 +88,10 @@ class LLMEndpointManager:
         for this one ask. It still has to be a model this Graph offers; it does
         **not** bypass the cast's check, because a pick is a resolution and not a
         widening ([GV6](docs/for-developers/modules/govern/spec.md)).
+
+        ``pins`` are model addresses, innermost first — a skill version's, then
+        an agent's. The first one set is the model, or the run is refused: it
+        must be offered, it must not be an alias, and the lens must allow it.
         """
         offered = await self.models_qs.endpoints_for_graph(session, graph_id)
         if not offered:
@@ -88,6 +102,10 @@ class LLMEndpointManager:
             if picked is None:
                 raise ValidationError("That model was not found for this graph.")
             return picked
+
+        pin = next((p for p in pins if p), None)
+        if pin is not None:
+            return self._pinned(offered, pin=pin, effective=effective)
 
         address = self._cast_address(offered, effective=effective, role=role)
         if address is None:
@@ -102,6 +120,37 @@ class LLMEndpointManager:
             # misconfiguration, and the refusal says which address, because
             # that is the string somebody has to go and fix.
             raise NoEndpointError(f"{address} is cast for {Role(role).value}, and this graph does not offer it.")
+        return found
+
+    async def check_pin(self, session: AsyncSession, *, graph_id: str, address: str) -> str:
+        """A pin as stored, or a refusal naming what is wrong with it.
+
+        Checked when a pin is set, so a typo is refused where it was typed
+        rather than at the next run. The lens is checked at open, because
+        which world a run is asked in is not known until then.
+        """
+        address = address.strip()
+        offered = await self.models_qs.endpoints_for_graph(session, graph_id)
+        _offered_pin(offered, address)
+        return address
+
+    @staticmethod
+    def _pinned(offered: list[LLMEndpoint], *, pin: str, effective: Effective | None) -> LLMEndpoint:
+        """The pinned endpoint, checked against the lens like a cast address."""
+        found = _offered_pin(offered, pin)
+        if effective is not None:
+            verdict = effective.decide(pin)
+            if verdict.decision is not Decision.allowed:
+                where = f" in {verdict.denied_in}" if verdict.denied_in else ""
+                raise ValidationError(
+                    {
+                        "error": "pin_refused",
+                        "message": f"{pin} is pinned, and {verdict.rule_matched or 'this world'}{where} denies it.",
+                        "address": pin,
+                        "rule": verdict.rule_matched,
+                        "denied_in": verdict.denied_in,
+                    }
+                )
         return found
 
     def _cast_address(
@@ -324,6 +373,30 @@ class LLMEndpointManager:
     @staticmethod
     def _name_of(lens: Lens) -> str:
         return lens.display_name
+
+
+def _offered_pin(offered: list[LLMEndpoint], pin: str) -> LLMEndpoint:
+    """The offered endpoint a pin names, or the refusal that names the pin."""
+    segments = split_address(pin)
+    if segments is None:
+        raise ValidationError(
+            {"error": "pin_invalid", "message": f"{pin!r} is not a model address — llm/<provider>/<model id>."}
+        )
+    model_id = segments[1]
+    if model_id == "latest" or model_id.endswith(_ALIAS_SUFFIXES):
+        raise ValidationError(
+            {"error": "pin_alias", "message": f"{model_id} is an alias, so pinning it pins nothing. Pin a version."}
+        )
+    found = next((e for e in offered if (e.row.name, e.model.model_id) == segments), None)
+    if found is None:
+        raise ValidationError(
+            {
+                "error": "pin_not_offered",
+                "message": f"{pin} is pinned, and this graph does not offer it.",
+                "address": pin,
+            }
+        )
+    return found
 
 
 def _names_endpoint(value: object, name: str) -> bool:

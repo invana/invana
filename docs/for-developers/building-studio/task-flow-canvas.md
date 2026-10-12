@@ -142,6 +142,6 @@ real value in `data.bound`.
 |---|---|
 | A layout switcher, or a force / radial / tree layout | TF3 |
 | A theme toggle on the canvas | TF7 |
-| Editing: drag-to-connect, adding a node, deleting | the flow is read-only on both surfaces ([SR52](../modules/operate/features/see-what-ran.md#decisions)). Drafting is [7.7](../modules/workflows/features/draft-a-plan.md)'s canvas |
+| Editing: drag-to-connect, adding a node, deleting | the flow is read-only on both surfaces ([SR52](../modules/operate/features/see-what-ran.md#decisions)). Nobody edits a plan by hand ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3) |
 | Per-caller templates | one pair of templates. A caller that needs another passes its own `templates` (TF2) and does not fork the component |
 | Any flow drawing other than this one | the grid of `TaskNode` cards in `TaskFlowWidget` and the layer strip in `SkillFlowTab` are removed, not kept beside it |

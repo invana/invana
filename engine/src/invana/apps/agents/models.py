@@ -161,6 +161,8 @@ class Agent(Base):
     # agent this is what its parent told it (docs/for-developers/modules/work/spec.md — the brief is all a
     # child receives; never the parent's step history).
     instructions: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    #: Unpublished instructions; null is no draft open.
+    instructions_draft: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # ── voice ────────────────────────────────────────────────────────────────
     # Who the agent is, as Markdown. Empty is Invana's default voice (SO3). It
@@ -188,6 +190,9 @@ class Agent(Base):
     # then ``budget`` for one release — where these numbers lived before.
     effort: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     policy: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    #: The model address this agent thinks with, ``llm/<provider>/<model id>``;
+    #: null lets the cast decide.
+    model_pin: Mapped[str | None] = mapped_column(String(255), nullable=True)
     # Bumped on every envelope / binding change so a run can record which
     # version of the agent it ran under (``runs.agent_version``).
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)

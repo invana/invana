@@ -769,6 +769,20 @@
         "title": "AgentCreate",
         "type": "object"
       },
+      "AgentDraftWrite": {
+        "description": "The agent's unpublished instructions, written whole.",
+        "properties": {
+          "instructions": {
+            "title": "Instructions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "instructions"
+        ],
+        "title": "AgentDraftWrite",
+        "type": "object"
+      },
       "AgentEdge": {
         "description": "One causal hop. Selecting it is the point of the trace\n(docs/for-developers/modules/agents/features/lineage.md).",
         "properties": {
@@ -1071,6 +1085,24 @@
         "title": "AgentNode",
         "type": "object"
       },
+      "AgentPublish": {
+        "properties": {
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "title": "AgentPublish",
+        "type": "object"
+      },
       "AgentRead": {
         "properties": {
           "answers_asks": {
@@ -1152,6 +1184,17 @@
             "title": "Instructions",
             "type": "string"
           },
+          "instructions_draft": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions Draft"
+          },
           "key": {
             "anyOf": [
               {
@@ -1170,6 +1213,17 @@
           "lifetime": {
             "title": "Lifetime",
             "type": "string"
+          },
+          "model_pin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Pin"
           },
           "name": {
             "title": "Name",
@@ -1267,6 +1321,33 @@
           "updated_at"
         ],
         "title": "AgentRead",
+        "type": "object"
+      },
+      "AgentRollback": {
+        "description": "Restore the instructions as they were at an earlier agent version.",
+        "properties": {
+          "version": {
+            "minimum": 1.0,
+            "title": "Version",
+            "type": "integer"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "title": "AgentRollback",
         "type": "object"
       },
       "AgentSkillRow": {
@@ -1428,6 +1509,18 @@
               }
             ],
             "title": "Instructions"
+          },
+          "model_pin": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Pin"
           },
           "name": {
             "anyOf": [
@@ -4275,6 +4368,750 @@
         "title": "EmissionRead",
         "type": "object"
       },
+      "EvalBudgetRead": {
+        "properties": {
+          "monthly_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Tokens"
+          },
+          "spent": {
+            "default": 0,
+            "title": "Spent",
+            "type": "integer"
+          }
+        },
+        "title": "EvalBudgetRead",
+        "type": "object"
+      },
+      "EvalBudgetWrite": {
+        "properties": {
+          "monthly_tokens": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Tokens"
+          }
+        },
+        "title": "EvalBudgetWrite",
+        "type": "object"
+      },
+      "EvalCaseRead": {
+        "properties": {
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/EvalCheck"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "created_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "enum": [
+              "passing",
+              "failing"
+            ],
+            "title": "Label",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "source_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Run Id"
+          },
+          "status": {
+            "enum": [
+              "proposed",
+              "active",
+              "retired"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "checks",
+          "label",
+          "status"
+        ],
+        "title": "EvalCaseRead",
+        "type": "object"
+      },
+      "EvalCaseUpdate": {
+        "properties": {
+          "checks": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/EvalCheck"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checks"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "enum": [
+                  "passing",
+                  "failing"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "question": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "proposed",
+                  "active",
+                  "retired"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "title": "EvalCaseUpdate",
+        "type": "object"
+      },
+      "EvalCaseWrite": {
+        "properties": {
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/EvalCheck"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "label": {
+            "default": "passing",
+            "enum": [
+              "passing",
+              "failing"
+            ],
+            "title": "Label",
+            "type": "string"
+          },
+          "proposed": {
+            "default": false,
+            "title": "Proposed",
+            "type": "boolean"
+          },
+          "question": {
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "EvalCaseWrite",
+        "type": "object"
+      },
+      "EvalCheck": {
+        "description": "One rule check \u2014 ``kind`` and, where the kind takes one, its ``value``.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "cites_records",
+              "names_world",
+              "cannot_answer",
+              "guardrail_holds",
+              "expected_records",
+              "max_tokens",
+              "max_latency_ms"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "EvalCheck",
+        "type": "object"
+      },
+      "EvalDrift": {
+        "properties": {
+          "trigger": {
+            "default": "nightly",
+            "enum": [
+              "nightly",
+              "model_publish",
+              "world_change",
+              "pin_moved"
+            ],
+            "title": "Trigger",
+            "type": "string"
+          }
+        },
+        "title": "EvalDrift",
+        "type": "object"
+      },
+      "EvalDriftResponse": {
+        "properties": {
+          "run_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Run Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "run_ids"
+        ],
+        "title": "EvalDriftResponse",
+        "type": "object"
+      },
+      "EvalPromote": {
+        "properties": {
+          "checks": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/EvalCheck"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checks"
+          },
+          "label": {
+            "enum": [
+              "passing",
+              "failing"
+            ],
+            "title": "Label",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "subject_id": {
+            "title": "Subject Id",
+            "type": "string"
+          },
+          "subject_kind": {
+            "enum": [
+              "skill",
+              "agent"
+            ],
+            "title": "Subject Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "subject_kind",
+          "subject_id",
+          "label"
+        ],
+        "title": "EvalPromote",
+        "type": "object"
+      },
+      "EvalResultRead": {
+        "properties": {
+          "answer_digest": {
+            "title": "Answer Digest",
+            "type": "string"
+          },
+          "case_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Case Run Id"
+          },
+          "eval_case_id": {
+            "title": "Eval Case Id",
+            "type": "string"
+          },
+          "hard": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Hard",
+            "type": "object"
+          },
+          "judged": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Judged"
+          },
+          "latency_ms": {
+            "title": "Latency Ms",
+            "type": "integer"
+          },
+          "side": {
+            "enum": [
+              "live",
+              "draft"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "eval_case_id",
+          "side",
+          "hard",
+          "tokens",
+          "latency_ms",
+          "answer_digest"
+        ],
+        "title": "EvalResultRead",
+        "type": "object"
+      },
+      "EvalRunDetail": {
+        "properties": {
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          },
+          "queued_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Queued At"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/EvalResultRead"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "triggered_by": {
+            "title": "Triggered By",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "triggered_by",
+          "params"
+        ],
+        "title": "EvalRunDetail",
+        "type": "object"
+      },
+      "EvalRunOpen": {
+        "properties": {
+          "model_pin": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Pin"
+          },
+          "side": {
+            "default": "both",
+            "enum": [
+              "live",
+              "draft",
+              "both"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "trigger": {
+            "default": "manual",
+            "enum": [
+              "manual",
+              "publish",
+              "rollback",
+              "pin"
+            ],
+            "title": "Trigger",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "title": "EvalRunOpen",
+        "type": "object"
+      },
+      "EvalRunOpened": {
+        "properties": {
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "status"
+        ],
+        "title": "EvalRunOpened",
+        "type": "object"
+      },
+      "EvalRunRead": {
+        "properties": {
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          },
+          "queued_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Queued At"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "triggered_by": {
+            "title": "Triggered By",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "triggered_by",
+          "params"
+        ],
+        "title": "EvalRunRead",
+        "type": "object"
+      },
+      "EvalSetRead": {
+        "properties": {
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/EvalCaseRead"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "judge_model_pin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Judge Model Pin"
+          },
+          "rubric": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rubric"
+          },
+          "subject_id": {
+            "title": "Subject Id",
+            "type": "string"
+          },
+          "subject_kind": {
+            "enum": [
+              "skill",
+              "agent"
+            ],
+            "title": "Subject Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject_kind",
+          "subject_id"
+        ],
+        "title": "EvalSetRead",
+        "type": "object"
+      },
+      "EvalSetWrite": {
+        "properties": {
+          "judge_model_pin": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Judge Model Pin"
+          },
+          "rubric": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rubric"
+          }
+        },
+        "title": "EvalSetWrite",
+        "type": "object"
+      },
       "EventListResponse": {
         "description": "Paginated event list.\n\nKeyset pagination on ``(created_at DESC, id DESC)``. ``next_cursor`` is\nopaque to the client; pass it back as ``?cursor=<value>`` for the next\npage. Null means no more rows.",
         "properties": {
@@ -6148,75 +6985,6 @@
           "index_options"
         ],
         "title": "IndexResponse",
-        "type": "object"
-      },
-      "InlinablePlan": {
-        "description": "A library plan a skill may inline, and what it offers a caller.\n\nThe picker's one read. `args_schema` comes with the row because tuning is\nthe same act as picking \u2014 a person who inlines `nl-single@1` decides\n`read_only` in the same breath\n([LB19](docs/for-developers/modules/workflows/features/the-library.md)).",
-        "properties": {
-          "args_schema": {
-            "additionalProperties": true,
-            "title": "Args Schema",
-            "type": "object"
-          },
-          "description": {
-            "default": "",
-            "title": "Description",
-            "type": "string"
-          },
-          "key": {
-            "title": "Key",
-            "type": "string"
-          },
-          "kind": {
-            "default": "",
-            "title": "Kind",
-            "type": "string"
-          },
-          "layers": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Layers",
-            "type": "array"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "ref": {
-            "title": "Ref",
-            "type": "string"
-          },
-          "step_count": {
-            "default": 0,
-            "title": "Step Count",
-            "type": "integer"
-          },
-          "version": {
-            "title": "Version",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "key",
-          "version",
-          "ref",
-          "name"
-        ],
-        "title": "InlinablePlan",
-        "type": "object"
-      },
-      "InlinablePlanListResponse": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/InlinablePlan"
-            },
-            "title": "Items",
-            "type": "array"
-          }
-        },
-        "title": "InlinablePlanListResponse",
         "type": "object"
       },
       "Insights": {
@@ -10972,6 +11740,56 @@
         "title": "RunNodeRead",
         "type": "object"
       },
+      "RunRerun": {
+        "description": "Re-run a settled ask on the versions it recorded, or on today's.",
+        "properties": {
+          "versions": {
+            "default": "same",
+            "enum": [
+              "same",
+              "current"
+            ],
+            "title": "Versions",
+            "type": "string"
+          }
+        },
+        "title": "RunRerun",
+        "type": "object"
+      },
+      "RunRerunResponse": {
+        "properties": {
+          "model_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Version"
+          },
+          "rerun_of_run_id": {
+            "title": "Rerun Of Run Id",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "stream_url": {
+            "title": "Stream Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "rerun_of_run_id",
+          "stream_url"
+        ],
+        "title": "RunRerunResponse",
+        "type": "object"
+      },
       "SchemaDiff": {
         "properties": {
           "added_constraints": {
@@ -12647,6 +13465,11 @@
             ],
             "title": "Drawing Run Id"
           },
+          "drawn": {
+            "default": false,
+            "title": "Drawn",
+            "type": "boolean"
+          },
           "open_clarification": {
             "anyOf": [
               {
@@ -12672,13 +13495,6 @@
           },
           "version": {
             "$ref": "#/components/schemas/SkillVersionRead"
-          },
-          "vocabulary": {
-            "items": {
-              "$ref": "#/components/schemas/SkillStepChoice"
-            },
-            "title": "Vocabulary",
-            "type": "array"
           }
         },
         "required": [
@@ -12686,95 +13502,6 @@
           "plan"
         ],
         "title": "SkillDraftRead",
-        "type": "object"
-      },
-      "SkillDraftTaskWrite": {
-        "description": "One row of a hand-edited plan.\n\nRow-level on purpose ([\u00a7 9](docs/for-developers/building-engine/skills-draw-as-plans.md)):\nthis is not a flow editor. A person says **which step**, what it is called\nand what it takes; the edges are materialised from what actually constrains\neach node \u2014 its `${steps.X.y}` bindings and the catalogue's `requires` \u2014 so\nan order nobody reviewed is never written down\n(`apps/task_plans/dag.py`).",
-        "properties": {
-          "args": {
-            "additionalProperties": true,
-            "title": "Args",
-            "type": "object"
-          },
-          "form": {
-            "default": "callable",
-            "pattern": "^(callable|human|uses)$",
-            "title": "Form",
-            "type": "string"
-          },
-          "key": {
-            "anyOf": [
-              {
-                "maxLength": 200,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Key"
-          },
-          "source_span": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Source Span"
-          },
-          "step_key": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Step Key"
-          },
-          "title": {
-            "default": "",
-            "maxLength": 250,
-            "title": "Title",
-            "type": "string"
-          },
-          "uses": {
-            "anyOf": [
-              {
-                "maxLength": 80,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Uses"
-          },
-          "uses_args": {
-            "additionalProperties": true,
-            "title": "Uses Args",
-            "type": "object"
-          }
-        },
-        "title": "SkillDraftTaskWrite",
-        "type": "object"
-      },
-      "SkillDraftTasksWrite": {
-        "description": "The draft's plan, replaced wholesale.\n\nThe rows go and come back rather than being patched, for the same reason a\nredraw does ([SK12](docs/for-developers/modules/skills/features/authoring-a-skill.md)):\nan edit is a revision of the whole shape, and the diff a person reads is\nagainst what was there.",
-        "properties": {
-          "tasks": {
-            "items": {
-              "$ref": "#/components/schemas/SkillDraftTaskWrite"
-            },
-            "title": "Tasks",
-            "type": "array"
-          }
-        },
-        "title": "SkillDraftTasksWrite",
         "type": "object"
       },
       "SkillDrawRefusal": {
@@ -13109,44 +13836,35 @@
         "title": "SkillRead",
         "type": "object"
       },
-      "SkillStepChoice": {
-        "description": "One step a hand-edit may name.\n\nThe catalogue is what bounds authoring\n([SK28](docs/for-developers/modules/skills/features/authoring-a-skill.md)),\nso the surface that offers the choice is sent the set rather than carrying a\ncopy of it \u2014 a second list of step keys in TypeScript is a second thing to\nkeep in step with a closed set it cannot see.",
+      "SkillRollback": {
+        "description": "Which earlier version to restore, and why.",
         "properties": {
-          "bound": {
-            "title": "Bound",
-            "type": "string"
+          "version": {
+            "minimum": 1.0,
+            "title": "Version",
+            "type": "integer"
           },
-          "label": {
-            "title": "Label",
-            "type": "string"
-          },
-          "layer": {
-            "title": "Layer",
-            "type": "string"
-          },
-          "requires": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Requires",
-            "type": "array"
-          },
-          "step_key": {
-            "title": "Step Key",
-            "type": "string"
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
           }
         },
         "required": [
-          "step_key",
-          "label",
-          "bound",
-          "layer"
+          "version"
         ],
-        "title": "SkillStepChoice",
+        "title": "SkillRollback",
         "type": "object"
       },
       "SkillUpdate": {
-        "description": "A rename, a republish, or both.\n\nChanging any of the three text fields publishes the next version; changing\nonly the name does not, because the name is the skill's identity and not\nsomething a step was ever offered\n([SK2](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "description": "A rename, an edit to the draft, or both.\n\nChanging any of the three text fields writes them onto the draft and\npublishes nothing: a version publishes only once its plan is drawn from\nits text. The name is the skill's identity, changed in place, and never\nsomething a step was offered.",
         "properties": {
           "content": {
             "anyOf": [
@@ -13575,6 +14293,18 @@
             ],
             "title": "Description"
           },
+          "model_pin": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Pin"
+          },
           "when_to_use": {
             "anyOf": [
               {
@@ -13621,6 +14351,17 @@
             "title": "Is Draft",
             "type": "boolean"
           },
+          "model_pin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Pin"
+          },
           "plan_id": {
             "title": "Plan Id",
             "type": "string"
@@ -13647,6 +14388,17 @@
               }
             ],
             "title": "Published By Id"
+          },
+          "restored_from_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restored From Version"
           },
           "skill_id": {
             "title": "Skill Id",
@@ -15115,6 +15867,17 @@
             "title": "Id",
             "type": "string"
           },
+          "model_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Version"
+          },
           "outcome": {
             "anyOf": [
               {
@@ -15148,6 +15911,17 @@
               }
             ],
             "title": "Queued At"
+          },
+          "rerun_of_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rerun Of Run Id"
           },
           "started_at": {
             "anyOf": [
@@ -18718,6 +19492,7 @@
         ]
       },
       "patch": {
+        "description": "Edit an agent. Moving its pin passes the eval gate first, on the new pin.",
         "operationId": "update_agent_api_v1_u__username___graphSlug__agents__agent_id__patch",
         "parameters": [
           {
@@ -18888,6 +19663,153 @@
           }
         ],
         "summary": "Agent Activity",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/draft": {
+      "delete": {
+        "operationId": "discard_agent_draft_api_v1_u__username___graphSlug__agents__agent_id__draft_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Discard Agent Draft",
+        "tags": [
+          "agents"
+        ]
+      },
+      "patch": {
+        "description": "Write the agent's unpublished instructions. Runs keep reading the published ones.",
+        "operationId": "write_agent_draft_api_v1_u__username___graphSlug__agents__agent_id__draft_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentDraftWrite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Write Agent Draft",
         "tags": [
           "agents"
         ]
@@ -19169,6 +20091,86 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/publish": {
+      "post": {
+        "description": "Publish the draft into the agent's instructions \u2014 the next agent version.\n\nRefused with 409 when no draft is open, and by the eval gate.",
+        "operationId": "publish_agent_instructions_api_v1_u__username___graphSlug__agents__agent_id__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentPublish"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Publish Agent Instructions",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/resume": {
       "post": {
         "operationId": "resume_agent_api_v1_u__username___graphSlug__agents__agent_id__resume_post",
@@ -19387,6 +20389,86 @@
           }
         ],
         "summary": "Retire Agent",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/rollback": {
+      "post": {
+        "description": "Restore the instructions as they were at an earlier version, as the next version.\n\nRefused with 409 while a draft is open, when that text is already current,\nor when it predates recorded edits; 404 for a version the agent never had.\nThe eval gate reads the restored text against today's set.",
+        "operationId": "rollback_agent_instructions_api_v1_u__username___graphSlug__agents__agent_id__rollback_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentRollback"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Rollback Agent Instructions",
         "tags": [
           "agents"
         ]
@@ -21392,6 +22474,1050 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/evals/budget": {
+      "get": {
+        "description": "The Graph's monthly eval tokens and what eval runs have spent this month.",
+        "operationId": "get_budget_api_v1_u__username___graphSlug__evals_budget_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalBudgetRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Budget",
+        "tags": [
+          "evals"
+        ]
+      },
+      "put": {
+        "operationId": "put_budget_api_v1_u__username___graphSlug__evals_budget_put",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvalBudgetWrite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalBudgetRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Put Budget",
+        "tags": [
+          "evals"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/evals/drift": {
+      "post": {
+        "description": "The drift pass: a live eval run for every set with active cases.",
+        "operationId": "drift_api_v1_u__username___graphSlug__evals_drift_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvalDrift"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalDriftResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Drift",
+        "tags": [
+          "evals"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/evals/promote": {
+      "post": {
+        "description": "Make a real ask a passing or failing case \u2014 a person's act.",
+        "operationId": "promote_api_v1_u__username___graphSlug__evals_promote_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvalPromote"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalCaseRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Promote",
+        "tags": [
+          "evals"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/evals/{subject_kind}/{subject_id}": {
+      "get": {
+        "description": "The subject's eval set and its cases; an empty set when none was written.",
+        "operationId": "get_set_api_v1_u__username___graphSlug__evals__subject_kind___subject_id__get",
+        "parameters": [
+          {
+            "description": "skill \u00b7 agent",
+            "in": "path",
+            "name": "subject_kind",
+            "required": true,
+            "schema": {
+              "description": "skill \u00b7 agent",
+              "title": "Subject Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject_id",
+            "required": true,
+            "schema": {
+              "title": "Subject Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalSetRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Set",
+        "tags": [
+          "evals"
+        ]
+      },
+      "put": {
+        "description": "Set the judge's pin and rubric. A judge on the model under test is refused, naming both.",
+        "operationId": "put_set_api_v1_u__username___graphSlug__evals__subject_kind___subject_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subject_kind",
+            "required": true,
+            "schema": {
+              "title": "Subject Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject_id",
+            "required": true,
+            "schema": {
+              "title": "Subject Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvalSetWrite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalSetRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Put Set",
+        "tags": [
+          "evals"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/evals/{subject_kind}/{subject_id}/cases": {
+      "post": {
+        "description": "Write a case, or propose one \u2014 a proposed case replays only once a person accepts it.",
+        "operationId": "add_case_api_v1_u__username___graphSlug__evals__subject_kind___subject_id__cases_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subject_kind",
+            "required": true,
+            "schema": {
+              "title": "Subject Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject_id",
+            "required": true,
+            "schema": {
+              "title": "Subject Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvalCaseWrite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalCaseRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Add Case",
+        "tags": [
+          "evals"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/evals/{subject_kind}/{subject_id}/cases/{case_id}": {
+      "delete": {
+        "operationId": "delete_case_api_v1_u__username___graphSlug__evals__subject_kind___subject_id__cases__case_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subject_kind",
+            "required": true,
+            "schema": {
+              "title": "Subject Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject_id",
+            "required": true,
+            "schema": {
+              "title": "Subject Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Case",
+        "tags": [
+          "evals"
+        ]
+      },
+      "patch": {
+        "description": "Accept a proposed case (``status: active``), relabel, retire, or rewrite it.",
+        "operationId": "update_case_api_v1_u__username___graphSlug__evals__subject_kind___subject_id__cases__case_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subject_kind",
+            "required": true,
+            "schema": {
+              "title": "Subject Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject_id",
+            "required": true,
+            "schema": {
+              "title": "Subject Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvalCaseUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalCaseRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Case",
+        "tags": [
+          "evals"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/evals/{subject_kind}/{subject_id}/propose": {
+      "post": {
+        "description": "The assistant's starter set from the subject's text \u2014 every case waits as proposed.",
+        "operationId": "propose_api_v1_u__username___graphSlug__evals__subject_kind___subject_id__propose_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subject_kind",
+            "required": true,
+            "schema": {
+              "title": "Subject Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject_id",
+            "required": true,
+            "schema": {
+              "title": "Subject Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EvalCaseRead"
+                  },
+                  "title": "Response Propose Api V1 U  Username   Graphslug  Evals  Subject Kind   Subject Id  Propose Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Propose",
+        "tags": [
+          "evals"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/evals/{subject_kind}/{subject_id}/runs": {
+      "get": {
+        "operationId": "list_runs_api_v1_u__username___graphSlug__evals__subject_kind___subject_id__runs_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subject_kind",
+            "required": true,
+            "schema": {
+              "title": "Subject Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject_id",
+            "required": true,
+            "schema": {
+              "title": "Subject Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EvalRunRead"
+                  },
+                  "title": "Response List Runs Api V1 U  Username   Graphslug  Evals  Subject Kind   Subject Id  Runs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Runs",
+        "tags": [
+          "evals"
+        ]
+      },
+      "post": {
+        "description": "Replay every active case on live, on the candidate, or on both \u2014 202, then poll the run.",
+        "operationId": "open_run_api_v1_u__username___graphSlug__evals__subject_kind___subject_id__runs_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subject_kind",
+            "required": true,
+            "schema": {
+              "title": "Subject Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject_id",
+            "required": true,
+            "schema": {
+              "title": "Subject Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvalRunOpen"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalRunOpened"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Open Run",
+        "tags": [
+          "evals"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/evals/{subject_kind}/{subject_id}/runs/{run_id}": {
+      "get": {
+        "description": "One eval run: its summary, the gate's verdict and every case's result on each side.",
+        "operationId": "get_run_api_v1_u__username___graphSlug__evals__subject_kind___subject_id__runs__run_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subject_kind",
+            "required": true,
+            "schema": {
+              "title": "Subject Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject_id",
+            "required": true,
+            "schema": {
+              "title": "Subject Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalRunDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Run",
+        "tags": [
+          "evals"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/events": {
       "get": {
         "description": "Events for this graph only. Any graph member.\n\n``changes=true`` is the change log: only the events that mint a version of\na versioned record, composed with every other filter\n(docs/for-developers/modules/operate/features/change-log.md).",
@@ -22666,7 +24792,7 @@
         ]
       },
       "patch": {
-        "description": "Naming it here is the write that publishes it ([WO1]).",
+        "description": "Naming it here is the write that publishes it; the drift pass re-runs every live eval set.",
         "operationId": "update_lens_api_v1_u__username___graphSlug__govern_lenses__lens_id__patch",
         "parameters": [
           {
@@ -29428,6 +31554,86 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/runs/{run_id}/rerun": {
+      "post": {
+        "description": "Re-run a settled ask on the versions it recorded (``same``) or on today's (``current``).",
+        "operationId": "rerun_run_api_v1_u__username___graphSlug__runs__run_id__rerun_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRerun"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunRerunResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Rerun Run",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/runs/{run_id}/resume": {
       "post": {
         "description": "Answer a clarification \u2014 the same run continues (UC7).",
@@ -30850,67 +33056,6 @@
         ]
       }
     },
-    "/api/v1/u/{username}/{graphSlug}/skills/inlinable": {
-      "get": {
-        "description": "The library plans a skill may inline, each with what it offers a caller.\n\nOne read for the picker **and** the tuning, because they are one act: a\nperson who inlines `nl-single@1` decides its `read_only` in the same breath\n([LB19](docs/for-developers/modules/workflows/features/the-library.md)).",
-        "operationId": "inlinable_plans_api_v1_u__username___graphSlug__skills_inlinable_get",
-        "parameters": [
-          {
-            "description": "Owner username from the URL prefix.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "schema": {
-              "description": "Owner username from the URL prefix.",
-              "title": "Username",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Graph slug, unique per owner.",
-            "in": "path",
-            "name": "graphSlug",
-            "required": true,
-            "schema": {
-              "description": "Graph slug, unique per owner.",
-              "title": "Graphslug",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InlinablePlanListResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Inlinable Plans",
-        "tags": [
-          "skills"
-        ]
-      }
-    },
     "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}": {
       "delete": {
         "operationId": "delete_skill_api_v1_u__username___graphSlug__skills__skill_id__delete",
@@ -31555,10 +33700,10 @@
         ]
       }
     },
-    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/draft/tasks": {
-      "patch": {
-        "description": "Hand-edit the draft's plan, and take ownership of it.\n\nThe rows are replaced wholesale, and `task_plans.origin` flips to\n`authored` \u2014 after which redrawing from the prose is **offered, never\nautomatic**, and says what it would discard\n([SK7](docs/for-developers/modules/skills/features/authoring-a-skill.md)).\n\nWhat is checked is the **catalogue**, not an agent's envelope: a skill\nbelongs to no agent, so *may this agent call this step* is checked where\nthe agent is known \u2014 at bind time\n([SK28](docs/for-developers/modules/skills/features/authoring-a-skill.md) \u00b7\n[BN5](docs/for-developers/modules/skills/features/bindings.md)).",
-        "operationId": "write_skill_draft_tasks_api_v1_u__username___graphSlug__skills__skill_id__draft_tasks_patch",
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/rollback": {
+      "post": {
+        "description": "Restore an earlier version as the next one \u2014 its text and a copy of its plan.\n\nNothing is rewritten: the restore is a new published version that names the\none it copied. Refused while a draft is open, and for the current version.",
+        "operationId": "rollback_skill_api_v1_u__username___graphSlug__skills__skill_id__rollback_post",
         "parameters": [
           {
             "in": "path",
@@ -31596,18 +33741,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SkillDraftTasksWrite"
+                "$ref": "#/components/schemas/SkillRollback"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SkillDraftRead"
+                  "$ref": "#/components/schemas/SkillVersionRead"
                 }
               }
             },
@@ -31629,7 +33774,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Write Skill Draft Tasks",
+        "summary": "Rollback Skill",
         "tags": [
           "skills"
         ]
@@ -31785,7 +33930,7 @@
         ]
       },
       "post": {
-        "description": "Publish the next version. Fields left out carry over from the current one.",
+        "description": "Publish the draft as the next version. Fields left out carry over.\n\nRefused with 409 unless the draft's plan was drawn from the exact text being\npublished \u2014 draw after the last edit, then publish.",
         "operationId": "publish_skill_version_api_v1_u__username___graphSlug__skills__skill_id__versions_post",
         "parameters": [
           {

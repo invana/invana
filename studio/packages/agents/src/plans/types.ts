@@ -47,11 +47,11 @@ export interface TaskPlanSummary {
 	/** The plan's subject: `ask · import · bulk · stitch · model · enrich`. */
 	kind: string;
 	/**
-	 * How the plan got here. `builtin · authored · promoted` are the library's
+	 * How the plan got here. `packaged · authored · promoted` are the library's
 	 * badge; `generated` is never listed — a one-off belongs to its Todo
-	 * (the-library.md).
+	 * (the-library.md). Nothing new is written `authored`.
 	 */
-	origin: "builtin" | "authored" | "generated" | "promoted";
+	origin: "packaged" | "authored" | "generated" | "promoted";
 	intent: string[];
 	reusable: boolean;
 	todo_id: string | null;

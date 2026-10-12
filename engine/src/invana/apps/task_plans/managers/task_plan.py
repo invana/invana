@@ -90,7 +90,7 @@ class TaskPlanManager:
                     name=template.key,
                     description=template.description,
                     kind=template.kind,
-                    origin=PlanOrigin.builtin.value,
+                    origin=PlanOrigin.packaged.value,
                     intent=list(template.intents),
                     # What this plan offers a caller that inlines it. Seeded
                     # with the rows, because a row binding `${args.N}` and a

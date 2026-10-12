@@ -210,6 +210,12 @@ class TaskRun(Base):
     # ── who ran it ───────────────────────────────────────────────────────────
     agent_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
     agent_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: The provider's version name this run called; null when it called none.
+    model_version: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    #: The root run this one re-ran.
+    rerun_of_run_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("task_runs.id", ondelete="SET NULL"), nullable=True
+    )
     triggered_by: Mapped[str] = mapped_column(String(16), default=TriggeredBy.user.value, nullable=False)
     on_behalf_of_user_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
 
@@ -377,3 +383,115 @@ class ProjectionTemplate(Base):
     status: Mapped[str] = mapped_column(String(16), default="published", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
+
+
+# ---------------------------------------------------------------------------
+# Evals (docs/for-developers/modules/skills/features/evals.md)
+#
+# An eval run is a `TaskRun` with `role=evaluate`, its cases replayed as child
+# runs; these tables hold only what a run row cannot — the set, its cases, the
+# per-case verdicts and the Graph's eval budget.
+# ---------------------------------------------------------------------------
+
+
+class EvalSubject(enum.StrEnum):
+    skill = "skill"
+    agent = "agent"
+
+
+class EvalLabel(enum.StrEnum):
+    passing = "passing"
+    failing = "failing"
+
+
+class EvalCaseStatus(enum.StrEnum):
+    proposed = "proposed"
+    active = "active"
+    retired = "retired"
+
+
+class EvalSet(Base):
+    """The fixed questions one skill or one agent is replayed against.
+
+    One per subject. The judge pin and rubric are optional: a set with neither
+    is rule checks alone, which is the only part that can block a publish.
+    """
+
+    __tablename__ = "eval_sets"
+    __table_args__ = (UniqueConstraint("subject_kind", "subject_id", name="uq_eval_set_subject"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    graph_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("graphs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    #: `skill` · `agent`.
+    subject_kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    subject_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    #: The judge's model address; never the model under test.
+    judge_model_pin: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    rubric: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class EvalCase(Base):
+    """One fixed question and the checks a good answer passes."""
+
+    __tablename__ = "eval_cases"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    eval_set_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("eval_sets.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    #: `[{kind, value}]` — rule checks, counted from the run's own record.
+    checks: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    #: `passing` · `failing` — what a good answer does with this question.
+    label: Mapped[str] = mapped_column(String(16), default=EvalLabel.passing.value, nullable=False)
+    #: `proposed` waits for a person; only `active` replays.
+    status: Mapped[str] = mapped_column(String(16), default=EvalCaseStatus.active.value, nullable=False)
+    #: The real ask it was promoted from; kept when that run is gone.
+    source_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    created_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class EvalResult(Base):
+    """One case on one side of one eval run."""
+
+    __tablename__ = "eval_results"
+    __table_args__ = (UniqueConstraint("eval_run_id", "eval_case_id", "side", name="uq_eval_result_side"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    eval_run_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("task_runs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    eval_case_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("eval_cases.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    #: The replayed ask this verdict reads.
+    case_run_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("task_runs.id", ondelete="SET NULL"), nullable=True
+    )
+    #: `live` · `draft`.
+    side: Mapped[str] = mapped_column(String(8), nullable=False)
+    #: `{check kind: pass | fail}`.
+    hard: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    #: The judge's 0-5, labelled apart; null when no judge is set.
+    judged: Mapped[float | None] = mapped_column(Float, nullable=True)
+    tokens: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    latency_ms: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    #: sha256 of the answer as text — two sides differ when these do.
+    answer_digest: Mapped[str] = mapped_column(String(64), default="", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class EvalBudget(Base):
+    """A Graph's monthly eval tokens, apart from production."""
+
+    __tablename__ = "eval_budgets"
+
+    graph_id: Mapped[str] = mapped_column(String(36), ForeignKey("graphs.id", ondelete="CASCADE"), primary_key=True)
+    #: Null is no ceiling.
+    monthly_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)

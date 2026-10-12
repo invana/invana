@@ -18,6 +18,7 @@ from invana.core.auth.models import User
 from invana.runtime.managers import SkillDraftManager, SkillUsageManager
 from invana.runtime.managers.skill_usage import MIN_OFFERS_TO_READ
 from invana.runtime.models import TaskRun
+from tests.skills.drawn import publish_drawn
 
 skills = SkillManager()
 drafts = SkillDraftManager()
@@ -68,7 +69,7 @@ async def test_a_rewrite_reports_only_the_field_that_moved(session: AsyncSession
         actor_id=user.id,
         publish=True,
     )
-    await drafts.publish(session, skill=skill, payload=SkillVersionPublish(content="after"), actor_id=user.id)
+    await publish_drawn(session, skill=skill, payload=SkillVersionPublish(content="after"), actor_id=user.id)
 
     diff = await skills.diff_version(session, skill=skill, version=2)
 

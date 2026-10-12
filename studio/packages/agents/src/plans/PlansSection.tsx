@@ -151,10 +151,10 @@ export function plansSection({
 }
 
 /**
- * `6 · 3 builtin` — what the section header carries beside its label, as the
- * artboard draws it. The total is *how much there is to pick from*; the builtin
- * share is *how much of it came with Invana*, which is the one split a reader
- * asks about before they have authored anything.
+ * `6 · 3 packaged` — what the section header carries beside its label. The
+ * total is *how much there is to pick from*; the packaged share is *how much
+ * of it came with Invana or a plugin*, which is the one split a reader asks
+ * about first.
  */
 function PlansCount({
 	username,
@@ -166,6 +166,8 @@ function PlansCount({
 	const list = useTaskPlansQuery(username, graphSlug);
 	const items = list.data?.items ?? [];
 	if (!items.length) return null;
-	const builtin = items.filter((w) => w.origin === "builtin").length;
-	return <>{builtin ? `${items.length} · ${builtin} builtin` : items.length}</>;
+	const packaged = items.filter((w) => w.origin === "packaged").length;
+	return (
+		<>{packaged ? `${items.length} · ${packaged} packaged` : items.length}</>
+	);
 }

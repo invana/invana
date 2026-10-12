@@ -15,30 +15,26 @@
  * because that is a second way to write the playbook in a box that is not the
  * playbook.
  *
- * ## And when the prose cannot fix it
+ * ## Nobody draws the plan
  *
- * **Edit by hand** opens the rows themselves. After that the plan is
- * `authored`, so drawing again stops being a button and becomes an offer that
- * names what it would discard — because editing the prose must never silently
- * throw away a correction somebody made deliberately.
+ * The flow is read-only. A plan that reads wrong is fixed in the prose or in
+ * the answer to a question, and drawn again; a sentence that names a library
+ * plan draws that plan's rows in.
  */
 
 import { Input, Label, Textarea } from "@invana/forms";
 import { Badge, Button, Spinner } from "@invana/ui";
 import { PanelSection } from "@invana-studio/ui";
-import { PencilLine, Sparkles, SquarePen, Trash2 } from "lucide-react";
+import { PencilLine, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
 	useAnswerClarificationMutation,
 	useDiscardDraftMutation,
 	useDrawDraftMutation,
-	useInlinablePlansQuery,
 	usePublishSkillVersionMutation,
 	useSaveDraftMutation,
 	useSkillDraftQuery,
-	useWriteDraftTasksMutation,
 } from "./queries";
-import { SkillPlaybookEditor } from "./SkillPlaybookEditor";
 import type {
 	Skill,
 	SkillClarification,
@@ -95,20 +91,9 @@ export function SkillPlaybookTab({
 	const discard = useDiscardDraftMutation(username, graphSlug, skill.id);
 	const draw = useDrawDraftMutation(username, graphSlug, skill.id);
 	const answer = useAnswerClarificationMutation(username, graphSlug, skill.id);
-	const writeTasks = useWriteDraftTasksMutation(username, graphSlug, skill.id);
-	// The Graph's library, read only while the rows are open: a plan a skill may
-	// inline instead of redrawing its steps.
-	const inlinable = useInlinablePlansQuery(username, graphSlug, editing);
-	const [editingPlan, setEditingPlan] = useState(false);
-	// A redraw over an authored plan is offered, never automatic.
-	const [confirmRedraw, setConfirmRedraw] = useState(false);
 
 	const open = draft.data?.open_clarification ?? null;
 	const drawn = draft.data?.plan;
-	// Only a hand-edit flips `origin`, so this is the one fact that
-	// claims somebody's rows are at stake — the plan a draft is born with is
-	// `generated`, and nobody wrote it.
-	const handEdited = drawn?.origin === "authored";
 	// A node carries a `source_span` only because a draw wrote it, so this is
 	// *has this ever been drawn* — which is what turns the action into Redraw.
 	const everDrawn = (drawn?.nodes ?? []).some((n) => !!n.source_span);
@@ -136,10 +121,8 @@ export function SkillPlaybookTab({
 	}, [drawing, inFlight, draw.isPending, draft.isFetching]);
 
 	// Answering continues the drawing: the run that asked has settled,
-	// so the next draw is opened here. A hand-edited plan is the exception —
-	// there a draw discards rows somebody wrote, so it stays an offer.
+	// so the next draw is opened here.
 	const startDraw = () => {
-		setConfirmRedraw(false);
 		setDrawing(true);
 		draw.mutate(undefined, { onError: () => setDrawing(false) });
 	};
@@ -174,64 +157,18 @@ export function SkillPlaybookTab({
 				title="The flow it draws"
 				hint="drafted automatically, published deliberately — editing prose never silently changes what runs"
 				action={
-					editingPlan ? null : (
-						<span className="flex items-center gap-1">
-							<Button
-								size="sm"
-								variant="ghost"
-								className="h-6 text-base"
-								disabled={!!open || busy}
-								onClick={() => {
-									setConfirmRedraw(false);
-									setEditingPlan(true);
-								}}
-							>
-								<SquarePen className="size-3" />
-								Edit by hand
-							</Button>
-							<Button
-								size="sm"
-								variant="outline"
-								className="h-6 text-base"
-								disabled={busy}
-								onClick={() => {
-									// An authored plan is somebody's correction, so drawing over
-									// it asks first and says what it would throw away.
-									if (handEdited && !confirmRedraw) {
-										setConfirmRedraw(true);
-										return;
-									}
-									startDraw();
-								}}
-							>
-								<Sparkles className="size-3" />
-								{busy
-									? "Drawing…"
-									: confirmRedraw
-										? "Discard and redraw"
-										: everDrawn || handEdited
-											? "Redraw"
-											: "Draw this"}
-							</Button>
-						</span>
-					)
+					<Button
+						size="sm"
+						variant="outline"
+						className="h-6 text-base"
+						disabled={busy}
+						onClick={startDraw}
+					>
+						<Sparkles className="size-3" />
+						{busy ? "Drawing…" : everDrawn ? "Redraw" : "Draw this"}
+					</Button>
 				}
 			>
-				{confirmRedraw && !editingPlan ? (
-					<p className="mb-1.5 rounded-sm border border-warning/40 bg-warning/5 px-2 py-1.5 text-base">
-						Drawing again replaces the {drawn?.nodes.length} step
-						{drawn?.nodes.length === 1 ? "" : "s"} you edited by hand with what
-						the prose reads as.{" "}
-						<button
-							type="button"
-							className="underline"
-							onClick={() => setConfirmRedraw(false)}
-						>
-							Keep what I wrote
-						</button>
-					</p>
-				) : null}
-
 				{open ? (
 					<ClarificationCard
 						clarification={open}
@@ -241,38 +178,11 @@ export function SkillPlaybookTab({
 								{ clarificationId: open.id, answer: value },
 								{
 									// The answer was given to get the flow drawn, so the next
-									// draw opens on it — unless it would discard a
-									// hand-edit, which stays an offer.
-									onSuccess: (next) => {
-										if (next.plan.origin !== "authored") startDraw();
-									},
+									// draw opens on it.
+									onSuccess: startDraw,
 								},
 							)
 						}
-					/>
-				) : editingPlan && drawn ? (
-					<SkillPlaybookEditor
-						plan={drawn}
-						vocabulary={draft.data.vocabulary ?? []}
-						inlinable={inlinable.data?.items ?? []}
-						saving={writeTasks.isPending}
-						error={
-							writeTasks.error
-								? String((writeTasks.error as Error).message)
-								: null
-						}
-						onSave={(tasks) =>
-							writeTasks.mutate(tasks, {
-								onSuccess: () => {
-									writeTasks.reset();
-									setEditingPlan(false);
-								},
-							})
-						}
-						onCancel={() => {
-							writeTasks.reset();
-							setEditingPlan(false);
-						}}
 					/>
 				) : (
 					<>
@@ -517,8 +427,8 @@ function DraftFields({
  *
  * A refusal settles rather than fails, so it is shown here rather than
  * left in a run nobody opens. The reasons are the validator's own — a plan is
- * refused **on what was checked** — and the two acts that can answer them are
- * the two the Seams table already names: rewrite the sentence, or edit by hand.
+ * refused **on what was checked** — and the act that answers them is
+ * rewriting the sentence it names.
  */
 function RefusalCard({ refusal }: { refusal: SkillDrawRefusal }) {
 	return (
@@ -537,8 +447,8 @@ function RefusalCard({ refusal }: { refusal: SkillDrawRefusal }) {
 				))}
 			</ul>
 			<p className="mt-2 text-muted-foreground text-base">
-				Rewrite the sentence it names and draw again, or <b>Edit by hand</b> —
-				the plan you had is untouched.
+				Rewrite the sentence it names and draw again — the plan you had is
+				untouched.
 			</p>
 		</div>
 	);

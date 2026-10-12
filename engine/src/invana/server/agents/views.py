@@ -14,10 +14,13 @@ from invana.apps.agents.managers import AgentManager, SoulManager
 from invana.apps.agents.models import AgentStatus
 from invana.apps.agents.schemas import (
     AgentCreate,
+    AgentDraftWrite,
     AgentLineageResponse,
     AgentListResponse,
     AgentMeters,
+    AgentPublish,
     AgentRead,
+    AgentRollback,
     AgentSkillsAndCallables,
     AgentUpdate,
     DefaultAgentRequest,
@@ -34,7 +37,7 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events.schemas import EventListResponse
 from invana.core.events.store import EventFilter, EventStore
-from invana.runtime.managers import AgentCapabilitiesManager, AgentLifecycleManager, SkillBindManager
+from invana.runtime.managers import AgentCapabilitiesManager, AgentLifecycleManager, EvalManager, SkillBindManager
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 agents = AgentManager()
@@ -47,6 +50,7 @@ bindings = SkillBindingManager()
 #: both is composed one band up (`runtime/managers/skill_bind.py`) and handed to
 #: the binding manager (BN5).
 binds = SkillBindManager()
+evals = EvalManager()
 
 
 async def list_agents(
@@ -101,8 +105,100 @@ async def update_agent(
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> AgentRead:
+    """Edit an agent. Moving its pin passes the eval gate first, on the new pin."""
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
-    agent = await agents.update_agent(session, agent=agent, payload=payload, actor=user)
+    moving = "model_pin" in payload.model_fields_set and payload.model_pin != agent.model_pin
+    evaluated = None
+    if moving:
+        evaluated = await evals.gate(
+            session,
+            graph_id=graph.id,
+            subject_kind="agent",
+            subject_id=agent.id,
+            model_pin=payload.model_pin,
+            unchanged_pin=False,
+            why=payload.why,
+        )
+    agent = await agents.update_agent(session, agent=agent, payload=payload, actor=user, evaluated=evaluated)
+    return await agents.read(session, agent)
+
+
+async def write_agent_draft(
+    payload: AgentDraftWrite,
+    agent_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> AgentRead:
+    """Write the agent's unpublished instructions. Runs keep reading the published ones."""
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    agent = await agents.write_draft(session, agent=agent, instructions=payload.instructions)
+    return await agents.read(session, agent)
+
+
+async def discard_agent_draft(
+    agent_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> AgentRead:
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    agent = await agents.discard_draft(session, agent=agent)
+    return await agents.read(session, agent)
+
+
+async def publish_agent_instructions(
+    payload: AgentPublish,
+    agent_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> AgentRead:
+    """Publish the draft into the agent's instructions — the next agent version.
+
+    Refused with 409 when no draft is open, and by the eval gate.
+    """
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    evaluated = (
+        await evals.gate(session, graph_id=graph.id, subject_kind="agent", subject_id=agent.id, why=payload.why)
+        if agent.instructions_draft is not None
+        else None
+    )
+    agent = await agents.publish_instructions(session, agent=agent, actor=user, why=payload.why, evaluated=evaluated)
+    return await agents.read(session, agent)
+
+
+async def rollback_agent_instructions(
+    payload: AgentRollback,
+    agent_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> AgentRead:
+    """Restore the instructions as they were at an earlier version, as the next version.
+
+    Refused with 409 while a draft is open, when that text is already current,
+    or when it predates recorded edits; 404 for a version the agent never had.
+    The eval gate reads the restored text against today's set.
+    """
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    evaluated = (
+        await evals.gate(
+            session,
+            graph_id=graph.id,
+            subject_kind="agent",
+            subject_id=agent.id,
+            version=payload.version,
+            why=payload.why,
+        )
+        if agent.instructions_draft is None and payload.version < agent.version
+        else None
+    )
+    agent = await agents.rollback_instructions(
+        session, agent=agent, version=payload.version, actor=user, why=payload.why, evaluated=evaluated
+    )
     return await agents.read(session, agent)
 
 

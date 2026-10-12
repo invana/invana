@@ -12,6 +12,11 @@ difference is what lets ambiguity be a declared condition rather than a feeling
 * none → a ``form: human`` step, because a person can always do it (SK15);
 * not an instruction at all → no step, and the sentence reads as *unmapped*.
 
+A candidate is a catalogue entry or a reusable library plan, named
+``plan:<key>@<v>``. A plan candidate is counted exactly like a step; the
+manager copies its rows in when it is picked, with the arguments the sentence
+tunes.
+
 The model never writes args it invented: it may bind one earlier step's output,
 exactly as the workflow planner may, and everything else is validated against
 the envelope before a row is written.
@@ -26,6 +31,9 @@ from typing import Any
 from invana.apps.llm import LLMError, complete_tool
 from invana.apps.llm.schemas import Exchange, TokenUsage
 from invana.apps.llm_providers.endpoint import LLMEndpoint
+
+#: How a candidate names a library plan rather than a catalogue entry.
+PLAN_PREFIX = "plan:"
 
 DRAFT_TOOL = {
     "type": "object",
@@ -59,7 +67,10 @@ DRAFT_TOOL = {
                         "items": {
                             "type": "object",
                             "properties": {
-                                "task": {"type": "string", "description": "One of the allowed task keys."},
+                                "task": {
+                                    "type": "string",
+                                    "description": "One of the allowed task keys, or a library plan as plan:<key>@<v>.",
+                                },
                                 "label": {"type": "string", "description": "What the step's row says."},
                                 "why": {
                                     "type": "string",
@@ -69,6 +80,13 @@ DRAFT_TOOL = {
                                     "type": "string",
                                     "description": (
                                         "Optional ${steps.<earlier id>.<field>} this step consumes. Else ''."
+                                    ),
+                                },
+                                "tune": {
+                                    "type": "object",
+                                    "description": (
+                                        "Library plans only: the declared arguments the sentence sets, "
+                                        'e.g. {"read_only": false}. Else {}.'
                                     ),
                                 },
                             },
@@ -86,10 +104,13 @@ DRAFT_TOOL = {
 
 @dataclass(frozen=True, slots=True)
 class Candidate:
+    #: A catalogue key, or ``plan:<key>@<v>`` for a library plan.
     task: str
     label: str
     why: str = ""
     binds: str = ""
+    #: A library plan's arguments, as the sentence sets them.
+    tune: dict = field(default_factory=dict)
 
     def as_option(self) -> dict:
         """The reading, as the clarification card offers it."""
@@ -127,7 +148,29 @@ def _vocabulary_lines(vocabulary: Sequence[Mapping[str, Any]]) -> str:
     return "\n".join(lines) or "  (none)"
 
 
-def _system_prompt(*, vocabulary: Sequence[Mapping[str, Any]], answered: Mapping[str, str]) -> str:
+def _plan_lines(plans: Sequence[Mapping[str, Any]]) -> str:
+    lines = []
+    for plan in sorted(plans, key=lambda p: str(p.get("ref"))):
+        parts = [f"  {PLAN_PREFIX}{plan.get('ref')}"]
+        if plan.get("description"):
+            parts.append(str(plan["description"]))
+        args = plan.get("args_schema") or {}
+        if args:
+            tunable = (
+                f"{name} ({spec.get('type', 'any')}, default {spec.get('default')!r})"
+                for name, spec in sorted(args.items())
+            )
+            parts.append("tune: " + ", ".join(tunable))
+        lines.append(" · ".join(parts))
+    return "\n".join(lines) or "  (none)"
+
+
+def _system_prompt(
+    *,
+    vocabulary: Sequence[Mapping[str, Any]],
+    answered: Mapping[str, str],
+    plans: Sequence[Mapping[str, Any]] = (),
+) -> str:
     settled = (
         "\n".join(f"  {span!r} → {task}" for span, task in sorted(answered.items())) if answered else "  (none yet)"
     )
@@ -136,6 +179,9 @@ def _system_prompt(*, vocabulary: Sequence[Mapping[str, Any]], answered: Mapping
         "execute it, and you do not rewrite it.\n\n"
         f"Allowed tasks (use nothing else), with what each needs before it and what it "
         f"produces:\n{_vocabulary_lines(vocabulary)}\n\n"
+        "Library plans — a whole flow under one name. Offer one as a candidate only when the "
+        "sentence names it or plainly asks for what it describes; set 'tune' only for arguments "
+        f"it lists:\n{_plan_lines(plans)}\n\n"
         "Rules:\n"
         "- Return EVERY sentence of the playbook, in order, with its span copied verbatim.\n"
         "- A sentence that tells the runtime to act is kind='step'. One that sets tone, context or "
@@ -146,6 +192,7 @@ def _system_prompt(*, vocabulary: Sequence[Mapping[str, Any]], answered: Mapping
         "- Give NO candidates when no allowed task can express it; a person will do that step.\n"
         "- 'binds' may reference an EARLIER sentence's task as ${steps.<task>.<field>}, and only a "
         "field listed under that task's outputs.\n"
+        "- 'tune' is {} for a task, and for a plan whose defaults the sentence keeps.\n"
         "- Do not invent a task key. Do not merge two sentences into one step unless one of them "
         "only qualifies the other.\n\n"
         f"Readings the author has already settled — use these, never ask again:\n{settled}"
@@ -159,18 +206,21 @@ async def draft_skill_plan(
     when_to_use: str,
     content: str,
     vocabulary: Sequence[Mapping[str, Any]],
+    plans: Sequence[Mapping[str, Any]] = (),
     answered: Mapping[str, str] | None = None,
     encryption_key: str,
     timeout_s: float = 60.0,
 ) -> DraftedPlaybook:
     """Ask the model which task each sentence names.
 
-    ``answered`` carries the clarifications this version has already settled, so
-    a redraw never re-asks ([SK11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    ``plans`` are the library plans the sentence may name instead of a task —
+    ``ref``, ``description`` and ``args_schema`` each. ``answered`` carries the
+    clarifications this version has already settled, so a redraw never re-asks
+    ([SK11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
     """
     result = await complete_tool(
         provider=provider,
-        system=_system_prompt(vocabulary=vocabulary, answered=answered or {}),
+        system=_system_prompt(vocabulary=vocabulary, answered=answered or {}, plans=plans),
         messages=[
             {
                 "role": "user",
@@ -200,6 +250,7 @@ async def draft_skill_plan(
                 label=str(c.get("label") or "").strip(),
                 why=str(c.get("why") or "").strip(),
                 binds=str(c.get("binds") or "").strip(),
+                tune=dict(c["tune"]) if isinstance(c.get("tune"), dict) else {},
             )
             for c in (item.get("candidates") or [])
             if isinstance(c, dict) and str(c.get("task") or "").strip()

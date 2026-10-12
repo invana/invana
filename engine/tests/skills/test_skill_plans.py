@@ -18,6 +18,7 @@ from invana.core.auth.models import User
 from invana.core.errors import ValidationError
 from invana.runtime.managers import BuiltinSkillSeeder, SkillDraftManager
 from invana.runtime.managers.skill_seed import NAME as BUILTIN_NAME
+from tests.skills.drawn import publish_drawn
 
 pytestmark = pytest.mark.asyncio
 
@@ -67,7 +68,7 @@ async def test_a_new_skill_is_a_draft_that_already_has_a_plan(session: AsyncSess
     assert read.plan.layers == ["human"]
 
     draft = await skills.get_draft(session, skill=skill)
-    published = await drafts.publish(
+    published = await publish_drawn(
         session, skill=skill, payload=SkillVersionPublish(content="Chase it."), actor_id=user.id
     )
 
@@ -95,12 +96,10 @@ async def test_a_published_version_cannot_be_edited_and_a_builtin_cannot_be_dele
     with pytest.raises(ValidationError):
         await skills.delete(session, skill=builtin, actor_id=user.id)
 
-    # Editing it is ordinary: the next version publishes over the seeded one.
+    # Publishing over it is ordinary. The draft opens on a copy of v1's plan,
+    # which is the plan of v1's text, so a why-only publish needs no draw.
     v2 = await drafts.publish(
-        session,
-        skill=builtin,
-        payload=SkillVersionPublish(when_to_use="when someone asks in prose"),
-        actor_id=user.id,
+        session, skill=builtin, payload=SkillVersionPublish(why="Republished as it is."), actor_id=user.id
     )
     assert v2.version == 2
     # A redraw is a revision: v2's plan is its own **copy** of what v1 drew, so

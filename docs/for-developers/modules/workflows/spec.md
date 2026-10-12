@@ -13,7 +13,7 @@ into the library when they demonstrably served.
 | | |
 |---|---|
 | Index | [§7 · Workflows](../../README.md#7--workflows) |
-| Features | [the-library](features/the-library.md) · [plan-selection](features/plan-selection.md) · [envelope-validation](features/envelope-validation.md) · [promote-a-plan](features/promote-a-plan.md) · [run-a-workflow](features/run-a-workflow.md) · [the-catalogue](features/the-catalogue.md) · [draft-a-plan](features/draft-a-plan.md) |
+| Features | [the-library](features/the-library.md) · [plan-selection](features/plan-selection.md) · [envelope-validation](features/envelope-validation.md) · [promote-a-plan](features/promote-a-plan.md) · [run-a-workflow](features/run-a-workflow.md) · [the-catalogue](features/the-catalogue.md) |
 | Depends on | [Agents](../agents/spec.md) (the envelope a plan is checked against) · [Ask](../ask/spec.md) (the step catalogue and the runtime) |
 | Depended on by | [Ask](../ask/spec.md) (the `plan_queries` Task) · [Work](../work/spec.md) (a Todo runs a plan) · [Operate](../operate/features/schedules.md) (a schedule is a start on a cron) · [Bring data in](../bring-data-in/features/load-a-bundle.md) (a bundle load is one of these plans) |
 
@@ -64,7 +64,7 @@ flowchart TD
 
 | Owns | Shape |
 |---|---|
-| `task_plans` | `graph_id` · `key?` · `name` · `intent` · `kind` · `origin (authored\|generated\|promoted)` · `reusable` · `todo_id?` · `args_schema` · `source_skill_version_ids[]` |
+| `task_plans` | `graph_id` · `key?` · `name` · `intent` · `kind` · `origin (packaged\|generated\|promoted)` — `authored` is read on older rows, never written · `reusable` · `todo_id?` · `args_schema` · `source_skill_version_ids[]` |
 | `tasks` | the plan's nodes — `task_plan_id` **NOT NULL** · `parent_id?` · `key` · `form` · `step_key?` · `depends_on[]` and the rest of the grammar |
 | Plan record | on the run: `plan_snapshot` (frozen) and `plan_origin` (`authored:<id>` · `generated` · `reused:<id>`) |
 | Validation result | which bound refused a plan, when one did |
@@ -129,21 +129,19 @@ is closed ([orchestration § 0.6](../../orchestration.md#06-the-catalogue--what-
 | F9 | **Every plan resolves from this library, including Invana's own** — `plan-a-todo` and `check-criteria` included. A builtin is a seeded, read-only plan, never a constant in a feature package. |
 | F10 | A builtin is listed and composable but not editable: no edit, no retire, reseeded on migrate. Its Tasks are bound to catalogue entries the engine owns. |
 | F11 | **A multi-stage load is an ordinary plan.** `bundle-import` inlines `dataset-import` per dataset with `ref`; ingestion gets no grammar of its own. [13.8 §3.2](../platform/features/runtime.md) |
-| F14 | **A `TaskPlan` is one record, whatever drew it.** A plan drafted from a skill, generated for a Todo or authored by hand is the same table with a different `origin`. There is no `SkillPlan`: provenance is a column, not a type ([orchestration § 0.8](../../orchestration.md#08-a-skill-drawn-as-a-flow)). |
+| F14 | **A `TaskPlan` is one record, whatever drew it.** A plan drawn from a skill, generated for a Todo, packaged or promoted is the same table with a different `origin`. There is no `SkillPlan`: provenance is a column, not a type ([orchestration § 0.8](../../orchestration.md#08-a-skill-drawn-as-a-flow)). |
 | F15 | **A skill version is drawn as exactly one plan** — `skill_versions.plan_id` is `NOT NULL`. If a playbook cannot be drawn as a flow, it is a [rule](../skills/features/rules.md), not a skill. |
 | F16 | **A plan is a flow of Tasks, never of Todos.** Where one needs a person, that is a `form: human` Task — and if the person owns it beyond this run, the Task raises a Todo in [Work](../work/spec.md). |
 | F12 | **A plan in the library is startable.** A person picks a published version, supplies its arguments and runs it ([7.5](features/run-a-workflow.md)). Reaching a deterministic plan only by asking a question the planner might match was the gap. |
-| F13 | Starting by hand changes nothing downstream: the envelope check, the trace, the journal row and the pauses are the ones every other run gets. **A published version is still not editable** — editing forks a draft ([7.7](features/draft-a-plan.md) DP1). |
-| F17 | **A plan is authored in Studio, by drafting.** A draft is a fork of a published version (or an empty plan), edited on the flow canvas or as `manifest.yml`, validated against the envelope, and published as the next immutable version ([7.7](features/draft-a-plan.md)). Promotion from a run that served ([7.4](features/promote-a-plan.md)) is still a door into the library — it is no longer the only one. |
-| F18 | **The canvas and `manifest.yml` are two editors over one document.** The plan is data ([orchestration § 5](../../orchestration.md#5-the-plan-is-data)); the canvas draws that data and writes it back. Neither is the source of truth over the other, and there is no third representation to keep in sync. |
+| F13 | Starting by hand changes nothing downstream: the envelope check, the trace, the journal row and the pauses are the ones every other run gets. **A published version is not editable** — nobody edits a plan by hand ([6.5](../skills/features/instructions-publish-rollback.md#decisions) IS3). |
+| F17 | **A plan enters the library generated, packaged or promoted — never drafted.** Studio has no *New plan* and no plan editor ([6.5](../skills/features/instructions-publish-rollback.md#decisions) IS2 · IS3). A plan that served is promoted ([7.4](features/promote-a-plan.md)); a builtin or a plugin pack's plan is packaged. Composition happens at a skill's draw, where a sentence names a library plan ([IS11](../skills/features/instructions-publish-rollback.md#decisions)). |
+| F18 | **The canvas and `manifest.yml` are two readings of one document.** The plan is data ([orchestration § 5](../../orchestration.md#5-the-plan-is-data)); the canvas draws it and the YAML export prints it. Neither writes it back. |
 
 ## 7. Deliberately absent
 
 | Not built | Because |
 |---|---|
-| Editing a **published** version | a version is immutable, because the runs that used it have to stay readable. Editing forks a draft ([7.7](features/draft-a-plan.md)) |
-| A free-form node editor — arbitrary shapes, notes, swimlanes | the canvas edits a plan, and a plan's grammar is closed ([orchestration § 5](../../orchestration.md#5-the-plan-is-data)). What cannot be expressed as a plan cannot be drawn on it |
-| Running a draft | a draft has not passed publish, and `plan_origin` has to name a version a trace can resolve. Validate, publish, then run |
+| Editing a plan by hand — a *New plan*, a draft, a plan editor | plans come from instructions or are packaged ([6.5](../skills/features/instructions-publish-rollback.md#decisions) IS3); a version is immutable, because the runs that used it have to stay readable |
 | A second plan grammar for ingestion | the plan graph of [13.8 §4](../platform/features/runtime.md) already carries order, failure branches, conditions, fan-out and gates (F11) |
 | Auto-promotion on a passing verdict | promotion is a person's call; the verdict only makes it a candidate |
 | Cross-Graph workflow sharing | the Graph is the reasoning boundary |

@@ -8,6 +8,7 @@ CREATE TABLE agents (
 	status VARCHAR(16) NOT NULL, 
 	workflow_spec JSON NOT NULL, 
 	instructions TEXT NOT NULL, 
+	instructions_draft TEXT, 
 	soul TEXT NOT NULL, 
 	soul_traits JSON NOT NULL, 
 	lifetime VARCHAR(16) NOT NULL, 
@@ -16,6 +17,7 @@ CREATE TABLE agents (
 	budget JSON NOT NULL, 
 	effort JSON NOT NULL, 
 	policy JSON NOT NULL, 
+	model_pin VARCHAR(255), 
 	version INTEGER NOT NULL, 
 	created_by_kind VARCHAR(16) NOT NULL, 
 	created_by_id VARCHAR(36), 
@@ -146,6 +148,68 @@ CREATE TABLE emissions (
 CREATE INDEX ix_emissions_message_id ON emissions (message_id);
 
 CREATE INDEX ix_emissions_run_id ON emissions (run_id);
+
+CREATE TABLE eval_budgets (
+	graph_id VARCHAR(36) NOT NULL, 
+	monthly_tokens INTEGER, 
+	PRIMARY KEY (graph_id), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
+CREATE TABLE eval_cases (
+	id VARCHAR(36) NOT NULL, 
+	eval_set_id VARCHAR(36) NOT NULL, 
+	question TEXT NOT NULL, 
+	checks JSON NOT NULL, 
+	label VARCHAR(16) NOT NULL, 
+	status VARCHAR(16) NOT NULL, 
+	source_run_id VARCHAR(36), 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(eval_set_id) REFERENCES eval_sets (id) ON DELETE CASCADE, 
+	FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_eval_cases_eval_set_id ON eval_cases (eval_set_id);
+
+CREATE TABLE eval_results (
+	id VARCHAR(36) NOT NULL, 
+	eval_run_id VARCHAR(36) NOT NULL, 
+	eval_case_id VARCHAR(36) NOT NULL, 
+	case_run_id VARCHAR(36), 
+	side VARCHAR(8) NOT NULL, 
+	hard JSON NOT NULL, 
+	judged FLOAT, 
+	tokens INTEGER NOT NULL, 
+	latency_ms INTEGER NOT NULL, 
+	answer_digest VARCHAR(64) NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_eval_result_side UNIQUE (eval_run_id, eval_case_id, side), 
+	FOREIGN KEY(eval_run_id) REFERENCES task_runs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(eval_case_id) REFERENCES eval_cases (id) ON DELETE CASCADE, 
+	FOREIGN KEY(case_run_id) REFERENCES task_runs (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_eval_results_eval_case_id ON eval_results (eval_case_id);
+
+CREATE INDEX ix_eval_results_eval_run_id ON eval_results (eval_run_id);
+
+CREATE TABLE eval_sets (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	subject_kind VARCHAR(16) NOT NULL, 
+	subject_id VARCHAR(36) NOT NULL, 
+	judge_model_pin VARCHAR(255), 
+	rubric TEXT, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_eval_set_subject UNIQUE (subject_kind, subject_id), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_eval_sets_graph_id ON eval_sets (graph_id);
 
 CREATE TABLE events (
 	id VARCHAR(36) NOT NULL, 
@@ -713,6 +777,9 @@ CREATE TABLE skill_versions (
 	plan_id VARCHAR(36) NOT NULL, 
 	published_by_id VARCHAR(36), 
 	published_at TIMESTAMP WITH TIME ZONE, 
+	restored_from_version INTEGER, 
+	model_pin VARCHAR(255), 
+	drawn_digest VARCHAR(64), 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_skill_version_number UNIQUE (skill_id, version), 
@@ -822,6 +889,8 @@ CREATE TABLE task_runs (
 	author_kind VARCHAR(16) NOT NULL, 
 	agent_id VARCHAR(36), 
 	agent_version INTEGER, 
+	model_version VARCHAR(255), 
+	rerun_of_run_id VARCHAR(36), 
 	triggered_by VARCHAR(16) NOT NULL, 
 	on_behalf_of_user_id VARCHAR(36), 
 	trace_id VARCHAR(32), 
@@ -859,6 +928,7 @@ CREATE TABLE task_runs (
 	FOREIGN KEY(session_id) REFERENCES sessions (id) ON DELETE CASCADE, 
 	FOREIGN KEY(message_id) REFERENCES session_messages (id) ON DELETE SET NULL, 
 	FOREIGN KEY(author_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(rerun_of_run_id) REFERENCES task_runs (id) ON DELETE SET NULL, 
 	FOREIGN KEY(assistant_message_id) REFERENCES session_messages (id) ON DELETE SET NULL
 );
 

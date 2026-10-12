@@ -457,6 +457,7 @@ async def draft_plan(ctx: TaskContext, v: RunVars) -> Out:
             when_to_use=subject.when_to_use,
             content=subject.content,
             vocabulary=_vocabulary(envelope),
+            plans=[p.model_dump() for p in await drafts.inlinable(ctx.db, graph_id=subject.graph_id)],
             answered=subject.answered,
             encryption_key=v.encryption_key,
             **({"timeout_s": v.timeout_s} if v.timeout_s is not None else {}),
@@ -469,7 +470,12 @@ async def draft_plan(ctx: TaskContext, v: RunVars) -> Out:
     await close_model(ctx, v, crossing, usage=drafted.usage, duration_ms=drafted.duration_ms)
 
     outcome = await drafts.apply_drawing(
-        ctx.db, version_id=version_id, drafted=drafted, envelope=envelope, validate=resolve_plan
+        ctx.db,
+        version_id=version_id,
+        drafted=drafted,
+        envelope=envelope,
+        validate=resolve_plan,
+        read_digest=subject.digest,
     )
     usage = drafted.usage
     # A refusal **settles**, exactly as a question does

@@ -1,5 +1,5 @@
 """HTTP routes for runs (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md): read, tail,
-resume, cancel.
+resume, re-run, cancel.
 
 Opening a run happens through the sessions routes (a message *is* the ask);
 these address the run in its own right.
@@ -41,6 +41,8 @@ from invana.runtime.schemas import (
     EmissionRead,
     ResumeTaskRun,
     RunNodeRead,
+    RunRerun,
+    RunRerunResponse,
     SwitchTemplate,
     TaskPromptRead,
     TaskRunListResponse,
@@ -180,6 +182,31 @@ async def resume_run(
         result=None,
         run_id=th.id,
         stream_url=services.stream_url(username, graphSlug, th.id),
+    )
+
+
+@runs_router.post("/{run_id}/rerun", response_model=RunRerunResponse, status_code=status.HTTP_202_ACCEPTED)
+async def rerun_run(
+    payload: RunRerun,
+    run_id: str = Path(...),
+    username: str = Path(...),
+    graphSlug: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+    runtime: TaskRuntime = Depends(get_runtime),
+) -> RunRerunResponse:
+    """Re-run a settled ask on the versions it recorded (``same``) or on today's (``current``)."""
+    th = await services.get_run_or_404(session, run_id=run_id, graph_id=graph.id, user_id=user.id)
+    rerun = await services.rerun_run(session, graph=graph, run=th, versions=payload.versions, actor_id=user.id)
+    await session.commit()
+    runtime.submit(rerun.id)
+    return RunRerunResponse(
+        run_id=rerun.id,
+        rerun_of_run_id=th.id,
+        model_version=rerun.model_version,
+        stream_url=services.stream_url(username, graphSlug, rerun.id),
     )
 
 

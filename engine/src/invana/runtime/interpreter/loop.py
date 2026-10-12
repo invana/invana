@@ -42,7 +42,7 @@ from invana.apps.sessions.transcript import (
     _title_from_text,
 )
 from invana.apps.skills.managers import RuleManager
-from invana.apps.skills.models import Rule, Skill
+from invana.apps.skills.models import Rule, Skill, SkillAtVersion, SkillVersion
 from invana.apps.work.models import Task as Todo
 from invana.core.events import actions
 from invana.core.events.models import ActorKind, ActorType
@@ -211,6 +211,55 @@ class TaskRuntime:
             await task
         finally:
             self._tasks.pop(run_id, None)
+
+    def submit_eval(self, run_id: str) -> None:
+        """Work an eval run whose rows are committed: each replay in turn, then the score.
+
+        The replays run one after another, not at once, so an eval run never
+        takes more of the Graph's ceiling than one ask and its latencies are
+        not each other's queueing. A run that settled at open (*paused:
+        budget*) has no children and is not scored.
+        """
+        task = asyncio.create_task(self._eval(run_id), name=f"invana.eval.{run_id}")
+        self._tasks[run_id] = task
+        task.add_done_callback(lambda t: self._tasks.pop(run_id, None))
+
+    async def eval_inline(self, run_id: str) -> None:
+        """Work a committed eval run in the caller's own process, and return when it is scored.
+
+        For the CLI, which has no server runtime to hand the run to: the same
+        replays and score ``submit_eval`` would run, awaited.
+        """
+        await self._eval(run_id)
+
+    async def _eval(self, run_id: str) -> None:
+        from invana.runtime.managers.evals import EvalManager
+
+        evals = EvalManager()
+        async with self._factory() as db:
+            root = await TaskRunQuerySet().get(db, run_id)
+            if root is None or root.status != RunStatus.queued.value:
+                return
+            root.status = RunStatus.running.value
+            root.started_at = _now()
+            children = [c.id for c in await evals.case_runs(db, run_id=run_id)]
+            await db.commit()
+        for child_id in children:
+            await self._run(child_id)
+        async with self._factory() as db:
+            try:
+                await evals.score(db, run_id=run_id, encryption_key=self._key)
+                await db.commit()
+            except Exception as exc:
+                await db.rollback()
+                log.error("eval run failed to score", exc_info=exc, extra={"run_id": run_id})
+                root = await TaskRunQuerySet().get(db, run_id)
+                if root is not None:
+                    root.status = RunStatus.failed.value
+                    root.outcome = "failed"
+                    root.finished_at = _now()
+                    root.error = {"cls": "defect", "cause": "internal", "message": "The eval run could not be scored."}
+                    await db.commit()
 
     def contention(self, graph_id: str, pools: dict[str, int] | None = None) -> dict:
         """What is running in this Graph, what is waiting behind it, and how full
@@ -489,7 +538,10 @@ class TaskRuntime:
 
             agent = await db.get(Agent, th.agent_id) if th.agent_id else None
             provider = await self._provider_for(db, th=run_ask)
-            skills = await self._skills_for(db, agent=agent, graph_id=graph.id)
+            # An eval replay names the candidate it replays: a skill version in
+            # place of the head, or an agent's draft instructions.
+            replay = params.get("eval") or {}
+            skills = await self._skills_for(db, agent=agent, graph_id=graph.id, replay=replay)
             rules = await self._rules_for(db, run=th, graph_id=graph.id)
             history = (
                 context_turns(
@@ -527,7 +579,10 @@ class TaskRuntime:
                 skills=skills,
                 rules=rules,
                 # The Graph's, then the agent's own focus (AG13).
-                instructions=layered_instructions(graph.instructions, agent.instructions if agent else ""),
+                instructions=layered_instructions(
+                    graph.instructions,
+                    replay.get("instructions", agent.instructions if agent else ""),
+                ),
                 # The voice this run speaks with, fixed at open like the lens
                 # (SO6). No agent is still a voice — the default one (SO3).
                 soul=voice_for(agent.soul if agent else "", agent.soul_traits if agent else {}),
@@ -606,15 +661,26 @@ class TaskRuntime:
         a Task's run resolves exactly as the ask that opened beside it would
         have ([PM14]).
         """
-        return await endpoint_for_run(db, th=th)
+        provider = await endpoint_for_run(db, th=th)
+        if provider is not None and th.model_version is None:
+            # The version this run calls, kept beside the row id: the string is
+            # what history keeps once the row is gone.
+            th.model_version = provider.model_id
+        return provider
 
-    async def _skills_for(self, db: AsyncSession, *, agent: Agent | None, graph_id: str) -> list[Skill]:
+    async def _skills_for(
+        self, db: AsyncSession, *, agent: Agent | None, graph_id: str, replay: dict | None = None
+    ) -> list[Skill | SkillAtVersion]:
         """The prose this run's prompts carry.
 
         An agent with no explicit binding gets every skill in the graph — the
         behaviour before agents existed, and what the seeded Explorer wants
         (docs/for-developers/modules/work/spec.md). An authored agent's empty list means *no skills*, and
         is distinguishable because seeded agents ship with none set.
+
+        An eval replay that names ``skill_version_id`` offers that version of
+        its skill in place of the head — the one way a draft reaches a prompt,
+        and only on a run that is itself an eval.
         """
         # **Never a draft** — a skill reaches a step through its current
         # version, and a draft has not published one
@@ -622,7 +688,16 @@ class TaskRuntime:
         stmt = select(Skill).where(Skill.graph_id == graph_id, Skill.current_version_id.is_not(None))
         if agent is not None and agent.skill_ids:
             stmt = stmt.where(Skill.id.in_(list(agent.skill_ids)))
-        return list((await db.execute(stmt.order_by(Skill.name))).scalars().all())
+        skills: list[Skill | SkillAtVersion] = list((await db.execute(stmt.order_by(Skill.name))).scalars().all())
+        version_id = (replay or {}).get("skill_version_id")
+        version = await db.get(SkillVersion, version_id) if version_id else None
+        if version is None:
+            return skills
+        subject = await db.get(Skill, version.skill_id)
+        if subject is None:
+            return skills
+        swapped = [s for s in skills if s.id != subject.id]
+        return sorted([*swapped, SkillAtVersion.of(subject, version)], key=lambda s: s.name)
 
     async def _rules_for(self, db: AsyncSession, *, run: TaskRun, graph_id: str) -> list[Rule]:
         """The statements always true in this run's scope.

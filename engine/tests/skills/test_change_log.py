@@ -17,13 +17,14 @@ from invana.apps.agents.managers import AgentManager
 from invana.apps.agents.schemas import AgentCreate, AgentUpdate
 from invana.apps.graphs.models import Graph
 from invana.apps.skills.managers import RuleManager
-from invana.apps.skills.schemas import RuleCreate, RuleUpdate, SkillCreate, SkillUpdate
+from invana.apps.skills.schemas import RuleCreate, RuleUpdate, SkillCreate, SkillVersionPublish
 from invana.core.auth.models import User
 from invana.core.errors import NotFoundError
 from invana.core.events.querysets import EventQuerySet
 from invana.core.events.querysets.event import EventFilter
 from invana.runtime.managers import SkillDraftManager
 from invana.runtime.models import TaskRun
+from tests.skills.drawn import publish_drawn
 
 changes = ChangeLogManager()
 rules = RuleManager()
@@ -152,12 +153,15 @@ async def test_a_skill_history_carries_its_why_and_its_prose_diff(
         actor_id=user.id,
         publish=True,
     )
-    await drafts.update(session, skill=skill, payload=SkillUpdate(content="second", why="Clearer."), actor_id=user.id)
+    await publish_drawn(
+        session, skill=skill, payload=SkillVersionPublish(content="second", why="Clearer."), actor_id=user.id
+    )
 
     history = await changes.history(session, graph_id=graph.id, record_kind="skill", record_id=skill.id)
 
     assert [(e.version, e.why, e.summary) for e in history.items] == [
-        ("2", "Clearer.", "content changed"),
+        # The prose changed, so the plan was redrawn from it.
+        ("2", "Clearer.", "content changed · plan: +translate_thought · \u2212do-it"),
         ("1", None, "the first version"),
     ]
     assert history.items[0].effect.basis == "pinned"

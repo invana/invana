@@ -223,9 +223,6 @@ itself, and the rules are the same wherever a board is drawn:
 | a **two-column region** | **stacks below 720**, in reading order, in one scroll. Nothing moves to another region |
 | a **pagehead** | keeps the record's name (truncated, never wrapped), the reading switch and the one primary act; secondary acts fold into the `⋯`, and badges the body already states go |
 
-Stated for the draft board as [DP13 · DP14](../modules/workflows/features/draft-a-plan.md#decisions),
-drawn as `library.plans.detail.flow_canvas.edit` and `…edit.assistant`.
-
 ### What is actually wired today
 
 Validated against `shell/GraphDetail.tsx` and `GraphDetailPage.tsx`, so the table above is read as

@@ -30,7 +30,7 @@ governs.
 | API | The engine HTTP surface Studio and external agents call. |
 | CLI | `invana …` — the entry point for anything a person runs at a terminal. Most features need none. |
 | Words | Pinned in [terminology.md](terminology.md). Nothing outside it is ours. |
-| **Orchestration** | [orchestration.md § 0](orchestration.md#0-the-records) — **Todo → TaskPlan → Task → TaskRun**, the model this product is moving to. A person writes a **Todo**; a **TaskPlan** (authored, generated or reused) is the flow of **Task**s that carries it out; a **TaskRun** is one execution. *Nothing a user authors is ever a Task.* A **Lens** bounds what a run may see. ⚠ **§ 0 is current; § 1–§ 3 of that file and every feature file below still describe the retired Todo · Run · Step · Workflow · Project split** |
+| **Orchestration** | [orchestration.md § 0](orchestration.md#0-the-records) — **Todo → TaskPlan → Task → TaskRun**, the model this product is moving to. A person writes a **Todo**; a **TaskPlan** (generated, packaged or promoted, and reused when it matches) is the flow of **Task**s that carries it out; a **TaskRun** is one execution. *Nothing a user authors is ever a Task.* A **Lens** bounds what a run may see. ⚠ **§ 0 is current; § 1–§ 3 of that file and every feature file below still describe the retired Todo · Run · Step · Workflow · Project split** |
 | **The migration** | [building-engine/task-model-migration.md](building-engine/task-model-migration.md) — eight tables → the records above, column by column, with the route changes, the slices M1–M8 and what Studio ships in lockstep. **Read this before touching anything task-shaped** |
 | **Module structure** | [module-structure.md](module-structure.md) — **decided, not started.** One name per module, shared by docs, Studio and the engine, in seven groups; feature numbers kept; the component suffix convention; the target file trees; phases R0–R6 |
 | **The runtime package** | [building-engine/the-runtime-package.md](building-engine/the-runtime-package.md) — one package walks every plan; apps reach it through protocols, never imports. The file-by-file plan, and the ~900 LOC of consolidation it pays for |
@@ -129,6 +129,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 5.6 | [Who spawned whom](modules/agents/features/lineage.md) | Who authored whom, who spawned whom, on what run | ✅ | — | ✅ | S12c |
 | 5.7 | [How many run at once](modules/agents/features/concurrency-and-contention.md) | How many run at once in a Graph, the pools, and what happens at the ceiling | 🟡 | — | 🔵 | S12e · **S16** |
 | 5.8 | [Give an agent a soul](modules/agents/features/soul.md) | Who the agent is and how it speaks — Markdown on the agent, read only by the steps a person reads | 🟡 | — | ✅ | S-TBD |
+| 5.9 | [Pin a model version](modules/agents/features/pinned-model-versions.md) | Agents, skill versions and judges pin an exact model version; every run records the one it called; re-run on the same versions | 🟡 | 🟡 | 🔵 | B02 |
 
 ## 6 · [Skills](modules/skills/spec.md)
 
@@ -138,6 +139,8 @@ provider row and its models, and reopens four rows below. The shapes:
 | 6.2 | [Offer a skill to an agent](modules/skills/features/bindings.md) | Which agent may be offered which skill | ✅ | — | ✅ | S12c |
 | 6.3 | [Where a skill was used](modules/skills/features/usage.md) | Where a skill was offered, and where it was reported applied | ✅ | — | ✅ | S12c |
 | 6.4 | [Rules](modules/skills/features/rules.md) | Graph invariants and project working rules, offered as statements | ✅ | — | ✅ | S12b |
+| 6.5 | [Instructions, publish and roll back](modules/skills/features/instructions-publish-rollback.md) | `instructions.md` drafts on skills and agents; publish regenerates the plan; one-act rollback; plans generated or packaged | 🟡 | 🟡 | 🔵 | B02 |
+| 6.6 | [Evals](modules/skills/features/evals.md) | Eval sets with rule checks and a labelled judge; the publish gate; drift re-runs; an eval token budget | ✅ | 🟡 | 🔵 | B02 |
 
 ## 7 · [Workflows](modules/workflows/spec.md)
 
@@ -149,7 +152,6 @@ provider row and its models, and reopens four rows below. The shapes:
 | 7.4 | [Promote a plan](modules/workflows/features/promote-a-plan.md) | A plan that served becomes a template | 🟡 | — | 🟡 | S12c |
 | 7.5 | [Run a workflow](modules/workflows/features/run-a-workflow.md) | Start a plan from the library with its arguments — the front door | 🔵 | 🔵 | 🔵 | S15 |
 | 7.6 | [Read the catalogue](modules/workflows/features/the-catalogue.md) | The closed set of callables a plan may name — bound · args · outputs · requires | 🟡 | — | 🟡 | S12c |
-| 7.7 | [Draft a plan](modules/workflows/features/draft-a-plan.md) | Fork a version into a draft, edit it on the canvas or as `manifest.yml`, publish it, retire it | 🔵 | — | 🔵 | S15 |
 
 ## 8 · [Memory](modules/memory/spec.md)
 
@@ -260,11 +262,11 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 43 | 15 | 15 | 3 |
-| CLI | 4 | 4 | 3 | 65 |
-| Studio | 33 | 15 | 21 | 7 |
+| API | 44 | 18 | 17 | 3 |
+| CLI | 6 | 4 | 6 | 66 |
+| Studio | 37 | 16 | 23 | 6 |
 
-Seventy-six features. **These counts are the tables above, counted** — if a cell is flipped, they
+Eighty-two features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 

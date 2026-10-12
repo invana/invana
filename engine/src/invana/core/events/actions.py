@@ -134,6 +134,15 @@ THINKING_CANCEL = "run.cancel"  # stopped by the user; cascades to children
 THINKING_DELEGATE = "run.delegate"  # a step opened a child run (docs/for-developers/modules/work/spec.md)
 THINKING_RESUME = "run.resume"  # a clarification was answered
 
+# ── Evals (docs/for-developers/modules/skills/features/evals.md) ─────────────────
+EVAL_SET_UPDATE = "eval_set.update"  # judge pin, rubric
+EVAL_CASE_CREATE = "eval_case.create"  # written, proposed or promoted from a run
+EVAL_CASE_UPDATE = "eval_case.update"  # accepted, relabelled or retired
+EVAL_CASE_DELETE = "eval_case.delete"
+EVAL_RUN = "eval.run"  # an eval run settled, with its gate verdict
+EVAL_DEGRADED = "eval.degraded"  # a drift run fell behind the last live run
+EVAL_BUDGET_UPDATE = "eval_budget.update"
+
 # ── Projects (docs/for-developers/modules/work/spec.md) ────────────────────────────────────────────────────
 PROJECT_CREATE = "project.create"
 PROJECT_UPDATE = "project.update"
@@ -247,6 +256,7 @@ TARGET_PROJECT = "project"
 TARGET_TASK = "task"
 TARGET_AGENT = "agent"
 TARGET_THINKING = "run"
+TARGET_EVAL_SET = "eval_set"
 TARGET_WORKFLOW = "workflow"
 TARGET_TOKEN = "personal_access_token"
 
