@@ -21,7 +21,7 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 
 | ID | Feature | Status | Stories |
 |---|---|---|---|
-| AG-F1 | Overview — broke, waiting, slower, changed recently | In Studio (parts) · New | AG-01 |
+| AG-F1 | Overview — broke, waiting, slower, changed recently | In Studio (C10, [5.10](../for-developers/modules/agents/features/fleet-performance.md)) | AG-01 |
 | AG-F2 | Agents and their lineage | In Studio | AG-02 |
 | AG-F3 | Agent page and activity | In Studio | AG-03 |
 | AG-F4 | Agent instructions.md | In Studio (C03) | AG-04 |
@@ -34,8 +34,8 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | AG-F11 | Library › Plans — generated, read-only; revisions in runs | In Studio (plans · revisions in runs, C03) | AG-11 |
 | AG-F12 | Library › Templates — chosen by code from the result’s shape, ranked by the classified intent | In Studio · New (intent ranking — engine ✅ B13) | AG-12 |
 | AG-F13 | Plugins — the registry of every plugin (core, tool, simulator, MCP) with its task types, manifests, versions, skills and flows; Admin enables | In Studio (C03) · engine registry API ✅ B06b ([13.12](../for-developers/modules/platform/features/tool-plugins.md)) · MCP plugins ✅ B07 ([13.13](../for-developers/modules/platform/features/mcp-plugins.md)) | AG-13 |
-| AG-F14 | LLM endpoints and model versions — agents pin an exact version name | In Studio (endpoints · pinning, C03) · LLMs as its own page is C10 | AG-14 |
-| AG-F15 | Performance with degradation alerts | New | AG-15 |
+| AG-F14 | LLM endpoints and model versions — agents pin an exact version name | In Studio (endpoints · pinning, C03 · its own page, C10) | AG-14 |
+| AG-F15 | Performance with degradation alerts | In Studio (C10, [5.10](../for-developers/modules/agents/features/fleet-performance.md)) · alert notifications not built | AG-15 |
 | AG-F16 | Concurrency pools | In Studio | AG-16 |
 
 ## User stories
@@ -108,17 +108,18 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | Tokens, never currency | Budgets, limits and usage are in tokens. No dollar or other currency amounts anywhere, since what a token costs depends on each customer’s subscription |
 | Degradation | An alert fires when p95 passes 1.5× its 7-day baseline for 3 runs; it names the change that preceded it |
 | Rail → path | Overview `/agents/overview` · Agents `/agents/agents[/:agent]` · Skills `/agents/skills` · Library `/agents/library[/:plan]` and `/agents/library/templates[/:template]` · Plugins `/agents/plugins[/tasks/:entry]` · LLMs `/agents/llms[/:provider]` · Performance `/agents/performance` · Settings `/agents/settings`. The product has no crumb of its own, because the wordmark reads *Invana Agents* |
-| Landing | The bare `/agents` lands on Agents. It is the first rail item with something to read, while Overview is still empty |
-| Agents and LLMs | Two sections of one stack, as today. Each rail item focuses its own section and keeps its own path |
+| Landing | The bare `/agents` lands on Overview, the first rail item |
+| Agents and LLMs | The Agents panel is one section, the agents. LLMs is a page of its own (see *LLMs*) |
 | Library | Plans over Templates. Templates sits under Library's path, so Library's rail item stays lit there |
 | Plugins | The plugin registry over the task catalogue (see *Plugins registry*). The catalogue moved here from Library, because plugins bring the task types. An old `?panel=library&section=catalogue` link lands on `/agents/plugins/tasks` |
-| Overview, Performance | Kit `EmptyState` with *Opens with engine support*. Overview points to Activity › Runs for runs that broke or wait |
+| Overview, Performance | Full-width pages over the engine's fleet reads (`…/agents/overview`, `…/agents/performance`), drawn as the boards are. Every act on them is a link to where the act lives — Activity › Runs, Approvals, the change log's compare, the agent's page. Detail: [5.10 › Decisions](../for-developers/modules/agents/features/fleet-performance.md#decisions) |
 | Settings | The Graph's concurrency ceiling and its pools. These left the Modeller's Graph settings, which keeps Basic · Graph |
 | Rules | Not listed under Skills. A Graph's rules are the Modeller's Rules |
 | Plan page | It shows no cost in currency. Tokens per plan replace it once the engine reports them |
-| Agent budgets | An agent's list row, quick look and Overview › Limits read its token budget (`up to 8k tokens a run`), or *no token budget yet*. Activity has no spend tile; its runs table shows tokens per run, and its meter reads tokens this month against the month budget. The Limits › Budget table lists `max_tokens_run` and `max_tokens_month`. The engine keeps both budgets in tokens ([EB8 · EB14 · EB15](../for-developers/modules/agents/features/envelope-and-budget.md#decisions)) |
-| Main area | Each rail item has its own empty-main line. Overview and Performance read *Opens with engine support*, Plugins *Pick a task type…*, Settings *Settings have no canvas…* |
-| LLMs | Until AG-14 builds its own page, LLMs is the Agents stack focused on its LLMs section |
+| Agent budgets | An agent's list row, quick look and Overview › Limits read its token budget (`up to 8k tokens a run`); with none set, the list row and quick look read *the Graph's run budget* and the meters read *no run budget*. Activity has no spend tile; its runs table shows tokens per run, and its meter reads tokens this month against the month budget. The Limits › Budget table lists `max_tokens_run` and `max_tokens_month`. The engine keeps both budgets in tokens ([EB8 · EB14 · EB15](../for-developers/modules/agents/features/envelope-and-budget.md#decisions)) |
+| Session run cap | The assistant's session settings cap one run in tokens (`max_tokens_run`), held at the agent's own run budget, which the field names; empty is *the agent's budget*. A session made before tokens keeps its money cap stored, unread and undrawn |
+| Main area | Each panel rail item has its own empty-main line — Plugins *Pick a task type…*, Settings *Settings have no canvas…*. Overview, Performance and LLMs are pages: they fill the main area and open no panel |
+| LLMs | Its own page: the model versions the Graph offers — model · version name · endpoint · pinned by (agents, skills, eval judges) · status — under a notice naming any pinned version no longer offered. An endpoint's detail and *Add endpoint* open in a sheet over the page (`/agents/llms/<provider>`, `/agents/llms/new`) |
 | Agent page tabs | Overview · Instructions · Skills & callables · Thinking · Soul · Activity · History, as drawn. Instructions leave the page's Save buffer: Thinking no longer edits a *Focus*, and Overview's *Instructions* card goes to the Instructions tab |
 | Agent instructions | The Instructions tab reads the published `instructions.md` beside *What it shapes*. *Edit* writes the agent's draft (`PATCH …/draft`) — nothing runs on it. *Publish* takes a stated reason and goes through the eval gate; a gate refusal is drawn as a refusal card with *Run the evals* where the engine asks for one. *Discard* drops the draft. A restore is made from History |
 | Agent history | The History tab is the change log of the agent (`history/agent/<id>`): when · by · what changed · why · after (runs, failed, tokens). A row that changed the instructions offers *Restore*, which asks for a reason and is gated like a publish. *Compare two versions* is the shared compare (SH-14, C04) and is not drawn here |

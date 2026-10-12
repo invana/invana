@@ -67,12 +67,11 @@ export interface AgentListResponse {
 	total: number;
 	default_agent_id: string | null;
 	/**
-	 * `{agent_id: usd}` since the first of the month — what a row draws against
-	 * `max_cost_usd_month`. An agent with no **priced** run is absent, not
-	 * zero: a subscription endpoint publishes no per-token rate, so *nothing
-	 * spent* and *nothing known* are different facts.
+	 * `{agent_id: tokens}` since the first of the month — what a row draws
+	 * against `max_tokens_month`. An agent that ran nothing is absent; read it
+	 * as `0`.
 	 */
-	spend_this_month: Record<string, number>;
+	tokens_this_month: Record<string, number>;
 }
 
 export interface AgentCreate {
@@ -149,15 +148,13 @@ export interface AgentSkillsAndCallables {
 	plans: string[];
 }
 
-/**
- * What the agent is using now, each beside the limit that caps it.
- * `spend_this_month` absent is *nothing priced*, never zero.
- */
+/** What the agent is using now, each beside the limit that caps it. */
 export interface AgentMeters {
 	agent_id: string;
-	spend_this_month?: number | null;
-	max_cost_usd_month?: number | null;
-	max_cost_usd_run?: number | null;
+	/** Always counted; `0` when it ran nothing this month. */
+	tokens_this_month: number;
+	max_tokens_month?: number | null;
+	max_tokens_run?: number | null;
 	running: number;
 	queued: number;
 	max_concurrent_runs?: number | null;
@@ -169,7 +166,6 @@ export interface AgentMeters {
 	max_children?: number | null;
 	max_depth?: number | null;
 	max_fanout?: number | null;
-	max_tokens?: number | null;
 }
 
 export interface SoulPreviewRequest {

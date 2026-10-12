@@ -60,8 +60,10 @@ interface ApiSummary {
 	lens_id?: string | null;
 	lens_name?: string | null;
 	lens_missing?: boolean;
-	max_cost_usd_run?: number | null;
-	agent_max_cost_usd_run?: number | null;
+	/** This session's cap on one run, in tokens; null is the agent's own. */
+	max_tokens_run?: number | null;
+	/** The agent's run budget, which caps the session's. */
+	agent_max_tokens_run?: number | null;
 	title: string;
 	pinned: boolean;
 	archived: boolean;
@@ -155,14 +157,14 @@ export interface SessionCreateBody {
 }
 
 /** Partial update for a session — rename, pin/archive, or its bounds.
- *  For `lens_id` and `max_cost_usd_run`, null is a value: *Everything*, and
- *  *the agent's cap*. */
+ *  For `lens_id` and `max_tokens_run`, null is a value: *Everything*, and
+ *  *the agent's budget*. */
 export interface SessionUpdateBody {
 	title?: string;
 	pinned?: boolean;
 	archived?: boolean;
 	lens_id?: string | null;
-	max_cost_usd_run?: number | null;
+	max_tokens_run?: number | null;
 }
 
 export interface SessionListResult {
@@ -223,8 +225,8 @@ function toSession(s: ApiSummary, messages: SessionMessage[] = []): Session {
 		lensId: s.lens_id ?? undefined,
 		lensName: s.lens_name ?? undefined,
 		lensMissing: s.lens_missing ?? false,
-		maxCostUsdRun: s.max_cost_usd_run ?? undefined,
-		agentMaxCostUsdRun: s.agent_max_cost_usd_run ?? undefined,
+		maxTokensRun: s.max_tokens_run ?? undefined,
+		agentMaxTokensRun: s.agent_max_tokens_run ?? undefined,
 		nodeCount: s.node_count,
 		edgeCount: s.edge_count,
 		lastStatus: s.last_status ?? undefined,

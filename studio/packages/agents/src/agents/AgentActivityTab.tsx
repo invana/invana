@@ -80,6 +80,16 @@ function Meters({ m }: { m: AgentMeters }) {
 				caption="waiting for a slot"
 			/>
 			<MetricTile
+				label="Tokens"
+				value={formatCompact(m.tokens_this_month)}
+				caption={
+					m.max_tokens_month == null
+						? "this month"
+						: `of ${formatCompact(m.max_tokens_month)} this month`
+				}
+				meter={share(m.tokens_this_month, m.max_tokens_month)}
+			/>
+			<MetricTile
 				label="Runs"
 				value={m.runs_this_month.toLocaleString()}
 				caption="this month"

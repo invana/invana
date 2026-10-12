@@ -24,6 +24,7 @@ export type SetupTarget =
 	| "model"
 	| "runs"
 	| "agents"
+	| "llms"
 	| "skills"
 	| "sessions"
 	| "library"

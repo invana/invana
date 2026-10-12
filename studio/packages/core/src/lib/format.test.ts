@@ -1,12 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatCompact, formatCompactCount, usdWhole } from "./format";
-
-describe("usdWhole", () => {
-	it("draws a budget in whole cents", () => {
-		expect(usdWhole(5)).toBe("$5.00");
-		expect(usdWhole(0.001)).toBe("$0.00");
-	});
-});
+import { formatCompact, formatCompactCount } from "./format";
 
 describe("formatCompact", () => {
 	it("reads a magnitude, dropping a trailing .0", () => {

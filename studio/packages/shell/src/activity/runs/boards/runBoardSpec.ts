@@ -399,7 +399,8 @@ function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 	const retried = groups.filter((g) => g.attempts > 1);
 	const fanned = groups.filter((g) => g.lanes > 1);
 	const live = isLive(trace.status);
-	const ceilings = trace.budget ?? { max_tokens: null };
+	const runBudget =
+		trace.budget?.max_tokens_run ?? trace.budget?.max_tokens ?? null;
 
 	return {
 		kind: "grid",
@@ -426,11 +427,11 @@ function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 				tokens
 					? {
 							label: "Tokens",
-							value: ceilings.max_tokens
-								? `${compact(tokens)} of ${compact(ceilings.max_tokens)}`
+							value: runBudget
+								? `${compact(tokens)} of ${compact(runBudget)}`
 								: compact(tokens),
 							delta: `in ${count(trace.tokens_in ?? 0)} · out ${count(trace.tokens_out ?? 0)}`,
-							gauge: gaugeOf(tokens, ceilings.max_tokens),
+							gauge: gaugeOf(tokens, runBudget),
 						}
 					: null,
 				rows

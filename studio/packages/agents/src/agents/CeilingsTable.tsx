@@ -11,13 +11,13 @@
  * `max_concurrent_runs` refuses at admission, naming the agent
  * ([concurrency-and-contention.md](../../../../../docs/for-developers/modules/agents/features/concurrency-and-contention.md));
  * a token budget is drawn against rather than stopped on, because stopping
- * mid-run is exactly what [ ] forbids; and `max_fanout` is unread until
- * something dispatches a `map_over`. A table that printed all eight the same
- * way would be telling the reader that eight numbers protect them when six do.
+ * mid-run is what the envelope forbids; and `max_fanout` is unread until
+ * something dispatches a `map_over`. A table that printed all nine the same
+ * way would be telling the reader that nine numbers protect them when six do.
  *
- * **Tokens, never currency.** The record still carries the month and per-run
- * money ceilings; the table does not draw them, and the budget group is the
- * token budget alone until the engine keeps budgets in tokens.
+ * **Tokens, never currency.** The budget group is two token budgets — one run
+ * (`max_tokens_run`) and the month (`max_tokens_month`). `max_tokens` is the run
+ * budget's older name, read where the newer one is absent and never written.
  *
  * **Drawn as the page draws it:** each row is the key a reader will meet
  * in a plan's refusal (`max_steps`), the number, and what it bounds. A ceiling
@@ -35,6 +35,7 @@
 
 import { Input } from "@invana/forms";
 import { Table, TableBody, TableCell, TableRow } from "@invana/ui";
+import { formatCompact } from "@invana-studio/core";
 
 /** How a ceiling is held, in the reader's words. */
 type Enforcement = "admission" | "validation" | "drawn" | "unread";
@@ -50,10 +51,7 @@ interface Ceiling {
 	enforcement: Enforcement;
 }
 
-/**
- * Every key of `effective_budget` and `effective_effort` except the money
- * ceilings, each group in the order the page lists it.
- */
+/** Every key of `effective_budget` and `effective_effort`, each group in page order. */
 const CEILINGS: readonly Ceiling[] = [
 	{
 		key: "max_steps",
@@ -74,9 +72,15 @@ const CEILINGS: readonly Ceiling[] = [
 		enforcement: "validation",
 	},
 	{
-		key: "max_tokens",
+		key: "max_tokens_run",
 		group: "budget",
-		bounds: "one run",
+		bounds: "tokens in one run",
+		enforcement: "drawn",
+	},
+	{
+		key: "max_tokens_month",
+		group: "budget",
+		bounds: "tokens this calendar month",
 		enforcement: "drawn",
 	},
 	{
@@ -105,6 +109,9 @@ const CEILINGS: readonly Ceiling[] = [
 	},
 ];
 
+/** The run budget's older name — read where `max_tokens_run` is absent. */
+const LEGACY_RUN_KEY = "max_tokens";
+
 /** Said only where the number does not stop a run by itself. */
 const NOT_ENFORCED: Partial<Record<Enforcement, string>> = {
 	drawn: "drawn against",
@@ -124,14 +131,31 @@ export interface CeilingsTableProps {
 
 function show(v: number | null | undefined): string {
 	if (v == null) return "—";
-	return v >= 1000 && v % 1000 === 0 ? `${v / 1000}k` : String(v);
+	return formatCompact(v);
 }
 
-/** `up to 8k tokens a run` — the token budget in a line, or that there is none. */
-export function tokenBudgetLine(maxTokens: number | null | undefined): string {
-	return maxTokens == null
-		? "no token budget yet"
-		: `up to ${show(maxTokens)} tokens a run`;
+/**
+ * `up to 8k tokens a run` — the run budget in a line. `none` is what the
+ * caller's null means: no run budget on the meters, the Graph's on a row that
+ * only carries what the agent set itself.
+ */
+export function tokenBudgetLine(
+	maxTokensRun: number | null | undefined,
+	none = "no run budget",
+): string {
+	return maxTokensRun == null
+		? none
+		: `up to ${show(maxTokensRun)} tokens a run`;
+}
+
+/** `1.2m of 5m tokens this month` — or the count alone with no month budget. */
+export function tokenMonthLine(
+	used: number,
+	maxTokensMonth: number | null | undefined,
+): string {
+	return maxTokensMonth == null
+		? `${formatCompact(used)} tokens this month`
+		: `${formatCompact(used)} of ${formatCompact(maxTokensMonth)} tokens this month`;
 }
 
 export function CeilingsTable({
@@ -146,7 +170,9 @@ export function CeilingsTable({
 		<Table bordered={false} density="compact">
 			<TableBody>
 				{rows.map((c) => {
-					const own = values[c.key];
+					const own =
+						values[c.key] ??
+						(c.key === "max_tokens_run" ? values[LEGACY_RUN_KEY] : undefined);
 					const runs = own ?? effective?.[c.key];
 					return (
 						<TableRow key={c.key}>
@@ -171,9 +197,12 @@ export function CeilingsTable({
 										// rather than writing a zero nobody chose.
 										value={own ?? ""}
 										placeholder={runs != null ? String(runs) : "—"}
-										className="h-7 w-20 text-right"
+										className="w-24 text-right"
 										onChange={(e) => {
 											const next = { ...values };
+											// The older name goes with the first edit, so one key holds it.
+											if (c.key === "max_tokens_run")
+												delete next[LEGACY_RUN_KEY];
 											if (e.target.value === "") delete next[c.key];
 											else next[c.key] = Number(e.target.value);
 											onChange(next);

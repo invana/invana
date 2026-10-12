@@ -5,6 +5,7 @@ from invana.activity.managers.changes import ChangeLogManager
 from invana.activity.managers.channels import ChannelManager
 from invana.activity.managers.clock import Clock, Tick
 from invana.activity.managers.delivery import DeliveryManager
+from invana.activity.managers.fleet import FleetManager
 from invana.activity.managers.notifications import EventMatcher, InboxManager, NotificationRuleManager
 from invana.activity.managers.publish_reviews import PublishReviewManager
 from invana.activity.managers.schedules import ScheduleManager
@@ -20,6 +21,7 @@ __all__ = [
     "Clock",
     "DeliveryManager",
     "EventMatcher",
+    "FleetManager",
     "InboxManager",
     "NotificationRuleManager",
     "PublishReviewManager",

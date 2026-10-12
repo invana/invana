@@ -6,8 +6,7 @@ const G = "/u/admin/airways";
 describe("panelPaths", () => {
 	it("reads a path as the panel, its section and its drill-in", () => {
 		const params = pageParamsOf("agents/llms/openai", "page=run%3A1");
-		expect(params.get("panel")).toBe("agents");
-		expect(params.get("section")).toBe("llms");
+		expect(params.get("panel")).toBe("llms");
 		expect(params.get("provider")).toBe("openai");
 		expect(params.get("page")).toBe("run:1");
 	});
@@ -52,7 +51,7 @@ describe("panelPaths", () => {
 	});
 
 	it("gives each Agents rail item its own path", () => {
-		expect(canonicalRedirect(`${G}/agents`, "")).toBe(`${G}/agents/agents`);
+		expect(canonicalRedirect(`${G}/agents`, "")).toBe(`${G}/agents/overview`);
 		expect(pageParamsOf("agents/settings", "").get("panel")).toBe(
 			"concurrency",
 		);
@@ -61,6 +60,9 @@ describe("panelPaths", () => {
 		expect(template.get("template")).toBe("t1");
 		expect(canonicalRedirect(`${G}/agents/plugins`, "")).toBeNull();
 		expect(canonicalRedirect(G, "?panel=llms")).toBe(`${G}/agents/llms`);
+		expect(
+			canonicalRedirect(G, "?panel=agents&section=llms&provider=openai"),
+		).toBe(`${G}/agents/llms/openai`);
 	});
 
 	it("puts a project under the Projects root and Decisions beside My todos", () => {

@@ -465,7 +465,7 @@ reads a run's ledger from a terminal.
 | R2 | `RunLensStep` | one step, generated vs executed | `run_touches.query` from the connector · `sent` from the cut | `EgressList` · `SliceSummary` | ✅ | ✅ |
 | R3 | `GovCompare` | two runs, one question | compare over `run_touches` | `DiffList` · `RecordHeader` | ✅ | ✅ a page kind, `compare:<a>:<b>` |
 | R4 | `Cast` | innermost wins, then checked | `LensRead.cast_resolved` | `CastTable` · `CannotAnswerCard` | ✅ | ✅ |
-| A1 | `AgentsList` | Agents › Agents | `agents.lens_id` read **and** written, and composed at run open · `llm_config_id` gone · `spend_this_month` | `LensChip` · `CastTable` · `MetricTile` | ✅ | ✅ the lens chip, the spend line, and *nothing priced* where a subscription answers |
+| A1 | `AgentsList` | Agents › Agents | `agents.lens_id` read **and** written, and composed at run open · `llm_config_id` gone · `tokens_this_month` | `LensChip` · `CastTable` · `MetricTile` | ✅ | ✅ the lens chip and the run budget in tokens |
 | A2 | `AgentEnvelope` | the envelope | all ten `budget` keys | `BoundChip` (exists) · `DataTable` | ✅ | ✅ the ceilings are a table with an **Enforced** column (EB7) |
 | A3 | `AgentLineage` | delegation and lineage | — | `TreeView` (exists) | ✅ | ✅ |
 | A4 | `AgentLifecycle` | pause, resume, retire | one preview, two acts — the same open work, the effects differ ([LC8](modules/agents/features/lifecycle.md)) | `AlertDialog` · `DataTable` | ✅ | ✅ |
@@ -761,7 +761,10 @@ the skill are pages in `mainSection`; a plugin and a task type are two more (`pl
 | `agents.plugins` | AG-13 | `/agents/plugins` — the registry over the catalogue | ✅ |
 | `agents.plugins.plugin` | AG-13 | page `plugin:<name>` | ✅ |
 | `agents.plugins.task` | AG-13 | page `task_type:<key>` | ✅ |
-| `agents.llms` | AG-14 | `/agents/llms` — a model row names the agents pinned to it; LLMs as its own page is C10 | 🟡 |
+| `agents.llms` | AG-14 | `/agents/llms[/:provider]` — page: model versions, who pins each (agents, skills, eval judges), the endpoint in a sheet (C10) | ✅ |
+| `agents.overview` | AG-01 | `/agents/overview` — page: six tiles, needs attention, runs a day, changed recently (C10) | ✅ |
+| `agents.overview.dark` | AG-01 | `/agents/overview` in the dark theme | ✅ |
+| `agents.performance` | AG-15 | `/agents/performance` — page: tabs, 7 · 30 · 90 days, tiles, the p95 trend, each agent and skill (C10) | ✅ |
 
 ---
 

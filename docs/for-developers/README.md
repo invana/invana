@@ -138,6 +138,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 5.7 | [How many run at once](modules/agents/features/concurrency-and-contention.md) | How many run at once in a Graph, the pools, and what happens at the ceiling | 🟡 | — | 🔵 | S12e · **S16** |
 | 5.8 | [Give an agent a soul](modules/agents/features/soul.md) | Who the agent is and how it speaks — Markdown on the agent, read only by the steps a person reads | 🟡 | — | ✅ | S-TBD |
 | 5.9 | [Pin a model version](modules/agents/features/pinned-model-versions.md) | Agents, skill versions and judges pin an exact model version; every run records the one it called; re-run on the same versions | 🟡 | 🟡 | 🟡 | B02 |
+| 5.10 | [Watch the fleet](modules/agents/features/fleet-performance.md) | What broke, waits, slowed or changed; speed, success and tokens per agent, skill, plan and model against a baseline; degradations named; who pins each model | ✅ | — | ✅ | C10 |
 
 ## 6 · [Skills](modules/skills/spec.md)
 

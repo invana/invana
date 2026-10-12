@@ -77,7 +77,7 @@ export function rightSection(deps: RightSectionDeps) {
 		setPinned,
 		setArchived,
 		world,
-		setSpendPerRun,
+		setTokensPerRun,
 	} = sessionState;
 	const {
 		resultsByMessageId,
@@ -137,7 +137,7 @@ export function rightSection(deps: RightSectionDeps) {
 			onShowArchivedChange={setShowArchived}
 			onPin={setPinned}
 			onArchive={setArchived}
-			onSetSpendPerRun={setSpendPerRun}
+			onSetTokensPerRun={setTokensPerRun}
 		/>
 	);
 

@@ -80,9 +80,11 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	// The Modeller's requests and rules.
 	"requests",
 	"rules",
-	// The Agents product's own panels.
+	// The Agents product's own panels, and its pages — Overview, LLMs and
+	// Performance draw no panel, so the column stays closed.
 	"overview",
 	"plugins",
+	"llms",
 	"performance",
 	"concurrency",
 	// The Projects product's own panel.

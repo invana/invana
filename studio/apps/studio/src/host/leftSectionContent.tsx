@@ -4,8 +4,6 @@ import {
 	AgentsSettingsViewPanel,
 	AgentsViewPanel,
 	LibraryViewPanel,
-	OverviewViewPanel,
-	PerformanceViewPanel,
 	PluginsViewPanel,
 	SkillsViewPanel,
 	taskPlansApi,
@@ -184,8 +182,6 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		/>
 	) : settingsPanel.section === "requests" ? (
 		<RequestsViewPanel />
-	) : settingsPanel.section === "overview" ? (
-		<OverviewViewPanel />
 	) : settingsPanel.section === "plugins" ? (
 		// The plugin registry over the task catalogue a plan is written in.
 		<PluginsViewPanel
@@ -193,8 +189,6 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			graphSlug={graphSlug as string}
 			onOpenPlugin={(name) => openBoard({ kind: "plugin", subjectId: name })}
 		/>
-	) : settingsPanel.section === "performance" ? (
-		<PerformanceViewPanel />
 	) : settingsPanel.section === "concurrency" ? (
 		<AgentsSettingsViewPanel
 			username={username as string}

@@ -3,8 +3,9 @@
  * that do the legwork (`agents/`), the skills they may be offered (`skills/`),
  * the Library of plans (`plans/`) and answer templates (`projections/`), the
  * LLM endpoints they think with (`llms/`), and how much of it may run at once
- * (`settings/`) (agents.md); the Overview, Plugins and Performance panels; and
- * the product's `ProductDefinition`.
+ * (`settings/`) (agents.md); the Plugins panel; the full-width Overview,
+ * Performance and LLMs pages over the fleet's reads (`fleet/`); and the
+ * product's `ProductDefinition`.
  *
  * Nothing outside this package reaches past this file. What the product
  * borrows from its host comes through `AgentsSlotsContext`.
@@ -20,10 +21,11 @@ export {
 	useAgentsQuery,
 } from "./agents/queries";
 export type { AgentEdge } from "./agents/types";
+export { LlmsPage } from "./llms/LlmsPage";
 export { useLLMProvidersQuery } from "./llms/queries";
 export type { LLMProvider } from "./llms/types";
-export { OverviewViewPanel } from "./overview/OverviewViewPanel";
-export { PerformanceViewPanel } from "./performance/PerformanceViewPanel";
+export { OverviewPage } from "./overview/OverviewPage";
+export { PerformancePage } from "./performance/PerformancePage";
 export { taskPlansApi } from "./plans/api";
 export { PlanBoardPage } from "./plans/boards/PlanBoardPage";
 export { PLAN_CHART_WIDGETS } from "./plans/boards/PlanChartWidgets";

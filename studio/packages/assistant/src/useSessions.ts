@@ -326,7 +326,7 @@ export function useSessions(
 			if (
 				body.title !== undefined ||
 				"lens_id" in body ||
-				"max_cost_usd_run" in body
+				"max_tokens_run" in body
 			) {
 				qc.invalidateQueries({ queryKey: detailKey(id) });
 			}
@@ -641,8 +641,8 @@ export function useSessions(
 		},
 		setNextAskOnly: (on: boolean) => setNextAsk(on ? {} : null),
 	};
-	const setSpendPerRun = (id: string, usd: number | null) =>
-		updateMutation.mutateAsync({ id, body: { max_cost_usd_run: usd } });
+	const setTokensPerRun = (id: string, tokens: number | null) =>
+		updateMutation.mutateAsync({ id, body: { max_tokens_run: tokens } });
 	// A thread's world and *Next ask only* belong to that thread: switching
 	// resets both, and a new thread starts in *Everything*.
 	const switchTo = (id: string | null) => {
@@ -677,7 +677,7 @@ export function useSessions(
 		setArchived,
 		renameSession,
 		world,
-		setSpendPerRun,
+		setTokensPerRun,
 		openSession: (id: string) => switchTo(id),
 		backToList: () => switchTo(null),
 	};

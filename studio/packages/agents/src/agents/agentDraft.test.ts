@@ -4,7 +4,7 @@ import type { Agent } from "./types";
 
 const agent = {
 	instructions: "Be brief.",
-	budget: { max_cost_usd_run: 1 },
+	budget: { max_tokens_run: 8000 },
 	effort: { max_steps: 16 },
 	policy: {},
 	workflow_spec: { allow: ["graph_read"] },

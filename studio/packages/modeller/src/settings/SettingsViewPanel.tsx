@@ -116,6 +116,7 @@ type SingleTabSection = Exclude<
 	| "rules"
 	| "overview"
 	| "plugins"
+	| "llms"
 	| "performance"
 	| "concurrency"
 	| "decisions"

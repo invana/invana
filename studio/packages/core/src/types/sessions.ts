@@ -140,9 +140,9 @@ export interface Session {
 	lensId?: string;
 	lensName?: string;
 	lensMissing?: boolean;
-	/** The thread's spend per run, and the agent's cap it is held under. */
-	maxCostUsdRun?: number;
-	agentMaxCostUsdRun?: number;
+	/** The thread's token cap per run, and the agent's run budget it is held under. */
+	maxTokensRun?: number;
+	agentMaxTokensRun?: number;
 	/** Running totals across the session, for the list meta line. */
 	nodeCount: number;
 	edgeCount: number;

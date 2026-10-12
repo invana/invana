@@ -19,11 +19,3 @@ export function formatCompact(n: number): string {
 	if (n < 1_000_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
 	return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}m`;
 }
-
-/**
- * `$5.00` · `$1,250.00` — a budget or a cap, which someone typed in whole
- * cents.
- */
-export function usdWhole(value: number): string {
-	return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}

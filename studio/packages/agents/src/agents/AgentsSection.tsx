@@ -55,7 +55,7 @@ import {
 } from "@invana-studio/ui";
 import { Bot, ChevronRight, Plus, Shield } from "lucide-react";
 import { useMemo } from "react";
-import { tokenBudgetLine } from "./CeilingsTable";
+import { tokenBudgetLine, tokenMonthLine } from "./CeilingsTable";
 import {
 	useAgentMetersQuery,
 	useAgentSkillsAndCallablesQuery,
@@ -223,7 +223,10 @@ function AgentsBody({
 										</span>
 									</span>
 									<span className="truncate">
-										{tokenBudgetLine(agent.budget?.max_tokens)}
+										{rowTokenLine(
+											agent,
+											query.data?.tokens_this_month[agent.id] ?? 0,
+										)}
 									</span>
 								</span>
 							}
@@ -322,6 +325,22 @@ function guardrailLine(agent: Agent, byId: Map<string, Agent>): string {
 	return `${own} · spawned by ${parent?.name ?? "an agent"}`;
 }
 
+/** A row carries only what the agent set; a blank run budget is the Graph's. */
+const GRAPH_RUN_BUDGET = "the Graph's run budget";
+
+/** The run budget the agent set, under either of its names. */
+function ownRunBudget(agent: Agent): number | undefined {
+	return agent.budget?.max_tokens_run ?? agent.budget?.max_tokens;
+}
+
+/** `up to 8k tokens a run · 1.2m of 5m tokens this month` — the month only once it ran. */
+function rowTokenLine(agent: Agent, used: number): string {
+	const run = tokenBudgetLine(ownRunBudget(agent), GRAPH_RUN_BUDGET);
+	return used
+		? `${run} · ${tokenMonthLine(used, agent.budget?.max_tokens_month)}`
+		: run;
+}
+
 /**
  * The selected row's quick look: which one is this, and is it
  * healthy. Everything else is on the page, one click on by **Open**.
@@ -366,7 +385,12 @@ function AgentQuickLook({
 						</span>
 					</PropertyRow>
 					<PropertyRow label="tokens">
-						{tokenBudgetLine(agent.budget?.max_tokens)}
+						{m
+							? tokenBudgetLine(m.max_tokens_run)
+							: tokenBudgetLine(ownRunBudget(agent), GRAPH_RUN_BUDGET)}
+					</PropertyRow>
+					<PropertyRow label="this month">
+						{m ? tokenMonthLine(m.tokens_this_month, m.max_tokens_month) : "…"}
 					</PropertyRow>
 					<PropertyRow label="at once">
 						{m ? `${m.running} of ${m.max_concurrent_runs ?? "∞"} runs` : "…"}

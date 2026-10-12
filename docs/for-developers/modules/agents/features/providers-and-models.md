@@ -61,7 +61,7 @@ flowchart TD
 
 | Surface | Shape | Components |
 |---|---|---|
-| Agents › `LLMs` | The second drawer of the Agents stack. Each provider is a group; its models are the rows under it, each showing the cast role that names it | `Item` · `StatusDot` · **`AddressChip`** |
+| Agents › `LLMs` | A page of its own ([5.10](fleet-performance.md) FP15): one row per model version — model · version name · endpoint · pinned by · status — and the endpoint's detail or *Add endpoint* in a sheet over it | `Table` · `StatusDot` · `Sheet` |
 | A provider's detail | kind · endpoint · credential (*blank on edit means keep*) · **address prefix** `llm/anthropic-prod/*` · scope; `Ping` with its result | `RecordHeader` · `PropertyList` · `Field` · `PasswordInput` |
 | *Who names it* | model → the cast roles and worlds that name it, or *named by nothing — safe to remove* | `DataTable` |
 | Failure | The provider named in the diagnosis, with its own message | `DiagnosisCard` |

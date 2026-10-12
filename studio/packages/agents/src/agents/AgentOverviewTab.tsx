@@ -206,7 +206,7 @@ export function AgentOverviewTab({
 							label="tokens"
 							to={<GoTo label="Activity" onClick={() => onGoTo("activity")} />}
 						>
-							{m ? tokenBudgetLine(m.max_tokens) : "…"}
+							{m ? tokenBudgetLine(m.max_tokens_run) : "…"}
 						</LimitRow>
 						<LimitRow
 							label="at once"

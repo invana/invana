@@ -10,6 +10,8 @@ from __future__ import annotations
 from fastapi import Depends, Path, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.activity.managers import FleetManager
+from invana.activity.schemas import FleetOverview, FleetPerformance
 from invana.apps.agents.managers import AgentManager, SoulManager
 from invana.apps.agents.models import AgentStatus
 from invana.apps.agents.schemas import (
@@ -51,6 +53,10 @@ bindings = SkillBindingManager()
 #: the binding manager (BN5).
 binds = SkillBindManager()
 evals = EvalManager()
+fleet = FleetManager()
+
+#: `?window=` → days; Performance offers these three and no other.
+_WINDOWS = {"7d": 7, "30d": 30, "90d": 90}
 
 
 async def list_agents(
@@ -411,3 +417,22 @@ async def unbind_skill(
     await bindings.unbind(session, skill=skill, agent_id=agent.id, agent_name=agent.name, actor_id=user.id)
     await session.refresh(agent, ["bound_skills"])
     return await agents.read(session, agent)
+
+
+async def fleet_overview(
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> FleetOverview:
+    """The Agents Overview — what broke, waits, slowed or changed (fleet-performance.md)."""
+    return await fleet.overview(session, graph_id=graph.id)
+
+
+async def fleet_performance(
+    window: str = Query(default="7d", pattern="^(7d|30d|90d)$"),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> FleetPerformance:
+    """The Agents Performance page — speed, success and tokens per agent, skill, plan and model."""
+    return await fleet.performance(session, graph_id=graph.id, window=_WINDOWS[window])

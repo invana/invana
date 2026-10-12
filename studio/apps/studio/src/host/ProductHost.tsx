@@ -33,6 +33,7 @@ import {
 } from "@invana-studio/shell";
 import { useCallback, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { agentsPage } from "@/host/agentsPages";
 import { assistantSlots } from "@/host/assistantSlots";
 import { OpenBoardContext } from "@/host/boards";
 import { consoleSection } from "@/host/consoleSection";
@@ -437,6 +438,14 @@ export function ProductHost() {
 			</div>
 		) : null;
 
+	// An Agents page — Overview, Performance, LLMs — fills the main area in
+	// place of the Workbook while its rail item is open.
+	const page = agentsPage(
+		settingsPanel.isOpen ? settingsPanel.section : null,
+		username,
+		graphSlug,
+	);
+
 	// The right side's occupant, and the header controls and `footer`.
 	const regionDeps = {
 		username,
@@ -502,18 +511,23 @@ export function ProductHost() {
 								// component, so the tabs cannot drift from what they switch
 								// (graph-detail-page.md the-shell.md).
 								content: (
-									<ErrorBoundary onError={reportBoundaryError}>
-										<div className="relative h-full">
-											<Workbook
-												{...strip}
-												addLabel="New canvas"
-												// Until each canvas owns its own engine, only the active page is
-												// mounted — today's behaviour, now stated rather than emergent.
-												keepMounted={false}
-												className="h-full"
-											/>
-											{reopenPill}
-										</div>
+									<ErrorBoundary
+										key={page ? settingsPanel.section : "workbook"}
+										onError={reportBoundaryError}
+									>
+										{page ?? (
+											<div className="relative h-full">
+												<Workbook
+													{...strip}
+													addLabel="New canvas"
+													// Until each canvas owns its own engine, only the active page is
+													// mounted — today's behaviour, now stated rather than emergent.
+													keepMounted={false}
+													className="h-full"
+												/>
+												{reopenPill}
+											</div>
+										)}
 									</ErrorBoundary>
 								),
 							}}

@@ -7,16 +7,17 @@
  *
  * | Rail | Path | Draws |
  * |---|---|---|
- * | Overview | `/agents/overview` | what broke, waits, slowed or changed — empty until the engine summarises it |
- * | Agents | `/agents/agents[/:agent]` | the Agents stack on Agents |
+ * | Overview | `/agents/overview` | page: what broke, waits, slowed or changed |
+ * | Agents | `/agents/agents[/:agent]` | the Agents panel |
  * | Skills | `/agents/skills` | the skills an agent may be offered |
  * | Library | `/agents/library[/:plan]` · `/agents/library/templates[/:template]` | Plans over Templates |
- * | Plugins | `/agents/plugins[/tasks/:entry]` | the plugin registry (empty until the engine's plugin module) over the task catalogue |
- * | LLMs | `/agents/llms[/:provider]` | the Agents stack on LLMs |
- * | Performance | `/agents/performance` | speed, success and tokens — empty until the engine keeps baselines |
+ * | Plugins | `/agents/plugins[/tasks/:entry]` | the plugin registry over the task catalogue |
+ * | LLMs | `/agents/llms[/:provider]` | page: the model versions offered and who pins them; an endpoint in a sheet |
+ * | Performance | `/agents/performance` | page: speed, success and tokens against each one's baseline |
  * | Settings | `/agents/settings` | how much may run at once, pool by pool |
  *
- * The product lands on Agents, the first rail item with something to read.
+ * A *page* fills the main area and opens no panel. The product lands on
+ * Overview, the first rail item.
  * The levels under the product's route have no element of their own, so
  * moving along the rail never remounts the page. The page itself is the app's
  * product host, which composes every graph product's regions, so the route's
@@ -65,7 +66,7 @@ export const agents: ProductDefinition = {
 	tagline: "Build, tune, watch",
 	icon: Bot,
 	scope: "graph",
-	landing: "agents",
+	landing: "overview",
 	nav: {
 		groups: [
 			[

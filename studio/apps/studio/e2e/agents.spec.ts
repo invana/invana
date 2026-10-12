@@ -3,7 +3,7 @@ import { GRAPH } from "./explorer";
 
 /**
  * Agents is its own product: its rail is the shell's `leftNav`, every rail
- * item is a path, and the landing is the agents list.
+ * item is a path, and the landing is Overview.
  *
  * Needs `demos/airways`.
  */
@@ -15,7 +15,7 @@ const onPath = (item: string) => new RegExp(`${AGENTS}/${item}(\\?|$)`);
 
 test("the product lands on Agents with its own rail", async ({ page }) => {
 	await page.goto(AGENTS);
-	await expect(page).toHaveURL(onPath("agents"));
+	await expect(page).toHaveURL(onPath("overview"));
 	for (const item of [
 		"Overview",
 		"Skills",
@@ -31,7 +31,7 @@ test("the product lands on Agents with its own rail", async ({ page }) => {
 	}
 });
 
-test("Plugins holds the registry and the catalogue; Performance shows its lock", async ({
+test("Plugins holds the registry and the catalogue; Performance is a page", async ({
 	page,
 }) => {
 	await page.goto(`${AGENTS}/agents`);
@@ -44,9 +44,7 @@ test("Plugins holds the registry and the catalogue; Performance shows its lock",
 
 	await page.locator('button[aria-label="Performance"]').click();
 	await expect(page).toHaveURL(onPath("performance"));
-	await expect(
-		page.getByText("Opens with engine support", { exact: true }),
-	).toBeVisible({
+	await expect(page.getByText("Tokens per run", { exact: true })).toBeVisible({
 		timeout: 30_000,
 	});
 });

@@ -33,6 +33,7 @@ export type LeftNavKey =
 	// The Agents rail items that are panels of their own.
 	| "overview"
 	| "plugins"
+	| "llms"
 	| "performance"
 	| "concurrency"
 	// The Projects rail's Decisions, a panel of its own.
@@ -92,10 +93,11 @@ const STACK_KEYS_OF: Partial<Record<LeftNavKey, readonly string[]>> = {
 	// by `kind`; they are two keys because reading the ceiling is not
 	// reading the world drawn inside it.
 	govern: [SECTION_PARAM, "world", "guardrail"],
-	// **Agents** is the fourth stack — Agents over the LLMs.
-	// `agent` is an agent's own surface, `provider` one
-	// configured endpoint and the models it offers.
-	agents: [SECTION_PARAM, "agent", "provider"],
+	// **Agents** is the fourth stack, of one section; `agent` is an agent's
+	// own surface.
+	agents: [SECTION_PARAM, "agent"],
+	// **LLMs** is a page; `provider` is the endpoint open in its sheet.
+	llms: ["provider"],
 	// **Model** keeps `?section=` for which Modeller rail item reads it —
 	// Global model, Models or Stitches — so a write never moves the path.
 	model: [SECTION_PARAM],
@@ -130,6 +132,7 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"rules",
 	"overview",
 	"plugins",
+	"llms",
 	"performance",
 	"concurrency",
 	"decisions",

@@ -1,16 +1,16 @@
-import { usdWhole } from "@invana-studio/core";
+import { formatCompact } from "@invana-studio/core";
 
 /**
- * a spend per run for the thread — the session's settings, opened from
+ * A token cap per run for the thread — the session's settings, opened from
  * the thread header (the-assistant.md).
  *
- * *As someone asking in a thread, I want to cap what one ask may spend, so that
- * a question that runs away cannot cost more than I meant it to.*
+ * *As someone asking in a thread, I want to cap the tokens one ask may use, so
+ * that a question that runs away cannot use more than I meant it to.*
  *
- * **Capped by the agent's own `max_cost_usd_run`.** The engine clamps on write,
- * so the value that comes back is the one in force; when it came back lower
- * than what was typed, the popover says so rather than silently changing it.
- * Empty is *the agent's cap*.
+ * **Held at the agent's own run budget, `max_tokens_run`.** The engine clamps
+ * on write, so the value that comes back is the one in force; when it came
+ * back lower than what was typed, the popover says so rather than silently
+ * changing it. Empty is *the agent's budget*.
  */
 
 import { Input } from "@invana/forms";
@@ -28,7 +28,7 @@ export interface SessionSettingsProps {
 	session: Session;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onSave: (usd: number | null) => Promise<unknown>;
+	onSave: (tokens: number | null) => Promise<unknown>;
 }
 
 export function SessionSettings({
@@ -37,26 +37,26 @@ export function SessionSettings({
 	onOpenChange,
 	onSave,
 }: SessionSettingsProps) {
-	const cap = session.agentMaxCostUsdRun;
+	const cap = session.agentMaxTokensRun;
 	const [draft, setDraft] = useState("");
 	const [asked, setAsked] = useState<number | null>(null);
 	const [saving, setSaving] = useState(false);
 
 	useEffect(() => {
 		if (!open) return;
-		setDraft(
-			session.maxCostUsdRun != null ? String(session.maxCostUsdRun) : "",
-		);
+		setDraft(session.maxTokensRun != null ? String(session.maxTokensRun) : "");
 		setAsked(null);
-	}, [open, session.maxCostUsdRun]);
+	}, [open, session.maxTokensRun]);
 
 	const parsed = draft.trim() === "" ? null : Number(draft);
-	const invalid = parsed !== null && (!Number.isFinite(parsed) || parsed <= 0);
+	const invalid =
+		parsed !== null &&
+		(!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0);
 	const clamped =
 		asked !== null &&
 		cap != null &&
 		asked > cap &&
-		session.maxCostUsdRun === cap;
+		session.maxTokensRun === cap;
 
 	const save = async () => {
 		if (invalid) return;
@@ -83,15 +83,17 @@ export function SessionSettings({
 			<PopoverContent align="end" className="w-72 space-y-3">
 				<Eyebrow>Session settings</Eyebrow>
 				<div className="space-y-1.5">
-					<label htmlFor="session-spend-per-run">Spend per run</label>
+					<label htmlFor="session-tokens-per-run">Tokens per run</label>
 					<Input
-						id="session-spend-per-run"
+						id="session-tokens-per-run"
 						type="number"
-						inputMode="decimal"
-						min={0}
-						step={0.1}
+						inputMode="numeric"
+						min={1}
+						step={1000}
 						placeholder={
-							cap != null ? `${usdWhole(cap)} — the agent's cap` : "USD"
+							cap != null
+								? `${formatCompact(cap)} — the agent's budget`
+								: "tokens"
 						}
 						value={draft}
 						onChange={(e) => setDraft(e.target.value)}
@@ -103,10 +105,10 @@ export function SessionSettings({
 				</div>
 				<p className="text-muted-foreground">
 					{cap != null
-						? `${session.agentName ?? "The agent"} caps a run at ${usdWhole(cap)}.`
-						: `${session.agentName ?? "The agent"} sets no cap per run.`}
+						? `${session.agentName ?? "The agent"} allows up to ${formatCompact(cap)} tokens a run.`
+						: `${session.agentName ?? "The agent"} sets no token budget per run.`}
 					{clamped
-						? ` Held at ${usdWhole(cap as number)} — the agent's cap.`
+						? ` Held at ${formatCompact(cap as number)} — the agent's budget.`
 						: ""}
 				</p>
 				<div className="flex justify-end gap-2">

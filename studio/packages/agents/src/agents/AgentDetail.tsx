@@ -7,7 +7,7 @@
  * assigning it a task is a choice and not a guess.*
  *
  * There is no Bounds tab. The world comes with the work, and every
- * standing limit sits where it is read: effort on Thinking, spend and reach on
+ * standing limit sits where it is read: effort on Thinking, budget and reach on
  * Activity beside the meters they cap.
  *
  * ## Save is explicit

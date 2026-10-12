@@ -64,8 +64,7 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	},
 	{ path: "modeller/rules", panel: "rules" },
 	{ path: "modeller/settings", panel: "settings" },
-	// The Agents rail. Agents and LLMs are two sections of one stack, so each
-	// keeps its own path; Templates is Library's second section, under its path.
+	// The Agents rail. Templates is Library's second section, under its path.
 	{ path: "agents/overview", panel: "overview" },
 	{
 		path: "agents/agents",
@@ -93,7 +92,7 @@ const PANEL_PATHS: readonly PanelPath[] = [
 		section: "catalogue",
 		detail: "entry",
 	},
-	{ path: "agents/llms", panel: "agents", section: "llms", detail: "provider" },
+	{ path: "agents/llms", panel: "llms", detail: "provider" },
 	{ path: "agents/performance", panel: "performance" },
 	{ path: "agents/settings", panel: "concurrency" },
 	// Activity's tabs (the shell's page). Runs and Events keep the panel keys
@@ -135,7 +134,7 @@ const INFO_TAB = "info";
 // segment — opens the first section under it.
 const LEVEL_LANDINGS: Record<string, string> = {
 	modeller: "modeller/global-model",
-	agents: "agents/agents",
+	agents: "agents/overview",
 	activity: "activity/runs",
 };
 
@@ -143,21 +142,17 @@ const LEVEL_LANDINGS: Record<string, string> = {
 const ALIASES: Record<string, string> = {
 	schema: "model",
 	links: "model",
-	llms: "agents",
 	layers: "explorer",
 	canvases: "explorer",
 	connection: "settings",
 };
 
-// An alias that also names the section it meant, when the link names none.
-const ALIAS_SECTIONS: Record<string, string> = {
-	llms: "llms",
-};
-
 // A section that left its panel, as `panel:section` → the panel that holds it
-// now. The Catalogue was Library's; it is Plugins'.
+// now. The Catalogue was Library's; it is Plugins'. LLMs was the Agents
+// stack's second section; it is a page of its own.
 const SECTION_MOVES: Record<string, string> = {
 	"library:catalogue": "plugins",
+	"agents:llms": "llms",
 };
 
 // Pages of Activity with no panel behind them — the change log and a change's
@@ -245,12 +240,6 @@ export function pageUrlOf(params: URLSearchParams): {
 	}
 
 	const aliased = ALIASES[raw] ?? raw;
-	if (
-		ALIAS_SECTIONS[raw] &&
-		!search.has(SECTION) &&
-		!search.has(LEGACY_SECTION)
-	)
-		search.set(SECTION, ALIAS_SECTIONS[raw]);
 	const moved =
 		SECTION_MOVES[
 			`${aliased}:${search.get(SECTION) ?? search.get(LEGACY_SECTION)}`
@@ -263,9 +252,10 @@ export function pageUrlOf(params: URLSearchParams): {
 	if (entry.section) {
 		const wanted = search.get(SECTION) ?? search.get(LEGACY_SECTION);
 		entry = entries.find((e) => e.section === wanted) ?? entries[0];
-		search.delete(SECTION);
-		search.delete(LEGACY_SECTION);
 	}
+	// A panel with no sections keeps none in its URL.
+	search.delete(SECTION);
+	search.delete(LEGACY_SECTION);
 	const id = entry.detail ? search.get(entry.detail) : null;
 	if (entry.detail) search.delete(entry.detail);
 	return {

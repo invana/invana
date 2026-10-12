@@ -598,9 +598,11 @@ export interface TraceStepRead {
  * against a ceiling that does not exist is the thing [ ] warns about.
  */
 interface RunBudget {
+	/** The run's token budget. */
+	max_tokens_run?: number | null;
+	max_tokens_month?: number | null;
+	/** The run budget's older name — what a run from before both windows carries. */
 	max_tokens: number | null;
-	max_cost_usd: number | null;
-	max_cost_usd_run?: number | null;
 	max_clarifications?: number | null;
 	max_replans?: number | null;
 }

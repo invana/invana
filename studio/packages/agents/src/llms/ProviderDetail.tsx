@@ -45,7 +45,7 @@ import {
 } from "./queries";
 import { LLM_PROVIDER_OPTIONS, type LLMModel, type LLMProvider } from "./types";
 
-export function providerLabel(provider: LLMProvider): string {
+function providerLabel(provider: LLMProvider): string {
 	return (
 		LLM_PROVIDER_OPTIONS.find((o) => o.value === provider.provider)?.label ??
 		provider.provider
@@ -61,7 +61,7 @@ export interface ProviderDetailProps {
 	provider: LLMProvider;
 	/** Worlds and guardrails that name each address in their `cast`. */
 	castBy: CastBy;
-	/** The endpoint is gone — the section goes back to the list. */
+	/** The endpoint is gone — whatever holds it closes. */
 	onGone: () => void;
 }
 

@@ -59,7 +59,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Agents › LLMs | Models by version name; each model row names the agents pinned to it (C03). Skills and judges on the row, and LLMs as its own page, are C10 |
+| Agents › LLMs | A page of its own: models by version name, each row naming the agents, skill versions and eval judges pinned to it (`GET …/llm/pins`), and a notice for a pinned version the Graph no longer offers ([5.10](fleet-performance.md)) |
 | Agent page › Thinking | *Model version*: none, or an exact version; moving it is its own act with a why, gated (C03) |
 | Skill page › Instructions | The draft's model version, published with the next version (C03) |
 | Run page | *Re-run…* on the header of a settled root ask → the re-run dialog: *Ran with* (model version · agent version · world), *The same versions — reproduce it* · *Current versions — compare*, Cancel · Re-run. A re-run's page carries *Compare with the original* (SH-18, C09) |

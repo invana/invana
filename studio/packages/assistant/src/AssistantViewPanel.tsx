@@ -107,10 +107,10 @@ export interface AssistantViewPanelProps {
 	onRemoveAttachment?: () => void;
 	/** The world picker, placed in the composer. */
 	worldControl?: ReactNode;
-	/** Set the open thread's spend per run; null is the agent's cap. */
-	onSetSpendPerRun?: (
+	/** Set the open thread's token cap per run; null is the agent's budget. */
+	onSetTokensPerRun?: (
 		sessionId: string,
-		usd: number | null,
+		tokens: number | null,
 	) => Promise<unknown>;
 }
 
@@ -162,7 +162,7 @@ export function AssistantViewPanel({
 	attachment,
 	onRemoveAttachment,
 	worldControl,
-	onSetSpendPerRun,
+	onSetTokensPerRun,
 }: AssistantViewPanelProps) {
 	const isModeller = surface === "modeller";
 	// Bumped to focus the composer when the user picks "let me type instead" on a
@@ -518,7 +518,7 @@ export function AssistantViewPanel({
 						icon: HelpCircle,
 						onClick: () => setLegendOpen(true),
 					},
-					...(inDetail && activeSession && onSetSpendPerRun
+					...(inDetail && activeSession && onSetTokensPerRun
 						? [
 								{
 									key: "settings",
@@ -578,12 +578,14 @@ export function AssistantViewPanel({
 				{({ search }) =>
 					activeSession ? (
 						<>
-							{onSetSpendPerRun && (
+							{onSetTokensPerRun && (
 								<SessionSettings
 									session={activeSession}
 									open={settingsOpen}
 									onOpenChange={setSettingsOpen}
-									onSave={(usd) => onSetSpendPerRun(activeSession.id, usd)}
+									onSave={(tokens) =>
+										onSetTokensPerRun(activeSession.id, tokens)
+									}
 								/>
 							)}
 							{view === "tasks" ? (

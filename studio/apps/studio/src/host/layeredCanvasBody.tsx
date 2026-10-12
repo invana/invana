@@ -36,8 +36,6 @@ const EMPTY_HINTS: Partial<Record<LeftNavKey, string>> = {
 		"A request has no canvas of its own — each one names the type or property it asks the model for.",
 	settings:
 		"Graph settings have no canvas — the form beside is the whole of it.",
-	overview: "Opens with engine support.",
-	performance: "Opens with engine support.",
 	plugins: "Pick a task type to read what it does and which plans use it.",
 	concurrency: "Settings have no canvas — everything is in the form beside.",
 };

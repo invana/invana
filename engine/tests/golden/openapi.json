@@ -2167,6 +2167,80 @@
         "title": "Attention",
         "type": "object"
       },
+      "AttentionItem": {
+        "description": "One thing a builder should look at now, with what answers it.",
+        "properties": {
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "approval_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approval Id"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "failing",
+              "waiting",
+              "degraded"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "title",
+          "detail"
+        ],
+        "title": "AttentionItem",
+        "type": "object"
+      },
       "AuthResponse": {
         "properties": {
           "access_token": {
@@ -5634,6 +5708,29 @@
         "title": "DatasetVersionUsage",
         "type": "object"
       },
+      "DayCount": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "succeeded": {
+            "title": "Succeeded",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "succeeded",
+          "failed"
+        ],
+        "title": "DayCount",
+        "type": "object"
+      },
       "DayValue": {
         "properties": {
           "label": {
@@ -6017,6 +6114,41 @@
           "agent_id"
         ],
         "title": "DefaultAgentRequest",
+        "type": "object"
+      },
+      "Degradation": {
+        "properties": {
+          "baseline_p95_ms": {
+            "title": "Baseline P95 Ms",
+            "type": "number"
+          },
+          "change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RecentChange"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "p95_ms": {
+            "title": "P95 Ms",
+            "type": "number"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          }
+        },
+        "required": [
+          "p95_ms",
+          "baseline_p95_ms",
+          "since",
+          "change"
+        ],
+        "title": "Degradation",
         "type": "object"
       },
       "DeleteMeRequest": {
@@ -8090,6 +8222,183 @@
           "delivered_at"
         ],
         "title": "FiringRead",
+        "type": "object"
+      },
+      "FleetMeasure": {
+        "description": "One number over a window, and the same number over the window before.",
+        "properties": {
+          "prior": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prior"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "prior"
+        ],
+        "title": "FleetMeasure",
+        "type": "object"
+      },
+      "FleetOverview": {
+        "properties": {
+          "agents": {
+            "title": "Agents",
+            "type": "integer"
+          },
+          "attention": {
+            "items": {
+              "$ref": "#/components/schemas/AttentionItem"
+            },
+            "title": "Attention",
+            "type": "array"
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/RecentChange"
+            },
+            "title": "Changes",
+            "type": "array"
+          },
+          "daily": {
+            "items": {
+              "$ref": "#/components/schemas/DayCount"
+            },
+            "title": "Daily",
+            "type": "array"
+          },
+          "skills": {
+            "title": "Skills",
+            "type": "integer"
+          },
+          "tiles": {
+            "$ref": "#/components/schemas/OverviewTiles"
+          }
+        },
+        "required": [
+          "agents",
+          "skills",
+          "tiles",
+          "attention",
+          "daily",
+          "changes"
+        ],
+        "title": "FleetOverview",
+        "type": "object"
+      },
+      "FleetPerformance": {
+        "properties": {
+          "agents": {
+            "items": {
+              "$ref": "#/components/schemas/PerformanceRow"
+            },
+            "title": "Agents",
+            "type": "array"
+          },
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/PerformanceRow"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "plans": {
+            "items": {
+              "$ref": "#/components/schemas/PerformanceRow"
+            },
+            "title": "Plans",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/PerformanceRow"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "tiles": {
+            "$ref": "#/components/schemas/FleetTiles"
+          },
+          "trend": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PerformanceTrend"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "window_days": {
+            "title": "Window Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "window_days",
+          "tiles",
+          "agents",
+          "skills",
+          "plans",
+          "models",
+          "trend"
+        ],
+        "title": "FleetPerformance",
+        "type": "object"
+      },
+      "FleetTiles": {
+        "properties": {
+          "degraded": {
+            "title": "Degraded",
+            "type": "integer"
+          },
+          "failing": {
+            "title": "Failing",
+            "type": "integer"
+          },
+          "p50_ms": {
+            "$ref": "#/components/schemas/FleetMeasure"
+          },
+          "p95_ms": {
+            "$ref": "#/components/schemas/FleetMeasure"
+          },
+          "runs": {
+            "$ref": "#/components/schemas/FleetMeasure"
+          },
+          "success": {
+            "$ref": "#/components/schemas/FleetMeasure"
+          },
+          "tokens_per_run": {
+            "$ref": "#/components/schemas/FleetMeasure"
+          }
+        },
+        "required": [
+          "success",
+          "p50_ms",
+          "p95_ms",
+          "runs",
+          "tokens_per_run",
+          "degraded",
+          "failing"
+        ],
+        "title": "FleetTiles",
         "type": "object"
       },
       "GlobalModel": {
@@ -11338,6 +11647,59 @@
         "title": "ModelImportResult",
         "type": "object"
       },
+      "ModelPin": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "agents": {
+            "items": {
+              "$ref": "#/components/schemas/PinnedAgent"
+            },
+            "title": "Agents",
+            "type": "array"
+          },
+          "judges": {
+            "items": {
+              "$ref": "#/components/schemas/PinnedJudge"
+            },
+            "title": "Judges",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/PinnedSkill"
+            },
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "address",
+          "agents",
+          "skills",
+          "judges"
+        ],
+        "title": "ModelPin",
+        "type": "object"
+      },
+      "ModelPins": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ModelPin"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ModelPins",
+        "type": "object"
+      },
       "ModelPublishChange": {
         "description": "One change in a draft against the published version, and whether it breaks.",
         "properties": {
@@ -12949,6 +13311,83 @@
         "title": "OverviewRow",
         "type": "object"
       },
+      "OverviewTiles": {
+        "properties": {
+          "failed_latest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failed Latest"
+          },
+          "failed_today": {
+            "title": "Failed Today",
+            "type": "integer"
+          },
+          "max_tokens_month": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens Month"
+          },
+          "p95_ms": {
+            "$ref": "#/components/schemas/FleetMeasure"
+          },
+          "runs_today": {
+            "title": "Runs Today",
+            "type": "integer"
+          },
+          "runs_week_ago": {
+            "title": "Runs Week Ago",
+            "type": "integer"
+          },
+          "success": {
+            "$ref": "#/components/schemas/FleetMeasure"
+          },
+          "tokens_this_month": {
+            "title": "Tokens This Month",
+            "type": "integer"
+          },
+          "waiting": {
+            "title": "Waiting",
+            "type": "integer"
+          },
+          "waiting_latest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waiting Latest"
+          }
+        },
+        "required": [
+          "runs_today",
+          "runs_week_ago",
+          "failed_today",
+          "failed_latest",
+          "waiting",
+          "waiting_latest",
+          "p95_ms",
+          "tokens_this_month",
+          "max_tokens_month",
+          "success"
+        ],
+        "title": "OverviewTiles",
+        "type": "object"
+      },
       "ParticipantRead": {
         "properties": {
           "address": {
@@ -13062,6 +13501,146 @@
         "title": "Performance",
         "type": "object"
       },
+      "PerformanceRow": {
+        "description": "One agent, skill, plan or model over the window.",
+        "properties": {
+          "degradation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Degradation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failing": {
+            "title": "Failing",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "p50_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Ms"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          },
+          "p95_prior_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Prior Ms"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          },
+          "signal": {
+            "anyOf": [
+              {
+                "enum": [
+                  "degraded",
+                  "failing"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signal"
+          },
+          "success": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Success"
+          },
+          "tokens_per_run": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens Per Run"
+          },
+          "tokens_per_run_prior": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens Per Run Prior"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "version",
+          "runs",
+          "success",
+          "p50_ms",
+          "p95_ms",
+          "p95_prior_ms",
+          "tokens_per_run",
+          "tokens_per_run_prior",
+          "failing",
+          "signal",
+          "degradation"
+        ],
+        "title": "PerformanceRow",
+        "type": "object"
+      },
       "PerformanceTiles": {
         "properties": {
           "cost_per_run": {
@@ -13092,6 +13671,59 @@
           "failed"
         ],
         "title": "PerformanceTiles",
+        "type": "object"
+      },
+      "PerformanceTrend": {
+        "description": "p95 a day for one agent \u2014 the most degraded, else the busiest.",
+        "properties": {
+          "baseline_p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline P95 Ms"
+          },
+          "marks": {
+            "items": {
+              "$ref": "#/components/schemas/TrendMark"
+            },
+            "title": "Marks",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/TrendPoint"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "subject_id": {
+            "title": "Subject Id",
+            "type": "string"
+          },
+          "subject_kind": {
+            "const": "agent",
+            "title": "Subject Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject_kind",
+          "subject_id",
+          "name",
+          "baseline_p95_ms",
+          "points",
+          "marks"
+        ],
+        "title": "PerformanceTrend",
         "type": "object"
       },
       "PersonalAccessTokenCreateRequest": {
@@ -13406,6 +14038,70 @@
           "drift"
         ],
         "title": "PhysicalType",
+        "type": "object"
+      },
+      "PinnedAgent": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "PinnedAgent",
+        "type": "object"
+      },
+      "PinnedJudge": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "subject_id": {
+            "title": "Subject Id",
+            "type": "string"
+          },
+          "subject_kind": {
+            "title": "Subject Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject_kind",
+          "subject_id",
+          "name"
+        ],
+        "title": "PinnedJudge",
+        "type": "object"
+      },
+      "PinnedSkill": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "version"
+        ],
+        "title": "PinnedSkill",
         "type": "object"
       },
       "PlanCallerRead": {
@@ -15215,6 +15911,103 @@
         ],
         "title": "RdfFormat",
         "type": "string"
+      },
+      "RecentChange": {
+        "description": "One agent or skill version and what ran on it after.",
+        "properties": {
+          "actor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Name"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "p95_change": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Change"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_kind": {
+            "enum": [
+              "agent",
+              "skill"
+            ],
+            "title": "Record Kind",
+            "type": "string"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_kind",
+          "record_id",
+          "name",
+          "version",
+          "previous",
+          "at",
+          "actor_name",
+          "summary",
+          "runs",
+          "failed",
+          "p95_change"
+        ],
+        "title": "RecentChange",
+        "type": "object"
       },
       "RecordChange": {
         "properties": {
@@ -24084,6 +24877,49 @@
         "title": "TraceStep",
         "type": "object"
       },
+      "TrendMark": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "label"
+        ],
+        "title": "TrendMark",
+        "type": "object"
+      },
+      "TrendPoint": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          }
+        },
+        "required": [
+          "date",
+          "p95_ms"
+        ],
+        "title": "TrendPoint",
+        "type": "object"
+      },
       "TypeCount": {
         "description": "One type and how many of it the graph holds.\n\n``count`` is ``None`` when the vendor cannot count\n(selection-and-the-panel.md SP8) \u2014 the type is still named, because a list\nwith no numbers is still the canvas legend.",
         "properties": {
@@ -28652,6 +29488,139 @@
           }
         ],
         "summary": "Create Agent",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/agents/overview": {
+      "get": {
+        "description": "The Agents Overview \u2014 what broke, waits, slowed or changed (fleet-performance.md).",
+        "operationId": "fleet_overview_api_v1_u__username___graphSlug__agents_overview_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FleetOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Fleet Overview",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/agents/performance": {
+      "get": {
+        "description": "The Agents Performance page \u2014 speed, success and tokens per agent, skill, plan and model.",
+        "operationId": "fleet_performance_api_v1_u__username___graphSlug__agents_performance_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window",
+            "required": false,
+            "schema": {
+              "default": "7d",
+              "pattern": "^(7d|30d|90d)$",
+              "title": "Window",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FleetPerformance"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Fleet Performance",
         "tags": [
           "agents"
         ]
@@ -35298,6 +36267,67 @@
           }
         ],
         "summary": "Create Llm Provider",
+        "tags": [
+          "llm-providers"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/llm/pins": {
+      "get": {
+        "description": "Who pins each model address \u2014 agents, skill versions and eval judges.",
+        "operationId": "list_model_pins_api_v1_u__username___graphSlug__llm_pins_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelPins"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Model Pins",
         "tags": [
           "llm-providers"
         ]
