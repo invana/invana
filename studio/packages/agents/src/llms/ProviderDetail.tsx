@@ -10,6 +10,10 @@
  * segment, and one row cannot be both. So this reads as the endpoint's own
  * fields, then its models, each with the address a rule names.
  *
+ * **Who pins it is said too.** An agent whose Thinking pins an exact model
+ * version runs on that model whatever the world casts, so each row names the
+ * agents pinned to it beside the worlds that cast it.
+ *
  * **The safe case is visibly safe.** A model no cast names says so on its row;
  * removing one a world casts is refused, and the refusal — which names the
  * worlds — is drawn where the click was, never as a toast that leaves
@@ -30,6 +34,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Check, Loader2, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAgentsQuery } from "../agents/queries";
 import { llmProvidersApi } from "./api";
 import { ProviderForm } from "./ProviderForm";
 import {
@@ -78,6 +83,11 @@ export function ProviderDetail({
 	/** The refusal from the last remove, held against the model it refused. */
 	const [refusedId, setRefusedId] = useState<string | null>(null);
 
+	const agents = useAgentsQuery(username, graphSlug);
+	const pinnedBy = (address: string) =>
+		(agents.data?.items ?? [])
+			.filter((a) => a.model_pin === address)
+			.map((a) => a.name);
 	const remove = useDeleteLLMProviderMutation(username, graphSlug);
 	const removeModel = useRemoveLLMModelMutation(username, graphSlug);
 
@@ -217,6 +227,7 @@ export function ProviderDetail({
 							key={model.id}
 							model={model}
 							castBy={castBy.get(model.address) ?? []}
+							pinnedBy={pinnedBy(model.address)}
 							isRemoving={
 								removeModel.isPending &&
 								removeModel.variables?.modelRowId === model.id
@@ -252,12 +263,15 @@ export function ProviderDetail({
 function ModelRow({
 	model,
 	castBy,
+	pinnedBy,
 	isRemoving,
 	refusal,
 	onRemove,
 }: {
 	model: LLMModel;
 	castBy: string[];
+	/** Agents whose Thinking pins this exact version. */
+	pinnedBy: string[];
 	isRemoving: boolean;
 	refusal: string | null;
 	onRemove: () => void;
@@ -287,9 +301,10 @@ function ModelRow({
 			</div>
 
 			<p className="text-sm text-muted-foreground">
-				{castBy.length ? (
-					<>cast by {castBy.join(" · ")}</>
-				) : (
+				{castBy.length ? <>cast by {castBy.join(" · ")}</> : null}
+				{castBy.length && pinnedBy.length ? " · " : null}
+				{pinnedBy.length ? <>pinned by {pinnedBy.join(" · ")}</> : null}
+				{castBy.length || pinnedBy.length ? null : (
 					// The safe case, visibly safe.
 					<>named by nothing — safe to remove</>
 				)}

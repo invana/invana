@@ -8,8 +8,17 @@
  * into a scroll.*
  *
  * A record header over five tabs, the agent page's shape:
- * `Playbook · Flow · Bindings · Usage · Versions`. It authors — edit and
- * publish on Playbook, bind and unbind on Bindings.
+ * `Instructions · Plan · Bindings · Usage · History`. It authors — write,
+ * evaluate and publish on Instructions, bind and unbind on Bindings, restore an
+ * earlier version on History.
+ *
+ * | Tab | What it answers |
+ * |---|---|
+ * | **Instructions** | what the skill says, its draft, and the evals a publish is gated by |
+ * | **Plan** | the plan this version drew, what the last publish regenerated, and who picks it up |
+ * | **Bindings** | which agents carry it, and which are refused |
+ * | **Usage** | offered against applied, per version |
+ * | **History** | every version with who, why and what happened after; *Restore* makes a new one |
  *
  * ## Two words that are never the same claim
  *
@@ -22,7 +31,15 @@
  * prose, so a word implying we did would be a lie told in a badge.
  */
 
-import { Badge, Button, RecordHeader, Spinner, TabbedPanel } from "@invana/ui";
+import {
+	Badge,
+	Button,
+	DiffList,
+	DiffRow,
+	RecordHeader,
+	Spinner,
+	TabbedPanel,
+} from "@invana/ui";
 import {
 	asBindRefusal,
 	BindRefusalCard,
@@ -32,16 +49,20 @@ import {
 import { BarChart3, GitBranch } from "lucide-react";
 import { useState } from "react";
 import { useAgentMutations } from "../agents/queries";
+import { ChangesTable } from "../changes/ChangesTable";
+import { useCompareQuery } from "../changes/history";
+import { GatedActDialog } from "../evals/GatedActDialog";
+import { useEvalMutations } from "../evals/queries";
 import {
+	useRollbackSkillMutation,
 	useSkillAgentsQuery,
 	useSkillDiffQuery,
 	useSkillDraftQuery,
 	useSkillPlaybookQuery,
 	useSkillUsageQuery,
-	useSkillVersionsQuery,
 } from "./queries";
 import { SkillFlowTab } from "./SkillFlowTab";
-import { SkillPlaybookTab } from "./SkillPlaybookTab";
+import { SkillInstructionsTab } from "./SkillInstructionsTab";
 import type {
 	BindRefusal,
 	Skill,
@@ -78,7 +99,7 @@ export function SkillDetail({
 		skill.id,
 		skill.is_draft ? null : skill.version,
 	);
-	// A draft has no published plan, so its Flow tab draws the draft's own.
+	// A draft has no published plan, so its Plan tab draws the draft's own.
 	// Read only for a draft: `GET …/draft` opens one when none is open.
 	const draft = useSkillDraftQuery(username, graphSlug, skill.id, {
 		enabled: skill.is_draft,
@@ -115,27 +136,42 @@ export function SkillDetail({
 
 			<TabbedPanel
 				className="min-h-0 flex-1 border-0 bg-transparent shadow-none"
+				bodyClassName="@container"
 				activeTab={tab}
 				onTabChange={(v) => setTab(v as SkillTab)}
 				tabs={[
 					{
 						value: "playbook",
-						label: "Playbook",
+						label: "Instructions",
 						content: (
-							<SkillPlaybookTab
+							<SkillInstructionsTab
 								username={username}
 								graphSlug={graphSlug}
 								skill={skill}
 								plan={plan.data}
 								editing={editing}
 								onEditing={onEditing}
+								onPublished={() => setTab("flow")}
 							/>
 						),
 					},
 					{
 						value: "flow",
-						label: skill.plan ? `Flow · ${skill.plan.step_count}` : "Flow",
-						content: <SkillFlowTab plan={flowPlan} loading={flowLoading} />,
+						label: skill.plan ? `Plan · ${skill.plan.step_count}` : "Plan",
+						content: (
+							<div className="flex h-full min-h-0 flex-col">
+								<div className="min-h-0 flex-1">
+									<SkillFlowTab plan={flowPlan} loading={flowLoading} />
+								</div>
+								{!skill.is_draft && skill.version > 1 ? (
+									<Regenerated
+										username={username}
+										graphSlug={graphSlug}
+										skill={skill}
+									/>
+								) : null}
+							</div>
+						),
 					},
 					{
 						value: "bindings",
@@ -163,9 +199,9 @@ export function SkillDetail({
 					},
 					{
 						value: "versions",
-						label: "Versions",
+						label: "History",
 						content: (
-							<VersionsSection
+							<SkillHistoryTab
 								username={username}
 								graphSlug={graphSlug}
 								skill={skill}
@@ -179,11 +215,11 @@ export function SkillDetail({
 }
 
 /**
- * The versions this playbook has been through — the Versions tab. A
- * published version is immutable, so this is a history rather than a list of
- * things to edit — the one editable row is the draft, on Playbook.
+ * Under the plan: what the publish that made this version regenerated, and
+ * which bound agents pick it up. A run in flight keeps the plan it started
+ * with, so the agents here take it on their **next** run.
  */
-function VersionsSection({
+function Regenerated({
 	username,
 	graphSlug,
 	skill,
@@ -192,72 +228,164 @@ function VersionsSection({
 	graphSlug: string;
 	skill: Skill;
 }) {
-	const versions = useSkillVersionsQuery(username, graphSlug, skill.id);
-	const [diffOf, setDiffOf] = useState<number | null>(null);
-	const items = versions.data?.items ?? [];
-
-	if (items.length === 0 && !versions.isLoading)
-		return (
-			<p className="px-3 py-4 text-base text-muted-foreground">
-				Nothing is published yet — the draft becomes v1 when it is published.
-			</p>
-		);
+	const compare = useCompareQuery(
+		username,
+		graphSlug,
+		"skill",
+		skill.id,
+		String(skill.version),
+	);
+	const standings = useSkillAgentsQuery(username, graphSlug, skill.id);
+	const diff = compare.data?.plan;
+	const bound = (standings.data?.items ?? []).filter((a) => a.bound);
+	const touched = diff
+		? diff.added.length + diff.removed.length + diff.changed.length
+		: 0;
 
 	return (
-		<PanelSection
-			title="Versions"
-			hint="a published version is immutable; a step resolves to the one it read"
-		>
-			{versions.isLoading ? (
-				<Spinner />
-			) : (
-				<div className="space-y-1">
-					{items.map((v) => (
-						<div
-							key={v.id}
-							className="flex items-center gap-2 rounded-sm px-1.5 py-1 text-base hover:bg-muted/50"
-						>
-							<Badge
-								variant={
-									v.id === skill.current_version_id ? "default" : "secondary"
-								}
-							>
-								v{v.version}
+		<div className="max-h-64 shrink-0 overflow-y-auto border-t">
+			<PanelSection
+				title={`Regenerated — v${skill.version}`}
+				hint={diff ? diff.summary : undefined}
+			>
+				{compare.isLoading ? (
+					<Spinner />
+				) : !diff || touched === 0 ? (
+					<p className="text-muted-foreground">
+						The plan did not change with this version.
+					</p>
+				) : (
+					<DiffList>
+						{diff.added.map((k) => (
+							<DiffRow key={`+${k}`} op="add" kind="step">
+								{k}
+							</DiffRow>
+						))}
+						{diff.removed.map((k) => (
+							<DiffRow key={`-${k}`} op="remove" kind="step">
+								{k}
+							</DiffRow>
+						))}
+						{diff.changed.map((c) => (
+							<DiffRow key={`~${c.step_key}`} op="change" kind="step">
+								{c.step_key} · {c.fields.join(", ")}
+							</DiffRow>
+						))}
+					</DiffList>
+				)}
+			</PanelSection>
+			<PanelSection
+				title="Who picks it up"
+				hint="a run in flight keeps its plan"
+			>
+				{bound.length === 0 ? (
+					<p className="text-muted-foreground">
+						No agent carries it, so no run picks it up.
+					</p>
+				) : (
+					<div className="flex flex-wrap gap-1">
+						{bound.map((a) => (
+							<Badge key={a.agent_id} variant="secondary">
+								{a.agent_name} · next run
 							</Badge>
-							<span className="truncate text-muted-foreground">
-								{v.published_at
-									? new Date(v.published_at).toLocaleDateString()
-									: "draft"}
-							</span>
-							{v.version > 1 ? (
-								<button
-									type="button"
-									onClick={() =>
-										setDiffOf(diffOf === v.version ? null : v.version)
-									}
-									className="ml-auto flex items-center gap-1 text-muted-foreground hover:text-foreground"
+						))}
+					</div>
+				)}
+			</PanelSection>
+		</div>
+	);
+}
+
+/**
+ * The History tab: every version, who published it, why, and what happened
+ * after. *Diff* opens the prose changes under a row; *Restore* makes the next
+ * version from an earlier one's text, asked with a reason and gated by the
+ * skill's evals like a publish.
+ */
+function SkillHistoryTab({
+	username,
+	graphSlug,
+	skill,
+}: {
+	username: string;
+	graphSlug: string;
+	skill: Skill;
+}) {
+	const rollback = useRollbackSkillMutation(username, graphSlug, skill.id);
+	const evals = useEvalMutations(username, graphSlug, "skill", skill.id);
+	const [diffOf, setDiffOf] = useState<number | null>(null);
+	const [restoring, setRestoring] = useState<number | null>(null);
+
+	return (
+		<div className="flex flex-col gap-2.5 p-3.5">
+			<ChangesTable
+				username={username}
+				graphSlug={graphSlug}
+				kind="skill"
+				recordId={skill.id}
+				act={(e, latest) => {
+					const v = Number(e.version);
+					return (
+						<div className="flex items-center gap-1">
+							{v > 1 ? (
+								<Button
+									size="sm"
+									variant="ghost"
+									onClick={() => setDiffOf(diffOf === v ? null : v)}
 								>
-									<GitBranch className="size-3" />
-									{diffOf === v.version ? "hide" : "diff"}
-								</button>
-							) : (
-								// v1 is compared against nothing — a first version did not
-								// delete anything.
-								<span className="ml-auto text-muted-foreground">first</span>
+									<GitBranch /> {diffOf === v ? "Hide" : "Diff"}
+								</Button>
+							) : null}
+							{latest ? null : (
+								<Button
+									size="sm"
+									variant="ghost"
+									onClick={() => setRestoring(v)}
+								>
+									Restore v{v}
+								</Button>
 							)}
 						</div>
-					))}
-					{diffOf !== null ? (
+					);
+				}}
+				detail={(e) =>
+					Number(e.version) === diffOf ? (
 						<VersionDiff
 							username={username}
 							graphSlug={graphSlug}
 							skillId={skill.id}
 							version={diffOf}
 						/>
-					) : null}
-				</div>
-			)}
-		</PanelSection>
+					) : null
+				}
+			/>
+			<GatedActDialog
+				open={restoring !== null}
+				title={`Restore v${restoring}`}
+				description={`Makes v${skill.version + 1} from the text of v${restoring}; nothing is rewritten.`}
+				confirm={`Restore v${restoring}`}
+				pending={rollback.isPending}
+				error={rollback.error}
+				onConfirm={(why) =>
+					rollback.mutate(
+						{ version: restoring as number, why },
+						{ onSuccess: () => setRestoring(null) },
+					)
+				}
+				onClose={() => {
+					rollback.reset();
+					setRestoring(null);
+				}}
+				onRunEvals={() =>
+					evals.open.mutate({
+						version: restoring,
+						side: "draft",
+						trigger: "rollback",
+					})
+				}
+				runningEvals={evals.open.isPending}
+			/>
+		</div>
 	);
 }
 

@@ -16,18 +16,6 @@ export function useSkillsQuery(
 	});
 }
 
-export function useSkillVersionsQuery(
-	username: string,
-	graphSlug: string,
-	skillId: string | null,
-) {
-	return useQuery({
-		queryKey: [...key(username, graphSlug), skillId, "versions"] as const,
-		queryFn: () => skillsApi.versions(username, graphSlug, skillId as string),
-		enabled: !!skillId,
-	});
-}
-
 /** The prose diff against the version before. `v1` has nothing to diff against. */
 export function useSkillDiffQuery(
 	username: string,
@@ -202,6 +190,24 @@ export function usePublishSkillVersionMutation(
 			skillsApi.publish(username, graphSlug, id, data),
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: key(username, graphSlug) });
+			qc.invalidateQueries({ queryKey: ["history", username, graphSlug] });
+		},
+	});
+}
+
+/** Restore an earlier version as the next one; History moves with it. */
+export function useRollbackSkillMutation(
+	username: string,
+	graphSlug: string,
+	skillId: string,
+) {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: ({ version, why }: { version: number; why: string }) =>
+			skillsApi.rollback(username, graphSlug, skillId, version, why),
+		onSuccess: () => {
+			qc.invalidateQueries({ queryKey: key(username, graphSlug) });
+			qc.invalidateQueries({ queryKey: ["history", username, graphSlug] });
 		},
 	});
 }

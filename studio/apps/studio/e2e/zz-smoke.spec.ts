@@ -33,7 +33,7 @@ test("every panel renders with no module or runtime error", async ({
 		.getByText("Brief the route desk", { exact: true })
 		.click({ timeout: 30_000 });
 	await page.getByRole("button", { name: "Open", exact: true }).click();
-	await page.getByRole("tab", { name: /^Flow/ }).click();
+	await page.getByRole("tab", { name: /^Plan/ }).click();
 	await expect(page.getByText(/^Composed —/)).toBeVisible({ timeout: 30_000 });
 	await page.waitForTimeout(1000);
 

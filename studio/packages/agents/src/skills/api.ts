@@ -114,6 +114,19 @@ export const skillsApi = {
 			body: JSON.stringify(data),
 		}),
 
+	/** Restore `version` as the next one — through the eval gate. */
+	rollback: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		version: number,
+		why: string,
+	) =>
+		request<SkillVersion>(`${base(username, graphSlug)}/${id}/rollback`, {
+			method: "POST",
+			body: JSON.stringify({ version, why: why || null }),
+		}),
+
 	/** What this version changed against the one before it. */
 	diff: (username: string, graphSlug: string, id: string, version: number) =>
 		request<SkillVersionDiff>(

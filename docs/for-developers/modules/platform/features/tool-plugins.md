@@ -3,13 +3,13 @@
 Optional plugins that reach outside Invana — the web, mail, science sources — as task types an agent
 may name. Each is installed by its extra, enabled by an install Admin, and runs **in a worker**, never
 in the API process. The registry they join is listed over the API and the CLI, so Agents › Plugins
-(C03) and a terminal read the same thing.
+and a terminal read the same thing.
 
 | | |
 |---|---|
 | Index | [13.12](../../../README.md#13--platform) · Slice **B06b** |
 | Module | [Platform](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 — the Agents › Plugins surface is C03 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [plugins](plugins.md) · [distributed execution](distributed-execution.md) · [approvals](../../operate/features/approvals.md) · [products › plugins §4, §9](../../../../products/plugins.md#4-what-a-plugin-contributes) · [products › agents AG-13](../../../../products/agents.md) |
 
 > **As** an install Admin, **I want** to see every plugin the engine carries — its task types, their
@@ -166,6 +166,7 @@ sequenceDiagram
 | TP15 | **The runtime names only the gate's shape.** `SendGate` (request · decision) is declared in the interpreter; `ApprovalSendGate` over the inbox lives with the approvals manager, and each front-end that builds a runtime installs it (the API at start-up, the CLI in `with_runtime`). With none installed a `send` step fails `blocked · approvals_unavailable` — nothing is sent. The approval's subject is the step row, which a resumed run re-runs. |
 | TP16 | **A plugin skill is seeded as a published v1 whose plan is the one-step `human` placeholder, marked `generated`,** so the first draw replaces it — a skill version always has a plan, and the instructions are what the plugin ships. |
 | TP17 | **Two keys of one plugin that end alike take whole-key folders** — `uniprot_get/`, `pubchem_get/`, and `pubmed_search/` beside them for symmetry; keys stay as the product named them. |
+| TP18 | **Studio reads the registry and switches only what the engine marks switchable.** Agents › Plugins lists `/plugins` filtered by kind; a row opens `plugin:<name>`, a task type on it `task_type:<key>` — two Studio-only board kinds. Enable and Disable show only to an install Admin on a `switchable` plugin. *Connect an MCP server* stays in the CLI ([agents.md › Decisions](../../../../products/agents.md#decisions) *Plugins registry* · *Task type versions*). |
 | TP14 | **Wire forms are tagged JSON.** `{kind: "out", …Out}` · `{kind: "failure", cls, cause, message, short, evidence, raw}` · `{kind: "needs_input", question, options}` · `{kind: "cannot_answer", reason, exchange}` · `{kind: "converse", reply, options, exchange}`; anything else a worker raises is `failure · defect · worker_error`. |
 
 ## Not building
@@ -173,7 +174,6 @@ sequenceDiagram
 | Not building | Because |
 |---|---|
 | MCP plugins and `invana plugins mcp add` | [13.13 MCP plugins](mcp-plugins.md) — they switch and run like tool plugins |
-| The Agents › Plugins screen | C03 — this slice ships its API |
 | Genebank tools | no single genebank API to target yet; the science plugin starts with PubMed, UniProt and PubChem |
 | A secrets store in the app DB | env in the worker is enough for three secrets; a store is its own feature |
 | Per-agent "who may call it" on the registry | worlds and guardrails already decide it per Graph; the install-level registry does not repeat it |

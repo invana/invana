@@ -2,17 +2,14 @@
  * Plugins — everything agents can run, in one registry (agents.md).
  *
  * Two sections, stacked with no panel header above them: `Plugins` over
- * `Catalogue`. The registry of plugins — each with its manifests, versions and
- * who may call it — needs the engine's plugin module, so its section draws the
- * kit's `EmptyState` naming what opens it. The catalogue of task types exists
- * today; it moved here from Library, because the task types are what the
- * plugins provide. `?section=` names the section holding the height and
- * `&entry=` the task type drilled into.
+ * `Catalogue`. The registry lists every plugin this install loaded — kind,
+ * version, task types and whether it may run — and a row opens the plugin's
+ * page beside the stack. The catalogue of task types moved here from Library,
+ * because the task types are what the plugins provide. `?section=` names the
+ * section holding the height and `&entry=` the task type drilled into.
  */
 
 import {
-	EmptyState,
-	EmptyStateLock,
 	PanelStack,
 	type PanelStackHandle,
 	type PanelStackSection,
@@ -20,13 +17,12 @@ import {
 import { useStackSections } from "@invana-studio/shell";
 import {
 	PanelStatusBar,
-	SectionTitle,
 	StatusCrumb,
 	useStackSectionUi,
 } from "@invana-studio/ui";
-import { Lock, Puzzle } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { catalogueSection } from "../plans/CatalogueSection";
+import { registrySection } from "./RegistrySection";
 
 type PluginsSectionKey = "plugins" | "catalogue";
 
@@ -39,9 +35,11 @@ const DETAIL_PARAM: Record<PluginsSectionKey, string> = {
 interface Props {
 	username: string;
 	graphSlug: string;
+	/** A registry row — the plugin's page, beside the stack. */
+	onOpenPlugin?: (name: string) => void;
 }
 
-export function PluginsViewPanel({ username, graphSlug }: Props) {
+export function PluginsViewPanel({ username, graphSlug, onOpenPlugin }: Props) {
 	const stack = useStackSections<PluginsSectionKey>({
 		sectionKeys: SECTION_KEYS,
 		detailParam: DETAIL_PARAM,
@@ -61,24 +59,7 @@ export function PluginsViewPanel({ username, graphSlug }: Props) {
 		stack.sectionKey === d ? "60%" : "40%";
 
 	const sections: PanelStackSection[] = [
-		{
-			id: "plugins",
-			title: <SectionTitle>Plugins</SectionTitle>,
-			defaultSize: size("plugins"),
-			content: (
-				<EmptyState
-					className="h-full"
-					icon={<Puzzle />}
-					title="No plugins yet"
-					description="Core, tool, simulator and MCP plugins, each with the task types, skills and flows it brings — enabled deliberately, by an Admin."
-					locks={[
-						<EmptyStateLock key="engine" icon={<Lock />}>
-							Opens with engine support
-						</EmptyStateLock>,
-					]}
-				/>
-			),
-		},
+		registrySection({ ui, onOpenPlugin, defaultSize: size("plugins") }),
 		catalogueSection({
 			username,
 			graphSlug,

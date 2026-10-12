@@ -2,7 +2,7 @@
  * The plan page as a board document ([the-library.md](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * A report header naming the version, then **Overview · Layers · Flow ·
- * Activity**, with the `7 · 30 · 90 days` window on the right of the tab strip —
+ * Activity · Revisions in runs**, with the `7 · 30 · 90 days` window on the right of the tab strip —
  * the run page's layout in the plan's tense. This file composes; the page
  * fetches and answers actions, and `@invana/boards` draws.
  */
@@ -23,9 +23,11 @@ import type {
 	TaskPlanDetail,
 } from "../types";
 import type { PlanChartWidgets } from "./PlanChartWidgets";
+import type { PlanRevisionsOptions } from "./PlanRevisionsWidget";
 
 export type PlanPanels = PlanChartWidgets & {
 	flow: FlowOptions;
+	revisions: PlanRevisionsOptions;
 };
 
 export const PLAN_ACTIONS = {
@@ -49,7 +51,13 @@ const PLAN_READINGS = {
 } as const;
 export type PlanReading = keyof typeof PLAN_READINGS;
 
-const PLAN_TABS = ["overview", "layers", "flow", "activity"] as const;
+const PLAN_TABS = [
+	"overview",
+	"layers",
+	"flow",
+	"activity",
+	"revisions",
+] as const;
 export type PlanTab = (typeof PLAN_TABS)[number];
 
 export const WINDOWS: Record<string, PlanWindow> = {
@@ -88,6 +96,8 @@ export interface PlanPageData {
 	versions: number[];
 	performance: PlanPerformance | undefined;
 	runs: PlanRunsPage[] | undefined;
+	/** Whose graph — the Revisions tab reads each run's trace itself. */
+	owner: { username: string; graphSlug: string };
 }
 
 type Panel = PanelSpec<PlanPanels>;
@@ -120,6 +130,7 @@ export function planBoardSpec(
 		{ id: "layers", label: "Layers", rows: layersRows(plan, performance) },
 		{ id: "flow", label: "Flow", rows: flowRows(plan, performance, view) },
 		{ id: "activity", label: "Activity", rows: activityRows(data, view) },
+		{ id: "revisions", label: "Revisions in runs", rows: revisionRows(data) },
 	];
 
 	return {
@@ -667,4 +678,30 @@ function runRow(r: PlanRunRow) {
 
 function waiting(text: string): Panel {
 	return { kind: "text", options: { text, tone: "muted" } };
+}
+
+// ── Revisions in runs ─────────────────────────────────────────────────────────
+
+/** The window's runs against the base plan; the panel keeps those that replanned. */
+function revisionRows(data: PlanPageData): TabSpec<PlanPanels>["rows"] {
+	const runs = (data.runs ?? []).flatMap((p) => p.items);
+	return [
+		{
+			panels: [
+				{
+					kind: "revisions",
+					options: {
+						...data.owner,
+						version: data.plan.version,
+						steps: data.plan.nodes.map((n) => ({ key: n.id, label: n.label })),
+						runs: runs.map((r) => ({
+							run_id: r.run_id,
+							when: r.when,
+							asked: r.asked,
+						})),
+					},
+				},
+			],
+		},
+	];
 }

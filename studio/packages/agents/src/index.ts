@@ -39,7 +39,9 @@ export {
 	useTaskPlansQuery,
 } from "./plans/queries";
 export { useLibraryViewPanel } from "./plans/useLibraryViewPanel";
+export { PluginPage } from "./plugins/PluginPage";
 export { PluginsViewPanel } from "./plugins/PluginsViewPanel";
+export { TaskTypePage } from "./plugins/TaskTypePage";
 export { agents } from "./product";
 export { AgentsSettingsViewPanel } from "./settings/AgentsSettingsViewPanel";
 export { SkillFlowWidget } from "./skills/boards/SkillFlowWidget";

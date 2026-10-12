@@ -721,6 +721,31 @@ are in [products/projects.md](../products/projects.md#decisions) and the work fe
 | `projects.report` | PJ-14 | `…?view=report` | ✅ |
 | `explorer.answer.to_project` | EX-12 | *Add to a project* on an answer's reply line | ✅ |
 
+## Beyond the 42 · Agents — instructions, evals, history and plugins
+
+The `agents.*` boards of the *Invana Products* prototype for AG-04 · AG-06 · AG-08 · AG-09 · AG-11 ·
+AG-13 · AG-14, as Studio builds them in `@invana-studio/agents` (migration session C03). The agent and
+the skill are pages in `mainSection`; a plugin and a task type are two more (`plugin:<name>` ·
+`task_type:<key>`). Decisions are in [products/agents.md](../products/agents.md#decisions) and the feature files
+[6.5](modules/skills/features/instructions-publish-rollback.md) · [6.6](modules/skills/features/evals.md) ·
+[5.9](modules/agents/features/pinned-model-versions.md) · [13.12](modules/platform/features/tool-plugins.md) ·
+[10.6](modules/operate/features/change-log.md).
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `agents.agent.instructions` | AG-04 | page `agent:<id>` › Instructions — draft, publish through the gate, the eval set | ✅ |
+| `agents.agent.history` | AG-06 | page `agent:<id>` › History — the change log, *Restore* on an instructions row | ✅ |
+| `agents.skills.detail` | AG-08 | page `skill:<id>` — Instructions · Plan · Bindings · Usage · History | ✅ |
+| `agents.skills.instructions.edit` | AG-08 | Instructions › *Edit instructions* — save, draw, evals | ✅ |
+| `agents.skills.evals` | AG-08 | Instructions in its evals mode — tiles, cases, *Publish vN* | ✅ |
+| `agents.skills.plan.regenerated` | AG-08 | Plan — the plan, what the last publish regenerated, who picks it up | ✅ |
+| `agents.skills.history` | AG-09 | page `skill:<id>` › History — versions, diff, *Restore vN* | ✅ |
+| `agents.library.plan.revisions` | AG-11 | page `plan_runs:<id>` › Revisions in runs | ✅ |
+| `agents.plugins` | AG-13 | `/agents/plugins` — the registry over the catalogue | ✅ |
+| `agents.plugins.plugin` | AG-13 | page `plugin:<name>` | ✅ |
+| `agents.plugins.task` | AG-13 | page `task_type:<key>` | ✅ |
+| `agents.llms` | AG-14 | `/agents/llms` — a model row names the agents pinned to it; LLMs as its own page is C10 | 🟡 |
+
 ---
 
 ## The other direction — every feature, and the screen that draws it

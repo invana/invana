@@ -7,7 +7,7 @@ read from the records that already hold the versions and the events that minted 
 |---|---|
 | Index | [10.6](../../../README.md#10--operate) · Slice **B01** (P-09) |
 | Module | [Operate](../spec.md) |
-| API / CLI / Studio | ✅ / 🔵 / 🔵 |
+| API / CLI / Studio | ✅ / 🔵 / 🟡 |
 | Related | [audit-and-activity](audit-and-activity.md) · [see-what-ran](see-what-ran.md) · products: [shell.md](../../../../products/shell.md) SH-14 · [agents.md](../../../../products/agents.md) AG-06 · AG-09 · [modeller.md](../../../../products/modeller.md) MO-09 |
 
 > **As** an auditor, **I want** every change to anything versioned, with its effect after, and any two
@@ -57,7 +57,8 @@ flowchart TD
 | Surface | Shape |
 |---|---|
 | Activity › Events › Changes | The Events tab's filter; rows are events (C04) |
-| History panel | On the record page in its product and opened from a change row (C04, AG-06, AG-09, MO-09) |
+| Agent page › History · Skill page › History | The record's changes — version · when · by · what changed · why · after (C03 AG-06 · AG-09) |
+| History panel | On the other record pages and opened from a change row (C04, MO-09) |
 | Compare | Two versions side by side (C04 `shell.change.compare`) |
 
 ## Engine
@@ -108,6 +109,7 @@ flowchart TD
 | CL8 | **An agent update records `details.diff`** — `{field: {before, after}}` for every changed field — beside the field names it already recorded, because an agent has no version table and its event is the only place an earlier version still exists. |
 | CL9 | **Compare `a` omitted is "against the one before"**; `a` older than `b` is not required — the diff reads from `a` to `b`. Drafts are never versions. |
 | CL10 | **Restore is not here.** Restoring makes a new version through the record's own write (shell.md); the change log only reads. |
+| CL11 | **The agent and skill pages read their own history; the shared surfaces are C04.** Their History tabs read `history/<kind>/<id>`, and the skill's Plan tab reads its compare against the version before; Activity › Changes and the compare board stay with the shell ([agents.md › Decisions](../../../../products/agents.md#decisions) *Agent history* · *Skill history*). |
 
 ## Not building
 

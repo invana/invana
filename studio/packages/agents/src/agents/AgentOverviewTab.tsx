@@ -99,8 +99,10 @@ export function AgentOverviewTab({
 
 				<PanelSection
 					card
-					title="Focus"
-					action={<GoTo label="Thinking" onClick={() => onGoTo("thinking")} />}
+					title="Instructions"
+					action={
+						<GoTo label="Instructions" onClick={() => onGoTo("instructions")} />
+					}
 				>
 					<p
 						className={
@@ -108,7 +110,7 @@ export function AgentOverviewTab({
 						}
 					>
 						{agent.instructions ||
-							"No focus of its own — the Graph's instructions alone."}
+							"No instructions of its own — the Graph's instructions alone."}
 					</p>
 				</PanelSection>
 

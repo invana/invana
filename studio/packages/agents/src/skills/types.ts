@@ -169,6 +169,8 @@ export interface SkillDraft {
 	clarifications: SkillClarification[];
 	open_clarification: SkillClarification | null;
 	drawing_run_id: string | null;
+	/** Whether the plan was drawn from the text as it reads now — publish needs it. */
+	drawn: boolean;
 	/**
 	 * Why the last draw wrote nothing. A refusal settles rather than fails,
 	 * so it is read here — where the flow would have been — and not in
@@ -195,7 +197,7 @@ export interface SkillAgentStanding {
 export type { BindRefusal };
 
 /** What the last draw refused, in the validator's own words. */
-export interface SkillDrawRefusal {
+interface SkillDrawRefusal {
 	run_id: string;
 	reasons: string[];
 }
@@ -222,6 +224,9 @@ export interface SkillVersion {
 	/** One version, exactly one plan. Never null. */
 	plan_id: string;
 	is_draft: boolean;
+	model_pin: string | null;
+	/** The version this one restored, when it is a rollback. */
+	restored_from_version: number | null;
 }
 
 export interface SkillVersionListResponse {
@@ -234,6 +239,10 @@ export interface SkillVersionPublish {
 	description?: string;
 	content?: string;
 	when_to_use?: string;
+	/** The exact model version this skill pins; omitted keeps the current one. */
+	model_pin?: string | null;
+	/** Kept in History; a warned eval run needs one. */
+	why?: string;
 }
 
 interface SkillVersionFieldDiff {

@@ -191,6 +191,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		<PluginsViewPanel
 			username={username as string}
 			graphSlug={graphSlug as string}
+			onOpenPlugin={(name) => openBoard({ kind: "plugin", subjectId: name })}
 		/>
 	) : settingsPanel.section === "performance" ? (
 		<PerformanceViewPanel />

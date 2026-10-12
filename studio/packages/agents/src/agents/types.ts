@@ -23,6 +23,10 @@ export interface Agent {
 	status: AgentStatus;
 	lifetime: AgentLifetime;
 	instructions: string;
+	/** The unpublished `instructions.md`; null when no draft is open. */
+	instructions_draft: string | null;
+	/** The exact model version it thinks with; null lets the world's cast decide. */
+	model_pin: string | null;
 	/** The envelope: allow-list · pinned args · require · templates · budgets. */
 	workflow_spec: Record<string, unknown>;
 	/**
@@ -92,7 +96,12 @@ export interface AgentCreate {
  *  skill it rejected rather than a whole list. */
 export type AgentUpdate = Partial<
 	Omit<AgentCreate, "envelope_from" | "skill_ids">
->;
+> & {
+	/** Moving it is gated by the agent's evals. */
+	model_pin?: string | null;
+	/** Kept in History; a warned eval run needs one. */
+	why?: string;
+};
 
 type EffortKey = "max_steps" | "max_replans" | "max_clarifications";
 

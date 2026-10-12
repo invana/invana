@@ -1,6 +1,6 @@
 /**
- * The agent's page — one page, five tabs: **Overview · Skills &
- * callables · Thinking · Soul · Activity**.
+ * The agent's page — one page, seven tabs: **Overview · Instructions ·
+ * Skills & callables · Thinking · Soul · Activity · History**.
  *
  * *As someone running work through agents, I want to see what one agent is,
  * what it can do, how it thinks, how it speaks and what it has done, so that
@@ -15,8 +15,9 @@
  * Nothing here autosaves. An envelope is a permission boundary and a voice is
  * a version, so edits from every tab accumulate in one buffer, Discard · Save
  * appear in the header while it differs, and one **Save** is one agent edit.
- * Binding a skill is the exception — its own write, so a refusal can
- * name the one skill it refused.
+ * Three acts are their own writes: binding a skill, so a refusal can name the
+ * one skill it refused; the instructions, which have a draft and publish
+ * through the eval gate; and the model pin, a gated move with a reason.
  */
 
 import { Button, RecordHeader, TabbedPanel } from "@invana/ui";
@@ -25,6 +26,8 @@ import { Eye, Lock, Play, Save, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AgentActivityTab } from "./AgentActivityTab";
 import { AgentEffortTab } from "./AgentEffortTab";
+import { AgentHistoryTab } from "./AgentHistoryTab";
+import { AgentInstructionsTab } from "./AgentInstructionsTab";
 import { AgentOverviewTab } from "./AgentOverviewTab";
 import { AgentSkillsTab } from "./AgentSkillsTab";
 import { AgentSoulTab, useSoulPreview } from "./AgentSoulTab";
@@ -53,7 +56,14 @@ export const ALL_TASKS = [
 	"create_task",
 ];
 
-export type AgentTab = "overview" | "skills" | "thinking" | "soul" | "activity";
+export type AgentTab =
+	| "overview"
+	| "instructions"
+	| "skills"
+	| "thinking"
+	| "soul"
+	| "activity"
+	| "history";
 
 export function AgentDetail({
 	username,
@@ -237,6 +247,21 @@ export function AgentDetail({
 						),
 					},
 					{
+						value: "instructions",
+						label:
+							agent.instructions_draft !== null
+								? "Instructions · draft"
+								: "Instructions",
+						content: (
+							<AgentInstructionsTab
+								username={username}
+								graphSlug={graphSlug}
+								agent={agent}
+								onGoToHistory={() => setTab("history")}
+							/>
+						),
+					},
+					{
 						value: "skills",
 						label: "Skills & callables",
 						content: (
@@ -260,7 +285,13 @@ export function AgentDetail({
 						value: "thinking",
 						label: "Thinking",
 						content: (
-							<AgentEffortTab agent={agent} draft={draft} onPatch={patch} />
+							<AgentEffortTab
+								username={username}
+								graphSlug={graphSlug}
+								agent={agent}
+								draft={draft}
+								onPatch={patch}
+							/>
 						),
 					},
 					{
@@ -286,6 +317,17 @@ export function AgentDetail({
 								draft={draft}
 								onPatch={patch}
 								onOpenLineage={onOpenLineage}
+							/>
+						),
+					},
+					{
+						value: "history",
+						label: "History",
+						content: (
+							<AgentHistoryTab
+								username={username}
+								graphSlug={graphSlug}
+								agent={agent}
 							/>
 						),
 					},

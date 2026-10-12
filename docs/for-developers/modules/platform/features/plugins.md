@@ -9,7 +9,7 @@ builds itself from the manifests once at start-up and is then frozen.
 |---|---|
 | Index | [13.9](../../../README.md#13--platform) · Slice **B06a** |
 | Module | [Platform](../spec.md) |
-| API / CLI / Studio | — / — / — — the engine layout only; the registry API and `invana plugins` are [13.12](tool-plugins.md), the Plugins surface is C03 |
+| API / CLI / Studio | — / — / — — the engine layout only; the registry API, `invana plugins` and Agents › Plugins are [13.12](tool-plugins.md) |
 | Related | [the runtime](runtime.md) · [read the catalogue](../../workflows/features/the-catalogue.md) · [products › plugins](../../../../products/plugins.md) |
 
 > **As** an engine developer adding a task type, **I want** one folder with its manifest and its code,
@@ -113,5 +113,4 @@ flowchart LR
 |---|---|
 | MCP plugins | B07 |
 | Tool plugins, `invana plugins …`, enabling a plugin, skills in a plugin | [13.12 Tool plugins](tool-plugins.md) |
-| The Agents › Plugins surface | C03 |
 | Hot-loading a plugin | the registry is frozen per process |

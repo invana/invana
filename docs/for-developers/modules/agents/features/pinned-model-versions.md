@@ -8,7 +8,7 @@ changes nothing until a person moves the pin, and any run can be re-run on the v
 |---|---|
 | Index | [5.9](../../../README.md#5--agents) · Slice **B02** (P-17) |
 | Module | [Agents](../spec.md) |
-| API / CLI / Studio | 🟡 / 🟡 / 🔵 |
+| API / CLI / Studio | 🟡 / 🟡 / 🟡 |
 | Related | [providers-and-models](providers-and-models.md) · [author-an-agent](author-an-agent.md) · [evals](../../skills/features/evals.md) · [change-log](../../operate/features/change-log.md) · products: [agents.md](../../../../products/agents.md) AG-14 · [shell.md](../../../../products/shell.md) SH-18 |
 
 > **As** a builder, **I want** the LLM models agents think with pinned to an exact version name, **so
@@ -59,8 +59,9 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Agents › LLMs | Models by version name, and which agents, skills and judges pin each (AG-14, C10) |
-| Agent page › Thinking | The pin picker; moving it shows the eval result first (C03) |
+| Agents › LLMs | Models by version name; each model row names the agents pinned to it (C03). Skills and judges on the row, and LLMs as its own page, are C10 |
+| Agent page › Thinking | *Model version*: none, or an exact version; moving it is its own act with a why, gated (C03) |
+| Skill page › Instructions | The draft's model version, published with the next version (C03) |
 | Run page | *Re-run* with *same versions* · *current versions* (SH-18, C09) |
 | CLI | `invana llms list` · `models <endpoint>` print the addresses a pin takes; `invana agents pin <agent> --model <address>` passes the eval gate on the new pin first |
 
@@ -96,6 +97,7 @@ flowchart TD
 | PV7 | **Re-run is a new root run**, linked by `rerun_of_run_id`; it never touches the original. `same` replays the recorded versions and refuses, naming it, when one is gone; `current` reads today's pins and cast. |
 | PV8 | **A person's pick for one ask is innermost.** The composer's model pick names the model for that ask only; it outranks the pins, and it is lens-checked like them. It moves no pin and mints no version. |
 | PV9 | **The skill pin is the plan's.** A run whose plan was drawn from a skill version calls that version's pin; a run on a generated plan reads the agent's. |
+| PV11 | **Studio cannot clear a pin.** `PATCH …/agents/{id}` reads `model_pin: null` as *unchanged*, so Thinking offers a move between versions and no *none* once one is set ([agents.md › Decisions](../../../../products/agents.md#decisions) *Model pins*). |
 | PV10 | **Re-run takes a settled ask.** An `nl` or `ql` root that is no longer queued, running or waiting. It opens as a run of its own, in no session, so the original reply is never rewritten. `same` pins the recorded `model_version` and copies the frozen lens; the plan is drawn afresh. Replaying plan revision 0 and the offered skill versions waits for the run page that shows them (SH-18). |
 
 ## Not building

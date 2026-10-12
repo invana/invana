@@ -136,7 +136,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 5.6 | [Who spawned whom](modules/agents/features/lineage.md) | Who authored whom, who spawned whom, on what run | ✅ | — | ✅ | S12c |
 | 5.7 | [How many run at once](modules/agents/features/concurrency-and-contention.md) | How many run at once in a Graph, the pools, and what happens at the ceiling | 🟡 | — | 🔵 | S12e · **S16** |
 | 5.8 | [Give an agent a soul](modules/agents/features/soul.md) | Who the agent is and how it speaks — Markdown on the agent, read only by the steps a person reads | 🟡 | — | ✅ | S-TBD |
-| 5.9 | [Pin a model version](modules/agents/features/pinned-model-versions.md) | Agents, skill versions and judges pin an exact model version; every run records the one it called; re-run on the same versions | 🟡 | 🟡 | 🔵 | B02 |
+| 5.9 | [Pin a model version](modules/agents/features/pinned-model-versions.md) | Agents, skill versions and judges pin an exact model version; every run records the one it called; re-run on the same versions | 🟡 | 🟡 | 🟡 | B02 |
 
 ## 6 · [Skills](modules/skills/spec.md)
 
@@ -146,8 +146,8 @@ provider row and its models, and reopens four rows below. The shapes:
 | 6.2 | [Offer a skill to an agent](modules/skills/features/bindings.md) | Which agent may be offered which skill | ✅ | — | ✅ | S12c |
 | 6.3 | [Where a skill was used](modules/skills/features/usage.md) | Where a skill was offered, and where it was reported applied | ✅ | — | ✅ | S12c |
 | 6.4 | [Rules](modules/skills/features/rules.md) | Install rules, Graph invariants and project working rules, offered as statements; a rule with a check is enforced block · warn · report at the acts it names | ✅ | ✅ | 🟡 | S12b · B04 |
-| 6.5 | [Instructions, publish and roll back](modules/skills/features/instructions-publish-rollback.md) | `instructions.md` drafts on skills and agents; publish regenerates the plan; one-act rollback; plans generated or packaged | 🟡 | 🟡 | 🔵 | B02 |
-| 6.6 | [Evals](modules/skills/features/evals.md) | Eval sets with rule checks and a labelled judge; the publish gate; drift re-runs; an eval token budget | ✅ | 🟡 | 🔵 | B02 |
+| 6.5 | [Instructions, publish and roll back](modules/skills/features/instructions-publish-rollback.md) | `instructions.md` drafts on skills and agents; publish regenerates the plan; one-act rollback; plans generated or packaged | 🟡 | 🟡 | ✅ | B02 |
+| 6.6 | [Evals](modules/skills/features/evals.md) | Eval sets with rule checks and a labelled judge; the publish gate; drift re-runs; an eval token budget | ✅ | 🟡 | ✅ | B02 |
 
 ## 7 · [Workflows](modules/workflows/spec.md)
 
@@ -191,7 +191,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 10.3 | [Observability](modules/operate/features/observability.md) | Query and LLM metrics, cost and latency | 🔵 | — | 🔵 | S11 |
 | 10.4 | [External-agent API](modules/operate/features/external-agent-api.md) | Scoped tokens; retrieval with provenance | 🔵 | — | 🔵 | S10 |
 | 10.5 | [See what ran](modules/operate/features/see-what-ran.md) | **Runs** — every run in the Graph, children nested; Imports is a filter of it | 🟡 | — | 🟡 | S14 |
-| 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | 🔵 | B01 |
+| 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | 🟡 | B01 |
 | 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | 🔵 | B08 |
 | 10.8 | [Approvals](modules/operate/features/approvals.md) | Anything sent outside waits for a named approver; a reminder at half-time; at the deadline *expired, not sent* | ✅ | ✅ | 🔵 | B08 |
 
@@ -231,7 +231,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 13.9 | [Plugins](modules/platform/features/plugins.md) | Every task type in a plugin — `plugin.yaml`, a manifest beside each task's code, packaged flows; one frozen registry; each Task records its task version | — | — | — | B06a |
 | 13.10 | [Search](modules/platform/features/search.md) | One name search over every Graph and dataset you may open, filtered by access, exact → prefix → contains | ✅ | ✅ | 🔵 | B11 |
 | 13.11 | [Distributed execution](modules/platform/features/distributed-execution.md) | Every step as a `TaskEnvelope`, called by one `run_envelope()` that rebuilds its context from ids; procrastinate chosen as the distributed executor by benchmark | — | — | — | B14 |
-| 13.12 | [Tool plugins](modules/platform/features/tool-plugins.md) | `tools/web` · `tools/mail` · `tools/science` as optional extras, Admin-enabled, run in workers; `send` waits for an approval; the plugin registry over API and CLI | ✅ | ✅ | 🔵 | B06b |
+| 13.12 | [Tool plugins](modules/platform/features/tool-plugins.md) | `tools/web` · `tools/mail` · `tools/science` as optional extras, Admin-enabled, run in workers; `send` waits for an approval; the plugin registry over API and CLI | ✅ | ✅ | ✅ | B06b |
 | 13.13 | [MCP plugins](modules/platform/features/mcp-plugins.md) | An MCP server's tools as task types in an `mcp` plugin, frozen when an Admin adds the server; refreshed by hand, loaded at start-up, switched like a tool plugin | ✅ | ✅ | 🔵 | B07 |
 
 ---
@@ -283,7 +283,7 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 |---|---|---|---|---|
 | API | 62 | 19 | 15 | 5 |
 | CLI | 23 | 10 | 3 | 65 |
-| Studio | 42 | 18 | 33 | 8 |
+| Studio | 45 | 20 | 28 | 8 |
 
 A hundred and one features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse

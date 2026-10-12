@@ -14,6 +14,7 @@
 
 import { useGraphsQuery } from "@invana-studio/core";
 import {
+	type QueryClient,
 	useMutation,
 	useQueries,
 	useQuery,
@@ -32,6 +33,8 @@ import type {
 	DatasetStandard,
 	DatasetStandardCreate,
 	DatasetUpdate,
+	DatasetVersion,
+	DatasetVersionListResponse,
 	StandardCreate,
 } from "./types";
 
@@ -188,6 +191,40 @@ export async function readBase(
 		);
 	}
 	return readAll(d, base);
+}
+
+/**
+ * Folds a version the engine just minted into the cached dataset and its
+ * version list, then reads everything else under `["datasets"]` again. The
+ * two folded keys are not refetched: the engine commits after it answers, so
+ * a read sent the moment the save returns can still see the old version and
+ * would put it back.
+ */
+export function foldPublished(
+	qc: QueryClient,
+	d: DatasetRef,
+	v: DatasetVersion,
+) {
+	qc.setQueryData<Dataset>(dsKey(d), (old) =>
+		old
+			? {
+					...old,
+					current_version: v.version,
+					record_count: v.record_count,
+					licence: v.licence,
+				}
+			: old,
+	);
+	qc.setQueryData<DatasetVersionListResponse>(dsKey(d, "versions"), (old) =>
+		old && !old.items.some((x) => x.version === v.version)
+			? { items: [v, ...old.items], total: old.total + 1 }
+			: old,
+	);
+	const folded = [dsKey(d), dsKey(d, "versions")].map((k) => JSON.stringify(k));
+	void qc.invalidateQueries({
+		queryKey: ["datasets"],
+		predicate: (q) => !folded.includes(JSON.stringify(q.queryKey)),
+	});
 }
 
 function useDatasetWrite<V, R>(fn: (vars: V) => Promise<R>) {

@@ -9,7 +9,7 @@ generated from instructions or packaged; nobody draws one.
 |---|---|
 | Index | [6.5](../../../README.md#6--skills) · Slice **B02** (P-11 · P-15) |
 | Module | [Skills](../spec.md) |
-| API / CLI / Studio | 🟡 / 🟡 / 🔵 |
+| API / CLI / Studio | 🟡 / 🟡 / ✅ |
 | Related | [authoring-a-skill](authoring-a-skill.md) · [evals](evals.md) · [author-an-agent](../../agents/features/author-an-agent.md) · [the-library](../../workflows/features/the-library.md) · [change-log](../../operate/features/change-log.md) · products: [agents.md › Instructions → plan](../../../../products/agents.md#instructions--plan) AG-04 · AG-08 · AG-09 · AG-11 |
 
 > **As** a builder, **I want** to write a skill's or an agent's instructions and see the plan generated
@@ -67,10 +67,11 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Skill page › Playbook | The draft, *Draw*, *Publish*; publish shows the eval result first (C03 `agents.skills.instructions.edit`) |
-| Skill page › Flow | The generated plan, read-only (`agents.skills.plan.regenerated`) |
-| Agent page › Instructions | The agent's draft and publish (C03 `agents.agent.instructions`) |
-| History | *Restore this version* on an older row (AG-06 · AG-09) |
+| Skill page › Instructions | The text beside its generated plan; *Edit instructions* saves the draft, draws it and replays the evals; *Publish vN* with a why (C03 `agents.skills.instructions.edit`) |
+| Skill page › Plan | The generated plan, read-only, and under it what the last publish regenerated and which bound agents pick it up on their next run (C03 `agents.skills.plan.regenerated`) |
+| Agent page › Instructions | The agent's draft, *Publish* through the gate, *Discard* (C03 `agents.agent.instructions`) |
+| Agent page › History · Skill page › History | The change log; *Restore* on an older row, with a why, gated (C03 AG-06 · AG-09) |
+| Plan page › Revisions in runs | A run that replanned, its steps against the base plan's (C03 AG-11) |
 | Library › Plans | Generated and packaged plans, read-only; no *New plan* (AG-11) |
 | CLI | `invana skills list` · `history` · `push <skill> --instructions <file>` · `publish` · `rollback --to N`; `invana agents list` · `push` · `publish`; `invana plans list` · `show`, all read-only for plans |
 
@@ -101,12 +102,13 @@ flowchart TD
 | IS3 | **Nobody edits a plan by hand.** A skill has no route that writes plan rows and no *Edit by hand*; the library has no *New plan* and no drafting of one. A plan that reads wrong means the instructions are ambiguous, and the fix is the prose or the clarification answer. |
 | IS11 | **Composition is drawn.** The planner reads the Graph's reusable library plans beside the catalogue — newest version of each, as `plan:<key>@<v>` with its description and declared arguments — and a sentence may name one as a candidate. It is counted like any candidate: one is a step, two or more ask. A picked plan is inlined at the draw: copied flat, keys prefixed with the plan key, each row naming the plan and step it came from ([SK32](authoring-a-skill.md#decisions) · [SK33](authoring-a-skill.md#decisions)), and validated in the drawing envelope with every other step. A candidate's `tune` sets arguments the plan declares; an undeclared one refuses the draw by name ([LB27](../../workflows/features/the-library.md#decisions)). `task_plans.uses` records the composition. A person composes by naming the plan in the prose. |
 | IS4 | **Publish regenerates by requiring a fresh draw.** A draw stamps `drawn_digest` — the sha256 of the draft's description, content and when-to-use. Publish compares it with the draft's text now and refuses `409` when they differ, so a published plan is always the one drawn from the published words. Studio's *Publish* draws and then publishes; the engine never publishes an undrawn change. A draft opened over a published version, and a rollback, carry that version's digest: its plan is the plan of its text, so a pin-only or why-only publish needs no draw. `PATCH …/skills/{id}` with new prose writes the draft and publishes nothing. Seeds, fixtures and imports publish through `create(publish=True)`, a Python-only path no route reaches. The draft read says `drawn` — whether the digest matches the text now. |
-| IS5 | **An agent's draft is one column**, `agents.instructions_draft`. An agent has no version table — its versions are its events ([CL8](../../operate/features/change-log.md#decisions)) — so publish is an ordinary `agent.update` that moves the draft into `instructions`, with its diff and why, and clears the draft; a draft equal to `instructions` clears without a new version. Publish with no draft open is refused `409`. `PATCH …/agents/{id}` `{instructions}` stays a direct write — an `agent.update` — for a caller with no draft surface, and Studio's Focus editor until C03 moves it onto the draft. An agent's draw and eval gate arrive with [evals](evals.md); until then publish moves the text. |
+| IS5 | **An agent's draft is one column**, `agents.instructions_draft`. An agent has no version table — its versions are its events ([CL8](../../operate/features/change-log.md#decisions)) — so publish is an ordinary `agent.update` that moves the draft into `instructions`, with its diff and why, and clears the draft; a draft equal to `instructions` clears without a new version. Publish with no draft open is refused `409`. `PATCH …/agents/{id}` `{instructions}` stays a direct write — an `agent.update` — for a caller with no draft surface; Studio writes the draft. An agent's draw and eval gate arrive with [evals](evals.md); until then publish moves the text. |
 | IS10 | **An agent's rollback reads its events.** The instructions at version N are the `after` of the last change at or before N, else the `before` of the first change after N, else today's text. It is refused `409` while a draft is open, when that text is already current, and when the change that holds it predates recorded diffs; an unknown version is `404`. The `agent.update` it writes carries `restored_from`. |
 | IS6 | **Rollback is a new version, never a rewrite.** It copies the chosen version's description, content, when-to-use, pin and plan rows into the next version number, publishes it, and records `restored_from_version`. The copied plan keeps the origin its rows had. An agent's rollback restores `instructions` from that version's fold in the change log. |
 | IS7 | **Rollback refuses while a draft is open.** The draft owns the next version number; rolling back past it would either overwrite a person's work or skip a number. |
 | IS8 | **Publish and rollback both pass the eval gate** ([evals](evals.md)). A rollback restores something that once passed — it still runs the current set, because the set may have grown. |
 | IS9 | **Rollout is draft → publish to every bound agent on its next run.** No traffic splitting; a run open on the old version finishes on it. |
+| IS13 | **Studio authors through the draft and the gate, never around them.** The agent's Instructions tab and the skill's Instructions tab write drafts, publish with a why and draw a gate refusal where the act was; History restores with a why through the same gate. Tab names, modes and what each draws are [agents.md › Decisions](../../../../products/agents.md#decisions) — *Agent instructions* · *Skill instructions* · *Plan regenerated* · *Skill history* · *Revisions in runs*. |
 | IS12 | **`invana skills push` writes the draft and draws it**, in the CLI's own process, so the next `publish` has a plan drawn from that text. A draw that asks a question exits 2 and prints it; the question is answered in Studio, and the CLI never answers one. |
 
 ## Not building

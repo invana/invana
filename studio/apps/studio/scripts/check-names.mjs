@@ -71,9 +71,10 @@ const ENGINE_ONLY = {
 	llm_providers:
 		"served by the @invana-studio/agents package, outside the host",
 	work: "served by the @invana-studio/projects package, outside the host",
-	history: "the change log; no Studio surface reads it yet",
-	evals: "eval sets and runs; no Studio surface reads them yet",
-	plugins: "the plugins registry; the Agents product reads it from C03",
+	history:
+		"the change log; the agent and skill pages in @invana-studio/agents read it",
+	evals: "served by the @invana-studio/agents package, outside the host",
+	plugins: "served by the @invana-studio/agents package, outside the host",
 	datasets: "served by the @invana-studio/datasets package, outside the host",
 	standards: "served by the @invana-studio/datasets package, outside the host",
 	members:

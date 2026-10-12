@@ -5,7 +5,9 @@ import {
 	PlanBoardPage,
 	PlanExportPage,
 	PlanVersionsPage,
+	PluginPage,
 	SkillBoardPage,
+	TaskTypePage,
 	UsageBoardPage,
 } from "@invana-studio/agents";
 import type { CanvasBackend } from "@invana-studio/canvases";
@@ -293,6 +295,28 @@ export function declaredBoardContent(
 		);
 	}
 
+	// The plugin registry's two pages — install-level, so neither takes the
+	// Graph. A task type on a plugin opens beside it, and back.
+	if (board.kind === "plugin") {
+		return (
+			<PluginPage
+				name={board.subjectId}
+				onOpenTaskType={(key) =>
+					openBoard({ kind: "task_type", subjectId: key })
+				}
+			/>
+		);
+	}
+
+	if (board.kind === "task_type") {
+		return (
+			<TaskTypePage
+				taskKey={board.subjectId}
+				onOpenPlugin={(name) => openBoard({ kind: "plugin", subjectId: name })}
+			/>
+		);
+	}
+
 	if (board.kind === "compare") {
 		const pair = parseComparePair(board.subjectId);
 		return pair ? (
@@ -386,15 +410,17 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 							BOARD_KINDS[board.kind].label)
 						: board.kind === "project"
 							? (projectNameByKey.get(board.subjectId) ?? board.subjectId)
-							: board.kind === "run"
-								? runAddress(board.subjectId)
-								: board.kind === "plan_runs"
-									? (planRefById.get(board.subjectId) ??
-										BOARD_KINDS[board.kind].label)
-									: board.kind === "plan_versions" ||
-											board.kind === "plan_arguments" ||
-											board.kind === "plan_export"
-										? `${planRefById.get(board.subjectId) ?? "plan"} · ${BOARD_KINDS[board.kind].label.toLowerCase()}`
-										: BOARD_KINDS[board.kind].label
+							: board.kind === "plugin" || board.kind === "task_type"
+								? board.subjectId
+								: board.kind === "run"
+									? runAddress(board.subjectId)
+									: board.kind === "plan_runs"
+										? (planRefById.get(board.subjectId) ??
+											BOARD_KINDS[board.kind].label)
+										: board.kind === "plan_versions" ||
+												board.kind === "plan_arguments" ||
+												board.kind === "plan_export"
+											? `${planRefById.get(board.subjectId) ?? "plan"} · ${BOARD_KINDS[board.kind].label.toLowerCase()}`
+											: BOARD_KINDS[board.kind].label
 	);
 }

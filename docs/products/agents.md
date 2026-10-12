@@ -24,17 +24,17 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | AG-F1 | Overview — broke, waiting, slower, changed recently | In Studio (parts) · New | AG-01 |
 | AG-F2 | Agents and their lineage | In Studio | AG-02 |
 | AG-F3 | Agent page and activity | In Studio | AG-03 |
-| AG-F4 | Agent instructions.md | New · Blocked · P-11 | AG-04 |
+| AG-F4 | Agent instructions.md | In Studio (C03) | AG-04 |
 | AG-F5 | Tune — soul, thinking, skills and callables, envelope | In Studio | AG-05 |
-| AG-F6 | Agent history with effect after | New · Blocked · P-09 | AG-06 |
+| AG-F6 | Agent history with effect after | In Studio (C03) · compare two versions is C04 | AG-06 |
 | AG-F7 | Pause or retire with impact | In Studio | AG-07 |
-| AG-F8 | Skill instructions.md beside its generated plan; drafts, eval set replayed before publish, regenerate on publish, one-click rollback | New · Blocked · P-11 P-15 | AG-08 |
-| AG-F9 | Skill history — why, plan change, performance after; restore | New · Blocked · P-09 | AG-09 |
+| AG-F8 | Skill instructions.md beside its generated plan; drafts, eval set replayed before publish, regenerate on publish, one-click rollback | In Studio (C03) | AG-08 |
+| AG-F9 | Skill history — why, plan change, performance after; restore | In Studio (C03) | AG-09 |
 | AG-F10 | Skill usage | In Studio | AG-10 |
-| AG-F11 | Library › Plans — generated, read-only; revisions in runs | In Studio (plans) · New (generated, revisions) | AG-11 |
+| AG-F11 | Library › Plans — generated, read-only; revisions in runs | In Studio (plans · revisions in runs, C03) | AG-11 |
 | AG-F12 | Library › Templates — chosen by code from the result’s shape, ranked by the classified intent | In Studio · New (intent ranking — engine ✅ B13) | AG-12 |
-| AG-F13 | Plugins — the registry of every plugin (core, tool, simulator, MCP) with its task types, manifests, versions, skills and flows; Admin enables | New · engine registry API ✅ B06b ([13.12](../for-developers/modules/platform/features/tool-plugins.md)) · MCP plugins ✅ B07 ([13.13](../for-developers/modules/platform/features/mcp-plugins.md)) · Studio C03 | AG-13 |
-| AG-F14 | LLM endpoints and model versions — agents pin an exact version name | In Studio (endpoints) · New (pinning) · Blocked · P-17 | AG-14 |
+| AG-F13 | Plugins — the registry of every plugin (core, tool, simulator, MCP) with its task types, manifests, versions, skills and flows; Admin enables | In Studio (C03) · engine registry API ✅ B06b ([13.12](../for-developers/modules/platform/features/tool-plugins.md)) · MCP plugins ✅ B07 ([13.13](../for-developers/modules/platform/features/mcp-plugins.md)) | AG-13 |
+| AG-F14 | LLM endpoints and model versions — agents pin an exact version name | In Studio (endpoints · pinning, C03) · LLMs as its own page is C10 | AG-14 |
 | AG-F15 | Performance with degradation alerts | New | AG-15 |
 | AG-F16 | Concurrency pools | In Studio | AG-16 |
 
@@ -111,7 +111,7 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | Landing | The bare `/agents` lands on Agents. It is the first rail item with something to read, while Overview is still empty |
 | Agents and LLMs | Two sections of one stack, as today. Each rail item focuses its own section and keeps its own path |
 | Library | Plans over Templates. Templates sits under Library's path, so Library's rail item stays lit there |
-| Plugins | The plugin registry over the task catalogue. The registry section is the kit's `EmptyState` with *Opens with engine support* until the engine's plugin module exists. The catalogue moved here from Library, because plugins bring the task types. An old `?panel=library&section=catalogue` link lands on `/agents/plugins/tasks` |
+| Plugins | The plugin registry over the task catalogue (see *Plugins registry*). The catalogue moved here from Library, because plugins bring the task types. An old `?panel=library&section=catalogue` link lands on `/agents/plugins/tasks` |
 | Overview, Performance | Kit `EmptyState` with *Opens with engine support*. Overview points to Activity › Runs for runs that broke or wait |
 | Settings | The Graph's concurrency ceiling and its pools. These left the Modeller's Graph settings, which keeps Basic · Graph |
 | Rules | Not listed under Skills. A Graph's rules are the Modeller's Rules |
@@ -119,6 +119,18 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | Agent budgets | An agent's list row, quick look and Overview › Limits read its token budget (`up to 8k tokens a run`), or *no token budget yet*. Activity has no spend tile; its runs table shows tokens per run, and its meter reads tokens this month against the month budget. The Limits › Budget table lists `max_tokens_run` and `max_tokens_month`. The engine keeps both budgets in tokens ([EB8 · EB14 · EB15](../for-developers/modules/agents/features/envelope-and-budget.md#decisions)) |
 | Main area | Each rail item has its own empty-main line. Overview and Performance read *Opens with engine support*, Plugins *Pick a task type…*, Settings *Settings have no canvas…* |
 | LLMs | Until AG-14 builds its own page, LLMs is the Agents stack focused on its LLMs section |
+| Agent page tabs | Overview · Instructions · Skills & callables · Thinking · Soul · Activity · History, as drawn. Instructions leave the page's Save buffer: Thinking no longer edits a *Focus*, and Overview's *Instructions* card goes to the Instructions tab |
+| Agent instructions | The Instructions tab reads the published `instructions.md` beside *What it shapes*. *Edit* writes the agent's draft (`PATCH …/draft`) — nothing runs on it. *Publish* takes a stated reason and goes through the eval gate; a gate refusal is drawn as a refusal card with *Run the evals* where the engine asks for one. *Discard* drops the draft. A restore is made from History |
+| Agent history | The History tab is the change log of the agent (`history/agent/<id>`): when · by · what changed · why · after (runs, failed, tokens). A row that changed the instructions offers *Restore*, which asks for a reason and is gated like a publish. *Compare two versions* is the shared compare (SH-14, C04) and is not drawn here |
+| Skill page tabs | Instructions · Plan · Bindings · Usage · History, as drawn — Playbook, Flow and Versions are renamed to the product's words |
+| Skill instructions | The Instructions tab reads `instructions.md` beside the plan generated from it, read-only. *Edit instructions* opens the draft with a *Why* field and the model version it pins. *Save draft · run evals* saves the text, generates the plan (a draw — a question the planner asks is answered on the tab) and, once it is drawn, replays the eval set against live and draft. *Publish vN* sends the why; a warned run needs one, a failed hard check blocks it |
+| Skill evals | The evals view is a mode of the Instructions tab, not a sixth tab: tiles (questions · checks passed · answers changed · p95 · tokens per run) over the case table, live against draft. The eval set is edited there: add a case (question · passing or failing · rule checks), delete one, *Propose from the instructions*. Promoting a real ask stays in the run's page (`evals/promote`), not built here |
+| Plan regenerated | The Plan tab draws the current version's generated plan and, under it, the change log's compare of the last two versions: steps added, removed and changed, and which bound agents pick it up on their next run |
+| Skill history | The History tab is the change log of the skill (`history/skill/<id>`): version · when · by · why · after (runs, failed, tokens), each row with its prose diff. *Restore vN* asks for a reason, is gated, and makes a new version; nothing is rewritten |
+| Revisions in runs | A plan page gains *Revisions in runs*: pick one of the plan's runs that replanned, and read the base plan's steps against the steps that run ran — run, added by a replan, not run. A replan changes that run only. The engine keeps a run's revision count, not each revision's steps, so the tab draws what the run ran, not r1 · r2 · r3 |
+| Plugins registry | The Plugins section lists `/plugins` — name · kind · version · task types · state — filtered by kind and searched by name. A row opens the plugin's page (`plugin:<name>` in `mainSection`); a task type on it opens the task type's page (`task_type:<key>`). Enable and Disable are an install Admin's and only on a switchable plugin. *Connect an MCP server* is not built in Studio — `invana plugins mcp add` does it |
+| Task type versions | The task type page shows the manifest the registry loaded and its runs in 30 days. The registry keeps one version per key, so earlier versions are named by the runs that recorded them, not listed |
+| Model pins | Thinking carries *Model version*: none (the world's cast decides) or an exact version name from the Graph's endpoints. Moving it is its own act with a reason, gated by evals; *Run the evals on this pin* opens the run the gate asks for. Each LLM endpoint's models name the agents pinned to them |
 
 ## Not building
 

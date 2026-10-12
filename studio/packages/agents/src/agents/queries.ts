@@ -206,6 +206,64 @@ export function useAgentMutations(username: string, graphSlug: string) {
 			}) => agentsApi.retire(username, graphSlug, id, reassign),
 			onSuccess: invalidate,
 		}),
+		writeDraft: useMutation({
+			mutationFn: ({
+				id,
+				instructions,
+			}: {
+				id: string;
+				instructions: string;
+			}) => agentsApi.writeDraft(username, graphSlug, id, instructions),
+			onSuccess: invalidate,
+		}),
+		discardDraft: useMutation({
+			mutationFn: (id: string) =>
+				agentsApi.discardDraft(username, graphSlug, id),
+			onSuccess: invalidate,
+		}),
+		publish: useMutation({
+			mutationFn: ({ id, why }: { id: string; why: string }) =>
+				agentsApi.publish(username, graphSlug, id, why),
+			onSuccess: () => {
+				invalidate();
+				qc.invalidateQueries({ queryKey: ["history", username, graphSlug] });
+			},
+		}),
+		rollback: useMutation({
+			mutationFn: ({
+				id,
+				version,
+				why,
+			}: {
+				id: string;
+				version: number;
+				why: string;
+			}) => agentsApi.rollback(username, graphSlug, id, version, why),
+			onSuccess: () => {
+				invalidate();
+				qc.invalidateQueries({ queryKey: ["history", username, graphSlug] });
+			},
+		}),
+		/** A pin move is its own act: gated, with a reason. */
+		pin: useMutation({
+			mutationFn: ({
+				id,
+				modelPin,
+				why,
+			}: {
+				id: string;
+				modelPin: string;
+				why: string;
+			}) =>
+				agentsApi.update(username, graphSlug, id, {
+					model_pin: modelPin,
+					...(why ? { why } : {}),
+				}),
+			onSuccess: () => {
+				invalidate();
+				qc.invalidateQueries({ queryKey: ["history", username, graphSlug] });
+			},
+		}),
 		setDefault: useMutation({
 			mutationFn: (id: string) => agentsApi.setDefault(username, graphSlug, id),
 			onSuccess: () =>

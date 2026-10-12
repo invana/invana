@@ -31,7 +31,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { datasetsApi } from "../api";
 import { coerce, FORM_LIMIT, type RecordRow, withAdded } from "../nextVersion";
-import { readBase, useVersionsQuery } from "../queries";
+import { foldPublished, readBase, useVersionsQuery } from "../queries";
 import type { AuthorStep, Dataset, DatasetVersion } from "../types";
 
 type Draft = Record<string, string>;
@@ -88,7 +88,7 @@ export function ObserveDialog({
 			});
 		},
 		onSuccess: (v) => {
-			void qc.invalidateQueries({ queryKey: ["datasets"] });
+			foldPublished(qc, dataset, v);
 			if (!v.warnings?.length) close();
 		},
 	});

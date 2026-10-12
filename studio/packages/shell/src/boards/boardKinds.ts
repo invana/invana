@@ -35,6 +35,7 @@
 
 import {
 	Bot,
+	Box,
 	Boxes,
 	Database,
 	FileCode,
@@ -46,6 +47,7 @@ import {
 	History,
 	LayoutDashboard,
 	ListTree,
+	Puzzle,
 	Quote,
 	Scale,
 	ShieldCheck,
@@ -203,7 +205,9 @@ export type DeclaredKind =
 	| "agent"
 	| "models"
 	| "project"
-	| "decisions";
+	| "decisions"
+	| "plugin"
+	| "task_type";
 
 export type BoardKind = CanvasKind | DeclaredKind;
 
@@ -406,6 +410,27 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		// Switching the `leftNav` to Decisions opens it.
 		panel: "decisions",
 		subject: "the graph's slug",
+	},
+	// A plugin's page — its task types, skills and flows. Studio-only and
+	// install-level, like the registry it reads; titled with the plugin's name.
+	plugin: {
+		kind: "plugin",
+		renders: "declared",
+		label: "Plugin",
+		icon: Puzzle,
+		// A row in the Plugins section.
+		panel: "plugins",
+		subject: "a plugin name",
+	},
+	// A task type's manifest. Studio-only; titled with its key.
+	task_type: {
+		kind: "task_type",
+		renders: "declared",
+		label: "Task type",
+		icon: Box,
+		// A task type on a plugin's page.
+		panel: "plugins",
+		subject: "a task type key",
 	},
 };
 

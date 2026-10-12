@@ -159,6 +159,43 @@ export const agentsApi = {
 			{ method: "POST", ...json(data) },
 		),
 
+	/** Write the unpublished `instructions.md`. Nothing runs on it yet. */
+	writeDraft: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		instructions: string,
+	) =>
+		request<Agent>(`${base(username, graphSlug)}/agents/${id}/draft`, {
+			method: "PATCH",
+			...json({ instructions }),
+		}),
+
+	discardDraft: (username: string, graphSlug: string, id: string) =>
+		request<Agent>(`${base(username, graphSlug)}/agents/${id}/draft`, {
+			method: "DELETE",
+		}),
+
+	/** The draft becomes the instructions — through the eval gate. */
+	publish: (username: string, graphSlug: string, id: string, why: string) =>
+		request<Agent>(`${base(username, graphSlug)}/agents/${id}/publish`, {
+			method: "POST",
+			...json({ why: why || null }),
+		}),
+
+	/** A new version with the instructions as they read at `version`. */
+	rollback: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		version: number,
+		why: string,
+	) =>
+		request<Agent>(`${base(username, graphSlug)}/agents/${id}/rollback`, {
+			method: "POST",
+			...json({ version, why: why || null }),
+		}),
+
 	setDefault: (username: string, graphSlug: string, agentId: string) =>
 		request<Agent>(`${base(username, graphSlug)}/default-agent`, {
 			method: "POST",

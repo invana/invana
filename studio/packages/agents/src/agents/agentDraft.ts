@@ -1,8 +1,9 @@
 /**
  * The agent page's edit buffer — what **Save** sends, and nothing else.
  *
- * One buffer for all five tabs: a Save is one agent edit, one version,
- * whichever tabs the edits came from. Only the fields that moved are
+ * One buffer for every tab that edits in place: a Save is one agent edit,
+ * one version, whichever tabs the edits came from. The instructions are not in
+ * it — they have their own draft, published through the eval gate. Only the fields that moved are
  * sent, so saving an effort does not also re-send the soul and emit a voice
  * change nobody made.
  */
@@ -19,7 +20,6 @@ export interface Envelope {
 }
 
 export interface AgentDraft {
-	instructions: string;
 	budget: Record<string, number>;
 	effort: Record<string, number>;
 	policy: Record<string, boolean>;
@@ -29,7 +29,6 @@ export interface AgentDraft {
 }
 
 export const draftOf = (agent: Agent): AgentDraft => ({
-	instructions: agent.instructions ?? "",
 	budget: { ...(agent.budget ?? {}) },
 	effort: { ...(agent.effort ?? {}) } as Record<string, number>,
 	policy: { ...(agent.policy ?? {}) },
@@ -45,8 +44,6 @@ const same = (a: unknown, b: unknown) =>
 export function changesOf(agent: Agent, draft: AgentDraft): AgentUpdate {
 	const saved = draftOf(agent);
 	const out: AgentUpdate = {};
-	if (draft.instructions !== saved.instructions)
-		out.instructions = draft.instructions;
 	if (!same(draft.budget, saved.budget)) out.budget = draft.budget;
 	if (!same(draft.effort, saved.effort)) out.effort = draft.effort;
 	if (!same(draft.policy, saved.policy)) out.policy = draft.policy;

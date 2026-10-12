@@ -20,6 +20,7 @@ import {
 	useTaskPlansQuery,
 } from "../queries";
 import { PLAN_CHART_WIDGETS } from "./PlanChartWidgets";
+import { PlanRevisionsWidget } from "./PlanRevisionsWidget";
 import {
 	ALL,
 	PLAN_ACTIONS,
@@ -33,6 +34,7 @@ import {
 
 const REGISTRY = {
 	flow: TaskFlowWidget,
+	revisions: PlanRevisionsWidget,
 	...PLAN_CHART_WIDGETS,
 };
 
@@ -104,10 +106,19 @@ export function PlanBoardPage({
 				versions,
 				performance: performance.data,
 				runs: runs.data?.pages,
+				owner: { username, graphSlug },
 			},
 			view,
 		);
-	}, [plan.data, versions, performance.data, runs.data, view]);
+	}, [
+		plan.data,
+		versions,
+		performance.data,
+		runs.data,
+		view,
+		username,
+		graphSlug,
+	]);
 
 	// `Save report` on the header, and the act behind it. What it
 	// keeps is this reading — the version, window and tab — resolved.

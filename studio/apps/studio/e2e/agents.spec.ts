@@ -31,20 +31,22 @@ test("the product lands on Agents with its own rail", async ({ page }) => {
 	}
 });
 
-test("Plugins holds the catalogue; Performance shows its lock", async ({
+test("Plugins holds the registry and the catalogue; Performance shows its lock", async ({
 	page,
 }) => {
 	await page.goto(`${AGENTS}/agents`);
 	await page.locator('button[aria-label="Plugins"]').click({ timeout: 30_000 });
 	await expect(page).toHaveURL(onPath("plugins"));
-	await expect(page.getByText("No plugins yet")).toBeVisible({
-		timeout: 30_000,
-	});
+	await expect(
+		page.getByRole("button", { name: /^invana\.core\./ }).first(),
+	).toBeVisible({ timeout: 30_000 });
 	await expect(page.getByText("Catalogue", { exact: true })).toBeVisible();
 
 	await page.locator('button[aria-label="Performance"]').click();
 	await expect(page).toHaveURL(onPath("performance"));
-	await expect(page.getByText("Opens with engine support")).toBeVisible({
+	await expect(
+		page.getByText("Opens with engine support", { exact: true }),
+	).toBeVisible({
 		timeout: 30_000,
 	});
 });

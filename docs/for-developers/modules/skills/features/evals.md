@@ -8,7 +8,7 @@ changes and nightly, and spends its own token budget.
 |---|---|
 | Index | [6.6](../../../README.md#6--skills) · Slice **B02** (P-15) |
 | Module | [Skills](../spec.md) |
-| API / CLI / Studio | ✅ / 🟡 / 🔵 |
+| API / CLI / Studio | ✅ / 🟡 / ✅ |
 | Related | [instructions-publish-rollback](instructions-publish-rollback.md) · [pinned-model-versions](../../agents/features/pinned-model-versions.md) · [change-log](../../operate/features/change-log.md) · [schedules](../../operate/features/schedules.md) · products: [agents.md](../../../../products/agents.md) AG-08 · AG-15 |
 
 > **As** a builder, **I want** every draft replayed against a fixed set of questions before it
@@ -68,8 +68,9 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Skill page › Evals · Agent page › Evals | The set, its last runs, live vs draft (C03 `agents.skills.evals`) |
-| Run page | *Promote to eval* — passing or failing (C03) |
+| Skill page › Instructions (evals mode) · Agent page › Instructions | The set — add, accept, delete, *Propose from the instructions* — and a run's tiles and cases, live vs draft (C03 `agents.skills.evals`) |
+| Publish · Restore · Model version | A gate refusal drawn where the act was, with *Run the evals* when the gate asks for a run (C03) |
+| Run page | *Promote to eval* — not in Studio yet; `invana evals promote` does it |
 | Performance | Degradation alerts and the eval budget apart from production (AG-15, C10) |
 | CLI | `invana evals list` · `run [--draft] [--version N] [--pin <address>]` · `promote <run> --as passing\|failing` · `drift [--trigger]`, each `--graph` and `--skill`/`--agent`. A run is worked in the CLI's own process and scored before it returns; `run` exits 1 when the gate blocks and 3 when it warns |
 
@@ -127,6 +128,7 @@ flowchart TD
 | EL12 | **The drift pass is one call**, `POST …/evals/drift {trigger}`: a live eval run for every set with active cases. The nightly schedule, `invana evals drift`, a Graph model publishing and a guardrail or world changing all call it; an agent's pin move needs no drift run, because the gate already replayed the new pin. A drift run is compared with the subject's last settled live run; `eval.degraded` fires on fewer hard passes, or p95 or tokens past 1.5× that run. |
 | EL13 | **The judge reads a written answer.** The answer handed to the judge is the run's emissions as text — prose verbatim, a table's first rows, a subgraph's counts — capped at 4,000 characters; it scores 0–5 against the rubric. Its tokens are the eval run's own and count on the eval budget. |
 | EL14 | **The starter set is one model call, and every case it writes waits.** `POST …/propose` hands the subject's text — its draft when one is open, else what is live — to the subject's own pinned model (the Graph's decide model when it has no pin), which writes up to five questions, each with rule checks it can state without the graph (`cites_records`, `cannot_answer`, `guardrail_holds`). Every case lands `proposed`, created by the person who asked; the exact model version is on each case's `eval_case.create` event. It is not an eval run, so it is not on the eval budget. |
+| EL15 | **Studio draws the gate's answer, never predicts it.** A publish, a restore or a pin move goes to the engine as it is; a `409` whose `detail.error` is `eval_required` · `eval_running` · `eval_failed` · `eval_warned` is drawn as a refusal card, with *Run the evals* on `eval_required`. The evals view is a mode of the skill's Instructions tab, not a tab of its own ([agents.md › Decisions](../../../../products/agents.md#decisions) *Skill evals*). |
 | EL9 | **The eval budget is tokens per Graph per month**, counted from eval runs only. At the ceiling scheduled and drift runs settle *paused: budget*; a publish-time run still runs and its result carries the warning. |
 
 ## Not building
