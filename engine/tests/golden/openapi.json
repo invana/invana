@@ -11119,12 +11119,17 @@
             "title": "Roles",
             "type": "array"
           },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          },
           "username": {
             "title": "Username",
             "type": "string"
           }
         },
         "required": [
+          "user_id",
           "username",
           "first_name",
           "roles",

@@ -8,7 +8,7 @@ is a **firing**, recorded whether it ran or not.
 |---|---|
 | Index | [10.1](../../../README.md#10--operate) · Slice **B08** |
 | Module | [Operate](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [notifications](notifications.md) · [approvals](approvals.md) · [see-what-ran](see-what-ran.md) · [instructions](../../skills/features/instructions-publish-rollback.md) · products [shell.md › Decisions](../../../../products/shell.md#decisions) SH-13 |
 
 > **As** anyone on a Graph, **I want** to schedule routine work — a digest, a morning plan — with no

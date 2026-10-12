@@ -6,7 +6,7 @@
  * - `/u/:user/:graph` opens the product this browser last had open on a
  *   Graph, else Explorer, carrying the query string across — so `?right=`,
  *   `?page=` and `?onboarding=` land in the product.
- * - `/u/:user/:graph/activity/<tab>[/:run]` is the shell's Activity page, and
+ * - `/u/:user/:graph/activity/<tab>[/:run | /:schedule]` is the shell's Activity page, and
  *   `/activity/changes/<kind>/<record>` a change's compare inside it; the bare
  *   `/activity/changes` is the change log, Events with its Changes filter.
  *   Its levels are routes with no element of their own: they exist to match
@@ -34,6 +34,8 @@ import {
 	type RecordKind,
 } from "./activity/changes/history";
 import { runAddress } from "./activity/runs/boards/runBoards";
+import { scheduleKeys } from "./activity/schedules/queries";
+import type { Schedule } from "./activity/schedules/types";
 import { boardPageId } from "./boards/boardKinds";
 import { lastProduct } from "./lastProduct";
 import { ErrorPage } from "./pages/ErrorPage";
@@ -158,7 +160,26 @@ export const graphRoutes: RouteObject[] = [
 					level("inbox", "Inbox"),
 					level("approvals", "Approvals"),
 					drillable("runs", "Runs", "run", runAddress),
-					level("schedules", "Schedules"),
+					level("schedules", "Schedules", [
+						{
+							path: ":schedule",
+							handle: {
+								// The schedule's name once its page has read it; its id until then.
+								crumb: (p) => p.schedule && shortId(p.schedule),
+								crumbTitle: (p) => p.schedule,
+								crumbFrom: (p) =>
+									p.username && p.graphSlug && p.schedule
+										? {
+												queryKey: scheduleKeys.one(
+													{ username: p.username, graphSlug: p.graphSlug },
+													p.schedule,
+												),
+												label: (data) => (data as Schedule).name,
+											}
+										: undefined,
+							} satisfies ShellRouteHandle,
+						},
+					]),
 					level("events", "Events"),
 					level("changes", "Changes", [
 						{

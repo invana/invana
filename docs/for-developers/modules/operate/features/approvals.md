@@ -8,7 +8,7 @@ sent** — never auto-approved.
 |---|---|
 | Index | [10.8](../../../README.md#10--operate) · Slice **B08** |
 | Module | [Operate](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / 🟡 |
 | Related | [notifications](notifications.md) · [schedules](schedules.md) · [publish review](../../connect-and-model/features/publish-review.md) · [review](../../work/features/review.md) · [the runtime](../../platform/features/runtime.md) §10 · products [shell.md › Decisions](../../../../products/shell.md#decisions) SH-12 |
 
 > **As** an approver, **I want** to see exactly what a run will send before it goes, **so that**

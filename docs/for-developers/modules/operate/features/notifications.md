@@ -8,7 +8,7 @@ inbox to send to; a **notification** is one inbox row; a **delivery** is one sen
 |---|---|
 | Index | [10.7](../../../README.md#10--operate) · Slice **B08** |
 | Module | [Operate](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [approvals](approvals.md) · [schedules](schedules.md) · [audit-and-activity](audit-and-activity.md) · [roles](../../identity-and-access/features/roles.md) · products [shell.md › Activity](../../../../products/shell.md#activity) SH-15 · SH-16 |
 
 > **As** anyone on a Graph, **I want** one inbox of what needs me and rules that say which events

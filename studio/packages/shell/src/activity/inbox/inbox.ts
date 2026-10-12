@@ -1,31 +1,37 @@
 /**
- * The Inbox before the engine records notifications: what the runs journal
- * already says needs a person.
+ * The Inbox: what needs a person on this Graph, from three reads.
  *
- * Two kinds of row, read off one list of the Graph's runs:
+ * | Row | From | Order | Next step |
+ * |---|---|---|---|
+ * | approval | approvals waiting on me (`mine`, `pending`) | soonest deadline first | Review |
+ * | waiting | runs `awaiting_input` in the Graph's last 100 runs — no event says so | newest first | Answer |
+ * | notification | `GET …/notifications` — what rules, schedules and approvals told me | newest first | open its target |
  *
- * | Row | Which runs | Next step |
- * |---|---|---|
- * | waiting | `awaiting_input` — a run stopped on someone's answer, at any age | Answer |
- * | failed | `failed` and finished within the last 7 days | Open run |
- *
- * Newest first. There is no read state, so nothing here is *unread* — the
- * count is the number of rows. When notifications land, this module is what
- * they replace.
+ * Failed runs arrive as notifications, through a rule; nothing here derives
+ * them from the journal, so no failure shows twice. The count the bell and
+ * the Inbox tab carry is unread notifications + approvals + waiting runs.
  */
 import type { ProductId, TaskRunSummary } from "@invana-studio/core";
+import type { Approval, Notification } from "../notifications/types";
 
-/** How far back a failure still needs someone. */
-export const FAILED_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-
-export interface InboxItem {
-	run: TaskRunSummary;
-	reason: "waiting" | "failed";
-	/** When it came to need someone — the run's finish, else its start. */
-	at: number;
-	/** The product the run came from, named on the row. */
-	product: ProductId;
-}
+export type InboxItem =
+	| { kind: "approval"; id: string; at: number; approval: Approval }
+	| {
+			kind: "waiting";
+			id: string;
+			at: number;
+			run: TaskRunSummary;
+			product: ProductId;
+	  }
+	| {
+			kind: "notification";
+			id: string;
+			at: number;
+			notification: Notification;
+			/** Null for the shell's own records: a schedule, approval, rule or channel. */
+			product: ProductId | null;
+			unread: boolean;
+	  };
 
 /**
  * Which product a run came from: a load is Datasets', a Todo's run Projects',
@@ -43,25 +49,89 @@ export function productOfRun(run: TaskRunSummary): ProductId {
 	return "explorer";
 }
 
+const TARGET_PRODUCT: Record<string, ProductId> = {
+	agent: "agents",
+	skill: "agents",
+	workflow: "agents",
+	eval_set: "agents",
+	llm_provider: "agents",
+	llm_model: "agents",
+	graph_model: "modeller",
+	model_link: "modeller",
+	projection_template: "modeller",
+	rule: "modeller",
+	lens: "modeller",
+	connection: "modeller",
+	project: "projects",
+	task: "projects",
+	dataset: "datasets",
+	standard: "datasets",
+	session: "explorer",
+	query: "explorer",
+	board: "explorer",
+	run: "explorer",
+};
+
+/**
+ * A notification's product: its run's when the run is among the recent ones,
+ * else its target's; a schedule, approval, rule or channel has none.
+ */
+function productOfNotification(
+	n: Notification,
+	runs: readonly TaskRunSummary[],
+): ProductId | null {
+	if (n.run_id) {
+		const run = runs.find((r) => r.id === n.run_id);
+		if (run) return productOfRun(run);
+	}
+	return n.target_kind ? (TARGET_PRODUCT[n.target_kind] ?? null) : null;
+}
+
 function timeOf(run: TaskRunSummary): number {
 	const iso = run.finished_at ?? run.started_at ?? run.queued_at;
 	return iso ? new Date(iso).getTime() : 0;
 }
 
 export function inboxOf(
+	approvals: readonly Approval[],
 	runs: readonly TaskRunSummary[],
-	now: number,
+	notifications: readonly Notification[],
 ): InboxItem[] {
-	const items: InboxItem[] = [];
-	for (const run of runs) {
-		const at = timeOf(run);
-		if (run.status === "awaiting_input") {
-			items.push({ run, reason: "waiting", at, product: productOfRun(run) });
-		} else if (run.status === "failed" && now - at <= FAILED_WINDOW_MS) {
-			items.push({ run, reason: "failed", at, product: productOfRun(run) });
-		}
-	}
-	return items.sort((a, b) => b.at - a.at);
+	const a: InboxItem[] = approvals
+		.filter((x) => x.status === "pending")
+		.map((approval) => ({
+			kind: "approval" as const,
+			id: `approval:${approval.id}`,
+			at: new Date(approval.deadline_at).getTime(),
+			approval,
+		}))
+		.sort((x, y) => x.at - y.at);
+	const w: InboxItem[] = runs
+		.filter((r) => r.status === "awaiting_input")
+		.map((run) => ({
+			kind: "waiting" as const,
+			id: `run:${run.id}`,
+			at: timeOf(run),
+			run,
+			product: productOfRun(run),
+		}))
+		.sort((x, y) => y.at - x.at);
+	const n: InboxItem[] = notifications
+		.map((notification) => ({
+			kind: "notification" as const,
+			id: `notification:${notification.id}`,
+			at: new Date(notification.created_at).getTime(),
+			notification,
+			product: productOfNotification(notification, runs),
+			unread: !notification.read_at,
+		}))
+		.sort((x, y) => y.at - x.at);
+	return [...a, ...w, ...n];
+}
+
+/** What the bell and the Inbox tab count. */
+export function inboxCount(items: readonly InboxItem[]): number {
+	return items.filter((i) => i.kind !== "notification" || i.unread).length;
 }
 
 /** A run's name on a row: what the opener wrote, else its Todo, else its plan. */

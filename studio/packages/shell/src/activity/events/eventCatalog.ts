@@ -164,6 +164,52 @@ export const EVENT_CATEGORIES: EventCategory[] = [
 		],
 	},
 	{
+		key: "run",
+		label: "Run",
+		types: [
+			{ action: "run.open", label: "Started" },
+			{ action: "run.finish", label: "Finished" },
+			{ action: "run.cancel", label: "Cancelled" },
+			{ action: "run.resume", label: "Answered and resumed" },
+		],
+	},
+	{
+		key: "schedule",
+		label: "Schedule",
+		types: [
+			{ action: "schedule.create", label: "Created" },
+			{ action: "schedule.update", label: "Updated" },
+			{ action: "schedule.pause", label: "Paused" },
+			{ action: "schedule.resume", label: "Resumed" },
+			{ action: "schedule.delete", label: "Deleted" },
+			{ action: "schedule.fire", label: "Fired" },
+			{ action: "schedule.skip", label: "Firing skipped" },
+		],
+	},
+	{
+		key: "approval",
+		label: "Approval",
+		types: [
+			{ action: "approval.request", label: "Requested" },
+			{ action: "approval.approve", label: "Approved" },
+			{ action: "approval.decline", label: "Declined" },
+			{ action: "approval.expire", label: "Expired, not sent" },
+			{ action: "approval.remind", label: "Reminder sent" },
+		],
+	},
+	{
+		key: "notification",
+		label: "Notifications",
+		types: [
+			{ action: "notification_rule.create", label: "Rule created" },
+			{ action: "notification_rule.update", label: "Rule updated" },
+			{ action: "notification_rule.delete", label: "Rule deleted" },
+			{ action: "channel.create", label: "Channel added" },
+			{ action: "channel.delete", label: "Channel removed" },
+			{ action: "delivery.fail", label: "Delivery failed" },
+		],
+	},
+	{
 		key: "system",
 		label: "System",
 		types: [

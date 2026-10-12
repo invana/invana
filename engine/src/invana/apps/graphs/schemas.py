@@ -259,6 +259,8 @@ class ContentionRead(BaseModel):
 class MemberRead(BaseModel):
     """One member of a Graph and the Graph roles they hold."""
 
+    #: What rules, schedules and approvals store a member by.
+    user_id: str
     username: str
     first_name: str
     last_name: str | None = None

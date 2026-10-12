@@ -52,6 +52,7 @@ class GraphMemberManager:
     @staticmethod
     def read(row: GraphMember) -> MemberRead:
         return MemberRead(
+            user_id=str(row.user_id),
             username=row.user.username,
             first_name=row.user.first_name,
             last_name=row.user.last_name,

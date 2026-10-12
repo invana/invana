@@ -186,14 +186,14 @@ provider row and its models, and reopens four rows below. The shapes:
 
 | # | Feature | What it does | API | CLI | Studio | Slice |
 |---|---|---|---|---|---|---|
-| 10.1 | [Schedules](modules/operate/features/schedules.md) | An agent and instructions on a cron in a zone; every firing recorded; a missed-firing and an overlap policy; the result delivered to the inbox and channels | ✅ | ✅ | 🔵 | B08 |
+| 10.1 | [Schedules](modules/operate/features/schedules.md) | An agent and instructions on a cron in a zone; every firing recorded; a missed-firing and an overlap policy; the result delivered to the inbox and channels | ✅ | ✅ | ✅ | B08 |
 | 10.2 | [Audit and activity](modules/operate/features/audit-and-activity.md) | Every write is an event; every actor is a principal; retention lives here | 🟡 | — | 🟡 | S5.5 · S12a |
 | 10.3 | [Observability](modules/operate/features/observability.md) | Query and LLM metrics, cost and latency | 🔵 | — | 🔵 | S11 |
 | 10.4 | [External-agent API](modules/operate/features/external-agent-api.md) | Scoped tokens; retrieval with provenance | 🔵 | — | 🔵 | S10 |
 | 10.5 | [See what ran](modules/operate/features/see-what-ran.md) | **Runs** — every run in the Graph, children nested; Imports is a filter of it | 🟡 | — | 🟡 | S14 |
 | 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | ✅ | B01 |
-| 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | 🔵 | B08 |
-| 10.8 | [Approvals](modules/operate/features/approvals.md) | Anything sent outside waits for a named approver; a reminder at half-time; at the deadline *expired, not sent* | ✅ | ✅ | 🔵 | B08 |
+| 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | ✅ | B08 |
+| 10.8 | [Approvals](modules/operate/features/approvals.md) | Anything sent outside waits for a named approver; a reminder at half-time; at the deadline *expired, not sent* | ✅ | ✅ | 🟡 | B08 |
 
 
 ## 11 · [Identity and access](modules/identity-and-access/spec.md)
@@ -283,7 +283,7 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 |---|---|---|---|---|
 | API | 62 | 19 | 15 | 5 |
 | CLI | 23 | 10 | 3 | 65 |
-| Studio | 47 | 19 | 27 | 8 |
+| Studio | 49 | 20 | 24 | 8 |
 
 A hundred and one features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse

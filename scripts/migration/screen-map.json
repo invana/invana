@@ -118,7 +118,7 @@
    "story": "SH-13",
    "product": "shell",
    "route": "/u/admin/airways/activity/schedules",
-   "state": "click a schedule"
+   "state": "click a schedule: /activity/schedules/<id>"
   },
   "shell.activity.events": {
    "story": "SH-14",
@@ -147,20 +147,20 @@
   "shell.notifications.rules": {
    "story": "SH-16",
    "product": "shell",
-   "route": "/u/admin/airways/activity/inbox",
-   "state": "Rules tab (needs B08)"
+   "route": "/u/admin/airways/activity/rules",
+   "state": ""
   },
   "shell.notifications.rule": {
    "story": "SH-16",
    "product": "shell",
-   "route": "/u/admin/airways/activity/inbox",
-   "state": "Rules tab, click a rule (needs B08)"
+   "route": "/u/admin/airways/activity/rules",
+   "state": "click a rule, or ?new=1 for New rule"
   },
   "shell.notifications.channels": {
    "story": "SH-16",
    "product": "shell",
-   "route": "/u/admin/airways/activity/inbox",
-   "state": "Channels tab (needs B08)"
+   "route": "/u/admin/airways/activity/channels",
+   "state": ""
   },
   "shell.run.rerun": {
    "story": "SH-18",

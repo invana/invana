@@ -768,6 +768,24 @@ and `@invana-studio/datasets` (migration session C04). Decisions are in
 | `modeller.draft.publish` | MO-05 | `/modeller/models?model=<id>` › *Publish* — additive, with *Who reads* | ✅ |
 | `modeller.draft.migration` | MO-05 | the same › *Publish* on a breaking draft — *Request approval*, then the review | ✅ |
 
+## Beyond the 42 · Schedules, the Inbox, rules and channels
+
+Activity's Schedules, Inbox, Rules and Channels tabs of the *Invana Products* prototype (SH-13 · SH-15 ·
+SH-16), as Studio builds them in `@invana-studio/shell` (migration session C05). Decisions are in
+[products/shell.md](../products/shell.md#decisions) and the feature files
+[10.1](modules/operate/features/schedules.md) · [10.7](modules/operate/features/notifications.md) ·
+[10.8](modules/operate/features/approvals.md).
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `shell.schedules` | SH-13 | `/activity/schedules` — Coming up (7 days) and every schedule | ✅ |
+| `shell.schedule.new` | SH-13 | the same › *New schedule* — no sources, tools or project picker | ✅ |
+| `shell.schedule.detail` | SH-13 | `/activity/schedules/<id>` — Instructions · Firings · Delivers to; no Plan card | ✅ |
+| `shell.notifications` | SH-15 | `/activity/inbox` — approvals, runs waiting on an answer, notifications | ✅ |
+| `shell.notifications.rules` | SH-16 | `/activity/rules` | ✅ |
+| `shell.notifications.rule` | SH-16 | `/activity/rules` › a rule (`?new=1` opens *New rule*) — events only, no metric condition or preview | ✅ |
+| `shell.notifications.channels` | SH-16 | `/activity/channels` — Teams listed *not connected* | ✅ |
+
 ---
 
 ## The other direction — every feature, and the screen that draws it
@@ -816,10 +834,12 @@ So a feature file can be opened next to the drawing that shows it.
 | 9.2 | Objectives and criteria | 🔵 | 🔵 | S12b | `JournalTaskHiFi` | 🔵 |
 | 9.3 | Review | 🔵 | 🔵 | S12b | `ReviewHiFi` · `TaskReviewHiFi` | 🔵 |
 | 9.4 | Recurring tasks and conditions | 🔵 | 🔵 | S12e | `RecurringTaskHiFi` | 🔵 |
-| 10.1 | Schedules | 🔵 | 🔵 | S9.5 | `SchedulesHiFi` | 🔵 |
+| 10.1 | Schedules | ✅ | ✅ | B08 · C05 | `shell.schedules` · `shell.schedule.new` · `shell.schedule.detail` | ✅ |
 | 10.3 | Observability | 🔵 | 🔵 | S11 | `AgentStatsHiFi` | 🔵 |
 | 10.5 | See what ran | 🔵 | 🔵 | S14 | `RunDetail` · `DrawerRunsList` · `DrawerRunLive` · `DrawerRunAll` · `DrawerRunDebug` · `RunDash` · `StepImport` · `StepQuery` · `StepLlm` · `RunLens` | 🔵 · ✅ |
 | 10.6 | Change log | ✅ | ✅ | B01 · C04 | `shell.events.changes` · `shell.change.compare` · `modeller.model.history` · `datasets.record` | ✅ |
+| 10.7 | Notifications | ✅ | ✅ | B08 · C05 | `shell.notifications` · `shell.notifications.rules` · `shell.notifications.rule` · `shell.notifications.channels` | ✅ |
+| 10.8 | Approvals | ✅ | 🟡 | B08 · C05 | `shell.notifications` (review from the Inbox); `shell.activity.approvals` · `shell.run.approval` not built | 🟡 |
 | 13.3 | Command line | — | — | — | `CliHiFi` | — |
 | 13.7 | Setup | ✅ | 🟡 | S13 | `SetupPageHiFi` · `SetupBlockedHiFi` · `SetupReadyHiFi` · `SetupLocksHiFi` | 🟡 |
 | 14.1 | Worlds | 🔵 | 🔵 | S16 | `GovWorlds` · `GovWorld` · `GovCompare` | 🔵 |

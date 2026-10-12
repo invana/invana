@@ -7,23 +7,19 @@ import { GRAPH } from "./explorer";
  * in the header as the way in, and a run's page inside the Runs tab.
  */
 
-test("the bell opens the Inbox, and a tab with no records names its unlock", async ({
-	page,
-}) => {
+test("the bell opens the Inbox, and each tab is a path", async ({ page }) => {
 	await page.goto(GRAPH);
 	await page
 		.getByRole("link", { name: "Notifications" })
 		.click({ timeout: 30_000 });
 	await expect(page).toHaveURL(`${GRAPH}/activity/inbox`);
-	// The Inbox reads the Graph's runs: what needs someone, or that nothing does.
+	// What needs someone, or that nothing does.
 	await expect(
-		page.getByText(/^(Nothing needs you|\d+ needs? you)$/),
+		page.getByText(/^(Nothing needs you|\d+ needs? you)$/).first(),
 	).toBeVisible({ timeout: 30_000 });
 
 	await page.getByRole("tab", { name: "Channels" }).click();
-	await expect(
-		page.getByText("Opens when the engine records notifications"),
-	).toBeVisible();
+	await expect(page).toHaveURL(`${GRAPH}/activity/channels`);
 
 	await page.getByRole("tab", { name: "Events" }).click();
 	await expect(page).toHaveURL(`${GRAPH}/activity/events`);

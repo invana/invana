@@ -81,7 +81,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| `GET …/members` | every member with `username` · `first_name` · `last_name` · `roles` · `added_at` |
+| `GET …/members` | every member with `user_id` · `username` · `first_name` · `last_name` · `roles` · `added_at` |
 | `POST …/members` | `{user, roles}` — `user` is an email or a username |
 | `PATCH …/members/{member}` | `{roles}` — replaces the set |
 | `DELETE …/members/{member}` | removes the membership; their work stays |

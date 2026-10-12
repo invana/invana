@@ -21,9 +21,14 @@ import { ComparePage } from "./changes/ComparePage";
 import { EventsTab } from "./events/EventsTab";
 import { InboxTab } from "./inbox/InboxTab";
 import { useInbox } from "./inbox/useInbox";
+import { ChannelsTab } from "./notifications/channels/ChannelsTab";
+import { useRulesQuery } from "./notifications/queries";
+import { RulesTab } from "./notifications/rules/RulesTab";
 import { RunBoardPage } from "./runs/boards/RunBoardPage";
 import { useRunStep } from "./runs/boards/useRunStep";
 import { RunsBoardPage } from "./runs/RunsBoardPage";
+import { SchedulePage } from "./schedules/SchedulePage";
+import { SchedulesTab } from "./schedules/SchedulesTab";
 
 export interface ActivityPageProps {
 	username: string;
@@ -56,33 +61,15 @@ const ICONS: Record<ActivityTab, React.ElementType> = {
 	channels: Radio,
 };
 
-/** What a tab with no engine records yet says, and what unlocks it. */
+/** What a tab with no list of its own yet says, and where to look. */
 const NOT_YET: Partial<
 	Record<ActivityTab, { title: string; description: string; locks: string[] }>
 > = {
 	approvals: {
-		title: "No approvals yet",
+		title: "Approvals are reviewed from the Inbox",
 		description:
-			"Anything a run would send outside Invana waits here, showing exactly what it will send, until an approver says yes or no. A run waiting on a person's answer shows in the Inbox.",
-		locks: ["Opens when schedules can send outside Invana"],
-	},
-	schedules: {
-		title: "No schedules yet",
-		description:
-			"A schedule runs an agent's instructions or a skill on a cron and delivers what it finds to a channel. It needs no project.",
-		locks: ["Opens when the engine runs schedules"],
-	},
-	rules: {
-		title: "No rules yet",
-		description:
-			"A rule says which events reach whom, and on which channel — a failed run, a slower agent, a change to a model.",
-		locks: ["Opens when the engine records notifications"],
-	},
-	channels: {
-		title: "No channels yet",
-		description:
-			"In app, email, Slack and webhook. Rules and schedules deliver through them.",
-		locks: ["Opens when the engine records notifications"],
+			"Anything a schedule would send outside Invana waits for an approver, showing exactly what it will send. The approvals waiting on you sit at the top of the Inbox, each with Review.",
+		locks: ["A list of every approval opens in a later release"],
 	},
 };
 
@@ -96,14 +83,15 @@ const NOT_YET: Partial<
  * at `/activity/runs/<run>`, its step riding in `&step=`. The run page owns
  * `mainSection` — the tab strip steps aside and the breadcrumb
  * (`Activity › Runs › run:…`) is the way back up.
- * **Inbox** is what needs a person — runs waiting on an answer and recent
- * failures, until the engine records notifications.
+ * **Inbox** is what needs a person — approvals, runs waiting on an answer,
+ * and what rules and schedules told them. **Schedules** drills in like Runs:
+ * `/activity/schedules/<schedule>` is that schedule's page. **Rules** and
+ * **Channels** are who hears about what, and where it is sent.
  * **Events** is the Graph's writes; its Changes filter is the change log, and
  * a change's compare (`/activity/changes/<kind>/<record>`) opens inside it,
  * with the tab strip kept and Events lit.
- * A tab whose records the engine does not
- * keep yet draws the kit's `EmptyState`, with one lock per thing that opens
- * it — never an empty table.
+ * Approvals, whose own list is not built yet, draws the kit's `EmptyState`
+ * pointing at the Inbox — never an empty table.
  *
  * It is not a product: whichever product the person came from keeps its
  * wordmark and `leftNav`, and the page fills `mainSection`. Run pages read
@@ -119,9 +107,14 @@ export function ActivityPage({
 	const navigate = useNavigate();
 	const { stepId, openStep } = useRunStep();
 	const graph = { username, graphSlug };
-	const { tab, runId, change } = location;
-	// The Inbox tab carries its count; the other tabs have no source for one yet.
+	const { tab, runId, change, scheduleId } = location;
+	// The Inbox and Rules tabs carry their counts; the others have none.
 	const inbox = useInbox(graph);
+	const rules = useRulesQuery(graph).data?.total ?? 0;
+	const counts: Partial<Record<ActivityTab, number>> = {
+		inbox: inbox.count,
+		rules,
+	};
 
 	const body = (value: ActivityTab): ReactNode => {
 		if (value === "runs") {
@@ -156,6 +149,25 @@ export function ActivityPage({
 			);
 		}
 		if (value === "inbox") return <InboxTab graph={graph} />;
+		if (value === "schedules") {
+			return scheduleId ? (
+				<SchedulePage
+					graph={graph}
+					scheduleId={scheduleId}
+					onDeleted={() => navigate(activityPath(graph, "schedules"))}
+					onOpenRun={(id) => navigate(activityPath(graph, "runs", id))}
+				/>
+			) : (
+				<SchedulesTab
+					graph={graph}
+					onOpenSchedule={(id) =>
+						navigate(activityPath(graph, "schedules", id))
+					}
+				/>
+			);
+		}
+		if (value === "rules") return <RulesTab graph={graph} />;
+		if (value === "channels") return <ChannelsTab graph={graph} />;
 		const empty = NOT_YET[value];
 		return empty ? (
 			<EmptyState
@@ -187,10 +199,9 @@ export function ActivityPage({
 			tabs={ACTIVITY_TABS.map((value) => ({
 				value,
 				name: LABELS[value],
-				label:
-					value === "inbox" && inbox.items.length
-						? `${LABELS.inbox} · ${inbox.items.length}`
-						: LABELS[value],
+				label: counts[value]
+					? `${LABELS[value]} · ${counts[value]}`
+					: LABELS[value],
 				icon: ICONS[value],
 				content: value === tab ? body(value) : null,
 			}))}

@@ -101,7 +101,12 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	{ path: "activity/inbox", panel: "activity", section: "inbox" },
 	{ path: "activity/approvals", panel: "activity", section: "approvals" },
 	{ path: "activity/runs", panel: "runs", detail: "run" },
-	{ path: "activity/schedules", panel: "activity", section: "schedules" },
+	{
+		path: "activity/schedules",
+		panel: "activity",
+		section: "schedules",
+		detail: "schedule",
+	},
 	{ path: "activity/events", panel: "events" },
 	{ path: "activity/rules", panel: "activity", section: "rules" },
 	{ path: "activity/channels", panel: "activity", section: "channels" },

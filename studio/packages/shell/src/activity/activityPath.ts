@@ -1,8 +1,9 @@
 /**
  * Where Activity lives on a Graph: `/u/:user/:graph/activity/<tab>[/:id]`.
  *
- * The tab is a path level, so it is a crumb and survives a reload. Runs
- * drills in — `/activity/runs/<run>` is that run's page, inside the tab. A
+ * The tab is a path level, so it is a crumb and survives a reload. Runs and
+ * Schedules drill in — `/activity/runs/<run>` is that run's page and
+ * `/activity/schedules/<schedule>` that schedule's, inside the tab. A
  * change's compare is `/activity/changes/<kind>/<record>?a=&b=`: it belongs to
  * Events, whose Changes filter lists the changes, so Events stays lit.
  */
@@ -25,6 +26,8 @@ export interface ActivityLocation {
 	tab: ActivityTab;
 	/** The run open in the Runs tab, or null for the journal. */
 	runId: string | null;
+	/** The schedule open in the Schedules tab. */
+	scheduleId?: string | null;
 	/** The record whose versions the compare page reads. */
 	change?: { kind: RecordKind; id: string };
 }
@@ -49,18 +52,20 @@ export function activityOf(pathname: string): ActivityLocation | null {
 	if (!m) return null;
 	const tab = ACTIVITY_TABS.find((t) => t === m[1]);
 	if (!tab) return null;
-	if (m[2] && tab !== "runs") return null;
-	return { tab, runId: m[2] ? decodeURIComponent(m[2]) : null };
+	const id = m[2] ? decodeURIComponent(m[2]) : null;
+	if (id && tab === "schedules") return { tab, runId: null, scheduleId: id };
+	if (id && tab !== "runs") return null;
+	return { tab, runId: id };
 }
 
-/** The path of an Activity tab, or of one run in Runs. */
+/** The path of an Activity tab, or of one run in Runs or schedule in Schedules. */
 export function activityPath(
 	graph: { username: string; graphSlug: string },
 	tab: ActivityTab,
-	runId?: string,
+	id?: string,
 ): string {
 	const base = `/u/${graph.username}/${graph.graphSlug}/activity/${tab}`;
-	return runId ? `${base}/${encodeURIComponent(runId)}` : base;
+	return id ? `${base}/${encodeURIComponent(id)}` : base;
 }
 
 /** The change log: Events with its Changes filter on. */
