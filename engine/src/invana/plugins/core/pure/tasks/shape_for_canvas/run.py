@@ -33,7 +33,8 @@ async def shape_for_canvas(ctx: TaskContext, v: RunVars) -> Out:
         query=v.query,
         message_id=v.assistant_message_id,
         step_id=ctx.step.id,
-        intent=v.prompt,
+        kind=v.intent.kind if v.intent else "",
+        prefer=v.intent.prefer if v.intent else "",
     )
     await ctx.emit("emission", emission_to_dict(emission, offers=offers))
 

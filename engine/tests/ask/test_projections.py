@@ -6,8 +6,10 @@ before render (P4), a template that cannot render is offered **with its reason**
 rather than hidden (P10), and falling back to a default is explicit (C9).
 """
 
+import json
 from dataclasses import dataclass
 
+from invana.apps.llm.intent import UNDERSTAND_TOOL
 from invana.runtime.projections import (
     BUILTIN_RESULT_TEMPLATES,
     accepts_reason,
@@ -97,6 +99,30 @@ class TestSelection:
         assert [o["name"] for o in unavailable] == ["category-bars"]
         assert all(o["reason"] for o in unavailable)
 
+    def test_an_asked_for_table_outranks_the_more_specific_chart(self):
+        shape = shape_of(
+            FakeResult(
+                result_type="tabular", row_count=2, rows=[{"sector": "energy", "n": 4}, {"sector": "it", "n": 2}]
+            )
+        )
+        templates = [builtin("records-table"), builtin("category-bars")]
+
+        assert select_template(templates, shape)[0].name == "category-bars"
+        assert select_template(templates, shape, kind="single_query", prefer="table")[0].name == "records-table"
+
+    def test_an_asked_for_chart_never_forces_an_ineligible_template(self):
+        shape = shape_of(FakeResult(result_type="tabular", row_count=1, rows=[{"total": 42}]))
+        chosen, offers = select_template(
+            [builtin("records-table"), builtin("single-value"), builtin("category-bars")],
+            shape,
+            kind="aggregate_and_chart",
+            prefer="chart",
+        )
+
+        assert chosen.name == "single-value"
+        chart = next(o for o in offers if o["name"] == "category-bars")
+        assert chart["available"] is False and chart["reason"]
+
     def test_no_eligible_template_falls_back_explicitly(self):
         shape = shape_of(FakeResult(result_type="tabular", row_count=0, rows=[]))
         chosen, offers = select_template([builtin("records-table")], shape)
@@ -107,6 +133,16 @@ class TestSelection:
         assert kind == "empty"
         assert "does not hold" in payload["statement"]
         assert offers[0]["available"] is False
+
+
+class TestClassifierSchema:
+    def test_prefer_is_a_fixed_enum_and_no_template_enters_the_schema(self):
+        prefer = UNDERSTAND_TOOL["properties"]["prefer"]
+
+        assert prefer["enum"] == ["", "graph", "table", "chart"]
+        assert "prefer" in UNDERSTAND_TOOL["required"]
+        schema = json.dumps(UNDERSTAND_TOOL)
+        assert not any(t.name in schema for t in BUILTIN_RESULT_TEMPLATES)
 
 
 class TestRender:

@@ -76,6 +76,7 @@ flowchart TD
 | Grounding block | `render_model_context(global_model, lens, may_send)` — one block, used unchanged by Understand, Translate and Propose |
 | Routes | `POST …/runs` · `GET …/task_runs/{id}` (stream) |
 | Events | `todo.created` · `run.*` · `query.executed` |
+| Understood intent | `kind` · `summary` · `refs` · `expects` · `confidence` · `prefer` (`graph · table · chart` or `""` — the visual the ask named, read by `project` to rank templates, [P13](projections.md#7-decisions)) |
 | Understand's outcomes | `understood` · `clarify` · `cannot_answer` · `converse`. `converse` carries `reply` and `choices` `[{ask, refs}]` and returns `Conversed`; the step keeps the choices it could answer ([NL14](#decisions)) and raises `Converse`, its row reads `small talk` with `output.reply` · `output.options`, the queued steps are dropped, the message content is the reply, and the run settles `succeeded` · `conversed` with no emission and no `cannot_answer` event ([NL12](#decisions) · [NL13](#decisions)) |
 
 ### The grounding block

@@ -1,5 +1,5 @@
 key = "shape_for_canvas"
-version = "1.0.0"
+version = "1.0.1"
 summary = "Turn query records into an emission for the canvas, through a template."
 bound = "none"
 side_effect = "read"

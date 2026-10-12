@@ -41,6 +41,11 @@ INTENT_KINDS = (
     "out_of_scope",
 )
 
+# The visuals an ask can name. A fixed enum, never a template list: the schema
+# stays a constant, so it never grows with a Graph's templates and stays in the
+# cacheable prefix. ``project`` maps each to a surface and ranks by it.
+PREFERS = ("graph", "table", "chart")
+
 UNDERSTAND_TOOL = {
     "type": "object",
     "properties": {
@@ -68,6 +73,12 @@ UNDERSTAND_TOOL = {
             "type": "array",
             "items": {"type": "string", "enum": ["graph", "table", "metric", "chart", "text"]},
             "description": "Which result shapes would answer this ask. Verify checks these were emitted.",
+        },
+        "prefer": {
+            "type": "string",
+            "enum": ["", *PREFERS],
+            "description": 'The visual the person asked for in words ("as a chart", "in a table", "show the '
+            'graph"). "" when they named none — never guess one from the data.',
         },
         "confidence": {"type": "number", "description": "0-1. Below 0.5, prefer clarify."},
         "reason": {"type": "string", "description": 'When cannot_answer: what the graph does not hold. Else "".'},
@@ -120,6 +131,7 @@ UNDERSTAND_TOOL = {
         "summary",
         "refs",
         "expects",
+        "prefer",
         "confidence",
         "reason",
         "question",
@@ -147,6 +159,8 @@ class Intent:
     summary: str
     refs: list[str] = field(default_factory=list)
     expects: list[str] = field(default_factory=list)
+    #: The visual the ask named — one of ``PREFERS``, or "" for none.
+    prefer: str = ""
     confidence: float = 1.0
     skills_applied: list[str] = field(default_factory=list)
     #: The rule statements it says it followed. Also a self-report.
@@ -163,6 +177,7 @@ class Intent:
             "summary": self.summary,
             "refs": self.refs,
             "expects": self.expects,
+            "prefer": self.prefer,
             "confidence": self.confidence,
         }
 
@@ -325,11 +340,15 @@ async def understand(
     kind = str(data.get("kind") or "single_query")
     if kind not in INTENT_KINDS:
         kind = "single_query"
+    prefer = str(data.get("prefer") or "").strip().lower()
+    if prefer not in PREFERS:
+        prefer = ""
     return Intent(
         kind=kind,
         summary=str(data.get("summary") or "").strip(),
         refs=[str(r).strip() for r in (data.get("refs") or []) if str(r).strip()],
         expects=[str(e).strip() for e in (data.get("expects") or []) if str(e).strip()],
+        prefer=prefer,
         confidence=float(data.get("confidence") or 1.0),
         skills_applied=[str(s).strip() for s in (data.get("skills_applied") or []) if str(s).strip()],
         rules_cited=[str(r).strip() for r in (data.get("rules_cited") or []) if str(r).strip()],

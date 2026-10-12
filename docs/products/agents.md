@@ -32,7 +32,7 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | AG-F9 | Skill history — why, plan change, performance after; restore | New · Blocked · P-09 | AG-09 |
 | AG-F10 | Skill usage | In Studio | AG-10 |
 | AG-F11 | Library › Plans — generated, read-only; revisions in runs | In Studio (plans) · New (generated, revisions) | AG-11 |
-| AG-F12 | Library › Templates — chosen by code from the result’s shape, ranked by the classified intent | In Studio · New (intent ranking) · Blocked · P-20 | AG-12 |
+| AG-F12 | Library › Templates — chosen by code from the result’s shape, ranked by the classified intent | In Studio · New (intent ranking — engine ✅ B13) | AG-12 |
 | AG-F13 | Plugins — the registry of every plugin (core, tool, simulator, MCP) with its task types, manifests, versions, skills and flows; Admin enables | New · Blocked · P-01 P-02 P-03 P-04 P-05 P-07 | AG-13 |
 | AG-F14 | LLM endpoints and model versions — agents pin an exact version name | In Studio (endpoints) · New (pinning) · Blocked · P-17 | AG-14 |
 | AG-F15 | Performance with degradation alerts | New | AG-15 |

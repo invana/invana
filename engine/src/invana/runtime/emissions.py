@@ -44,9 +44,13 @@ async def produce(
     query: str | None,
     message_id: str | None = None,
     step_id: str | None = None,
-    intent: str = "",
+    kind: str = "",
+    prefer: str = "",
 ) -> tuple[Emission, list[dict[str, Any]], Shape]:
     """Turn one query result into one persisted emission.
+
+    *kind* and *prefer* are the classified intent the template is ranked by;
+    an ask with no intent leaves both empty and the shape alone decides.
 
     Returns the emission, the full template offer list (so the header's picker
     can show what else would render this, and why the rest cannot), and the shape
@@ -54,7 +58,7 @@ async def produce(
     """
     shape = shape_of(result)
     templates = await available_templates(session, graph_id=graph_id)
-    template, offers = select_template(templates, shape, intent=intent)
+    template, offers = select_template(templates, shape, kind=kind, prefer=prefer)
     kind, payload = render(template, result, shape)
 
     emission = Emission(

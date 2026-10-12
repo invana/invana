@@ -246,7 +246,7 @@ async def _offers_for(session: AsyncSession, *, graph: Graph, emission) -> list[
     if shape is None:
         return []
     templates = await available_templates(session, graph_id=graph.id)
-    _, offers = select_template(templates, shape, intent="")
+    _, offers = select_template(templates, shape)
     return offers
 
 

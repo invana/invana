@@ -32,7 +32,7 @@ step supplies values.
 | C1 | A step can ask a **closed** question | Choice, multi-choice or yes/no — the answer is a value, not a sentence |
 | C2 | Options are **grounded** | Either a literal list declared in the template, or the rows of a query. Never invented at run time |
 | C3 | An answer is stored structured | The chosen option's id, not its label — so it replays, parameterises and is diffable |
-| C4 | Results render through a chosen template | Picked by the emission's shape and the question's intent |
+| C4 | Results render through a chosen template | Picked by the emission's shape, then ranked by the classified intent — its `kind` and the visual it asked for (`prefer`) |
 | C5 | The reader can switch template | Table ↔ chart ↔ subgraph on the same emission, **without re-running the query** |
 | C6 | An `html` template is sandboxed | No script, no network, no external assets; tokens come only from the emission |
 | C7 | Templates are versioned and promotable | A projection that read well is promoted, exactly like a workflow that served |
@@ -48,7 +48,7 @@ step supplies values.
 | `surface` | `choice · multi-choice · boolean · pick-from-graph · value · confirm · table · metric · chart · subgraph · markdown · html` |
 | `accepts` | the shape it can render: required fields and their types |
 | `spec` | the surface's own definition — columns and formats for a table, axes for a chart, the markup for html, the option source for a choice |
-| `intent` | what it is for, so `project` can select it the way `plan` selects a workflow |
+| `intent` | what it is for, in a reader's words — shown on the Templates page; ranking reads `surface`, never this text ([P13](#7-decisions)) |
 | `version` · `status` | `draft · published`; published versions are read-only |
 
 Two rules keep this safe:
@@ -124,6 +124,7 @@ flowchart LR
 | `projection_templates` | `graph_id` · `name` · `kind` · `surface` · `accepts` jsonb · `spec` jsonb · `intent` · `version` · `status` |
 | `task_prompts` | `run_id` · `step_seq` · `template_id` · `answered_by_kind/id` · `value` jsonb · `answered_at` |
 | `emissions.template_id` | which template rendered it; null means the kind's default |
+| `select_template(templates, shape, kind=, prefer=)` | ranks eligible templates by `prefer` → `kind` → specificity → name ([P13](#7-decisions)); the switcher's offers call it with neither |
 | Routes | `…/projection-templates*` · `…/task_runs/{id}/answers` · `…/emissions/{id}/render?template=` |
 | Events | `projection_template.*` · `prompt.asked` · `prompt.answered` |
 
@@ -143,6 +144,8 @@ flowchart LR
 | P10 | A template that cannot accept the shape is offered disabled, with the reason it cannot — never hidden. |
 | P11 | Five result templates ship with the distribution — `records-table` · `single-value` · `category-bars` · `graph-subgraph` · `nothing-held` — as ordinary rows with no Graph, so a Graph's own template competes with them on the same terms. |
 | P12 | Between eligible templates, **intent first, then the most specific shape constraint**. A constraint that narrows the shape (`single_value`, `categorical`, `empty`) outranks one that barely does (`min_rows`), so a one-cell result reads as a number rather than as a one-row table. |
+| P13 | **Intent is the classifier's structured output, never the raw question.** Ranking is, in order: the asked-for visual (`prefer`), the intent `kind`, specificity, name. `prefer` is `graph · table · chart` or empty and maps to the surfaces `subgraph · table · chart`; `kind` ranks `aggregate_and_chart` toward `chart` then `metric`, and `exploration` toward `subgraph`; every other kind ranks nothing. Both only **rank eligible templates** — *as a chart* over a one-cell result still renders `single-value`, and the picker offers the chart disabled with its reason (P10). An ask with no intent (a QL ask, a scheduled firing) ranks by specificity alone. |
+| P14 | **Templates never enter the prompt.** `prefer` is a fixed enum in the classifier's tool schema, so the schema is a constant and stays in the cacheable prefix however many templates a Graph authors. |
 
 ## 8. Deliberately absent
 
@@ -153,6 +156,8 @@ flowchart LR
 | Per-answer styling | a template is chosen, not restyled |
 | Editing an answer in place | re-asking is a new question, so the trace stays honest |
 | Conditional multi-step forms | a wizard is a workflow, not a projection |
+| Naming a template in the classifier's prompt, or `prefer` naming one | the prompt would grow with every template a Graph authors; code picks from the shape (P14) |
+| Matching the question's words against a template's `intent` text | a substring match is not a classification; *show me a table of charts* is not a request for a chart (P13) |
 
 ## 9. Open
 
