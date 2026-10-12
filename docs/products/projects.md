@@ -43,8 +43,8 @@ The type sets the words and the panel that opens first. The records underneath a
 | PJ-F3 | Branch page — hypothesis, verdict, evidence for and against, agent proposals, todos | ✅ B05 · Studio C02 (no *Runs* or *Schedules* tab) | PJ-05 |
 | PJ-F4 | Findings with evidence — stance, records, origin, version, rules satisfied | ✅ B05 · Studio C02 | PJ-06 |
 | PJ-F5 | Verdicts and decisions — rationale, cites, rule check that can refuse, supersede | ✅ B05 · Studio C02 | PJ-07 · PJ-13 |
-| PJ-F6 | Simulation — parents, targets, simulator plugin, ranked result | New · engine ✅ B09 ([9.8](../for-developers/modules/work/features/simulation.md)), Studio C06 | PJ-09 |
-| PJ-F7 | Impact — a decision’s blast radius by hop over the graph | New · Blocked · P-06 (what-if values only) | PJ-10 |
+| PJ-F6 | Simulation — parents, targets, simulator plugin, ranked result | ✅ B09 ([9.8](../for-developers/modules/work/features/simulation.md)) · Studio C06 | PJ-09 |
+| PJ-F7 | Impact — a decision’s blast radius by hop over the graph | Studio C06 ([9.9](../for-developers/modules/work/features/impact.md), reach by hop) · what-if values Blocked · P-06 | PJ-10 |
 | PJ-F8 | Lineage — decision back to original authors | Studio C02 (built from the records) · CLI not built | PJ-11 |
 | PJ-F9 | My todos — with or without a project | Moves (today’s Projects) | PJ-12 |
 | PJ-F10 | Reports — drafted from the records, edited, published as versions, exported | ✅ B05 · Studio C02 | PJ-14 |
@@ -146,6 +146,8 @@ The type sets the words and the panel that opens first. The records underneath a
 | No “Misc” project | A todo may have no project; routine work is a schedule |
 | Simulation | A plugin does the science; Invana runs it, pins inputs, labels output `derived` |
 | Impact | Reach by hop is graph traversal; what-if values need the simulation runtime |
+| Simulate in Studio | On a branch's header and the project's; the dialog is drawn from the simulator's declared spec fields, the result is a drill-in (`simulation=<n>`) that polls while it runs, and a branch lists its simulations in a *Simulations* tab. Add finding cites the simulation's run; Save as dataset writes one `derived` dataset from the inputs. [9.8](../for-developers/modules/work/features/simulation.md) SM11–SM17 |
+| Impact in Studio | A tab of every project (`view=impact&of=<branch>&hops=<n>`): reach starts from the records the option's findings cite and is walked through the Explorer's expand, up to 3 hops, drawn on the shared layered canvas (kind `impact`, a column per hop, a node per type). No what-if values and no currency. [9.9](../for-developers/modules/work/features/impact.md) IM1–IM6 |
 | Lineage | Built from records, never inferred; every node opens its source |
 | Rail → path | Projects `/projects[/:project]` · My todos `/projects/todos[/:todo]` · Decisions `/projects/decisions`. A project's key sits right under the product root, so `todos` and `decisions` are not usable project keys. The rail lights the longest-matching item |
 | One stack, two rail items | Projects and My todos are the two sections of today's Projects stack (Projects over Todos), as Agents and LLMs share one stack |
@@ -158,7 +160,7 @@ The type sets the words and the panel that opens first. The records underneath a
 | Breadcrumbs | The project page names its own levels in the shell's header — *Projects › the project › H2 · title › the finding's statement*, each linking one level up — through `HostLayout`'s `pageTrail`. The page headers carry only their own title: no in-page back trail. The stack's drill-in trail shows the project's name, not its key |
 | A finding's page | The statement is the title. *Added by* and *reviewed by* name the person or agent through the project's staff (`usePeople`), the same map *By* uses on Decisions. A run cite reads `run 8195c5e8` and links to the run |
 | Merge | Always marks the source branch merged; there is no *stays parked* option. The merge dialog shows *What moves* only: what moves is also what the decision cites. Its title reads *Merge H2* until *Into* is set |
-| Not on the page yet | *Simulate* (C06); *Datasets* as a tab of its own — the Overview lists a project's datasets, which are its findings' dataset cites; a branch's *Runs* and *Schedules* tabs |
+| Not on the page yet | *Datasets* as a tab of its own — the Overview lists a project's datasets, which are its findings' dataset cites; a branch's *Runs* and *Schedules* tabs |
 | Report reading | The draft and every published version read rendered: the report's Markdown subset (`#`–`###`, lists, `**bold**`, paragraphs) drawn with the kit's typography, a finding's trailing `(cites)` as numbered marks listed once under *Cites*. *Read · Edit* switches the draft to its Markdown. *Versions* counts the rows it lists, the draft included |
 | Report export | PDF is the browser's print of the page; Markdown is the version body (or the draft) downloaded as it is |
 | New project | One dialog: type (the three launched types; the others drawn and switched off), the question, name (the question's first 60 characters unless typed), objective, first branch, agents, and who can see it. Project rules are written on the project's Details tab after it exists |

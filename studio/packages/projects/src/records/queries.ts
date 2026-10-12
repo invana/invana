@@ -14,8 +14,13 @@ import {
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { projectsApi, recordsApi } from "../api";
-import type { DecisionCreate, FindingCreate } from "../types";
+import { projectsApi, recordsApi, simulationsApi } from "../api";
+import type {
+	DecisionCreate,
+	DerivedDatasetCreate,
+	FindingCreate,
+	SimulationCreate,
+} from "../types";
 
 export interface ProjectRef {
 	username: string;
@@ -154,7 +159,11 @@ export function useLineageDatasets(refs: string[]) {
 export function useRecordMutations(p: ProjectRef) {
 	const qc = useQueryClient();
 	const invalidate = () => {
-		qc.invalidateQueries({ queryKey: ["projects", p.username, p.graphSlug] });
+		// Impact's reach is graph reads, not records: a record write leaves it.
+		qc.invalidateQueries({
+			queryKey: ["projects", p.username, p.graphSlug],
+			predicate: (q) => !q.queryKey.includes("reach"),
+		});
 		qc.invalidateQueries({ queryKey: ["decisions", p.username, p.graphSlug] });
 	};
 	const { username, graphSlug, key } = p;
@@ -195,6 +204,65 @@ export function useRecordMutations(p: ProjectRef) {
 		publish: useMutation({
 			mutationFn: () => recordsApi.publish(username, graphSlug, key),
 			onSuccess: invalidate,
+		}),
+	};
+}
+
+/** The installed simulators; *Simulate* is drawn only when there is one. */
+export function useSimulatorsQuery() {
+	return useQuery({
+		queryKey: ["simulators"],
+		queryFn: () => simulationsApi.simulators(),
+		staleTime: 60_000,
+	});
+}
+
+/** A project's simulations, newest first — one branch's when `branch` is set. */
+export function useSimulationsQuery(p: ProjectRef, branch: number | null) {
+	return useQuery({
+		queryKey: recordKey(p, "simulations", branch),
+		queryFn: () => simulationsApi.list(p.username, p.graphSlug, p.key, branch),
+	});
+}
+
+const SETTLED = new Set(["succeeded", "failed", "cancelled"]);
+
+/** True while the simulation's run has not settled — the result is not in yet. */
+export function simulationPending(status: string | null | undefined) {
+	return !status || !SETTLED.has(status);
+}
+
+/** One simulation, read again every 2 s until its run settles. */
+export function useSimulationQuery(p: ProjectRef, n: number | null) {
+	return useQuery({
+		queryKey: recordKey(p, "simulation", n),
+		queryFn: () =>
+			simulationsApi.get(p.username, p.graphSlug, p.key, n as number),
+		enabled: n !== null,
+		refetchInterval: (q) =>
+			q.state.data && simulationPending(q.state.data.status) ? 2_000 : false,
+	});
+}
+
+export function useSimulationMutations(p: ProjectRef) {
+	const qc = useQueryClient();
+	return {
+		simulate: useMutation({
+			mutationFn: ({
+				branch,
+				data,
+			}: {
+				branch: number;
+				data: SimulationCreate;
+			}) =>
+				simulationsApi.simulate(p.username, p.graphSlug, p.key, branch, data),
+			onSuccess: () =>
+				qc.invalidateQueries({ queryKey: recordKey(p, "simulations") }),
+		}),
+		saveAsDataset: useMutation({
+			mutationFn: (data: DerivedDatasetCreate) =>
+				simulationsApi.saveAsDataset(data),
+			onSuccess: () => qc.invalidateQueries({ queryKey: ["datasets"] }),
 		}),
 	};
 }

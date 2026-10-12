@@ -1,15 +1,17 @@
 /**
  * **A project** — the page `mainSection` draws when a project is open
- * (projects.md PJ-03…PJ-08, PJ-11, PJ-14; boards `projects.project` and its
+ * (projects.md PJ-03…PJ-11, PJ-14; boards `projects.project` and its
  * tabs).
  *
  * The header names the project and what is true of it — its type, who can see
  * it, how many branches, whether a decision is open — over the question it
- * decides and the people on it. Its tabs read the project five ways:
+ * decides and the people on it. Its tabs read the project six ways:
  * **Overview** where the quest stands, **Branches** the tree of inquiry,
- * **Decisions** what was decided on it, **Lineage** how a decision got here,
- * **Report** the write-up. A branch and a finding are drill-ins with headers
- * of their own; the tab they were opened from waits behind them.
+ * **Impact** what an option reaches over the graph, **Decisions** what was
+ * decided on it, **Lineage** how a decision got here, **Report** the
+ * write-up. A branch, a finding and a simulation's result are drill-ins with
+ * headers of their own; the tab they were opened from waits behind them.
+ * *Simulate* is offered whenever a simulator is installed.
  *
  * The page reads the project's records once (`useProjectRecords`) and hands
  * them down, so the header's counts and the tab under it never disagree.
@@ -23,12 +25,20 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
-import { FileText, GitFork } from "lucide-react";
+import { FileText, FlaskConical, GitFork } from "lucide-react";
 import { useState } from "react";
+import { ImpactTab } from "../impact/ImpactTab";
 import { useProjectQuery } from "../queries";
-import { useAssignmentsQuery, useReportQuery } from "../records/queries";
+import {
+	useAssignmentsQuery,
+	useReportQuery,
+	useSimulatorsQuery,
+} from "../records/queries";
 import { useProjectRecords } from "../records/useProjectRecords";
 import { branchWord, plural, typeLabel } from "../records/words";
+import { SimulateDialog } from "../simulation/SimulateDialog";
+import { SimulationView } from "../simulation/SimulationView";
+import type { Simulation } from "../types";
 import { useProjectsViewPanel } from "../useProjectsViewPanel";
 import { BranchCanvas } from "./BranchTree";
 import { BranchView } from "./BranchView";
@@ -57,6 +67,7 @@ export interface ProjectPageProps {
 type Act =
 	| { kind: "fork"; branch: number }
 	| { kind: "decide"; branch: number; merge?: boolean }
+	| { kind: "simulate"; branch: number | null }
 	| null;
 
 export function ProjectPage(pageProps: ProjectPageProps) {
@@ -73,6 +84,8 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 	const report = useReportQuery(ref);
 	const view = useProjectView();
 	const [act, setAct] = useState<Act>(null);
+	const simulators = useSimulatorsQuery();
+	const canSimulate = (simulators.data?.items.length ?? 0) > 0;
 
 	const project = query.data;
 	if (!project)
@@ -98,6 +111,16 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 	);
 
 	const openAct = (next: Act) => setAct(next);
+	const acts = (
+		<Acts
+			project={project}
+			act={act}
+			records={records}
+			onClose={() => setAct(null)}
+			onSimulated={(s) => view.openSimulation(s.number, s.branch)}
+			refKey={ref}
+		/>
+	);
 
 	if (view.finding !== null)
 		return (
@@ -108,6 +131,11 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 				number={view.finding}
 				onTrace={(d) => view.traceDecision(d)}
 			/>
+		);
+
+	if (view.simulation !== null)
+		return (
+			<SimulationView {...props} project={project} number={view.simulation} />
 		);
 
 	if (view.branch !== null)
@@ -123,20 +151,23 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 					onOpenFinding={view.openFinding}
 					onFork={(n) => openAct({ kind: "fork", branch: n })}
 					onDecide={(n, merge) => openAct({ kind: "decide", branch: n, merge })}
+					onSimulate={
+						canSimulate
+							? (n) => openAct({ kind: "simulate", branch: n })
+							: undefined
+					}
+					onOpenSimulation={(n) =>
+						view.openSimulation(n, view.branch ?? undefined)
+					}
 				/>
-				<Acts
-					project={project}
-					act={act}
-					records={records}
-					onClose={() => setAct(null)}
-					refKey={ref}
-				/>
+				{acts}
 			</>
 		);
 
 	const tabs: { id: ProjectTab; label: string }[] = [
 		{ id: "overview", label: "Overview" },
 		{ id: "branches", label: `Branches · ${branches.length}` },
+		{ id: "impact", label: "Impact" },
 		{ id: "decisions", label: `Decisions · ${decisions.length}` },
 		{ id: "lineage", label: "Lineage" },
 		{
@@ -186,6 +217,17 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 							<FileText />
 							Report
 						</Button>
+						{canSimulate ? (
+							<Button
+								variant="outline"
+								size="sm"
+								disabled={frozen}
+								onClick={() => openAct({ kind: "simulate", branch: null })}
+							>
+								<FlaskConical />
+								Simulate
+							</Button>
+						) : null}
 						<Button
 							size="sm"
 							disabled={frozen}
@@ -236,6 +278,17 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 						/>
 					</CanvasFrame>
 				</div>
+			) : view.tab === "impact" ? (
+				<ImpactTab
+					username={username}
+					graphSlug={graphSlug}
+					project={project}
+					records={records}
+					of={view.of}
+					hops={view.hops}
+					onReach={view.setReach}
+					onOpenFinding={(n, b) => view.openFindingOn(b, n)}
+				/>
 			) : view.tab === "decisions" ? (
 				<div className="p-3">
 					<DecisionsTable
@@ -259,30 +312,26 @@ export function ProjectPage(pageProps: ProjectPageProps) {
 				<ReportTab project={project} refKey={ref} frozen={frozen} />
 			)}
 
-			<Acts
-				project={project}
-				act={act}
-				records={records}
-				onClose={() => setAct(null)}
-				refKey={ref}
-			/>
+			{acts}
 		</Page>
 	);
 }
 
-/** The dialogs the page's acts open — fork, decide and merge. */
+/** The dialogs the page's acts open — fork, decide, merge and simulate. */
 function Acts({
 	project,
 	act,
 	records,
 	refKey,
 	onClose,
+	onSimulated,
 }: {
 	project: Parameters<typeof ForkDialog>[0]["project"];
 	act: Act;
 	records: ReturnType<typeof useProjectRecords>;
 	refKey: { username: string; graphSlug: string; key: string };
 	onClose: () => void;
+	onSimulated: (s: Simulation) => void;
 }) {
 	return (
 		<>
@@ -300,6 +349,15 @@ function Acts({
 				branch={act?.kind === "decide" ? act.branch : null}
 				merge={act?.kind === "decide" && !!act.merge}
 				onClose={onClose}
+			/>
+			<SimulateDialog
+				open={act?.kind === "simulate"}
+				onClose={onClose}
+				project={project}
+				refKey={refKey}
+				branch={act?.kind === "simulate" ? act.branch : null}
+				branches={records.branches}
+				onSimulated={onSimulated}
 			/>
 		</>
 	);

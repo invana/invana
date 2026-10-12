@@ -116,6 +116,7 @@ export const EVENT_CATEGORIES: EventCategory[] = [
 			{ action: "finding.add", label: "Finding added" },
 			{ action: "finding.review", label: "Finding reviewed" },
 			{ action: "decision.record", label: "Decision recorded" },
+			{ action: "simulation.run", label: "Simulation run" },
 			{ action: "proposal.submit", label: "Proposal submitted" },
 			{ action: "proposal.accept", label: "Proposal accepted" },
 			{ action: "proposal.reject", label: "Proposal rejected" },

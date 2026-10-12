@@ -225,6 +225,132 @@ export interface LineageDataset {
 	}[];
 }
 
+// ── Simulation ───────────────────────────────────────────────────────────────
+
+/** One field a simulator's spec takes; `type` is `int · float · str · bool · list · obj`. */
+export interface SpecField {
+	name: string;
+	type: string;
+	required: boolean;
+	default: unknown;
+	label: string;
+}
+
+/** One installed simulator, as `GET /simulators` lists it. */
+export interface Simulator {
+	key: string;
+	version: string;
+	plugin: string;
+	plugin_version: string;
+	/** The plugin's short name. */
+	handle: string;
+	title: string;
+	summary: string;
+	spec: SpecField[];
+}
+
+export interface SimulationCreate {
+	/** A simulator key, `key@version`, or its plugin's short name. */
+	simulator: string;
+	spec: Record<string, unknown>;
+	/** `publisher/name@v` of each dataset version it reads. */
+	inputs: string[];
+	seed?: number | null;
+}
+
+/** One trait's figures on a ranked row. */
+interface TraitFigures {
+	mean?: number;
+	sd?: number;
+	/** Share of progeny meeting the trait's target, 0–1. */
+	meets?: number;
+}
+
+/**
+ * One ranked row. The simulator's own shape: a label (`cross`), `meets_all`
+ * (0–1) and per-trait figures; any other key is a plain figure.
+ */
+export type RankedRow = Record<string, unknown> & {
+	cross?: string;
+	meets_all?: number;
+	traits?: Record<string, TraitFigures>;
+};
+
+export interface Simulation {
+	number: number;
+	branch: number;
+	simulator: {
+		key: string;
+		version: string;
+		plugin: string;
+		plugin_version: string;
+		title: string;
+	};
+	spec: Record<string, unknown>;
+	seed: number;
+	inputs: {
+		ref: string;
+		dataset_id: string;
+		version_id: string;
+		content_hash: string;
+	}[];
+	origin: "derived";
+	run_id: string | null;
+	/** The run's: `queued · running · succeeded · failed · cancelled`. */
+	status: string | null;
+	outcome: string | null;
+	error: string | null;
+	result: { ranked: RankedRow[]; summary: Record<string, unknown> } | null;
+	tokens: number;
+	created_by_id: string | null;
+	created_at: string;
+	started_at: string | null;
+	finished_at: string | null;
+}
+
+/** What Save as dataset writes: the dataset, then its first version. */
+export interface DerivedDatasetCreate {
+	dataset: {
+		name: string;
+		title: string;
+		description: string;
+		origin: "derived";
+		key_column: string;
+	};
+	version: {
+		licence: string;
+		records: Record<string, unknown>[];
+		derived_from: string[];
+		author_chain: LineageDataset["author_chain"];
+		why?: string;
+	};
+}
+
+// ── Impact ───────────────────────────────────────────────────────────────────
+
+/** A graph record as the Explorer's expand reads it. */
+export interface ReachVertex {
+	id: string;
+	label: string;
+	properties: Record<string, unknown>;
+}
+
+export interface ReachEdge {
+	id: string;
+	label: string;
+	source: string;
+	target: string;
+}
+
+/** One expand read — a record's neighbours, and how many it has in all. */
+export interface NeighbourRead {
+	data: { nodes: ReachVertex[]; edges: ReachEdge[] };
+	total: number;
+	returned: number;
+	has_more: boolean;
+	run_id: string | null;
+}
+
 // ── Reports ──────────────────────────────────────────────────────────────────
 
 export interface Report {

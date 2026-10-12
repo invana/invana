@@ -5,10 +5,12 @@
  *
  * The header carries the branch's state — its status, the current verdict,
  * the balance of evidence and where it was forked from — and its acts:
- * *Decide*, *Merge…*, *Fork* and *Add finding*. **Work** is proposals over the
- * todos and findings side by side, because the next act on a branch is one of
- * those three. **History** is its decisions, newest first, a superseded one
- * kept and marked: decisions are append-only.
+ * *Decide*, *Merge…*, *Fork*, *Simulate* (when a simulator is installed) and
+ * *Add finding*. **Work** is proposals over the todos and findings side by
+ * side, because the next act on a branch is one of those three.
+ * **Simulations** lists what was simulated on it, each opening its result.
+ * **History** is its decisions, newest first, a superseded one kept and
+ * marked: decisions are append-only.
  */
 
 import { Input, Label } from "@invana/forms";
@@ -22,11 +24,15 @@ import {
 	TabsTrigger,
 } from "@invana/ui";
 import { humanStatus, RecordRow, taskTone } from "@invana-studio/ui";
-import { Gavel, GitFork, GitMerge, Plus } from "lucide-react";
+import { FlaskConical, Gavel, GitFork, GitMerge, Plus } from "lucide-react";
 import { useState } from "react";
 import { useProjectsSlots } from "../ProjectsSlots";
 import { useTodoMutations, useTodosQuery } from "../queries";
-import { useBranchQuery, useRecordMutations } from "../records/queries";
+import {
+	useBranchQuery,
+	useRecordMutations,
+	useSimulationsQuery,
+} from "../records/queries";
 import type { useProjectRecords } from "../records/useProjectRecords";
 import {
 	balance,
@@ -39,11 +45,12 @@ import {
 	shortDate,
 	verdictLabel,
 } from "../records/words";
+import { SimulationRows } from "../simulation/SimulationRows";
 import type { Decision, Finding, Project, Proposal } from "../types";
 import { AddFindingDialog } from "./AddFindingDialog";
 import { Box, Muted, Page, ReadState, StanceBadge } from "./parts";
 
-type BranchTab = "work" | "findings" | "history";
+type BranchTab = "work" | "findings" | "simulations" | "history";
 
 export function BranchView({
 	username,
@@ -56,6 +63,8 @@ export function BranchView({
 	onOpenTodo,
 	onFork,
 	onDecide,
+	onSimulate,
+	onOpenSimulation,
 }: {
 	username: string;
 	graphSlug: string;
@@ -68,9 +77,13 @@ export function BranchView({
 	onOpenTodo?: (id: string) => void;
 	onFork: (n: number) => void;
 	onDecide: (n: number, merge?: boolean) => void;
+	/** Absent while no simulator is installed. */
+	onSimulate?: (n: number) => void;
+	onOpenSimulation: (n: number) => void;
 }) {
 	const ref = { username, graphSlug, key: project.key };
 	const detail = useBranchQuery(ref, number);
+	const simulations = useSimulationsQuery(ref, number);
 	const [tab, setTab] = useState<BranchTab>("work");
 	const [adding, setAdding] = useState(false);
 
@@ -147,6 +160,17 @@ export function BranchView({
 								<GitFork />
 								Fork
 							</Button>
+							{onSimulate ? (
+								<Button
+									variant="outline"
+									size="sm"
+									disabled={closed}
+									onClick={() => onSimulate(b.number)}
+								>
+									<FlaskConical />
+									Simulate
+								</Button>
+							) : null}
 						</>
 					)
 				}
@@ -159,6 +183,9 @@ export function BranchView({
 					<TabsTrigger value="work">Work</TabsTrigger>
 					<TabsTrigger value="findings">
 						{evidenceWord(project)}s · {d.findings.length}
+					</TabsTrigger>
+					<TabsTrigger value="simulations">
+						Simulations · {simulations.data?.total ?? 0}
 					</TabsTrigger>
 					<TabsTrigger value="history">
 						History · {d.decisions.length}
@@ -229,6 +256,17 @@ export function BranchView({
 							project={project}
 							findings={d.findings}
 							onOpen={onOpenFinding}
+						/>
+					</Box>
+				</div>
+			) : tab === "simulations" ? (
+				<div className="p-3">
+					<Box title="Simulations" count={simulations.data?.total ?? 0}>
+						<SimulationRows
+							project={project}
+							refKey={ref}
+							branch={b.number}
+							onOpen={onOpenSimulation}
 						/>
 					</Box>
 				</div>

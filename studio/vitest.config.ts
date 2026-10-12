@@ -28,6 +28,7 @@ export default defineConfig({
 				"packages/agents/src/agents/agentDraft.ts",
 				"packages/agents/src/plans/taskFlowFromTaskPlan.ts",
 				"packages/agents/src/skills/taskFlowFromPlan.ts",
+				"packages/projects/src/impact/reach.ts",
 			],
 			// The OpenTelemetry SDK boot — browser wiring with no decision in it.
 			exclude: [

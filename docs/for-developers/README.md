@@ -180,7 +180,8 @@ provider row and its models, and reopens four rows below. The shapes:
 | 9.5 | [Branches, findings and decisions](modules/work/features/branches-and-decisions.md) | A project of a type forks into branches; findings for and against; a verdict and a decision the rules check, superseded never edited; agents propose | ✅ | ✅ | ✅ | B05 |
 | 9.6 | [Project reports](modules/work/features/project-reports.md) | A report drafted from the records, edited, published as frozen versions that cite their datasets | ✅ | ✅ | ✅ | B05 |
 | 9.7 | [Private projects](modules/work/features/private-projects.md) | A project only its people and agents can see | ✅ | ✅ | ✅ | B05 |
-| 9.8 | [Simulation](modules/work/features/simulation.md) | A branch runs a simulator plugin over pinned dataset versions; the result is ranked, reproducible from its seed and labelled derived | ✅ | ✅ | 🔵 | B09 |
+| 9.8 | [Simulation](modules/work/features/simulation.md) | A branch runs a simulator plugin over pinned dataset versions; the result is ranked, reproducible from its seed and labelled derived | ✅ | ✅ | ✅ | B09 · C06 |
+| 9.9 | [Impact](modules/work/features/impact.md) | What a branch's option reaches over the graph, hop by hop from the records its evidence cites | — | — | ✅ | C06 |
 
 ## 10 · [Operate](modules/operate/spec.md)
 
@@ -281,11 +282,11 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 62 | 19 | 15 | 5 |
-| CLI | 23 | 10 | 3 | 65 |
-| Studio | 49 | 20 | 24 | 8 |
+| API | 62 | 19 | 15 | 6 |
+| CLI | 23 | 10 | 3 | 66 |
+| Studio | 51 | 20 | 23 | 8 |
 
-A hundred and one features. **These counts are the tables above, counted** — if a cell is flipped, they
+A hundred and two features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 

@@ -11,9 +11,11 @@ import type {
 	BranchDetail,
 	Decision,
 	DecisionCreate,
+	DerivedDatasetCreate,
 	Finding,
 	FindingCreate,
 	LineageDataset,
+	NeighbourRead,
 	Project,
 	ProjectAssignment,
 	ProjectCreate,
@@ -23,6 +25,9 @@ import type {
 	Proposal,
 	Report,
 	ReportVersion,
+	Simulation,
+	SimulationCreate,
+	Simulator,
 	Todo,
 	TodoActivity,
 	TodoCreate,
@@ -221,6 +226,81 @@ export const recordsApi = {
 	dataset: (publisher: string, name: string) =>
 		request<LineageDataset>(
 			`/api/v1/datasets/${encodeURIComponent(publisher)}/${encodeURIComponent(name)}`,
+		),
+};
+
+/**
+ * Simulations on a project's branches, and the simulators installed
+ * (simulation.md). A simulation opens a run and answers `202`; its result is
+ * read back from `simulation` until the run settles.
+ */
+export const simulationsApi = {
+	/** Every installed simulator — install-wide, not Graph-scoped. */
+	simulators: () =>
+		request<{ items: Simulator[]; total: number }>("/api/v1/simulators"),
+
+	list: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		branch?: number | null,
+	) =>
+		request<{ items: Simulation[]; total: number }>(
+			`${base(username, graphSlug)}/projects/${key}/simulations${branch ? `?branch=${branch}` : ""}`,
+		),
+
+	get: (username: string, graphSlug: string, key: string, n: number) =>
+		request<Simulation>(
+			`${base(username, graphSlug)}/projects/${key}/simulations/${n}`,
+		),
+
+	simulate: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		branch: number,
+		data: SimulationCreate,
+	) =>
+		request<Simulation>(
+			`${base(username, graphSlug)}/projects/${key}/branches/${branch}/simulations`,
+			{ method: "POST", ...json(data) },
+		),
+
+	/**
+	 * Save as dataset: the dataset, then its first version. Called directly —
+	 * this product may not import Datasets.
+	 */
+	saveAsDataset: async (data: DerivedDatasetCreate) => {
+		const made = await request<{ publisher: string; name: string }>(
+			"/api/v1/datasets",
+			{ method: "POST", ...json(data.dataset) },
+		);
+		await request<unknown>(
+			`/api/v1/datasets/${encodeURIComponent(made.publisher)}/${encodeURIComponent(made.name)}/versions`,
+			{ method: "POST", ...json(data.version) },
+		);
+		return made;
+	},
+};
+
+/**
+ * The graph reads Impact walks: one record's neighbours, through the
+ * Explorer's expand (each read is a run under the Graph's lens). Called
+ * directly — this product may not import the Explorer.
+ */
+export const reachApi = {
+	neighbours: (
+		username: string,
+		graphSlug: string,
+		vertexId: string,
+		limit: number,
+	) =>
+		request<NeighbourRead>(
+			`${base(username, graphSlug)}/explorer/expand/neighbors`,
+			{
+				method: "POST",
+				...json({ vertex_id: vertexId, direction: "both", limit }),
+			},
 		),
 };
 

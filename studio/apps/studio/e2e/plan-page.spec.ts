@@ -3,7 +3,9 @@
  * of four tabs read over a window, and a run row opens that run's page.
  *
  * Reads only. It needs a Graph where `nl-single` has run and
- * `expand-neighbours` never has — `demos/airways` after a few asks.
+ * `stitch-withdraw` never has — `demos/airways` after a few asks. (Expanding a
+ * node, on the canvas or through a project's Impact tab, runs
+ * `expand-neighbours`, so that plan is no longer one nobody runs.)
  */
 import { expect, type Page, test } from "@playwright/test";
 
@@ -71,7 +73,7 @@ test("a plan that has run reads across its four tabs and opens a run", async ({
 test("a plan that has never run shows an empty Overview, not a chart of zeros", async ({
 	page,
 }) => {
-	await openPlan(page, "expand-neighbours");
+	await openPlan(page, "stitch-withdraw");
 
 	await expect(
 		page.getByText(/^Nothing ran this plan in the last/),

@@ -6,9 +6,9 @@ back `derived`.
 
 | | |
 |---|---|
-| Index | [9.8](../../../README.md#9--work) · B09 |
+| Index | [9.8](../../../README.md#9--work) · B09 · C06 |
 | Module | [Work](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Product | [products/projects.md](../../../../products/projects.md) PJ-F6 · PJ-09 · P-06 · P-07 |
 | Related | [plugins](../../platform/features/plugins.md) (the simulator kind) · [branches-and-decisions](branches-and-decisions.md) · [datasets](../../bring-data-in/features/datasets.md) · [see what ran](../../operate/features/see-what-ran.md) |
 
@@ -86,14 +86,17 @@ sequenceDiagram
 
 ## Surfaces
 
-Studio is C06 (`projects.simulate` · `projects.simulate.result`).
+Studio is `@invana-studio/projects` (C06).
 
-| Surface | Consumes |
-|---|---|
-| Simulate dialog (`projects.simulate`) | `GET /api/v1/simulators` for the simulator chip and its spec fields · the branch's datasets for *Reads* · `POST …/branches/{n}/simulations` |
-| Simulation result (`projects.simulate.result`) | `GET …/simulations/{n}` — header from `simulator · inputs · tokens · started_at/finished_at`, the table from `result.ranked` |
-| Branch page | `GET …/simulations?branch=n` for *1 simulation* and its findings |
-| CLI | `invana simulate` · `invana simulations list · show` |
+| Surface | Route | Consumes |
+|---|---|---|
+| *Simulate* on a branch's header and the project's header | — | `GET /api/v1/simulators` (hidden when none is installed) |
+| Simulate dialog (`projects.simulate`) | over the page | the simulator's spec fields · the branch's cited dataset versions for *Reads* · `POST …/branches/{n}/simulations` |
+| Simulation result (`projects.simulate.result`) | `…?page=project:<key>&simulation=<n>` | `GET …/simulations/{n}`, polled while queued or running · header from `simulator · inputs · tokens · started_at/finished_at`, the table from `result.ranked` |
+| Add finding (a row's act) | over the result | `POST …/branches/{n}/findings` with a `run` cite |
+| Save as dataset | over the result | `POST /api/v1/datasets` then `POST …/{publisher}/{name}/versions` |
+| Branch page *Simulations · N* tab | `…&branch=<n>` | `GET …/simulations?branch=n` |
+| CLI | | `invana simulate` · `invana simulations list · show` |
 
 ## Engine
 
@@ -176,12 +179,19 @@ All four carry the OpenAPI tag `simulations`.
 | SM8 | **Saving as a dataset and adding a finding reuse what exists.** A finding cites the simulation's run; a saved dataset is `derived` with the simulation's inputs as `derived_from`. Neither is a simulation endpoint. |
 | SM9 | **The genomic simulator is deliberately simple:** mid-parent plus independent Gaussian segregation per trait. A better model is a new version of the plugin, and simulations already run keep the version they ran. |
 | SM10 | **Numbered per project** (`s1`, `s2`), like branches, findings and decisions, because people type it. |
+| SM11 | **Studio offers *Simulate* wherever a branch can be simulated.** On a branch's header, and on the project's header with the branch to pick (dropped and merged branches are not offered). It is hidden while no simulator is installed and off on an archived project. |
+| SM12 | **The dialog is drawn from what the simulator declares, never from its science.** One control per spec field, by type: `int`/`float` a number (its default filled in), `str` a text field, `bool` a switch, `obj` JSON, `list` one entry per line. A list entry written `trait >= value` or `trait <= value`, optionally `± sd`, is sent as a target `{trait, op, value, sd}`; any other entry as its text. *Reads* lists the branch's cited dataset versions, all ticked, and takes more as `publisher/name@v`. The seed is optional. |
+| SM13 | **A refusal stays in the dialog with the engine's sentence**, and nothing opens. A `202` closes it and opens the simulation over the branch. |
+| SM14 | **The result is a drill-in of the project page, `simulation=<n>`.** It polls every 2 s while queued or running and draws the run's status meanwhile; a failed run shows the simulator's sentence beside *Open run page*. The table reads the ranked contract: the row label (`cross`, else its first text field), `meets_all` as a bar, each trait's `mean ± sd` and share meeting it, and any other plain figure as a column. A muted line says the rows are predictions, not observations. |
+| SM15 | **A row's *Add finding* opens Add a finding fixed to the simulation's branch**, the statement drawn from the row (*Col-0 × Ler-1: 41% of progeny meet every target*) and the simulation's run as its cite. |
+| SM16 | **Save as dataset writes one `derived` dataset.** Its key column is the row label; each row flattens to the label, `meets_all` and `<trait>_mean · _sd · _meets`; the version's `derived_from` is the simulation's inputs and its author chain one `original` step of kind `run` naming the simulation and its run. The licence is asked for. A refusal (a taken name, a role) stays in the dialog. |
+| SM17 | **The branch page lists its simulations** in a *Simulations · N* tab, newest first, each opening its result; the breadcrumb reads *Projects › project › H2 · title › Simulation s1*. |
 
 ## Not building
 
 | Not building | Because |
 |---|---|
-| Impact — reach by hop and what-if values (PJ-10) | Reach by hop is graph traversal and C06's; what-if values arrive as a simulator plugin when a policy model exists |
+| Impact — reach by hop and what-if values (PJ-10) | Reach by hop is [9.9](impact.md); what-if values arrive as a simulator plugin when a policy model exists |
 | Parameter sweeps · game theory | Still not built ([README](../../../README.md#not-building)) |
 | Enabling or disabling a simulator per install | An Admin enables plugins with B06b; a simulator loads whenever it is installed |
 | Simulators on a GPU worker pool | Workers and routing by `resources` are B14 |

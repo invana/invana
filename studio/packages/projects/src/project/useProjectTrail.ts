@@ -1,6 +1,6 @@
 /**
  * The header's trail for a project's page — `Projects › the project › H2 ›
- * the finding` (shell.md › Breadcrumbs: Graph › section › item › drill-in).
+ * the finding` (or `› Simulation s1`) (shell.md › Breadcrumbs: Graph › section › item › drill-in).
  *
  * The project page carries no trail of its own; its drill-ins are levels of
  * the shell's breadcrumb, each linking to the page one level up. A level is
@@ -11,7 +11,11 @@
 
 import { useLocation } from "react-router-dom";
 import { useProjectQuery } from "../queries";
-import { useBranchQuery, useFindingQuery } from "../records/queries";
+import {
+	useBranchQuery,
+	useFindingQuery,
+	useSimulationQuery,
+} from "../records/queries";
 import { branchLabel, evidenceWord } from "../records/words";
 import { useProjectView } from "./useProjectView";
 
@@ -39,8 +43,12 @@ export function useProjectTrail(
 		graphSlug,
 		projectKey ?? undefined,
 	).data;
-	const branchNumber = projectKey ? view.branch : null;
 	const findingNumber = projectKey ? view.finding : null;
+	const simulationNumber = projectKey ? view.simulation : null;
+	const simulation = useSimulationQuery(ref, simulationNumber).data;
+	const branchNumber = projectKey
+		? (view.branch ?? simulation?.branch ?? null)
+		: null;
 	const branch = useBranchQuery(ref, branchNumber).data?.branch;
 	const finding = useFindingQuery(ref, findingNumber).data;
 
@@ -55,15 +63,20 @@ export function useProjectTrail(
 
 	const levels: TrailLevel[] = [
 		{ label: "Projects", to: `/u/${username}/${graphSlug}/projects` },
-		{ label: project?.name ?? projectKey, to: up(["branch", "finding"]) },
+		{
+			label: project?.name ?? projectKey,
+			to: up(["branch", "finding", "simulation"]),
+		},
 	];
 	if (project && branchNumber !== null) {
 		const label = branchLabel(project, branchNumber);
 		levels.push({
 			label: branch ? `${label} · ${branch.title}` : label,
-			to: up(["finding"]),
+			to: up(["finding", "simulation"]),
 		});
 	}
+	if (project && simulationNumber !== null && findingNumber === null)
+		levels.push({ label: `Simulation s${simulationNumber}` });
 	if (project && findingNumber !== null)
 		levels.push({
 			label: finding?.statement ?? `${evidenceWord(project)} ${findingNumber}`,

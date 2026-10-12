@@ -696,11 +696,11 @@ builds them in `@invana-studio/datasets` (migration session C01). Decisions are 
 ## Beyond the 42 · Projects
 
 The `projects.*` boards of the *Invana Products* prototype (`.design/canvas-products/p_projects.py`),
-as Studio builds them in `@invana-studio/projects` (migration session C02). A project and Decisions
+as Studio builds them in `@invana-studio/projects` (migration sessions C02 and C06). A project and Decisions
 are pages in `mainSection`; the page's tab and drill-in ride in the query beside `?page=`. Decisions
 are in [products/projects.md](../products/projects.md#decisions) and the work feature files
 [9.5](modules/work/features/branches-and-decisions.md) · [9.6](modules/work/features/project-reports.md) ·
-[9.7](modules/work/features/private-projects.md).
+[9.7](modules/work/features/private-projects.md) · [9.8](modules/work/features/simulation.md) · [9.9](modules/work/features/impact.md).
 
 | Artboard | Story | Studio route | Studio |
 |---|---|---|---|
@@ -709,12 +709,13 @@ are in [products/projects.md](../products/projects.md#decisions) and the work fe
 | `projects.project` | PJ-03 | `/projects/<key>` → page `project:<key>` | ✅ |
 | `projects.project.branches` | PJ-04 | `…?view=branches` | ✅ |
 | `projects.branch.fork` | PJ-04 | *Fork a branch* · a branch's *Fork* | ✅ |
-| `projects.branch` | PJ-05 | `…&branch=<n>` — Work · Findings · History; no Runs or Schedules tab | 🟡 |
+| `projects.branch` | PJ-05 | `…&branch=<n>` — Work · Findings · Simulations · History; no Runs or Schedules tab | 🟡 |
 | `projects.finding` | PJ-06 | `…&finding=<n>` | ✅ |
 | `projects.branch.decide` | PJ-07 | a branch's *Decide* | ✅ |
 | `projects.branch.merge` | PJ-08 | a branch's *Merge…* | ✅ |
-| `projects.simulate` · `projects.simulate.result` | PJ-09 | C06 | 🔵 |
-| `projects.impact` | PJ-10 | C06 | 🔵 |
+| `projects.simulate` | PJ-09 | *Simulate* on a branch's or the project's header | ✅ |
+| `projects.simulate.result` | PJ-09 | `…&simulation=<n>` | ✅ |
+| `projects.impact` | PJ-10 | `…?view=impact&of=<n>&hops=<n>` — reach by hop; no what-if values | 🟡 |
 | `projects.lineage` | PJ-11 | `…?view=lineage&decision=<n>` | ✅ |
 | `projects.todos` · `projects.todo` | PJ-12 | `/projects/todos[/<id>]` — *My todos* | ✅ |
 | `projects.decisions` | PJ-13 | `/projects/decisions` → page `decisions:<graph>` | ✅ |

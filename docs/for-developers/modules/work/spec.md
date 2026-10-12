@@ -10,7 +10,7 @@ the same Todo can go to either, and the same acceptance closes it.
 | | |
 |---|---|
 | Index | [§5 · Work](../../README.md#5--work) |
-| Features | [projects-and-tasks](features/projects-and-tasks.md) · [objectives-and-criteria](features/objectives-and-criteria.md) · [review](features/review.md) · [recurring-tasks-and-conditions](features/recurring-tasks-and-conditions.md) · [branches-and-decisions](features/branches-and-decisions.md) · [project-reports](features/project-reports.md) · [private-projects](features/private-projects.md) · [simulation](features/simulation.md) |
+| Features | [projects-and-tasks](features/projects-and-tasks.md) · [objectives-and-criteria](features/objectives-and-criteria.md) · [review](features/review.md) · [recurring-tasks-and-conditions](features/recurring-tasks-and-conditions.md) · [branches-and-decisions](features/branches-and-decisions.md) · [project-reports](features/project-reports.md) · [private-projects](features/private-projects.md) · [simulation](features/simulation.md) · [impact](features/impact.md) |
 | Depends on | [Agents](../agents/spec.md) (the assignee, and what it may run) · Ask (a Todo runs as a TaskRun) · Explore (the canvas the panel selects from) |
 
 ## 1. Vocabulary

@@ -22,6 +22,7 @@
  * | `lineage` | causal depth | authored · spawned · delegated-for | no |
  * | `branches` | fork depth | a fork · a merge (dashed) | no |
  * | `provenance` | author → dataset · run → finding → decision | a cite · authorship | no |
+ * | `impact` | a hop from the cited records | a relationship type joining two groups | no |
  *
  * **The canvas law still holds** (docs/for-developers/modules/agents/features/lineage.md): it selects and draws. Exactly
  * one kind writes, `plan`, and only where the geometry *is* the datum —
@@ -89,6 +90,7 @@ type LayeredKind =
 	| "lineage"
 	| "branches"
 	| "provenance"
+	| "impact"
 	| "data"
 	| "model";
 
@@ -724,6 +726,15 @@ const LEGENDS: Record<LayeredKind, { keys: LegendKey[]; note: string }> = {
 			{ swatch: "edge", dashed: true, label: "authored" },
 		],
 		note: "Read left to right: who first wrote the data, the datasets and runs it reached, the findings that cite them, the decision. Click a node to open it.",
+	},
+	impact: {
+		keys: [
+			{ swatch: "node", tone: "success", label: "what the evidence cites" },
+			{ swatch: "node", tone: "info", label: "reached" },
+			{ swatch: "node", tone: "warning", label: "reached · more lies beyond" },
+			{ swatch: "edge", label: "relationship" },
+		],
+		note: "Read left to right: the records the option's evidence cites, then what each hop reaches — one node per type, with its count. Click a node to list what it holds.",
 	},
 	data: { keys: [], note: "" },
 	model: { keys: [], note: "" },

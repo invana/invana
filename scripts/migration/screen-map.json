@@ -712,19 +712,19 @@
    "story": "PJ-09",
    "product": "projects",
    "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
-   "state": "on branch H2, Simulate crosses (needs B09)"
+   "state": "on branch H2, Simulate (needs a simulator and a dataset cite on H2)"
   },
   "projects.simulate.result": {
    "story": "PJ-09",
    "product": "projects",
    "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
-   "state": "on branch H2, Simulate crosses \u203a Run 4 crosses (needs B09)"
+   "state": "on branch H2, Simulate \u203a Run simulation; or its Simulations tab \u203a s1"
   },
   "projects.impact": {
    "story": "PJ-10",
    "product": "projects",
    "route": "/u/admin/arabidopsis/projects/gene-edited-field-trials",
-   "state": "Impact tab (needs B05)"
+   "state": "Impact tab (needs a finding that cites a graph record)"
   },
   "projects.lineage": {
    "story": "PJ-11",
