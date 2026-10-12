@@ -17551,6 +17551,375 @@
         "title": "Signal",
         "type": "object"
       },
+      "SimulationCreate": {
+        "properties": {
+          "inputs": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Inputs",
+            "type": "array"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740992.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seed"
+          },
+          "simulator": {
+            "maxLength": 96,
+            "minLength": 1,
+            "title": "Simulator",
+            "type": "string"
+          },
+          "spec": {
+            "additionalProperties": true,
+            "title": "Spec",
+            "type": "object"
+          }
+        },
+        "required": [
+          "simulator"
+        ],
+        "title": "SimulationCreate",
+        "type": "object"
+      },
+      "SimulationInput": {
+        "description": "One pinned input.",
+        "properties": {
+          "content_hash": {
+            "title": "Content Hash",
+            "type": "string"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "version_id": {
+            "title": "Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref",
+          "dataset_id",
+          "version_id",
+          "content_hash"
+        ],
+        "title": "SimulationInput",
+        "type": "object"
+      },
+      "SimulationListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SimulationRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "SimulationListResponse",
+        "type": "object"
+      },
+      "SimulationRead": {
+        "properties": {
+          "branch": {
+            "title": "Branch",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Id"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "inputs": {
+            "items": {
+              "$ref": "#/components/schemas/SimulationInput"
+            },
+            "title": "Inputs",
+            "type": "array"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "origin": {
+            "default": "derived",
+            "title": "Origin",
+            "type": "string"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SimulationResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "simulator": {
+            "$ref": "#/components/schemas/SimulatorRef"
+          },
+          "spec": {
+            "additionalProperties": true,
+            "title": "Spec",
+            "type": "object"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "tokens": {
+            "default": 0,
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "number",
+          "branch",
+          "simulator",
+          "spec",
+          "seed",
+          "inputs",
+          "run_id",
+          "status",
+          "created_by_id",
+          "created_at"
+        ],
+        "title": "SimulationRead",
+        "type": "object"
+      },
+      "SimulationResult": {
+        "properties": {
+          "ranked": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Ranked",
+            "type": "array"
+          },
+          "summary": {
+            "additionalProperties": true,
+            "title": "Summary",
+            "type": "object"
+          }
+        },
+        "required": [
+          "ranked",
+          "summary"
+        ],
+        "title": "SimulationResult",
+        "type": "object"
+      },
+      "SimulatorListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SimulatorRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "SimulatorListResponse",
+        "type": "object"
+      },
+      "SimulatorRead": {
+        "description": "One installed simulator.",
+        "properties": {
+          "handle": {
+            "title": "Handle",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "plugin": {
+            "title": "Plugin",
+            "type": "string"
+          },
+          "plugin_version": {
+            "title": "Plugin Version",
+            "type": "string"
+          },
+          "spec": {
+            "items": {
+              "$ref": "#/components/schemas/SpecFieldRead"
+            },
+            "title": "Spec",
+            "type": "array"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "version",
+          "plugin",
+          "plugin_version",
+          "handle",
+          "title",
+          "summary",
+          "spec"
+        ],
+        "title": "SimulatorRead",
+        "type": "object"
+      },
+      "SimulatorRef": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "plugin": {
+            "title": "Plugin",
+            "type": "string"
+          },
+          "plugin_version": {
+            "title": "Plugin Version",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "version",
+          "plugin",
+          "plugin_version",
+          "title"
+        ],
+        "title": "SimulatorRef",
+        "type": "object"
+      },
       "SkillAgentStanding": {
         "description": "Where this skill stands with one agent \u2014 the Bindings tab's three sections.\n\n``refusal`` is the refusal the bind **would** raise, run as a dry run rather\nthan predicted by the surface\n([BN10](docs/for-developers/modules/skills/features/bindings.md)): a second\nreading of the same rules in TypeScript is a copy to keep in step, and the\ncopy is what goes stale. It is null for an agent already bound \u2014 a bind that\nhappened is not re-litigated by a later guardrail; unbinding is.",
         "properties": {
@@ -18857,6 +19226,38 @@
           "draft"
         ],
         "title": "SoulPreviewResponse",
+        "type": "object"
+      },
+      "SpecFieldRead": {
+        "description": "One field a simulator's spec takes.",
+        "properties": {
+          "default": {
+            "title": "Default"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "required",
+          "label"
+        ],
+        "title": "SpecFieldRead",
         "type": "object"
       },
       "StagedChange": {
@@ -25343,6 +25744,33 @@
         "summary": "Search",
         "tags": [
           "search"
+        ]
+      }
+    },
+    "/api/v1/simulators": {
+      "get": {
+        "description": "Every installed simulator, with the spec fields it takes.",
+        "operationId": "list_simulators_api_v1_simulators_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulatorListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Simulators",
+        "tags": [
+          "simulations"
         ]
       }
     },
@@ -38924,6 +39352,96 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/branches/{number}/simulations": {
+      "post": {
+        "description": "Run a simulator on a branch \u2014 202 with the simulation queued; poll it or follow its run.",
+        "operationId": "simulate_api_v1_u__username___graphSlug__projects__key__branches__number__simulations_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Simulate",
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/projects/{key}/decisions": {
       "get": {
         "operationId": "list_project_decisions_api_v1_u__username___graphSlug__projects__key__decisions_get",
@@ -40070,6 +40588,171 @@
         "summary": "Create Working Rule",
         "tags": [
           "rules"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/simulations": {
+      "get": {
+        "operationId": "list_simulations_api_v1_u__username___graphSlug__projects__key__simulations_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "branch",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Branch"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Simulations",
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/simulations/{number}": {
+      "get": {
+        "operationId": "get_simulation_api_v1_u__username___graphSlug__projects__key__simulations__number__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Simulation",
+        "tags": [
+          "simulations"
         ]
       }
     },

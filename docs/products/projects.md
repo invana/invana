@@ -43,7 +43,7 @@ The type sets the words and the panel that opens first. The records underneath a
 | PJ-F3 | Branch page — hypothesis, verdict, evidence for and against, agent proposals, todos, datasets, runs, schedules | New · Blocked · P-10 | PJ-05 |
 | PJ-F4 | Findings with evidence — stance, records, origin, version, rules satisfied | New · Blocked · P-10 P-08 | PJ-06 |
 | PJ-F5 | Verdicts and decisions — rationale, cites, rule check that can refuse, supersede | New · Blocked · P-10 | PJ-07 · PJ-13 |
-| PJ-F6 | Simulation — parents, targets, simulator plugin, ranked result | New · Blocked · P-06 P-07 | PJ-09 |
+| PJ-F6 | Simulation — parents, targets, simulator plugin, ranked result | New · engine ✅ B09 ([9.8](../for-developers/modules/work/features/simulation.md)), Studio C06 | PJ-09 |
 | PJ-F7 | Impact — a decision’s blast radius by hop over the graph | New · Blocked · P-06 (what-if values only) | PJ-10 |
 | PJ-F8 | Lineage — decision back to original authors | New · Blocked · P-10 P-08 | PJ-11 |
 | PJ-F9 | My todos — with or without a project | Moves (today’s Projects) | PJ-12 |
@@ -135,7 +135,7 @@ The type sets the words and the panel that opens first. The records underneath a
 | `invana todos list [--mine]` · `add` · `done` | todos, with or without a project | ✅ partly (today's projects API) · New CLI |
 | `invana reports generate --project` · `publish` · `export --format md` | versioned write-ups; PDF is Studio's print | ✅ B05 |
 | `invana lineage --decision <id>` | everything behind a decision | New · P-10 |
-| `invana simulate --branch --plugin <name> --file <spec>` | run a simulator plugin | Later · P-06 P-07 |
+| `invana simulate --project --branch --plugin <name> --file <spec>` · `invana simulations list` · `show` | run a simulator plugin; its ranked result | ✅ B09 |
 
 ## Decisions
 

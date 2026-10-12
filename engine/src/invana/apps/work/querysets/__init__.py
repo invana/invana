@@ -8,6 +8,7 @@ from invana.apps.work.querysets.dependency import TaskDependencyQuerySet
 from invana.apps.work.querysets.finding import ProjectFindingQuerySet
 from invana.apps.work.querysets.project import ProjectQuerySet
 from invana.apps.work.querysets.report import ProjectReportQuerySet
+from invana.apps.work.querysets.simulation import ProjectSimulationQuerySet
 from invana.apps.work.querysets.task import TaskQuerySet
 
 __all__ = [
@@ -19,6 +20,7 @@ __all__ = [
     "ProjectProposalQuerySet",
     "ProjectQuerySet",
     "ProjectReportQuerySet",
+    "ProjectSimulationQuerySet",
     "TaskDependencyQuerySet",
     "TaskQuerySet",
 ]

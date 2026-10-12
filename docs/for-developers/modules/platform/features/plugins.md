@@ -24,21 +24,22 @@ builds itself from the manifests once at start-up and is then frozen.
 | C2 | A plugin manifest | `plugin.toml` — `name · kind · engine · extra · secrets`; a core plugin's version is the engine's |
 | C3 | A task manifest | `key · version · summary · bound · side_effect · args · outputs · requires · resources`, plus optional `timeout_s · retries` |
 | C4 | Packaged flows | `flows/<key>.toml` — the fixed multi-step plans the plugin ships (`model-import@1`, `stitch-apply@1`, …) |
-| C5 | Checked at start-up | A manifest whose key is not its folder, whose `run.py` has no `async def run(ctx, v)`, or whose key repeats stops the process with the file named |
+| C5 | Checked at start-up | A manifest whose key's last dotted segment is not its folder, whose `run.py` has no `async def run(ctx, v)`, or whose key repeats stops the process with the file named |
 | C6 | Frozen per process | Built once; nothing registers while plans run |
 | C7 | Keys never move | `run_nodes.task_key` and Studio read them; moving a task type into a plugin renames nothing |
 | C8 | Each Task records its task type's version | `tasks.task_version`, written when a plan's rows are exploded |
+| C9 | Simulator plugins | `plugins/simulators/<name>/`, `kind = "simulator"`: one simulator task type, its declared spec fields, and one packaged `simulate` flow — run by [9.8 Simulation](../../work/features/simulation.md) |
 
 ## Journey
 
 ```mermaid
 flowchart LR
     A[Process start] --> B[load_plugins]
-    B --> C[Read each core plugin.toml]
+    B --> C[Read each core plugin.toml, then each simulator's]
     C --> D[Read tasks/*/manifest.toml]
     D --> E{run.py has async run ctx, v?<br/>key = folder? unique?}
     E -->|no| F[Stop · the file is named]
-    E -->|yes| G[Read flows/*.yaml]
+    E -->|yes| G[Read flows/*.toml]
     G --> H[Frozen Registry]
     H --> I[runtime.catalogue re-exports CATALOGUE · TASKS]
     H --> J[Library seeding explodes flows into rows · task_version set]
@@ -62,12 +63,14 @@ flowchart LR
 | `plugins/sdk/context.py` | `TaskContext` · `RunVars` · `Out` and the shared step helpers |
 | `plugins/sdk/errors.py` | `TaskFailure` · `NeedsInput` · `CannotAnswer` · `Converse` |
 | `plugins/registry.py` | `Registry` — plugins, task types by `key` and `key@version`, flows; read-only mappings |
+| `plugins/sdk/simulation.py` | `Input` · `read_inputs(ctx)` — the pinned dataset versions a simulator reads, hash-checked |
+| `plugins/simulators/<plugin>/` | `genomic` — loaded after the core plugins |
 | `plugins/core/<plugin>/` | `pure · graph_read · graph_write · schema_write · ingest · llm · work_write`; `ingest` also holds the bodies `bundle · records · stitching` |
 | `runtime/catalogue/__init__.py` | Re-export of `CATALOGUE` · `TASKS` and the contract names, so importers keep working |
 
 | `TaskManifest` field | Type | Notes |
 |---|---|---|
-| `key` | str | the plan vocabulary; equals the folder name |
+| `key` | str | the plan vocabulary; its last dotted segment is the folder name (`sim.genomic_prediction` → `genomic_prediction/`) |
 | `version` | semver str | per task type; every core task type starts at `1.0.0` |
 | `summary` | str | the catalogue drawer's one line |
 | `bound` | `Bound` | what it spends — the envelope's ceiling group |
@@ -77,6 +80,7 @@ flowchart LR
 | `requires` | list of keys | ordered before it in any plan |
 | `resources` | list of `llm · cpu · gpu` | `llm` for the `llm` bound, else `cpu` |
 | `timeout_s` · `retries` | int, optional | declared only; no executor reads them yet |
+| `spec` | `{name: {type, required, default, label}}` | a simulator's spec fields; empty on every other task type |
 
 | Column | Type | Notes |
 |---|---|---|
@@ -97,13 +101,18 @@ flowchart LR
 | PL9 | **Every core task type starts at `1.0.0`;** `side_effect` is `write` for the `graph_write · schema_write · ingest · work_write` bounds and `read` otherwise; `resources` is `llm` for the `llm` bound and `cpu` otherwise. |
 | PL10 | **The seeded agents keep their own step lists.** `ql-query` and `modeller` carry their envelope's steps inline, as agent data in `apps/agents/registry.py`, rather than reading `ql-direct` and `modeller-propose` from band 3. |
 
+| PL11 | **A simulator plugin contributes exactly one simulator.** `kind = "simulator"`, its own semver `version`, one task type and one packaged flow of kind `simulate` whose single step names it. Two models are two plugins, so `--plugin <name>` is never ambiguous. |
+| PL12 | **The simulator contract is checked at load.** Its task type is `bound = "none"`, `side_effect = "read"`, takes `spec: obj` · `inputs: list` · `seed: int` (all required) and declares `ranked: list` · `summary: obj`; a plugin that breaks any of it stops the process with its manifest named. |
+| PL13 | **A simulator reads data only through `read_inputs(ctx)`.** It gets the records of the versions Invana pinned, after their content hash is checked and a retraction refused. It never queries the graph or another dataset. |
+| PL14 | **A simulator's task type is in the registry like any other** — the catalogue lists it, the interpreter dispatches it, and a plan may name it only where an envelope allows it. The closed **core** set stays the count the catalogue test holds; a simulator adds to the registry, not to it. |
+| PL15 | **A task type's key may carry its plugin's prefix** (`sim.genomic_prediction`); the folder is the last segment, so the module path stays importable. Core keys have no prefix. |
 ## Not building
 
 | Not building | Because |
 |---|---|
-| Tool, simulator and MCP plugins | B06b and B07 |
+| Tool and MCP plugins | B06b and B07 |
 | `TaskEnvelope` · `worker.run_envelope()` | B14 |
 | `invana plugins …` CLI and the Agents › Plugins surface | B06b · C03 |
-| Enabling or disabling a plugin | only tool plugins are optional, and none exist yet |
+| Enabling or disabling a plugin | B06b — until then a simulator loads whenever it is installed |
 | Hot-loading a plugin | the registry is frozen per process |
 | Skills shipped inside a plugin | skills stay seeded from `runtime/managers/skill_seed.py` until a tool plugin ships one |

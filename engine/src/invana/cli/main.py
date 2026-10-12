@@ -59,6 +59,7 @@ from invana.cli.commands.records import records_cmd
 from invana.cli.commands.rules import rules_cmd
 from invana.cli.commands.schedules import schedules_cmd
 from invana.cli.commands.search import search_cmd
+from invana.cli.commands.simulate import simulate_cmd, simulations_cmd
 from invana.cli.commands.skills import skills_cmd
 from invana.cli.commands.standards import standards_cmd
 from invana.cli.commands.start import start_cmd
@@ -231,6 +232,8 @@ app.add_command(branches_cmd)
 app.add_command(findings_cmd)
 app.add_command(proposals_cmd)
 app.add_command(reports_cmd)
+app.add_command(simulate_cmd)
+app.add_command(simulations_cmd)
 app.add_command(search_cmd)
 app.add_command(stitches_cmd)
 app.add_command(govern_cmd)

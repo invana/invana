@@ -8,6 +8,7 @@ from invana.runtime.managers.evals import EvalManager
 from invana.runtime.managers.plan_performance import PlanPerformanceManager
 from invana.runtime.managers.rule_checks import RuleCheckManager
 from invana.runtime.managers.rule_citations import RuleCitationManager
+from invana.runtime.managers.simulation import SimulationManager
 from invana.runtime.managers.skill_bind import SkillBindManager
 from invana.runtime.managers.skill_draft import SkillDraftManager
 from invana.runtime.managers.skill_seed import BuiltinSkillSeeder
@@ -24,6 +25,7 @@ __all__ = [
     "PlanPerformanceManager",
     "RuleCheckManager",
     "RuleCitationManager",
+    "SimulationManager",
     "SkillBindManager",
     "SkillDraftManager",
     "SkillUsageManager",

@@ -275,5 +275,5 @@ from a wrong map.
 | Row | Because |
 |---|---|
 | [3.11 Act as](modules/ask/features/act-as.md) | `S-TBD` in the index — a stance needs the touch record to have a ledger to hang on, so it is sequenced when A closes, not before |
-| Simulation · parameter sweeps · game theory | post-1.0, and [not built](README.md#not-building) |
+| Parameter sweeps · game theory | post-1.0, and [not built](README.md#not-building). Simulation itself is [9.8](modules/work/features/simulation.md), B09 |
 | The engine band migration | [migration-plan.md](building-engine/migration-plan.md) is orthogonal to every block here — it moves files and changes no contract, so it interleaves rather than sequences |

@@ -24,8 +24,10 @@ from invana.runtime.catalogue import CATALOGUE, TASKS
 
 CORE_DIR = Path(__file__).resolve().parents[2] / "src" / "invana" / "plugins" / "core"
 TEMPLATES = load_plugins().flows
+#: The core plugins' task types. An installed simulator adds its own beside them.
+CORE = {t.key for p in load_plugins().plugins.values() if p.manifest.kind == "core" for t in p.tasks}
 
-#: The closed set's size. Growth belongs in reusable TaskPlans, not here — so
+#: The core set's size. Growth belongs in reusable TaskPlans, not here — so
 #: changing this number is a decision, and the decision goes in
 #: `building-engine/task-model-migration.md` § 6.1 first.
 ENTRY_COUNT = 28
@@ -81,7 +83,7 @@ def _apps_imported(paths: list[Path]) -> set[str]:
 
 class TestClosed:
     def test_the_set_is_the_size_it_says_it_is(self) -> None:
-        assert len(CATALOGUE) == ENTRY_COUNT
+        assert len(CORE) == ENTRY_COUNT
         assert set(TASKS) == set(CATALOGUE)
 
     def test_every_entry_declares_all_four_fields(self) -> None:
@@ -117,7 +119,7 @@ class TestNoEntrySpansTwoBounds:
     def test_every_entry_lives_in_the_plugin_for_its_bound(self) -> None:
         plugins = load_plugins().plugins
         placed = {t.key for name in BOUND_PLUGINS for t in plugins[f"invana.core.{name}"].tasks}
-        assert placed == set(CATALOGUE)
+        assert placed == CORE
 
     def test_a_plugin_reaches_no_further_than_its_named_span(self) -> None:
         for name in BOUND_PLUGINS:

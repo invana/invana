@@ -209,6 +209,9 @@ keys do not change in M1.** They are stored in `thinking_steps.task_key` and rea
 renaming them to [§0.6](../orchestration.md#06-the-catalogue--what-a-plan-may-name)'s target names is
 a data migration, not a declaration.
 
+The count is the **core** set — the task types the core plugins declare. An installed simulator plugin
+adds its one task type to the catalogue beside them and is not counted here.
+
 | Key | Bound | Args | Outputs | Requires |
 |---|---|---|---|---|
 | `understand_intent` | `llm` | — | `kind` str · `summary` str · `refs` list · `expects` list · `confidence` float · `question` str · `options` list | — |

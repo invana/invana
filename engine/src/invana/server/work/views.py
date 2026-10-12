@@ -9,7 +9,7 @@ Parse, call one manager, serialise (migration-plan §4.1).
 
 from __future__ import annotations
 
-from fastapi import Depends, Path, Query, Response, status
+from fastapi import Depends, Path, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.managers import TaskReadManager, TreeManager
@@ -51,6 +51,10 @@ from invana.apps.work.schemas import (
     ReportDraftUpdate,
     ReportRead,
     ReportVersionRead,
+    SimulationCreate,
+    SimulationListResponse,
+    SimulationRead,
+    SimulatorListResponse,
     TaskActivityResponse,
     TaskCreate,
     TaskListResponse,
@@ -63,6 +67,7 @@ from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events.models import ActorKind
+from invana.runtime.managers import SimulationManager
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 tasks = TaskManager()
@@ -76,6 +81,7 @@ branches = BranchManager()
 decisions = DecisionManager()
 proposals = ProposalManager()
 reports = ReportManager()
+simulations = SimulationManager()
 
 
 # ── Tasks ────────────────────────────────────────────────────────────────────
@@ -649,3 +655,58 @@ async def export_report_version(
         media_type="text/markdown",
         headers={"Content-Disposition": f'attachment; filename="{project.key}-report-v{version}.md"'},
     )
+
+
+# ── Simulation (docs/for-developers/modules/work/features/simulation.md) ─────
+
+
+async def list_simulators(_: User = Depends(get_current_user)) -> SimulatorListResponse:
+    """Every installed simulator, with the spec fields it takes."""
+    items = simulations.simulators()
+    return SimulatorListResponse(items=items, total=len(items))
+
+
+async def simulate(
+    payload: SimulationCreate,
+    request: Request,
+    key: str = Path(...),
+    number: int = Path(..., ge=1),
+    member: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> SimulationRead:
+    """Run a simulator on a branch — 202 with the simulation queued; poll it or follow its run."""
+    project = await _project(session, graph, member, key)
+    branch = await branches.get(session, project=project, number=number)
+    row, run = await simulations.simulate(
+        session, graph=graph, project=project, branch=branch, payload=payload, actor=user
+    )
+    read = await simulations.read(session, row)
+    await session.commit()
+    request.app.state.task_runtime.submit(run.id)
+    return read
+
+
+async def list_simulations(
+    key: str = Path(...),
+    branch: int | None = Query(None, ge=1),
+    member: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> SimulationListResponse:
+    project = await _project(session, graph, member, key)
+    on = await branches.get(session, project=project, number=branch) if branch is not None else None
+    items = await simulations.list(session, project=project, branch=on)
+    return SimulationListResponse(items=items, total=len(items))
+
+
+async def get_simulation(
+    key: str = Path(...),
+    number: int = Path(..., ge=1),
+    member: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> SimulationRead:
+    project = await _project(session, graph, member, key)
+    return await simulations.read(session, await simulations.get(session, project=project, number=number))

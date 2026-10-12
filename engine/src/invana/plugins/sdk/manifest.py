@@ -79,6 +79,17 @@ class Arg:
     default: Any = None
 
 
+@dataclass(frozen=True, slots=True)
+class SpecField:
+    """One field of a simulator's spec — checked by Invana before a run opens."""
+
+    type: Type
+    required: bool = False
+    default: Any = None
+    #: What a form labels it.
+    label: str = ""
+
+
 class SideEffect(StrEnum):
     """What a task type does to the world — ``send`` always needs an approval."""
 
@@ -117,6 +128,8 @@ class TaskManifest:
     retries: int | None = None
     #: The plugin that declares it, e.g. ``invana.core.graph_read``.
     plugin: str = ""
+    #: A simulator's spec fields — what a caller fills in; empty on every other task type.
+    spec: Mapping[str, SpecField] = field(default_factory=dict)
 
     @property
     def ref(self) -> str:
@@ -175,6 +188,8 @@ class PluginManifest:
     extra: str = ""
     #: The secret names its task types may resolve inside a worker.
     secrets: tuple[str, ...] = ()
+    #: What a person calls it — a simulator's chip; empty for a core plugin.
+    title: str = ""
 
 
 def build(*entries: TaskManifest) -> dict[str, TaskManifest]:

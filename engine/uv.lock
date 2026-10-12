@@ -1156,6 +1156,7 @@ requires-dist = [
     { name = "gremlinpython", specifier = ">=3.8.1" },
     { name = "httpx", specifier = ">=0.27" },
     { name = "invana-engine", extras = ["server"], marker = "extra == 'all'" },
+    { name = "invana-engine", extras = ["sim-genomic"], marker = "extra == 'all'" },
     { name = "invana-engine", extras = ["telemetry"], marker = "extra == 'all'" },
     { name = "itsdangerous", marker = "extra == 'server'", specifier = ">=2.2" },
     { name = "neo4j", specifier = ">=5.0" },
@@ -1173,7 +1174,7 @@ requires-dist = [
     { name = "starlette-admin", marker = "extra == 'server'", specifier = ">=0.16" },
     { name = "uvicorn", marker = "extra == 'server'", specifier = ">=0.34" },
 ]
-provides-extras = ["server", "telemetry", "all"]
+provides-extras = ["server", "telemetry", "sim-genomic", "all"]
 
 [package.metadata.requires-dev]
 dev = [

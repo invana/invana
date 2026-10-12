@@ -124,7 +124,7 @@ Studio is [C02](../../../../products/migration-sessions.md#track-c--new-product-
 | Not building | Because |
 |---|---|
 | Lineage (`invana lineage --decision`) | PJ-F8, a later session; the records here carry every link it will read |
-| Simulation and impact | PJ-F6 · PJ-F7 need the simulation runtime (B09) |
+| Simulation and impact | Simulation is [9.8](simulation.md); impact (PJ-F7) is C06 |
 | Editing or deleting a decision or a finding | append-only is the point; a finding is superseded by a newer one |
 | Type authoring | six built-in types |
 | Agents deciding | agents propose; people decide |

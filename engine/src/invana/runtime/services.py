@@ -1479,3 +1479,51 @@ async def open_stitch_preview_run(
     else:
         body, args = "Resolve every stitch", {"all_links": True}
     return await _open_stitch_run(db, graph=graph, key=STITCH_PREVIEW_PLAN_KEY, body=body, actor_id=actor_id, args=args)
+
+
+async def open_simulation_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    flow_key: str,
+    body: str,
+    args: dict,
+    params: dict,
+    actor_id: str,
+) -> TaskRun:
+    """Open the run a simulation is — the simulator's packaged flow, one step.
+
+    **A simulation is a run** (docs/for-developers/modules/work/features/simulation.md):
+    the Graph's guardrails are frozen on it, no agent and no world, the same as
+    a load or a stitch. ``args`` — the spec, the pinned inputs and the seed — go
+    to the simulator's step; ``params`` are the journal's copy, naming the
+    project and branch that asked. Left queued; the caller commits and submits.
+    """
+    selected = await select_plan_by_key(db, graph_id=graph.id, key=flow_key)
+    if selected is None:
+        raise RuntimeError(f"The plan library has no populated {flow_key!r}.")
+    steps = [
+        dataclasses.replace(step, args={**step.args, **args})
+        for step in (PlanStep.parse(dict(s), index=i) for i, s in enumerate(selected.steps))
+    ]
+    run = TaskRun(
+        graph_id=graph.id,
+        author_id=actor_id,
+        author_kind="user",
+        ask_kind="simulate",
+        body=body,
+        params=params,
+        workflow_key=selected.ref,
+        task_plan_id=selected.plan_id,
+        plan_origin=f"template:{selected.ref}",
+        triggered_by=TriggeredBy.user.value,
+        on_behalf_of_user_id=actor_id,
+        status=RunStatus.queued.value,
+        **await freeze_lens(db, graph_id=graph.id, agent_id=None, lens_id=None),
+    )
+    db.add(run)
+    await db.flush()
+    run.plan_revision = 1
+    run.plan_snapshot = plan_payload(steps, source=run.plan_origin or "", version=1)
+    await queue_plan_steps(db, run=run, message_id=None, steps=steps, start_seq=0)
+    return run

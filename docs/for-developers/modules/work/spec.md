@@ -10,7 +10,7 @@ the same Todo can go to either, and the same acceptance closes it.
 | | |
 |---|---|
 | Index | [§5 · Work](../../README.md#5--work) |
-| Features | [projects-and-tasks](features/projects-and-tasks.md) · [objectives-and-criteria](features/objectives-and-criteria.md) · [review](features/review.md) · [recurring-tasks-and-conditions](features/recurring-tasks-and-conditions.md) · [branches-and-decisions](features/branches-and-decisions.md) · [project-reports](features/project-reports.md) · [private-projects](features/private-projects.md) |
+| Features | [projects-and-tasks](features/projects-and-tasks.md) · [objectives-and-criteria](features/objectives-and-criteria.md) · [review](features/review.md) · [recurring-tasks-and-conditions](features/recurring-tasks-and-conditions.md) · [branches-and-decisions](features/branches-and-decisions.md) · [project-reports](features/project-reports.md) · [private-projects](features/private-projects.md) · [simulation](features/simulation.md) |
 | Depends on | [Agents](../agents/spec.md) (the assignee, and what it may run) · Ask (a Todo runs as a TaskRun) · Explore (the canvas the panel selects from) |
 
 ## 1. Vocabulary
@@ -26,6 +26,7 @@ Product-wide words are pinned in [terminology.md](../../terminology.md). What th
 | **Finding** | one piece of evidence on a branch, with a **stance** (`supports · contradicts · context`) and its cites | a criterion's outcome |
 | **Project decision** | a person's verdict and decision on a branch, checked by the rules; append-only, superseded never edited | an approval's answer |
 | **Project proposal** | an agent's suggested fork or decision, waiting for a person | a memory proposal ([8.3](../memory/features/proposals.md)) |
+| **Simulation** | one run of a simulator plugin on a branch, over pinned dataset versions; its result is `derived` | an observation · a finding — a finding may cite it |
 
 **A Todo is not a run, and a Task is not a Todo.** A Todo is work with a definition of done; a
 **TaskRun** is one execution; a **Task** is one node inside the TaskPlan that run is executing. A
@@ -44,6 +45,7 @@ default project. And a Todo may have **no plan at all**: a person simply does it
 | `projects` | `graph_id` · `key` (unique per Graph, URL-safe) · `name` · `description` · `status (active\|archived)` · `type` · `question` · `visibility (graph\|private)` · `created_by_kind/id` |
 | `project_branches` · `project_findings` · `branch_findings` · `project_decisions` · `project_proposals` | [branches-and-decisions](features/branches-and-decisions.md) |
 | `project_reports` · `project_report_versions` | [project-reports](features/project-reports.md) |
+| `project_simulations` | [simulation](features/simulation.md) — the project's handle on a simulator run |
 | `project_assignments` | `project_id` · `principal_kind (user\|agent)` · `principal_id` · `assigned_by_*` · `assigned_at` |
 | `todos` | `graph_id` · `project_id?` · `parent_id?` · `title` · `body` (the prose a planner reads) · `assignee_kind/id?` · `created_by_kind/id` · `due_at?` · `lens_id?` · `closed_at?` · `outcome?`. **No `status` column** — see §3 |
 | `todo_dependencies` | `todo_id` · `depends_on_id` · `on (success\|failure\|any_outcome)` · cycles rejected with the loop named |
@@ -155,6 +157,7 @@ everything else acts on a row and lives on the row.
 | W13 | **A Todo may have no plan.** A person assigned a Todo with criteria and no steps is the smallest legal case, and it uses no field it does not need. |
 | W14 | **Branches live inside a project; projects stay flat.** A Todo may name a branch of its own project (`todos.branch_id`); the branch is where its evidence and decisions sit ([9.5](features/branches-and-decisions.md)). |
 | W15 | **Per-project access is one filter.** `ProjectManager.hidden_ids` names the private projects a reader is not on, and every read of projects, todos, plans, decisions and search applies it ([9.7](features/private-projects.md)). |
+| W16 | **A simulation is a run with a project handle.** The simulator plugin computes, the runtime runs it, and `project_simulations` only records which branch asked, with which spec, inputs and seed; the result is read off the run ([9.8](features/simulation.md)). |
 
 ## 8. Deliberately absent
 

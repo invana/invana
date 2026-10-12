@@ -56,7 +56,7 @@ this map.** Feature numbers do not change.
 | Data | `graphs` 1.1 · `models` 1.2–1.8 · `imports` 2.x · `graph-connectors` 12.x |
 | Exploration | `explorer` 4.1 · 4.3 · `queries` 3.1 · 4.4 · `boards` 4.2 |
 | Answers | `assistant` 3.2–3.3 · 3.5–3.8 · 3.10–3.13 · `projections` 3.4 · `memory` 8.x |
-| Work | `projects` 9.1 · 9.2 · 9.4 · 9.5 · 9.6 · 9.7 |
+| Work | `projects` 9.1 · 9.2 · 9.4 · 9.5 · 9.6 · 9.7 · 9.8 |
 | Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 · `notifications` 10.7 · 10.8 |
 | Governance | `lenses` 14.x · `events` 10.2 |
 | Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
@@ -177,6 +177,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 9.5 | [Branches, findings and decisions](modules/work/features/branches-and-decisions.md) | A project of a type forks into branches; findings for and against; a verdict and a decision the rules check, superseded never edited; agents propose | ✅ | ✅ | 🔵 | B05 |
 | 9.6 | [Project reports](modules/work/features/project-reports.md) | A report drafted from the records, edited, published as frozen versions that cite their datasets | ✅ | ✅ | 🔵 | B05 |
 | 9.7 | [Private projects](modules/work/features/private-projects.md) | A project only its people and agents can see | ✅ | ✅ | 🔵 | B05 |
+| 9.8 | [Simulation](modules/work/features/simulation.md) | A branch runs a simulator plugin over pinned dataset versions; the result is ranked, reproducible from its seed and labelled derived | ✅ | ✅ | 🔵 | B09 |
 
 ## 10 · [Operate](modules/operate/spec.md)
 
@@ -218,7 +219,7 @@ provider row and its models, and reopens four rows below. The shapes:
 |---|---|---|---|---|---|---|
 | 13.1 | [Design system](modules/platform/features/design-system.md) | Studio builds from `@invana/design-kit`, never beside it | — | — | 🟡 | — |
 | 13.2 | [Theming](modules/platform/features/theming.md) | Light · dark · theme variants, everywhere | — | — | ✅ | — |
-| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · standards · rules · members · search · models · loader · schedules · approvals · notifications` | — | 🟡 | — | — |
+| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · standards · rules · members · search · models · loader · schedules · approvals · notifications · simulate · simulations` | — | 🟡 | — | — |
 | 13.4 | [Logging](modules/platform/features/logging.md) | One call at startup; plain or JSON; every line carries its trace; lifecycle, not chatter | ✅ | ✅ | — | S1 |
 | 13.5 | [Telemetry](modules/platform/features/telemetry.md) | Traces, metrics and logs for everything a person or the system does — one trace per action from the Studio click through runs, queries and model calls, metrics that open it, logs that carry it; optional | ✅ | ✅ | ✅ | S1 |
 | 13.6 | [Admin and health](modules/platform/features/admin-and-health.md) | A generated browser over app state, and a readiness probe | ✅ | — | — | S1 |
@@ -274,11 +275,11 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 56 | 19 | 15 | 4 |
-| CLI | 17 | 10 | 3 | 64 |
-| Studio | 36 | 17 | 34 | 7 |
+| API | 57 | 19 | 15 | 4 |
+| CLI | 18 | 10 | 3 | 64 |
+| Studio | 36 | 17 | 35 | 7 |
 
-Ninety-four features. **These counts are the tables above, counted** — if a cell is flipped, they
+Ninety-five features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 
@@ -371,7 +372,7 @@ replacement lands.
 - Write-back to a source · fuzzy entity resolution · node merge on an anchor
 - Source connectors, cursors and a mapping grammar — Invana is a destination, not an extractor
 - Roles beyond membership · invitations · soft deletes · undo
-- Simulation · parameter sweeps · game theory (post-1.0, `../../system-design.md`)
+- Parameter sweeps · game theory (post-1.0, `../../system-design.md`). Simulation is [9.8](modules/work/features/simulation.md): a simulator plugin run on a branch
 - Per-element canvas styling · workflow authoring UI · criterion weights and waivers
 
 ## Delivery

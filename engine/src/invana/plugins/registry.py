@@ -8,14 +8,23 @@ A plugin is a folder:
 
 | Path | Holds |
 |---|---|
-| ``plugin.toml`` | ``name · kind · engine · extra · secrets`` and the ordered ``tasks`` and ``flows`` |
-| ``tasks/<key>/manifest.toml`` | the task manifest — :class:`~invana.plugins.sdk.manifest.TaskManifest` |
+| ``plugin.toml`` | ``name · kind · engine · extra · secrets · title`` and the ordered ``tasks`` and ``flows`` |
+| ``tasks/<folder>/manifest.toml`` | the task manifest — :class:`~invana.plugins.sdk.manifest.TaskManifest` |
 | ``tasks/<key>/run.py`` | ``async def run(ctx, v) -> Out`` |
 | ``flows/<key>.toml`` | a packaged flow — :class:`~invana.plugins.sdk.manifest.FlowManifest` |
 
 Every check is made at load, and a failure raises :class:`PluginError` naming
 the file, so a manifest that drifted from its code stops the process at start
-rather than a plan at run time. A core plugin's version is the engine's.
+rather than a plan at run time. A core plugin's version is the engine's, and a
+task key's last dotted segment is its folder (``sim.genomic_prediction`` →
+``tasks/genomic_prediction/``).
+
+Two kinds load today: the **core** plugins, always, and the **simulator**
+plugins under ``simulators/`` (docs/for-developers/modules/work/features/simulation.md).
+A simulator plugin contributes exactly one simulator — one task type held to
+the simulator contract (:func:`_check_simulator`) and the one ``simulate`` flow
+that runs it — and is listed in :attr:`Registry.simulators` as well as among the
+task types.
 
 Usage::
 
@@ -25,6 +34,7 @@ Usage::
     registry.task("execute_graph_query")        # latest version of a key
     registry.task("execute_graph_query@1.0.0")  # one exact version
     registry.flows["model-import"]
+    registry.simulator("sim.genomic_prediction")
 """
 
 from __future__ import annotations
@@ -45,14 +55,23 @@ from invana.plugins.sdk.manifest import (
     PluginManifest,
     Resource,
     SideEffect,
+    SpecField,
     TaskManifest,
     Type,
 )
 
 CORE_DIR = Path(__file__).parent / "core"
+SIMULATORS_DIR = Path(__file__).parent / "simulators"
 
 #: Load order of the core plugins — and so the order the catalogue lists task types in.
 CORE_PLUGINS = ("pure", "graph_read", "ingest", "graph_write", "schema_write", "llm", "work_write")
+
+#: The simulator plugins, loaded after the core ones.
+SIMULATOR_PLUGINS = ("genomic",)
+
+#: What every simulator task type takes and returns — the contract Invana runs it under.
+SIMULATOR_ARGS = {"spec": Type.obj, "inputs": Type.list_, "seed": Type.int_}
+SIMULATOR_OUTPUTS = {"ranked": Type.list_, "summary": Type.obj}
 
 
 class PluginError(RuntimeError):
@@ -73,10 +92,28 @@ class LoadedPlugin:
     flows: tuple[FlowManifest, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class Simulator:
+    """One installed simulator: its plugin, its task type, and the flow that runs it."""
+
+    plugin: PluginManifest
+    task: TaskManifest
+    flow: FlowManifest
+
+    @property
+    def key(self) -> str:
+        return self.task.key
+
+    @property
+    def handle(self) -> str:
+        """The plugin's short name — ``genomic`` for ``invana.simulators.genomic``."""
+        return self.plugin.name.rsplit(".", 1)[-1]
+
+
 class Registry:
     """Plugins → task types (by ``key`` and ``key@version``) and flows; read-only once built."""
 
-    __slots__ = ("_by_ref", "flows", "plugins", "tasks")
+    __slots__ = ("_by_ref", "flows", "plugins", "simulators", "tasks")
 
     def __init__(self, plugins: tuple[LoadedPlugin, ...]) -> None:
         tasks: dict[str, TaskManifest] = {}
@@ -99,10 +136,26 @@ class Registry:
         #: Every packaged flow, by key.
         self.flows: Mapping[str, FlowManifest] = MappingProxyType(flows)
         self._by_ref: Mapping[str, TaskManifest] = MappingProxyType(by_ref)
+        #: Every installed simulator, by its task type's key.
+        self.simulators: Mapping[str, Simulator] = MappingProxyType(
+            {
+                p.tasks[0].key: Simulator(plugin=p.manifest, task=p.tasks[0], flow=p.flows[0])
+                for p in plugins
+                if p.manifest.kind == "simulator"
+            }
+        )
 
     def task(self, ref: str) -> TaskManifest | None:
         """A task type by ``key`` or by ``key@version``; None when it is not loaded."""
         return self._by_ref.get(ref) if "@" in ref else self.tasks.get(ref)
+
+    def simulator(self, ref: str) -> Simulator | None:
+        """A simulator by key, ``key@version`` or its plugin's short name; None when none is installed."""
+        key, _, version = ref.partition("@")
+        found = self.simulators.get(key) or next((s for s in self.simulators.values() if s.handle == key), None)
+        if found is None or (version and found.task.version != version):
+            return None
+        return found
 
     def versions(self) -> dict[str, str]:
         """``{key: version}`` for every task type — what a plan's rows record."""
@@ -119,8 +172,8 @@ def _read(path: Path) -> dict:
 def _task(plugin: PluginManifest, package: str, folder: Path) -> TaskManifest:
     path = folder / "manifest.toml"
     data = _read(path)
-    if data.get("key") != folder.name:
-        raise PluginError(f"{path}: key '{data.get('key')}' is not its folder '{folder.name}'")
+    if str(data.get("key", "")).rsplit(".", 1)[-1] != folder.name:
+        raise PluginError(f"{path}: key '{data.get('key')}' does not end in its folder '{folder.name}'")
     module = importlib.import_module(f"{package}.tasks.{folder.name}.run")
     run = getattr(module, "run", None)
     if not inspect.iscoroutinefunction(run) or len(inspect.signature(run).parameters) != 2:
@@ -143,6 +196,12 @@ def _task(plugin: PluginManifest, package: str, folder: Path) -> TaskManifest:
             timeout_s=data.get("timeout_s"),
             retries=data.get("retries"),
             plugin=plugin.name,
+            spec={
+                name: SpecField(
+                    Type(f["type"]), bool(f.get("required", False)), f.get("default"), str(f.get("label", ""))
+                )
+                for name, f in data.get("spec", {}).items()
+            },
         )
     except (KeyError, ValueError) as exc:
         raise PluginError(f"{path}: {exc!r}") from exc
@@ -186,21 +245,49 @@ def load_plugin(folder: Path, package: str) -> LoadedPlugin:
         engine=data.get("engine", "*"),
         extra=data.get("extra", ""),
         secrets=tuple(data.get("secrets", ())),
+        title=data.get("title", ""),
     )
     tasks, flows = list(data.get("tasks", ())), list(data.get("flows", ()))
     on_disk = {p.parent.name for p in (folder / "tasks").glob("*/manifest.toml")}
-    if set(tasks) != on_disk:
+    if {t.rsplit(".", 1)[-1] for t in tasks} != on_disk:
         raise PluginError(f"{path}: `tasks` lists {sorted(tasks)}, the folder holds {sorted(on_disk)}")
     on_disk = {p.stem for p in (folder / "flows").glob("*.toml")}
     if set(flows) != on_disk:
         raise PluginError(f"{path}: `flows` lists {sorted(flows)}, the folder holds {sorted(on_disk)}")
-    return LoadedPlugin(
+    loaded = LoadedPlugin(
         manifest=manifest,
-        tasks=tuple(_task(manifest, package, folder / "tasks" / key) for key in tasks),
+        tasks=tuple(_task(manifest, package, folder / "tasks" / key.rsplit(".", 1)[-1]) for key in tasks),
         flows=tuple(_flow(manifest, folder / "flows" / f"{key}.toml") for key in flows),
     )
+    if kind == "simulator":
+        _check_simulator(loaded, path)
+    return loaded
+
+
+def _check_simulator(plugin: LoadedPlugin, path: Path) -> None:
+    """Hold a simulator plugin to its contract: one task type that takes a spec,
+    pinned inputs and a seed and returns ranked rows and a summary, spends no
+    bound, writes nothing, and one ``simulate`` flow whose single step runs it."""
+    if len(plugin.tasks) != 1 or len(plugin.flows) != 1:
+        raise PluginError(f"{path}: a simulator plugin declares exactly one task type and one flow")
+    task, flow = plugin.tasks[0], plugin.flows[0]
+    if task.bound is not Bound.none or task.side_effect is not SideEffect.read:
+        raise PluginError(f"{path}: simulator '{task.key}' must be bound 'none' and side_effect 'read'")
+    for name, wanted in SIMULATOR_ARGS.items():
+        arg = task.args.get(name)
+        if arg is None or arg.type is not wanted or not arg.required:
+            raise PluginError(f"{path}: simulator '{task.key}' must take a required `{name}: {wanted}`")
+    for name, wanted in SIMULATOR_OUTPUTS.items():
+        if task.outputs.get(name) is not wanted:
+            raise PluginError(f"{path}: simulator '{task.key}' must declare the output `{name}: {wanted}`")
+    if flow.kind != "simulate" or [s["task"] for s in flow.steps] != [task.key]:
+        raise PluginError(f"{path}: flow '{flow.key}' must be kind 'simulate' with one step running '{task.key}'")
 
 
 def build_registry() -> Registry:
-    """Every core plugin, in load order. Tool plugins join here when they ship."""
-    return Registry(tuple(load_plugin(CORE_DIR / name, f"invana.plugins.core.{name}") for name in CORE_PLUGINS))
+    """Every core plugin in load order, then every simulator. Tool plugins join here when they ship."""
+    core = tuple(load_plugin(CORE_DIR / name, f"invana.plugins.core.{name}") for name in CORE_PLUGINS)
+    simulators = tuple(
+        load_plugin(SIMULATORS_DIR / name, f"invana.plugins.simulators.{name}") for name in SIMULATOR_PLUGINS
+    )
+    return Registry(core + simulators)

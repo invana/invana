@@ -152,3 +152,28 @@ class ProjectReportVersionView(ModelView):
     label = "Report versions"
     icon = "fa fa-file-signature"
     fields = ["id", "report_id", "version", "body", "cites", "published_by_id", "published_at"]
+
+
+class ProjectSimulationView(ModelView):
+    """Read-only: a simulation is the record of a run."""
+
+    label = "Project simulations"
+    icon = "fa fa-flask"
+    fields = [
+        "id",
+        "project_id",
+        "branch_id",
+        "number",
+        "simulator",
+        "simulator_version",
+        "plugin",
+        "plugin_version",
+        "spec",
+        "seed",
+        "inputs",
+        "run_id",
+        "created_by_id",
+        "created_at",
+    ]
+    can_create = False
+    can_edit = False

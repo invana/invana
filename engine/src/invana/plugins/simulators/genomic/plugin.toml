@@ -1,0 +1,11 @@
+# A simulator plugin contributes exactly one simulator: one task type held to
+# the simulator contract and the one `simulate` flow that runs it.
+name = "invana.simulators.genomic"
+version = "0.1.0"
+kind = "simulator"
+title = "Genomic prediction"
+engine = "*"
+extra = "sim-genomic"
+secrets = []
+tasks = ["sim.genomic_prediction"]
+flows = ["genomic-prediction"]

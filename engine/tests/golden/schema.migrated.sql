@@ -943,6 +943,35 @@ CREATE TABLE project_reports (
 	CONSTRAINT project_reports_project_id_key UNIQUE NULLS DISTINCT (project_id)
 );
 
+CREATE TABLE project_simulations (
+	id VARCHAR(36) NOT NULL, 
+	project_id VARCHAR(36) NOT NULL, 
+	branch_id VARCHAR(36) NOT NULL, 
+	number INTEGER NOT NULL, 
+	simulator VARCHAR(64) NOT NULL, 
+	simulator_version VARCHAR(32) NOT NULL, 
+	plugin VARCHAR(128) NOT NULL, 
+	plugin_version VARCHAR(32) NOT NULL, 
+	spec JSON NOT NULL, 
+	seed BIGINT NOT NULL, 
+	inputs JSON NOT NULL, 
+	run_id VARCHAR(36), 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT project_simulations_pkey PRIMARY KEY (id), 
+	CONSTRAINT project_simulations_branch_id_fkey FOREIGN KEY(branch_id) REFERENCES project_branches (id) ON DELETE CASCADE, 
+	CONSTRAINT project_simulations_created_by_id_fkey FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT project_simulations_project_id_fkey FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	CONSTRAINT project_simulations_run_id_fkey FOREIGN KEY(run_id) REFERENCES task_runs (id) ON DELETE SET NULL, 
+	CONSTRAINT uq_project_simulation_number UNIQUE NULLS DISTINCT (project_id, number)
+);
+
+CREATE INDEX ix_project_simulations_branch_id ON project_simulations (branch_id);
+
+CREATE INDEX ix_project_simulations_project_id ON project_simulations (project_id);
+
+CREATE INDEX ix_project_simulations_run_id ON project_simulations (run_id);
+
 CREATE TABLE projection_templates (
 	id VARCHAR(36) NOT NULL, 
 	graph_id VARCHAR(36), 

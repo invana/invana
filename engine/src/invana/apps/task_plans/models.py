@@ -72,6 +72,8 @@ class PlanKind(enum.StrEnum):
     #: A canvas act that reads the graph — an expansion, the types a world
     #: holds, a reopened canvas's check (GC6 · SP11 · GC14).
     canvas = "canvas"
+    #: A simulator plugin run on a project's branch (docs/for-developers/modules/work/features/simulation.md).
+    simulate = "simulate"
 
 
 class TaskForm(enum.StrEnum):

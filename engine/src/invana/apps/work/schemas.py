@@ -462,3 +462,92 @@ class ReportRead(BaseModel):
     draft_updated_by_id: str | None = None
     draft_updated_at: datetime | None = None
     versions: list[ReportVersionSummary] = []
+
+
+# ── Simulation (docs/for-developers/modules/work/features/simulation.md) ─────
+
+
+class SpecFieldRead(BaseModel):
+    """One field a simulator's spec takes."""
+
+    name: str
+    type: str
+    required: bool
+    default: Any = None
+    label: str
+
+
+class SimulatorRead(BaseModel):
+    """One installed simulator."""
+
+    key: str
+    version: str
+    plugin: str
+    plugin_version: str
+    #: The plugin's short name — what `invana simulate --plugin` takes.
+    handle: str
+    title: str
+    summary: str
+    spec: list[SpecFieldRead]
+
+
+class SimulatorListResponse(BaseModel):
+    items: list[SimulatorRead]
+    total: int
+
+
+class SimulationCreate(BaseModel):
+    #: A simulator key, `key@version`, or its plugin's short name.
+    simulator: str = Field(..., min_length=1, max_length=96)
+    spec: dict[str, Any] = Field(default_factory=dict)
+    #: `publisher/name@v` of each dataset version it reads.
+    inputs: list[str] = Field(default_factory=list, max_length=20)
+    seed: int | None = Field(default=None, ge=0, le=2**53)
+
+
+class SimulationInput(BaseModel):
+    """One pinned input."""
+
+    ref: str
+    dataset_id: str
+    version_id: str
+    content_hash: str
+
+
+class SimulatorRef(BaseModel):
+    key: str
+    version: str
+    plugin: str
+    plugin_version: str
+    title: str
+
+
+class SimulationResult(BaseModel):
+    ranked: list[dict[str, Any]]
+    summary: dict[str, Any]
+
+
+class SimulationRead(BaseModel):
+    number: int
+    branch: int
+    simulator: SimulatorRef
+    spec: dict[str, Any]
+    seed: int
+    inputs: list[SimulationInput]
+    #: A simulation is a prediction, never an observation.
+    origin: str = "derived"
+    run_id: str | None
+    status: str | None
+    outcome: str | None = None
+    error: str | None = None
+    result: SimulationResult | None = None
+    tokens: int = 0
+    created_by_id: str | None
+    created_at: datetime
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+
+
+class SimulationListResponse(BaseModel):
+    items: list[SimulationRead]
+    total: int

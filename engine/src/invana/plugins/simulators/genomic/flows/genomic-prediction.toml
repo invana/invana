@@ -1,0 +1,10 @@
+key = "genomic-prediction"
+version = 1
+kind = "simulate"
+description = "Predict the progeny of every cross and rank the crosses by how many meet every target."
+intents = []
+
+[[steps]]
+id = "simulate"
+task = "sim.genomic_prediction"
+label = "Simulate"

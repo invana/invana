@@ -2,7 +2,8 @@
 and ``task_dependencies`` (docs/for-developers/modules/work/spec.md), and the
 records a quest is made of — branches, findings, decisions, proposals and the
 report (docs/for-developers/modules/work/features/branches-and-decisions.md,
-project-reports.md).
+project-reports.md), and the handle a branch keeps on a simulator run
+(simulation.md).
 
 `projects` folded in here at migration-plan §17 step 6: the two packages held
 one idea and imported each other. Table names are unchanged, so no migration.
@@ -14,7 +15,7 @@ import enum
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, BigInteger, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from invana.core.models import Base
@@ -459,3 +460,38 @@ class ProjectReportVersion(Base):
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     published_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class ProjectSimulation(Base):
+    """A branch's handle on one simulator run: what it asked, over which pinned inputs.
+
+    The result is not stored here — it is the simulator step's output on the run.
+    """
+
+    __tablename__ = "project_simulations"
+    __table_args__ = (UniqueConstraint("project_id", "number", name="uq_project_simulation_number"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    project_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    branch_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("project_branches.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    number: Mapped[int] = mapped_column(Integer, nullable=False)
+    # The simulator's task type key and version, and the plugin that declared it.
+    simulator: Mapped[str] = mapped_column(String(64), nullable=False)
+    simulator_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    plugin: Mapped[str] = mapped_column(String(128), nullable=False)
+    plugin_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    spec: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    seed: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    # [{ref: publisher/name@v, dataset_id, version_id, content_hash}]
+    inputs: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    run_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("task_runs.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    created_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)

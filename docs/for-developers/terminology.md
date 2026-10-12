@@ -172,6 +172,8 @@ sub-slots, the URL params and the retired words are in
 | **Project decision** | A person's verdict (`supported · refuted · inconclusive`) and decision (`pursue · park · drop · merge`) on a branch, in the type's words, checked by the rules. Append-only: revisiting **supersedes**. In code `ProjectDecision`; in a project's UI just *decision* and *verdict*. Not an approval's answer and not a runtime verdict ([§4](#4-asking-and-answering)). |
 | **Project proposal** | An agent's suggested fork or decision on a branch; a person accepts or rejects it. Not a memory proposal. |
 | **Project report** | A project written up from its records and published as frozen versions. Not a *Report* board ([§5](#5-working-surfaces)). |
+| **Simulation** | One run of a **simulator** on a branch, over pinned dataset versions and a seed; its result is ranked and always `derived` — a prediction, never an observation. Numbered per project (`s1`). [9.8](modules/work/features/simulation.md) |
+| **Simulator** | A plugin of kind `simulator` that does a domain's science (genomic prediction first); Invana runs it, never computes a figure itself. Not a *simulation* — the simulator is the model, a simulation is one use of it. |
 | **Objective** | One statement of what a Project is for. |
 | **Criterion** | One checkable statement of "done", with how it is checked: `query · agent · human`. |
 | **Outcome** | A criterion's finding on one Todo, with its evidence: met · unmet · needs a human. Not a **verdict** — that is a person answering a paused Task. |

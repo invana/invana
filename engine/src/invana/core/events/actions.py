@@ -163,6 +163,7 @@ PROPOSAL_ACCEPT = "proposal.accept"
 PROPOSAL_REJECT = "proposal.reject"
 REPORT_GENERATE = "report.generate"
 REPORT_PUBLISH = "report.publish"
+SIMULATION_RUN = "simulation.run"  # a simulator run opened on a branch (modules/work/features/simulation.md)
 
 # ── Tasks — the assignable unit of work (docs/for-developers/modules/work/spec.md) ─────────────────────────
 TASK_CREATE = "task.create"

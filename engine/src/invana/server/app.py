@@ -209,7 +209,13 @@ def create_app() -> FastAPI:
     from invana.server.skills.routes import skills_router
     from invana.server.standards.routes import standards_router
     from invana.server.task_plans.routes import task_plans_router
-    from invana.server.work.routes import decisions_router, projects_router, tasks_router
+    from invana.server.work.routes import (
+        decisions_router,
+        projects_router,
+        simulations_router,
+        simulators_router,
+        tasks_router,
+    )
 
     app = FastAPI(
         title=settings.app_name,
@@ -281,6 +287,8 @@ def create_app() -> FastAPI:
     app.include_router(atlas_agent_router)
     app.include_router(projects_router)
     app.include_router(decisions_router)
+    app.include_router(simulations_router)
+    app.include_router(simulators_router)
     app.include_router(tasks_router)
     app.include_router(task_plans_router)
     app.include_router(catalogue_router)

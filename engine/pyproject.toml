@@ -45,9 +45,13 @@ telemetry = [
     # dependency (see [project].dependencies) — not repeated here.
     "opentelemetry-instrumentation-httpx>=0.46b0",
 ]
+# The genomic prediction simulator plugin. Standard library only, so empty; the
+# extra is its install name (docs/for-developers/modules/work/features/simulation.md).
+sim-genomic = []
 all = [
     "invana-engine[server]",
     "invana-engine[telemetry]",
+    "invana-engine[sim-genomic]",
 ]
 
 [dependency-groups]

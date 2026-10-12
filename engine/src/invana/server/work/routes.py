@@ -4,6 +4,8 @@
 ``/api/v1/u/{username}/{graphSlug}/projects``  — the folder, staffing, the plan, and
                                                its branches, findings, decisions, proposals, report
 ``/api/v1/u/{username}/{graphSlug}/decisions`` — every decision in the Graph
+``/api/v1/simulators``                         — the installed simulators; a project's
+                                               simulations sit under its branches
 
 Defines no function — path to view, nothing else.
 """
@@ -27,6 +29,9 @@ from invana.apps.work.schemas import (
     ProposalRead,
     ReportRead,
     ReportVersionRead,
+    SimulationListResponse,
+    SimulationRead,
+    SimulatorListResponse,
     TaskActivityResponse,
     TaskListResponse,
     TaskRead,
@@ -102,3 +107,16 @@ projects_router.get(
 decisions_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/decisions", tags=["projects"])
 
 decisions_router.get("", response_model=DecisionListResponse)(views.list_decisions)
+
+
+simulations_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/projects", tags=["simulations"])
+
+simulations_router.post(
+    "/{key}/branches/{number}/simulations", response_model=SimulationRead, status_code=status.HTTP_202_ACCEPTED
+)(views.simulate)
+simulations_router.get("/{key}/simulations", response_model=SimulationListResponse)(views.list_simulations)
+simulations_router.get("/{key}/simulations/{number}", response_model=SimulationRead)(views.get_simulation)
+
+simulators_router = APIRouter(prefix="/api/v1/simulators", tags=["simulations"])
+
+simulators_router.get("", response_model=SimulatorListResponse)(views.list_simulators)

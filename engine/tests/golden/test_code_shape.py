@@ -132,6 +132,8 @@ COMMIT_ALLOWED = {
     "server/evals/views.py",
     # Binding a dataset version opens its load run and then submits it, the same shape.
     "server/datasets/views.py",
+    # Simulating on a branch opens the simulator's run and then submits it, the same shape.
+    "server/work/views.py",
     "server/admin/auth.py",
     "plugins/core/ingest/records.py",
     # A CLI command is not serving a request: it opens its own session and owns

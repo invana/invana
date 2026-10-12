@@ -68,6 +68,7 @@ from invana.apps.work.models import (
     ProjectProposal,
     ProjectReport,
     ProjectReportVersion,
+    ProjectSimulation,
     Task,
     TaskDependency,
 )
@@ -163,6 +164,7 @@ from invana.server.work.admin import (
     ProjectProposalView,
     ProjectReportVersionView,
     ProjectReportView,
+    ProjectSimulationView,
     ProjectView,
     TaskDependencyView,
     TaskView,
@@ -347,6 +349,7 @@ def mount_admin(app: FastAPI) -> None:
                 ProjectProposalView(ProjectProposal, label="Project proposals", icon="fa fa-lightbulb"),
                 ProjectReportView(ProjectReport, label="Project reports", icon="fa fa-file-lines"),
                 ProjectReportVersionView(ProjectReportVersion, label="Report versions", icon="fa fa-file-signature"),
+                ProjectSimulationView(ProjectSimulation, label="Project simulations", icon="fa fa-flask"),
                 TaskView(Task, label="Tasks", icon="fa fa-list-check"),
                 TaskDependencyView(TaskDependency, label="Task dependencies", icon="fa fa-arrow-right-long"),
             ],

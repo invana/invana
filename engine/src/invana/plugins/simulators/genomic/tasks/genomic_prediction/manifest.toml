@@ -1,0 +1,25 @@
+key = "sim.genomic_prediction"
+version = "0.1.0"
+summary = "Predict each cross's progeny from its parents' trait values and rank the crosses by targets met."
+bound = "none"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+timeout_s = 300
+
+[args]
+spec = { type = "obj", required = true }
+inputs = { type = "list", required = true }
+seed = { type = "int", required = true }
+
+[outputs]
+ranked = "list"
+summary = "obj"
+
+# What a person fills in. Invana checks presence and type before a run opens;
+# the simulator checks the data.
+[spec]
+females = { type = "list", required = true, label = "Female parents" }
+males = { type = "list", required = true, label = "Male parents" }
+targets = { type = "list", required = true, label = "Targets" }
+progeny = { type = "int", default = 2000, label = "Progeny per cross" }

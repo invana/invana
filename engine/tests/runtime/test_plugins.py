@@ -36,7 +36,9 @@ class TestCorePlugins:
         assert task is not None and task.plugin == "invana.core.graph_read"
         assert registry.task(f"execute_graph_query@{task.version}") is task
         assert registry.task("execute_graph_query@99.0.0") is None
-        assert {p.manifest.version for p in registry.plugins.values()} == {engine_version()}
+        # A core plugin is versioned with the engine; a simulator declares its own.
+        core = [p for p in registry.plugins.values() if p.manifest.kind == "core"]
+        assert {p.manifest.version for p in core} == {engine_version()}
 
     def test_every_packaged_flow_names_loaded_task_types(self) -> None:
         registry = load_plugins()
