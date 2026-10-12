@@ -7,6 +7,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from invana.apps.semantic.reader import MAX_CONTENT_CHARS, RdfFormat
+from invana.apps.semantic.schemas import SkosReport
 from invana.apps.standards.models import StandardOrigin, TermType
 
 SLUG = r"^[a-z0-9][a-z0-9-]{0,62}$"
@@ -15,6 +17,10 @@ SLUG = r"^[a-z0-9][a-z0-9-]{0,62}$"
 class TermValue(BaseModel):
     code: str = Field(..., min_length=1, max_length=255)
     label: str | None = Field(default=None, max_length=255)
+    #: The source IRI, set by a SKOS import.
+    iri: str | None = Field(default=None, max_length=2048)
+    #: The code of the value above this one in the same term.
+    broader: str | None = Field(default=None, max_length=255)
 
 
 class StandardTerm(BaseModel):
@@ -24,6 +30,8 @@ class StandardTerm(BaseModel):
     #: The allowed codes; omitted, any value of the type conforms.
     values: list[TermValue] | None = None
     description: str | None = None
+    #: The source IRI, set by a SKOS import.
+    iri: str | None = Field(default=None, max_length=2048)
 
 
 class StandardCreate(BaseModel):
@@ -84,3 +92,35 @@ class StandardRead(BaseModel):
 class StandardListResponse(BaseModel):
     items: list[StandardRead]
     total: int
+
+
+class SkosImportRequest(BaseModel):
+    """A SKOS vocabulary's text — the engine never fetches a URL."""
+
+    content: str = Field(..., min_length=1, max_length=MAX_CONTENT_CHARS)
+    #: Omitted, detected from the text.
+    format: RdfFormat | None = None
+    #: The concept scheme's IRI; needed when the file holds several.
+    scheme: str | None = Field(default=None, max_length=2048)
+    #: Defaults to the importer's username.
+    publisher: str | None = Field(default=None, pattern=SLUG)
+    #: Defaults to the scheme's slug.
+    name: str | None = Field(default=None, pattern=SLUG)
+    lang: str = Field(default="en", min_length=2, max_length=16)
+    why: str | None = Field(default=None, max_length=500)
+    dry_run: bool = False
+
+
+class SkosImportResult(BaseModel):
+    #: ``publisher/name`` the import writes to — or would.
+    address: str
+    scheme_iri: str | None
+    title: str
+    terms: list[StandardTerm]
+    #: Absent on a dry run.
+    standard: StandardRead | None = None
+    #: Absent on a dry run, and when the terms were unchanged.
+    version: StandardVersionRead | None = None
+    #: The terms match the current version; nothing was written.
+    unchanged: bool = False
+    report: SkosReport

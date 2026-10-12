@@ -7,7 +7,7 @@ here.
 | | |
 |---|---|
 | Index | [§1 · Connect and model](../../README.md#1--connect-and-model) |
-| Features | [connect-a-database](features/connect-a-database.md) · [introspect-a-database](features/introspect-a-database.md) · [domain-models](features/domain-models.md) · [model-editor](features/model-editor.md) · [share-a-model](features/share-a-model.md) · [stitch-models](features/stitch-models.md) · [starter-models](features/starter-models.md) · [the-model-page](features/the-model-page.md) |
+| Features | [connect-a-database](features/connect-a-database.md) · [introspect-a-database](features/introspect-a-database.md) · [domain-models](features/domain-models.md) · [model-editor](features/model-editor.md) · [share-a-model](features/share-a-model.md) · [stitch-models](features/stitch-models.md) · [starter-models](features/starter-models.md) · [the-model-page](features/the-model-page.md) · [publish-review](features/publish-review.md) · [ontology-import](features/ontology-import.md) |
 | Depends on | — |
 | Depended on by | everything: the global model is the grounding context for every question |
 

@@ -25,7 +25,7 @@ from invana.core.errors import ValidationError
 
 #: Kept per conformance row; ``violation_count`` is the whole.
 MAX_VIOLATIONS = 50
-_TERM_KEYS = {"name", "type", "required", "values", "description"}
+_TERM_KEYS = {"name", "type", "required", "values", "description", "iri"}
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
@@ -57,11 +57,14 @@ def normalise_terms(raw: list[Any]) -> list[dict[str, Any]]:
             stored["values"] = _values(name, values)
         if term.get("description"):
             stored["description"] = str(term["description"])
+        if term.get("iri"):
+            stored["iri"] = str(term["iri"])
         out.append(stored)
     return out
 
 
 def _values(name: str, raw: Any) -> list[dict[str, str]]:
+    """Codes unique; ``broader`` names another code of the same term."""
     if not isinstance(raw, list) or not raw:
         raise ValidationError(f"Term {name!r}: values is a non-empty list of codes.")
     out: list[dict[str, str]] = []
@@ -75,9 +78,15 @@ def _values(name: str, raw: Any) -> list[dict[str, str]]:
             raise ValidationError(f"Term {name!r}: code {code!r} is listed twice.")
         codes.add(code)
         value = {"code": code}
-        if item.get("label"):
-            value["label"] = str(item["label"])
+        for key in ("label", "iri", "broader"):
+            if item.get(key):
+                value[key] = str(item[key])
         out.append(value)
+    for value in out:
+        if value.get("broader") is not None and value["broader"] not in codes:
+            raise ValidationError(
+                f"Term {name!r}: {value['code']!r} is under {value['broader']!r}, which is not a code."
+            )
     return out
 
 

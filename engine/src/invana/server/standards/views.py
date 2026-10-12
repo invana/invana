@@ -6,11 +6,13 @@ standard; who may mint a version, and who may create a pack, is the manager's.
 
 from __future__ import annotations
 
-from fastapi import Depends, Path, Query
+from fastapi import Depends, Path, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.standards.managers import StandardManager
+from invana.apps.standards.managers import SkosImportManager, StandardManager
 from invana.apps.standards.schemas import (
+    SkosImportRequest,
+    SkosImportResult,
     StandardCreate,
     StandardListResponse,
     StandardRead,
@@ -23,6 +25,7 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 
 standards = StandardManager()
+skos = SkosImportManager()
 
 
 async def list_standards(
@@ -89,3 +92,16 @@ async def get_version(
 ) -> StandardVersionRead:
     standard = await standards.get(session, publisher=publisher, name=name)
     return standards.read_version(standard, await standards.get_version(session, standard=standard, version=version))
+
+
+async def import_skos(
+    payload: SkosImportRequest,
+    response: Response,
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> SkosImportResult:
+    """A SKOS concept scheme as a standard — created, versioned, unchanged, or previewed."""
+    result = await skos.import_skos(session, payload=payload, actor=user)
+    if result.version is not None:
+        response.status_code = status.HTTP_201_CREATED
+    return result

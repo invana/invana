@@ -6,6 +6,7 @@ lives above Graphs, so every command names who acts with ``--user``:
     invana standards list    --user ada [--origin pack]
     invana standards show    admin/iso-3166 --user ada
     invana standards apply   --file iso-3166.json --user admin
+    invana standards import  --skos crop-stages.ttl --user ada [--scheme IRI] [--dry-run]
     invana standards attach  abrc/accessions --standard admin/iso-3166 --mode block \\
                              --map country=country_code --user ada
     invana standards detach  abrc/accessions --standard admin/iso-3166 --user ada
@@ -15,6 +16,9 @@ lives above Graphs, so every command names who acts with ``--user``:
 ``publisher?``, ``name``, ``title?``, ``description?``, ``origin?``, ``terms``,
 ``why?``. ``apply`` creates the standard, or mints its next version when the
 terms changed, and prints ``unchanged`` when they did not.
+
+``import`` reads a SKOS concept scheme — a file, or a URL it fetches itself —
+into a standard (docs/for-developers/modules/bring-data-in/features/skos-import.md).
 
 ``check`` scores one dataset version (the current one when none is named)
 against every standard the dataset claims, and exits 1 when any does not
@@ -31,11 +35,13 @@ import click
 
 from invana.apps.datasets.managers import ConformanceManager, DatasetManager
 from invana.apps.datasets.schemas import DatasetStandardCreate, Enforcement
-from invana.apps.standards.managers import StandardManager
-from invana.apps.standards.schemas import StandardCreate
+from invana.apps.standards.managers import SkosImportManager, StandardManager
+from invana.apps.standards.schemas import SkosImportRequest, SkosImportResult, StandardCreate
 from invana.cli.context import as_user
+from invana.cli.sources import FORMAT_CHOICES, read_source
 
 _standards = StandardManager()
+_skos = SkosImportManager()
 _datasets = DatasetManager()
 _claims = ConformanceManager()
 
@@ -109,6 +115,63 @@ def apply(path: str, user_ref: str) -> None:
             click.echo("unchanged" if version is None else f"{standard.address}@{version.version}")
 
     asyncio.run(go())
+
+
+@standards_cmd.command("import")
+@click.option("--skos", "source", required=True, help="A SKOS vocabulary: a file, or a URL to fetch.")
+@click.option(
+    "--format", "fmt", type=click.Choice(FORMAT_CHOICES), default=None, help="Default: from the name or text."
+)
+@click.option("--scheme", default=None, help="The concept scheme's IRI, when the file holds several.")
+@click.option("--publisher", default=None, help="Default: the user's username.")
+@click.option("--name", default=None, help="Default: the slug of the scheme's title.")
+@click.option("--lang", default="en", show_default=True, help="Which labels to read.")
+@click.option("--why", default=None, help="Recorded on the version.")
+@click.option("--dry-run", is_flag=True, help="Show the terms and the report; write nothing.")
+@_user_option
+def import_(
+    source: str,
+    fmt: str | None,
+    scheme: str | None,
+    publisher: str | None,
+    name: str | None,
+    lang: str,
+    why: str | None,
+    dry_run: bool,
+    user_ref: str,
+) -> None:
+    """A SKOS concept scheme as a standard — created, or its next version."""
+    content, detected = read_source(source, fmt)
+    payload = SkosImportRequest(
+        content=content,
+        format=detected,
+        scheme=scheme,
+        publisher=publisher,
+        name=name,
+        lang=lang,
+        why=why,
+        dry_run=dry_run,
+    )
+
+    async def go() -> SkosImportResult:
+        async with as_user(user_ref) as (session, actor):
+            return await _skos.import_skos(session, payload=payload, actor=actor)
+
+    result = asyncio.run(go())
+    for term in result.terms:
+        click.echo(f"  {term.name}\t{len(term.values or [])} values")
+    report = result.report
+    click.echo(f"{report.mapped['terms']} terms, {report.mapped['values']} values; {report.skipped_count} skipped.")
+    for note in report.skipped:
+        click.echo(f"  skipped {note.subject}: {note.message}")
+    for note in report.notes:
+        click.echo(f"  note {note.subject}: {note.message}")
+    if dry_run:
+        click.echo(f"dry run — nothing written; would write {result.address}.")
+    elif result.unchanged:
+        click.echo(f"unchanged — {result.address} already holds these terms.")
+    else:
+        click.echo(f"{result.address}@{result.version.version}")
 
 
 @standards_cmd.command("attach")

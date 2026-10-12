@@ -75,7 +75,8 @@ class GraphModel(Base):
     package_id: Mapped[str] = mapped_column(String(64), nullable=False, default=_new_id, index=True)
     # Where this model came from, when it did not start here: ``file`` for an
     # imported artefact, ``starter`` for one shipped with the distribution
-    # (starter-models.md SR1). NULL means it was authored in this Graph.
+    # (starter-models.md SR1), ``ontology`` for an ontology import. NULL means it
+    # was authored in this Graph.
     import_source: Mapped[str | None] = mapped_column(String(32), nullable=True)
     validation_mode: Mapped[str] = mapped_column(
         Enum("strict", "permissive", name="validation_mode_enum"),
@@ -176,6 +177,8 @@ class PropertyKeyDefinition(Base):
         default="SINGLE",
     )
     description: Mapped[str] = mapped_column(Text, default="")
+    #: The IRI it was imported from (ontology-import); provenance, not identity.
+    source_iri: Mapped[str | None] = mapped_column(String(2048), nullable=True)
 
     version: Mapped[GraphVersion] = relationship(back_populates="property_keys")
     mappings: Mapped[list[TypePropertyMapping]] = relationship(
@@ -204,6 +207,8 @@ class NodeTypeDefinition(Base):
     parent_type: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_abstract: Mapped[bool] = mapped_column(Boolean, default=False)
     validation_mode: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    #: The IRI it was imported from (ontology-import); provenance, not identity.
+    source_iri: Mapped[str | None] = mapped_column(String(2048), nullable=True)
 
     version: Mapped[GraphVersion] = relationship(back_populates="node_types")
     property_mappings: Mapped[list[TypePropertyMapping]] = relationship(
@@ -232,6 +237,8 @@ class EdgeTypeDefinition(Base):
         Enum("MULTI", "SIMPLE", "ONE2MANY", "MANY2ONE", "ONE2ONE", name="multiplicity_enum"),
         default="MULTI",
     )
+    #: The IRI it was imported from (ontology-import); provenance, not identity.
+    source_iri: Mapped[str | None] = mapped_column(String(2048), nullable=True)
 
     version: Mapped[GraphVersion] = relationship(back_populates="edge_types")
     property_mappings: Mapped[list[TypePropertyMapping]] = relationship(

@@ -305,6 +305,7 @@ CREATE TABLE edge_type_definitions (
 	source_node_types JSON, 
 	target_node_types JSON, 
 	multiplicity multiplicity_enum NOT NULL, 
+	source_iri VARCHAR(2048), 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_version_edge_type UNIQUE (version_id, name), 
 	FOREIGN KEY(version_id) REFERENCES graph_versions (id) ON DELETE CASCADE
@@ -705,6 +706,7 @@ CREATE TABLE node_type_definitions (
 	parent_type VARCHAR(255), 
 	is_abstract BOOLEAN NOT NULL, 
 	validation_mode VARCHAR(16), 
+	source_iri VARCHAR(2048), 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_version_node_type UNIQUE (version_id, name), 
 	FOREIGN KEY(version_id) REFERENCES graph_versions (id) ON DELETE CASCADE
@@ -1054,6 +1056,7 @@ CREATE TABLE property_key_definitions (
 	type VARCHAR(64) NOT NULL, 
 	value_cardinality value_cardinality_enum NOT NULL, 
 	description TEXT NOT NULL, 
+	source_iri VARCHAR(2048), 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_version_property_key UNIQUE (version_id, name), 
 	FOREIGN KEY(version_id) REFERENCES graph_versions (id) ON DELETE CASCADE

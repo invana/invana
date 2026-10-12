@@ -333,6 +333,29 @@
         "title": "ActionResponse[NoneType]",
         "type": "object"
       },
+      "ActionResponse_OntologyImportResult_": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OntologyImportResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ActionResponse[OntologyImportResult]",
+        "type": "object"
+      },
       "ActionResponse_PropertyKeyResponse_": {
         "properties": {
           "data": {
@@ -6112,6 +6135,17 @@
             "title": "Property Mappings",
             "type": "array"
           },
+          "source_iri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Iri"
+          },
           "source_node_types": {
             "default": [],
             "items": {
@@ -6165,6 +6199,17 @@
             },
             "title": "Property Mappings",
             "type": "array"
+          },
+          "source_iri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Iri"
           },
           "source_node_types": {
             "default": [],
@@ -6257,6 +6302,17 @@
             },
             "title": "Property Mappings",
             "type": "array"
+          },
+          "source_iri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Iri"
           },
           "source_node_types": {
             "items": {
@@ -9211,6 +9267,41 @@
         "title": "ImpactRequest",
         "type": "object"
       },
+      "ImportNote": {
+        "description": "One thing an import skipped, or did in a way worth saying.",
+        "properties": {
+          "iri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iri"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject",
+          "kind",
+          "message"
+        ],
+        "title": "ImportNote",
+        "type": "object"
+      },
       "InboxResponse": {
         "properties": {
           "approvals_waiting": {
@@ -9349,6 +9440,24 @@
           "index_options"
         ],
         "title": "IndexResponse",
+        "type": "object"
+      },
+      "InheritedProperty": {
+        "properties": {
+          "from_type": {
+            "title": "From Type",
+            "type": "string"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          }
+        },
+        "required": [
+          "property",
+          "from_type"
+        ],
+        "title": "InheritedProperty",
         "type": "object"
       },
       "Insights": {
@@ -10647,6 +10756,60 @@
         "title": "LogoutRequest",
         "type": "object"
       },
+      "MappedType": {
+        "properties": {
+          "came_with": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Came With"
+          },
+          "inherited": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/InheritedProperty"
+            },
+            "title": "Inherited",
+            "type": "array"
+          },
+          "iri": {
+            "title": "Iri",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "node",
+              "edge"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "properties": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Properties",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "iri",
+          "kind"
+        ],
+        "title": "MappedType",
+        "type": "object"
+      },
       "MarkRead": {
         "properties": {
           "ids": {
@@ -11563,6 +11726,17 @@
             "title": "Property Mappings",
             "type": "array"
           },
+          "source_iri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Iri"
+          },
           "validation_mode": {
             "anyOf": [
               {
@@ -11619,6 +11793,17 @@
             },
             "title": "Property Mappings",
             "type": "array"
+          },
+          "source_iri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Iri"
           },
           "validation_mode": {
             "anyOf": [
@@ -11737,6 +11922,17 @@
             },
             "title": "Property Mappings",
             "type": "array"
+          },
+          "source_iri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Iri"
           },
           "validation_mode": {
             "anyOf": [
@@ -12302,6 +12498,188 @@
           "display_name"
         ],
         "title": "OnBehalfOfRef",
+        "type": "object"
+      },
+      "OntologyImportRequest": {
+        "properties": {
+          "content": {
+            "maxLength": 20000000,
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "dry_run": {
+            "default": false,
+            "title": "Dry Run",
+            "type": "boolean"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RdfFormat"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lang": {
+            "default": "en",
+            "maxLength": 16,
+            "minLength": 2,
+            "title": "Lang",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "types": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Types"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "title": "OntologyImportRequest",
+        "type": "object"
+      },
+      "OntologyImportResult": {
+        "properties": {
+          "draft": {
+            "$ref": "#/components/schemas/SchemaExport-Output"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GraphModelResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "publishable": {
+            "default": true,
+            "title": "Publishable",
+            "type": "boolean"
+          },
+          "report": {
+            "$ref": "#/components/schemas/OntologyReport"
+          },
+          "unsupported_property_types": {
+            "default": [],
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Unsupported Property Types",
+            "type": "array"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VersionResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "draft",
+          "report"
+        ],
+        "title": "OntologyImportResult",
+        "type": "object"
+      },
+      "OntologyReport": {
+        "properties": {
+          "format": {
+            "$ref": "#/components/schemas/RdfFormat"
+          },
+          "mapped": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Mapped",
+            "type": "object"
+          },
+          "notes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ImportNote"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "notes_count": {
+            "default": 0,
+            "title": "Notes Count",
+            "type": "integer"
+          },
+          "skipped": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ImportNote"
+            },
+            "title": "Skipped",
+            "type": "array"
+          },
+          "skipped_count": {
+            "default": 0,
+            "title": "Skipped Count",
+            "type": "integer"
+          },
+          "suggestions": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StitchSuggestion"
+            },
+            "title": "Suggestions",
+            "type": "array"
+          },
+          "triples": {
+            "title": "Triples",
+            "type": "integer"
+          },
+          "types": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MappedType"
+            },
+            "title": "Types",
+            "type": "array"
+          }
+        },
+        "required": [
+          "format",
+          "triples",
+          "mapped"
+        ],
+        "title": "OntologyReport",
         "type": "object"
       },
       "OperationResponse": {
@@ -13957,6 +14335,17 @@
             "title": "Name",
             "type": "string"
           },
+          "source_iri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Iri"
+          },
           "type": {
             "default": "string",
             "title": "Type",
@@ -14027,6 +14416,17 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "source_iri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Iri"
           },
           "type": {
             "title": "Type",
@@ -14450,6 +14850,15 @@
         ],
         "title": "QueryResponse",
         "type": "object"
+      },
+      "RdfFormat": {
+        "enum": [
+          "turtle",
+          "json-ld",
+          "rdf-xml"
+        ],
+        "title": "RdfFormat",
+        "type": "string"
       },
       "RecordChange": {
         "properties": {
@@ -19471,6 +19880,210 @@
         "title": "SkillVersionRead",
         "type": "object"
       },
+      "SkosImportRequest": {
+        "description": "A SKOS vocabulary's text \u2014 the engine never fetches a URL.",
+        "properties": {
+          "content": {
+            "maxLength": 20000000,
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "dry_run": {
+            "default": false,
+            "title": "Dry Run",
+            "type": "boolean"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RdfFormat"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lang": {
+            "default": "en",
+            "maxLength": 16,
+            "minLength": 2,
+            "title": "Lang",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9][a-z0-9-]{0,62}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "publisher": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9][a-z0-9-]{0,62}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publisher"
+          },
+          "scheme": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scheme"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "title": "SkosImportRequest",
+        "type": "object"
+      },
+      "SkosImportResult": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "report": {
+            "$ref": "#/components/schemas/SkosReport"
+          },
+          "scheme_iri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scheme Iri"
+          },
+          "standard": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StandardRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "terms": {
+            "items": {
+              "$ref": "#/components/schemas/StandardTerm"
+            },
+            "title": "Terms",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "unchanged": {
+            "default": false,
+            "title": "Unchanged",
+            "type": "boolean"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StandardVersionRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "address",
+          "scheme_iri",
+          "title",
+          "terms",
+          "report"
+        ],
+        "title": "SkosImportResult",
+        "type": "object"
+      },
+      "SkosReport": {
+        "properties": {
+          "format": {
+            "$ref": "#/components/schemas/RdfFormat"
+          },
+          "mapped": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Mapped",
+            "type": "object"
+          },
+          "notes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ImportNote"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "notes_count": {
+            "default": 0,
+            "title": "Notes Count",
+            "type": "integer"
+          },
+          "skipped": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ImportNote"
+            },
+            "title": "Skipped",
+            "type": "array"
+          },
+          "skipped_count": {
+            "default": 0,
+            "title": "Skipped Count",
+            "type": "integer"
+          },
+          "triples": {
+            "title": "Triples",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "format",
+          "triples",
+          "mapped"
+        ],
+        "title": "SkosReport",
+        "type": "object"
+      },
       "SlowCall": {
         "properties": {
           "at": {
@@ -19990,6 +20603,18 @@
             ],
             "title": "Description"
           },
+          "iri": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iri"
+          },
           "name": {
             "maxLength": 255,
             "minLength": 1,
@@ -20367,6 +20992,39 @@
           }
         },
         "title": "StitchPreview",
+        "type": "object"
+      },
+      "StitchSuggestion": {
+        "properties": {
+          "iri": {
+            "title": "Iri",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "same_as",
+              "equivalent_class",
+              "equivalent_property"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "target_iri": {
+            "title": "Target Iri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "name",
+          "iri",
+          "target_iri"
+        ],
+        "title": "StitchSuggestion",
         "type": "object"
       },
       "StitchUse": {
@@ -22006,11 +22664,35 @@
       },
       "TermValue": {
         "properties": {
+          "broader": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Broader"
+          },
           "code": {
             "maxLength": 255,
             "minLength": 1,
             "title": "Code",
             "type": "string"
+          },
+          "iri": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iri"
           },
           "label": {
             "anyOf": [
@@ -26299,6 +26981,53 @@
           }
         ],
         "summary": "Create Standard",
+        "tags": [
+          "standards"
+        ]
+      }
+    },
+    "/api/v1/standards/import/skos": {
+      "post": {
+        "description": "A SKOS concept scheme as a standard \u2014 created, versioned, unchanged, or previewed.",
+        "operationId": "import_skos_api_v1_standards_import_skos_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkosImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkosImportResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Import Skos",
         "tags": [
           "standards"
         ]
@@ -35048,6 +35777,77 @@
           }
         ],
         "summary": "Import Model",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/import/ontology": {
+      "post": {
+        "description": "An ontology as a draft model \u2014 or, with ``dry_run``, what it would be.",
+        "operationId": "import_ontology_api_v1_u__username___graphSlug__models_import_ontology_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OntologyImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse_OntologyImportResult_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Import Ontology",
         "tags": [
           "models"
         ]

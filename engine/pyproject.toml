@@ -26,6 +26,9 @@ dependencies = [
     # engine to import at all. The optional `anthropic`/`openai`/`claude-agent-sdk`
     # SDKs are NOT required: the keyless local/ollama paths use httpx only.
     "httpx>=0.27",
+    # Semantic imports (SKOS vocabularies → standards, RDFS/OWL ontologies → draft
+    # models) read JSON-LD, Turtle and RDF/XML through rdflib's parsers.
+    "rdflib>=7.1",
 ]
 
 [project.optional-dependencies]
@@ -264,6 +267,7 @@ layers = [
     "invana.apps.llm_providers",
     "invana.apps.datasets",
     "invana.apps.standards",
+    "invana.apps.semantic",
     "invana.apps.graphs",
     "invana.apps.modeller",
 ]

@@ -147,6 +147,7 @@ class GraphVersionQuerySet(VersionScopedQuerySet):
                 validation_rules=[
                     {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in pk.validation_rules
                 ],
+                source_iri=pk.source_iri,
             )
 
         # Clone node types
@@ -171,6 +172,7 @@ class GraphVersionQuerySet(VersionScopedQuerySet):
                 is_abstract=nt.is_abstract,
                 validation_mode=nt.validation_mode,
                 property_mappings=mappings,
+                source_iri=nt.source_iri,
             )
 
         # Clone edge types
@@ -195,6 +197,7 @@ class GraphVersionQuerySet(VersionScopedQuerySet):
                 target_node_types=copy.deepcopy(et.target_node_types),
                 multiplicity=et.multiplicity,
                 property_mappings=mappings,
+                source_iri=et.source_iri,
             )
 
         # Clone constraints

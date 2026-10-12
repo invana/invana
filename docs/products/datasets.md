@@ -36,7 +36,7 @@ Reusable knowledge, labelled by where it came from. Prototype page: *Invana Data
 | DS-F13 | Imports journal and ingestion timeline (CLI and API loads) | Moves (from Modeller) | DS-13 |
 | DS-F14 | Retraction — a version marked retracted with a reason; everything citing it flagged | New · Blocked · P-08 P-13 | DS-14 |
 | DS-F15 | Scheduled refresh → new version, consumers stay pinned | New · Blocked · P-08 | DS-03 |
-| DS-F17 | Import a standard from **SKOS** (concept scheme → terms and allowed values); JSON-LD, Turtle or RDF/XML | New · Blocked · P-19 | DS-15 |
+| DS-F17 | Import a standard from **SKOS** (concept scheme → terms and allowed values); JSON-LD, Turtle or RDF/XML | New · engine ✅ B12, Studio C08 | DS-15 |
 | DS-F16 | Sensitivity labels per dataset and column, read by guardrails | New · Blocked · P-08 | DS-01 · DS-02 |
 
 ## User stories
@@ -110,7 +110,7 @@ Reusable knowledge, labelled by where it came from. Prototype page: *Invana Data
 | `invana datasets refresh <ds> --schedule "<cron>"` | refresh into new versions on a schedule | New · P-08 P-13 |
 | `invana datasets bind <ds>@v --graph --model --type` | bind a version into a Graph's model | New · P-08 |
 | `invana validation list` · `resolve <id> --use official\|collected\|value` | the review queue | New · P-08 |
-| `invana standards list` · `show` · `import --skos <file\|url>` · `attach --dataset --mode block\|warn\|report` · `check --dataset` | standards packs, SKOS import, enforcement | New · P-12 P-19 |
+| `invana standards list` · `show` · `import --skos <file\|url>` · `attach --dataset --mode block\|warn\|report` · `check --dataset` | standards packs, SKOS import, enforcement | ✅ B04 · B12 |
 | `invana datasets pack` · `unpack` | registry phase 1 — files with provenance | Later |
 
 ## Decisions

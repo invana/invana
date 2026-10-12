@@ -14,6 +14,8 @@ GET    /{model_id}                         model detail (+ versions)
 PATCH  /{model_id}                         update name/description/validation_mode; status archives or restores (MP7)
 DELETE /{model_id}                         hard delete — refused once a version was published (MP7)
 
+POST   /import/ontology                    an RDFS / OWL ontology as a draft model (or a preview)
+
 GET    /{model_id}/draft/projection        the DDL publishing the draft would project (MP8)
 
 GET    /{model_id}/versions                list versions
@@ -36,7 +38,7 @@ from __future__ import annotations
 from http import HTTPStatus
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -92,6 +94,8 @@ from invana.apps.modeller.schemas import (
 from invana.apps.modeller.staging import StagedSet, UnknownChange, collect, discard_all, discard_one
 from invana.apps.modeller.store import ModelStore
 from invana.apps.modeller.versioner import Versioner, compute_diff
+from invana.apps.semantic.managers import OntologyImportManager
+from invana.apps.semantic.schemas import OntologyImportRequest, OntologyImportResult
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
@@ -110,6 +114,7 @@ _store = ModelStore()
 _lifecycle = ModelLifecycleManager()
 _publishing = PublishManager()
 _reviews = PublishReviewManager()
+_ontologies = OntologyImportManager()
 
 
 # ---------------------------------------------------------------------------
@@ -452,6 +457,60 @@ async def import_model(
             publishable=not blockers,
         ),
     )
+
+
+@models_router.post("/import/ontology", response_model=ActionResponse[OntologyImportResult])
+async def import_ontology(
+    payload: OntologyImportRequest,
+    response: Response,
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[OntologyImportResult]:
+    """An ontology as a draft model — or, with ``dry_run``, what it would be."""
+    try:
+        imported = await _ontologies.import_ontology(session, graph_id=graph.id, payload=payload)
+    except ImportRefused as exc:
+        raise HTTPException(HTTPStatus.CONFLICT, detail={"error": exc.error, **exc.detail}) from exc
+
+    blockers = await _unsupported_for_graph(session, graph, imported.artefact)
+    result = OntologyImportResult(
+        draft=imported.export,
+        report=imported.report,
+        unsupported_property_types=blockers,
+        publishable=not blockers,
+    )
+    counts = imported.report.mapped
+    if imported.model is None:
+        return action(
+            f"{counts['node_types']} node types, {counts['edge_types']} edge types and "
+            f"{counts['property_keys']} property keys would import; {imported.report.skipped_count} skipped.",
+            result,
+        )
+
+    await emit_event(
+        session,
+        action=event_actions.MODEL_IMPORT,
+        target_kind=event_actions.TARGET_MODEL,
+        target_id=imported.model.id,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={
+            "name": imported.model.name,
+            "package_id": imported.artefact.package_id,
+            "content_hash": imported.artefact.content_hash,
+            "source": "ontology",
+            "unsupported": blockers,
+            "skipped": imported.report.skipped_count,
+        },
+    )
+    await session.commit()
+    model = await _store.get_graph_model(session, imported.model.id)
+    result.model = _to_response(model)
+    result.version = await _full_version(session, imported.version_id)
+    response.status_code = status.HTTP_201_CREATED
+    return action(_import_message(model.name, blockers), result)
 
 
 @models_router.get("/{model_id}", response_model=GraphModelResponse)

@@ -25,6 +25,7 @@ Studio.
 | `invana records import` | Loads a folder of records into a model |
 | `invana datasets list · show · import · versions · diff · history · share · retract · refresh · bind` | The install's datasets: import a CSV or JSON file as the next version, read versions and change logs, share, retract (Admin), set or fire a refresh, bind a version into a Graph's model — [2.4](../../bring-data-in/features/datasets.md) · [2.5](../../bring-data-in/features/retract-and-refresh.md) · [2.6](../../bring-data-in/features/bind-a-dataset.md) |
 | `invana standards list · show · apply · attach · detach · check` | The install's standards: apply a standard file as its next version, attach one to a dataset with a mode (`block · warn · report`), score a dataset version against it — [2.7](../../bring-data-in/features/standards.md) |
+| `invana standards import --skos <file\|url> [--scheme] [--dry-run]` | A SKOS concept scheme as a standard, or its next version; the CLI fetches a URL itself — [2.8](../../bring-data-in/features/skos-import.md) |
 | `invana rules list · show · apply` | The install's rules, or a Graph's with `--graph`: list, show every version, apply a rule file (a check and a mode included) — [6.4](../../skills/features/rules.md) |
 | `invana members list · add · set-roles · remove` | A Graph's members and their Graph roles (`--role`, repeatable); the last owner cannot be removed or demoted — [11.4](../../identity-and-access/features/membership.md) · [11.6](../../identity-and-access/features/roles.md) |
 | `invana projects list · create · show` · `invana branches list · fork · decide · merge` · `invana findings add · review` · `invana proposals list · accept · reject` | A project of a type (`--private` for only its people), its branches, evidence with a stance, and decisions the rules check — superseded, never edited — [9.5](../../work/features/branches-and-decisions.md) · [9.7](../../work/features/private-projects.md) |
@@ -34,6 +35,7 @@ Studio.
 | `invana notifications list · read` · `invana notifications rules list · apply --file` · `invana notifications channels list · add · remove` | The inbox, the rules that fill it and the channels they send to — [10.7](../../operate/features/notifications.md) |
 | `invana search "<text>"` | The ⌘K search from a terminal, as `--user`, over every Graph they are in or one `--graph` — [13.10](search.md) |
 | `invana models export · import · upgrade` | Moves a domain model between Graphs |
+| `invana models import --ontology <file\|url> [--types A,B] [--dry-run]` | An RDFS / OWL ontology, schema.org included, as a draft model with its import report — [1.10](../../connect-and-model/features/ontology-import.md) |
 | `invana models starters` | Lists the shipped starter models |
 | `invana models publish [--dry-run]` | Publishes a draft: additive at once, breaking through a [publish review](../../connect-and-model/features/publish-review.md) whose preview runs inline |
 | `invana loader` | Loads a flat CSV straight through the connector; `--graph` supplies the connection and journals it as a `bulk` run — [2.1](../../bring-data-in/features/load-data.md) |

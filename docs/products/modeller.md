@@ -34,7 +34,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | MO-F11 | Rules at install, Graph or project scope | New · Blocked · P-12 | MO-12 |
 | MO-F12 | Requests inbox | New | MO-13 |
 | MO-F13 | Graph settings — basic, database, members and roles | In Studio · New (roles) · Blocked · P-18 | MO-14 |
-| MO-F14 | New model from an ontology — **RDFS / OWL subset, including schema.org**; JSON-LD, Turtle or RDF/XML; pick types, preview, open as a draft | New · Blocked · P-19 | MO-15 |
+| MO-F14 | New model from an ontology — **RDFS / OWL subset, including schema.org**; JSON-LD, Turtle or RDF/XML; pick types, preview, open as a draft | New · engine ✅ B12, Studio C08 | MO-15 |
 | MO-F15 | Constraints from **SHACL**; schema from **GQL graph types** (ISO/IEC 39075) | Later | — |
 
 ## User stories
@@ -71,7 +71,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | Command | Does | Status |
 |---|---|---|
 | `invana models list` · `starters` · `export` · `import` · `upgrade` | models in a Graph; shipped starters; move models as files | ✅ exists |
-| `invana models import --ontology <file\|url> [--types A,B]` | a draft model from RDFS / OWL / schema.org | New · P-19 |
+| `invana models import --ontology <file\|url> [--types A,B]` | a draft model from RDFS / OWL / schema.org | ✅ B12 |
 | `invana models diff --name <m> v1 v2` · `history --name <m>` | compare versions; who changed what | New · P-09 |
 | `invana models publish --name <m> [--dry-run]` | publish; `--dry-run` says additive or breaking and previews the migration | ✅ B10 |
 | `invana stitches apply` · `list` · `resolve` · `commit` · `discard` | declare and manage stitches | ✅ exists |

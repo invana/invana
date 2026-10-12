@@ -9,6 +9,7 @@ committed, and another Graph imports or upgrades from it.
     invana models export    --graph ravi/finance --name MarketData --out marketdata.json
     invana models import    --graph ravi/other   --file marketdata.json [--as MarketDataV2]
     invana models import    --graph ravi/other   --starter memory
+    invana models import    --graph ravi/other   --ontology schemaorg.jsonld --types Person,Organization [--dry-run]
     invana models upgrade   --graph ravi/other   --name MarketData --file marketdata.json
     invana models publish   --graph ravi/finance --name MarketData --user ravi [--dry-run] [--why …] [--approver …]
 
@@ -40,6 +41,9 @@ from invana.apps.modeller.portability import (
 from invana.apps.modeller.schemas import ModelPublishRequest
 from invana.apps.modeller.store import ModelStore
 from invana.apps.modeller.versioner import compute_diff
+from invana.apps.semantic.managers import OntologyImportManager
+from invana.apps.semantic.schemas import OntologyImportRequest
+from invana.cli.sources import FORMAT_CHOICES, read_source
 from invana.core.auth.querysets import UserQuerySet
 from invana.core.db import create_db_engine, create_session_factory
 from invana.core.errors import InvanaError
@@ -50,6 +54,7 @@ from invana.runtime.querysets import TaskRunQuerySet
 
 _store = ModelStore()
 _reviews = PublishReviewManager()
+_ontologies = OntologyImportManager()
 
 
 @click.group("models")
@@ -212,11 +217,29 @@ def _refusal(exc: ImportRefused, *, graph_ref: str, file: str | None, starter: s
 @click.option("--graph", "graph_ref", required=True, help="Graph as <username>/<slug>.")
 @click.option("--file", "file", default=None, type=click.Path(exists=True, dir_okay=False), help="Artefact to import.")
 @click.option("--starter", "starter", default=None, help="A shipped starter, by slug.")
+@click.option("--ontology", "ontology", default=None, help="An RDFS / OWL ontology: a file, or a URL to fetch.")
 @click.option("--as", "local_name", default=None, help="Name it this on arrival — the name is local.")
-def import_cmd(graph_ref: str, file: str | None, starter: str | None, local_name: str | None) -> None:
-    """Import an artefact — or a starter — as a draft."""
-    if bool(file) == bool(starter):
-        raise click.UsageError("Give either --file or --starter, not both.")
+@click.option("--types", default=None, help="With --ontology: the classes to import, comma-separated.")
+@click.option("--format", "fmt", type=click.Choice(FORMAT_CHOICES), default=None, help="With --ontology.")
+@click.option("--lang", default="en", show_default=True, help="With --ontology: which labels to read.")
+@click.option("--dry-run", is_flag=True, help="With --ontology: show what would import; write nothing.")
+def import_cmd(
+    graph_ref: str,
+    file: str | None,
+    starter: str | None,
+    ontology: str | None,
+    local_name: str | None,
+    types: str | None,
+    fmt: str | None,
+    lang: str,
+    dry_run: bool,
+) -> None:
+    """Import an artefact, a starter or an ontology as a draft."""
+    if sum(bool(s) for s in (file, starter, ontology)) != 1:
+        raise click.UsageError("Give one of --file, --starter or --ontology.")
+    if ontology:
+        _import_ontology(graph_ref, ontology, local_name, types, fmt, lang, dry_run)
+        return
     if starter:
         try:
             artefact = starter_models.get(starter)
@@ -244,6 +267,61 @@ def import_cmd(graph_ref: str, file: str | None, starter: str | None, local_name
     name, _version_id, nodes, edges = asyncio.run(_with_graph(graph_ref, work))
     click.echo(f"{name} imported as a draft — {nodes} node types, {edges} edge types.")
     click.echo("Rename what you want, then publish it from Studio or `invana models` upstream.")
+
+
+def _import_ontology(
+    graph_ref: str, source: str, name: str | None, types: str | None, fmt: str | None, lang: str, dry_run: bool
+) -> None:
+    """``import --ontology``: the manager the API calls, then the report as lines."""
+    content, detected = read_source(source, fmt)
+    payload = OntologyImportRequest(
+        content=content,
+        format=detected,
+        types=[t.strip() for t in types.split(",") if t.strip()] if types else None,
+        name=name,
+        lang=lang,
+        dry_run=dry_run,
+    )
+
+    async def work(session, graph):
+        try:
+            imported = await _ontologies.import_ontology(session, graph_id=graph.id, payload=payload)
+        except ImportRefused as exc:
+            taken = exc.detail.get("name")
+            raise click.ClickException(
+                f"{taken!r} is already in this Graph. Nothing was imported.\n"
+                f"  invana models import --graph {graph_ref} --ontology {source} --as <name>"
+            ) from exc
+        except InvanaError as exc:
+            raise click.ClickException(_detail(exc)) from exc
+        if imported.model is not None:
+            await session.commit()
+        return imported
+
+    imported = asyncio.run(_with_graph(graph_ref, work))
+    report = imported.report
+    for mapped in report.types:
+        brought = f"  (came with {mapped.came_with})" if mapped.came_with else ""
+        props = f" — {', '.join(mapped.properties)}" if mapped.properties else ""
+        click.echo(f"  {mapped.kind:<4} {mapped.name}{props}{brought}")
+    for note in report.skipped:
+        click.echo(f"  skipped {note.subject}: {note.message}")
+    for note in report.notes:
+        click.echo(f"  note {note.subject}: {note.message}")
+    for hint in report.suggestions:
+        click.echo(f"  suggestion {hint.name} {hint.kind} {hint.target_iri}")
+    counts = report.mapped
+    summary = (
+        f"{counts['node_types']} node types, {counts['edge_types']} edge types, "
+        f"{counts['property_keys']} property keys; {report.skipped_count} skipped."
+    )
+    if imported.model is None:
+        click.echo(f"dry run — nothing written. {summary}")
+        return
+    click.echo(f"{imported.model.name} imported as a draft — {summary}")
+    click.echo(
+        f"Publish it when it reads right: invana models publish --graph {graph_ref} --name {imported.model.name}"
+    )
 
 
 @models_cmd.command("upgrade")

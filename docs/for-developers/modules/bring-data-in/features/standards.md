@@ -26,6 +26,7 @@ mapping and an enforcement mode; every version of the dataset is then scored aga
 | C5 | Conformance | Per dataset version × standard version: records, conforming, score, violations |
 | C6 | Enforce | `block` refuses a non-conforming version · `warn` accepts it and says so · `report` records it only |
 | C7 | Apply a file | `invana standards apply --file` creates the standard or mints its next version |
+| C8 | Import SKOS | A concept scheme becomes a standard through the same apply path — [skos-import](skos-import.md) |
 
 ## Journey
 
@@ -83,8 +84,9 @@ flowchart TD
 | `name` | unique in the version |
 | `type` | `text · integer · number · boolean · date` (ISO `YYYY-MM-DD`); default `text` |
 | `required` | default `false`; a null or empty value is missing |
-| `values` | `[{code, label?}]`, codes unique; a value conforms when its text equals a code |
+| `values` | `[{code, label?, iri?, broader?}]`, codes unique; a value conforms when its text equals a code. `broader` names another value's code — the hierarchy a [SKOS import](skos-import.md) brings |
 | `description` | free text |
+| `iri` | the source IRI, set by a [SKOS import](skos-import.md); part of the hash |
 
 | Violation | Means |
 |---|---|
@@ -142,7 +144,6 @@ flowchart TD
 | Not building | Because |
 |---|---|
 | The shipped packs' content (TO, MIAPPE, Darwin Core, ISO 3166, IAB) | a pack is a standard file applied by an Admin; curating the files is content work, not engine |
-| SKOS import, broader/narrower hierarchies, source IRIs on terms | P-19, B12 |
 | Model properties that reference a standard's values | constraints, MO-08 |
 | Validation queue items from violations | DS-F7 |
 | Standards in the change log | a later kind; versions and their hashes are readable today |

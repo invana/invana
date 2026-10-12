@@ -34,6 +34,8 @@ class PropertyKeyCreate(BaseModel):
     value_cardinality: Literal["SINGLE", "LIST", "SET"] = "SINGLE"
     description: str = ""
     validation_rules: list[ValidationRuleSchema] = []
+    #: The IRI it was imported from (ontology-import); provenance, not identity.
+    source_iri: str | None = None
 
 
 class PropertyKeyResponse(BaseModel):
@@ -43,6 +45,7 @@ class PropertyKeyResponse(BaseModel):
     value_cardinality: str
     description: str
     validation_rules: list[ValidationRuleResponse] = []
+    source_iri: str | None = None
 
     model_config = {"from_attributes": True}
 
@@ -126,6 +129,8 @@ class NodeTypeCreate(BaseModel):
     is_abstract: bool = False
     validation_mode: Literal["strict", "permissive"] | None = None
     property_mappings: list[TypePropertyMappingCreate] = []
+    #: The IRI it was imported from (ontology-import); provenance, not identity.
+    source_iri: str | None = None
 
 
 class NodeTypeResponse(BaseModel):
@@ -138,6 +143,7 @@ class NodeTypeResponse(BaseModel):
     property_mappings: list[TypePropertyMappingResponse] = []
     effective_property_mappings: list[TypePropertyMappingResponse] = []
     hierarchy: list[str] = Field(default_factory=list, description="Parent chain from root to self")
+    source_iri: str | None = None
 
     model_config = {"from_attributes": True}
 
@@ -164,6 +170,8 @@ class EdgeTypeCreate(BaseModel):
     target_node_types: list[str] = []
     multiplicity: Literal["MULTI", "SIMPLE", "ONE2MANY", "MANY2ONE", "ONE2ONE"] = "MULTI"
     property_mappings: list[TypePropertyMappingCreate] = []
+    #: The IRI it was imported from (ontology-import); provenance, not identity.
+    source_iri: str | None = None
 
 
 class EdgeTypeResponse(BaseModel):
@@ -174,6 +182,7 @@ class EdgeTypeResponse(BaseModel):
     target_node_types: list[str]
     multiplicity: str
     property_mappings: list[TypePropertyMappingResponse] = []
+    source_iri: str | None = None
 
     model_config = {"from_attributes": True}
 
