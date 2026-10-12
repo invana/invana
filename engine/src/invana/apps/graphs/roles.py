@@ -77,8 +77,11 @@ _POLICY: tuple[tuple[tuple[str, ...], Area], ...] = (
     (("sessions",), ASK),
     (("explorer",), ASK),
     (("boards",), ASK),
+    (("notifications", "read"), ASK),
+    (("approvals",), ASK),
     (("projects",), WORK),
     (("tasks",), WORK),
+    (("schedules",), WORK),
     (("agents",), BUILD),
     (("skills",), BUILD),
     (("evals",), BUILD),
@@ -97,6 +100,7 @@ _POLICY: tuple[tuple[tuple[str, ...], Area], ...] = (
     (("default-agent",), SETTINGS),
     (("llm",), SETTINGS),
     (("members",), SETTINGS),
+    (("notifications",), SETTINGS),
     ((), SETTINGS),  # the Graph itself: PATCH · DELETE
 )
 

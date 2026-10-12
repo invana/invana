@@ -36,6 +36,7 @@ from typing import Any
 import click
 
 from invana.cli.commands.agents import agents_cmd
+from invana.cli.commands.approvals import approvals_cmd
 from invana.cli.commands.datasets import datasets_cmd
 from invana.cli.commands.evals import evals_cmd
 from invana.cli.commands.govern import govern_cmd
@@ -45,6 +46,7 @@ from invana.cli.commands.loader import loader_cmd
 from invana.cli.commands.members import members_cmd
 from invana.cli.commands.migrate import migrate_cmd
 from invana.cli.commands.models import models_cmd
+from invana.cli.commands.notifications import notifications_cmd
 from invana.cli.commands.plans import plans_cmd
 from invana.cli.commands.projects import (
     branches_cmd,
@@ -55,6 +57,7 @@ from invana.cli.commands.projects import (
 )
 from invana.cli.commands.records import records_cmd
 from invana.cli.commands.rules import rules_cmd
+from invana.cli.commands.schedules import schedules_cmd
 from invana.cli.commands.search import search_cmd
 from invana.cli.commands.skills import skills_cmd
 from invana.cli.commands.standards import standards_cmd
@@ -220,6 +223,9 @@ app.add_command(datasets_cmd)
 app.add_command(standards_cmd)
 app.add_command(rules_cmd)
 app.add_command(members_cmd)
+app.add_command(schedules_cmd)
+app.add_command(approvals_cmd)
+app.add_command(notifications_cmd)
 app.add_command(projects_cmd)
 app.add_command(branches_cmd)
 app.add_command(findings_cmd)

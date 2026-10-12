@@ -8,6 +8,16 @@ from fastapi import FastAPI
 from starlette_admin import DropDown
 from starlette_admin.contrib.sqla import Admin
 
+from invana.activity.models import (
+    Approval,
+    Notification,
+    NotificationChannel,
+    NotificationCursor,
+    NotificationDelivery,
+    NotificationRule,
+    Schedule,
+    ScheduleFiring,
+)
 from invana.apps.agents.models import Agent
 from invana.apps.boards.models import Board, BoardVersion
 from invana.apps.datasets.models import (
@@ -76,6 +86,7 @@ from invana.runtime.models import (
 )
 from invana.server.admin.auth import SuperuserAuthProvider
 from invana.server.agents.admin import AgentView
+from invana.server.approvals.admin import ApprovalView
 from invana.server.auth.admin import (
     PersonalAccessTokenView,
     RefreshTokenView,
@@ -114,6 +125,13 @@ from invana.server.modeller.admin import (
     TypePropertyMappingView,
     ValidationRuleView,
 )
+from invana.server.notifications.admin import (
+    NotificationChannelView,
+    NotificationCursorView,
+    NotificationDeliveryView,
+    NotificationRuleView,
+    NotificationView,
+)
 from invana.server.rules.admin import RuleVersionView, RuleView
 from invana.server.runtime.admin import (
     EmissionView,
@@ -123,6 +141,7 @@ from invana.server.runtime.admin import (
     TaskRunView,
     TaskStreamView,
 )
+from invana.server.schedules.admin import ScheduleFiringView, ScheduleView
 from invana.server.sessions.admin import (
     SessionMessageView,
     SessionView,
@@ -362,6 +381,25 @@ def mount_admin(app: FastAPI) -> None:
                 DatasetConformanceView(DatasetConformance, label="Dataset conformance", icon="fa fa-check-double"),
                 StandardView(Standard, label="Standards", icon="fa fa-ruler-combined"),
                 StandardVersionView(StandardVersion, label="Standard versions", icon="fa fa-clock-rotate-left"),
+            ],
+        ),
+    )
+
+    # ── Schedules, notifications, approvals (docs/for-developers/modules/operate/features/notifications.md)
+    # ──────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Schedules & notifications",
+            icon="fa fa-bell",
+            views=[
+                ScheduleView(Schedule, label="Schedules", icon="fa fa-clock"),
+                ScheduleFiringView(ScheduleFiring, label="Firings", icon="fa fa-bolt"),
+                NotificationRuleView(NotificationRule, label="Notification rules", icon="fa fa-filter"),
+                NotificationChannelView(NotificationChannel, label="Channels", icon="fa fa-tower-broadcast"),
+                NotificationView(Notification, label="Inbox rows", icon="fa fa-inbox"),
+                NotificationDeliveryView(NotificationDelivery, label="Deliveries", icon="fa fa-paper-plane"),
+                NotificationCursorView(NotificationCursor, label="Cursors", icon="fa fa-bookmark"),
+                ApprovalView(Approval, label="Approvals", icon="fa fa-stamp"),
             ],
         ),
     )

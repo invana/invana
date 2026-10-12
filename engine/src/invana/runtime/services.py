@@ -520,6 +520,57 @@ async def open_todo_run(
     return th
 
 
+async def open_schedule_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    schedule_id: str,
+    schedule_name: str,
+    instructions: str,
+    agent: Agent,
+    on_behalf_of_user_id: str,
+) -> TaskRun:
+    """Open the run a schedule's firing opens — a Todo's run with no Todo.
+
+    The instructions are the body and the agent carries them out, bounded by
+    its frozen lens like any run nobody was watching open
+    (docs/for-developers/modules/operate/features/schedules.md).
+    ``params.schedule_id`` names the schedule so the run reads as scheduled
+    from its own row.
+    """
+    th = TaskRun(
+        graph_id=graph.id,
+        author_id=on_behalf_of_user_id,
+        author_kind="user",
+        ask_kind="nl",
+        body=instructions,
+        params={"schedule_id": schedule_id},
+        workflow_key=NL_QUERY.key,
+        agent_id=agent.id,
+        agent_version=agent.version,
+        triggered_by=TriggeredBy.schedule.value,
+        on_behalf_of_user_id=on_behalf_of_user_id,
+        **await freeze_lens(db, graph_id=graph.id, agent_id=agent.id, lens_id=None),
+    )
+    db.add(th)
+    await db.flush()
+    _queue_opening(db, th, None, opening_for(agent, ask_kind="nl"))
+    await emit_event(
+        db,
+        action=actions.THINKING_OPEN,
+        target_kind=actions.TARGET_THINKING,
+        target_id=th.id,
+        graph_id=graph.id,
+        run_id=th.id,
+        actor_kind=ActorKind.agent,
+        actor_id=agent.id,
+        on_behalf_of_user_id=on_behalf_of_user_id,
+        details={"actor_name": agent.name, "schedule_id": schedule_id, "schedule": schedule_name},
+    )
+    await db.flush()
+    return th
+
+
 async def open_draft_run(
     db: AsyncSession,
     *,

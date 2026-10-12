@@ -37,11 +37,11 @@ Reading is never gated: every `GET` on a Graph is open to every member. A role g
 
 | Area | Role | Writes it covers (paths under `/api/v1/u/{username}/{graphSlug}`) |
 |---|---|---|
-| `ask` | viewer | `sessions…` · `explorer…` · `boards…` · `runs/{id}/answer · cancel · rerun · resume` · `connection/ping` |
-| `work` | contributor | `projects…` · `tasks…` |
+| `ask` | viewer | `sessions…` · `explorer…` · `boards…` · `runs/{id}/answer · cancel · rerun · resume` · `connection/ping` · `notifications/read` · `approvals…` |
+| `work` | contributor | `projects…` · `tasks…` · `schedules…` |
 | `build` | builder | `agents…` · `skills…` · `evals…` · `task-plans…` · `projection-templates…` · `runs/{id}/emissions/{id}/template` |
 | `model` | modeller | `models…` · `model-links…` · `rules…` · `projects/{key}/rules` · `govern…` · `dataset-bindings` · `connection/introspect` |
-| `settings` | owner | the Graph itself (`PATCH` · `DELETE`) · `connection…` · `setup…` · `default-agent` · `llm…` · `members…` |
+| `settings` | owner | the Graph itself (`PATCH` · `DELETE`) · `connection…` · `setup…` · `default-agent` · `llm…` · `members…` · `notifications…` (rules and channels) |
 
 ## Journey
 

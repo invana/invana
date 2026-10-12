@@ -10,6 +10,16 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from invana.activity.models import (  # noqa: F401
+    Approval,
+    Notification,
+    NotificationChannel,
+    NotificationCursor,
+    NotificationDelivery,
+    NotificationRule,
+    Schedule,
+    ScheduleFiring,
+)
 from invana.apps.agents.models import Agent  # noqa: F401
 from invana.apps.boards.models import Board, BoardVersion  # noqa: F401
 from invana.apps.datasets.models import (  # noqa: F401

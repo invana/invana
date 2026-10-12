@@ -57,7 +57,7 @@ this map.** Feature numbers do not change.
 | Exploration | `explorer` 4.1 · 4.3 · `queries` 3.1 · 4.4 · `boards` 4.2 |
 | Answers | `assistant` 3.2–3.3 · 3.5–3.8 · 3.10–3.13 · `projections` 3.4 · `memory` 8.x |
 | Work | `projects` 9.1 · 9.2 · 9.4 · 9.5 · 9.6 · 9.7 |
-| Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 |
+| Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 · `notifications` 10.7 · 10.8 |
 | Governance | `lenses` 14.x · `events` 10.2 |
 | Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
 
@@ -182,12 +182,14 @@ provider row and its models, and reopens four rows below. The shapes:
 
 | # | Feature | What it does | API | CLI | Studio | Slice |
 |---|---|---|---|---|---|---|
-| 10.1 | [Schedules](modules/operate/features/schedules.md) | Put a question, a task or a workflow on a cron; firings stack | 🔵 | — | 🔵 | S9.5 |
+| 10.1 | [Schedules](modules/operate/features/schedules.md) | An agent and instructions on a cron in a zone; every firing recorded; a missed-firing and an overlap policy; the result delivered to the inbox and channels | ✅ | ✅ | 🔵 | B08 |
 | 10.2 | [Audit and activity](modules/operate/features/audit-and-activity.md) | Every write is an event; every actor is a principal; retention lives here | 🟡 | — | 🟡 | S5.5 · S12a |
 | 10.3 | [Observability](modules/operate/features/observability.md) | Query and LLM metrics, cost and latency | 🔵 | — | 🔵 | S11 |
 | 10.4 | [External-agent API](modules/operate/features/external-agent-api.md) | Scoped tokens; retrieval with provenance | 🔵 | — | 🔵 | S10 |
 | 10.5 | [See what ran](modules/operate/features/see-what-ran.md) | **Runs** — every run in the Graph, children nested; Imports is a filter of it | 🟡 | — | 🟡 | S14 |
 | 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | 🔵 | B01 |
+| 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | 🔵 | B08 |
+| 10.8 | [Approvals](modules/operate/features/approvals.md) | Anything sent outside waits for a named approver; a reminder at half-time; at the deadline *expired, not sent* | ✅ | ✅ | 🔵 | B08 |
 
 
 ## 11 · [Identity and access](modules/identity-and-access/spec.md)
@@ -216,7 +218,7 @@ provider row and its models, and reopens four rows below. The shapes:
 |---|---|---|---|---|---|---|
 | 13.1 | [Design system](modules/platform/features/design-system.md) | Studio builds from `@invana/design-kit`, never beside it | — | — | 🟡 | — |
 | 13.2 | [Theming](modules/platform/features/theming.md) | Light · dark · theme variants, everywhere | — | — | ✅ | — |
-| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · standards · rules · members · search · models · loader` | — | 🟡 | — | — |
+| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · standards · rules · members · search · models · loader · schedules · approvals · notifications` | — | 🟡 | — | — |
 | 13.4 | [Logging](modules/platform/features/logging.md) | One call at startup; plain or JSON; every line carries its trace; lifecycle, not chatter | ✅ | ✅ | — | S1 |
 | 13.5 | [Telemetry](modules/platform/features/telemetry.md) | Traces, metrics and logs for everything a person or the system does — one trace per action from the Studio click through runs, queries and model calls, metrics that open it, logs that carry it; optional | ✅ | ✅ | ✅ | S1 |
 | 13.6 | [Admin and health](modules/platform/features/admin-and-health.md) | A generated browser over app state, and a readiness probe | ✅ | — | — | S1 |
@@ -272,11 +274,11 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 53 | 19 | 16 | 4 |
-| CLI | 14 | 10 | 3 | 65 |
-| Studio | 36 | 17 | 32 | 7 |
+| API | 56 | 19 | 15 | 4 |
+| CLI | 17 | 10 | 3 | 64 |
+| Studio | 36 | 17 | 34 | 7 |
 
-Ninety-two features. **These counts are the tables above, counted** — if a cell is flipped, they
+Ninety-four features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 

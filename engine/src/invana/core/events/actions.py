@@ -252,6 +252,31 @@ BOARD_CREATE = "board.create"
 BOARD_UPDATE = "board.update"
 BOARD_DELETE = "board.delete"
 
+# ── Schedules, notifications, approvals ───────────────────────────────────────
+# docs/for-developers/modules/operate/features/schedules.md · notifications.md ·
+# approvals.md. A rule never matches a delivery or a reminder, so nothing it
+# sends can wake it again.
+SCHEDULE_CREATE = "schedule.create"
+SCHEDULE_UPDATE = "schedule.update"
+SCHEDULE_PAUSE = "schedule.pause"
+SCHEDULE_RESUME = "schedule.resume"
+SCHEDULE_DELETE = "schedule.delete"
+SCHEDULE_FIRE = "schedule.fire"
+SCHEDULE_SKIP = "schedule.skip"
+NOTIFICATION_RULE_CREATE = "notification_rule.create"
+NOTIFICATION_RULE_UPDATE = "notification_rule.update"
+NOTIFICATION_RULE_DELETE = "notification_rule.delete"
+CHANNEL_CREATE = "channel.create"
+CHANNEL_DELETE = "channel.delete"
+DELIVERY_FAIL = "delivery.fail"
+APPROVAL_REQUEST = "approval.request"
+APPROVAL_APPROVE = "approval.approve"
+APPROVAL_DECLINE = "approval.decline"
+APPROVAL_EXPIRE = "approval.expire"
+APPROVAL_REMIND = "approval.remind"
+UNMATCHED_PREFIXES: tuple[str, ...] = ("delivery.", "notification.")
+UNMATCHED_ACTIONS: frozenset[str] = frozenset({APPROVAL_REMIND})
+
 # ── System-emitted events (actor_type=system) ─────────────────────────────────
 SYSTEM_CONNECTION_HEALTH_CHECK = "system.connection_health_check"
 SYSTEM_CONNECTION_RECONNECT = "system.connection_reconnect"
@@ -286,6 +311,11 @@ TARGET_THINKING = "run"
 TARGET_EVAL_SET = "eval_set"
 TARGET_WORKFLOW = "workflow"
 TARGET_TOKEN = "personal_access_token"
+TARGET_SCHEDULE = "schedule"
+TARGET_NOTIFICATION_RULE = "notification_rule"
+TARGET_CHANNEL = "channel"
+TARGET_DELIVERY = "delivery"
+TARGET_APPROVAL = "approval"
 
 
 # ── The change log (docs/for-developers/modules/operate/features/change-log.md)

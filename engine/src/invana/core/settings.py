@@ -89,6 +89,17 @@ class Settings(BaseSettings):
     # Fraction of new root traces kept (0 to 1); traces with a parent follow the parent's decision.
     telemetry_sample_ratio: float = Field(default=1.0, ge=0, le=1)
 
+    # Notifications — email channels send through this SMTP server; none configured
+    # means an email delivery fails saying so (docs/for-developers/modules/operate/features/notifications.md).
+    smtp_host: str = ""  # INVANA_SMTP_HOST
+    smtp_port: int = 587  # INVANA_SMTP_PORT
+    smtp_username: str = ""  # INVANA_SMTP_USERNAME
+    smtp_password: str = ""  # INVANA_SMTP_PASSWORD
+    smtp_from: str = ""  # INVANA_SMTP_FROM
+    smtp_starttls: bool = True  # INVANA_SMTP_STARTTLS
+    # How often the clock fires schedules, matches rules, reminds, expires and sends; 0 turns it off.
+    clock_interval_s: int = 30  # INVANA_CLOCK_INTERVAL_S
+
     # Graphs — runtime connection pool
     encryption_key: str = ""  # INVANA_ENCRYPTION_KEY — required in production; 32-byte URL-safe base64 Fernet key
     graph_health_interval_s: int = 30  # INVANA_GRAPH_HEALTH_INTERVAL_S

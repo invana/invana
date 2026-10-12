@@ -29,6 +29,9 @@ Studio.
 | `invana members list · add · set-roles · remove` | A Graph's members and their Graph roles (`--role`, repeatable); the last owner cannot be removed or demoted — [11.4](../../identity-and-access/features/membership.md) · [11.6](../../identity-and-access/features/roles.md) |
 | `invana projects list · create · show` · `invana branches list · fork · decide · merge` · `invana findings add · review` · `invana proposals list · accept · reject` | A project of a type (`--private` for only its people), its branches, evidence with a stance, and decisions the rules check — superseded, never edited — [9.5](../../work/features/branches-and-decisions.md) · [9.7](../../work/features/private-projects.md) |
 | `invana reports generate · publish · export` | A project's report drawn from its records, published as frozen versions, exported as Markdown — [9.6](../../work/features/project-reports.md) |
+| `invana schedules list · create --file · show · pause · resume · run-now · delete` | A Graph's schedules, as `--user`: apply a schedule file, read its firings, fire one now — [10.1](../../operate/features/schedules.md) |
+| `invana approvals list · approve · decline` | What waits on `--user` to leave Invana, and the decision with a note — [10.8](../../operate/features/approvals.md) |
+| `invana notifications list · read` · `invana notifications rules list · apply --file` · `invana notifications channels list · add · remove` | The inbox, the rules that fill it and the channels they send to — [10.7](../../operate/features/notifications.md) |
 | `invana search "<text>"` | The ⌘K search from a terminal, as `--user`, over every Graph they are in or one `--graph` — [13.10](search.md) |
 | `invana models export · import · upgrade` | Moves a domain model between Graphs |
 | `invana models starters` | Lists the shipped starter models |

@@ -118,7 +118,7 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Run frame** | One frame of a TaskRun's stream: a Task transition, a reasoning line, an emission arriving. `TaskStream` is the log of them, and its `seq` is the resume cursor. |
 | **Session** | A named thread of asks, assigned to an agent. It references Todos; it is not one — a conversation never runs and has no outcome. |
 | **Clarification** | A pause *inside* a Task: the agent does not know something and asks, with options. Its answer is an **answer**. A `role=plan` run raises one rather than guessing an ambiguous instruction. |
-| **Approval** | A pause *before* a Task is dispatched: the agent may not proceed alone. Its answer is a **decision** — approve · reject. Nothing has been spent, and **only a person may answer one**. |
+| **Approval** | A pause *before* a Task is dispatched: the agent may not proceed alone. Its answer is a **decision** — approve · reject. Nothing has been spent, and **only a person may answer one**. The same record holds anything about to leave Invana — a schedule's delivery to a channel — until a **named approver** decides; at its deadline it is *expired, not sent*, never approved ([10.8](modules/operate/features/approvals.md)). |
 | **Verdict** | A pause *after* a pass produced output: the agent may not judge its own work. Its answer is a **verdict** — accept · revise, with a note bound into the next pass. The pass is already paid for, so it is bounded by `max_iterations` **and** a deadline. [13.8 §10](modules/platform/features/runtime.md) |
 | **Iteration** | One serial pass of a `loop` node. Distinct from a **lane** (one parallel element of a fan-out) and an **attempt** (one retry of a failure). All three nest, and each is its own row. |
 | **Cannot answer** | The graph does not hold it. Deliberately not answer-shaped, and distinct from a failure — and distinct from **outside the lens**, which names a setting the user can widen. |
@@ -179,7 +179,9 @@ sub-slots, the URL params and the retired words are in
 | **Wave** | Dependency depth. The Plan canvas groups by it. |
 | **Critical path** | The longest success chain. Failure edges never inflate it. |
 | **Review** | The one queue for everything waiting on a person: **clarifications, approvals and verdicts** each stop a run; results need accepting; proposals wait. |
-| **Schedule** | A cron naming a **TaskPlan**. A **firing** is one occurrence. One kind of schedule: whether a firing creates work a person accepts is a property of what it names, not of the schedule. |
+| **Schedule** | An agent and its instructions on a cron, with where the result is delivered. A **firing** is one occurrence, recorded whether it ran or not; a **missed** firing is one the clock reached late, handled by the schedule's policy (`catch_up · run_all · skip`). One kind of schedule: whether a firing creates work a person accepts is the run's business, not the schedule's. |
+| **Notification rule** | Which events reach whom, on which **channels**. A **channel** is email · Slack · webhook — never the inbox, which every rule may also write to. |
+| **Inbox** | One person's notifications on a Graph, with the approvals waiting on them. A **notification** is one row; a **delivery** is one send to one channel. |
 
 ## 7. Actors
 

@@ -79,6 +79,9 @@ const ENGINE_ONLY = {
 	members:
 		"members and Graph roles; the Modeller's settings read them from C07",
 	search: "access-filtered search; ⌘K reads it from C07",
+	schedules: "schedules and their firings; Studio reads them from C05",
+	notifications: "the inbox, rules and channels; Studio reads them from C05",
+	approvals: "the approvals inbox; Studio reads it from C05",
 	routes: "shared route helpers",
 	__pycache__: "bytecode",
 };

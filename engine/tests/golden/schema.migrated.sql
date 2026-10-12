@@ -42,6 +42,32 @@ CREATE TABLE alembic_version (
 	CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
 );
 
+CREATE TABLE approvals (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	subject_kind VARCHAR(16) NOT NULL, 
+	subject_id VARCHAR(36) NOT NULL, 
+	run_id VARCHAR(36), 
+	schedule_id VARCHAR(36), 
+	title VARCHAR(255) NOT NULL, 
+	payload JSON NOT NULL, 
+	approver_ids JSON NOT NULL, 
+	requested_by_id VARCHAR(36), 
+	deadline_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	reminded_at TIMESTAMP WITH TIME ZONE, 
+	status VARCHAR(16) NOT NULL, 
+	decided_by_id VARCHAR(36), 
+	decided_at TIMESTAMP WITH TIME ZONE, 
+	note TEXT NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE, 
+	CONSTRAINT approvals_pkey PRIMARY KEY (id), 
+	CONSTRAINT approvals_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_approvals_graph_id ON approvals (graph_id);
+
+CREATE INDEX ix_approvals_pending ON approvals (status, deadline_at);
+
 CREATE TABLE board_versions (
 	id VARCHAR(36) NOT NULL, 
 	board_id VARCHAR(36) NOT NULL, 
@@ -650,6 +676,103 @@ CREATE TABLE node_type_definitions (
 	CONSTRAINT uq_version_node_type UNIQUE NULLS DISTINCT (version_id, name)
 );
 
+CREATE TABLE notification_channels (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(128) NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	target VARCHAR(512) NOT NULL, 
+	secret_encrypted BYTEA, 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE, 
+	CONSTRAINT notification_channels_pkey PRIMARY KEY (id), 
+	CONSTRAINT notification_channels_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_notification_channel_name UNIQUE NULLS DISTINCT (graph_id, name)
+);
+
+CREATE INDEX ix_notification_channels_graph_id ON notification_channels (graph_id);
+
+CREATE TABLE notification_cursors (
+	name VARCHAR(32) NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	event_id VARCHAR(36) NOT NULL, 
+	CONSTRAINT notification_cursors_pkey PRIMARY KEY (name)
+);
+
+CREATE TABLE notification_deliveries (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	channel_id VARCHAR(36), 
+	rule_id VARCHAR(36), 
+	event_id VARCHAR(36), 
+	firing_id VARCHAR(36), 
+	approval_id VARCHAR(36), 
+	status VARCHAR(16) NOT NULL, 
+	payload JSON NOT NULL, 
+	attempts INTEGER NOT NULL, 
+	error TEXT NOT NULL, 
+	sent_at TIMESTAMP WITH TIME ZONE, 
+	created_at TIMESTAMP WITH TIME ZONE, 
+	CONSTRAINT notification_deliveries_pkey PRIMARY KEY (id), 
+	CONSTRAINT notification_deliveries_channel_id_fkey FOREIGN KEY(channel_id) REFERENCES notification_channels (id) ON DELETE SET NULL, 
+	CONSTRAINT notification_deliveries_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_delivery_event_rule UNIQUE NULLS DISTINCT (channel_id, event_id, rule_id)
+);
+
+CREATE INDEX ix_notification_deliveries_approval_id ON notification_deliveries (approval_id);
+
+CREATE INDEX ix_notification_deliveries_channel_id ON notification_deliveries (channel_id);
+
+CREATE INDEX ix_notification_deliveries_firing_id ON notification_deliveries (firing_id);
+
+CREATE INDEX ix_notification_deliveries_status ON notification_deliveries (status, created_at);
+
+CREATE TABLE notification_rules (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(128) NOT NULL, 
+	events JSON NOT NULL, 
+	match JSON NOT NULL, 
+	member_ids JSON NOT NULL, 
+	roles JSON NOT NULL, 
+	requester BOOLEAN NOT NULL, 
+	in_app BOOLEAN NOT NULL, 
+	channel_ids JSON NOT NULL, 
+	enabled BOOLEAN NOT NULL, 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE, 
+	updated_at TIMESTAMP WITH TIME ZONE, 
+	CONSTRAINT notification_rules_pkey PRIMARY KEY (id), 
+	CONSTRAINT notification_rules_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_notification_rule_name UNIQUE NULLS DISTINCT (graph_id, name)
+);
+
+CREATE INDEX ix_notification_rules_graph_id ON notification_rules (graph_id);
+
+CREATE TABLE notifications (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	user_id VARCHAR(36) NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	title VARCHAR(255) NOT NULL, 
+	body TEXT NOT NULL, 
+	event_id VARCHAR(36), 
+	rule_id VARCHAR(36), 
+	approval_id VARCHAR(36), 
+	schedule_id VARCHAR(36), 
+	run_id VARCHAR(36), 
+	target_kind VARCHAR(32), 
+	target_id VARCHAR(36), 
+	read_at TIMESTAMP WITH TIME ZONE, 
+	created_at TIMESTAMP WITH TIME ZONE, 
+	CONSTRAINT notifications_pkey PRIMARY KEY (id), 
+	CONSTRAINT notifications_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT notifications_user_id_fkey FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_notification_event_rule UNIQUE NULLS DISTINCT (user_id, event_id, rule_id)
+);
+
+CREATE INDEX ix_notifications_inbox ON notifications (graph_id, user_id, created_at);
+
 CREATE TABLE personal_access_tokens (
 	id VARCHAR(36) NOT NULL, 
 	user_id VARCHAR(36) NOT NULL, 
@@ -961,6 +1084,62 @@ CREATE INDEX ix_run_touches_address ON run_touches (address);
 CREATE INDEX ix_run_touches_graph_id ON run_touches (graph_id);
 
 CREATE INDEX ix_run_touches_run_id ON run_touches (run_id);
+
+CREATE TABLE schedule_firings (
+	id VARCHAR(36) NOT NULL, 
+	schedule_id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	due_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	fired_at TIMESTAMP WITH TIME ZONE, 
+	outcome VARCHAR(16) NOT NULL, 
+	catch_up BOOLEAN NOT NULL, 
+	manual BOOLEAN NOT NULL, 
+	run_id VARCHAR(36), 
+	reason VARCHAR(255) NOT NULL, 
+	delivered_at TIMESTAMP WITH TIME ZONE, 
+	actor_id VARCHAR(36), 
+	CONSTRAINT schedule_firings_pkey PRIMARY KEY (id), 
+	CONSTRAINT schedule_firings_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT schedule_firings_run_id_fkey FOREIGN KEY(run_id) REFERENCES task_runs (id) ON DELETE SET NULL, 
+	CONSTRAINT schedule_firings_schedule_id_fkey FOREIGN KEY(schedule_id) REFERENCES schedules (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_schedule_firing_due UNIQUE NULLS DISTINCT (schedule_id, due_at)
+);
+
+CREATE INDEX ix_schedule_firings_graph_id ON schedule_firings (graph_id);
+
+CREATE INDEX ix_schedule_firings_schedule_id ON schedule_firings (schedule_id);
+
+CREATE TABLE schedules (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(128) NOT NULL, 
+	agent_id VARCHAR(36), 
+	instructions TEXT NOT NULL, 
+	cron VARCHAR(128) NOT NULL, 
+	timezone VARCHAR(64) NOT NULL, 
+	status VARCHAR(16) NOT NULL, 
+	missed VARCHAR(16) NOT NULL, 
+	overlap VARCHAR(16) NOT NULL, 
+	deliver_in_app BOOLEAN NOT NULL, 
+	recipient_ids JSON NOT NULL, 
+	channel_ids JSON NOT NULL, 
+	approve_outward BOOLEAN NOT NULL, 
+	approver_ids JSON NOT NULL, 
+	approval_deadline_s INTEGER NOT NULL, 
+	next_fire_at TIMESTAMP WITH TIME ZONE, 
+	owner_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE, 
+	updated_at TIMESTAMP WITH TIME ZONE, 
+	CONSTRAINT schedules_pkey PRIMARY KEY (id), 
+	CONSTRAINT schedules_agent_id_fkey FOREIGN KEY(agent_id) REFERENCES agents (id) ON DELETE SET NULL, 
+	CONSTRAINT schedules_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT schedules_owner_id_fkey FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT uq_schedule_name UNIQUE NULLS DISTINCT (graph_id, name)
+);
+
+CREATE INDEX ix_schedules_due ON schedules (status, next_fire_at);
+
+CREATE INDEX ix_schedules_graph_id ON schedules (graph_id);
 
 CREATE TABLE schema_projections (
 	id VARCHAR(36) NOT NULL, 

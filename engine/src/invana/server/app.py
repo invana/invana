@@ -149,6 +149,14 @@ async def lifespan(app: FastAPI):
         app.state.query_log = query_log
         set_query_observer(query_log.submit)
         query_log_task = asyncio.create_task(query_log.run(), name="query-log")
+
+        # docs/for-developers/modules/operate/features/notifications.md — the
+        # clock: schedules, deliveries, notification rules and approval deadlines.
+        from invana.activity.clock import ClockLoop
+
+        clock = ClockLoop(session_factory, submit=task_runtime.submit, interval_s=settings.clock_interval_s)
+        app.state.clock = clock
+        clock.start()
         log.info(
             "startup finished",
             extra={
@@ -161,6 +169,7 @@ async def lifespan(app: FastAPI):
     yield
 
     set_query_observer(None)
+    await clock.stop()
     query_log_task.cancel()
     await task_runtime.shutdown()
     await event_broadcaster.stop()
@@ -173,6 +182,7 @@ def create_app() -> FastAPI:
     """Build and return the Invana FastAPI application."""
     from invana.server.admin.views import mount_admin
     from invana.server.agents.routes import agents_router, atlas_agent_router
+    from invana.server.approvals.routes import approvals_router
     from invana.server.boards.routes import boards_router
     from invana.server.datasets.routes import dataset_bindings_router, datasets_router
     from invana.server.evals.routes import evals_router
@@ -183,6 +193,7 @@ def create_app() -> FastAPI:
     from invana.server.history.routes import history_router
     from invana.server.llm_providers.routes import llm_providers_router
     from invana.server.members.routes import members_router
+    from invana.server.notifications.routes import notifications_router
     from invana.server.routes.auth import auth_router
     from invana.server.routes.events import events_router, graph_events_router
     from invana.server.routes.model_links import model_links_router
@@ -192,6 +203,7 @@ def create_app() -> FastAPI:
     from invana.server.runtime.catalogue import catalogue_router
     from invana.server.runtime.runs import runs_router
     from invana.server.runtime.templates import templates_router
+    from invana.server.schedules.routes import schedules_router
     from invana.server.search.routes import search_router
     from invana.server.sessions.routes import sessions_router
     from invana.server.skills.routes import skills_router
@@ -287,6 +299,9 @@ def create_app() -> FastAPI:
     app.include_router(datasets_router)
     app.include_router(dataset_bindings_router)
     app.include_router(standards_router)
+    app.include_router(schedules_router)
+    app.include_router(notifications_router)
+    app.include_router(approvals_router)
 
     # Proxy the studio's browser OTLP/HTTP span export to the collector.
     # Always mounted: the studio exports on its own gate, so a route that

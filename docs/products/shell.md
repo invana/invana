@@ -124,11 +124,11 @@ One binary, `invana`, for every product. Prerequisites are in the [README](READM
 | `invana members list` · `add --role` · `remove` | Graph roles: viewer · contributor · builder · modeller · owner | New · P-18 |
 | `invana runs list` · `show` · `log` · `cancel` | the journal across products | New |
 | `invana runs rerun <id> --same-versions \| --current` | reproduce on the versions it used, or compare on current | New · P-17 |
-| `invana schedules list` · `create --file` · `show` · `pause` · `resume` · `run-now` · `delete` | shared schedules, with delivery and missed-firing policy | New · P-13 |
-| `invana approvals list` · `approve` · `decline` | what waits on you | New · P-13 |
+| `invana schedules list` · `create --file` · `show` · `pause` · `resume` · `run-now` · `delete` | shared schedules, with delivery and missed-firing policy | ✅ B08 |
+| `invana approvals list` · `approve` · `decline` | what waits on you | ✅ B08 |
 | `invana events list [--changes]` · `tail` | every write; `--changes` is the change log | New · P-09 |
 | `invana changes show <record>` · `compare <a> <b>` | a record's versions, and two of them side by side | New · P-09 |
-| `invana notifications rules list` · `apply --file` · `channels list` | who hears what, on which channel | New · P-13 |
+| `invana notifications list` · `read` · `rules list` · `rules apply --file` · `channels list` · `add` · `remove` | the inbox; who hears what, on which channel | ✅ B08 |
 | `invana search "<text>"` | the ⌘K search, from the terminal | New · P-18 (access filter) |
 
 ## Decisions

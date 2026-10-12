@@ -2519,5 +2519,5 @@ Stated so nobody mistakes this document for finished.
 | Cloning a reusable Task on use | definitions would drift, and *which copy is right* becomes a real question |
 | A plugin-registerable catalogue | the closed set *is* the policy. Users compose Tasks; they never invent callables |
 | Auto-approval · auto-acceptance | a rule that decides on the agent's behalf is the switch these pauses exist to replace |
-| Backfill · catchup · polling sensors | a missed firing is recorded as missed. A run waits on a person or an event, never on a spin loop |
+| Backfill · polling sensors | a missed firing is recorded and handled by its schedule's policy — one catch-up run, every missed one (at most 24), or none ([SC4](modules/operate/features/schedules.md#decisions)). A run waits on a person or an event, never on a spin loop |
 | Distributed workers · per-step CPU limits | the runtime is in-process; a pool is how a heavy Task is rationed |
