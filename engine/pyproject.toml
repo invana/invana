@@ -56,6 +56,9 @@ sim-genomic = []
 tools-web = []
 tools-mail = []
 tools-science = []
+# MCP plugins: an MCP server's tools as task types, over the official SDK's Streamable HTTP
+# client (docs/for-developers/modules/platform/features/mcp-plugins.md).
+mcp = ["mcp>=1.29"]
 # The distributed executor (`INVANA_EXECUTOR=procrastinate`, `invana worker`). Postgres-only,
 # so a SQLite dev install never needs it (docs/for-developers/modules/platform/features/tool-plugins.md).
 workers = [
@@ -69,6 +72,7 @@ all = [
     "invana-engine[tools-web]",
     "invana-engine[tools-mail]",
     "invana-engine[tools-science]",
+    "invana-engine[mcp]",
     "invana-engine[workers]",
 ]
 
@@ -176,6 +180,8 @@ ignore = [
 "src/invana/plugins/core/work_write/**" = ["PLC0415"]
 # procrastinate is the optional `workers` extra; the queue imports it on first use.
 "src/invana/plugins/queue.py" = ["PLC0415"]
+# The MCP SDK is the optional `mcp` extra; the client imports it on first call.
+"src/invana/plugins/mcp/client.py" = ["PLC0415"]
 # Alembic revisions import the registry lazily so the seed and the runtime
 # cannot drift; a top-level import would run at Alembic discovery time.
 "src/invana/core/migrations/versions/*" = ["PLC0415"]

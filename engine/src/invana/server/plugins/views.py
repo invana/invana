@@ -1,8 +1,10 @@
 """HTTP views for the plugin registry.
 
-docs/for-developers/modules/platform/features/tool-plugins.md. Any signed-in
-user reads the registry; enabling or disabling is an install Admin's, and the
-manager decides that — a view parses, calls ``PluginManager`` and returns.
+docs/for-developers/modules/platform/features/tool-plugins.md and
+docs/for-developers/modules/platform/features/mcp-plugins.md. Any signed-in
+user reads the registry; enabling, disabling and adding or refreshing an MCP
+server are an install Admin's, and the manager decides that — a view parses,
+calls ``PluginManager`` or ``McpManager`` and returns.
 """
 
 from __future__ import annotations
@@ -13,10 +15,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
-from invana.runtime.managers import PluginManager
-from invana.runtime.schemas import PluginDetail, PluginListResponse, PluginSummary, TaskTypeRead
+from invana.runtime.managers import McpManager, PluginManager
+from invana.runtime.schemas import (
+    McpServerAdd,
+    McpServerRead,
+    PluginDetail,
+    PluginListResponse,
+    PluginSummary,
+    TaskTypeRead,
+)
 
 plugins = PluginManager()
+mcp = McpManager()
 
 
 async def list_plugins(
@@ -57,3 +67,19 @@ async def get_task_type(
     session: AsyncSession = Depends(get_session),
 ) -> TaskTypeRead:
     return await plugins.task_type(session, ref)
+
+
+async def add_mcp_server(
+    body: McpServerAdd,
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> McpServerRead:
+    return await mcp.add(session, name=body.name, url=body.url, actor=user)
+
+
+async def refresh_mcp_server(
+    name: str,
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> McpServerRead:
+    return await mcp.refresh(session, name=name, actor=user)

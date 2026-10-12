@@ -1,4 +1,4 @@
-"""Queries against ``plugin_states`` and ``envelope_outcomes``, and how often a task type ran."""
+"""Queries against ``plugin_states``, ``envelope_outcomes`` and ``mcp_servers``, and how often a task type ran."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.runtime.models import EnvelopeOutcome, PluginState, TaskRun
+from invana.runtime.models import EnvelopeOutcome, McpServer, PluginState, TaskRun
 
 
 class TaskTypeUsageQuerySet:
@@ -42,6 +42,19 @@ class EnvelopeOutcomeQuerySet:
 
     async def add(self, session: AsyncSession, *, idempotency_key: str, run_id: str, outcome: dict) -> EnvelopeOutcome:
         row = EnvelopeOutcome(idempotency_key=idempotency_key, run_id=run_id, outcome=outcome)
+        session.add(row)
+        await session.flush()
+        return row
+
+
+class McpServerQuerySet:
+    async def all(self, session: AsyncSession) -> list[McpServer]:
+        return list(await session.scalars(select(McpServer).order_by(McpServer.name)))
+
+    async def get(self, session: AsyncSession, name: str) -> McpServer | None:
+        return await session.get(McpServer, name)
+
+    async def add(self, session: AsyncSession, row: McpServer) -> McpServer:
         session.add(row)
         await session.flush()
         return row

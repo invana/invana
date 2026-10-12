@@ -521,17 +521,19 @@ class PluginBase(BaseModel):
     """What a plugin is and whether it may run — shared by the summary and the detail."""
 
     name: str
-    #: ``core`` · ``simulator`` · ``tool``.
+    #: ``core`` · ``simulator`` · ``tool`` · ``mcp``.
     kind: str
     version: str
     title: str = ""
     #: The pip extra that installs it; empty for a core plugin.
     extra: str = ""
-    #: False for a tool plugin whose extra is missing.
+    #: False for a tool plugin whose extra is missing, or an MCP plugin this process has not loaded.
     installed: bool
     enabled: bool
-    #: Whether an install Admin may enable or disable it — tool plugins only.
+    #: Whether an install Admin may enable or disable it — tool and MCP plugins.
     switchable: bool
+    #: An MCP plugin stored at a revision this process has not loaded — restart to load it.
+    restart_required: bool = False
 
 
 class PluginSummary(PluginBase):
@@ -593,6 +595,38 @@ class PluginDetail(PluginBase):
     task_types: list[TaskManifestRead]
     flows: list[PluginFlowRead]
     skills: list[PluginSkillRead]
+
+
+class McpServerAdd(BaseModel):
+    #: ``[a-z][a-z0-9_]{0,31}`` — the plugin is ``invana.mcp.<name>``.
+    name: str
+    #: The server's Streamable HTTP endpoint.
+    url: str
+
+
+class McpToolRead(BaseModel):
+    key: str
+    version: str
+    side_effect: str
+    summary: str
+
+
+class McpServerRead(BaseModel):
+    """An MCP server as stored, and whether this process serves that revision."""
+
+    name: str
+    plugin: str
+    url: str
+    revision: int
+    #: The revision this process loaded at start-up; null when it loaded none.
+    loaded_revision: int | None
+    restart_required: bool
+    tools: list[McpToolRead]
+    #: Tool names that could not be keyed.
+    skipped: list[str]
+    #: ``{name, version, protocol}`` from the server's ``initialize``.
+    server: dict
+    frozen_at: datetime
 
 
 class TaskTypeRead(TaskManifestRead):

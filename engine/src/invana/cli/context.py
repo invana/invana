@@ -104,17 +104,22 @@ async def as_user(user_ref: str):
 async def with_runtime():
     """An in-process ``TaskRuntime`` over its own engine and graph connections.
 
-    A ``send`` step held here waits on the same approvals inbox the API uses.
+    The stored MCP servers are loaded into the registry first, as the API does
+    at start-up. A ``send`` step held here waits on the same approvals inbox the
+    API uses.
     """
     from invana.activity.managers import ApprovalSendGate
     from invana.apps.graphs.pool import GraphConnectionManager
     from invana.core.settings import settings
     from invana.runtime.interpreter import TaskRuntime
+    from invana.runtime.managers import McpManager
 
     TaskRuntime.send_gate = ApprovalSendGate()
 
     engine = await create_db_engine()
     factory = create_session_factory(engine)
+    async with factory() as db:
+        await McpManager().load(db)
     manager = GraphConnectionManager(session_factory=factory, encryption_key=settings.encryption_key)
     await manager.startup()
     try:

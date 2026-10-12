@@ -63,6 +63,24 @@ CATALOGUE: dict[str, Entry] = dict(load_plugins().tasks)
 #: What the interpreter dispatches — derived, never authored beside CATALOGUE.
 TASKS = {key: entry.run for key, entry in CATALOGUE.items()}
 
+
+def sync() -> None:
+    """Re-derive ``CATALOGUE`` and ``TASKS`` in place from the registry as it now stands.
+
+    Called once at start-up, after :func:`invana.plugins.install_mcp` has added
+    the MCP plugins — the two dicts are imported by name everywhere, so they
+    are updated rather than rebound.
+    """
+    tasks = load_plugins().tasks
+    for key in [k for k in CATALOGUE if k not in tasks]:
+        del CATALOGUE[key]
+        TASKS.pop(key, None)
+    for key, entry in tasks.items():
+        if CATALOGUE.get(key) is not entry:
+            CATALOGUE[key] = entry
+            TASKS[key] = entry.run
+
+
 __all__ = [
     "CATALOGUE",
     "TASKS",
@@ -100,6 +118,7 @@ __all__ = [
     "snapshot_model",
     "spawn_agent",
     "stitch",
+    "sync",
     "translate_thought",
     "understand_ask",
     "understand_intent",

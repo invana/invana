@@ -5,6 +5,7 @@ from invana.runtime.managers.agent_lifecycle import AgentLifecycleManager
 from invana.runtime.managers.catalogue import CatalogueManager
 from invana.runtime.managers.dataset_bind import DatasetBindManager
 from invana.runtime.managers.evals import EvalManager
+from invana.runtime.managers.mcp import McpManager
 from invana.runtime.managers.plan_performance import PlanPerformanceManager
 from invana.runtime.managers.plugins import PluginManager
 from invana.runtime.managers.rule_checks import RuleCheckManager
@@ -23,6 +24,7 @@ __all__ = [
     "CatalogueManager",
     "DatasetBindManager",
     "EvalManager",
+    "McpManager",
     "PlanPerformanceManager",
     "PluginManager",
     "RuleCheckManager",

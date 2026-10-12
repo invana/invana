@@ -16,8 +16,8 @@ executor carries it. Two context sources feed that one call:
 
 | Step | Runs |
 |---|---|
-| A **tool** plugin's, not enabled | nowhere: ``blocked · plugin_disabled``, naming ``invana plugins enable`` |
-| A tool plugin's, under ``procrastinate`` | on the ``tools`` queue; the pass polls the outcome row |
+| A **tool** or **MCP** plugin's, not enabled | ``blocked · plugin_disabled``, naming ``invana plugins enable`` |
+| A tool or MCP plugin's, under ``procrastinate`` | on the ``tools`` queue; the pass polls the outcome row |
 | Any other — every core step, every step under ``inline`` | ``run_envelope`` in this process |
 
 Only tool steps go to the queue: core steps hand state to each other on
@@ -43,7 +43,7 @@ from invana.plugins.envelope import TaskEnvelope
 from invana.plugins.sdk.manifest import TaskManifest
 from invana.plugins.worker import run_envelope
 from invana.runtime.catalogue import TASKS, RunVars, TaskContext, TaskFailure
-from invana.runtime.managers.plugins import PluginManager
+from invana.runtime.managers.plugins import SWITCHABLE, PluginManager
 from invana.runtime.models import TaskRun
 from invana.runtime.querysets.task_run import TaskRunQuerySet
 from invana.runtime.stream import Emitter
@@ -131,11 +131,14 @@ QUEUE_WAIT_S = 120
 
 
 def tool_manifest(task_key: str) -> TaskManifest | None:
-    """The manifest of ``task_key`` when a **tool** plugin declares it, else None."""
+    """The manifest of ``task_key`` when a **tool** or **MCP** plugin declares it, else None.
+
+    Those are the switchable kinds, and their steps are the ones that run in a worker.
+    """
     registry = load_plugins()
     manifest = registry.task(task_key)
     plugin = registry.plugins.get(manifest.plugin) if manifest else None
-    return manifest if plugin is not None and plugin.manifest.kind == "tool" else None
+    return manifest if plugin is not None and plugin.manifest.kind in SWITCHABLE else None
 
 
 async def refuse_disabled(db: AsyncSession, manifest: TaskManifest) -> None:

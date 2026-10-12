@@ -29,6 +29,9 @@ tool plugin whose extra is missing is kept in :attr:`Registry.missing` — its
 manifest only, so the registry can say what would install it. Whether an
 installed tool plugin is *enabled* is not the registry's business: that is a
 gate checked at dispatch, and the loaded set stays closed.
+A fourth kind, **mcp**, is not on disk: each MCP server an Admin added is
+stored in the app DB and handed to :func:`build_registry` once at start-up
+(docs/for-developers/modules/platform/features/mcp-plugins.md).
 A simulator plugin contributes exactly one simulator — one task type held to
 the simulator contract (:func:`_check_simulator`) and the one ``simulate`` flow
 that runs it — and is listed in :attr:`Registry.simulators` as well as among the
@@ -370,8 +373,9 @@ def _check_simulator(plugin: LoadedPlugin, path: Path) -> None:
         raise PluginError(f"{path}: flow '{flow.key}' must be kind 'simulate' with one step running '{task.key}'")
 
 
-def build_registry() -> Registry:
-    """Every core plugin in load order, then every simulator, then every tool plugin whose extra is installed."""
+def build_registry(mcp: tuple[LoadedPlugin, ...] = ()) -> Registry:
+    """Every core plugin in load order, then every simulator, then every tool plugin whose extra is
+    installed, then the ``mcp`` plugins read from the app DB at start-up."""
     core = tuple(load_plugin(CORE_DIR / name, f"invana.plugins.core.{name}") for name in CORE_PLUGINS)
     simulators = tuple(
         load_plugin(SIMULATORS_DIR / name, f"invana.plugins.simulators.{name}") for name in SIMULATOR_PLUGINS
@@ -386,4 +390,6 @@ def build_registry() -> Registry:
             tools.append(load_plugin(TOOLS_DIR / name, f"invana.plugins.tools.{name}"))
         else:
             missing.append(manifest)
-    return Registry(core + simulators + tuple(tools), tuple(missing))
+    if any(p.manifest.kind != "mcp" for p in mcp):
+        raise PluginError("only mcp plugins are installed from the app DB")
+    return Registry(core + simulators + tuple(tools) + mcp, tuple(missing))

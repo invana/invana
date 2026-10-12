@@ -52,7 +52,7 @@ engine/src/invana/plugins/
 │   └── science/           pubmed.search · uniprot.get · pubchem.get      → invana[tools-science]
 ├── simulators/
 │   └── genomic/           sim.genomic_prediction                         → invana[sim-genomic]
-└── mcp/                   turns an enabled MCP server's tools into task types, frozen at enable time
+└── mcp/                   turns an added MCP server's tools into task types, frozen when added — 13.13
 ```
 
 ### One plugin
@@ -208,8 +208,8 @@ flowchart LR
 | Surface | What |
 |---|---|
 | Studio | **Agents › Plugins** — the registry: every plugin (core, tool, simulator, MCP), its task types with their manifests and versions, its skills and flows, enabled or not, who may call them, how often they run |
-| CLI | `invana plugins list` · `show <plugin>` · `enable <plugin>` · `disable <plugin>` · `invana tasks show <key>[@version]` · `invana worker` · `invana plugins mcp add <url>` (B07) |
-| API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` · `GET /api/v1/task-types/{ref}` — [13.12](../for-developers/modules/platform/features/tool-plugins.md) |
+| CLI | `invana plugins list` · `show <plugin>` · `enable <plugin>` · `disable <plugin>` · `invana tasks show <key>[@version]` · `invana worker` · `invana plugins mcp add <url> --name <name>` · `mcp refresh <name>` ([13.13](../for-developers/modules/platform/features/mcp-plugins.md)) |
+| API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` · `GET /api/v1/task-types/{ref}` — [13.12](../for-developers/modules/platform/features/tool-plugins.md) · `POST /plugins/mcp` · `/plugins/mcp/{name}/refresh` — [13.13](../for-developers/modules/platform/features/mcp-plugins.md) |
 | Access | Only an install Admin enables a plugin; worlds and guardrails decide which agents may call its task types |
 
 ## 10. Changes to existing docs, applied when B06 lands

@@ -641,6 +641,18 @@ CREATE TABLE llm_providers (
 
 CREATE INDEX ix_llm_providers_graph_id ON llm_providers (graph_id);
 
+CREATE TABLE mcp_servers (
+	name VARCHAR(32) NOT NULL, 
+	url VARCHAR(2048) NOT NULL, 
+	revision INTEGER NOT NULL, 
+	tools JSON NOT NULL, 
+	skipped JSON NOT NULL, 
+	server JSON NOT NULL, 
+	frozen_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	added_by_id VARCHAR(36), 
+	PRIMARY KEY (name)
+);
+
 CREATE TABLE model_links (
 	id VARCHAR(36) NOT NULL, 
 	graph_id VARCHAR(36) NOT NULL, 

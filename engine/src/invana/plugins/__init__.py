@@ -21,13 +21,29 @@ from __future__ import annotations
 
 from functools import cache
 
-from invana.plugins.registry import PluginError, Registry, build_registry
+from invana.plugins.registry import LoadedPlugin, PluginError, Registry, build_registry
+
+#: The ``mcp`` plugins this process installed at start-up; empty until then.
+_mcp: tuple[LoadedPlugin, ...] = ()
 
 
 @cache
 def load_plugins() -> Registry:
     """The frozen registry of this process, built on first call."""
-    return build_registry()
+    return build_registry(_mcp)
 
 
-__all__ = ["PluginError", "Registry", "load_plugins"]
+def install_mcp(plugins: tuple[LoadedPlugin, ...]) -> Registry:
+    """Add the MCP plugins read from the app DB; called once, at start-up, before any plan runs.
+
+    Rebuilds the registry with them appended and returns it. Calling it again
+    replaces the MCP set rather than adding to it, so a start-up path that runs
+    twice (a test app, a CLI command inside another) lands on the same registry.
+    """
+    global _mcp  # noqa: PLW0603 — set once at start-up, read by every later build
+    _mcp = tuple(plugins)
+    load_plugins.cache_clear()
+    return load_plugins()
+
+
+__all__ = ["PluginError", "Registry", "install_mcp", "load_plugins"]

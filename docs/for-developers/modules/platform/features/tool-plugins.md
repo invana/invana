@@ -172,7 +172,7 @@ sequenceDiagram
 
 | Not building | Because |
 |---|---|
-| MCP plugins and `invana plugins mcp add` | B07 |
+| MCP plugins and `invana plugins mcp add` | [13.13 MCP plugins](mcp-plugins.md) — they switch and run like tool plugins |
 | The Agents › Plugins screen | C03 — this slice ships its API |
 | Genebank tools | no single genebank API to target yet; the science plugin starts with PubMed, UniProt and PubChem |
 | A secrets store in the app DB | env in the worker is enough for three secrets; a store is its own feature |

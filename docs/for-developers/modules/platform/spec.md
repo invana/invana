@@ -6,7 +6,7 @@ own; everything here is why the rest can be built quickly and look like one thin
 | | |
 |---|---|
 | Index | [§11 · Platform](../../README.md#11--platform) |
-| Features | [design-system](features/design-system.md) · [theming](features/theming.md) · [command-line](features/command-line.md) · [logging](features/logging.md) · [telemetry](features/telemetry.md) · [admin-and-health](features/admin-and-health.md) · [setup](features/setup.md) · [runtime](features/runtime.md) · [plugins](features/plugins.md) · [search](features/search.md) · [distributed-execution](features/distributed-execution.md) · [tool-plugins](features/tool-plugins.md) |
+| Features | [design-system](features/design-system.md) · [theming](features/theming.md) · [command-line](features/command-line.md) · [logging](features/logging.md) · [telemetry](features/telemetry.md) · [admin-and-health](features/admin-and-health.md) · [setup](features/setup.md) · [runtime](features/runtime.md) · [plugins](features/plugins.md) · [search](features/search.md) · [distributed-execution](features/distributed-execution.md) · [tool-plugins](features/tool-plugins.md) · [mcp-plugins](features/mcp-plugins.md) |
 | Depends on | — |
 | Depended on by | every Studio surface, every install, and — through [the runtime](features/runtime.md) — every module that runs anything |
 

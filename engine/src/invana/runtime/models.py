@@ -530,3 +530,31 @@ class EnvelopeOutcome(Base):
     run_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
     outcome: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class McpServer(Base):
+    """An MCP server an install Admin added, with its tool list frozen as it was then
+    (docs/for-developers/modules/platform/features/mcp-plugins.md).
+
+    Each row is one plugin, ``invana.mcp.<name>``, loaded into every process's
+    registry at start-up. Whether it is enabled is its ``plugin_states`` row,
+    like a tool plugin. No token is stored: a bearer token is the environment's.
+    """
+
+    __tablename__ = "mcp_servers"
+
+    #: ``[a-z][a-z0-9_]{0,31}``; the plugin is ``invana.mcp.<name>``.
+    name: Mapped[str] = mapped_column(String(32), primary_key=True)
+    #: The Streamable HTTP endpoint.
+    url: Mapped[str] = mapped_column(String(2048), nullable=False)
+    #: 1 on add, +1 per refresh; the plugin version is ``<revision>.0.0``.
+    revision: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    #: ``[{name, version, title, description, input_schema, annotations}]`` as frozen.
+    tools: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    #: Tool names that could not be keyed.
+    skipped: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    #: ``{name, version, protocol}`` from ``initialize``.
+    server: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    frozen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    #: The Admin who added or last refreshed it.
+    added_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)

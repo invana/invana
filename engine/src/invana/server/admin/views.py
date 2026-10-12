@@ -82,6 +82,7 @@ from invana.runtime.models import (
     EvalCase,
     EvalResult,
     EvalSet,
+    McpServer,
     PluginState,
     ProjectionTemplate,
     TaskPrompt,
@@ -137,7 +138,7 @@ from invana.server.notifications.admin import (
     NotificationRuleView,
     NotificationView,
 )
-from invana.server.plugins.admin import EnvelopeOutcomeView, PluginStateView
+from invana.server.plugins.admin import EnvelopeOutcomeView, McpServerView, PluginStateView
 from invana.server.rules.admin import RuleVersionView, RuleView
 from invana.server.runtime.admin import (
     EmissionView,
@@ -422,6 +423,7 @@ def mount_admin(app: FastAPI) -> None:
             views=[
                 PluginStateView(PluginState, label="Plugin states", icon="fa fa-toggle-on"),
                 EnvelopeOutcomeView(EnvelopeOutcome, label="Envelope outcomes", icon="fa fa-envelope-open"),
+                McpServerView(McpServer, label="MCP servers", icon="fa fa-server"),
             ],
         ),
     )

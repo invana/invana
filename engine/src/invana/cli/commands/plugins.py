@@ -9,6 +9,14 @@ an install Admin's act and names one with ``--user``::
     invana plugins enable  invana.tools.web --user admin
     invana plugins disable invana.tools.web --user admin
     invana tasks show execute_graph_query@1.0.0
+    invana plugins mcp add http://localhost:9000/mcp --name files --user admin
+    invana plugins mcp refresh files --user admin
+
+``mcp add`` connects to an MCP server and freezes its tools as the plugin
+``invana.mcp.<name>`` (docs/for-developers/modules/platform/features/mcp-plugins.md);
+``mcp refresh`` reads them again as the next revision. Either takes effect when
+each process — the API and every worker — restarts. Every command here loads
+the stored MCP servers first, as a process does at start-up.
 
 ``list`` prints one tab-separated row per plugin — name, kind, version,
 installed, enabled, task types. ``show`` and ``tasks show`` print JSON, the
@@ -30,9 +38,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.cli.context import as_user, refusal
 from invana.core.db import create_db_engine, create_session_factory
 from invana.core.errors import InvanaError
-from invana.runtime.managers import PluginManager
+from invana.runtime.managers import McpManager, PluginManager
+from invana.runtime.schemas import McpServerRead
 
 _plugins = PluginManager()
+_mcp = McpManager()
 
 
 def _read(fn: Callable[[AsyncSession], Awaitable[Any]]) -> Any:
@@ -42,6 +52,7 @@ def _read(fn: Callable[[AsyncSession], Awaitable[Any]]) -> Any:
         engine = await create_db_engine()
         try:
             async with create_session_factory(engine)() as session:
+                await _mcp.load(session)
                 return await fn(session)
         except InvanaError as exc:
             raise refusal(exc) from exc
@@ -66,7 +77,7 @@ def _yes(flag: bool) -> str:
 
 @click.group("plugins")
 def plugins_cmd() -> None:
-    """Plugins: what is installed, what is enabled, and switching tool plugins."""
+    """Plugins: what is installed, what is enabled, switching them, and MCP servers."""
 
 
 @plugins_cmd.command("list")
@@ -99,6 +110,52 @@ def enable(name: str, user_ref: str) -> None:
 def disable(name: str, user_ref: str) -> None:
     """Disable a tool plugin; a step naming one of its task types is refused from now."""
     _switch(name, user_ref, enabled=False)
+
+
+def _print_server(server: McpServerRead) -> None:
+    click.echo(f"{server.plugin}\trevision {server.revision}\t{len(server.tools)} task types")
+    for tool in server.tools:
+        click.echo(f"  {tool.key}@{tool.version}\t{tool.side_effect}")
+    for name in server.skipped:
+        click.echo(f"  skipped {name!r}: not a name a task key can hold")
+    if server.restart_required:
+        click.echo(
+            f"Restart the engine and every worker to load it; enable it with: invana plugins enable {server.plugin}"
+        )
+
+
+@plugins_cmd.group("mcp")
+def mcp_cmd() -> None:
+    """MCP servers: add one, or read its tools again."""
+
+
+@mcp_cmd.command("add")
+@click.argument("url")
+@click.option("--name", required=True, help="Short name: the plugin becomes invana.mcp.<name>.")
+@click.option("--user", "user_ref", required=True, help="An install Admin (username or email).")
+def mcp_add(url: str, name: str, user_ref: str) -> None:
+    """Connect an MCP server and freeze its tools as task types."""
+
+    async def go() -> None:
+        async with as_user(user_ref) as (session, actor):
+            await _mcp.load(session)
+            _print_server(await _mcp.add(session, name=name, url=url, actor=actor))
+
+    asyncio.run(go())
+
+
+@mcp_cmd.command("refresh")
+@click.argument("name")
+@click.option("--user", "user_ref", required=True, help="An install Admin (username or email).")
+def mcp_refresh(name: str, user_ref: str) -> None:
+    """List an MCP server's tools again, as its next revision."""
+
+    async def go() -> None:
+        async with as_user(user_ref) as (session, actor):
+            await _mcp.load(session)
+            _print_server(await _mcp.refresh(session, name=name, actor=actor))
+
+    asyncio.run(go())
 
 
 @click.group("tasks")

@@ -116,6 +116,12 @@ async def lifespan(app: FastAPI):
         # Startup fails whatever a previous process left mid-flight.
         from invana.activity.managers import ApprovalSendGate
         from invana.runtime.interpreter import TaskRuntime
+        from invana.runtime.managers import McpManager
+
+        # docs/for-developers/modules/platform/features/mcp-plugins.md — the MCP servers an
+        # Admin added join this process's registry now, before any plan can name a task type.
+        async with session_factory() as db:
+            await McpManager().load(db)
 
         # A `send` step (mail.send) waits on an approval in the inbox.
         TaskRuntime.send_gate = ApprovalSendGate()

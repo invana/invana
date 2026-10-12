@@ -57,7 +57,7 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 | ID | Capability | Blocks | Note |
 |---|---|---|---|
 | P-01 | Tool plugin runtime | AG-13 · DS-06 · SH-13 · PJ-09 | ✅ B06b (engine) — [13.12 Tool plugins](../for-developers/modules/platform/features/tool-plugins.md): one extra each, Admin-enabled, run in workers under procrastinate. Plugins live in the engine (`invana/plugins/tools/`), dependencies as optional extras; each method registers a catalogue entry in the third-party layer |
-| P-02 | MCP client | AG-13 | Connect an MCP server; its tools become task types in an `mcp` plugin |
+| P-02 | MCP client | AG-13 | ✅ B07 (engine) — [13.13 MCP plugins](../for-developers/modules/platform/features/mcp-plugins.md): connect an MCP server; its tools become task types in an `mcp` plugin, frozen when added, loaded at start-up, Admin-enabled |
 | P-03 | Web search and fetch tools | DS-06 · SH-13 | ✅ B06b (engine) — `web.search` (SearXNG) · `web.fetch` · `web.download_and_extract`. Honour robots.txt; every row cites its URL |
 | P-04 | Mail tools (read, send) | SH-13 | ✅ B06b (engine) — `mail.read` · `mail.send`, held on an approval in the inbox. `mail.send` always asks for approval |
 | P-05 | Science-source tools (PubMed, UniProt, PubChem, genebanks) | DS-06 · DS-10 | ✅ B06b (engine) — `pubmed.search` · `uniprot.get` · `pubchem.get`; genebanks not yet. Official origin where the source is the author |
