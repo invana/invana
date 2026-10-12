@@ -73,9 +73,9 @@ const ENGINE_ONLY = {
 	work: "served by the @invana-studio/projects package, outside the host",
 	history: "the change log; no Studio surface reads it yet",
 	evals: "eval sets and runs; no Studio surface reads them yet",
-	datasets: "dataset records; the Datasets product reads them from C01",
-	standards:
-		"standards and conformance; the Datasets product reads them from C01",
+	plugins: "the plugins registry; the Agents product reads it from C03",
+	datasets: "served by the @invana-studio/datasets package, outside the host",
+	standards: "served by the @invana-studio/datasets package, outside the host",
 	members:
 		"members and Graph roles; the Modeller's settings read them from C07",
 	search: "access-filtered search; ⌘K reads it from C07",

@@ -667,6 +667,32 @@ and the Inspector drawn in `rightSection`. The name is the file, the frame title
 
 ---
 
+## Beyond the 42 · Datasets
+
+The `datasets.*` boards of the *Invana Products* prototype (`.design/canvas-products/`), as Studio
+builds them in `@invana-studio/datasets` (migration session C01). Decisions are in
+[products/datasets.md](../products/datasets.md#decisions) and the four feature files.
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `datasets.catalogue` | DS-01 | `/datasets/catalogue` | ✅ |
+| `datasets.dataset` · `.provenance` · `.versions` · `.used` · `.conformance` | DS-02 · DS-03 · DS-09 | `/datasets/catalogue/<publisher>/<name>[/<tab>]` | ✅ |
+| `datasets.dataset.retracted` | DS-14 | the Overview banner and the Versions tab | ✅ |
+| `datasets.record` | DS-04 | `…/records/<key>` | ✅ |
+| `datasets.observe` | DS-05 | *Add observations* on the dataset header | ✅ |
+| `datasets.observe.assistant` | DS-05 | not built — no assistant tool writes a dataset | ⛔ |
+| `datasets.collect` · `datasets.collect.run` | DS-06 | not built — no collector agent; the button is drawn disabled | ⛔ |
+| `datasets.validation` · `datasets.validation.item` | DS-07 | `/datasets/validation[/<publisher>/<name>/<key>/<term>]` — standard violations only | 🟡 |
+| `datasets.standards` · `datasets.standard` | DS-08 | `/datasets/standards[/<publisher>/<name>]` | ✅ |
+| `datasets.standard.attach` | DS-09 | *Attach a standard* — from a dataset or a standard | ✅ |
+| `datasets.documents` | DS-10 | not built — no documents dataset in the engine | ⛔ |
+| `datasets.bind` | DS-11 | *Bind to a Graph* on the dataset header | ✅ |
+| `datasets.share` | DS-12 | *Share* on the dataset header — only me · the install | ✅ |
+| `datasets.imports` · `datasets.imports.run` | DS-13 | `/datasets/imports` | ✅ |
+| `datasets.standards.import` | DS-15 | C08 | 🔵 |
+
+---
+
 ## The other direction — every feature, and the screen that draws it
 
 So a feature file can be opened next to the drawing that shows it.
@@ -679,6 +705,10 @@ So a feature file can be opened next to the drawing that shows it.
 | 1.6 | Stitch models | ✅ | ✅ | S7 | `StitchHiFi` | ✅ |
 | 2.1 | Load data | ✅ | ✅ | S6 | `ImportRunHiFi` | ✅ |
 | 2.2 | Inspect what landed | ✅ | ✅ | S6 | `DatasetsHiFi` | ✅ |
+| 2.4 | Datasets | ✅ | ✅ | B03 · C01 | `datasets.catalogue` · `datasets.dataset` (+ tabs) · `datasets.record` · `datasets.observe` · `datasets.share` | ✅ |
+| 2.5 | Retract and refresh | ✅ | 🟡 | B03 · C01 | `datasets.dataset.used` · `datasets.dataset.retracted` | ✅ |
+| 2.6 | Bind a dataset | 🟡 | ✅ | B03 · C01 | `datasets.bind` | ✅ |
+| 2.7 | Standards and conformance | ✅ | ✅ | B04 · C01 | `datasets.standards` · `datasets.standard` · `datasets.standard.attach` · `datasets.dataset.conformance` · `datasets.validation` (+ `.item`) | ✅ |
 | 3.2 | Ask in natural language | ✅ | ✅ | S9b | `ExplorerAsksHiFi` | ✅ |
 | 3.3 | The answer surface | ✅ | ✅ | S9b | `SessionHiFi` · `AnswerSurfaceHiFi` | ✅ |
 | 3.4 | Projections | ✅ | ✅ | S9b→S9d | `ProjectionSwitchHiFi` | ✅ |

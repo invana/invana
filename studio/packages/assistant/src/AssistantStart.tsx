@@ -64,6 +64,7 @@ export function AssistantStart({
 			<SessionComposer
 				{...composer}
 				sessionKey={null}
+				takesAsk={false}
 				worldControl={
 					<WorldPicker
 						username={username}

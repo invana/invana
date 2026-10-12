@@ -7,7 +7,7 @@ import run, so its records land validated, with provenance, and the trace is the
 |---|---|
 | Index | [2.6](../../../README.md#2--bring-data-in) · Slice **B03** (P-08) |
 | Module | [Bring data in](../spec.md) |
-| API / CLI / Studio | 🟡 / 🟡 / 🔵 |
+| API / CLI / Studio | 🟡 / 🟡 / ✅ |
 | Related | [datasets](datasets.md) · [load-data](load-data.md) · [retract-and-refresh](retract-and-refresh.md) · products: [datasets.md](../../../../products/datasets.md) DS-11 · DS-F11 |
 
 > **As** a modeller, **I want** to bind a dataset version into my Graph's model, **so that** its tables
@@ -52,7 +52,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| `datasets.bind` | Studio, C01 |
+| `datasets.bind` | Studio — `BindDialog` from the dataset header: Graph → model · type from the model's active version, columns against the type's properties, then *Open the run* |
 | `invana datasets bind <ds>@v --graph --model --type` | CLI |
 
 ## Engine
@@ -89,6 +89,7 @@ flowchart TD
 | BV5 | **A version's effect after is its bind loads.** `basis = "bound"` counts the runs the `dataset.bind` events of that version name, in every Graph, and their tokens — read from the events because a moved binding no longer holds its earlier version — loads spend none today, so tokens read 0. |
 | BV6 | **The view opens and submits.** The bind opens the run in the request's transaction, commits, and submits it to the runtime — the shape the skill draw and the eval run already have. |
 | BV7 | **A load the prologue refuses is 409, naming why** — no published model version, no connection, a read-only one. The version is already materialised by then, which is harmless: the folder is content-addressed and the next bind reuses it. No binding row is written for a refused bind. |
+| BV8 | **Studio binds the current version** and lists the Graph's models with their active version's node types; the key column lands as `<Type>.id`. Success links to the load run in that Graph's Activity — the run's page is where the load is followed. |
 
 ## Not building
 

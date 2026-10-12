@@ -7,7 +7,7 @@ from, licensed, versioned and hashed, so a result can be reproduced from the exa
 |---|---|
 | Index | [2.4](../../../README.md#2--bring-data-in) · Slice **B03** (P-08) |
 | Module | [Bring data in](../spec.md) |
-| API / CLI / Studio | ✅ / 🟡 / 🔵 |
+| API / CLI / Studio | ✅ / 🟡 / ✅ |
 | Related | [retract-and-refresh](retract-and-refresh.md) · [bind-a-dataset](bind-a-dataset.md) · [change-log](../../operate/features/change-log.md) · products: [datasets.md](../../../../products/datasets.md) DS-01 · DS-02 · DS-03 · DS-04 · DS-12 · DS-F16 |
 
 > **As** a researcher, **I want** one catalogue of datasets, each with its origin, author chain, licence
@@ -63,7 +63,9 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| `datasets.catalogue` · `datasets.dataset` · `datasets.dataset.provenance` · `datasets.dataset.versions` · `datasets.record` · `datasets.share` | Studio, C01 |
+| `datasets.catalogue` | Studio `/datasets/catalogue` — `CataloguePage` |
+| `datasets.dataset` · `.provenance` · `.versions` · `datasets.record` | Studio `/datasets/catalogue/<publisher>/<name>[/provenance · /records[/<key>] · /versions]` — `DatasetPage` and its tabs |
+| `datasets.observe` · `datasets.share` | Studio — `ObserveDialog` · `ShareDialog` on the dataset header, for its writer |
 | `invana datasets list · show · import · versions · diff · history · share` | CLI (products/datasets.md › CLI) |
 
 ## Engine
@@ -129,6 +131,7 @@ flowchart TD
 | DT12 | **`dataset` is the sixth change-log kind**, read by `ChangeLogManager` with `graph_id` null under the dataset's own routes. The minting action is `dataset.version`. Compare carries `licence`, `author_chain` and `columns` as fields and a one-line records summary (`n added · n removed · n changed`). Effect after is `basis = "bound"`: the load runs that bound that version ([BV5](bind-a-dataset.md)). |
 | DT13 | **A record's change log is read from the versions, never stored** — the same rule as CL1. For one key, each version whose values or provenance differ from the version before is an entry, its who/when/why the version's. Properties are compared by name; a property absent on one side reads as null. |
 | DT14 | **The API takes records in the request body; a file is the CLI's.** `invana datasets import` reads CSV (header row) or JSON (a list of objects), creates the dataset when absent, and mints a version through the same manager. |
+| DT15 | **Studio writes a version the way the API takes one: whole.** Observations by form and a validation fix read every record of the current version, make the change, and publish the result as the next version; a record's provenance exception is re-sent as `_provenance`. The engine publishes whatever it is sent and does not check the version a write started from, so Studio re-reads the dataset before publishing and refuses when a newer version has appeared — this narrows the window in which two writers drop each other's change; a base-version check on publish is the engine's to add. Studio creates no dataset — the empty catalogue shows `invana datasets import`. |
 
 ## Not building
 

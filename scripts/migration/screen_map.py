@@ -33,7 +33,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("shell", f"{G}/explorer"),
     ("datasets.catalogue", "/datasets/catalogue"), ("datasets.validation", "/datasets/validation"),
     ("datasets.standard", "/datasets/standards"), ("datasets.imports", "/datasets/imports"),
-    ("datasets", "/datasets/catalogue/accession-phenotypes"),
+    ("datasets", "/datasets/catalogue/admin/accession-phenotypes"),
     ("modeller.global_model", f"{G}/modeller/global-model"), ("modeller.models", f"{G}/modeller/models"),
     ("modeller.model.type.constraint", f"{AR}/modeller/models/arabidopsis/accession"), ("modeller.model.history", f"{AR}/modeller/models/arabidopsis?tab=history"),
     ("modeller.model", f"{G}/modeller/models/airroutes"), ("modeller.stitches", f"{G}/modeller/stitches"),
@@ -53,7 +53,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
 RUN = "15 stands for a run id: Activity › Runs, open the newest succeeded run"
 SESSION = "routes-out-of-lhr stands for a session id: ask “Which routes out of LHR grew last quarter?”"
 DARK = "theme dark: user menu › Appearance › Dark"
-DATASET = "dataset accession-phenotypes (arabidopsis; needs B03)"
+DATASET = "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it)"
 BRANCH = "on branch H1.1 · …via lower FLC (needs B05)"
 AGENT = "analyst stands for an agent's slug: open any agent from Agents"
 SKILL = "answer-nl stands for a skill's slug: open any skill from Skills"
@@ -82,7 +82,6 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "shell.first_run": "an install with no Graph yet",
     "agents.skills.detail.readonly": f"{SKILL}, signed in as a member without the Agents role (needs B11)",
     "shell.profile.tokens": "Access tokens tab",
-    "datasets.catalogue": "needs B03 for its rows",
     "datasets.dataset": DATASET,
     "datasets.dataset.provenance": f"{DATASET}; Provenance tab",
     "datasets.dataset.versions": f"{DATASET}; Versions tab",
@@ -92,11 +91,11 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "datasets.observe.assistant": f"{DATASET}; Add observations › tell the assistant",
     "datasets.collect": "Catalogue › Collect with an agent (needs B06b)",
     "datasets.collect.run": "a collection while it runs (needs B06b)",
-    "datasets.validation.item": "click Col-0 · days to flowering (needs B03)",
-    "datasets.standard": "click Plant Trait Ontology (TO) (needs B04)",
-    "datasets.standard.attach": "on a standard, Attach to a dataset (needs B04)",
-    "datasets.dataset.conformance": f"{DATASET}; Conformance tab (needs B04)",
-    "datasets.documents": "a documents dataset (needs B03)",
+    "datasets.validation.item": "a standard violation: attach a standard to a dataset in warn, then click a row of the queue",
+    "datasets.standard": "click a standard in the library",
+    "datasets.standard.attach": "on a standard, Attach to a dataset",
+    "datasets.dataset.conformance": f"{DATASET}; Conformance tab",
+    "datasets.documents": "not built — no documents dataset in the engine",
     "datasets.bind": f"{DATASET}; Bind to a Graph › arabidopsis",
     "datasets.share": f"{DATASET}; Share",
     "datasets.dataset.retracted": f"{DATASET}; a version marked retracted",

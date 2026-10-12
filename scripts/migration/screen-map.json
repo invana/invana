@@ -196,60 +196,60 @@
    "story": "DS-01",
    "product": "datasets",
    "route": "/datasets/catalogue",
-   "state": "needs B03 for its rows"
+   "state": ""
   },
   "datasets.dataset": {
    "story": "DS-02",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03)"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it)"
   },
   "datasets.dataset.provenance": {
    "story": "DS-02",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Provenance tab"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Provenance tab"
   },
   "datasets.dataset.versions": {
    "story": "DS-03",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Versions tab"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Versions tab"
   },
   "datasets.dataset.used": {
    "story": "DS-03",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Used by tab"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Used by tab"
   },
   "datasets.record": {
    "story": "DS-04",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03); click Col-0 in the preview"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); click Col-0 in the preview"
   },
   "datasets.observe": {
    "story": "DS-05",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Add observations"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Add observations"
   },
   "datasets.observe.assistant": {
    "story": "DS-05",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Add observations \u203a tell the assistant"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Add observations \u203a tell the assistant"
   },
   "datasets.collect": {
    "story": "DS-06",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
    "state": "Catalogue \u203a Collect with an agent (needs B06b)"
   },
   "datasets.collect.run": {
    "story": "DS-06",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
    "state": "a collection while it runs (needs B06b)"
   },
   "datasets.validation": {
@@ -262,7 +262,7 @@
    "story": "DS-07",
    "product": "datasets",
    "route": "/datasets/validation",
-   "state": "click Col-0 \u00b7 days to flowering (needs B03)"
+   "state": "a standard violation: attach a standard to a dataset in warn, then click a row of the queue"
   },
   "datasets.standards": {
    "story": "DS-08",
@@ -274,43 +274,43 @@
    "story": "DS-08",
    "product": "datasets",
    "route": "/datasets/standards",
-   "state": "click Plant Trait Ontology (TO) (needs B04)"
+   "state": "click a standard in the library"
   },
   "datasets.standard.attach": {
    "story": "DS-09",
    "product": "datasets",
    "route": "/datasets/standards",
-   "state": "on a standard, Attach to a dataset (needs B04)"
+   "state": "on a standard, Attach to a dataset"
   },
   "datasets.dataset.conformance": {
    "story": "DS-09",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Conformance tab (needs B04)"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Conformance tab"
   },
   "datasets.documents": {
    "story": "DS-10",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "a documents dataset (needs B03)"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "not built \u2014 no documents dataset in the engine"
   },
   "datasets.bind": {
    "story": "DS-11",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Bind to a Graph \u203a arabidopsis"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Bind to a Graph \u203a arabidopsis"
   },
   "datasets.share": {
    "story": "DS-12",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03); Share"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Share"
   },
   "datasets.dataset.retracted": {
    "story": "DS-14",
    "product": "datasets",
-   "route": "/datasets/catalogue/accession-phenotypes",
-   "state": "dataset accession-phenotypes (arabidopsis; needs B03); a version marked retracted"
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); a version marked retracted"
   },
   "datasets.standards.import": {
    "story": "DS-15",
@@ -843,8 +843,8 @@
   "agents.skills.detail": {
    "story": "AG-08",
    "product": "agents",
-   "route": "/u/admin/airways/agents/skills",
-   "state": "open any skill from Skills: it opens as ?page=skill:<id> on the list path, which has no :skill level"
+   "route": "/u/admin/airways/agents/skills/answer-nl",
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills"
   },
   "agents.skills.instructions.edit": {
    "story": "AG-08",

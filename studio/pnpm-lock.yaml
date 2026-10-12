@@ -533,6 +533,9 @@ importers:
       '@invana/charts':
         specifier: ^0.0.34
         version: 0.0.34(@invana/styling@0.0.34(tailwindcss@4.2.2))(@invana/tables@0.0.34(@invana/forms@0.0.34(@invana/styling@0.0.34(tailwindcss@4.2.2))(@invana/ui@0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.87.0(react@19.2.5))(react@19.2.5))(@invana/styling@0.0.34(tailwindcss@4.2.2))(@invana/ui@0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@invana/ui@0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/forms':
+        specifier: ^0.0.34
+        version: 0.0.34(@invana/styling@0.0.34(tailwindcss@4.2.2))(@invana/ui@0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.87.0(react@19.2.5))(react@19.2.5)
       '@invana/ui':
         specifier: ^0.0.34
         version: 0.0.34(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)

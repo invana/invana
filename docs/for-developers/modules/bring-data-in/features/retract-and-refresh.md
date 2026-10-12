@@ -7,7 +7,7 @@ schedule mints new versions while its consumers stay pinned to the one they chos
 |---|---|
 | Index | [2.5](../../../README.md#2--bring-data-in) · Slice **B03** (P-08) |
 | Module | [Bring data in](../spec.md) |
-| API / CLI / Studio | ✅ / 🟡 / 🔵 |
+| API / CLI / Studio | ✅ / 🟡 / 🟡 |
 | Related | [datasets](datasets.md) · [bind-a-dataset](bind-a-dataset.md) · [schedules](../../operate/features/schedules.md) · products: [datasets.md](../../../../products/datasets.md) DS-03 · DS-14 · DS-F14 · DS-F15 |
 
 > **As** a researcher, **I want** a retracted source kept and flagged with everything that cites it, and a
@@ -59,7 +59,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| `datasets.dataset.used` · `datasets.dataset.retracted` | Studio, C01 |
+| `datasets.dataset.used` · `datasets.dataset.retracted` | Studio — the dataset's `used` tab, the retraction banner on Overview, *Retract* on Versions for an install Admin |
 | `invana datasets retract <ds>@v --reason` · `refresh <ds> --schedule "<cron>" --source <path>` · `refresh <ds> --now` | CLI |
 
 ## Engine
@@ -95,6 +95,7 @@ flowchart TD
 | DR8 | **Consumers stay pinned.** A binding keeps its version; its read carries `newer_version` while the dataset's current version is newer. Nothing moves a binding but a person binding again. |
 | DR9 | **`used` lists bindings only in Graphs the reader belongs to** (an install Admin sees all). A dataset is install-wide; the Graphs that bound it are not, and a Graph the reader cannot open reads as absent. Derived versions are listed when the reader may read their dataset. |
 | DR10 | **The flags ride on the reads.** A version read carries `retracted_inputs` (the addresses in `derived_from` that are retracted); a binding read carries its version's `retracted` (`Retraction?`, with when, who, why). |
+| DR11 | **Studio shows the refresh schedule read-only.** Setting one is `invana datasets refresh`; Studio draws the schedule and the newer-version notice, and retracts from the Versions tab for an install Admin. |
 
 ## Not building
 

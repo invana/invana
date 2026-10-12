@@ -18,6 +18,7 @@ export default defineConfig({
 				"packages/core/src/services/telemetry/*.ts",
 				"packages/assistant/src/answer-surface/emissions.ts",
 				"packages/datasets/src/imports/journal.ts",
+				"packages/datasets/src/nextVersion.ts",
 				"packages/modeller/src/govern/addressing.ts",
 				"packages/shell/src/activity/events/eventSearch.ts",
 				"packages/shell/src/activity/inbox/inbox.ts",

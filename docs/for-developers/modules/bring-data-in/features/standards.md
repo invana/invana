@@ -9,7 +9,7 @@ mapping and an enforcement mode; every version of the dataset is then scored aga
 |---|---|
 | Index | [2.7](../../../README.md#2--bring-data-in) · Slice **B04** (P-12) |
 | Module | [Bring data in](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [datasets](datasets.md) · [bind-a-dataset](bind-a-dataset.md) · [rules](../../skills/features/rules.md) · products: [datasets.md](../../../../products/datasets.md) DS-08 · DS-09 · DS-F8 · DS-F9 |
 
 > **As** a curator, **I want** a library of standards and to enforce one on a dataset as block, warn or
@@ -65,8 +65,9 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| `datasets.standards` · `datasets.standard` | Studio, C01 — the library and one standard |
-| `datasets.standard.attach` · `datasets.dataset.conformance` | Studio, C01 — attach, and the conformance page |
+| `datasets.standards` · `datasets.standard` | Studio `/datasets/standards[/<publisher>/<name>]` — `StandardsPage` with *Write a standard*, `StandardPage` with *Used by* |
+| `datasets.standard.attach` · `datasets.dataset.conformance` | Studio — `AttachStandardDialog` (from a dataset or a standard) and the dataset's `conformance` tab |
+| `datasets.validation` · `datasets.validation.item` | Studio `/datasets/validation[/<publisher>/<name>/<key>/<term>]` — the violation queue and one item |
 | `invana standards list · show · apply --file` | CLI |
 | `invana standards attach <ds> --standard <p/n[@v]> --mode --map term=column` · `detach` · `check <ds>[@v]` | CLI |
 
@@ -138,6 +139,7 @@ flowchart TD
 | ST8 | **Conformance is stored, one row per dataset version × standard version,** recomputed in place when the mapping changes — it is derived, not a versioned record. At most 50 violations are kept; `violation_count` is the whole. |
 | ST9 | **Who attaches:** the dataset's owner or an install Admin — the same who mints its versions. |
 | ST10 | **Rules read conformance.** A rule's `dataset.conforms` check reads the attachment and its conformance row ([rules](../../skills/features/rules.md) RU16); a dataset that does not claim the standard fails it. |
+| ST11 | **Studio reads claims dataset by dataset.** The engine has no install-wide list of attachments, so the validation queue and a standard's *Used by* read `GET …/standards` for each readable dataset; one that cannot be read is counted, not hidden. A queue item is a violation on a current version; its fix is a new version. |
 
 ## Not building
 

@@ -241,6 +241,9 @@ export interface SessionComposerProps {
 	worldControl?: ReactNode;
 	/** Told whenever the ask kind flips, so the status bar can show its keys. */
 	onAskKindChange?: (mode: QueryMode) => void;
+	/** Whether a question from ⌘K lands here. False on the home start: ⌘K
+	 *  docks the chat on the right, which unmounts the start. Defaults to true. */
+	takesAsk?: boolean;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -269,6 +272,7 @@ export function SessionComposer({
 	onRemoveAttachment,
 	worldControl,
 	onAskKindChange,
+	takesAsk = true,
 }: SessionComposerProps) {
 	const isModeller = surface === "modeller";
 	const [mode, setMode] = useState<QueryMode>("nl");
@@ -357,14 +361,14 @@ export function SessionComposer({
 	// A question handed over from ⌘K: into the input, focused, never sent.
 	const { request: askRequest, clear: clearAskRequest } = useAskRequest();
 	useEffect(() => {
-		if (!askRequest) return;
+		if (!askRequest || !takesAsk) return;
 		setMode("nl");
 		setNlQuery(askRequest.text);
 		clearAskRequest();
 		requestAnimationFrame(() =>
 			rootRef.current?.querySelector("textarea")?.focus(),
 		);
-	}, [askRequest, clearAskRequest]);
+	}, [askRequest, clearAskRequest, takesAsk]);
 
 	// The session we've already restored the mode/model for — guards against
 	// re-applying over the user's manual switches within the same session.

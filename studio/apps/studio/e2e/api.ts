@@ -45,6 +45,32 @@ export async function graphApi<T>(
 }
 
 /**
+ * Call an install-wide route (`/datasets`, `/standards`) as the signed-in
+ * user. `accept` names the refusals the caller expects on a re-run — `409`
+ * for a record an earlier run already made — and they answer `null`.
+ */
+export async function api<T>(
+	page: Page,
+	path: string,
+	init: {
+		method?: "GET" | "POST" | "PATCH" | "DELETE";
+		data?: unknown;
+		accept?: number[];
+	} = {},
+): Promise<T | null> {
+	const res = await page.request.fetch(`${API}/api/v1${path}`, {
+		method: init.method ?? "GET",
+		data: init.data,
+		headers: { Authorization: `Bearer ${token()}` },
+	});
+	if (init.accept?.includes(res.status())) return null;
+	expect(res.ok(), `${init.method ?? "GET"} ${path} → ${res.status()}`).toBe(
+		true,
+	);
+	return res.status() === 204 ? null : res.json();
+}
+
+/**
  * A Graph invariant with this statement — found, or written once.
  *
  * Rules are never deleted, and an active one is offered to every prompt, so a
