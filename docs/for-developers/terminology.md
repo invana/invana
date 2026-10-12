@@ -70,7 +70,9 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Setup step** | One of them. `done · next · todo · blocked · skipped · broken`. |
 | **Gate** | A group of setup steps, named for what it unlocks: **Connected** · **Grounded** · **Answering**. |
 | **Ready** | A Graph whose required setup steps are done. It can be asked a question. The word in the UI is **ready** — never "graduated", "complete", "live" or "onboarded". *Graduation* is the onboarding cap's metaphor and nothing else: it names no state, no badge and no API field |
-| **Member** | Someone with access to a Graph. Binary — there are no roles. |
+| **Member** | Someone with access to a Graph. A member reads everything in it. |
+| **Graph role** | What a member may change: `viewer` (ask) · `contributor` (projects, tasks) · `builder` (agents, skills, evals) · `modeller` (models, rules, guardrails) · `owner` (members, settings). A member holds a set; `owner` implies the rest. In UI copy *role* alone is fine; in code it is `GraphRole`, because a run's `role` is another thing. |
+| **Install Admin** | The person who administers the install — install rules, standards, any dataset, retraction. `is_superuser` in code. Never a way into a Graph. |
 
 ## 3. Models and data
 
@@ -206,7 +208,7 @@ sub-slots, the URL params and the retired words are in
 | Approval · verdict, used for each other | the **three pauses**, by name | they differ in *when*: an approval is asked before dispatch and costs nothing to refuse; a verdict is asked after a pass and costs another one. One word for both hides the bound that follows from it |
 | Accepting a **Task** vs accepting a **verdict** | **accept a result** · **accept a pass** | a result closes work somebody owns; a verdict decides whether a loop goes round again. Both are "accept" in the UI and different rows against different subjects |
 | Iteration · lane · attempt, used loosely | each by its own name | serial repetition, parallel repetition, and a retry. They nest, so a sentence using the wrong one describes a different row |
-| Role · permission level | **Member** | membership is binary |
+| Permission level · access tier · Graph admin | **Graph role** by name (`viewer` … `owner`) | five named roles; a Graph has no *admin* — that word is the install's |
 | Thought · Thinking | **Todo** · **TaskRun** | a load is not a thought, and the run is the thing that happens. Both words are retired |
 | Job · execution · job run | **TaskRun** | one vocabulary from UI to code. There is no *job* anywhere in the product |
 | Task (for a thing a user wrote) | **Todo** | **the flip.** `Task` now names a node inside a TaskPlan and nothing else. Nothing a user authors is ever a Task |

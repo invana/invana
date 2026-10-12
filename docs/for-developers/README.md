@@ -194,8 +194,9 @@ provider row and its models, and reopens four rows below. The shapes:
 | 11.1 | [Accounts](modules/identity-and-access/features/accounts.md) | Sign up, sign in, profile; email is the login identity | 🟡 | 🟡 | 🟡 | S1 |
 | 11.2 | [Usernames](modules/identity-and-access/features/usernames.md) | The URL identity — mutable, rate-limited, never aliased | ✅ | — | ✅ | S1 |
 | 11.3 | [Sessions](modules/identity-and-access/features/sessions.md) | Short access token, revocable rotating refresh | ✅ | — | 🟡 | S1 |
-| 11.4 | [Membership](modules/identity-and-access/features/membership.md) | Binary access to a Graph; no roles | ✅ | — | ✅ | S1 |
+| 11.4 | [Membership](modules/identity-and-access/features/membership.md) | Who may open a Graph; add, re-role and remove members | ✅ | ✅ | ✅ | S1 |
 | 11.5 | [Personal access tokens](modules/identity-and-access/features/personal-access-tokens.md) | A long-lived credential that carries your identity; revocable, shown once | ✅ | — | ✅ | S1 |
+| 11.6 | [Roles](modules/identity-and-access/features/roles.md) | Graph roles viewer · contributor · builder · modeller · owner, enforced on every graph route; install Admin; a refusal names who can | ✅ | ✅ | 🔵 | B11 |
 
 ## 12 · [Graph connectors](modules/graph-connectors/spec.md)
 
@@ -212,13 +213,14 @@ provider row and its models, and reopens four rows below. The shapes:
 |---|---|---|---|---|---|---|
 | 13.1 | [Design system](modules/platform/features/design-system.md) | Studio builds from `@invana/design-kit`, never beside it | — | — | 🟡 | — |
 | 13.2 | [Theming](modules/platform/features/theming.md) | Light · dark · theme variants, everywhere | — | — | ✅ | — |
-| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · standards · rules · models · loader` | — | 🟡 | — | — |
+| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · standards · rules · members · search · models · loader` | — | 🟡 | — | — |
 | 13.4 | [Logging](modules/platform/features/logging.md) | One call at startup; plain or JSON; every line carries its trace; lifecycle, not chatter | ✅ | ✅ | — | S1 |
 | 13.5 | [Telemetry](modules/platform/features/telemetry.md) | Traces, metrics and logs for everything a person or the system does — one trace per action from the Studio click through runs, queries and model calls, metrics that open it, logs that carry it; optional | ✅ | ✅ | ✅ | S1 |
 | 13.6 | [Admin and health](modules/platform/features/admin-and-health.md) | A generated browser over app state, and a readiness probe | ✅ | — | — | S1 |
 | 13.7 | [Setup](modules/platform/features/setup.md) | Four required steps in four features — the onboarding wizard, created to answering | ✅ | — | 🟡 | S13 |
 | 13.8 | [The runtime](modules/platform/features/runtime.md) | The workhorse: plan graph · frontier · signals · pools · approvals · what it emits | 🟡 | — | — | S15 |
 | 13.9 | [Plugins](modules/platform/features/plugins.md) | Every task type in a plugin — `plugin.yaml`, a manifest beside each task's code, packaged flows; one frozen registry; each Task records its task version | — | — | — | B06a |
+| 13.10 | [Search](modules/platform/features/search.md) | One name search over every Graph and dataset you may open, filtered by access, exact → prefix → contains | ✅ | ✅ | 🔵 | B11 |
 
 ---
 
@@ -267,11 +269,11 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 48 | 19 | 16 | 3 |
-| CLI | 8 | 10 | 3 | 65 |
-| Studio | 36 | 17 | 27 | 6 |
+| API | 50 | 19 | 16 | 4 |
+| CLI | 11 | 10 | 3 | 65 |
+| Studio | 36 | 17 | 29 | 7 |
 
-Eighty-six features. **These counts are the tables above, counted** — if a cell is flipped, they
+Eighty-nine features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 

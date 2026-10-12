@@ -33,10 +33,10 @@ class GraphContainerView(ModelView):
 class GraphMemberView(ModelView):
     label = "Graph members"
     icon = "fa fa-users"
-    # Binary membership post-docs/for-developers/modules/identity-and-access/features/membership.md — no role column.
     fields = [
         "graph_id",
         "user_id",
+        "roles",
         "created_at",
     ]
     sortable_fields = ["created_at"]

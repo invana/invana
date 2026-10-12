@@ -1,6 +1,68 @@
 {
   "components": {
     "schemas": {
+      "AccessArea": {
+        "description": "One area of a Graph: the role that changes it, and whether the caller may.",
+        "properties": {
+          "allowed": {
+            "title": "Allowed",
+            "type": "boolean"
+          },
+          "area": {
+            "title": "Area",
+            "type": "string"
+          },
+          "holders": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Holders",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "area",
+          "label",
+          "role",
+          "allowed",
+          "holders"
+        ],
+        "title": "AccessArea",
+        "type": "object"
+      },
+      "AccessRead": {
+        "description": "What the caller may change in this Graph. Reading is never gated.",
+        "properties": {
+          "areas": {
+            "items": {
+              "$ref": "#/components/schemas/AccessArea"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "roles",
+          "areas"
+        ],
+        "title": "AccessRead",
+        "type": "object"
+      },
       "ActionResponse_CommitResult_": {
         "properties": {
           "data": {
@@ -7264,7 +7326,7 @@
         "type": "object"
       },
       "GraphMembershipOut": {
-        "description": "A user's membership in a Graph \u2014 what /auth/me returns.\n\nMembership is binary (docs/for-developers/modules/identity-and-access/features/membership.md); there is no role\nfield.",
+        "description": "A user's membership in a Graph \u2014 what /auth/me returns, with the Graph\nroles they hold there (docs/for-developers/modules/identity-and-access/features/roles.md).",
         "properties": {
           "graph_id": {
             "title": "Graph Id",
@@ -7281,6 +7343,13 @@
           "owner_username": {
             "title": "Owner Username",
             "type": "string"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
           }
         },
         "required": [
@@ -9540,6 +9609,111 @@
           "prior"
         ],
         "title": "Measure",
+        "type": "object"
+      },
+      "MemberAdd": {
+        "description": "Add a member: ``user`` is an email or a username; no roles means ``viewer``.",
+        "properties": {
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "user": {
+            "maxLength": 320,
+            "minLength": 1,
+            "title": "User",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user"
+        ],
+        "title": "MemberAdd",
+        "type": "object"
+      },
+      "MemberListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MemberRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "MemberListResponse",
+        "type": "object"
+      },
+      "MemberRead": {
+        "description": "One member of a Graph and the Graph roles they hold.",
+        "properties": {
+          "added_at": {
+            "format": "date-time",
+            "title": "Added At",
+            "type": "string"
+          },
+          "first_name": {
+            "title": "First Name",
+            "type": "string"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "first_name",
+          "roles",
+          "added_at"
+        ],
+        "title": "MemberRead",
+        "type": "object"
+      },
+      "MemberUpdate": {
+        "description": "Replace a member's roles; an empty list leaves them a ``viewer``.",
+        "properties": {
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "roles"
+        ],
+        "title": "MemberUpdate",
         "type": "object"
       },
       "ModelArtefact-Input": {
@@ -13570,6 +13744,100 @@
           "schema_name"
         ],
         "title": "SchemaExport",
+        "type": "object"
+      },
+      "SearchHit": {
+        "description": "One record the reader may open, and where it lives.",
+        "properties": {
+          "graph": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graph"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "graph",
+              "model",
+              "agent",
+              "skill",
+              "project",
+              "world",
+              "guardrail",
+              "dataset"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "match": {
+            "enum": [
+              "exact",
+              "prefix",
+              "contains"
+            ],
+            "title": "Match",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "enum": [
+                  "explorer",
+                  "modeller",
+                  "agents",
+                  "projects",
+                  "datasets"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "name",
+          "match"
+        ],
+        "title": "SearchHit",
+        "type": "object"
+      },
+      "SearchResponse": {
+        "properties": {
+          "hits": {
+            "items": {
+              "$ref": "#/components/schemas/SearchHit"
+            },
+            "title": "Hits",
+            "type": "array"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query",
+          "hits"
+        ],
+        "title": "SearchResponse",
         "type": "object"
       },
       "SendMessage": {
@@ -22484,6 +22752,87 @@
         ]
       }
     },
+    "/api/v1/search": {
+      "get": {
+        "operationId": "search_api_v1_search_get",
+        "parameters": [
+          {
+            "description": "Text to match against names.",
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "description": "Text to match against names.",
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Narrow to one Graph, as <username>/<slug>.",
+            "in": "query",
+            "name": "graph",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrow to one Graph, as <username>/<slug>.",
+              "title": "Graph"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Search",
+        "tags": [
+          "search"
+        ]
+      }
+    },
     "/api/v1/standards": {
       "get": {
         "description": "The library: every standard in the install, by address.",
@@ -23083,6 +23432,66 @@
         "summary": "Patch Graph",
         "tags": [
           "graphs"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/access": {
+      "get": {
+        "operationId": "get_access_api_v1_u__username___graphSlug__access_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Access",
+        "tags": [
+          "members"
         ]
       }
     },
@@ -29993,6 +30402,277 @@
         "summary": "Ping Llm Provider",
         "tags": [
           "llm-providers"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/members": {
+      "get": {
+        "operationId": "list_members_api_v1_u__username___graphSlug__members_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Members",
+        "tags": [
+          "members"
+        ]
+      },
+      "post": {
+        "operationId": "add_member_api_v1_u__username___graphSlug__members_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberAdd"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Add Member",
+        "tags": [
+          "members"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/members/{member}": {
+      "delete": {
+        "operationId": "remove_member_api_v1_u__username___graphSlug__members__member__delete",
+        "parameters": [
+          {
+            "description": "The member's username.",
+            "in": "path",
+            "name": "member",
+            "required": true,
+            "schema": {
+              "description": "The member's username.",
+              "title": "Member",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Remove Member",
+        "tags": [
+          "members"
+        ]
+      },
+      "patch": {
+        "operationId": "update_member_api_v1_u__username___graphSlug__members__member__patch",
+        "parameters": [
+          {
+            "description": "The member's username.",
+            "in": "path",
+            "name": "member",
+            "required": true,
+            "schema": {
+              "description": "The member's username.",
+              "title": "Member",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Member",
+        "tags": [
+          "members"
         ]
       }
     },

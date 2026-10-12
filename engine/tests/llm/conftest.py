@@ -89,7 +89,7 @@ async def member(session: AsyncSession, graph: Graph, user: User) -> GraphMember
     Migration 49 backfills the owner as the first holder, so a Graph never has
     nobody who may edit its bounds (GV22). The fixture mirrors that.
     """
-    row = GraphMember(graph_id=graph.id, user_id=user.id, can_edit_guardrails=True)
+    row = GraphMember(graph_id=graph.id, user_id=user.id, roles=["owner"])
     session.add(row)
     await session.flush()
     return row

@@ -12,9 +12,9 @@ Resolution chain (per docs/for-developers/modules/identity-and-access/spec.md):
     └─> get_graph_membership(current_user, graph)
         └─> require_graph_member
 
-Membership is binary (docs/for-developers/modules/identity-and-access/features/membership.md): a ``GraphMember`` row ==
-full access. The old
-``require_graph_builder`` / ``require_graph_admin`` role tiers were removed.
+A ``GraphMember`` row is the right to read the Graph; its ``roles`` are the right
+to change it (docs/for-developers/modules/identity-and-access/features/roles.md).
+``require_graph_member`` checks both, from one policy table, on every route.
 
 All graph-scoped URLs are namespaced as ``/api/v1/u/{username}/{graphSlug}/...``.
 The path-param is named ``graphSlug`` to disambiguate from the generic word
@@ -23,11 +23,13 @@ The path-param is named ``graphSlug`` to disambiguate from the generic word
 
 from __future__ import annotations
 
-from fastapi import Depends, HTTPException, Path, status
+from fastapi import Depends, HTTPException, Path, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.graphs.managers import GraphMemberManager
 from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.graphs.roles import READ_METHODS, GraphRole, area_for
 from invana.apps.setup.managers import SetupManager
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
@@ -40,7 +42,7 @@ def _not_found(detail: str) -> HTTPException:
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail)
 
 
-def _forbidden(detail: str) -> HTTPException:
+def _forbidden(detail: str | dict) -> HTTPException:
     return HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
 
 
@@ -84,11 +86,39 @@ async def get_graph_membership(
 
 
 async def require_graph_member(
+    request: Request,
+    graph: Graph = Depends(resolve_graph_by_username_slug),
     member: GraphMember = Depends(get_graph_membership),
+    session: AsyncSession = Depends(get_session),
 ) -> GraphMember:
-    """Any member of the Graph — the sole graph-scoped access gate
-    (docs/for-developers/modules/identity-and-access/features/membership.md)."""
-    return member
+    """A member of the Graph holding the role the request's area needs — the one
+    graph-scoped access gate (docs/for-developers/modules/identity-and-access/features/roles.md).
+
+    Reads are open to every member. A write's area is read off the route the
+    request matched (``apps/graphs/roles.area_for``), so no route names its own
+    role; a write the policy does not name needs ``owner``. A refusal is 403
+    ``role_required`` naming the area, the role and who holds it.
+    """
+    route = request.scope.get("route")
+    path = getattr(route, "path", request.url.path)
+    if request.method.upper() in READ_METHODS:
+        return member
+    area = area_for(request.method, path)
+    role = area.role if area is not None else GraphRole.owner
+    if member.holds(role):
+        return member
+    holders = await GraphMemberManager().holders(session, graph_id=graph.id, role=role)
+    label = area.label if area is not None else "This change"
+    raise _forbidden(
+        {
+            "error": "role_required",
+            "area": area.name if area is not None else None,
+            "role": role.value,
+            "holders": holders,
+            "message": f"{label} needs the {role.value} role on this Graph. "
+            + (f"Ask {', '.join(holders)}." if holders else "Ask an owner."),
+        }
+    )
 
 
 def require_graph_gate(gate: str):

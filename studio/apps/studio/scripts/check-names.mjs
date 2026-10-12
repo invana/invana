@@ -76,6 +76,9 @@ const ENGINE_ONLY = {
 	datasets: "dataset records; the Datasets product reads them from C01",
 	standards:
 		"standards and conformance; the Datasets product reads them from C01",
+	members:
+		"members and Graph roles; the Modeller's settings read them from C07",
+	search: "access-filtered search; ⌘K reads it from C07",
 	routes: "shared route helpers",
 	__pycache__: "bytecode",
 };

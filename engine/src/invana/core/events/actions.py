@@ -33,10 +33,11 @@ CONNECTION_VERSION_ACKNOWLEDGE = "connection.version_acknowledge"
 CONNECTION_VERSION_DECLARE = "connection.version_declare"
 
 # ── Members ───────────────────────────────────────────────────────────────────
-# Membership is binary post-docs/for-developers/modules/identity-and-access/features/membership.md; the owner is added
-# once at graph creation.
-# Role-change / removal / invitation actions were removed with the feature.
+# docs/for-developers/modules/identity-and-access/features/roles.md — details carry
+# ``username`` and ``roles``; the creator's own add is ``via: graph.create``.
 MEMBER_ADD = "member.add"
+MEMBER_REMOVE = "member.remove"
+MEMBER_ROLES = "member.roles"
 
 # ── LLM providers (docs/for-developers/modules/operate/features/audit-and-activity.md)
 # ─────────────────────────────────────────────

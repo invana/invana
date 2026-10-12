@@ -424,7 +424,7 @@ CREATE TABLE graph_members (
 	graph_id VARCHAR(36) NOT NULL, 
 	user_id VARCHAR(36) NOT NULL, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
-	can_edit_guardrails BOOLEAN DEFAULT false NOT NULL, 
+	roles JSON DEFAULT '["viewer"]'::json NOT NULL, 
 	CONSTRAINT pk_graph_members PRIMARY KEY (graph_id, user_id), 
 	CONSTRAINT graph_members_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	CONSTRAINT graph_members_user_id_fkey FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE

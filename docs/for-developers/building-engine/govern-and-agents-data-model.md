@@ -284,7 +284,7 @@ components they need are in
 | W4 · the ladder | `key` null → named → `kind = guardrail` | ✅ naming publishes, promoting is one field |
 | W4 · usage | run count · last use · who, per lens | ✅ `TaskRunQuerySet.lens_usage`, grouped — no counter column |
 | G1 · impact of a save | revalidate every world, name what each loses | ✅ `impact.py`, `POST …/govern/lenses/impact` |
-| G1 · who may edit | one field-level permission on the Graph | ✅ `graph_members.can_edit_guardrails`, owner backfilled |
+| G1 · who may edit | the `modeller` Graph role | ✅ `graph_members.roles` ([roles](../modules/identity-and-access/features/roles.md)) |
 | G2 · what this would match | resolve a pattern against the catalogue, live | ✅ `?match=` on the catalogue route |
 | R1 · the layer strip | a **touch** per engagement, in `seq` order | ✅ `runtime/governing.py` writes one per engagement, projected from the frame it carries the `seq` of |
 | R2 · generated vs executed | both query digests on the touch | ✅ the connector returns `ComposedQuery`; `close_graph` records both as `generated_sha256` · `executed_sha256` |
@@ -373,7 +373,7 @@ erDiagram
     GRAPH_MEMBER {
         string  graph_id            PK
         string  user_id             PK
-        bool    can_edit_guardrails "the one field-level permission (GR5)"
+        json    roles "Graph roles; modeller edits guardrails (GR5)"
     }
 ```
 

@@ -416,7 +416,7 @@ CREATE UNIQUE INDEX ix_graph_connections_graph_id ON graph_connections (graph_id
 CREATE TABLE graph_members (
 	graph_id VARCHAR(36) NOT NULL, 
 	user_id VARCHAR(36) NOT NULL, 
-	can_edit_guardrails BOOLEAN DEFAULT 'false' NOT NULL, 
+	roles JSON DEFAULT '["viewer"]' NOT NULL, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (graph_id, user_id), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 

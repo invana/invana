@@ -397,7 +397,7 @@ class LensManager:
     def _require_guardrail_permission(self, may_edit: bool) -> None:
         if not may_edit:
             raise PermissionDeniedError(
-                "Editing a guardrail is a permission on this Graph. You can read every rule in force."
+                "Editing a guardrail needs the modeller role on this Graph. You can read every rule in force."
             )
 
     async def _claim_name(self, session: AsyncSession, graph_id: str, name: str) -> tuple[str, str]:

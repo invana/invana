@@ -15,6 +15,7 @@ from invana.apps.graphs.models import (
     GraphMember,
 )
 from invana.apps.graphs.querysets import GraphConnectionQuerySet, GraphMemberQuerySet, GraphQuerySet
+from invana.apps.graphs.roles import GraphRole
 from invana.apps.graphs.schemas import (
     GraphCreate,
     GraphRead,
@@ -38,8 +39,8 @@ class GraphManager:
     members_qs = GraphMemberQuerySet()
 
     async def create_graph(self, session: AsyncSession, *, owner: User, payload: GraphCreate) -> Graph:
-        """Create a Graph and attach the creator as its member (binary access,
-        docs/for-developers/modules/identity-and-access/features/membership.md).
+        """Create a Graph and attach the creator as its first owner
+        (docs/for-developers/modules/identity-and-access/features/roles.md).
 
         Returns the row. Serialising it is `SetupManager.graph_read`, because a
         Graph read carries **derived** setup state and deriving it is a cross-app
@@ -60,7 +61,7 @@ class GraphManager:
         session.add(graph)
         await session.flush()
 
-        session.add(GraphMember(graph_id=graph.id, user_id=owner.id))
+        session.add(GraphMember(graph_id=graph.id, user_id=owner.id, roles=[GraphRole.owner.value]))
         await session.flush()
 
         # Every graph is born with its agents — Explorer (the default), Query and

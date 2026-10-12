@@ -98,3 +98,26 @@ class ChangeCompare(BaseModel):
     plan: PlanVersionDiff | None = None
     #: The schema diff, for a model.
     schema_diff: SchemaDiff | None = None
+
+
+# ── Search (docs/for-developers/modules/platform/features/search.md) ─────────
+
+SearchKind = Literal["graph", "model", "agent", "skill", "project", "world", "guardrail", "dataset"]
+
+
+class SearchHit(BaseModel):
+    """One record the reader may open, and where it lives."""
+
+    kind: SearchKind
+    id: str
+    name: str
+    #: ``<owner>/<slug>`` of the Graph it lives in; absent for a Graph or a dataset.
+    graph: str | None = None
+    #: The product that opens it; absent for a Graph.
+    product: Literal["explorer", "modeller", "agents", "projects", "datasets"] | None = None
+    match: Literal["exact", "prefix", "contains"]
+
+
+class SearchResponse(BaseModel):
+    query: str
+    hits: list[SearchHit]

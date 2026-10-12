@@ -116,7 +116,7 @@ class LensListResponse(BaseModel):
 
     items: list[LensRead]
     total: int
-    #: ``graph_members.can_edit_guardrails`` for whoever asked (GV22).
+    #: Whether whoever asked holds the ``modeller`` Graph role.
     may_edit_guardrails: bool = False
 
 

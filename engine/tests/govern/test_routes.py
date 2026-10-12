@@ -58,7 +58,7 @@ async def client(db_engine):
         graph = Graph(slug=f"g-{uuid.uuid4().hex[:6]}", name="Atlas", created_by_id=user.id, setup_state={})
         s.add(graph)
         await s.flush()
-        member = GraphMember(graph_id=graph.id, user_id=user.id, can_edit_guardrails=True)
+        member = GraphMember(graph_id=graph.id, user_id=user.id, roles=["owner"])
         s.add(member)
         await lenses.create(
             s,

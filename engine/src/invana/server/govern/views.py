@@ -45,6 +45,7 @@ from invana.apps.govern.schemas import (
 )
 from invana.apps.govern.validate import validate_draft
 from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.graphs.roles import GraphRole
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
@@ -120,7 +121,7 @@ async def list_lenses(
     return LensListResponse(
         items=reads,
         total=len(reads),
-        may_edit_guardrails=member.can_edit_guardrails,
+        may_edit_guardrails=member.holds(GraphRole.modeller),
     )
 
 
@@ -175,7 +176,7 @@ async def create_lens(
         payload=payload,
         actor_id=user.id,
         catalogue=await catalogue_resolver.resolve(session, graph_id=graph.id),
-        may_edit_guardrails=member.can_edit_guardrails,
+        may_edit_guardrails=member.holds(GraphRole.modeller),
     )
     return _read(lens)
 
@@ -197,7 +198,7 @@ async def update_lens(
         payload=payload,
         actor_id=user.id,
         catalogue=await catalogue_resolver.resolve(session, graph_id=graph.id),
-        may_edit_guardrails=member.can_edit_guardrails,
+        may_edit_guardrails=member.holds(GraphRole.modeller),
     )
     await drift_after(request, session, graph_id=graph.id, trigger="world_change")
     return _read(updated)
@@ -217,7 +218,7 @@ async def promote_lens(
         lens=lens,
         scope=payload.scope,
         actor_id=user.id,
-        may_edit_guardrails=member.can_edit_guardrails,
+        may_edit_guardrails=member.holds(GraphRole.modeller),
     )
     return _read(promoted)
 
@@ -245,7 +246,7 @@ async def delete_lens(
         session,
         lens=lens,
         actor_id=user.id,
-        may_edit_guardrails=member.can_edit_guardrails,
+        may_edit_guardrails=member.holds(GraphRole.modeller),
     )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
