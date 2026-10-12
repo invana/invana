@@ -5,6 +5,7 @@ and nowhere else, before anything is matched:
 
 - Graph records come only from the Graphs the reader is a member of — every
   member reads every record, so a Graph role narrows nothing;
+- a private project is a hit only for the people staffed on it;
 - datasets come through the dataset reading rule (install-visible, the reader's
   own, or every one for an install Admin);
 - ``graph_ref`` narrows to one Graph, and one the reader is not in is absent.
@@ -24,6 +25,7 @@ from invana.activity.querysets.search import KINDS
 from invana.activity.schemas import SearchHit, SearchResponse
 from invana.apps.datasets.managers import DatasetManager
 from invana.apps.graphs.querysets import GraphMemberQuerySet, GraphQuerySet
+from invana.apps.work.managers import ProjectManager
 from invana.core.auth.models import User
 from invana.core.errors import NotFoundError, ValidationError
 
@@ -82,6 +84,11 @@ class SearchManager:
             graph_ids = [await self._one_graph(session, graph_ref=graph_ref, member_of=graph_ids)]
         refs = await self.search_qs.graph_refs(session, graph_ids=graph_ids)
 
+        # A private project shows only to the people on it.
+        hidden: set[str] = set()
+        for graph_id in graph_ids:
+            hidden |= await ProjectManager().hidden_ids(session, graph_id=graph_id, reader_id=reader.id)
+
         hits: list[SearchHit] = []
         if graph_ref is None:
             for graph_id, (name, ref) in refs.items():
@@ -91,6 +98,8 @@ class SearchManager:
         for kind in KINDS:
             rows = await self.search_qs.named(session, kind=kind, graph_ids=graph_ids, needle=needle, limit=limit)
             for row_id, name, graph_id in rows:
+                if kind == "project" and row_id in hidden:
+                    continue
                 hits.append(
                     SearchHit(
                         kind=kind,

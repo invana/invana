@@ -56,7 +56,7 @@ this map.** Feature numbers do not change.
 | Data | `graphs` 1.1 · `models` 1.2–1.8 · `imports` 2.x · `graph-connectors` 12.x |
 | Exploration | `explorer` 4.1 · 4.3 · `queries` 3.1 · 4.4 · `boards` 4.2 |
 | Answers | `assistant` 3.2–3.3 · 3.5–3.8 · 3.10–3.13 · `projections` 3.4 · `memory` 8.x |
-| Work | `projects` 9.1 · 9.2 · 9.4 |
+| Work | `projects` 9.1 · 9.2 · 9.4 · 9.5 · 9.6 · 9.7 |
 | Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 |
 | Governance | `lenses` 14.x · `events` 10.2 |
 | Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
@@ -174,6 +174,9 @@ provider row and its models, and reopens four rows below. The shapes:
 | 9.2 | [Objectives and criteria](modules/work/features/objectives-and-criteria.md) | Goals and "done" as nodes, not paragraphs | 🔵 | — | 🔵 | S12b |
 | 9.3 | [Review](modules/work/features/review.md) | One queue: questions, approvals and verdicts block; results and proposals wait | 🔵 | — | 🔵 | S12b |
 | 9.4 | [Recurring tasks and conditions](modules/work/features/recurring-tasks-and-conditions.md) | A template on a cron; failure branches that say why | 🔵 | — | 🔵 | S12e |
+| 9.5 | [Branches, findings and decisions](modules/work/features/branches-and-decisions.md) | A project of a type forks into branches; findings for and against; a verdict and a decision the rules check, superseded never edited; agents propose | ✅ | ✅ | 🔵 | B05 |
+| 9.6 | [Project reports](modules/work/features/project-reports.md) | A report drafted from the records, edited, published as frozen versions that cite their datasets | ✅ | ✅ | 🔵 | B05 |
+| 9.7 | [Private projects](modules/work/features/private-projects.md) | A project only its people and agents can see | ✅ | ✅ | 🔵 | B05 |
 
 ## 10 · [Operate](modules/operate/spec.md)
 
@@ -269,11 +272,11 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 50 | 19 | 16 | 4 |
-| CLI | 11 | 10 | 3 | 65 |
-| Studio | 36 | 17 | 29 | 7 |
+| API | 53 | 19 | 16 | 4 |
+| CLI | 14 | 10 | 3 | 65 |
+| Studio | 36 | 17 | 32 | 7 |
 
-Eighty-nine features. **These counts are the tables above, counted** — if a cell is flipped, they
+Ninety-two features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 

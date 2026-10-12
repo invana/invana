@@ -84,7 +84,7 @@ async def create_invariant(
 
 async def list_working_rules(
     key: str = Path(...),
-    _: GraphMember = Depends(require_graph_member),
+    member: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> RuleListResponse:
@@ -94,7 +94,7 @@ async def list_working_rules(
     and the panel shows them above, greyed — a project that edits an invariant
     is editing the Graph, which is a different act on a different surface.
     """
-    project = await projects.get_by_key(session, key=key, graph_id=graph.id)
+    project = await projects.get_by_key(session, key=key, graph_id=graph.id, reader_id=member.user_id)
     items = await rules.working(session, project_id=project.id)
     inherited = [*await rules.install(session), *await rules.invariants(session, graph_id=graph.id)]
     reads = await _with_citations(session, graph_id=graph.id, items=items)
@@ -108,12 +108,12 @@ async def list_working_rules(
 async def create_working_rule(
     payload: RuleCreate,
     key: str = Path(...),
-    _: GraphMember = Depends(require_graph_member),
+    member: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> RuleRead:
-    project = await projects.get_by_key(session, key=key, graph_id=graph.id)
+    project = await projects.get_by_key(session, key=key, graph_id=graph.id, reader_id=member.user_id)
     rule = await rules.create(session, graph_id=graph.id, project_id=project.id, payload=payload, actor_id=user.id)
     return RuleRead.model_validate(rule)
 

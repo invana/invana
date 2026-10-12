@@ -111,29 +111,29 @@ The type sets the words and the panel that opens first. The records underneath a
 | Setting | Who can see the project |
 |---|---|
 | Graph members | every member of the Graph |
-| Only the people on it | the people and agents listed on the project — needs per-project access (P-14) |
+| Only the people on it | the people staffed on the project ✅ B05. Agents are not on the list: an agent run reads projects through its own principal, and access is enforced on the people-facing API and search ([PP6](../for-developers/modules/work/features/private-projects.md)) |
 
 ## Reports
 
 | Rule | Detail |
 |---|---|
-| Drafted | by the assistant from the records — question, branches, evidence, verdicts, decisions; never invented |
+| Drafted | from a template over the records — question, branches, evidence, verdicts, decisions; never invented, no LLM |
 | Edited | by a person before publishing |
 | Published | as a frozen version that cites dataset versions; earlier versions stay readable |
-| Exported | PDF and Markdown |
+| Exported | Markdown from the engine; PDF from Studio's print |
 | Retractions | a published report that cites retracted data shows a notice |
 
 ## CLI
 
 | Command | Does | Status |
 |---|---|---|
-| `invana projects list` · `create --type research\|policy\|general --question "…" [--private]` · `show` | projects of a type, optionally private | New · P-10 P-14 |
-| `invana branches list --project` · `fork <b> --into "…" "…"` · `merge <from> <into>` | the tree of inquiry | New · P-10 |
-| `invana findings add --branch --stance supports\|contradicts\|context --cites <record…>` | evidence for or against | New · P-10 |
-| `invana branches decide <b> --verdict … --decision … --rationale "…"` | verdict and decision; rules checked; supersedes, never edits | New · P-10 |
-| `invana proposals list` · `accept` · `reject` | what agents proposed | New · P-10 |
+| `invana projects list` · `create <name> --type research\|policy\|general --question "…" [--private]` · `show` | projects of a type, optionally private | ✅ B05 |
+| `invana branches list --project` · `fork <b> --into "…" "…"` · `merge <from> <into>` | the tree of inquiry | ✅ B05 |
+| `invana findings add --branch --stance supports\|contradicts\|context --cites <record…>` · `review` | evidence for or against; an agent's waits for a person's review | ✅ B05 |
+| `invana branches decide <b> --verdict … --decision … --rationale "…"` | verdict and decision; rules checked; supersedes, never edits | ✅ B05 |
+| `invana proposals list` · `accept` · `reject` | what agents proposed | ✅ B05 |
 | `invana todos list [--mine]` · `add` · `done` | todos, with or without a project | ✅ partly (today's projects API) · New CLI |
-| `invana reports generate --project` · `publish` · `export --format pdf\|md` | versioned write-ups | New · P-10 |
+| `invana reports generate --project` · `publish` · `export --format md` | versioned write-ups; PDF is Studio's print | ✅ B05 |
 | `invana lineage --decision <id>` | everything behind a decision | New · P-10 |
 | `invana simulate --branch --plugin <name> --file <spec>` | run a simulator plugin | Later · P-06 P-07 |
 

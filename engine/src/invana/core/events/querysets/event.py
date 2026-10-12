@@ -36,6 +36,8 @@ class EventFilter:
     actor_kind: str | None = None
     on_behalf_of: str | None = None
     project_id: str | None = None
+    #: Projects whose events the reader may not see — a private project they are not on.
+    exclude_project_ids: frozenset[str] = frozenset()
     task_id: str | None = None
     run_id: str | None = None
     skill_id: str | None = None
@@ -124,6 +126,10 @@ class EventQuerySet:
             stmt = stmt.where(Event.on_behalf_of_user_id == filters.on_behalf_of)
         if filters.project_id is not None:
             stmt = stmt.where(Event.project_id == filters.project_id)
+        if filters.exclude_project_ids:
+            stmt = stmt.where(
+                or_(Event.project_id.is_(None), Event.project_id.not_in(sorted(filters.exclude_project_ids))),
+            )
         if filters.task_id is not None:
             stmt = stmt.where(Event.task_id == filters.task_id)
         if filters.run_id is not None:

@@ -166,6 +166,12 @@ sub-slots, the URL params and the retired words are in
 |---|---|
 | **Project** | A piece of work inside a Graph — a folder of **Todos**, staffed by principals. Its own record: it never runs, has no criteria and no plan. Flat — there are no sub-projects. |
 | **Todo** | One unit of work a person wrote, with a definition of done. A Todo may have no Project (the Graph's *No project* bucket) and no plan at all (a person simply does it). **This is the word that used to be "Task".** |
+| **Project type** | What a project is deciding, and so its words: `research · investment · policy · market · investigation · general`. Changing it only relabels. [9.5](modules/work/features/branches-and-decisions.md) |
+| **Branch** | One line of inquiry inside a project. The type names it — hypothesis, thesis, option, position, lead. Forked, merged, parked, dropped; never a sub-project. |
+| **Finding** | One piece of evidence on a branch, with a **stance** — `supports · contradicts · context` — and what it cites. The type may call it a signal, insight or evidence. |
+| **Project decision** | A person's verdict (`supported · refuted · inconclusive`) and decision (`pursue · park · drop · merge`) on a branch, in the type's words, checked by the rules. Append-only: revisiting **supersedes**. In code `ProjectDecision`; in a project's UI just *decision* and *verdict*. Not an approval's answer and not a runtime verdict ([§4](#4-asking-and-answering)). |
+| **Project proposal** | An agent's suggested fork or decision on a branch; a person accepts or rejects it. Not a memory proposal. |
+| **Project report** | A project written up from its records and published as frozen versions. Not a *Report* board ([§5](#5-working-surfaces)). |
 | **Objective** | One statement of what a Project is for. |
 | **Criterion** | One checkable statement of "done", with how it is checked: `query · agent · human`. |
 | **Outcome** | A criterion's finding on one Todo, with its evidence: met · unmet · needs a human. Not a **verdict** — that is a person answering a paused Task. |

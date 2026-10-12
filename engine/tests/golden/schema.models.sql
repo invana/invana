@@ -103,6 +103,22 @@ CREATE INDEX ix_boards_graph_id ON boards (graph_id);
 
 CREATE INDEX ix_boards_graph_kind ON boards (graph_id, kind);
 
+CREATE TABLE branch_findings (
+	id VARCHAR(36) NOT NULL, 
+	branch_id VARCHAR(36) NOT NULL, 
+	finding_id VARCHAR(36) NOT NULL, 
+	via VARCHAR(8) NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_branch_finding UNIQUE (branch_id, finding_id), 
+	FOREIGN KEY(branch_id) REFERENCES project_branches (id) ON DELETE CASCADE, 
+	FOREIGN KEY(finding_id) REFERENCES project_findings (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_branch_findings_branch_id ON branch_findings (branch_id);
+
+CREATE INDEX ix_branch_findings_finding_id ON branch_findings (finding_id);
+
 CREATE TABLE constraint_definitions (
 	id VARCHAR(36) NOT NULL, 
 	version_id VARCHAR(36) NOT NULL, 
@@ -661,6 +677,142 @@ CREATE TABLE project_assignments (
 
 CREATE INDEX ix_project_assignments_project_id ON project_assignments (project_id);
 
+CREATE TABLE project_branches (
+	id VARCHAR(36) NOT NULL, 
+	project_id VARCHAR(36) NOT NULL, 
+	number INTEGER NOT NULL, 
+	parent_id VARCHAR(36), 
+	title VARCHAR(500) NOT NULL, 
+	body TEXT NOT NULL, 
+	status VARCHAR(16) NOT NULL, 
+	merged_into_id VARCHAR(36), 
+	created_by_kind VARCHAR(16) NOT NULL, 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_project_branch_number UNIQUE (project_id, number), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(parent_id) REFERENCES project_branches (id) ON DELETE CASCADE, 
+	FOREIGN KEY(merged_into_id) REFERENCES project_branches (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_project_branches_parent_id ON project_branches (parent_id);
+
+CREATE INDEX ix_project_branches_project_id ON project_branches (project_id);
+
+CREATE TABLE project_decisions (
+	id VARCHAR(36) NOT NULL, 
+	project_id VARCHAR(36) NOT NULL, 
+	branch_id VARCHAR(36) NOT NULL, 
+	number INTEGER NOT NULL, 
+	verdict VARCHAR(16) NOT NULL, 
+	choice VARCHAR(16) NOT NULL, 
+	rationale TEXT NOT NULL, 
+	cites JSON NOT NULL, 
+	addresses JSON NOT NULL, 
+	into_branch_id VARCHAR(36), 
+	supersedes_id VARCHAR(36), 
+	checks JSON NOT NULL, 
+	warnings JSON NOT NULL, 
+	decided_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_project_decision_number UNIQUE (project_id, number), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(branch_id) REFERENCES project_branches (id) ON DELETE CASCADE, 
+	FOREIGN KEY(into_branch_id) REFERENCES project_branches (id) ON DELETE SET NULL, 
+	UNIQUE (supersedes_id), 
+	FOREIGN KEY(supersedes_id) REFERENCES project_decisions (id) ON DELETE SET NULL, 
+	FOREIGN KEY(decided_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_project_decisions_branch_id ON project_decisions (branch_id);
+
+CREATE INDEX ix_project_decisions_project_id ON project_decisions (project_id);
+
+CREATE TABLE project_findings (
+	id VARCHAR(36) NOT NULL, 
+	project_id VARCHAR(36) NOT NULL, 
+	branch_id VARCHAR(36) NOT NULL, 
+	number INTEGER NOT NULL, 
+	statement TEXT NOT NULL, 
+	stance VARCHAR(16) NOT NULL, 
+	cites JSON NOT NULL, 
+	added_by_kind VARCHAR(16) NOT NULL, 
+	added_by_id VARCHAR(36), 
+	reviewed_by_id VARCHAR(36), 
+	reviewed_at TIMESTAMP WITH TIME ZONE, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_project_finding_number UNIQUE (project_id, number), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(branch_id) REFERENCES project_branches (id) ON DELETE CASCADE, 
+	FOREIGN KEY(reviewed_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_project_findings_branch_id ON project_findings (branch_id);
+
+CREATE INDEX ix_project_findings_project_id ON project_findings (project_id);
+
+CREATE TABLE project_proposals (
+	id VARCHAR(36) NOT NULL, 
+	project_id VARCHAR(36) NOT NULL, 
+	branch_id VARCHAR(36) NOT NULL, 
+	number INTEGER NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	payload JSON NOT NULL, 
+	rationale TEXT NOT NULL, 
+	status VARCHAR(16) NOT NULL, 
+	agent_id VARCHAR(36), 
+	submitted_by_id VARCHAR(36), 
+	resolved_by_id VARCHAR(36), 
+	resolved_at TIMESTAMP WITH TIME ZONE, 
+	note TEXT NOT NULL, 
+	result JSON, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_project_proposal_number UNIQUE (project_id, number), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(branch_id) REFERENCES project_branches (id) ON DELETE CASCADE, 
+	FOREIGN KEY(agent_id) REFERENCES agents (id) ON DELETE SET NULL, 
+	FOREIGN KEY(resolved_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_project_proposals_branch_id ON project_proposals (branch_id);
+
+CREATE INDEX ix_project_proposals_project_id ON project_proposals (project_id);
+
+CREATE INDEX ix_project_proposals_status ON project_proposals (status);
+
+CREATE TABLE project_report_versions (
+	id VARCHAR(36) NOT NULL, 
+	report_id VARCHAR(36) NOT NULL, 
+	version INTEGER NOT NULL, 
+	body TEXT NOT NULL, 
+	cites JSON NOT NULL, 
+	published_by_id VARCHAR(36), 
+	published_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_project_report_version UNIQUE (report_id, version), 
+	FOREIGN KEY(report_id) REFERENCES project_reports (id) ON DELETE CASCADE, 
+	FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_project_report_versions_report_id ON project_report_versions (report_id);
+
+CREATE TABLE project_reports (
+	id VARCHAR(36) NOT NULL, 
+	project_id VARCHAR(36) NOT NULL, 
+	draft TEXT NOT NULL, 
+	draft_updated_by_id VARCHAR(36), 
+	draft_updated_at TIMESTAMP WITH TIME ZONE, 
+	PRIMARY KEY (id), 
+	UNIQUE (project_id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(draft_updated_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
 CREATE TABLE projection_templates (
 	id VARCHAR(36) NOT NULL, 
 	graph_id VARCHAR(36), 
@@ -688,6 +840,9 @@ CREATE TABLE projects (
 	name VARCHAR(255) NOT NULL, 
 	description TEXT NOT NULL, 
 	status VARCHAR(16) NOT NULL, 
+	type VARCHAR(16) NOT NULL, 
+	question TEXT NOT NULL, 
+	visibility VARCHAR(16) NOT NULL, 
 	created_by_kind VARCHAR(16) NOT NULL, 
 	created_by_id VARCHAR(36), 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
@@ -1217,6 +1372,7 @@ CREATE TABLE todos (
 	graph_id VARCHAR(36) NOT NULL, 
 	project_id VARCHAR(36), 
 	parent_id VARCHAR(36), 
+	branch_id VARCHAR(36), 
 	title VARCHAR(255) NOT NULL, 
 	body TEXT NOT NULL, 
 	acceptance TEXT NOT NULL, 
@@ -1234,10 +1390,13 @@ CREATE TABLE todos (
 	PRIMARY KEY (id), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE SET NULL, 
-	FOREIGN KEY(parent_id) REFERENCES todos (id) ON DELETE CASCADE
+	FOREIGN KEY(parent_id) REFERENCES todos (id) ON DELETE CASCADE, 
+	FOREIGN KEY(branch_id) REFERENCES project_branches (id) ON DELETE SET NULL
 );
 
 CREATE INDEX ix_todos_assignee_id ON todos (assignee_id);
+
+CREATE INDEX ix_todos_branch_id ON todos (branch_id);
 
 CREATE INDEX ix_todos_graph_id ON todos (graph_id);
 

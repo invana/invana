@@ -153,6 +153,16 @@ PROJECT_UNARCHIVE = "project.unarchive"  # archiving is reversible, and the way 
 PROJECT_STAFF = "project.staff"
 PROJECT_UNSTAFF = "project.unstaff"
 PROJECT_DELETE = "project.delete"
+# The records a quest is made of (docs/for-developers/modules/work/features/branches-and-decisions.md)
+BRANCH_FORK = "branch.fork"
+FINDING_ADD = "finding.add"
+FINDING_REVIEW = "finding.review"
+DECISION_RECORD = "decision.record"  # a verdict and a decision; a superseding one names its predecessor
+PROPOSAL_SUBMIT = "proposal.submit"
+PROPOSAL_ACCEPT = "proposal.accept"
+PROPOSAL_REJECT = "proposal.reject"
+REPORT_GENERATE = "report.generate"
+REPORT_PUBLISH = "report.publish"
 
 # ── Tasks — the assignable unit of work (docs/for-developers/modules/work/spec.md) ─────────────────────────
 TASK_CREATE = "task.create"

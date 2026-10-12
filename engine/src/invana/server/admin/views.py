@@ -48,7 +48,19 @@ from invana.apps.skills.models import (
 from invana.apps.standards.models import Standard, StandardVersion
 from invana.apps.task_plans.models import Task as PlanTask
 from invana.apps.task_plans.models import TaskPlan
-from invana.apps.work.models import Project, ProjectAssignment, Task, TaskDependency
+from invana.apps.work.models import (
+    BranchFinding,
+    Project,
+    ProjectAssignment,
+    ProjectBranch,
+    ProjectDecision,
+    ProjectFinding,
+    ProjectProposal,
+    ProjectReport,
+    ProjectReportVersion,
+    Task,
+    TaskDependency,
+)
 from invana.core.auth.models import PersonalAccessToken, RefreshToken, User
 from invana.core.events.models import Event
 from invana.runtime.models import (
@@ -124,7 +136,14 @@ from invana.server.skills.admin import (
 from invana.server.standards.admin import StandardVersionView, StandardView
 from invana.server.task_plans.admin import PlanTaskView, TaskPlanView
 from invana.server.work.admin import (
+    BranchFindingView,
     ProjectAssignmentView,
+    ProjectBranchView,
+    ProjectDecisionView,
+    ProjectFindingView,
+    ProjectProposalView,
+    ProjectReportVersionView,
+    ProjectReportView,
     ProjectView,
     TaskDependencyView,
     TaskView,
@@ -302,6 +321,13 @@ def mount_admin(app: FastAPI) -> None:
                 PlanTaskView(PlanTask, label="Plan tasks", icon="fa fa-diagram-project"),
                 ProjectView(Project, label="Projects", icon="fa fa-folder-open"),
                 ProjectAssignmentView(ProjectAssignment, label="Project staffing", icon="fa fa-user-plus"),
+                ProjectBranchView(ProjectBranch, label="Project branches", icon="fa fa-code-branch"),
+                ProjectFindingView(ProjectFinding, label="Project findings", icon="fa fa-magnifying-glass"),
+                BranchFindingView(BranchFinding, label="Branch findings", icon="fa fa-link"),
+                ProjectDecisionView(ProjectDecision, label="Project decisions", icon="fa fa-gavel"),
+                ProjectProposalView(ProjectProposal, label="Project proposals", icon="fa fa-lightbulb"),
+                ProjectReportView(ProjectReport, label="Project reports", icon="fa fa-file-lines"),
+                ProjectReportVersionView(ProjectReportVersion, label="Report versions", icon="fa fa-file-signature"),
                 TaskView(Task, label="Tasks", icon="fa fa-list-check"),
                 TaskDependencyView(TaskDependency, label="Task dependencies", icon="fa fa-arrow-right-long"),
             ],

@@ -124,7 +124,7 @@ flowchart TD
 | Not building | Because |
 |---|---|
 | Per-record permissions | an area is the unit; a finer grain is unproven |
-| Private projects | B05 adds per-project access on top of these roles |
+| Private projects | Per-project access sits on top of these roles — [9.7](../../work/features/private-projects.md) |
 | Custom roles | five named roles are the product's words |
 | Role-aware agents | agents are principals bounded by an envelope ([MB5](membership.md)) |
 | Hiding a product a role cannot read | every role reads every product today |

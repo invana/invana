@@ -46,6 +46,13 @@ from invana.cli.commands.members import members_cmd
 from invana.cli.commands.migrate import migrate_cmd
 from invana.cli.commands.models import models_cmd
 from invana.cli.commands.plans import plans_cmd
+from invana.cli.commands.projects import (
+    branches_cmd,
+    findings_cmd,
+    projects_cmd,
+    proposals_cmd,
+    reports_cmd,
+)
 from invana.cli.commands.records import records_cmd
 from invana.cli.commands.rules import rules_cmd
 from invana.cli.commands.search import search_cmd
@@ -213,6 +220,11 @@ app.add_command(datasets_cmd)
 app.add_command(standards_cmd)
 app.add_command(rules_cmd)
 app.add_command(members_cmd)
+app.add_command(projects_cmd)
+app.add_command(branches_cmd)
+app.add_command(findings_cmd)
+app.add_command(proposals_cmd)
+app.add_command(reports_cmd)
 app.add_command(search_cmd)
 app.add_command(stitches_cmd)
 app.add_command(govern_cmd)

@@ -18,6 +18,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.work.managers import ProjectManager
 from invana.core.auth.deps import require_superuser
 from invana.core.auth.models import User
 from invana.core.db import get_session
@@ -122,11 +123,14 @@ async def list_graph_events(
     changes: bool = Query(default=False, description="Only the events that mint a version — the change log."),
     since: datetime | None = Query(default=None),
     until: datetime | None = Query(default=None),
-    _: GraphMember = Depends(require_graph_member),
+    member: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> EventListResponse:
     """Events for this graph only. Any graph member.
+
+    The events of a private project the member is not on are left out, so the
+    feed never names a project the member cannot open.
 
     ``changes=true`` is the change log: only the events that mint a version of
     a versioned record, composed with every other filter
@@ -140,6 +144,9 @@ async def list_graph_events(
             actor_kind=actor_kind,
             on_behalf_of=on_behalf_of,
             project_id=project,
+            exclude_project_ids=frozenset(
+                await ProjectManager().hidden_ids(session, graph_id=graph.id, reader_id=member.user_id),
+            ),
             task_id=task,
             run_id=run,
             skill_id=skill,
@@ -160,7 +167,11 @@ async def stream_graph_events(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
 ) -> StreamingResponse:
-    """SSE companion for the per-graph view."""
+    """SSE companion for the per-graph view.
+
+    A frame carries only an event's id, Graph and time; the client reads the
+    row through the list above, which applies the member's project access.
+    """
     broadcaster = _get_broadcaster(request)
     sub = broadcaster.subscribe(graph_id_filter=graph.id)
     return _sse_response(iter_frames(sub))

@@ -56,12 +56,18 @@ class TaskManager:
 
     # ── Reads ────────────────────────────────────────────────────────────────
 
-    async def list_for_graph(self, session: AsyncSession, **kwargs) -> list[Task]:
-        return await self.tasks_qs.list_for_graph(session, **kwargs)
+    async def list_for_graph(self, session: AsyncSession, *, reader_id: str | None = None, **kwargs) -> list[Task]:
+        """A Graph's todos, without those of private projects the reader is not on."""
+        hidden = await self.projects.hidden_ids(session, graph_id=kwargs["graph_id"], reader_id=reader_id)
+        return await self.tasks_qs.list_for_graph(session, exclude_project_ids=hidden, **kwargs)
 
-    async def get(self, session: AsyncSession, *, task_id: str, graph_id: str) -> Task:
+    async def get(self, session: AsyncSession, *, task_id: str, graph_id: str, reader_id: str | None = None) -> Task:
+        """One todo; a todo of a private project the reader is not on reads as absent."""
         task = await self.tasks_qs.get(session, task_id)
         if task is None or task.graph_id != graph_id:
+            raise NotFoundError("Task not found.")
+        hidden = await self.projects.hidden_ids(session, graph_id=graph_id, reader_id=reader_id)
+        if task.project_id is not None and task.project_id in hidden:
             raise NotFoundError("Task not found.")
         return task
 
@@ -76,8 +82,20 @@ class TaskManager:
     async def create(self, session: AsyncSession, *, graph: Graph, payload: TaskCreate, actor: User) -> Task:
         project = None
         if payload.project_key:
-            project = await self.projects.get_by_key(session, key=payload.project_key, graph_id=graph.id)
+            project = await self.projects.get_by_key(
+                session, key=payload.project_key, graph_id=graph.id, reader_id=actor.id
+            )
             self.projects.require_writable(project)
+        branch_id = None
+        if payload.branch is not None:
+            if project is None:
+                raise ValidationError("A branch is a branch of a project — name the project too.")
+            branch = await self.projects.branches_qs.get_by_number(
+                session, project_id=project.id, number=payload.branch
+            )
+            if branch is None:
+                raise NotFoundError(f"Branch {payload.branch} not found in '{project.key}'.")
+            branch_id = branch.id
 
         if payload.parent_id:
             parent = await self.get(session, task_id=payload.parent_id, graph_id=graph.id)
@@ -92,6 +110,7 @@ class TaskManager:
             graph_id=graph.id,
             project_id=project.id if project else None,
             parent_id=payload.parent_id,
+            branch_id=branch_id,
             title=payload.title,
             body=payload.body,
             acceptance=payload.acceptance,
@@ -129,7 +148,9 @@ class TaskManager:
         await self._require_writable(session, task)
 
         if payload.project_key is not None:
-            project = await self.projects.get_by_key(session, key=payload.project_key, graph_id=graph.id)
+            project = await self.projects.get_by_key(
+                session, key=payload.project_key, graph_id=graph.id, reader_id=actor.id
+            )
             task.project_id = project.id
 
         fields = ["title", "body", "acceptance", "due_at"]

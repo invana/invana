@@ -349,7 +349,7 @@ class SkillListResponse(BaseModel):
 class RuleCheck(BaseModel):
     """A rule's machine half, from a closed vocabulary — ``invana.apps.skills.checks``."""
 
-    kind: Literal["dataset.conforms", "dataset.licence"]
+    kind: Literal["dataset.conforms", "dataset.licence", "evidence.reviewed", "evidence.not_retracted"]
     #: ``dataset.conforms``: the standard as ``publisher/name``.
     standard: str | None = Field(default=None, max_length=200)
     #: ``dataset.conforms``: the lowest score that passes; 1 when omitted.

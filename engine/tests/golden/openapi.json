@@ -2965,6 +2965,199 @@
         "title": "BoundUse",
         "type": "object"
       },
+      "BranchDetail": {
+        "description": "The branch page in one call.",
+        "properties": {
+          "branch": {
+            "$ref": "#/components/schemas/BranchRead"
+          },
+          "children": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Children",
+            "type": "array"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionRead"
+            },
+            "title": "Decisions",
+            "type": "array"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/FindingRead"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "proposals": {
+            "items": {
+              "$ref": "#/components/schemas/ProposalRead"
+            },
+            "title": "Proposals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "branch",
+          "findings",
+          "decisions",
+          "proposals",
+          "children"
+        ],
+        "title": "BranchDetail",
+        "type": "object"
+      },
+      "BranchFork": {
+        "description": "One child per title.",
+        "properties": {
+          "titles": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Titles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "titles"
+        ],
+        "title": "BranchFork",
+        "type": "object"
+      },
+      "BranchListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BranchRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "BranchListResponse",
+        "type": "object"
+      },
+      "BranchRead": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "context": {
+            "default": 0,
+            "title": "Context",
+            "type": "integer"
+          },
+          "contradicts": {
+            "default": 0,
+            "title": "Contradicts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Id"
+          },
+          "created_by_kind": {
+            "title": "Created By Kind",
+            "type": "string"
+          },
+          "current_decision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Decision"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "merged_into_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merged Into Number"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "parent_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Number"
+          },
+          "project_id": {
+            "title": "Project Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "supports": {
+            "default": 0,
+            "title": "Supports",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "number",
+          "title",
+          "body",
+          "status",
+          "created_by_kind",
+          "created_by_id",
+          "created_at"
+        ],
+        "title": "BranchRead",
+        "type": "object"
+      },
       "CalledBy": {
         "properties": {
           "kind": {
@@ -3583,6 +3776,39 @@
           "new_password"
         ],
         "title": "ChangePasswordRequest",
+        "type": "object"
+      },
+      "Cite": {
+        "description": "What a finding rests on: a graph record, a dataset version or a run.",
+        "properties": {
+          "kind": {
+            "pattern": "^(record|dataset|run)$",
+            "title": "Kind",
+            "type": "string"
+          },
+          "ref": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Ref",
+            "type": "string"
+          },
+          "version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version Id"
+          }
+        },
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "title": "Cite",
         "type": "object"
       },
       "CommitRequest": {
@@ -5111,6 +5337,322 @@
           "value"
         ],
         "title": "DayValue",
+        "type": "object"
+      },
+      "DecisionCheck": {
+        "properties": {
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "rule_id": {
+            "title": "Rule Id",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule_id",
+          "version",
+          "statement",
+          "mode",
+          "passed"
+        ],
+        "title": "DecisionCheck",
+        "type": "object"
+      },
+      "DecisionCreate": {
+        "properties": {
+          "addresses": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Addresses",
+            "type": "array"
+          },
+          "carry": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Carry"
+          },
+          "choice": {
+            "pattern": "^(pursue|park|drop|merge)$",
+            "title": "Choice",
+            "type": "string"
+          },
+          "cites": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cites"
+          },
+          "into": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Into"
+          },
+          "rationale": {
+            "minLength": 1,
+            "title": "Rationale",
+            "type": "string"
+          },
+          "supersedes": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supersedes"
+          },
+          "verdict": {
+            "pattern": "^(supported|refuted|inconclusive)$",
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verdict",
+          "choice",
+          "rationale"
+        ],
+        "title": "DecisionCreate",
+        "type": "object"
+      },
+      "DecisionListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "DecisionListResponse",
+        "type": "object"
+      },
+      "DecisionRead": {
+        "properties": {
+          "addresses": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Addresses",
+            "type": "array"
+          },
+          "branch_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Branch Number"
+          },
+          "checks": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DecisionCheck"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "choice": {
+            "title": "Choice",
+            "type": "string"
+          },
+          "choice_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Choice Label"
+          },
+          "cites": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Cites",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decided_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "into_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Into Number"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "project_id": {
+            "title": "Project Id",
+            "type": "string"
+          },
+          "project_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Key"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "superseded_by_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Superseded By Number"
+          },
+          "supersedes_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supersedes Number"
+          },
+          "verdict": {
+            "title": "Verdict",
+            "type": "string"
+          },
+          "verdict_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verdict Label"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "number",
+          "verdict",
+          "choice",
+          "rationale",
+          "decided_by_id",
+          "created_at"
+        ],
+        "title": "DecisionRead",
         "type": "object"
       },
       "DeclaredAxes": {
@@ -6943,6 +7485,156 @@
         ],
         "title": "FilterOp",
         "type": "string"
+      },
+      "FindingCreate": {
+        "properties": {
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "cites": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Cite"
+            },
+            "title": "Cites",
+            "type": "array"
+          },
+          "stance": {
+            "pattern": "^(supports|contradicts|context)$",
+            "title": "Stance",
+            "type": "string"
+          },
+          "statement": {
+            "minLength": 1,
+            "title": "Statement",
+            "type": "string"
+          }
+        },
+        "required": [
+          "statement",
+          "stance"
+        ],
+        "title": "FindingCreate",
+        "type": "object"
+      },
+      "FindingRead": {
+        "properties": {
+          "added_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Added By Id"
+          },
+          "added_by_kind": {
+            "title": "Added By Kind",
+            "type": "string"
+          },
+          "branch_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Branch Number"
+          },
+          "cites": {
+            "items": {
+              "$ref": "#/components/schemas/Cite"
+            },
+            "title": "Cites",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "project_id": {
+            "title": "Project Id",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewed_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By Id"
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Via"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "number",
+          "statement",
+          "stance",
+          "cites",
+          "added_by_kind",
+          "added_by_id",
+          "reviewed_by_id",
+          "reviewed_at",
+          "created_at"
+        ],
+        "title": "FindingRead",
+        "type": "object"
       },
       "GlobalModel": {
         "description": "The union of a Graph's published models plus its declared links.",
@@ -11495,6 +12187,18 @@
             "title": "Description",
             "type": "string"
           },
+          "first_branch": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Branch"
+          },
           "key": {
             "anyOf": [
               {
@@ -11513,6 +12217,23 @@
             "maxLength": 255,
             "minLength": 1,
             "title": "Name",
+            "type": "string"
+          },
+          "question": {
+            "default": "",
+            "title": "Question",
+            "type": "string"
+          },
+          "type": {
+            "default": "general",
+            "maxLength": 16,
+            "title": "Type",
+            "type": "string"
+          },
+          "visibility": {
+            "default": "graph",
+            "pattern": "^(graph|private)$",
+            "title": "Visibility",
             "type": "string"
           }
         },
@@ -11645,6 +12366,11 @@
             "title": "Open Task Count",
             "type": "integer"
           },
+          "question": {
+            "default": "",
+            "title": "Question",
+            "type": "string"
+          },
           "status": {
             "title": "Status",
             "type": "string"
@@ -11654,10 +12380,30 @@
             "title": "Task Count",
             "type": "integer"
           },
+          "type": {
+            "default": "general",
+            "title": "Type",
+            "type": "string"
+          },
           "updated_at": {
             "format": "date-time",
             "title": "Updated At",
             "type": "string"
+          },
+          "visibility": {
+            "default": "graph",
+            "title": "Visibility",
+            "type": "string"
+          },
+          "words": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectWords"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -11701,6 +12447,17 @@
             ],
             "title": "Name"
           },
+          "question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question"
+          },
           "status": {
             "anyOf": [
               {
@@ -11712,9 +12469,76 @@
               }
             ],
             "title": "Status"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "pattern": "^(graph|private)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visibility"
           }
         },
         "title": "ProjectUpdate",
+        "type": "object"
+      },
+      "ProjectWords": {
+        "description": "The type's words for a branch, evidence, verdicts and decisions.",
+        "properties": {
+          "branch": {
+            "title": "Branch",
+            "type": "string"
+          },
+          "choices": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Choices",
+            "type": "object"
+          },
+          "evidence": {
+            "title": "Evidence",
+            "type": "string"
+          },
+          "opens_first": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Opens First",
+            "type": "array"
+          },
+          "verdicts": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Verdicts",
+            "type": "object"
+          }
+        },
+        "required": [
+          "branch",
+          "evidence",
+          "verdicts",
+          "choices",
+          "opens_first"
+        ],
+        "title": "ProjectWords",
         "type": "object"
       },
       "ProjectionOperation": {
@@ -12063,6 +12887,215 @@
           "cold"
         ],
         "title": "PropertyUse",
+        "type": "object"
+      },
+      "ProposalCreate": {
+        "properties": {
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecisionCreate"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "pattern": "^(fork|decision)$",
+            "title": "Kind",
+            "type": "string"
+          },
+          "rationale": {
+            "minLength": 1,
+            "title": "Rationale",
+            "type": "string"
+          },
+          "titles": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Titles"
+          }
+        },
+        "required": [
+          "agent_id",
+          "kind",
+          "rationale"
+        ],
+        "title": "ProposalCreate",
+        "type": "object"
+      },
+      "ProposalListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ProposalRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "ProposalListResponse",
+        "type": "object"
+      },
+      "ProposalRead": {
+        "properties": {
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "branch_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Branch Number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "project_id": {
+            "title": "Project Id",
+            "type": "string"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "resolved_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved By Id"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "submitted_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted By Id"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "number",
+          "kind",
+          "payload",
+          "rationale",
+          "status",
+          "agent_id",
+          "submitted_by_id",
+          "resolved_by_id",
+          "resolved_at",
+          "note",
+          "result",
+          "created_at"
+        ],
+        "title": "ProposalRead",
+        "type": "object"
+      },
+      "ProposalResolve": {
+        "properties": {
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "title": "ProposalResolve",
         "type": "object"
       },
       "PublishMark": {
@@ -12461,6 +13494,169 @@
         "title": "RegisterRequest",
         "type": "object"
       },
+      "ReportCite": {
+        "properties": {
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "version_id": {
+            "title": "Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref",
+          "version_id"
+        ],
+        "title": "ReportCite",
+        "type": "object"
+      },
+      "ReportDraftUpdate": {
+        "properties": {
+          "draft": {
+            "title": "Draft",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draft"
+        ],
+        "title": "ReportDraftUpdate",
+        "type": "object"
+      },
+      "ReportRead": {
+        "properties": {
+          "draft": {
+            "title": "Draft",
+            "type": "string"
+          },
+          "draft_updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Draft Updated At"
+          },
+          "draft_updated_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Draft Updated By Id"
+          },
+          "project_key": {
+            "title": "Project Key",
+            "type": "string"
+          },
+          "versions": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ReportVersionSummary"
+            },
+            "title": "Versions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "project_key",
+          "draft"
+        ],
+        "title": "ReportRead",
+        "type": "object"
+      },
+      "ReportVersionRead": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "cites": {
+            "items": {
+              "$ref": "#/components/schemas/ReportCite"
+            },
+            "title": "Cites",
+            "type": "array"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "published_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published By Id"
+          },
+          "retracted": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Retracted",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "body",
+          "cites",
+          "published_by_id",
+          "published_at"
+        ],
+        "title": "ReportVersionRead",
+        "type": "object"
+      },
+      "ReportVersionSummary": {
+        "properties": {
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "published_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published By Id"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "published_by_id",
+          "published_at"
+        ],
+        "title": "ReportVersionSummary",
+        "type": "object"
+      },
       "RerunResponse": {
         "description": "202 \u2014 a new run is re-running the reply's query in place.",
         "properties": {
@@ -12707,7 +13903,9 @@
           "kind": {
             "enum": [
               "dataset.conforms",
-              "dataset.licence"
+              "dataset.licence",
+              "evidence.reviewed",
+              "evidence.not_retracted"
             ],
             "title": "Kind",
             "type": "string"
@@ -17188,6 +18386,18 @@
             "title": "Body",
             "type": "string"
           },
+          "branch": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Branch"
+          },
           "due_at": {
             "anyOf": [
               {
@@ -17723,6 +18933,17 @@
           "body": {
             "title": "Body",
             "type": "string"
+          },
+          "branch_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Branch Id"
           },
           "closed_at": {
             "anyOf": [
@@ -26816,6 +28037,67 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/decisions": {
+      "get": {
+        "description": "Every decision in the Graph the reader may see, newest first \u2014 the Decisions rail item.",
+        "operationId": "list_decisions_api_v1_u__username___graphSlug__decisions_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Decisions",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/default-agent": {
       "post": {
         "operationId": "set_default_agent_api_v1_u__username___graphSlug__default_agent_post",
@@ -27932,7 +29214,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/events": {
       "get": {
-        "description": "Events for this graph only. Any graph member.\n\n``changes=true`` is the change log: only the events that mint a version of\na versioned record, composed with every other filter\n(docs/for-developers/modules/operate/features/change-log.md).",
+        "description": "Events for this graph only. Any graph member.\n\nThe events of a private project the member is not on are left out, so the\nfeed never names a project the member cannot open.\n\n``changes=true`` is the change log: only the events that mint a version of\na versioned record, composed with every other filter\n(docs/for-developers/modules/operate/features/change-log.md).",
         "operationId": "list_graph_events_api_v1_u__username___graphSlug__events_get",
         "parameters": [
           {
@@ -28218,7 +29500,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/events/stream": {
       "get": {
-        "description": "SSE companion for the per-graph view.",
+        "description": "SSE companion for the per-graph view.\n\nA frame carries only an event's id, Graph and time; the client reads the\nrow through the list above, which applies the member's project access.",
         "operationId": "stream_graph_events_api_v1_u__username___graphSlug__events_stream_get",
         "parameters": [
           {
@@ -34849,6 +36131,739 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/branches": {
+      "get": {
+        "operationId": "list_branches_api_v1_u__username___graphSlug__projects__key__branches_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Branches",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/branches/{number}": {
+      "get": {
+        "description": "The branch page in one call: the branch, its evidence, decisions, proposals and children.",
+        "operationId": "get_branch_api_v1_u__username___graphSlug__projects__key__branches__number__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Branch",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/branches/{number}/decisions": {
+      "post": {
+        "description": "A verdict and a decision, checked by every rule in force. Only a person decides.",
+        "operationId": "decide_branch_api_v1_u__username___graphSlug__projects__key__branches__number__decisions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Decide Branch",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/branches/{number}/findings": {
+      "post": {
+        "operationId": "add_finding_api_v1_u__username___graphSlug__projects__key__branches__number__findings_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FindingCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindingRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Add Finding",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/branches/{number}/fork": {
+      "post": {
+        "operationId": "fork_branch_api_v1_u__username___graphSlug__projects__key__branches__number__fork_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchFork"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Fork Branch",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/branches/{number}/proposals": {
+      "post": {
+        "operationId": "submit_proposal_api_v1_u__username___graphSlug__projects__key__branches__number__proposals_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Submit Proposal",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/decisions": {
+      "get": {
+        "operationId": "list_project_decisions_api_v1_u__username___graphSlug__projects__key__decisions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Project Decisions",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/findings/{number}": {
+      "get": {
+        "operationId": "get_finding_api_v1_u__username___graphSlug__projects__key__findings__number__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindingRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Finding",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/findings/{number}/review": {
+      "post": {
+        "operationId": "review_finding_api_v1_u__username___graphSlug__projects__key__findings__number__review_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindingRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Review Finding",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/projects/{key}/plan": {
       "get": {
         "description": "Waves, blocked-by, the critical path and the edges \u2014 one call, because\nthe Plan tab and the Plan canvas are two renderings of the same fact.",
@@ -34914,6 +36929,711 @@
           }
         ],
         "summary": "Project Plan",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/proposals": {
+      "get": {
+        "operationId": "list_proposals_api_v1_u__username___graphSlug__projects__key__proposals_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(open|accepted|rejected)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Proposals",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/proposals/{number}/accept": {
+      "post": {
+        "description": "Do what the agent proposed, as this person \u2014 a decision runs the full rule check.",
+        "operationId": "accept_proposal_api_v1_u__username___graphSlug__projects__key__proposals__number__accept_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalResolve"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Accept Proposal",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/proposals/{number}/reject": {
+      "post": {
+        "operationId": "reject_proposal_api_v1_u__username___graphSlug__projects__key__proposals__number__reject_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Number",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalResolve"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reject Proposal",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/report": {
+      "get": {
+        "operationId": "get_report_api_v1_u__username___graphSlug__projects__key__report_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Report",
+        "tags": [
+          "projects"
+        ]
+      },
+      "put": {
+        "operationId": "edit_report_api_v1_u__username___graphSlug__projects__key__report_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportDraftUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Edit Report",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/report/generate": {
+      "post": {
+        "description": "Replace the draft with one drawn from the records \u2014 nothing invented.",
+        "operationId": "generate_report_api_v1_u__username___graphSlug__projects__key__report_generate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Generate Report",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/report/publish": {
+      "post": {
+        "operationId": "publish_report_api_v1_u__username___graphSlug__projects__key__report_publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Publish Report",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/report/versions/{version}": {
+      "get": {
+        "operationId": "get_report_version_api_v1_u__username___graphSlug__projects__key__report_versions__version__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Report Version",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/report/versions/{version}/export": {
+      "get": {
+        "description": "The version as Markdown, with the retraction notice above it when one applies.",
+        "operationId": "export_report_version_api_v1_u__username___graphSlug__projects__key__report_versions__version__export_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/markdown": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Export Report Version",
         "tags": [
           "projects"
         ]

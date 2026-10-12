@@ -4,12 +4,14 @@ A rule's **check** is its machine half: ``{kind, …params}`` from the table
 below, never free text an engine interprets, so an auditor can read every
 check there is (docs/for-developers/modules/skills/features/rules.md).
 
-=====================  ===========================  ===================  ==============
-kind                   params                       read at              scopes
-=====================  ===========================  ===================  ==============
-``dataset.conforms``   ``standard`` · ``min_score``  share · bind         install · graph
-``dataset.licence``    ``allowed``                   share · bind         install · graph
-=====================  ===========================  ===================  ==============
+==========================  ===========================  ==============  =======================
+kind                        params                       read at         scopes
+==========================  ===========================  ==============  =======================
+``dataset.conforms``        ``standard`` · ``min_score``  share · bind    install · graph
+``dataset.licence``         ``allowed``                   share · bind    install · graph
+``evidence.reviewed``       —                            decide          install · graph · project
+``evidence.not_retracted``  —                            decide          install · graph · project
+==========================  ===========================  ==============  =======================
 
 Pure: whether a named standard exists is the manager's to ask.
 
@@ -30,9 +32,15 @@ from invana.core.errors import ValidationError
 ACT_DATASET_SHARE = "dataset.share"
 #: A dataset version bound into a Graph.
 ACT_DATASET_BIND = "dataset.bind"
+#: A person recording a verdict and decision on a project branch.
+ACT_PROJECT_DECIDE = "project.decide"
 
 CONFORMS = "dataset.conforms"
 LICENCE = "dataset.licence"
+#: Every finding a decision cites was reviewed by a person.
+REVIEWED = "evidence.reviewed"
+#: No finding a decision cites cites a retracted dataset version.
+NOT_RETRACTED = "evidence.not_retracted"
 
 
 @dataclass(frozen=True)
@@ -52,6 +60,16 @@ CHECK_KINDS: dict[str, CheckKind] = {
         acts=frozenset({ACT_DATASET_SHARE, ACT_DATASET_BIND}),
         scopes=frozenset({"install", "graph"}),
         params=frozenset({"allowed"}),
+    ),
+    REVIEWED: CheckKind(
+        acts=frozenset({ACT_PROJECT_DECIDE}),
+        scopes=frozenset({"install", "graph", "project"}),
+        params=frozenset(),
+    ),
+    NOT_RETRACTED: CheckKind(
+        acts=frozenset({ACT_PROJECT_DECIDE}),
+        scopes=frozenset({"install", "graph", "project"}),
+        params=frozenset(),
     ),
 }
 
@@ -84,6 +102,9 @@ def normalise_check(check: dict[str, Any], *, scope: str) -> dict[str, Any]:
         if not 0.0 <= min_score <= 1.0:
             raise ValidationError("min_score is between 0 and 1.")
         return {"kind": kind, "standard": standard, "min_score": min_score}
+
+    if not spec.params:
+        return {"kind": kind}
 
     allowed = given.get("allowed")
     if not isinstance(allowed, list) or not [a for a in allowed if str(a).strip()]:

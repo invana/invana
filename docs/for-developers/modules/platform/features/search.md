@@ -76,7 +76,7 @@ flowchart TD
 |---|---|
 | SE1 | Search lives in `activity`, the band that may read every app, because it joins Graphs, models, agents, skills, projects, lenses and datasets. |
 | SE2 | Access is applied in the query, never after it: the queryset is handed the Graph ids the reader is a member of, and datasets are read through the dataset reading rule (install-visible, own, or every one for an install Admin). |
-| SE3 | Every member reads every record in their Graph, so a Graph role narrows nothing here. Per-project access (B05) filters `project` hits in `SearchManager`, the one place access is decided. |
+| SE3 | Every member reads every record in their Graph, so a Graph role narrows nothing here. A private project is a hit only for the people staffed on it ([9.7](../../work/features/private-projects.md)) — filtered in `SearchManager`, the one place search decides access. |
 | SE4 | Ranking is name-only: exact, prefix, contains, then the name. Meaning-based *related* hits wait for a vector index ([12.4](../../graph-connectors/features/vector-search.md)). |
 | SE5 | `graph=` naming a Graph the reader is not in is 404, as every Graph route reads a scoping refusal. |
 | SE6 | The Graph's own records (an airport, a gene) are not searched; that is the graph database's, through Explorer. |

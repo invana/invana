@@ -1,5 +1,8 @@
 """SQLAlchemy models for Work — ``projects``, ``project_assignments``, ``tasks``
-and ``task_dependencies`` (docs/for-developers/modules/work/spec.md).
+and ``task_dependencies`` (docs/for-developers/modules/work/spec.md), and the
+records a quest is made of — branches, findings, decisions, proposals and the
+report (docs/for-developers/modules/work/features/branches-and-decisions.md,
+project-reports.md).
 
 `projects` folded in here at migration-plan §17 step 6: the two packages held
 one idea and imported each other. Table names are unchanged, so no migration.
@@ -11,7 +14,7 @@ import enum
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, DateTime, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from invana.core.models import Base
@@ -88,6 +91,10 @@ class Task(Base):
     parent_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("todos.id", ondelete="CASCADE"), nullable=True, index=True
     )
+    # A branch of the todo's own project; open todos stay on a branch when it forks.
+    branch_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("project_branches.id", ondelete="SET NULL"), nullable=True, index=True
+    )
 
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     # The goal as prose. **This is the intent an agent plans from** — a
@@ -154,6 +161,12 @@ class ProjectStatus(enum.StrEnum):
     archived = "archived"
 
 
+class ProjectVisibility(enum.StrEnum):
+    graph = "graph"
+    # Only the principals staffed on it see it.
+    private = "private"
+
+
 class Project(Base):
     __tablename__ = "projects"
     __table_args__ = (UniqueConstraint("graph_id", "key", name="uq_project_graph_key"),)
@@ -168,6 +181,11 @@ class Project(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, default="", nullable=False)
     status: Mapped[str] = mapped_column(String(16), default=ProjectStatus.active.value, nullable=False)
+    # Sets the words the project speaks in; the stored records never change with it.
+    type: Mapped[str] = mapped_column(String(16), default="general", nullable=False)
+    # The one question the project is deciding.
+    question: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    visibility: Mapped[str] = mapped_column(String(16), default=ProjectVisibility.graph.value, nullable=False)
 
     created_by_kind: Mapped[str] = mapped_column(String(16), default="user", nullable=False)
     created_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
@@ -198,3 +216,246 @@ class ProjectAssignment(Base):
     assigned_by_kind: Mapped[str] = mapped_column(String(16), default="user", nullable=False)
     assigned_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     assigned_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+# ── Project records ──────────────────────────────────────────────────────────
+
+
+class BranchStatus(enum.StrEnum):
+    open = "open"
+    pursuing = "pursuing"
+    parked = "parked"
+    dropped = "dropped"
+    merged = "merged"
+
+
+CLOSED_BRANCH_STATUSES = frozenset({BranchStatus.dropped, BranchStatus.merged})
+
+
+class Stance(enum.StrEnum):
+    supports = "supports"
+    contradicts = "contradicts"
+    context = "context"
+
+
+class Verdict(enum.StrEnum):
+    """The canonical verdict words; a project type relabels them on the way out."""
+
+    supported = "supported"
+    refuted = "refuted"
+    inconclusive = "inconclusive"
+
+
+class Choice(enum.StrEnum):
+    """The canonical decision words; ``merge`` is a decision in every type."""
+
+    pursue = "pursue"
+    park = "park"
+    drop = "drop"
+    merge = "merge"
+
+
+# What each decision does to its branch.
+STATUS_AFTER: dict[str, str] = {
+    Choice.pursue: BranchStatus.pursuing,
+    Choice.park: BranchStatus.parked,
+    Choice.drop: BranchStatus.dropped,
+    Choice.merge: BranchStatus.merged,
+}
+
+
+class FindingVia(enum.StrEnum):
+    own = "own"
+    fork = "fork"
+    merge = "merge"
+
+
+class ProposalKind(enum.StrEnum):
+    fork = "fork"
+    decision = "decision"
+
+
+class ProposalStatus(enum.StrEnum):
+    open = "open"
+    accepted = "accepted"
+    rejected = "rejected"
+
+
+class ProjectBranch(Base):
+    """One line of inquiry. Its status is written by its decisions alone."""
+
+    __tablename__ = "project_branches"
+    __table_args__ = (UniqueConstraint("project_id", "number", name="uq_project_branch_number"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    project_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    # Per project, because people type it.
+    number: Mapped[int] = mapped_column(Integer, nullable=False)
+    parent_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("project_branches.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    # The hypothesis, option or lead, in a line.
+    title: Mapped[str] = mapped_column(String(500), nullable=False)
+    body: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    status: Mapped[str] = mapped_column(String(16), default=BranchStatus.open.value, nullable=False)
+    merged_into_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("project_branches.id", ondelete="SET NULL"), nullable=True
+    )
+    created_by_kind: Mapped[str] = mapped_column(String(16), default="user", nullable=False)
+    created_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False
+    )
+
+
+class ProjectFinding(Base):
+    """One piece of evidence, added on one branch and linked to others by fork and merge."""
+
+    __tablename__ = "project_findings"
+    __table_args__ = (UniqueConstraint("project_id", "number", name="uq_project_finding_number"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    project_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    branch_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("project_branches.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    number: Mapped[int] = mapped_column(Integer, nullable=False)
+    statement: Mapped[str] = mapped_column(Text, nullable=False)
+    stance: Mapped[str] = mapped_column(String(16), nullable=False)
+    # [{kind: record|dataset|run, ref, version_id?}]; a dataset cite resolves on add.
+    cites: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    added_by_kind: Mapped[str] = mapped_column(String(16), default="user", nullable=False)
+    added_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    # The person who reviewed it; an agent's finding waits for one.
+    reviewed_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class BranchFinding(Base):
+    """A finding counted on a branch — its own, inherited by fork, or carried by merge."""
+
+    __tablename__ = "branch_findings"
+    __table_args__ = (UniqueConstraint("branch_id", "finding_id", name="uq_branch_finding"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    branch_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("project_branches.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    finding_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("project_findings.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    via: Mapped[str] = mapped_column(String(8), default=FindingVia.own.value, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class ProjectDecision(Base):
+    """A person's verdict and decision on a branch. Append-only; a later one supersedes."""
+
+    __tablename__ = "project_decisions"
+    __table_args__ = (UniqueConstraint("project_id", "number", name="uq_project_decision_number"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    project_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    branch_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("project_branches.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    number: Mapped[int] = mapped_column(Integer, nullable=False)
+    verdict: Mapped[str] = mapped_column(String(16), nullable=False)
+    choice: Mapped[str] = mapped_column(String(16), nullable=False)
+    rationale: Mapped[str] = mapped_column(Text, nullable=False)
+    # Finding ids it rests on, and the contradicting ones it answers.
+    cites: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    addresses: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    into_branch_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("project_branches.id", ondelete="SET NULL"), nullable=True
+    )
+    supersedes_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("project_decisions.id", ondelete="SET NULL"), nullable=True, unique=True
+    )
+    # The rules it was checked against: [{rule_id, version, statement, mode, passed, reason}].
+    checks: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    warnings: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    decided_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class ProjectProposal(Base):
+    """An agent's suggested fork or decision; a person accepts or rejects it."""
+
+    __tablename__ = "project_proposals"
+    __table_args__ = (UniqueConstraint("project_id", "number", name="uq_project_proposal_number"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    project_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    branch_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("project_branches.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    number: Mapped[int] = mapped_column(Integer, nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    # fork: {titles}; decision: the decide payload.
+    payload: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    rationale: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(16), default=ProposalStatus.open.value, nullable=False, index=True)
+    agent_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("agents.id", ondelete="SET NULL"), nullable=True
+    )
+    # The signed-in principal that sent it on the agent's behalf.
+    submitted_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    resolved_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    note: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    # What accepting made: {branches: [n…]} or {decision: n}.
+    result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class ProjectReport(Base):
+    """A project's one report: the draft, and the versions published from it."""
+
+    __tablename__ = "project_reports"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    project_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, unique=True
+    )
+    draft: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    draft_updated_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    draft_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class ProjectReportVersion(Base):
+    """One published version — a frozen body and the dataset versions it cites."""
+
+    __tablename__ = "project_report_versions"
+    __table_args__ = (UniqueConstraint("report_id", "version", name="uq_project_report_version"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    report_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("project_reports.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    # [{ref: publisher/name@v, version_id}]
+    cites: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    published_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    published_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)

@@ -27,6 +27,8 @@ Studio.
 | `invana standards list · show · apply · attach · detach · check` | The install's standards: apply a standard file as its next version, attach one to a dataset with a mode (`block · warn · report`), score a dataset version against it — [2.7](../../bring-data-in/features/standards.md) |
 | `invana rules list · show · apply` | The install's rules, or a Graph's with `--graph`: list, show every version, apply a rule file (a check and a mode included) — [6.4](../../skills/features/rules.md) |
 | `invana members list · add · set-roles · remove` | A Graph's members and their Graph roles (`--role`, repeatable); the last owner cannot be removed or demoted — [11.4](../../identity-and-access/features/membership.md) · [11.6](../../identity-and-access/features/roles.md) |
+| `invana projects list · create · show` · `invana branches list · fork · decide · merge` · `invana findings add · review` · `invana proposals list · accept · reject` | A project of a type (`--private` for only its people), its branches, evidence with a stance, and decisions the rules check — superseded, never edited — [9.5](../../work/features/branches-and-decisions.md) · [9.7](../../work/features/private-projects.md) |
+| `invana reports generate · publish · export` | A project's report drawn from its records, published as frozen versions, exported as Markdown — [9.6](../../work/features/project-reports.md) |
 | `invana search "<text>"` | The ⌘K search from a terminal, as `--user`, over every Graph they are in or one `--graph` — [13.10](search.md) |
 | `invana models export · import · upgrade` | Moves a domain model between Graphs |
 | `invana models starters` | Lists the shipped starter models |

@@ -111,7 +111,7 @@ flowchart LR
 | PT3 | An agent never marks its own Todo done. |
 | PT4 | Order is derived from dependencies, never maintained by hand. |
 | PT5 | Cycles are refused, naming the loop. |
-| PT6 | Staffing is a default; Graph membership is the permission. |
+| PT6 | Staffing is a default; Graph membership is the permission. On a private project staffing is also the access list ([PP1](private-projects.md)). |
 | PT7 | **Projects owns Todos; there is no Todos icon.** A Todo without its project is a to-do list, and the project is the thing it is for — so the list lives under Projects with a *No project* bucket, and the rail's **Tasks** icon is execution only ([G30](../../../building-studio/graph-detail-page.md)). The word *Tasks* in the rail therefore names `TaskRun`s, `TaskPlan`s and the catalogue, never Todos ([SR3](../../operate/features/see-what-ran.md)). |
 | PT8 | **The detail leads with the project, not with the way back.** The name is a heading, the panel breadcrumb is the only *Projects* link, and the second `← Projects` row is gone — two back-links on one screen is one too many, and the row cost the title its place. |
 | PT9 | **The purpose is clamped to three lines with *Show more*.** A project's purpose is the thing every agent plans from, so it sits above the tabs where it is always read; three lines is what a panel can spare before the Todos disappear. |
@@ -126,7 +126,7 @@ flowchart LR
 
 | Not building | Because |
 |---|---|
-| Roles and per-project permissions | membership is binary |
+| Roles and per-project permissions here | Graph roles are [11.6](../../identity-and-access/features/roles.md); private projects are [9.7](private-projects.md) |
 | A swimlane board per assignee | the Plan canvas answers "what is next" better |
 | Manual ordering that overrides dependencies | two sources of order is one too many |
 | Time tracking and estimates | the record already holds what things actually cost |
