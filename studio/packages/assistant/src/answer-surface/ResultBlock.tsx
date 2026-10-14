@@ -122,7 +122,7 @@ export function ResultBlock({
 export function loadableGraph(
 	result: QueryResponse | null | undefined,
 ): QueryResponse | null {
-	if (!result || result.result_type !== "graph" || !result.data) return null;
+	if (result?.result_type !== "graph" || !result.data) return null;
 	const { nodes, edges } = result.data;
 	return nodes.length === 0 && edges.length === 0 ? null : result;
 }

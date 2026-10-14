@@ -8,7 +8,7 @@
 		"./telemetry-setup": "./src/services/telemetry/setup.ts"
 	},
 	"scripts": {
-		"lint": "biome check .",
+		"lint": "biome check --error-on-warnings .",
 		"check-types": "tsc --noEmit -p tsconfig.json"
 	},
 	"dependencies": {

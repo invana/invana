@@ -1,3 +1,7 @@
+# Hooks with no `stages` run on commit only. The pre-push block at the end
+# runs the whole-workspace checks CI runs, for the areas a push touches.
+default_stages: [pre-commit]
+
 repos:
   # ─── Commit message ───────────────────────────────────────────
   - repo: https://github.com/commitizen-tools/commitizen
@@ -43,3 +47,39 @@ repos:
       - id: biome-check
         additional_dependencies: ["@biomejs/biome@2.5.14"]
         files: ^studio/
+
+  # ─── Before a push: whole-workspace checks, as in CI ──────────
+  # Each runs only when the pushed commits touch its area.
+  - repo: local
+    hooks:
+      - id: python-ruff-all
+        name: ruff check and format (engine + integrations)
+        entry: bash -c 'cd engine && uv run ruff check . ../integrations && uv run ruff format --check . ../integrations'
+        language: system
+        pass_filenames: false
+        files: ^(engine|integrations)/
+        stages: [pre-push]
+
+      - id: studio-check-types
+        name: tsc (studio, every package)
+        entry: bash -c 'cd studio && pnpm check-types'
+        language: system
+        pass_filenames: false
+        files: ^studio/
+        stages: [pre-push]
+
+      - id: studio-lint
+        name: biome, boundaries, names, kit overlap (studio)
+        entry: bash -c 'cd studio && pnpm lint'
+        language: system
+        pass_filenames: false
+        files: ^studio/
+        stages: [pre-push]
+
+      - id: studio-knip
+        name: knip (studio dead files and exports)
+        entry: bash -c 'cd studio && pnpm knip'
+        language: system
+        pass_filenames: false
+        files: ^studio/
+        stages: [pre-push]

@@ -15,7 +15,7 @@ help: ## Show this help
 # ─── Setup ──────────────────────────────────────────────────────
 setup: ## Install all dependencies (dev tools + engine + studio + docs)
 	uv sync
-	uv run pre-commit install --install-hooks --hook-type pre-commit --hook-type commit-msg
+	uv run pre-commit install --install-hooks --hook-type pre-commit --hook-type commit-msg --hook-type pre-push
 	@[ -f engine/pyproject.toml ] && (cd engine && uv sync) || echo "  skip engine (no pyproject.toml)"
 	@[ -f studio/package.json ]   && (cd studio && pnpm install) || echo "  skip studio (no package.json)"
 	@[ -f docs/pyproject.toml ]   && (cd docs && uv sync) || echo "  skip docs (no pyproject.toml)"
@@ -76,14 +76,10 @@ integrations-test: ## Run all integration connector tests
 	done
 
 integrations-lint: ## Lint all integrations
-	@for dir in integrations/*/; do \
-		[ -f "$$dir/pyproject.toml" ] && (cd "$$dir" && uv run ruff check .) || true; \
-	done
+	cd engine && uv run ruff check ../integrations
 
 integrations-format: ## Format all integrations
-	@for dir in integrations/*/; do \
-		[ -f "$$dir/pyproject.toml" ] && (cd "$$dir" && uv run ruff format .) || true; \
-	done
+	cd engine && uv run ruff format ../integrations
 
 # ─── All ────────────────────────────────────────────────────────
 test: engine-test studio-test integrations-test ## Run all tests

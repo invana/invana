@@ -52,7 +52,7 @@ export function traceUrl(
 ): string | null {
 	const id = traceId?.trim();
 	const tpl = template?.trim();
-	if (!id || !tpl || !tpl.includes("{trace_id}")) return null;
+	if (!id || !tpl?.includes("{trace_id}")) return null;
 	const [from, to] = range(window, now);
 	return tpl
 		.replaceAll("{trace_id}", encodeURIComponent(id))

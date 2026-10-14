@@ -7,7 +7,7 @@
 		"dev": "vite --port 8300",
 		"build": "tsc -b && vite build",
 		"preview": "vite preview",
-		"lint": "biome check . && node scripts/check-names.mjs && node scripts/check-kit-overlap.mjs && node scripts/check-sources.mjs",
+		"lint": "biome check --error-on-warnings . && node scripts/check-names.mjs && node scripts/check-kit-overlap.mjs && node scripts/check-sources.mjs",
 		"check-names": "node scripts/check-names.mjs",
 		"format": "biome format --write .",
 		"check-types": "tsc -b --noEmit",
