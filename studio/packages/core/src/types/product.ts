@@ -11,8 +11,10 @@
  *
  * Types only — the shell owns the behaviour.
  */
+
 import type { ComponentType, ReactNode } from "react";
 import type { RouteObject } from "react-router-dom";
+import type { SetupGate } from "./graphs";
 
 /** A product's path segment and launcher key. */
 export type ProductId =
@@ -85,13 +87,19 @@ export interface SearchHit {
 
 /** The Graph's set-up state a gate reads. */
 interface ProductSetup {
-	isGateOpen: (gate: string) => boolean;
+	isGateOpen: (gate: SetupGate) => boolean;
 }
 
 /** Why a product is locked, and where the step that unlocks it lives. */
-interface ProductLock {
+export interface ProductLock {
+	/** The heading — what opens it: `Asking opens once a model is published`. */
 	reason: string;
+	/** The line under it — what is true now, and the step to take. */
+	detail?: string;
+	/** Where that step lives, relative to the Graph's base. */
 	to?: string;
+	/** The button that goes there — `Open the Modeller`. */
+	action?: string;
 }
 
 export interface ProductDefinition {

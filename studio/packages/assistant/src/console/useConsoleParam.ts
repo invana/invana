@@ -60,14 +60,22 @@ export function useConsoleParam(): ConsoleParam {
 const CLOCK_SLACK_MS = 60_000;
 
 /**
- * Open the console on Log when a reply in the open thread fails **while the
- * page watches** — a reply that turns to `error`, or arrives already failed
- * after the thread was opened. Reopening an old thread with a failure in it
- * never moves the console: that failure is history, read in the thread.
+ * Open the console when a reply in the open thread settles **while the page
+ * watches** — a reply that turns, or arrives already settled, after the thread
+ * was opened:
+ *
+ * | Reply | Console opens on |
+ * |---|---|
+ * | failed | Log — where the failing line is |
+ * | a query (`ql`) that answered | Records — the rows it drew |
+ *
+ * An ask in words stays in the chat; its records are one click away on the
+ * reply. Reopening an old thread never moves the console: what it holds is
+ * history, read in the thread.
  */
-export function useOpenLogOnFailure(
+export function useOpenConsoleOnSettle(
 	session: Session | null,
-	openLog: () => void,
+	open: (tab: ConsoleTab) => void,
 ) {
 	const seen = useRef<{
 		sessionId: string | null;
@@ -84,20 +92,29 @@ export function useOpenLogOnFailure(
 		const fresh = prev.sessionId !== session.id;
 		const openedAt = fresh ? Date.now() : prev.openedAt;
 		const statuses = new Map<string, string | undefined>();
-		let failed = false;
+		let tab: ConsoleTab | null = null;
 		for (const m of session.messages) {
 			if (m.role !== "assistant") continue;
 			statuses.set(m.id, m.status);
 			// A refusal is drawn as its own card in the thread; nothing ran.
-			if (m.status !== "error" || m.refusal) continue;
+			// A canvas operation is the board's own act, not an answer.
+			if (m.refusal || m.operation) continue;
+			const settledAs =
+				m.status === "error"
+					? "log"
+					: m.mode === "ql" && m.status === "ok"
+						? "records"
+						: null;
+			if (!settledAs) continue;
 			const before = prev.statuses.get(m.id);
-			const turned = !fresh && prev.statuses.has(m.id) && before !== "error";
+			const turned = !fresh && prev.statuses.has(m.id) && before !== m.status;
 			const arrived =
 				!prev.statuses.has(m.id) &&
 				m.createdAt.getTime() >= openedAt - CLOCK_SLACK_MS;
-			if (turned || arrived) failed = true;
+			if (turned || arrived)
+				tab = settledAs === "log" ? "log" : (tab ?? "records");
 		}
 		seen.current = { sessionId: session.id, openedAt, statuses };
-		if (failed) openLog();
-	}, [session, openLog]);
+		if (tab) open(tab);
+	}, [session, open]);
 }

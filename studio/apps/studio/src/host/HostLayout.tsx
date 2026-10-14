@@ -38,7 +38,7 @@ interface HostLayoutProps {
 	leftSection?: SectionSlot;
 	/** Main content. Replaced by SettingsViewPanel when settings is expanded. */
 	mainSection: SectionSlot;
-	/** Right auxiliary panel (e.g. Inspector / DetailPanel). Hidden when
+	/** Right panel — the docked assistant. Hidden when
 	 *  settings is expanded so the panel owns the full content width. */
 	rightSection?: SectionSlot;
 	/** The console, under the canvas only (`bottomSpan: "main"`) — the left
@@ -55,9 +55,12 @@ interface HostLayoutProps {
 	headerRightExtras?: ReactNode;
 	/** The Assistant toggle, the header's slot just before the user menu. */
 	headerPanelControls?: ReactNode;
-	/** Page-specific header center content (e.g. Explorer's canvas toolbar).
+	/** Page-specific header center content (e.g. a data canvas's toolbar).
 	 *  Most pages won't need this. */
 	headerCenter?: ReactNode;
+	/** Replaces the whole `footer` — the Explorer's connection and renderer
+	 *  line, in place of the shared status bar. */
+	footer?: { left: ReactNode; right: ReactNode };
 }
 
 // The panels the host draws in its own `leftSection`, keyed into the shared
@@ -102,8 +105,8 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
  *   product's `nav`.
  * - SettingsViewPanel takeover: docked replaces `leftSection`; expanded replaces
  *   `mainSection` and hides both `leftSection` and `rightSection`.
- * - Explorer: no `leftSection` — the board and the assistant fill it, and the
- *   canvas toolbar floats over the board instead of sitting in the header.
+ * - Explorer: no `leftSection` — the board and the assistant fill it, the
+ *   canvas tools float over the board, and the page hands its own `footer`.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
  *   and a right cluster (extras + `AppVersion`).
  *
@@ -121,6 +124,7 @@ export function HostLayout({
 	headerRightExtras,
 	headerPanelControls,
 	headerCenter,
+	footer,
 }: HostLayoutProps) {
 	const { username, graphSlug } = useParams<{
 		username: string;
@@ -207,21 +211,29 @@ export function HostLayout({
 			rightSection={effectiveRightSection}
 			bottomSection={effectiveBottomSection}
 			bottomSpan="main"
-			footer={{
-				className: "!h-[25px]",
-				left: (
-					<ConnectionStatusBar
-						graph={connection ?? undefined}
-						metrics={statusMetrics}
-					/>
-				),
-				right: (
-					<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">
-						{footerRightExtras}
-						<AppVersion />
-					</div>
-				),
-			}}
+			footer={
+				footer
+					? {
+							className: "text-sm text-muted-foreground",
+							left: footer.left,
+							right: footer.right,
+						}
+					: {
+							className: "!h-[25px]",
+							left: (
+								<ConnectionStatusBar
+									graph={connection ?? undefined}
+									metrics={statusMetrics}
+								/>
+							),
+							right: (
+								<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">
+									{footerRightExtras}
+									<AppVersion />
+								</div>
+							),
+						}
+			}
 		/>
 	);
 }

@@ -80,7 +80,7 @@ export function useCanvasExpand(deps: CanvasExpandDeps) {
 	// Fix: birth each new node *next to the existing node it attaches to* (an even
 	// ring around that anchor), so it spawns where it belongs. d3-force then just
 	// relaxes the ring locally — placed nodes stay put, neighbours fan out from
-	// their parent. `canvasData` (the Inspector list) is merged in parallel so the
+	// their parent. `canvasData` (the record list) is merged in parallel so the
 	// right panel sees the additions.
 	const handleExpandResult = useCallback(
 		(res: NeighborExpandResponse) => {
@@ -107,7 +107,7 @@ export function useCanvasExpand(deps: CanvasExpandDeps) {
 				newItems.push({ ...e, type: "edge" });
 			}
 			if (newItems.length === 0) return;
-			// Inspector list — additive.
+			// Record list — additive.
 			setCanvasData((prev) => [...prev, ...newItems]);
 			// When the canvas isn't live yet there's no store; the canvasData merge
 			// above still lands and the next paint/remount seeds it.

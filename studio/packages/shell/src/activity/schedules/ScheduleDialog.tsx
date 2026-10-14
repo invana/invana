@@ -143,6 +143,9 @@ export interface ScheduleDialogProps {
 	onClose: () => void;
 	/** The schedule to edit; omitted, the dialog creates one. */
 	schedule?: Schedule;
+	/** A new schedule's name and instructions, filled in — the Explorer's
+	 *  *Schedule this* hands the question it was asked. */
+	prefill?: { name: string; instructions: string };
 	/** After the engine accepts the write, with what it saved. */
 	onSaved?: (schedule: Schedule) => void;
 }
@@ -152,6 +155,7 @@ export function ScheduleDialog({
 	open,
 	onClose,
 	schedule,
+	prefill,
 	onSaved,
 }: ScheduleDialogProps) {
 	return (
@@ -162,6 +166,7 @@ export function ScheduleDialog({
 					<ScheduleForm
 						graph={graph}
 						schedule={schedule}
+						prefill={prefill}
 						onClose={onClose}
 						onSaved={onSaved}
 					/>
@@ -174,13 +179,17 @@ export function ScheduleDialog({
 function ScheduleForm({
 	graph,
 	schedule,
+	prefill,
 	onClose,
 	onSaved,
 }: Omit<ScheduleDialogProps, "open">) {
 	const create = useCreateSchedule(graph);
 	const update = useUpdateSchedule(graph);
 	const { agents } = useScheduleNames(graph);
-	const [d, setD] = useState<Draft>(() => draftOf(schedule));
+	const [d, setD] = useState<Draft>(() => ({
+		...draftOf(schedule),
+		...(schedule ? {} : prefill),
+	}));
 	const set = (patch: Partial<Draft>) =>
 		setD((prev) => ({ ...prev, ...patch }));
 	const setRepeat = (patch: Partial<Repeat>) =>

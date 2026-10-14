@@ -27,7 +27,9 @@ export async function openExplorer(page: Page) {
 
 	// The composer is a contenteditable, not an <input> — it has no placeholder
 	// attribute to address it by, and it can carry a draft from a previous visit.
-	return page.getByRole("textbox").first();
+	// The history's search is a textbox too, so the composer is addressed by its
+	// region.
+	return page.getByTestId("composer").getByRole("textbox").first();
 }
 
 /** Ask, and return the URL the session settled on so a reload can come back. */

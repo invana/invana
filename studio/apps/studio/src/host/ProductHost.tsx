@@ -6,7 +6,7 @@ import {
 	AssistantSlotsContext,
 	AssistantStart,
 	useConsoleParam,
-	useOpenLogOnFailure,
+	useOpenConsoleOnSettle,
 	useSessions,
 } from "@invana-studio/assistant";
 import type { QueryResponse } from "@invana-studio/core";
@@ -17,6 +17,7 @@ import {
 	useGraphConnectionQuery,
 	useGraphQuery,
 } from "@invana-studio/core";
+import { EmptyBoard, ExplorerLocked } from "@invana-studio/explorer";
 import {
 	type ModelSelection,
 	useLensesViewPanel,
@@ -48,7 +49,7 @@ import { useDataBoards } from "@/host/useDataBoards";
 import { useLayeredCanvas } from "@/host/useLayeredCanvas";
 import { useModelsPage } from "@/host/useModelsPage";
 import { useOpenBoards } from "@/host/useOpenBoards";
-import { useOpenPages } from "@/host/useOpenPages";
+import { GRAPH_PAGE_ID, useOpenPages } from "@/host/useOpenPages";
 import { useProjectsPage } from "@/host/useProjectsPage";
 
 /** `invana_neo4j.connector.Neo4jConnector` → `Neo4j`. */
@@ -91,7 +92,7 @@ function startSubtitle(
  * the state the regions share (the open sessions, the canvas, the declared
  * boards, the layered canvases, the selection) and fills each region for the
  * open product: the Workbook in `mainSection`, the product's panel in
- * `leftSection`, the assistant or the inspector on the right and the Console
+ * `leftSection`, the assistant on the right and the Console
  * underneath. The open product is the route's (`useActiveProduct`); the open
  * panel is the path's (`useLeftSection`).
  */
@@ -145,10 +146,8 @@ export function ProductHost() {
 	// thread open is *Everything*.
 	const threadWorldId = world.threadLensId;
 
-	// Who holds the right side — `?right=assistant | inspector`, absent means
-	// closed. One param, so opening one occupant replaces the other and the
-	// region survives a reload. The inspector defaults closed: it is only useful
-	// with something selected, so navigating here never opens it.
+	// Who holds the right side — `?right=assistant`, absent means closed. A
+	// param, so the region survives a reload.
 	const right = useRightSection();
 	// The left rail's single-open param. Sessions is no longer one of its keys —
 	// it is the `assistant` occupant of the right side (the-assistant.md).
@@ -177,7 +176,7 @@ export function ProductHost() {
 	// The attachment is the canvas selection until someone takes it off — asked
 	// without it, and the thread records that.
 	const [attachmentDetached, setAttachmentDetached] = useState(false);
-	// A node carries the id of the dataset that wrote it; the inspector shows the
+	// A node carries the id of the dataset that wrote it; its record card shows the
 	// name. One list, cached, rather than a lookup per selection.
 	// An element's provenance names the model it conforms to, so the name comes
 	// from the models list — there is no second record between a model and its
@@ -230,17 +229,6 @@ export function ProductHost() {
 	// panel owns, which panel the left column draws).
 	const { section: settingsSection } = settingsPanel;
 
-	// The inspector is an occupant of the right side, not a flag on it: showing
-	// it *is* `?right=inspector`, and hiding it closes the region.
-	const closeInspector = right.close;
-	const openInspector = useCallback(
-		() => right.open("inspector"),
-		[right.open],
-	);
-	const toggleInspector = useCallback(
-		() => right.toggle("inspector"),
-		[right.toggle],
-	);
 	const { data: llmProvidersResponse } = useLLMProvidersQuery(
 		username,
 		graphSlug,
@@ -300,7 +288,6 @@ export function ProductHost() {
 		right,
 		attachmentDetached,
 		cannotAnswer,
-		openInspector,
 		boardPage,
 		setActiveBoardId,
 		setWorkKind,
@@ -344,15 +331,11 @@ export function ProductHost() {
 	// the page watches opens it on Log, where the failing line is.
 	const consoleParam = useConsoleParam();
 	const openConsoleTab = consoleParam.open;
-	const openConsoleLog = useCallback(
-		() => openConsoleTab("log"),
-		[openConsoleTab],
-	);
-	useOpenLogOnFailure(activeSession, openConsoleLog);
+	useOpenConsoleOnSettle(activeSession, openConsoleTab);
 
 	// The assistant starts centred: with nothing docked on the right and no
-	// left panel open — or in Explorer, which draws no left panel — the home
-	// page is one question box. Sending from it docks the conversation on the
+	// left panel open — or in the Explorer, which draws no left panel — the
+	// home page is one question box. Sending from it docks the conversation on the
 	// right as the session's canvas opens. A new session is answered by the
 	// Graph's default agent, so the start names it.
 	const explorerOpen = useActiveProduct()?.id === "explorer";
@@ -388,8 +371,17 @@ export function ProductHost() {
 				}}
 				onStop={sessionState.stop}
 				isRunning={sessionState.isRunning}
-				onOpenAssistant={() => right.open("assistant")}
-				onOpenSession={dataBoards.handleOpenSession}
+				views={(dataBoards.canvasList?.items ?? []).map((c) => ({
+					id: c.id,
+					sessionId: c.sessionId,
+					title: c.title || sessionTitleById.get(c.sessionId) || "Untitled",
+					pinned: c.pinned,
+					updatedAt: c.updatedAt,
+				}))}
+				onOpenSession={(id) => {
+					right.open("assistant");
+					dataBoards.handleOpenSession(id);
+				}}
 			/>
 		) : undefined;
 
@@ -420,9 +412,7 @@ export function ProductHost() {
 		renameSession,
 		backToList,
 		right,
-		toggleInspector,
 		homeStart,
-		console: consoleParam,
 	});
 
 	// The pill that reopens a closed conversation floats over the data canvas
@@ -460,9 +450,7 @@ export function ProductHost() {
 		llmProviders,
 		attachmentDetached,
 		setAttachmentDetached,
-		closeInspector,
-		modelName,
-		openConsoleLog,
+		openConsoleTab,
 	};
 	const chrome = hostChrome({
 		username,
@@ -472,7 +460,33 @@ export function ProductHost() {
 		activeSessionId,
 		workCanvas,
 		workTarget,
+		explorer: explorerOpen,
+		connection: graphLoading ? undefined : (graph ?? null),
 	});
+
+	// The Explorer with no canvas open is the centred start alone — no strip,
+	// no tabs: one question box on the board's dotted ground. On a Graph that
+	// cannot answer yet it is the product's lock instead, naming the step.
+	const product = useActiveProduct();
+	const explorerLock =
+		explorerOpen && graphContainer
+			? (product?.gate?.({
+					isGateOpen: (g) => isGateOpen(graphContainer, g),
+				}) ?? null)
+			: null;
+	// With the chat docked and nothing drawn yet, the board is its empty
+	// ground: one question box on screen, never two.
+	const explorerHome =
+		explorerOpen && !page ? (
+			explorerLock ? (
+				<ExplorerLocked
+					lock={explorerLock}
+					graphBase={`/u/${username}/${graphSlug}`}
+				/>
+			) : strip.activeId === GRAPH_PAGE_ID ? (
+				(homeStart ?? <EmptyBoard />)
+			) : null
+		) : null;
 
 	return (
 		// Lifted context: the live engine reaches the header toolbar, which lives
@@ -515,7 +529,7 @@ export function ProductHost() {
 										key={page ? settingsPanel.section : "workbook"}
 										onError={reportBoundaryError}
 									>
-										{page ?? (
+										{page ?? explorerHome ?? (
 											<div className="relative h-full">
 												<Workbook
 													{...strip}

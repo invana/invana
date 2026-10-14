@@ -5,6 +5,7 @@
  */
 
 export * from "./BindRefusalCard";
+export * from "./BoardGround";
 export * from "./boardIcons";
 export * from "./DetailRows";
 export * from "./FilterSelect";

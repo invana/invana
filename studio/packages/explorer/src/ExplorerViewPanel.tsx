@@ -302,7 +302,7 @@ function TypeList({
 
 /**
  * Id, a summary of its telling properties, its relationship chips, and where it
- * came from. The full property table is `InspectorViewPanel` — this
+ * came from. The full property table is the board's `RecordCard` — this
  * says which thing is selected, not everything about it.
  */
 function SelectedBlock({

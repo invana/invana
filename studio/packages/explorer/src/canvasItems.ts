@@ -21,7 +21,7 @@ export function isCanvasStateSnapshot(
 }
 
 // Map query-result items (vertices / edges) to the canvas engine's GraphData
-// shape: the label rides as `type` (colour-by-label + the Inspector's Type row)
+// shape: the label rides as `type` (colour-by-label + the record card's type)
 // and the properties as `data`. Shared by the full-paint seed and the
 // incremental node-expand append (docs/for-developers/modules/explore/features/graph-canvas.md).
 export function adaptItems(items: QueryResultItem[]): EngineGraphData {

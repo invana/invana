@@ -22,7 +22,6 @@ export type QueryRunPayload =
 			mode: "nl";
 			query: string;
 			llmProviderId: string;
-			attachments: File[];
 			/** Seconds to budget the LLM translation + query execution. */
 			timeoutS: number;
 	  };

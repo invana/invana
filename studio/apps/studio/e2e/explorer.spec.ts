@@ -15,8 +15,14 @@ test("the workflow runs in front of the reader, step by step", async ({
 }) => {
 	await ask(page, "RETURN 1 AS one");
 
-	// C2: the steps are the surface while a run is live, not a spinner. The
-	// running step is also echoed above the composer, so it can match twice.
+	// C2: the steps are the surface while a run is live, not a spinner; once
+	// it settles they fold under *How I got this*, one click away. A run this
+	// small can settle before the first look, so the fold is opened when shown.
+	const howIGotThis = page.getByRole("button", { name: "How I got this" });
+	await expect(
+		page.getByText("Plan", { exact: true }).first().or(howIGotThis.last()),
+	).toBeVisible({ timeout: 30_000 });
+	if (await howIGotThis.last().isVisible()) await howIGotThis.last().click();
 	for (const step of ["Plan", "Validate", "Execute", "Project", "Verify"]) {
 		await expect(page.getByText(step, { exact: true }).first()).toBeVisible({
 			timeout: 30_000,
@@ -53,14 +59,15 @@ test("the Explorer has no leftNav; its tools float over the board", async ({
 	// The graph page's leftNav icons are not drawn on the Explorer.
 	await expect(page.getByRole("button", { name: "Runs" })).toHaveCount(0);
 
-	// Compact until Tools is on; then the canvas toolbar is under it.
-	const tools = page.getByRole("button", { name: "Tools" });
+	// Select · lasso · box until *Tools* is on; then the full set.
+	const tools = page.getByRole("switch", { name: "Tools" });
 	await expect(tools).toBeVisible();
 	const runLayout = page.getByRole("button", { name: "Run layout" });
 	await expect(runLayout).toHaveCount(0);
 	await tools.click();
-	await expect(tools).toHaveAttribute("aria-pressed", "true");
-	await expect(runLayout.first()).toBeVisible();
+	await expect(tools).toBeChecked();
+	await expect(runLayout).toBeVisible();
+	await tools.click();
 });
 
 test("a rejected query is a diagnosis, never an answer", async ({ page }) => {

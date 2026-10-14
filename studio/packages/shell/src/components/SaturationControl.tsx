@@ -1,8 +1,7 @@
 /**
  * A single slider that scales the active theme's primary + accent saturation.
  * Binds straight to the appearance store; `<SaturationBridge>` does the applying.
- * Dropped in below the `<ThemeSelector>` in both the header `ThemeMenu` popover
- * and the settings Appearance tab.
+ * Dropped in below the `<ThemeSelector>` in the settings Appearance tab.
  */
 
 import { Slider } from "@invana/forms";

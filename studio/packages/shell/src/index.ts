@@ -31,6 +31,7 @@ export { useRunStep } from "./activity/runs/boards/useRunStep";
 export { useRunsQuery } from "./activity/runs/queries";
 export { RunsBoardPage } from "./activity/runs/RunsBoardPage";
 export { StepTouchWidget } from "./activity/runs/touches/StepTouchWidget";
+export { ScheduleDialog } from "./activity/schedules/ScheduleDialog";
 // The board record and its versions and reports — what a canvas tab saves.
 export { boardsApi } from "./boards/api";
 export type { CanvasKind, DeclaredKind, OpenBoard } from "./boards/boardKinds";
@@ -115,3 +116,4 @@ export type { SetupSlots } from "./setup/SetupSlots";
 export { SetupSlotsContext } from "./setup/SetupSlots";
 export { SetupTimeline } from "./setup/SetupTimeline";
 export { useOnboarding } from "./setup/useOnboarding";
+export { useToolsAlwaysShown } from "./toolsPreference";

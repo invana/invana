@@ -10,20 +10,25 @@
  * It owns the state that is about **this canvas and nothing else**: which
  * overlays are open, which vertex is being fine-tuned, which canvas is being
  * renamed. State the shell's own regions still read — the contents the
- * inspector shows, the selection, the styling — stays above and arrives as
+ * record card shows, the selection, the styling — stays above and arrives as
  * props. Moving that down is what turns this from one instance into one per
  * open canvas, and it is deliberately the next step rather than this one.
  *
  * **The strip is not here.** `mainSection` is `Workbook`
  * (`docs/for-developers/building-studio/graph-detail-page.md`), which owns the
- * tabs for every open page — a canvas, a model, a plan. This page is one body
- * inside it. The five controls that act on *this* canvas — help, layers,
- * styling, history, rename — reach it through {@link BoardPageHandle}, because
- * `WorkbookAction` is strip-level and carries no page id.
+ * tabs for every open page. The strip holds tabs and nothing else; the tab
+ * menu's *Rename* reaches this page through {@link BoardPageHandle}.
  *
- * Layers, Styling and History are **one at a time**: all three are cards pinned
- * to the canvas's top-right corner, so opening one closes the other
- * (`docs/for-developers/modules/explore/features/boards.md`).
+ * What floats over the board (`docs/products/explorer.md`):
+ *
+ * | Where | What |
+ * |---|---|
+ * | top-left | the toolbar — select · lasso · box, the full set with *Tools* on |
+ * | top-right | one card at a time: a record, Layers, Styling or History |
+ * | bottom-left | the legend, with *Tools* on |
+ * | bottom-right | zoom in · zoom out · fit |
+ *
+ * Opening a corner card closes the one before it — they share the corner.
  */
 
 import {
@@ -36,11 +41,11 @@ import {
 import type {
 	GraphCanvas as GraphCanvasEngine,
 	GraphData,
+	GraphLayer,
 } from "@invana/graph";
-import { Button, Card } from "@invana/ui";
 import { SessionTutorialModal } from "@invana-studio/assistant";
 import type { CanvasBackend } from "@invana-studio/canvases";
-import type { InteractionRef } from "@invana-studio/core";
+import type { InteractionRef, QueryResultItem } from "@invana-studio/core";
 import type {
 	ExpandMenuHandlers,
 	ExpandMenuSchema,
@@ -48,14 +53,18 @@ import type {
 	NeighborExpandResponse,
 } from "@invana-studio/explorer";
 import {
+	BoardLegend,
+	type BoardOverlay,
+	BoardToolbar,
 	ExpandNeighboursDialog,
 	ExplorerCanvas,
+	RecordCard,
+	useExplorerTools,
+	ZoomControls,
 } from "@invana-studio/explorer";
 import type { CanvasStyling } from "@invana-studio/shell";
-import { Wrench } from "lucide-react";
 import {
 	forwardRef,
-	type ReactNode,
 	useCallback,
 	useImperativeHandle,
 	useMemo,
@@ -69,14 +78,6 @@ import { BoardHistoryWidget } from "@/host/boards/BoardHistoryWidget";
  * these for the active page and builds its `headerActions` from it.
  */
 export interface BoardPageHandle {
-	/** The tutorial — "what can I do here?" */
-	openHelp: () => void;
-	/** This canvas's layers, elements and their visibility. */
-	toggleLayers: () => void;
-	/** Per-type styling for this canvas. */
-	toggleStyling: () => void;
-	/** Saved states, and forking one into a new canvas. */
-	toggleHistory: () => void;
 	/** Rename this canvas — really its session's title. */
 	openRename: (boardId: string) => void;
 }
@@ -106,6 +107,16 @@ export interface BoardPageProps {
 	onShowDetail: (id: string) => void;
 	interactionRef?: InteractionRef;
 
+	/** The record clicked on the board, drawn as the top-right card. */
+	selected: QueryResultItem | null;
+	/** Records the Graph no longer holds, marked on their card. */
+	missingIds: ReadonlySet<string>;
+	modelName: (modelId: string) => string | undefined;
+	onOpenModel: (modelId: string) => void;
+	onCloseRecord: () => void;
+	/** The card's *Ask about* — the selection rides along as the attachment. */
+	onAskAboutRecord: () => void;
+
 	/** Node-expand. `onOpenFineTune` is supplied here, not by the caller — the
 	 *  panel it opens is this page's. */
 	expand: Omit<ExpandMenuHandlers, "onOpenFineTune">;
@@ -123,33 +134,6 @@ export interface BoardPageProps {
 	/** Auto-open the tutorial on a user's very first session. */
 	tutorialSeen: boolean;
 	onTutorialSeen: () => void;
-
-	/** The canvas toolbar, floated top-left behind *Tools*; absent, it stays
-	 *  in the header. */
-	tools?: ReactNode;
-}
-
-/**
- * The board's floating tools: compact — one *Tools* toggle — until it is on,
- * then the canvas toolbar stacked under it.
- */
-function FloatingTools({ children }: { children: ReactNode }) {
-	const [on, setOn] = useState(false);
-	return (
-		<Card className="flex flex-col items-center gap-1 p-1">
-			<Button
-				variant={on ? "secondary" : "ghost"}
-				size="icon-sm"
-				aria-label="Tools"
-				aria-pressed={on}
-				title={on ? "Hide the tools" : "Show the tools"}
-				onClick={() => setOn((v) => !v)}
-			>
-				<Wrench />
-			</Button>
-			{on && children}
-		</Card>
-	);
 }
 
 export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
@@ -171,6 +155,12 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			onViewTargetChange,
 			onShowDetail,
 			interactionRef,
+			selected,
+			missingIds,
+			modelName,
+			onOpenModel,
+			onCloseRecord,
+			onAskAboutRecord,
 			expand,
 			expandSchema,
 			propertyKeys,
@@ -181,20 +171,24 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			isSaving,
 			tutorialSeen,
 			onTutorialSeen,
-			tools,
 		},
 		ref,
 	) {
-		// Overlays. Each is about this canvas, so each lives with it. The three
-		// corner cards share one slot — they share the corner.
-		const [overlay, setOverlay] = useState<
-			"layers" | "styling" | "history" | null
-		>(null);
+		// Overlays. Each is about this canvas, so each lives with it. The
+		// corner cards share one slot — they share the corner — and a record
+		// card shows only while none of them is open.
+		const [overlay, setOverlay] = useState<BoardOverlay | null>(null);
 		const toggleOverlay = useCallback(
-			(next: "layers" | "styling" | "history") =>
+			(next: BoardOverlay) =>
 				setOverlay((open) => (open === next ? null : next)),
 			[],
 		);
+		const [toolsOn] = useExplorerTools();
+		const [legendShown, setLegendShown] = useState(true);
+		// The board's graph store — read off the engine, since this page sits
+		// above the canvas root that the store hooks resolve from.
+		const store =
+			(canvas?.layers.get("graph") as GraphLayer | undefined)?.store ?? null;
 		const [tutorialOpen, setTutorialOpen] = useState(!tutorialSeen);
 		const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
 		const [fineTuneVertex, setFineTuneVertex] = useState<string | null>(null);
@@ -219,20 +213,24 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			[onFork],
 		);
 
-		// The strip's five canvas controls. `WorkbookAction.onClick` takes no
-		// page id, so the shell cannot address this page by argument — it holds
-		// the handle instead and calls straight into it.
+		// The tab menu's *Rename*. A page menu item carries only the page id,
+		// so the shell holds the handle and calls straight into it.
 		useImperativeHandle(
 			ref,
-			() => ({
-				openHelp: () => setTutorialOpen(true),
-				toggleLayers: () => toggleOverlay("layers"),
-				toggleStyling: () => toggleOverlay("styling"),
-				toggleHistory: () => toggleOverlay("history"),
-				openRename: (id: string) => setEditingCanvasId(id),
-			}),
-			[toggleOverlay],
+			() => ({ openRename: (id: string) => setEditingCanvasId(id) }),
+			[],
 		);
+
+		// A clicked record opens its card in the corner, in place of whatever
+		// tool card was there.
+		const selectedId = selected ? String(selected.id) : null;
+		const selectedType = selected
+			? String(
+					(selected.type === "vertex"
+						? store?.getNode(selectedId as string)?.type
+						: store?.getEdge(selectedId as string)?.type) ?? selected.label,
+				)
+			: "";
 
 		const closeTutorial = useCallback(() => {
 			onTutorialSeen();
@@ -243,9 +241,52 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			<div className="flex h-full w-full flex-col overflow-hidden">
 				<div className="relative min-h-0 w-full flex-1 overflow-hidden">
 					<RendererCapabilityBanner />
-					{tools && canvas && (
+					{canvas && (
 						<Panel position="top-left" offset={12} zIndex={20}>
-							<FloatingTools>{tools}</FloatingTools>
+							<BoardToolbar
+								overlay={overlay}
+								onToggleOverlay={toggleOverlay}
+								canExpand={selected?.type === "vertex"}
+								onExpandSelection={() =>
+									selectedId && setFineTuneVertex(selectedId)
+								}
+								legendShown={legendShown}
+								onToggleLegend={() => setLegendShown((v) => !v)}
+							/>
+						</Panel>
+					)}
+					{canvas && (
+						<Panel position="bottom-right" offset={12} zIndex={20}>
+							<ZoomControls />
+						</Panel>
+					)}
+					{canvas && toolsOn && legendShown && (
+						<Panel position="bottom-left" offset={12} zIndex={20}>
+							<BoardLegend styling={styling} />
+						</Panel>
+					)}
+					{selected && !overlay && (
+						<Panel position="top-right" offset={12} zIndex={20}>
+							<RecordCard
+								item={selected}
+								recordType={selectedType}
+								missing={missingIds.has(String(selected.id))}
+								modelName={modelName}
+								onOpenModel={onOpenModel}
+								onAsk={onAskAboutRecord}
+								onExpand={
+									selected.type === "vertex"
+										? () => setFineTuneVertex(String(selected.id))
+										: undefined
+								}
+								onHide={() => {
+									if (selected.type === "vertex")
+										store?.hideNode(String(selected.id));
+									else store?.hideEdge(String(selected.id));
+									onCloseRecord();
+								}}
+								onClose={onCloseRecord}
+							/>
 						</Panel>
 					)}
 					<ExplorerCanvas

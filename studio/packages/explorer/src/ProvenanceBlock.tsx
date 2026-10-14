@@ -4,7 +4,7 @@
  * Every element an import writes carries its source record on itself
  * (docs/for-developers/modules/bring-data-in/features/load-data.md), so this
  * block needs no request: it reads `_inv_model_id`, `_inv_file`,
- * `_inv_record_id` and `_inv_run_id` off the node the inspector already has.
+ * `_inv_record_id` and `_inv_run_id` off the node the record card already has.
  *
  * That is the whole point of stamping them. "Where did this number come from"
  * ends at a record rather than at a shrug, and it ends there even when the

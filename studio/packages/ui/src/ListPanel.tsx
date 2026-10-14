@@ -25,12 +25,6 @@
 
 import {
 	DropdownMenu,
-	DropdownMenuCheckboxItem,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	PanelContent,
 	SearchInput,
@@ -43,9 +37,6 @@ import {
 } from "lucide-react";
 import type { ElementType, ReactNode } from "react";
 import { useState } from "react";
-
-// Sort is the same two-way toggle everywhere the engine lists entities.
-type ListSort = "updated" | "created";
 
 // A single header icon-button, matching TabbedPanel's `rightNavItems` shape.
 interface ListHeaderAction {
@@ -208,61 +199,6 @@ export function ListPanelChrome({
 }
 
 // ── Filter menu ──────────────────────────────────────────────────────────────
-
-export interface ListFilterMenuProps {
-	sort: ListSort;
-	onSortChange: (sort: ListSort) => void;
-	showArchived: boolean;
-	onShowArchivedChange: (show: boolean) => void;
-	onReset: () => void;
-	/** Panel-specific filter rows, inserted between sort and "Show archived"
-	 *  (e.g. Sessions' per-LLM checkboxes). */
-	children?: ReactNode;
-}
-
-/**
- * The sort + filter dropdown content (the header funnel). Items keep the menu
- * open on select so several filters can be adjusted in one pass.
- */
-export function ListFilterMenu({
-	sort,
-	onSortChange,
-	showArchived,
-	onShowArchivedChange,
-	onReset,
-	children,
-}: ListFilterMenuProps) {
-	const keepOpen = (e: Event) => e.preventDefault();
-	return (
-		<DropdownMenuContent align="end" sideOffset={8} className="w-52">
-			<DropdownMenuRadioGroup
-				value={sort}
-				onValueChange={(v) => onSortChange(v as ListSort)}
-			>
-				<DropdownMenuRadioItem value="created" onSelect={keepOpen}>
-					Sort by Created
-				</DropdownMenuRadioItem>
-				<DropdownMenuRadioItem value="updated" onSelect={keepOpen}>
-					Sort by Updated
-				</DropdownMenuRadioItem>
-			</DropdownMenuRadioGroup>
-
-			{children}
-
-			<DropdownMenuSeparator />
-			<DropdownMenuCheckboxItem
-				checked={showArchived}
-				onCheckedChange={onShowArchivedChange}
-				onSelect={keepOpen}
-			>
-				Show archived
-			</DropdownMenuCheckboxItem>
-
-			<DropdownMenuSeparator />
-			<DropdownMenuItem onSelect={onReset}>Reset</DropdownMenuItem>
-		</DropdownMenuContent>
-	);
-}
 
 // ── List row ──────────────────────────────────────────────────────────────────
 

@@ -6,7 +6,7 @@
 // `ExplorerHeaderToolbar`). The header lives outside the `<Board>` subtree (in
 // GraphDetail's header), so ExplorerPage lifts a `CanvasContext.Provider` above
 // the shell and feeds it the live engine published by `<CanvasBridge>` (the last
-// child here). Every header / inspector control then resolves the same instance.
+// child here). Every toolbar and card over the board then resolves the same instance.
 //
 // Distinct from the Modeller's `GraphModelCanvas` (`@/canvases/model`), which
 // draws models as frames of types.
@@ -32,7 +32,6 @@ import {
 	HoverActivateBehaviour,
 	LassoSelectBehaviour,
 	type LayoutFactory,
-	MiniMapLayer,
 	PinchZoomBehaviour,
 	TextResolutionLODBehaviour,
 	type UseClipboardResult,
@@ -226,7 +225,6 @@ const APP_OPTIONS: CanvasConfig = {
 			},
 			edge: { style: { strokeWidth: 1, arrowTargetShape: "none" } },
 		},
-		minimap: { position: "bottom-left", margin: { x: 20 } },
 	},
 	behaviours: {
 		pan: { enabled: true },
@@ -828,8 +826,8 @@ function StylingBridge({
 	return null;
 }
 
-/** Lifts the clicked element's id up to ExplorerPage to drive the Inspector. */
-function InspectorSelectionBridge({
+/** Lifts the clicked element's id up to the page, which opens its record card. */
+function SelectionBridge({
 	onViewTargetChange,
 }: {
 	onViewTargetChange: (id: string | null) => void;
@@ -849,7 +847,7 @@ interface ExplorerCanvasProps {
 	data: GraphData;
 	/** Receives the live engine once every layer/behaviour has registered. */
 	onReady: (canvas: GraphCanvasEngine | null) => void;
-	/** Receives the clicked node/edge id (or null) for the Inspector. */
+	/** Receives the clicked node/edge id (or null) for the record card. */
 	onViewTargetChange: (id: string | null) => void;
 	/** On → hover lights up the node's 1st-degree neighbours; off → node only. */
 	magnet: boolean;
@@ -861,7 +859,7 @@ interface ExplorerCanvasProps {
 	backend: CanvasBackend;
 	/** Node-expand handlers + schema for the right-click "Load neighbors" menu (docs/for-developers/modules/explore/features/graph-canvas.md). */
 	expand?: ExpandMenuHandlers;
-	/** Open the right-side detail (Inspector) for a node/edge id — wired to the
+	/** Open a node/edge's record card — wired to the
 	 *  "Node details" / "Edge details" context-menu items. */
 	onShowDetail?: (id: string) => void;
 	/** Per node/edge-type visual rules (docs/for-developers/modules/explore/features/graph-canvas.md). Colour is always driven from
@@ -978,11 +976,10 @@ export function ExplorerCanvas({
 			<LassoSelectBehaviour id="lasso-select" targetLayerId="graph" />
 
 			{/* Click-to-view — no `panel`; the bridge feeds the right-side
-			    InspectorViewPanel instead of a floating viewer. */}
+			    record card on the board instead of a floating viewer. */}
 			<ClickViewBehaviour id="click-view" targetLayerId="graph" />
 
 			<TextResolutionLODBehaviour id="label-lod" targetLayerId="graph" />
-			<MiniMapLayer id="minimap" graphLayerId="graph" />
 
 			{/* Right-click menus — wrapped in the clipboard provider so their
 			    Cut / Copy / Paste / Delete items resolve `useClipboard`. */}
@@ -990,7 +987,7 @@ export function ExplorerCanvas({
 				<CanvasContextMenus expand={expand ?? {}} onShowDetail={onShowDetail} />
 			</GraphClipboardProvider>
 
-			<InspectorSelectionBridge onViewTargetChange={onViewTargetChange} />
+			<SelectionBridge onViewTargetChange={onViewTargetChange} />
 			{/* Last child: publishes the engine only after everything registered. */}
 			<CanvasBridge onReady={onReady} />
 		</GraphCanvas>

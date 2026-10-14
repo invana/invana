@@ -343,46 +343,4 @@ export function StepTrace({
 	);
 }
 
-// ── Collapsed summary ─────────────────────────────────────────────────────────
-
-/**
- * The one line a settled reply keeps: `✻ Ask for 2.4s · 4 of 4 steps`.
- * Click to reopen the list.
- */
-export function StepsSummary({
-	steps,
-	status,
-	onClick,
-}: {
-	steps: RunNode[];
-	status: "ok" | "error" | "stopped";
-	onClick: () => void;
-}) {
-	const done = steps.filter((s) => s.status === "succeeded").length;
-	// Count distinct steps (a retried step has several rows).
-	const total = new Set(steps.map((s) => s.seq)).size;
-	const verb =
-		status === "error"
-			? "Failed after"
-			: status === "stopped"
-				? "Stopped after"
-				: "Ask for";
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			className="flex items-center gap-2 text-left text-muted-foreground hover:text-foreground"
-		>
-			<span className="select-none text-border" aria-hidden>
-				✻
-			</span>
-			<span>
-				{verb} {formatDuration(totalDuration(steps))} · {done} of {total} step
-				{total === 1 ? "" : "s"}
-			</span>
-			<span className="text-muted-foreground/70">▸</span>
-		</button>
-	);
-}
-
 // ── Diagnosis ─────────────────────────────────────────────────────────────────

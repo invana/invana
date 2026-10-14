@@ -25,12 +25,6 @@ interface AssistantWorld {
 }
 
 export interface AssistantSlots {
-	/** A board's banner image, for a session row's preview. */
-	useBoardBanner: (
-		username: string | undefined,
-		graphSlug: string | undefined,
-		boardId: string | null | undefined,
-	) => { data: string | null | undefined; isLoading: boolean };
 	/** Opens a rule's board from a trace, or `null` where nothing can open one. */
 	useOpenBoard: () => ((kind: "rule", subjectId: string) => void) | null;
 	/** The rules a step was offered, and the ones it says it followed. */
@@ -63,6 +57,11 @@ export interface AssistantSlots {
 	 * product offers it, and the turn draws no button.
 	 */
 	useShareAnswer: () => ((answer: SharedAnswer) => void) | null;
+	/**
+	 * Asks the question again on a schedule — or `null` where no product
+	 * offers it, and the turn draws no button.
+	 */
+	useScheduleQuestion: () => ((question: string) => void) | null;
 }
 
 /** One settled answer, as *Share* hands it on. */

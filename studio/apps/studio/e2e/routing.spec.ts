@@ -11,8 +11,6 @@ import { GRAPH } from "./explorer";
  * was about.
  */
 
-const slug = GRAPH.split("/").pop() as string;
-
 // Every `?panel=` value the graph page has read, and the path it lands on.
 const OLD_PANEL_LINKS: [string, string][] = [
 	["?panel=info", "/modeller/settings?tab=info"],
@@ -53,8 +51,11 @@ test("the Graph's own URL opens the last product, else Explorer", async ({
 	// A fresh browser has no last product, so the Graph opens in Explorer.
 	await page.goto(GRAPH);
 	await expect(page).toHaveURL(`${GRAPH}/explorer`);
+	// The Graph is the header's switcher, not a crumb.
+	await expect(page.getByRole("button", { name: "Switch graph" })).toBeVisible({
+		timeout: 30_000,
+	});
 	const crumbs = page.getByLabel("Breadcrumb");
-	await expect(crumbs.getByText(slug)).toBeVisible({ timeout: 30_000 });
 
 	// Once the Modeller has been open, the Graph returns to it, query and all.
 	await page.goto(`${GRAPH}/modeller/rules`);

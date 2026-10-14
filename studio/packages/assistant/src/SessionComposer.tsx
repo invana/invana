@@ -13,8 +13,8 @@ import type {
 	Session,
 } from "@invana-studio/core";
 import { useAskRequest } from "@invana-studio/core";
-import { ArrowUp, Bot, Paperclip, Square, Timer, X } from "lucide-react";
-import type { ChangeEvent, KeyboardEvent, ReactNode } from "react";
+import { Bot, Send, Square, X } from "lucide-react";
+import type { KeyboardEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 /** What the composer reads of an LLM provider: the models it offers. */
@@ -66,14 +66,8 @@ const DEFAULT_QUERY: Record<QueryLanguage, string> = {
 	gremlin: "g.V().hasLabel('Person').limit(25)",
 };
 
-// NL-only LLM translation timeout presets (seconds). Default matches the
-// engine's translate fallback; longer options give slow local models room.
-const TIMEOUT_OPTIONS = [
-	{ value: 30, label: "30s" },
-	{ value: 60, label: "1m" },
-	{ value: 120, label: "2m" },
-	{ value: 300, label: "5m" },
-] as const;
+// The LLM + query timeout an ask runs under until a reopened session restores
+// its own — the engine's translate fallback.
 const DEFAULT_TIMEOUT_S = 120;
 
 // Cypher ships in CM 6 legacy-modes; Gremlin's host language is Groovy, which
@@ -244,6 +238,8 @@ export interface SessionComposerProps {
 	/** Whether a question from ⌘K lands here. False on the home start: ⌘K
 	 *  docks the chat on the right, which unmounts the start. Defaults to true. */
 	takesAsk?: boolean;
+	/** The input's prompt — the start asks, the docked chat follows up. */
+	placeholder?: string;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -273,6 +269,7 @@ export function SessionComposer({
 	worldControl,
 	onAskKindChange,
 	takesAsk = true,
+	placeholder = "Ask a follow-up, or say what to draw…",
 }: SessionComposerProps) {
 	const isModeller = surface === "modeller";
 	const [mode, setMode] = useState<QueryMode>("nl");
@@ -283,9 +280,6 @@ export function SessionComposer({
 	const [language, setLanguage] = useState<QueryLanguage>(defaultLanguage);
 	const [llmProviderId, setLlmProviderId] = useState<string>("");
 	const [nlQuery, setNlQuery] = useState("");
-	// Picked files. The *selection* attachment is the `attachment` prop below —
-	// these are the paperclip's, and they ride the payload under its own name.
-	const [files, setFiles] = useState<File[]>([]);
 	const [timeoutS, setTimeoutS] = useState<number>(DEFAULT_TIMEOUT_S);
 
 	// Wraps the NL composer so Studio can reach its textarea (focus, ↑/↓ keys)
@@ -298,7 +292,6 @@ export function SessionComposer({
 	// when the user switches back.
 	const qlDocRef = useRef<string>(DEFAULT_QUERY[defaultLanguage]);
 	const languageCompartmentRef = useRef(new Compartment());
-	const fileInputRef = useRef<HTMLInputElement>(null);
 	// Lets the CodeMirror Enter keybinding (wired when the editor mounts) call
 	// the latest handleRun without closing over stale mode/language/query state.
 	const handleRunRef = useRef<() => void>(() => {});
@@ -533,9 +526,8 @@ export function SessionComposer({
 		}
 		const query = nlQuery.trim();
 		if (!query || !llmProviderId) return;
-		onRun({ mode: "nl", query, llmProviderId, attachments: files, timeoutS });
+		onRun({ mode: "nl", query, llmProviderId, timeoutS });
 		setNlQuery("");
-		setFiles([]);
 		historyIndexRef.current = -1;
 	};
 	handleRunRef.current = handleRun;
@@ -566,25 +558,14 @@ export function SessionComposer({
 		}
 	};
 
-	const handleFilePick = (e: ChangeEvent<HTMLInputElement>) => {
-		const picked = e.target.files;
-		if (!picked) return;
-		setFiles((prev) => [...prev, ...Array.from(picked)]);
-		e.target.value = ""; // allow re-picking the same file after removal
-	};
-
-	const removeFile = (index: number) =>
-		setFiles((prev) => prev.filter((_, i) => i !== index));
-
 	// An endpoint that offers no model answers nothing, so the gate counts
 	// models rather than rows — the same thing `endpoint_for_run` resolves.
 	const noLlmProviders = llmProviders.every((p) => p.models.length === 0);
 
 	// ── Toolbar (shared by both input surfaces) ──────────────────────────────
-	// Ask kind on the left, timeout + attach on the right (the ⌘↵ hint is the
-	// status bar's, via `onAskKindChange`). The
-	// kind select and buttons stay fixed; the second control absorbs the
-	// leftover width.
+	// One row under the input: ask kind · world · agent, then send (the ⌘↵
+	// hint is the status bar's, via `onAskKindChange`). The kind stays fixed;
+	// the world and the agent absorb the leftover width.
 	//
 	// **There is no LLM picker here** (docs/for-developers/modules/agents/spec.md). The session names an
 	// *agent*, and the agent carries the provider and the model — so the one
@@ -640,48 +621,6 @@ export function SessionComposer({
 		</>
 	);
 
-	const toolbarEnd = (
-		<>
-			{(mode === "ql" || !noLlmProviders) && (
-				<RichSelect
-					appearance="inline"
-					side="top"
-					align="end"
-					triggerAriaLabel={
-						mode === "nl" ? "LLM + query timeout" : "Query timeout"
-					}
-					triggerIcon={Timer}
-					value={String(timeoutS)}
-					onChange={(v) => setTimeoutS(Number(v))}
-					options={TIMEOUT_OPTIONS.map((t) => ({
-						value: String(t.value),
-						label: t.label,
-					}))}
-				/>
-			)}
-			{mode === "nl" && (
-				<>
-					<input
-						ref={fileInputRef}
-						type="file"
-						multiple
-						onChange={handleFilePick}
-						className="hidden"
-					/>
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-7 w-7 shrink-0 text-muted-foreground"
-						onClick={() => fileInputRef.current?.click()}
-						title="Attach files"
-					>
-						<Paperclip className="w-4 h-4" />
-					</Button>
-				</>
-			)}
-		</>
-	);
-
 	// The subject rides directly above the input, on both surfaces.
 	const attachmentChip =
 		attachment && onRemoveAttachment ? (
@@ -693,7 +632,7 @@ export function SessionComposer({
 		return (
 			<>
 				{attachmentChip}
-				<div className="p-3">
+				<div className="p-3" data-testid="composer">
 					<div className="rounded-control border border-border bg-card shadow-sm overflow-hidden focus-within:border-ring transition-colors">
 						{/* The editor mounts into a flex-1 child of a resize-y wrapper so
 					    CodeMirror keeps a resolved height (its hit-region needs one). */}
@@ -704,7 +643,6 @@ export function SessionComposer({
 							<div className="flex-1 min-w-0 flex items-center gap-1.5">
 								{toolbarStart}
 							</div>
-							{toolbarEnd}
 							{isRunning ? (
 								<Button
 									size="icon"
@@ -723,7 +661,7 @@ export function SessionComposer({
 									title="Send"
 									aria-label="Send"
 								>
-									<ArrowUp className="w-4 h-4" />
+									<Send className="w-4 h-4" />
 								</Button>
 							)}
 						</div>
@@ -734,36 +672,11 @@ export function SessionComposer({
 	}
 
 	// ── Natural-language surface: the design-kit composer ────────────────────
-	const fileChips =
-		files.length > 0
-			? files.map((file, i) => (
-					<span
-						key={`${file.name}-${
-							// biome-ignore lint/suspicious/noArrayIndexKey: the list is rebuilt whole, never reordered in place
-							i
-						}`}
-						className="inline-flex items-center gap-1 bg-muted border border-border rounded-control px-1.5 py-0.5 text-muted-foreground max-w-full"
-					>
-						<span className="truncate max-w-40" title={file.name}>
-							{file.name}
-						</span>
-						<button
-							type="button"
-							onClick={() => removeFile(i)}
-							className="hover:text-foreground shrink-0"
-							aria-label={`Remove ${file.name}`}
-						>
-							<X className="w-3 h-3" />
-						</button>
-					</span>
-				))
-			: undefined;
-
 	return (
 		<>
 			{attachmentChip}
 			{/** biome-ignore lint/a11y/noStaticElementInteractions: a key or menu handler scoped to the region, not a control */}
-			<div ref={rootRef} onKeyDown={handleNlKeyDown}>
+			<div ref={rootRef} onKeyDown={handleNlKeyDown} data-testid="composer">
 				<ChatSessionComposer
 					value={nlQuery}
 					onChange={(v) => {
@@ -774,14 +687,11 @@ export function SessionComposer({
 					onStop={onStop}
 					isRunning={isRunning}
 					placeholder={
-						isModeller
-							? "Describe the model to build…"
-							: "Ask anything about your graph…"
+						isModeller ? "Describe the model to build…" : placeholder
 					}
+					textareaClassName="h-14 min-h-12"
 					toolbarStart={toolbarStart}
-					toolbarEnd={toolbarEnd}
-					attachments={fileChips}
-					sendIcon={<ArrowUp className="w-4 h-4" />}
+					sendIcon={<Send className="w-4 h-4" />}
 					stopIcon={<Square className="w-3 h-3 fill-current" />}
 					sendDisabled={noLlmProviders || !nlQuery.trim()}
 				/>

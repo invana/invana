@@ -123,7 +123,7 @@ const MODE_ICONS = { light: Sun, dark: Moon, system: Monitor };
  * Theme / mode / accent picker (docs/for-developers/modules/platform/features/theming.md). Changes apply live and are persisted
  * to the user's profile by the app-level `<ThemeSyncBridge>` (mounted in
  * main.tsx), so this tab is a thin wrapper around `<ThemeSelector>` — no local
- * save wiring. The header `ThemeMenu` drives the same provider state.
+ * save wiring. The user menu's *Theme* drives the same provider state.
  */
 function AppearanceTab() {
 	return (

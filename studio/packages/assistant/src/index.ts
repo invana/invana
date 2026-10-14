@@ -23,7 +23,7 @@ export { sessionsApi } from "./api";
 export { ConsolePanel } from "./console/ConsolePanel";
 export {
 	useConsoleParam,
-	useOpenLogOnFailure,
+	useOpenConsoleOnSettle,
 } from "./console/useConsoleParam";
 export { RecentSessions } from "./RecentSessions";
 export { attachmentFor } from "./SessionComposer";

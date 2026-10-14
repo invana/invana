@@ -1,16 +1,11 @@
-import type {
-	WorkbookAction,
-	WorkbookPage,
-	WorkbookPageMenuItem,
-} from "@invana/ui";
+import type { WorkbookPage, WorkbookPageMenuItem } from "@invana/ui";
 import { useAgentsQuery, useSkillsQuery } from "@invana-studio/agents";
-import type { useConsoleParam, useSessions } from "@invana-studio/assistant";
+import type { useSessions } from "@invana-studio/assistant";
 import {
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,
 } from "@invana-studio/assistant";
 import { useLensesQuery } from "@invana-studio/core";
-import { ExplorerHeaderToolbar } from "@invana-studio/explorer";
 import type {
 	ModelSelection,
 	useLensesViewPanel,
@@ -26,20 +21,7 @@ import {
 	parseBoardPageId,
 	useActiveProduct,
 } from "@invana-studio/shell";
-import {
-	HelpCircle,
-	History,
-	Home,
-	Layers,
-	PanelBottomClose,
-	PanelBottomOpen,
-	PanelRightClose,
-	PanelRightOpen,
-	Pencil,
-	Route,
-	SlidersHorizontal,
-	X,
-} from "lucide-react";
+import { Home, Pencil, Route, X } from "lucide-react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useMemo, useRef } from "react";
 import { LayeredCanvasHeader } from "@/canvases/layered/LayeredCanvasChrome";
@@ -61,7 +43,7 @@ import type { useLayeredCanvas } from "@/host/useLayeredCanvas";
 import type { useOpenBoards } from "@/host/useOpenBoards";
 
 /** The page that is always open and can never be closed (graph-detail-page.md). */
-const GRAPH_PAGE_ID = "graph";
+export const GRAPH_PAGE_ID = "graph";
 
 /** What the open pages read from the page that hosts them. */
 export interface OpenPagesDeps {
@@ -93,11 +75,8 @@ export interface OpenPagesDeps {
 	renameSession: ReturnType<typeof useSessions>["renameSession"];
 	backToList: ReturnType<typeof useSessions>["backToList"];
 	right: ReturnType<typeof useRightSection>;
-	toggleInspector: () => void;
 	/** The assistant's centred start, for the graph page; absent while docked. */
 	homeStart?: ReactNode;
-	/** `?console=` — the strip's Console toggle on a data canvas. */
-	console: ReturnType<typeof useConsoleParam>;
 }
 
 /**
@@ -139,9 +118,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		renameSession,
 		backToList,
 		right,
-		toggleInspector,
 		homeStart,
-		console: consoleParam,
 	} = deps;
 	const {
 		boards,
@@ -158,15 +135,15 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		canvas,
 		handleReady,
 		magnet,
-		toggleMagnet,
 		backend,
-		setBackend,
 		openTabs,
 		createCanvasState,
 		isRestoring,
 		activeCanvasId,
 		seedData,
 		styling,
+		selected,
+		missingIds,
 		setSelectedId,
 		sessionTitleById,
 		handleStylingChange,
@@ -216,16 +193,15 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		[projectsList.data],
 	);
 
-	// The active canvas page's handle. The strip's help / styling / history /
-	// rename buttons act on *this* canvas, but `WorkbookAction` carries no
-	// page id (graph-detail-page.md), so the shell calls into the page
-	// rather than passing one.
+	// The active canvas page's handle. The tab menu's *Rename* acts on *this*
+	// canvas, but a page menu item carries only the page id
+	// (graph-detail-page.md), so the shell calls into the page.
 	const boardPageRef = useRef<BoardPageHandle>(null);
 	const explorerOpen = useActiveProduct()?.id === "explorer";
 
-	// Clicking a node/edge feeds `selectedId` via <InspectorSelectionBridge>; the
-	// derived `selected` (above) drives the right-side InspectorViewPanel. The strip
-	// above it belongs to `Workbook` in `mainSection`
+	// Clicking a node/edge feeds `selectedId` via <SelectionBridge>; the
+	// derived `selected` (above) is the record card the page floats over the
+	// board. The strip above it belongs to `Workbook` in `mainSection`
 	// (graph-detail-page.md), not to this page.
 	const canvasContent = (
 		<DataBoardPage
@@ -247,6 +223,12 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			onReady={handleReady}
 			onViewTargetChange={setSelectedId}
 			onShowDetail={handleShowDetail}
+			selected={selected}
+			missingIds={missingIds}
+			modelName={modelName}
+			onCloseRecord={() => setSelectedId(null)}
+			onAskAboutRecord={() => right.open("assistant")}
+			onOpenModel={() => settingsPanel.setSection("runs")}
 			interactionRef={runRef}
 			expand={expandHandlers}
 			expandSchema={expandSchema}
@@ -258,18 +240,6 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			isSaving={createCanvasState.isPending}
 			tutorialSeen={hasSeenSessionTutorial()}
 			onTutorialSeen={markSessionTutorialSeen}
-			tools={
-				// Explorer has no header toolbar: its tools float over the board.
-				explorerOpen ? (
-					<ExplorerHeaderToolbar
-						orientation="vertical"
-						magnet={magnet}
-						onToggleMagnet={toggleMagnet}
-						backend={backend}
-						onBackendChange={setBackend}
-					/>
-				) : undefined
-			}
 		/>
 	);
 
@@ -333,26 +303,33 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		projectNameByKey,
 	};
 
+	// The Explorer has no graph page: with no canvas open it draws the centred
+	// start in place of the strip, so the strip only ever holds canvases.
+	const graphPage: WorkbookPage[] = explorerOpen
+		? []
+		: [
+				{
+					id: GRAPH_PAGE_ID,
+					// The page says what it is *showing*. While setup is unfinished the
+					// graph page is the setup board, so the strip tab and the
+					// breadcrumb's last crumb both read `Setup` — a tab named for the slug
+					// over a board of gates names the container and not the content. The id
+					// does not change with it: it is the same page, and `?page=graph` has
+					// to keep resolving.
+					title: setupOutstanding ? "Setup" : (graphSlug ?? "Graph"),
+					icon: setupOutstanding ? Route : Home,
+					content: (
+						<GraphHomePage
+							username={username as string}
+							graphSlug={graphSlug as string}
+							hint={canvasEmptyHint(settingsSection)}
+							start={homeStart}
+						/>
+					),
+				},
+			];
 	const pages: WorkbookPage[] = [
-		{
-			id: GRAPH_PAGE_ID,
-			// The page says what it is *showing*. While setup is unfinished the
-			// graph page is the setup board, so the strip tab and the
-			// breadcrumb's last crumb both read `Setup` — a tab named for the slug
-			// over a board of gates names the container and not the content. The id
-			// does not change with it: it is the same page, and `?page=graph` has
-			// to keep resolving.
-			title: setupOutstanding ? "Setup" : (graphSlug ?? "Graph"),
-			icon: setupOutstanding ? Route : Home,
-			content: (
-				<GraphHomePage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					hint={canvasEmptyHint(settingsSection)}
-					start={homeStart}
-				/>
-			),
-		},
+		...graphPage,
 		...openTabs.map((tab) => ({
 			id: boardPageId("data", tab.id),
 			title: sessionTitleById.get(tab.sessionId) ?? "Board",
@@ -464,49 +441,6 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		setWorkKind(null);
 	};
 
-	// Strip-level, and two owners: the active page's own controls first, then the
-	// shell's region toggles. A model page therefore never offers
-	// "Styling", and the graph page offers none of them.
-	const isDataBoardPage = parseBoardPageId(activePageId)?.kind === "data";
-	const pageHeaderActions: WorkbookAction[] = isDataBoardPage
-		? [
-				{
-					id: "help",
-					label: "What can I do here?",
-					icon: HelpCircle,
-					onClick: () => boardPageRef.current?.openHelp(),
-				},
-				{
-					// Layers describes the canvas in front of you, so it is a strip
-					// control and a card over the canvas, not a `leftNav` panel.
-					id: "layers",
-					label: "Layers",
-					icon: Layers,
-					onClick: () => boardPageRef.current?.toggleLayers(),
-				},
-				{
-					id: "styling",
-					label: "Styling",
-					icon: SlidersHorizontal,
-					onClick: () => boardPageRef.current?.toggleStyling(),
-				},
-				{
-					id: "history",
-					label: "History",
-					icon: History,
-					onClick: () => boardPageRef.current?.toggleHistory(),
-				},
-				{
-					// The console describes this canvas's drawing, so its toggle is
-					// a strip control of the data canvas, beside the inspector's.
-					id: "console",
-					label: consoleParam.tab ? "Hide console" : "Show console",
-					icon: consoleParam.tab ? PanelBottomClose : PanelBottomOpen,
-					onClick: consoleParam.toggle,
-				},
-			]
-		: [];
-
 	const pageMenuItems: WorkbookPageMenuItem[] = [
 		{
 			id: "rename",
@@ -536,16 +470,5 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		onAdd: () => void newCanvasTab(),
 		onClose: closePage,
 		pageMenuItems,
-		headerActions: [
-			...pageHeaderActions,
-			{
-				id: "inspector",
-				label: right.is("inspector")
-					? "Hide inspector panel"
-					: "Show inspector panel",
-				icon: right.is("inspector") ? PanelRightClose : PanelRightOpen,
-				onClick: toggleInspector,
-			},
-		],
 	};
 }

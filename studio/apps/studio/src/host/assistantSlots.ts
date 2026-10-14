@@ -1,8 +1,7 @@
 /**
- * What the graph page lends the assistant: a board's banner and a rule's board
- * (boards), a step's rules (skills), the worlds a thread can be set to
- * (lenses), keeping an answer as a finding (projects) and sharing it
- * (explorer), both through the action registry. The assistant package may
+ * What the graph page lends the assistant: a rule's board (boards), a step's rules (skills), the worlds a thread can be set to
+ * (lenses), keeping an answer as a finding (projects), sharing it and
+ * scheduling its question (explorer), all through the action registry. The assistant package may
  * import none of these modules, so the page hands them in through
  * `AssistantSlotsContext`.
  *
@@ -12,9 +11,12 @@
 
 import type { AssistantSlots, SharedAnswer } from "@invana-studio/assistant";
 import { useLensesQuery } from "@invana-studio/core";
-import type { ShareAnswerArgs } from "@invana-studio/explorer";
+import type {
+	ScheduleQuestionArgs,
+	ShareAnswerArgs,
+} from "@invana-studio/explorer";
 import { matches, useParticipantsQuery } from "@invana-studio/modeller";
-import { useAction, useCanvasBannerQuery } from "@invana-studio/shell";
+import { useAction } from "@invana-studio/shell";
 import { StepRules } from "@invana-studio/ui";
 import { useCallback } from "react";
 import { useParams } from "react-router-dom";
@@ -61,8 +63,24 @@ function useShareAnswer() {
 	return invoke && username && graphSlug ? share : null;
 }
 
+/** `explorer.scheduleQuestion`, bound to the open Graph — null when nothing offers it. */
+function useScheduleQuestion() {
+	const { username, graphSlug } = useParams();
+	const action = useAction<ScheduleQuestionArgs>("explorer.scheduleQuestion");
+	const invoke = action?.invoke;
+	const schedule = useCallback(
+		(question: string) =>
+			invoke?.({
+				username: username as string,
+				graphSlug: graphSlug as string,
+				question,
+			}),
+		[invoke, username, graphSlug],
+	);
+	return invoke && username && graphSlug ? schedule : null;
+}
+
 export const assistantSlots: AssistantSlots = {
-	useBoardBanner: useCanvasBannerQuery,
 	useOpenBoard,
 	StepRules,
 	useWorlds: useLensesQuery,
@@ -70,4 +88,5 @@ export const assistantSlots: AssistantSlots = {
 	matches,
 	useAddToProject,
 	useShareAnswer,
+	useScheduleQuestion,
 };

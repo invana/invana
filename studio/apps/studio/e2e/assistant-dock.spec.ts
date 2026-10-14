@@ -24,7 +24,7 @@ async function sendFromStart(page: Page, query: string) {
 		await mode.click();
 		await page.getByRole("menuitemradio", { name: "Cypher" }).click();
 	}
-	await page.getByRole("textbox").first().fill(query);
+	await page.getByTestId("composer").getByRole("textbox").first().fill(query);
 	await page.getByRole("button", { name: "Send" }).click();
 }
 

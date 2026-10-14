@@ -18,12 +18,9 @@ import { Fragment, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchTrigger } from "../../palette/CommandPalette";
 import { useActiveProduct, useRouteCrumbs } from "../../products";
-import { FullscreenToggle } from "../FullscreenToggle";
-import { GitHubStars } from "../GitHubStars";
-import { ThemeMenu } from "../ThemeMenu";
 import { ActivityBell } from "./ActivityBell";
+import { GraphSwitcher } from "./GraphSwitcher";
 import { Launcher } from "./Launcher";
-import { GraphOnboardingCap } from "./OnboardingCap";
 import { UserMenu } from "./UserMenu";
 
 export interface AppHeaderOptions {
@@ -32,25 +29,16 @@ export interface AppHeaderOptions {
 	 *  graph, Profile). */
 	pageLabel?: string;
 	/** The object open on this screen — the canvas, the model, the agent. Drawn
-	 *  as the last crumb: `owner › graph › Explorer › Defence theme`. Omitted
+	 *  as the last crumb: `airways ▾ › Sessions › Routes out of LHR`. Omitted
 	 *  when the screen holds nothing yet. */
 	objectLabel?: string;
 	/** The levels after the lead when the focused page names its own —
 	 *  `Projects › a project › H2 › f1`. Wins over the route's crumbs. */
 	pageTrail?: HeaderLevel[];
-	/** The Graph picker slot, after the wordmark. */
-	graphPicker?: ReactNode;
 	/** Center content. Most pages won't need this. */
 	center?: ReactNode;
-	/** The ⌘K slot, first in `header.right`. Defaults to the search field that opens the palette. */
-	search?: ReactNode;
-	/** Page-specific controls, left of the shared ones. */
+	/** Page-specific controls, first in `header.right` — the Explorer's *Tools*. */
 	rightExtras?: ReactNode;
-	/** Graph-scoped status, before the theme menu. Defaults to the onboarding
-	 *  cap inside a Graph. */
-	status?: ReactNode;
-	/** The notifications slot. Defaults to the bell that opens Activity. */
-	notifications?: ReactNode;
 	/** The Assistant toggle, just before the user menu. */
 	assistantToggle?: ReactNode;
 }
@@ -58,21 +46,21 @@ export interface AppHeaderOptions {
 /**
  * The shell's `header`, the same on every screen:
  *
- *   [launcher] [Invana <Product>] | [graph picker] breadcrumb   [center]   [⌘K] [rightExtras] [GitHubStars] [status] [ThemeMenu] [FullscreenToggle] [notifications] [assistant] [user menu]
+ *   [launcher] Invana <Product> | [graph ▾] › level › level   [center]   [rightExtras] [⌘K] [Notifications] [Assistant] [user menu]
  *
  * The wordmark names the open product, and `Invana Studio` where none is
- * open. Each slot is empty until a page or a later product fills it.
+ * open. Theme and set-up live in the user menu, not here.
  *
  * Breadcrumb behaviour (after the wordmark):
- * - Graph-scoped (`/u/:username/:graphSlug/…`): `owner › graph`, then one
+ * - Graph-scoped (`/u/:username/:graphSlug/…`): the Graph switcher, then one
  *   level per matched route that names a `handle.crumb` — section › item ›
  *   drill-in — then `› object` when something is open on it. Every level but
  *   the last links to its path; a tab is a query param, so it is never a level.
  * - Otherwise: `@username / pageLabel` (e.g. `@ravi-merugu / Graphs`), or,
  *   on an install-wide product's route, `@username ›` its route crumbs.
  * - If logged out, the leading user segment is dropped.
- * - More than four levels (`owner › graph` counts as one) collapse to the
- *   first · `…` · the last two; `…` opens a menu of the hidden levels.
+ * - More than four levels collapse to the first · `…` · the last two; `…`
+ *   opens a menu of the hidden levels.
  * - A long name truncates; its full text is on hover.
  */
 export function useAppHeader(options: AppHeaderOptions = {}) {
@@ -80,12 +68,8 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 		pageLabel,
 		objectLabel,
 		pageTrail,
-		graphPicker,
 		center,
-		search,
 		rightExtras,
-		status,
-		notifications,
 		assistantToggle,
 	} = options;
 	const { pathname } = useLocation();
@@ -100,40 +84,41 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 		pageTrail?.length ? pageTrail : routeCrumbs,
 	);
 	if (objectLabel) trail.levels.push({ label: objectLabel });
+	const inGraph = GRAPH_PATH.test(pathname);
 	const hasTrail = trail.lead.length + trail.levels.length > 0;
 
 	return {
 		// `relative` makes the header bar a positioning context so a `center`
 		// consumer can dead-center its content against the full header width
-		// (e.g. Explorer's canvas toolbar) rather than only within the leftover
-		// space between the breadcrumb and the right-side controls.
-		className: "!h-[38px] relative",
+		// rather than only within the space between the trail and the controls.
+		className: "relative",
 		left: (
 			<div className="flex items-center gap-2 px-2 min-w-0">
 				<Launcher />
 				<Link
 					to="/graphs"
-					className="font-bold text-xl select-none hover:opacity-80 transition-opacity"
+					className="select-none whitespace-nowrap text-base hover:opacity-80 transition-opacity"
 				>
-					Invana {product?.name ?? "Studio"}
+					<span className="font-bold">Invana</span>{" "}
+					<span className="text-muted-foreground">
+						{product?.name ?? "Studio"}
+					</span>
 				</Link>
-				{(hasTrail || graphPicker) && (
+				{(hasTrail || inGraph) && (
 					<Separator orientation="vertical" className="h-4" />
 				)}
-				{graphPicker}
-				{hasTrail && <HeaderBreadcrumb trail={trail} />}
+				{inGraph && <GraphSwitcher />}
+				{hasTrail && (
+					<HeaderBreadcrumb trail={trail} leadingSeparator={inGraph} />
+				)}
 			</div>
 		),
 		center,
 		right: (
-			<div className="flex items-center gap-4 px-2">
-				{search ?? <SearchTrigger />}
+			<div className="flex items-center gap-1 px-2">
 				{rightExtras}
-				<GitHubStars />
-				{status ?? <GraphOnboardingCap />}
-				<ThemeMenu />
-				<FullscreenToggle />
-				{notifications ?? <ActivityBell />}
+				<SearchTrigger />
+				<ActivityBell />
 				{assistantToggle}
 				<UserMenu />
 			</div>
@@ -166,10 +151,20 @@ interface Trail {
 /** Levels shown before the middle collapses, the lead counting as one. */
 const MAX_LEVELS = 4;
 
+/** `/u/:username/:graphSlug/…` — a screen inside a Graph. */
+const GRAPH_PATH = /^\/u\/[^/]+\/[^/]+(?:\/.*)?$/;
+
 const SEPARATOR_CLASS =
 	"shrink-0 text-muted-foreground/60 [&>svg]:h-3.5 [&>svg]:w-3.5";
 
-function HeaderBreadcrumb({ trail }: { trail: Trail }) {
+function HeaderBreadcrumb({
+	trail,
+	leadingSeparator,
+}: {
+	trail: Trail;
+	/** A `›` before the first level — after the Graph switcher. */
+	leadingSeparator: boolean;
+}) {
 	const { lead, levels } = trail;
 	const levelCount = (lead.length > 0 ? 1 : 0) + levels.length;
 	const collapse = levelCount > MAX_LEVELS;
@@ -180,8 +175,11 @@ function HeaderBreadcrumb({ trail }: { trail: Trail }) {
 	const ellipsisAt = collapse ? lead.length : -1;
 
 	return (
-		<Breadcrumb className="min-w-0 font-semibold">
+		<Breadcrumb className="min-w-0">
 			<BreadcrumbList className="flex-nowrap gap-1 sm:gap-1">
+				{leadingSeparator && (
+					<BreadcrumbSeparator className={SEPARATOR_CLASS} />
+				)}
 				{segments.map((s, i) => {
 					const isLast = i === segments.length - 1;
 					return (
@@ -191,13 +189,13 @@ function HeaderBreadcrumb({ trail }: { trail: Trail }) {
 								i
 							}`}
 						>
+							{i > 0 && <BreadcrumbSeparator className={SEPARATOR_CLASS} />}
 							{i === ellipsisAt && (
 								<>
-									<BreadcrumbSeparator className={SEPARATOR_CLASS} />
 									<HiddenLevels levels={hidden} />
+									<BreadcrumbSeparator className={SEPARATOR_CLASS} />
 								</>
 							)}
-							{i > 0 && <BreadcrumbSeparator className={SEPARATOR_CLASS} />}
 							<BreadcrumbItem className="min-w-0">
 								{s.to && !isLast ? (
 									<BreadcrumbLink asChild className="truncate">
@@ -210,7 +208,7 @@ function HeaderBreadcrumb({ trail }: { trail: Trail }) {
 										title={s.title ?? s.label}
 										className={cn(
 											"truncate",
-											!isLast && "text-muted-foreground",
+											isLast ? "font-medium" : "text-muted-foreground",
 										)}
 									>
 										{s.label}
@@ -264,23 +262,13 @@ function computeTrail(
 	override: string | undefined,
 	routeCrumbs: Segment[],
 ): Trail {
-	const graphMatch = pathname.match(/^\/u\/([^/]+)\/([^/]+)(?:\/.*)?$/);
-	if (graphMatch) {
-		const [, owner, graphSlug] = graphMatch;
-		// `owner › graph › …`. The owner and the graph are **not** dropped:
-		// every graph-scoped screen is inside a graph, and a header that does not
-		// name it leaves the URL as the only way to tell which one you are in.
-		// This is what the hi-fi draws (`ExplorerHiFi`), and what both shell
-		// references draw — design-kit's `Themes/AppV2 › ExplorerShell` and
-		// canvas-ui's `apps/AppLayoutV2`.
+	// Inside a Graph the switcher is the lead, so the trail is only the levels
+	// after it.
+	if (GRAPH_PATH.test(pathname))
 		return {
-			lead: [
-				{ label: owner, to: "/graphs" },
-				{ label: graphSlug, to: `/u/${owner}/${graphSlug}` },
-			],
+			lead: [],
 			levels: override ? [{ label: override }] : [...routeCrumbs],
 		};
-	}
 
 	// Non-graph routes (/graphs, /graphs/new, /settings/profile, /login, ...).
 	// An install-wide product's routes name their own levels (`Imports`).

@@ -4,7 +4,6 @@ import type { useSessions } from "@invana-studio/assistant";
 import { AssistantHost, attachmentFor } from "@invana-studio/assistant";
 import type { useGraphQuery } from "@invana-studio/core";
 import { ASSISTANT_SECTION, reportBoundaryError } from "@invana-studio/core";
-import { InspectorViewPanel } from "@invana-studio/explorer";
 import type {
 	RightSectionKey,
 	useLeftSection,
@@ -31,11 +30,8 @@ export interface RightSectionDeps {
 	/** The canvas selection was taken off the next ask. */
 	attachmentDetached: boolean;
 	setAttachmentDetached: Dispatch<SetStateAction<boolean>>;
-	closeInspector: () => void;
-	/** A model's name by id, for an element's provenance line. */
-	modelName: (id: string) => string | undefined;
-	/** Open the console on Log — a failed reply's *Open the log*. */
-	openConsoleLog: () => void;
+	/** Open the console — Records from a reply's count, Log from a failure. */
+	openConsoleTab: (tab: "records" | "log") => void;
 }
 
 /**
@@ -57,23 +53,14 @@ export function rightSection(deps: RightSectionDeps) {
 		llmProviders,
 		attachmentDetached,
 		setAttachmentDetached,
-		closeInspector,
-		modelName,
-		openConsoleLog,
+		openConsoleTab,
 	} = deps;
 	const {
 		sessions,
 		activeSession,
 		isRunning,
-		isRefreshing,
-		sort,
-		setSort,
-		showArchived,
-		setShowArchived,
 		fetchContext,
-		setFeedback,
 		stop,
-		refresh,
 		setPinned,
 		setArchived,
 		world,
@@ -81,9 +68,6 @@ export function rightSection(deps: RightSectionDeps) {
 	} = sessionState;
 	const {
 		resultsByMessageId,
-		canvasData,
-		missingIds,
-		bannerCanvasIdBySession,
 		selected,
 		availableLanguages,
 		defaultLanguage,
@@ -92,6 +76,7 @@ export function rightSection(deps: RightSectionDeps) {
 		handleRun,
 		handleRerun,
 		handleBack,
+		handleSaveState,
 	} = dataBoards;
 
 	// The assistant, as the right side's `assistant` occupant. Its close closes
@@ -115,26 +100,19 @@ export function rightSection(deps: RightSectionDeps) {
 			activeSession={activeSession}
 			username={username}
 			graphSlug={graphSlug}
-			bannerCanvasIdBySession={bannerCanvasIdBySession}
 			onOpenSession={handleOpenSession}
 			onBack={handleBack}
 			onRerun={handleRerun}
 			onFetchContext={fetchContext}
-			onSetFeedback={setFeedback}
 			results={resultsByMessageId}
 			onLoadToCanvas={handleLoadToCanvasClick}
-			onOpenLog={openConsoleLog}
-			onRefresh={refresh}
-			isRefreshing={isRefreshing}
+			onOpenConsole={openConsoleTab}
+			onSaveView={() => void handleSaveState()}
 			onClose={right.close}
 			// The chip rides above the composer's input, not above the panel
 			// (the-assistant.md).
 			attachment={attachmentDetached ? null : attachmentFor(selected)}
 			onRemoveAttachment={() => setAttachmentDetached(true)}
-			sort={sort}
-			onSortChange={setSort}
-			showArchived={showArchived}
-			onShowArchivedChange={setShowArchived}
 			onPin={setPinned}
 			onArchive={setArchived}
 			onSetTokensPerRun={setTokensPerRun}
@@ -152,24 +130,6 @@ export function rightSection(deps: RightSectionDeps) {
 		assistant: {
 			content: assistantContent,
 			size: ASSISTANT_SECTION,
-		},
-		inspector: {
-			content: (
-				<InspectorViewPanel
-					selected={selected}
-					allItems={canvasData}
-					missingIds={missingIds}
-					onClose={closeInspector}
-					modelName={modelName}
-					onOpenModel={() => {
-						// A node's provenance line opens the journal that holds the run
-						// that wrote it — the Runs panel, not an Imports panel of its own.
-						// There is no model facet to narrow to: the journal
-						// is filtered by kind, never by subject.
-						settingsPanel.setSection("runs");
-					}}
-				/>
-			),
 		},
 	};
 

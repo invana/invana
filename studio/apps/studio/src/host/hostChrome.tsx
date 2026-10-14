@@ -3,9 +3,15 @@ import {
 	GraphStatusBar as CanvasStatusBar,
 } from "@invana/canvas-ui";
 import { Button, cn } from "@invana/ui";
-import { ExplorerHeaderToolbar } from "@invana-studio/explorer";
+import type { GraphConnectionRead } from "@invana-studio/core";
+import {
+	ConnectionLine,
+	ExplorerHeaderToolbar,
+	RendererLine,
+	ToolsSwitch,
+} from "@invana-studio/explorer";
 import type { useRightSection } from "@invana-studio/shell";
-import { Sparkles } from "lucide-react";
+import { Star } from "lucide-react";
 import type { ReactNode } from "react";
 import { LayeredCanvasStatus } from "@/canvases/layered/LayeredCanvasChrome";
 import type { useDataBoards } from "@/host/useDataBoards";
@@ -21,6 +27,9 @@ export interface HostChromeDeps {
 	/** The layered canvas `mainSection` draws, when a panel drove one. */
 	workCanvas: ReactNode;
 	workTarget: ReturnType<typeof useLayeredCanvas>["workTarget"];
+	/** The Explorer draws its own header switch and `footer`. */
+	explorer: boolean;
+	connection: GraphConnectionRead | null | undefined;
 }
 
 /**
@@ -38,6 +47,8 @@ export function hostChrome(deps: HostChromeDeps) {
 		activeSessionId,
 		workCanvas,
 		workTarget,
+		explorer,
+		connection,
 	} = deps;
 	const { canvas, magnet, toggleMagnet, backend, setBackend } = dataBoards;
 
@@ -50,17 +61,34 @@ export function hostChrome(deps: HostChromeDeps) {
 			<Button
 				variant="ghost"
 				size="sm"
-				className={cn(right.is("assistant") && "text-primary")}
+				className={cn(
+					right.is("assistant") &&
+						"bg-primary/15 text-primary ring-1 ring-primary/30 hover:bg-primary/20 hover:text-primary",
+				)}
 				aria-pressed={right.is("assistant")}
 				onClick={() => right.toggle("assistant")}
 				title={right.is("assistant") ? "Close the assistant" : "Ask about this"}
 			>
-				<Sparkles className="h-4 w-4" />
+				<Star />
 				Assistant
 			</Button>
 		),
+		// The Explorer's *Tools* switch, first in `header.right`.
+		headerRightExtras: explorer ? <ToolsSwitch /> : undefined,
+		// The Explorer's `footer`: the database it stands on, how it draws.
+		footer: explorer
+			? {
+					left: <ConnectionLine connection={connection} />,
+					right: (
+						<RendererLine
+							canvas={activeSessionId ? canvas : null}
+							backend={dataBoards.backend}
+						/>
+					),
+				}
+			: undefined,
 		headerCenter:
-			canvas && activeSessionId ? (
+			!explorer && canvas && activeSessionId ? (
 				// The canvas toolbar reads the live camera; it only initialises
 				// correctly mounted in the app header (in the main-section tab bar
 				// the camera reads null and `HeaderToolbarItems` throws). It sits

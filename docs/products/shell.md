@@ -15,12 +15,13 @@ Not a product. The layout and the features that appear in all five. Prototype pa
 |---|---|---|
 | Launcher | 9-dot grid, far left | Opens the five products in path order; switching keeps the open Graph |
 | Wordmark | `Invana <Product>` | Names the product; never repeated in the breadcrumbs |
-| Graph picker | the open Graph, with a chevron | Name → the product’s landing; chevron → switch Graph. Absent in Datasets (install-wide) |
+| Graph picker | the open Graph, with a chevron | Opens the Graphs the person can reach; switching keeps the open product. The owner is not a level. Absent in Datasets (install-wide) |
 | Breadcrumbs | levels after the Graph | See [Breadcrumbs](#breadcrumbs) |
 | ⌘K | search or ask | Jumps to any record, model, run, schedule, or asks the assistant |
 | Notifications | bell with a count | Opens Activity › Inbox |
 | Assistant | toggle | Highlighted while the chat is open; opens and closes the chat docked on the right. Can be switched off entirely (user menu) |
-| Avatar | user menu | Assistant on/off · tools always shown · theme · profile |
+| Avatar | user menu | Assistant on/off · tools always shown · theme · Graph setup (inside a Graph) · profile |
+| Nothing else | — | No theme, fullscreen, set-up or repository buttons in the header; the theme and set-up live in the user menu |
 
 ## Breadcrumbs
 
@@ -152,7 +153,7 @@ One binary, `invana`, for every product. Prerequisites are in the [README](READM
 | First run | A new install asks *what are you trying to decide?* and offers three paths: connect a graph database (Modeller drafts a model) · start from data (Datasets) · try a sample Graph (airways or arabidopsis, read-only, with a starter project). Every empty state links to the step that unlocks it; the set-up checklist tracks progress |
 | A shared page opens inside the product | Every shared page inside a Graph — Activity (runs, approvals, schedules, events, changes), Notifications, onboarding, and the launcher, ⌘K and user-menu overlays — draws inside the product it was opened from: that product's wordmark and `leftNav`, with nothing lit, and no footer of its own. Opened by a direct link or from ⌘K, it uses the product this browser last had open, else the run's origin. Opened from Explorer it has no `leftNav`, because Explorer has none. There is no “Activity” product |
 | The Graph’s own URL | `/u/:user/:graph` opens the graph product this browser last had open, else Explorer, at that product’s landing, carrying the query string (`?right=`, `?page=`, `?onboarding=`). An old `?panel=` link resolves to its path first. The last product is a per-browser convenience; with storage blocked the Graph opens Explorer |
-| Activity is the shell’s route | `/u/:user/:graph/activity/<tab>[/:run]` belongs to no product: the shell owns the page and the product host draws it in `mainSection`, inside the product as above. The header keeps the bell and the onboarding cap, which are the header’s defaults on every screen inside a Graph. Off a Graph (sign in, the Graph list, first run, profile) there is no product and no `leftNav` |
+| Activity is the shell’s route | `/u/:user/:graph/activity/<tab>[/:run]` belongs to no product: the shell owns the page and the product host draws it in `mainSection`, inside the product as above. The header keeps Notifications, which is the header’s default on every screen inside a Graph; set-up is reopened from the user menu. Off a Graph (sign in, the Graph list, first run, profile) there is no product and no `leftNav` |
 | One host draws the graph products | Explorer, Modeller, Projects and Agents render one page from the app — the product host — through their slot’s `Page`, because it composes all four (the Workbook, each product’s `leftSection` panel, the assistant, the Console) and a product may not import another. It reads the open product off the route and the open panel off the path; there is no graph page of its own and no product called *Studio* |
 | What ⌘K searches today | Only lists the engine already serves, fetched once each time the palette opens and matched in the browser as you type: on a Graph, Explorer's conversations, Modeller's models, the node and edge types of its union, and its worlds, Agents' agents and skills, Projects' projects and todos, and the Graph's last 100 runs (*Activity*); everywhere, the Graphs you can open. Each product hands the shell its list through `search` on its definition. A record with no path of its own (a model, a type, a skill) opens its section. Conversations and runs carry their age beside their kind, since many share a title. The Graph's records themselves (an airport, a gene) are not searched until the engine serves a search over them |
 | What ⌘K can do | Each product's rail sections and its `commands` are entries in its group, matched by label and keywords. With nothing typed, the palette lists the open product's entries |

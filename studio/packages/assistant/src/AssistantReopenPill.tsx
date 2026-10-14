@@ -1,5 +1,5 @@
 import { Button } from "@invana/ui";
-import { Sparkles } from "lucide-react";
+import { Star } from "lucide-react";
 
 interface AssistantReopenPillProps {
 	/** The open conversation's title — what reopening brings back. */
@@ -27,7 +27,7 @@ export function AssistantReopenPill({
 			className="max-w-80 bg-card shadow-md"
 			onClick={onOpen}
 		>
-			<Sparkles className="h-3.5 w-3.5 shrink-0 text-primary" />
+			<Star className="h-3.5 w-3.5 shrink-0 text-primary" />
 			<span className="truncate">Assistant · {title || "New session"}</span>
 		</Button>
 	);

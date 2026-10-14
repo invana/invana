@@ -18,6 +18,9 @@ interface AssistantHostProps
 	world: ReturnType<typeof useSessions>["world"];
 	/** `Manage` on the world picker — opens Govern beside the thread. */
 	onManageWorlds: () => void;
+	/** The open Graph, for the world picker. */
+	username: string | undefined;
+	graphSlug: string | undefined;
 }
 
 /**
@@ -34,6 +37,8 @@ export function AssistantHost({
 	renderLock,
 	world,
 	onManageWorlds,
+	username,
+	graphSlug,
 	...panel
 }: AssistantHostProps) {
 	if (connectionMissing) return renderLock("connected", "The Assistant");
@@ -44,8 +49,8 @@ export function AssistantHost({
 			// The world is the thread's, set where it asks.
 			worldControl={
 				<WorldPicker
-					username={panel.username}
-					graphSlug={panel.graphSlug}
+					username={username}
+					graphSlug={graphSlug}
 					lensId={world.lensId}
 					missing={world.missing}
 					nextAskOnly={world.nextAskOnly}

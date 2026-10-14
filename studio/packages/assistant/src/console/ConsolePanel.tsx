@@ -80,7 +80,10 @@ function RecordsTable({
 					const id = records.elementIds?.[i];
 					return (
 						<TableRow
-							key={id ?? `${i}`}
+							// One element can come back on several rows, so the
+							// position keeps the key unique; rows are never reordered.
+							// biome-ignore lint/suspicious/noArrayIndexKey: the rows are a fixed page of one result
+							key={`${i}:${id ?? ""}`}
 							className={id && onSelectElement ? "cursor-pointer" : undefined}
 							onClick={
 								id && onSelectElement ? () => onSelectElement(id) : undefined

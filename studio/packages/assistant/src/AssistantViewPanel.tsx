@@ -1,14 +1,6 @@
-import {
-	Button,
-	ChatSessionStatusBar,
-	ChatSessionTaskRow,
-	DropdownMenuCheckboxItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-} from "@invana/ui";
+import { Badge, Button, ChatSessionTaskRow, SearchInput } from "@invana/ui";
 import type {
 	QueryLanguage,
-	QueryMode,
 	QueryResponse,
 	QueryRunPayload,
 	RunView,
@@ -17,24 +9,22 @@ import type {
 	SessionMessage,
 } from "@invana-studio/core";
 import { formatCompactCount, useRunStore } from "@invana-studio/core";
-import { ListFilterMenu, ListPanelChrome } from "@invana-studio/ui";
 import {
 	Check,
-	ChevronRight,
-	HelpCircle,
+	History,
 	MessageSquare,
+	Plus,
 	Settings2,
+	Star,
 	X,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import type { SessionSort } from "./api";
 import type { AssistantAttachment, LLMProvider } from "./SessionComposer";
 import { deriveComposerConfig, SessionComposer } from "./SessionComposer";
-import { SessionLegendDialog } from "./SessionLegendDialog";
 import { SessionList } from "./SessionList";
 import { SessionSettings } from "./SessionSettings";
-import { SessionStepsTimeline, stepsFor } from "./SessionStepsTimeline";
+import { stepsFor } from "./SessionStepsTimeline";
 import { SessionThread } from "./SessionThread";
 
 export interface AssistantViewPanelProps {
@@ -49,13 +39,6 @@ export interface AssistantViewPanelProps {
 	// Sessions
 	sessions: Session[];
 	activeSession: Session | null;
-	/** Owning graph coordinates — let bannered rows lazy-fetch their canvas
-	 *  preview (docs/for-developers/modules/explore/features/graph-canvas.md). Undefined until the route params resolve. */
-	username?: string;
-	graphSlug?: string;
-	/** sessionId → boardId for sessions whose 1:1 canvas has a banner
-	 *  screenshot (docs/for-developers/modules/explore/features/graph-canvas.md). Rows in this map render the preview above the title. */
-	bannerCanvasIdBySession?: Map<string, string>;
 	onOpenSession: (id: string) => void;
 	onBack: () => void;
 	/** Re-run a past assistant message's query in place (a new run). */
@@ -63,29 +46,19 @@ export interface AssistantViewPanelProps {
 	/** Fetch the conversation context the model was given for an assistant reply
 	 *  (docs/for-developers/modules/ask/spec.md · docs/for-developers/modules/ask/features/reasoning-trace.md) — lazily, when its disclosure is opened. */
 	onFetchContext: (messageId: string) => Promise<SessionContextTurn[]>;
-	/** Record (or clear) a 👍/👎 vote on a reply (docs/for-developers/modules/ask/features/clarifying-questions.md · docs/for-developers/modules/workflows/features/promote-a-plan.md). */
-	onSetFeedback: (messageId: string, value: "up" | "down" | null) => void;
 	/** Transient per-message query results, keyed by assistant message id (docs/for-developers/modules/ask/features/the-answer-surface.md). */
 	results: Record<string, QueryResponse | null>;
 	/** Project a graph result onto the canvas (logs a `load` turn, docs/for-developers/modules/explore/features/boards.md). The
 	 *  message is the reply the result belongs to — its query is what was loaded. */
 	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
-	/** Open the console on Log — offered on a failed reply where the page has
-	 *  a console. */
-	onOpenLog?: () => void;
-	/** Refetch sessions from the engine (header refresh control). */
-	onRefresh: () => void;
-	/** True while a refetch is in flight — spins the refresh icon. */
-	isRefreshing: boolean;
+	/** Open the console under the board — on Records from a reply's record
+	 *  count, on Log from a failure. Absent where the page has no console. */
+	onOpenConsole?: (tab: "records" | "log") => void;
+	/** Keep the board as it stands as a view — a reply's *Save view*. */
+	onSaveView?: () => void;
 	/** Close the assistant. Its sessions live on the RIGHT and nowhere else,
 	 *  so this closes the region — it never touches the left rail. */
 	onClose: () => void;
-	/** List ordering (server-side); pinned always float to the top. */
-	sort: SessionSort;
-	onSortChange: (sort: SessionSort) => void;
-	/** Whether archived sessions are included in the list (server-side). */
-	showArchived: boolean;
-	onShowArchivedChange: (show: boolean) => void;
 	/** Toggle a session's pinned flag. */
 	onPin: (id: string, pinned: boolean) => void;
 	/** Toggle a session's archived flag. */
@@ -115,16 +88,13 @@ export interface AssistantViewPanelProps {
 }
 
 // ── Panel ─────────────────────────────────────────────────────────────────────
-// Two views in one rail panel (docs/for-developers/modules/platform/features/design-system.md · docs/for-developers/modules/ask/features/streaming-and-the-workflow.md): the list of past sessions, and the
-// console transcript of the open one — with a Tasks view (every step of every
-// reply) reachable from the status bar. The composer, the pinned strip of what
-// is running and the status bar are the footer in every view, so asking from
-// the list opens a fresh session and drops you into its thread. The list is
-// `SessionList`, the transcript `SessionThread` (design-kit `ChatSession*`),
-// the input `SessionComposer`; this file is the chrome and the glue.
-
-/** The panel's one name, in the tab header and the breadcrumb alike. */
-const PANEL_NAME = "Ask Assistant";
+// The assistant, docked right (docs/products/explorer.md): a header —
+// *Assistant* and what is open — over one of two views, the open thread or
+// the history of sessions, with the composer under both. Asking from the
+// history opens a fresh session and drops you into its thread. While a run
+// runs, a strip above the composer names its current step. The list is
+// `SessionList`, the transcript `SessionThread`, the input `SessionComposer`;
+// this file is the chrome and the glue.
 
 export function AssistantViewPanel({
 	availableLanguages,
@@ -135,24 +105,15 @@ export function AssistantViewPanel({
 	isRunning,
 	sessions,
 	activeSession,
-	username,
-	graphSlug,
-	bannerCanvasIdBySession,
 	onOpenSession,
 	onBack,
 	onRerun,
 	onFetchContext,
-	onSetFeedback,
 	results,
 	onLoadToCanvas,
-	onOpenLog,
-	onRefresh,
-	isRefreshing,
+	onOpenConsole,
+	onSaveView,
 	onClose,
-	sort,
-	onSortChange,
-	showArchived,
-	onShowArchivedChange,
 	onPin,
 	onArchive,
 	surface = "explorer",
@@ -168,23 +129,17 @@ export function AssistantViewPanel({
 	// Bumped to focus the composer when the user picks "let me type instead" on a
 	// clarification (docs/for-developers/modules/ask/features/clarifying-questions.md).
 	const [composerFocus, setComposerFocus] = useState(0);
-	// The composer's ask kind — a query's keys differ from an ask's.
-	const [askMode, setAskMode] = useState<QueryMode>("nl");
-	// Chat (the transcript) or Tasks (every step of every reply) —.
-	const [view, setView] = useState<"chat" | "tasks">("chat");
-	// The "what do the dots mean" legend, opened from the header help icon.
-	const [legendOpen, setLegendOpen] = useState(false);
 	// The thread's settings — its spend per run, from the header.
 	const [settingsOpen, setSettingsOpen] = useState(false);
-	// LLM providers excluded from the list (client-side). Empty = show all.
-	// Sessions don't record their provider yet, so this filters nothing today —
-	// it's wired ahead of NL queries landing (see Session.llmProviderId).
-	const [excludedLLMs, setExcludedLLMs] = useState<ReadonlySet<string>>(
-		() => new Set(),
-	);
 	const runViews = useRunStore((s) => s.views);
 
-	const inDetail = activeSession !== null;
+	// The history is a view over the open thread, not a way out of it: the
+	// board keeps its canvas while the person looks back. With no thread open,
+	// the history is all there is.
+	const [historyOpen, setHistoryOpen] = useState(false);
+	const inDetail = activeSession !== null && !historyOpen;
+	// The history, searched by title.
+	const [search, setSearch] = useState("");
 
 	// `esc` stops the run, from anywhere on the page — like a console.
 	useEffect(() => {
@@ -198,66 +153,6 @@ export function AssistantViewPanel({
 		document.addEventListener("keydown", onKey);
 		return () => document.removeEventListener("keydown", onKey);
 	}, [isRunning, onStop]);
-
-	// Leaving the thread returns the footer to the chat view.
-	useEffect(() => {
-		if (!inDetail) setView("chat");
-	}, [inDetail]);
-
-	// The panel is named for the occupant, not its contents: **Ask Assistant**,
-	// because the region holds the assistant and sessions are what it holds
-	// (docs/for-developers/modules/ask/features/the-assistant.md).
-	//
-	// Inside a thread the header becomes a breadcrumb: `Ask Assistant` (click to
-	// return to the list — the tab *is* the back affordance, so there's no
-	// separate back button) › the open session's title, ellipsized.
-	const tabLabel =
-		inDetail && activeSession ? (
-			<span className="flex min-w-0 items-center gap-1">
-				{/* biome-ignore lint/a11y/useSemanticElements: a native <button> can't nest inside the Radix TabsTrigger <button> hosting this label. */}
-				<span
-					role="button"
-					tabIndex={0}
-					className="shrink-0 hover:underline"
-					onPointerDown={(e) => e.stopPropagation()}
-					onClick={(e) => {
-						e.stopPropagation();
-						onBack();
-					}}
-					onKeyDown={(e) => {
-						if (e.key === "Enter" || e.key === " ") {
-							e.stopPropagation();
-							onBack();
-						}
-					}}
-				>
-					{PANEL_NAME}
-				</span>
-				<ChevronRight className="h-3 w-3 shrink-0 opacity-60" />
-				<span
-					className="min-w-0 truncate"
-					title={activeSession.title || "New session"}
-				>
-					{activeSession.title || "New session"}
-				</span>
-			</span>
-		) : (
-			PANEL_NAME
-		);
-
-	const toggleLLM = (id: string) => {
-		setExcludedLLMs((prev) => {
-			const next = new Set(prev);
-			next.has(id) ? next.delete(id) : next.add(id);
-			return next;
-		});
-	};
-
-	const resetFilters = () => {
-		onSortChange("updated");
-		onShowArchivedChange(false);
-		setExcludedLLMs(new Set());
-	};
 
 	// Mode/model/timeout to restore for the open session (docs/for-developers/modules/ask/features/ask-in-natural-language.md).
 	const composerConfig = useMemo(
@@ -292,7 +187,6 @@ export function AssistantViewPanel({
 			mode: "nl",
 			query: text,
 			llmProviderId,
-			attachments: [],
 			timeoutS: composerConfig?.timeoutS ?? 120,
 		});
 	};
@@ -301,21 +195,8 @@ export function AssistantViewPanel({
 	// answers in their own words (docs/for-developers/modules/ask/features/clarifying-questions.md).
 	const handleTypeInstead = () => setComposerFocus((n) => n + 1);
 
-	// 👍/👎 a reply (docs/for-developers/modules/ask/features/clarifying-questions.md · docs/for-developers/modules/workflows/features/promote-a-plan.md). A downvote also kicks off a refinement: it
-	// sends a follow-up NL turn so the model asks what to change (with options),
-	// re-translating with this reply now in context. Clearing a vote doesn't.
-	const handleVote = (messageId: string, value: "up" | "down" | null) => {
-		onSetFeedback(messageId, value);
-		if (value === "down") {
-			handleSelectOption(
-				"That's not what I'm looking for. What can I change to get it right? Offer a few options.",
-			);
-		}
-	};
-
-	// Jump from the Tasks view (or the pinned strip) to a reply in the chat.
+	// Jump from the running strip to its reply in the thread.
 	const jumpTo = (messageId: string) => {
-		setView("chat");
 		window.setTimeout(() => {
 			document
 				.getElementById(`turn-${messageId}`)
@@ -347,7 +228,7 @@ export function AssistantViewPanel({
 	}, [activeSession, runViews]);
 
 	const strip =
-		view === "chat" && liveTurns.length > 0 ? (
+		liveTurns.length > 0 ? (
 			<div className="shrink-0 border-t border-border px-3 py-1.5 flex flex-col gap-px">
 				{liveTurns.map(({ message, view: v }) => {
 					const steps = stepsFor(message, v);
@@ -384,76 +265,6 @@ export function AssistantViewPanel({
 				})}
 			</div>
 		) : null;
-
-	const running = liveTurns.filter(
-		(t) => t.view.status === "queued" || t.view.status === "run",
-	).length;
-	const waiting = liveTurns.length - running;
-	const stepCount = activeSession
-		? activeSession.messages.reduce(
-				(n, m) =>
-					n +
-					(m.role === "assistant"
-						? stepsFor(m, m.runId ? runViews[m.runId] : undefined).length
-						: 0),
-				0,
-			)
-		: 0;
-
-	const statusStart = inDetail ? (
-		<>
-			<button
-				type="button"
-				onClick={() => setView("chat")}
-				className={
-					view === "chat"
-						? "font-medium text-foreground"
-						: "hover:text-foreground"
-				}
-			>
-				Chat
-			</button>
-			<button
-				type="button"
-				onClick={() => setView("tasks")}
-				className={
-					view === "tasks"
-						? "font-medium text-foreground"
-						: "hover:text-foreground"
-				}
-			>
-				Tasks ({stepCount})
-			</button>
-			{running > 0 ? (
-				<span className="text-primary">{running} running</span>
-			) : waiting > 0 ? (
-				<span className="text-warning">{waiting} needs input</span>
-			) : null}
-		</>
-	) : (
-		<span>
-			{sessions.length} session{sessions.length === 1 ? "" : "s"}
-		</span>
-	);
-
-	const statusEnd = isRunning ? (
-		<>
-			<span>esc stop</span>
-			<span>↓ tasks</span>
-		</>
-	) : askMode === "ql" ? (
-		<>
-			<span>⌘↵ run</span>
-			<span>↵ newline</span>
-			<span>↑↓ history</span>
-		</>
-	) : (
-		<>
-			<span>↵ send</span>
-			<span>⇧↵ newline</span>
-			<span>↑↓ history</span>
-		</>
-	);
 
 	// Modeller: a Commit bar above the composer publishes the bound draft —
 	// identical to the Modeller's Publish, in the session's context (docs/for-developers/modules/ask/spec.md).
@@ -496,132 +307,122 @@ export function AssistantViewPanel({
 				attachment={attachment}
 				onRemoveAttachment={onRemoveAttachment}
 				worldControl={worldControl}
-				onAskKindChange={setAskMode}
-			/>
-			<ChatSessionStatusBar
-				className="pt-0"
-				start={statusStart}
-				end={statusEnd}
 			/>
 		</>
 	);
 
 	return (
-		<>
-			<ListPanelChrome
-				title={tabLabel}
-				icon={MessageSquare}
-				leadingActions={[
-					{
-						key: "legend",
-						name: "Status legend",
-						icon: HelpCircle,
-						onClick: () => setLegendOpen(true),
-					},
-					...(inDetail && activeSession && onSetTokensPerRun
-						? [
-								{
-									key: "settings",
-									name: "Session settings",
-									icon: Settings2,
-									onClick: () => setSettingsOpen((v) => !v),
-								},
-							]
-						: []),
-				]}
-				onRefresh={onRefresh}
-				isRefreshing={isRefreshing}
-				refreshLabel="Refresh sessions"
-				searchable
-				searchLabel="Search sessions"
-				onClose={onClose}
-				// The assistant is on the right, so its control is a close ✕ — the hi-fi
-				// draws exactly that (`Assistant · the shell`). A left-collapse chevron
-				// here promised to fold the left column, and did.
-				closeIcon={X}
-				closeLabel="Close the assistant"
-				// Search + filter only apply on the list, not inside a thread.
-				listControls={!inDetail}
-				filterMenu={
-					<ListFilterMenu
-						sort={sort}
-						onSortChange={(s) => onSortChange(s as SessionSort)}
-						showArchived={showArchived}
-						onShowArchivedChange={onShowArchivedChange}
-						onReset={resetFilters}
+		<div className="flex h-full min-h-0 flex-col bg-card">
+			<div className="flex h-control-lg shrink-0 items-center gap-2 border-b border-border pr-2 pl-3">
+				<Star className="size-3.5 shrink-0 text-primary" aria-hidden />
+				<span className="shrink-0 font-semibold">Assistant</span>
+				<span
+					className="min-w-0 truncate text-xs text-muted-foreground"
+					title={activeSession?.title || undefined}
+				>
+					{inDetail ? activeSession?.title || "New session" : "History"}
+				</span>
+				<span className="flex-1" />
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					aria-label="Sessions"
+					aria-pressed={!inDetail}
+					title={inDetail ? "Sessions" : "Back to the thread"}
+					onClick={() => setHistoryOpen((v) => !v)}
+					disabled={!activeSession}
+				>
+					<History />
+				</Button>
+				{inDetail && activeSession && onSetTokensPerRun && (
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						aria-label="Session settings"
+						title="Session settings"
+						onClick={() => setSettingsOpen((v) => !v)}
 					>
-						{llmProviders.length > 0 && (
-							<>
-								<DropdownMenuSeparator />
-								<DropdownMenuLabel className="text-muted-foreground">
-									LLM
-								</DropdownMenuLabel>
-								{llmProviders.map((p) => (
-									<DropdownMenuCheckboxItem
-										key={p.id}
-										checked={!excludedLLMs.has(p.id)}
-										onCheckedChange={() => toggleLLM(p.id)}
-										onSelect={(e) => e.preventDefault()}
-									>
-										{/* The endpoint's own name is the address segment a
-										    refusal reads back — a filter names what a rule
-										    names. */}
-										{p.name || p.provider}
-									</DropdownMenuCheckboxItem>
-								))}
-							</>
+						<Settings2 />
+					</Button>
+				)}
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					aria-label="Close the assistant"
+					title="Close the assistant"
+					onClick={onClose}
+				>
+					<X />
+				</Button>
+			</div>
+			<div className="min-h-0 flex-1 overflow-hidden">
+				{activeSession && inDetail ? (
+					<>
+						{onSetTokensPerRun && (
+							<SessionSettings
+								session={activeSession}
+								open={settingsOpen}
+								onOpenChange={setSettingsOpen}
+								onSave={(tokens) => onSetTokensPerRun(activeSession.id, tokens)}
+							/>
 						)}
-					</ListFilterMenu>
-				}
-				footer={footer}
-			>
-				{({ search }) =>
-					activeSession ? (
-						<>
-							{onSetTokensPerRun && (
-								<SessionSettings
-									session={activeSession}
-									open={settingsOpen}
-									onOpenChange={setSettingsOpen}
-									onSave={(tokens) =>
-										onSetTokensPerRun(activeSession.id, tokens)
-									}
-								/>
-							)}
-							{view === "tasks" ? (
-								<SessionStepsTimeline session={activeSession} onJump={jumpTo} />
-							) : (
-								<SessionThread
-									session={activeSession}
-									isRunning={isRunning}
-									results={results}
-									onRerun={onRerun}
-									onFetchContext={onFetchContext}
-									onSelectOption={handleSelectOption}
-									onTypeInstead={handleTypeInstead}
-									onVote={handleVote}
-									onLoadToCanvas={onLoadToCanvas}
-									onOpenLog={onOpenLog}
-								/>
-							)}
-						</>
-					) : (
-						<SessionList
-							sessions={sessions}
-							sort={sort}
-							search={search}
-							username={username}
-							graphSlug={graphSlug}
-							bannerCanvasIdBySession={bannerCanvasIdBySession}
-							onOpen={onOpenSession}
-							excludedLLMs={excludedLLMs}
-							onPin={onPin}
-							onArchive={onArchive}
+						<SessionThread
+							session={activeSession}
+							isRunning={isRunning}
+							results={results}
+							onRerun={onRerun}
+							onFetchContext={onFetchContext}
+							onSelectOption={handleSelectOption}
+							onTypeInstead={handleTypeInstead}
+							onLoadToCanvas={onLoadToCanvas}
+							onOpenConsole={onOpenConsole}
+							onSaveView={onSaveView}
 						/>
-					)
-				}
-			</ListPanelChrome>
-			<SessionLegendDialog open={legendOpen} onOpenChange={setLegendOpen} />
-		</>
+					</>
+				) : (
+					<div className="flex h-full min-h-0 flex-col">
+						<div className="flex shrink-0 flex-col gap-2 border-b border-border p-3">
+							<div className="flex items-center gap-2">
+								<MessageSquare className="size-3.5 text-muted-foreground" />
+								<span className="font-semibold">Sessions</span>
+								<Badge variant="secondary">{sessions.length}</Badge>
+								<span className="flex-1" />
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => {
+										setHistoryOpen(false);
+										onBack();
+										setComposerFocus((n) => n + 1);
+									}}
+								>
+									<Plus />
+									New
+								</Button>
+							</div>
+							<SearchInput
+								value={search}
+								onChange={setSearch}
+								placeholder="Search sessions…"
+								aria-label="Search sessions"
+							/>
+						</div>
+						<div className="min-h-0 flex-1 overflow-auto">
+							<SessionList
+								sessions={sessions}
+								search={search}
+								onOpen={(id) => {
+									setHistoryOpen(false);
+									onOpenSession(id);
+								}}
+								onPin={onPin}
+								onArchive={onArchive}
+							/>
+						</div>
+					</div>
+				)}
+			</div>
+			{footer}
+		</div>
 	);
 }

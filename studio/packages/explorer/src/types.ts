@@ -108,3 +108,10 @@ export type ExpandRequest =
 	| { kind: "neighbors"; body: ExpandNeighborsRequest }
 	| { kind: "by-edge-type"; body: ExpandByEdgeTypeRequest }
 	| { kind: "by-node-type"; body: ExpandByNodeTypeRequest };
+
+/** What *Schedule this* hands `explorer.scheduleQuestion`. */
+export interface ScheduleQuestionArgs {
+	username: string;
+	graphSlug: string;
+	question: string;
+}

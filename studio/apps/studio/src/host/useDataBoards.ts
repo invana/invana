@@ -76,7 +76,6 @@ export interface DataBoardsDeps {
 	attachmentDetached: boolean;
 	/** The answering gate is shut, so a natural-language ask is refused here. */
 	cannotAnswer: boolean;
-	openInspector: () => void;
 	boardPage: ReturnType<typeof useBoardPage>;
 	setActiveBoardId: Dispatch<SetStateAction<string | null>>;
 	setWorkKind: Dispatch<SetStateAction<DataBoardsCanvasKind | null>>;
@@ -115,14 +114,13 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		right,
 		attachmentDetached,
 		cannotAnswer,
-		openInspector,
 		boardPage,
 		setActiveBoardId,
 		setWorkKind,
 		streamResultRef,
 	} = deps;
 
-	// Full current canvas contents — drives the Inspector (`allItems` / `selected`)
+	// Full current canvas contents — drives the record card (`selected`)
 	// and the seed re-fed to a freshly-mounted canvas (e.g. on a backend remount).
 	// A fresh query *replaces* it; a node-expand *appends* to it (docs/for-developers/modules/explore/features/graph-canvas.md).
 	// Held per canvas by `useBoardVersions` (below), not per page — a second
@@ -271,19 +269,16 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		[activeCanvasId, username, graphSlug, setStyling],
 	);
 
-	// Clicked node/edge id, lifted from the canvas by <InspectorSelectionBridge>.
+	// Clicked node/edge id, lifted from the canvas by <SelectionBridge>.
 	const selected: QueryResultItem | null = selectedId
 		? (canvasData.find((i) => String(i.id) === selectedId) ?? null)
 		: null;
 
-	// "Node details" / "Edge details" context-menu items — select the element and
-	// open the (default-closed) inspector so its properties show on the right.
+	// "Node details" / "Edge details" context-menu items — select the element,
+	// which opens its record card on the board.
 	const handleShowDetail = useCallback(
-		(id: string) => {
-			setSelectedId(id);
-			openInspector();
-		},
-		[openInspector, setSelectedId],
+		(id: string) => setSelectedId(id),
+		[setSelectedId],
 	);
 
 	const paintCanvas = useCallback(
@@ -674,7 +669,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 	const {
 		canvasList,
 		createCanvas,
-		bannerCanvasIdBySession,
 		sessionTitleById,
 		openCanvasTab,
 		handleOpenSession,
@@ -928,6 +922,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 
 	return {
 		resultsByMessageId,
+		canvasList,
 		runRef,
 		canvas,
 		handleReady,
@@ -944,7 +939,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		missingIds,
 		setSelectedId,
 		setBackend,
-		bannerCanvasIdBySession,
 		sessionTitleById,
 		handleStylingChange,
 		selected,

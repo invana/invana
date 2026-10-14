@@ -3,8 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 // The wizard is the graph page's content while anything is outstanding,
 // so it needs no param to be *shown*. This one exists for the other half of
-// re-opening it once the Graph is ready, from the graduation cap in
-// `header.right`. It is the cap's only state.
+// re-opening it once the Graph is ready, from the user menu's *Graph setup*.
 const ONBOARDING_PARAM = "onboarding";
 
 /**

@@ -104,16 +104,6 @@ export function useCanvasTabs(deps: CanvasTabsDeps) {
 		limit: 100,
 		includeArchived: true,
 	});
-	// sessionId → boardId for canvases that have a banner screenshot (docs/for-developers/modules/explore/features/graph-canvas.md),
-	// so the Sessions list can show each session's canvas preview above its title.
-	// Only bannered canvases are mapped; their rows lazy-fetch the (heavy) image.
-	const bannerCanvasIdBySession = useMemo(() => {
-		const m = new Map<string, string>();
-		for (const c of canvasList?.items ?? []) {
-			if (c.hasBanner) m.set(c.sessionId, c.id);
-		}
-		return m;
-	}, [canvasList]);
 	// A session's title is the single name for it and its 1:1 canvas (docs/for-developers/modules/explore/features/graph-canvas.md):
 	// the breadcrumb and the canvas tab show the same session title, so there's no
 	// separate canvas name to keep in sync. `activeSession` is the freshest source
@@ -335,7 +325,6 @@ export function useCanvasTabs(deps: CanvasTabsDeps) {
 	return {
 		canvasList,
 		createCanvas,
-		bannerCanvasIdBySession,
 		sessionTitleById,
 		openCanvasTab,
 		handleOpenSession,

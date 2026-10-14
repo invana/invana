@@ -21,6 +21,18 @@ export {
 	isCanvasStateSnapshot,
 	resultToItems,
 } from "./canvasItems";
+// What floats over the board, and the chrome around it.
+export { BoardLegend } from "./chrome/BoardLegend";
+export {
+	type BoardOverlay,
+	BoardToolbar,
+	ZoomControls,
+} from "./chrome/BoardToolbar";
+export { EmptyBoard, ExplorerLocked } from "./chrome/ExplorerLocked";
+export { RecordCard } from "./chrome/RecordCard";
+export { ConnectionLine, RendererLine } from "./chrome/StatusLine";
+export { ToolsSwitch } from "./chrome/ToolsSwitch";
+export { useExplorerTools } from "./chrome/useExplorerTools";
 export { ExpandNeighboursDialog } from "./ExpandNeighboursDialog";
 export type {
 	ExpandMenuHandlers,
@@ -28,12 +40,12 @@ export type {
 } from "./ExplorerCanvas";
 export { ExplorerCanvas, ExplorerHeaderToolbar } from "./ExplorerCanvas";
 export { ExplorerViewPanel } from "./ExplorerViewPanel";
-export { InspectorViewPanel } from "./InspectorViewPanel";
 // The product: its routes, and the slot the app fills with the page.
 export { ExplorerSlotsContext, explorer } from "./product";
 export type {
 	ExpandRequest,
 	NeighborExpandResponse,
+	ScheduleQuestionArgs,
 	ShareAnswerArgs,
 } from "./types";
 export { useCanvasExpand } from "./useCanvasExpand";

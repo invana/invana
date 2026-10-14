@@ -22,10 +22,11 @@ export interface SessionThreadProps {
 	onFetchContext: (messageId: string) => Promise<SessionContextTurn[]>;
 	onSelectOption: (text: string) => void;
 	onTypeInstead: () => void;
-	onVote: (messageId: string, value: "up" | "down" | null) => void;
 	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
-	/** Open the console on Log — offered on a failed reply. */
-	onOpenLog?: () => void;
+	/** Open the console — on Records or on Log. */
+	onOpenConsole?: (tab: "records" | "log") => void;
+	/** Keep the board as it stands as a view — a reply's *Save view*. */
+	onSaveView?: () => void;
 }
 
 /**
@@ -47,9 +48,9 @@ export function SessionThread({
 	onFetchContext,
 	onSelectOption,
 	onTypeInstead,
-	onVote,
 	onLoadToCanvas,
-	onOpenLog,
+	onOpenConsole,
+	onSaveView,
 }: SessionThreadProps) {
 	const runViews = useRunStore((s) => s.views);
 
@@ -165,10 +166,10 @@ export function SessionThread({
 							onFetchContext={onFetchContext}
 							onSelectOption={onSelectOption}
 							onTypeInstead={onTypeInstead}
-							onVote={onVote}
 							result={results[message.id]}
 							onLoadToCanvas={onLoadToCanvas}
-							onOpenLog={onOpenLog}
+							onOpenConsole={onOpenConsole}
+							onSaveView={onSaveView}
 							sessionId={session.id}
 						/>
 					</div>

@@ -9,7 +9,7 @@ import {
 	useGraphsQuery,
 } from "@invana-studio/core";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { FolderGit2, History, Sparkles } from "lucide-react";
+import { FolderGit2, History, Star } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { activityPath } from "../activity/activityPath";
 import { runTitle } from "../activity/inbox/inbox";
@@ -184,7 +184,7 @@ export function usePaletteGroups(query: string, open: boolean) {
 				{
 					key: "do:ask",
 					label: `Ask the assistant: “${q}”`,
-					icon: Sparkles,
+					icon: Star,
 					run: () => {
 						requestAsk(q);
 						// A graph product docks the chat where the person is; anywhere

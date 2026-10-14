@@ -67,12 +67,12 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 
 | Decision | Detail |
 |---|---|
-| Tools on demand | Hidden by default; the user menu can keep them always shown |
-| Where the tools float | A card at the board's top-left: one *Tools* toggle, and the canvas toolbar stacked under it while on. The toggle is per visit, not in the URL. The renderer switch is a setting, so the floating bar leaves it out. Layers, Styling and History stay as the board's tab-strip controls |
-| Paths | `/u/:user/:graph/explorer` is the product. `/explorer/:session` is the open thread: opening, starting or leaving a thread rewrites it in place, and a reload or a shared link reopens the thread with its answer. The `:session` level has no element of its own, so it never remounts the board. Crumbs: `owner › graph › session:<short id>`. The wordmark names the product, so there is no `Explorer` crumb |
-| Lock | `gate` is the `answering` set-up step, the step the assistant's lock names today |
-| Chat starts centred | An empty board shows one question box in the middle, with suggestions and saved views |
-| Chat docks right | The first question moves the conversation into a panel on the right; the board keeps the drawing |
+| Tools on demand | Off by default: the header’s *Tools* switch, first in `header.right`, turns them on for the visit. The user menu’s *Tools always shown* starts them on |
+| Where the tools float | A card at the board’s top-left: select · lasso · box, and a chevron that turns *Tools* on. With *Tools* on the card grows to expand the selection · layers · history | run layout · styling · legend | undo · redo | export image, and the legend shows bottom-left (node types and relationships, each with its count on the board). Zoom in · zoom out · fit sit bottom-right whatever *Tools* says. There is no minimap. The renderer is a setting, so no bar carries it |
+| Paths | `/u/:user/:graph/explorer` is the product. `/explorer/:session` is the open thread: opening, starting or leaving a thread rewrites it in place, and a reload or a shared link reopens the thread with its answer. The `:session` level has no element of its own, so it never remounts the board. Crumbs: `airways ▾ › Sessions › <session title>`. The wordmark names the product, so there is no `Explorer` crumb |
+| Lock | `gate` is the `answering` set-up step. Until it opens, the board is the lock alone: *Asking opens once a model is published*, what is true now, and *Open the Modeller* |
+| Chat starts centred | With no canvas open the board is one question box on the dotted ground — no strip, no tabs — headed *What do you want to know about `<Graph>`?* and the Graph’s line. Under it: the person’s three most recent distinct questions, each asked again in one click, and *Your views* — their kept canvases, pinned first. Neither is invented: a Graph never asked anything shows the box alone. With the chat docked and nothing drawn, the board is the empty ground — one question box on screen, never two |
+| Chat docks right | The first question moves the conversation into a panel on the right; the board keeps the drawing. The panel’s header is the Assistant’s star · *Assistant* · the open session’s title, then Sessions · session settings · ✕ |
 | Everything answers in the chat | Answers, charts’ words, refusals, cannot-answer, traces and confirmations arrive as chat messages |
 | How an answer takes shape | The LLM classifies the ask (`single_query · compound · exploration · aggregate_and_chart · model_change · out_of_scope`) and writes the words. **Code** picks the visual: the result is reduced to a shape (graph or table, rows, numeric columns, single value, category + number, empty), each template’s `accepts` is checked against it, and the most specific fit renders. Templates never enter the prompt, so the prompt does not grow with them |
 | Asking for a visual | “as a chart / table / graph” is read by the intent classifier as a structured `prefer` field and ranks the eligible templates, ahead of the intent `kind` and the shape's specificity. It never forces an ineligible one: the picker offers it disabled with its reason. No substring match of the raw question ([3.4 P13](../for-developers/modules/ask/features/projections.md#7-decisions)) |
@@ -80,12 +80,28 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | Chat closes | The panel’s ✕ closes it; a pill and the header’s Assistant button reopen it where it left off |
 | Query in the composer | The composer switches Ask · Cypher · Gremlin; ⌘↵ runs. The query and its outcome are chat messages. No floating query bar |
 | A failed query | The chat says why and offers a fix; the console opens on Log with the failing line; the board is untouched |
-| Console | `AppLayoutV2` `bottomSection`, `bottomSpan: "main"` — under the canvas only, the chat stays full height. Resizable by its grip, collapsible, tabs Records · Query · Log, Records as Table or JSON, Re-run. Per [the-console.md](../for-developers/modules/explore/features/the-console.md), plus Log |
-| Sessions | Live in the chat’s history, not a second side panel |
+| Console | `AppLayoutV2` `bottomSection`, `bottomSpan: "main"` — under the canvas only, the chat stays full height. Resizable by its grip, collapsible, tabs Records · Query · Log, Records as Table or JSON, Re-run. It opens on Records when a query answers and on Log when one fails, while the page watches; a reply’s record count opens it on Records. The strip has no console toggle |
+| Sessions | Live in the chat’s history, not a second side panel: the header’s Sessions shows *Sessions `n`* · *New* · a search, and every session newest first — its outcome’s dot, its title, when, and *failed* when its last reply did. The history is a view over the open thread: the board keeps its canvas while it shows |
 | Sharing | Members get a live link (same board and chat) or a frozen snapshot (board image, answer, citations, dataset versions). Outside people get an exported file, never access; guardrails apply to what exports carry. The snapshot is a report on the answer's run, opened at `/explorer?page=run:<id>@<version>`; its board is kept as its records, and its datasets are the bindings when it was taken ([4.5](../for-developers/modules/explore/features/share-an-answer.md) SA1–SA11) |
 | Off entirely | The user menu switches the assistant off in every product (SH-07) |
-| Schedules | “Schedule this” creates a shared schedule; the toast links to Activity › Schedules |
+| Schedules | *Schedule this* on a reply opens the schedule dialog filled with the question; saving confirms with a toast that opens it in Activity › Schedules |
 | Into a project | An answer becomes a finding with its evidence (records, queries, dataset versions) attached |
+| A reply | The assistant’s mark, then the words; under them what it stood on (`195 records · Everything · 9ms`); then *Load to canvas* (a graph not yet drawn) · *Save view* (keeps the board as it stands in its History) · *Schedule this* · *Add to a project* · *Share*; then *How I got this*, which unfolds the steps, the query and what the model was given. The question is a bubble on the right. While a run runs, the reply is its live steps |
+| A record opened | Clicking a node or relationship opens its card top-right on the board — name, type, provenance, properties — with *Ask about `<name>`* · *Expand* (a node) · *Hide*. The chat keeps the right side; opening a tool card closes the record card, they share the corner |
+| The strip | Tabs for the open canvases and *+*, nothing else; *Rename* and *Close* are on a tab’s menu |
+| The footer | Left: the database and its version, and whether it is connected (`Neo4j 5.26 · connected`). Right: the renderer and the board’s frame rate (`WebGPU · 60 fps`) |
+
+## Drawn, not built yet
+
+What the prototype draws that Studio does not do yet. Each is a gap, not a non-goal.
+
+| Board | What is missing | Needs |
+|---|---|---|
+| `explorer.answer.chart` (EX-03) | A chart answer draws on the board; today the emission renders in the chat | The board to host an emission beside the graph |
+| `explorer.answer` (EX-02) | Numbered notes the answer pins on the board, and the board tool that adds one | A notes layer on the canvas |
+| `explorer.answer.trace` (EX-04) | *Datasets behind the records* under the steps | The run’s dataset bindings on the reply |
+| `explorer.home` | The composer’s first chip reads the skill (*Explain*); today it reads the ask kind | The engine picks a skill inside each run from the agent’s bound skills, so nothing names one before the ask; the chip needs the run’s skill exposed on the thread |
+| `shell.user_menu` (SH-07) | *Assistant* on/off in the user menu | The off switch across products |
 
 ## Not building
 
