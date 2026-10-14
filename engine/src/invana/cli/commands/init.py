@@ -44,22 +44,12 @@ def _validate_username_cli(raw: str) -> str:
     "--non-interactive",
     is_flag=True,
     default=False,
-    help="Use the flag values (which default to the standard admin account) instead of prompting.",
+    help="Read the values from the flags instead of prompting; --username, --password and --first-name are required.",
 )
-@click.option(
-    "--username",
-    default="admin",
-    show_default=True,
-    help="Root username (lowercase + digits + hyphen, 2-64).",
-)
-@click.option(
-    "--email",
-    default="hi@invana.local",
-    show_default=True,
-    help="Root email (optional — pass an empty string to create the account without one).",
-)
-@click.option("--password", default="change_me_please", show_default=True, help="Root password.")
-@click.option("--first-name", default="Admin", show_default=True, help="Root first name.")
+@click.option("--username", default=None, help="Root username (lowercase + digits + hyphen, 2-64).")
+@click.option("--email", default=None, help="Root email (optional).")
+@click.option("--password", default=None, help="Root password.")
+@click.option("--first-name", default=None, help="Root first name.")
 @click.option("--last-name", default=None, help="Root last name.")
 def init_cmd(
     non_interactive: bool,
@@ -71,9 +61,19 @@ def init_cmd(
 ) -> None:
     """Create the root superuser.
 
-    Idempotent — if any superuser already exists, exits without changes.
-    No personal Graph is created; the user creates their first Graph after login.
+    Nothing is defaulted: the person running it chooses the username and the
+    password, at the prompts or through the flags. Idempotent — if any
+    superuser already exists, exits without changes. No personal Graph is
+    created; the user creates their first Graph after login.
     """
+    if non_interactive:
+        missing = [
+            flag
+            for flag, value in (("--username", username), ("--password", password), ("--first-name", first_name))
+            if not value
+        ]
+        if missing:
+            raise click.UsageError(f"--non-interactive needs {', '.join(missing)}.")
     asyncio.run(
         _run_init(
             non_interactive=non_interactive,
@@ -107,24 +107,21 @@ async def _run_init(
                 return
 
             if non_interactive:
-                # All flags carry defaults (the standard admin account), so a
-                # bare `invana init --non-interactive` provisions it. Email is
-                # optional — an empty string stores NULL.
-                _username = _validate_username_cli(username)
+                # init_cmd has already refused a missing required flag.
+                _username = _validate_username_cli(username or "")
                 _email = (email.strip().lower() or None) if email else None
-                _password = password
-                _first_name = first_name.strip()
+                _password = password or ""
+                _first_name = (first_name or "").strip()
                 _last_name = last_name.strip() if last_name else None
             else:
-                _username = _validate_username_cli(click.prompt("Username", default="admin"))
-                _first_name = click.prompt("First name", default="Admin").strip()
+                _username = _validate_username_cli(click.prompt("Username"))
+                _first_name = click.prompt("First name").strip()
                 _last_name_raw = click.prompt("Last name (optional)", default="", show_default=False)
                 _last_name = _last_name_raw.strip() or None
-                _email_raw = click.prompt("Email (optional)", default="hi@invana.local").strip()
+                _email_raw = click.prompt("Email (optional)", default="", show_default=False).strip()
                 _email = _email_raw.lower() or None
                 _password = click.prompt(
                     "Password",
-                    default="change_me_please",
                     hide_input=True,
                     confirmation_prompt="Confirm",
                 )
@@ -146,7 +143,6 @@ async def _run_init(
 
         click.echo(f"✓ Created root superuser ({user.email or 'no email'}, @{user.username}).")
         click.echo(f"  Log in at: {settings.studio_base_url}/login")
-        click.echo("  Change the default password after first sign-in.")
         click.echo("  You can create your first Graph after signing in.")
     finally:
         await engine.dispose()

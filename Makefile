@@ -56,8 +56,8 @@ engine-migration: ## Generate a new migration (usage: make engine-migration msg=
 engine-migrate-history: ## Show migration history and current revision
 	cd engine && uv run alembic history && echo "\nCurrent:" && uv run alembic current
 
-engine-init: engine-migrate ## Bootstrap the default root superuser (admin / hi@invana.local / change_me_please)
-	cd engine && uv run invana init --non-interactive
+engine-init: engine-migrate ## Create the development superuser (admin / change_me_please); never for a shared install
+	cd engine && uv run invana init --non-interactive --username admin --email hi@invana.local --password change_me_please --first-name Admin
 
 # ─── Studio ─────────────────────────────────────────────────────
 studio-test: ## Run studio tests

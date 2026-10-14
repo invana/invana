@@ -66,10 +66,11 @@ services:
     build:
       context: .
       dockerfile: engine/Dockerfile
+    image: invana-engine
     container_name: invana-engine
     ports:
       - "8200:8200"
-    environment:
+    environment: &engine-env
       INVANA_ENV: ${INVANA_ENV:-development}
       # Container-network default (Postgres by service name) — deliberately
       # NOT sourced from INVANA_DATABASE_URL in .env, whose value is for
@@ -86,7 +87,7 @@ services:
       INVANA_TELEMETRY_ENABLED: ${INVANA_TELEMETRY_ENABLED:-false}
       INVANA_TELEMETRY_OTLP_ENDPOINT: http://hyperdx:4317
       INVANA_TELEMETRY_OTLP_HTTP_ENDPOINT: http://hyperdx:4318
-    volumes:
+    volumes: &engine-volumes
       # Whole repo, not just engine/ — engine/pyproject.toml path-depends on
       # the sibling integrations/invana-* packages (editable).
       - .:/app
@@ -101,6 +102,28 @@ services:
     # /etc/hosts to complete the other half (see demos/airways/README.md).
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      engine-migrate:
+        condition: service_completed_successfully
+
+  # Runs once per `up`, before the engine: applies pending migrations, which is
+  # idempotent. It creates no users. `docker compose logs engine-migrate` shows
+  # what it applied.
+  engine-migrate:
+    build:
+      context: .
+      dockerfile: engine/Dockerfile
+    # Same image as `engine`, so it is built once and reused.
+    image: invana-engine
+    container_name: invana-engine-migrate
+    command: ["uv", "run", "invana", "migrate"]
+    environment: *engine-env
+    volumes: *engine-volumes
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: "no"
     depends_on:
       postgres:
         condition: service_healthy
