@@ -43,7 +43,7 @@ No user exists until you create one.
    password; nothing is filled in for you:
 
    ```bash
-   docker compose exec engine uv run invana init
+   docker compose exec engine uv run invana users create --superuser
    ```
 
 2. Open Studio at <http://localhost:8300> and sign in as that Admin.
@@ -67,7 +67,7 @@ No user exists until you create one.
 | Studio | <http://localhost:8300> |
 | Engine API | <http://localhost:8200> |
 | Graph database | Neo4j starts by default. Memgraph, JanusGraph and ArcadeDB are Compose profiles, for example `docker compose --profile memgraph up -d` |
-| Sample data | [CONTRIBUTING.md › Quick start](CONTRIBUTING.md#quick-start) loads the air-routes graph |
+| Sample data | [The airways demo](demos/airways/README.md): models, records, stitches and guardrails, step by step |
 
 > **This is the development stack.** Before anyone else can reach it, set `INVANA_SECRET_KEY` and
 > `INVANA_ENCRYPTION_KEY` ([CONTRIBUTING.md › Environment variables](CONTRIBUTING.md#environment-variables))

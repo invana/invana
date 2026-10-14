@@ -108,7 +108,7 @@ inv users create --non-interactive \
     --username demo --password 'ChangeMe!2026' --first-name Demo
 
 #     ↓ STUDIO · sign in as demo → New Graph "airways" → attach the connection
-#       bolt://localhost:7687 · invana.graph.connectors.OpenCypherConnector
+#       bolt://host.docker.internal:7687 · invana.graph.connectors.OpenCypherConnector
 
 # 3 · the bundle, before anything is loaded — no Graph, no database
 inv records check $DATA
@@ -161,8 +161,7 @@ inv users create --non-interactive \
     --username demo --password 'ChangeMe!2026' --first-name Demo
 ```
 
-`invana init` instead creates the root superuser and is idempotent; `users create` is not,
-and makes an ordinary account. Either can own the Graph.
+This makes an ordinary account; add `--superuser` for an install Admin. Either can own the Graph.
 
 ### 2 · A Graph, and the database behind it
 
@@ -171,7 +170,7 @@ the slug is what the CLI wants. Attach a connection in the same flow:
 
 | Field | Value |
 |---|---|
-| URI | `bolt://localhost:7687` — `bolt://neo4j:7687` if the **engine** runs in Docker |
+| URI | `bolt://localhost:7687` — `bolt://host.docker.internal:7687` if the **engine** runs in Docker |
 | Connector | `invana.graph.connectors.OpenCypherConnector` |
 | Username / password | your Neo4j credentials |
 

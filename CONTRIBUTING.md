@@ -31,20 +31,18 @@ make setup
 docker compose up -d
 
 # 3. Create the development superuser (admin / change_me_please, for local use only)
-docker compose exec engine uv run invana init --non-interactive \
+docker compose exec engine uv run invana users create --superuser --non-interactive \
     --username admin --email hi@invana.local --password change_me_please --first-name Admin
-
-# 4. Load the sample graph (air routes) into Neo4j
-uv run --directory engine invana loader ../demos/airways/air-routes \
-    --uri bolt://localhost:7687 \
-    --connector invana.graph.connectors.OpenCypherConnector \
-    --username neo4j \
-    --password testpassword
 ```
 
 Open Studio at <http://localhost:8300> and sign in as `admin` / `change_me_please`. The engine API is at <http://localhost:8200>.
 
 `make help` lists every command.
+
+### Loading the sample data
+
+Follow the [airways demo](demos/airways/README.md). It builds a Graph the way a user does: the Graph
+and its database, then models, records, stitches, and the guardrails and worlds that bound them.
 
 ### What is in the repo
 
@@ -83,7 +81,6 @@ docker compose --profile telemetry up -d    # HyperDX: traces, logs, metrics on 
 
 Pass the same `--profile` to `down` or `stop`, or use `docker compose down --remove-orphans`.
 
-For Gremlin databases (JanusGraph, Neptune, TinkerGraph), load data with `--connector invana.graph.connectors.GremlinConnector` and a `ws://…/gremlin` URI.
 
 ### Running the engine and Studio on your host
 
@@ -99,7 +96,7 @@ cd studio && pnpm dev                            # or Studio alone
 
 ### First-time bootstrap
 
-Every screen except sign-in needs a user, and none is created for you. Quick start step 3 creates the development superuser; running the engine on your host instead, `make engine-init` does the same:
+Every screen except sign-in needs a user, and none is created for you. Quick start step 3 creates the development superuser; running the engine on your host instead, `make dev-superuser` does the same:
 
 | Field | Value |
 |---|---|
@@ -107,21 +104,21 @@ Every screen except sign-in needs a user, and none is created for you. Quick sta
 | email | `hi@invana.local` |
 | password | `change_me_please` |
 
-`invana init` has no defaults: these are the values the quick start and `make engine-init` pass, and the e2e specs sign in with them. Use them only on your own machine.
+The CLI has no defaults: these are the values the quick start and `make dev-superuser` pass, and the e2e specs sign in with them. Use them only on your own machine. Run either once: a second run is refused because the username is taken.
 
-To choose your own values, run the CLI against a database that has no superuser yet:
+To choose your own values:
 
 ```bash
-uv run --directory engine invana init                    # interactive
-uv run --directory engine invana init --non-interactive \
+uv run --directory engine invana users create --superuser                   # interactive
+uv run --directory engine invana users create --superuser --non-interactive \
   --username <username> --email <email> \
   --password "<password>" --first-name "<first name>"
 ```
 
-- The command is idempotent. If any superuser exists, it changes nothing.
+- Leave out `--superuser` for an ordinary account.
 - `--non-interactive` needs `--username`, `--password` and `--first-name`.
 - Email is optional. Sign-in accepts the username or the email.
-- More accounts come from `invana users create`; reset a password with `invana users update-password`.
+- Reset a password with `invana users update-password`.
 
 After pulling someone else's migration, restart the stack (`docker compose up -d`): `engine-migrate` applies it before the engine starts. On your host, run `make engine-migrate`. `docker compose logs engine-migrate` shows what it applied.
 
