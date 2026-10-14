@@ -139,7 +139,6 @@ COMMIT_ALLOWED = {
     # A CLI command is not serving a request: it opens its own session and owns
     # the transaction itself. §18.1 binds the *request*, and there isn't one.
     "cli/commands/records.py",
-    "cli/commands/init.py",
     # `invana loader --graph` opens a `bulk-load@1` run and then dispatches it,
     # so the row has to be committed before the runtime reads it in its own
     # session — the same shape `records.py` above already has.
@@ -185,9 +184,8 @@ def test_routes_files_define_no_function() -> None:
 
 # ── 5 · the CLI calls managers, not models ───────────────────────────────────
 CLI_ALLOWED = {
-    # `invana init` and the loaders construct rows directly; converting them is
+    # The CLI and the loaders construct rows directly; converting them is
     # the same work as converting the record loaders.
-    "cli/commands/init.py",
     "cli/commands/loader.py",
     "cli/commands/records.py",
     "cli/commands/stitches.py",

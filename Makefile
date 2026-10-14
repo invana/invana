@@ -1,6 +1,6 @@
 .PHONY: help setup dev docs docs-build \
        engine-test engine-lint engine-format \
-       engine-migrate engine-migration engine-migrate-history engine-init \
+       engine-migrate engine-migration engine-migrate-history dev-superuser \
        studio-test studio-lint studio-format \
        integrations-test integrations-lint integrations-format \
        test lint format \
@@ -56,8 +56,8 @@ engine-migration: ## Generate a new migration (usage: make engine-migration msg=
 engine-migrate-history: ## Show migration history and current revision
 	cd engine && uv run alembic history && echo "\nCurrent:" && uv run alembic current
 
-engine-init: engine-migrate ## Create the development superuser (admin / change_me_please); never for a shared install
-	cd engine && uv run invana init --non-interactive --username admin --email hi@invana.local --password change_me_please --first-name Admin
+dev-superuser: engine-migrate ## Create the development superuser (admin / change_me_please); never for a shared install
+	cd engine && uv run invana users create --superuser --non-interactive --username admin --email hi@invana.local --password change_me_please --first-name Admin
 
 # ─── Studio ─────────────────────────────────────────────────────
 studio-test: ## Run studio tests

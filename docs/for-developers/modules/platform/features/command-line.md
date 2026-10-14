@@ -17,8 +17,7 @@ Studio.
 
 | Command | Does |
 |---|---|
-| `invana init` | Bootstraps the root superuser; idempotent, and non-interactive for a container |
-| `invana users` | Creates accounts and resets passwords, for an operator with shell access |
+| `invana users create · update-password` | Creates accounts (`--superuser` for an install Admin, the first one included) and resets passwords, for an operator with shell access |
 | `invana start` | Runs the engine, and Studio when bundled |
 | `invana migrate` | Applies database migrations; nothing migrates itself on boot |
 | `invana version` | The engine version and every installed connector |
@@ -89,6 +88,7 @@ flowchart LR
 | CL3 | Connectors are separate packages; the core depends on no driver. |
 | CL4 | Exit codes distinguish failure kinds. |
 | CL5 | The same commands work on every supported OS. |
+| CL6 | One command creates every account: `invana users create`, with `--superuser` for an install Admin. Nothing creates an account the operator did not name, and no account has a default password. |
 
 ## Not building
 

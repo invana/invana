@@ -40,7 +40,7 @@ src/invana/
   runtime/     3  the workhorse — catalogue/ (a re-export) · interpreter/ + the planner and state files
   plugins/     3  every task type — sdk/ · registry · core/<plugin>/tasks/<key>/ (manifest.toml + run.py)
   server/      4  FastAPI app · routes/ · admin/ · middleware        ─┐ two front-ends
-  cli/         4  invana start · migrate · init · version · users …  ─┘ over the same code
+  cli/         4  invana start · migrate · version · users …  ─┘ over the same code
 ```
 
 `import-linter` enforces this in pre-commit and CI — three contracts in `pyproject.toml`

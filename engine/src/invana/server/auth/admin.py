@@ -30,7 +30,7 @@ class UserView(ModelView):
     search_fields = ["email", "username", "first_name", "last_name"]
     sortable_fields = ["email", "username", "created_at", "updated_at"]
 
-    # Users come from `invana init` (root) or the superuser register API — not admin UI.
+    # Users come from `invana users create` or the superuser register API — not admin UI.
     def can_create(self, request: Request) -> bool:
         return False
 

@@ -30,7 +30,7 @@ install chromium` installs both.
 | `E2E_BASE_URL` | `http://localhost:8300` | Where Studio is served |
 | `E2E_GRAPH_PATH` | `/u/admin/airways` | The Graph the specs ask against — `demos/airways` loaded as `airways` |
 | `E2E_API_URL` | `http://localhost:8200` | The engine, for the records a spec makes for itself |
-| `E2E_USERNAME` · `E2E_PASSWORD` | `admin` · `change_me_please` | The dev superuser `invana init` provisions |
+| `E2E_USERNAME` · `E2E_PASSWORD` | `admin` · `change_me_please` | The dev superuser `make dev-superuser` creates |
 
 A spec never reads a row somebody made by hand. A run, a report or a rule it
 needs is made in the spec — by asking, by driving Studio, or through

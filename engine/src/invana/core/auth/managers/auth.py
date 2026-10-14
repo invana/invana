@@ -394,45 +394,6 @@ class AuthManager:
         stmt = select(User).where((func.lower(User.email) == value) | (User.username == value))
         return (await session.execute(stmt)).scalar_one_or_none()
 
-    async def bootstrap_root(
-        self,
-        session: AsyncSession,
-        *,
-        email: str | None,
-        password: str,
-        username: str,
-        first_name: str,
-        last_name: str | None,
-    ) -> User:
-        """Create the root superuser. Does NOT create a personal Graph
-        (docs/for-developers/modules/identity-and-access/spec.md).
-
-        Idempotent guard at the call site: refuse if any superuser already exists.
-        """
-        normalized_username = _validate_username_format(username)
-        if normalized_username in _RESERVED_USERNAMES:
-            raise ConflictError("username is reserved.")
-        if await self._username_taken(session, username=normalized_username):
-            raise ConflictError("username is taken.")
-
-        password_hash = hash_password(password)
-        user = User(
-            email=email.lower() if email else None,
-            username=normalized_username,
-            password_hash=password_hash,
-            first_name=first_name.strip(),
-            last_name=(last_name.strip() if last_name else None) or None,
-            is_superuser=True,
-            is_active=True,
-        )
-        session.add(user)
-        await session.flush()
-        return user
-
-    async def any_superuser_exists(self, session: AsyncSession) -> bool:
-        stmt = select(func.count(User.id)).where(User.is_superuser.is_(True))
-        return (await session.execute(stmt)).scalar_one() > 0
-
     async def provision_user(
         self,
         session: AsyncSession,

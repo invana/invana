@@ -225,7 +225,7 @@ provider row and its models, and reopens four rows below. The shapes:
 |---|---|---|---|---|---|---|
 | 13.1 | [Design system](modules/platform/features/design-system.md) | Studio builds from `@invana/design-kit`, never beside it | — | — | 🟡 | — |
 | 13.2 | [Theming](modules/platform/features/theming.md) | Light · dark · theme variants, everywhere | — | — | ✅ | — |
-| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · standards · rules · members · search · models · loader · schedules · approvals · notifications · simulate · simulations · plugins · tasks · worker` | — | 🟡 | — | — |
+| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana users · start · migrate · version · datasets · standards · rules · members · search · models · loader · schedules · approvals · notifications · simulate · simulations · plugins · tasks · worker` | — | 🟡 | — | — |
 | 13.4 | [Logging](modules/platform/features/logging.md) | One call at startup; plain or JSON; every line carries its trace; lifecycle, not chatter | ✅ | ✅ | — | S1 |
 | 13.5 | [Telemetry](modules/platform/features/telemetry.md) | Traces, metrics and logs for everything a person or the system does — one trace per action from the Studio click through runs, queries and model calls, metrics that open it, logs that carry it; optional | ✅ | ✅ | ✅ | S1 |
 | 13.6 | [Admin and health](modules/platform/features/admin-and-health.md) | A generated browser over app state, and a readiness probe | ✅ | — | — | S1 |
@@ -328,10 +328,10 @@ Where a 🟡 stops, so nobody re-derives it from the code.
 |---|---|---|---|
 | 7.1 | The library | Library list and detail | Served rate, match counts, and the diff view |
 | 9.1 | Projects and tasks | Tables, status machine, derived plan, activity tree | The live step list on a task; `needs_input` rendering; cross-project dependencies |
-| 11.1 · 11.3 | Accounts · Sessions | Users, bcrypt, JWT access and refresh, superuser-provisioned register, `invana init` | Account self-service edge cases — sole superuser and owns-a-Graph refusals; the profile tabs |
+| 11.1 · 11.3 | Accounts · Sessions | Users, bcrypt, JWT access and refresh, superuser-provisioned register, `invana users create --superuser` | Account self-service edge cases — sole superuser and owns-a-Graph refusals; the profile tabs |
 | 13.1 | Design system | Themes, the kit at `0.0.20`, the shared panel skeleton, the emission card with its six bodies, the projection picker, and the cannot-answer and diagnosis cards | The surfaces modules 6–13 still need — see each feature's own row |
 | 10.5 | See what ran | The Runs panel and its filters, the run board and the step board, reports kept and reopened | Keyset paging and the paced live tail; how a retention-purged run renders; the CLI verb |
-| 13.3 | Command line | `invana init` | `start · migrate · version` as documented |
+| 13.3 | Command line | `invana users` | `start · migrate · version` as documented |
 | 13.7 | Setup | The six derived steps, the three gates as route dependencies, the provider's remembered ping, the board on the graph page, the Info panel's timeline, and the Assistant's lock | Locks on the other gated surfaces (Explorer, Model, Imports), and the four artboards |
 
 

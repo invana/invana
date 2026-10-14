@@ -187,7 +187,7 @@ _TEMPLATES_DIR = str(Path(__file__).parent / "templates")
 #
 # Sensitive columns (`password_hash`, `token_hash`) are deliberately omitted
 # from `fields` so they aren't displayed or editable. User creation goes through
-# the CLI (`invana init`) or the superuser-gated register API, not the admin UI.
+# the CLI (`invana users create`) or the superuser-gated register API, not the admin UI.
 # ---------------------------------------------------------------------------
 
 

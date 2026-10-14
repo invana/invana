@@ -101,7 +101,7 @@ async def prepare_graph(opts: argparse.Namespace) -> None:
             owner = await UserQuerySet().get_by_username_or_email(session, username)
             if owner is None:
                 raise Refused(
-                    f"No user {username!r}. Create it first: invana init, or invana users create."
+                    f"No user {username!r}. Create it first: invana users create."
                 )
             graph = await GraphQuerySet().get_by_owner_username_and_slug(
                 session, owner_username=username, slug=slug

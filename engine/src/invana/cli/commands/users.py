@@ -1,6 +1,6 @@
 """invana users — create accounts and reset passwords from the command line.
 
-Complements ``invana init`` (which bootstraps only the root superuser). These
+``create --superuser`` makes an install Admin, the first one included. These
 commands operate directly on the app database and are meant for operators with
 shell access to the engine host or container.
 """
@@ -16,6 +16,7 @@ from fastapi import HTTPException
 from invana.core.auth.managers import AuthManager
 from invana.core.auth.passwords import WeakPasswordError
 from invana.core.db import create_db_engine, create_session_factory
+from invana.core.errors import InvanaError
 
 _USERNAME_PATTERN = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 
@@ -64,8 +65,8 @@ def create_cmd(
 ) -> None:
     """Create a new user account.
 
-    Unlike ``invana init``, this is not idempotent and is not restricted to the
-    root superuser — pass ``--superuser`` to grant platform-admin privileges.
+    Not idempotent: a taken username is refused. Pass ``--superuser`` to grant
+    install-Admin privileges; nothing is defaulted.
     """
     asyncio.run(
         _run_create(
@@ -149,6 +150,8 @@ async def _run_create(
                 raise click.ClickException(str(e)) from e
             except HTTPException as e:
                 raise click.ClickException(str(e.detail)) from e
+            except InvanaError as e:
+                raise click.ClickException(str(e)) from e
             await session.commit()
 
         kind = "superuser" if superuser else "user"

@@ -195,8 +195,8 @@ Each flow names who triggers it, what happens, and what the user sees next.
 An operator has just installed Invana. There are no accounts.
 
 1. `invana migrate` applies database migrations. Nothing migrates itself on boot.
-2. `invana init` bootstraps the **root superuser**. It is idempotent and non-interactive, so a
-   container can run it.
+2. `invana users create --superuser` creates the first install Admin. It prompts, or takes
+   `--non-interactive` with every value as a flag; nothing is defaulted.
 3. `invana start` runs the engine, and Studio when bundled.
 
 Further accounts are created by an operator with shell access (`invana users`) or by a superuser

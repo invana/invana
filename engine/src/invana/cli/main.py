@@ -40,7 +40,6 @@ from invana.cli.commands.approvals import approvals_cmd
 from invana.cli.commands.datasets import datasets_cmd
 from invana.cli.commands.evals import evals_cmd
 from invana.cli.commands.govern import govern_cmd
-from invana.cli.commands.init import init_cmd
 from invana.cli.commands.llms import llms_cmd
 from invana.cli.commands.loader import loader_cmd
 from invana.cli.commands.members import members_cmd
@@ -218,7 +217,6 @@ def version_cmd() -> None:
 app.add_command(start_cmd)
 app.add_command(migrate_cmd)
 app.add_command(loader_cmd)
-app.add_command(init_cmd)
 app.add_command(users_cmd)
 app.add_command(models_cmd)
 app.add_command(records_cmd)

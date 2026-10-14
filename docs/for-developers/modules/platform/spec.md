@@ -175,7 +175,7 @@ component was called with. `studio/e2e/README.md` carries the two commands that 
 | Rule | Detail |
 |---|---|
 | Real stack, real database | `docker compose up -d`, then a dataset loaded through `invana loader`. A spec that needs data says so and fails loudly without it |
-| One sign-in per run | The `setup` project logs in once and saves `storageState`; specs never repeat it. Credentials come from `E2E_USERNAME` / `E2E_PASSWORD`, defaulting to the dev superuser `invana init` provisions |
+| One sign-in per run | The `setup` project logs in once and saves `storageState`; specs never repeat it. Credentials come from `E2E_USERNAME` / `E2E_PASSWORD`, defaulting to the dev superuser `make dev-superuser` creates |
 | Serial by default | One engine, one Graph — parallel files would race each other's sessions |
 | Addressed by role, then by seam | A control a person can name is found by its accessible name; a shape that has no name carries a `data-testid` and the fact under test as a data attribute (`data-emission-kind`) |
 | First-run state is declared, not dismissed | A tutorial modal or a tour is turned off in setup. A spec never clicks through UI it is not testing |

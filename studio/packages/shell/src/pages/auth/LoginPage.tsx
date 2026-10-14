@@ -366,10 +366,9 @@ export function LoginPage() {
 												<code className="font-mono">--first-name</code>.
 											</p>
 											<p className="text-muted-foreground">
-												Setting up a fresh install?{" "}
-												<code className="font-mono">invana init</code> creates
-												the first superuser (idempotent — it refuses once one
-												exists).
+												Setting up a fresh install? The first superuser is
+												created the same way, with{" "}
+												<code className="font-mono">--superuser</code>.
 											</p>
 										</div>
 									),

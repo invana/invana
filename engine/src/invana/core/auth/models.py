@@ -57,8 +57,8 @@ class User(Base):
     # UI prefs
     # don't need a migration each.
     preferences: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
-    # Platform-level superuser flag. Gates starlette-admin. Set ONLY by
-    # `invana init` for the root user. Has no bearing on graph-level roles.
+    # Install-Admin flag, set by `invana users create --superuser`. Gates
+    # starlette-admin; no bearing on Graph roles.
     is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     # Stamp set on every username change; enforces auth_username_change_cooldown_days.

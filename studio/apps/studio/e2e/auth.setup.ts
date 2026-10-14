@@ -6,8 +6,8 @@ import { expect, test as setup } from "@playwright/test";
  * Auth is a localStorage store (`invana.auth`, stores/auth.store.ts), so
  * Playwright's storageState carries it — no spec repeats the login.
  *
- * The credentials are the dev-only defaults `invana init` provisions (see the
- * Makefile's `engine-init` target). Point the run at a different account by
+ * The credentials are the dev-only superuser the Makefile's `dev-superuser`
+ * target creates. Point the run at a different account by
  * exporting E2E_USERNAME / E2E_PASSWORD; nothing here belongs anywhere but a
  * local stack.
  */
