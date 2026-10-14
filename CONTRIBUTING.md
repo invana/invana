@@ -26,11 +26,13 @@ git clone https://github.com/invana/invana.git
 cd invana
 make setup
 
-# 2. Start Postgres, Neo4j, the engine and Studio (hot-reload dev containers)
+# 2. Start Postgres, Neo4j, the engine and Studio (hot-reload dev containers).
+#    engine-migrate runs first and applies the migrations.
 docker compose up -d
 
-# 3. Run migrations and create the default superuser
-make engine-init
+# 3. Create the development superuser (admin / change_me_please, for local use only)
+docker compose exec engine uv run invana init --non-interactive \
+    --username admin --email hi@invana.local --password change_me_please --first-name Admin
 
 # 4. Load the sample graph (air routes) into Neo4j
 uv run --directory engine invana loader ../demos/airways/air-routes \
@@ -97,7 +99,7 @@ cd studio && pnpm dev                            # or Studio alone
 
 ### First-time bootstrap
 
-Every screen except sign-in needs a user. `make engine-init` runs the migrations and creates the root superuser:
+Every screen except sign-in needs a user, and none is created for you. Quick start step 3 creates the development superuser; running the engine on your host instead, `make engine-init` does the same:
 
 | Field | Value |
 |---|---|
@@ -105,22 +107,23 @@ Every screen except sign-in needs a user. `make engine-init` runs the migrations
 | email | `hi@invana.local` |
 | password | `change_me_please` |
 
-These are well-known defaults. **Change the password after your first sign-in.**
+`invana init` has no defaults: these are the values the quick start and `make engine-init` pass, and the e2e specs sign in with them. Use them only on your own machine.
 
-To choose your own values, run the CLI:
+To choose your own values, run the CLI against a database that has no superuser yet:
 
 ```bash
 uv run --directory engine invana init                    # interactive
 uv run --directory engine invana init --non-interactive \
-  --username admin --email hi@invana.local \
-  --password "change_me_please" --first-name "Admin"
+  --username <username> --email <email> \
+  --password "<password>" --first-name "<first name>"
 ```
 
 - The command is idempotent. If any superuser exists, it changes nothing.
+- `--non-interactive` needs `--username`, `--password` and `--first-name`.
 - Email is optional. Sign-in accepts the username or the email.
-- More accounts come from `invana users` or from Studio: user menu → **Invitations**.
+- More accounts come from `invana users create`; reset a password with `invana users update-password`.
 
-After pulling someone else's migration, run `make engine-migrate` (or `docker compose exec engine uv run invana migrate` for the container).
+After pulling someone else's migration, restart the stack (`docker compose up -d`): `engine-migrate` applies it before the engine starts. On your host, run `make engine-migrate`. `docker compose logs engine-migrate` shows what it applied.
 
 ### Environment variables
 

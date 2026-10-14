@@ -32,16 +32,46 @@ Invana has no published release yet, so you deploy it from source. You need Dock
 git clone https://github.com/invana/invana.git
 cd invana
 docker compose up -d
-docker compose exec engine uv run invana migrate
-docker compose exec engine uv run invana init --non-interactive
 ```
+
+On every start, a one-off `engine-migrate` container applies pending migrations, then the engine starts.
+No user exists until you create one.
+
+### Create the first users
+
+1. Create the first install Admin. The command asks for a username, a name, an optional email and a
+   password; nothing is filled in for you:
+
+   ```bash
+   docker compose exec engine uv run invana init
+   ```
+
+2. Open Studio at <http://localhost:8300> and sign in as that Admin.
+3. Add the people who will use it. Each command asks for the password:
+
+   ```bash
+   docker compose exec engine uv run invana users create --username user --email user@invana.io
+   ```
+
+   Add `--superuser` for another install Admin. Graph roles are given per Graph, in Studio.
+4. Reset a password when someone needs it:
+
+   ```bash
+   docker compose exec engine uv run invana users update-password --user user
+   ```
+
+### What is running
 
 | | |
 |---|---|
-| Studio | <http://localhost:8300>. Sign in as `admin` / `change_me_please`, then change the password |
+| Studio | <http://localhost:8300> |
 | Engine API | <http://localhost:8200> |
 | Graph database | Neo4j starts by default. Memgraph, JanusGraph and ArcadeDB are Compose profiles, for example `docker compose --profile memgraph up -d` |
 | Sample data | [CONTRIBUTING.md › Quick start](CONTRIBUTING.md#quick-start) loads the air-routes graph |
+
+> **This is the development stack.** Before anyone else can reach it, set `INVANA_SECRET_KEY` and
+> `INVANA_ENCRYPTION_KEY` ([CONTRIBUTING.md › Environment variables](CONTRIBUTING.md#environment-variables))
+> and use strong passwords for every account.
 
 ## Integrations
 
