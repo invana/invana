@@ -1,153 +1,38 @@
 # Contributing to Invana
 
-Thank you for your interest in contributing to Invana! This guide will help you get started.
+Thanks for helping build Invana. This guide covers three things:
 
-## Development Setup
+1. [Local setup](#local-setup): get the engine, Studio and a graph database running on your machine.
+2. [Contributing a feature](#contributing-a-feature): how a feature goes from idea to code.
+3. [Raising a pull request](#raising-a-pull-request): branches, commits, changesets, checks and review.
+
+## Local setup
 
 ### Prerequisites
 
-- Python 3.14+
-- Node.js 22+
-- [uv](https://docs.astral.sh/uv/) (Python package manager)
-- [pnpm](https://pnpm.io/) (Node package manager)
-- Docker & Docker Compose (for integration tests)
+| Tool | Version | Used for |
+|---|---|---|
+| Python | 3.14+ | the engine |
+| Node.js | 22+ | Studio |
+| [uv](https://docs.astral.sh/uv/) | latest | Python packages |
+| [pnpm](https://pnpm.io/) | latest | Node packages |
+| Docker and Docker Compose | latest | Postgres, the graph databases and the dev containers |
 
-### Getting Started
+### Quick start
 
 ```bash
-# Clone the repo
+# 1. Clone, then install every dependency and the pre-commit hooks
 git clone https://github.com/invana/invana.git
 cd invana
-
-# Install all dependencies + pre-commit hooks
 make setup
 
-# Start postgres, neo4j, the engine, and studio (hot-reload dev containers)
-docker compose up -d
-```
-
-Run `make help` to see all available commands.
-
-### Local infrastructure
-
-`docker-compose.yml` is the full local dev environment. By default it starts:
-
-| Service  | What it's for                          | Port(s)         |
-|----------|-----------------------------------------|-----------------|
-| postgres | App-state database                      | 5432            |
-| neo4j    | Default graph database                  | 7474, 7687      |
-| engine   | FastAPI, hot-reload (bind-mounted)      | 8200            |
-| studio   | Vite dev server, hot-reload (bind-mounted) | 8300         |
-
-```bash
-# Start the default core services
+# 2. Start Postgres, Neo4j, the engine and Studio (hot-reload dev containers)
 docker compose up -d
 
-# Stop them
-docker compose down
-```
-
-`engine` and `studio` run off stock `python`/`node` images: `docker-compose.yml`
-bind-mounts your working tree in and `command` installs deps then starts in
-reload mode (`uv run invana start --reload`, Vite's dev server). No dev image
-to build or maintain — the trade-off is `uv sync`/`pnpm install` re-running on
-every `up` (a fast no-op once the `engine-venv`/`studio-node-modules` named
-volumes are warm). Not used for production builds. If you'd rather run the engine and/or
-studio directly on your host (faster iteration, no image build), stop those
-two containers — or never start them — and use `make dev` (or run each side
-individually: `cd engine && uv run invana start --reload`, `cd studio && pnpm
-dev`) against the same Postgres/Neo4j containers.
-
-The additional graph databases (Memgraph, JanusGraph, ArcadeDB) and the
-observability stack (HyperDX — traces/logs/metrics UI on 8080, 4317–4318) are
-heavier and **opt-in via Compose profiles** — they don't start by default.
-Enable one, all databases with the `extra-dbs` group profile, or telemetry:
-
-```bash
-# Add a single on-demand database
-docker compose --profile memgraph up -d
-docker compose --profile janusgraph up -d
-docker compose --profile arcadedb up -d
-
-# Add all on-demand databases at once
-docker compose --profile extra-dbs up -d
-
-# Add the observability stack (HyperDX)
-docker compose --profile telemetry up -d
-```
-
-Pass the same `--profile` flag to `down`/`stop` to tear those services down too
-(or use `down --remove-orphans`).
-
-### First-time bootstrap (auth)
-
-The engine and Studio both require an authenticated user to do anything beyond `/login`. On a fresh checkout — or after wiping the Postgres data volume — create the **root superuser**. The quickest path runs migrations and bootstraps the default admin account in one step:
-
-```bash
+# 3. Run migrations and create the default superuser
 make engine-init
-```
 
-This creates the standard development superuser:
-
-| Field    | Value              |
-|----------|--------------------|
-| username | `admin`            |
-| email    | `hi@invana.local`  |
-| password | `change_me_please` |
-
-**Change the password after your first sign-in** — these are well-known defaults.
-
-To pick your own values, run the CLI directly:
-
-```bash
-# Interactive — prompts for username, first/last name, email, password (all defaulted)
-uv run --directory engine invana init
-
-# Non-interactive — every flag defaults to the admin account above, so this is
-# equivalent to `make engine-init`. Override any flag to change a field; email
-# is optional (pass --email "" to create the account without one).
-uv run --directory engine invana init --non-interactive \
-  --username admin \
-  --email hi@invana.local \
-  --password "change_me_please" \
-  --first-name "Admin"
-```
-
-The command is **idempotent** — if any user with `is_superuser=true` already exists, it exits without making changes. To re-bootstrap, wipe the `users` table (or the whole DB) first.
-
-> **Email is optional.** The `users.email` column is nullable, so accounts can be provisioned without one (`invana users create` and the API likewise). Login accepts **username _or_ email** (docs/for-developers/modules/identity-and-access/features/accounts.md), so an email-less account signs in by username; an account with an email can use either.
-
-From there, additional accounts come from an operator with shell access (`invana users`) or from Studio: log into `http://localhost:8300/login`, open the user menu → **Invitations**, and issue invite URLs. See `docs/system-design.md §4.1` for the bootstrap flow.
-
-### Required environment variables
-
-`INVANA_SECRET_KEY` and `INVANA_ENCRYPTION_KEY` are **required in production** and fall back to insecure dev defaults in `env=development` (loud warning at startup). For local dev you can ignore them; for any shared / non-dev deployment, generate real ones:
-
-```bash
-# JWT signing key (INVANA_SECRET_KEY)
-python -c 'import secrets; print(secrets.token_urlsafe(48))'
-
-# Fernet encryption key (INVANA_ENCRYPTION_KEY) — used for graph connector + LLM-provider secrets at rest
-python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'
-```
-
-`.env.example` (repo root) is the single template for every optional env var in the project, engine and studio included — copy it to `.env` and docker-compose.yml picks these two up automatically for the `engine` container. Running the engine directly on your host instead (`make dev`)? Put them in `engine/.env` instead — pydantic-settings loads that file relative to the engine process's own working directory, not the repo root. All other auth knobs (TTLs, bcrypt rounds, min password length, JWT algorithm) live under `INVANA_AUTH_*` and have sensible defaults — see `engine/src/invana/settings.py`. The full design is in [`docs/for-developers/modules/identity-and-access/spec.md`](docs/for-developers/modules/identity-and-access/spec.md).
-
-### Default ports (local dev)
-
-| Service          | Port  | Override                                   |
-|------------------|-------|--------------------------------------------|
-| Engine (FastAPI) | 8200  | `INVANA_PORT` / `invana start --port`      |
-| Studio (Vite)    | 8300  | `studio/vite.config.ts`                    |
-| Postgres         | 5432 | `docker-compose.yml`                       |
-
-Studio's API base URL defaults to `http://localhost:8200`; override with `VITE_API_BASE_URL` — in root `.env` for the `studio` container, or `studio/.env.local` when running Vite directly on your host (Vite loads that relative to `studio/`, independent of the root file).
-
-### Loading sample data
-
-To populate the local Neo4j with the bundled **air-routes** dataset, run the loader from the `engine/` directory against the `neo4j` service started by `docker-compose.yml`:
-
-```bash
+# 4. Load the sample graph (air routes) into Neo4j
 uv run --directory engine invana loader ../demos/airways/air-routes \
     --uri bolt://localhost:7687 \
     --connector invana.graph.connectors.OpenCypherConnector \
@@ -155,163 +40,326 @@ uv run --directory engine invana loader ../demos/airways/air-routes \
     --password testpassword
 ```
 
-> For Gremlin-based databases (JanusGraph, Neptune, TinkerGraph), use `--connector invana.graph.connectors.GremlinConnector` with the appropriate `--uri` (e.g. `ws://localhost:8182/gremlin`) instead.
+Open Studio at <http://localhost:8300> and sign in as `admin` / `change_me_please`. The engine API is at <http://localhost:8200>.
 
-### Engine (Python)
+`make help` lists every command.
+
+### What is in the repo
+
+| Path | What it is | Stack |
+|---|---|---|
+| `engine/` | The engine: API, CLI, app-state database, query engine, runtime | Python, FastAPI, SQLAlchemy, uv |
+| `studio/` | Studio, a pnpm and Turborepo workspace | React 19, TypeScript, Vite, TailwindCSS 4 |
+| `studio/apps/studio/` | The app that composes the packages, plus the Playwright e2e suite (`e2e/`) | |
+| `studio/packages/` | `core`, `ui`, `canvases`, `assistant`, `shell`, and one package per product (`datasets`, `modeller`, `explorer`, `projects`, `agents`) | |
+| `integrations/` | One pip package per graph database (`invana-neo4j`, `invana-memgraph`, …). Each imports only `invana.graph` | Python |
+| `demos/` | Sample data: `airways`, `arabidopsis` | |
+| `docs/for-developers/` | **The scope.** The feature index, module specs and one file per feature | Markdown |
+| `docs/products/` | The five products plan and the migration runbook | Markdown |
+| `docs/docs/` | The public docs site | MkDocs Material |
+
+### Local infrastructure
+
+`docker compose up -d` starts the core stack:
+
+| Service | What it is for | Port(s) |
+|---|---|---|
+| postgres | App-state database | 5432 |
+| neo4j | Default graph database | 7474, 7687 |
+| engine | FastAPI, hot-reload (your working tree is bind-mounted) | 8200 |
+| studio | Vite dev server, hot-reload (bind-mounted) | 8300 |
+
+The `engine` and `studio` containers are built from development images. Your working tree is bind-mounted into them, dependencies live in named volumes, and both start in reload mode. They are not used for production builds.
+
+Other graph databases and the observability stack are opt-in through Compose profiles:
 
 ```bash
-make engine-test                # Run tests
-make engine-lint                # Lint (ruff check)
-make engine-format              # Format (ruff format)
+docker compose --profile memgraph up -d     # or janusgraph, arcadedb
+docker compose --profile extra-dbs up -d    # every extra database
+docker compose --profile telemetry up -d    # HyperDX: traces, logs, metrics on 8080
 ```
 
-#### Installing optional extras
+Pass the same `--profile` to `down` or `stop`, or use `docker compose down --remove-orphans`.
 
-The engine has optional dependency groups. `uv sync` is **exact** — it makes the environment match exactly what you ask for, so syncing with one `--extra` (or omitting `--dev`) **removes** packages from a previously installed set. Always specify everything you want in a single command:
+For Gremlin databases (JanusGraph, Neptune, TinkerGraph), load data with `--connector invana.graph.connectors.GremlinConnector` and a `ws://…/gremlin` URI.
+
+### Running the engine and Studio on your host
+
+Iteration is faster without containers. Stop the `engine` and `studio` containers (or never start them), keep Postgres and Neo4j running, then:
 
 ```bash
-# Install a single extra
-uv sync --extra server
-
-# Install multiple extras (required to keep all of them)
-uv sync --extra server --extra telemetry
-
-# Install everything
-uv sync --extra all
+make dev                                         # both at once
+cd engine && uv run invana start --reload        # or the engine alone
+cd studio && pnpm dev                            # or Studio alone
 ```
 
-Available extras: `server`, `telemetry`, `all`.
+> **Running Studio in the container?** Its `node_modules` is a Docker volume, so a `pnpm install` on your host does not reach it. Install inside the container too: `docker compose exec studio pnpm install`.
 
-The **`dev` group** (pytest, httpx, ruff, editable connectors) is pruned the same way — `uv sync --extra all` *without* `--dev` strips it, and `uv sync --dev` *without* `--extra all` strips the extras. The canonical full developer install that keeps everything is:
+### First-time bootstrap
 
-```bash
-uv sync --dev --extra all   # or: uv sync --dev --all-extras
-```
+Every screen except sign-in needs a user. `make engine-init` runs the migrations and creates the root superuser:
 
-If you sync with a missing piece, the failure shows up at **import time**, not install time, and the message points at the wrong thing:
-
-| Missing from the sync | Symptom |
+| Field | Value |
 |---|---|
-| `--extra telemetry` (with `INVANA_TELEMETRY_ENABLED=true` in `.env`) | `import invana` raises `ImportError: OpenTelemetry packages are required …` |
-| `--extra server` | `ModuleNotFoundError: No module named 'fastapi'` when importing routes/app |
-| `--dev` | tests can't import `httpx` / `pytest` (collection error) |
+| username | `admin` |
+| email | `hi@invana.local` |
+| password | `change_me_please` |
 
-When something that worked yesterday suddenly can't import a top-level package, re-run the full `uv sync --dev --extra all` before debugging further — a partial sync from an earlier command is the usual cause.
+These are well-known defaults. **Change the password after your first sign-in.**
 
-### Studio (TypeScript/React)
+To choose your own values, run the CLI:
 
 ```bash
-make studio-test                # Run tests
-make studio-lint                # Lint (biome check)
-make studio-format              # Format (biome format)
+uv run --directory engine invana init                    # interactive
+uv run --directory engine invana init --non-interactive \
+  --username admin --email hi@invana.local \
+  --password "change_me_please" --first-name "Admin"
 ```
+
+- The command is idempotent. If any superuser exists, it changes nothing.
+- Email is optional. Sign-in accepts the username or the email.
+- More accounts come from `invana users` or from Studio: user menu → **Invitations**.
+
+After pulling someone else's migration, run `make engine-migrate` (or `docker compose exec engine uv run invana migrate` for the container).
+
+### Environment variables
+
+`.env.example` at the repo root is the template for every optional variable, for both the engine and Studio. Copy it to `.env`.
+
+| Variable | Needed when | Notes |
+|---|---|---|
+| `INVANA_SECRET_KEY` | production | JWT signing key. Development falls back to an insecure default and warns at startup |
+| `INVANA_ENCRYPTION_KEY` | production | Fernet key for connector and LLM-provider secrets at rest |
+| `INVANA_AUTH_*` | optional | TTLs, bcrypt rounds, password length. See `engine/src/invana/settings.py` |
+| `VITE_API_BASE_URL` | optional | Studio's API base, default `http://localhost:8200` |
+
+Generate the two production keys:
+
+```bash
+python -c 'import secrets; print(secrets.token_urlsafe(48))'
+python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'
+```
+
+Where each file is read from:
+
+| You run | Engine reads | Studio reads |
+|---|---|---|
+| Docker Compose | root `.env` | root `.env` |
+| On your host | `engine/.env` | `studio/apps/studio/.env.local` |
+
+### Ports
+
+| Service | Port | Override |
+|---|---|---|
+| Engine | 8200 | `INVANA_PORT` or `invana start --port` |
+| Studio | 8300 | `studio/apps/studio/vite.config.ts` |
+| Postgres | 5432 | `docker-compose.yml` |
+
+### Engine extras
+
+`uv sync` is exact: it removes anything you don't ask for. The full developer install is:
+
+```bash
+cd engine && uv sync --dev --extra all
+```
+
+Extras are `server`, `telemetry` and `all`. A partial sync fails at import time, and the error points at the wrong thing:
+
+| Missing | Symptom |
+|---|---|
+| `--extra telemetry` (with telemetry on) | `ImportError: OpenTelemetry packages are required …` |
+| `--extra server` | `ModuleNotFoundError: No module named 'fastapi'` |
+| `--dev` | tests cannot import `httpx` or `pytest` |
+
+If an import that worked yesterday fails today, re-run the full sync first.
 
 ### Working against a local design-kit
 
-Studio's UI comes from the published `@invana/*` packages, and that is the default for everyone —
-you do not need a design-kit checkout to run Studio. To try a kit change before it is released,
-point Studio at your checkout for that run:
+Studio's components come from the published `@invana/*` packages, so you don't need a design-kit checkout. To try a kit change before it is released:
 
 ```bash
 cd studio
-INVANA_DESIGN_KIT=../../../../design-kit pnpm dev     # or pnpm build
+INVANA_DESIGN_KIT=../../../../design-kit pnpm dev
 ```
 
-The path is resolved relative to `studio/apps/studio/` (where `vite.config.ts` lives), so it works the same on macOS, Linux and Windows.
-`@invana/styling` resolves to its source; the rest resolve to their local `dist`, so run
-`pnpm build` in design-kit after editing them. Unset the variable and everything comes from npm
-again.
-
-Nothing about this is committed: a local link never enters `package.json`
-(`docs/for-developers/modules/platform/features/design-system.md` DS3/DS10). A kit change reaches
-`main` by being released and the dependency bumped — not by pointing Studio at a checkout.
+- The path is relative to `studio/apps/studio/`.
+- `@invana/styling` resolves to its source. The other packages resolve to their `dist`, so run `pnpm build` in design-kit after editing them.
+- A local link is never committed. A kit change reaches `main` through a kit release and a version bump.
 
 ### Docs
 
 ```bash
-make docs                       # Serve docs locally (http://localhost:8000)
-make docs-build                 # Build docs static site
+make docs          # serve on http://localhost:8000
+make docs-build    # build the static site
 ```
 
-## Making Changes
+## Contributing a feature
 
-### Branch Naming
+Invana is built from written decisions. **The design is written down before the code.**
 
-- `feature/<description>` — New features
-- `bugfix/<description>` — Bug fixes
-- `hotfix/<description>` — Urgent fixes for production
+```mermaid
+flowchart TD
+    A[An idea] --> B{Listed in docs/for-developers/README.md?}
+    B -- No --> C[Open an issue or discussion first]
+    C --> D[Agreed: add a row to the index and a feature file]
+    B -- Yes --> E[Read the feature file and its module spec.md]
+    D --> E
+    E --> F{Under the feature's Not building?}
+    F -- Yes --> G[Stop: it is an explicit non-goal]
+    F -- No --> H[Write any missing decisions into the feature file]
+    H --> I[Build the columns the feature needs: API, CLI, Studio]
+    I --> J[Tests against a real graph database]
+    J --> K[Changeset, then a pull request]
+```
 
-### Changesets
+### Rules for a feature
 
-Every PR that changes user-facing behavior must include a changeset:
+| Rule | What it means |
+|---|---|
+| Only what the index lists | [`docs/for-developers/README.md`](docs/for-developers/README.md) is the scope. Anything not listed there is out of scope, even if another doc describes it |
+| Respect *Not building* | Every module spec and feature file ends with a *Not building* table. Don't implement those items or scaffold for them |
+| Read the feature file first | `docs/for-developers/modules/<module>/features/<feature>.md` has the user story, journeys, surfaces and engine shapes |
+| Decisions before code | A decision about one feature goes in that feature's Decisions table. A decision that spans a module goes in its `spec.md`. Write them in the present tense, with no history |
+| Build every column it needs | The index tracks `API`, `CLI` and `Studio` separately. A feature ships when each column it needs is ✅ |
+| Follow the slice order | The `Slice` column is the build order. [the-sequence.md](docs/for-developers/the-sequence.md) says what is next |
+| Use the product's words | [terminology.md](docs/for-developers/terminology.md) pins the terms, and names the ones we don't use |
+
+### Studio features
+
+- **Start from the user's journey, not the components.** Name the actor and the goal. Map the steps, including the empty, loading, error and permission-denied states. Draw it as a mermaid flowchart in the feature file. Only then name the routes, pages and components.
+- **Compose from `@invana/design-kit`.** Don't build custom components in Studio. If the kit lacks something, add it to the kit with a story first. The only exception is a Studio-only composition of kit components, which goes in `@invana-studio/ui`.
+- **Use tokens only.** No literal colours, and no hard-coded control heights.
+- **Graph rendering goes through `@invana/canvas`.** No PixiJS code in Studio.
+- **Keep package boundaries.** `pnpm check-boundaries` enforces them. A product package never imports another product.
+
+### Engine features
+
+- Every new table or column comes with an Alembic migration: `make engine-migration msg="add foo table"`.
+- A change to the API or schema changes the golden files. Regenerate them deliberately with `cd engine && uv run python -m tests.golden.update`, and review the diff. CI fails if they drift.
+- Connectors live in `integrations/` and import only `invana.graph`.
+
+### Tests
+
+| Rule | Detail |
+|---|---|
+| Same standards as source | Tests are linted, formatted and type-checked like the code they test, e2e specs included |
+| Few tests, but meaningful | A few positive and negative cases per behaviour, not many random ones |
+| No mocks | Engine tests run against real graph databases and Postgres. Mock only when a reviewer asks for it |
+| Coverage | 80% minimum for both the engine and Studio |
+| Where | Engine: `engine/tests/<module>/`. Studio units: `*.test.tsx` next to the code. Studio e2e: `studio/apps/studio/e2e/` |
+
+> **Engine and connector tests clear the graph database they run against.** Run them against a database you don't mind losing, and reload the sample data afterwards.
+
+## Raising a pull request
+
+### 1. Branch from an up-to-date `main`
+
+```bash
+git switch main && git pull
+git switch -c feat/datasets-retraction
+```
+
+| Prefix | For |
+|---|---|
+| `feat/` | a new feature |
+| `fix/` | a bug fix |
+| `docs/` | documentation only |
+| `refactor/` | a code change with no change in behaviour |
+| `chore/` | maintenance, dependencies, tooling |
+
+Never commit to `main` directly. Work reaches `main` only through a pull request.
+
+### 2. Commit with Conventional Commits
+
+The `commit-msg` hook ([commitizen](https://commitizen-tools.github.io/commitizen/)) rejects any message that doesn't follow the format.
+
+**Format:** `<type>(<optional scope>): <description>`
+
+| Type | Use when |
+|---|---|
+| `feat` | adding a feature |
+| `fix` | fixing a bug |
+| `docs` | changing documentation only |
+| `style` | formatting, with no logic change |
+| `refactor` | changing code without fixing or adding anything |
+| `perf` | improving performance |
+| `test` | adding or updating tests |
+| `build` | changing the build system or dependencies |
+| `ci` | changing CI configuration |
+| `chore` | maintenance |
+| `revert` | reverting a commit |
+| `bump` | bumping versions |
+
+```
+feat(datasets): retract a version and flag what cites it
+fix(connectors): handle Neo4j connection timeout
+docs: add the change log to the feature index
+```
+
+Scopes are optional. Use the module or package name (`engine`, `studio`, `datasets`, `connectors`).
+
+#### What the hooks check
+
+`make setup` installs three git hooks. A failing hook stops the commit or the push until you fix the errors.
+
+| When | Checks | Scope |
+|---|---|---|
+| `git commit` (message) | Conventional Commits format | the message |
+| `git commit` | `ruff check --fix` and `ruff format`; the engine import layers; connectors import only `invana.graph`; Biome | the staged files |
+| `git push` | `ruff check` and `ruff format --check` over the whole engine and every integration | when the push touches `engine/` or `integrations/` |
+| `git push` | `tsc` over every package and the e2e specs; `pnpm lint` (Biome, where a warning fails too; package boundaries, retired names, kit overlap); `knip` | when the push touches `studio/` |
+| Pull request to `main` (CI) | The lint checks above, plus a changeset check | the whole repo |
+
+- **Cloned before the push hook existed?** Run `make setup` once more to install it.
+- **Don't bypass the hooks.** On every branch except a pull request to `main`, they are the only check. `--no-verify` skips them, and the errors come back when the PR runs CI.
+- Run the push checks without pushing: `uv run pre-commit run --hook-stage pre-push --all-files`.
+
+### 3. Add a changeset
+
+Every user-facing change needs one:
 
 ```bash
 pnpm changeset
 ```
 
-This creates a file in `.changeset/` describing your change and its semver impact.
+This adds a file to `.changeset/` that describes the change and its semver impact. Invana releases as one version, so pick the bump for the whole product.
 
-### Commit Messages
+### 4. Run the checks before you open the PR
 
-We enforce [Conventional Commits](https://www.conventionalcommits.org/) via [commitizen](https://commitizen-tools.github.io/commitizen/). Non-conforming commit messages are **rejected automatically** by the `commit-msg` hook.
+| Check | Command |
+|---|---|
+| Lint everything | `make lint` |
+| All tests | `make test` |
+| Studio types | `cd studio && pnpm check-types` |
+| Studio package boundaries | `cd studio && pnpm check-boundaries` |
+| Studio dead code | `cd studio && pnpm knip` |
+| Studio e2e | `cd studio && pnpm test:e2e` (needs the stack running and signed in) |
+| Engine golden files | `cd engine && uv run pytest tests/golden -q` |
 
-**Format:** `<type>(<optional scope>): <description>`
+### 5. Open the pull request
 
-**Allowed types:**
-
-| Type       | Use when...                                    |
-|------------|------------------------------------------------|
-| `feat`     | Adding a new feature                           |
-| `fix`      | Fixing a bug                                   |
-| `docs`     | Documentation only changes                     |
-| `style`    | Code style (formatting, no logic change)       |
-| `refactor` | Code change that neither fixes nor adds        |
-| `perf`     | Performance improvement                        |
-| `test`     | Adding or updating tests                       |
-| `build`    | Build system or dependency changes             |
-| `ci`       | CI/CD configuration changes                    |
-| `chore`    | Maintenance tasks                              |
-| `revert`   | Reverting a previous commit                    |
-| `bump`     | Version bumps                                  |
-
-**Examples:**
-
-```
-feat(query-engine): add query plan caching
-fix(connectors): handle Neo4j connection timeout
-docs: update quickstart guide
-chore: bump dependencies
-refactor(studio): extract sidebar into design-kit component
+```bash
+git push -u origin feat/datasets-retraction
 ```
 
-**Scopes** are optional but encouraged — use the module name (`engine`, `studio`, `docs`, `query-engine`, `connectors`, etc.).
+Open the PR against `main` and fill in every section of the [template](.github/PULL_REQUEST_TEMPLATE.md):
 
-### Pre-commit Hooks
+| Section | What to write |
+|---|---|
+| Summary | What the PR does, in one or two lines |
+| Type and Component | Tick what applies |
+| Changes | The key changes, and the feature file or decision each one implements |
+| Testing | What you tested and how. Say so if something was not run |
+| Checklist | Conventional commits, tests, lint, changeset, docs |
+| Screenshots | Required for any Studio change |
+| Related Issues | `Fixes #123` or `Relates to #456` |
 
-[pre-commit](https://pre-commit.com/) runs automatically on every commit (installed via `make setup`):
+### 6. Review and merge
 
-- **commit-msg**: Validates commit message format (commitizen)
-- **pre-commit**: Lints and formats staged files
-  - Python: `ruff check --fix` + `ruff format`
-  - TypeScript: `biome check`
-
-### Testing
-
-- Write tests for all new functionality
-- Unit tests: `engine/tests/unit/` and co-located `*.test.tsx` in studio
-- Integration tests: `engine/tests/integration/`
-- E2E tests: `studio/tests/e2e/`
-- Maintain **80%+ code coverage**
-
-## Pull Request Process
-
-1. Create a branch from `main`
-2. Make your changes with tests
-3. Add a changeset (`pnpm changeset`)
-4. Push and open a PR
-5. CI must pass (lint, tests, coverage)
-6. Get at least one review approval
-7. Squash and merge
+- CI runs the lint checks and the changeset check on the PR, and they must pass. Tests and golden files don't run on PRs; run them yourself (step 4). A maintainer can run the full suite from the Actions tab.
+- At least one approving review is required.
+- Reviewers check the code against the feature file. If the code does something the file doesn't say, update the file in the same PR.
+- PRs are squash-merged. The PR title becomes the commit message, so it must also follow Conventional Commits.
 
 ## Code of Conduct
 

@@ -1,7 +1,31 @@
 # Invana
 
-Invana is an open-source **graph intelligence platform** that turns structured 
-knowledge graphs into interactive decision simulation environments.
+**An ontology-governed operating system for humans and AI agents.**
+
+Invana is open source. People and agents work on the same knowledge graph, and
+the ontology governs both of them:
+
+- **Ontology-governed.** Models give the data its meaning. Worlds, guardrails and
+  rules decide what anyone may read, use or send, and they apply to people and
+  agents alike.
+- **Grounded.** Every answer traces back from the LLM to the query, the record and
+  the dataset it came from. When the graph can't answer, Invana says so.
+- **An operating system.** Runs, schedules, approvals, notifications and a change
+  log are shared by every product, so the work is visible wherever it started.
+
+## The products
+
+| Product | For | Job |
+|---|---|---|
+| **Datasets** | researchers, curators | Gather the data: reusable, labelled by origin, checked against standards |
+| **Modeller** | modellers, compliance leads | Give it meaning: models, stitches, worlds, guardrails, rules |
+| **Explorer** | analysts | Ask and look: answers drawn on a board, each claim citing its record |
+| **Projects** | anyone deciding something | Pursue a question: gather evidence for and against, decide, keep the trail |
+| **Agents** | builders | Build, tune and watch the agents that do the legwork |
+
+All five run on Neo4j, Memgraph, ArcadeDB, JanusGraph, Amazon Neptune or
+TinkerGraph, through Cypher or Gremlin. Each database connector is its own
+package (`pip install invana-neo4j`).
 
 ## Development setup
 
