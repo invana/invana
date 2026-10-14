@@ -1,0 +1,546 @@
+import { Input, Label } from "@invana/forms";
+import { ThemeSelector } from "@invana/themes";
+import {
+	Button,
+	Card,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	NavVerticalItems,
+} from "@invana/ui";
+import { ApiError, authApi, useAuth } from "@invana-studio/core";
+import {
+	AlertTriangle,
+	KeyRound,
+	KeySquare,
+	Monitor,
+	Moon,
+	Palette,
+	Sun,
+	User,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { SaturationControl } from "../../components/SaturationControl";
+import { STUDIO_THEMES } from "../../components/studioThemes";
+import { AccessTokensTab } from "./AccessTokensTab";
+
+const USERNAME_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+const USERNAME_COOLDOWN_DAYS = 30;
+
+type UsernameState =
+	| { kind: "idle" }
+	| { kind: "checking" }
+	| { kind: "available" }
+	| { kind: "unavailable"; reason: string };
+
+/**
+ * The sections, in the order the left nav lists them. Sections are a vertical
+ * strip, not a tab bar: five labels do not fit a 2xl-wide header, and Access
+ * tokens needs the width the strip was eating.
+ */
+const SECTIONS = [
+	{ key: "basic", name: "Basic info", icon: User },
+	{ key: "appearance", name: "Appearance", icon: Palette },
+	{ key: "password", name: "Password", icon: KeyRound },
+	{ key: "tokens", name: "Access tokens", icon: KeySquare },
+	{ key: "danger", name: "Danger zone", icon: AlertTriangle },
+] as const;
+
+type SectionKey = (typeof SECTIONS)[number]["key"];
+
+export function ProfileSettingsPage() {
+	const { user, setUser, clear } = useAuth();
+	const [section, setSection] = useState<SectionKey>("basic");
+	if (!user) return null;
+
+	return (
+		// The kit sets a 13px root, so the named container steps top out near
+		// 830px — too narrow for the tokens table. The cap is explicit.
+		<div className="mx-auto w-full max-w-[1200px] px-6 py-10">
+			<header className="mb-8">
+				<h1 className="text-2xl font-semibold">Account settings</h1>
+				<p className="text-muted-foreground text-base">
+					Update your profile, change your password, or close your account.
+				</p>
+			</header>
+			<div className="flex flex-wrap items-start gap-6">
+				<NavVerticalItems
+					items={SECTIONS.map((s) => ({
+						key: s.key,
+						name: s.name,
+						label: s.name,
+						icon: s.icon,
+						// The strip centres its items; a settings list reads down a
+						// left edge, so each row starts at one.
+						className: "w-full justify-start px-3",
+						onClick: () => setSection(s.key),
+					}))}
+					selectionMode="tabs"
+					activeKey={section}
+					panelId={() => "account-section"}
+					iconClassName="w-4 h-4 flex-shrink-0"
+					className="w-52 shrink-0 items-stretch gap-1"
+				/>
+				<Card
+					id="account-section"
+					className="min-w-0 flex-1 p-2"
+					aria-label={SECTIONS.find((s) => s.key === section)?.name}
+				>
+					{section === "basic" && (
+						<BasicInfoTab
+							initial={{
+								email: user.email,
+								username: user.username,
+								first_name: user.first_name,
+								last_name: user.last_name,
+								username_last_changed_at: user.username_last_changed_at,
+							}}
+							onSaved={(updated) => setUser({ ...user, ...updated })}
+						/>
+					)}
+					{section === "appearance" && <AppearanceTab />}
+					{section === "password" && <PasswordTab />}
+					{section === "tokens" && <AccessTokensTab />}
+					{section === "danger" && (
+						<DangerZoneTab email={user.email} onDeleted={() => clear()} />
+					)}
+				</Card>
+			</div>
+		</div>
+	);
+}
+
+// ─── Appearance ─────────────────────────────────────────────────────────────
+
+const MODE_ICONS = { light: Sun, dark: Moon, system: Monitor };
+
+/**
+ * Theme / mode / accent picker (docs/for-developers/modules/platform/features/theming.md). Changes apply live and are persisted
+ * to the user's profile by the app-level `<ThemeSyncBridge>` (mounted in
+ * main.tsx), so this tab is a thin wrapper around `<ThemeSelector>` — no local
+ * save wiring. The header `ThemeMenu` drives the same provider state.
+ */
+function AppearanceTab() {
+	return (
+		<div className="max-w-md space-y-6 p-4">
+			<div>
+				<h2 className="text-lg font-semibold">Appearance</h2>
+				<p className="text-muted-foreground text-base">
+					Pick a theme and a light/dark/system mode. Your choice is saved to
+					your account and follows you across devices.
+				</p>
+			</div>
+			<ThemeSelector
+				layout="form"
+				themes={STUDIO_THEMES}
+				showAccent={false}
+				modeIcons={MODE_ICONS}
+				className="theme-picker"
+			/>
+			<SaturationControl className="max-w-xs border-t border-border pt-6" />
+		</div>
+	);
+}
+
+// ─── Basic info ─────────────────────────────────────────────────────────────
+
+interface BasicInfoInitial {
+	email: string;
+	username: string;
+	first_name: string;
+	last_name: string | null;
+	username_last_changed_at: string | null;
+}
+
+function BasicInfoTab({
+	initial,
+	onSaved,
+}: {
+	initial: BasicInfoInitial;
+	onSaved: (u: {
+		username: string;
+		first_name: string;
+		last_name: string | null;
+		username_last_changed_at: string | null;
+	}) => void;
+}) {
+	const [firstName, setFirstName] = useState(initial.first_name);
+	const [lastName, setLastName] = useState(initial.last_name ?? "");
+	const [username, setUsername] = useState(initial.username);
+	const [submitting, setSubmitting] = useState(false);
+	const [usernameState, setUsernameState] = useState<UsernameState>({
+		kind: "idle",
+	});
+	const debounceRef = useRef<number | undefined>(undefined);
+
+	const cooldownUntil = computeCooldownUntil(initial.username_last_changed_at);
+	const inCooldown = cooldownUntil !== null && cooldownUntil > new Date();
+
+	const usernameChanged = username.trim().toLowerCase() !== initial.username;
+	const usernameOk = !usernameChanged || usernameState.kind === "available";
+
+	useEffect(() => {
+		if (debounceRef.current) window.clearTimeout(debounceRef.current);
+		const value = username.trim().toLowerCase();
+		if (!usernameChanged) {
+			setUsernameState({ kind: "idle" });
+			return;
+		}
+		if (value.length < 2) {
+			setUsernameState({ kind: "idle" });
+			return;
+		}
+		if (!USERNAME_RE.test(value) || value.includes("--")) {
+			setUsernameState({ kind: "unavailable", reason: "invalid_format" });
+			return;
+		}
+		setUsernameState({ kind: "checking" });
+		debounceRef.current = window.setTimeout(async () => {
+			try {
+				const res = await authApi.usernameAvailable(value);
+				setUsernameState(
+					res.available
+						? { kind: "available" }
+						: { kind: "unavailable", reason: res.reason ?? "taken" },
+				);
+			} catch {
+				setUsernameState({ kind: "idle" });
+			}
+		}, 300);
+		return () => {
+			if (debounceRef.current) window.clearTimeout(debounceRef.current);
+		};
+	}, [username, usernameChanged]);
+
+	const dirty =
+		firstName.trim() !== initial.first_name ||
+		(lastName.trim() || null) !== (initial.last_name ?? null) ||
+		usernameChanged;
+
+	async function onSubmit(e: React.FormEvent) {
+		e.preventDefault();
+		if (usernameChanged && inCooldown && cooldownUntil) {
+			toast.error(
+				`Username can be changed again on ${cooldownUntil.toLocaleDateString()}.`,
+			);
+			return;
+		}
+		if (usernameChanged && usernameState.kind !== "available") {
+			toast.error("Pick a valid, available username before saving.");
+			return;
+		}
+		setSubmitting(true);
+		try {
+			const patch: {
+				first_name?: string;
+				last_name?: string | null;
+				username?: string;
+			} = {};
+			if (firstName.trim() !== initial.first_name) {
+				patch.first_name = firstName.trim();
+			}
+			if ((lastName.trim() || null) !== (initial.last_name ?? null)) {
+				patch.last_name = lastName.trim() || null;
+			}
+			if (usernameChanged) patch.username = username.trim().toLowerCase();
+			const updated = await authApi.patchMe(patch);
+			onSaved({
+				username: updated.username,
+				first_name: updated.first_name,
+				last_name: updated.last_name,
+				username_last_changed_at: updated.username_last_changed_at,
+			});
+			toast.success("Profile updated.");
+		} catch (err) {
+			toast.error(err instanceof ApiError ? err.message : "Update failed.");
+		} finally {
+			setSubmitting(false);
+		}
+	}
+
+	return (
+		<form className="space-y-5 p-4" onSubmit={onSubmit}>
+			<div className="space-y-2">
+				<Label htmlFor="email">Email</Label>
+				<Input id="email" value={initial.email} disabled readOnly />
+				<p className="text-base text-muted-foreground">
+					Email cannot be changed.
+				</p>
+			</div>
+			<div className="space-y-2">
+				<Label htmlFor="username">Username</Label>
+				<Input
+					id="username"
+					required
+					minLength={2}
+					maxLength={64}
+					autoCapitalize="off"
+					autoCorrect="off"
+					disabled={inCooldown}
+					value={username}
+					onChange={(e) => setUsername(e.target.value.toLowerCase())}
+				/>
+				<UsernameStatus
+					state={usernameState}
+					changed={usernameChanged}
+					cooldownUntil={cooldownUntil}
+				/>
+			</div>
+			<div className="grid grid-cols-2 gap-3">
+				<div className="space-y-2">
+					<Label htmlFor="firstName">First name</Label>
+					<Input
+						id="firstName"
+						required
+						value={firstName}
+						onChange={(e) => setFirstName(e.target.value)}
+					/>
+				</div>
+				<div className="space-y-2">
+					<Label htmlFor="lastName">Last name (optional)</Label>
+					<Input
+						id="lastName"
+						value={lastName}
+						onChange={(e) => setLastName(e.target.value)}
+					/>
+				</div>
+			</div>
+			<Button type="submit" disabled={!dirty || submitting || !usernameOk}>
+				{submitting ? "Saving…" : "Save changes"}
+			</Button>
+		</form>
+	);
+}
+
+function computeCooldownUntil(lastChanged: string | null): Date | null {
+	if (!lastChanged) return null;
+	const d = new Date(lastChanged);
+	d.setDate(d.getDate() + USERNAME_COOLDOWN_DAYS);
+	return d;
+}
+
+function UsernameStatus({
+	state,
+	changed,
+	cooldownUntil,
+}: {
+	state: UsernameState;
+	changed: boolean;
+	cooldownUntil: Date | null;
+}) {
+	if (cooldownUntil && cooldownUntil > new Date()) {
+		return (
+			<p className="text-base text-muted-foreground">
+				Username can be changed again on {cooldownUntil.toLocaleDateString()}.
+			</p>
+		);
+	}
+	if (!changed) {
+		return (
+			<p className="text-base text-muted-foreground">
+				Lowercase letters, digits, and hyphens. Changes are rate-limited.
+			</p>
+		);
+	}
+	if (state.kind === "checking") {
+		return <p className="text-base text-muted-foreground">Checking…</p>;
+	}
+	if (state.kind === "available") {
+		return <p className="text-base text-success">Username available.</p>;
+	}
+	if (state.kind === "unavailable") {
+		const message =
+			state.reason === "taken"
+				? "Username is taken."
+				: state.reason === "reserved"
+					? "Username is reserved."
+					: "Invalid format.";
+		return <p className="text-base text-destructive">{message}</p>;
+	}
+	return (
+		<p className="text-base text-muted-foreground">
+			Lowercase letters, digits, and hyphens. Changes are rate-limited.
+		</p>
+	);
+}
+
+// ─── Password ───────────────────────────────────────────────────────────────
+
+function PasswordTab() {
+	const [current, setCurrent] = useState("");
+	const [next, setNext] = useState("");
+	const [confirm, setConfirm] = useState("");
+	const [submitting, setSubmitting] = useState(false);
+
+	async function onSubmit(e: React.FormEvent) {
+		e.preventDefault();
+		if (next !== confirm) {
+			toast.error("New passwords don't match.");
+			return;
+		}
+		setSubmitting(true);
+		try {
+			await authApi.changePassword(current, next);
+			toast.success(
+				"Password updated. You'll need to sign in again on other devices.",
+			);
+			setCurrent("");
+			setNext("");
+			setConfirm("");
+		} catch (err) {
+			toast.error(
+				err instanceof ApiError ? err.message : "Password update failed.",
+			);
+		} finally {
+			setSubmitting(false);
+		}
+	}
+
+	return (
+		<form className="space-y-5 p-4 max-w-md" onSubmit={onSubmit}>
+			<div className="space-y-2">
+				<Label htmlFor="current">Current password</Label>
+				<Input
+					id="current"
+					type="password"
+					autoComplete="current-password"
+					required
+					value={current}
+					onChange={(e) => setCurrent(e.target.value)}
+				/>
+			</div>
+			<div className="space-y-2">
+				<Label htmlFor="next">New password (min 12 chars)</Label>
+				<Input
+					id="next"
+					type="password"
+					autoComplete="new-password"
+					required
+					minLength={12}
+					value={next}
+					onChange={(e) => setNext(e.target.value)}
+				/>
+			</div>
+			<div className="space-y-2">
+				<Label htmlFor="confirm">Confirm new password</Label>
+				<Input
+					id="confirm"
+					type="password"
+					autoComplete="new-password"
+					required
+					minLength={12}
+					value={confirm}
+					onChange={(e) => setConfirm(e.target.value)}
+				/>
+			</div>
+			<Button type="submit" disabled={submitting}>
+				{submitting ? "Updating…" : "Update password"}
+			</Button>
+		</form>
+	);
+}
+
+// ─── Danger zone ────────────────────────────────────────────────────────────
+
+function DangerZoneTab({
+	email,
+	onDeleted,
+}: {
+	email: string;
+	onDeleted: () => void;
+}) {
+	const navigate = useNavigate();
+	const [open, setOpen] = useState(false);
+	const [emailConfirm, setEmailConfirm] = useState("");
+	const [password, setPassword] = useState("");
+	const [submitting, setSubmitting] = useState(false);
+
+	const canDelete = emailConfirm.trim().toLowerCase() === email.toLowerCase();
+
+	async function onConfirm() {
+		setSubmitting(true);
+		try {
+			await authApi.deleteMe(password);
+			toast.success("Account deleted.");
+			onDeleted();
+			navigate("/login", { replace: true });
+		} catch (err) {
+			toast.error(
+				err instanceof ApiError ? err.message : "Account deletion failed.",
+			);
+		} finally {
+			setSubmitting(false);
+		}
+	}
+
+	return (
+		<div className="p-4 space-y-4">
+			<div className="border border-destructive/30 rounded-md p-4 bg-destructive/5">
+				<h3 className="font-medium text-destructive">Delete account</h3>
+				<p className="text-base text-muted-foreground mt-1">
+					This permanently deletes your account and removes all Graphs you own —
+					with their datasets, skills, agents, and bindings. This cannot be
+					undone.
+				</p>
+				<Button
+					variant="destructive"
+					className="mt-4"
+					onClick={() => setOpen(true)}
+				>
+					Delete account
+				</Button>
+			</div>
+
+			<Dialog open={open} onOpenChange={setOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Delete account</DialogTitle>
+						<DialogDescription>
+							Type your email and password to confirm. All Graphs you own, with
+							their datasets, skills, agents, and bindings, will be deleted
+							permanently.
+						</DialogDescription>
+					</DialogHeader>
+					<div className="space-y-3 pt-2">
+						<div className="space-y-1">
+							<Label htmlFor="emailConfirm">
+								Type <span className="font-mono">{email}</span> to confirm
+							</Label>
+							<Input
+								id="emailConfirm"
+								value={emailConfirm}
+								onChange={(e) => setEmailConfirm(e.target.value)}
+							/>
+						</div>
+						<div className="space-y-1">
+							<Label htmlFor="dpassword">Password</Label>
+							<Input
+								id="dpassword"
+								type="password"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+							/>
+						</div>
+					</div>
+					<DialogFooter>
+						<Button variant="ghost" onClick={() => setOpen(false)}>
+							Cancel
+						</Button>
+						<Button
+							variant="destructive"
+							disabled={!canDelete || !password || submitting}
+							onClick={onConfirm}
+						>
+							{submitting ? "Deleting…" : "Delete account"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		</div>
+	);
+}

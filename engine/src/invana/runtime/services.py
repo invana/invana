@@ -39,6 +39,7 @@ from invana.apps.sessions.models import (
 from invana.apps.sessions.querysets import SessionMessageQuerySet
 from invana.apps.sessions.schemas import SendMessage
 from invana.apps.sessions.transcript import _title_from_text
+from invana.apps.skills.models import SkillVersion
 from invana.apps.task_plans.models import TaskPlan
 from invana.apps.work.models import Task
 from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedError, ValidationError
@@ -46,7 +47,7 @@ from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
 from invana.core.settings import settings
-from invana.runtime.catalogue.records import LoadRefused
+from invana.plugins.core.ingest.records import LoadRefused
 from invana.runtime.models import RunRole, RunStatus, TaskRun, TriggeredBy
 from invana.runtime.planning import opening_for, plan_payload, queue_plan_steps, select_plan_by_key
 from invana.runtime.querysets import TaskRunQuerySet
@@ -184,6 +185,7 @@ async def open_turn(
                 graph_id=graph.id,
                 snapshot=frozen["lens_snapshot"],
                 prefer_model_row_id=payload.llm_model_id,
+                pins=(agent.model_pin if agent else None,),
             )
             if needs_provider
             else None
@@ -231,14 +233,15 @@ async def open_turn(
             "llm_model_id": provider.model_row_id if provider else None,
             "timeout_s": payload.timeout_s,
             "parameters": payload.parameters,
-            # The thread's spend per run, frozen under the agent's own cap
+            # The thread's tokens per run, frozen under the agent's own budget
             # ([AS5](docs/for-developers/modules/ask/spec.md) · AG25).
-            "max_cost_usd_run": spend_per_run(sess, agent),
+            "max_tokens_run": tokens_per_run(sess, agent),
         },
         workflow_key=wf.key,
         assistant_message_id=assistant_msg.id,
         agent_id=agent.id if agent else None,
         agent_version=agent.version if agent else None,
+        model_version=provider.model_id if provider else None,
         triggered_by=TriggeredBy.user.value,
         on_behalf_of_user_id=actor_id,
         **frozen,
@@ -341,10 +344,10 @@ async def session_world(db: AsyncSession, *, sess: Session) -> str | None:
     return lens.id if lens is not None and lens.graph_id == sess.graph_id else None
 
 
-def spend_per_run(sess: Session | None, agent: Agent | None) -> float | None:
-    """The thread's spend per run, never above the agent's standing cap (AG24)."""
-    cap = agent.effective_budget.get("max_cost_usd_run") if agent is not None else None
-    own = sess.max_cost_usd_run if sess is not None else None
+def tokens_per_run(sess: Session | None, agent: Agent | None) -> int | None:
+    """The thread's tokens per run, never above the agent's standing budget (AG24)."""
+    cap = agent.effective_budget.get("max_tokens_run") if agent is not None else None
+    own = sess.max_tokens_run if sess is not None else None
     if own is None:
         return cap
     return own if cap is None else min(own, cap)
@@ -373,6 +376,7 @@ async def resolve_endpoint(
     graph_id: str,
     snapshot: dict | None,
     prefer_model_row_id: str | None = None,
+    pins: tuple[str | None, ...] = (),
 ) -> LLMEndpoint:
     """The model this run calls, resolved through the lens it was frozen under.
 
@@ -387,7 +391,25 @@ async def resolve_endpoint(
         graph_id=graph_id,
         effective=from_snapshot(snapshot) if snapshot else None,
         prefer_model_row_id=prefer_model_row_id,
+        pins=pins,
     )
+
+
+async def pins_for_run(db: AsyncSession, *, th: TaskRun) -> tuple[str | None, ...]:
+    """The pins a run resolves through, innermost first.
+
+    The skill version's pin when the run's plan was drawn from one, then the
+    agent's. A plan drawn from several versions takes the first that pins.
+    """
+    skill_pin = None
+    plan = await db.get(TaskPlan, th.task_plan_id) if th.task_plan_id else None
+    for version_id in (plan.source_skill_version_ids or []) if plan is not None else []:
+        version = await db.get(SkillVersion, version_id)
+        if version is not None and version.model_pin:
+            skill_pin = version.model_pin
+            break
+    agent = await db.get(Agent, th.agent_id) if th.agent_id else None
+    return (skill_pin, agent.model_pin if agent is not None else None)
 
 
 async def endpoint_for_run(db: AsyncSession, *, th: TaskRun) -> LLMEndpoint | None:
@@ -397,7 +419,8 @@ async def endpoint_for_run(db: AsyncSession, *, th: TaskRun) -> LLMEndpoint | No
     queued before it carries ``llm_provider_id``, which resolves to that
     provider's first offered model for one release ([PM15]). Neither present —
     a Task's run, a delegation — and the frozen lens answers, which is the same
-    resolution the ask took, re-read rather than re-decided.
+    resolution the ask took, re-read rather than re-decided. A pin on the
+    plan's skill version or on the agent is that resolution's first word.
 
     **``None`` when the Graph offers no model**, rather than a refusal: a ``ql``
     run calls none, and killing it over configuration it never needed would be
@@ -415,7 +438,9 @@ async def endpoint_for_run(db: AsyncSession, *, th: TaskRun) -> LLMEndpoint | No
         if legacy is not None and legacy.graph_id == th.graph_id:
             return await LLMProviderManager().first_endpoint(db, provider=legacy)
     try:
-        return await resolve_endpoint(db, graph_id=th.graph_id, snapshot=th.lens_snapshot)
+        return await resolve_endpoint(
+            db, graph_id=th.graph_id, snapshot=th.lens_snapshot, pins=await pins_for_run(db, th=th)
+        )
     except NoEndpointError:
         return None
 
@@ -490,6 +515,57 @@ async def open_todo_run(
         actor_id=agent.id,
         on_behalf_of_user_id=on_behalf_of_user_id,
         details={"actor_name": agent.name, "parent_run_id": parent_run_id},
+    )
+    await db.flush()
+    return th
+
+
+async def open_schedule_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    schedule_id: str,
+    schedule_name: str,
+    instructions: str,
+    agent: Agent,
+    on_behalf_of_user_id: str,
+) -> TaskRun:
+    """Open the run a schedule's firing opens — a Todo's run with no Todo.
+
+    The instructions are the body and the agent carries them out, bounded by
+    its frozen lens like any run nobody was watching open
+    (docs/for-developers/modules/operate/features/schedules.md).
+    ``params.schedule_id`` names the schedule so the run reads as scheduled
+    from its own row.
+    """
+    th = TaskRun(
+        graph_id=graph.id,
+        author_id=on_behalf_of_user_id,
+        author_kind="user",
+        ask_kind="nl",
+        body=instructions,
+        params={"schedule_id": schedule_id},
+        workflow_key=NL_QUERY.key,
+        agent_id=agent.id,
+        agent_version=agent.version,
+        triggered_by=TriggeredBy.schedule.value,
+        on_behalf_of_user_id=on_behalf_of_user_id,
+        **await freeze_lens(db, graph_id=graph.id, agent_id=agent.id, lens_id=None),
+    )
+    db.add(th)
+    await db.flush()
+    _queue_opening(db, th, None, opening_for(agent, ask_kind="nl"))
+    await emit_event(
+        db,
+        action=actions.THINKING_OPEN,
+        target_kind=actions.TARGET_THINKING,
+        target_id=th.id,
+        graph_id=graph.id,
+        run_id=th.id,
+        actor_kind=ActorKind.agent,
+        actor_id=agent.id,
+        on_behalf_of_user_id=on_behalf_of_user_id,
+        details={"actor_name": agent.name, "schedule_id": schedule_id, "schedule": schedule_name},
     )
     await db.flush()
     return th
@@ -694,6 +770,119 @@ async def rerun_turn(
         sess.last_status = message.status
     await db.flush()
     return th
+
+
+#: A root in one of these is still live, so it is not re-run.
+_LIVE = (RunStatus.queued.value, RunStatus.running.value, RunStatus.awaiting_input.value)
+
+
+async def rerun_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    run: TaskRun,
+    versions: str,
+    actor_id: str,
+) -> TaskRun:
+    """Re-run a settled ask as a new root run, linked to the one it re-ran.
+
+    ``same`` calls the model version the run recorded and runs under its frozen
+    lens; a version the Graph no longer offers refuses, naming it, rather than
+    calling another model. ``current`` resolves today's pins and cast and
+    freezes the lens anew, in the world the run was asked in.
+
+    The new run belongs to no session, so the reply the original wrote is
+    never rewritten; it reads in Runs like any other root. The original is
+    never touched.
+    """
+    if run.parent_run_id is not None or run.ask_kind not in ("nl", "ql"):
+        raise ConflictError({"error": "not_an_ask", "message": "Only an ask re-runs — a question or a query."})
+    if run.status in _LIVE:
+        raise ConflictError({"error": "run_live", "message": "This run has not settled — re-run a settled run only."})
+    agent = await _agents.require_available(db, agent_id=run.agent_id, graph_id=graph.id) if run.agent_id else None
+    if agent is None and run.workflow_key not in WORKFLOWS:
+        raise ConflictError({"error": "not_an_ask", "message": "This run's flow cannot be opened again."})
+
+    needs_model = run.ask_kind == "nl"
+    provider: LLMEndpoint | None = None
+    if versions == "same":
+        frozen = {"lens_id": run.lens_id, "lens_snapshot": run.lens_snapshot}
+        if needs_model:
+            provider = await _recorded_endpoint(db, run=run)
+    else:
+        frozen = await freeze_lens(db, graph_id=graph.id, agent_id=agent.id if agent else None, lens_id=run.lens_id)
+        if needs_model:
+            provider = await resolve_endpoint(
+                db,
+                graph_id=graph.id,
+                snapshot=frozen["lens_snapshot"],
+                pins=(agent.model_pin if agent else None,),
+            )
+
+    th = TaskRun(
+        graph_id=graph.id,
+        author_id=actor_id,
+        author_kind="user",
+        ask_kind=run.ask_kind,
+        body=run.body,
+        params={**(run.params or {}), "llm_model_id": provider.model_row_id if provider else None},
+        workflow_key=run.workflow_key,
+        agent_id=agent.id if agent else None,
+        agent_version=agent.version if agent else None,
+        model_version=provider.model_id if provider else None,
+        rerun_of_run_id=run.id,
+        triggered_by=TriggeredBy.user.value,
+        on_behalf_of_user_id=actor_id,
+        **frozen,
+    )
+    db.add(th)
+    await db.flush()
+    opening = opening_for(agent, ask_kind=run.ask_kind) if agent is not None else None
+    if opening is not None:
+        _queue_opening(db, th, None, opening)
+    else:
+        _queue_steps(db, th, None, WORKFLOWS[run.workflow_key])
+    await emit_event(
+        db,
+        action=actions.THINKING_OPEN,
+        target_kind=actions.TARGET_THINKING,
+        target_id=th.id,
+        graph_id=graph.id,
+        run_id=th.id,
+        actor_id=actor_id,
+        details={"rerun_of_run_id": run.id, "versions": versions, "model_version": th.model_version},
+    )
+    await _prune(db, graph.id)
+    await db.flush()
+    return th
+
+
+async def _recorded_endpoint(db: AsyncSession, *, run: TaskRun) -> LLMEndpoint:
+    """The endpoint offering the version a run recorded, or the refusal naming it.
+
+    The row the run called wins while it still offers that version; another
+    endpoint offering the same version name is the same model.
+    """
+    if not run.model_version:
+        raise ConflictError(
+            {
+                "error": "version_not_recorded",
+                "message": "This run predates recorded model versions — re-run it on the current versions.",
+            }
+        )
+    offered = await _endpoints.models_qs.endpoints_for_graph(db, run.graph_id)
+    same = [e for e in offered if e.model.model_id == run.model_version]
+    row_id = (run.params or {}).get("llm_model_id")
+    found = next((e for e in same if e.model.id == row_id), same[0] if same else None)
+    if found is None:
+        raise ConflictError(
+            {
+                "error": "version_not_offered",
+                "message": f"{run.model_version} is no longer offered by this graph, so this run cannot re-run on it.",
+                "model_version": run.model_version,
+            }
+        )
+    return found
 
 
 def _workflow(th: TaskRun) -> Workflow:
@@ -975,6 +1164,8 @@ STITCH_COMMIT_PLAN_KEY = "stitch-commit"
 STITCH_WITHDRAW_PLAN_KEY = "stitch-withdraw"
 #: The builtin that counts what stitch rules resolve — a read (ST43).
 STITCH_PREVIEW_PLAN_KEY = "stitch-preview"
+#: The builtin a publish review previews and applies a breaking model change with.
+MODEL_MIGRATION_PLAN_KEY = "model-migration"
 
 
 _store = ModelStore()
@@ -1290,3 +1481,98 @@ async def open_stitch_preview_run(
     else:
         body, args = "Resolve every stitch", {"all_links": True}
     return await _open_stitch_run(db, graph=graph, key=STITCH_PREVIEW_PLAN_KEY, body=body, actor_id=actor_id, args=args)
+
+
+async def open_simulation_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    flow_key: str,
+    body: str,
+    args: dict,
+    params: dict,
+    actor_id: str,
+) -> TaskRun:
+    """Open the run a simulation is — the simulator's packaged flow, one step.
+
+    **A simulation is a run** (docs/for-developers/modules/work/features/simulation.md):
+    the Graph's guardrails are frozen on it, no agent and no world, the same as
+    a load or a stitch. ``args`` — the spec, the pinned inputs and the seed — go
+    to the simulator's step; ``params`` are the journal's copy, naming the
+    project and branch that asked. Left queued; the caller commits and submits.
+    """
+    selected = await select_plan_by_key(db, graph_id=graph.id, key=flow_key)
+    if selected is None:
+        raise RuntimeError(f"The plan library has no populated {flow_key!r}.")
+    steps = [
+        dataclasses.replace(step, args={**step.args, **args})
+        for step in (PlanStep.parse(dict(s), index=i) for i, s in enumerate(selected.steps))
+    ]
+    run = TaskRun(
+        graph_id=graph.id,
+        author_id=actor_id,
+        author_kind="user",
+        ask_kind="simulate",
+        body=body,
+        params=params,
+        workflow_key=selected.ref,
+        task_plan_id=selected.plan_id,
+        plan_origin=f"template:{selected.ref}",
+        triggered_by=TriggeredBy.user.value,
+        on_behalf_of_user_id=actor_id,
+        status=RunStatus.queued.value,
+        **await freeze_lens(db, graph_id=graph.id, agent_id=None, lens_id=None),
+    )
+    db.add(run)
+    await db.flush()
+    run.plan_revision = 1
+    run.plan_snapshot = plan_payload(steps, source=run.plan_origin or "", version=1)
+    await queue_plan_steps(db, run=run, message_id=None, steps=steps, start_seq=0)
+    return run
+
+
+async def open_model_migration_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    model_name: str,
+    args: dict,
+    actor_id: str | None,
+) -> TaskRun:
+    """Open the migration run a publish review is — previewing or applying, one step.
+
+    **A breaking publish is a run** (docs/for-developers/modules/connect-and-model/features/publish-review.md):
+    the Graph's guardrails are frozen on it, no agent and no world, the same as
+    a stitch. ``args`` name the model, the draft, the published version it was
+    classified against, the review and ``apply``. Left queued; the caller
+    commits and submits.
+    """
+    selected = await select_plan_by_key(db, graph_id=graph.id, key=MODEL_MIGRATION_PLAN_KEY)
+    if selected is None:
+        raise RuntimeError(f"The plan library has no populated {MODEL_MIGRATION_PLAN_KEY!r}.")
+    steps = [
+        dataclasses.replace(step, args={**step.args, **args})
+        for step in (PlanStep.parse(dict(s), index=i) for i, s in enumerate(selected.steps))
+    ]
+    verb = "Publish" if args.get("apply") else "Preview"
+    run = TaskRun(
+        graph_id=graph.id,
+        author_id=actor_id,
+        author_kind="user" if actor_id else "system",
+        ask_kind="model_migration",
+        body=f"{verb} the breaking change to {model_name}",
+        params=dict(args),
+        workflow_key=selected.ref,
+        task_plan_id=selected.plan_id,
+        plan_origin=f"template:{selected.ref}",
+        triggered_by=TriggeredBy.user.value,
+        on_behalf_of_user_id=actor_id,
+        status=RunStatus.queued.value,
+        **await freeze_lens(db, graph_id=graph.id, agent_id=None, lens_id=None),
+    )
+    db.add(run)
+    await db.flush()
+    run.plan_revision = 1
+    run.plan_snapshot = plan_payload(steps, source=run.plan_origin or "", version=1)
+    await queue_plan_steps(db, run=run, message_id=None, steps=steps, start_seq=0)
+    return run

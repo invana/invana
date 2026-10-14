@@ -5,7 +5,7 @@ and rejections group by reason so one bad column is one line rather than four
 thousand (IW2).
 """
 
-from invana.runtime.catalogue.records import group_report
+from invana.plugins.core.ingest.records import group_report
 
 
 class TestGrouping:

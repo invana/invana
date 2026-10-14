@@ -35,15 +35,38 @@ from typing import Any
 
 import click
 
+from invana.cli.commands.agents import agents_cmd
+from invana.cli.commands.approvals import approvals_cmd
+from invana.cli.commands.datasets import datasets_cmd
+from invana.cli.commands.evals import evals_cmd
 from invana.cli.commands.govern import govern_cmd
 from invana.cli.commands.init import init_cmd
+from invana.cli.commands.llms import llms_cmd
 from invana.cli.commands.loader import loader_cmd
+from invana.cli.commands.members import members_cmd
 from invana.cli.commands.migrate import migrate_cmd
 from invana.cli.commands.models import models_cmd
+from invana.cli.commands.notifications import notifications_cmd
+from invana.cli.commands.plans import plans_cmd
+from invana.cli.commands.plugins import plugins_cmd, tasks_cmd
+from invana.cli.commands.projects import (
+    branches_cmd,
+    findings_cmd,
+    projects_cmd,
+    proposals_cmd,
+    reports_cmd,
+)
 from invana.cli.commands.records import records_cmd
+from invana.cli.commands.rules import rules_cmd
+from invana.cli.commands.schedules import schedules_cmd
+from invana.cli.commands.search import search_cmd
+from invana.cli.commands.simulate import simulate_cmd, simulations_cmd
+from invana.cli.commands.skills import skills_cmd
+from invana.cli.commands.standards import standards_cmd
 from invana.cli.commands.start import start_cmd
 from invana.cli.commands.stitches import stitches_cmd
 from invana.cli.commands.users import users_cmd
+from invana.cli.commands.worker import worker_cmd
 from invana.core.logging import set_level
 from invana.core.settings import settings
 from invana.core.telemetry.spans import mark_error, root_span
@@ -199,5 +222,28 @@ app.add_command(init_cmd)
 app.add_command(users_cmd)
 app.add_command(models_cmd)
 app.add_command(records_cmd)
+app.add_command(datasets_cmd)
+app.add_command(standards_cmd)
+app.add_command(rules_cmd)
+app.add_command(members_cmd)
+app.add_command(schedules_cmd)
+app.add_command(approvals_cmd)
+app.add_command(notifications_cmd)
+app.add_command(projects_cmd)
+app.add_command(branches_cmd)
+app.add_command(findings_cmd)
+app.add_command(proposals_cmd)
+app.add_command(reports_cmd)
+app.add_command(simulate_cmd)
+app.add_command(simulations_cmd)
+app.add_command(search_cmd)
 app.add_command(stitches_cmd)
 app.add_command(govern_cmd)
+app.add_command(skills_cmd)
+app.add_command(agents_cmd)
+app.add_command(evals_cmd)
+app.add_command(llms_cmd)
+app.add_command(plans_cmd)
+app.add_command(plugins_cmd)
+app.add_command(tasks_cmd)
+app.add_command(worker_cmd)

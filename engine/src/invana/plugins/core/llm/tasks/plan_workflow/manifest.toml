@@ -1,0 +1,14 @@
+key = "plan_workflow"
+version = "1.0.0"
+summary = "Serve the intent: match a reusable plan, or compose one."
+bound = "llm"
+side_effect = "read"
+requires = []
+resources = ["llm"]
+
+[args]
+
+[outputs]
+source = "str"
+steps = "list"
+rationale = "str"

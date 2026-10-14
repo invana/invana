@@ -16,6 +16,7 @@ from invana.apps.skills.schemas import SkillCreate, SkillVersionPublish
 from invana.core.auth.models import User
 from invana.runtime.managers import SkillDraftManager, SkillUsageManager
 from invana.runtime.models import TaskRun
+from tests.skills.drawn import publish_drawn
 
 skills = SkillManager()
 drafts = SkillDraftManager()
@@ -81,7 +82,7 @@ async def test_publishing_starts_a_fresh_count_and_leaves_the_old_one_standing(
     root = await _root(session, graph)
     await _step(session, graph, root, offered=[v1], applied=[v1])
 
-    await drafts.publish(session, skill=skill, payload=SkillVersionPublish(content="better"), actor_id=user.id)
+    await publish_drawn(session, skill=skill, payload=SkillVersionPublish(content="better"), actor_id=user.id)
     v2 = skill.current_version_id
     await _step(session, graph, root, offered=[v2], applied=[])
 

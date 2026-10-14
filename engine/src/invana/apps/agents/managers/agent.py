@@ -23,7 +23,7 @@ from invana.apps.agents.schemas import (
     AgentRead,
     AgentUpdate,
 )
-from invana.apps.govern.managers import LensManager
+from invana.apps.govern.managers import LensManager, LLMEndpointManager
 from invana.apps.govern.models import Lens, LensKind
 from invana.apps.graphs.models import Graph
 from invana.apps.llm.voice import check_traits
@@ -34,6 +34,7 @@ from invana.core.auth.models import User
 from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
+from invana.core.events.querysets import EventQuerySet
 from invana.core.events.services import diff_changed_fields, emit_event
 
 """Service layer for agents — the agents, the lifecycle, and lineage."""
@@ -50,6 +51,7 @@ _UPDATABLE = [
     "policy",
     "soul",
     "soul_traits",
+    "model_pin",
 ]
 #: The fields that are the agent's voice. A change to one is `agent.soul_set`
 #: rather than `agent.update`, because it changes how the agent speaks and
@@ -91,6 +93,7 @@ def agent_actor(agent: Agent) -> dict:
 
 class AgentManager:
     agents_qs = AgentQuerySet()
+    events_qs = EventQuerySet()
     tasks_qs = TaskQuerySet()
     # Binding is Skills' rule, called from here rather than reimplemented: this
     # package writes no `skill_bindings` row of its own (BN6).
@@ -99,6 +102,7 @@ class AgentManager:
     # An agent's own narrowing is a guardrail scoped to it (AG10 · AG26), and
     # guardrails are Govern's rows.
     lenses = LensManager()
+    endpoints = LLMEndpointManager()
 
     async def reads(self, session: AsyncSession, items: list[Agent]) -> list[AgentRead]:
         """Agents as the API answers them, each with its own guardrail named.
@@ -281,7 +285,22 @@ class AgentManager:
         )
         return agent
 
-    async def update_agent(self, session: AsyncSession, *, agent: Agent, payload: AgentUpdate, actor: User) -> Agent:
+    async def update_agent(
+        self,
+        session: AsyncSession,
+        *,
+        agent: Agent,
+        payload: AgentUpdate,
+        actor: User,
+        restored_from: int | None = None,
+        evaluated: dict | None = None,
+    ) -> Agent:
+        """Apply an edit, bump the version once, and record before and after.
+
+        ``restored_from`` is set by a rollback: the agent version whose
+        instructions this edit restores, carried on the ``agent.update``.
+        ``evaluated`` is the eval gate's verdict the edit passed, carried beside it.
+        """
         if agent.kind == AgentKind.seeded.value and payload.name is not None and payload.name != agent.name:
             # Seeded agents are addressed by key elsewhere; renaming one silently
             # breaks nothing, but it does make the trace harder to read across
@@ -293,11 +312,20 @@ class AgentManager:
             payload.soul_traits = check_traits(payload.soul_traits)
         if payload.effort is not None:
             payload.effort = check_effort(payload.effort)
+        # A pin is cleared by sending null, so it is read by set-ness; an empty
+        # string reads as null too.
+        repin = "model_pin" in payload.model_fields_set
+        pin = payload.model_pin or None
+        if repin and pin is not None:
+            pin = await self.endpoints.check_pin(session, graph_id=agent.graph_id, address=pin)
 
         before = {f: copy.deepcopy(getattr(agent, f)) for f in _UPDATABLE}
         for field in _UPDATABLE:
             value = getattr(payload, field)
-            if value is not None:
+            if field == "model_pin":
+                if repin:
+                    agent.model_pin = pin
+            elif value is not None:
                 setattr(agent, field, value)
         after = {f: getattr(agent, f) for f in _UPDATABLE}
         changed = diff_changed_fields(before, after, fields=_UPDATABLE)
@@ -322,7 +350,17 @@ class AgentManager:
                     target_id=agent.id,
                     graph_id=agent.graph_id,
                     actor_id=actor.id,
-                    details={"name": agent.name, "changed": rest, "version": agent.version},
+                    details={
+                        "name": agent.name,
+                        "changed": rest,
+                        "version": agent.version,
+                        # Before and after — the agent keeps no version rows,
+                        # so this is the only place an earlier version survives.
+                        "diff": {f: changed[f] for f in rest},
+                        "why": payload.why,
+                        **({"restored_from": restored_from} if restored_from is not None else {}),
+                        **({"eval": evaluated} if evaluated is not None else {}),
+                    },
                 )
             if voice:
                 await emit_event(
@@ -332,18 +370,125 @@ class AgentManager:
                     target_id=agent.id,
                     graph_id=agent.graph_id,
                     actor_id=actor.id,
-                    # The dials are small and closed, so they ride in full; the
-                    # soul is a document, so the event says its size and the
-                    # agent version holds the text.
+                    # The dials ride in full beside the soul's size; ``diff``
+                    # holds the before and after, text included, because the
+                    # agent keeps no version rows to hold it instead.
                     details={
                         "name": agent.name,
                         "changed": voice,
                         "version": agent.version,
                         "soul_traits": agent.soul_traits,
                         "soul_chars": len(agent.soul or ""),
+                        "diff": {f: changed[f] for f in voice},
+                        "why": payload.why,
                     },
                 )
         return agent
+
+    # ── instructions: draft, publish, roll back ──────────────────────────────
+
+    async def write_draft(self, session: AsyncSession, *, agent: Agent, instructions: str) -> Agent:
+        """Write the agent's unpublished instructions. Nothing runs on them yet."""
+        agent.instructions_draft = instructions
+        await session.flush()
+        return agent
+
+    async def discard_draft(self, session: AsyncSession, *, agent: Agent) -> Agent:
+        agent.instructions_draft = None
+        await session.flush()
+        return agent
+
+    async def publish_instructions(
+        self,
+        session: AsyncSession,
+        *,
+        agent: Agent,
+        actor: User,
+        why: str | None = None,
+        evaluated: dict | None = None,
+    ) -> Agent:
+        """Move the draft into ``instructions`` — an ordinary ``agent.update``.
+
+        A draft that says what the instructions already say closes without a
+        new version: nothing a run reads has changed. Refused when no draft is
+        open, because there is nothing to publish.
+        """
+        draft = agent.instructions_draft
+        if draft is None:
+            raise ConflictError(f"'{agent.name}' has no draft of its instructions to publish.")
+        agent.instructions_draft = None
+        return await self.update_agent(
+            session, agent=agent, payload=AgentUpdate(instructions=draft, why=why), actor=actor, evaluated=evaluated
+        )
+
+    async def rollback_instructions(
+        self,
+        session: AsyncSession,
+        *,
+        agent: Agent,
+        version: int,
+        actor: User,
+        why: str | None = None,
+        evaluated: dict | None = None,
+    ) -> Agent:
+        """Restore the instructions as they were at an earlier agent version.
+
+        An agent keeps no version rows, so the text is read back from the
+        ``diff`` its update events carry: the ``after`` of the last change at
+        or before ``version``, else the ``before`` of the first change after
+        it, else today's text. The restore is a new version, never a rewrite.
+
+        Refused while a draft is open (the draft is a person's unpublished
+        work), when that text is already current, and when the change holding
+        it was written before events recorded before and after. A version the
+        agent never had reads as absent.
+        """
+        if agent.instructions_draft is not None:
+            raise ConflictError(
+                f"'{agent.name}' has a draft of its instructions — publish or discard it before rolling back."
+            )
+        if version >= agent.version:
+            raise NotFoundError(f"Version {version} of '{agent.name}' is not an earlier version.")
+        text = await self.instructions_at(session, agent=agent, version=version)
+        if text == agent.instructions:
+            raise ConflictError(f"The instructions of '{agent.name}' at v{version} are already current.")
+        return await self.update_agent(
+            session,
+            agent=agent,
+            payload=AgentUpdate(instructions=text, why=why),
+            actor=actor,
+            restored_from=version,
+            evaluated=evaluated,
+        )
+
+    async def instructions_at(self, session: AsyncSession, *, agent: Agent, version: int) -> str:
+        """The agent's instructions as they read at ``version``, folded from its update events."""
+        events = await self.events_qs.for_targets(
+            session,
+            graph_id=agent.graph_id,
+            target_kind=actions.TARGET_AGENT,
+            target_ids=[agent.id],
+            actions=frozenset({actions.AGENT_UPDATE}),
+        )
+        changes = [
+            (int((e.details or {}).get("version") or 0), e.details or {})
+            for e in events
+            if "instructions" in ((e.details or {}).get("changed") or [])
+        ]
+        at_or_before = [(v, d) for v, d in changes if v <= version]
+        if at_or_before:
+            recorded, side = at_or_before[-1][1], "after"
+        elif changes:
+            recorded, side = changes[0][1], "before"
+        else:
+            return agent.instructions
+        value = ((recorded.get("diff") or {}).get("instructions") or {}).get(side)
+        if value is None:
+            raise ConflictError(
+                f"The instructions of '{agent.name}' at v{version} were changed before edits were recorded, "
+                "so they cannot be restored."
+            )
+        return value
 
     async def set_status(self, session: AsyncSession, *, agent: Agent, status: AgentStatus, actor: User) -> Agent:
         """Pause / resume. Retiring goes through :func:`retire_agent`."""

@@ -26,7 +26,7 @@ selection already in hand. Not a page you navigate to and re-explain yourself on
 | C7 | Closing does not cancel | A run continues and can be watched from the thread |
 | C8 | **The session remembers its world** | The world chip in the composer, beside the ask kind, reads the open session's world; picking one sets it for every ask in the thread, or for the next ask only ([AS5](../spec.md#7b-a-session-executes-through-plans-always)) |
 | C9 | **Each turn says what it ran in** | A turn shows the world it was frozen with, so a thread that moved between worlds reads honestly |
-| C10 | **A spend per run for the thread** | In the session's settings, opened from the thread header; capped by the agent's own `max_cost_usd_run` |
+| C10 | **A token budget per run for the thread** | In the session's settings, opened from the thread header; capped by the agent's own `max_tokens_run` |
 
 ## Journey
 
@@ -84,23 +84,30 @@ flowchart TD
 | The agent's guardrail forbids what the world casts | Refused before the run opens, naming the guardrail and that it is the agent's ([AG6](../../agents/features/author-an-agent.md#decisions)) |
 | The session's world is deleted | The chip reads *Everything* and says the world is gone; earlier turns keep the name they ran in |
 | Spend per run above the agent's | Clamped to the agent's, and the settings say so |
+| Nothing asked yet | The Graph's page holds one question box in the middle, with the recent conversations under it; the right side stays closed |
+| Closed mid-conversation | The canvas takes the width; a pill over it names the conversation and reopens it |
+| A query fails | The reply says why; the console opens on Log with the failing line; the board is untouched |
 
 ## Surfaces
 
 | Surface | Shape |
 |---|---|
-| Region | `rightSection` with `?right=assistant`; the page stays visible and usable beside it |
+| Region | `rightSection` with `?right=assistant`; the page stays visible and usable beside it. `ASSISTANT_SECTION`: opens at 440px, no narrower than 320px (AD26) |
 | Header | `Ask Assistant` on the list; `Ask Assistant › <session title>` inside a thread, the first crumb being the way back (AD14) |
 | Attachment chip | What is attached, with a remove — **in the composer**, directly above the input (AD10) |
 | Thread | Question · steps · emissions, exactly as the main ask surface; each turn carries a small world tag |
 | World picker | In the composer, between the ask kind and the agent ([WO5](../../govern/features/worlds.md#decisions)) — an inline **`RichSelect`** like every other composer control ([AD18](#decisions)). Opens upward: *Ask in* · Everything and each world with its description, a stale one disabled with its reason · ☐ *Next ask only* · *Manage worlds…* |
 | Session settings | A popover from the thread header's settings button: the spend per run, with the agent's cap beside it | `Popover` · `Field` |
+| Centred start | `AssistantStart` on the Graph's page while the right side does not hold the assistant: the kit's `EmptyState` (the question as its title; the Graph's description · `<n> models` · `live on <database>` as its description), the composer with the world picker and the Graph's default agent, `RecentSessions` |
+| Failed query | The kit's `DiagnosisCard`: the error's first line, clamped to two; the engine's next steps; **Open the log**, which opens the console on Log where the whole error is |
+| Reopen | The header's `Assistant` button, and `AssistantReopenPill` over the canvas while a conversation is open and the assistant is not |
+| Ask kind | One inline `RichSelect`, `Ask mode`: Ask · Cypher · Gremlin — the languages the connector speaks |
 
 ## Engine
 
 | Thing | Shape |
 |---|---|
-| Sessions | one per subject; it resumes rather than starting fresh · `lens_id?` and `max_cost_usd_run?` are its defaults ([AS5](../spec.md#7b-a-session-executes-through-plans-always)) |
+| Sessions | one per subject; it resumes rather than starting fresh · `lens_id?` and `max_tokens_run?` are its defaults ([AS5](../spec.md#7b-a-session-executes-through-plans-always)) |
 | Attachment | the selection passed as context on the todo |
 | Routes | the ordinary ask routes; the assistant is a surface, not an API |
 
@@ -128,7 +135,12 @@ flowchart TD
 | AD18 | **Every composer control is one component: `RichSelect`, inline.** Ask kind, query language, world and timeout share one trigger and one menu — a radio group of items with an optional description and disabled reason, then optional checkbox and action items. It is the kit's `RichSelect` with `appearance="inline"` — already a `DropdownMenu`, extended with toggles and actions rather than duplicated — not `Select`, because the world menu carries a checkbox and an action, which a form control cannot hold. A number input belongs in no dropdown, so the spend per run lives in the session's settings. |
 | AD19 | **An ask that omits `lens_id` runs in the session's world; one that sends `null` runs in *Everything* for that ask only.** Set-ness, not None-ness, on `SendMessage` and on `PATCH …/sessions/{id}` alike: null is a world somebody chose, and *Next ask only* has to be able to choose it. |
 | AD20 | **`sessions.lens_id` has no foreign key.** A deleted world leaves its id behind, so the summary answers `lens_missing` and the chip says the world is gone, while the next ask runs in *Everything*. A `SET NULL` would make *deleted* and *never picked* look alike. A turn's world name is read from its run's frozen contributors, so it survives the delete too. |
-| AD21 | **The spend per run is clamped on write and frozen on the run.** `PATCH` stores `min(asked, agent's max_cost_usd_run)`; `open_turn` freezes the same `min` into `task_runs.params.max_cost_usd_run`. The summary carries `agent_max_cost_usd_run` so the settings popover can say the value was clamped. |
+| AD22 | **It starts centred.** With the right side not holding the assistant, the Graph's page is one question box, the recent conversations under it. Sending from it opens `?right=assistant` and the session's canvas, so the conversation moves right and the board keeps the drawing. Docked, the page goes back to the Graph's identity card — one composer on screen, never two. The start's composer is the docked one's: it names the Graph's default agent, which answers a new session, and carries the world picker. Its subtitle is in product words — never a connector class. |
+| AD23 | **Closing is reversible from two places.** The header's `Assistant` button toggles `?right=assistant`; while a conversation is open and the assistant is not, a pill over the canvas — `Assistant · <session title>` — reopens it on that thread. |
+| AD24 | **The ask kind is one switch: Ask · Cypher · Gremlin.** A language is a kind of ask, not a second control under a *Query language* kind. Only the languages the connector speaks are offered. In a query, `⌘↵` runs and `↵` is a newline, because a query is multi-line text; in Ask, `↵` sends. The keys are named in the chat's status bar, which follows the ask kind, not in the composer's toolbar, which a docked chat has no width for. The query and its outcome are turns in the thread, like any ask. |
+| AD25 | **A failed query opens the console on Log.** The reply says why; the console shows the failing step and its error, so the line is read where the rows would have been. Only a failure that lands while the page is open does this — reopening an old thread never moves the console. A first query that fails from the centred start still docks the chat: `?right=` and `?console=` write through one writer that builds on the newest query string, so neither drops the other. The reply's card states the error's first line and offers **Open the log**; the whole error is the Log's. |
+| AD26 | **The docked assistant opens at 440px.** It reads queries, replies and error cards; at the shared 280px side width a query wraps word by word. Its occupant carries its own size; the inspector and left panels keep the shared width. |
+| AD21 | **The tokens per run are clamped on write and frozen on the run.** `PATCH` stores `min(asked, agent's max_tokens_run)`; `open_turn` freezes the same `min` into `task_runs.params.max_tokens_run`. The summary carries `agent_max_tokens_run` so the settings popover can say the value was clamped. `max_cost_usd_run` is still accepted and answered for one release and bounds nothing ([EB8](../../agents/features/envelope-and-budget.md#decisions)). |
 
 ## Not building
 
@@ -151,7 +163,7 @@ now reads *assistant decision*.
 
 | | |
 |---|---|
-| Studio | `src/pages/graphs-detail/features/ask/assistant/` — `AssistantViewPanel` and its `Session*` parts |
+| Studio | `studio/packages/assistant/src/` (`@invana-studio/assistant`) — `AssistantViewPanel` and its `Session*` parts, `AssistantStart`, `AssistantReopenPill`, and the console |
 | The region | `src/pages/graphs-detail/shared/useRightSection.ts` — who holds `rightSection`, which is the region's question, not the assistant's |
 | Siblings | `features/ask/answer-surface/` (what a reply renders) and `features/ask/projections/` (the Templates panel). One module, one sub-folder per feature |
 | Not | `features/explore/` — it was there, and that was the filing mistake AD12 names |

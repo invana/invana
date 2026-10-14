@@ -16,6 +16,8 @@ class TaskCreate(BaseModel):
     body: str = Field(default="")
     acceptance: str = Field(default="")
     project_key: str | None = None
+    # A branch of that project, by number.
+    branch: int | None = Field(default=None, ge=1)
     parent_id: str | None = None
     assignee_kind: str | None = Field(default=None, pattern=r"^(user|agent)$")
     assignee_id: str | None = None
@@ -59,6 +61,7 @@ class TaskRead(BaseModel):
     graph_id: str
     project_id: str | None
     parent_id: str | None
+    branch_id: str | None = None
     title: str
     body: str
     acceptance: str
@@ -109,10 +112,8 @@ class ActivityNode(BaseModel):
     status: str | None = None
     skills_offered: list[str] = []
     skills_applied: list[str] = []
-    #: The same pair again, for rules: offered is a fact written by assembly,
-    #: cited is the model's own claim (RU7). Each is the statement the step was
-    #: given — a citation must still read after the rule is reworded or
-    #: deactivated — beside the rule its statement belongs to (RU12).
+    #: Rules offered by assembly and cited by the model, each as the statement
+    #: the step was given, so a citation still reads after a rewording.
     rules_offered: list[OfferedRule] = []
     rules_cited: list[OfferedRule] = []
     tokens_in: int | None = None
@@ -138,12 +139,31 @@ class ProjectCreate(BaseModel):
     # slug to write down a piece of work.
     key: str | None = Field(default=None, min_length=1, max_length=64, pattern=r"^[a-z0-9][a-z0-9-]*$")
     description: str = Field(default="")
+    type: str = Field(default="general", max_length=16)
+    question: str = Field(default="")
+    visibility: str = Field(default="graph", pattern=r"^(graph|private)$")
+    # The first branch; the question, or the name, when omitted.
+    first_branch: str | None = Field(default=None, max_length=500)
 
 
 class ProjectUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=255)
     description: str | None = None
     status: str | None = Field(default=None, pattern=r"^(active|archived)$")
+    # Relabels only — nothing stored changes with it.
+    type: str | None = Field(default=None, max_length=16)
+    question: str | None = None
+    visibility: str | None = Field(default=None, pattern=r"^(graph|private)$")
+
+
+class ProjectWords(BaseModel):
+    """The type's words for a branch, evidence, verdicts and decisions."""
+
+    branch: str
+    evidence: str
+    verdicts: dict[str, str]
+    choices: dict[str, str]
+    opens_first: list[str]
 
 
 class ProjectRead(BaseModel):
@@ -155,6 +175,10 @@ class ProjectRead(BaseModel):
     name: str
     description: str
     status: str
+    type: str = "general"
+    question: str = ""
+    visibility: str = "graph"
+    words: ProjectWords | None = None
     created_by_kind: str
     created_by_id: str | None
     # Who wrote it, resolved for display — the detail's heading says a name, never
@@ -223,3 +247,307 @@ class ProjectPlanResponse(BaseModel):
     tasks: list[PlanTaskRead]
     edges: list[PlanEdge]
     critical_path: list[str]
+
+
+# ── Project records ──────────────────────────────────────────────────────────
+
+
+class Cite(BaseModel):
+    """What a finding rests on: a graph record, a dataset version or a run."""
+
+    kind: str = Field(..., pattern=r"^(record|dataset|run)$")
+    # record: the element id · dataset: publisher/name@v · run: the run id.
+    ref: str = Field(..., min_length=1, max_length=300)
+    version_id: str | None = None
+
+
+class BranchFork(BaseModel):
+    """One child per title."""
+
+    titles: list[str] = Field(..., min_length=1)
+
+
+class BranchRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    project_id: str
+    number: int
+    parent_number: int | None = None
+    title: str
+    body: str
+    status: str
+    merged_into_number: int | None = None
+    created_by_kind: str
+    created_by_id: str | None
+    created_at: datetime
+    # The balance the branch header shows.
+    supports: int = 0
+    contradicts: int = 0
+    context: int = 0
+    current_decision: int | None = None
+
+
+class BranchListResponse(BaseModel):
+    items: list[BranchRead]
+    total: int
+
+
+class FindingCreate(BaseModel):
+    statement: str = Field(..., min_length=1)
+    stance: str = Field(..., pattern=r"^(supports|contradicts|context)$")
+    cites: list[Cite] = []
+    # An agent of the Graph the finding is attributed to; it waits for a person's review.
+    agent_id: str | None = None
+
+
+class FindingRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    project_id: str
+    number: int
+    branch_number: int | None = None
+    statement: str
+    stance: str
+    cites: list[Cite]
+    added_by_kind: str
+    added_by_id: str | None
+    reviewed_by_id: str | None
+    reviewed_at: datetime | None
+    created_at: datetime
+    # How it reached the branch being read: own · fork · merge.
+    via: str | None = None
+
+
+class FindingListResponse(BaseModel):
+    items: list[FindingRead]
+    total: int
+
+
+class DecisionCreate(BaseModel):
+    verdict: str = Field(..., pattern=r"^(supported|refuted|inconclusive)$")
+    choice: str = Field(..., pattern=r"^(pursue|park|drop|merge)$")
+    rationale: str = Field(..., min_length=1)
+    # Finding numbers; every finding on the branch when omitted.
+    cites: list[int] | None = None
+    # The contradicting finding numbers the verdict answers.
+    addresses: list[int] = []
+    supersedes: int | None = Field(default=None, ge=1)
+    # merge only: the branch to carry into, and the finding numbers to carry.
+    into: int | None = Field(default=None, ge=1)
+    carry: list[int] | None = None
+
+
+class DecisionCheck(BaseModel):
+    rule_id: str
+    version: int
+    statement: str
+    mode: str
+    passed: bool
+    reason: str | None = None
+
+
+class DecisionRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    project_id: str
+    project_key: str | None = None
+    number: int
+    branch_number: int | None = None
+    verdict: str
+    choice: str
+    # The type's words for the two.
+    verdict_label: str | None = None
+    choice_label: str | None = None
+    rationale: str
+    cites: list[int] = []
+    addresses: list[int] = []
+    into_number: int | None = None
+    supersedes_number: int | None = None
+    superseded_by_number: int | None = None
+    checks: list[DecisionCheck] = []
+    warnings: list[str] = []
+    decided_by_id: str | None
+    created_at: datetime
+
+
+class DecisionListResponse(BaseModel):
+    items: list[DecisionRead]
+    total: int
+
+
+class ProposalCreate(BaseModel):
+    agent_id: str
+    kind: str = Field(..., pattern=r"^(fork|decision)$")
+    rationale: str = Field(..., min_length=1)
+    # fork: the child titles.
+    titles: list[str] | None = None
+    # decision: what the agent suggests a person record.
+    decision: DecisionCreate | None = None
+
+
+class ProposalResolve(BaseModel):
+    note: str = ""
+
+
+class ProposalRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    project_id: str
+    number: int
+    branch_number: int | None = None
+    kind: str
+    payload: dict[str, Any]
+    rationale: str
+    status: str
+    agent_id: str | None
+    submitted_by_id: str | None
+    resolved_by_id: str | None
+    resolved_at: datetime | None
+    note: str
+    result: dict[str, Any] | None
+    created_at: datetime
+
+
+class ProposalListResponse(BaseModel):
+    items: list[ProposalRead]
+    total: int
+
+
+class BranchDetail(BaseModel):
+    """The branch page in one call."""
+
+    branch: BranchRead
+    findings: list[FindingRead]
+    decisions: list[DecisionRead]
+    proposals: list[ProposalRead]
+    children: list[int]
+
+
+class ReportDraftUpdate(BaseModel):
+    draft: str
+
+
+class ReportCite(BaseModel):
+    ref: str
+    version_id: str
+
+
+class ReportVersionRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    version: int
+    body: str
+    cites: list[ReportCite]
+    published_by_id: str | None
+    published_at: datetime
+    # Cited dataset versions retracted since — read, never stored.
+    retracted: list[str] = []
+
+
+class ReportVersionSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    version: int
+    published_by_id: str | None
+    published_at: datetime
+
+
+class ReportRead(BaseModel):
+    project_key: str
+    draft: str
+    draft_updated_by_id: str | None = None
+    draft_updated_at: datetime | None = None
+    versions: list[ReportVersionSummary] = []
+
+
+# ── Simulation (docs/for-developers/modules/work/features/simulation.md) ─────
+
+
+class SpecFieldRead(BaseModel):
+    """One field a simulator's spec takes."""
+
+    name: str
+    type: str
+    required: bool
+    default: Any = None
+    label: str
+
+
+class SimulatorRead(BaseModel):
+    """One installed simulator."""
+
+    key: str
+    version: str
+    plugin: str
+    plugin_version: str
+    #: The plugin's short name — what `invana simulate --plugin` takes.
+    handle: str
+    title: str
+    summary: str
+    spec: list[SpecFieldRead]
+
+
+class SimulatorListResponse(BaseModel):
+    items: list[SimulatorRead]
+    total: int
+
+
+class SimulationCreate(BaseModel):
+    #: A simulator key, `key@version`, or its plugin's short name.
+    simulator: str = Field(..., min_length=1, max_length=96)
+    spec: dict[str, Any] = Field(default_factory=dict)
+    #: `publisher/name@v` of each dataset version it reads.
+    inputs: list[str] = Field(default_factory=list, max_length=20)
+    seed: int | None = Field(default=None, ge=0, le=2**53)
+
+
+class SimulationInput(BaseModel):
+    """One pinned input."""
+
+    ref: str
+    dataset_id: str
+    version_id: str
+    content_hash: str
+
+
+class SimulatorRef(BaseModel):
+    key: str
+    version: str
+    plugin: str
+    plugin_version: str
+    title: str
+
+
+class SimulationResult(BaseModel):
+    ranked: list[dict[str, Any]]
+    summary: dict[str, Any]
+
+
+class SimulationRead(BaseModel):
+    number: int
+    branch: int
+    simulator: SimulatorRef
+    spec: dict[str, Any]
+    seed: int
+    inputs: list[SimulationInput]
+    #: A simulation is a prediction, never an observation.
+    origin: str = "derived"
+    run_id: str | None
+    status: str | None
+    outcome: str | None = None
+    error: str | None = None
+    result: SimulationResult | None = None
+    tokens: int = 0
+    created_by_id: str | None
+    created_at: datetime
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+
+
+class SimulationListResponse(BaseModel):
+    items: list[SimulationRead]
+    total: int

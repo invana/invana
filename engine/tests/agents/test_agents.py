@@ -63,34 +63,37 @@ async def test_an_agent_reads_back_its_own_guardrail_and_no_world(session: Async
     assert "lens_id" not in AgentRead.model_fields
 
 
-async def test_spend_this_month_is_a_grouped_read_and_absence_is_not_zero(
-    session: AsyncSession, graph: Graph, user: User
-):
-    """C10 — the meter is a windowed `SUM(cost_usd)` per agent, and an agent
-    whose runs cost nothing *knowable* is absent rather than zero (OB4)."""
+async def test_tokens_this_month_sum_each_root_and_its_steps(session: AsyncSession, graph: Graph, user: User):
+    """EB15 — the meter is a windowed sum of tokens per agent, over its roots
+    and their steps; last month's runs and eval runs are left out."""
     manager = AgentManager()
-    priced = await manager.create_agent(session, graph=graph, payload=AgentCreate(name="Analyst"), actor=user)
-    unpriced = await manager.create_agent(session, graph=graph, payload=AgentCreate(name="Subscriber"), actor=user)
+    busy = await manager.create_agent(session, graph=graph, payload=AgentCreate(name="Analyst"), actor=user)
+    idle = await manager.create_agent(session, graph=graph, payload=AgentCreate(name="Idle"), actor=user)
 
     now = datetime.now(UTC)
+    root = TaskRun(graph_id=graph.id, agent_id=busy.id, started_at=now, tokens_in=100, tokens_out=20)
+    session.add(root)
+    await session.flush()
     session.add_all(
         [
-            TaskRun(graph_id=graph.id, agent_id=priced.id, started_at=now, cost_usd=1.25),
-            TaskRun(graph_id=graph.id, agent_id=priced.id, started_at=now, cost_usd=0.59),
+            # A step carries no agent of its own; it counts through its root.
+            TaskRun(graph_id=graph.id, parent_run_id=root.id, tokens_in=1_000, tokens_out=200),
             # Last month's run, outside the window.
             TaskRun(
                 graph_id=graph.id,
-                agent_id=priced.id,
+                agent_id=busy.id,
                 started_at=now.replace(day=1) - timedelta(days=2),
-                cost_usd=40.0,
+                tokens_in=9_999,
             ),
-            # A subscription call: nothing is known, so nothing is summed.
-            TaskRun(graph_id=graph.id, agent_id=unpriced.id, started_at=now, cost_usd=None),
+            # An eval replay draws on the Graph's eval budget, not the agent's.
+            TaskRun(graph_id=graph.id, agent_id=busy.id, started_at=now, role="evaluate", tokens_in=7_777),
         ]
     )
     await session.flush()
 
-    spend = await AgentLifecycleManager().spend_this_month(session, graph_id=graph.id)
+    lifecycle = AgentLifecycleManager()
+    used = await lifecycle.tokens_this_month(session, graph_id=graph.id)
 
-    assert spend[priced.id] == pytest.approx(1.84)
-    assert unpriced.id not in spend
+    assert used[busy.id] == 1_320
+    assert idle.id not in used
+    assert (await lifecycle.meters(session, agent=idle)).tokens_this_month == 0

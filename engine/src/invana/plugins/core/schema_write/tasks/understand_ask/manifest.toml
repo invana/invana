@@ -1,0 +1,13 @@
+key = "understand_ask"
+version = "1.0.0"
+summary = "Resolve the modeller draft and the turns to replay."
+bound = "schema_write"
+side_effect = "write"
+requires = []
+resources = ["cpu"]
+
+[args]
+
+[outputs]
+model_id = "str"
+draft_version_id = "str"

@@ -229,16 +229,41 @@ def accepts_reason(template: ProjectionTemplate, shape: Shape) -> str | None:
     return None
 
 
+# The surface each asked-for visual names (``invana.apps.llm.intent.PREFERS``).
+_PREFER_SURFACES: dict[str, tuple[str, ...]] = {
+    "graph": ("subgraph",),
+    "table": ("table",),
+    "chart": ("chart",),
+}
+
+# The surfaces an intent kind leans toward, best first. A kind not listed
+# leans nowhere, and the shape alone decides.
+_KIND_SURFACES: dict[str, tuple[str, ...]] = {
+    "aggregate_and_chart": ("chart", "metric"),
+    "exploration": ("subgraph",),
+}
+
+
 def select_template(
     templates: list[ProjectionTemplate],
     shape: Shape,
     *,
-    intent: str = "",
+    kind: str = "",
+    prefer: str = "",
 ) -> tuple[ProjectionTemplate | None, list[dict[str, Any]]]:
     """Pick the template for *shape*, and say what every other one would have done.
 
     Returns the choice and the full offer list — each entry carrying whether it
     can render and, when it cannot, the reason. The picker shows all of them.
+
+    *kind* and *prefer* are the classified intent (``Intent.kind`` and
+    ``Intent.prefer``), never the raw question. They only rank templates that
+    can already render the shape: asking for a chart over a one-cell result
+    still renders the metric, and the chart is offered disabled with its
+    reason. Ranking is ``prefer``, then ``kind``, then the most specific shape
+    match, then name — so ``single-value`` beats ``records-table`` on a
+    one-cell result rather than losing to it on name order. Called with
+    neither, the shape alone decides.
     """
     offers: list[dict[str, Any]] = []
     eligible: list[ProjectionTemplate] = []
@@ -260,12 +285,13 @@ def select_template(
     if not eligible:
         return None, offers
 
-    # Intent first — `project` selects a template the way `plan` selects a
-    # workflow. Then the most specific shape match, so `single-value` beats
-    # `records-table` on a one-cell result rather than losing to it on name order.
-    def rank(template: ProjectionTemplate) -> tuple[int, int, str]:
-        by_intent = 0 if intent and intent.lower() in (template.intent or "").lower() else 1
-        return (by_intent, -_specificity(template), template.name)
+    preferred = _PREFER_SURFACES.get(prefer, ())
+    leaning = _KIND_SURFACES.get(kind, ())
+
+    def rank(template: ProjectionTemplate) -> tuple[int, int, int, str]:
+        by_prefer = 0 if template.surface in preferred else 1
+        by_kind = leaning.index(template.surface) if template.surface in leaning else len(leaning)
+        return (by_prefer, by_kind, -_specificity(template), template.name)
 
     return sorted(eligible, key=rank)[0], offers
 

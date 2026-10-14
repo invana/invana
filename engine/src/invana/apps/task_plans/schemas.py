@@ -305,3 +305,5 @@ class PromoteRequest(BaseModel):
     key: str = Field(..., min_length=1, max_length=64, pattern=r"^[a-z0-9][a-z0-9-]*$")
     description: str = ""
     intents: list[str] = Field(default_factory=list)
+    #: Why — carried on the event that mints the version, never inferred.
+    why: str | None = Field(default=None, max_length=500)

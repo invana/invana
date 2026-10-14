@@ -21,7 +21,7 @@ import enum
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from invana.core.models import Base
@@ -127,8 +127,8 @@ class TaskRun(Base):
         # root of a run has no parent and no lane, so it is excluded rather
         # than squeezed into the same uniqueness.
         UniqueConstraint("parent_run_id", "task_id", "lane", "iteration", "attempt", name="uq_task_run_attempt"),
-        # *$1.84 of $40.00 this month* is a windowed ``SUM(cost_usd)`` per agent
-        # ([§ 5.1](docs/for-developers/building-engine/govern-and-agents-data-model.md)),
+        # *1.2M of 5M tokens this month* is a windowed ``SUM`` of tokens per agent
+        # ([EB15](docs/for-developers/modules/agents/features/envelope-and-budget.md)),
         # never a counter column — a counter can disagree with the runs it
         # counts. Without the second column the window is a scan of every run
         # the agent has ever done.
@@ -210,6 +210,12 @@ class TaskRun(Base):
     # ── who ran it ───────────────────────────────────────────────────────────
     agent_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
     agent_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: The provider's version name this run called; null when it called none.
+    model_version: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    #: The root run this one re-ran.
+    rerun_of_run_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("task_runs.id", ondelete="SET NULL"), nullable=True
+    )
     triggered_by: Mapped[str] = mapped_column(String(16), default=TriggeredBy.user.value, nullable=False)
     on_behalf_of_user_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
 
@@ -377,3 +383,178 @@ class ProjectionTemplate(Base):
     status: Mapped[str] = mapped_column(String(16), default="published", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
+
+
+# ---------------------------------------------------------------------------
+# Evals (docs/for-developers/modules/skills/features/evals.md)
+#
+# An eval run is a `TaskRun` with `role=evaluate`, its cases replayed as child
+# runs; these tables hold only what a run row cannot — the set, its cases, the
+# per-case verdicts and the Graph's eval budget.
+# ---------------------------------------------------------------------------
+
+
+class EvalSubject(enum.StrEnum):
+    skill = "skill"
+    agent = "agent"
+
+
+class EvalLabel(enum.StrEnum):
+    passing = "passing"
+    failing = "failing"
+
+
+class EvalCaseStatus(enum.StrEnum):
+    proposed = "proposed"
+    active = "active"
+    retired = "retired"
+
+
+class EvalSet(Base):
+    """The fixed questions one skill or one agent is replayed against.
+
+    One per subject. The judge pin and rubric are optional: a set with neither
+    is rule checks alone, which is the only part that can block a publish.
+    """
+
+    __tablename__ = "eval_sets"
+    __table_args__ = (UniqueConstraint("subject_kind", "subject_id", name="uq_eval_set_subject"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    graph_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("graphs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    #: `skill` · `agent`.
+    subject_kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    subject_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    #: The judge's model address; never the model under test.
+    judge_model_pin: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    rubric: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class EvalCase(Base):
+    """One fixed question and the checks a good answer passes."""
+
+    __tablename__ = "eval_cases"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    eval_set_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("eval_sets.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    #: `[{kind, value}]` — rule checks, counted from the run's own record.
+    checks: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    #: `passing` · `failing` — what a good answer does with this question.
+    label: Mapped[str] = mapped_column(String(16), default=EvalLabel.passing.value, nullable=False)
+    #: `proposed` waits for a person; only `active` replays.
+    status: Mapped[str] = mapped_column(String(16), default=EvalCaseStatus.active.value, nullable=False)
+    #: The real ask it was promoted from; kept when that run is gone.
+    source_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    created_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class EvalResult(Base):
+    """One case on one side of one eval run."""
+
+    __tablename__ = "eval_results"
+    __table_args__ = (UniqueConstraint("eval_run_id", "eval_case_id", "side", name="uq_eval_result_side"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    eval_run_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("task_runs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    eval_case_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("eval_cases.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    #: The replayed ask this verdict reads.
+    case_run_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("task_runs.id", ondelete="SET NULL"), nullable=True
+    )
+    #: `live` · `draft`.
+    side: Mapped[str] = mapped_column(String(8), nullable=False)
+    #: `{check kind: pass | fail}`.
+    hard: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    #: The judge's 0-5, labelled apart; null when no judge is set.
+    judged: Mapped[float | None] = mapped_column(Float, nullable=True)
+    tokens: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    latency_ms: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    #: sha256 of the answer as text — two sides differ when these do.
+    answer_digest: Mapped[str] = mapped_column(String(64), default="", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class EvalBudget(Base):
+    """A Graph's monthly eval tokens, apart from production."""
+
+    __tablename__ = "eval_budgets"
+
+    graph_id: Mapped[str] = mapped_column(String(36), ForeignKey("graphs.id", ondelete="CASCADE"), primary_key=True)
+    #: Null is no ceiling.
+    monthly_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+
+class PluginState(Base):
+    """Whether an install Admin has enabled a tool plugin
+    (docs/for-developers/modules/platform/features/tool-plugins.md).
+
+    No row is *disabled*: a tool plugin is off until someone switches it on.
+    Core and simulator plugins have no row — they are always on.
+    """
+
+    __tablename__ = "plugin_states"
+
+    #: The plugin's name, e.g. ``invana.tools.web``.
+    name: Mapped[str] = mapped_column(String(128), primary_key=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    #: The Admin who last switched it.
+    changed_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class EnvelopeOutcome(Base):
+    """What a worker made of one envelope — ``Out``, a failure or a signal, as tagged JSON.
+
+    Keyed by the envelope's idempotency key, so the API process finds the
+    outcome it is waiting on, and a redelivered envelope returns the recorded
+    outcome instead of running its task type twice.
+    """
+
+    __tablename__ = "envelope_outcomes"
+
+    #: ``run_id:node_id:attempt``.
+    idempotency_key: Mapped[str] = mapped_column(String(160), primary_key=True)
+    run_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    outcome: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+
+class McpServer(Base):
+    """An MCP server an install Admin added, with its tool list frozen as it was then
+    (docs/for-developers/modules/platform/features/mcp-plugins.md).
+
+    Each row is one plugin, ``invana.mcp.<name>``, loaded into every process's
+    registry at start-up. Whether it is enabled is its ``plugin_states`` row,
+    like a tool plugin. No token is stored: a bearer token is the environment's.
+    """
+
+    __tablename__ = "mcp_servers"
+
+    #: ``[a-z][a-z0-9_]{0,31}``; the plugin is ``invana.mcp.<name>``.
+    name: Mapped[str] = mapped_column(String(32), primary_key=True)
+    #: The Streamable HTTP endpoint.
+    url: Mapped[str] = mapped_column(String(2048), nullable=False)
+    #: 1 on add, +1 per refresh; the plugin version is ``<revision>.0.0``.
+    revision: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    #: ``[{name, version, title, description, input_schema, annotations}]`` as frozen.
+    tools: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    #: Tool names that could not be keyed.
+    skipped: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    #: ``{name, version, protocol}`` from ``initialize``.
+    server: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    frozen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    #: The Admin who added or last refreshed it.
+    added_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)

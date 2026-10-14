@@ -1,31 +1,40 @@
 """Plan library rules — seeding, exploding a spec into rows, and who carries each entry.
 
-The registry's templates still live in the repo as authored step lists; this is
-what turns one into **rows**, which is the form everything downstream reads.
+The packaged flows live in the plugins as authored step lists; this is what
+turns one into **rows**, which is the form everything downstream reads. The
+flows arrive as an argument, because plugins are band 3 and this module is
+band 2.
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.models import Agent
 from invana.apps.agents.querysets import AgentQuerySet
-from invana.apps.agents.registry import TEMPLATES
 from invana.apps.task_plans.dag import materialise
 from invana.apps.task_plans.models import PlanOrigin, Task, TaskForm, TaskPlan
 from invana.apps.task_plans.querysets import TaskPlanQuerySet
 
 
-def explode(plan_id: str, steps, *, requires: Mapping[str, tuple[str, ...]] | None = None) -> list[Task]:
+def explode(
+    plan_id: str,
+    steps,
+    *,
+    requires: Mapping[str, tuple[str, ...]] | None = None,
+    versions: Mapping[str, str] | None = None,
+) -> list[Task]:
     """An authored step list, as :class:`Task` rows with materialised ``depends_on``.
 
     The materialisation happens **here, once**, rather than on every read: an
     order derived at read time is an order nobody reviewed
     (:func:`invana.apps.task_plans.dag.materialise`).
 
-    ``requires`` is **passed in**, not read: the catalogue is band 3 and this
+    ``requires`` and ``versions`` (task type key → semver, recorded on each
+    callable row) are **passed in**, not read: the catalogue is band 3 and this
     module is band 2, so an import of it would be the wrong direction — the
     same reason ``dag_for`` took it as an argument before M2
     (migration-plan §4.1, enforced by ``import-linter``).
@@ -35,6 +44,7 @@ def explode(plan_id: str, steps, *, requires: Mapping[str, tuple[str, ...]] | No
             task_plan_id=plan_id,
             key=row["key"],
             step_key=row["step_key"] or None,
+            task_version=(versions or {}).get(row["step_key"]) if row["step_key"] else None,
             # Every seeded node names a catalogue entry. `composite` and
             # `human` arrive with authoring; a row without a step key would be
             # one of those, and there are none yet.
@@ -62,12 +72,20 @@ class TaskPlanManager:
         return await self.task_plans_qs.tasks_for(session, plan_id=plan_id)
 
     async def ensure_seeded(
-        self, session: AsyncSession, *, graph_id: str, requires: Mapping[str, tuple[str, ...]] | None = None
+        self,
+        session: AsyncSession,
+        *,
+        graph_id: str,
+        flows: Iterable[Any],
+        requires: Mapping[str, tuple[str, ...]] | None = None,
+        versions: Mapping[str, str] | None = None,
     ) -> None:
-        """Load the registry's templates into this graph's library, idempotently.
+        """Load the packaged flows into this graph's library, idempotently.
 
-        ``requires`` comes from the caller for the band reason in
-        :func:`explode` — the runtime knows the catalogue; an app may not.
+        ``flows`` (each with ``key · version · kind · description · intents ·
+        args_schema · steps``), ``requires`` and ``versions`` come from the caller for the
+        band reason in :func:`explode` — the runtime knows the plugins; an app
+        may not.
         """
         existing = await self.task_plans_qs.key_versions(session, graph_id=graph_id)
         # A plan **is** its rows, so "already seeded" has to mean *populated*,
@@ -76,10 +94,12 @@ class TaskPlanManager:
         # version and no nodes; matching on identity alone would skip it here
         # and the entry would stay empty for the life of the graph.
         empty = await self.task_plans_qs.plans_without_nodes(session, graph_id=graph_id)
-        for template in TEMPLATES.values():
+        for template in flows:
             if (template.key, template.version) in existing:
                 if (plan_id := empty.get((template.key, template.version))) is not None:
-                    await self.task_plans_qs.add_tasks(session, explode(plan_id, template.steps, requires=requires))
+                    await self.task_plans_qs.add_tasks(
+                        session, explode(plan_id, template.steps, requires=requires, versions=versions)
+                    )
                 continue
             plan = await self.task_plans_qs.add(
                 session,
@@ -90,7 +110,7 @@ class TaskPlanManager:
                     name=template.key,
                     description=template.description,
                     kind=template.kind,
-                    origin=PlanOrigin.builtin.value,
+                    origin=PlanOrigin.packaged.value,
                     intent=list(template.intents),
                     # What this plan offers a caller that inlines it. Seeded
                     # with the rows, because a row binding `${args.N}` and a
@@ -101,7 +121,9 @@ class TaskPlanManager:
                     created_by_kind="system",
                 ),
             )
-            await self.task_plans_qs.add_tasks(session, explode(plan.id, template.steps, requires=requires))
+            await self.task_plans_qs.add_tasks(
+                session, explode(plan.id, template.steps, requires=requires, versions=versions)
+            )
 
     async def used_by(self, session: AsyncSession, plan: TaskPlan) -> list[Agent]:
         """The agents whose envelope lists this plan.

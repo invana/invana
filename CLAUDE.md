@@ -23,6 +23,8 @@ each module folder holds `spec.md` and one file per feature. When choosing what 
 7. **Use the product's words.** `docs/for-developers/terminology.md` pins them, and names the
    ones we do not use. Code, UI copy and docs follow it.
 
+The product split of Studio (Explorer, Modeller, Agents, Projects, Datasets) is planned in `docs/products/`.
+
 ## Architecture
 
 - **Monorepo**: `engine/` (Python 3.14 + FastAPI) + `studio/` (React 19 + TypeScript) + `integrations/` (connector packages)
@@ -116,7 +118,7 @@ set, so a screen that can be drawn can be built, and a screen that cannot be bui
 |---|---|
 | Compose, don't draw | A hi-fi screen is `@invana/ui` + `@invana/forms` + `@invana/tables` + `@invana/themes` + `@invana/canvas` components. No hand-written HTML with inline styles, no one-off CSS, no ad-hoc colours. |
 | Tokens only | Colour, spacing, radius and control heights come from `@invana/styling` tokens (`--primary`, `--muted-foreground`, `--border`, `--success`, …). Never a literal `hsl()`/hex in a design or in Studio. |
-| Missing component → build it in the kit first | If a design needs something the kit does not have, add it to `~/Projects/invana/design-kit` **with a story**, then use it. Never inline it into the design and never reimplement it in Studio. |
+| Missing component → build it in the kit first | If a design needs something the kit does not have, add it to `~/Projects/invana/design-kit` **with a story**, then use it. Never inline it into the design and never reimplement it in Studio. The one exception: a composition built **exclusively for Studio** from `@invana/*` and tokens may live in `@invana-studio/ui`, under the rules of [migration-plan §4](docs/products/migration-plan.md#4-the-studio-ui-package). Primitives still go to `design-kit` with a story. |
 | Three repos, one direction | `design-kit` (`~/Projects/invana/design-kit`) → `canvas` (`~/Projects/invana/canvas`) → `invana` (here). `@invana/canvas-ui` peer-depends on `@invana/ui`; nothing depends back up. A component belongs in the **lowest layer that can own it** — if canvas-ui invents something general, promote it down into `@invana/ui` and have canvas-ui consume it. |
 | Where it goes | shadcn-style primitive → `design-kit/packages/ui/src/components/ui/`. Composition of primitives, **including Invana-domain ones** (emissions, citations, charts) → `ui-extended/`. Form field → `@invana/forms`. Needs an external JS library (editor, uploader, heavy picker) → its own package. Anything bound to canvas state (toolbars, layers, minimap, context menus, canvas status bar) → `@invana/canvas-ui` — **check there before building it**, it already ships most canvas chrome. |
 | Density is a token, not a prop | `@invana/styling` ships `data-density="compact"`; Studio and the board set it on the root. Components read `--control-h*` / `--font-size-*` — never a hard-coded `h-8`/`h-9`, never a `size="xs"` at every call site. |
@@ -155,7 +157,7 @@ set, so a screen that can be drawn can be built, and a screen that cannot be bui
 6. Coverage target: 80% minimum for both engine and studio.
 7. Don't mock the tests, unless asked, always test using graph databases.
 8. Every user-facing change requires a changeset.
-9. Studio uses `@invana/design-kit` for all UI components — don't create custom components unless absolutely necessary. A component Studio needs and the kit lacks is built in design-kit, with a story, not in `studio/`. See **Design rules**.
+9. Studio uses `@invana/design-kit` for all UI components — don't create custom components unless absolutely necessary. A component Studio needs and the kit lacks is built in design-kit, with a story, not in `studio/`. The exception is a Studio-only composition of `@invana/*` and tokens, which may live in `@invana-studio/ui` under the rules of [migration-plan §4](docs/products/migration-plan.md#4-the-studio-ui-package); primitives always go to design-kit. See **Design rules**.
 10. Studio uses `@invana/canvas` for all graph rendering — no PixiJS code in studio.
 11. **Never commit automatically.** Only run `git commit` when the user has explicitly asked for it in the current turn (e.g. "commit", "commit the changes"). Finishing a task is not implicit approval to commit — leave changes staged or unstaged and let the user decide. This rule applies even when a previous turn included a commit request; each commit needs its own ask. Same goes for `git push` and any other action that publishes work outside the local repo.
 12. **Short on columns, full on modules.** Model and column comments are one or two lines — trim the long ones in every file you touch. Module, class and method docstrings stay full: they explain usage and design (`engine/src/invana/core/telemetry/middleware.py` is the model). Code documentation stands alone — never cite a decision id (`TE3`, `(SR7)`) in code or tests. No history ([module-structure.md](docs/for-developers/module-structure.md) §5b).

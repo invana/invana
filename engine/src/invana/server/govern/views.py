@@ -10,7 +10,7 @@ holds the rule about it.
 
 from __future__ import annotations
 
-from fastapi import Depends, Path, Query, Response, status
+from fastapi import Depends, Path, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.govern.addressing import Layer
@@ -45,11 +45,13 @@ from invana.apps.govern.schemas import (
 )
 from invana.apps.govern.validate import validate_draft
 from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.graphs.roles import GraphRole
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.errors import NotFoundError
 from invana.runtime.querysets import TaskRunQuerySet
+from invana.server.evals.views import drift_after
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 lenses = LensManager()
@@ -119,7 +121,7 @@ async def list_lenses(
     return LensListResponse(
         items=reads,
         total=len(reads),
-        may_edit_guardrails=member.can_edit_guardrails,
+        may_edit_guardrails=member.holds(GraphRole.modeller),
     )
 
 
@@ -174,20 +176,21 @@ async def create_lens(
         payload=payload,
         actor_id=user.id,
         catalogue=await catalogue_resolver.resolve(session, graph_id=graph.id),
-        may_edit_guardrails=member.can_edit_guardrails,
+        may_edit_guardrails=member.holds(GraphRole.modeller),
     )
     return _read(lens)
 
 
 async def update_lens(
     payload: LensUpdate,
+    request: Request,
     lens_id: str = Path(...),
     member: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> LensRead:
-    """Naming it here is the write that publishes it ([WO1])."""
+    """Naming it here is the write that publishes it; the drift pass re-runs every live eval set."""
     lens = await lenses.get(session, lens_id=lens_id, graph_id=graph.id)
     updated = await lenses.update(
         session,
@@ -195,8 +198,9 @@ async def update_lens(
         payload=payload,
         actor_id=user.id,
         catalogue=await catalogue_resolver.resolve(session, graph_id=graph.id),
-        may_edit_guardrails=member.can_edit_guardrails,
+        may_edit_guardrails=member.holds(GraphRole.modeller),
     )
+    await drift_after(request, session, graph_id=graph.id, trigger="world_change")
     return _read(updated)
 
 
@@ -214,7 +218,7 @@ async def promote_lens(
         lens=lens,
         scope=payload.scope,
         actor_id=user.id,
-        may_edit_guardrails=member.can_edit_guardrails,
+        may_edit_guardrails=member.holds(GraphRole.modeller),
     )
     return _read(promoted)
 
@@ -242,7 +246,7 @@ async def delete_lens(
         session,
         lens=lens,
         actor_id=user.id,
-        may_edit_guardrails=member.can_edit_guardrails,
+        may_edit_guardrails=member.holds(GraphRole.modeller),
     )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

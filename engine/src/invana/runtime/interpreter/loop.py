@@ -20,7 +20,7 @@ import logging
 import random
 import time
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, ClassVar, Protocol
 
 from sqlalchemy import select
 from sqlalchemy.exc import OperationalError, ProgrammingError
@@ -42,7 +42,7 @@ from invana.apps.sessions.transcript import (
     _title_from_text,
 )
 from invana.apps.skills.managers import RuleManager
-from invana.apps.skills.models import Rule, Skill
+from invana.apps.skills.models import Rule, Skill, SkillAtVersion, SkillVersion
 from invana.apps.work.models import Task as Todo
 from invana.core.events import actions
 from invana.core.events.models import ActorKind, ActorType
@@ -50,6 +50,9 @@ from invana.core.events.services import emit_event
 from invana.core.querylog import calling_as
 from invana.core.telemetry.recorders import add_run_active, record_run, record_run_admitted
 from invana.core.telemetry.spans import add_event, current_ids, current_span_context, set_current
+from invana.plugins import load_plugins
+from invana.plugins.core.ingest.records import LoadRefused, connector_for
+from invana.plugins.sdk.manifest import SideEffect
 from invana.runtime.callers import caller_for
 from invana.runtime.catalogue import (
     CannotAnswer,
@@ -63,11 +66,10 @@ from invana.runtime.catalogue import (
     load_global_model,
     load_grounding,
 )
-from invana.runtime.catalogue.records import LoadRefused, connector_for
 from invana.runtime.contention import AgentAtCeiling, AgentSlots, GraphSlots, PoolSlots, Refused
 from invana.runtime.delegation import cost_rollup, descendants
 from invana.runtime.diagnosis import diagnose, internal_failure
-from invana.runtime.executor import _dispatch
+from invana.runtime.executor import _dispatch, refuse_disabled, tool_manifest
 from invana.runtime.governing import Governor
 from invana.runtime.interpreter.bindings import resolve as resolve_bindings
 from invana.runtime.interpreter.payloads import (
@@ -100,6 +102,34 @@ _IMPORT_PLAN_KEYS = frozenset({LOAD_PLAN_KEY, BULK_PLAN_KEY})
 
 log = logging.getLogger(__name__)
 
+#: How long a ``send`` step's approval waits for its approver.
+SEND_APPROVAL_DEADLINE_S = 86400
+
+
+class SendGate(Protocol):
+    """Where a ``send`` step's approval is asked for and read back.
+
+    The approvals inbox sits above the runtime, so the runtime names only this
+    shape and the edge that owns the inbox installs one on
+    :attr:`TaskRuntime.send_gate`. ``decision`` returns the approval's status
+    (``pending · approved · declined · expired``) and who decided it, by name.
+    """
+
+    async def request(
+        self,
+        db: AsyncSession,
+        *,
+        graph_id: str,
+        run_id: str,
+        step_id: str,
+        title: str,
+        payload: dict,
+        approver_id: str,
+        deadline_s: int,
+    ) -> str: ...
+
+    async def decision(self, db: AsyncSession, *, approval_id: str) -> tuple[str, str]: ...
+
 
 def _seconds_since(then: datetime | None) -> float:
     """Seconds from *then* to now, never negative; a naive time is read as UTC."""
@@ -112,6 +142,11 @@ def _seconds_since(then: datetime | None) -> float:
 
 class TaskRuntime:
     """Runs runs in-process. Created in the app lifespan; stubbed in route tests."""
+
+    #: The approvals inbox a ``send`` step holds on, installed process-wide by
+    #: the edge that owns it. With none installed a ``send`` step is refused,
+    #: never sent unapproved.
+    send_gate: ClassVar[SendGate | None] = None
 
     def __init__(
         self,
@@ -197,6 +232,25 @@ class TaskRuntime:
         self._tasks[run_id] = task
         task.add_done_callback(lambda t: self._tasks.pop(run_id, None))
 
+    async def resume_after_decision(self, run_id: str) -> bool:
+        """Continue a run held on a ``send`` approval once that approval is decided.
+
+        Called after the decision has committed. The run goes back to queued
+        and resumes at the held step — the same step row, so the pass reads the
+        decision through the approval id the row carries: approved sends,
+        declined fails the step as *not sent*. Returns False, doing nothing, for
+        a run that is not held on an approval.
+        """
+        async with self._factory() as db:
+            th = await TaskRunQuerySet().get(db, run_id)
+            if th is None or th.status != RunStatus.awaiting_input.value or not (th.cursor or {}).get("approval"):
+                return False
+            th.status = RunStatus.queued.value
+            th.finished_at = None
+            await db.commit()
+        self.submit(run_id)
+        return True
+
     async def run_inline(self, run_id: str) -> None:
         """Run a committed run in the caller's own request, and return when it settles.
 
@@ -211,6 +265,55 @@ class TaskRuntime:
             await task
         finally:
             self._tasks.pop(run_id, None)
+
+    def submit_eval(self, run_id: str) -> None:
+        """Work an eval run whose rows are committed: each replay in turn, then the score.
+
+        The replays run one after another, not at once, so an eval run never
+        takes more of the Graph's ceiling than one ask and its latencies are
+        not each other's queueing. A run that settled at open (*paused:
+        budget*) has no children and is not scored.
+        """
+        task = asyncio.create_task(self._eval(run_id), name=f"invana.eval.{run_id}")
+        self._tasks[run_id] = task
+        task.add_done_callback(lambda t: self._tasks.pop(run_id, None))
+
+    async def eval_inline(self, run_id: str) -> None:
+        """Work a committed eval run in the caller's own process, and return when it is scored.
+
+        For the CLI, which has no server runtime to hand the run to: the same
+        replays and score ``submit_eval`` would run, awaited.
+        """
+        await self._eval(run_id)
+
+    async def _eval(self, run_id: str) -> None:
+        from invana.runtime.managers.evals import EvalManager
+
+        evals = EvalManager()
+        async with self._factory() as db:
+            root = await TaskRunQuerySet().get(db, run_id)
+            if root is None or root.status != RunStatus.queued.value:
+                return
+            root.status = RunStatus.running.value
+            root.started_at = _now()
+            children = [c.id for c in await evals.case_runs(db, run_id=run_id)]
+            await db.commit()
+        for child_id in children:
+            await self._run(child_id)
+        async with self._factory() as db:
+            try:
+                await evals.score(db, run_id=run_id, encryption_key=self._key)
+                await db.commit()
+            except Exception as exc:
+                await db.rollback()
+                log.error("eval run failed to score", exc_info=exc, extra={"run_id": run_id})
+                root = await TaskRunQuerySet().get(db, run_id)
+                if root is not None:
+                    root.status = RunStatus.failed.value
+                    root.outcome = "failed"
+                    root.finished_at = _now()
+                    root.error = {"cls": "defect", "cause": "internal", "message": "The eval run could not be scored."}
+                    await db.commit()
 
     def contention(self, graph_id: str, pools: dict[str, int] | None = None) -> dict:
         """What is running in this Graph, what is waiting behind it, and how full
@@ -450,26 +553,9 @@ class TaskRuntime:
             if th.started_at is None:
                 record_run_admitted(**labels, queue_wait_s=_seconds_since(th.queued_at))
             started = time.perf_counter()
-            # The ask is the run's own columns — there is no second row.
-            run_ask = th
-            graph = await db.get(Graph, th.graph_id)
-            assert run_ask and graph
-            # A task-triggered or delegated run has no session and no
-            # reply row. Everything below tolerates both being None, which is
-            # what makes "a task is worked through as runs" true rather
-            # than aspirational.
-            sess = await db.get(Session, run_ask.session_id) if run_ask.session_id else None
-            assistant = await db.get(SessionMessage, th.assistant_message_id) if th.assistant_message_id else None
-            user_msg = None
-            if sess is not None and assistant is not None:
-                user_msg = (
-                    await db.execute(
-                        select(SessionMessage).where(
-                            SessionMessage.session_id == sess.id, SessionMessage.seq == assistant.seq - 1
-                        )
-                    )
-                ).scalar_one_or_none()
-
+            # A cursor exists only after a pause for input, so it is also how a
+            # run knows it is *resuming* — from this step.
+            start_index = int((th.cursor or {}).get("step", 0))
             # **Lenient, because a library plan is the normal case now**
             # (task-model-migration § 6.5). `workflow_key` on an import run is
             # `dataset-import@1`, which `WORKFLOWS` does not hold and is not
@@ -478,87 +564,7 @@ class TaskRuntime:
             # ingestion running inline — the run raised `KeyError` before a
             # single node was dispatched.
             wf = WORKFLOWS.get(th.workflow_key)
-            # A cursor exists only after a pause for input, so it is also how a
-            # run knows it is *resuming*: this pass answers `question`, and
-            # `prompt` below is the answer the user gave.
-            cursor = th.cursor or {}
-            start_index = int(cursor.get("step", 0))
-            answering = cursor.get("question")
-            params = run_ask.params or {}
-            mode = run_ask.ask_kind
-
-            agent = await db.get(Agent, th.agent_id) if th.agent_id else None
-            provider = await self._provider_for(db, th=run_ask)
-            skills = await self._skills_for(db, agent=agent, graph_id=graph.id)
-            rules = await self._rules_for(db, run=th, graph_id=graph.id)
-            history = (
-                context_turns(
-                    await SessionMessageQuerySet().list_recent_messages(
-                        db, session_id=sess.id, before_seq=user_msg.seq, limit=_HISTORY_TURNS * 2
-                    )
-                )
-                if sess is not None and user_msg is not None
-                else []
-            )
-            v = RunVars(
-                graph=graph,
-                sess=sess,
-                actor_id=run_ask.author_id or "",
-                encryption_key=self._key,
-                user_message_id=user_msg.id if user_msg else "",
-                user_seq=user_msg.seq if user_msg else 0,
-                assistant_message_id=assistant.id if assistant else "",
-                mode=mode,
-                prompt=(user_msg.content if user_msg else run_ask.body),
-                # A `ql` run **is** its query, and the query is the ask's body —
-                # not the user row's content. On a re-run the reply's user row
-                # still holds the natural-language question that was translated
-                # once, and `ql-query` has no translate step to do it again, so
-                # reading the row here would send English to the driver.
-                query=(run_ask.body if mode == "ql" else None),
-                answering=answering,
-                language=params.get("language"),
-                timeout_s=params.get("timeout_s"),
-                parameters=params.get("parameters"),
-                provider=provider,
-                history=history,
-                grounding=await load_grounding(db, graph.id) if th.workflow_key != "modeller-generate" else None,
-                global_model=await load_global_model(db, graph.id) if th.workflow_key != "modeller-generate" else None,
-                skills=skills,
-                rules=rules,
-                # The Graph's, then the agent's own focus (AG13).
-                instructions=layered_instructions(graph.instructions, agent.instructions if agent else ""),
-                # The voice this run speaks with, fixed at open like the lens
-                # (SO6). No agent is still a voice — the default one (SO3).
-                soul=voice_for(agent.soul if agent else "", agent.soul_traits if agent else {}),
-                agent=agent,
-                envelope=Envelope.from_spec(agent.workflow_spec, effort=agent.effective_effort) if agent else None,
-                run=th,
-                # The lens this run froze at open ([GV26]) — read, never
-                # recomposed ([GV8]). It is built once, here, so every step of
-                # the run is checked against the same document, and a guardrail
-                # tightened mid-run cannot change what this one was allowed to
-                # rest on (docs/for-developers/modules/govern/spec.md).
-                governor=Governor.for_run(th),
-                # The Graph's pools, so a crossing can take a slot in one
-                # ([CC8](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
-                # Handed down on the run's vars for the same reason the governor
-                # is: process state belongs to the thing that owns the process.
-                pools=self._pools,
-                # A load's stages hand each other records, and the plan carries
-                # only counts and ids (LD21). The prologue settled these before
-                # the run was queued, so this rebuilds the holder rather than
-                # deciding anything (LD20).
-                load=(
-                    LoadVars(
-                        root=str(params.get("root") or ""),
-                        model_id=str(params.get("model_id") or ""),
-                        version_id=str(params.get("version_id") or ""),
-                    )
-                    if mode == "import"
-                    else None
-                ),
-            )
+            v, assistant = await self.run_vars(db, th)
 
             th.status = RunStatus.running.value
             th.started_at = _now()
@@ -576,7 +582,7 @@ class TaskRuntime:
                         "message_id": assistant.id if assistant else None,
                         "workflow": th.workflow_key,
                         "agent_id": th.agent_id,
-                        "agent": agent.name if agent else None,
+                        "agent": v.agent.name if v.agent else None,
                         "task_id": th.todo_id,
                         "started_at": th.started_at,
                     },
@@ -597,6 +603,124 @@ class TaskRuntime:
                 if not crashed:
                     log_run_ended(th, outcome, duration_s)
 
+    async def run_vars(self, db: AsyncSession, th: TaskRun) -> tuple[RunVars, SessionMessage | None]:
+        """Everything a step reads about its run, rebuilt from the run row's ids.
+
+        The pass calls it once before its loop; a worker calls it for each
+        envelope it is handed, so a step sees the same Graph, session, provider,
+        skills, rules, voice and frozen lens wherever it runs. Returns the vars
+        and the reply row they write into (None for a task-triggered run).
+
+        It reads and does not commit; the one column it may set is
+        ``model_version``, through :meth:`_provider_for`.
+        """
+        run_ask = th
+        graph = await db.get(Graph, th.graph_id)
+        assert run_ask and graph
+        # A task-triggered or delegated run has no session and no
+        # reply row. Everything below tolerates both being None, which is
+        # what makes "a task is worked through as runs" true rather
+        # than aspirational.
+        sess = await db.get(Session, run_ask.session_id) if run_ask.session_id else None
+        assistant = await db.get(SessionMessage, th.assistant_message_id) if th.assistant_message_id else None
+        user_msg = None
+        if sess is not None and assistant is not None:
+            user_msg = (
+                await db.execute(
+                    select(SessionMessage).where(
+                        SessionMessage.session_id == sess.id, SessionMessage.seq == assistant.seq - 1
+                    )
+                )
+            ).scalar_one_or_none()
+
+        # A cursor exists only after a pause for input, so it is also how a
+        # run knows it is *resuming*: this pass answers `question`, and
+        # `prompt` below is the answer the user gave.
+        cursor = th.cursor or {}
+        answering = cursor.get("question")
+        params = run_ask.params or {}
+        mode = run_ask.ask_kind
+
+        agent = await db.get(Agent, th.agent_id) if th.agent_id else None
+        provider = await self._provider_for(db, th=run_ask)
+        # An eval replay names the candidate it replays: a skill version in
+        # place of the head, or an agent's draft instructions.
+        replay = params.get("eval") or {}
+        skills = await self._skills_for(db, agent=agent, graph_id=graph.id, replay=replay)
+        rules = await self._rules_for(db, run=th, graph_id=graph.id)
+        history = (
+            context_turns(
+                await SessionMessageQuerySet().list_recent_messages(
+                    db, session_id=sess.id, before_seq=user_msg.seq, limit=_HISTORY_TURNS * 2
+                )
+            )
+            if sess is not None and user_msg is not None
+            else []
+        )
+        v = RunVars(
+            graph=graph,
+            sess=sess,
+            actor_id=run_ask.author_id or "",
+            encryption_key=self._key,
+            user_message_id=user_msg.id if user_msg else "",
+            user_seq=user_msg.seq if user_msg else 0,
+            assistant_message_id=assistant.id if assistant else "",
+            mode=mode,
+            prompt=(user_msg.content if user_msg else run_ask.body),
+            # A `ql` run **is** its query, and the query is the ask's body —
+            # not the user row's content. On a re-run the reply's user row
+            # still holds the natural-language question that was translated
+            # once, and `ql-query` has no translate step to do it again, so
+            # reading the row here would send English to the driver.
+            query=(run_ask.body if mode == "ql" else None),
+            answering=answering,
+            language=params.get("language"),
+            timeout_s=params.get("timeout_s"),
+            parameters=params.get("parameters"),
+            provider=provider,
+            history=history,
+            grounding=await load_grounding(db, graph.id) if th.workflow_key != "modeller-generate" else None,
+            global_model=await load_global_model(db, graph.id) if th.workflow_key != "modeller-generate" else None,
+            skills=skills,
+            rules=rules,
+            # The Graph's, then the agent's own focus (AG13).
+            instructions=layered_instructions(
+                graph.instructions,
+                replay.get("instructions", agent.instructions if agent else ""),
+            ),
+            # The voice this run speaks with, fixed at open like the lens
+            # (SO6). No agent is still a voice — the default one (SO3).
+            soul=voice_for(agent.soul if agent else "", agent.soul_traits if agent else {}),
+            agent=agent,
+            envelope=Envelope.from_spec(agent.workflow_spec, effort=agent.effective_effort) if agent else None,
+            run=th,
+            # The lens this run froze at open ([GV26]) — read, never
+            # recomposed ([GV8]). It is built once, here, so every step of
+            # the run is checked against the same document, and a guardrail
+            # tightened mid-run cannot change what this one was allowed to
+            # rest on (docs/for-developers/modules/govern/spec.md).
+            governor=Governor.for_run(th),
+            # The Graph's pools, so a crossing can take a slot in one
+            # ([CC8](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
+            # Handed down on the run's vars for the same reason the governor
+            # is: process state belongs to the thing that owns the process.
+            pools=self._pools,
+            # A load's stages hand each other records, and the plan carries
+            # only counts and ids (LD21). The prologue settled these before
+            # the run was queued, so this rebuilds the holder rather than
+            # deciding anything (LD20).
+            load=(
+                LoadVars(
+                    root=str(params.get("root") or ""),
+                    model_id=str(params.get("model_id") or ""),
+                    version_id=str(params.get("version_id") or ""),
+                )
+                if mode == "import"
+                else None
+            ),
+        )
+        return v, assistant
+
     async def _provider_for(self, db: AsyncSession, *, th: TaskRun):
         """The endpoint this run calls — what it recorded, else what its lens casts.
 
@@ -606,15 +730,26 @@ class TaskRuntime:
         a Task's run resolves exactly as the ask that opened beside it would
         have ([PM14]).
         """
-        return await endpoint_for_run(db, th=th)
+        provider = await endpoint_for_run(db, th=th)
+        if provider is not None and th.model_version is None:
+            # The version this run calls, kept beside the row id: the string is
+            # what history keeps once the row is gone.
+            th.model_version = provider.model_id
+        return provider
 
-    async def _skills_for(self, db: AsyncSession, *, agent: Agent | None, graph_id: str) -> list[Skill]:
+    async def _skills_for(
+        self, db: AsyncSession, *, agent: Agent | None, graph_id: str, replay: dict | None = None
+    ) -> list[Skill | SkillAtVersion]:
         """The prose this run's prompts carry.
 
         An agent with no explicit binding gets every skill in the graph — the
         behaviour before agents existed, and what the seeded Explorer wants
         (docs/for-developers/modules/work/spec.md). An authored agent's empty list means *no skills*, and
         is distinguishable because seeded agents ship with none set.
+
+        An eval replay that names ``skill_version_id`` offers that version of
+        its skill in place of the head — the one way a draft reaches a prompt,
+        and only on a run that is itself an eval.
         """
         # **Never a draft** — a skill reaches a step through its current
         # version, and a draft has not published one
@@ -622,19 +757,30 @@ class TaskRuntime:
         stmt = select(Skill).where(Skill.graph_id == graph_id, Skill.current_version_id.is_not(None))
         if agent is not None and agent.skill_ids:
             stmt = stmt.where(Skill.id.in_(list(agent.skill_ids)))
-        return list((await db.execute(stmt.order_by(Skill.name))).scalars().all())
+        skills: list[Skill | SkillAtVersion] = list((await db.execute(stmt.order_by(Skill.name))).scalars().all())
+        version_id = (replay or {}).get("skill_version_id")
+        version = await db.get(SkillVersion, version_id) if version_id else None
+        if version is None:
+            return skills
+        subject = await db.get(Skill, version.skill_id)
+        if subject is None:
+            return skills
+        swapped = [s for s in skills if s.id != subject.id]
+        return sorted([*swapped, SkillAtVersion.of(subject, version)], key=lambda s: s.name)
 
     async def _rules_for(self, db: AsyncSession, *, run: TaskRun, graph_id: str) -> list[Rule]:
         """The statements always true in this run's scope.
 
-        The order is fixed (skills/spec.md § 4): the Graph's invariants, then
-        the working rules of the Project this run's Todo belongs to. A session
-        ask belongs to no Project and is offered the invariants alone.
+        The order is fixed (skills/spec.md § 4): the install's rules, the
+        Graph's invariants, then the working rules of the Project this run's
+        Todo belongs to. A session ask belongs to no Project and is offered the
+        install rules and the invariants alone.
 
         Only **active** rules — deactivating is how a rule stops applying, and
         the versions and past citations stay exactly where they are (RU4).
         """
-        invariants = await self._rules.invariants(db, graph_id=graph_id, active_only=True)
+        install = await self._rules.install(db, active_only=True)
+        invariants = [*install, *await self._rules.invariants(db, graph_id=graph_id, active_only=True)]
         if not run.todo_id:
             return invariants
         todo = await db.get(Todo, run.todo_id)
@@ -654,6 +800,9 @@ class TaskRuntime:
         start_index: int,
     ) -> str:
         """Returns the metric status label: ok · clarify · cannot_answer · conversed · error.
+
+        ``clarify`` is any pause for a person — a question, or a ``send`` step
+        held on its approval.
 
         The list of steps is read from ``run_nodes`` each pass rather than
         from a static workflow, because a *Plan* step appends to it mid-run.
@@ -681,6 +830,8 @@ class TaskRuntime:
                 await emitter.emit("step.started", _step_payload(row))
                 ctx = TaskContext(db=db, manager=self._manager, emitter=emitter, step=row, runtime=self)
                 try:
+                    if await self._hold_for_send(db, emitter, th, row, v, i):
+                        return "clarify"
                     with step_span(row, attempt):
                         out = await _dispatch(step.task_key, ctx, v)
                 except CannotAnswer as cannot:
@@ -832,6 +983,79 @@ class TaskRuntime:
             i += 1
         await self._finish_ok(db, emitter, th, v, assistant)
         return "ok"
+
+    async def _hold_for_send(
+        self, db: AsyncSession, emitter: Emitter, th: TaskRun, row: TaskRun, v: RunVars, i: int
+    ) -> bool:
+        """Hold a ``send`` step on an approval until a person decides; True when the run is now held.
+
+        Nothing leaves Invana without a named person. The first pass that
+        reaches the step asks the run's actor — else the Graph's owner — with
+        the args frozen as the approval's payload, and records the approval id
+        on the step row. A resumed pass runs the same row, so it reads the
+        decision by that id: approved → the step dispatches; still pending →
+        held again, no second request; declined or expired → ``blocked ·
+        send_declined``, nothing sent. A disabled plugin is refused before
+        anyone is asked.
+
+        The hold is the clarification's suspension — row ``needs_input``, run
+        ``awaiting_input``, a cursor naming the step — and not a clarification:
+        an unattended run waits on its approver rather than ending.
+        """
+        manifest = load_plugins().task(row.task_key)
+        if manifest is None or manifest.side_effect is not SideEffect.send:
+            return False
+        tool = tool_manifest(row.task_key)
+        if tool is not None:
+            await refuse_disabled(db, tool)
+        gate = self.send_gate
+        if gate is None:
+            raise TaskFailure(
+                cls="blocked",
+                cause="approvals_unavailable",
+                message="This process has no approvals inbox to hold a send step on; nothing was sent.",
+                short="no approvals inbox",
+            )
+        approval_id = (row.output or {}).get("approval_id")
+        if approval_id:
+            status, who = await gate.decision(db, approval_id=approval_id)
+            if status == "approved":
+                return False
+            if status in {"declined", "expired"}:
+                raise TaskFailure(
+                    cls="blocked",
+                    cause="send_declined",
+                    message=(
+                        f"Declined by {who or 'its approver'}; nothing was sent."
+                        if status == "declined"
+                        else "The approval expired before anyone decided; nothing was sent."
+                    ),
+                    short="not sent",
+                    evidence={"approval_id": approval_id, "status": status},
+                )
+        else:
+            args = dict(row.args or {})
+            subject = args.get("subject") or row.label or row.task_key
+            approval_id = await gate.request(
+                db,
+                graph_id=th.graph_id,
+                run_id=th.id,
+                step_id=row.id,
+                title=f"Send: {subject}",
+                payload=args,
+                approver_id=v.actor_id or (v.graph.created_by_id if v.graph else ""),
+                deadline_s=SEND_APPROVAL_DEADLINE_S,
+            )
+            row.output = {**(row.output or {}), "approval_id": approval_id}
+        row.status = RunStatus.needs_input.value
+        row.finished_at = _now()
+        row.detail = "awaiting approval"
+        th.status = RunStatus.awaiting_input.value
+        th.cursor = {"step": i, "approval": approval_id}
+        await db.commit()
+        await emitter.emit("step.needs_input", _step_payload(row))
+        await emitter.emit("approval.requested", {"approval_id": approval_id, "step_id": row.id})
+        return True
 
     # ── what a row spent, and what it recorded ────────────────────────────────
 

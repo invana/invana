@@ -28,6 +28,7 @@ class NodeTypeQuerySet(VersionScopedQuerySet):
         is_abstract: bool = False,
         validation_mode: str | None = None,
         property_mappings: list[dict] | None = None,
+        source_iri: str | None = None,
     ) -> NodeTypeDefinition:
         await self._ensure_draft(session, version_id)
 
@@ -38,6 +39,7 @@ class NodeTypeQuerySet(VersionScopedQuerySet):
             parent_type=parent_type,
             is_abstract=is_abstract,
             validation_mode=validation_mode,
+            source_iri=source_iri,
         )
         session.add(node_type)
         await session.flush()

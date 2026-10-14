@@ -44,6 +44,28 @@ class AgentUpdate(BaseModel):
     # leaves it alone.
     soul: str | None = None
     soul_traits: dict[str, str] | None = None
+    #: Read by set-ness: an address pins the model, ``null`` hands it back to the cast.
+    model_pin: str | None = Field(default=None, max_length=255)
+    #: Why — carried on the event that mints the version, never inferred.
+    why: str | None = Field(default=None, max_length=500)
+
+
+class AgentDraftWrite(BaseModel):
+    """The agent's unpublished instructions, written whole."""
+
+    instructions: str
+
+
+class AgentPublish(BaseModel):
+    #: Why — carried on the ``agent.update`` the publish writes.
+    why: str | None = Field(default=None, max_length=500)
+
+
+class AgentRollback(BaseModel):
+    """Restore the instructions as they were at an earlier agent version."""
+
+    version: int = Field(ge=1)
+    why: str | None = Field(default=None, max_length=500)
 
 
 class AgentRead(BaseModel):
@@ -58,6 +80,8 @@ class AgentRead(BaseModel):
     status: str
     lifetime: str
     instructions: str
+    #: Unpublished instructions; null is no draft open.
+    instructions_draft: str | None = None
     workflow_spec: dict[str, Any]
     # Read through `skill_bindings` (BN6). Present here because the skills badge
     # and the bindings picker both need it; not writable on this object.
@@ -68,6 +92,8 @@ class AgentRead(BaseModel):
     guardrail_id: str | None = None
     guardrail_name: str | None = None
     budget: dict[str, Any]
+    #: The model address this agent thinks with; null lets the cast decide.
+    model_pin: str | None = None
     #: As stored — a missing key is the default. ``effective_effort`` is what a
     #: run reads, with the one-release fallbacks filled in (EB9).
     effort: dict[str, Any]
@@ -90,13 +116,11 @@ class AgentRead(BaseModel):
 class AgentListResponse(BaseModel):
     items: list[AgentRead]
     total: int
-    #: ``{agent_id: usd}`` since the first of the month — what the list draws
-    #: against ``max_cost_usd_month`` (C10). A **sidecar map, not a field on the
-    #: agent**: it is a grouped read over ``task_runs``, which this band may not
-    #: touch, and an agent with no priced run is absent rather than zero — a
-    #: subscription publishes no per-token rate, so *nothing spent* and *nothing
-    #: known* are different facts (OB4).
-    spend_this_month: dict[str, float] = Field(default_factory=dict)
+    #: ``{agent_id: tokens}`` since the first of the month — what the list draws
+    #: against ``max_tokens_month``. A **sidecar map, not a field on the agent**:
+    #: it is a grouped read over ``task_runs``, which this band may not touch.
+    #: An agent with no run is absent and reads ``0``.
+    tokens_this_month: dict[str, int] = Field(default_factory=dict)
     # The graph's default agent — what a new session binds when nothing is picked.
     default_agent_id: str | None = None
 
@@ -341,13 +365,13 @@ class SoulPreviewResponse(BaseModel):
 class AgentMeters(BaseModel):
     """What the agent is using now, each beside the limit that caps it (AG23).
 
-    Spend is absent — not zero — when no run this month was priced (AG11).
+    Usage and budgets are in tokens, never currency.
     """
 
     agent_id: str
-    spend_this_month: float | None = None
-    max_cost_usd_month: float | None = None
-    max_cost_usd_run: float | None = None
+    tokens_this_month: int = 0
+    max_tokens_month: int | None = None
+    max_tokens_run: int | None = None
     running: int = 0
     queued: int = 0
     max_concurrent_runs: int | None = None
@@ -361,6 +385,7 @@ class AgentMeters(BaseModel):
     max_children: int | None = None
     max_depth: int | None = None
     max_fanout: int | None = None
+    #: ``max_tokens_run`` under its old name, answered for one release.
     max_tokens: int | None = None
 
 

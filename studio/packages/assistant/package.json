@@ -1,0 +1,49 @@
+{
+	"name": "@invana-studio/assistant",
+	"version": "0.1.0",
+	"type": "module",
+	"private": true,
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"lint": "biome check .",
+		"check-types": "tsc --noEmit -p tsconfig.json"
+	},
+	"dependencies": {
+		"@codemirror/commands": "^6.10.3",
+		"@codemirror/language": "^6.12.3",
+		"@codemirror/legacy-modes": "^6.5.3",
+		"@codemirror/state": "^6.6.0",
+		"@codemirror/view": "^6.41.0",
+		"@invana-studio/core": "workspace:*",
+		"@invana-studio/ui": "workspace:*"
+	},
+	"peerDependencies": {
+		"@invana/forms": "^0.0.34",
+		"@invana/ui": "^0.0.34",
+		"@tanstack/react-query": "^5.0.0",
+		"lucide-react": "^0.475.0",
+		"react": "^19.2.0",
+		"react-router-dom": "^7.0.0",
+		"sonner": "^2.0.7"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.14",
+		"@invana/forms": "^0.0.34",
+		"@invana/styling": "^0.0.34",
+		"@invana/ui": "^0.0.34",
+		"@tanstack/react-query": "^5.0.0",
+		"@types/react": "^19.0.0",
+		"@types/react-dom": "^19.0.0",
+		"lucide-react": "^0.475.0",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0",
+		"react-hook-form": "7.72.1",
+		"react-router-dom": "^7.0.0",
+		"sonner": "^2.0.7",
+		"typescript": "^6.0.0",
+		"vite": "^7.0.0",
+		"vitest": "^5.0.2"
+	}
+}

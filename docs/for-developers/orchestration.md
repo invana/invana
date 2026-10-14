@@ -1,7 +1,7 @@
 # Orchestration — the whole model, in one read
 
-**Three records, one line.** A **Todo** is what a person wrote; a **TaskPlan** — authored, generated
-or reused — is the flow of **Task**s that carries it out; a **TaskRun** is one execution of it.
+**Three records, one line.** A **Todo** is what a person wrote; a **TaskPlan** — generated, packaged
+or promoted, and reused when it matches — is the flow of **Task**s that carries it out; a **TaskRun** is one execution of it.
 **Nothing a user authors is ever a `Task`.**
 
 > ⚠ **This document is ahead of the rest of `for-developers/`.** It states the model the product is
@@ -21,7 +21,7 @@ or reused — is the flow of **Task**s that carries it out; a **TaskRun** is one
 | § | | What it settles |
 |---|---|---|
 | **0** | **[The records](#0-the-records)** | **Todo · TaskPlan · Task · TaskRun · Artifact · Stream · Prompt — the ER diagram** |
-| 0.4 | [Where a TaskPlan comes from](#04-where-a-taskplan-comes-from) | matched · authored · generated · none — and why the planner does not regress |
+| 0.4 | [Where a TaskPlan comes from](#04-where-a-taskplan-comes-from) | matched · generated · none — and why the planner does not regress |
 | 0.5 | [Swimlanes](#05-swimlanes--who-does-what-in-order) | the generated · matched · human paths, and who may write each field |
 | 0.6 | [The catalogue](#06-the-catalogue--what-a-plan-may-name) | the closed set of callables, grouped by bound — and where to cut granularity |
 | 0.7 | [Agents, skills and plans](#07-agents-skills-and-plans--three-things-composed-at-run-time) | why a skill is not a plan, the two links that are real, and where a DeepAgent fits |
@@ -87,8 +87,8 @@ Nine configs in [§8](#8-worked-examples), one per shape — **every `kind` a Ta
 
 ## 0. The records
 
-**Nothing a user authors is ever a `Task`.** A person writes a **Todo**; a **TaskPlan** — authored,
-generated or reused — is the flow of **Task**s that carries it out; a **TaskRun** is one execution.
+**Nothing a user authors is ever a `Task`.** A person writes a **Todo**; a **TaskPlan** — generated,
+packaged or promoted, and reused when it matches — is the flow of **Task**s that carries it out; a **TaskRun** is one execution.
 
 ```mermaid
 erDiagram
@@ -156,7 +156,7 @@ erDiagram
         text  name
         text  intent      "what matches it to a Todo"
         enum  kind        "import ask enrich model stitch bulk"
-        enum  origin      "authored generated promoted"
+        enum  origin      "packaged generated promoted - authored on older rows, never written"
         bool  reusable
         jsonb args_schema
     }
@@ -173,7 +173,7 @@ erDiagram
         text  title
         jsonb args
         enum  assignee_kind "human only"
-        jsonb source_span  "the prose span it was drawn from - null when hand-authored"
+        jsonb source_span  "the prose span it was drawn from - null on a packaged plan"
         jsonb depends_on    "the edges, on the node"
         jsonb when
         jsonb map_over
@@ -261,7 +261,7 @@ erDiagram
 |---|---|---|
 | `Project → Todo` | 0..1 → many | A Todo needs no Project — the Graph's "No project" bucket ([work/spec.md](modules/work/spec.md)) |
 | `Todo → TaskPlan` | 1 → 0..1 | **Optional both ways.** A Todo assigned to a person never gets a plan ([§8.9](#89-a-human-task--no-steps-at-all)); a reusable TaskPlan belongs to no Todo |
-| `TaskPlan → Task` | 1 → many | The plan is the unit that is authored, versioned-by-freezing and reused. A Task has no life outside one |
+| `TaskPlan → Task` | 1 → many | The plan is the unit that is drawn, versioned-by-freezing and reused. A Task has no life outside one |
 | `Task → Task` | self | Nesting is inside the plan, never in the filing cabinet |
 | `Todo → TaskRun` | 1 → many | Set on **root** runs only. Many runs per Todo: one to plan it, one to execute, one to evaluate |
 | `Task → TaskRun` | 1 → many | Set on **child** runs. A `map_over` of 200 makes 200 runs of one Task |
@@ -296,12 +296,11 @@ task-shaped. A **metric** is telemetry.
 **A reusable TaskPlan is what this product has been calling a workflow** — `workflows` and
 `workflow_versions` collapse into it ([§13](#13-what-this-replaces)).
 
-A Todo reaches a flow four ways, and **only one of them runs a planner**:
+A Todo reaches a flow three ways, and **only one of them runs a planner**:
 
 | Path | `TaskPlan.origin` | A `role=plan` run? |
 |---|---|---|
-| **Matched** — a reusable TaskPlan's `intent` fits the Todo | `authored` — reused as-is | no |
-| **Authored** — the user drew the flow themselves | `authored` | no |
+| **Matched** — a reusable TaskPlan's `intent` fits the Todo | `packaged` or `promoted` — reused as-is | no |
 | **Generated** — nothing fit, so one is drafted | `generated`, `todo_id` set | **yes, one** |
 | **None** — a person simply does it ([§8.9](#89-a-human-task--no-steps-at-all)) | — | no |
 
@@ -312,10 +311,10 @@ journal filter the subject is supposed to narrow.
 ```
 Todo  "Which suppliers are at risk?"
  |
- +-- TaskRun  role=plan      of TaskPlan "plan-a-todo"      <- system, origin=authored
+ +-- TaskRun  role=plan      of TaskPlan "plan-a-todo"      <- system, origin=packaged
  |              writes a new TaskPlan  origin=generated  todo_id=<this Todo>
  +-- TaskRun  role=execute   of that generated TaskPlan
- +-- TaskRun  role=evaluate  of TaskPlan "check-criteria"   <- system, origin=authored
+ +-- TaskRun  role=evaluate  of TaskPlan "check-criteria"   <- system, origin=packaged
 ```
 
 **The planner is an ordinary TaskPlan.** The only unusual thing about it is what its run writes: a
@@ -323,11 +322,11 @@ Todo  "Which suppliers are at risk?"
 
 | Rule | |
 |---|---|
-| **A generated plan always comes from an authored one** | `plan-a-todo` and `check-criteria` ship with the product as `origin: authored`. They are never themselves generated |
-| **So the chain is one level deep, always** | authored → generated. Never generated → generated, which is what would regress |
+| **A generated plan always comes from a packaged one** | `plan-a-todo` and `check-criteria` ship with the product as `origin: packaged`. They are never themselves generated |
+| **So the chain is one level deep, always** | packaged → generated. Never generated → generated, which is what would regress |
 | **The evaluator recommends; a person accepts** | A `role=evaluate` run writes a `TaskPrompt` of `kind = verdict`. Only a person writes `Todo.closed_at` ([§7](#7-three-kinds-of-pause)) |
 | **Promotion closes the loop** | A generated plan that served is promoted — `origin: promoted`, `reusable: true`, `todo_id` cleared. The next matching Todo takes the *matched* path and never plans again |
-| **A builtin is seeded, never registered** | The four plans Invana ships enter the library the same way any other does — as `task_plans` + `tasks` rows, `origin: authored`, published and read-only. **The runtime resolves every plan from rows**, so a builtin has no privileged path and the *matched* row above is the only one it ever takes ([the-library LB12–LB14](modules/workflows/features/the-library.md#decisions)) |
+| **A builtin is seeded, never registered** | The four plans Invana ships enter the library the same way any other does — as `task_plans` + `tasks` rows, `origin: packaged`, published and read-only. **The runtime resolves every plan from rows**, so a builtin has no privileged path and the *matched* row above is the only one it ever takes ([the-library LB12–LB14](modules/workflows/features/the-library.md#decisions)) |
 
 **Three things called plan, kept apart:**
 
@@ -452,8 +451,8 @@ flowchart TB
         A3["Todo.closed_at · outcome"]
     end
 
-    subgraph AUTHOR["Person, authoring"]
-        B1["TaskPlan origin=authored<br/>and its Task rows"]
+    subgraph AUTHOR["Package seed"]
+        B1["TaskPlan origin=packaged<br/>and its Task rows"]
     end
 
     subgraph PLANNER["Planner &mdash; role=plan"]
@@ -494,7 +493,7 @@ exactly one writer. If that arrow ever becomes solid, an agent is accepting its 
 | Field | Written by | Never by |
 |---|---|---|
 | `Todo.title · body · criteria` | a person | anything else — this is the definition of a Todo |
-| `TaskPlan` rows | a person *(authored)* or the Planner *(generated)* | a worker mid-run |
+| `TaskPlan` rows | the Planner or a skill's draw *(generated)*, a package seed *(packaged)*, promotion *(promoted)* | a person by hand ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) · a worker mid-run |
 | `TaskRun.plan_snapshot` | the Runtime, at open | anyone, afterwards |
 | `TaskPrompt.answer` where `kind = approval` | **a person** | an agent |
 | `TaskPrompt.answer` where `kind = verdict` | an agent **or** a person | — |
@@ -613,7 +612,7 @@ The planner is an ordinary TaskPlan naming ordinary callables:
 
 ```yaml
 key: plan-a-todo
-origin: authored          # ships with the engine - never itself generated
+origin: packaged          # ships with the engine - never itself generated
 kind: ask
 
 steps:
@@ -658,7 +657,7 @@ The fix is a link, not a merge.
 ```mermaid
 flowchart LR
     SK["Skill version<br/>content · when_to_use"]
-    PL["TaskPlan<br/>origin=authored"]
+    PL["TaskPlan<br/>origin=generated"]
     GEN["TaskPlan<br/>origin=generated"]
     AG["Agent<br/>envelope · budget"]
     RUN["TaskRun"]
@@ -773,7 +772,7 @@ immutable ([skills/spec.md](modules/skills/spec.md)).
 
 | Rule | |
 |---|---|
-| **A hand-edit flips `origin` to `authored`** | Redrawing from prose afterwards is offered, never automatic, and names what it will discard |
+| **A draw is the only writer of a skill's plan** | Nobody edits a plan by hand ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3); a plan that reads wrong is fixed in the prose. Redrawing is offered, never automatic |
 | **Exactly one plan per version — never zero** | `skill_versions.plan_id` is `NOT NULL`. There is no *does this skill have a flow?* branch to write, in the engine or in any surface |
 | **`form: human` is the universal fallback** | This is what makes *never zero* safe. Anything the catalogue cannot express, a person can — *email the supplier* becomes a `human` Task. A catalogue gap therefore never blocks publishing a playbook |
 | **A shipped plan is still offered** | Drawing a playbook does not make an agent run it ([§0.7](#07-agents-skills-and-plans--three-things-composed-at-run-time)) |
@@ -900,7 +899,7 @@ With spans, the canvas answers the question the author actually has:
 
 | Not building | Because |
 |---|---|
-| Generating **prose from a hand-edited flow** | two generators pointing at each other is a drift machine, and neither side stays authoritative |
+| Generating **prose from a flow** | two generators pointing at each other is a drift machine, and neither side stays authoritative |
 | Redrawing on every keystroke | half a sentence is not an instruction; a flow drawn from one is misleading feedback, not live feedback |
 | A free-text answer to a clarification | it is a second way to write the playbook, in a box that is not the playbook |
 
@@ -1448,7 +1447,7 @@ A **session** is a conversation. It never runs, has no outcome, and its children
 there is no `depends_on` graph over the messages in a thread. It **references** Tasks; it is not one.
 
 **But everything a session *does* is a Task.** A message that asks for something opens a TaskRun
-against a TaskPlan — matched, authored or generated ([§0.4](#04-where-a-taskplan-comes-from)) — and
+against a TaskPlan — matched or generated ([§0.4](#04-where-a-taskplan-comes-from)) — and
 nothing in a chat reaches a provider, a database or the graph except through it. The session is the
 thread; the plans are the work.
 
@@ -1470,14 +1469,14 @@ Session  "Q3 supply review"                    a conversation, not a Task
 
 | In a chat | What happens |
 |---|---|
-| **An expert plan fits** | The message resolves to a `reusable` TaskPlan matched by intent — including one **authored deliberately for chat**, to serve an edge case or a case worth doing better than a generated plan would. A new TaskRun against it; **no plan is created** |
+| **An expert plan fits** | The message resolves to a `reusable` TaskPlan matched by intent — packaged, or promoted from a generated plan that served. A new TaskRun against it; **no plan is created** |
 | **Nothing fits** | A one-off plan is generated for the ask, `plan_origin = generated`, validated against the envelope before anything is dispatched |
 | **The generated plan served** | Promote it — the frozen plan becomes reusable with an `intent`, and the next matching question selects it instead |
 | **Either way** | The run is the same record, the same trace, the same budget. *Which plan served this answer* is a column, not an implementation detail |
 
 **Expert plans are how a chat gets better without the planner getting cleverer.** A question that
-keeps being answered badly is answered once, properly, as an authored plan with an `intent`
-([7.7](modules/workflows/features/draft-a-plan.md)) — and from then on selection picks it. That is
+keeps being answered badly is answered once, properly — the plan that served is promoted with an `intent`
+([7.4](modules/workflows/features/promote-a-plan.md)), or a reusable plan is packaged — and from then on selection picks it. That is
 the whole mechanism; there is no per-session prompt to tune.
 
 So a session accumulates *asks*; each ask is a Task; each attempt is a run. Selection and generation
@@ -2520,5 +2519,5 @@ Stated so nobody mistakes this document for finished.
 | Cloning a reusable Task on use | definitions would drift, and *which copy is right* becomes a real question |
 | A plugin-registerable catalogue | the closed set *is* the policy. Users compose Tasks; they never invent callables |
 | Auto-approval · auto-acceptance | a rule that decides on the agent's behalf is the switch these pauses exist to replace |
-| Backfill · catchup · polling sensors | a missed firing is recorded as missed. A run waits on a person or an event, never on a spin loop |
+| Backfill · polling sensors | a missed firing is recorded and handled by its schedule's policy — one catch-up run, every missed one (at most 24), or none ([SC4](modules/operate/features/schedules.md#decisions)). A run waits on a person or an event, never on a spin loop |
 | Distributed workers · per-step CPU limits | the runtime is in-process; a pool is how a heavy Task is rationed |

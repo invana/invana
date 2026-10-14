@@ -88,7 +88,20 @@ def canonical_body(export: SchemaExport) -> dict[str, Any]:
     the semver, which is a Graph's own counting. What is left is the shape.
     """
     body = export.model_dump(mode="json", exclude={"schema_name", "schema_description", "version"})
-    return _sorted(body)
+    return _sorted(_drop_unset_iris(body))
+
+
+def _drop_unset_iris(value: Any) -> Any:
+    """A ``source_iri`` that was never set is not part of the shape.
+
+    It is provenance an ontology import adds; leaving the empty key out keeps
+    every artefact written before it hashing exactly as it did.
+    """
+    if isinstance(value, dict):
+        return {k: _drop_unset_iris(v) for k, v in value.items() if not (k == "source_iri" and v is None)}
+    if isinstance(value, list):
+        return [_drop_unset_iris(v) for v in value]
+    return value
 
 
 def _sorted(value: Any) -> Any:

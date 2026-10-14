@@ -136,18 +136,26 @@ async def test_a_skill_needing_a_callable_the_envelope_lacks_is_marked_on_both_t
     assert by_key["create_task"].bound == "work_write"
 
 
-async def test_meters_read_the_record_and_absence_is_not_zero(session: AsyncSession, graph: Graph, user: User):
+async def test_meters_read_the_record_in_tokens(session: AsyncSession, graph: Graph, user: User):
     agent = await agents.create_agent(session, graph=graph, payload=AgentCreate(name="Analyst"), actor=user)
     lifecycle = AgentLifecycleManager()
 
     empty = await lifecycle.meters(session, agent=agent)
-    assert empty.spend_this_month is None
+    assert empty.tokens_this_month == 0
+    assert (empty.max_tokens_month, empty.max_tokens_run) == (5_000_000, 200_000)
     assert empty.running == 0 and empty.runs_this_month == 0
 
     now = datetime.now(UTC)
     session.add_all(
         [
-            TaskRun(graph_id=graph.id, agent_id=agent.id, status=RunStatus.running.value, started_at=now, cost_usd=0.5),
+            TaskRun(
+                graph_id=graph.id,
+                agent_id=agent.id,
+                status=RunStatus.running.value,
+                started_at=now,
+                tokens_in=400,
+                tokens_out=100,
+            ),
             TaskRun(graph_id=graph.id, agent_id=agent.id, status=RunStatus.queued.value),
             ChatSession(graph_id=graph.id, agent_id=agent.id, created_by_id=user.id, title="t"),
         ]
@@ -155,7 +163,7 @@ async def test_meters_read_the_record_and_absence_is_not_zero(session: AsyncSess
     await session.flush()
 
     meters = await lifecycle.meters(session, agent=agent)
-    assert meters.spend_this_month == pytest.approx(0.5)
+    assert meters.tokens_this_month == 500
     assert (meters.running, meters.queued, meters.runs_this_month, meters.sessions) == (1, 1, 2, 1)
     assert meters.max_concurrent_runs == agent.effective_budget["max_concurrent_runs"]
 

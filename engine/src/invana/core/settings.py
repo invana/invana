@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Literal
 
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -72,6 +73,9 @@ class Settings(BaseSettings):
     # whether a username is taken, so cap scraping cost. 0 disables the limit.
     auth_username_available_rate_limit_per_minute: int = 30
 
+    # Where a bound dataset version's records are written for its load, by content hash.
+    dataset_dir: str = ".invana/datasets"
+
     # URL Studio is served from — used to build user-facing links (e.g. login).
     studio_base_url: str = "http://localhost:8300"
 
@@ -85,6 +89,17 @@ class Settings(BaseSettings):
     telemetry_environment: str = "development"
     # Fraction of new root traces kept (0 to 1); traces with a parent follow the parent's decision.
     telemetry_sample_ratio: float = Field(default=1.0, ge=0, le=1)
+
+    # Notifications — email channels send through this SMTP server; none configured
+    # means an email delivery fails saying so (docs/for-developers/modules/operate/features/notifications.md).
+    smtp_host: str = ""  # INVANA_SMTP_HOST
+    smtp_port: int = 587  # INVANA_SMTP_PORT
+    smtp_username: str = ""  # INVANA_SMTP_USERNAME
+    smtp_password: str = ""  # INVANA_SMTP_PASSWORD
+    smtp_from: str = ""  # INVANA_SMTP_FROM
+    smtp_starttls: bool = True  # INVANA_SMTP_STARTTLS
+    # How often the clock fires schedules, matches rules, reminds, expires and sends; 0 turns it off.
+    clock_interval_s: int = 30  # INVANA_CLOCK_INTERVAL_S
 
     # Graphs — runtime connection pool
     encryption_key: str = ""  # INVANA_ENCRYPTION_KEY — required in production; 32-byte URL-safe base64 Fernet key
@@ -100,8 +115,23 @@ class Settings(BaseSettings):
     # when a new one opens (docs/for-developers/modules/ask/spec.md). 0 keeps all.
     run_history_limit: int = 500  # INVANA_RUN_HISTORY_LIMIT
 
+    # Where a tool step runs: `inline` in this process, or `procrastinate` — deferred to the
+    # `tools` queue and run by `invana worker` (docs/for-developers/modules/platform/features/tool-plugins.md).
+    executor: Literal["inline", "procrastinate"] = "inline"  # INVANA_EXECUTOR
+    worker_concurrency: int = Field(default=4, ge=1)  # INVANA_WORKER_CONCURRENCY — jobs one worker runs at once
+
     # CORS — comma-separated allowed origins; use * for development only
     cors_origins: list[str] = ["http://localhost:8300", "http://127.0.0.1:8300"]
+
+    @model_validator(mode="after")
+    def refuse_procrastinate_without_postgres(self) -> Settings:
+        """The queue lives in the app database, so ``procrastinate`` needs it to be Postgres."""
+        if self.executor == "procrastinate" and not self.database_url.startswith("postgresql"):
+            raise ValueError(
+                "INVANA_EXECUTOR=procrastinate needs a PostgreSQL INVANA_DATABASE_URL; "
+                f"this one is {self.database_url.partition(':')[0]}. Use INVANA_EXECUTOR=inline on SQLite."
+            )
+        return self
 
     @model_validator(mode="after")
     def resolve_encryption_key(self) -> Settings:

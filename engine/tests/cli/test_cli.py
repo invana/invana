@@ -155,3 +155,21 @@ class TestLoaderCommandErrors:
             )
         assert result.exit_code == 0
         assert "DRY RUN" in result.output
+
+
+# ---------------------------------------------------------------------------
+# invana skills · agents · evals · llms · plans
+# ---------------------------------------------------------------------------
+
+
+class TestInstructionsCommands:
+    def test_lists_the_instruction_and_eval_groups(self):
+        result = CliRunner().invoke(app, ["--help"])
+        assert result.exit_code == 0
+        for cmd in ("skills", "agents", "evals", "llms", "plans"):
+            assert cmd in result.output
+
+    def test_a_candidate_without_draft_is_a_usage_error(self):
+        result = CliRunner().invoke(app, ["evals", "run", "--graph", "a/b", "--skill", "S", "--pin", "llm/x/y"])
+        assert result.exit_code == 2
+        assert "add --draft" in result.output

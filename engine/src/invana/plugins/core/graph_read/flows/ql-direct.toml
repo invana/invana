@@ -1,0 +1,26 @@
+key = "ql-direct"
+version = 1
+kind = "ask"
+description = "A typed query, and every re-run: no translation."
+intents = ["typed_query"]
+
+[[steps]]
+id = "validate_query"
+task = "validate_query"
+label = "Validate"
+
+[[steps]]
+id = "execute_graph_query"
+task = "execute_graph_query"
+label = "Execute"
+args = { read_only = true }
+
+[[steps]]
+id = "shape_for_canvas"
+task = "shape_for_canvas"
+label = "Project"
+
+[[steps]]
+id = "verify_result"
+task = "verify_result"
+label = "Verify"

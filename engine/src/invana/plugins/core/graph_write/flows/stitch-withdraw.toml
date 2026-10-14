@@ -1,0 +1,10 @@
+key = "stitch-withdraw"
+version = 1
+kind = "stitch"
+description = "Withdraw the edges a removed stitch wrote, under the Graph's guardrails."
+intents = []
+
+[[steps]]
+id = "withdraw_stitch"
+task = "withdraw_stitch"
+label = "Withdraw"

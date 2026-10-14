@@ -16,7 +16,7 @@ composition happens at run open and is drawn in [Ask](../ask/spec.md)**.
 | | |
 |---|---|
 | Index | [§5 · Agents](../../README.md#5--agents) |
-| Features | [providers-and-models](features/providers-and-models.md) · [author-an-agent](features/author-an-agent.md) · [envelope-and-budget](features/envelope-and-budget.md) · [delegation](features/delegation.md) · [lifecycle](features/lifecycle.md) · [lineage](features/lineage.md) · [concurrency-and-contention](features/concurrency-and-contention.md) · [soul](features/soul.md) |
+| Features | [providers-and-models](features/providers-and-models.md) · [author-an-agent](features/author-an-agent.md) · [envelope-and-budget](features/envelope-and-budget.md) · [delegation](features/delegation.md) · [lifecycle](features/lifecycle.md) · [lineage](features/lineage.md) · [concurrency-and-contention](features/concurrency-and-contention.md) · [soul](features/soul.md) · [pinned-model-versions](features/pinned-model-versions.md) |
 | Depends on | [Skills](../skills/spec.md) (what it may be offered) · [Workflows](../workflows/spec.md) (what it may run) · Ask (an agent runs a run) |
 | Depended on by | [Work](../work/spec.md) (an agent is an assignee) · Ask (a session asks through an agent) |
 
@@ -155,7 +155,7 @@ erDiagram
     TASKPLAN {
         string id       PK
         string key      UK "reusable plans only"
-        string origin      "authored generated promoted"
+        string origin      "packaged generated promoted"
         bool   reusable
     }
     TASK {
@@ -197,7 +197,7 @@ erDiagram
         string id               PK
         string agent_id         FK "one agent per session"
         string lens_id          FK "default world - null = Everything"
-        float  max_cost_usd_run    "capped by the agent's own"
+        int    max_tokens_run      "capped by the agent's own"
     }
     TASKRUN {
         string id             PK

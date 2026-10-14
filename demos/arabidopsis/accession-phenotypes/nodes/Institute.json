@@ -1,0 +1,26 @@
+[
+  {
+    "id": "I-GMI",
+    "properties": {
+      "name": "GMI Vienna",
+      "city": "Vienna",
+      "country": "AT"
+    }
+  },
+  {
+    "id": "I-MPI",
+    "properties": {
+      "name": "MPI Tübingen",
+      "city": "Tübingen",
+      "country": "DE"
+    }
+  },
+  {
+    "id": "I-Salk",
+    "properties": {
+      "name": "Salk",
+      "city": "La Jolla",
+      "country": "US"
+    }
+  }
+]

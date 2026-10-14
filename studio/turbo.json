@@ -1,0 +1,38 @@
+{
+	"$schema": "https://turborepo.com/schema.json",
+	"agentGuidance": false,
+	"globalPassThroughEnv": ["CI"],
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"env": ["VITE_*", "INVANA_DESIGN_KIT", "INVANA_CANVAS"],
+			"outputs": ["dist/**"]
+		},
+		"lint": {
+			"dependsOn": ["^lint", "//#check-boundaries"]
+		},
+		"//#check-boundaries": {
+			"inputs": [
+				"scripts/check-boundaries.mjs",
+				"apps/*/turbo.json",
+				"apps/*/src/**",
+				"packages/*/turbo.json",
+				"packages/*/src/**",
+				"packages/*/package.json",
+				"apps/*/package.json"
+			]
+		},
+		"check-types": {
+			"dependsOn": ["^check-types"]
+		},
+		"//#test": {
+			"cache": false
+		},
+		"dev": {
+			"env": ["VITE_*", "INVANA_DESIGN_KIT", "INVANA_CANVAS"],
+			"cache": false,
+			"persistent": true
+		}
+	}
+}

@@ -1,0 +1,17 @@
+key = "mail.read"
+version = "0.1.0"
+summary = "Read the newest messages in a mailbox folder over IMAP, without marking them read."
+bound = "network"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+timeout_s = 30
+retries = 2
+
+[args]
+folder = { type = "str", default = "INBOX" }
+limit = { type = "int", default = 20 }
+unseen_only = { type = "bool", default = true }
+
+[outputs]
+messages = "list"

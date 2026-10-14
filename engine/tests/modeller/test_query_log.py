@@ -26,7 +26,7 @@ from invana.core.querylog import ObservedQuery, QueryCaller, calling_as, observe
 from invana.core.telemetry import spans
 from invana.runtime.callers import classify
 from invana.runtime.models import TaskRun
-from tests.graph.connectors.backends import NEO4J
+from tests.graph.connectors.backends import NEO4J, has_airways
 
 TODAY = date(2026, 9, 27)
 NOON = datetime(2026, 9, 26, 12, tzinfo=UTC)
@@ -83,6 +83,8 @@ def test_a_shape_takes_the_literals_out():
 
 @pytest.mark.asyncio
 async def test_a_query_is_observed_only_when_someone_asked(neo4j):
+    if not await has_airways(neo4j):
+        pytest.skip("Neo4j holds no airways data to read")
     seen: list[ObservedQuery] = []
     set_query_observer(seen.append)
     try:

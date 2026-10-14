@@ -11,9 +11,11 @@ from __future__ import annotations
 import pytest
 
 from invana.apps.agents.envelope import Envelope, PlanRejected, apply_pins, validate_plan
-from invana.apps.agents.registry import EXPLORER, NL_SINGLE
+from invana.apps.agents.registry import EXPLORER
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 
+NL_SINGLE = load_plugins().flows["nl-single"]
 ENVELOPE = Envelope.from_spec(EXPLORER.workflow_spec)
 
 
@@ -148,25 +150,27 @@ class TestTheCeilings:
 
         budget = Agent(budget=None).effective_budget
 
-        assert budget["max_cost_usd_month"] == 5.0
-        assert budget["max_cost_usd_run"] == 2.0
+        assert budget["max_tokens_month"] == 5_000_000
+        assert budget["max_tokens_run"] == budget["max_tokens"] == 200_000
+        assert not any(key.startswith("max_cost_usd") for key in budget)
         assert budget["max_concurrent_runs"] == 3
         assert budget["max_fanout"] == 200
 
-    def test_the_old_name_still_means_the_month(self):
-        """A row written before the rename carries `max_cost_usd`, and it meant
-        the month — so it wins where the new name is absent, and it is answered
-        back so a reader that has not moved sees a number (§8 #4)."""
+    def test_the_old_name_still_means_the_run(self):
+        """EB8 — a row carrying `max_tokens` meant the run; it is read as
+        `max_tokens_run` and answered back under both names."""
         from invana.apps.agents.models import Agent
 
-        budget = Agent(budget={"max_cost_usd": 12.0}).effective_budget
+        budget = Agent(budget={"max_tokens": 8_000}).effective_budget
 
-        assert budget["max_cost_usd_month"] == 12.0
-        assert budget["max_cost_usd"] == 12.0
+        assert budget["max_tokens_run"] == budget["max_tokens"] == 8_000
 
-    def test_the_new_name_wins_where_a_row_sets_both(self):
+    def test_both_names_set_the_smaller_binds_and_money_bounds_nothing(self):
+        """EB8 — a ceiling read two ways never widens; a stored money key is
+        answered as stored and is not a token budget."""
         from invana.apps.agents.models import Agent
 
-        budget = Agent(budget={"max_cost_usd": 12.0, "max_cost_usd_month": 40.0}).effective_budget
+        budget = Agent(budget={"max_tokens": 8_000, "max_tokens_run": 50_000, "max_cost_usd_run": 2.0}).effective_budget
 
-        assert budget["max_cost_usd_month"] == 40.0
+        assert budget["max_tokens_run"] == 8_000
+        assert budget["max_cost_usd_run"] == 2.0

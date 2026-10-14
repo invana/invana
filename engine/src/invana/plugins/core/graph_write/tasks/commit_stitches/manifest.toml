@@ -1,0 +1,14 @@
+key = "commit_stitches"
+version = "1.0.0"
+summary = "Make the staged stitches active and write the edges they imply."
+bound = "graph_write"
+side_effect = "write"
+requires = []
+resources = ["cpu"]
+
+[args]
+
+[outputs]
+written = "int"
+rejected = "int"
+links = "list"

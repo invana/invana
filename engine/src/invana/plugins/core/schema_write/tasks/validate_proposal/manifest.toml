@@ -1,0 +1,13 @@
+key = "validate_proposal"
+version = "1.0.0"
+summary = "Check a proposed model change for referential integrity, then stage it."
+bound = "schema_write"
+side_effect = "write"
+requires = ["propose_model"]
+resources = ["cpu"]
+
+[args]
+
+[outputs]
+counts = "obj"
+draft_version_id = "str"

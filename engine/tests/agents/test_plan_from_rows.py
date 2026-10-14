@@ -17,9 +17,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.envelope import Envelope
-from invana.apps.agents.registry import EXPLORER, TEMPLATES
+from invana.apps.agents.registry import EXPLORER
 from invana.apps.graphs.models import Graph
 from invana.apps.task_plans.models import Task as PlanTask
+from invana.plugins import load_plugins
 from invana.runtime.models import RunStatus, TaskRun
 from invana.runtime.planning import queue_plan_steps, resolve_plan, select_plan
 
@@ -52,7 +53,7 @@ class TestTheRowsAreThePlan:
         assert selected is not None
         assert (selected.key, selected.version, selected.ref) == ("nl-single", 2, "nl-single@2")
 
-        authored = TEMPLATES["nl-single"].steps
+        authored = load_plugins().flows["nl-single"].steps
         assert [s["task"] for s in selected.steps] == [s["task"] for s in authored]
         # Every `${args.N}` the plan declares is already resolved against its
         # default — a plan selected directly runs on what it declares, and a

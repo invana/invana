@@ -1,51 +1,49 @@
-"""The catalogue — the **closed** set of steps a plan may name
+"""The catalogue — the **closed** set of task types a plan may name
 (docs/for-developers/orchestration.md §0.6).
 
-``CATALOGUE`` is the declaration: every entry carries the bound it spends, the
-args it parses, the outputs it promises and what must run before it. ``TASKS``
-is the dispatch table derived from it. Nothing outside this package adds an
-entry, which is what makes the set closed and a plan checkable before it runs —
-an app that could register one would close an import cycle *and* make the
-envelope advisory (building-engine/the-runtime-package.md §1).
+Task types are declared in plugins (:mod:`invana.plugins`), one folder each, and
+this package is the runtime's view of them: ``CATALOGUE`` is every loaded task
+type by key, ``TASKS`` the dispatch table derived from it. The set is closed
+**per process** — the plugin registry is built once at start-up and frozen —
+which is what makes a plan checkable before it runs.
 
-**One module per bound**, because the group is what the envelope ceilings:
-
-| Module | Bound | Entries |
-|---|---|---|
-| `contract` | — | what a step is handed and may raise; declares no entry |
-| `registry` | — | the shape of a declaration |
-| `pure` | *none* | `validate_query` · `shape_for_canvas` · `verify_result` · `await_delegations` |
-| `graph_read` | `graph_read` | `execute_graph_query` |
-| `ingest` | `ingest` | `check_bundle` · `validate_records` · `snapshot_model` |
-| `graph_write` | `graph_write` | `write_graph` · `stitch` · `bulk_write` · `apply_stitches` · `commit_stitches` · |
-| | | `withdraw_stitch` |
-| `schema_write` | `schema_write` | `understand_ask` · `validate_proposal` |
-| `llm` | `llm` | `understand_intent` · `plan_workflow` · `translate_thought` · `draft_plan` · `propose_model` |
-| `work_write` | `work_write` | `spawn_agent` · `delegate` · `create_task` |
-
-Three modules in here declare no entry and are **bodies**: `bundle` (the
-manifest's only parser), `records` (validating and writing records) and
-`stitching` (the rules between models). Loading owns no records of its own, so
-there is no app for those entries to be thin against — § 4a of
-building-engine/the-runtime-package.md says where a body goes.
+``TASKS`` is a plain dict so a test may substitute one step; ``CATALOGUE`` is a
+copy of the frozen registry's mapping, never authored beside it.
 
 The keys are the plan vocabulary and are **not** module paths: they are stored
-in `run_nodes.task_key` and read by Studio, so they do not change when a
-step moves between modules here.
+in `run_nodes.task_key` and read by Studio, so they do not change when a task
+type moves between plugins.
 """
 
 from __future__ import annotations
 
-from invana.runtime.catalogue import graph_read, graph_write, ingest, llm, pure, schema_write, work_write
-from invana.runtime.catalogue.contract import (
-    CannotAnswer,
-    Converse,
+from invana.plugins import load_plugins
+from invana.plugins.core.graph_read.tasks.execute_graph_query.run import execute_graph_query
+from invana.plugins.core.graph_write.tasks.apply_stitches.run import apply_stitches
+from invana.plugins.core.graph_write.tasks.commit_stitches.run import commit_stitches
+from invana.plugins.core.graph_write.tasks.stitch.run import stitch
+from invana.plugins.core.graph_write.tasks.write_graph.run import write_graph
+from invana.plugins.core.ingest.tasks.check_bundle.run import check_bundle
+from invana.plugins.core.ingest.tasks.snapshot_model.run import snapshot_model
+from invana.plugins.core.ingest.tasks.validate_records.run import validate_records
+from invana.plugins.core.llm.tasks.plan_workflow.run import plan_workflow
+from invana.plugins.core.llm.tasks.propose_model.run import propose_model_task
+from invana.plugins.core.llm.tasks.translate_thought.run import translate_thought
+from invana.plugins.core.llm.tasks.understand_intent.run import understand_intent
+from invana.plugins.core.pure.tasks.await_delegations.run import await_delegations
+from invana.plugins.core.pure.tasks.shape_for_canvas.run import shape_for_canvas
+from invana.plugins.core.pure.tasks.validate_query.run import validate_query
+from invana.plugins.core.pure.tasks.verify_result.run import verify_result
+from invana.plugins.core.schema_write.tasks.understand_ask.run import understand_ask
+from invana.plugins.core.schema_write.tasks.validate_proposal.run import validate_proposal_task
+from invana.plugins.core.work_write.tasks.create_task.run import create_task
+from invana.plugins.core.work_write.tasks.delegate.run import delegate
+from invana.plugins.core.work_write.tasks.spawn_agent.run import spawn_agent
+from invana.plugins.sdk.context import (
     LoadVars,
-    NeedsInput,
     Out,
     RunVars,
     TaskContext,
-    TaskFailure,
     cited_rule_version_ids,
     context_turns,
     http_failure,
@@ -56,43 +54,32 @@ from invana.runtime.catalogue.contract import (
     offered_skill_version_ids,
     query_language_for,
 )
-from invana.runtime.catalogue.graph_read import execute_graph_query
-from invana.runtime.catalogue.graph_write import (
-    apply_stitches,
-    commit_stitches,
-    stitch,
-    write_graph,
-)
-from invana.runtime.catalogue.ingest import check_bundle, snapshot_model, validate_records
-from invana.runtime.catalogue.llm import (
-    plan_workflow,
-    propose_model_task,
-    translate_thought,
-    understand_intent,
-)
-from invana.runtime.catalogue.pure import (
-    await_delegations,
-    shape_for_canvas,
-    validate_query,
-    verify_result,
-)
-from invana.runtime.catalogue.registry import Arg, Bound, Entry, Type, build
-from invana.runtime.catalogue.schema_write import understand_ask, validate_proposal_task
-from invana.runtime.catalogue.work_write import create_task, delegate, spawn_agent
+from invana.plugins.sdk.errors import CannotAnswer, Converse, NeedsInput, TaskFailure
+from invana.plugins.sdk.manifest import Arg, Bound, Entry, Type
 
-#: Every declared entry, by key. The closed set.
-CATALOGUE: dict[str, Entry] = build(
-    *pure.ENTRIES.values(),
-    *graph_read.ENTRIES.values(),
-    *ingest.ENTRIES.values(),
-    *graph_write.ENTRIES.values(),
-    *schema_write.ENTRIES.values(),
-    *llm.ENTRIES.values(),
-    *work_write.ENTRIES.values(),
-)
+#: Every loaded task type, by key. The closed set.
+CATALOGUE: dict[str, Entry] = dict(load_plugins().tasks)
 
 #: What the interpreter dispatches — derived, never authored beside CATALOGUE.
 TASKS = {key: entry.run for key, entry in CATALOGUE.items()}
+
+
+def sync() -> None:
+    """Re-derive ``CATALOGUE`` and ``TASKS`` in place from the registry as it now stands.
+
+    Called once at start-up, after :func:`invana.plugins.install_mcp` has added
+    the MCP plugins — the two dicts are imported by name everywhere, so they
+    are updated rather than rebound.
+    """
+    tasks = load_plugins().tasks
+    for key in [k for k in CATALOGUE if k not in tasks]:
+        del CATALOGUE[key]
+        TASKS.pop(key, None)
+    for key, entry in tasks.items():
+        if CATALOGUE.get(key) is not entry:
+            CATALOGUE[key] = entry
+            TASKS[key] = entry.run
+
 
 __all__ = [
     "CATALOGUE",
@@ -131,6 +118,7 @@ __all__ = [
     "snapshot_model",
     "spawn_agent",
     "stitch",
+    "sync",
     "translate_thought",
     "understand_ask",
     "understand_intent",

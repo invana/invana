@@ -82,7 +82,7 @@ flowchart LR
 | | `llms` | providers-and-models | Agents › LLMs · Settings › LLMs | agents |
 | | `skills` | authoring-a-skill · bindings · usage | `leftNav` Skills | skills |
 | | `rules` | rules | Skills › Rules | skills |
-| | `plans` | the-library · plan-selection · envelope-validation · promote-a-plan · draft-a-plan · run-a-workflow · the-catalogue | `leftNav` Library | workflows |
+| | `plans` | the-library · plan-selection · envelope-validation · promote-a-plan · run-a-workflow · the-catalogue | `leftNav` Library | workflows |
 | | `reviews` | review | the Review queue | work |
 | | `runs` | see-what-ran · observability | `leftNav` Runs | operate |
 | | `schedules` | schedules | none yet | operate |
@@ -273,7 +273,7 @@ docstrings stay full — they are how a reader learns to use the code.
 
 ## 6. Retired words still in Studio
 
-**Status: file and component names done** — `TodoActivityTree`, `TodoRunsBlock`, `LayeredCanvas*`, `RecordRow`, `PlanTrendWidget`, `taskFlowFromTaskPlan`, `SkillPlaybookEditor`, `AgentEffortTab`, `useLeftSection` · `LeftNavKey`. The type, hook and API names are done too — `Todo*` · `todosApi` · `useTodosQuery` · `useTodoRunsQuery`, `TaskRun` · `RunStreamHandle` · `RunState` · `LIVE_RUN_STATUSES`, `useTaskPlansQuery` · `taskPlansApi`, `SkillPlaybook*`, `navItem`. **Journal:** the journal hook is `useRunListQuery` and its row `RunListRow`; `useRunsQuery` keeps its name, because it is a different read — the raw list with server-side filters, where the journal shapes and filters rows client-side — and both live in `runs/queries.ts`. Only a *Todo* retires *Task*: `TaskFlowCanvas`, `TaskGroup`, `TaskPlan*` and `TaskRun` name the runtime step and keep it. UI copy keeps its words (§11) — the Todos section still labels its runs *Thoughts*.
+**Status: file and component names done** — `TodoActivityTree`, `TodoRunsBlock`, `LayeredCanvas*`, `RecordRow`, `PlanTrendWidget`, `taskFlowFromTaskPlan`, `AgentEffortTab`, `useLeftSection` · `LeftNavKey`. The type, hook and API names are done too — `Todo*` · `todosApi` · `useTodosQuery` · `useTodoRunsQuery`, `TaskRun` · `RunStreamHandle` · `RunState` · `LIVE_RUN_STATUSES`, `useTaskPlansQuery` · `taskPlansApi`, `SkillPlaybook*`, `navItem`. **Journal:** the journal hook is `useRunListQuery` and its row `RunListRow`; `useRunsQuery` keeps its name, because it is a different read — the raw list with server-side filters, where the journal shapes and filters rows client-side — and both live in `runs/queries.ts`. Only a *Todo* retires *Task*: `TaskFlowCanvas`, `TaskGroup`, `TaskPlan*` and `TaskRun` name the runtime step and keep it. UI copy keeps its words (§11) — the Todos section still labels its runs *Thoughts*.
 
 | Word | Where | Becomes |
 |---|---|---|
@@ -606,7 +606,7 @@ studio/src/
             │  ── Orchestration
             ├── agents/            AgentsViewPanel · AgentsSection · AgentDetail · Agent*Tab · EnvelopeCanvas · LineageCanvas
             ├── llms/              LlmsSection · ProviderForm · ProviderDetail
-            ├── skills/            SkillsViewPanel · SkillDetail · SkillPlaybookEditor · boards/
+            ├── skills/            SkillsViewPanel · SkillDetail · boards/
             ├── rules/             RulesSection · RuleParts · ProjectRules · boards/
             ├── plans/             LibraryViewPanel · PlansSection · CatalogueSection · PromoteDialog · boards/
             ├── runs/              RunsViewPanel · RunsList · RunDetail · RunsBoardPage · boards/
@@ -787,7 +787,6 @@ studio/src/
                 ├── index.ts  api.ts  queries.ts  types.ts   ← skills.ts (SkillPlan* → SkillPlaybook*)
                 ├── SkillsViewPanel.tsx  SkillDetail.tsx  SkillBoardPage.tsx   ← SkillsPanel
                 ├── SkillPlaybookTab.tsx  SkillFlowTab.tsx
-                ├── SkillPlaybookEditor.tsx  ← SkillPlanEditor.tsx
                 └── boards/                  ← boards/ — SkillFlowWidget ← SkillFlowPanel
                                              UsageBoardPage ← UsageDashboardPage · usageBoardSpec · shared
 ```

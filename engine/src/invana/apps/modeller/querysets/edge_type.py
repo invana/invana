@@ -28,6 +28,7 @@ class EdgeTypeQuerySet(VersionScopedQuerySet):
         target_node_types: list[str] | None = None,
         multiplicity: str = "MULTI",
         property_mappings: list[dict] | None = None,
+        source_iri: str | None = None,
     ) -> EdgeTypeDefinition:
         await self._ensure_draft(session, version_id)
 
@@ -38,6 +39,7 @@ class EdgeTypeQuerySet(VersionScopedQuerySet):
             source_node_types=source_node_types or [],
             target_node_types=target_node_types or [],
             multiplicity=multiplicity,
+            source_iri=source_iri,
         )
         session.add(edge_type)
         await session.flush()

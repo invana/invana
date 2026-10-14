@@ -1,0 +1,40 @@
+{
+  "projects": [
+    {
+      "key": "early-flowering-under-drought",
+      "name": "Early flowering under drought",
+      "description": "Does FRI loss-of-function shorten flowering under drought — and is it through lower FLC? Pick the crosses that test it, with evidence a reviewer can follow back to the data."
+    },
+    {
+      "key": "gene-edited-field-trials",
+      "name": "Allow gene-edited lines in field trials",
+      "description": "What the change reaches: lines, trial sites, stock centres and labs."
+    },
+    {
+      "key": "seed-stock-audit-2025",
+      "name": "Seed-stock audit 2025",
+      "description": "Which accessions the stock centres still hold, and whether their seed matches the record."
+    }
+  ],
+  "todos": [
+    {
+      "title": "Score days to flowering on trays 11–18",
+      "project_key": "early-flowering-under-drought",
+      "acceptance": "All 8 trays are scored under the drought regime."
+    },
+    {
+      "title": "Find published FLC expression data for Cvi-0",
+      "project_key": "early-flowering-under-drought"
+    },
+    {
+      "title": "Genotype FRI on the F2 plants",
+      "project_key": "early-flowering-under-drought"
+    },
+    {
+      "title": "Reply to NASC about the Kas-1 seed request"
+    },
+    {
+      "title": "Review 12 conflicts in Accession phenotypes"
+    }
+  ]
+}

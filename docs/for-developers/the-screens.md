@@ -133,9 +133,9 @@ composed from is [building-studio/design-kit-coverage.md](building-studio/design
 | 34 | `WorkflowStepHiFi` | a step selected | Tasks › Plans › step | [7.2](modules/workflows/features/plan-selection.md) | 🟡 | 🟡 | ❌ |
 | 34a | `RunWorkflowHiFi` | the run dialog — arguments, step preview, projected cost | Tasks › Plans › run | [7.5](modules/workflows/features/run-a-workflow.md) | 🔵 | 🔵 | ❌ |
 | 34b | `PlanDetail` | a published version, its flow on the canvas | Tasks › Plans › a plan | [7.1](modules/workflows/features/the-library.md) | ✅ | 🟡 | ❌ |
-| 34c | `PlanDraftCanvas` | drafting on the canvas — a refused drop, the bound named | Tasks › Plans › draft | [7.7](modules/workflows/features/draft-a-plan.md) | 🔵 | 🔵 | ❌ |
-| 34d | `PlanDraftYaml` | the same draft as `manifest.yml` | Tasks › Plans › draft | [7.7](modules/workflows/features/draft-a-plan.md) | 🔵 | 🔵 | ❌ |
-| 34e | `PlanRetire` | retiring a version — what stops, what keeps reading | Tasks › Plans › retire | [7.7](modules/workflows/features/draft-a-plan.md) | 🔵 | 🔵 | ❌ |
+| 34c | `PlanDraftCanvas` | **retired, not to build** ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) — drafting on the canvas — a refused drop, the bound named | Tasks › Plans › draft | [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) | ⛔ | ⛔ | ❌ |
+| 34d | `PlanDraftYaml` | **retired, not to build** ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) — the same draft as `manifest.yml` | Tasks › Plans › draft | [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) | ⛔ | ⛔ | ❌ |
+| 34e | `PlanRetire` | retiring a version — what stops, what keeps reading | Tasks › Plans › retire | [7.1](modules/workflows/features/the-library.md) | 🔵 | 🔵 | ❌ |
 | 34f | `CatalogueDetail` | an entry as a page — **considered, not built** ([CA6](modules/workflows/features/the-catalogue.md)); the detail is the drawer body and the contract card | Tasks › Catalogue | 🟡 | ⛔ | ❌ |
 | 34g | `RunDetail` | the light drawer — info, the Gantt, a line of log per task — beside the flow | Tasks › Runs › a run | [10.5](modules/operate/features/see-what-ran.md) | 🔵 | 🔵 | ❌ |
 | 34h | `RunDashboard` | what `More` opens — a declared board, `kind = run` | Tasks › Runs › board | [10.5](modules/operate/features/see-what-ran.md) · [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
@@ -149,7 +149,7 @@ composed from is [building-studio/design-kit-coverage.md](building-studio/design
 | 34m | `StepQuery` | the same shell — output is rows | Tasks › Runs › a task | [10.5](modules/operate/features/see-what-ran.md) | ✅ | ✅ | ❌ |
 | 34n | `StepLlm` | the same shell — output is the prompt and completion | Tasks › Runs › a task | [10.5](modules/operate/features/see-what-ran.md) | ✅ | ✅ | ❌ |
 | 34o | `PlanDash` | the plan board — the flow with per-task medians, arguments, its runs | Tasks › Plans › a plan | [7.1](modules/workflows/features/the-library.md) | 🔵 | 🔵 | ❌ |
-| 34p | `PlanStepParams` | a task's parameters, generated from its catalogue contract | Tasks › Plans › draft › a task | [7.7](modules/workflows/features/draft-a-plan.md) | 🔵 | 🔵 | ❌ |
+| 34p | `PlanStepParams` | **retired, not to build** ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) — a task's parameters, generated from its catalogue contract | Tasks › Plans › draft › a task | [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) | ⛔ | ⛔ | ❌ |
 | 34q | `CatalogueList` | 25 entries grouped by bound, each row carrying how many plans name it | Tasks › Catalogue | [7.6](modules/workflows/features/the-catalogue.md) | ✅ | ✅ | ❌ |
 | 34r | `SkillDash` | **superseded by 34y** — the skill board — the trigger, the playbook, the flow mounted from the Flow tab, and the tab strip that proves the drawer kept its place | Skills › a skill › `More` | [6.1](modules/skills/features/authoring-a-skill.md) · [4.2](modules/explore/features/boards.md) | ✅ | ✅ | ❌ |
 | 34r.1 | `SkillDashDraft` | **superseded by 34y** — the same board on a **draft** — no tiles, and three bands that say *nothing published yet* rather than reporting a fault ([SD10](building-studio/skills-boards.md)) | Skills › a draft › `More` | [6.1](modules/skills/features/authoring-a-skill.md) | ✅ | ✅ | ❌ |
@@ -408,17 +408,17 @@ title, character for character** — the canvas and this table are one string, n
 | `library.plans.detail.flow_canvas.complex_variant2` | A plan with an approval: a gate is a seam the bands are crossed by, never a task on one of them | [7.1](modules/workflows/features/the-library.md) |
 | `library.plans.detail.flow_canvas.complex_variant3` | A plan with a verdict: a seam on the far edge of the pass, with the bracket it sends back hanging off it | [7.1](modules/workflows/features/the-library.md) |
 | | | |
-| `library.plans.detail.flow_canvas.edit` | Drafting with the Assistant shut: the catalogue is the palette, the whole flow is in view, the editor is two columns | [7.7](modules/workflows/features/draft-a-plan.md) |
-| `library.plans.detail.flow_canvas.edit.states` | The three refused tasks and one file error that hold a publish, each naming its bound | [7.7](modules/workflows/features/draft-a-plan.md) |
-| `library.plans.detail.flow_canvas.edit.assistant` | The same draft with the Assistant open: mainSection gives up 360px, the canvas pans to the selection and the editor stacks | [7.7](modules/workflows/features/draft-a-plan.md) |
-| `library.plans.detail.manifest` | The same document as YAML, with the refused line marked in the gutter | [7.7](modules/workflows/features/draft-a-plan.md) |
+| `library.plans.detail.flow_canvas.edit` | **retired, not to build** ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) — Drafting with the Assistant shut: the catalogue is the palette, the whole flow is in view, the editor is two columns | [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) |
+| `library.plans.detail.flow_canvas.edit.states` | **retired, not to build** ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) — The three refused tasks and one file error that hold a publish, each naming its bound | [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) |
+| `library.plans.detail.flow_canvas.edit.assistant` | **retired, not to build** ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) — The same draft with the Assistant open: mainSection gives up 360px, the canvas pans to the selection and the editor stacks | [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) |
+| `library.plans.detail.manifest` | **retired, not to build** ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) — The same document as YAML, with the refused line marked in the gutter | [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) |
 | | | |
-| `library.plans.detail.retire` | What retiring stops, what keeps running regardless, and who loses their plan | [7.7](modules/workflows/features/draft-a-plan.md) |
+| `library.plans.detail.retire` | What retiring stops, what keeps running regardless, and who loses their plan | [7.1](modules/workflows/features/the-library.md) |
 | `library.plans.detail.export` | A published version as YAML, for reading in a pull request rather than editing | [7.1](modules/workflows/features/the-library.md) |
 | `library.plans.detail.readonly` | A member without write: the plan reads in full, and the acts they lack are absent | [7.1](modules/workflows/features/the-library.md) |
 | `library.plans.detail.ceilings` | Every ceiling a plan carries, and the three above one that are worth a pixel on the drawing | [7.1](modules/workflows/features/the-library.md) |
 | | | |
-| `library.plans.create` | A new plan starts as an empty draft, and the empty canvas says what to drag onto it | [7.7](modules/workflows/features/draft-a-plan.md) |
+| `library.plans.create` | **retired, not to build** ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) — A new plan starts as an empty draft, and the empty canvas says what to drag onto it | [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) |
 | | | |
 | `library.catalogue.list` | Every callable, grouped by the bound it spends, and how many plans name each one | [7.6](modules/workflows/features/the-catalogue.md) |
 | `library.catalogue.detail` | A task's contract read in the drawer, beside the plan that sent you to it | [7.6](modules/workflows/features/the-catalogue.md) |
@@ -430,8 +430,8 @@ title, character for character** — the canvas and this table are one string, n
 | Govern › what a world did | [10.5](modules/operate/features/see-what-ran.md) · [14.1](modules/govern/features/worlds.md) | `RunLens` (six bands, what each step touched, refusals struck, *This run's lens* + Retune) · `RunLensStep` (generated vs executed, and what egress cut) · `GovCompare` (the one participant that differed) · `Cast` (innermost wins, then it is checked) |
 | Agents › Agents | [5.2](modules/agents/features/author-an-agent.md)–[5.7](modules/agents/features/concurrency-and-contention.md) | `AgentsList` · `AgentEnvelope` · `AgentLineage` · `AgentLifecycle` · `AgentConcurrency` |
 | Agents › LLMs | [5.1](modules/agents/features/providers-and-models.md) | `AgentsLlms` |
-| Library › Plans | [7.1](modules/workflows/features/the-library.md) · [7.6](modules/workflows/features/the-catalogue.md) · [7.7](modules/workflows/features/draft-a-plan.md) | **22 artboards** — named `module.feature.surface.variant`, one row per name prefix, no annotation cards. Listed one by one in [the table below](#library--plans--the-22-artboards) |
-| Skills › Skills | [6.1](modules/skills/features/authoring-a-skill.md) | `SkillsViewPanel` (the panel, and the skill/rule line) · `SkillAuthor` (four fields, and the sentence `draft_plan` stops and asks about) · `SkillFlow` (**the plan in its six layers** — the only flow view, [SK16](modules/skills/features/authoring-a-skill.md)) · `SkillUsesPlan` (inlining a library plan with `uses`, and tuning what it declares — built on `SkillPlaybookEditor`'s rows) · `SkillVersions` (seven versions, immutable, the v4→v5 diff, a hand-edit flipping `origin`) |
+| Library › Plans | [7.1](modules/workflows/features/the-library.md) · [7.6](modules/workflows/features/the-catalogue.md) · [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) (the retired draft boards) | **22 artboards** — named `module.feature.surface.variant`, one row per name prefix, no annotation cards. Listed one by one in [the table below](#library--plans--the-22-artboards) |
+| Skills › Skills | [6.1](modules/skills/features/authoring-a-skill.md) | `SkillsViewPanel` (the panel, and the skill/rule line) · `SkillAuthor` (four fields, and the sentence `draft_plan` stops and asks about) · `SkillFlow` (**the plan in its six layers** — the only flow view, [SK16](modules/skills/features/authoring-a-skill.md)) · `SkillUsesPlan` (inlining a library plan with `uses`, and tuning what it declares — named in the prose and inlined at the draw, [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS11; no picker is built) · `SkillVersions` (seven versions, immutable, the v4→v5 diff; the hand-edit it draws is not built, IS3) |
 | Skills › Bindings | [6.2](modules/skills/features/bindings.md) | `SkillBindings` (bound, refused, and the world that changes which model decides) · `BindRefusals` (both halves run; the plan's declared bands with the shut one struck, and the three readings that shut one [BN13](modules/skills/features/bindings.md)) · `BindFromAgent` (the agent's side — it binds as you click, the refusal under the chip, the draft chip, and what the bindings cost in characters [BN11](modules/skills/features/bindings.md) · [BN14](modules/skills/features/bindings.md) · [BN15](modules/skills/features/bindings.md)) · `SkillOffer` (the fixed assembly order, discrete items with ids, what the record holds after) · `BindSeams` (a draft · unbound · in flight · refused · read-only) · `BindStanding` (the row's world as context, and the writer it does not have yet [BN12](modules/skills/features/bindings.md)) |
 | Skills › Usage | [6.3](modules/skills/features/usage.md) | `SkillUsage` (per version, by agent, by run outcome) · `UsageVersions` (every version with `enough_to_read`, and the v1 migration) · `UsageReadings` (four readings, and the move each names) · `UsageSeams` (too few · none yet · purged · self-reported) |
 | Skills › Rules | [6.4](modules/skills/features/rules.md) | `RulesPanel` (one statement, cited by 214 steps — and the four statements that are **not** rules) · `RuleAuthor` (the scope choice, and the nudge that it is two rules) · `RuleCited` (offered against cited, and what deactivating keeps) · `RulesProject` (a Project's working rules, the invariants read-only above) |
@@ -465,7 +465,7 @@ reads a run's ledger from a terminal.
 | R2 | `RunLensStep` | one step, generated vs executed | `run_touches.query` from the connector · `sent` from the cut | `EgressList` · `SliceSummary` | ✅ | ✅ |
 | R3 | `GovCompare` | two runs, one question | compare over `run_touches` | `DiffList` · `RecordHeader` | ✅ | ✅ a page kind, `compare:<a>:<b>` |
 | R4 | `Cast` | innermost wins, then checked | `LensRead.cast_resolved` | `CastTable` · `CannotAnswerCard` | ✅ | ✅ |
-| A1 | `AgentsList` | Agents › Agents | `agents.lens_id` read **and** written, and composed at run open · `llm_config_id` gone · `spend_this_month` | `LensChip` · `CastTable` · `MetricTile` | ✅ | ✅ the lens chip, the spend line, and *nothing priced* where a subscription answers |
+| A1 | `AgentsList` | Agents › Agents | `agents.lens_id` read **and** written, and composed at run open · `llm_config_id` gone · `tokens_this_month` | `LensChip` · `CastTable` · `MetricTile` | ✅ | ✅ the lens chip and the run budget in tokens |
 | A2 | `AgentEnvelope` | the envelope | all ten `budget` keys | `BoundChip` (exists) · `DataTable` | ✅ | ✅ the ceilings are a table with an **Enforced** column (EB7) |
 | A3 | `AgentLineage` | delegation and lineage | — | `TreeView` (exists) | ✅ | ✅ |
 | A4 | `AgentLifecycle` | pause, resume, retire | one preview, two acts — the same open work, the effects differ ([LC8](modules/agents/features/lifecycle.md)) | `AlertDialog` · `DataTable` | ✅ | ✅ |
@@ -667,6 +667,173 @@ and the Inspector drawn in `rightSection`. The name is the file, the frame title
 
 ---
 
+## Beyond the 42 · Datasets
+
+The `datasets.*` boards of the *Invana Products* prototype (`.design/canvas-products/`), as Studio
+builds them in `@invana-studio/datasets` (migration session C01). Decisions are in
+[products/datasets.md](../products/datasets.md#decisions) and the four feature files.
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `datasets.catalogue` | DS-01 | `/datasets/catalogue` | ✅ |
+| `datasets.dataset` · `.provenance` · `.versions` · `.used` · `.conformance` | DS-02 · DS-03 · DS-09 | `/datasets/catalogue/<publisher>/<name>[/<tab>]` | ✅ |
+| `datasets.dataset.retracted` | DS-14 | the Overview banner and the Versions tab | ✅ |
+| `datasets.record` | DS-04 | `…/records/<key>` | ✅ |
+| `datasets.observe` | DS-05 | *Add observations* on the dataset header | ✅ |
+| `datasets.observe.assistant` | DS-05 | not built — no assistant tool writes a dataset | ⛔ |
+| `datasets.collect` · `datasets.collect.run` | DS-06 | not built — no collector agent; the button is drawn disabled | ⛔ |
+| `datasets.validation` · `datasets.validation.item` | DS-07 | `/datasets/validation[/<publisher>/<name>/<key>/<term>]` — standard violations only | 🟡 |
+| `datasets.standards` · `datasets.standard` | DS-08 | `/datasets/standards[/<publisher>/<name>]` | ✅ |
+| `datasets.standard.attach` | DS-09 | *Attach a standard* — from a dataset or a standard | ✅ |
+| `datasets.documents` | DS-10 | not built — no documents dataset in the engine | ⛔ |
+| `datasets.bind` | DS-11 | *Bind to a Graph* on the dataset header | ✅ |
+| `datasets.share` | DS-12 | *Share* on the dataset header — only me · the install | ✅ |
+| `datasets.imports` · `datasets.imports.run` | DS-13 | `/datasets/imports` | ✅ |
+
+---
+
+## Beyond the 42 · Semantic imports
+
+The SKOS and ontology import boards of the *Invana Products* prototype (DS-15 · MO-15,
+`.design/canvas-products/p_round3.py`), as Studio builds them in `@invana-studio/datasets` and
+`@invana-studio/modeller` (migration session C08). Both are dialogs over their list page; the source
+field is `RdfSourceField` in `@invana-studio/ui`. Decisions are in
+[2.8](modules/bring-data-in/features/skos-import.md) SK8–SK11 and
+[1.10](modules/connect-and-model/features/ontology-import.md) OI13–OI17.
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `datasets.standards.import` | DS-15 | `/datasets/standards` › *Import from SKOS* — read, preview, import | ✅ |
+| `modeller.models.new.ontology` | MO-15 | `/modeller/models` › `⋯` › *From an ontology* — read, pick types (names above 500 classes) | ✅ |
+| `modeller.models.new.ontology.preview` | MO-15 | the same › *Preview* — the mapping, skips and suggestions; *Open as a draft* | ✅ |
+
+---
+
+## Beyond the 42 · Projects
+
+The `projects.*` boards of the *Invana Products* prototype (`.design/canvas-products/p_projects.py`),
+as Studio builds them in `@invana-studio/projects` (migration sessions C02 and C06). A project and Decisions
+are pages in `mainSection`; the page's tab and drill-in ride in the query beside `?page=`. Decisions
+are in [products/projects.md](../products/projects.md#decisions) and the work feature files
+[9.5](modules/work/features/branches-and-decisions.md) · [9.6](modules/work/features/project-reports.md) ·
+[9.7](modules/work/features/private-projects.md) · [9.8](modules/work/features/simulation.md) · [9.9](modules/work/features/impact.md).
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `projects.list` | PJ-01 | `/projects` — the Projects stack | ✅ |
+| `projects.new` | PJ-02 | *New project* on the stack's Projects header | ✅ |
+| `projects.project` | PJ-03 | `/projects/<key>` → page `project:<key>` | ✅ |
+| `projects.project.branches` | PJ-04 | `…?view=branches` | ✅ |
+| `projects.branch.fork` | PJ-04 | *Fork a branch* · a branch's *Fork* | ✅ |
+| `projects.branch` | PJ-05 | `…&branch=<n>` — Work · Findings · Simulations · History; no Runs or Schedules tab | 🟡 |
+| `projects.finding` | PJ-06 | `…&finding=<n>` | ✅ |
+| `projects.branch.decide` | PJ-07 | a branch's *Decide* | ✅ |
+| `projects.branch.merge` | PJ-08 | a branch's *Merge…* | ✅ |
+| `projects.simulate` | PJ-09 | *Simulate* on a branch's or the project's header | ✅ |
+| `projects.simulate.result` | PJ-09 | `…&simulation=<n>` | ✅ |
+| `projects.impact` | PJ-10 | `…?view=impact&of=<n>&hops=<n>` — reach by hop; no what-if values | 🟡 |
+| `projects.lineage` | PJ-11 | `…?view=lineage&decision=<n>` | ✅ |
+| `projects.todos` · `projects.todo` | PJ-12 | `/projects/todos[/<id>]` — *My todos* | ✅ |
+| `projects.decisions` | PJ-13 | `/projects/decisions` → page `decisions:<graph>` | ✅ |
+| `projects.report` | PJ-14 | `…?view=report` | ✅ |
+| `explorer.answer.to_project` | EX-12 | *Add to a project* on an answer's reply line | ✅ |
+
+## Beyond the 42 · Agents — instructions, evals, history and plugins
+
+The `agents.*` boards of the *Invana Products* prototype for AG-04 · AG-06 · AG-08 · AG-09 · AG-11 ·
+AG-13 · AG-14, as Studio builds them in `@invana-studio/agents` (migration session C03). The agent and
+the skill are pages in `mainSection`; a plugin and a task type are two more (`plugin:<name>` ·
+`task_type:<key>`). Decisions are in [products/agents.md](../products/agents.md#decisions) and the feature files
+[6.5](modules/skills/features/instructions-publish-rollback.md) · [6.6](modules/skills/features/evals.md) ·
+[5.9](modules/agents/features/pinned-model-versions.md) · [13.12](modules/platform/features/tool-plugins.md) ·
+[10.6](modules/operate/features/change-log.md).
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `agents.agent.instructions` | AG-04 | page `agent:<id>` › Instructions — draft, publish through the gate, the eval set | ✅ |
+| `agents.agent.history` | AG-06 | page `agent:<id>` › History — the change log, *Restore* on an instructions row | ✅ |
+| `agents.skills.detail` | AG-08 | page `skill:<id>` — Instructions · Plan · Bindings · Usage · History | ✅ |
+| `agents.skills.instructions.edit` | AG-08 | Instructions › *Edit instructions* — save, draw, evals | ✅ |
+| `agents.skills.evals` | AG-08 | Instructions in its evals mode — tiles, cases, *Publish vN* | ✅ |
+| `agents.skills.plan.regenerated` | AG-08 | Plan — the plan, what the last publish regenerated, who picks it up | ✅ |
+| `agents.skills.history` | AG-09 | page `skill:<id>` › History — versions, diff, *Restore vN* | ✅ |
+| `agents.library.plan.revisions` | AG-11 | page `plan_runs:<id>` › Revisions in runs | ✅ |
+| `agents.plugins` | AG-13 | `/agents/plugins` — the registry over the catalogue | ✅ |
+| `agents.plugins.plugin` | AG-13 | page `plugin:<name>` | ✅ |
+| `agents.plugins.task` | AG-13 | page `task_type:<key>` | ✅ |
+| `agents.llms` | AG-14 | `/agents/llms[/:provider]` — page: model versions, who pins each (agents, skills, eval judges), the endpoint in a sheet (C10) | ✅ |
+| `agents.overview` | AG-01 | `/agents/overview` — page: six tiles, needs attention, runs a day, changed recently (C10) | ✅ |
+| `agents.overview.dark` | AG-01 | `/agents/overview` in the dark theme | ✅ |
+| `agents.performance` | AG-15 | `/agents/performance` — page: tabs, 7 · 30 · 90 days, tiles, the p95 trend, each agent and skill (C10) | ✅ |
+
+---
+
+## Beyond the 42 · Change log and publish review
+
+The shared change log and the Modeller's publish review of the *Invana Products* prototype (SH-14 ·
+MO-09 · DS-04 · MO-05), as Studio builds them in `@invana-studio/shell`, `@invana-studio/modeller`
+and `@invana-studio/datasets` (migration session C04). Decisions are in
+[products/shell.md](../products/shell.md#decisions) · [products/modeller.md](../products/modeller.md#decisions) ·
+[products/datasets.md](../products/datasets.md#decisions) and the feature files
+[10.6](modules/operate/features/change-log.md) · [1.9](modules/connect-and-model/features/publish-review.md).
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `shell.activity.events` | SH-14 | `/activity/events` — the *Changes* toggle leads the filter bar | ✅ |
+| `shell.events.changes` | SH-14 | `/activity/events?filter=changes` — Product and Who filters, *Compare* per row | ✅ |
+| `shell.change.compare` | SH-14 | `/activity/changes/<kind>/<record>?a=&b=` — no *Restore* (the change log only reads) | ✅ |
+| `modeller.model.history` | MO-09 | `/modeller/models?model=<id>&models_tab=history` | ✅ |
+| `datasets.record` | DS-04 | `/datasets/catalogue/<publisher>/<name>/records/<key>` — the change log names who | ✅ |
+| `modeller.global_model.diff` | MO-05 | `/modeller/global-model` with a draft — the Comparing bar; the map is not re-coloured | 🟡 |
+| `modeller.draft.publish` | MO-05 | `/modeller/models?model=<id>` › *Publish* — additive, with *Who reads* | ✅ |
+| `modeller.draft.migration` | MO-05 | the same › *Publish* on a breaking draft — *Request approval*, then the review | ✅ |
+
+## Beyond the 42 · Schedules, the Inbox, rules and channels
+
+Activity's Schedules, Inbox, Rules and Channels tabs of the *Invana Products* prototype (SH-13 · SH-15 ·
+SH-16), as Studio builds them in `@invana-studio/shell` (migration session C05). Decisions are in
+[products/shell.md](../products/shell.md#decisions) and the feature files
+[10.1](modules/operate/features/schedules.md) · [10.7](modules/operate/features/notifications.md) ·
+[10.8](modules/operate/features/approvals.md).
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `shell.schedules` | SH-13 | `/activity/schedules` — Coming up (7 days) and every schedule | ✅ |
+| `shell.schedule.new` | SH-13 | the same › *New schedule* — no sources, tools or project picker | ✅ |
+| `shell.schedule.detail` | SH-13 | `/activity/schedules/<id>` — Instructions · Firings · Delivers to; no Plan card | ✅ |
+| `shell.notifications` | SH-15 | `/activity/inbox` — approvals, runs waiting on an answer, notifications | ✅ |
+| `shell.notifications.rules` | SH-16 | `/activity/rules` | ✅ |
+| `shell.notifications.rule` | SH-16 | `/activity/rules` › a rule (`?new=1` opens *New rule*) — events only, no metric condition or preview | ✅ |
+| `shell.notifications.channels` | SH-16 | `/activity/channels` — Teams listed *not connected* | ✅ |
+
+## Beyond the 42 · Roles and access
+
+Read-only views and Graph settings › Members of the *Invana Products* prototype (SH-20 · MO-14 · PJ-02),
+as Studio builds them in migration session C07. Decisions are in [11.6 roles](modules/identity-and-access/features/roles.md)
+RO13–RO18, [9.7 private projects](modules/work/features/private-projects.md) PP7–PP8 and
+[13.10 search](modules/platform/features/search.md) SE7.
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `agents.skills.detail.readonly` | SH-20 | page `skill:<id>` as a member without `builder` — the notice, *Edit instructions* disabled; no *Request access* |✅ |
+| `modeller.settings.members` | MO-14 | `/modeller/settings?tab=members` — members, roles, *Add member*, the Roles key; no agent rows, no LLMs tab |✅ |
+| `modeller.settings.database` | MO-14 | `/modeller/settings?tab=graph` — the connection, labelled *Database* |✅ |
+| `projects.new` people | PJ-02 | *New project* › People and agents — the Graph's other members and its agents |✅ |
+
+## Beyond the 42 · Runs and sharing
+
+Re-run on the run page and *Share* on an answer, from the *Invana Products* prototype (SH-18 · EX-15),
+as Studio builds them in migration session C09. Decisions are in
+[5.9 pinned model versions](modules/agents/features/pinned-model-versions.md) PV12–PV15 and
+[4.5 share an answer](modules/explore/features/share-an-answer.md) SA1–SA11.
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `shell.run.rerun` | SH-18 | `/activity/runs/<id>` › *Re-run…* — *Ran with* (model version · agent · world), same or current versions; no skill or dataset rows | ✅ |
+| `explorer.answer.share` | EX-15 | *Share* on an answer's reply line — live link · frozen snapshot (`/explorer?page=run:<id>@<version>`) · PNG · CSV · Markdown | ✅ |
+
+---
+
 ## The other direction — every feature, and the screen that draws it
 
 So a feature file can be opened next to the drawing that shows it.
@@ -677,8 +844,13 @@ So a feature file can be opened next to the drawing that shows it.
 | 1.3 | Domain models | ✅ | ✅ | S3 | `ModellerHiFi` | ✅ |
 | 1.4 | Model editor | ✅ | ✅ | S3 | `ModellerHiFi` · `ModellerSessionHiFi` · `ModelEditBottomHiFi` | ✅ |
 | 1.6 | Stitch models | ✅ | ✅ | S7 | `StitchHiFi` | ✅ |
+| 1.9 | Publish review | ✅ | ✅ | B10 · C04 | `modeller.draft.publish` · `modeller.draft.migration` · `modeller.global_model.diff` | ✅ |
 | 2.1 | Load data | ✅ | ✅ | S6 | `ImportRunHiFi` | ✅ |
 | 2.2 | Inspect what landed | ✅ | ✅ | S6 | `DatasetsHiFi` | ✅ |
+| 2.4 | Datasets | ✅ | ✅ | B03 · C01 | `datasets.catalogue` · `datasets.dataset` (+ tabs) · `datasets.record` · `datasets.observe` · `datasets.share` | ✅ |
+| 2.5 | Retract and refresh | ✅ | 🟡 | B03 · C01 | `datasets.dataset.used` · `datasets.dataset.retracted` | ✅ |
+| 2.6 | Bind a dataset | 🟡 | ✅ | B03 · C01 | `datasets.bind` | ✅ |
+| 2.7 | Standards and conformance | ✅ | ✅ | B04 · C01 | `datasets.standards` · `datasets.standard` · `datasets.standard.attach` · `datasets.dataset.conformance` · `datasets.validation` (+ `.item`) | ✅ |
 | 3.2 | Ask in natural language | ✅ | ✅ | S9b | `ExplorerAsksHiFi` | ✅ |
 | 3.3 | The answer surface | ✅ | ✅ | S9b | `SessionHiFi` · `AnswerSurfaceHiFi` | ✅ |
 | 3.4 | Projections | ✅ | ✅ | S9b→S9d | `ProjectionSwitchHiFi` | ✅ |
@@ -698,26 +870,29 @@ So a feature file can be opened next to the drawing that shows it.
 | 6.2 | Bindings | ✅ | ✅ | S12c | `SkillBindings` · `BindRefusals` · `BindFromAgent` · `SkillOffer` · `BindSeams` · `BindStanding` | ✅ |
 | 6.3 | Usage | ✅ | ✅ | S12c | `SkillUsage` · `UsageVersions` · `UsageDash` · `UsageDashStates` (superseding `SkillsHiFi`) | ✅ |
 | 6.4 | Rules | ✅ | ✅ | S12b | `RulesPanel` · `RuleAuthor` · `RuleCited` · `RulesProject` (superseding `RulesHiFi`) | ✅ |
-| 7.1 | The library | 🟡 | 🟡 | S12c | `WorkflowsHiFi` | 🟡 |
+| 7.1 | The library | 🟡 | 🟡 | S12c | `WorkflowsHiFi` · `PlanRetire` | 🟡 |
 | 7.2 | Plan selection | 🟡 | 🟡 | S9d | `WorkflowStepHiFi` | 🟡 |
 | 7.5 | Run a workflow | 🔵 | 🔵 | S15 | `RunWorkflowHiFi` | 🔵 |
 | 7.6 | The catalogue | 🟡 | 🔵 | S12c | `CatalogueList` · `CatalogueDetail` (⛔ considered, not built) | 🔵 |
-| 7.7 | Draft a plan | 🔵 | 🔵 | S15 | `PlanDraftCanvas` · `PlanDraftYaml` · `PlanRetire` · `PlanStepParams` | 🔵 |
 | 8.3 | Proposals | 🔵 | 🔵 | S12c | `ReviewProposalHiFi` | 🔵 |
 | 8.4 | Consolidation | 🔵 | 🔵 | S12c | `ReviewProposalHiFi` | 🔵 |
 | 9.1 | Projects and tasks | 🟡 | 🟡 | S12b | `ProjectsHiFi` · `SwingProjectHiFi` · `ProjectPlanHiFi` · `NewTaskHiFi` · `TaskHiFi` | ✅ · 🟡 |
 | 9.2 | Objectives and criteria | 🔵 | 🔵 | S12b | `JournalTaskHiFi` | 🔵 |
 | 9.3 | Review | 🔵 | 🔵 | S12b | `ReviewHiFi` · `TaskReviewHiFi` | 🔵 |
 | 9.4 | Recurring tasks and conditions | 🔵 | 🔵 | S12e | `RecurringTaskHiFi` | 🔵 |
-| 10.1 | Schedules | 🔵 | 🔵 | S9.5 | `SchedulesHiFi` | 🔵 |
+| 10.1 | Schedules | ✅ | ✅ | B08 · C05 | `shell.schedules` · `shell.schedule.new` · `shell.schedule.detail` | ✅ |
 | 10.3 | Observability | 🔵 | 🔵 | S11 | `AgentStatsHiFi` | 🔵 |
 | 10.5 | See what ran | 🔵 | 🔵 | S14 | `RunDetail` · `DrawerRunsList` · `DrawerRunLive` · `DrawerRunAll` · `DrawerRunDebug` · `RunDash` · `StepImport` · `StepQuery` · `StepLlm` · `RunLens` | 🔵 · ✅ |
+| 10.6 | Change log | ✅ | ✅ | B01 · C04 | `shell.events.changes` · `shell.change.compare` · `modeller.model.history` · `datasets.record` | ✅ |
+| 10.7 | Notifications | ✅ | ✅ | B08 · C05 | `shell.notifications` · `shell.notifications.rules` · `shell.notifications.rule` · `shell.notifications.channels` | ✅ |
+| 10.8 | Approvals | ✅ | 🟡 | B08 · C05 | `shell.notifications` (review from the Inbox); `shell.activity.approvals` · `shell.run.approval` not built | 🟡 |
 | 13.3 | Command line | — | — | — | `CliHiFi` | — |
 | 13.7 | Setup | ✅ | 🟡 | S13 | `SetupPageHiFi` · `SetupBlockedHiFi` · `SetupReadyHiFi` · `SetupLocksHiFi` | 🟡 |
 | 14.1 | Worlds | 🔵 | 🔵 | S16 | `GovWorlds` · `GovWorld` · `GovCompare` | 🔵 |
 | 14.2 | Guardrails | 🔵 | 🔵 | S16 | `GovGuardrails` | 🔵 |
 | 2.3 | Load a bundle | 🔵 | 🔵 | S15 | `Main` (BundleLoad) | 🔵 |
 | 4.4 | The console | ✅ | 🔵 | S12f | `Console` | 🔵 |
+| 4.5 | Share an answer | ✅ | ✅ | C09 | `explorer.answer.share` | ✅ |
 | 8.1 | Evidence | 🔵 | 🔵 | S12c | `Evidence` | 🔵 |
 | 8.2 | Recall by query | 🔵 | 🔵 | S9d | `Recall` | 🔵 |
 | 10.2 | Audit and activity | 🟡 | 🟡 | S5.5 · S12a | `Events` | 🟡 |

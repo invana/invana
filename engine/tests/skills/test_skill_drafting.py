@@ -14,11 +14,10 @@ from invana.apps.agents.envelope import Envelope
 from invana.apps.graphs.models import Graph
 from invana.apps.llm.draft import Candidate, DraftedPlaybook, DraftedSentence
 from invana.apps.skills.managers import SkillManager
-from invana.apps.skills.schemas import SkillCreate, SkillDraftTaskWrite
+from invana.apps.skills.schemas import SkillCreate, SkillVersionPublish
 from invana.apps.task_plans.managers import TaskPlanManager
-from invana.apps.task_plans.models import TaskPlan
 from invana.core.auth.models import User
-from invana.core.errors import ValidationError
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.managers import SkillDraftManager
 from invana.runtime.planning import resolve_plan
@@ -199,224 +198,117 @@ async def test_a_drafts_plan_is_born_generated_so_authored_means_a_person_wrote_
     assert [n.source_span for n in born.nodes] == [None], "nothing drew it, so no sentence claims it"
 
 
-# ── the hand-edit (SK7 · SK28) ───────────────────────────────────────────────
-
-
-async def test_a_hand_edit_replaces_the_rows_and_takes_ownership_of_the_plan(
-    session: AsyncSession, graph: Graph, user: User
-) -> None:
-    """SK7 — writing the rows flips `origin` to `authored`, and the spans stay."""
-    skill, draft = await _draft_of(session, graph, user, "By hand", "Read it. Run it.")
-    before = await drafts.plan_read(session, version=draft)
-    # Born `generated` (SK29), so the flip below is caused by the hand-edit and
-    # by nothing else.
-    assert before.origin == "generated" and before.nodes[0].form == "human"
-
-    read = await drafts.write_tasks(
-        session,
-        skill=skill,
-        tasks=[
-            SkillDraftTaskWrite(step_key="translate_thought", title="Understand", source_span="Read it."),
-            SkillDraftTaskWrite(
-                step_key="validate_query",
-                title="Check",
-                args={"query": "${steps.translate_thought.query}"},
-                source_span="Run it.",
-            ),
-            SkillDraftTaskWrite(form="human", title="Telephone the supplier."),
-        ],
-        validate=resolve_plan,
-    )
-
-    assert read.plan.origin == "authored"
-    assert [n.task for n in read.plan.nodes] == ["translate_thought", "validate_query", ""]
-    # The bands the Flow tab draws, and the sentence each step answers to (C11).
-    assert read.plan.layers == ["llm", "human", "agent"]
-    assert [n.source_span for n in read.plan.nodes[:2]] == ["Read it.", "Run it."]
-    # The binding is an edge, not a guess.
-    assert any(e.source == "translate_thought" and e.kind == "binding" for e in read.plan.edges)
-
-
-async def test_a_hand_edit_is_bounded_by_the_catalogue_and_never_by_no_steps(
-    session: AsyncSession, graph: Graph, user: User
-) -> None:
-    """SK28 — the closed set is the bound here; the envelope is the agent's, at
-    bind time. And a playbook with no steps is a rule, not a skill."""
-    skill, _draft = await _draft_of(session, graph, user, "Nowhere", "…")
-
-    with pytest.raises(ValidationError) as unknown:
-        await drafts.write_tasks(
-            session,
-            skill=skill,
-            tasks=[SkillDraftTaskWrite(step_key="telephone_the_supplier", title="Call")],
-            validate=resolve_plan,
-        )
-    assert "telephone_the_supplier" in str(unknown.value.detail)
-
-    with pytest.raises(ValidationError) as empty:
-        await drafts.write_tasks(session, skill=skill, tasks=[], validate=resolve_plan)
-    assert "rule" in str(empty.value.detail)
-
-    # The plan is still checked as a plan: `write_graph` declares what must run
-    # before it, and a hand-edit cannot write an order the runtime would refuse.
-    with pytest.raises(ValidationError) as unordered:
-        await drafts.write_tasks(
-            session,
-            skill=skill,
-            tasks=[SkillDraftTaskWrite(step_key="write_graph", title="Write")],
-            validate=resolve_plan,
-        )
-    assert "validate_records" in str(unordered.value.detail)
-
-    # And `write_graph` is outside every seeded envelope yet in the catalogue,
-    # so authoring it is allowed — binding it is where an agent refuses (BN5).
-    read = await drafts.write_tasks(
-        session,
-        skill=skill,
-        tasks=[
-            SkillDraftTaskWrite(step_key="validate_records", title="Check the records"),
-            SkillDraftTaskWrite(step_key="write_graph", title="Write"),
-        ],
-        validate=resolve_plan,
-    )
-    assert [n.task for n in read.plan.nodes] == ["validate_records", "write_graph"]
-
-
 async def test_a_plan_a_person_does_every_step_of_is_written_not_refused(
     session: AsyncSession, graph: Graph, user: User
 ) -> None:
-    """SK15 · SK22 — `form: human` is the universal fallback, so a catalogue gap
-    never blocks publishing. A plan of only those rows reaches the envelope with
-    nothing to validate, and *nothing to validate* is not *no steps*."""
-    skill, _draft = await _draft_of(session, graph, user, "By hand only", "Telephone them. Write it up.")
-
-    read = await drafts.write_tasks(
-        session,
-        skill=skill,
-        tasks=[
-            SkillDraftTaskWrite(form="human", title="Telephone the supplier.", source_span="Telephone them."),
-            SkillDraftTaskWrite(form="human", title="Write it up.", source_span="Write it up."),
-        ],
-        validate=resolve_plan,
+    """A person is the universal fallback, so a catalogue gap never blocks
+    publishing. A plan of only those rows reaches the envelope with nothing to
+    validate, and *nothing to validate* is not *no steps*."""
+    _skill, draft = await _draft_of(session, graph, user, "By hand only", "Telephone them. Write it up.")
+    drafted = _drafted(
+        DraftedSentence(span="Telephone them.", kind="step", candidates=()),
+        DraftedSentence(span="Write it up.", kind="step", candidates=()),
     )
 
-    assert [n.form for n in read.plan.nodes] == ["human", "human"]
-    assert read.plan.layers == ["human"]
-    assert read.plan.origin == "authored"
+    out = await drafts.apply_drawing(
+        session, version_id=draft.id, drafted=drafted, envelope=ENVELOPE, validate=resolve_plan
+    )
+
+    assert out.rejected is None
+    plan = await drafts.plan_read(session, version=draft)
+    assert [(n.form, n.source_span) for n in plan.nodes] == [("human", "Telephone them."), ("human", "Write it up.")]
+    assert plan.layers == ["human"]
 
 
-# ── inlining a library plan (SK32 · SK33 · LB19 · LB20) ──────────────────────
+# ── a sentence that names a library plan ─────────────────────────────────────
+
+#: `nl-single@2` ends in `verify_result`, so the drawing envelope must allow it.
+ANSWERING = Envelope.from_spec(
+    {
+        "allow": [
+            "translate_thought",
+            "validate_query",
+            "execute_graph_query",
+            "shape_for_canvas",
+            "verify_result",
+        ]
+    }
+)
 
 
-async def test_a_uses_row_becomes_the_plans_rows_flat_and_tuned(
+async def test_a_sentence_that_names_a_library_plan_draws_its_rows_flat_and_tuned(
     session: AsyncSession, graph: Graph, user: User
 ) -> None:
-    """SK32 · SK33 — the rows are copied in, flat, each naming where it came from.
-
-    `nl-single@1` declares `read_only`, and this skill wants the other value.
-    Tuning it is a property of the call, so neither plan is edited and neither
-    is a fork (LB19).
-    """
-    skill, _draft = await _draft_of(session, graph, user, "Inlined", "Answer it.")
-    await plans.ensure_seeded(session, graph_id=graph.id, requires=_REQUIRES)
-
-    read = await drafts.write_tasks(
-        session,
-        skill=skill,
-        tasks=[
-            SkillDraftTaskWrite(key="answer", form="uses", uses="nl-single@2", uses_args={"read_only": False}),
-            SkillDraftTaskWrite(form="human", title="Tell the desk."),
-        ],
-        validate=resolve_plan,
+    """The plan's rows are copied in at the draw, flat, each naming where it
+    came from, with the argument the sentence tunes — and the composition is
+    recorded on the plan."""
+    skill, draft = await _draft_of(session, graph, user, "Inlined", "Answer it, writes allowed. Tell the desk.")
+    await plans.ensure_seeded(session, graph_id=graph.id, flows=load_plugins().flows.values(), requires=_REQUIRES)
+    offered = {p.ref for p in await drafts.inlinable(session, graph_id=graph.id)}
+    assert "nl-single@2" in offered, "the planner is offered the library"
+    drafted = _drafted(
+        DraftedSentence(
+            span="Answer it, writes allowed.",
+            kind="step",
+            candidates=(Candidate(task="plan:nl-single@2", label="Answer", tune={"read_only": False}),),
+        ),
+        DraftedSentence(span="Tell the desk.", kind="step", candidates=()),
     )
 
-    steps = [n for n in read.plan.nodes if n.form == "callable"]
-    assert [n.id for n in steps] == [
-        "answer_translate_thought",
-        "answer_validate_query",
-        "answer_execute_graph_query",
-        "answer_shape_for_canvas",
-        "answer_verify_result",
-    ], "flat siblings, prefixed so two inlined plans cannot collide"
+    out = await drafts.apply_drawing(
+        session, version_id=draft.id, drafted=drafted, envelope=ANSWERING, validate=resolve_plan
+    )
+
+    assert out.rejected is None
+    read = await drafts.plan_read(session, version=draft)
+    steps = [n for n in read.nodes if n.form == "callable"]
+    copied = ("translate_thought", "validate_query", "execute_graph_query", "shape_for_canvas", "verify_result")
+    assert [n.id for n in steps] == [f"nl_single_{step}" for step in copied], "flat, prefixed siblings"
+    assert {n.source_span for n in steps} == {"Answer it, writes allowed."}
     execute = next(n for n in steps if n.task == "execute_graph_query")
     assert execute.args["read_only"] is False, "the tuned value, not the declared default"
-    # The copied plan's own binding follows its rows rather than pointing at
-    # whatever the skill happens to call `translate_thought`.
-    assert execute.args["query"] == "${steps.answer_translate_thought.query}"
+    # The copied plan's own binding follows its rows.
+    assert execute.args["query"] == "${steps.nl_single_translate_thought.query}"
 
-    plan = await drafts.plans_qs.get(session, read.version.plan_id)
+    plan = await drafts.plans_qs.get(session, draft.plan_id)
+    assert plan.origin == "generated"
     assert plan.uses == [{"key": "nl-single", "version": 2, "args": {"read_only": False}}]
     rows = await drafts.plans_qs.tasks_for(session, plan_id=plan.id)
-    assert {r.source_plan_key for r in rows} == {"nl-single@2", None}
-    # Each copy names the step it came from, so the plan's page matches a
-    # skill's run on the record and not on the prefix (LB36).
-    assert {r.key: r.source_step_key for r in rows if r.source_plan_key} == {
-        f"answer_{step}": step
-        for step in ("translate_thought", "validate_query", "execute_graph_query", "shape_for_canvas", "verify_result")
+    assert {r.key: (r.source_plan_key, r.source_step_key) for r in rows if r.source_plan_key} == {
+        f"nl_single_{step}": ("nl-single@2", step) for step in copied
     }
-    # What the Flow tab reads back: the composition, and whether the library
-    # has moved past it. `@2` is the newest, so this one has not.
-    [use] = read.plan.uses
+    [use] = read.uses
     assert (use.key, use.version, use.latest_version) == ("nl-single", 2, 2)
-    assert use.args == {"read_only": False}
+
+    # A draft opened over the published version keeps the composition with the rows.
+    await drafts.publish(session, skill=skill, payload=SkillVersionPublish(), actor_id=user.id)
+    reopened = await drafts.ensure_draft(session, skill=skill)
+    again = await drafts.plans_qs.get(session, reopened.plan_id)
+    assert again.uses == plan.uses
 
 
-async def test_inlining_an_older_version_says_a_newer_one_exists(
-    session: AsyncSession, graph: Graph, user: User
+@pytest.mark.parametrize(
+    ("task", "tune", "named"),
+    [
+        ("plan:nl-single@2", {"read_onyl": True}, "read_onyl"),
+        ("plan:no-such-plan@1", {}, "no-such-plan@1"),
+    ],
+)
+async def test_a_plan_that_cannot_be_inlined_refuses_the_draw_by_name(
+    session: AsyncSession, graph: Graph, user: User, task: str, tune: dict, named: str
 ) -> None:
-    """SK32 — *a newer version exists* is said, never acted on: the copy is what
-    makes a published skill do tomorrow what it did today."""
-    skill, _draft = await _draft_of(session, graph, user, "Behind", "Answer it.")
-    await plans.ensure_seeded(session, graph_id=graph.id, requires=_REQUIRES)
-
-    read = await drafts.write_tasks(
-        session,
-        skill=skill,
-        tasks=[SkillDraftTaskWrite(key="answer", form="uses", uses="nl-single@2")],
-        validate=resolve_plan,
-    )
-    assert read.plan.uses[0].latest_version == 2, "nothing newer yet"
-
-    # The library publishes `@3`. The skill's rows do not move (SK32), and the
-    # read is what says so.
-    seeded = await drafts.plans_qs.find_by_key(session, graph_id=graph.id, key="nl-single", version=2)
-    await drafts.plans_qs.add(
-        session,
-        TaskPlan(
-            graph_id=graph.id,
-            key="nl-single",
-            version=3,
-            name=seeded.name,
-            description=seeded.description,
-            kind=seeded.kind,
-            origin=seeded.origin,
-            intent=list(seeded.intent or []),
-            args_schema=dict(seeded.args_schema or {}),
-            source_skill_version_ids=[],
-            reusable=True,
-            created_by_kind="user",
-        ),
+    """An argument the plan does not declare is a typo, and an unknown plan is
+    not on offer; either settles the draw with the reason and writes nothing."""
+    _skill, draft = await _draft_of(session, graph, user, "Typo", "Answer it.")
+    await plans.ensure_seeded(session, graph_id=graph.id, flows=load_plugins().flows.values(), requires=_REQUIRES)
+    drafted = _drafted(
+        DraftedSentence(span="Answer it.", kind="step", candidates=(Candidate(task=task, label="A", tune=tune),))
     )
 
-    again = await drafts.plan_read(session, version=read.version)
-    [use] = again.uses
-    assert (use.version, use.latest_version) == (2, 3)
-    rows = await drafts.plans_qs.tasks_for(session, plan_id=read.version.plan_id)
-    assert {r.source_plan_key for r in rows} == {"nl-single@2"}
+    out = await drafts.apply_drawing(
+        session, version_id=draft.id, drafted=drafted, envelope=ANSWERING, validate=resolve_plan
+    )
 
-
-async def test_an_argument_the_plan_does_not_declare_is_refused_by_name(
-    session: AsyncSession, graph: Graph, user: User
-) -> None:
-    """LB20 — an argument nothing offers is a typo, and it is named as one."""
-    skill, _draft = await _draft_of(session, graph, user, "Typo", "Answer it.")
-    await plans.ensure_seeded(session, graph_id=graph.id, requires=_REQUIRES)
-
-    with pytest.raises(ValidationError) as refused:
-        await drafts.write_tasks(
-            session,
-            skill=skill,
-            tasks=[SkillDraftTaskWrite(form="uses", uses="nl-single@2", uses_args={"read_onyl": True})],
-            validate=resolve_plan,
-        )
-    assert "read_onyl" in str(refused.value) and "read_only" in str(refused.value)
+    assert out.rejected and named in out.rejected[0] and "Answer it." in out.rejected[0]
+    plan = await drafts.plan_read(session, version=draft)
+    assert len(plan.nodes) == 1 and plan.nodes[0].form == "human", "the plan that was there is untouched"

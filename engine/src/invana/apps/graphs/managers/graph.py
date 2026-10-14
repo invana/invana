@@ -15,6 +15,7 @@ from invana.apps.graphs.models import (
     GraphMember,
 )
 from invana.apps.graphs.querysets import GraphConnectionQuerySet, GraphMemberQuerySet, GraphQuerySet
+from invana.apps.graphs.roles import GraphRole
 from invana.apps.graphs.schemas import (
     GraphCreate,
     GraphRead,
@@ -22,7 +23,7 @@ from invana.apps.graphs.schemas import (
 )
 from invana.apps.setup.sections import _mark_section
 from invana.core.auth.models import User
-from invana.core.errors import ConflictError
+from invana.core.errors import ConflictError, NotFoundError
 from invana.core.events import actions
 from invana.core.events.services import diff_changed_fields, emit_event
 
@@ -38,8 +39,8 @@ class GraphManager:
     members_qs = GraphMemberQuerySet()
 
     async def create_graph(self, session: AsyncSession, *, owner: User, payload: GraphCreate) -> Graph:
-        """Create a Graph and attach the creator as its member (binary access,
-        docs/for-developers/modules/identity-and-access/features/membership.md).
+        """Create a Graph and attach the creator as its first owner
+        (docs/for-developers/modules/identity-and-access/features/roles.md).
 
         Returns the row. Serialising it is `SetupManager.graph_read`, because a
         Graph read carries **derived** setup state and deriving it is a cross-app
@@ -60,7 +61,7 @@ class GraphManager:
         session.add(graph)
         await session.flush()
 
-        session.add(GraphMember(graph_id=graph.id, user_id=owner.id))
+        session.add(GraphMember(graph_id=graph.id, user_id=owner.id, roles=[GraphRole.owner.value]))
         await session.flush()
 
         # Every graph is born with its agents — Explorer (the default), Query and
@@ -92,6 +93,18 @@ class GraphManager:
             details={"via": "graph.create"},
         )
 
+        return graph
+
+    async def get_by_ref(self, session: AsyncSession, *, ref: str) -> Graph:
+        """The Graph a ``<username>/<slug>`` names — how the CLI is told which Graph to act on."""
+        username, _, slug = ref.partition("/")
+        graph = (
+            await self.graphs_qs.get_by_owner_username_and_slug(session, owner_username=username, slug=slug)
+            if slug
+            else None
+        )
+        if graph is None:
+            raise NotFoundError(f"Graph {ref!r} not found. Name it as <username>/<slug>.")
         return graph
 
     async def list_graphs_for_user(

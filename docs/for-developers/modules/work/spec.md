@@ -10,7 +10,7 @@ the same Todo can go to either, and the same acceptance closes it.
 | | |
 |---|---|
 | Index | [§5 · Work](../../README.md#5--work) |
-| Features | [projects-and-tasks](features/projects-and-tasks.md) · [objectives-and-criteria](features/objectives-and-criteria.md) · [review](features/review.md) · [recurring-tasks-and-conditions](features/recurring-tasks-and-conditions.md) |
+| Features | [projects-and-tasks](features/projects-and-tasks.md) · [objectives-and-criteria](features/objectives-and-criteria.md) · [review](features/review.md) · [recurring-tasks-and-conditions](features/recurring-tasks-and-conditions.md) · [branches-and-decisions](features/branches-and-decisions.md) · [project-reports](features/project-reports.md) · [private-projects](features/private-projects.md) · [simulation](features/simulation.md) · [impact](features/impact.md) |
 | Depends on | [Agents](../agents/spec.md) (the assignee, and what it may run) · Ask (a Todo runs as a TaskRun) · Explore (the canvas the panel selects from) |
 
 ## 1. Vocabulary
@@ -21,7 +21,12 @@ Product-wide words are pinned in [terminology.md](../../terminology.md). What th
 |---|---|---|
 | **Project** | a piece of work inside a Graph — a folder of **Todos**, staffed by principals. Its own record: it never runs, has no criteria and no plan | a permission scope · a Task · nestable — there are no sub-projects |
 | **Todo** | one unit of work a person wrote, with a definition of done | a Task · a runtime step · a plan |
-| **Staffing** | appearing in a project's assignee picker | a grant of access |
+| **Staffing** | appearing in a project's assignee picker — and, on a private project, its access list | a Graph role |
+| **Branch** | one line of inquiry inside a project — the type calls it a hypothesis, thesis, option, position or lead | a sub-project · a git branch |
+| **Finding** | one piece of evidence on a branch, with a **stance** (`supports · contradicts · context`) and its cites | a criterion's outcome |
+| **Project decision** | a person's verdict and decision on a branch, checked by the rules; append-only, superseded never edited | an approval's answer |
+| **Project proposal** | an agent's suggested fork or decision, waiting for a person | a memory proposal ([8.3](../memory/features/proposals.md)) |
+| **Simulation** | one run of a simulator plugin on a branch, over pinned dataset versions; its result is `derived` | an observation · a finding — a finding may cite it |
 
 **A Todo is not a run, and a Task is not a Todo.** A Todo is work with a definition of done; a
 **TaskRun** is one execution; a **Task** is one node inside the TaskPlan that run is executing. A
@@ -37,7 +42,10 @@ default project. And a Todo may have **no plan at all**: a person simply does it
 
 | Owns | Shape |
 |---|---|
-| `projects` | `graph_id` · `key` (unique per Graph, URL-safe) · `name` · `description` · `status (active\|archived)` · `created_by_kind/id` |
+| `projects` | `graph_id` · `key` (unique per Graph, URL-safe) · `name` · `description` · `status (active\|archived)` · `type` · `question` · `visibility (graph\|private)` · `created_by_kind/id` |
+| `project_branches` · `project_findings` · `branch_findings` · `project_decisions` · `project_proposals` | [branches-and-decisions](features/branches-and-decisions.md) |
+| `project_reports` · `project_report_versions` | [project-reports](features/project-reports.md) |
+| `project_simulations` | [simulation](features/simulation.md) — the project's handle on a simulator run |
 | `project_assignments` | `project_id` · `principal_kind (user\|agent)` · `principal_id` · `assigned_by_*` · `assigned_at` |
 | `todos` | `graph_id` · `project_id?` · `parent_id?` · `title` · `body` (the prose a planner reads) · `assignee_kind/id?` · `created_by_kind/id` · `due_at?` · `lens_id?` · `closed_at?` · `outcome?`. **No `status` column** — see §3 |
 | `todo_dependencies` | `todo_id` · `depends_on_id` · `on (success\|failure\|any_outcome)` · cycles rejected with the loop named |
@@ -102,8 +110,9 @@ has exactly one writer. That is the governance seam, and the signal that feeds p
 
 | Rule | Detail |
 |---|---|
-| Membership is the permission | Graph membership decides who can act; there are no roles |
-| Staffing is a default, not a grant | Being staffed on a project means "appears in that project's assignee picker" and nothing more |
+| Membership and roles are the permission | Graph membership decides who reads; a Graph role decides who writes ([11.6](../identity-and-access/features/roles.md)) |
+| A private project adds its people on top | Only the principals staffed on it see it ([9.7](features/private-projects.md)) |
+| Staffing is a default, not a grant | On a `graph` project, being staffed means "appears in that project's assignee picker" and nothing more |
 | An unstaffed agent can still be assigned | Explicitly, by someone with Graph membership |
 | Archiving freezes | An archived project's Todos go read-only; running runs finish |
 
@@ -146,12 +155,15 @@ everything else acts on a row and lives on the row.
 | W11 | **A Todo has no status column.** Its state derives from its latest run; `closed_at` and `outcome` are written by acceptance alone (§3). |
 | W12 | **A Project is a record, not a Task.** It never runs, carries no criteria, no plan, no timeout — and there are no sub-projects. Nesting belongs inside the work item, not in the filing cabinet ([orchestration § 0.1](../../orchestration.md#01-reading-the-dependencies)). |
 | W13 | **A Todo may have no plan.** A person assigned a Todo with criteria and no steps is the smallest legal case, and it uses no field it does not need. |
+| W14 | **Branches live inside a project; projects stay flat.** A Todo may name a branch of its own project (`todos.branch_id`); the branch is where its evidence and decisions sit ([9.5](features/branches-and-decisions.md)). |
+| W15 | **Per-project access is one filter.** `ProjectManager.hidden_ids` names the private projects a reader is not on, and every read of projects, todos, plans, decisions and search applies it ([9.7](features/private-projects.md)). |
+| W16 | **A simulation is a run with a project handle.** The simulator plugin computes, the runtime runs it, and `project_simulations` only records which branch asked, with which spec, inputs and seed; the result is read off the run ([9.8](features/simulation.md)). |
 
 ## 8. Deliberately absent
 
 | Not built | Because |
 |---|---|
-| Roles and invitations | membership is binary; anything finer is unproven complexity |
+| Per-project roles | Graph roles govern writes; a private project only narrows who sees it |
 | Soft deletes, trash, undo | archive covers the real need |
 | A task board with swimlanes per assignee | the Plan canvas answers "what is next" better than a board does |
 | Sub-projects | a Project is a folder; nesting belongs in the Todo's plan |

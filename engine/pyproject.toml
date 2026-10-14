@@ -26,6 +26,9 @@ dependencies = [
     # engine to import at all. The optional `anthropic`/`openai`/`claude-agent-sdk`
     # SDKs are NOT required: the keyless local/ollama paths use httpx only.
     "httpx>=0.27",
+    # Semantic imports (SKOS vocabularies → standards, RDFS/OWL ontologies → draft
+    # models) read JSON-LD, Turtle and RDF/XML through rdflib's parsers.
+    "rdflib>=7.1",
 ]
 
 [project.optional-dependencies]
@@ -45,9 +48,32 @@ telemetry = [
     # dependency (see [project].dependencies) — not repeated here.
     "opentelemetry-instrumentation-httpx>=0.46b0",
 ]
+# The genomic prediction simulator plugin. Standard library only, so empty; the
+# extra is its install name (docs/for-developers/modules/work/features/simulation.md).
+sim-genomic = []
+# The tool plugins. Standard library plus httpx (a core dependency), so empty; each
+# extra is its plugin's install name (docs/for-developers/modules/platform/features/tool-plugins.md).
+tools-web = []
+tools-mail = []
+tools-science = []
+# MCP plugins: an MCP server's tools as task types, over the official SDK's Streamable HTTP
+# client (docs/for-developers/modules/platform/features/mcp-plugins.md).
+mcp = ["mcp>=1.29"]
+# The distributed executor (`INVANA_EXECUTOR=procrastinate`, `invana worker`). Postgres-only,
+# so a SQLite dev install never needs it (docs/for-developers/modules/platform/features/tool-plugins.md).
+workers = [
+    "procrastinate>=3.10",
+    "psycopg[binary,pool]>=3.2",
+]
 all = [
     "invana-engine[server]",
     "invana-engine[telemetry]",
+    "invana-engine[sim-genomic]",
+    "invana-engine[tools-web]",
+    "invana-engine[tools-mail]",
+    "invana-engine[tools-science]",
+    "invana-engine[mcp]",
+    "invana-engine[workers]",
 ]
 
 [dependency-groups]
@@ -147,11 +173,15 @@ ignore = [
 "src/invana/apps/work/managers/task.py" = ["PLC0415"]
 "src/invana/apps/sessions/managers/session.py" = ["PLC0415"]
 "src/invana/runtime/interpreter/loop.py" = ["PLC0415"]
-# The catalogue is band 3 and `delegation` / `planning` / `services` sit beside it:
-# a top-level import would close the cycle the closed set exists to prevent.
-"src/invana/runtime/catalogue/llm.py" = ["PLC0415"]
-"src/invana/runtime/catalogue/pure.py" = ["PLC0415"]
-"src/invana/runtime/catalogue/work_write.py" = ["PLC0415"]
+# Task types share band 3 with `delegation` / `planning` / `services`, which import
+# the catalogue: a top-level import would close the cycle.
+"src/invana/plugins/core/llm/**" = ["PLC0415"]
+"src/invana/plugins/core/pure/**" = ["PLC0415"]
+"src/invana/plugins/core/work_write/**" = ["PLC0415"]
+# procrastinate is the optional `workers` extra; the queue imports it on first use.
+"src/invana/plugins/queue.py" = ["PLC0415"]
+# The MCP SDK is the optional `mcp` extra; the client imports it on first call.
+"src/invana/plugins/mcp/client.py" = ["PLC0415"]
 # Alembic revisions import the registry lazily so the seed and the runtime
 # cannot drift; a top-level import would run at Alembic discovery time.
 "src/invana/core/migrations/versions/*" = ["PLC0415"]
@@ -197,6 +227,7 @@ forbidden_modules = [
     "invana.graph",
     "invana.apps",
     "invana.runtime",
+    "invana.plugins",
     "invana.server",
     "invana.cli",
 ]
@@ -221,7 +252,8 @@ type = "layers"
 layers = [
     "invana.cli : invana.server",
     "invana.activity",
-    "invana.runtime",
+    # Task types use the runtime's stream and governor; the runtime dispatches them.
+    "invana.runtime : invana.plugins",
     "invana.apps",
     "invana.graph",
     "invana.core",
@@ -256,6 +288,9 @@ layers = [
     "invana.apps.govern",
     "invana.apps.llm",
     "invana.apps.llm_providers",
+    "invana.apps.datasets",
+    "invana.apps.standards",
+    "invana.apps.semantic",
     "invana.apps.graphs",
     "invana.apps.modeller",
 ]

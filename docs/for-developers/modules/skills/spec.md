@@ -13,7 +13,7 @@ trace can name them.
 | | |
 |---|---|
 | Index | [§6 · Skills](../../README.md#6--skills) |
-| Features | [authoring-a-skill](features/authoring-a-skill.md) · [bindings](features/bindings.md) · [usage](features/usage.md) · [rules](features/rules.md) |
+| Features | [authoring-a-skill](features/authoring-a-skill.md) · [bindings](features/bindings.md) · [usage](features/usage.md) · [rules](features/rules.md) · [instructions-publish-rollback](features/instructions-publish-rollback.md) · [evals](features/evals.md) |
 | Depends on | — (authored against a Graph, before any agent exists) |
 | Depended on by | [Agents](../agents/spec.md) (binds them) · [Ask](../ask/spec.md) (assembles them) · [Work](../work/spec.md) (project rules) |
 
@@ -64,7 +64,7 @@ what the step was given — not what the text says today.
 
 | Rule | Detail |
 |---|---|
-| A published version is immutable | Editing publishes the next version; the previous one keeps resolving |
+| A published version is immutable | Publishing a drawn draft makes the next version; the previous one keeps resolving |
 | A step records the version it was offered | `skill_version_id` · `rule_version_id`, never the bare id |
 | A binding points at the skill, not a version | An agent gets the current version at run time — bindings do not pin |
 | Evidence is per version | "Offered 40, applied 2" is a claim about v3, and v4 starts its own count |
@@ -124,8 +124,8 @@ draws before any of it is built ([README › How a module gets built](../../READ
 | `SkillsViewPanel` | the two drawers, and the skill/rule line as a table | § 2 — a playbook has steps, a statement never does |
 | `SkillAuthor` | the **Playbook** tab: each sentence showing the step it produced, and `draft_plan` asking which of two readings sentence 2 means | C10 · SK6 — it never guesses; nothing is written until it is answered |
 | `SkillFlow` | the **Flow** tab: the plan in the **six layers** it will touch | SK16 — one flow view, and it is the layer one |
-| `SkillUsesPlan` | a skill inlining the library's `nl-single@2` with `uses`, tuning the one argument it declares, and the two tunings its declaration refuses | SK18 · SK32 · SK33 · LB18 · LB19 · LB20 |
-| `SkillVersions` | seven versions, the v4→v5 prose-and-plan diff, a hand-edit flipping `origin` | SK2 · SK5 · SK7 · SK19 |
+| `SkillUsesPlan` | a skill inlining the library's `nl-single@2` with `uses`, tuning the one argument it declares, and the two tunings its declaration refuses. The plan is named in the prose and inlined at the draw; any picker the artboard draws is not built | SK18 · SK32 · SK33 · LB18 · LB19 · LB20 · IS11 |
+| `SkillVersions` | seven versions, the v4→v5 prose-and-plan diff. The hand-edit it also draws is not built ([IS3](features/instructions-publish-rollback.md#decisions)) | SK2 · SK5 · SK7 · SK19 |
 
 ### Bindings — [6.2](features/bindings.md)
 

@@ -28,6 +28,7 @@ class PropertyKeyQuerySet(VersionScopedQuerySet):
         value_cardinality: str = "SINGLE",
         description: str = "",
         validation_rules: list[dict] | None = None,
+        source_iri: str | None = None,
     ) -> PropertyKeyDefinition:
         await self._ensure_draft(session, version_id)
         pk = PropertyKeyDefinition(
@@ -36,6 +37,7 @@ class PropertyKeyQuerySet(VersionScopedQuerySet):
             type=type,
             value_cardinality=value_cardinality,
             description=description,
+            source_iri=source_iri,
         )
         session.add(pk)
         await session.flush()

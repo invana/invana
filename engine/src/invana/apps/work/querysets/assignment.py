@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.work.models import ProjectAssignment
@@ -29,6 +29,12 @@ class ProjectAssignmentQuerySet:
             ProjectAssignment.principal_id == principal_id,
         )
         return (await session.execute(stmt)).scalar_one_or_none()
+
+    async def count_people(self, session: AsyncSession, *, project_id: str) -> int:
+        stmt = select(func.count()).where(
+            ProjectAssignment.project_id == project_id, ProjectAssignment.principal_kind == "user"
+        )
+        return int((await session.execute(stmt)).scalar_one())
 
     async def add(self, session: AsyncSession, row: ProjectAssignment) -> ProjectAssignment:
         session.add(row)

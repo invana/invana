@@ -61,6 +61,7 @@ class SchemaExporter:
                         ValidationRuleSchema(rule_type=r.rule_type, params=copy.deepcopy(r.params))
                         for r in pk.validation_rules
                     ],
+                    source_iri=pk.source_iri,
                 )
             )
 
@@ -87,6 +88,7 @@ class SchemaExporter:
                     is_abstract=nt.is_abstract,
                     validation_mode=nt.validation_mode,
                     property_mappings=mappings,
+                    source_iri=nt.source_iri,
                 )
             )
 
@@ -113,6 +115,7 @@ class SchemaExporter:
                     target_node_types=copy.deepcopy(et.target_node_types) or [],
                     multiplicity=et.multiplicity,
                     property_mappings=mappings,
+                    source_iri=et.source_iri,
                 )
             )
 
@@ -193,6 +196,7 @@ class SchemaImporter:
                 value_cardinality=pk_data.value_cardinality,
                 description=pk_data.description,
                 validation_rules=[{"rule_type": r.rule_type, "params": r.params} for r in pk_data.validation_rules],
+                source_iri=pk_data.source_iri,
             )
 
         # Import node types
@@ -215,6 +219,7 @@ class SchemaImporter:
                 is_abstract=nt_data.is_abstract,
                 validation_mode=nt_data.validation_mode,
                 property_mappings=mappings,
+                source_iri=nt_data.source_iri,
             )
 
         # Import edge types
@@ -237,6 +242,7 @@ class SchemaImporter:
                 target_node_types=et_data.target_node_types,
                 multiplicity=et_data.multiplicity,
                 property_mappings=mappings,
+                source_iri=et_data.source_iri,
             )
 
         # Import constraints

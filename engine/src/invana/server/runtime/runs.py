@@ -1,5 +1,5 @@
 """HTTP routes for runs (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md): read, tail,
-resume, cancel.
+resume, re-run, cancel.
 
 Opening a run happens through the sessions routes (a message *is* the ask);
 these address the run in its own right.
@@ -41,6 +41,8 @@ from invana.runtime.schemas import (
     EmissionRead,
     ResumeTaskRun,
     RunNodeRead,
+    RunRerun,
+    RunRerunResponse,
     SwitchTemplate,
     TaskPromptRead,
     TaskRunListResponse,
@@ -183,6 +185,31 @@ async def resume_run(
     )
 
 
+@runs_router.post("/{run_id}/rerun", response_model=RunRerunResponse, status_code=status.HTTP_202_ACCEPTED)
+async def rerun_run(
+    payload: RunRerun,
+    run_id: str = Path(...),
+    username: str = Path(...),
+    graphSlug: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+    runtime: TaskRuntime = Depends(get_runtime),
+) -> RunRerunResponse:
+    """Re-run a settled ask on the versions it recorded (``same``) or on today's (``current``)."""
+    th = await services.get_run_or_404(session, run_id=run_id, graph_id=graph.id, user_id=user.id)
+    rerun = await services.rerun_run(session, graph=graph, run=th, versions=payload.versions, actor_id=user.id)
+    await session.commit()
+    runtime.submit(rerun.id)
+    return RunRerunResponse(
+        run_id=rerun.id,
+        rerun_of_run_id=th.id,
+        model_version=rerun.model_version,
+        stream_url=services.stream_url(username, graphSlug, rerun.id),
+    )
+
+
 @runs_router.post("/{run_id}/cancel", response_model=CancelResponse, status_code=status.HTTP_202_ACCEPTED)
 async def cancel_run(
     run_id: str = Path(...),
@@ -219,7 +246,7 @@ async def _offers_for(session: AsyncSession, *, graph: Graph, emission) -> list[
     if shape is None:
         return []
     templates = await available_templates(session, graph_id=graph.id)
-    _, offers = select_template(templates, shape, intent="")
+    _, offers = select_template(templates, shape)
     return offers
 
 
@@ -330,6 +357,8 @@ async def switch_emission_template(
 
 
 _CEILINGS = (
+    "max_tokens_run",
+    "max_tokens_month",
     "max_tokens",
     "max_steps",
     "max_cost_usd",
@@ -343,23 +372,27 @@ _CEILINGS = (
 
 
 def run_ceilings(run: TaskRun, agent: Agent) -> dict[str, Any]:
-    """Every ceiling the run board draws a spend or a count against.
+    """Every ceiling the run board draws a token count or a count against.
 
-    Effort is its own column (EB9) and is read beside the spend ceilings. Every
-    ceiling, not the two the board drew first: a run's spend reads against
-    its **per-run** ceiling, and the month one belongs beside it or neither
-    number says its window ([EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
-    `max_cost_usd` rides along for one release under its old name.
+    Effort is its own column (EB9) and is read beside the token budgets. Every
+    ceiling, not the two the board drew first: a run's tokens read against its
+    **per-run** budget, and the month one belongs beside it or neither number
+    says its window ([EB8](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+    `max_tokens` is `max_tokens_run` under its old name, and the money keys are
+    answered as the row stores them — both for one release.
 
-    **The per-run ceiling is the one this run froze** — the session's spend per
-    run, already clamped to the agent's cap — never the agent's cap as it reads
-    today. A run is drawn against the bound it opened with (AG25 · EB13).
+    **The per-run budget is the one this run froze** — the session's tokens per
+    run, already clamped to the agent's budget — never the agent's budget as it
+    reads today. A run is drawn against the bound it opened with (AG25 · EB13).
+    A run opened before tokens were frozen keeps the money cap it froze.
     """
     effective = {**agent.effective_budget, **agent.effective_effort}
     ceilings = {key: effective.get(key) for key in _CEILINGS}
-    frozen = (run.params or {}).get("max_cost_usd_run")
-    if frozen is not None:
-        ceilings["max_cost_usd_run"] = frozen
+    params = run.params or {}
+    if params.get("max_tokens_run") is not None:
+        ceilings["max_tokens_run"] = ceilings["max_tokens"] = params["max_tokens_run"]
+    if params.get("max_cost_usd_run") is not None:
+        ceilings["max_cost_usd_run"] = params["max_cost_usd_run"]
     return ceilings
 
 

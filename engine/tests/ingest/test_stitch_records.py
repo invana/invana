@@ -9,7 +9,7 @@ import json
 
 from invana.apps.modeller.models import ModelLink
 from invana.apps.modeller.solve import ORIGIN, ORIGIN_KEY, STITCH_ID_KEY
-from invana.runtime.catalogue.stitching import rows_path, write_query
+from invana.plugins.core.ingest.stitching import rows_path, write_query
 
 
 def link(**kwargs) -> ModelLink:
@@ -45,7 +45,7 @@ class TestWhatTheWriteCarries:
         assert "MERGE (a)-[r:`ABOUT`]->(b)" in query
 
     def test_it_is_both_a_record_and_a_stitch_edge(self):
-        from invana.runtime.catalogue.stitching import _provenance
+        from invana.plugins.core.ingest.stitching import _provenance
 
         prov = _provenance(link(), model_id="m-twitter", record_id="ABOUT_1", file="stitches/ABOUT.json")
         assert prov[ORIGIN_KEY] == ORIGIN

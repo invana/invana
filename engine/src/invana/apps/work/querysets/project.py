@@ -5,13 +5,25 @@ from __future__ import annotations
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.work.models import Project
+from invana.apps.work.models import Project, ProjectAssignment, ProjectVisibility
 
 
 class ProjectQuerySet:
     async def list_for_graph(self, session: AsyncSession, *, graph_id: str) -> list[Project]:
         stmt = select(Project).where(Project.graph_id == graph_id).order_by(Project.status, Project.name)
         return list((await session.execute(stmt)).scalars().all())
+
+    async def hidden_ids(self, session: AsyncSession, *, graph_id: str, user_id: str) -> set[str]:
+        """The private projects of a Graph the user is not staffed on."""
+        staffed = select(ProjectAssignment.project_id).where(
+            ProjectAssignment.principal_kind == "user", ProjectAssignment.principal_id == user_id
+        )
+        stmt = select(Project.id).where(
+            Project.graph_id == graph_id,
+            Project.visibility == ProjectVisibility.private.value,
+            Project.id.not_in(staffed),
+        )
+        return set((await session.execute(stmt)).scalars().all())
 
     async def get(self, session: AsyncSession, project_id: str) -> Project | None:
         return await session.get(Project, project_id)

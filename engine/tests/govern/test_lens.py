@@ -315,8 +315,8 @@ async def test_editing_a_guardrail_is_a_permission(session: AsyncSession, graph:
 
 @pytest.mark.asyncio
 async def test_the_owner_holds_the_permission(session: AsyncSession, member: GraphMember) -> None:
-    """GV22 — a Graph always has at least one holder."""
-    assert member.can_edit_guardrails is True
+    """GV22 — editing a guardrail is the modeller role, which the owner implies."""
+    assert member.holds("modeller") is True
 
 
 # ── the delete guard ─────────────────────────────────────────────────────────

@@ -92,7 +92,7 @@ landing the Console, not a later tidy-up.
 
 | Region | Type | Sub-slots | What it holds in Studio |
 |---|---|---|---|
-| `header` | `NavHorizontalProps` | `left` · `center` · `right` (+ `*NavItems`) | wordmark · breadcrumb · the camera toolbar · the onboarding cap · theme · Assistant |
+| `header` | `NavHorizontalProps` | `left` · `center` · `right` (+ `*NavItems`) | launcher · `Invana <Product>` wordmark · breadcrumb · the camera toolbar · the onboarding cap · theme · Assistant · user menu — drawn by `<StudioShell>` (`@invana-studio/shell`) on every screen |
 | `leftNav` | `NavVerticalProps` | `top` · `topNavItems` · `middle` · `bottom` · `bottomNavItems` | one icon per module with a `leftSection` panel, exactly one lit |
 | `leftSection` | `SectionConfig` | — | the open view panel — Info · Explorer · Model · Projects · Runs · Library · Govern · Agents · Skills · Events · Settings. **Layers is not here**: it is a canvas control on the page strip ([graph-detail-page.md](graph-detail-page.md) G18) |
 | `mainSection` | `MainSectionConfig` | — | `Workbook` — the open pages |
@@ -222,9 +222,6 @@ itself, and the rules are the same wherever a board is drawn:
 | a **table** | keeps its key columns and scrolls the rest; it does not drop one silently |
 | a **two-column region** | **stacks below 720**, in reading order, in one scroll. Nothing moves to another region |
 | a **pagehead** | keeps the record's name (truncated, never wrapped), the reading switch and the one primary act; secondary acts fold into the `⋯`, and badges the body already states go |
-
-Stated for the draft board as [DP13 · DP14](../modules/workflows/features/draft-a-plan.md#decisions),
-drawn as `library.plans.detail.flow_canvas.edit` and `…edit.assistant`.
 
 ### What is actually wired today
 

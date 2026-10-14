@@ -1,0 +1,65 @@
+{
+	"name": "@invana-studio/explorer",
+	"version": "0.1.0",
+	"type": "module",
+	"private": true,
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"lint": "biome check .",
+		"check-types": "tsc --noEmit -p tsconfig.json"
+	},
+	"dependencies": {
+		"@invana-studio/assistant": "workspace:*",
+		"@invana-studio/canvases": "workspace:*",
+		"@invana-studio/core": "workspace:*",
+		"@invana-studio/shell": "workspace:*",
+		"@invana-studio/ui": "workspace:*",
+		"elkjs": "^0.9.3"
+	},
+	"peerDependencies": {
+		"@invana/boards": "^0.0.34",
+		"@invana/canvas": "^0.0.15",
+		"@invana/canvas-react": "^0.0.15",
+		"@invana/canvas-ui": "^0.0.15",
+		"@invana/forms": "^0.0.34",
+		"@invana/graph": "^0.0.15",
+		"@invana/graph-layout-d3-force": "^0.0.15",
+		"@invana/graph-layout-elkjs": "^0.0.15",
+		"@invana/styling": "^0.0.34",
+		"@invana/themes": "^0.0.34",
+		"@invana/ui": "^0.0.34",
+		"@tanstack/react-query": "^5.0.0",
+		"lucide-react": "^0.475.0",
+		"react": "^19.2.0",
+		"react-router-dom": "^7.0.0",
+		"sonner": "^2.0.7"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.14",
+		"@invana/boards": "^0.0.34",
+		"@invana/canvas": "^0.0.15",
+		"@invana/canvas-react": "^0.0.15",
+		"@invana/canvas-ui": "^0.0.15",
+		"@invana/forms": "^0.0.34",
+		"@invana/graph": "^0.0.15",
+		"@invana/graph-layout-d3-force": "^0.0.15",
+		"@invana/graph-layout-elkjs": "^0.0.15",
+		"@invana/styling": "^0.0.34",
+		"@invana/themes": "^0.0.34",
+		"@invana/ui": "^0.0.34",
+		"@tanstack/react-query": "^5.0.0",
+		"@types/react": "^19.0.0",
+		"@types/react-dom": "^19.0.0",
+		"lucide-react": "^0.475.0",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0",
+		"react-hook-form": "7.72.1",
+		"react-router-dom": "^7.0.0",
+		"sonner": "^2.0.7",
+		"typescript": "^6.0.0",
+		"vite": "^7.0.0",
+		"vitest": "^5.0.2"
+	}
+}

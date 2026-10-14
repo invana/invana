@@ -1,0 +1,18 @@
+key = "mail.send"
+version = "0.1.0"
+summary = "Send one plain-text message over SMTP — only after a person approves it."
+bound = "network"
+side_effect = "send"
+requires = []
+resources = ["cpu"]
+timeout_s = 30
+retries = 0
+
+[args]
+to = { type = "str", required = true }
+subject = { type = "str", required = true }
+body = { type = "str", required = true }
+
+[outputs]
+message_id = "str"
+sent_at = "str"

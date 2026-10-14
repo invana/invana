@@ -23,7 +23,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from invana.runtime.catalogue.registry import Entry
+from invana.plugins.sdk.manifest import Entry
 
 #: The keys every fanned-out node carries. Reserved: a declared output of the
 #: same name would be shadowed, so the registry must never mint one.

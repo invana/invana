@@ -1,0 +1,92 @@
+{
+  "nodes": {
+    "Accession": {
+      "identity": [
+        "name"
+      ]
+    },
+    "StockCentre": {
+      "identity": [
+        "name"
+      ]
+    },
+    "Institute": {
+      "identity": [
+        "name"
+      ]
+    },
+    "Trait": {
+      "identity": [
+        "name"
+      ]
+    },
+    "Gene": {
+      "identity": [
+        "name"
+      ]
+    },
+    "Cross": {
+      "identity": [
+        "cross_id"
+      ]
+    }
+  },
+  "edges": {
+    "HELD_BY": {
+      "from": [
+        "Accession"
+      ],
+      "to": [
+        "StockCentre"
+      ]
+    },
+    "SEQUENCED_BY": {
+      "from": [
+        "Accession"
+      ],
+      "to": [
+        "Institute"
+      ]
+    },
+    "NOTED_FOR": {
+      "from": [
+        "Accession"
+      ],
+      "to": [
+        "Trait"
+      ]
+    },
+    "CARRIES": {
+      "from": [
+        "Accession"
+      ],
+      "to": [
+        "Gene"
+      ]
+    },
+    "AFFECTS": {
+      "from": [
+        "Gene"
+      ],
+      "to": [
+        "Trait"
+      ]
+    },
+    "FEMALE_PARENT": {
+      "from": [
+        "Cross"
+      ],
+      "to": [
+        "Accession"
+      ]
+    },
+    "MALE_PARENT": {
+      "from": [
+        "Cross"
+      ],
+      "to": [
+        "Accession"
+      ]
+    }
+  }
+}

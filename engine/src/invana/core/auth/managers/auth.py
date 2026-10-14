@@ -153,6 +153,7 @@ class AuthManager:
                 graph_name=m.graph.name,
                 graph_slug=m.graph.slug,
                 owner_username=owners.get(m.graph.created_by_id, ""),
+                roles=list(m.roles or ["viewer"]),
             )
             for m in rows
         ]

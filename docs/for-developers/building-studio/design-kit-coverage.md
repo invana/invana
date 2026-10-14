@@ -948,6 +948,55 @@ literal, or an element outside `@invana/*`. That is the mechanical form of the r
 
 ---
 
+## 6d. `@invana-studio/ui` — what is promoted to the kit
+
+`@invana-studio/ui` holds Studio-only compositions ([migration-plan §4](../../products/migration-plan.md#4-the-studio-ui-package)).
+A component that **two or more products** import is a promotion candidate. The products are
+Explorer, Modeller, Agents, Projects and Datasets. The shared packages (`shell`, `assistant`,
+`canvases`) and the app's product host do not count as products. Counts are importing files, as of
+the end of Phase 7.
+
+### Kit work — promote
+
+Each row is design-kit work, done with a story. Studio then swaps its import and deletes the file.
+
+| # | Studio export | Products (files) | Goes to | Kit change | Retires |
+|---|---|---|---|---|---|
+| **G6** | `PanelSection` | Agents 8 · Modeller 1 · Projects 1 · Datasets 1 (+ shell 1) | `@invana/ui` › `ui-extended` | A `SectionHeader` that also takes a body. It carries a `hint` sentence that truncates before the title does (the `count` slot shrinks the title to nothing). It also has a `card` reading, an `Eyebrow` title on a bordered card | `ui/PanelSection.tsx` |
+| **G7** | `PanelStatusBar` · `StatusCount` · `StatusCrumb` | Agents 5 · Modeller 2 · Projects 2 | `@invana/ui` › `AppStatusBar` | `left` · `middle[]` · `end` slots, each with its own gap (today everything shares one truncating span). Plus a toned count and a crumb that may be a button | `ui/PanelStatusBar.tsx` |
+| **G8** | `RecordRow` | Agents 4 · Modeller 2 · Projects 2 | `@invana/ui` › `Item` or a sibling | A work row: `StatusDot` · title · subtitle · hover actions *before* a status badge that never hides · `indent` with the `└` gutter · `pinActions`. The select target is a sibling of the actions, never their parent | `ui/RecordRow.tsx` |
+| **G9** | `stackSection` · `useStackSectionUi` · `StackSectionUi` | Agents 5 · Modeller 2 · Projects 1 | `@invana/ui` › `PanelStack` | Per-section search, filter and drill-in (`‹ RUNS / orders.csv`). Needs a slot ahead of `PanelStack`'s collapse chevron, so *Back* stops living among the header actions | `ui/StackSection.tsx` |
+| **G10** | `SectionTitle` | Agents 2 · Modeller 3 | `@invana/ui` › `PanelStackSection` | A `count` on the section header that reads while it is closed. Today Studio repeats the kit's header typography to fit a badge | `ui/SectionTitle.tsx` |
+| **G11** | `DetailBlock` · `DetailProse` · `DetailStatus` | Agents 7 · Projects 2 | `@invana/ui` › `ui-extended` | The read-only detail grammar: a bottom-pinned `PropertyList` block, a prose completion, and a status that is the only bordered element. `DetailStatus` takes the kit's `StatusDot` tone and maps it onto `Badge` | `DetailBlock`, `DetailProse` and `DetailStatus` in `ui/DetailRows.tsx` |
+| **G12** | `RuleStatementRow` · `RuleStatementForm` | Modeller 1 · Projects 1 | `@invana/ui` › `ui-extended` | Invana-domain, so `ui-extended`, as emissions and citations are. *The statement is the row*: kind, scope and citations underneath, struck when not offered, `readOnly` when inherited. The form nudges past 160 characters and never refuses | `ui/RuleParts.tsx` |
+| G4 | `FilterSelect` | Agents 1 · Projects 2 | `@invana/ui` › `FilterChip` | Already open (§6a) and now confirmed by two products | `ui/FilterSelect.tsx` |
+
+### Not kit work — swap in Studio
+
+| Studio export | Products (files) | Why it is not a promotion | Next |
+|---|---|---|---|
+| `FormError` | Agents 1 · Modeller 4 (+ shell 3, app 1) | The kit already has it. `Alert tone="destructive"` with an icon and `AlertDescription` draws the same banner | A Studio `change` session swaps the nine call sites and deletes `ui/forms/FormError.tsx` |
+| `BOARD_ICONS` | Agents 3 · Modeller 2 (+ app 2) | A lucide map that `@invana/boards` takes as a prop, so a spec stays JSON. Whether the board ships default icons is a `@invana/boards` call, not a component | Stays until `@invana/boards` takes a default |
+| `LAYER_PALETTE` | Agents 1 · Modeller 4 (+ shell 2) | The kit ships no hues. Which colour means `llm` is the product's decision (§6c) | Stays |
+| `humanStatus` and the tone maps | Agents 1 · Projects 2 | What `needs_input` *means* is domain. What a tone looks like is already the kit's | Stays |
+
+### Below the bar — one product
+
+`AgentChipRow`, `BindRefusalCard`, `DetailPlaceholder`, `PrincipalChip` (G3 stays open), `ListPanelChrome`,
+`ListRow`, `ListFilterMenu`, `StepRules`, `LAYER_SWATCHES`, `layerSlug` and the per-kind tone maps are
+each imported by one product, or by one product plus a shared package. They stay in `@invana-studio/ui`
+until a second product needs them.
+
+### Order
+
+| Step | Detail |
+|---|---|
+| 1 | G10 · G7 · G4 — small, slot-shaped extensions of components the kit already ships |
+| 2 | G6 · G8 · G11 — new `ui-extended` compositions, each with a story |
+| 3 | G9 — depends on `PanelStack`'s header slot, and on G10 for the count |
+| 4 | G12 — the first Invana-domain row in the kit's rule vocabulary |
+| Each | Kit release (or the local link), then one Studio `change` session: swap the import, delete the file, and `check-kit-overlap` proves no name is left behind |
+
 ## 6b. A rail is a `PanelContent`, not a one-tab `TabbedPanel`
 
 `ListPanelChrome` drew every left rail as a `TabbedPanel` holding a **single permanent tab** — a tab
@@ -1127,7 +1176,7 @@ when what was being marked is that they repeated.
 | `DataTable` | `@invana/tables` | **indent rows** (a child run under its parent), **row selection** (accent + inset rule), and cell readings — mono · tone · struck. `density="compact"` and `groupBy` already ship. **Studio does not depend on `@invana/tables` yet** — install it | list · list.states · step · step.touched* |
 | `Legend` | `@invana/ui` | swatch kinds `stripe` (the layer bar), `bracket` (a bounded repetition), `rule` (a gate). Today: dot · line · dashed · arrow · ring | in_order · layers · layers.forecast · flow |
 | `FilterBar` / `FilterChip` | `@invana/ui` | a **closable** chip (`since: today ×`) and the bar's own summary (`interactive runs hidden`) | list · list.states · every panel |
-| `TaskNode` | `@invana/ui` | `readOnly` — a run's picked node gets the ring and **no handles**; handles belong to the draft canvas | flow · flow.step ([SR52](../modules/operate/features/see-what-ran.md#decisions)) |
+| `TaskNode` | `@invana/ui` | `readOnly` — a run's picked node gets the ring and **no handles**; nothing edits a plan by hand ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3) | flow · flow.step ([SR52](../modules/operate/features/see-what-ran.md#decisions)) |
 
 ### 7.4 `@invana/boards` — the panel kinds a run page is made of
 

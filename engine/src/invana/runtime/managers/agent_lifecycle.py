@@ -40,8 +40,8 @@ from invana.runtime.querysets import TaskRunQuerySet
 
 
 def _month_start() -> datetime:
-    """The first of this calendar month — the window ``max_cost_usd_month``
-    names (AG11)."""
+    """The first of this calendar month — the window ``max_tokens_month``
+    names."""
     return datetime.now(UTC).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
 
@@ -51,33 +51,33 @@ class AgentLifecycleManager:
     runs_qs = TaskRunQuerySet()
     sessions_qs = SessionQuerySet()
 
-    async def spend_this_month(self, session: AsyncSession, *, graph_id: str) -> dict[str, float]:
-        """``{agent_id: usd}`` since the first of the month, for the list's
-        meter ([C10](docs/for-developers/modules/agents/features/author-an-agent.md)).
+    async def tokens_this_month(self, session: AsyncSession, *, graph_id: str) -> dict[str, int]:
+        """``{agent_id: tokens}`` since the first of the month, for the list's
+        meter ([AG11](docs/for-developers/modules/agents/features/author-an-agent.md)).
 
         It lives here rather than in ``apps/agents`` because it reads
         ``task_runs``, which an app may not (migration-plan §18.1.1). The window
-        is the **calendar month**, the same one ``max_cost_usd_month`` names — a
-        rolling thirty days would draw a different number from the ceiling it
+        is the **calendar month**, the same one ``max_tokens_month`` names — a
+        rolling thirty days would draw a different number from the budget it
         sits beside.
         """
-        return await self.runs_qs.spend_by_agent(session, graph_id=graph_id, since=_month_start())
+        return await self.runs_qs.tokens_by_agent(session, graph_id=graph_id, since=_month_start())
 
     async def meters(self, session: AsyncSession, *, agent: Agent) -> AgentMeters:
         """What the agent is using now, each beside the limit that caps it — the
         Activity tab's strip ([AG23](docs/for-developers/modules/agents/features/author-an-agent.md)).
 
         Every number is derived from the record on read; none is a counter.
-        Spend is ``None`` when nothing this month was priced (AG11).
+        Usage and budgets are tokens, never currency.
         """
         since = _month_start()
         budget = agent.effective_budget
         in_flight = await self.runs_qs.in_flight_for_agent(session, agent_id=agent.id)
         return AgentMeters(
             agent_id=agent.id,
-            spend_this_month=await self.runs_qs.spend_for_agent(session, agent_id=agent.id, since=since),
-            max_cost_usd_month=budget.get("max_cost_usd_month"),
-            max_cost_usd_run=budget.get("max_cost_usd_run"),
+            tokens_this_month=await self.runs_qs.tokens_for_agent(session, agent_id=agent.id, since=since),
+            max_tokens_month=budget.get("max_tokens_month"),
+            max_tokens_run=budget.get("max_tokens_run"),
             running=sum(1 for run in in_flight if run.status == RunStatus.running.value),
             queued=sum(1 for run in in_flight if run.status == RunStatus.queued.value),
             max_concurrent_runs=budget.get("max_concurrent_runs"),

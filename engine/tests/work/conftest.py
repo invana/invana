@@ -77,7 +77,7 @@ async def graph(session: AsyncSession, user: User) -> Graph:
     row = Graph(slug="atlas", name="Atlas", created_by_id=user.id, setup_state={})
     session.add(row)
     await session.flush()
-    session.add(GraphMember(graph_id=row.id, user_id=user.id))
+    session.add(GraphMember(graph_id=row.id, user_id=user.id, roles=["owner"]))
     await session.flush()
     return row
 

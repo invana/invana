@@ -10,6 +10,8 @@ from __future__ import annotations
 from fastapi import Depends, Path, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.activity.managers import FleetManager
+from invana.activity.schemas import ModelPins
 from invana.apps.govern.managers import LLMEndpointManager
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.llm_providers.managers import LLMProviderManager
@@ -35,6 +37,15 @@ providers = LLMProviderManager()
 # (PM17), and the refusals on removal and on rename name the worlds that name
 # the address (PM11 · PM18). The manager that can read both answers all three.
 endpoints = LLMEndpointManager()
+
+
+async def list_model_pins(
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ModelPins:
+    """Who pins each model address — agents, skill versions and eval judges."""
+    return await FleetManager().pins(session, graph_id=graph.id)
 
 
 async def list_llm_providers(

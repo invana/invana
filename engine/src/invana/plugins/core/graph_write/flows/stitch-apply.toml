@@ -1,0 +1,15 @@
+key = "stitch-apply"
+version = 1
+kind = "stitch"
+description = "Declare a bundle's join rules, staged, then write their edges on commit."
+intents = []
+
+[[steps]]
+id = "apply_stitches"
+task = "apply_stitches"
+label = "Apply"
+
+[[steps]]
+id = "commit_stitches"
+task = "commit_stitches"
+label = "Commit"

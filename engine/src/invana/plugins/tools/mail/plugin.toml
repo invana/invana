@@ -1,0 +1,12 @@
+# A tool plugin: loads when its extra is installed, runs only once an install
+# Admin enables it. `imap` and `smtp` are server URLs with credentials, read in the worker.
+name = "invana.tools.mail"
+version = "0.1.0"
+kind = "tool"
+title = "Mail"
+engine = "*"
+extra = "tools-mail"
+secrets = ["imap", "smtp"]
+tasks = ["mail.read", "mail.send"]
+flows = []
+skills = []

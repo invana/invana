@@ -18,8 +18,8 @@ from collections.abc import Iterable, Sequence
 
 from invana.apps.govern.addressing import Layer
 from invana.apps.task_plans.models import Task, TaskForm
+from invana.plugins.sdk.manifest import Bound
 from invana.runtime.catalogue import CATALOGUE
-from invana.runtime.catalogue.registry import Bound
 
 #: What a node's bound means on the **six-band** strip a flow is drawn as
 #: ([SK16](docs/for-developers/modules/skills/features/authoring-a-skill.md)).

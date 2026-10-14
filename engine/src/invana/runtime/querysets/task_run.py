@@ -43,47 +43,51 @@ class TaskRunQuerySet:
         )
         return bool(result.rowcount)
 
-    # ── what an agent has spent ──────────────────────────────────────────────
+    # ── what an agent has used ───────────────────────────────────────────────
 
-    async def spend_by_agent(self, session: AsyncSession, *, graph_id: str, since: datetime) -> dict[str, float]:
-        """``{agent_id: usd}`` over a window — what the list draws against the
-        month ceiling ([C10](docs/for-developers/modules/agents/features/author-an-agent.md)).
+    @staticmethod
+    def _agent_tokens(since: datetime):
+        """Tokens per agent over its root runs that started since ``since``,
+        each root's own and its steps', keyed by the root's agent.
+
+        The root carries the agent; a step is counted through its root, so a
+        step that carries no ``agent_id`` of its own is not lost. Eval runs are
+        left out: they draw on the Graph's eval budget, shown apart.
+        """
+        root = aliased(TaskRun)
+        used = func.coalesce(func.sum(func.coalesce(TaskRun.tokens_in, 0) + func.coalesce(TaskRun.tokens_out, 0)), 0)
+        return (
+            select(root.agent_id, used)
+            .select_from(TaskRun)
+            .join(root, or_(TaskRun.id == root.id, TaskRun.parent_run_id == root.id))
+            .where(
+                root.agent_id.is_not(None),
+                root.parent_run_id.is_(None),
+                root.started_at >= since,
+                root.role != RunRole.evaluate.value,
+            )
+            .group_by(root.agent_id)
+        ), root
+
+    async def tokens_by_agent(self, session: AsyncSession, *, graph_id: str, since: datetime) -> dict[str, int]:
+        """``{agent_id: tokens}`` over a window — what the list draws against
+        the month budget.
 
         A grouped read, never a counter column: a counter can disagree with the
         runs it counts. It rides ``ix_task_runs_agent_started``, which is why
         the window is on ``started_at`` and not on ``queued_at`` — a run that
-        queued in March and ran in April spent April's dollars.
-
-        An agent with no priced run is **absent**, not zero: a subscription
-        endpoint publishes no per-token rate, so ``cost_usd`` is ``NULL`` and
-        *nothing was spent* and *nothing is known* are different facts
-        ([OB4](docs/for-developers/modules/operate/features/observability.md)).
+        queued in March and ran in April used April's tokens. An agent with no
+        run in the window is absent; a reader takes that as ``0``.
         """
-        rows = await session.execute(
-            select(TaskRun.agent_id, func.sum(TaskRun.cost_usd))
-            .where(
-                TaskRun.graph_id == graph_id,
-                TaskRun.agent_id.is_not(None),
-                TaskRun.started_at >= since,
-                TaskRun.cost_usd.is_not(None),
-            )
-            .group_by(TaskRun.agent_id)
-        )
-        return {agent_id: float(total) for agent_id, total in rows.all() if agent_id and total is not None}
+        stmt, root = self._agent_tokens(since)
+        rows = await session.execute(stmt.where(root.graph_id == graph_id))
+        return {agent_id: int(total) for agent_id, total in rows.all() if agent_id}
 
-    async def spend_for_agent(self, session: AsyncSession, *, agent_id: str, since: datetime) -> float | None:
-        """One agent's :meth:`spend_by_agent` — ``None`` when no run in the
-        window was priced, for the same reason the list leaves it out (OB4)."""
-        total = (
-            await session.execute(
-                select(func.sum(TaskRun.cost_usd)).where(
-                    TaskRun.agent_id == agent_id,
-                    TaskRun.started_at >= since,
-                    TaskRun.cost_usd.is_not(None),
-                )
-            )
-        ).scalar_one()
-        return float(total) if total is not None else None
+    async def tokens_for_agent(self, session: AsyncSession, *, agent_id: str, since: datetime) -> int:
+        """One agent's :meth:`tokens_by_agent`, ``0`` when it ran nothing."""
+        stmt, root = self._agent_tokens(since)
+        row = (await session.execute(stmt.where(root.agent_id == agent_id))).first()
+        return int(row[1]) if row else 0
 
     async def root_count_for_agent(self, session: AsyncSession, *, agent_id: str, since: datetime) -> int:
         """Runs this agent opened since ``since`` — roots only, by when they
@@ -473,6 +477,88 @@ class TaskRunQuerySet:
             .order_by(TaskRun.queued_at.desc())
         )
         return list((await session.execute(stmt)).scalars().all())
+
+    # ── the effect after a change (change-log.md) ─────────────────────────────
+
+    async def effect_of_steps(
+        self, session: AsyncSession, *, graph_id: str, offered: str, version_id: str
+    ) -> tuple[int, int, int, int]:
+        """``(runs, failed, tokens_in, tokens_out)`` over the steps offered one
+        skill or rule version. ``offered`` is ``"skills"`` or ``"rules"``.
+
+        The step is the unit here, because the step is what was offered the
+        version and what spent the tokens. The match is the quoted-substring
+        test :meth:`skill_version_counts` explains.
+        """
+        column = TaskRun.skills_offered if offered == "skills" else TaskRun.rules_offered
+        stmt = select(
+            func.count(),
+            func.count().filter(TaskRun.status == RunStatus.failed.value),
+            func.coalesce(func.sum(TaskRun.tokens_in), 0),
+            func.coalesce(func.sum(TaskRun.tokens_out), 0),
+        ).where(
+            TaskRun.graph_id == graph_id,
+            TaskRun.parent_run_id.is_not(None),
+            column.cast(Text).like(f'%"{version_id}"%'),
+        )
+        runs, failed, tokens_in, tokens_out = (await session.execute(stmt)).one()
+        return int(runs or 0), int(failed or 0), int(tokens_in or 0), int(tokens_out or 0)
+
+    async def effect_of_roots(
+        self,
+        session: AsyncSession,
+        *,
+        graph_id: str | None,
+        agent: tuple[str, int] | None = None,
+        plan: tuple[str, str] | None = None,
+        run_ids: list[str] | None = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
+    ) -> tuple[int, int, int, int]:
+        """``(runs, failed, tokens_in, tokens_out)`` over the roots that ran on
+        one version — tokens summed over each root and its own steps.
+
+        Exactly one way in: ``agent`` is ``(agent_id, agent_version)``; ``plan``
+        is ``(task_plan_id, "template:<key>@<v>")``, the two ways a library plan
+        is run (:meth:`roots_for_plan`); ``run_ids`` names the roots outright —
+        a dataset version's bind loads, in any Graph, so ``graph_id`` is None;
+        none of these is the Graph's roots queued in ``[since, until)``, the
+        window a model version was published for.
+        """
+        where = [TaskRun.parent_run_id.is_(None)]
+        if graph_id is not None:
+            where.append(TaskRun.graph_id == graph_id)
+        if run_ids is not None:
+            if not run_ids:
+                return 0, 0, 0, 0
+            where.append(TaskRun.id.in_(run_ids))
+        elif agent is not None:
+            where += [TaskRun.agent_id == agent[0], TaskRun.agent_version == agent[1]]
+        elif plan is not None:
+            where.append(or_(TaskRun.task_plan_id == plan[0], TaskRun.plan_origin == plan[1]))
+        if since is not None:
+            where.append(TaskRun.queued_at >= since)
+        if until is not None:
+            where.append(TaskRun.queued_at < until)
+
+        runs, failed = (
+            await session.execute(
+                select(func.count(), func.count().filter(TaskRun.status == RunStatus.failed.value)).where(*where)
+            )
+        ).one()
+        if not runs:
+            return 0, 0, 0, 0
+        # Same table inside and out, so correlation is switched off explicitly.
+        roots = select(TaskRun.id).where(*where).correlate(None)
+        tokens_in, tokens_out = (
+            await session.execute(
+                select(
+                    func.coalesce(func.sum(TaskRun.tokens_in), 0),
+                    func.coalesce(func.sum(TaskRun.tokens_out), 0),
+                ).where(or_(TaskRun.id.in_(roots), TaskRun.parent_run_id.in_(roots)))
+            )
+        ).one()
+        return int(runs), int(failed or 0), int(tokens_in or 0), int(tokens_out or 0)
 
     async def add(self, session: AsyncSession, run: TaskRun) -> TaskRun:
         session.add(run)

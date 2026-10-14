@@ -1,0 +1,20 @@
+key = "modeller-propose"
+version = 1
+kind = "ask"
+description = "Read a described change and stage it on the model draft."
+intents = ["model_change"]
+
+[[steps]]
+id = "understand_ask"
+task = "understand_ask"
+label = "Understand"
+
+[[steps]]
+id = "propose_model"
+task = "propose_model"
+label = "Propose"
+
+[[steps]]
+id = "validate_proposal"
+task = "validate_proposal"
+label = "Validate"

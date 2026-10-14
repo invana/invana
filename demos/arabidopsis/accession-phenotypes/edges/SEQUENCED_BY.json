@@ -1,0 +1,34 @@
+[
+  {
+    "from": "A-Col-0",
+    "to": "I-Salk"
+  },
+  {
+    "from": "A-Ler-1",
+    "to": "I-MPI"
+  },
+  {
+    "from": "A-Cvi-0",
+    "to": "I-MPI"
+  },
+  {
+    "from": "A-C24",
+    "to": "I-GMI"
+  },
+  {
+    "from": "A-Sha",
+    "to": "I-GMI"
+  },
+  {
+    "from": "A-Bur-0",
+    "to": "I-MPI"
+  },
+  {
+    "from": "A-Kas-1",
+    "to": "I-GMI"
+  },
+  {
+    "from": "A-Van-0",
+    "to": "I-Salk"
+  }
+]

@@ -34,8 +34,8 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events import actions as event_actions
 from invana.core.events.services import emit_event
+from invana.plugins.core.ingest.stitching import REFUSED
 from invana.runtime import services as run_services
-from invana.runtime.catalogue.stitching import REFUSED
 from invana.runtime.models import RunStatus
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug

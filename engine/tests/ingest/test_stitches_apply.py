@@ -15,7 +15,7 @@ from invana.apps.graphs.models import Graph
 from invana.apps.modeller.links import list_links
 from invana.apps.modeller.versioner import Versioner
 from invana.core.auth.models import User
-from invana.runtime.catalogue.stitching import apply_bundle
+from invana.plugins.core.ingest.stitching import apply_bundle
 
 
 @pytest_asyncio.fixture

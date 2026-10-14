@@ -1,0 +1,946 @@
+{
+ "boards": {
+  "shell.login": {
+   "story": "SH-01",
+   "product": "shell",
+   "route": "/login",
+   "state": ""
+  },
+  "shell.graphs": {
+   "story": "SH-02",
+   "product": "shell",
+   "route": "/graphs",
+   "state": ""
+  },
+  "shell.onboarding": {
+   "story": "SH-03",
+   "product": "shell",
+   "route": "/u/admin/airways/explorer",
+   "state": "a Graph whose set-up is not finished: the set-up checklist open"
+  },
+  "shell.launcher.open": {
+   "story": "SH-04",
+   "product": "shell",
+   "route": "/u/admin/airways/explorer",
+   "state": "click the product launcher in the header"
+  },
+  "shell.breadcrumbs.overflow": {
+   "story": "SH-05",
+   "product": "shell",
+   "route": "/u/admin/airways/explorer",
+   "state": "open a finding on branch H1.1 \u00b7 \u2026via lower FLC (needs B05): /u/admin/arabidopsis/projects/early-flowering-under-drought \u203a H1.1 \u203a a finding"
+  },
+  "shell.command_palette": {
+   "story": "SH-06",
+   "product": "shell",
+   "route": "/u/admin/airways/explorer",
+   "state": "press \u2318K"
+  },
+  "shell.user_menu": {
+   "story": "SH-07",
+   "product": "shell",
+   "route": "/u/admin/airways/explorer",
+   "state": "open the user menu, header right"
+  },
+  "shell.runs": {
+   "story": "SH-08",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs",
+   "state": "open the kind, status and product filters"
+  },
+  "shell.activity.runs": {
+   "story": "SH-08",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs",
+   "state": ""
+  },
+  "shell.run.overview": {
+   "story": "SH-09",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs/15",
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Overview tab"
+  },
+  "shell.run.touched": {
+   "story": "SH-09",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs/15",
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Touched tab"
+  },
+  "shell.run.log": {
+   "story": "SH-09",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs/15",
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Log tab"
+  },
+  "shell.run.step": {
+   "story": "SH-09",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs/15",
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; click a step on its timeline"
+  },
+  "shell.run.failed": {
+   "story": "SH-10",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs/15",
+   "state": "15 stands for a failed run's id: Activity \u203a Runs, status failed, open the newest"
+  },
+  "shell.run.compare": {
+   "story": "SH-11",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs/15",
+   "state": "two runs of one question in two worlds: select both in Activity \u203a Runs, Compare"
+  },
+  "shell.activity.approvals": {
+   "story": "SH-12",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs",
+   "state": "Approvals tab"
+  },
+  "shell.run.approval": {
+   "story": "SH-12",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs/15",
+   "state": "15 stands for a run waiting on approval: open it from Approvals (needs B08)"
+  },
+  "shell.schedules": {
+   "story": "SH-13",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/schedules",
+   "state": ""
+  },
+  "shell.schedule.new": {
+   "story": "SH-13",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/schedules",
+   "state": "New schedule"
+  },
+  "shell.schedule.detail": {
+   "story": "SH-13",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/schedules",
+   "state": "click a schedule: /activity/schedules/<id>"
+  },
+  "shell.activity.events": {
+   "story": "SH-14",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/events",
+   "state": ""
+  },
+  "shell.events.changes": {
+   "story": "SH-14",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/events?filter=changes",
+   "state": ""
+  },
+  "shell.change.compare": {
+   "story": "SH-14",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/changes/agent/a1",
+   "state": "a1 stands for an agent id with two versions: on its change row, Compare"
+  },
+  "shell.notifications": {
+   "story": "SH-15",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/inbox",
+   "state": ""
+  },
+  "shell.notifications.rules": {
+   "story": "SH-16",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/rules",
+   "state": ""
+  },
+  "shell.notifications.rule": {
+   "story": "SH-16",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/rules",
+   "state": "click a rule, or ?new=1 for New rule"
+  },
+  "shell.notifications.channels": {
+   "story": "SH-16",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/channels",
+   "state": ""
+  },
+  "shell.run.rerun": {
+   "story": "SH-18",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/runs/15",
+   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run that answered a question or a query; Re-run\u2026 on its header"
+  },
+  "shell.first_run": {
+   "story": "SH-19",
+   "product": "shell",
+   "route": "/graphs?first-run",
+   "state": "an install with no Graph yet"
+  },
+  "agents.skills.detail.readonly": {
+   "story": "SH-20",
+   "product": "shell",
+   "route": "/u/admin/airways/agents/skills/answer-nl",
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills, signed in as e2e-viewer (a viewer on the Graph; e2e/roles-agents.spec.ts makes the account, its password is in e2e/members.ts)"
+  },
+  "shell.profile": {
+   "story": "SH-17",
+   "product": "shell",
+   "route": "/settings/profile",
+   "state": ""
+  },
+  "shell.profile.tokens": {
+   "story": "SH-17",
+   "product": "shell",
+   "route": "/settings/profile",
+   "state": "Access tokens tab"
+  },
+  "datasets.catalogue": {
+   "story": "DS-01",
+   "product": "datasets",
+   "route": "/datasets/catalogue",
+   "state": ""
+  },
+  "datasets.dataset": {
+   "story": "DS-02",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it)"
+  },
+  "datasets.dataset.provenance": {
+   "story": "DS-02",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Provenance tab"
+  },
+  "datasets.dataset.versions": {
+   "story": "DS-03",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Versions tab"
+  },
+  "datasets.dataset.used": {
+   "story": "DS-03",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Used by tab"
+  },
+  "datasets.record": {
+   "story": "DS-04",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); click Col-0 in the preview"
+  },
+  "datasets.observe": {
+   "story": "DS-05",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Add observations"
+  },
+  "datasets.observe.assistant": {
+   "story": "DS-05",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Add observations \u203a tell the assistant"
+  },
+  "datasets.collect": {
+   "story": "DS-06",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "Catalogue \u203a Collect with an agent (needs B06b)"
+  },
+  "datasets.collect.run": {
+   "story": "DS-06",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "a collection while it runs (needs B06b)"
+  },
+  "datasets.validation": {
+   "story": "DS-07",
+   "product": "datasets",
+   "route": "/datasets/validation",
+   "state": ""
+  },
+  "datasets.validation.item": {
+   "story": "DS-07",
+   "product": "datasets",
+   "route": "/datasets/validation",
+   "state": "a standard violation: attach a standard to a dataset in warn, then click a row of the queue"
+  },
+  "datasets.standards": {
+   "story": "DS-08",
+   "product": "datasets",
+   "route": "/datasets/standards",
+   "state": ""
+  },
+  "datasets.standard": {
+   "story": "DS-08",
+   "product": "datasets",
+   "route": "/datasets/standards",
+   "state": "click a standard in the library"
+  },
+  "datasets.standard.attach": {
+   "story": "DS-09",
+   "product": "datasets",
+   "route": "/datasets/standards",
+   "state": "on a standard, Attach to a dataset"
+  },
+  "datasets.dataset.conformance": {
+   "story": "DS-09",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Conformance tab"
+  },
+  "datasets.documents": {
+   "story": "DS-10",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "not built \u2014 no documents dataset in the engine"
+  },
+  "datasets.bind": {
+   "story": "DS-11",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Bind to a Graph \u203a arabidopsis"
+  },
+  "datasets.share": {
+   "story": "DS-12",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); Share"
+  },
+  "datasets.dataset.retracted": {
+   "story": "DS-14",
+   "product": "datasets",
+   "route": "/datasets/catalogue/admin/accession-phenotypes",
+   "state": "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it); a version marked retracted"
+  },
+  "datasets.standards.import": {
+   "story": "DS-15",
+   "product": "datasets",
+   "route": "/datasets/standards",
+   "state": "Import from SKOS \u203a File: demos/arabidopsis/semantic/plant-traits.skos.ttl (the preview)"
+  },
+  "datasets.imports": {
+   "story": "DS-13",
+   "product": "datasets",
+   "route": "/datasets/imports",
+   "state": ""
+  },
+  "datasets.imports.run": {
+   "story": "DS-13",
+   "product": "datasets",
+   "route": "/datasets/imports",
+   "state": "click an import while it runs: re-run demos/arabidopsis/load.py and open its run"
+  },
+  "modeller.global_model": {
+   "story": "MO-01",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/global-model",
+   "state": ""
+  },
+  "modeller.global_model.dark": {
+   "story": "MO-01",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/global-model",
+   "state": "theme dark: user menu \u203a Appearance \u203a Dark"
+  },
+  "modeller.model.airroutes": {
+   "story": "MO-02",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models/airroutes",
+   "state": ""
+  },
+  "modeller.model.type": {
+   "story": "MO-02",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models/airroutes",
+   "state": "click node type airport"
+  },
+  "modeller.global_model.stitch": {
+   "story": "MO-03",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/global-model",
+   "state": "click a dashed stitch on the board"
+  },
+  "modeller.stitches": {
+   "story": "MO-03",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/stitches",
+   "state": ""
+  },
+  "modeller.connect": {
+   "story": "MO-04",
+   "product": "modeller",
+   "route": "/graphs/new",
+   "state": "New Graph"
+  },
+  "modeller.draft": {
+   "story": "MO-04",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models?model=m1",
+   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, with an unpublished draft: change any property, do not publish"
+  },
+  "modeller.global_model.diff": {
+   "story": "MO-05",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/global-model",
+   "state": "with a draft on airroutes, Compare"
+  },
+  "modeller.draft.publish": {
+   "story": "MO-05",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models?model=m1",
+   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, on the draft: Publish"
+  },
+  "modeller.draft.migration": {
+   "story": "MO-05",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models?model=m1",
+   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, a breaking draft (remove a property): Publish"
+  },
+  "modeller.models.new": {
+   "story": "MO-06",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models",
+   "state": "New model"
+  },
+  "modeller.models.new.ontology": {
+   "story": "MO-15",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models",
+   "state": "More actions \u203a From an ontology \u203a File: demos/arabidopsis/semantic/schema-org-subset.ttl; tick Person, Organization, Product"
+  },
+  "modeller.models.new.ontology.preview": {
+   "story": "MO-15",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models",
+   "state": "the same, then Preview"
+  },
+  "modeller.models.overview": {
+   "story": "MO-07",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models",
+   "state": "Overview tab"
+  },
+  "modeller.models.database": {
+   "story": "MO-07",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models",
+   "state": "Database tab"
+  },
+  "modeller.models.usage": {
+   "story": "MO-07",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models",
+   "state": "Usage tab"
+  },
+  "modeller.models.performance": {
+   "story": "MO-07",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models",
+   "state": "Performance tab"
+  },
+  "modeller.models.growth": {
+   "story": "MO-07",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models",
+   "state": "Growth tab"
+  },
+  "modeller.models.report": {
+   "story": "MO-07",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models",
+   "state": "open a saved report"
+  },
+  "modeller.model.type.constraint": {
+   "story": "MO-08",
+   "product": "modeller",
+   "route": "/u/admin/arabidopsis/modeller/models/arabidopsis/accession",
+   "state": "Constraints tab; click days_to_flowering"
+  },
+  "modeller.model.history": {
+   "story": "MO-09",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/models?model=m1&models_tab=history",
+   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board"
+  },
+  "modeller.worlds": {
+   "story": "MO-10",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/worlds",
+   "state": ""
+  },
+  "modeller.worlds.board": {
+   "story": "MO-10",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/worlds",
+   "state": "click a world"
+  },
+  "modeller.guardrails.request": {
+   "story": "MO-11",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/guardrails",
+   "state": "a request from Explorer that meets a guardrail: open it"
+  },
+  "modeller.guardrails.edit": {
+   "story": "MO-11",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/guardrails",
+   "state": "click a guardrail rule"
+  },
+  "modeller.rules": {
+   "story": "MO-12",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/rules",
+   "state": ""
+  },
+  "modeller.rules.edit": {
+   "story": "MO-12",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/rules",
+   "state": "click a rule"
+  },
+  "modeller.requests": {
+   "story": "MO-13",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/requests",
+   "state": ""
+  },
+  "modeller.settings": {
+   "story": "MO-14",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/settings",
+   "state": ""
+  },
+  "modeller.settings.database": {
+   "story": "MO-14",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/settings",
+   "state": "Database tab (?tab=graph)"
+  },
+  "modeller.settings.members": {
+   "story": "MO-14",
+   "product": "modeller",
+   "route": "/u/admin/airways/modeller/settings",
+   "state": "Members tab (?tab=members)"
+  },
+  "explorer.home": {
+   "story": "EX-01",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer",
+   "state": "a new session: empty board, nothing asked"
+  },
+  "explorer.answer": {
+   "story": "EX-02",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d"
+  },
+  "explorer.answer.node": {
+   "story": "EX-02",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; click a node on the board"
+  },
+  "explorer.answer.dark": {
+   "story": "EX-02",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; theme dark: user menu \u203a Appearance \u203a Dark"
+  },
+  "explorer.answer.chart": {
+   "story": "EX-03",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "ask \u201cRoutes out of LHR by carrier, as a bar chart\u201d"
+  },
+  "explorer.answer.trace": {
+   "story": "EX-04",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; How I got this"
+  },
+  "explorer.answer.cannot": {
+   "story": "EX-05",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "ask something the graph holds nothing on, e.g. \u201cWhat did a ticket to JFK cost?\u201d"
+  },
+  "explorer.answer.guardrail": {
+   "story": "EX-06",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "in the Price-blind world, ask for deals by revenue"
+  },
+  "explorer.answer.schedule": {
+   "story": "EX-07",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Schedule this"
+  },
+  "explorer.answer.scheduled": {
+   "story": "EX-07",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Schedule this \u203a confirm"
+  },
+  "explorer.answer.query": {
+   "story": "EX-08",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; composer Cypher, run MATCH (a:airport {code:'LHR'})-[:route]->(b) RETURN a,b LIMIT 25"
+  },
+  "explorer.answer.query.error": {
+   "story": "EX-08",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; composer Cypher, run a query with a syntax error"
+  },
+  "explorer.tools": {
+   "story": "EX-09",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; toolbar expanded"
+  },
+  "explorer.tools.expand": {
+   "story": "EX-09",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; on a node, Expand neighbours"
+  },
+  "explorer.tools.styling": {
+   "story": "EX-09",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Styling and layers"
+  },
+  "explorer.tools.history": {
+   "story": "EX-09",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Canvas history"
+  },
+  "explorer.sessions": {
+   "story": "EX-10",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer?history",
+   "state": ""
+  },
+  "explorer.locked": {
+   "story": "EX-11",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "a Graph whose set-up is not finished"
+  },
+  "explorer.answer.to_project": {
+   "story": "EX-12",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Add to a project (needs C02)"
+  },
+  "explorer.answer.closed": {
+   "story": "EX-13",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; close the chat with \u2715"
+  },
+  "explorer.answer.share": {
+   "story": "EX-15",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; Share on the reply line, beside Add to a project"
+  },
+  "explorer.answer.console": {
+   "story": "EX-14",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; open the Console"
+  },
+  "projects.list": {
+   "story": "PJ-01",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects",
+   "state": ""
+  },
+  "projects.new": {
+   "story": "PJ-02",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects",
+   "state": "Projects \u203a New project"
+  },
+  "projects.project": {
+   "story": "PJ-03",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": ""
+  },
+  "projects.project.branches": {
+   "story": "PJ-04",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "Branches tab (needs B05)"
+  },
+  "projects.branch.fork": {
+   "story": "PJ-04",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "Branches tab \u203a Fork a branch on H1 (needs B05)"
+  },
+  "projects.branch": {
+   "story": "PJ-05",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "on branch H1.1 \u00b7 \u2026via lower FLC (needs B05)"
+  },
+  "projects.finding": {
+   "story": "PJ-06",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "on branch H1.1 \u00b7 \u2026via lower FLC (needs B05); click \u201cCol-0 carries a loss-of-function FRI allele\u201d"
+  },
+  "projects.branch.decide": {
+   "story": "PJ-07",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "on branch H1.1 \u00b7 \u2026via lower FLC (needs B05); Decide"
+  },
+  "projects.branch.merge": {
+   "story": "PJ-08",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "on branch H1.1 \u00b7 \u2026via lower FLC (needs B05); Merge\u2026"
+  },
+  "projects.simulate": {
+   "story": "PJ-09",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "on branch H2, Simulate (needs a simulator and a dataset cite on H2)"
+  },
+  "projects.simulate.result": {
+   "story": "PJ-09",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "on branch H2, Simulate \u203a Run simulation; or its Simulations tab \u203a s1"
+  },
+  "projects.impact": {
+   "story": "PJ-10",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/gene-edited-field-trials",
+   "state": "Impact tab (needs a finding that cites a graph record)"
+  },
+  "projects.lineage": {
+   "story": "PJ-11",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "Lineage tab (needs B05)"
+  },
+  "projects.todos": {
+   "story": "PJ-12",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/todos",
+   "state": ""
+  },
+  "projects.todo": {
+   "story": "PJ-12",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/todos",
+   "state": "click \u201cScore days to flowering on trays 11\u201318\u201d"
+  },
+  "projects.decisions": {
+   "story": "PJ-13",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/decisions",
+   "state": "needs B05 for its rows"
+  },
+  "projects.report": {
+   "story": "PJ-14",
+   "product": "projects",
+   "route": "/u/admin/arabidopsis/projects/early-flowering-under-drought",
+   "state": "Report tab (needs B05)"
+  },
+  "agents.overview": {
+   "story": "AG-01",
+   "product": "agents",
+   "route": "/u/admin/airways/agents",
+   "state": ""
+  },
+  "agents.overview.dark": {
+   "story": "AG-01",
+   "product": "agents",
+   "route": "/u/admin/airways/agents",
+   "state": "theme dark: user menu \u203a Appearance \u203a Dark"
+  },
+  "agents.agents": {
+   "story": "AG-02",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents",
+   "state": ""
+  },
+  "agents.agents.lineage": {
+   "story": "AG-02",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents",
+   "state": "Lineage tab"
+  },
+  "agents.agent": {
+   "story": "AG-03",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents/analyst",
+   "state": "analyst stands for an agent's slug: open any agent from Agents"
+  },
+  "agents.agent.activity": {
+   "story": "AG-03",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents/analyst",
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Activity tab"
+  },
+  "agents.agent.instructions": {
+   "story": "AG-04",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents/analyst",
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Instructions tab (needs B02)"
+  },
+  "agents.agent.soul": {
+   "story": "AG-05",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents/analyst",
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Soul tab"
+  },
+  "agents.agent.thinking": {
+   "story": "AG-05",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents/analyst",
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Thinking tab"
+  },
+  "agents.agent.skills": {
+   "story": "AG-05",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents/analyst",
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Skills & callables tab"
+  },
+  "agents.agent.envelope": {
+   "story": "AG-05",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents/analyst",
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Envelope"
+  },
+  "agents.agent.history": {
+   "story": "AG-06",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents/analyst",
+   "state": "analyst stands for an agent's slug: open any agent from Agents; History tab"
+  },
+  "agents.agent.pause": {
+   "story": "AG-07",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/agents/analyst",
+   "state": "analyst stands for an agent's slug: open any agent from Agents; Pause or retire"
+  },
+  "agents.skills": {
+   "story": "AG-08",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/skills",
+   "state": ""
+  },
+  "agents.skills.detail": {
+   "story": "AG-08",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/skills/answer-nl",
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills"
+  },
+  "agents.skills.instructions.edit": {
+   "story": "AG-08",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/skills",
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills; Edit instructions (needs B02)"
+  },
+  "agents.skills.evals": {
+   "story": "AG-08",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/skills",
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills; Evals tab (needs B02)"
+  },
+  "agents.skills.plan.regenerated": {
+   "story": "AG-08",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/skills",
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills; save an instructions edit (needs B02)"
+  },
+  "agents.skills.history": {
+   "story": "AG-09",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/skills",
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills; History tab"
+  },
+  "agents.skills.usage": {
+   "story": "AG-10",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/skills",
+   "state": "answer-nl stands for a skill's slug: open any skill from Skills; Usage tab"
+  },
+  "agents.library": {
+   "story": "AG-11",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/library",
+   "state": ""
+  },
+  "agents.library.plan": {
+   "story": "AG-11",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/library",
+   "state": "Plans tab, click a plan"
+  },
+  "agents.library.plan.overview": {
+   "story": "AG-11",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/library",
+   "state": "Plans tab, click a plan; Overview tab"
+  },
+  "agents.library.plan.revisions": {
+   "story": "AG-11",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/library",
+   "state": "a run that replanned: its Revisions"
+  },
+  "agents.library.templates": {
+   "story": "AG-12",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/library",
+   "state": "Templates tab"
+  },
+  "agents.plugins": {
+   "story": "AG-13",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/plugins",
+   "state": "needs B06a for its rows"
+  },
+  "agents.plugins.plugin": {
+   "story": "AG-13",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/plugins",
+   "state": "click a plugin (needs B06a)"
+  },
+  "agents.plugins.task": {
+   "story": "AG-13",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/plugins",
+   "state": "click a plugin, then a task type (needs B06a)"
+  },
+  "agents.llms": {
+   "story": "AG-14",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/llms",
+   "state": ""
+  },
+  "agents.performance": {
+   "story": "AG-15",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/performance",
+   "state": ""
+  },
+  "agents.settings": {
+   "story": "AG-16",
+   "product": "agents",
+   "route": "/u/admin/airways/agents/settings",
+   "state": ""
+  }
+ }
+}

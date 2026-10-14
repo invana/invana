@@ -1,0 +1,46 @@
+# The query bindings are **declared**, not left to the sequence: `validate_query`
+# and `execute_graph_query` both bind `${steps.translate_thought.query}`, so
+# materialising the plan records the data-flow edge rather than a sequence guess.
+# `read_only` is declared, not hard-coded, because it is the one thing a caller
+# legitimately differs on: a skill that answers questions wants it true, one that
+# writes what it found does not. An agent whose envelope **pins** it still wins —
+# a pin is a ceiling, and a tuned argument is a request.
+#
+# **@2, not an edit to @1.** A library version is immutable: a changed shape mints
+# `key@n+1` rather than rewriting the rows an install already holds.
+
+key = "nl-single"
+version = 2
+kind = "ask"
+description = "One question, one query: translate it, check it is read-only, run it, paint it, verify it served."
+intents = ["single_query", "exploration"]
+
+[args_schema]
+read_only = { type = "bool", default = true, label = "Refuse anything that writes" }
+
+[[steps]]
+id = "translate_thought"
+task = "translate_thought"
+label = "Translate"
+
+[[steps]]
+id = "validate_query"
+task = "validate_query"
+label = "Validate"
+args = { query = "${steps.translate_thought.query}" }
+
+[[steps]]
+id = "execute_graph_query"
+task = "execute_graph_query"
+label = "Execute"
+args = { query = "${steps.translate_thought.query}", read_only = "${args.read_only}" }
+
+[[steps]]
+id = "shape_for_canvas"
+task = "shape_for_canvas"
+label = "Project"
+
+[[steps]]
+id = "verify_result"
+task = "verify_result"
+label = "Verify"

@@ -9,12 +9,14 @@ from __future__ import annotations
 
 import pytest
 
-from invana.apps.agents.registry import TEMPLATES
 from invana.apps.task_plans.dag import dag_for, materialise
 from invana.apps.task_plans.managers.task_plan import explode
 from invana.apps.task_plans.models import PlanKind, PlanOrigin, TaskPlan
 from invana.apps.task_plans.yaml_export import steps_of, to_yaml
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
+
+TEMPLATES = load_plugins().flows
 
 REQUIRES = {key: entry.requires for key, entry in CATALOGUE.items()}
 
@@ -28,7 +30,7 @@ def _plan(template) -> TaskPlan:
         name=template.key,
         description=template.description,
         kind=PlanKind.ask.value,
-        origin=PlanOrigin.builtin.value,
+        origin=PlanOrigin.packaged.value,
         intent=list(template.intents),
     )
 
@@ -98,3 +100,11 @@ def test_the_export_declares_its_arguments_and_writes_an_empty_mapping_as_one() 
 
     assert "\nargs:\n  read_only:\n    type: bool\n    default: true\n" in text
     assert "    args: {}\n" in text and 'args: "{}"' not in text
+
+
+def test_an_exploded_row_records_its_task_types_version() -> None:
+    versions = load_plugins().versions()
+    tasks = explode("p1", TEMPLATES["nl-single"].steps, requires=REQUIRES, versions=versions)
+    assert [t.task_version for t in tasks] == [versions[t.step_key] for t in tasks]
+    # A caller that hands no versions records none, rather than guessing one.
+    assert {t.task_version for t in explode("p1", TEMPLATES["nl-single"].steps, requires=REQUIRES)} == {None}

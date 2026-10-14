@@ -303,13 +303,12 @@ metered nor free ([OB4](../modules/operate/features/observability.md)), and for 
 model added to it ranks at the **middle** — a subscription publishes no per-token rate for PM17 to
 read. An api-key endpoint exercises both.
 
-**The spend meter is the fourth thing the engine owed**, and it landed with the rest:
-`AgentListResponse.spend_this_month` is a `{agent_id: usd}` sidecar over the calendar month, read
-once for the whole list on `ix_task_runs_agent_started`. The row states `$1.84 of $40.00 this
-month` and the summary draws the meter against the ceiling — **only against a real one**, because a
-bar under a number with no ceiling invents a limit nobody set. On this stack every agent is absent
-from that map, which is [OB4](../modules/operate/features/observability.md) working rather than a
-gap: the meter itself is the one thing here a subscription cannot exercise.
+**The token meter is the fourth thing the engine owed**, and it landed with the rest:
+`AgentListResponse.tokens_this_month` is a `{agent_id: tokens}` sidecar over the calendar month, read
+once for the whole list on `ix_task_runs_agent_started`. The row states the run budget
+(`up to 200k tokens a run`) and Activity draws the month meter against `max_tokens_month` — tokens,
+never currency, because what a token costs depends on each customer's subscription
+([EB14](../modules/agents/features/envelope-and-budget.md#decisions)).
 
 **And the edit form opened a hole the split had closed.** `ProviderForm`'s Edit path puts the
 endpoint's `name` in front of a person, and the `name` *is* the address segment — so a rename moved

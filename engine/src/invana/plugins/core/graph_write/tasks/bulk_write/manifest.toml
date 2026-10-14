@@ -1,0 +1,18 @@
+key = "bulk_write"
+version = "1.0.0"
+summary = "Write a CSV folder straight into the graph, validating nothing."
+bound = "graph_write"
+side_effect = "write"
+requires = []
+resources = ["cpu"]
+
+[args]
+root = { type = "str" }
+batch_size = { type = "int" }
+skip_on_error = { type = "bool" }
+keep_source_ids = { type = "bool" }
+
+[outputs]
+nodes = "int"
+edges = "int"
+failed = "int"

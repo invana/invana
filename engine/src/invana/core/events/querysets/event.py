@@ -13,6 +13,7 @@ from sqlalchemy.orm import aliased
 
 from invana.apps.agents.models import Agent
 from invana.core.auth.models import User
+from invana.core.events.actions import CHANGE_ACTIONS
 from invana.core.events.models import Event
 from invana.core.events.schemas import ActorRef, EventListResponse, EventRead, OnBehalfOfRef
 
@@ -35,11 +36,15 @@ class EventFilter:
     actor_kind: str | None = None
     on_behalf_of: str | None = None
     project_id: str | None = None
+    #: Projects whose events the reader may not see — a private project they are not on.
+    exclude_project_ids: frozenset[str] = frozenset()
     task_id: str | None = None
     run_id: str | None = None
     skill_id: str | None = None
     action_prefix: str | None = None
     actions: list[str] | None = None
+    #: Only the events that mint a version — the change log.
+    changes: bool = False
     since: datetime | None = None
     until: datetime | None = None
 
@@ -53,6 +58,31 @@ class EventQuerySet:
     async def get(self, session: AsyncSession, event_id: str) -> Event | None:
         stmt = select(Event).where(Event.id == event_id)
         return (await session.execute(stmt)).scalar_one_or_none()
+
+    async def for_targets(
+        self,
+        session: AsyncSession,
+        *,
+        graph_id: str | None,
+        target_kind: str,
+        target_ids: list[str],
+        actions: frozenset[str],
+        any_graph: bool = False,
+    ) -> list[Event]:
+        """One record's events of the given actions, oldest first — what a
+        record's history reads its who, when and why from.
+
+        ``graph_id`` None reads the events of a record above Graphs (a
+        dataset's, which carry none); ``any_graph`` drops the Graph filter, for
+        the events a Graph-scoped act writes about such a record.
+        """
+        if not target_ids:
+            return []
+        where = [Event.target_kind == target_kind, Event.target_id.in_(target_ids), Event.action.in_(sorted(actions))]
+        if not any_graph:
+            where.append(Event.graph_id.is_(None) if graph_id is None else Event.graph_id == graph_id)
+        stmt = select(Event).where(*where).order_by(Event.created_at, Event.id)
+        return list((await session.execute(stmt)).scalars().all())
 
     async def list_page(
         self,
@@ -96,6 +126,10 @@ class EventQuerySet:
             stmt = stmt.where(Event.on_behalf_of_user_id == filters.on_behalf_of)
         if filters.project_id is not None:
             stmt = stmt.where(Event.project_id == filters.project_id)
+        if filters.exclude_project_ids:
+            stmt = stmt.where(
+                or_(Event.project_id.is_(None), Event.project_id.not_in(sorted(filters.exclude_project_ids))),
+            )
         if filters.task_id is not None:
             stmt = stmt.where(Event.task_id == filters.task_id)
         if filters.run_id is not None:
@@ -116,6 +150,10 @@ class EventQuerySet:
             # types here. IN keeps the composite (action, created_at) index
             # usable. Empty list = no constraint (treated as "all").
             stmt = stmt.where(Event.action.in_(filters.actions))
+        if filters.changes:
+            # ANDed with ``actions``, so a chosen type outside the change log
+            # narrows to nothing rather than widening back to everything.
+            stmt = stmt.where(Event.action.in_(sorted(CHANGE_ACTIONS)))
         if filters.since is not None:
             stmt = stmt.where(Event.created_at >= filters.since)
         if filters.until is not None:

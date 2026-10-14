@@ -29,6 +29,8 @@ class RuleVersionView(ModelView):
         "rule_id",
         "version",
         "statement",
+        "check",
+        "mode",
         "published_by_id",
         "published_at",
     ]

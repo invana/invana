@@ -1,0 +1,177 @@
+[
+  {
+    "from": "A-Col-0",
+    "to": "G-FRI",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-Col-0",
+    "to": "G-FLC",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Col-0",
+    "to": "G-DOG1",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Ler-1",
+    "to": "G-FRI",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-Ler-1",
+    "to": "G-FLC",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-Ler-1",
+    "to": "G-DOG1",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Cvi-0",
+    "to": "G-FRI",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-Cvi-0",
+    "to": "G-FLC",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-Cvi-0",
+    "to": "G-DOG1",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-C24",
+    "to": "G-FRI",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-C24",
+    "to": "G-FLC",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-C24",
+    "to": "G-DOG1",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-Sha",
+    "to": "G-FRI",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Sha",
+    "to": "G-FLC",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-Sha",
+    "to": "G-DOG1",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Bur-0",
+    "to": "G-FRI",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Bur-0",
+    "to": "G-FLC",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Bur-0",
+    "to": "G-DOG1",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-Kas-1",
+    "to": "G-FRI",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Kas-1",
+    "to": "G-FLC",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Kas-1",
+    "to": "G-DOG1",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Van-0",
+    "to": "G-FRI",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-Van-0",
+    "to": "G-FLC",
+    "properties": {
+      "allele": "functional"
+    }
+  },
+  {
+    "from": "A-Van-0",
+    "to": "G-DOG1",
+    "properties": {
+      "allele": "loss-of-function"
+    }
+  },
+  {
+    "from": "A-Col-0",
+    "to": "G-FT",
+    "properties": {
+      "allele": "functional"
+    }
+  }
+]

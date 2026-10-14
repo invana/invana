@@ -14,13 +14,19 @@ GET    /{model_id}                         model detail (+ versions)
 PATCH  /{model_id}                         update name/description/validation_mode; status archives or restores (MP7)
 DELETE /{model_id}                         hard delete — refused once a version was published (MP7)
 
+POST   /import/ontology                    an RDFS / OWL ontology as a draft model (or a preview)
+
 GET    /{model_id}/draft/projection        the DDL publishing the draft would project (MP8)
 
 GET    /{model_id}/versions                list versions
 POST   /{model_id}/versions                create a draft (optional based_on)
 GET    /{model_id}/active-version          active version (full tree)
 GET    /{model_id}/versions/{vid}          a version (full tree)
-POST   /{model_id}/versions/{vid}/activate activate a draft
+POST   /{model_id}/versions/{vid}/activate activate a draft (refused when breaking)
+
+GET    /{model_id}/draft/review            additive or breaking, change by change
+POST   /{model_id}/publish                 publish additive now; breaking opens a review
+GET    /{model_id}/publish-reviews[/{id}]  the model's publish reviews
 
 # type authoring — only on a draft version (ModelStore._ensure_draft → 409)
 POST/PATCH/DELETE /{model_id}/versions/{vid}/node-types[/{id}]
@@ -32,17 +38,18 @@ from __future__ import annotations
 from http import HTTPStatus
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.activity.managers import PublishReviewManager
 from invana.apps.graphs.compatibility import supported_property_type_values
 from invana.apps.graphs.managers import GraphManager
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.graphs.pool import GraphUnavailableError
 from invana.apps.modeller import starters as starter_models
 from invana.apps.modeller.json_io import SchemaExporter
-from invana.apps.modeller.managers import InsightsManager, ModelLifecycleManager
+from invana.apps.modeller.managers import InsightsManager, ModelLifecycleManager, PublishManager
 from invana.apps.modeller.models import GraphModel, GraphVersion
 from invana.apps.modeller.portability import (
     ImportRefused,
@@ -67,6 +74,10 @@ from invana.apps.modeller.schemas import (
     IndexCreate,
     IndexResponse,
     Insights,
+    ModelPublishClassification,
+    ModelPublishOutcome,
+    ModelPublishRequest,
+    ModelPublishReviewRead,
     NodeTypeCreate,
     NodeTypeResponse,
     NodeTypeUpdate,
@@ -83,11 +94,14 @@ from invana.apps.modeller.schemas import (
 from invana.apps.modeller.staging import StagedSet, UnknownChange, collect, discard_all, discard_one
 from invana.apps.modeller.store import ModelStore
 from invana.apps.modeller.versioner import Versioner, compute_diff
+from invana.apps.semantic.managers import OntologyImportManager
+from invana.apps.semantic.schemas import OntologyImportRequest, OntologyImportResult
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events import actions as event_actions
 from invana.core.events.services import emit_event
+from invana.server.evals.views import drift_after
 from invana.server.graphs.deps import (
     require_graph_member,
     resolve_graph_by_username_slug,
@@ -98,6 +112,9 @@ models_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/models", tags
 
 _store = ModelStore()
 _lifecycle = ModelLifecycleManager()
+_publishing = PublishManager()
+_reviews = PublishReviewManager()
+_ontologies = OntologyImportManager()
 
 
 # ---------------------------------------------------------------------------
@@ -442,6 +459,60 @@ async def import_model(
     )
 
 
+@models_router.post("/import/ontology", response_model=ActionResponse[OntologyImportResult])
+async def import_ontology(
+    payload: OntologyImportRequest,
+    response: Response,
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[OntologyImportResult]:
+    """An ontology as a draft model — or, with ``dry_run``, what it would be."""
+    try:
+        imported = await _ontologies.import_ontology(session, graph_id=graph.id, payload=payload)
+    except ImportRefused as exc:
+        raise HTTPException(HTTPStatus.CONFLICT, detail={"error": exc.error, **exc.detail}) from exc
+
+    blockers = await _unsupported_for_graph(session, graph, imported.artefact)
+    result = OntologyImportResult(
+        draft=imported.export,
+        report=imported.report,
+        unsupported_property_types=blockers,
+        publishable=not blockers,
+    )
+    counts = imported.report.mapped
+    if imported.model is None:
+        return action(
+            f"{counts['node_types']} node types, {counts['edge_types']} edge types and "
+            f"{counts['property_keys']} property keys would import; {imported.report.skipped_count} skipped.",
+            result,
+        )
+
+    await emit_event(
+        session,
+        action=event_actions.MODEL_IMPORT,
+        target_kind=event_actions.TARGET_MODEL,
+        target_id=imported.model.id,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={
+            "name": imported.model.name,
+            "package_id": imported.artefact.package_id,
+            "content_hash": imported.artefact.content_hash,
+            "source": "ontology",
+            "unsupported": blockers,
+            "skipped": imported.report.skipped_count,
+        },
+    )
+    await session.commit()
+    model = await _store.get_graph_model(session, imported.model.id)
+    result.model = _to_response(model)
+    result.version = await _full_version(session, imported.version_id)
+    response.status_code = status.HTTP_201_CREATED
+    return action(_import_message(model.name, blockers), result)
+
+
 @models_router.get("/{model_id}", response_model=GraphModelResponse)
 async def get_model(
     model_id: str = Path(...),
@@ -596,6 +667,7 @@ async def get_version(
 @models_router.post("/{model_id}/versions/{version_id}/activate", response_model=ActionResponse[VersionResponse])
 async def activate_version(
     payload: VersionActivate,
+    request: Request,
     model_id: str = Path(...),
     version_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
@@ -604,6 +676,7 @@ async def activate_version(
     session: AsyncSession = Depends(get_session),
 ) -> ActionResponse[VersionResponse]:
     await _get_model_or_404(session, graph.id, model_id)
+    await _publishing.refuse_breaking(session, version_id=version_id)
     try:
         activated = await Versioner(_store).activate(session, version_id=version_id, override_version=payload.version)
     except ValueError as exc:
@@ -617,7 +690,7 @@ async def activate_version(
         actor_id=user.id,
         details={"version": activated.version},
     )
-    await session.commit()
+    await drift_after(request, session, graph_id=graph.id, trigger="model_publish")
     return action("Model published.", await _full_version(session, activated.id))
 
 
@@ -1113,6 +1186,7 @@ async def discard_staged_change(
 @models_router.post("/{model_id}/commit", response_model=ActionResponse[CommitResult])
 async def commit_draft(
     payload: CommitRequest,
+    request: Request,
     model_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
@@ -1128,6 +1202,7 @@ async def commit_draft(
             HTTPStatus.CONFLICT,
             detail={"error": "nothing_staged", "message": staged.reason},
         )
+    await _publishing.refuse_breaking(session, version_id=draft.id)
 
     try:
         published = await Versioner(_store).activate(session, version_id=draft.id, override_version=payload.version)
@@ -1157,7 +1232,7 @@ async def commit_draft(
             "changes": [c.id for c in staged.changes],
         },
     )
-    await session.commit()
+    await drift_after(request, session, graph_id=graph.id, trigger="model_publish")
     return action(
         f"{staged.count} changes committed — {model.name} {published.version} published.",
         CommitResult(
@@ -1321,3 +1396,72 @@ async def diff_version(
             classification="major",
         )
     return compute_diff(base, target)
+
+
+# ---------------------------------------------------------------------------
+# Publish review (publish-review.md)
+# ---------------------------------------------------------------------------
+
+
+@models_router.get("/{model_id}/draft/review", response_model=ModelPublishClassification)
+async def review_draft(
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ModelPublishClassification:
+    """Whether publishing the draft is additive or breaking, change by change. Reads only."""
+    model = await _get_model_or_404(session, graph.id, model_id)
+    return await _publishing.classify_draft(session, model=model)
+
+
+@models_router.post("/{model_id}/publish", response_model=ActionResponse[ModelPublishOutcome])
+async def publish_model(
+    payload: ModelPublishRequest,
+    request: Request,
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[ModelPublishOutcome]:
+    """Publish the draft: an additive one now, a breaking one through a review.
+
+    A review opens its preview migration run, committed and then submitted
+    here; the clock asks the Graph's other owners for approval once the
+    preview has settled, and opens the migration run after one approves.
+    """
+    model = await _get_model_or_404(session, graph.id, model_id)
+    outcome, run_id = await _reviews.publish(session, graph=graph, model=model, user=user, payload=payload)
+    if run_id is None:
+        await drift_after(request, session, graph_id=graph.id, trigger="model_publish")
+        await session.commit()
+        return action(f"{model.name} {outcome.version} published.", outcome)
+    await session.commit()
+    request.app.state.task_runtime.submit(run_id)
+    return action(
+        f"{model.name} has breaking changes — previewing the migration, then another owner approves it.", outcome
+    )
+
+
+@models_router.get("/{model_id}/publish-reviews", response_model=list[ModelPublishReviewRead])
+async def list_publish_reviews(
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> list[ModelPublishReviewRead]:
+    model = await _get_model_or_404(session, graph.id, model_id)
+    return [ModelPublishReviewRead.model_validate(r) for r in await _reviews.list(session, model=model)]
+
+
+@models_router.get("/{model_id}/publish-reviews/{review_id}", response_model=ModelPublishReviewRead)
+async def get_publish_review(
+    model_id: str = Path(...),
+    review_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ModelPublishReviewRead:
+    model = await _get_model_or_404(session, graph.id, model_id)
+    return ModelPublishReviewRead.model_validate(await _reviews.get(session, model=model, review_id=review_id))

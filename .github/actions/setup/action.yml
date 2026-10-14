@@ -42,7 +42,10 @@ runs:
     - name: Cache pnpm
       uses: actions/cache@v4
       with:
-        path: studio/node_modules
+        path: |
+          studio/node_modules
+          studio/apps/*/node_modules
+          studio/packages/*/node_modules
         key: pnpm-${{ runner.os }}-${{ hashFiles('studio/pnpm-lock.yaml') }}
         restore-keys: pnpm-${{ runner.os }}-
 

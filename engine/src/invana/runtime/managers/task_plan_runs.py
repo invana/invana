@@ -30,6 +30,7 @@ from invana.apps.task_plans.schemas import (
 )
 from invana.core.auth.models import User
 from invana.core.errors import NotFoundError, ValidationError
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.layers import declared_bands, layer_for, ordered_layers
 from invana.runtime.models import TaskRun
@@ -72,14 +73,26 @@ class TaskPlanRunsManager:
     async def get(self, session: AsyncSession, *, graph_id: str, key: str, version: int | None) -> TaskPlan:
         """Seeding first: a graph that has never listed its library still
         resolves a seeded key."""
-        await self.library.ensure_seeded(session, graph_id=graph_id, requires=_requires())
+        await self.library.ensure_seeded(
+            session,
+            graph_id=graph_id,
+            flows=load_plugins().flows.values(),
+            requires=_requires(),
+            versions=load_plugins().versions(),
+        )
         workflow = await self.workflows_qs.find_by_key(session, graph_id=graph_id, key=key, version=version)
         if workflow is None:
             raise NotFoundError(f"No workflow keyed '{key}'.")
         return workflow
 
     async def list_reads(self, session: AsyncSession, *, graph_id: str) -> list[TaskPlanRead]:
-        await self.library.ensure_seeded(session, graph_id=graph_id, requires=_requires())
+        await self.library.ensure_seeded(
+            session,
+            graph_id=graph_id,
+            flows=load_plugins().flows.values(),
+            requires=_requires(),
+            versions=load_plugins().versions(),
+        )
         rows = await self.workflows_qs.list_for_graph(session, graph_id=graph_id)
         # Every plan, because a caller is a skill's plan and those are not in
         # the library — the rows above are what is *listed*, these are what
@@ -307,7 +320,9 @@ class TaskPlanRunsManager:
         await self.workflows_qs.add(session, workflow)
         # The promoted plan is rows like any other — the snapshot it came from
         # is a step list, and it is exploded once, here.
-        await self.workflows_qs.add_tasks(session, explode(workflow.id, steps, requires=_requires()))
+        await self.workflows_qs.add_tasks(
+            session, explode(workflow.id, steps, requires=_requires(), versions=load_plugins().versions())
+        )
         return workflow
 
 

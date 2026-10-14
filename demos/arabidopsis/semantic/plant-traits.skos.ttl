@@ -1,0 +1,40 @@
+# A small SKOS vocabulary for the semantic-import boards (datasets.standards.import).
+# Studio: Datasets › Standards › Import from SKOS › File. CLI:
+#   invana standards import --skos demos/arabidopsis/semantic/plant-traits.skos.ttl --dry-run
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix pt:   <https://example.org/plant-traits/> .
+
+pt:scheme a skos:ConceptScheme ;
+    skos:prefLabel "Arabidopsis plant traits"@en ;
+    dct:description "Flowering and seed traits scored on Arabidopsis accessions."@en ;
+    skos:hasTopConcept pt:flowering , pt:seed .
+
+pt:flowering a skos:Concept ;
+    skos:inScheme pt:scheme ;
+    skos:topConceptOf pt:scheme ;
+    skos:prefLabel "flowering time"@en ;
+    skos:definition "When an accession flowers, as a class."@en .
+
+pt:early a skos:Concept ; skos:inScheme pt:scheme ; skos:broader pt:flowering ;
+    skos:notation "early" ; skos:prefLabel "early flowering"@en .
+pt:early-spring a skos:Concept ; skos:inScheme pt:scheme ; skos:broader pt:early ;
+    skos:notation "early-spring" ; skos:prefLabel "early, spring-sown"@en .
+pt:late a skos:Concept ; skos:inScheme pt:scheme ; skos:broader pt:flowering ;
+    skos:notation "late" ; skos:prefLabel "late flowering"@en ;
+    skos:related pt:vernalisation .
+pt:vernalisation a skos:Concept ; skos:inScheme pt:scheme ; skos:broader pt:late ;
+    skos:notation "needs-vernalisation" ; skos:prefLabel "needs vernalisation"@en ;
+    skos:altLabel "cold-requiring"@en .
+
+pt:seed a skos:Concept ;
+    skos:inScheme pt:scheme ;
+    skos:topConceptOf pt:scheme ;
+    skos:prefLabel "seed dormancy"@en .
+
+pt:dormant a skos:Concept ; skos:inScheme pt:scheme ; skos:broader pt:seed ;
+    skos:notation "dormant" ; skos:prefLabel "dormant"@en .
+pt:non-dormant a skos:Concept ; skos:inScheme pt:scheme ; skos:broader pt:seed ;
+    skos:notation "non-dormant" ; skos:prefLabel "nicht dormant"@de .
+pt:weak a skos:Concept ; skos:inScheme pt:scheme ; skos:broader pt:seed ;
+    skos:notation "weak" .

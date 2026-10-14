@@ -34,16 +34,15 @@ class UsernameAvailabilityResponse(BaseModel):
 
 
 class GraphMembershipOut(BaseModel):
-    """A user's membership in a Graph — what /auth/me returns.
-
-    Membership is binary (docs/for-developers/modules/identity-and-access/features/membership.md); there is no role
-    field.
+    """A user's membership in a Graph — what /auth/me returns, with the Graph
+    roles they hold there (docs/for-developers/modules/identity-and-access/features/roles.md).
     """
 
     graph_id: str
     graph_name: str
     graph_slug: str
     owner_username: str
+    roles: list[str] = Field(default_factory=lambda: ["viewer"])
 
 
 # ---------------------------------------------------------------------------

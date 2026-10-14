@@ -1,0 +1,28 @@
+{
+	"name": "@invana-studio/ui",
+	"version": "0.1.0",
+	"type": "module",
+	"private": true,
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"lint": "biome check .",
+		"check-types": "tsc --noEmit -p tsconfig.json"
+	},
+	"peerDependencies": {
+		"@invana/forms": "^0.0.34",
+		"@invana/ui": "^0.0.34",
+		"lucide-react": "^0.475.0",
+		"react": "^19.2.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.14",
+		"@invana/forms": "^0.0.34",
+		"@invana/ui": "^0.0.34",
+		"@types/react": "^19.0.0",
+		"lucide-react": "^0.475.0",
+		"react": "^19.2.0",
+		"typescript": "^6.0.0"
+	}
+}

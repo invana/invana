@@ -19,8 +19,10 @@ What it holds:
 * **A redraw is a revision** ([SK12](docs/for-developers/modules/skills/features/authoring-a-skill.md)):
   a draft opened over a published version starts as a **copy** of that version's
   plan, so the diff a person reads is against what was there.
-* **A hand-edit flips ``origin`` to ``authored``**
-  ([SK7](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+* **Composition is drawn.** A sentence may name a reusable library plan as
+  its reading; the draw copies that plan's rows in, flat, each naming the plan
+  and step it came from, and validates them with every other step. Nobody
+  writes plan rows by hand: a plan that reads wrong is fixed in the prose.
 """
 
 from __future__ import annotations
@@ -31,8 +33,9 @@ from datetime import UTC, datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.agents.envelope import Envelope
 from invana.apps.agents.registry import LABELS
+from invana.apps.govern.managers import LLMEndpointManager
+from invana.apps.llm.draft import PLAN_PREFIX
 from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.models import Skill, SkillVersion, SkillVersionClarification
 from invana.apps.skills.querysets import SkillClarificationQuerySet
@@ -42,12 +45,10 @@ from invana.apps.skills.schemas import (
     SkillClarificationRead,
     SkillCreate,
     SkillDraftRead,
-    SkillDraftTaskWrite,
     SkillDrawRefusal,
     SkillPlanRead,
     SkillPlanSummary,
     SkillRead,
-    SkillStepChoice,
     SkillUpdate,
     SkillVersionPublish,
     SkillVersionRead,
@@ -58,9 +59,11 @@ from invana.apps.task_plans.dag import dag_for
 from invana.apps.task_plans.managers.task_plan import TaskPlanManager, explode
 from invana.apps.task_plans.models import PlanKind, PlanOrigin, Task, TaskForm, TaskPlan
 from invana.apps.task_plans.querysets import TaskPlanQuerySet
-from invana.core.errors import NotFoundError, ValidationError
+from invana.core.errors import ConflictError, NotFoundError, ValidationError
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.layers import layer_for, ordered_layers
+from invana.runtime.managers.evals import EvalManager
 from invana.runtime.managers.skill_seed import BuiltinSkillSeeder
 from invana.runtime.querysets import TaskRunQuerySet
 
@@ -81,11 +84,14 @@ class Drawing:
     """What the planner reads before it draws: the prose, and what is settled."""
 
     version: SkillVersion
+    graph_id: str
     name: str
     when_to_use: str
     content: str
     answered: dict[str, str]
     asked: int
+    #: The digest of the text as it was read, stamped if this draw writes rows.
+    digest: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -95,6 +101,18 @@ class Drawn:
     detail: str
     output: dict
     rejected: list[str] | None = None
+
+
+class _Refused(Exception):
+    """Reasons a draw is refused before the plan reaches the validator.
+
+    Read like ``PlanRejected``, by its ``errors``, so both refusals settle the
+    draw through one path.
+    """
+
+    def __init__(self, errors: list[str]) -> None:
+        super().__init__("; ".join(errors))
+        self.errors = errors
 
 
 def _unique(key: str, seen: set[str]) -> str:
@@ -107,27 +125,45 @@ def _unique(key: str, seen: set[str]) -> str:
     return candidate
 
 
+#: The node fields a copied plan carries over — everything but identity and parent.
+_COPIED_TASK_FIELDS = (
+    "key",
+    "form",
+    "step_key",
+    "task_version",
+    "title",
+    "body",
+    "assignee_kind",
+    "assignee_id",
+    "ordinal",
+    "when",
+    "map_over",
+    "timeout_s",
+    "pool",
+    "max_parallel",
+    "on_lane_failure",
+    "source_span",
+    "source_plan_key",
+    "source_step_key",
+)
+
+
+def _copy_task(task: Task, *, plan_id: str) -> Task:
+    """One node of another plan, re-homed under ``plan_id``; JSON fields copied."""
+    fields = {name: getattr(task, name) for name in _COPIED_TASK_FIELDS}
+    return Task(
+        task_plan_id=plan_id,
+        args=dict(task.args or {}),
+        depends_on=list(task.depends_on or []),
+        loop=dict(task.loop) if task.loop else None,
+        approval=dict(task.approval) if task.approval else None,
+        retry=dict(task.retry) if task.retry else None,
+        **fields,
+    )
+
+
 def _requires() -> dict[str, tuple[str, ...]]:
     return {key: entry.requires for key, entry in CATALOGUE.items()}
-
-
-def _authoring_envelope() -> Envelope:
-    """What bounds a **hand-edited** plan: the catalogue, and nothing else
-    ([SK28](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
-
-    An envelope belongs to an agent, and a skill belongs to none — it is
-    offered to whichever agents are bound to it. So authoring is checked
-    against the closed set of steps that exist, and *may this agent call this
-    step* is checked where the agent is known: at bind time
-    ([BN5](docs/for-developers/modules/skills/features/bindings.md)). Validating
-    here against some agent's envelope would let the Graph's default agent
-    decide what every other agent's skills may say.
-
-    Everything else ``validate_plan`` checks still runs, and it is the part
-    that matters for a hand-edit: duplicate keys, a binding to a step that does
-    not run first, and a binding to an output its source does not declare.
-    """
-    return Envelope.from_spec({"allow": sorted(CATALOGUE)})
 
 
 @dataclass(frozen=True, slots=True)
@@ -139,35 +175,17 @@ class PlanView:
     edges: list[dict]
 
 
-def vocabulary() -> list[SkillStepChoice]:
-    """The steps a hand-edit may name — the catalogue, in the drawer's words.
-
-    Sent with the draft rather than looked up by the surface: the catalogue is
-    closed and Studio cannot see it, so a picker built from a list in
-    TypeScript would be a second copy to keep in step
-    ([SK28](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
-    """
-    return [
-        SkillStepChoice(
-            step_key=key,
-            label=LABELS.get(key, key),
-            bound=entry.bound.value,
-            layer=layer_for(form=TaskForm.callable.value, step_key=key),
-            requires=list(entry.requires),
-        )
-        for key, entry in sorted(CATALOGUE.items())
-    ]
-
-
 class SkillDraftManager:
     """Stateless. The session is the first argument of every method."""
 
     skills = SkillManager()
+    endpoints = LLMEndpointManager()
     plans_qs = TaskPlanQuerySet()
     clarifications_qs = SkillClarificationQuerySet()
     runs_qs = TaskRunQuerySet()
     seeder = BuiltinSkillSeeder()
     library = TaskPlanManager()
+    evals = EvalManager()
 
     # ── reading a drawer ─────────────────────────────────────────────────────
 
@@ -307,11 +325,8 @@ class SkillDraftManager:
     async def fallback_plan(self, session: AsyncSession, *, graph_id: str, name: str) -> TaskPlan:
         """One node, and it is a person's (SK15 · SK22).
 
-        It is born ``generated``, not ``authored``
-        ([SK29](docs/for-developers/modules/skills/features/authoring-a-skill.md)):
-        nobody wrote this node, and ``authored`` has to keep meaning *a person
-        corrected these rows* — it is what the redraw warning claims when it
-        says how many steps a draw would discard.
+        It is born ``generated``: nothing but the engine wrote this node, and
+        a draw replaces it like any other drawn plan.
         """
         plan = await self._new_plan(session, graph_id=graph_id, name=name, origin=PlanOrigin.generated.value)
         await self.plans_qs.add_tasks(
@@ -332,7 +347,13 @@ class SkillDraftManager:
         return plan
 
     async def copy_plan(self, session: AsyncSession, *, source_plan_id: str, graph_id: str, name: str) -> TaskPlan:
-        """The draft's plan starts as what the last version drew (SK12)."""
+        """A new plan with the source plan's nodes, node for node, its origin
+        and the library plans it composed.
+
+        A draft starts as what the last version drew, so a redraw diffs against
+        it; a rollback copies the version it restores. Every node field is
+        copied, so the copy runs exactly as the source did.
+        """
         source = await self.plans_qs.tasks_for(session, plan_id=source_plan_id)
         origin = await self.plans_qs.get(session, source_plan_id)
         plan = await self._new_plan(
@@ -341,29 +362,15 @@ class SkillDraftManager:
             name=name,
             origin=(origin.origin if origin is not None else PlanOrigin.generated.value),
         )
-        await self.plans_qs.add_tasks(
-            session,
-            [
-                Task(
-                    task_plan_id=plan.id,
-                    key=t.key,
-                    form=t.form,
-                    step_key=t.step_key,
-                    title=t.title,
-                    body=t.body,
-                    args=dict(t.args or {}),
-                    ordinal=t.ordinal,
-                    depends_on=list(t.depends_on or []),
-                    source_span=t.source_span,
-                )
-                for t in source
-            ],
-        )
+        await self.plans_qs.add_tasks(session, [_copy_task(t, plan_id=plan.id) for t in source])
+        if origin is not None:
+            plan.uses = list(origin.uses or [])
+            await session.flush()
         return plan
 
     async def rewrite(self, session: AsyncSession, *, version: SkillVersion, tasks: list[Task]) -> TaskPlan:
-        """Replace a draft's nodes — what ``draft_plan`` writes, and what a
-        hand-edit writes. The rows go and come back rather than being patched:
+        """Replace a draft's nodes — what ``draft_plan`` writes. The rows go and
+        come back rather than being patched:
         a redraw is a revision of the whole shape, not a merge (SK12)."""
         plan = await self.plans_qs.get(session, version.plan_id)
         if plan is None:  # pragma: no cover - a FK guarantees it
@@ -374,14 +381,6 @@ class SkillDraftManager:
             task.ordinal = ordinal
         await self.plans_qs.add_tasks(session, tasks)
         return plan
-
-    async def mark_authored(self, session: AsyncSession, *, version: SkillVersion) -> None:
-        """A hand-edit flips ``origin`` (SK7). Regenerating from the prose after
-        this is offered, never automatic, and says what it would discard."""
-        plan = await self.plans_qs.get(session, version.plan_id)
-        if plan is not None:
-            plan.origin = PlanOrigin.authored.value
-            await session.flush()
 
     async def inlinable(self, session: AsyncSession, *, graph_id: str) -> list[InlinablePlan]:
         """The library plans a skill may inline, newest version of each.
@@ -395,7 +394,13 @@ class SkillDraftManager:
         # (`select_plan_by_key`): a Graph whose library has never been listed
         # has no rows to offer, and a row seeded before its template declared
         # an argument holds `{}` while its own steps bind it.
-        await self.library.ensure_seeded(session, graph_id=graph_id, requires=_requires())
+        await self.library.ensure_seeded(
+            session,
+            graph_id=graph_id,
+            flows=load_plugins().flows.values(),
+            requires=_requires(),
+            versions=load_plugins().versions(),
+        )
 
         plans = await self.plans_qs.list_for_graph(session, graph_id=graph_id)
         newest: dict[str, TaskPlan] = {}
@@ -429,233 +434,69 @@ class SkillDraftManager:
             )
         return out
 
-    async def _expand_uses(
-        self, session: AsyncSession, *, graph_id: str, tasks: list[SkillDraftTaskWrite]
-    ) -> tuple[list[SkillDraftTaskWrite], list[dict]]:
-        """Replace every ``uses`` row with the rows of the plan it names.
+    async def _inline(
+        self, session: AsyncSession, *, graph_id: str, ref: str, tuned: dict, seen: set[str]
+    ) -> tuple[list[dict], dict]:
+        """Copy the rows of the library plan ``ref`` names, to sit beside the skill's own.
 
-        **Copied, not linked** ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)):
-        the library may publish `@2` tomorrow and this skill still does what it
-        said it did today. The copies land **flat**
-        ([SK33](docs/for-developers/modules/skills/features/authoring-a-skill.md)),
-        each carrying the plan version it came from, so the validator sees one
-        graph and the Flow tab can still group them.
+        **Copied, not linked**: the library may publish ``@3`` tomorrow and this
+        skill still does what it said it did today. The copies land **flat**,
+        each carrying the plan version and the step it came from, so the
+        validator sees one graph and the Flow tab can still group them.
 
-        Keys are prefixed with the row's own key — ``answer_translate_thought``
+        Keys are prefixed with the plan's key — ``nl_single_translate_thought``
         — because two plans may both name ``validate_query`` and a plan whose
         sibling keys collide is one whose bindings mean two things. An
         underscore and not a dot: a step id is ``[A-Za-z0-9_]`` in the binding
-        grammar, and a dotted one would parse as *step ``answer``, output
-        ``translate_thought.query``*. The ``${steps.X.y}`` bindings inside the
-        copied plan are rewritten to match, so a plan that bound its own steps
-        still does.
+        grammar, and a dotted one would parse as *step ``nl``, output
+        ``single_translate_thought.query``*. The ``${steps.X.y}`` bindings
+        inside the copied plan are rewritten to match, so a plan that bound its
+        own steps still does.
+
+        Returns the copied steps — ``{key, step_key, form, title, args,
+        source_step_key}`` each, arguments resolved over ``tuned`` — and the
+        entry ``task_plans.uses`` records. Raises ``ValidationError`` with a
+        sentence naming what is wrong: an unknown or one-off plan, an argument
+        the plan does not declare, a plan with no steps.
         """
-        out: list[SkillDraftTaskWrite] = []
-        composed: list[dict] = []
-        for index, row in enumerate(tasks):
-            if row.form != "uses":
-                out.append(row)
-                continue
-            if not row.uses:
-                raise ValidationError(f"Step {index + 1} inlines a plan but does not say which one.")
+        key, _, raw_version = ref.partition("@")
+        version = int(raw_version) if raw_version.isdigit() else None
+        plan = await self.plans_qs.find_by_key(session, graph_id=graph_id, key=key, version=version)
+        if plan is None:
+            raise ValidationError(f"'{ref}' is not a plan this Graph can offer.")
+        if not plan.reusable:
+            raise ValidationError(f"'{ref}' belongs to the Todo it was drafted for, so it is not something to reuse.")
 
-            key, _, raw_version = row.uses.partition("@")
-            version = int(raw_version) if raw_version.isdigit() else None
-            plan = await self.plans_qs.find_by_key(session, graph_id=graph_id, key=key, version=version)
-            if plan is None:
-                raise ValidationError(
-                    f"Step {index + 1} inlines '{row.uses}', which is not a plan this Graph can offer. "
-                    f"Pick one from the library."
-                )
-            if not plan.reusable:
-                raise ValidationError(
-                    f"'{row.uses}' belongs to the Todo it was drafted for, so it is not something to reuse. "
-                    f"Promote it to the library first."
-                )
-
-            declared = dict(plan.args_schema or {})
-            try:
-                check_tuning(declared, row.uses_args or {})
-            except ArgError as wrong:
-                raise ValidationError(f"Step {index + 1} inlines '{row.uses}': {wrong}") from None
-
-            inlined = await self.plans_qs.tasks_for(session, plan_id=plan.id)
-            if not inlined:
-                raise ValidationError(f"'{row.uses}' has no steps, and an empty plan is not a plan.")
-
-            prefix = row.key or key.replace("-", "_")
-            ref = f"{plan.key}@{plan.version}"
-            renamed = {task.key: f"{prefix}_{task.key}" for task in inlined}
-            steps = resolve_args(
-                [
-                    {
-                        "key": renamed[task.key],
-                        "step_key": task.step_key,
-                        "form": task.form,
-                        "title": task.title,
-                        "args": _rebind(dict(task.args or {}), renamed),
-                    }
-                    for task in inlined
-                ],
-                declared=declared,
-                tuned=row.uses_args or {},
-            )
-            copied_from = {renamed_key: original for original, renamed_key in renamed.items()}
-            for step in steps:
-                copy = SkillDraftTaskWrite(
-                    key=step["key"],
-                    form=step["form"],
-                    step_key=step["step_key"],
-                    title=step["title"],
-                    args=step["args"],
-                    source_span=row.source_span,
-                    uses=ref,
-                )
-                # Which step of *ref* this is, so the plan's page matches a
-                # skill's run on what was recorded rather than on the prefix (LB36).
-                copy._source_step_key = copied_from[step["key"]]
-                out.append(copy)
-            composed.append({"key": plan.key, "version": plan.version, "args": dict(row.uses_args or {})})
-        return out, composed
-
-    async def write_tasks(
-        self,
-        session: AsyncSession,
-        *,
-        skill: Skill,
-        tasks: list[SkillDraftTaskWrite],
-        validate,
-    ) -> SkillDraftRead:
-        """Hand-edit the draft's plan — the correction the prose could not make.
-
-        A drawn plan is usually corrected by rewriting the sentence and drawing
-        again. This is for the case where the prose is right and the reading
-        is not, and for the dead end the planner names: *no entry matches this*
-        is not rewritable, so hand-authoring is what is offered instead
-        (Seams).
-
-        Writing here flips ``origin`` to ``authored``
-        ([SK7](docs/for-developers/modules/skills/features/authoring-a-skill.md)),
-        which is what makes a later redraw an offer that says what it discards
-        rather than something that happens.
-
-        ``validate`` is handed in for the reason it is in
-        :meth:`apply_drawing` — it is ``runtime.planning.resolve_plan``, and
-        importing it here would close a cycle through the catalogue.
-        """
-        draft = await self.ensure_draft(session, skill=skill)
-        if not tasks:
-            raise ValidationError(
-                "A playbook with no steps is not a skill — it is a rule. "
-                "Write it as a rule instead, or give this one a step."
-            )
-
-        # A `uses` row is replaced by the rows of the plan it names **before**
-        # anything else reads the list ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
-        # From here down there are only ordinary steps, which is what keeps one
-        # promise LB18 makes: the envelope validates every step, because after
-        # this there is no step it cannot see.
-        tasks, composed = await self._expand_uses(session, graph_id=skill.graph_id, tasks=tasks)
-
-        raw_steps: list[dict] = []
-        spans: dict[str, str | None] = {}
-        sources: dict[str, str | None] = {}
-        source_steps: dict[str, str | None] = {}
-        human: dict[str, SkillDraftTaskWrite] = {}
-        order: list[str] = []
-        seen: set[str] = set()
-
-        for index, row in enumerate(tasks):
-            if row.form == TaskForm.human.value:
-                if row.step_key:
-                    raise ValidationError(
-                        f"Step {index + 1} is a person's, so it names no task. "
-                        f"Drop '{row.step_key}', or make it a callable step."
-                    )
-                key = _unique(row.key or f"do-{len(human) + 1}", seen)
-                human[key] = row
-                order.append(key)
-                continue
-            if not row.step_key or row.step_key not in CATALOGUE:
-                # The catalogue is closed, so this is nameable rather than
-                # vague: a step nothing can dispatch is a plan that cannot run.
-                raise ValidationError(
-                    f"Step {index + 1} names '{row.step_key or ''}', which is not a task Invana can run. "
-                    f"Pick one it declares, or make it a step a person does."
-                )
-            key = _unique(row.key or row.step_key, seen)
-            raw_steps.append(
-                {
-                    "id": key,
-                    "task": row.step_key,
-                    "label": row.title or LABELS.get(row.step_key, row.step_key),
-                    "args": dict(row.args or {}),
-                }
-            )
-            spans[key] = row.source_span
-            sources[key] = row.uses
-            source_steps[key] = row._source_step_key
-            order.append(key)
-
-        # A plan whose every row is a person's reaches the validator with nothing
-        # to validate, and `validate` reads an empty list as *no steps at all*.
-        # That is the one reading it must not have here: `form: human` is the
-        # universal fallback ([SK15]), the plan a draft is born with is exactly
-        # one of these rows ([SK22]), and a catalogue gap must never block
-        # publishing. The empty-plan case is already refused above, by its own
-        # sentence — so there is nothing left for the envelope to say.
-        validated: list = []
+        declared = dict(plan.args_schema or {})
         try:
-            if raw_steps:
-                validated, _source = validate(envelope=_authoring_envelope(), raw_steps=raw_steps, source="skill")
-        except Exception as rejected:  # PlanRejected, raised from band 2
-            errors = getattr(rejected, "errors", None)
-            if errors is None:
-                raise
-            raise ValidationError(
+            check_tuning(declared, tuned)
+        except ArgError as wrong:
+            raise ValidationError(f"'{ref}': {wrong}") from None
+
+        inlined = await self.plans_qs.tasks_for(session, plan_id=plan.id)
+        if not inlined:
+            raise ValidationError(f"'{ref}' has no steps, and an empty plan is not a plan.")
+
+        prefix = _unique(key.replace("-", "_"), seen)
+        renamed = {task.key: _unique(f"{prefix}_{task.key}", seen) for task in inlined}
+        steps = resolve_args(
+            [
                 {
-                    "error": "plan_rejected",
-                    "errors": errors,
-                    "message": "This plan does not hold together: " + "; ".join(errors),
+                    "key": renamed[task.key],
+                    "step_key": task.step_key,
+                    "form": task.form,
+                    "title": task.title,
+                    "args": _rebind(dict(task.args or {}), renamed),
                 }
-            ) from rejected
-
-        exploded = {t.key: t for t in explode("", [s.as_dict() for s in validated], requires=_requires())}
-        rows: list[Task] = []
-        for key in order:
-            task = exploded.get(key)
-            if task is not None:
-                task.source_span = spans.get(key)
-                task.source_plan_key = sources.get(key)
-                task.source_step_key = source_steps.get(key)
-                rows.append(task)
-                continue
-            row = human[key]
-            rows.append(
-                Task(
-                    task_plan_id="",
-                    key=key,
-                    form=TaskForm.human.value,
-                    step_key=None,
-                    title=(row.title or (row.source_span or "")[:250] or "A person does this"),
-                    args={},
-                    depends_on=[],
-                    source_span=row.source_span,
-                    source_plan_key=row.uses,
-                    source_step_key=row._source_step_key,
-                )
-            )
-
-        await self.rewrite(session, version=draft, tasks=rows)
-        await self.mark_authored(session, version=draft)
-        plan = await self.plans_qs.get(session, draft.plan_id)
-        if plan is not None:
-            # What this plan **spent**, beside what each row came from, so
-            # *what will this do for me* is answerable without opening the
-            # library ([LB19](docs/for-developers/modules/workflows/features/the-library.md)).
-            plan.uses = composed
-            await session.flush()
-        return await self._draft_read(session, draft=draft)
+                for task in inlined
+            ],
+            declared=declared,
+            tuned=tuned,
+        )
+        copied_from = {renamed_key: original for original, renamed_key in renamed.items()}
+        for step in steps:
+            step["source_step_key"] = copied_from[step["key"]]
+        return steps, {"key": plan.key, "version": plan.version, "args": dict(tuned)}
 
     async def view(self, session: AsyncSession, *, version: SkillVersion) -> PlanView:
         """The plan as nodes and edges, each node carrying its **layer** and the
@@ -712,7 +553,8 @@ class SkillDraftManager:
         """The open draft, or the next version opened as one.
 
         Opened over a published head, it copies that version's plan so a redraw
-        diffs against what was drawn (SK12).
+        diffs against what was drawn (SK12). That copy is the plan of the head's
+        text, so the draft opens stamped as drawn.
         """
         draft = await self.skills.get_draft(session, skill=skill)
         if draft is not None:
@@ -723,7 +565,7 @@ class SkillDraftManager:
             if head is not None
             else await self.fallback_plan(session, graph_id=skill.graph_id, name=skill.name)
         )
-        return await self.skills.start_draft(session, skill=skill, plan_id=plan.id)
+        return await self.skills.start_draft(session, skill=skill, plan_id=plan.id, drawn=head is not None)
 
     async def publish(
         self,
@@ -736,17 +578,93 @@ class SkillDraftManager:
         """Publish the open draft — text, answers and plan as one act (C9).
 
         With no draft open this is still one path: one is opened, the payload is
-        written onto it, and it publishes. That is what makes *editing is
-        publishing* true of the API as well as of the model.
+        written onto it, and it publishes.
+
+        Refused unless the plan was drawn from the text being published: a draw
+        stamps the digest of the words it read, and any change since — in the
+        draft or in this payload — leaves the plan describing other words. A
+        draft opened over a published version carries that version's plan, so
+        a pin-only or why-only publish passes without a draw.
         """
+        await self._check_pin(session, skill=skill, payload=payload)
         draft = await self.ensure_draft(session, skill=skill)
         await self.skills.update_draft(session, draft=draft, payload=payload)
-        published = await self.skills.publish_draft(session, skill=skill, draft=draft, actor_id=actor_id)
+        if not draft.is_drawn:
+            raise ConflictError(
+                f"The plan of '{skill.name}' was drawn from an earlier text — draw it again before publishing."
+            )
+        evaluated = await self.evals.gate(
+            session, graph_id=skill.graph_id, subject_kind="skill", subject_id=skill.id, why=payload.why
+        )
+        published = await self.skills.publish_draft(
+            session, skill=skill, draft=draft, actor_id=actor_id, why=payload.why, evaluated=evaluated
+        )
         plan = await self.plans_qs.get(session, published.plan_id)
         if plan is not None:
             # Provenance, N:M — the skill version this plan was drawn from (SK8).
             plan.source_skill_version_ids = [published.id]
             await session.flush()
+        return published
+
+    async def rollback(
+        self,
+        session: AsyncSession,
+        *,
+        skill: Skill,
+        version: int,
+        actor_id: str,
+        why: str | None = None,
+    ) -> SkillVersion:
+        """Restore an earlier version as the next one — one act, nothing rewritten.
+
+        The chosen version's description, content and when-to-use, and a copy of
+        its plan, become a new published version that records which version it
+        restored. The plan copy keeps the origin its rows had.
+
+        Refused while a draft is open, because the draft owns the next version
+        number and is a person's unpublished work; refused for the current
+        version, because there is nothing to restore. A version that does not
+        exist, or is the draft, reads as absent.
+        """
+        draft = await self.skills.get_draft(session, skill=skill)
+        if draft is not None:
+            raise ConflictError(
+                f"v{draft.version} of '{skill.name}' is a draft — publish or discard it before rolling back."
+            )
+        target = await self.skills.get_version(session, skill=skill, version=version)
+        if target.is_draft:  # pragma: no cover - the draft was refused above
+            raise NotFoundError(f"Version {version} of '{skill.name}' not found.")
+        if target.id == skill.current_version_id:
+            raise ConflictError(f"v{version} is already the current version of '{skill.name}'.")
+        # What once passed still runs today's set, which may have grown since.
+        evaluated = await self.evals.gate(
+            session, graph_id=skill.graph_id, subject_kind="skill", subject_id=skill.id, version=version, why=why
+        )
+
+        plan = await self.copy_plan(session, source_plan_id=target.plan_id, graph_id=skill.graph_id, name=skill.name)
+        restored = await self.skills.start_draft(
+            session,
+            skill=skill,
+            plan_id=plan.id,
+            payload=SkillVersionPublish(
+                description=target.description,
+                content=target.content,
+                when_to_use=target.when_to_use,
+                model_pin=target.model_pin,
+            ),
+            drawn=True,
+        )
+        published = await self.skills.publish_draft(
+            session,
+            skill=skill,
+            draft=restored,
+            actor_id=actor_id,
+            why=why,
+            restored_from=target.version,
+            evaluated=evaluated,
+        )
+        plan.source_skill_version_ids = [published.id]
+        await session.flush()
         return published
 
     async def update(
@@ -757,29 +675,24 @@ class SkillDraftManager:
         payload: SkillUpdate,
         actor_id: str,
     ) -> Skill:
-        """A rename edits the row; new prose publishes the next version."""
+        """A rename edits the row; new prose is written onto the draft.
+
+        Nothing publishes here. Prose that differs from the head opens (or
+        updates) the draft, which publishes only once its plan is drawn from
+        that text — editing never changes what runs by itself.
+        """
         wanted = SkillVersionPublish(
             description=payload.description, content=payload.content, when_to_use=payload.when_to_use
         )
-        publishes = any(
-            getattr(wanted, field) is not None and getattr(wanted, field) != getattr(skill, field)
+        draft = await self.skills.get_draft(session, skill=skill)
+        current = draft if draft is not None else skill
+        if any(
+            getattr(wanted, field) is not None and getattr(wanted, field) != getattr(current, field)
             for field in ("description", "content", "when_to_use")
-        )
-        plan_id = None
-        if publishes:
+        ):
             draft = await self.ensure_draft(session, skill=skill)
-            plan_id = draft.plan_id
-            # `update` mints its own row, so the draft opened above is the one
-            # it should use: write the text onto it and publish that.
             await self.skills.update_draft(session, draft=draft, payload=wanted)
-            await self.skills.update(session, skill=skill, payload=SkillUpdate(name=payload.name), actor_id=actor_id)
-            await self.skills.publish_draft(session, skill=skill, draft=draft, actor_id=actor_id)
-            plan = await self.plans_qs.get(session, draft.plan_id)
-            if plan is not None:
-                plan.source_skill_version_ids = [draft.id]
-                await session.flush()
-            return skill
-        return await self.skills.update(session, skill=skill, payload=payload, actor_id=actor_id, plan_id=plan_id)
+        return await self.skills.update(session, skill=skill, payload=SkillUpdate(name=payload.name), actor_id=actor_id)
 
     # ── drawing it from the prose ────────────────────────────────────────────
 
@@ -812,15 +725,30 @@ class SkillDraftManager:
         rows = await self.clarifications_qs.list_for_version(session, version.id)
         return Drawing(
             version=version,
+            graph_id=skill.graph_id,
             name=skill.name,
             when_to_use=version.when_to_use,
             content=version.content,
             answered={r.span: r.answer for r in rows if r.answer is not None},
             asked=len(rows),
+            digest=version.digest(),
         )
 
-    async def apply_drawing(self, session: AsyncSession, *, version_id: str, drafted, envelope, validate) -> Drawn:
+    async def apply_drawing(
+        self, session: AsyncSession, *, version_id: str, drafted, envelope, validate, read_digest: str | None = None
+    ) -> Drawn:
         """Turn what the model read into rows — or into one question.
+
+        A reading that names a library plan (``plan:<key>@<v>``) is inlined
+        here: its rows are copied in at the sentence's place, validated with
+        every other step, and the composition is recorded on the plan. A plan
+        that cannot be inlined refuses the draw by name, exactly as a step the
+        envelope forbids does.
+
+        Rows written stamp the draft as drawn from ``read_digest`` — the digest
+        of the text the model was handed. A text edited while the model read
+        then still differs, and publish asks for a fresh draw. Left out, it is
+        the draft's text now.
 
         The three cases are counted, not judged
         ([SK24](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
@@ -836,7 +764,13 @@ class SkillDraftManager:
 
         raw_steps: list[dict] = []
         spans: dict[str, str] = {}
+        #: The title of each step a person does, by key.
         human: dict[str, str] = {}
+        #: For inlined rows: the plan each came from, and the step of it.
+        sources: dict[str, str] = {}
+        source_steps: dict[str, str] = {}
+        composed: list[dict] = []
+        refused: list[str] = []
         unmapped: list[str] = []
         order: list[str] = []
         seen: set[str] = set()
@@ -877,8 +811,41 @@ class SkillDraftManager:
             # person does that step, and can edit it afterwards (SK15).
             if picked is None:
                 key = _unique(f"do-{len(human) + 1}", seen)
-                human[key] = sentence.span
+                human[key] = sentence.span[:250] or "A person does this"
+                spans[key] = sentence.span
                 order.append(key)
+                continue
+            if picked.task.startswith(PLAN_PREFIX):
+                try:
+                    steps, use = await self._inline(
+                        session,
+                        graph_id=subject.graph_id,
+                        ref=picked.task.removeprefix(PLAN_PREFIX),
+                        tuned=dict(picked.tune),
+                        seen=seen,
+                    )
+                except ValidationError as wrong:
+                    refused.append(f"'{sentence.span}' names {wrong.detail}")
+                    continue
+                composed.append(use)
+                ref = f"{use['key']}@{use['version']}"
+                for step in steps:
+                    key = step["key"]
+                    spans[key] = sentence.span
+                    sources[key] = ref
+                    source_steps[key] = step["source_step_key"]
+                    order.append(key)
+                    if step["form"] == TaskForm.human.value:
+                        human[key] = step["title"] or "A person does this"
+                        continue
+                    raw_steps.append(
+                        {
+                            "id": key,
+                            "task": step["step_key"],
+                            "label": step["title"] or LABELS.get(step["step_key"], step["step_key"]),
+                            "args": step["args"],
+                        }
+                    )
                 continue
             key = _unique(picked.task, seen)
             raw_steps.append(
@@ -893,7 +860,17 @@ class SkillDraftManager:
             order.append(key)
 
         try:
-            validated, _source = validate(envelope=envelope, raw_steps=raw_steps, source="skill")
+            if refused:
+                # A plan that cannot be inlined is the author's to answer, like
+                # every reason the validator gives; nothing is validated past it.
+                raise _Refused(refused)
+            # A plan every row of which is a person's reaches here with nothing
+            # to validate, and `validate` reads an empty list as *no steps at
+            # all*. A person is the universal fallback, so that plan is written;
+            # only a playbook with no step of any kind is refused.
+            validated = []
+            if raw_steps or not order:
+                validated, _source = validate(envelope=envelope, raw_steps=raw_steps, source="skill")
         except Exception as rejected:  # PlanRejected, raised from band 2
             errors = getattr(rejected, "errors", None)
             if errors is None:
@@ -908,33 +885,39 @@ class SkillDraftManager:
                 rejected=errors,
             )
 
-        exploded = {t.key: t for t in explode("", [s.as_dict() for s in validated], requires=_requires())}
+        exploded = {
+            t.key: t
+            for t in explode(
+                "", [s.as_dict() for s in validated], requires=_requires(), versions=load_plugins().versions()
+            )
+        }
         rows: list[Task] = []
         for key in order:
             task = exploded.get(key)
-            if task is not None:
-                task.source_span = spans.get(key)
-                rows.append(task)
-                continue
-            span = human.get(key, "")
-            rows.append(
-                Task(
+            if task is None:
+                task = Task(
                     task_plan_id="",
                     key=key,
                     form=TaskForm.human.value,
                     step_key=None,
-                    title=(span[:250] or "A person does this"),
+                    title=human.get(key, "A person does this"),
                     args={},
                     depends_on=[],
-                    source_span=span,
                 )
-            )
+            task.source_span = spans.get(key)
+            task.source_plan_key = sources.get(key)
+            task.source_step_key = source_steps.get(key)
+            rows.append(task)
         await self.rewrite(session, version=version, tasks=rows)
-        # It was drawn, so it is the planner's until someone edits it (SK7).
         plan = await self.plans_qs.get(session, version.plan_id)
         if plan is not None:
             plan.origin = PlanOrigin.generated.value
-            await session.flush()
+            # What this plan spent, beside what each row came from, so *what
+            # will this do for me* is answerable without opening the library.
+            plan.uses = composed
+        # The words this draw read, so publish can tell the plan is theirs.
+        version.drawn_digest = read_digest or subject.digest
+        await session.flush()
 
         detail = f"drawn · {len(rows)} step" + ("s" if len(rows) != 1 else "")
         if unmapped:
@@ -950,9 +933,17 @@ class SkillDraftManager:
         return await self._draft_read(session, draft=draft)
 
     async def write_draft(self, session: AsyncSession, *, skill: Skill, payload: SkillVersionPublish) -> SkillDraftRead:
+        await self._check_pin(session, skill=skill, payload=payload)
         draft = await self.ensure_draft(session, skill=skill)
         await self.skills.update_draft(session, draft=draft, payload=payload)
         return await self._draft_read(session, draft=draft)
+
+    async def _check_pin(self, session: AsyncSession, *, skill: Skill, payload: SkillVersionPublish) -> None:
+        """Refuse a pin the Graph does not offer, or an alias, where it was typed."""
+        if "model_pin" in payload.model_fields_set and payload.model_pin:
+            payload.model_pin = await self.endpoints.check_pin(
+                session, graph_id=skill.graph_id, address=payload.model_pin
+            )
 
     async def answer(
         self,
@@ -1001,7 +992,7 @@ class SkillDraftManager:
             open_clarification=next((r for r in reads if r.answer is None), None),
             drawing_run_id=drawing,
             refusal=refusal,
-            vocabulary=vocabulary(),
+            drawn=draft.is_drawn,
         )
 
     async def _refusal(self, session: AsyncSession, *, graph_id: str, version_id: str) -> SkillDrawRefusal | None:

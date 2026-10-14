@@ -8,6 +8,7 @@ GET · PATCH · DELETE ``/{id}``         detail · update — a **rename** is re
 POST ``/{id}/ping``                    credential test, on the first model offered
 GET · POST ``/{id}/models``            what this endpoint offers · offer one more
 DELETE ``/{id}/models/{model_row_id}`` stop offering one — refused while a cast names it
+GET ``/pins``                          who pins each model address
 =====================================  ==========================================
 
 **No ``set-default``**: the lens ``cast`` answers *which model when nobody said*
@@ -20,6 +21,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, status
 
+from invana.activity.schemas import ModelPins
 from invana.apps.llm_providers.schemas import (
     LLMModelListResponse,
     LLMModelRead,
@@ -38,6 +40,8 @@ llm_providers_router.get("", response_model=LLMProviderListResponse)(views.list_
 llm_providers_router.post("", response_model=LLMProviderRead, status_code=status.HTTP_201_CREATED)(
     views.create_llm_provider
 )
+# Before `/{provider_id}`, which would read `pins` as an id.
+llm_providers_router.get("/pins", response_model=ModelPins)(views.list_model_pins)
 llm_providers_router.get("/{provider_id}", response_model=LLMProviderRead)(views.get_llm_provider)
 llm_providers_router.patch("/{provider_id}", response_model=LLMProviderRead)(views.update_llm_provider)
 llm_providers_router.delete("/{provider_id}", status_code=status.HTTP_204_NO_CONTENT)(views.delete_llm_provider)

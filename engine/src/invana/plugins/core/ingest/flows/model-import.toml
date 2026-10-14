@@ -1,0 +1,30 @@
+# One of the plans ingestion is assembled from. Its steps are task type
+# primitives — `validate_records`, `write_graph`, `stitch`, `snapshot_model` — and
+# the plan is what orders them. `model-import`, not `dataset-import`: records are
+# imported **into a model**, and the model is what holds them.
+
+key = "model-import"
+version = 1
+kind = "import"
+description = "Load records into a model: check them, write them, resolve their edges, record what landed."
+intents = []
+
+[[steps]]
+id = "validate_records"
+task = "validate_records"
+label = "Validate"
+
+[[steps]]
+id = "write_graph"
+task = "write_graph"
+label = "Write"
+
+[[steps]]
+id = "stitch"
+task = "stitch"
+label = "Stitch"
+
+[[steps]]
+id = "snapshot_model"
+task = "snapshot_model"
+label = "Snapshot"

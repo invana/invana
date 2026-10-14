@@ -133,6 +133,16 @@ services:
     volumes:
       - ./studio:/app
       - studio-node-modules:/app/node_modules
+      - studio-app-node-modules:/app/apps/studio/node_modules
+      - studio-core-node-modules:/app/packages/core/node_modules
+      - studio-ui-node-modules:/app/packages/ui/node_modules
+      - studio-canvases-node-modules:/app/packages/canvases/node_modules
+      - studio-shell-node-modules:/app/packages/shell/node_modules
+      - studio-assistant-node-modules:/app/packages/assistant/node_modules
+      - studio-explorer-node-modules:/app/packages/explorer/node_modules
+      - studio-modeller-node-modules:/app/packages/modeller/node_modules
+      - studio-agents-node-modules:/app/packages/agents/node_modules
+      - studio-projects-node-modules:/app/packages/projects/node_modules
     depends_on:
       - engine
 
@@ -248,3 +258,13 @@ volumes:
   hyperdx-mongo-data:
   engine-venv:
   studio-node-modules:
+  studio-app-node-modules:
+  studio-core-node-modules:
+  studio-ui-node-modules:
+  studio-canvases-node-modules:
+  studio-shell-node-modules:
+  studio-assistant-node-modules:
+  studio-explorer-node-modules:
+  studio-modeller-node-modules:
+  studio-agents-node-modules:
+  studio-projects-node-modules:

@@ -10,10 +10,10 @@ Three things this file deliberately does not do, each a rule from §4.1:
 - **no ``select()``** — every query goes through a queryset;
 - **no ``session.commit()``** — the request owns the transaction (§18.1).
 
-**Editing is publishing.** There is no path here that rewrites the text of a
-*published* version: ``update`` with new prose mints ``version + 1`` and
-repoints the head, which is what keeps a step's ``skill_version_id`` resolvable
-([SK2 · SK3](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+**A published version is never rewritten.** New prose lands on the draft, and
+publishing the draft mints ``version + 1`` and repoints the head, which is what
+keeps a step's ``skill_version_id`` resolvable. ``update`` renames and nothing
+else.
 
 **A draft is the one exception, and it is a row.** A version with no
 ``published_at`` is what a person is still writing
@@ -53,6 +53,8 @@ from invana.core.events.services import diff_changed_fields, emit_event
 
 #: What lives on a version. Changing any of these publishes.
 _VERSIONED = ["description", "content", "when_to_use"]
+#: What a publish diffs: the text, and the model the version pins.
+_PUBLISHED = [*_VERSIONED, "model_pin"]
 #: What lives on the skill. Changing it is an edit in place.
 _TRACKED = ["name"]
 
@@ -130,6 +132,7 @@ class SkillManager:
         skill: Skill,
         plan_id: str,
         payload: SkillVersionPublish | None = None,
+        drawn: bool = False,
     ) -> SkillVersion:
         """Open the next version as a draft, seeded from the head's text.
 
@@ -137,6 +140,10 @@ class SkillManager:
         clarifications and the answers all hang off this row's id, and moving
         the number later would mean writing them twice
         ([SK20](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+
+        ``drawn`` says the plan handed in is already the plan of this text —
+        a copy of a published version's — so the draft is stamped as drawn
+        and publishing it unchanged needs no draw.
         """
         text = {
             field: (
@@ -147,7 +154,16 @@ class SkillManager:
             for field in _VERSIONED
         }
         number = await self.versions_qs.highest_version(session, skill.id) + 1
-        draft = SkillVersion(skill_id=skill.id, version=number, plan_id=plan_id, **text)
+        # The pin carries over from the head like the text does.
+        head = skill.current_version
+        pin = (
+            payload.model_pin
+            if payload is not None and "model_pin" in payload.model_fields_set
+            else (head.model_pin if head is not None else None)
+        )
+        draft = SkillVersion(skill_id=skill.id, version=number, plan_id=plan_id, model_pin=pin or None, **text)
+        if drawn:
+            draft.drawn_digest = draft.digest()
         return await self.versions_qs.add(session, draft)
 
     async def update_draft(
@@ -162,83 +178,51 @@ class SkillManager:
             value = getattr(payload, field)
             if value is not None:
                 setattr(draft, field, value)
+        if "model_pin" in payload.model_fields_set:
+            draft.model_pin = payload.model_pin or None
         await session.flush()
         return draft
 
     async def publish_draft(
-        self, session: AsyncSession, *, skill: Skill, draft: SkillVersion, actor_id: str
-    ) -> SkillVersion:
-        """Stamp the draft and move the head — text, answers and plan, one act."""
-        if not draft.is_draft:
-            raise ValidationError(f"v{draft.version} is already published.")
-        head = skill.current_version
-        before = {f: getattr(head, f) for f in _VERSIONED} if head is not None else {}
-
-        draft.published_at = datetime.now(UTC)
-        draft.published_by_id = actor_id
-        skill.current_version = draft
-        await session.flush()
-
-        changed = (
-            diff_changed_fields(before, {f: getattr(draft, f) for f in _VERSIONED}, fields=_VERSIONED)
-            if head is not None
-            else {}
-        )
-        await emit_event(
-            session,
-            action=actions.SKILL_PUBLISH,
-            target_kind=actions.TARGET_SKILL,
-            target_id=skill.id,
-            graph_id=skill.graph_id,
-            actor_id=actor_id,
-            details={"name": skill.name, "version": draft.version, "changed": changed},
-        )
-        return draft
-
-    async def publish(
         self,
         session: AsyncSession,
         *,
         skill: Skill,
-        payload: SkillVersionPublish,
+        draft: SkillVersion,
         actor_id: str,
-        plan_id: str,
+        why: str | None = None,
+        restored_from: int | None = None,
+        evaluated: dict | None = None,
     ) -> SkillVersion:
-        """Mint the next version and point the skill at it, in one call.
+        """Stamp the draft and move the head — text, answers and plan, one act.
 
-        Fields left unset carry over from the head, so publishing a one-line
-        change to ``when_to_use`` does not require resending the body. It is
-        :meth:`start_draft` and :meth:`publish_draft` back to back, because
-        there is one path that writes a version row and this is it.
+        ``restored_from`` is set by a rollback: the version whose text and plan
+        this one copies. It is kept on the row and on the publish event, so the
+        change log can say *restored v3* rather than only *changed content*.
+        ``evaluated`` is the eval gate's verdict — the eval run it read and any
+        warnings published past — kept on the event beside the why.
         """
+        if not draft.is_draft:
+            raise ValidationError(f"v{draft.version} is already published.")
         head = skill.current_version
-        text = {
-            field: (getattr(payload, field) if getattr(payload, field) is not None else getattr(skill, field))
-            for field in _VERSIONED
-        }
-        number = await self.versions_qs.highest_version(session, skill.id) + 1
-        version = SkillVersion(
-            skill_id=skill.id,
-            version=number,
-            plan_id=plan_id,
-            published_by_id=actor_id,
-            published_at=datetime.now(UTC),
-            **text,
-        )
-        await self.versions_qs.add(session, version)
+        before = {f: getattr(head, f) for f in _PUBLISHED} if head is not None else {}
 
-        skill.current_version = version
+        draft.published_at = datetime.now(UTC)
+        draft.published_by_id = actor_id
+        draft.restored_from_version = restored_from
+        skill.current_version = draft
         await session.flush()
 
         changed = (
-            diff_changed_fields(
-                {f: getattr(head, f) for f in _VERSIONED},
-                text,
-                fields=_VERSIONED,
-            )
+            diff_changed_fields(before, {f: getattr(draft, f) for f in _PUBLISHED}, fields=_PUBLISHED)
             if head is not None
             else {}
         )
+        details = {"name": skill.name, "version": draft.version, "changed": changed, "why": why}
+        if restored_from is not None:
+            details["restored_from"] = restored_from
+        if evaluated is not None:
+            details["eval"] = evaluated
         await emit_event(
             session,
             action=actions.SKILL_PUBLISH,
@@ -246,9 +230,9 @@ class SkillManager:
             target_id=skill.id,
             graph_id=skill.graph_id,
             actor_id=actor_id,
-            details={"name": skill.name, "version": number, "changed": changed},
+            details=details,
         )
-        return version
+        return draft
 
     # ── the skill ────────────────────────────────────────────────────────────
 
@@ -312,12 +296,12 @@ class SkillManager:
         skill: Skill,
         payload: SkillUpdate,
         actor_id: str,
-        plan_id: str | None = None,
     ) -> Skill:
-        """A rename edits the row; new prose publishes the next version.
+        """Rename the skill. Prose is never written here.
 
-        Both in one request is one rename event and one publish event, because
-        they are two different facts about two different records.
+        The name lives on the skill and changes in place; the words live on a
+        version, and only a drawn draft publishes one
+        (`runtime.managers.SkillDraftManager`).
         """
         before = {f: getattr(skill, f) for f in _TRACKED}
         for field in _TRACKED:
@@ -339,22 +323,6 @@ class SkillManager:
                 graph_id=skill.graph_id,
                 actor_id=actor_id,
                 details={"changed": changed, "name": skill.name},
-            )
-
-        # Prose that is sent but unchanged is not a publish: republishing
-        # identical text would start a new usage count for no reason (US3).
-        wanted = {f: getattr(payload, f) for f in _VERSIONED}
-        if any(v is not None and v != getattr(skill, f) for f, v in wanted.items()):
-            if plan_id is None:
-                # Every version owns a plan (SK13), and this package cannot draw
-                # one — the caller that can is `runtime.managers.SkillDraftManager`.
-                raise ValidationError("Publishing new prose needs a plan for the version it mints.")
-            await self.publish(
-                session,
-                skill=skill,
-                payload=SkillVersionPublish(**wanted),
-                actor_id=actor_id,
-                plan_id=plan_id,
             )
         return skill
 

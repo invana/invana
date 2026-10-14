@@ -79,19 +79,19 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| **Catalogue** drawer | The third drawer of the **Tasks** stack ([G33](../../../building-studio/graph-detail-page.md)). While a draft is open it is also the **palette** — drag an entry onto the canvas ([7.7](draft-a-plan.md)). Rows grouped under their bound, the group header carrying the bound and its count. A row is `step_key` (mono) · one-line summary · **how many plans name it**, or `unused`. The main column stays empty and says why an entry opens no page (CA6) |
+| **Catalogue** drawer | The third drawer of the **Tasks** stack ([G33](../../../building-studio/graph-detail-page.md)). Rows grouped under their bound, the group header carrying the bound and its count. A row is `step_key` (mono) · one-line summary · **how many plans name it**, or `unused`. The main column stays empty and says why an entry opens no page (CA6) |
 | Entry detail | **In the drawer only** (CA6): the bound, then `args`, `outputs` (with roll-up), `requires`, *Used by*, *Agents granted this bound*. There is no board page for an entry |
-| The contract, where it is used | The same fields render as the **contract card** beside a task's parameter form ([7.7](draft-a-plan.md)) — the form is generated from them — and inside a refusal. That is where an entry is actually read |
+| The contract, where it is used | The same fields render as the **contract card** beside a selected step's arguments, and inside a refusal. That is where an entry is actually read |
 | Deep links | A task on a run's canvas and a task on a plan's canvas both link to `?panel=library&section=catalogue&entry=<step_key>` — the refusal message links to the same place |
 
 ## Engine
 
-The declaration already exists — `runtime/catalogue/registry.py`, twenty-four entries across seven bounds
-today. This feature is a **read route over it**, and nothing else.
+The declaration already exists — one `manifest.toml` per task type in the core plugins
+([13.9 Plugins](../../platform/features/plugins.md)), twenty-eight across seven bounds today. This feature is a **read route over it**, and nothing else.
 
 | Thing | Shape |
 |---|---|
-| Source | `invana.runtime.catalogue.registry` — the closed set, derived nowhere else |
+| Source | `invana.plugins.load_plugins()` — the frozen registry, re-exported as `invana.runtime.catalogue.CATALOGUE`; derived nowhere else |
 | Entries this work adds | `test_connection` (`network`) · `expand_neighbours` (`graph_read`) · `import_dataset` · `check_bundle` · `validate_records` · `import_report` (`ingest`) · `apply_stitches` · `commit_stitches` · `bulk_write` (`graph_write`). Declared in the engine, not registered by the feature that needed them ([CA1](#decisions)) — folding a flow into the runtime means *declaring its callable*, never *opening the set* |
 | `GET …/catalogue` | Every entry: `step_key · bound · summary · args · outputs (with rollup) · requires · used_by`, ordered by bound then key. Graph-scoped only so *used by* and *granted to* can be answered. `used_by` counts this Graph's reusable plan **keys**, not versions |
 | `GET …/catalogue/{step_key}` | One entry, plus `used_by` (reusable plans naming it) and `granted_to` (agents whose envelope carries its bound) |
@@ -102,18 +102,18 @@ today. This feature is a **read route over it**, and nothing else.
 | # | Decision |
 |---|---|
 | CA1 | **The catalogue is read-only in the product.** The set is closed and ships with the engine — that closure is what makes an envelope a bound rather than a suggestion, and a UI that could add, edit or disable an entry would be the hole ([§ 0.6](../../../orchestration.md#06-the-catalogue--what-a-plan-may-name)). |
-| CA2 | **It is rendered from the declaration, never re-described.** No prose copy of an entry's args lives in Studio or in docs; the route serves `registry.py`, and an entry that changes changes here first. |
+| CA2 | **It is rendered from the declaration, never re-described.** No prose copy of an entry's args lives in Studio or in docs; the route serves the task manifests, and an entry that changes changes there first. |
 | CA3 | **Grouped by bound, not alphabetically.** The bound is what the envelope ceilings and what a refusal names, so the group a person scans is the group the system enforces. |
 | CA4 | **A drawer of Tasks, not an icon.** A run is an execution of a plan; a plan is a composition of catalogue entries — the catalogue is the bottom of that same sentence, and it is where *this run → the plan it ran → the callable that failed* ends ([G33](../../../building-studio/graph-detail-page.md)). |
-| CA6 | **An entry gets a drawer detail, not a page.** Fourteen entries, five or six fields each, and nothing per-entry to chart: a board would be a contract with whitespace around it. The two places an entry is genuinely read are the **parameter form it generates** and the **refusal that names its bound**, and both show the contract in place. Browsing all of them is the drawer's job. |
-| CA7 | **An entry's summary is declared on the entry.** `Entry.summary` is one line in `registry.py`'s declaration, and the route serves it — not a docstring parsed at read time, and not a string in Studio. A golden test refuses an entry without one. |
+| CA6 | **An entry gets a drawer detail, not a page.** Fourteen entries, five or six fields each, and nothing per-entry to chart: a board would be a contract with whitespace around it. The two places an entry is genuinely read are the **selected step whose arguments it declares** and the **refusal that names its bound**, and both show the contract in place. Browsing all of them is the drawer's job. |
+| CA7 | **An entry's summary is declared on the entry.** `summary` is one line in the task type's `manifest.toml`, and the route serves it — not a docstring parsed at read time, and not a string in Studio. A golden test refuses an entry without one. |
 | CA5 | **Control flow is not in the catalogue.** `if` · `loop` · `map` · `retry` · `stop` are plan grammar ([§ 5](../../../orchestration.md)); they are documented with the plan, and a person looking for them here is told where they live rather than shown an entry that does not exist. |
 
 ## Not building
 
 | Not building | Because |
 |---|---|
-| Registering an entry from a plugin or an app | the set is closed; an app that could register one would make the envelope advisory ([the-runtime-package.md](../../../building-engine/the-runtime-package.md) §1) |
+| Registering an entry from an app, or while plans run | the set is closed per process — task types come only from the plugins loaded at start-up ([13.9](../../platform/features/plugins.md)); an app that could register one would make the envelope advisory ([the-runtime-package.md](../../../building-engine/the-runtime-package.md) §1) |
 | Enabling / disabling an entry per Graph | the bound is the knob, and it is the envelope's ([7.3](envelope-validation.md)) — a second switch would have two answers to *may this run* |
 | A playground that executes an entry | a callable runs inside a plan, under an envelope, with a run row behind it; a bare invoke is a write with no trace |
 | Per-entry metrics | cost and duration belong to the run that spent them ([10.5](../../operate/features/see-what-ran.md)); an average over a callable answers nobody's question |

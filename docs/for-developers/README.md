@@ -30,7 +30,7 @@ governs.
 | API | The engine HTTP surface Studio and external agents call. |
 | CLI | `invana …` — the entry point for anything a person runs at a terminal. Most features need none. |
 | Words | Pinned in [terminology.md](terminology.md). Nothing outside it is ours. |
-| **Orchestration** | [orchestration.md § 0](orchestration.md#0-the-records) — **Todo → TaskPlan → Task → TaskRun**, the model this product is moving to. A person writes a **Todo**; a **TaskPlan** (authored, generated or reused) is the flow of **Task**s that carries it out; a **TaskRun** is one execution. *Nothing a user authors is ever a Task.* A **Lens** bounds what a run may see. ⚠ **§ 0 is current; § 1–§ 3 of that file and every feature file below still describe the retired Todo · Run · Step · Workflow · Project split** |
+| **Orchestration** | [orchestration.md § 0](orchestration.md#0-the-records) — **Todo → TaskPlan → Task → TaskRun**, the model this product is moving to. A person writes a **Todo**; a **TaskPlan** (generated, packaged or promoted, and reused when it matches) is the flow of **Task**s that carries it out; a **TaskRun** is one execution. *Nothing a user authors is ever a Task.* A **Lens** bounds what a run may see. ⚠ **§ 0 is current; § 1–§ 3 of that file and every feature file below still describe the retired Todo · Run · Step · Workflow · Project split** |
 | **The migration** | [building-engine/task-model-migration.md](building-engine/task-model-migration.md) — eight tables → the records above, column by column, with the route changes, the slices M1–M8 and what Studio ships in lockstep. **Read this before touching anything task-shaped** |
 | **Module structure** | [module-structure.md](module-structure.md) — **decided, not started.** One name per module, shared by docs, Studio and the engine, in seven groups; feature numbers kept; the component suffix convention; the target file trees; phases R0–R6 |
 | **The runtime package** | [building-engine/the-runtime-package.md](building-engine/the-runtime-package.md) — one package walks every plan; apps reach it through protocols, never imports. The file-by-file plan, and the ~900 LOC of consolidation it pays for |
@@ -56,10 +56,10 @@ this map.** Feature numbers do not change.
 | Data | `graphs` 1.1 · `models` 1.2–1.8 · `imports` 2.x · `graph-connectors` 12.x |
 | Exploration | `explorer` 4.1 · 4.3 · `queries` 3.1 · 4.4 · `boards` 4.2 |
 | Answers | `assistant` 3.2–3.3 · 3.5–3.8 · 3.10–3.13 · `projections` 3.4 · `memory` 8.x |
-| Work | `projects` 9.1 · 9.2 · 9.4 |
-| Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 |
+| Work | `projects` 9.1 · 9.2 · 9.4 · 9.5 · 9.6 · 9.7 · 9.8 |
+| Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 · `notifications` 10.7 · 10.8 |
 | Governance | `lenses` 14.x · `events` 10.2 |
-| Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
+| Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 13.11 · 13.12 · 13.13 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
 
 ---
 
@@ -75,6 +75,8 @@ this map.** Feature numbers do not change.
 | 1.6 | [Stitch models](modules/connect-and-model/features/stitch-models.md) | Anchors and relationships; the global model is derived | ✅ | ✅ | ✅ | S7 |
 | 1.7 | [Starter models](modules/connect-and-model/features/starter-models.md) | Importable models to begin from — memory, provenance — renamed on arrival | ✅ | ✅ | ✅ | S7 |
 | 1.8 | [The model page](modules/connect-and-model/features/the-model-page.md) | One page, six tabs — Overview · Model · Database · Usage · Performance · Growth — with the model as a filter; is it used, is it slow, how has it grown | ✅ | — | ✅ | S-TBD |
+| 1.9 | [Publish review](modules/connect-and-model/features/publish-review.md) | Additive publishes now; breaking is previewed as a migration run and published after another owner approves | ✅ | ✅ | ✅ | B10 |
+| 1.10 | [Import an ontology](modules/connect-and-model/features/ontology-import.md) | RDFS / OWL subset, schema.org included — JSON-LD, Turtle, RDF/XML — into a draft model; flattened, source IRIs kept, an import report of what was skipped | ✅ | ✅ | ✅ | B12 · C08 |
 
 ## 2 · [Bring data in](modules/bring-data-in/spec.md)
 
@@ -83,6 +85,11 @@ this map.** Feature numbers do not change.
 | 2.1 | [Bring data in](modules/bring-data-in/features/load-data.md) | `invana records import`, `invana loader` and `invana records check` — records into a model | ✅ | ✅ | ✅ | S6 |
 | 2.2 | [Inspect what landed](modules/bring-data-in/features/inspect-what-landed.md) | Imports — the journal filtered to `kind in (import, bulk)`; log, report, provenance — read-only | ✅ | — | ✅ | S6 |
 | 2.3 | [Load a bundle](modules/bring-data-in/features/load-a-bundle.md) | Every dataset a manifest names, in one run; stitched once, a Task raised for a broken source | 🔵 | 🔵 | 🔵 | S15 |
+| 2.4 | [Datasets](modules/bring-data-in/features/datasets.md) | Install-wide `publisher/name` records — origin, author chain, licence, sensitivity, sharing; immutable hashed versions; a record's change log | ✅ | 🟡 | ✅ | B03 |
+| 2.5 | [Retract and refresh](modules/bring-data-in/features/retract-and-refresh.md) | A version retracted with a reason and everything citing it flagged; a refresh schedule mints new versions while consumers stay pinned | ✅ | 🟡 | 🟡 | B03 |
+| 2.6 | [Bind a dataset](modules/bring-data-in/features/bind-a-dataset.md) | A Graph binds one dataset version into a model as an ordinary load run; told when a newer one exists | 🟡 | 🟡 | ✅ | B03 |
+| 2.7 | [Standards and conformance](modules/bring-data-in/features/standards.md) | Install-wide versioned standards — terms, types, allowed values; a dataset claims one pinned version and is scored against it, enforced block · warn · report | ✅ | ✅ | ✅ | B04 |
+| 2.8 | [Import a SKOS vocabulary](modules/bring-data-in/features/skos-import.md) | A concept scheme becomes a standard — concepts → terms and values, notation → code, broader → hierarchy, source IRIs kept; an import report | ✅ | ✅ | ✅ | B12 · C08 |
 
 ## 3 · [Ask](modules/ask/spec.md)
 
@@ -109,7 +116,8 @@ this map.** Feature numbers do not change.
 | 4.1 | [Graph canvas](modules/explore/features/graph-canvas.md) | Pan · zoom · select · style; 100K nodes | ✅ | — | ✅ | S9b |
 | 4.2 | [Boards](modules/explore/features/boards.md) | Named, saved, versioned working surfaces — drawn or declared | ✅ | — | ✅ | S9 |
 | 4.3 | [Selection and the panel](modules/explore/features/selection-and-the-panel.md) | The canvas selects; the panel states the fact | ✅ | — | ✅ | S12 |
-| 4.4 | [The console](modules/explore/features/the-console.md) | The rows and the query under the canvas that drew them | ✅ | — | 🔵 | S12f |
+| 4.4 | [The console](modules/explore/features/the-console.md) | The rows and the query under the canvas that drew them | ✅ | — | ✅ | S12f |
+| 4.5 | [Share an answer](modules/explore/features/share-an-answer.md) | A live link or a frozen snapshot for members; PNG · CSV · Markdown for anyone else | ✅ | 🔵 | ✅ | C09 |
 
 ## 5 · [Agents](modules/agents/spec.md)
 
@@ -123,12 +131,14 @@ provider row and its models, and reopens four rows below. The shapes:
 |---|---|---|---|---|---|---|
 | 5.1 | [Providers and models](modules/agents/features/providers-and-models.md) | A provider row per Graph, holding its models; ping it. **No default — the cast picks** | 🟡 | — | 🟡 | S5 · **S16** |
 | 5.2 | [Author an agent](modules/agents/features/author-an-agent.md) | Author an agent; give it skills and the callables they need, standing limits, a way of thinking and a voice. The world comes with the work | 🟡 | — | 🟡 | S12c · **S16** |
-| 5.3 | [Set what an agent may run](modules/agents/features/envelope-and-budget.md) | What an agent may run, with what arguments, at what cost | 🟡 | — | 🟡 | S12c · **S16** |
+| 5.3 | [Set what an agent may run](modules/agents/features/envelope-and-budget.md) | What an agent may run, with what arguments, and its token budgets — a run and a month | 🟡 | — | 🟡 | S12c · **S16** |
 | 5.4 | [Delegation](modules/agents/features/delegation.md) | Agents that spawn agents, bounded by the parent | ✅ | — | ✅ | S12d |
 | 5.5 | [Pause, resume, retire](modules/agents/features/lifecycle.md) | Pause · resume · retire; the row stays so lineage resolves | ✅ | — | 🟡 | S12c |
 | 5.6 | [Who spawned whom](modules/agents/features/lineage.md) | Who authored whom, who spawned whom, on what run | ✅ | — | ✅ | S12c |
 | 5.7 | [How many run at once](modules/agents/features/concurrency-and-contention.md) | How many run at once in a Graph, the pools, and what happens at the ceiling | 🟡 | — | 🔵 | S12e · **S16** |
 | 5.8 | [Give an agent a soul](modules/agents/features/soul.md) | Who the agent is and how it speaks — Markdown on the agent, read only by the steps a person reads | 🟡 | — | ✅ | S-TBD |
+| 5.9 | [Pin a model version](modules/agents/features/pinned-model-versions.md) | Agents, skill versions and judges pin an exact model version; every run records the one it called; re-run on the same versions | 🟡 | 🟡 | 🟡 | B02 |
+| 5.10 | [Watch the fleet](modules/agents/features/fleet-performance.md) | What broke, waits, slowed or changed; speed, success and tokens per agent, skill, plan and model against a baseline; degradations named; who pins each model | ✅ | — | ✅ | C10 |
 
 ## 6 · [Skills](modules/skills/spec.md)
 
@@ -137,7 +147,9 @@ provider row and its models, and reopens four rows below. The shapes:
 | 6.1 | [Authoring a skill](modules/skills/features/authoring-a-skill.md) | Four fields, drawn as a plan — the Playbook and Flow tabs | ✅ | — | ✅ | S5 · M8 |
 | 6.2 | [Offer a skill to an agent](modules/skills/features/bindings.md) | Which agent may be offered which skill | ✅ | — | ✅ | S12c |
 | 6.3 | [Where a skill was used](modules/skills/features/usage.md) | Where a skill was offered, and where it was reported applied | ✅ | — | ✅ | S12c |
-| 6.4 | [Rules](modules/skills/features/rules.md) | Graph invariants and project working rules, offered as statements | ✅ | — | ✅ | S12b |
+| 6.4 | [Rules](modules/skills/features/rules.md) | Install rules, Graph invariants and project working rules, offered as statements; a rule with a check is enforced block · warn · report at the acts it names | ✅ | ✅ | 🟡 | S12b · B04 |
+| 6.5 | [Instructions, publish and roll back](modules/skills/features/instructions-publish-rollback.md) | `instructions.md` drafts on skills and agents; publish regenerates the plan; one-act rollback; plans generated or packaged | 🟡 | 🟡 | ✅ | B02 |
+| 6.6 | [Evals](modules/skills/features/evals.md) | Eval sets with rule checks and a labelled judge; the publish gate; drift re-runs; an eval token budget | ✅ | 🟡 | ✅ | B02 |
 
 ## 7 · [Workflows](modules/workflows/spec.md)
 
@@ -149,7 +161,6 @@ provider row and its models, and reopens four rows below. The shapes:
 | 7.4 | [Promote a plan](modules/workflows/features/promote-a-plan.md) | A plan that served becomes a template | 🟡 | — | 🟡 | S12c |
 | 7.5 | [Run a workflow](modules/workflows/features/run-a-workflow.md) | Start a plan from the library with its arguments — the front door | 🔵 | 🔵 | 🔵 | S15 |
 | 7.6 | [Read the catalogue](modules/workflows/features/the-catalogue.md) | The closed set of callables a plan may name — bound · args · outputs · requires | 🟡 | — | 🟡 | S12c |
-| 7.7 | [Draft a plan](modules/workflows/features/draft-a-plan.md) | Fork a version into a draft, edit it on the canvas or as `manifest.yml`, publish it, retire it | 🔵 | — | 🔵 | S15 |
 
 ## 8 · [Memory](modules/memory/spec.md)
 
@@ -168,16 +179,24 @@ provider row and its models, and reopens four rows below. The shapes:
 | 9.2 | [Objectives and criteria](modules/work/features/objectives-and-criteria.md) | Goals and "done" as nodes, not paragraphs | 🔵 | — | 🔵 | S12b |
 | 9.3 | [Review](modules/work/features/review.md) | One queue: questions, approvals and verdicts block; results and proposals wait | 🔵 | — | 🔵 | S12b |
 | 9.4 | [Recurring tasks and conditions](modules/work/features/recurring-tasks-and-conditions.md) | A template on a cron; failure branches that say why | 🔵 | — | 🔵 | S12e |
+| 9.5 | [Branches, findings and decisions](modules/work/features/branches-and-decisions.md) | A project of a type forks into branches; findings for and against; a verdict and a decision the rules check, superseded never edited; agents propose | ✅ | ✅ | ✅ | B05 |
+| 9.6 | [Project reports](modules/work/features/project-reports.md) | A report drafted from the records, edited, published as frozen versions that cite their datasets | ✅ | ✅ | ✅ | B05 |
+| 9.7 | [Private projects](modules/work/features/private-projects.md) | A project only its people and agents can see | ✅ | ✅ | ✅ | B05 |
+| 9.8 | [Simulation](modules/work/features/simulation.md) | A branch runs a simulator plugin over pinned dataset versions; the result is ranked, reproducible from its seed and labelled derived | ✅ | ✅ | ✅ | B09 · C06 |
+| 9.9 | [Impact](modules/work/features/impact.md) | What a branch's option reaches over the graph, hop by hop from the records its evidence cites | — | — | ✅ | C06 |
 
 ## 10 · [Operate](modules/operate/spec.md)
 
 | # | Feature | What it does | API | CLI | Studio | Slice |
 |---|---|---|---|---|---|---|
-| 10.1 | [Schedules](modules/operate/features/schedules.md) | Put a question, a task or a workflow on a cron; firings stack | 🔵 | — | 🔵 | S9.5 |
+| 10.1 | [Schedules](modules/operate/features/schedules.md) | An agent and instructions on a cron in a zone; every firing recorded; a missed-firing and an overlap policy; the result delivered to the inbox and channels | ✅ | ✅ | ✅ | B08 |
 | 10.2 | [Audit and activity](modules/operate/features/audit-and-activity.md) | Every write is an event; every actor is a principal; retention lives here | 🟡 | — | 🟡 | S5.5 · S12a |
 | 10.3 | [Observability](modules/operate/features/observability.md) | Query and LLM metrics, cost and latency | 🔵 | — | 🔵 | S11 |
 | 10.4 | [External-agent API](modules/operate/features/external-agent-api.md) | Scoped tokens; retrieval with provenance | 🔵 | — | 🔵 | S10 |
 | 10.5 | [See what ran](modules/operate/features/see-what-ran.md) | **Runs** — every run in the Graph, children nested; Imports is a filter of it | 🟡 | — | 🟡 | S14 |
+| 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | ✅ | B01 |
+| 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | ✅ | B08 |
+| 10.8 | [Approvals](modules/operate/features/approvals.md) | Anything sent outside waits for a named approver; a reminder at half-time; at the deadline *expired, not sent* | ✅ | ✅ | 🟡 | B08 |
 
 
 ## 11 · [Identity and access](modules/identity-and-access/spec.md)
@@ -187,8 +206,9 @@ provider row and its models, and reopens four rows below. The shapes:
 | 11.1 | [Accounts](modules/identity-and-access/features/accounts.md) | Sign up, sign in, profile; email is the login identity | 🟡 | 🟡 | 🟡 | S1 |
 | 11.2 | [Usernames](modules/identity-and-access/features/usernames.md) | The URL identity — mutable, rate-limited, never aliased | ✅ | — | ✅ | S1 |
 | 11.3 | [Sessions](modules/identity-and-access/features/sessions.md) | Short access token, revocable rotating refresh | ✅ | — | 🟡 | S1 |
-| 11.4 | [Membership](modules/identity-and-access/features/membership.md) | Binary access to a Graph; no roles | ✅ | — | ✅ | S1 |
+| 11.4 | [Membership](modules/identity-and-access/features/membership.md) | Who may open a Graph; add, re-role and remove members | ✅ | ✅ | ✅ | S1 |
 | 11.5 | [Personal access tokens](modules/identity-and-access/features/personal-access-tokens.md) | A long-lived credential that carries your identity; revocable, shown once | ✅ | — | ✅ | S1 |
+| 11.6 | [Roles](modules/identity-and-access/features/roles.md) | Graph roles viewer · contributor · builder · modeller · owner, enforced on every graph route; install Admin; a refusal names who can | ✅ | ✅ | ✅ | B11 |
 
 ## 12 · [Graph connectors](modules/graph-connectors/spec.md)
 
@@ -205,12 +225,17 @@ provider row and its models, and reopens four rows below. The shapes:
 |---|---|---|---|---|---|---|
 | 13.1 | [Design system](modules/platform/features/design-system.md) | Studio builds from `@invana/design-kit`, never beside it | — | — | 🟡 | — |
 | 13.2 | [Theming](modules/platform/features/theming.md) | Light · dark · theme variants, everywhere | — | — | ✅ | — |
-| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · models · loader` | — | 🟡 | — | — |
+| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana init · users · start · migrate · version · datasets · standards · rules · members · search · models · loader · schedules · approvals · notifications · simulate · simulations · plugins · tasks · worker` | — | 🟡 | — | — |
 | 13.4 | [Logging](modules/platform/features/logging.md) | One call at startup; plain or JSON; every line carries its trace; lifecycle, not chatter | ✅ | ✅ | — | S1 |
 | 13.5 | [Telemetry](modules/platform/features/telemetry.md) | Traces, metrics and logs for everything a person or the system does — one trace per action from the Studio click through runs, queries and model calls, metrics that open it, logs that carry it; optional | ✅ | ✅ | ✅ | S1 |
 | 13.6 | [Admin and health](modules/platform/features/admin-and-health.md) | A generated browser over app state, and a readiness probe | ✅ | — | — | S1 |
 | 13.7 | [Setup](modules/platform/features/setup.md) | Four required steps in four features — the onboarding wizard, created to answering | ✅ | — | 🟡 | S13 |
 | 13.8 | [The runtime](modules/platform/features/runtime.md) | The workhorse: plan graph · frontier · signals · pools · approvals · what it emits | 🟡 | — | — | S15 |
+| 13.9 | [Plugins](modules/platform/features/plugins.md) | Every task type in a plugin — `plugin.yaml`, a manifest beside each task's code, packaged flows; one frozen registry; each Task records its task version | — | — | — | B06a |
+| 13.10 | [Search](modules/platform/features/search.md) | One name search over every Graph and dataset you may open, filtered by access, exact → prefix → contains | ✅ | ✅ | — | B11 |
+| 13.11 | [Distributed execution](modules/platform/features/distributed-execution.md) | Every step as a `TaskEnvelope`, called by one `run_envelope()` that rebuilds its context from ids; procrastinate chosen as the distributed executor by benchmark | — | — | — | B14 |
+| 13.12 | [Tool plugins](modules/platform/features/tool-plugins.md) | `tools/web` · `tools/mail` · `tools/science` as optional extras, Admin-enabled, run in workers; `send` waits for an approval; the plugin registry over API and CLI | ✅ | ✅ | ✅ | B06b |
+| 13.13 | [MCP plugins](modules/platform/features/mcp-plugins.md) | An MCP server's tools as task types in an `mcp` plugin, frozen when an Admin adds the server; refreshed by hand, loaded at start-up, switched like a tool plugin | ✅ | ✅ | 🔵 | B07 |
 
 ---
 
@@ -229,7 +254,7 @@ touch record that makes the declaration checkable. Decisions: [governance.md](go
 `lenses` and `run_touches` exist, the rule grammar and its three laws are enforced, the ladder and
 both authoring refusals work, and the routes serve. Past that, a lens now **runs**: the interpreter
 checks an address before dispatch and refuses in place
-([`catalogue/contract.py`](../../engine/src/invana/runtime/catalogue/contract.py) `engage` · `engaged`),
+([`plugins/sdk/context.py`](../../engine/src/invana/plugins/sdk/context.py) `engage` · `engaged`),
 writes the touch after the call (`touched`) and decides egress per crossing (`egress_for`); the
 openCypher connector composes the predicate and rewrites the projection
 ([`connectors/cypher/lens.py`](../../engine/src/invana/graph/connectors/cypher/lens.py)), refusing
@@ -259,16 +284,16 @@ reopens §5 above, because a lens on an agent is what replaces the provider on i
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
-| API | 42 | 15 | 15 | 3 |
-| CLI | 4 | 4 | 2 | 65 |
-| Studio | 33 | 15 | 20 | 7 |
+| API | 63 | 19 | 15 | 6 |
+| CLI | 23 | 10 | 4 | 66 |
+| Studio | 55 | 20 | 19 | 9 |
 
-Seventy-five features. **These counts are the tables above, counted** — if a cell is flipped, they
+A hundred and three features. **These counts are the tables above, counted** — if a cell is flipped, they
 are recounted in the same edit, because a summary that disagrees with what it summarises is worse
 than no summary.
 
-- Modules 1 · 3 · 4 are closed: **Connect and model · Ask · Explore**. **Agents reopened at 5.1 · 5.2 · 5.3 · 5.7** — S16 moves the model off the agent and onto the lens. What is left is 2.3, 5's four rows, and 6–14.
-- **Bring data in reopened at 2.3.** Its two shipped features are done; the bundle load is new scope, and it is the flow the runtime's deferred frontier, lanes and `uses` were waiting for ([13.8 §21](modules/platform/features/runtime.md)).
+- Modules 3 · 4 are closed: **Ask · Explore** — Explore grew **4.5**, sharing an answer, drawn in Studio by C09 over routes it already had. **Connect and model reopened at 1.9 and grew 1.10** — the publish review (B10) and the ontology import (B12) ship API and CLI; Studio draws 1.9 (C04) and 1.10 (C08). **Agents reopened at 5.1 · 5.2 · 5.3 · 5.7** — S16 moves the model off the agent and onto the lens. What is left is 2.3, 5's four rows, and 6–14.
+- **Bring data in reopened at 2.3 and grew 2.4–2.8**, the dataset record above Graphs (B03), the standards it is scored against (B04) and the SKOS import that makes one (B12, drawn in Studio by C08). **Rules (6.4) reopened in Studio**: B04 added install scope and checked rules, which Studio does not draw yet. Its two shipped features are done; the bundle load is new scope, and it is the flow the runtime's deferred frontier, lanes and `uses` were waiting for ([13.8 §21](modules/platform/features/runtime.md)).
 - Studio is no longer the lagging side for the closed four; the remaining 🟡 and 🔵 sit in Skills, Workflows, Memory, Work and Operate.
 
 ## Shipped
@@ -356,7 +381,7 @@ replacement lands.
 - Write-back to a source · fuzzy entity resolution · node merge on an anchor
 - Source connectors, cursors and a mapping grammar — Invana is a destination, not an extractor
 - Roles beyond membership · invitations · soft deletes · undo
-- Simulation · parameter sweeps · game theory (post-1.0, `../../system-design.md`)
+- Parameter sweeps · game theory (post-1.0, `../../system-design.md`). Simulation is [9.8](modules/work/features/simulation.md): a simulator plugin run on a branch
 - Per-element canvas styling · workflow authoring UI · criterion weights and waivers
 
 ## Delivery

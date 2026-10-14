@@ -1,0 +1,34 @@
+[
+  {
+    "from": "A-Col-0",
+    "to": "T-DTF"
+  },
+  {
+    "from": "A-Ler-1",
+    "to": "T-DTF"
+  },
+  {
+    "from": "A-Cvi-0",
+    "to": "T-DORM"
+  },
+  {
+    "from": "A-Cvi-0",
+    "to": "T-DS"
+  },
+  {
+    "from": "A-C24",
+    "to": "T-D13C"
+  },
+  {
+    "from": "A-Kas-1",
+    "to": "T-DS"
+  },
+  {
+    "from": "A-Bur-0",
+    "to": "T-RLN"
+  },
+  {
+    "from": "A-Sha",
+    "to": "T-DTF"
+  }
+]

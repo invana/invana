@@ -53,16 +53,13 @@ def _code(p: Path) -> str:
 _QUERY = re.compile(r"\b(?:select|sa_update|sa_delete)\s*\(")
 
 QUERIES_ALLOWED = {
-    # datasets' views were moved for the band, not yet converted. They go with
-    # the /datasets routes (task-model-migration § 6.7).
-    "server/datasets/views.py",
     # the runtime's own split (planner · state · stream) is its own change
     "runtime/services.py",
     "runtime/stream.py",
     "runtime/emissions.py",
     "runtime/projections.py",
     "runtime/delegation.py",
-    "runtime/catalogue/pure.py",
+    "plugins/core/pure/tasks/await_delegations/run.py",
     "runtime/interpreter/loop.py",
     "runtime/managers/agent_lifecycle.py",
     "runtime/managers/task_plan_runs.py",
@@ -121,7 +118,6 @@ COMMIT_ALLOWED = {
     "runtime/contention.py",
     "server/runtime/runs.py",
     "server/runtime/templates.py",
-    "server/datasets/views.py",
     "server/routes/models.py",
     "server/routes/model_links.py",
     "server/routes/auth.py",
@@ -132,8 +128,14 @@ COMMIT_ALLOWED = {
     # session — the same shape `server/sessions/views.py` above already has
     # (building-engine/skills-draw-as-plans.md).
     "server/skills/views.py",
+    # An eval run is opened and then submitted, the same shape as a draw.
+    "server/evals/views.py",
+    # Binding a dataset version opens its load run and then submits it, the same shape.
+    "server/datasets/views.py",
+    # Simulating on a branch opens the simulator's run and then submits it, the same shape.
+    "server/work/views.py",
     "server/admin/auth.py",
-    "runtime/catalogue/records.py",
+    "plugins/core/ingest/records.py",
     # A CLI command is not serving a request: it opens its own session and owns
     # the transaction itself. §18.1 binds the *request*, and there isn't one.
     "cli/commands/records.py",
@@ -148,6 +150,10 @@ COMMIT_ALLOWED = {
     # `invana govern apply` declares a Graph's guardrails and worlds from a
     # file, in one transaction — the same shape as `stitches apply` above.
     "cli/commands/govern.py",
+    # The session every skills · agents · evals · llms · plans command opens:
+    # it commits once the command returns, and before an eval run or a draw is
+    # worked in-process, which reads the rows in its own session.
+    "cli/context.py",
     # the app factory commits during startup wiring, before any request exists
     "server/app.py",
 }
@@ -217,22 +223,23 @@ EMIT_ALLOWED = {
     "server/task_plans/views.py",
     "server/runtime/runs.py",
     "server/runtime/templates.py",
-    "server/datasets/views.py",
     "cli/commands/stitches.py",
-    "runtime/catalogue/records.py",
-    "runtime/catalogue/stitching.py",
+    "plugins/core/ingest/records.py",
+    "plugins/core/ingest/stitching.py",
     "apps/graphs/pool.py",
     "runtime/services.py",
     "runtime/delegation.py",
     "runtime/interpreter/loop.py",
-    "runtime/catalogue/work_write.py",
+    "plugins/core/work_write/tasks/delegate/run.py",
+    "plugins/core/work_write/tasks/create_task/run.py",
     "runtime/managers/agent_lifecycle.py",
     # a failed credential check is recorded where it is detected
     "core/auth/deps.py",
     "apps/graphs/query_service.py",
-    # catalogue steps emit their own trace as they run
-    "runtime/catalogue/llm.py",
-    "runtime/catalogue/schema_write.py",
+    # task types emit their own trace as they run
+    "plugins/core/llm/shared.py",
+    "plugins/core/llm/tasks/translate_thought/run.py",
+    "plugins/core/schema_write/tasks/validate_proposal/run.py",
 }
 
 

@@ -1,0 +1,243 @@
+/**
+ * **Projects** — one icon, one panel, two sections (projects-and-tasks.md).
+ *
+ * `Projects` over `Todos`. **Projects owns Todos; there is no Todos icon**: a
+ * Todo without its project is a to-do list, and the project is the thing it is
+ * for. With no project drilled into, the Todos section is every Todo in the
+ * Graph — which *is* the **No project** bucket, because a Todo nobody filed is
+ * still work somebody wrote. Drill into a project and the section narrows to its
+ * Todos, while the projects list keeps its place above.
+ *
+ * The rail's **Tasks** icon is execution only — `TaskRun`s, `TaskPlan`s and the
+ * catalogue, never Todos.
+ */
+
+import {
+	PanelStack,
+	type PanelStackHandle,
+	type PanelStackSection,
+} from "@invana/ui";
+import type { Gate } from "@invana-studio/core";
+import { gateItem, useAccess } from "@invana-studio/shell";
+import { stackSection, useStackSectionUi } from "@invana-studio/ui";
+import { FolderOpen, ListTodo, Plus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ProjectsSectionBody } from "./ProjectsSection";
+import { useProjectsQuery, useTodosQuery, useTodosScope } from "./queries";
+import { TodosSectionBody } from "./TodosSection";
+import { useProjectsViewPanel } from "./useProjectsViewPanel";
+
+export interface ProjectsViewPanelProps {
+	username: string;
+	graphSlug: string;
+	onOpenAgent?: (agentId: string) => void;
+	/** A statement on a step row opens that rule's board. */
+	onOpenRule?: (ruleId: string) => void;
+	/** Opening the Plan tab is what draws the `plan` canvas. */
+	onOpenPlanCanvas?: (projectKey: string) => void;
+	onProjectChange?: (key: string | null) => void;
+}
+
+export function ProjectsViewPanel({
+	username,
+	graphSlug,
+	onOpenAgent,
+	onOpenRule,
+	onOpenPlanCanvas,
+	onProjectChange,
+}: ProjectsViewPanelProps) {
+	const projects = useProjectsViewPanel();
+	const ui = useStackSectionUi();
+	const work = useAccess().gate("work");
+	const [creatingProject, setCreatingProject] = useState(false);
+	const [creatingTodo, setCreatingTodo] = useState(false);
+	// The drill-in's trail names the project, not its key.
+	const projectName = useProjectsQuery(username, graphSlug).data?.items?.find(
+		(p) => p.key === projects.projectKey,
+	)?.name;
+
+	// `PanelStack` reads `defaultSize` at **mount**, so this is the opening split
+	// only — after that the column's shape belongs to whoever dragged it.
+	const size = (d: "projects" | "todos") =>
+		projects.sectionKey === d ? "60%" : "40%";
+
+	// A drill-in is the one thing allowed to override that drag: opening a Todo
+	// from a run's trace, or a project from a breadcrumb, has to bring its section
+	// back if the reader had collapsed it — otherwise the row lands in a shut
+	// section and nothing appears to happen. Watching the drilled-into id as well
+	// as the focus is what catches the case where `?section=` never moves and only
+	// `&todo=` does.
+	const stackRef = useRef<PanelStackHandle>(null);
+	const focused =
+		projects.sectionKey === "projects" ? projects.projectKey : projects.todoId;
+	// `focused` is a trigger, not a value: the effect re-runs when the drill-in
+	// moves but never reads it. Dropping it is the bug this wiring exists to fix.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: see above.
+	useEffect(() => {
+		stackRef.current?.expand(projects.sectionKey);
+	}, [projects.sectionKey, focused]);
+
+	return (
+		<PanelStack
+			withHandle
+			stackRef={stackRef}
+			className="h-full"
+			headerHeight={30}
+			sections={[
+				gateNew(
+					stackSection(
+						{
+							id: "projects",
+							label: "Projects",
+							icon: FolderOpen,
+							count: (
+								<ProjectsCount username={username} graphSlug={graphSlug} />
+							),
+							trail: projects.projectKey
+								? (projectName ?? projects.projectKey)
+								: undefined,
+							onBack: () => {
+								projects.openProject(null);
+								onProjectChange?.(null);
+							},
+							searchable: true,
+							searchPlaceholder: "Search projects",
+							headerActions: [
+								{
+									key: "new",
+									name: "New project",
+									icon: Plus,
+									onClick: () => setCreatingProject((v) => !v),
+								},
+							],
+							defaultSize: size("projects"),
+							children: ({ search }) => (
+								<ProjectsSectionBody
+									username={username}
+									graphSlug={graphSlug}
+									search={search}
+									creating={creatingProject}
+									onCreating={setCreatingProject}
+									selectedProjectKey={projects.projectKey}
+									onSelectProject={(key) => {
+										projects.openProject(key);
+										onProjectChange?.(key);
+									}}
+									selectedTaskId={projects.todoId}
+									onSelectTask={projects.openTodo}
+									onOpenTask={projects.openTodo}
+									onOpenAgent={onOpenAgent}
+									onTabChange={(tab) => {
+										if (tab === "plan" && projects.projectKey)
+											onOpenPlanCanvas?.(projects.projectKey);
+									}}
+								/>
+							),
+						},
+						ui,
+					),
+					work,
+				),
+				gateNew(
+					stackSection(
+						{
+							id: "todos",
+							label: projects.projectKey ? "Todos" : "My todos",
+							icon: ListTodo,
+							count: (
+								<TodosCount
+									username={username}
+									graphSlug={graphSlug}
+									projectKey={projects.projectKey}
+								/>
+							),
+							trail: projects.todoId ?? undefined,
+							onBack: () => projects.openTodo(null),
+							searchable: true,
+							searchPlaceholder: "Search todos",
+							headerActions: [
+								{
+									key: "new",
+									name: "New todo",
+									icon: Plus,
+									onClick: () => setCreatingTodo((v) => !v),
+								},
+							],
+							defaultSize: size("todos"),
+							children: ({ search }) => (
+								<TodosSectionBody
+									username={username}
+									graphSlug={graphSlug}
+									search={search}
+									creating={creatingTodo}
+									onCreating={setCreatingTodo}
+									selectedTaskId={projects.todoId}
+									onSelectTask={projects.openTodo}
+									projectKey={projects.projectKey}
+									onProjectContext={onProjectChange}
+									onOpenAgent={onOpenAgent}
+									onOpenRule={onOpenRule}
+								/>
+							),
+						},
+						ui,
+					),
+					work,
+				),
+			]}
+		/>
+	);
+}
+
+/** `6 projects` — the count the section header carries beside its label. */
+function ProjectsCount({
+	username,
+	graphSlug,
+}: {
+	username: string;
+	graphSlug: string;
+}) {
+	const list = useProjectsQuery(username, graphSlug);
+	const n = list.data?.items?.length ?? 0;
+	if (!n) return null;
+	return <>{n}</>;
+}
+
+/**
+ * `12 · 3 in review`. With no project drilled into this counts the signed-in
+ * person's Todos — *My todos*.
+ */
+function TodosCount({
+	username,
+	graphSlug,
+	projectKey,
+}: {
+	username: string;
+	graphSlug: string;
+	projectKey: string | null;
+}) {
+	const list = useTodosQuery(username, graphSlug, useTodosScope(projectKey));
+	const items = list.data?.items ?? [];
+	if (items.length === 0) return null;
+	const review = items.filter((t) => t.status === "review").length;
+	return <>{review ? `${items.length} · ${review} in review` : items.length}</>;
+}
+
+/**
+ * A section's own *new* act, drawn as the member's role allows it. The gate is
+ * applied to the built section because `stackSection` rebuilds its header
+ * items from the spec; search, filter and back stay open to every member.
+ */
+function gateNew(section: PanelStackSection, gate: Gate): PanelStackSection {
+	if (gate.allowed || !section.headerActions) return section;
+	return {
+		...section,
+		headerActions: section.headerActions.map((item) =>
+			// The kit draws an item with no `onClick` as static text, not a
+			// button; a no-op keeps it a disabled button found by its name.
+			item.key === "new"
+				? { ...gateItem(item, gate), onClick: () => {} }
+				: item,
+		),
+	};
+}

@@ -8,8 +8,26 @@ from fastapi import FastAPI
 from starlette_admin import DropDown
 from starlette_admin.contrib.sqla import Admin
 
+from invana.activity.models import (
+    Approval,
+    Notification,
+    NotificationChannel,
+    NotificationCursor,
+    NotificationDelivery,
+    NotificationRule,
+    Schedule,
+    ScheduleFiring,
+)
 from invana.apps.agents.models import Agent
 from invana.apps.boards.models import Board, BoardVersion
+from invana.apps.datasets.models import (
+    Dataset,
+    DatasetBinding,
+    DatasetConformance,
+    DatasetRecord,
+    DatasetStandard,
+    DatasetVersion,
+)
 from invana.apps.govern.models import Lens, RunTouch
 from invana.apps.graphs.models import Graph, GraphConnection, GraphMember
 from invana.apps.llm_providers.models import LLMModel, LLMProvider
@@ -21,6 +39,7 @@ from invana.apps.modeller.models import (
     GraphVersion,
     IndexDefinition,
     ModelLink,
+    ModelPublishReview,
     NodeTypeDefinition,
     PropertyKeyDefinition,
     SchemaProjection,
@@ -37,13 +56,34 @@ from invana.apps.skills.models import (
     SkillVersion,
     SkillVersionClarification,
 )
+from invana.apps.standards.models import Standard, StandardVersion
 from invana.apps.task_plans.models import Task as PlanTask
 from invana.apps.task_plans.models import TaskPlan
-from invana.apps.work.models import Project, ProjectAssignment, Task, TaskDependency
+from invana.apps.work.models import (
+    BranchFinding,
+    Project,
+    ProjectAssignment,
+    ProjectBranch,
+    ProjectDecision,
+    ProjectFinding,
+    ProjectProposal,
+    ProjectReport,
+    ProjectReportVersion,
+    ProjectSimulation,
+    Task,
+    TaskDependency,
+)
 from invana.core.auth.models import PersonalAccessToken, RefreshToken, User
 from invana.core.events.models import Event
 from invana.runtime.models import (
     Emission,
+    EnvelopeOutcome,
+    EvalBudget,
+    EvalCase,
+    EvalResult,
+    EvalSet,
+    McpServer,
+    PluginState,
     ProjectionTemplate,
     TaskPrompt,
     TaskRun,
@@ -51,12 +91,22 @@ from invana.runtime.models import (
 )
 from invana.server.admin.auth import SuperuserAuthProvider
 from invana.server.agents.admin import AgentView
+from invana.server.approvals.admin import ApprovalView
 from invana.server.auth.admin import (
     PersonalAccessTokenView,
     RefreshTokenView,
     UserView,
 )
 from invana.server.boards.admin import BoardVersionView, BoardView
+from invana.server.datasets.admin import (
+    DatasetBindingView,
+    DatasetConformanceView,
+    DatasetRecordView,
+    DatasetStandardView,
+    DatasetVersionView,
+    DatasetView,
+)
+from invana.server.evals.admin import EvalBudgetView, EvalCaseView, EvalResultView, EvalSetView
 from invana.server.events.admin import EventView
 from invana.server.govern.admin import LensView, RunTouchView
 from invana.server.graphs.admin import (
@@ -73,6 +123,7 @@ from invana.server.modeller.admin import (
     GraphVersionView,
     IndexDefinitionView,
     ModelLinkView,
+    ModelPublishReviewView,
     NodeTypeDefinitionView,
     PropertyKeyDefinitionView,
     SchemaProjectionView,
@@ -80,6 +131,14 @@ from invana.server.modeller.admin import (
     TypePropertyMappingView,
     ValidationRuleView,
 )
+from invana.server.notifications.admin import (
+    NotificationChannelView,
+    NotificationCursorView,
+    NotificationDeliveryView,
+    NotificationRuleView,
+    NotificationView,
+)
+from invana.server.plugins.admin import EnvelopeOutcomeView, McpServerView, PluginStateView
 from invana.server.rules.admin import RuleVersionView, RuleView
 from invana.server.runtime.admin import (
     EmissionView,
@@ -89,6 +148,7 @@ from invana.server.runtime.admin import (
     TaskRunView,
     TaskStreamView,
 )
+from invana.server.schedules.admin import ScheduleFiringView, ScheduleView
 from invana.server.sessions.admin import (
     SessionMessageView,
     SessionView,
@@ -99,9 +159,18 @@ from invana.server.skills.admin import (
     SkillVersionView,
     SkillView,
 )
+from invana.server.standards.admin import StandardVersionView, StandardView
 from invana.server.task_plans.admin import PlanTaskView, TaskPlanView
 from invana.server.work.admin import (
+    BranchFindingView,
     ProjectAssignmentView,
+    ProjectBranchView,
+    ProjectDecisionView,
+    ProjectFindingView,
+    ProjectProposalView,
+    ProjectReportVersionView,
+    ProjectReportView,
+    ProjectSimulationView,
     ProjectView,
     TaskDependencyView,
     TaskView,
@@ -231,6 +300,7 @@ def mount_admin(app: FastAPI) -> None:
                 ModelLinkView(ModelLink, label="Model links"),
                 TypeCountSnapshotView(TypeCountSnapshot, label="Count snapshots"),
                 GraphQueryLogView(GraphQueryLog, label="Query log"),
+                ModelPublishReviewView(ModelPublishReview, label="Publish reviews"),
             ],
         ),
     )
@@ -260,6 +330,10 @@ def mount_admin(app: FastAPI) -> None:
                 EmissionView(Emission, label="Emissions", icon="fa fa-square-poll-vertical"),
                 ProjectionTemplateView(ProjectionTemplate, label="Projection templates", icon="fa fa-table-cells"),
                 TaskPromptView(TaskPrompt, label="Run prompts", icon="fa fa-circle-check"),
+                EvalSetView(EvalSet, label="Eval sets", icon="fa fa-vial"),
+                EvalCaseView(EvalCase, label="Eval cases", icon="fa fa-list-ol"),
+                EvalResultView(EvalResult, label="Eval results", icon="fa fa-square-check"),
+                EvalBudgetView(EvalBudget, label="Eval budgets", icon="fa fa-gauge"),
             ],
         ),
     )
@@ -275,6 +349,14 @@ def mount_admin(app: FastAPI) -> None:
                 PlanTaskView(PlanTask, label="Plan tasks", icon="fa fa-diagram-project"),
                 ProjectView(Project, label="Projects", icon="fa fa-folder-open"),
                 ProjectAssignmentView(ProjectAssignment, label="Project staffing", icon="fa fa-user-plus"),
+                ProjectBranchView(ProjectBranch, label="Project branches", icon="fa fa-code-branch"),
+                ProjectFindingView(ProjectFinding, label="Project findings", icon="fa fa-magnifying-glass"),
+                BranchFindingView(BranchFinding, label="Branch findings", icon="fa fa-link"),
+                ProjectDecisionView(ProjectDecision, label="Project decisions", icon="fa fa-gavel"),
+                ProjectProposalView(ProjectProposal, label="Project proposals", icon="fa fa-lightbulb"),
+                ProjectReportView(ProjectReport, label="Project reports", icon="fa fa-file-lines"),
+                ProjectReportVersionView(ProjectReportVersion, label="Report versions", icon="fa fa-file-signature"),
+                ProjectSimulationView(ProjectSimulation, label="Project simulations", icon="fa fa-flask"),
                 TaskView(Task, label="Tasks", icon="fa fa-list-check"),
                 TaskDependencyView(TaskDependency, label="Task dependencies", icon="fa fa-arrow-right-long"),
             ],
@@ -290,6 +372,58 @@ def mount_admin(app: FastAPI) -> None:
             views=[
                 BoardView(Board, label="Boards", icon="fa fa-diagram-project"),
                 BoardVersionView(BoardVersion, label="Board versions", icon="fa fa-clock-rotate-left"),
+            ],
+        ),
+    )
+
+    # ── Datasets, above Graphs (docs/for-developers/modules/bring-data-in/features/datasets.md)
+    # ──────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Datasets",
+            icon="fa fa-table",
+            views=[
+                DatasetView(Dataset, label="Datasets", icon="fa fa-table"),
+                DatasetVersionView(DatasetVersion, label="Dataset versions", icon="fa fa-clock-rotate-left"),
+                DatasetRecordView(DatasetRecord, label="Dataset records", icon="fa fa-list"),
+                DatasetBindingView(DatasetBinding, label="Dataset bindings", icon="fa fa-link"),
+                DatasetStandardView(DatasetStandard, label="Dataset standards", icon="fa fa-ruler"),
+                DatasetConformanceView(DatasetConformance, label="Dataset conformance", icon="fa fa-check-double"),
+                StandardView(Standard, label="Standards", icon="fa fa-ruler-combined"),
+                StandardVersionView(StandardVersion, label="Standard versions", icon="fa fa-clock-rotate-left"),
+            ],
+        ),
+    )
+
+    # ── Schedules, notifications, approvals (docs/for-developers/modules/operate/features/notifications.md)
+    # ──────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Schedules & notifications",
+            icon="fa fa-bell",
+            views=[
+                ScheduleView(Schedule, label="Schedules", icon="fa fa-clock"),
+                ScheduleFiringView(ScheduleFiring, label="Firings", icon="fa fa-bolt"),
+                NotificationRuleView(NotificationRule, label="Notification rules", icon="fa fa-filter"),
+                NotificationChannelView(NotificationChannel, label="Channels", icon="fa fa-tower-broadcast"),
+                NotificationView(Notification, label="Inbox rows", icon="fa fa-inbox"),
+                NotificationDeliveryView(NotificationDelivery, label="Deliveries", icon="fa fa-paper-plane"),
+                NotificationCursorView(NotificationCursor, label="Cursors", icon="fa fa-bookmark"),
+                ApprovalView(Approval, label="Approvals", icon="fa fa-stamp"),
+            ],
+        ),
+    )
+
+    # ── Plugins (docs/for-developers/modules/platform/features/tool-plugins.md)
+    # ──────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Plugins",
+            icon="fa fa-plug",
+            views=[
+                PluginStateView(PluginState, label="Plugin states", icon="fa fa-toggle-on"),
+                EnvelopeOutcomeView(EnvelopeOutcome, label="Envelope outcomes", icon="fa fa-envelope-open"),
+                McpServerView(McpServer, label="MCP servers", icon="fa fa-server"),
             ],
         ),
     )

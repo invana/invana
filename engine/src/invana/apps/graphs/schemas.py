@@ -249,3 +249,56 @@ class ContentionRead(BaseModel):
     #: proceed; these say how many crossings may be in flight, and a Graph
     #: stalled on `graphdb` with two runs going is invisible without them.
     pools: list[dict] = []
+
+
+# ---------------------------------------------------------------------------
+# Members and Graph roles (docs/for-developers/modules/identity-and-access/features/roles.md)
+# ---------------------------------------------------------------------------
+
+
+class MemberRead(BaseModel):
+    """One member of a Graph and the Graph roles they hold."""
+
+    #: What rules, schedules and approvals store a member by.
+    user_id: str
+    username: str
+    first_name: str
+    last_name: str | None = None
+    roles: list[str]
+    added_at: datetime
+
+
+class MemberListResponse(BaseModel):
+    items: list[MemberRead]
+    total: int
+
+
+class MemberAdd(BaseModel):
+    """Add a member: ``user`` is an email or a username; no roles means ``viewer``."""
+
+    user: str = Field(min_length=1, max_length=320)
+    roles: list[str] = Field(default_factory=list)
+
+
+class MemberUpdate(BaseModel):
+    """Replace a member's roles; an empty list leaves them a ``viewer``."""
+
+    roles: list[str]
+
+
+class AccessArea(BaseModel):
+    """One area of a Graph: the role that changes it, and whether the caller may."""
+
+    area: str
+    label: str
+    role: str
+    allowed: bool
+    #: Usernames that hold the role, owners included — who to ask.
+    holders: list[str]
+
+
+class AccessRead(BaseModel):
+    """What the caller may change in this Graph. Reading is never gated."""
+
+    roles: list[str]
+    areas: list[AccessArea]

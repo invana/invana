@@ -1,0 +1,17 @@
+key = "validate_records"
+version = "1.0.0"
+summary = "Check every record against the model's published version."
+bound = "ingest"
+side_effect = "write"
+requires = []
+resources = ["cpu"]
+
+[args]
+root = { type = "str" }
+model = { type = "str" }
+
+[outputs]
+total = "int"
+reported = "int"
+model = "str"
+version = "int"

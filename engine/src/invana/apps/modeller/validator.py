@@ -394,6 +394,21 @@ class SchemaValidator:
 
         return errors
 
+    def validate_edge_properties(self, label: str, properties: dict[str, Any]) -> list[ValidationError]:
+        """Validate an existing edge's properties, leaving its endpoints aside.
+
+        A stored edge does not carry its endpoints' labels, so a migration scan
+        checks endpoints by reading them per label and the properties here.
+        """
+        if self._cache is None:
+            return []
+        et = self._cache.edge_types.get(label)
+        if et is None:
+            return [ValidationError(code="unknown_label", message=f"Edge label '{label}' is not defined.")]
+        mappings = list(et.property_mappings) if et.property_mappings else []
+        label_constraints = self._cache.constraints_by_label.get(label, [])
+        return self._validate_properties(properties, mappings, label_constraints, self._cache.validation_mode)
+
     # ------------------------------------------------------------------
     # Property validation (shared)
     # ------------------------------------------------------------------

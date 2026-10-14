@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.work.models import OPEN_TASK_STATUSES, Task, TaskStatus
@@ -22,8 +22,11 @@ class TaskQuerySet:
         status: list[str] | None = None,
         parent_id: str | None = None,
         include_sub_tasks: bool = True,
+        exclude_project_ids: set[str] | None = None,
     ) -> list[Task]:
         stmt = select(Task).where(Task.graph_id == graph_id)
+        if exclude_project_ids:
+            stmt = stmt.where(or_(Task.project_id.is_(None), Task.project_id.not_in(exclude_project_ids)))
         if project_id is not None:
             stmt = stmt.where(Task.project_id == project_id)
         if assignee_id is not None:

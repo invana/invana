@@ -1,9 +1,13 @@
 """HTTP views for Rules.
 
 Parse, call one manager, serialise (migration-plan §4.1). A Graph's list is its
-invariants; a Project's is its working rules, with the Graph's invariants
-alongside as ``inherited`` — read-only, so the panel can grey them
-([C3](docs/for-developers/modules/skills/features/rules.md)).
+invariants, with the install's rules alongside as ``inherited``; a Project's is
+its working rules, with the install's rules and the Graph's invariants as
+``inherited`` — read-only, in assembly order, so the panel can grey them
+(docs/for-developers/modules/skills/features/rules.md, C3).
+
+The install's own rules have no Graph and no citations read here: their
+routes read and write the rule, and writing is an install Admin's.
 """
 
 from __future__ import annotations
@@ -57,10 +61,11 @@ async def list_invariants(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> RuleListResponse:
-    """Every invariant on this Graph, active and inactive, in offer order."""
+    """Every invariant on this Graph, active and inactive, in offer order, and the install rules above them."""
     items = await rules.invariants(session, graph_id=graph.id)
     reads = await _with_citations(session, graph_id=graph.id, items=items)
-    return RuleListResponse(items=reads, total=len(reads))
+    inherited = await _with_citations(session, graph_id=graph.id, items=await rules.install(session))
+    return RuleListResponse(items=reads, total=len(reads), inherited=inherited)
 
 
 async def create_invariant(
@@ -79,19 +84,19 @@ async def create_invariant(
 
 async def list_working_rules(
     key: str = Path(...),
-    _: GraphMember = Depends(require_graph_member),
+    member: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> RuleListResponse:
-    """This Project's working rules, and the Graph invariants it inherits.
+    """This Project's working rules, and the install rules and Graph invariants it inherits.
 
     The inherited half is returned rather than merged: they are read-only here
     and the panel shows them above, greyed — a project that edits an invariant
     is editing the Graph, which is a different act on a different surface.
     """
-    project = await projects.get_by_key(session, key=key, graph_id=graph.id)
+    project = await projects.get_by_key(session, key=key, graph_id=graph.id, reader_id=member.user_id)
     items = await rules.working(session, project_id=project.id)
-    inherited = await rules.invariants(session, graph_id=graph.id)
+    inherited = [*await rules.install(session), *await rules.invariants(session, graph_id=graph.id)]
     reads = await _with_citations(session, graph_id=graph.id, items=items)
     return RuleListResponse(
         items=reads,
@@ -103,12 +108,12 @@ async def list_working_rules(
 async def create_working_rule(
     payload: RuleCreate,
     key: str = Path(...),
-    _: GraphMember = Depends(require_graph_member),
+    member: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> RuleRead:
-    project = await projects.get_by_key(session, key=key, graph_id=graph.id)
+    project = await projects.get_by_key(session, key=key, graph_id=graph.id, reader_id=member.user_id)
     rule = await rules.create(session, graph_id=graph.id, project_id=project.id, payload=payload, actor_id=user.id)
     return RuleRead.model_validate(rule)
 
@@ -189,3 +194,69 @@ async def rule_citations(
     """
     rule = await rules.get(session, rule_id=rule_id, graph_id=graph.id)
     return await citations.for_rule(session, rule=rule, graph_id=graph.id, limit=limit)
+
+
+# ── the install's rules ───────────────────────────────────────────────────────
+
+
+async def list_install_rules(
+    _: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RuleListResponse:
+    """Every install rule, active and inactive, in offer order."""
+    reads = [RuleRead.model_validate(r) for r in await rules.install(session)]
+    return RuleListResponse(items=reads, total=len(reads))
+
+
+async def create_install_rule(
+    payload: RuleCreate,
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RuleRead:
+    """An install rule — offered in every Graph, and checked where its check says."""
+    return RuleRead.model_validate(await rules.create_install(session, payload=payload, actor=user))
+
+
+async def get_install_rule(
+    rule_id: str = Path(...),
+    _: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RuleRead:
+    return RuleRead.model_validate(await rules.get_install(session, rule_id=rule_id))
+
+
+async def update_install_rule(
+    payload: RuleUpdate,
+    rule_id: str = Path(...),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RuleRead:
+    """Reword, re-check or reorder it. A new statement, check or mode publishes the next version."""
+    return RuleRead.model_validate(await rules.update_install(session, rule_id=rule_id, payload=payload, actor=user))
+
+
+async def activate_install_rule(
+    rule_id: str = Path(...),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RuleRead:
+    return RuleRead.model_validate(await rules.set_install_active(session, rule_id=rule_id, active=True, actor=user))
+
+
+async def deactivate_install_rule(
+    rule_id: str = Path(...),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RuleRead:
+    """Stop offering and checking it. Its versions and past checks stay."""
+    return RuleRead.model_validate(await rules.set_install_active(session, rule_id=rule_id, active=False, actor=user))
+
+
+async def list_install_rule_versions(
+    rule_id: str = Path(...),
+    _: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RuleVersionListResponse:
+    rule = await rules.get_install(session, rule_id=rule_id)
+    reads = [RuleVersionRead.model_validate(v) for v in await rules.list_versions(session, rule=rule)]
+    return RuleVersionListResponse(items=reads, total=len(reads))

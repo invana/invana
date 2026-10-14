@@ -1,0 +1,73 @@
+# A slice of schema.org for the semantic-import boards (modeller.models.new.ontology[.preview]),
+# for when the browser cannot read schema.org itself. Studio: Modeller › Models › More actions ›
+# From an ontology › File; pick Person, Organization, Product. CLI:
+#   invana models import --graph <g> --ontology demos/arabidopsis/semantic/schema-org-subset.ttl --types Person,Organization,Product --dry-run
+@prefix schema: <https://schema.org/> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+
+<https://schema.org/> rdfs:label "schema.org" .
+
+schema:Thing a rdfs:Class ; rdfs:label "Thing" ; rdfs:comment "The most generic type of item." .
+schema:Person a rdfs:Class ; rdfs:label "Person" ; rdfs:subClassOf schema:Thing ;
+    rdfs:comment "A person (alive, dead, undead, or fictional)." .
+schema:Organization a rdfs:Class ; rdfs:label "Organization" ; rdfs:subClassOf schema:Thing ;
+    rdfs:comment "An organization such as a school, NGO, corporation, club, etc." .
+schema:Corporation a rdfs:Class ; rdfs:label "Corporation" ; rdfs:subClassOf schema:Organization ;
+    rdfs:comment "Organization: A business corporation." .
+schema:Product a rdfs:Class ; rdfs:label "Product" ; rdfs:subClassOf schema:Thing ;
+    owl:sameAs <http://www.wikidata.org/entity/Q2424752> ;
+    rdfs:comment "Any offered product or service." .
+schema:PostalAddress a rdfs:Class ; rdfs:label "PostalAddress" ; rdfs:subClassOf schema:Thing .
+schema:Brand a rdfs:Class ; rdfs:label "Brand" ; rdfs:subClassOf schema:Thing .
+schema:Offer a rdfs:Class ; rdfs:label "Offer" ; rdfs:subClassOf schema:Thing .
+schema:Event a rdfs:Class ; rdfs:label "Event" ; rdfs:subClassOf schema:Thing .
+schema:Place a rdfs:Class ; rdfs:label "Place" ; rdfs:subClassOf schema:Thing .
+
+schema:Organization rdfs:subClassOf [ a owl:Restriction ; owl:onProperty schema:name ; owl:minCardinality 1 ] .
+
+schema:name a rdf:Property ; rdfs:label "name" ;
+    schema:domainIncludes schema:Thing ; schema:rangeIncludes schema:Text .
+schema:description a rdf:Property ; rdfs:label "description" ;
+    schema:domainIncludes schema:Thing ; schema:rangeIncludes schema:Text .
+schema:url a rdf:Property ; rdfs:label "url" ;
+    schema:domainIncludes schema:Thing ; schema:rangeIncludes schema:URL .
+schema:birthDate a rdf:Property ; rdfs:label "birthDate" ;
+    schema:domainIncludes schema:Person ; schema:rangeIncludes schema:Date .
+schema:email a rdf:Property ; rdfs:label "email" ;
+    schema:domainIncludes schema:Person , schema:Organization ; schema:rangeIncludes schema:Text .
+schema:foundingDate a rdf:Property ; rdfs:label "foundingDate" ;
+    schema:domainIncludes schema:Organization ; schema:rangeIncludes schema:Date .
+schema:tickerSymbol a rdf:Property ; rdfs:label "tickerSymbol" ;
+    schema:domainIncludes schema:Corporation ; schema:rangeIncludes schema:Text .
+schema:sku a rdf:Property ; rdfs:label "sku" ;
+    schema:domainIncludes schema:Product ; schema:rangeIncludes schema:Text .
+schema:streetAddress a rdf:Property ; rdfs:label "streetAddress" ;
+    schema:domainIncludes schema:PostalAddress ; schema:rangeIncludes schema:Text .
+schema:price a rdf:Property ; rdfs:label "price" ;
+    schema:domainIncludes schema:Offer ; schema:rangeIncludes schema:Number , schema:Text .
+
+schema:founder a rdf:Property ; rdfs:label "founder" ;
+    schema:domainIncludes schema:Organization ; schema:rangeIncludes schema:Person .
+schema:worksFor a rdf:Property ; rdfs:label "worksFor" ;
+    schema:domainIncludes schema:Person ; schema:rangeIncludes schema:Organization .
+schema:address a rdf:Property ; rdfs:label "address" ;
+    schema:domainIncludes schema:Organization , schema:Person ;
+    schema:rangeIncludes schema:PostalAddress , schema:Text .
+schema:brand a rdf:Property ; rdfs:label "brand" ;
+    schema:domainIncludes schema:Product , schema:Organization ; schema:rangeIncludes schema:Brand .
+schema:offers a rdf:Property ; rdfs:label "offers" ;
+    schema:domainIncludes schema:Product ; schema:rangeIncludes schema:Offer .
+schema:location a rdf:Property ; rdfs:label "location" ;
+    schema:domainIncludes schema:Event ; schema:rangeIncludes schema:Place .
+schema:owns a rdf:Property ; rdfs:label "owns" ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( schema:Person schema:Organization ) ] ;
+    schema:rangeIncludes schema:Product .
+
+schema:Text a schema:DataType , rdfs:Class ; rdfs:label "Text" .
+schema:URL a rdfs:Class ; rdfs:subClassOf schema:Text ; rdfs:label "URL" .
+schema:Number a schema:DataType , rdfs:Class ; rdfs:label "Number" .
+schema:Date a schema:DataType , rdfs:Class ; rdfs:label "Date" .
+schema:DataType a rdfs:Class ; rdfs:subClassOf rdfs:Class .

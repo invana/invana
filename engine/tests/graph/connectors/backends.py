@@ -131,3 +131,13 @@ BACKENDS = (NEO4J, MEMGRAPH, ARCADEDB, JANUSGRAPH)
 
 CYPHER_BACKENDS = tuple(b for b in BACKENDS if b.language == QueryLanguage.CYPHER)
 GREMLIN_BACKENDS = tuple(b for b in BACKENDS if b.language == QueryLanguage.GREMLIN)
+
+
+async def has_airways(connector: BaseConnector) -> bool:
+    """Whether the database holds the airways sample.
+
+    Tests that only read and count need data already loaded; they skip on an
+    empty database (such as an isolated test container) instead of failing,
+    and never seed it themselves.
+    """
+    return bool((await connector.execute("MATCH (a:airport) RETURN a LIMIT 1")).records)

@@ -33,10 +33,11 @@ CONNECTION_VERSION_ACKNOWLEDGE = "connection.version_acknowledge"
 CONNECTION_VERSION_DECLARE = "connection.version_declare"
 
 # ── Members ───────────────────────────────────────────────────────────────────
-# Membership is binary post-docs/for-developers/modules/identity-and-access/features/membership.md; the owner is added
-# once at graph creation.
-# Role-change / removal / invitation actions were removed with the feature.
+# docs/for-developers/modules/identity-and-access/features/roles.md — details carry
+# ``username`` and ``roles``; the creator's own add is ``via: graph.create``.
 MEMBER_ADD = "member.add"
+MEMBER_REMOVE = "member.remove"
+MEMBER_ROLES = "member.roles"
 
 # ── LLM providers (docs/for-developers/modules/operate/features/audit-and-activity.md)
 # ─────────────────────────────────────────────
@@ -84,12 +85,13 @@ AGENT_SKILL_BOUND = "agent.skill_bound"
 AGENT_SKILL_UNBOUND = "agent.skill_unbound"
 
 # ── Rules (docs/for-developers/modules/skills/features/rules.md) ──────────────
-# A statement that is always true in its scope. Offered and cited, never
-# enforced — there is no ``rule.enforce`` because a rule does not fire.
+# A statement that is always true in its scope, offered and cited. A rule with
+# a check is also read at acts; a failed warn or report is a ``rule.check``.
 RULE_CREATE = "rule.create"
 RULE_PUBLISH = "rule.publish"
 RULE_ACTIVATE = "rule.activate"
 RULE_DEACTIVATE = "rule.deactivate"
+RULE_CHECK = "rule.check"
 # The model reported following the skill on a step (docs/for-developers/modules/work/spec.md — a
 # self-report, labelled as one; ``skill.invoke`` needs executable skills).
 SKILL_APPLY = "skill.apply"
@@ -113,6 +115,9 @@ MODEL_DISCARD = "model.discard"
 MODEL_EXPORT = "model.export"
 MODEL_IMPORT = "model.import"
 MODEL_UPGRADE = "model.upgrade"
+# A breaking publish asked for review, and each end that is not a publish — the
+# status rides in details (docs/for-developers/modules/connect-and-model/features/publish-review.md)
+MODEL_REVIEW = "model.review"
 
 # ── Model links (docs/for-developers/modules/connect-and-model/features/stitch-models.md)
 # ──────────────────────────────────────────
@@ -134,6 +139,15 @@ THINKING_CANCEL = "run.cancel"  # stopped by the user; cascades to children
 THINKING_DELEGATE = "run.delegate"  # a step opened a child run (docs/for-developers/modules/work/spec.md)
 THINKING_RESUME = "run.resume"  # a clarification was answered
 
+# ── Evals (docs/for-developers/modules/skills/features/evals.md) ─────────────────
+EVAL_SET_UPDATE = "eval_set.update"  # judge pin, rubric
+EVAL_CASE_CREATE = "eval_case.create"  # written, proposed or promoted from a run
+EVAL_CASE_UPDATE = "eval_case.update"  # accepted, relabelled or retired
+EVAL_CASE_DELETE = "eval_case.delete"
+EVAL_RUN = "eval.run"  # an eval run settled, with its gate verdict
+EVAL_DEGRADED = "eval.degraded"  # a drift run fell behind the last live run
+EVAL_BUDGET_UPDATE = "eval_budget.update"
+
 # ── Projects (docs/for-developers/modules/work/spec.md) ────────────────────────────────────────────────────
 PROJECT_CREATE = "project.create"
 PROJECT_UPDATE = "project.update"
@@ -142,6 +156,17 @@ PROJECT_UNARCHIVE = "project.unarchive"  # archiving is reversible, and the way 
 PROJECT_STAFF = "project.staff"
 PROJECT_UNSTAFF = "project.unstaff"
 PROJECT_DELETE = "project.delete"
+# The records a quest is made of (docs/for-developers/modules/work/features/branches-and-decisions.md)
+BRANCH_FORK = "branch.fork"
+FINDING_ADD = "finding.add"
+FINDING_REVIEW = "finding.review"
+DECISION_RECORD = "decision.record"  # a verdict and a decision; a superseding one names its predecessor
+PROPOSAL_SUBMIT = "proposal.submit"
+PROPOSAL_ACCEPT = "proposal.accept"
+PROPOSAL_REJECT = "proposal.reject"
+REPORT_GENERATE = "report.generate"
+REPORT_PUBLISH = "report.publish"
+SIMULATION_RUN = "simulation.run"  # a simulator run opened on a branch (modules/work/features/simulation.md)
 
 # ── Tasks — the assignable unit of work (docs/for-developers/modules/work/spec.md) ─────────────────────────
 TASK_CREATE = "task.create"
@@ -177,6 +202,20 @@ WORKFLOW_PROMOTE = "workflow.promote"  # a served plan became a library entry
 # ── Datasets / ingestion (docs/for-developers/modules/bring-data-in/features/load-data.md)
 # ────────────────────────────────────────────
 DATASET_IMPORT = "dataset.import"
+
+# ── Datasets, above Graphs (docs/for-developers/modules/bring-data-in/features/datasets.md)
+# A dataset's events carry no graph_id; only a bind belongs to a Graph.
+DATASET_CREATE = "dataset.create"
+DATASET_VERSION = "dataset.version"  # mints a version
+DATASET_UPDATE = "dataset.update"  # metadata — never a version
+DATASET_RETRACT = "dataset.retract"
+DATASET_BIND = "dataset.bind"
+DATASET_STANDARD_ATTACH = "dataset.standard_attach"
+DATASET_STANDARD_DETACH = "dataset.standard_detach"
+
+# ── Standards, above Graphs (docs/for-developers/modules/bring-data-in/features/standards.md)
+STANDARD_CREATE = "standard.create"
+STANDARD_VERSION = "standard.version"  # mints a version
 
 # ── Setup ─────────────────────────────────────────────────────────────────────
 SETUP_COMPLETE = "setup.complete"
@@ -217,6 +256,31 @@ BOARD_CREATE = "board.create"
 BOARD_UPDATE = "board.update"
 BOARD_DELETE = "board.delete"
 
+# ── Schedules, notifications, approvals ───────────────────────────────────────
+# docs/for-developers/modules/operate/features/schedules.md · notifications.md ·
+# approvals.md. A rule never matches a delivery or a reminder, so nothing it
+# sends can wake it again.
+SCHEDULE_CREATE = "schedule.create"
+SCHEDULE_UPDATE = "schedule.update"
+SCHEDULE_PAUSE = "schedule.pause"
+SCHEDULE_RESUME = "schedule.resume"
+SCHEDULE_DELETE = "schedule.delete"
+SCHEDULE_FIRE = "schedule.fire"
+SCHEDULE_SKIP = "schedule.skip"
+NOTIFICATION_RULE_CREATE = "notification_rule.create"
+NOTIFICATION_RULE_UPDATE = "notification_rule.update"
+NOTIFICATION_RULE_DELETE = "notification_rule.delete"
+CHANNEL_CREATE = "channel.create"
+CHANNEL_DELETE = "channel.delete"
+DELIVERY_FAIL = "delivery.fail"
+APPROVAL_REQUEST = "approval.request"
+APPROVAL_APPROVE = "approval.approve"
+APPROVAL_DECLINE = "approval.decline"
+APPROVAL_EXPIRE = "approval.expire"
+APPROVAL_REMIND = "approval.remind"
+UNMATCHED_PREFIXES: tuple[str, ...] = ("delivery.", "notification.")
+UNMATCHED_ACTIONS: frozenset[str] = frozenset({APPROVAL_REMIND})
+
 # ── System-emitted events (actor_type=system) ─────────────────────────────────
 SYSTEM_CONNECTION_HEALTH_CHECK = "system.connection_health_check"
 SYSTEM_CONNECTION_RECONNECT = "system.connection_reconnect"
@@ -239,6 +303,7 @@ TARGET_MODEL = "graph_model"
 TARGET_MODEL_LINK = "model_link"
 TARGET_PROJECTION_TEMPLATE = "projection_template"
 TARGET_DATASET = "dataset"
+TARGET_STANDARD = "standard"
 TARGET_USER = "user"
 TARGET_QUERY = "query"
 TARGET_SESSION = "session"
@@ -247,5 +312,27 @@ TARGET_PROJECT = "project"
 TARGET_TASK = "task"
 TARGET_AGENT = "agent"
 TARGET_THINKING = "run"
+TARGET_EVAL_SET = "eval_set"
 TARGET_WORKFLOW = "workflow"
 TARGET_TOKEN = "personal_access_token"
+TARGET_SCHEDULE = "schedule"
+TARGET_NOTIFICATION_RULE = "notification_rule"
+TARGET_CHANNEL = "channel"
+TARGET_DELIVERY = "delivery"
+TARGET_APPROVAL = "approval"
+
+
+# ── The change log (docs/for-developers/modules/operate/features/change-log.md)
+# ──────────────────────────────────────────
+# The actions that mint a version of a versioned record, by target kind. The
+# change log is the events list narrowed to these — never a second record.
+CHANGE_ACTIONS_BY_TARGET: dict[str, frozenset[str]] = {
+    TARGET_SKILL: frozenset({SKILL_CREATE, SKILL_PUBLISH}),
+    TARGET_RULE: frozenset({RULE_CREATE, RULE_PUBLISH}),
+    TARGET_WORKFLOW: frozenset({WORKFLOW_PROMOTE}),
+    TARGET_AGENT: frozenset({AGENT_CREATE, AGENT_UPDATE, AGENT_SOUL_SET}),
+    # An import and an upgrade land as drafts; only publishing mints a version.
+    TARGET_MODEL: frozenset({MODEL_ACTIVATE, MODEL_COMMIT}),
+    TARGET_DATASET: frozenset({DATASET_VERSION}),
+}
+CHANGE_ACTIONS: frozenset[str] = frozenset().union(*CHANGE_ACTIONS_BY_TARGET.values())

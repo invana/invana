@@ -70,7 +70,7 @@ Six bands, seven top-level entries.
 | 0 | **Core** | `core/` — infrastructure | only other parts of `core` |
 | 1 | **Graph engine** | `graph/` — the drivers | `core` |
 | 2 | **Apps** | `apps/` — one folder per product domain | 0–1, and other apps **acyclically** |
-| 3 | **Runtime** | `runtime/` (today `run/`) | 0–2 |
+| 3 | **Runtime** | `runtime/` (today `run/`) · `plugins/` — every task type; non-independent siblings ([13.9 PL1](../modules/platform/features/plugins.md#decisions)) | 0–2, and each other |
 | 4 | **Activity** | `activity/` — the tree · notifications | 0–3 |
 | 5 | **Edge** | `server/` · `cli/` | anything below |
 
@@ -914,6 +914,7 @@ The target names — one per module, shared with Studio — are [module-structur
 | `activity/` | [Audit and activity 10.2](../modules/operate/features/audit-and-activity.md) — the **reader**. `core/events` is the record | 4 |
 | `activity/notifications` | Notifications — the inbox, its rules and its delivery. **Blocked**: no index row, no feature file | 4 |
 | `runtime` | [The runtime 13.8](../modules/platform/features/runtime.md) | 3 |
+| `plugins` | [Plugins 13.9](../modules/platform/features/plugins.md) | 3 |
 | `server` · `cli` | every module's API column · [13.3](../modules/platform/features/command-line.md) | 4 |
 
 A package serving more than one module is normal. A **module served by no package** is a gap; a
@@ -1270,6 +1271,7 @@ invana/
 ├── apps/          2   one product idea each · models · querysets · managers · schemas
 │   └── <app>/events.py    that app's verbs and target kinds, and how to describe one (E1)
 ├── runtime/       3   planner · interpreter · catalogue · executor · state · stream
+├── plugins/       3   every task type · sdk · registry · core/<plugin>/ (beside runtime, not above it)
 ├── activity/      4   reads every domain band · read only by the edge
 │   ├── managers/tree.py  the tree — per task, per agent, per Graph (10.2 C6). No models: it is derived
 │   └── notifications/    the inbox: thread, reason, read state (E5/E6) · rules · channels · deliveries (N4)

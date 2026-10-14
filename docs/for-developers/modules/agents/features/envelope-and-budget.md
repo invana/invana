@@ -19,7 +19,7 @@ anything is dispatched — so a plan outside the bounds costs nothing.
 |---|---|---|
 | C1 | Allowed steps | An explicit set; anything else is refused |
 | C2 | Pinned arguments | A step may be allowed only with certain arguments fixed |
-| C3 | Cost ceiling | Per run, and per window |
+| C3 | Token budget | Per run, and per calendar month — in tokens, never currency ([EB14](#decisions)) |
 | C3a | **Effort** | How hard it tries before it stops — steps, replans, clarifications. A bound of its own, not money and not character ([EB9](#decisions)) |
 | C4 | Depth and fan-out | How deep delegation may go and how wide |
 | C5 | Policy at the ceiling | Stop · ask · block — stated, not implicit |
@@ -61,7 +61,7 @@ flowchart TD
 | Agent page › *Skills & callables* › Callables | `6 of 25 callables`, each with its bound, its pinned arguments and what needs it; *Edit envelope* opens the allow-list against the whole catalogue, and pins, order and plans as JSON | `DataTable` · `BoundChip` |
 | The picker | Grouped by bound, with what is already allowed checked | `DataTable` · `Checkbox` · `BoundChip` |
 | Ceilings | value · what it bounds · **whether anything enforces it** (EB7), as tables by group — Budget and Reach on the agent's *Activity* tab beside the meters they cap, Effort on its *Thinking* tab ([AG23](author-an-agent.md#decisions)) — not a form of ten inputs. `agents/CeilingsTable.tsx`, one table per group — empty is *the default applies*, never zero, and an empty Effort cell shows the number a run reads ([EB12](#decisions)) | `DataTable` |
-| Budget strip | Spend against ceiling, per window | `MetricTile` with `meter` |
+| Budget strip | Tokens used against the budget, per window | `MetricTile` with `meter` |
 | A refused plan | *`nl-sweep@2` names `delegate`, which Analyst's envelope does not carry* — with `Open the plan` and `Hand to Coordinator` | `CannotAnswerCard` |
 
 ## Engine
@@ -69,7 +69,7 @@ flowchart TD
 | Thing | Shape |
 |---|---|
 | Envelope | `agents.envelope` JSON: `allow` (callable keys) · `pins` · `plans` (the reusable plans a Plan step may pick) · `entry` · `steps` for a fixed-step agent. Versioned with the agent, never a table. The ceilings are not in it — they are `budget` and `effort` |
-| Budget | per-run and per-window ceilings, with the policy at each |
+| Budget | per-run and per-month token budgets, with the policy at each |
 | Effort | `agents.effort` JSON — `max_steps` · `max_replans` · `max_clarifications`; a missing key is the Graph's default. Moved out of both `workflow_spec` and `budget`, each read as a fallback for one release |
 | Validation | performed by [envelope-validation](../../workflows/features/envelope-validation.md) before dispatch |
 | Events | `agent.envelope_updated · budget_updated · effort_updated · budget_exhausted` |
@@ -84,9 +84,8 @@ is `agents.effort` JSON ([EB9](#decisions)). [Data model § 5.1](../../../buildi
 
 | Key | Value | What it bounds | Enforced |
 |---|---|---|---|
-| `max_cost_usd_month` | `$40.00` | the agent's own spend ceiling. **Renamed from `max_cost_usd`**; both read for one release ([EB8](#decisions)) | declared · drawn against |
-| `max_cost_usd_run` | `$2.00` | per run. A plan may set less, never more | declared · drawn against ([EB7](#decisions)) |
-| `max_tokens` | | per run | unchanged |
+| `max_tokens_month` | `5,000,000` | the agent's tokens in a calendar month, across every run it opened | declared · drawn against ([EB7](#decisions)) |
+| `max_tokens_run` | `200,000` | tokens in one run. A session or a plan may set less, never more. `max_tokens` is its other name for one release ([EB8](#decisions)) | declared · drawn against ([EB7](#decisions)) |
 
 **Effort** — `agents.effort`
 
@@ -125,13 +124,15 @@ opening a row.
 | EB4 | A child's budget is a subset of its parent's. |
 | EB5 | An agent may propose tightening its own bounds, never loosening them. |
 | EB6 | **A ceiling the wire does not carry is one no screen can draw.** Every key of `effective_budget` rides `GET …/runs/{id}/trace`, not the two the first board happened to need. |
-| EB7 | **Declared is not the same as enforced, and the table says which.** `max_concurrent_runs` is enforced at admission and refuses naming the agent ([CC11](concurrency-and-contention.md)). `max_cost_usd_run` and `max_cost_usd_month` are declared and drawn against — stopping on a spend ceiling is EB2's *never during* and [orchestration § 0.10](../../../orchestration.md)'s budget approval. `max_fanout` is declared and unread until something dispatches a `map_over`. |
+| EB7 | **Declared is not the same as enforced, and the table says which.** `max_concurrent_runs` is enforced at admission and refuses naming the agent ([CC11](concurrency-and-contention.md)). `max_tokens_run` and `max_tokens_month` are declared and drawn against — stopping on a token budget is EB2's *never during* and [orchestration § 0.10](../../../orchestration.md)'s budget approval. `max_fanout` is declared and unread until something dispatches a `map_over`. |
 | EB10 | **The column is `envelope`, and its plan list is `plans`.** `workflow_spec` named a workflow where the thing is a bound, and `templates` named library plans with a word the product uses for projection templates. Both old names are read for one release, and the API answers both, so a reader that has not moved keeps working. |
 | EB9 | **Effort is its own bound, neither budget nor character.** Steps, replans and clarifications are not money, so they do not sit under a word that means money; and they decide what runs, so they cannot sit in the [soul](soul.md), which only chooses words ([SO2](soul.md#decisions)). They read like temperament and are enforced like a ceiling — a soul can make an agent *sound* persistent, only Effort makes it retry. No preset: three numbers set once, read on the Ceilings table. |
 | EB11 | **Effort is read by presence, from `effort` first, then `workflow_spec`, then `budget`.** `max_clarifications: 0` is an agent that never asks, never a fall-through to the default three. The migration copies each agent's numbers into `effort` without removing them, the seeded agents carry `effort` of their own, and a delegated child's effort is its parent's, narrowed key by key like its budget. |
 | EB12 | **An empty effort cell shows what a run reads.** Its placeholder is `effective_effort` — the default, or a number still carried on `workflow_spec` or `budget` (EB11) — never a dash, so an agent that inherits `max_clarifications 3` does not read as unbounded and one that never asks reads `0`. |
-| EB13 | **A run is drawn against the per-run ceiling it froze, and nothing stops it there.** `max_cost_usd_run` is the most the work may set: a session's spend per run is clamped to it and frozen on the run (AD21), and the run board reads that frozen number — never the agent's cap as it reads today. Reaching it pauses nothing mid-run (EB2); it is declared and drawn against (EB7), and a run's list row carries its spend beside it, absent when no step was priced. |
-| EB8 | **`max_cost_usd` is read as `max_cost_usd_month` for one release**, and answered back under its old name, so neither a row configured today nor a reader that has not moved yet loses its number on the rename. The release after this one drops both lines. |
+| EB13 | **A run is drawn against the per-run budget it froze, and nothing stops it there.** `max_tokens_run` is the most the work may set: a session's tokens per run are clamped to it and frozen on the run as `params.max_tokens_run` (AD21), and the run board reads that frozen number — never the agent's budget as it reads today. Reaching it pauses nothing mid-run (EB2); it is declared and drawn against (EB7), and a run's list row carries its tokens beside it. |
+| EB8 | **Two token budgets, each named by its window, and the old names are read for one release.** `max_tokens` is read as `max_tokens_run` and answered back under both names; when a row carries both, the smaller binds, because a ceiling read two ways must never widen. The money keys `max_cost_usd`, `max_cost_usd_month` and `max_cost_usd_run` stay on a row that carries them and on `sessions.max_cost_usd_run`, are answered back as stored, and bound nothing — no default carries them and no meter reads them. The release after this one drops every one of these reads. |
+| EB14 | **Budgets are in tokens, never currency.** What a token costs depends on each customer's subscription, so a money ceiling would mean something different on every install; a token count means the same everywhere. No default, meter, refusal or prompt names a currency. |
+| EB15 | **The month meter is tokens used, summed on read.** `tokens_this_month` is `tokens_in + tokens_out` over the agent's root runs that **started** this calendar month, and their own steps — the window `max_tokens_month` names, on `ix_task_runs_agent_started`. Eval runs are left out: they draw on the Graph's eval budget, shown apart. Tokens are always counted, so an agent with no run reads `0` — unlike a price, there is no *unknown*. |
 
 ## Not building
 

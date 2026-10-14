@@ -17,6 +17,11 @@ Its plan is the real one: five catalogue entries, ordered by what each declares
 it ``requires``, each carrying the **sentence it was drawn from**
 (``Task.source_span``). That is what makes the Playbook tab's sentence-to-step
 mapping true on a Graph's first day rather than after someone runs the planner.
+
+The skills a plugin ships (``plugins/<kind>/<plugin>/skills/<slug>/``) are
+seeded beside it the same way — ``origin = builtin``, idempotent by name, never
+deleted — but with their instructions only: a plugin skill's plan is generated
+from its prose, so it starts on the one-node plan every new skill starts on.
 """
 
 from __future__ import annotations
@@ -28,13 +33,16 @@ from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.models import Skill
 from invana.apps.skills.schemas import SkillCreate
 from invana.apps.task_plans.managers.task_plan import explode
-from invana.apps.task_plans.models import PlanKind, PlanOrigin, TaskPlan
+from invana.apps.task_plans.models import PlanKind, PlanOrigin, Task, TaskForm, TaskPlan
 from invana.apps.task_plans.querysets import TaskPlanQuerySet
 from invana.core.events.models import ActorKind
+from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 
 NAME = "Answer in natural language"
 PLAN_KEY = "skill:answer-in-nl"
+#: The one node a plugin skill's plan holds until it is drawn — the key a new skill's plan uses.
+PLUGIN_SKILL_NODE = "do-it"
 
 WHEN_TO_USE = "when someone asks a question of the graph in prose"
 DESCRIPTION = (
@@ -108,6 +116,7 @@ class BuiltinSkillSeeder:
         renamed it has made it theirs, and seeding a second copy beside it would
         be the product arguing with them.
         """
+        await self.ensure_plugin_skills(session, graph_id=graph_id)
         existing = await self.skills.skills_qs.by_name(session, graph_id=graph_id, name=NAME)
         if existing is not None:
             return None
@@ -121,7 +130,7 @@ class BuiltinSkillSeeder:
                 name=NAME,
                 description=DESCRIPTION,
                 kind=PlanKind.ask.value,
-                origin=PlanOrigin.builtin.value,
+                origin=PlanOrigin.packaged.value,
                 intent=[],
                 args_schema={},
                 source_skill_version_ids=[],
@@ -133,7 +142,7 @@ class BuiltinSkillSeeder:
             ),
         )
         steps = [step(key, **args) for key, args, _span in STEPS]
-        tasks = explode(plan.id, steps, requires=_requires())
+        tasks = explode(plan.id, steps, requires=_requires(), versions=load_plugins().versions())
         spans = {key: span for key, _args, span in STEPS}
         for task in tasks:
             task.source_span = spans.get(task.step_key or "")
@@ -155,3 +164,70 @@ class BuiltinSkillSeeder:
             origin="builtin",
             publish=True,
         )
+
+    async def ensure_plugin_skills(self, session: AsyncSession, *, graph_id: str) -> list[Skill]:
+        """Write every skill a loaded plugin ships into this Graph, if absent by name.
+
+        A plugin ships a skill's **instructions**, never its plan: the plan is
+        generated from the prose. So each is seeded the way a new skill starts —
+        published v1 over a one-node ``form: human`` plan born ``generated`` —
+        and the first draw replaces that node like any other drawn plan.
+        Returns the skills written this call.
+        """
+        written: list[Skill] = []
+        for plugin in load_plugins().plugins.values():
+            for manifest in plugin.skills:
+                if await self.skills.skills_qs.by_name(session, graph_id=graph_id, name=manifest.name) is not None:
+                    continue
+                plan = await self.plans_qs.add(
+                    session,
+                    TaskPlan(
+                        graph_id=graph_id,
+                        key=f"skill:{manifest.slug}",
+                        version=1,
+                        name=manifest.name,
+                        description=manifest.description,
+                        kind=PlanKind.ask.value,
+                        origin=PlanOrigin.generated.value,
+                        intent=[],
+                        args_schema={},
+                        source_skill_version_ids=[],
+                        reusable=False,
+                        created_by_kind="system",
+                    ),
+                )
+                await self.plans_qs.add_tasks(
+                    session,
+                    [
+                        Task(
+                            task_plan_id=plan.id,
+                            key=PLUGIN_SKILL_NODE,
+                            form=TaskForm.human.value,
+                            step_key=None,
+                            title=manifest.name,
+                            ordinal=0,
+                            args={},
+                            depends_on=[],
+                        )
+                    ],
+                )
+                skill = await self.skills.create(
+                    session,
+                    graph_id=graph_id,
+                    payload=SkillCreate(
+                        name=manifest.name,
+                        description=manifest.description,
+                        content=manifest.instructions,
+                        when_to_use=manifest.when_to_use,
+                    ),
+                    actor_id=None,
+                    actor_kind=ActorKind.system,
+                    plan_id=plan.id,
+                    origin="builtin",
+                    publish=True,
+                )
+                plan.source_skill_version_ids = [skill.current_version_id]
+                written.append(skill)
+        if written:
+            await session.flush()
+        return written

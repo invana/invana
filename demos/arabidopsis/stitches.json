@@ -1,0 +1,7 @@
+{
+  "name": "arabidopsis",
+  "datasets": [
+    "accession-phenotypes"
+  ],
+  "stitches": []
+}

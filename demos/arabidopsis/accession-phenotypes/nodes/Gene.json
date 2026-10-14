@@ -1,0 +1,34 @@
+[
+  {
+    "id": "G-FLC",
+    "properties": {
+      "name": "FLC",
+      "locus": "AT5G10140",
+      "function": "Represses flowering until winter has passed."
+    }
+  },
+  {
+    "id": "G-FRI",
+    "properties": {
+      "name": "FRI",
+      "locus": "AT4G00650",
+      "function": "Switches FLC on, so the plant waits for winter."
+    }
+  },
+  {
+    "id": "G-FT",
+    "properties": {
+      "name": "FT",
+      "locus": "AT1G65480",
+      "function": "The florigen — moves from leaf to shoot tip and starts flowering."
+    }
+  },
+  {
+    "id": "G-DOG1",
+    "properties": {
+      "name": "DOG1",
+      "locus": "AT5G45830",
+      "function": "Sets how long seed stays dormant."
+    }
+  }
+]

@@ -18,7 +18,7 @@ from invana.apps.modeller.managers.count_snapshots import degree_stats
 from invana.apps.modeller.models import TypeCountSnapshot
 from invana.apps.modeller.versioner import Versioner
 from invana.core.auth.models import User
-from tests.graph.connectors.backends import NEO4J
+from tests.graph.connectors.backends import NEO4J, has_airways
 
 TODAY = date(2026, 9, 27)
 
@@ -66,6 +66,8 @@ class TestSnapshots:
         connector = NEO4J.connector()
         await connector.connect()
         try:
+            if not await has_airways(connector):
+                pytest.skip("Neo4j holds no airways data to count")
             written = await CountSnapshotManager().take(
                 session, graph_id=graph_id, connector=connector, source="import", source_id=None, degrees=True
             )

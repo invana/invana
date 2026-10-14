@@ -17,45 +17,58 @@ from pathlib import Path
 
 import pytest
 
-from invana.apps.agents.registry import SEEDED_AGENTS, TEMPLATES
+from invana.apps.agents.registry import SEEDED_AGENTS
+from invana.plugins import load_plugins
+from invana.plugins.sdk.manifest import Bound, Entry, Type
 from invana.runtime.catalogue import CATALOGUE, TASKS
-from invana.runtime.catalogue.registry import Bound, Entry, Type
 
-CATALOGUE_DIR = Path(__file__).resolve().parents[2] / "src" / "invana" / "runtime" / "catalogue"
+CORE_DIR = Path(__file__).resolve().parents[2] / "src" / "invana" / "plugins" / "core"
+TEMPLATES = load_plugins().flows
+#: The core plugins' task types. An installed simulator adds its own beside them.
+CORE = {t.key for p in load_plugins().plugins.values() if p.manifest.kind == "core" for t in p.tasks}
 
-#: The closed set's size. Growth belongs in reusable TaskPlans, not here — so
+#: The core set's size. Growth belongs in reusable TaskPlans, not here — so
 #: changing this number is a decision, and the decision goes in
 #: `building-engine/task-model-migration.md` § 6.1 first.
-ENTRY_COUNT = 28
+ENTRY_COUNT = 29
 
-#: Modules that declare entries, and the one bound each of them names.
-BOUND_MODULES = {
-    "pure.py": Bound.none,
-    "graph_read.py": Bound.graph_read,
-    "ingest.py": Bound.ingest,
-    "graph_write.py": Bound.graph_write,
-    "schema_write.py": Bound.schema_write,
-    "llm.py": Bound.llm,
-    "work_write.py": Bound.work_write,
+#: Core plugins that declare task types, and the one bound each of them names.
+BOUND_PLUGINS = {
+    "pure": Bound.none,
+    "graph_read": Bound.graph_read,
+    "ingest": Bound.ingest,
+    "graph_write": Bound.graph_write,
+    "schema_write": Bound.schema_write,
+    "llm": Bound.llm,
+    "work_write": Bound.work_write,
 }
 
 #: An entry is a view: parse args, call **one manager in one app**, serialise
-#: the declared outputs (the-runtime-package.md § 4). These modules still reach
+#: the declared outputs (the-runtime-package.md § 4). These plugins still reach
 #: further; each row names what closes it.
 SPANS_ALLOWED = {
     # validate_proposal reconciles through apps/sessions into apps/modeller.
     # Closes when reconcile_proposal moves to an apps/modeller manager.
-    "schema_write.py": {"llm", "modeller", "sessions"},
+    "schema_write": {"llm", "modeller", "sessions"},
     # delegate opens a run against a work Task under a child agent.
     # Closes when delegate and create_task merge into one entry (§ 6.2).
-    "work_write.py": {"agents", "work"},
+    "work_write": {"agents", "work"},
 }
 
 
-def _apps_imported(path: Path) -> set[str]:
-    """The `invana.apps.<name>` packages this module imports, by name."""
+def _task_files(plugin: str) -> list[Path]:
+    """A plugin's task code — its ``run.py`` files and what they share, not the bodies beside them."""
+    root = CORE_DIR / plugin
+    return [
+        *sorted((root / "tasks").glob("*/run.py")),
+        *([root / "shared.py"] if (root / "shared.py").exists() else []),
+    ]
+
+
+def _apps_imported(paths: list[Path]) -> set[str]:
+    """The `invana.apps.<name>` packages these files import, by name."""
     names: list[str] = []
-    for node in ast.walk(ast.parse(path.read_text())):
+    for node in (n for path in paths for n in ast.walk(ast.parse(path.read_text()))):
         if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
             names.append(node.module)
         elif isinstance(node, ast.Import):
@@ -70,7 +83,7 @@ def _apps_imported(path: Path) -> set[str]:
 
 class TestClosed:
     def test_the_set_is_the_size_it_says_it_is(self) -> None:
-        assert len(CATALOGUE) == ENTRY_COUNT
+        assert len(CORE) == ENTRY_COUNT
         assert set(TASKS) == set(CATALOGUE)
 
     def test_every_entry_declares_all_four_fields(self) -> None:
@@ -95,30 +108,27 @@ class TestClosed:
 
 
 class TestNoEntrySpansTwoBounds:
-    def test_a_module_declares_exactly_one_bound(self) -> None:
-        # The bound is legible from the file an entry lives in, which is what
-        # makes "one act, one bound" checkable rather than asserted.
-        for filename, bound in BOUND_MODULES.items():
-            module = __import__(f"invana.runtime.catalogue.{filename[:-3]}", fromlist=["ENTRIES"])
-            declared = {e.bound for e in module.ENTRIES.values()}
-            assert declared == {bound}, f"{filename} declares {declared}, not {{{bound}}}"
+    def test_a_plugin_declares_exactly_one_bound(self) -> None:
+        # The bound is legible from the plugin a task type lives in, which is
+        # what makes "one act, one bound" checkable rather than asserted.
+        plugins = load_plugins().plugins
+        for name, bound in BOUND_PLUGINS.items():
+            declared = {t.bound for t in plugins[f"invana.core.{name}"].tasks}
+            assert declared == {bound}, f"{name} declares {declared}, not {{{bound}}}"
 
-    def test_every_entry_lives_in_the_module_for_its_bound(self) -> None:
-        placed = {
-            k
-            for f in BOUND_MODULES
-            for k in __import__(f"invana.runtime.catalogue.{f[:-3]}", fromlist=["ENTRIES"]).ENTRIES
-        }
-        assert placed == set(CATALOGUE)
+    def test_every_entry_lives_in_the_plugin_for_its_bound(self) -> None:
+        plugins = load_plugins().plugins
+        placed = {t.key for name in BOUND_PLUGINS for t in plugins[f"invana.core.{name}"].tasks}
+        assert placed == CORE
 
-    def test_an_entry_module_reaches_no_further_than_its_named_span(self) -> None:
-        for filename in BOUND_MODULES:
-            reached = _apps_imported(CATALOGUE_DIR / filename)
-            allowed = SPANS_ALLOWED.get(filename)
+    def test_a_plugin_reaches_no_further_than_its_named_span(self) -> None:
+        for name in BOUND_PLUGINS:
+            reached = _apps_imported(_task_files(name))
+            allowed = SPANS_ALLOWED.get(name)
             if allowed is not None:
-                assert reached <= allowed, f"{filename} reaches {reached - allowed}, which SPANS_ALLOWED does not name"
+                assert reached <= allowed, f"{name} reaches {reached - allowed}, which SPANS_ALLOWED does not name"
             else:
-                assert len(reached) <= 1, f"{filename} imports {reached}; an entry calls one manager in one app"
+                assert len(reached) <= 1, f"{name} imports {reached}; an entry calls one manager in one app"
 
 
 class TestBindings:

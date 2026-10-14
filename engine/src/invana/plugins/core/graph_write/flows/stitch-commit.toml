@@ -1,0 +1,10 @@
+key = "stitch-commit"
+version = 1
+kind = "stitch"
+description = "Commit the staged stitches and write their edges, under the Graph's guardrails."
+intents = []
+
+[[steps]]
+id = "commit_stitches"
+task = "commit_stitches"
+label = "Commit"

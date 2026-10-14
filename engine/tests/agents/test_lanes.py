@@ -7,7 +7,7 @@ catalogue entry and the lanes' outputs.
 
 from __future__ import annotations
 
-from invana.runtime.catalogue.registry import Bound, Entry, Type
+from invana.plugins.sdk.manifest import Bound, Entry, Type
 from invana.runtime.interpreter.lanes import Lane, aggregate
 
 LOAD = Entry(

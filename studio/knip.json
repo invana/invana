@@ -1,5 +1,53 @@
 {
 	"$schema": "https://unpkg.com/knip@6/schema.json",
-	"entry": ["scripts/*.mjs"],
-	"project": ["src/**/*.{ts,tsx,css}", "scripts/*.mjs"]
+	"workspaces": {
+		".": {
+			"entry": ["scripts/*.mjs"],
+			"project": ["scripts/*.mjs"]
+		},
+		"apps/studio": {
+			"entry": ["scripts/*.mjs"],
+			"project": ["src/**/*.{ts,tsx,css}", "scripts/*.mjs"]
+		},
+		"packages/core": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/ui": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/canvases": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/assistant": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/shell": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/datasets": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/explorer": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/modeller": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/agents": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/projects": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		}
+	}
 }

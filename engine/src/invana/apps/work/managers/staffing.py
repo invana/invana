@@ -11,11 +11,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.models import Agent
 from invana.apps.graphs.querysets import GraphMemberQuerySet
-from invana.apps.work.models import Project, ProjectAssignment
+from invana.apps.work.models import Project, ProjectAssignment, ProjectVisibility
 from invana.apps.work.querysets import ProjectAssignmentQuerySet
 from invana.apps.work.schemas import AssignmentCreate
 from invana.core.auth.models import User
-from invana.core.errors import NotFoundError
+from invana.core.errors import ConflictError, NotFoundError
 from invana.core.events import actions
 from invana.core.events.services import emit_event
 
@@ -83,6 +83,12 @@ class StaffingManager:
         row = await self.project_assignments_qs.get(session, assignment_id)
         if row is None or row.project_id != project.id:
             raise NotFoundError("Assignment not found.")
+        if (
+            project.visibility == ProjectVisibility.private.value
+            and row.principal_kind == "user"
+            and await self.project_assignments_qs.count_people(session, project_id=project.id) <= 1
+        ):
+            raise ConflictError(f"'{project.key}' is private and this is the last person on it.")
         details = {"principal_kind": row.principal_kind, "principal_id": row.principal_id}
         await self.project_assignments_qs.delete(session, row)
         await emit_event(

@@ -56,6 +56,7 @@ flowchart TD
 | Surface | Shape |
 |---|---|
 | Activity | On the task, the agent and the Graph — the same tree, scoped |
+| Activity › Events | The Graph's scope, as the `Events` tab of the shell's Activity page at `/u/:user/:graph/activity/events` ([O9](../spec.md#7-cross-feature-decisions)). The `Events` icon in `leftNav` opens it. It is the same timeline the Graph's settings carry, drawn full width |
 | Live tail | Events streaming, filterable |
 | Event row | A timeline entry: marker · when + actor, the verb on the line, the record on expand |
 

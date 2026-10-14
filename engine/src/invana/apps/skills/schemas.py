@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field
+
+from invana.apps.standards.models import Enforcement
 
 
 class OfferedRule(BaseModel):
@@ -35,18 +38,20 @@ class SkillCreate(BaseModel):
 
 
 class SkillUpdate(BaseModel):
-    """A rename, a republish, or both.
+    """A rename, an edit to the draft, or both.
 
-    Changing any of the three text fields publishes the next version; changing
-    only the name does not, because the name is the skill's identity and not
-    something a step was ever offered
-    ([SK2](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    Changing any of the three text fields writes them onto the draft and
+    publishes nothing: a version publishes only once its plan is drawn from
+    its text. The name is the skill's identity, changed in place, and never
+    something a step was offered.
     """
 
     name: str | None = Field(default=None, min_length=1, max_length=255)
     description: str | None = None
     content: str | None = None
     when_to_use: str | None = None
+    #: Why — carried on the event that mints the version, never inferred.
+    why: str | None = Field(default=None, max_length=500)
 
 
 class SkillVersionPublish(BaseModel):
@@ -55,6 +60,17 @@ class SkillVersionPublish(BaseModel):
     description: str | None = None
     content: str | None = None
     when_to_use: str | None = None
+    #: Read by set-ness: an address pins the model, ``null`` hands it back to the agent.
+    model_pin: str | None = Field(default=None, max_length=255)
+    #: Why — carried on the event that mints the version, never inferred.
+    why: str | None = Field(default=None, max_length=500)
+
+
+class SkillRollback(BaseModel):
+    """Which earlier version to restore, and why."""
+
+    version: int = Field(ge=1)
+    why: str | None = Field(default=None, max_length=500)
 
 
 class SkillVersionRead(BaseModel):
@@ -73,6 +89,10 @@ class SkillVersionRead(BaseModel):
     #: One version, exactly one plan (SK13). Never null.
     plan_id: str
     is_draft: bool = False
+    #: The earlier version a rollback copied; null for one somebody wrote.
+    restored_from_version: int | None = None
+    #: The model address a run on this version's plan calls; null defers to the agent.
+    model_pin: str | None = None
 
 
 class SkillVersionListResponse(BaseModel):
@@ -114,8 +134,7 @@ class SkillPlanSummary(BaseModel):
     """What the drawer row and the Flow tab's badge need without a second call."""
 
     plan_id: str
-    #: ``generated`` when the planner drew it, ``authored`` after a hand-edit
-    #: ([SK7](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    #: ``generated`` · ``packaged`` · ``promoted``; ``authored`` on rows written before.
     origin: str
     step_count: int
     #: The bands this playbook will touch, in the strip's order — what the
@@ -201,84 +220,14 @@ class SkillClarificationAnswer(BaseModel):
     answer: str = Field(..., min_length=1, max_length=64)
 
 
-class SkillDraftTaskWrite(BaseModel):
-    """One row of a hand-edited plan.
-
-    Row-level on purpose ([§ 9](docs/for-developers/building-engine/skills-draw-as-plans.md)):
-    this is not a flow editor. A person says **which step**, what it is called
-    and what it takes; the edges are materialised from what actually constrains
-    each node — its `${steps.X.y}` bindings and the catalogue's `requires` — so
-    an order nobody reviewed is never written down
-    (`apps/task_plans/dag.py`).
-    """
-
-    #: The sibling key. Minted from the step when absent; made unique when a
-    #: playbook names one step twice.
-    key: str | None = Field(default=None, max_length=200)
-    #: ``callable`` names a catalogue entry; ``human`` names none, because a
-    #: person is the universal fallback
-    #: ([SK15](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
-    #: ``uses`` names a library plan instead of a step: the row is replaced by
-    #: that plan's rows before anything is validated
-    #: ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
-    form: str = Field(default="callable", pattern="^(callable|human|uses)$")
-    step_key: str | None = None
-    #: ``uses`` rows only — ``nl-single@1``, or ``nl-single`` for its newest.
-    uses: str | None = Field(default=None, max_length=80)
-    #: ``uses`` rows only — the arguments this composition tunes, over the
-    #: plan's declared defaults ([LB19](docs/for-developers/modules/workflows/features/the-library.md)).
-    uses_args: dict = Field(default_factory=dict)
-    title: str = Field(default="", max_length=250)
-    args: dict = Field(default_factory=dict)
-    #: The sentence this step answers to, kept so the Playbook tab still maps
-    #: prose to steps after a hand-edit ([C11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
-    source_span: str | None = None
-    #: The step of the ``uses`` plan this row was copied from. Set by the
-    #: engine when it expands a ``uses`` row and never read from a request, so
-    #: a client cannot claim a row came from a plan it did not
-    #: ([LB36](docs/for-developers/modules/workflows/features/the-library.md)).
-    _source_step_key: str | None = PrivateAttr(default=None)
-
-
-class SkillDraftTasksWrite(BaseModel):
-    """The draft's plan, replaced wholesale.
-
-    The rows go and come back rather than being patched, for the same reason a
-    redraw does ([SK12](docs/for-developers/modules/skills/features/authoring-a-skill.md)):
-    an edit is a revision of the whole shape, and the diff a person reads is
-    against what was there.
-    """
-
-    tasks: list[SkillDraftTaskWrite] = Field(default_factory=list)
-
-
-class SkillStepChoice(BaseModel):
-    """One step a hand-edit may name.
-
-    The catalogue is what bounds authoring
-    ([SK28](docs/for-developers/modules/skills/features/authoring-a-skill.md)),
-    so the surface that offers the choice is sent the set rather than carrying a
-    copy of it — a second list of step keys in TypeScript is a second thing to
-    keep in step with a closed set it cannot see.
-    """
-
-    step_key: str
-    label: str
-    bound: str
-    #: The band this step sits in, so the picker reads in the same six bands the
-    #: Flow tab draws ([SK16](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
-    layer: str
-    #: Steps that must be ordered before it. The editor says so before the
-    #: write is refused for it.
-    requires: list[str] = Field(default_factory=list)
-
-
 class InlinablePlan(BaseModel):
     """A library plan a skill may inline, and what it offers a caller.
 
-    The picker's one read. `args_schema` comes with the row because tuning is
-    the same act as picking — a person who inlines `nl-single@1` decides
-    `read_only` in the same breath
+    What the planner reads beside the catalogue when it draws a playbook: a
+    sentence may name one of these as its candidate, and the plan's rows are
+    copied in at the draw. `args_schema` comes with the row because tuning is
+    the same act as picking — a sentence that names `nl-single@2` may set its
+    `read_only` too
     ([LB19](docs/for-developers/modules/workflows/features/the-library.md)).
     """
 
@@ -296,10 +245,6 @@ class InlinablePlan(BaseModel):
     layers: list[str] = Field(default_factory=list)
     #: `{name: {type, default, label}}` — what a caller may tune.
     args_schema: dict = Field(default_factory=dict)
-
-
-class InlinablePlanListResponse(BaseModel):
-    items: list[InlinablePlan] = Field(default_factory=list)
 
 
 class SkillAgentStanding(BaseModel):
@@ -350,9 +295,8 @@ class SkillDraftRead(BaseModel):
     #: prose named does not hold together as a plan (SK31). Cleared by the next
     #: draw that writes rows.
     refusal: SkillDrawRefusal | None = None
-    #: What a hand-edit may name (SK28). Sent with the draft, because the draft
-    #: is the only surface that authors rows.
-    vocabulary: list[SkillStepChoice] = Field(default_factory=list)
+    #: Whether the plan was drawn from the draft's text as it reads now; publish needs it.
+    drawn: bool = False
 
 
 class SkillDrawStarted(BaseModel):
@@ -402,10 +346,25 @@ class SkillListResponse(BaseModel):
 # ── Rules ─────────────────────────────────────────────────────────────────────
 
 
+class RuleCheck(BaseModel):
+    """A rule's machine half, from a closed vocabulary — ``invana.apps.skills.checks``."""
+
+    kind: Literal["dataset.conforms", "dataset.licence", "evidence.reviewed", "evidence.not_retracted"]
+    #: ``dataset.conforms``: the standard as ``publisher/name``.
+    standard: str | None = Field(default=None, max_length=200)
+    #: ``dataset.conforms``: the lowest score that passes; 1 when omitted.
+    min_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    #: ``dataset.licence``: the licences that pass, compared case-blind.
+    allowed: list[str] | None = None
+
+
 class RuleCreate(BaseModel):
     statement: str = Field(..., min_length=1)
     #: Where it lands in the assembled context. Omitted, it goes last.
     order: int | None = None
+    check: RuleCheck | None = None
+    #: What a failed check does; ``warn`` when a check is given without one.
+    mode: Enforcement | None = None
 
 
 class RuleUpdate(BaseModel):
@@ -418,6 +377,11 @@ class RuleUpdate(BaseModel):
 
     statement: str | None = Field(default=None, min_length=1)
     order: int | None = None
+    #: Sent as null, it removes the check (and the mode) in the next version.
+    check: RuleCheck | None = None
+    mode: Enforcement | None = None
+    #: Why — carried on the event that mints the version, never inferred.
+    why: str | None = Field(default=None, max_length=500)
 
 
 class RuleVersionRead(BaseModel):
@@ -427,6 +391,8 @@ class RuleVersionRead(BaseModel):
     rule_id: str
     version: int
     statement: str
+    check: RuleCheck | None = None
+    mode: Enforcement | None = None
     published_by_id: str | None
     published_at: datetime
 
@@ -447,8 +413,10 @@ class RuleRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    graph_id: str
+    #: Null on an install rule.
+    graph_id: str | None
     project_id: str | None
+    #: ``install · graph · project``.
     scope: str
     kind: str
     active: bool
@@ -456,6 +424,8 @@ class RuleRead(BaseModel):
     version: int
     current_version_id: str | None
     statement: str
+    check: RuleCheck | None = None
+    mode: Enforcement | None = None
     #: Steps that cited any version of this rule — the number under the
     #: statement on the drawer row. `0` on a rule nothing has used yet.
     citations: int = 0
@@ -516,5 +486,6 @@ class RuleCitationsResponse(BaseModel):
 class RuleListResponse(BaseModel):
     items: list[RuleRead]
     total: int
-    #: On a Project's list: the Graph invariants it inherits, read-only (C3).
+    #: Read-only rules from wider scopes, in assembly order: on a Graph's list
+    #: the install rules; on a Project's, the install rules then the Graph's.
     inherited: list[RuleRead] = Field(default_factory=list)

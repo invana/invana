@@ -6,9 +6,9 @@ Tables
                            membership, intent + setup state. CRUD lands in S2.
 - ``graph_connections``  — 1:1 child of Graph; the DB binding (URL, driver, encrypted auth,
                            runtime health). Renamed from the previous ``graphs`` table.
-- ``graph_members``      — (graph, user) access join. Composite PK. Binary membership
-                           (a row == full access); roles removed in
-                           docs/for-developers/modules/identity-and-access/features/membership.md.
+- ``graph_members``      — (graph, user) access join. Composite PK. A row is the right
+                           to read; ``roles`` the right to change
+                           (docs/for-developers/modules/identity-and-access/features/roles.md).
 """
 
 from __future__ import annotations
@@ -32,6 +32,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from invana.apps.graphs.roles import GraphRole, holds
 from invana.apps.modeller.models import GraphModel
 from invana.core.auth.models import User
 from invana.core.models import Base
@@ -226,26 +227,27 @@ class GraphConnection(Base):
 
 
 class GraphMember(Base):
-    """User↔graph access join. Binary membership (a row == full access).
+    """User↔graph access join, with the Graph roles the member holds.
 
-    Roles were removed in docs/for-developers/modules/identity-and-access/features/membership.md; this table no longer
-    carries a ``role``
-    column. ``get_graph_membership`` / ``require_graph_member`` gate every
-    graph-scoped route on the mere existence of a row.
+    A row is the right to read the Graph; ``roles`` is the right to change its
+    areas (docs/for-developers/modules/identity-and-access/features/roles.md).
+    ``require_graph_member`` resolves the row per request and checks the role
+    the matched route's area needs, from the one table in ``apps/graphs/roles.py``.
     """
 
     __tablename__ = "graph_members"
 
     graph_id: Mapped[str] = mapped_column(String(36), ForeignKey("graphs.id", ondelete="CASCADE"), primary_key=True)
     user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
-    # The one field-level permission in the product
-    # (docs/for-developers/modules/govern/features/guardrails.md GR5 · GV22).
-    # Not a role: a Member stays binary, and this does not start a role system.
-    # The guardrails are *readable* by every member whatever this says — a bound
-    # nobody may read is a bound nobody can work within — and a Graph always has
-    # at least one holder, so revoking the last one is refused.
-    can_edit_guardrails: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    # Graph role names in canonical order; never empty — ``["viewer"]`` is the floor.
+    roles: Mapped[list[str]] = mapped_column(
+        JSON, nullable=False, default=lambda: [GraphRole.viewer.value], server_default='["viewer"]'
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
 
     graph: Mapped[Graph] = relationship(back_populates="members")
     user: Mapped[User] = relationship(back_populates="memberships")
+
+    def holds(self, role: GraphRole | str) -> bool:
+        """Whether this member may act as ``role`` — ``owner`` implies the rest."""
+        return holds(self.roles or [], role)

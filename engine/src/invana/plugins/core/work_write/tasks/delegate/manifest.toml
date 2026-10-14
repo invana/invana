@@ -1,0 +1,15 @@
+key = "delegate"
+version = "1.0.0"
+summary = "Open a run under a child agent and wait for it."
+bound = "work_write"
+side_effect = "write"
+requires = []
+resources = ["cpu"]
+
+[args]
+agent_id = { type = "str" }
+body = { type = "str" }
+
+[outputs]
+child_run_id = "str"
+status = "str"

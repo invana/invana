@@ -1,5 +1,9 @@
 # S4 · A skill uses a plan
 
+> **The picker, `GET …/skills/inlinable` and `PATCH …/skills/{id}/draft/tasks` are gone** ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3 · IS11).
+> Composition is drawn: a sentence names a library plan and `draft_plan` inlines it. Expansion, `args_schema`,
+> `${args.N}`, `source_plan_key` and `task_plans.uses` below still hold.
+
 **The third Skills pass.** [M8](skills-draw-as-plans.md) gave every skill version a plan of its own,
 drawn from its prose. This is the other way a version's plan gets its steps: **it inlines one the
 Library already holds**, and tunes the arguments that make it fit ([SK18](../modules/skills/features/authoring-a-skill.md#decisions)
@@ -104,18 +108,17 @@ be read alone: the first answers *what did this compose*, the second *where did 
 
 | Route | Does |
 |---|---|
-| `GET …/skills/inlinable` | the reusable plans this Graph can inline, each with its `args_schema`, step count and layers — the picker's one read, and the library's seed-on-read like every other reader of it |
-| `PATCH …/skills/{id}/draft/tasks` | **unchanged in shape.** A row may now carry `uses` instead of a `step_key`, and the manager expands it before validating |
+| — | **No route.** Composition is drawn: `draft_plan` reads the library plans beside the catalogue, and a picked `plan:<key>@<v>` is expanded inside the draw ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS11) |
 
-Expansion is not its own route: inlining is an edit to the draft's rows, and it publishes with them.
+Expansion is not its own route: inlining is part of the draw, and it publishes with the plan.
 
 ## 7. Slices
 
 | # | Slice | Done when |
 |---|---|---|
 | **S4a** ✅ | The migration, `args_schema`'s shape, `${args.N}` in the grammar, and `nl-single@1` declaring `read_only` | **Done.** A reusable plan declares an argument, its row binds it, a plan selected directly resolves it to the declared default before anything validates, and an undeclared name is refused by name |
-| **S4b** ✅ | Expansion — a `uses` row becomes the inlined steps, flat, each carrying `source_plan_key`, validated as one graph | **Done.** Hand-editing a draft to `uses: nl-single@1` writes five rows keyed `answer_*`, the tuned `read_only` lands on `execute_graph_query`, the copied plan's own bindings follow the copies, and `task_plans.uses` records the act |
-| **S4c** ✅ | `GET …/skills/inlinable`, and Studio's picker + argument tuning in `SkillPlaybookEditor` | **Done.** The picker lists the eight reusable plans with their bands, step counts and what each offers; inlining `nl-single@2` and tuning `read_only` writes five rows and records the composition; re-opening the editor collapses those five back into the one row that wrote them |
+| **S4b** ✅ — the hand-edit path is gone; expansion runs inside the draw ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS11) | Expansion — a `uses` row becomes the inlined steps, flat, each carrying `source_plan_key`, validated as one graph | **Done.** Hand-editing a draft to `uses: nl-single@1` writes five rows keyed `answer_*`, the tuned `read_only` lands on `execute_graph_query`, the copied plan's own bindings follow the copies, and `task_plans.uses` records the act |
+| **S4c** ✅ — route and picker gone ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3 · IS11) | `GET …/skills/inlinable`, and Studio's picker + argument tuning in `SkillPlaybookEditor` | **Done.** The picker lists the eight reusable plans with their bands, step counts and what each offers; inlining `nl-single@2` and tuning `read_only` writes five rows and records the composition; re-opening the editor collapses those five back into the one row that wrote them |
 
 ## 8. Not in this pass
 
@@ -123,6 +126,6 @@ Expansion is not its own route: inlining is an edit to the draft's rows, and it 
 |---|---|
 | A composite node the interpreter walks | § 2 — it buys a drawing, and costs an interpreter |
 | Run-time `uses` resolution | § 2 — it breaks [SK5](../modules/skills/features/authoring-a-skill.md#decisions) |
-| Re-inlining when the library plan publishes `@2` | the copy is the point. *A newer version exists* is a thing to **say** on the row, and acting on it is a re-inline somebody asks for |
-| `uses` inside a library plan | the Library authors its own plans ([7.7](../modules/workflows/features/draft-a-plan.md)); this pass is the skill's side of it |
+| Re-inlining when the library plan publishes `@2` | the copy is the point. *A newer version exists* is a thing to **say** on the row, and acting on it is a redraw somebody asks for |
+| `uses` inside a library plan | library plans are packaged or promoted, never drafted ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3); this pass is the skill's side of it |
 | Arguments on a one-off plan | nothing calls it, so nothing tunes it |

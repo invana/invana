@@ -56,7 +56,7 @@ four features waiting on M5 and M11.
 
 | Rule | Consequence |
 |---|---|
-| **Enforcement before the surface that declares it** | a panel that writes a bound nothing enforces is a display filter wearing a bound's name. P1 before P5, M11 before 7.7 |
+| **Enforcement before the surface that declares it** | a panel that writes a bound nothing enforces is a display filter wearing a bound's name. P1 before P5 |
 | **Records before the features that read them** | a feature built on a column about to be dropped is built twice. M4 before 9.x, M7 before 14.x, M11 before 7.x |
 | **The kit before the screen** | [13.1](modules/platform/features/design-system.md) blocks most Studio columns; a missing component is added upstream in `design-kit`, never worked around in `studio/` |
 
@@ -70,7 +70,7 @@ flowchart TD
     A --> B["B · the plan is the authority<br/>7.1–7.4 · 7.6 · M11 · M5"]
     A --> C["C · one journal<br/>10.5 · S14 · M13"]
     B --> C
-    B --> D["D · the runtime grows up<br/>13.8 · 2.3 · 7.5 · 7.7 · S15"]
+    B --> D["D · the runtime grows up<br/>13.8 · 2.3 · 7.5 · S15"]
     B --> H["H · skills draw as plans<br/>the Flow tab · M8"]
     C --> F["F · operate<br/>10.1 · 10.2 · 10.3 · 10.4"]
     D --> E["E · work closes<br/>9.1–9.3 · 6.4 · M4 · M6"]
@@ -127,7 +127,7 @@ file.
 
 | | |
 |---|---|
-| Ships | [13.8 The runtime](modules/platform/features/runtime.md) · [2.3 Load a bundle](modules/bring-data-in/features/load-a-bundle.md) · [7.5 Run a workflow](modules/workflows/features/run-a-workflow.md) · [7.7 Draft a plan](modules/workflows/features/draft-a-plan.md) |
+| Ships | [13.8 The runtime](modules/platform/features/runtime.md) · [2.3 Load a bundle](modules/bring-data-in/features/load-a-bundle.md) · [7.5 Run a workflow](modules/workflows/features/run-a-workflow.md) |
 | Records | **M9** the budget pause · **M10** replan |
 | Detail | [the-runtime-package.md](building-engine/the-runtime-package.md) |
 | Done when | a plan is a graph, the cursor is a frontier, a step fans out into lanes, a pool stops one workflow starving the rest, and a person is asked before a gated step runs — proven by a bundle load that branches, fans out and inlines the single-dataset plan |
@@ -237,7 +237,7 @@ everywhere.
 | **A · Govern** | ✅ 7 — `GovWorlds` · `GovWorld` · `GovGuardrails` · `GovCompare` · `RunLens` · `AgentsList` · `AgentsLlms`, every one composed on the shell contract, **plus `RowShapes` for P6's G40** | canvas `8591piJHezfLsUoSZXn3z8` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ `govern/spec.md` has no **The drawn states** section |
 | **B · Workflows** | ✅ — `WorkflowsHiFi` · `WorkflowStepHiFi` · `PlanDetail` · `PlanDash` · `PlanStepParams` · `CatalogueList` · `Library` | canvas `9sAby5rPvkjMLb9BcdCom4` + `7c565h2z9irbFBwu1S1ebH`, cached in `.design/canvas-tasks-panel/` | ❌ `workflows/spec.md` has no drawn states |
 | **C · The journal** | ✅ — `RunDetail` · `DrawerRunsList` · `DrawerRunLive` · `DrawerRunAll` · `DrawerRunDebug` · `RunDash` · `StepImport` · `StepQuery` · `StepLlm` | `.design/canvas-tasks-panel/` | ❌ `operate/spec.md` has no drawn states |
-| **D · The runtime** | ✅ 7.5 `RunWorkflowHiFi` · 7.7 `PlanDraftCanvas` · `PlanDraftYaml` · `PlanRetire`, and now **2.3 `Main` (BundleLoad)** · **13.8 `Lanes` · `Approval`** | `.design/canvas-features/` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ reconcile open |
+| **D · The runtime** | ✅ 7.5 `RunWorkflowHiFi` · `PlanRetire` (the 7.7 draft boards `PlanDraftCanvas` · `PlanDraftYaml` are not built — [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3), and now **2.3 `Main` (BundleLoad)** · **13.8 `Lanes` · `Approval`** | `.design/canvas-features/` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ reconcile open |
 | **E · Work** | ✅ — `ProjectsHiFi` · `SwingProjectHiFi` · `ProjectPlanHiFi` · `NewTaskHiFi` · `TaskHiFi` · `JournalTaskHiFi` · `ReviewHiFi` · `TaskReviewHiFi` · `VerdictReviewHiFi` · `RulesHiFi` | `hi-fi-finance` | ❌ `work/spec.md` · `skills/spec.md` have no drawn states |
 | **F · Operate** | ✅ 10.1 `SchedulesHiFi` · 10.3 `AgentStatsHiFi`, and now **10.2 `Events`** · **10.4 `Tokens`** | `hi-fi-finance` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ reconcile open |
 | **G · Memory** | ✅ 8.3 · 8.4 share `ReviewProposalHiFi`, and now **8.1 `Evidence`** · **8.2 `Recall`** | `hi-fi-finance` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ `memory/spec.md` has no drawn states |
@@ -275,5 +275,5 @@ from a wrong map.
 | Row | Because |
 |---|---|
 | [3.11 Act as](modules/ask/features/act-as.md) | `S-TBD` in the index — a stance needs the touch record to have a ledger to hang on, so it is sequenced when A closes, not before |
-| Simulation · parameter sweeps · game theory | post-1.0, and [not built](README.md#not-building) |
+| Parameter sweeps · game theory | post-1.0, and [not built](README.md#not-building). Simulation itself is [9.8](modules/work/features/simulation.md), B09 |
 | The engine band migration | [migration-plan.md](building-engine/migration-plan.md) is orthogonal to every block here — it moves files and changes no contract, so it interleaves rather than sequences |

@@ -1,0 +1,11 @@
+import type { CanvasConfig } from "@invana/canvas";
+import settingsJson from "./settings.json";
+import templatesJson from "./templates.json";
+import type { TaskFlowTemplates } from "./types";
+
+export * from "./types";
+
+// JSON import widens string-literal unions to `string`; the files are a
+// `CanvasConfig` and two patches of one, so the casts only narrow them back.
+export const taskFlowSettings = settingsJson as unknown as CanvasConfig;
+export const taskFlowTemplates = templatesJson as unknown as TaskFlowTemplates;

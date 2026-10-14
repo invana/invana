@@ -28,7 +28,7 @@ setup: ## Install all dependencies (dev tools + engine + studio + docs)
 dev: ## Start engine + studio dev servers
 	@echo "Starting Invana development environment..."
 	@(cd engine && uv run uvicorn invana.server.app:create_app --factory --reload --host 127.0.0.1 --port 8200) & \
-	 (cd studio && pnpm dev --host 127.0.0.1 --port 8300) & \
+	 (cd studio && pnpm --filter studio dev --host 127.0.0.1 --port 8300) & \
 	 wait
 
 docs: ## Serve docs locally (http://localhost:8000)
@@ -61,10 +61,10 @@ engine-init: engine-migrate ## Bootstrap the default root superuser (admin / hi@
 
 # ─── Studio ─────────────────────────────────────────────────────
 studio-test: ## Run studio tests
-	@[ -f studio/package.json ] && (cd studio && pnpm test run) || echo "  skip studio-test (no package.json)"
+	@[ -f studio/package.json ] && (cd studio && pnpm test) || echo "  skip studio-test (no package.json)"
 
-studio-lint: ## Lint studio (biome check)
-	@[ -f studio/package.json ] && (cd studio && pnpm biome check .) || echo "  skip studio-lint (no package.json)"
+studio-lint: ## Lint studio (biome check + names + kit overlap)
+	@[ -f studio/package.json ] && (cd studio && pnpm lint) || echo "  skip studio-lint (no package.json)"
 
 studio-format: ## Format studio (biome format)
 	@[ -f studio/package.json ] && (cd studio && pnpm biome check --write .) || echo "  skip studio-format (no package.json)"
@@ -130,7 +130,7 @@ docker-run: ## Run engine via Docker
 # ─── Cleanup ────────────────────────────────────────────────────
 clean: ## Remove build artifacts and caches
 	rm -rf engine/dist/ engine/build/
-	rm -rf studio/dist/
+	rm -rf studio/apps/*/dist/ studio/packages/*/dist/
 	rm -rf docs/site/
 	rm -rf integrations/*/dist/ integrations/*/build/
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true

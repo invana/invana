@@ -36,8 +36,9 @@ src/invana/
   graph/       1  the graph engine — connectors/ (cypher · gremlin) · types/ · loaders/
   apps/        2  one product idea each — graphs · modeller · canvases · explorer · datasets
                │  sessions · skills · agents · task_plans · work · projects · llm · llm_providers
-               │  (`datasets` is the Dataset row and nothing else; loading lives in runtime/catalogue)
-  runtime/     3  the workhorse — catalogue/ · interpreter/ + the planner and state files
+               │  (`datasets` is the Dataset row and nothing else; loading lives in plugins/core/ingest)
+  runtime/     3  the workhorse — catalogue/ (a re-export) · interpreter/ + the planner and state files
+  plugins/     3  every task type — sdk/ · registry · core/<plugin>/tasks/<key>/ (manifest.toml + run.py)
   server/      4  FastAPI app · routes/ · admin/ · middleware        ─┐ two front-ends
   cli/         4  invana start · migrate · init · version · users …  ─┘ over the same code
 ```
@@ -74,7 +75,7 @@ Six greppable checks enforce this in `tests/golden/test_code_shape.py`, each wit
 **Deleting an entry is how a conversion is finished**; adding one means the map is wrong, and
 `migration-plan.md` changes first.
 
-Still old-shape, and knowingly so: parts of `runtime/`, `server/datasets/views.py`, and
+Still old-shape, and knowingly so: parts of `runtime/`, and
 `server/routes/{models,model_links,schemas}.py`. Follow whichever shape the package you are editing
 already has, and do not half-convert one in passing.
 
