@@ -22,7 +22,7 @@
 		"@opentelemetry/sdk-logs": "0.219.0",
 		"@opentelemetry/sdk-metrics": "2.8.0",
 		"@opentelemetry/sdk-trace-web": "2.8.0",
-		"axios": "^1.7.0",
+		"axios": "^1.20.0",
 		"web-vitals": "6.2.2"
 	},
 	"peerDependencies": {
