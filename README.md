@@ -3,15 +3,7 @@
 **An ontology-governed operating system for humans and AI agents.**
 
 Invana is open source. People and agents work on the same knowledge graph, and
-the ontology governs both of them:
-
-- **Ontology-governed.** Models give the data its meaning. Worlds, guardrails and
-  rules decide what anyone may read, use or send, and they apply to people and
-  agents alike.
-- **Grounded.** Every answer traces back from the LLM to the query, the record and
-  the dataset it came from. When the graph can't answer, Invana says so.
-- **An operating system.** Runs, schedules, approvals, notifications and a change
-  log are shared by every product, so the work is visible wherever it started.
+the ontology governs both of them.
 
 ## The products
 
@@ -23,46 +15,74 @@ the ontology governs both of them:
 | **Projects** | anyone deciding something | Pursue a question: gather evidence for and against, decide, keep the trail |
 | **Agents** | builders | Build, tune and watch the agents that do the legwork |
 
-All five run on Neo4j, Memgraph, ArcadeDB, JanusGraph, Amazon Neptune or
-TinkerGraph, through Cypher or Gremlin. Each database connector is its own
-package (`pip install invana-neo4j`).
+## Deploy
 
-## Development setup
-
-### Prerequisites
-
-- Python 3.14+
-- Node.js 22+
-- [uv](https://docs.astral.sh/uv/) (Python package manager)
-- [pnpm](https://pnpm.io/) (Node package manager)
-- Docker & Docker Compose
-
-### Quick start
+Invana has no published release yet, so you deploy it from source. You need Docker with Docker Compose.
 
 ```bash
-# 1. Clone and install dependencies + pre-commit hooks
 git clone https://github.com/invana/invana.git
 cd invana
-make setup
-
-# 2. Start postgres, neo4j, the engine, and studio (hot-reload dev containers)
 docker compose up -d
-
-# 3. Run migrations + bootstrap the default root superuser
-#    (admin / hi@invana.local / change_me_please — change the password after first login)
-make engine-init
+docker compose exec engine uv run invana migrate
+docker compose exec engine uv run invana init --non-interactive
 ```
 
-Studio runs at `http://localhost:8300`, the engine at `http://localhost:8200`.
-Log in with `hi@invana.local` / `change_me_please`.
-Run `make help` to see all available commands.
+| | |
+|---|---|
+| Studio | <http://localhost:8300>. Sign in as `admin` / `change_me_please`, then change the password |
+| Engine API | <http://localhost:8200> |
+| Graph database | Neo4j starts by default. Memgraph, JanusGraph and ArcadeDB are Compose profiles, for example `docker compose --profile memgraph up -d` |
+| Sample data | [CONTRIBUTING.md › Quick start](CONTRIBUTING.md#quick-start) loads the air-routes graph |
 
-`docker compose up -d` starts only the core stack — postgres, neo4j, engine,
-studio. Neo4j is the only graph database that starts by default; the extra
-ones (Memgraph, JanusGraph, ArcadeDB) and the observability stack (HyperDX)
-are opt-in via Docker Compose profiles. Prefer running the engine and studio
-directly on your host? Use `make dev` instead of the `engine`/`studio`
-containers (stop those two, or don't start them, first — same infra either
-way). See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide — infra
-profiles, environment variables, optional dependency extras, testing,
-changesets, commit conventions, and the pull-request process.
+`pip install invana` and the Docker Hub images arrive with the first release.
+
+## Use cases
+
+Invana is in **beta**. ✅ available · 🟡 partial: usable, with parts still being built.
+
+### Govern what people and agents may touch
+
+*Ontology-governed.* The ontology decides what anyone may read, use or send, and it is the same for a
+person and for an agent.
+
+| Capability | What you get | Status |
+|---|---|---|
+| Models and meaning | Models give the data its meaning, and stitches join models from different sources | ✅ |
+| Worlds, guardrails and rules | A guardrail is always in force, a world narrows it for one question, and a rule can block, warn or report | 🟡 |
+| Roles and access | Graph roles are enforced on every route, and search shows only what you can open | ✅ |
+| Provenance | Datasets carry their origin, versions, licence and sensitivity. A retracted version flags everything that cites it | 🟡 |
+
+### Decide with evidence
+
+*For humans.* Ask, test and decide, with every step traceable to the data behind it.
+
+| Capability | What you get | Status |
+|---|---|---|
+| Grounded answers | Every answer traces from the LLM to the query, the record and the dataset. When the graph can't answer, Invana says so | ✅ |
+| Decisions with a trail | Projects keep the evidence for and against, and decisions are append-only, so anyone can follow how a call was made | ✅ |
+| Simulation | Run a simulator on a project branch over pinned dataset versions, reproducible from its seed. One simulator ships today: genomic prediction | ✅ |
+
+### Put agents to work, within bounds
+
+*For AI agents.* Agents do the legwork; guardrails and budgets keep it inside the lines.
+
+| Capability | What you get | Status |
+|---|---|---|
+| Plans from instructions | An agent's plan is generated from its instructions, versioned, and checked by evals before it publishes | 🟡 |
+| Tools through plugins and MCP | Agents call tools through plugins, and through any MCP server an Admin enables | 🟡 |
+| Token budgets | Each agent has a monthly and a per-run token budget, metered in tokens, never currency | ✅ |
+
+### Run it all on one layer
+
+*An operating system.* What every product shares, so work is visible wherever it started.
+
+| Capability | What you get | Status |
+|---|---|---|
+| Runs, schedules, approvals and notifications | One journal of every run, schedules that need no project, and a person's approval before anything leaves | 🟡 |
+| Change log | Every versioned thing has a history, any two versions can be compared, and the effect after a change is shown | 🟡 |
+| Any graph database | Neo4j, Memgraph, ArcadeDB, JanusGraph and TinkerGraph, through Cypher or Gremlin. Amazon Neptune is planned | 🟡 |
+
+## Contributing
+
+[CONTRIBUTING.md](CONTRIBUTING.md) covers the development setup, how a feature goes from the feature
+index to code, and how to raise a pull request.
