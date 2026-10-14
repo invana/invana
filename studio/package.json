@@ -14,10 +14,10 @@
 		"test:e2e": "pnpm --filter studio test:e2e"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.5.14",
-		"@vitest/coverage-v8": "5.0.2",
-		"knip": "^6.38.0",
+		"@biomejs/biome": "^2.5.15",
+		"@vitest/coverage-v8": "5.0.3",
+		"knip": "^6.41.0",
 		"turbo": "^2.10.5",
-		"vitest": "^5.0.2"
+		"vitest": "^5.0.3"
 	}
 }
