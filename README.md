@@ -7,48 +7,22 @@ the ontology governs both of them.
 
 ## Core features
 
-Invana is in **beta**. ✅ available · 🟡 partial: usable, with parts still being built.
+Invana is in **beta**. ✅ available · 🟡 usable, with parts still being built.
 
-### Governance
-
-The ontology decides what anyone may read, use or send, people and agents alike.
-
-| Capability | What you get | Status |
+| Feature | What you get | Status |
 |---|---|---|
-| Models and meaning | Models give the data its meaning, and stitches join models from different sources | ✅ |
-| Worlds, guardrails and rules | A guardrail is always in force, a world narrows it for one question, and a rule can block, warn or report | 🟡 |
-| Roles and access | Graph roles are enforced on every route, and search shows only what you can open | ✅ |
-| Provenance | Datasets carry their origin, versions, licence and sensitivity. A retracted version flags everything that cites it | 🟡 |
-
-### Decisions
-
-Ask, test and decide, with every step traceable to the data behind it.
-
-| Capability | What you get | Status |
-|---|---|---|
-| Grounded answers | Every answer traces from the LLM to the query, the record and the dataset. When the graph can't answer, Invana says so | ✅ |
-| Decisions with a trail | Projects keep the evidence for and against, and decisions are append-only, so anyone can follow how a call was made | ✅ |
-| Simulation | Run a simulator on a project branch over pinned dataset versions, reproducible from its seed. One simulator ships today: genomic prediction | ✅ |
-
-### Agents
-
-Agents do the legwork; guardrails and budgets keep it inside the lines.
-
-| Capability | What you get | Status |
-|---|---|---|
-| Plans from instructions | An agent's plan is generated from its instructions, versioned, and checked by evals before it publishes | 🟡 |
-| Tools through plugins and MCP | Agents call tools through plugins, and through any MCP server an Admin enables | 🟡 |
-| Token budgets | Each agent has a monthly and a per-run token budget, metered in tokens, never currency | ✅ |
-
-### Platform
-
-What every product shares, so work is visible wherever it started.
-
-| Capability | What you get | Status |
-|---|---|---|
-| Runs, schedules, approvals and notifications | One journal of every run, schedules that need no project, and a person's approval before anything leaves | 🟡 |
-| Change log | Every versioned thing has a history, any two versions can be compared, and the effect after a change is shown | 🟡 |
-| Any graph database | Neo4j, Memgraph, ArcadeDB, JanusGraph and TinkerGraph, through Cypher or Gremlin. Amazon Neptune is planned | 🟡 |
+| **Self-hosted** | One Docker Compose stack on your own machines. Your graph and your keys stay with you, and with Ollama the LLM can run on your network too | ✅ |
+| **Ontology-governed** | Models give the data its meaning, and stitches join models from different sources | ✅ |
+| **Guardrails, worlds and rules** | Guardrails bound what any run may read, use or send; worlds narrow them per question; rules block, warn or report | 🟡 |
+| **Roles and access** | Graph roles are enforced on every route, and search shows only what you can open | ✅ |
+| **Grounded answers** | Every answer traces from the LLM to the query, the record and the dataset. When the graph can't answer, Invana says so | ✅ |
+| **Decisions with a trail** | Projects keep the evidence for and against, and decisions are append-only | ✅ |
+| **Simulation** | Run a simulator on a project branch over pinned dataset versions, reproducible from its seed | ✅ |
+| **Datasets and provenance** | Origin, versions, licence and sensitivity on every dataset; a retraction flags everything that cites it | 🟡 |
+| **Agents** | Plans generated from each agent's instructions, checked by evals before they publish, and bounded by token budgets | 🟡 |
+| **Plugins** | Every task comes from a plugin. Core plugins are always on; tool, MCP and simulator plugins extend what agents can do ([below](#plugins)) | 🟡 |
+| **Runs, schedules and approvals** | One journal of every run, schedules with delivery, and a person's approval before anything leaves | 🟡 |
+| **Change log** | Every versioned thing has a history; compare any two versions and see the effect after | 🟡 |
 
 ## Deploy
 
@@ -69,7 +43,63 @@ docker compose exec engine uv run invana init --non-interactive
 | Graph database | Neo4j starts by default. Memgraph, JanusGraph and ArcadeDB are Compose profiles, for example `docker compose --profile memgraph up -d` |
 | Sample data | [CONTRIBUTING.md › Quick start](CONTRIBUTING.md#quick-start) loads the air-routes graph |
 
-`pip install invana` and the Docker Hub images arrive with the first release.
+## Integrations
+
+### Graph databases
+
+The graph backend is switchable: each Graph connects to the database you choose, and models, governance
+and the products work the same on any of them. Invana speaks both **Cypher** and **Gremlin**, so its
+generic connectors can reach other Cypher or Gremlin databases too. The ones below have their own tested
+connector.
+
+| Database | Query language | Connector |
+|---|---|---|
+| Neo4j | Cypher | [`invana-neo4j`](integrations/invana-neo4j) |
+| Memgraph | Cypher | [`invana-memgraph`](integrations/invana-memgraph) |
+| ArcadeDB | Cypher, Gremlin | [`invana-arcadedb`](integrations/invana-arcadedb) |
+| JanusGraph | Gremlin | [`invana-janusgraph`](integrations/invana-janusgraph) |
+| TinkerGraph | Gremlin | [`invana-tinkergraph`](integrations/invana-tinkergraph) |
+| Amazon Neptune | Gremlin | planned |
+
+### LLM providers
+
+| Provider | How it connects |
+|---|---|
+| Anthropic (Claude) | The official Anthropic API |
+| Claude Agent SDK | Claude through a local Claude Code install, with an API key or a Claude subscription token |
+| OpenAI | The OpenAI API |
+| OpenAI-compatible servers | Any `/chat/completions` endpoint, such as vLLM, LM Studio or LocalAI |
+| Ollama | Local models, no API key |
+
+### Data and standards
+
+| Format | Use |
+|---|---|
+| SKOS | Import a vocabulary as a standard |
+| RDFS, OWL (subset), schema.org | Import an ontology as a draft model |
+| JSON-LD, Turtle, RDF/XML | Read those ontology files |
+| OpenTelemetry | Traces, logs and metrics, for example into HyperDX |
+
+## Plugins
+
+Everything a run does is a task from a plugin. An install Admin enables tool and MCP plugins; core
+plugins are always on.
+
+| Plugin | Type | What it does | Status |
+|---|---|---|---|
+| Graph read | core | Run queries, count types, resolve and expand records, preview stitches | ✅ |
+| Graph write | core | Write and bulk-load records; apply, commit and withdraw stitches | ✅ |
+| Ingest | core | Check a bundle, snapshot its model, validate records before they land | ✅ |
+| LLM | core | Understand a question, plan the work, turn a thought into a query, draft plans and models | ✅ |
+| Schema write | core | Propose, validate and migrate model changes | ✅ |
+| Work write | core | Spawn agents, delegate to them, create tasks | ✅ |
+| Pure | core | Validate queries, verify results, shape results for the canvas, with no side effects | ✅ |
+| Web | tool | Search, fetch, and download-and-extract. Ships the *collect a dataset* skill | ✅ |
+| Mail | tool | Read a mailbox over IMAP; send over SMTP only after a person approves | ✅ |
+| Science sources | tool | PubMed search, UniProt and PubChem lookups | ✅ |
+| MCP | mcp | One plugin per MCP server an Admin adds; each of its tools becomes a task | 🟡 |
+| Genomic prediction | simulator | Predict trait outcomes for a cross, run on a project branch over pinned datasets | ✅ |
+| Plugin SDK | sdk | Manifests, the task context, errors and the simulator contract, for writing a plugin. Plugins ship inside the engine today | 🟡 |
 
 ## The products
 
