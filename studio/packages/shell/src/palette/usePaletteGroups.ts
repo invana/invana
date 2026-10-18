@@ -14,6 +14,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { activityPath } from "../activity/activityPath";
 import { runTitle } from "../activity/inbox/inbox";
 import { recentRunsQuery } from "../activity/inbox/useInbox";
+import { useAssistantShown } from "../preferences";
 import {
 	joinPath,
 	productBase,
@@ -59,6 +60,8 @@ export function usePaletteGroups(query: string, open: boolean) {
 	const graph = useOpenGraph();
 	const navigate = useNavigate();
 	const { pathname, search } = useLocation();
+	// With the assistant off there is no *Ask the assistant* row.
+	const [assistantShown] = useAssistantShown();
 	const q = query.trim();
 
 	const searchable = products.filter(
@@ -177,7 +180,7 @@ export function usePaletteGroups(query: string, open: boolean) {
 	if (q && related.length)
 		groups.push({ heading: "Related", entries: related.slice(0, PER_GROUP) });
 
-	if (q && graph) {
+	if (q && graph && assistantShown) {
 		groups.push({
 			heading: "Do",
 			entries: [

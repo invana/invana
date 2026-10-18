@@ -29,6 +29,8 @@ export interface HostChromeDeps {
 	workTarget: ReturnType<typeof useLayeredCanvas>["workTarget"];
 	/** The Explorer draws its own header switch and `footer`. */
 	explorer: boolean;
+	/** The user menu's *Assistant* — off, the header has no Assistant button. */
+	assistantShown: boolean;
 	connection: GraphConnectionRead | null | undefined;
 }
 
@@ -48,16 +50,17 @@ export function hostChrome(deps: HostChromeDeps) {
 		workCanvas,
 		workTarget,
 		explorer,
+		assistantShown,
 		connection,
 	} = deps;
 	const { canvas, magnet, toggleMagnet, backend, setBackend } = dataBoards;
 
 	return {
-		// One assistant, reachable from every surface. The trigger sits
-		// in the header's panel controls, after fullscreen — a persistent
-		// control, so it keeps one name wherever you are: `Assistant`, pressed
-		// while it holds the right side.
-		headerPanelControls: (
+		// One assistant, reachable from every surface. The trigger sits just
+		// before the avatar — a persistent control, so it keeps one name
+		// wherever you are: `Assistant`, pressed while it holds the right side.
+		// Switched off in the user menu, there is no trigger.
+		headerPanelControls: assistantShown ? (
 			<Button
 				variant="ghost"
 				size="sm"
@@ -72,7 +75,7 @@ export function hostChrome(deps: HostChromeDeps) {
 				<Star />
 				Assistant
 			</Button>
-		),
+		) : undefined,
 		// The Explorer's *Tools* switch, first in `header.right`.
 		headerRightExtras: explorer ? <ToolsSwitch /> : undefined,
 		// The Explorer's `footer`: the database it stands on, how it draws.

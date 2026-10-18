@@ -90,6 +90,7 @@ export { GraphForm } from "./pages/graphs/GraphForm";
 export { GraphsListPage } from "./pages/graphs/GraphsListPage";
 export { PlatformEventsPage } from "./pages/platform/PlatformEventsPage";
 export * from "./pages/settings/ProfileSettingsPage";
+export { useAssistantShown, useToolsAlwaysShown } from "./preferences";
 export * from "./products";
 export {
 	LEGACY_PANEL_PARAM,
@@ -116,4 +117,3 @@ export type { SetupSlots } from "./setup/SetupSlots";
 export { SetupSlotsContext } from "./setup/SetupSlots";
 export { SetupTimeline } from "./setup/SetupTimeline";
 export { useOnboarding } from "./setup/useOnboarding";
-export { useToolsAlwaysShown } from "./toolsPreference";

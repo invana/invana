@@ -27,6 +27,7 @@ import {
 	parseBoardPageId,
 	SetupSlotsContext,
 	useActiveProduct,
+	useAssistantShown,
 	useLeftSection,
 	useOnboarding,
 	useRightSection,
@@ -149,6 +150,8 @@ export function ProductHost() {
 	// Who holds the right side — `?right=assistant`, absent means closed. A
 	// param, so the region survives a reload.
 	const right = useRightSection();
+	// The user menu's *Assistant*: off, no product draws the assistant.
+	const [assistantShown] = useAssistantShown();
 	// The left rail's single-open param. Sessions is no longer one of its keys —
 	// it is the `assistant` occupant of the right side (the-assistant.md).
 	const { isOpen: onboardingOpen } = useOnboarding();
@@ -350,6 +353,7 @@ export function ProductHost() {
 		!right.is("assistant") &&
 		(explorerOpen || !settingsPanel.isOpen) ? (
 			<AssistantStart
+				asking={assistantShown}
 				username={username}
 				graphSlug={graphSlug}
 				graphName={graphContainer?.name ?? graphSlug}
@@ -419,7 +423,10 @@ export function ProductHost() {
 	// it belongs to — never over a declared board or the home page.
 	const dataBoardInFront = parseBoardPageId(strip.activeId)?.kind === "data";
 	const reopenPill =
-		dataBoardInFront && activeSessionId && !right.is("assistant") ? (
+		assistantShown &&
+		dataBoardInFront &&
+		activeSessionId &&
+		!right.is("assistant") ? (
 			<div className="absolute right-16 bottom-4 z-10">
 				<AssistantReopenPill
 					title={sessionTitleById.get(activeSessionId) ?? ""}
@@ -461,6 +468,7 @@ export function ProductHost() {
 		workCanvas,
 		workTarget,
 		explorer: explorerOpen,
+		assistantShown,
 		connection: graphLoading ? undefined : (graph ?? null),
 	});
 
@@ -545,7 +553,11 @@ export function ProductHost() {
 									</ErrorBoundary>
 								),
 							}}
-							rightSection={rightSection(regionDeps)}
+							rightSection={
+								// Switched off in the user menu, the right side holds nothing,
+								// whatever `?right=` says.
+								assistantShown ? rightSection(regionDeps) : undefined
+							}
 							bottomSection={consoleSection({
 								username,
 								graphSlug,

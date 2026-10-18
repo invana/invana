@@ -83,7 +83,7 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | Console | `AppLayoutV2` `bottomSection`, `bottomSpan: "main"` — under the canvas only, the chat stays full height. Resizable by its grip, collapsible, tabs Records · Query · Log, Records as Table or JSON, Re-run. It opens on Records when a query answers and on Log when one fails, while the page watches; a reply’s record count opens it on Records. The strip has no console toggle |
 | Sessions | Live in the chat’s history, not a second side panel: the header’s Sessions shows *Sessions `n`* · *New* · a search, and every session newest first — its outcome’s dot, its title, when, and *failed* when its last reply did. The history is a view over the open thread: the board keeps its canvas while it shows |
 | Sharing | Members get a live link (same board and chat) or a frozen snapshot (board image, answer, citations, dataset versions). Outside people get an exported file, never access; guardrails apply to what exports carry. The snapshot is a report on the answer's run, opened at `/explorer?page=run:<id>@<version>`; its board is kept as its records, and its datasets are the bindings when it was taken ([4.5](../for-developers/modules/explore/features/share-an-answer.md) SA1–SA11) |
-| Off entirely | The user menu switches the assistant off in every product (SH-07) |
+| Off entirely | The user menu’s *Assistant* switches it off in every product, per browser (SH-07): no header button, no docked chat whatever `?right=` says, no reopen pill, no *Ask the assistant* in ⌘K, no *Ask about* on a record. The Explorer’s start keeps *Your views* and says how to turn asking back on — queries are typed in the chat, so there is no question box without it |
 | Schedules | *Schedule this* on a reply opens the schedule dialog filled with the question; saving confirms with a toast that opens it in Activity › Schedules |
 | Into a project | An answer becomes a finding with its evidence (records, queries, dataset versions) attached |
 | A reply | The assistant’s mark, then the words; under them what it stood on (`195 records · Everything · 9ms`); then *Load to canvas* (a graph not yet drawn) · *Save view* (keeps the board as it stands in its History) · *Schedule this* · *Add to a project* · *Share*; then *How I got this*, which unfolds the steps, the query and what the model was given. The question is a bubble on the right. While a run runs, the reply is its live steps |
@@ -101,7 +101,6 @@ What the prototype draws that Studio does not do yet. Each is a gap, not a non-g
 | `explorer.answer` (EX-02) | Numbered notes the answer pins on the board, and the board tool that adds one | A notes layer on the canvas |
 | `explorer.answer.trace` (EX-04) | *Datasets behind the records* under the steps | The run’s dataset bindings on the reply |
 | `explorer.home` | The composer’s first chip reads the skill (*Explain*); today it reads the ask kind | The engine picks a skill inside each run from the agent’s bound skills, so nothing names one before the ask; the chip needs the run’s skill exposed on the thread |
-| `shell.user_menu` (SH-07) | *Assistant* on/off in the user menu | The off switch across products |
 
 ## Not building
 

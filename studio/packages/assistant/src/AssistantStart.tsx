@@ -49,6 +49,9 @@ interface AssistantStartProps
 	views: readonly StartView[];
 	/** Reopen a view: its session's thread docks right, its canvas opens. */
 	onOpenSession: (sessionId: string) => void;
+	/** The user menu's *Assistant*. Off, there is no question box and no
+	 *  recent questions — only the views, and the way to turn asking on. */
+	asking: boolean;
 }
 
 /**
@@ -77,6 +80,7 @@ export function AssistantStart({
 	onManageWorlds,
 	views,
 	onOpenSession,
+	asking,
 	...composer
 }: AssistantStartProps) {
 	const { data } = useQuery({
@@ -87,7 +91,7 @@ export function AssistantStart({
 				includeArchived: false,
 				surface: "explorer",
 			}),
-		enabled: !!username && !!graphSlug,
+		enabled: asking && !!username && !!graphSlug,
 	});
 	// The distinct questions most recently asked — a session's title is its
 	// first question until someone renames it.
@@ -110,27 +114,34 @@ export function AssistantStart({
 			{subtitle && (
 				<p className="-mt-2 text-xs text-muted-foreground">{subtitle}</p>
 			)}
-			<div className="w-full max-w-2xl rounded-control shadow-lg">
-				<SessionComposer
-					{...composer}
-					sessionKey={null}
-					takesAsk={false}
-					placeholder="Ask a question, or say what to draw…"
-					worldControl={
-						<WorldPicker
-							username={username}
-							graphSlug={graphSlug}
-							lensId={world.lensId}
-							missing={world.missing}
-							nextAskOnly={world.nextAskOnly}
-							onPick={world.pick}
-							onNextAskOnly={world.setNextAskOnly}
-							onManage={onManageWorlds}
-						/>
-					}
-				/>
-			</div>
-			{recent.length > 0 && (
+			{!asking && (
+				<p className="text-muted-foreground">
+					The assistant is off. Turn it on from your avatar’s menu to ask.
+				</p>
+			)}
+			{asking && (
+				<div className="w-full max-w-2xl rounded-control shadow-lg">
+					<SessionComposer
+						{...composer}
+						sessionKey={null}
+						takesAsk={false}
+						placeholder="Ask a question, or say what to draw…"
+						worldControl={
+							<WorldPicker
+								username={username}
+								graphSlug={graphSlug}
+								lensId={world.lensId}
+								missing={world.missing}
+								nextAskOnly={world.nextAskOnly}
+								onPick={world.pick}
+								onNextAskOnly={world.setNextAskOnly}
+								onManage={onManageWorlds}
+							/>
+						}
+					/>
+				</div>
+			)}
+			{asking && recent.length > 0 && (
 				<div className="flex flex-wrap justify-center gap-2">
 					{recent.map((q) => (
 						<Button

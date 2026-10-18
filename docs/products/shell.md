@@ -20,7 +20,7 @@ Not a product. The layout and the features that appear in all five. Prototype pa
 | ⌘K | search or ask | Jumps to any record, model, run, schedule, or asks the assistant |
 | Notifications | bell with a count | Opens Activity › Inbox |
 | Assistant | toggle | Highlighted while the chat is open; opens and closes the chat docked on the right. Can be switched off entirely (user menu) |
-| Avatar | user menu | Assistant on/off · tools always shown · theme · Graph setup (inside a Graph) · profile |
+| Avatar | user menu | Assistant on/off · tools always shown · theme · Graph setup (inside a Graph) · profile. The two switches are per browser; Assistant off hides it in every product |
 | Nothing else | — | No theme, fullscreen, set-up or repository buttons in the header; the theme and set-up live in the user menu |
 
 ## Breadcrumbs

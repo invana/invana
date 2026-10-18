@@ -27,3 +27,7 @@ new: it opens the schedule dialog filled with the question. Sessions is a view o
 thread, newest first, and no longer closes the board. The composer drops its timeout picker and
 file attachment. The console opens on Records when a query answers, and a reply's record count
 opens it.
+
+**The assistant can be switched off.** *Assistant* in the user menu hides it in every product —
+the header button, the docked chat, its reopen pill, ⌘K's *Ask the assistant* and a record's
+*Ask about*. The Explorer's start then keeps your views and says how to turn asking back on.

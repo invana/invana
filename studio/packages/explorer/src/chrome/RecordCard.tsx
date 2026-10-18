@@ -37,8 +37,8 @@ export interface RecordCardProps {
 	missing?: boolean;
 	modelName?: (modelId: string) => string | undefined;
 	onOpenModel?: (modelId: string) => void;
-	/** Ask the assistant about this record. */
-	onAsk: () => void;
+	/** Ask the assistant about this record. Absent while the assistant is off. */
+	onAsk?: () => void;
 	/** Expand a node's neighbours. Absent on a relationship. */
 	onExpand?: () => void;
 	onHide: () => void;
@@ -134,10 +134,12 @@ export function RecordCard({
 				</div>
 			</ScrollArea>
 			<div className="flex items-center gap-1.5 border-t border-border px-3 py-2">
-				<Button size="sm" onClick={onAsk}>
-					<Star />
-					Ask about {name}
-				</Button>
+				{onAsk && (
+					<Button size="sm" onClick={onAsk}>
+						<Star />
+						Ask about {name}
+					</Button>
+				)}
 				{onExpand && (
 					<Button size="sm" variant="outline" onClick={onExpand}>
 						<Share2 />

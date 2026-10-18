@@ -24,9 +24,9 @@ import {
 	UserCog,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAssistantShown, useToolsAlwaysShown } from "../../preferences";
 import { useOpenGraph } from "../../products";
 import { useOnboarding } from "../../setup/useOnboarding";
-import { useToolsAlwaysShown } from "../../toolsPreference";
 
 const MODES = [
 	{ value: "light", label: "Light" },
@@ -36,7 +36,8 @@ const MODES = [
 
 /**
  * Avatar dropdown at the end of `header.right` on every shell surface: who is
- * signed in, the person's own switches — *Tools always shown* and the theme —
+ * signed in, the person's own switches — *Assistant*, *Tools always shown* and
+ * the theme —
  * the open Graph's set-up, their profile, the superuser's admin links and
  * sign out. The header holds none of these as buttons of its own.
  */
@@ -47,6 +48,7 @@ export function UserMenu() {
 	const { open: openSetup } = useOnboarding();
 	const { mode, setMode } = useTheme();
 	const [toolsShown, setToolsShown] = useToolsAlwaysShown();
+	const [assistantShown, setAssistantShown] = useAssistantShown();
 
 	if (!user) return null;
 
@@ -76,6 +78,12 @@ export function UserMenu() {
 					</div>
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
+				<DropdownMenuCheckboxItem
+					checked={assistantShown}
+					onCheckedChange={(on) => setAssistantShown(on === true)}
+				>
+					Assistant
+				</DropdownMenuCheckboxItem>
 				<DropdownMenuCheckboxItem
 					checked={toolsShown}
 					onCheckedChange={(on) => setToolsShown(on === true)}

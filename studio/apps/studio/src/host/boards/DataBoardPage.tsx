@@ -114,8 +114,9 @@ export interface BoardPageProps {
 	modelName: (modelId: string) => string | undefined;
 	onOpenModel: (modelId: string) => void;
 	onCloseRecord: () => void;
-	/** The card's *Ask about* — the selection rides along as the attachment. */
-	onAskAboutRecord: () => void;
+	/** The card's *Ask about* — the selection rides along as the attachment.
+	 *  Absent while the assistant is off. */
+	onAskAboutRecord?: () => void;
 
 	/** Node-expand. `onOpenFineTune` is supplied here, not by the caller — the
 	 *  panel it opens is this page's. */

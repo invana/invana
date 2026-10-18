@@ -20,6 +20,7 @@ import {
 	declaredPage,
 	parseBoardPageId,
 	useActiveProduct,
+	useAssistantShown,
 } from "@invana-studio/shell";
 import { Home, Pencil, Route, X } from "lucide-react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
@@ -198,6 +199,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	// (graph-detail-page.md), so the shell calls into the page.
 	const boardPageRef = useRef<BoardPageHandle>(null);
 	const explorerOpen = useActiveProduct()?.id === "explorer";
+	const [assistantShown] = useAssistantShown();
 
 	// Clicking a node/edge feeds `selectedId` via <SelectionBridge>; the
 	// derived `selected` (above) is the record card the page floats over the
@@ -227,7 +229,9 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			missingIds={missingIds}
 			modelName={modelName}
 			onCloseRecord={() => setSelectedId(null)}
-			onAskAboutRecord={() => right.open("assistant")}
+			onAskAboutRecord={
+				assistantShown ? () => right.open("assistant") : undefined
+			}
 			onOpenModel={() => settingsPanel.setSection("runs")}
 			interactionRef={runRef}
 			expand={expandHandlers}

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ask, emission } from "./explorer";
+import { ask, emission, GRAPH } from "./explorer";
 
 /**
  * The Explorer around the answer
@@ -86,4 +86,35 @@ test("a rejected query is a diagnosis, never an answer", async ({ page }) => {
 
 	// A failure is not an empty answer: nothing renders an emission card here.
 	await expect(emission(page)).toHaveCount(0);
+});
+
+test("SH-07 the user menu switches the assistant off, and back on", async ({
+	page,
+}) => {
+	await page.goto(`${GRAPH}/explorer`);
+	const assistant = page.getByRole("button", {
+		name: "Assistant",
+		exact: true,
+	});
+	await expect(assistant).toBeVisible({ timeout: 30_000 });
+
+	await page.getByRole("button", { name: "User menu" }).click();
+	await page.getByRole("menuitemcheckbox", { name: "Assistant" }).click();
+	await page.keyboard.press("Escape");
+
+	// Off: no header button, no question box — the views and the way back.
+	await expect(assistant).toHaveCount(0);
+	await expect(page.getByTestId("composer")).toHaveCount(0);
+	await expect(page.getByText("The assistant is off.")).toBeVisible();
+	// A link that names the chat does not bring it back.
+	await page.goto(`${GRAPH}/explorer?right=assistant`);
+	await expect(
+		page.getByRole("button", { name: "Close the assistant" }),
+	).toHaveCount(0);
+
+	await page.getByRole("button", { name: "User menu" }).click();
+	await page.getByRole("menuitemcheckbox", { name: "Assistant" }).click();
+	await page.keyboard.press("Escape");
+	await expect(assistant).toBeVisible();
+	await expect(page.getByTestId("composer").first()).toBeVisible();
 });
