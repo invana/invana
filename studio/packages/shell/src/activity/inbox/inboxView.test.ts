@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Approval, Notification } from "../notifications/types";
 import type { InboxItem } from "./inbox";
 import {
+	effectOf,
 	filterInbox,
 	nextStepOf,
 	payloadSections,
@@ -103,5 +104,11 @@ describe("the Inbox view", () => {
 		]);
 		expect(timeLeft(approval.deadline_at, NOW)).toBe("5 h");
 		expect(timeLeft(new Date(NOW - 1).toISOString(), NOW)).toBeNull();
+	});
+
+	it("says what each choice does for a held agent step, and that declining sends nothing", () => {
+		expect(effectOf("step").approve).toMatch(/run carries on/);
+		expect(effectOf("step").decline).toMatch(/Nothing is sent/);
+		expect(effectOf("model_publish").decline).toMatch(/unpublished/);
 	});
 });

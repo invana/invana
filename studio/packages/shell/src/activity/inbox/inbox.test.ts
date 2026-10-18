@@ -82,6 +82,16 @@ describe("inboxOf", () => {
 		expect(inboxCount(items)).toBe(3);
 	});
 
+	it("shows a run held on an approval once, as the approval", () => {
+		const items = inboxOf(
+			[{ ...approval, run_id: "held" }],
+			[run("held", "awaiting_input", 5_000)],
+			[],
+		);
+		expect(items.map((i) => i.id)).toEqual(["approval:ap1"]);
+		expect(inboxCount(items)).toBe(1);
+	});
+
 	it("names the product a run came from", () => {
 		expect(productOfRun(run("a", "failed", 0, { kind: "import" }))).toBe(
 			"datasets",

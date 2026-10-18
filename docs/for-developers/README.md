@@ -195,7 +195,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 10.4 | [External-agent API](modules/operate/features/external-agent-api.md) | Scoped tokens; retrieval with provenance | 🔵 | — | 🔵 | S10 |
 | 10.5 | [See what ran](modules/operate/features/see-what-ran.md) | **Runs** — every run in the Graph, children nested; Imports is a filter of it | 🟡 | — | 🟡 | S14 |
 | 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | ✅ | B01 |
-| 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | ✅ | B08 |
+| 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | 🟡 | B08 |
 | 10.8 | [Approvals](modules/operate/features/approvals.md) | Anything sent outside waits for a named approver; a reminder at half-time; at the deadline *expired, not sent* | ✅ | ✅ | 🟡 | B08 |
 
 

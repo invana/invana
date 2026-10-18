@@ -7,11 +7,17 @@ import { GRAPH } from "./explorer";
  * in the header as the way in, and a run's page inside the Runs tab.
  */
 
-test("the bell opens the Inbox, and each tab is a path", async ({ page }) => {
+test("the bell opens the tray, the tray opens the Inbox, and each tab is a path", async ({
+	page,
+}) => {
 	await page.goto(GRAPH);
-	await page
-		.getByRole("link", { name: "Notifications" })
-		.click({ timeout: 30_000 });
+	const bell = page.getByRole("button", { name: "Notifications" });
+	await bell.waitFor({ timeout: 30_000 });
+	const here = page.url();
+	await bell.click();
+	// The tray opens over the page; the bell never navigates.
+	await expect(page).toHaveURL(here);
+	await page.getByRole("button", { name: "Open inbox" }).click();
 	await expect(page).toHaveURL(`${GRAPH}/activity/inbox`);
 	// What needs someone, or that nothing does.
 	await expect(

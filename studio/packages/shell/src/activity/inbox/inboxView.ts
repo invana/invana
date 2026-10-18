@@ -9,6 +9,7 @@
  * | `nextStepOf` | a notification's one button: *Review* · *Open run* · *Open* · *Mark read* |
  * | `timeLeft` | an approval's deadline as time left, or null once it has passed |
  * | `payloadSections` | an approval's payload as label/value rows, nothing hidden |
+ * | `effectOf` | what *Approve* and *Decline* each do, by what the approval holds |
  *
  * *Unread* hides read notifications only: an approval or a run waiting on an
  * answer always needs the person, so it stays. A product filter keeps only
@@ -163,4 +164,30 @@ export function payloadSections(
 	}
 	const rows = rowsOf(payload);
 	return rows.length ? [{ heading: null, rows }] : [];
+}
+
+export interface Effect {
+	approve: string;
+	decline: string;
+}
+
+/**
+ * What each choice does, by what the approval holds: an agent's step held
+ * before it sends, a finished run's outward delivery, or a breaking publish.
+ */
+export function effectOf(subjectKind: string): Effect {
+	if (subjectKind === "step")
+		return {
+			approve: "It is sent, and the run carries on from this step.",
+			decline: "Nothing is sent; the step ends not sent.",
+		};
+	if (subjectKind === "model_publish")
+		return {
+			approve: "The migration runs and the draft is published.",
+			decline: "The draft stays unpublished.",
+		};
+	return {
+		approve: "It is sent within a minute.",
+		decline: "Nothing is sent.",
+	};
 }

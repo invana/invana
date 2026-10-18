@@ -802,6 +802,14 @@ SH-16), as Studio builds them in `@invana-studio/shell` (migration session C05).
 | `shell.schedule.new` | SH-13 | the same › *New schedule* — no sources, tools or project picker | ✅ |
 | `shell.schedule.detail` | SH-13 | `/activity/schedules/<id>` — Instructions · Firings · Delivers to; no Plan card | ✅ |
 | `shell.notifications` | SH-15 | `/activity/inbox` — approvals, runs waiting on an answer, notifications | ✅ |
+| `shell.notifications.tray` | SH-15 | the bell’s popover over any page — Needs you · Updates | ✅ |
+| `shell.notifications.tray.review` | SH-15 | the tray › *Review* — a held `mail.send` step, exactly what goes | ✅ |
+| `shell.notifications.tray.review.not_approver` | SH-15 | the same, not named — acts disabled, approvers named | ✅ |
+| `shell.notifications.tray.review.decided` | SH-15 | the same, decided first by someone else (409) — the engine’s 409 words inline, not a *who · when* line | 🟡 |
+| `shell.notifications.tray.review.expired` | SH-15 | the same, past the deadline — nothing was sent | ✅ |
+| `shell.notifications.tray.answer` | SH-15 | the tray › *Answer* — a run’s question, answered in place; *Answer* goes to the run until the run read carries its question | 🔵 |
+| `shell.notifications.tray.empty` | SH-15 | the tray, nothing needs you — *New rule* | ✅ |
+| `shell.notifications.toast` | SH-15 | a toast for a new approval or question — *Review* opens the tray | ✅ |
 | `shell.notifications.rules` | SH-16 | `/activity/rules` | ✅ |
 | `shell.notifications.rule` | SH-16 | `/activity/rules` › a rule (`?new=1` opens *New rule*) — events only, no metric condition or preview | ✅ |
 | `shell.notifications.channels` | SH-16 | `/activity/channels` — Teams listed *not connected* | ✅ |
@@ -884,7 +892,7 @@ So a feature file can be opened next to the drawing that shows it.
 | 10.3 | Observability | 🔵 | 🔵 | S11 | `AgentStatsHiFi` | 🔵 |
 | 10.5 | See what ran | 🔵 | 🔵 | S14 | `RunDetail` · `DrawerRunsList` · `DrawerRunLive` · `DrawerRunAll` · `DrawerRunDebug` · `RunDash` · `StepImport` · `StepQuery` · `StepLlm` · `RunLens` | 🔵 · ✅ |
 | 10.6 | Change log | ✅ | ✅ | B01 · C04 | `shell.events.changes` · `shell.change.compare` · `modeller.model.history` · `datasets.record` | ✅ |
-| 10.7 | Notifications | ✅ | ✅ | B08 · C05 | `shell.notifications` · `shell.notifications.rules` · `shell.notifications.rule` · `shell.notifications.channels` | ✅ |
+| 10.7 | Notifications | ✅ | ✅ | B08 · C05 | `shell.notifications` · `shell.notifications.rules` · `shell.notifications.rule` · `shell.notifications.channels` · `shell.notifications.tray*` · `shell.notifications.toast` built; `shell.notifications.tray.answer` not built | 🟡 |
 | 10.8 | Approvals | ✅ | 🟡 | B08 · C05 | `shell.notifications` (review from the Inbox); `shell.activity.approvals` · `shell.run.approval` not built | 🟡 |
 | 13.3 | Command line | — | — | — | `CliHiFi` | — |
 | 13.7 | Setup | ✅ | 🟡 | S13 | `SetupPageHiFi` · `SetupBlockedHiFi` · `SetupReadyHiFi` · `SetupLocksHiFi` | 🟡 |

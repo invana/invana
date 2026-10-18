@@ -7,6 +7,8 @@
  * | waiting | runs `awaiting_input` in the Graph's last 100 runs — no event says so | newest first | Answer |
  * | notification | `GET …/notifications` — what rules, schedules and approvals told me | newest first | open its target |
  *
+ * A run held on an approval shows once, as the approval.
+ *
  * Failed runs arrive as notifications, through a rule; nothing here derives
  * them from the journal, so no failure shows twice. The count the bell and
  * the Inbox tab carry is unread notifications + approvals + waiting runs.
@@ -106,8 +108,10 @@ export function inboxOf(
 			approval,
 		}))
 		.sort((x, y) => x.at - y.at);
+	// A run held on an approval is waiting too; its approval row already asks.
+	const held = new Set(approvals.map((x) => x.run_id).filter(Boolean));
 	const w: InboxItem[] = runs
-		.filter((r) => r.status === "awaiting_input")
+		.filter((r) => r.status === "awaiting_input" && !held.has(r.id))
 		.map((run) => ({
 			kind: "waiting" as const,
 			id: `run:${run.id}`,

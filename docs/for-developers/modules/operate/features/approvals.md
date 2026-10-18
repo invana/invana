@@ -18,7 +18,7 @@ sent** — never auto-approved.
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | One row per thing waiting | `subject_kind` · `subject_id` · the run it came from · `payload` — exactly what will be sent, to which channels |
+| C1 | One row per thing waiting | `subject_kind` — `delivery` (a finished run's outward send), `step` (an agent's `send` step, held mid-run — [tool-plugins](../../platform/features/tool-plugins.md) C10), `model_publish` · `subject_id` · the run it came from · `payload` — exactly what will be sent, to which channels |
 | C2 | Named approvers | User ids; only they may decide. Empty is refused at request |
 | C3 | A deadline | `deadline_at`; a reminder at half-time, once |
 | C4 | Approve · decline, with a note | Approve releases the held deliveries; decline marks them `declined`, not sent |
@@ -63,12 +63,13 @@ flowchart TD
 |---|---|
 | Activity › Approvals | Pending first, nearest deadline first; each shows what will be sent and to where |
 | The approval | The payload as it will be sent, the channels, approvers, deadline, Approve · Decline with a note |
+| The tray | The bell's popover lists what waits on me; *Review* opens the approval inside it — payload, what each choice does, who asked, the run and step, approvers, time left — and only then Approve · Decline ([notifications](notifications.md) NT11 · NT12) |
 
 ## Engine
 
 | Thing | Shape |
 |---|---|
-| `approvals` | `graph_id` · `subject_kind (delivery · model_publish)` · `subject_id` · `run_id` · `schedule_id` · `title` · `payload` · `approver_ids[]` · `requested_by_id` · `deadline_at` · `reminded_at` · `status (pending · approved · declined · expired)` · `decided_by_id` · `decided_at` · `note` |
+| `approvals` | `graph_id` · `subject_kind (delivery · step · model_publish)` · `subject_id` · `run_id` · `schedule_id` · `title` · `payload` · `approver_ids[]` · `requested_by_id` · `deadline_at` · `reminded_at` · `status (pending · approved · declined · expired)` · `decided_by_id` · `decided_at` · `note` |
 | Routes | `GET …/approvals` (`?status=` · `?mine=true`) · `GET …/approvals/{id}` · `POST …/approvals/{id}/approve` · `POST …/approvals/{id}/decline` (tag `approvals`) |
 | Events | `approval.request · approve · decline · expire · remind` |
 | CLI | `invana approvals list · approve · decline` |

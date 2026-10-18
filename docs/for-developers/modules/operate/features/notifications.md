@@ -8,7 +8,7 @@ inbox to send to; a **notification** is one inbox row; a **delivery** is one sen
 |---|---|
 | Index | [10.7](../../../README.md#10--operate) · Slice **B08** |
 | Module | [Operate](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / ✅ |
+| API / CLI / Studio | ✅ / ✅ / 🟡 |
 | Related | [approvals](approvals.md) · [schedules](schedules.md) · [audit-and-activity](audit-and-activity.md) · [roles](../../identity-and-access/features/roles.md) · products [shell.md › Activity](../../../../products/shell.md#activity) SH-15 · SH-16 |
 
 > **As** anyone on a Graph, **I want** one inbox of what needs me and rules that say which events
@@ -45,8 +45,17 @@ flowchart TD
     J --> K[Inbox row per recipient]
     J --> L[Delivery per channel · sent]
     L -->|channel down| M[Retried · then failed with the error]
-    K --> N[Bell count · Activity › Inbox]
-    N --> O[Open · marked read]
+    K --> N[Bell count]
+    N --> T[Bell opens the tray over the page]
+    T --> U{Row kind}
+    U -->|update| O[Go to its target · marked read]
+    U -->|approval| R[Review in the tray · exactly what will be sent]
+    R --> V{Approver and still pending?}
+    V -->|no · not named| V1[Reads · acts disabled · names the approvers]
+    V -->|no · decided or expired| V2[Says who decided · or expired, nothing sent]
+    V -->|yes| W[Approve · Decline with a note · the run resumes]
+    U -->|question| Q[Answer in the tray · the run resumes]
+    T --> X[Open inbox · Activity › Inbox]
 ```
 
 ## Seams
@@ -54,6 +63,10 @@ flowchart TD
 | Seam | What the user sees |
 |---|---|
 | Inbox empty | *Nothing needs you* — good news, not a blank page |
+| Tray empty | *Nothing needs you*, with *New rule* — failures reach a person only through a rule |
+| Tray loading | The tray opens at once with skeleton rows; the bell's count is the last one read |
+| An approval decided elsewhere while the tray is open | *Review* shows who decided and when in place of the acts (409) |
+| A new approval or question while Studio is open | A toast with *Review*, which opens it in the tray; updates never toast |
 | A viewer opens Rules | The list reads; *New rule* is disabled naming the owners (rules and channels are the `settings` area) |
 | Email with no SMTP on the install | The channel saves; its read says *email is not configured on this install*; each delivery fails with that reason |
 | A channel deleted while a rule names it | Refused (409) naming the rules that use it |
@@ -66,7 +79,9 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Header bell | Unread count from `GET …/notifications?unread=true` |
+| Header bell | The count: unread notifications + approvals waiting on me + runs waiting on my answer. A click opens the tray; it never navigates |
+| The tray | A popover under the bell. **Needs you** (approvals, then questions — *Review* · *Answer* open inside the tray) above **Updates** (notifications — a click goes to the target). *Mark all read* · *Rules* · *Open inbox* |
+| A toast | One per new approval or question for me; *Review* opens it in the tray |
 | Activity › Inbox | My notifications and the approvals waiting on me, each with its next step |
 | Activity › Rules · rule | The rules list; a rule's events, match, recipients and channels |
 | Activity › Channels | The channels with kind, masked target and *ready* |
@@ -98,7 +113,10 @@ flowchart TD
 | NT7 | A rule never matches `notification.*`, `delivery.*` or `approval.remind`, so no rule can feed itself. |
 | NT8 | Recipients resolve at match time: named members still on the Graph, holders of the named roles, and `requester` (the event's `on_behalf_of_user_id`, else its user actor). An event on a private project reaches only its staffed people. |
 | NT9 | A send is tried three times, one per tick, then left `failed` with the error. The inbox row is written first and never depends on a channel. |
-| NT10 | Read state is per notification (`read_at`); the bell is the unread count. Approvals waiting on the reader are counted by the Inbox as rows of their own until decided. |
+| NT10 | Read state is per notification (`read_at`); the bell counts unread notifications plus the approvals and runs waiting on the reader, which stay rows of their own until decided or answered. |
+| NT11 | **The bell opens the tray; the Inbox is the history.** The tray reads the same three lists as the Inbox and carries the same count. What needs a person is decided in place — reviewed and approved, or answered — without leaving the page. |
+| NT12 | **Nothing is approved from a list row.** *Approve* · *Decline* appear only after *Review* has shown the payload exactly as it will be sent and what each choice does. |
+| NT13 | Only what needs a person toasts — a new approval or question. Updates wait in the tray. |
 
 ## Not building
 
@@ -109,4 +127,5 @@ flowchart TD
 | Digest batching or quiet hours | a schedule is how routine reading recurs |
 | Rules on an answer's value | that is a monitoring product |
 | Escalation chains and on-call rotations | a rule names its people; paging policy is another product's job |
+| One-click approve from the tray or a toast | an approval is decided from what it will send (NT12) |
 | Per-user channel preferences | a rule owns its channels; a person reads the inbox |
