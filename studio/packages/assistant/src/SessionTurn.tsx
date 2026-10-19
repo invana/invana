@@ -32,7 +32,12 @@ import { RunCannotAnswer, RunDiagnosis } from "./answer-surface/NotAnAnswer";
 import { loadableGraph, ResultBlock } from "./answer-surface/ResultBlock";
 import { CastRefusalCard } from "./CastRefusal";
 import { SessionContextDisclosure } from "./SessionContextDisclosure";
-import { type StepClarification, StepList, StepTrace } from "./SessionSteps";
+import {
+	type StepClarification,
+	StepList,
+	StepTrace,
+	totalDuration,
+} from "./SessionSteps";
 import { stepsFor } from "./SessionStepsTimeline";
 
 // ── User turn ─────────────────────────────────────────────────────────────────
@@ -288,15 +293,16 @@ function SettledTurn({
 	const answerRunId = message.runId;
 	const question = prompt ?? message.content;
 
-	// What the answer stood on: `72 records · EU · H1 2026`.
+	// What the answer stood on: `72 records · EU · H1 2026`. The time is the
+	// whole run — its steps summed, so it agrees with the rows under *How I
+	// got this* — and the query's own time stays on the Execute row.
+	const tookMs = hasSteps ? totalDuration(steps) : message.executionTimeMs;
 	const meta = [
 		message.rowCount != null
 			? `${message.rowCount.toLocaleString()} record${message.rowCount === 1 ? "" : "s"}`
 			: null,
 		message.runId ? (message.lensName ?? "Everything") : null,
-		message.executionTimeMs != null
-			? formatDuration(message.executionTimeMs)
-			: null,
+		tookMs != null ? formatDuration(tookMs) : null,
 	]
 		.filter(Boolean)
 		.join(" · ");
