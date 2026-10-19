@@ -1,8 +1,6 @@
-import { Button } from "@invana/ui";
 import type { Emission, QueryResponse } from "@invana-studio/core";
 import { emissionsApi } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Network } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { EmissionList } from "./AnswerEmission";
@@ -14,10 +12,10 @@ import { TraceDialog } from "./TraceDialog";
 // of them goes through the emission card — header over a body — rather
 // than a bare table under the reply.
 //
-// A graph result is the one that waits: until it is on the canvas it is an
-// offer on the reply's own line (see `LoadToCanvasAction`), because the counts
-// are already in the reply sentence and the Project step above it. Once it has
-// landed, the subgraph emission states what landed and what it did not replace.
+// A subgraph is the one kind with no card: its body is the canvas, and the
+// reply sentence and meta line already carry its counts and its records. The
+// reply offers *Load to canvas* until it is drawn; the citation stays on the
+// meta line, which opens the records in the console.
 //
 // An emission is a **record** now: given a run, this reads the
 // emissions the `project` step wrote, so an answer survives a reload instead of
@@ -28,17 +26,11 @@ import { TraceDialog } from "./TraceDialog";
 
 export interface ResultBlockProps {
 	result: QueryResponse | null | undefined;
-	/** This reply's graph result is already painted on the canvas. */
-	onCanvas?: boolean;
 	/** The run that produced the answer; without one there is nothing to read. */
 	runId?: string;
 }
 
-export function ResultBlock({
-	result,
-	onCanvas = false,
-	runId,
-}: ResultBlockProps) {
+export function ResultBlock({ result, runId }: ResultBlockProps) {
 	// The citation opens the trace in place: "where did this number come from" is
 	// a question about *this* emission, so the answer opens from its own header
 	// rather than from a menu somewhere else.
@@ -84,19 +76,15 @@ export function ResultBlock({
 			}),
 	});
 
-	// The stored subgraph says what the step produced, not whether this person
-	// has loaded it — that is the reply's own fact, so it overrides the record.
 	const emissions: Emission[] =
 		scoped && persisted.data?.length
-			? persisted.data.map((e) =>
-					e.kind === "subgraph" ? { ...e, onCanvas } : e,
-				)
-			: emissionsFromResult(result, { onCanvas });
+			? persisted.data
+			: emissionsFromResult(result);
 
 	return (
 		<>
 			<EmissionList
-				emissions={emissions.filter((e) => e.kind !== "subgraph" || e.onCanvas)}
+				emissions={emissions.filter((e) => e.kind !== "subgraph")}
 				onSwitchTemplate={
 					scoped
 						? (emissionId, templateId) =>
@@ -125,25 +113,4 @@ export function loadableGraph(
 	if (result?.result_type !== "graph" || !result.data) return null;
 	const { nodes, edges } = result.data;
 	return nodes.length === 0 && edges.length === 0 ? null : result;
-}
-
-/**
- * "Load to canvas" as a question the reply asks, answered in place: it sits on
- * the reply's own line ("Returned 10 nodes and 0 relationships. [Load to
- * canvas]") rather than in a bordered panel underneath, and once answered the
- * line below records what happened — the same asked / you-answered grammar the
- * clarifying steps use (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md).
- */
-export function LoadToCanvasAction({ onLoad }: { onLoad: () => void }) {
-	return (
-		<Button
-			variant="secondary"
-			size="sm"
-			className="h-6 shrink-0 px-2 font-normal"
-			onClick={onLoad}
-		>
-			<Network className="mr-1.5 h-3.5 w-3.5" />
-			Load to canvas
-		</Button>
-	);
 }

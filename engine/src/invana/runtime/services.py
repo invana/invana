@@ -203,7 +203,13 @@ async def open_turn(
 
     messages_qs = SessionMessageQuerySet()
     user_seq = await messages_qs.next_seq(db, session_id=sess.id)
-    user_msg = SessionMessage(session_id=sess.id, seq=user_seq, role=SessionMessageRole.user, content=payload.content)
+    user_msg = SessionMessage(
+        session_id=sess.id,
+        seq=user_seq,
+        role=SessionMessageRole.user,
+        content=payload.content,
+        operation=payload.operation,
+    )
     assistant_msg = SessionMessage(
         session_id=sess.id,
         seq=user_seq + 1,
@@ -211,6 +217,7 @@ async def open_turn(
         content="Generating model…" if is_modeller else "Running query…",
         status=SessionMessageStatus.running,
         mode="nl" if is_modeller else payload.mode,
+        operation=payload.operation,
         timeout_s=payload.timeout_s,
     )
     await messages_qs.add(db, user_msg)

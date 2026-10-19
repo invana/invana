@@ -77,6 +77,7 @@ export function timelineFor(
 		asked.push({
 			question: m.content,
 			options: m.clarificationOptions ?? [],
+			descriptions: m.clarificationDescriptions,
 			answer: answerMsg?.role === "user" ? answerMsg.content : undefined,
 		});
 		// Still awaiting: keep the paused step, live. Resolved: only that last

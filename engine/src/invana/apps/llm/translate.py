@@ -32,11 +32,31 @@ SUBMIT_QUERY_TOOL = {
         "language": {"type": "string", "enum": ["cypher", "gremlin"]},
         "read_only": {"type": "boolean", "description": "Must be true (when action=query)."},
         "rationale": {"type": "string", "description": "One sentence on what the query returns (when action=query)."},
+        "canvas_query": {
+            "type": "string",
+            "description": (
+                "When each row of `query` is one thing in the graph — an airport, a person — even with a count "
+                "or rank beside it, the same selection (same filter, ordering and limit) returning those WHOLE "
+                "nodes, so the rows can be drawn on a canvas. E.g. for `MATCH (a:airport)-[r:route]-() RETURN "
+                "a.code, count(r) AS n ORDER BY n DESC LIMIT 10` write `MATCH (a:airport)-[r:route]-() WITH a, "
+                'count(r) AS n ORDER BY n DESC LIMIT 10 RETURN a`. "" when `query` already returns whole '
+                "nodes, or when its rows are not things: a total, an average, counts per category."
+            ),
+        },
         "question": {"type": "string", "description": "One short clarifying question (when action=clarify)."},
         "options": {
             "type": "array",
             "items": {"type": "string"},
             "description": "Fixed answer options the user can pick (when action=clarify); else [].",
+        },
+        "option_descriptions": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": (
+                'One entry per option, in the same order. "" when the label says enough — most of the '
+                "time. One short sentence only when the person needs it to choose (what the option means, "
+                "what it favours). [] when there are no fixed options."
+            ),
         },
         "options_query": {
             "type": "string",
@@ -71,8 +91,10 @@ SUBMIT_QUERY_TOOL = {
         "language",
         "read_only",
         "rationale",
+        "canvas_query",
         "question",
         "options",
+        "option_descriptions",
         "options_query",
         "skills_applied",
         "rules_cited",
@@ -114,6 +136,8 @@ class GeneratedQuery:
     # can report LLM time next to query time (docs/for-developers/modules/platform/features/telemetry.md ·
     # docs/for-developers/modules/ask/features/ask-in-natural-language.md).
     duration_ms: float = 0.0
+    # Whole-node twin of a scalar-column ``query``, run only when the reply is drawn; "" when none.
+    canvas_query: str = ""
 
 
 @dataclass(slots=True)
@@ -129,6 +153,8 @@ class Clarification:
     question: str
     usage: TokenUsage
     options: list[str] = field(default_factory=list)
+    # One per option, in order — "" where the label says enough; [] when none says more.
+    option_descriptions: list[str] = field(default_factory=list)
     # A read-only query whose DISTINCT first-column values become the options —
     # so the user picks a real value from the graph (e.g. a category). Empty when
     # the options are a fixed list (``options``) or there are none.
@@ -165,7 +191,12 @@ def _system_prompt(
         "`MATCH (n:SomeType)-[r:REL_TYPE]->(m:OtherType) RETURN n, r, m LIMIT 10` (use the graph's own "
         "types) — NOT scalar columns. "
         'When they want a list/table ("as a table", "list", named fields, "count"), return scalar '
-        'columns instead. "canvas" and "visualiser" are presentation words, not labels in the graph — '
+        "columns instead — and when each row is one thing in the graph (a ranking or list of entities, "
+        'counts beside them included), also fill "canvas_query" with the same selection (same filter, '
+        'ordering and limit) returning those whole nodes, so the person can draw the rows later. Leave it "" '
+        'when the rows are not things (a total, an average, counts per category) and whenever "query" '
+        "already returns whole nodes. "
+        '"canvas" and "visualiser" are presentation words, not labels in the graph — '
         "never clarify about them.\n\n"
         'To show the RELATIONSHIPS/connections of a previous result ("relationships of these nodes", '
         '"connect them", "how are they linked") you do NOT have the result rows — reuse the previous '
@@ -178,12 +209,14 @@ def _system_prompt(
         "be rare. NEVER offer a 'show all' / 'list everything' option.\n\n"
         'Always fill every field. For action="query": put the query in "query", set read_only=true, set '
         '"question"="" , "options"=[] , "options_query"="". For action="clarify": put the question in '
-        '"question" and set "query"="". When the choice is WHICH value from the data, set '
+        '"question" and set "query"="" , "canvas_query"="". When the choice is WHICH value from the data, set '
         '"options_query" to a read-only query returning up to 10 DISTINCT, human-readable labels for '
         "that choice — prefer a name/description over a bare code; if the value is a code that has its "
         "own node carrying a name, return that name (you may append the code in parentheses). Leave "
         '"options"=[]. Otherwise list 2-4 fixed choices '
         'in "options" and set "options_query"="".'
+        ' Describe an option in "option_descriptions" only when its label alone would leave the person '
+        'unsure which to pick; otherwise leave its entry "".'
         "\n\n"
         f"Target query language: {language}\n\n"
         + (f"Standing instructions for this graph:\n{instructions}\n\n" if instructions else "")
@@ -216,6 +249,26 @@ def _looks_read_only(query: str, language: str) -> bool:
     if any(phrase in low for phrase in _CYPHER_WRITE_PHRASES):
         return False
     return _CYPHER_WRITE_RE.search(low) is None
+
+
+def option_pairs(data: dict) -> tuple[list[str], list[str]]:
+    """The fixed options and their descriptions, aligned by index.
+
+    A blank option is dropped with its description. The descriptions come back
+    as ``[]`` when none says more than its label — the common case, and what
+    tells the reader to draw one-line rows.
+    """
+    raw = data.get("options") or []
+    given = data.get("option_descriptions") or []
+    options: list[str] = []
+    descriptions: list[str] = []
+    for i, option in enumerate(raw):
+        label = str(option).strip()
+        if not label:
+            continue
+        options.append(label)
+        descriptions.append(str(given[i]).strip() if i < len(given) else "")
+    return options, descriptions if any(descriptions) else []
 
 
 async def nl_to_query(
@@ -254,7 +307,7 @@ async def nl_to_query(
         question = str(data.get("question") or "").strip()
         if not question:
             raise LLMError("The model asked to clarify but gave no question.")
-        options = [str(o).strip() for o in (data.get("options") or []) if str(o).strip()]
+        options, option_descriptions = option_pairs(data)
         # Only honour an options query that looks read-only (execute_query guards
         # again at run time); drop it otherwise so clarification never mutates.
         options_query = str(data.get("options_query") or "").strip()
@@ -264,6 +317,7 @@ async def nl_to_query(
             question=question,
             usage=result.usage,
             options=options,
+            option_descriptions=option_descriptions,
             options_query=options_query,
             exchange=result.exchange,
             duration_ms=result.duration_ms,
@@ -276,8 +330,14 @@ async def nl_to_query(
         raise QueryNotReadOnlyError(
             "That query would write to the graph — Invana only runs read-only queries.", query=query
         )
+    # A twin that does not read as read-only is dropped, never refused: the
+    # answer stands, it just cannot be drawn.
+    canvas_query = str(data.get("canvas_query") or "").strip()
+    if canvas_query and (canvas_query == query or not _looks_read_only(canvas_query, out_language)):
+        canvas_query = ""
     return GeneratedQuery(
         query=query,
+        canvas_query=canvas_query,
         language=out_language,
         read_only=True,
         rationale=str(data.get("rationale") or ""),

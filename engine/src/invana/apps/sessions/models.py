@@ -198,6 +198,8 @@ class SessionMessage(Base):
     query_language: Mapped[str | None] = mapped_column(String(32), nullable=True)
     # The query that produced this reply, so it can be re-run (Decision 10).
     source_query: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Whole-node twin of a table's ``source_query``, run when the reply is drawn; null otherwise.
+    canvas_query: Mapped[str | None] = mapped_column(Text, nullable=True)
     # NL only — the model's one-line rationale for ``source_query`` (docs/for-developers/modules/ask/spec.md).
     # Replayed (with the query) as conversation context so a follow-up like
     # "only show 5" can refine the prior turn. Null on QL, on rerun, and on
@@ -208,6 +210,8 @@ class SessionMessage(Base):
     # question (the reply
     # has no ``source_query``); null otherwise.
     clarification_options: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # One per option, "" where the label says enough; null when none says more.
+    clarification_descriptions: Mapped[list | None] = mapped_column(JSON, nullable=True)
     # 👍/👎 on an assistant reply — a capture signal for the learning loop
     # (docs/for-developers/modules/ask/features/clarifying-questions.md ·
     # docs/for-developers/modules/workflows/features/promote-a-plan.md). "up" | "down"; null = no vote / cleared.

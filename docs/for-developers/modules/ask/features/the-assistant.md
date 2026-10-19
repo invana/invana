@@ -80,6 +80,7 @@ flowchart TD
 | Reopened later | The thread as it was, with the run's outcome |
 | Switching to another session | The chip follows: it reads that session's world |
 | A new session | Starts in *Everything*, never inheriting the last thread's world |
+| A new session, before its first ask | A blank thread — *New session* — with the composer focused in question mode; the first ask writes the session and its canvas ([AD27](#decisions)) |
 | Next ask only | The chip is marked for the one ask; after it runs, it returns to the session's world |
 | The agent's guardrail forbids what the world casts | Refused before the run opens, naming the guardrail and that it is the agent's ([AG6](../../agents/features/author-an-agent.md#decisions)) |
 | The session's world is deleted | The chip reads *Everything* and says the world is gone; earlier turns keep the name they ran in |
@@ -141,6 +142,7 @@ flowchart TD
 | AD25 | **A failed query opens the console on Log.** The reply says why; the console shows the failing step and its error, so the line is read where the rows would have been. Only a failure that lands while the page is open does this — reopening an old thread never moves the console. A first query that fails from the centred start still docks the chat: `?right=` and `?console=` write through one writer that builds on the newest query string, so neither drops the other. The reply's card states the error's first line and offers **Open the log**; the whole error is the Log's. |
 | AD26 | **The docked assistant opens at 440px.** It reads queries, replies and error cards; at the shared 280px side width a query wraps word by word. Its occupant carries its own size; the inspector and left panels keep the shared width. |
 | AD21 | **The tokens per run are clamped on write and frozen on the run.** `PATCH` stores `min(asked, agent's max_tokens_run)`; `open_turn` freezes the same `min` into `task_runs.params.max_tokens_run`. The summary carries `agent_max_tokens_run` so the settings popover can say the value was clamped. `max_cost_usd_run` is still accepted and answered for one release and bounds nothing ([EB8](../../agents/features/envelope-and-budget.md#decisions)). |
+| AD27 | **New is a blank thread, and the history opens only when asked for.** *New session* sits in the panel header beside *Sessions*, and in the history; both close the open thread and show a blank one with the composer focused, reset to a question. No session row exists until the first ask. With no thread open the panel is that blank thread, never the history — the history is the *Sessions* toggle, and asking from it returns to the thread the ask lands in. |
 
 ## Not building
 

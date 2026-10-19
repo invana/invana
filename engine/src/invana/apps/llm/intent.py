@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from invana.apps.llm import LLMError, complete_tool
 from invana.apps.llm.grounding import Grounding, render_model_context
 from invana.apps.llm.schemas import Exchange, TokenUsage
-from invana.apps.llm.translate import Clarification, _looks_read_only
+from invana.apps.llm.translate import Clarification, _looks_read_only, option_pairs
 from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.modeller.models import GraphVersion
 from invana.graph.types.lens import QueryLens
@@ -108,6 +108,15 @@ UNDERSTAND_TOOL = {
             "message does not call for them. Else [].",
         },
         "options": {"type": "array", "items": {"type": "string"}, "description": "Fixed answer options, or []."},
+        "option_descriptions": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": (
+                'One entry per option, in the same order. "" when the label says enough — most of the '
+                "time. One short sentence only when the person needs it to choose (what the option means, "
+                "what it favours). [] when there are no fixed options."
+            ),
+        },
         "options_query": {
             "type": "string",
             "description": "When the choice is WHICH value from the data, a read-only query returning up to 10 "
@@ -138,6 +147,7 @@ UNDERSTAND_TOOL = {
         "reply",
         "choices",
         "options",
+        "option_descriptions",
         "options_query",
         "skills_applied",
         "rules_cited",
@@ -328,10 +338,12 @@ async def understand(
         options_query = str(data.get("options_query") or "").strip()
         if options_query and not _looks_read_only(options_query, "cypher"):
             options_query = ""
+        options, option_descriptions = option_pairs(data)
         return Clarification(
             question=question,
             usage=result.usage,
-            options=[str(o).strip() for o in (data.get("options") or []) if str(o).strip()],
+            options=options,
+            option_descriptions=option_descriptions,
             options_query=options_query,
             exchange=result.exchange,
             duration_ms=result.duration_ms,

@@ -87,11 +87,16 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
         raise Converse(reply=outcome.reply, options=options, exchange=_exchange(outcome))
 
     if isinstance(outcome, Clarification):
-        options = await _options(ctx, v, outcome)
+        options, descriptions = await _options(ctx, v, outcome)
         ctx.step.tokens_in = usage.input_tokens if usage else None
         ctx.step.tokens_out = usage.output_tokens if usage else None
-        ctx.step.output = {"question": outcome.question, "options": options, **_exchange(outcome)}
-        raise NeedsInput(question=outcome.question, options=options)
+        ctx.step.output = {
+            "question": outcome.question,
+            "options": options,
+            "option_descriptions": descriptions,
+            **_exchange(outcome),
+        }
+        raise NeedsInput(question=outcome.question, options=options, descriptions=descriptions)
 
     v.intent = outcome
     ctx.step.skills_applied = _report_ids(v, outcome.skills_applied)

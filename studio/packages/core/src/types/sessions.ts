@@ -69,12 +69,18 @@ export interface SessionMessage {
 	language?: QueryLanguage;
 	/** The query that produced this reply, so it can be re-run. */
 	sourceQuery?: string;
+	/** A table's whole-node twin of `sourceQuery` — what *Load to canvas* runs
+	 *  to draw its rows. Absent on graphs and aggregates. */
+	canvasQuery?: string;
 	/** NL clarification only — answer options the user can pick instead of
 	 *  retyping (docs/for-developers/modules/ask/features/clarifying-questions.md). Present — possibly **empty** — when the reply is a
 	 *  clarifying question. Use `isClarification` rather than testing the
 	 *  length: a question with nothing to pick from ("which country?") is
 	 *  still a question, answered by typing. */
 	clarificationOptions?: string[];
+	/** One per option, `""` where the label says enough; absent when none
+	 *  says more — the options then read as one line each. */
+	clarificationDescriptions?: string[];
 	/** 👍/👎 on this reply — a capture signal for refining understanding
 	 *  (docs/for-developers/modules/ask/features/clarifying-questions.md · docs/for-developers/modules/workflows/features/promote-a-plan.md). Undefined = no vote. */
 	feedback?: "up" | "down";

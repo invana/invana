@@ -20,8 +20,10 @@
 		"@invana-studio/ui": "workspace:*"
 	},
 	"peerDependencies": {
-		"@invana/forms": "^0.0.34",
-		"@invana/ui": "^0.0.34",
+		"@invana/assistant": "^0.0.35",
+		"@invana/blocks": "^0.0.35",
+		"@invana/forms": "^0.0.35",
+		"@invana/ui": "^0.0.35",
 		"@tanstack/react-query": "^5.0.0",
 		"lucide-react": "^0.475.0",
 		"react": "^19.2.0",
@@ -30,9 +32,11 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.14",
-		"@invana/forms": "^0.0.34",
-		"@invana/styling": "^0.0.34",
-		"@invana/ui": "^0.0.34",
+		"@invana/assistant": "^0.0.35",
+		"@invana/blocks": "^0.0.35",
+		"@invana/forms": "^0.0.35",
+		"@invana/styling": "^0.0.35",
+		"@invana/ui": "^0.0.35",
 		"@tanstack/react-query": "^5.0.0",
 		"@types/react": "^19.0.0",
 		"@types/react-dom": "^19.0.0",

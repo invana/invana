@@ -920,6 +920,7 @@ class TaskRuntime:
                         {
                             "question": ni.question,
                             "options": ni.options,
+                            "option_descriptions": ni.descriptions,
                             "round": th.clarifications,
                             "message": message_payload(assistant) if assistant else None,
                         },
@@ -1144,6 +1145,7 @@ class TaskRuntime:
             r = v.result
             assert r is not None
             m.source_query = v.query
+            m.canvas_query = v.canvas_query
             m.query_language = r.query_language
             m.via = v.via or {"cypher": "Cypher", "gremlin": "Gremlin"}.get(r.query_language, r.query_language)
             m.rationale = v.rationale
@@ -1217,6 +1219,7 @@ class TaskRuntime:
         # record: Studio then printed the question as a plain sentence with no
         # way to respond, under a run still saying "waiting on your answer".
         m.clarification_options = list(ni.options)
+        m.clarification_descriptions = list(ni.descriptions) or None
         m.via = v.via
         m.llm_time_ms = round(v.llm_ms) if v.llm_ms is not None else None
         m.timeout_s = v.timeout_s

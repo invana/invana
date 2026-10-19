@@ -133,6 +133,9 @@ export function useAssistantCanvasBridge(deps: AssistantCanvasBridgeDeps) {
 	// when the run starts; consumed when the result lands on the stream.
 	const pendingNewSessionsRef = useRef<Set<string>>(new Set());
 	const pendingRestorePaintRef = useRef<Set<string>>(new Set());
+	// Sessions whose next result is a table's whole-node twin, asked by its
+	// *Load to canvas* — painted when it lands.
+	const pendingTwinRef = useRef<Set<string>>(new Set());
 	// The engine resolves capabilities from the live connector and returns
 	// them on the connection payload. Default to the first language it
 	// reports, fall back to allowing both while the engine is still warming
@@ -164,9 +167,8 @@ export function useAssistantCanvasBridge(deps: AssistantCanvasBridgeDeps) {
 	);
 
 	// Explicit "Load to canvas" click (docs/for-developers/modules/explore/features/boards.md): paint, then log a `load` turn in
-	// the thread referencing the query that produced the result. Only the click
-	// logs — the automatic paints (session create / restore) call
-	// `handleLoadToCanvas` directly and stay silent.
+	// the thread referencing the query that produced the result. A new
+	// session's first paint logs too; a restore repaints what was logged.
 	const handleLoadToCanvasClick = useCallback(
 		(result: QueryResponse, message: SessionMessage) => {
 			handleLoadToCanvas(result);
@@ -203,6 +205,18 @@ export function useAssistantCanvasBridge(deps: AssistantCanvasBridgeDeps) {
 			if (!username || !graphSlug) return;
 			if (result) {
 				handleLoadToCanvas(result);
+				// Painted is loaded: log it as the click would, so the reply's
+				// *Load to canvas* is spent here and after a reload.
+				if (result.result_type === "graph") {
+					void recordLoad({
+						kind: "load",
+						query_language: result.query_language,
+						row_count: result.row_count,
+						node_count: result.data?.nodes.length ?? 0,
+						edge_count: result.data?.edges.length ?? 0,
+						execution_time_ms: result.execution_time_ms,
+					});
+				}
 				// First paint of the new session's canvas — capture it as the opening
 				// version (docs/for-developers/modules/explore/features/boards.md). The canvas tab registers below; the delayed
 				// capture reads the (by-then active) canvas from the ref.
@@ -233,6 +247,7 @@ export function useAssistantCanvasBridge(deps: AssistantCanvasBridgeDeps) {
 			username,
 			graphSlug,
 			handleLoadToCanvas,
+			recordLoad,
 			openTabs,
 			createCanvas,
 			resultToItems,
@@ -292,11 +307,37 @@ export function useAssistantCanvasBridge(deps: AssistantCanvasBridgeDeps) {
 		}
 	};
 
+	// A table reply's *Load to canvas* (docs/for-developers/modules/ask/features/ask-in-natural-language.md
+	// NL15): its rows carry no element ids, so the whole-node twin Translate
+	// wrote beside it is asked as the next query, and its graph is painted.
+	// The ask is the system's, not the person's: it goes as a `load`
+	// operation, so the thread folds it into the table's reply and the
+	// composer keeps the mode the person was in.
+	const handleLoadCanvasQuery = (message: SessionMessage) => {
+		if (!message.canvasQuery || !activeSessionId) return;
+		pendingTwinRef.current.add(activeSessionId);
+		void handleRun({
+			mode: "ql",
+			query: message.canvasQuery,
+			language: message.language ?? defaultLanguage,
+			timeoutS: message.timeoutS ?? 120,
+			operation: "load",
+		});
+	};
+
 	// A query result landed on a run's stream (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md): render it inline
 	// against its reply, and paint it when the run asked for that — the first
 	// result of a new session (onto the canvas created above) or a restore.
 	streamResultRef.current = (sessionId, messageId, result) => {
 		setResultFor(messageId, result);
+		if (pendingTwinRef.current.delete(sessionId)) {
+			// The run is the load turn already; only the paint and its version.
+			if (result.result_type === "graph") {
+				handleLoadToCanvas(result);
+				void captureCanvasState("load", { messageId });
+			}
+			return;
+		}
 		if (pendingNewSessionsRef.current.delete(sessionId)) {
 			// The canvas was created on session-create; this paints the result onto
 			// it (the idempotent guard skips re-creating).
@@ -378,6 +419,7 @@ export function useAssistantCanvasBridge(deps: AssistantCanvasBridgeDeps) {
 		availableLanguages,
 		defaultLanguage,
 		handleLoadToCanvasClick,
+		handleLoadCanvasQuery,
 		handleRun,
 		handleRerun,
 	};

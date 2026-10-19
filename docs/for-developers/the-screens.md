@@ -736,7 +736,7 @@ are in [products/projects.md](../products/projects.md#decisions) and the work fe
 | `projects.todos` · `projects.todo` | PJ-12 | `/projects/todos[/<id>]` — *My todos* | ✅ |
 | `projects.decisions` | PJ-13 | `/projects/decisions` → page `decisions:<graph>` | ✅ |
 | `projects.report` | PJ-14 | `…?view=report` | ✅ |
-| `explorer.answer.to_project` | EX-12 | *Add to a project* on an answer's reply line | ✅ |
+| `explorer.answer.to_project` | EX-12 | *Add to a project* on an answer's meta-line strip (folds into `⋯` by width) | ✅ |
 
 ## Beyond the 42 · Agents — instructions, evals, history and plugins
 

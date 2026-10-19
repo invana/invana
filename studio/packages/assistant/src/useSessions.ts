@@ -50,6 +50,7 @@ function toBody(
 			mode: "ql",
 			language: payload.language,
 			timeout_s: payload.timeoutS,
+			...(payload.operation ? { operation: payload.operation } : {}),
 			...world,
 		};
 	}

@@ -59,6 +59,8 @@ function isLiveStep(s: RunNode): boolean {
 export interface StepClarification {
 	question: string;
 	options: string[];
+	/** One per option, `""` where the label says enough; empty when none says more. */
+	descriptions?: string[];
 	/** Set once the run has resumed — what the user picked or typed. */
 	answer?: string;
 }

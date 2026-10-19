@@ -1279,6 +1279,8 @@ CREATE TABLE session_messages (
 	feedback VARCHAR(4), 
 	operation VARCHAR(16), 
 	run_id VARCHAR(36), 
+	canvas_query TEXT, 
+	clarification_descriptions JSON, 
 	CONSTRAINT session_messages_pkey PRIMARY KEY (id), 
 	CONSTRAINT session_messages_session_id_fkey FOREIGN KEY(session_id) REFERENCES sessions (id) ON DELETE CASCADE, 
 	CONSTRAINT uq_session_message_seq UNIQUE NULLS DISTINCT (session_id, seq)

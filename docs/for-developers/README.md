@@ -108,6 +108,7 @@ this map.** Feature numbers do not change.
 | 3.11 | [Act as](modules/ask/features/act-as.md) | A stance — a method and its declared assumptions — and the ledger of what the answer rests on | 🔵 | — | 🔵 | S-TBD |
 | 3.12 | [The answer, in words](modules/ask/features/the-answer-in-words.md) | A few cited sentences over the records, in the agent's voice — words first, records after | 🔵 | — | 🔵 | S-TBD |
 | 3.13 | [Beyond the graph](modules/ask/features/beyond-the-graph.md) | The internet — the first third-party source — and the model's own knowledge, where a world allows; badged third-party, with the reference | 🔵 | — | 🔵 | S-TBD |
+| 3.14 | [Fork a session](modules/ask/features/fork-a-session.md) | Branch a thread at a reply — its turns and its board copied, its parent named, its forks listed | 🔵 | — | 🔵 | S-TBD |
 
 ## 4 · [Explore](modules/explore/spec.md)
 

@@ -370,7 +370,9 @@ export function SessionComposer({
 	// ── Restore the open session's mode + model once on open (docs/for-developers/modules/ask/features/ask-in-natural-language.md) ────────
 	useEffect(() => {
 		if (!sessionKey) {
-			appliedSessionRef.current = null; // back on the list — re-apply on next open
+			// A new session starts as a question, whatever the last thread was.
+			appliedSessionRef.current = null;
+			setMode("nl");
 			return;
 		}
 		if (!initialConfig || appliedSessionRef.current === sessionKey) return;

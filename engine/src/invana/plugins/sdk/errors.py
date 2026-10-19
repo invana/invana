@@ -41,10 +41,12 @@ class NeedsInput(Exception):
     """The model asked a question instead of answering
     (docs/for-developers/modules/ask/features/clarifying-questions.md)."""
 
-    def __init__(self, *, question: str, options: list[str]) -> None:
+    def __init__(self, *, question: str, options: list[str], descriptions: list[str] | None = None) -> None:
         super().__init__(question)
         self.question = question
         self.options = options
+        #: One per option, "" where the label says enough; [] when none says more.
+        self.descriptions = descriptions or []
 
 
 class CannotAnswer(Exception):

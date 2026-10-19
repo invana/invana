@@ -70,7 +70,7 @@ flowchart LR
 | Emission | One card: the header over a body chosen by kind | `EmissionCard` |
 | Emission header | The kind, the template in use, and the citation | `EmissionCard` — 24px, `kind · template@version · cite · N records` |
 | Bodies | One per kind, plus the empty one | `TableBody · MetricBody · ChartBody · SubgraphBody · ProseBody · EmptyBody` |
-| Canvas | Where subgraph emissions land | the subgraph body offers it; the canvas owns the paint |
+| Canvas | Where subgraph emissions land | the reply's *Load to canvas* chip offers it; the canvas owns the paint |
 
 The engine produces the emissions; Studio reads them. `GET …/task_runs/{id}/emissions` returns them in
 order with their citation and the templates that would render the same records. The derived path
@@ -97,14 +97,16 @@ chose the rendering.
 | AS5 | A subgraph adds to the canvas; it never replaces it. |
 | AS6 | Every emission carries a header: its kind, the template rendering it, and the link to its citation. |
 | AS7 | An empty emission is a sentence in the reading order — "the graph does not hold this" — never an empty table or a zeroed chart. |
-| AS8 | Every kind renders inside the emission card. A kind is a body within the card, never a block beside it. |
+| AS8 | **Every kind renders inside the emission card — except a subgraph, whose body is the canvas.** A table, chart, metric or prose is a body within the card, never a block beside it. A subgraph in the thread is the reply sentence and the meta line, which already carry its counts and open its records; a card restating them is a third copy of one fact. |
 | AS9 | The header names a template only when one chose the rendering. It is never filled with a default so the row looks complete. |
 | AS10 | An emission is a record, not page state. The `project` step writes it, and an answer survives a reload. |
 | AS11 | The chosen template's **surface** is the emission's kind. Switching template re-renders the same records and the kind follows — which is how one result can be read as a table and then as a chart without either being a lie about what the step produced. |
 | AS12 | A reply whose run was never recorded — an older row, or one whose run was pruned — still renders, by folding one emission out of the query result it carries. It names no template, because none chose the rendering (AS9). |
 | AS13 | **A reload renders the record; nothing re-runs on load.** Opening a session, switching a tab and refreshing the page all read what is stored — the reply's emissions and the board's snapshot — and ask the graph nothing. Freshness is a user action (AS14), never a side effect of arriving on a page: a query that re-runs itself spends against the graph on every refresh and can quietly answer differently from the answer on screen, with nothing saying so. |
 | AS14 | **A re-run is a new run, and it leaves the prior record intact.** Re-running writes a new run with its own emissions rather than reopening the reply's — so a re-run that fails shows a failure *next to* the answer it was re-checking, instead of erasing it. The emission header carries when its records were read and the re-run that reads them again. |
-| AS15 | **Whether a subgraph is on the canvas is the reply's fact, not the record's.** The stored subgraph emission says what the step produced; the reply knows whether the person loaded it (its click, or the thread's `load` turn). Until then the reply carries the *Load to canvas* offer and no subgraph card. |
+| AS15 | **Whether a subgraph is on the canvas is the reply's fact, not the record's.** The stored subgraph emission says what the step produced; the reply knows whether it is on the canvas (its click, or the thread's `load` turn). A new session's first result is painted onto the session's new canvas and logged as a `load` turn like a click, so it never offers what it already drew. Until then the reply carries the *Load to canvas* offer; drawn or not, there is no subgraph card ([AS8](#decisions)). A **table** whose translation wrote a `canvas_query` carries the same offer ([NL15](ask-in-natural-language.md#decisions)); it is answered once a later reply in the thread ran that twin. |
+| AS17 | **A graph is counted as it is drawn.** Nodes and edges come back once each, by id, whatever the rows named — `MATCH (n)-[r]-(m) RETURN n, r, m` names a hub on every route. The reply's *N nodes and M relationships*, its record count and the canvas agree. |
+| AS16 | **An answer's actions live on its meta line.** `N records · world · time` on the left; on the right one `NavItems` strip with `overflow`, in order: *How I got this* (pinned — it toggles the steps, which still open under the reply) · *Share* · *Save view* (only on a reply that holds a graph or was drawn) · *Fork from here* ([fork-a-session](fork-a-session.md)) · *Schedule this* · *Add to a project*. The strip folds from the end into its `⋯` menu by width. No action is a labelled button row under the answer. |
 
 > ⚠ **AS14 is half-built.** A re-run today writes a new run but re-points the
 > reply at it, so the prior emissions are orphaned and a failed re-run leaves the

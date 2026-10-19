@@ -1,4 +1,11 @@
-import { Button, ChatSessionDisclosure, Eyebrow, Spinner } from "@invana/ui";
+import { ClarifyCard, SuggestionChips } from "@invana/assistant";
+import {
+	Button,
+	ChatSessionDisclosure,
+	type NavItemConfig,
+	NavItems,
+	Spinner,
+} from "@invana/ui";
 import type { QueryResponse } from "@invana-studio/core";
 import {
 	formatDuration,
@@ -22,19 +29,10 @@ import {
 import { type ReactNode, useState } from "react";
 import { useAssistantSlots } from "./AssistantSlots";
 import { RunCannotAnswer, RunDiagnosis } from "./answer-surface/NotAnAnswer";
-import {
-	LoadToCanvasAction,
-	loadableGraph,
-	ResultBlock,
-} from "./answer-surface/ResultBlock";
+import { loadableGraph, ResultBlock } from "./answer-surface/ResultBlock";
 import { CastRefusalCard } from "./CastRefusal";
 import { SessionContextDisclosure } from "./SessionContextDisclosure";
-import {
-	OptionRow,
-	type StepClarification,
-	StepList,
-	StepTrace,
-} from "./SessionSteps";
+import { type StepClarification, StepList, StepTrace } from "./SessionSteps";
 import { stepsFor } from "./SessionStepsTimeline";
 
 // ── User turn ─────────────────────────────────────────────────────────────────
@@ -124,6 +122,9 @@ export interface AssistantTurnProps {
 	onTypeInstead: () => void;
 	result: QueryResponse | null | undefined;
 	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
+	/** Draw a table reply's rows: run its `canvasQuery` as the next ask and
+	 *  paint what it returns. Absent where the page has no canvas. */
+	onLoadCanvasQuery?: (message: SessionMessage) => void;
 	/** Open the console under the board — on Records from the reply's record
 	 *  count, on Log where a failed query's whole error is read. Absent where
 	 *  the page has no console. */
@@ -172,6 +173,11 @@ function RunningTurn({
 
 	return (
 		<ReplyRow>
+			<ClarifyRounds
+				clarifications={clarifications}
+				onSelectOption={onSelectOption}
+				onTypeInstead={onTypeInstead}
+			/>
 			{steps.length === 0 ? (
 				<span className="flex items-center gap-2 text-muted-foreground">
 					<Spinner className="size-3 shrink-0 text-primary motion-reduce:animate-none" />
@@ -182,9 +188,6 @@ function RunningTurn({
 				<StepList
 					steps={steps}
 					reasoning={view?.reasoning}
-					clarifications={clarifications}
-					onSelectOption={onSelectOption}
-					onTypeInstead={onTypeInstead}
 					onOpenTrace={(s) =>
 						setOpenTraceId((id) => (id === s.id ? null : s.id))
 					}
@@ -221,6 +224,7 @@ function SettledTurn({
 	onTypeInstead,
 	result,
 	onLoadToCanvas,
+	onLoadCanvasQuery,
 	loadedToCanvas,
 	isLatest,
 	onOpenConsole,
@@ -235,9 +239,9 @@ function SettledTurn({
 		isClarification(message) || view?.status === "awaiting_input";
 	const isStopped = message.status === "stopped";
 	// The steps are the auditable record of what ran, folded under *How I got
-	// this* — open from the start only while the run waits on the person,
-	// because then the question and its options live on the step.
-	const [stepsOpen, setStepsOpen] = useState(isAsking);
+	// this*. While the run waits on the person there is nothing to explain
+	// yet: the reply is the question.
+	const [stepsOpen, setStepsOpen] = useState(false);
 	const [openTraceId, setOpenTraceId] = useState<string | null>(null);
 	const [showContext, setShowContext] = useState(false);
 
@@ -296,111 +300,132 @@ function SettledTurn({
 	]
 		.filter(Boolean)
 		.join(" · ");
+	const showMeta = !!meta && isAnswer;
+
+	// A table offers to be drawn when Translate wrote its whole-node twin; a
+	// graph when it is not on the canvas yet. Never both, never on an aggregate.
+	const offer: "graph" | "twin" | null = loaded
+		? null
+		: graph
+			? "graph"
+			: isAnswer && message.canvasQuery && result?.result_type !== "graph"
+				? "twin"
+				: null;
+
+	// Order is fold order: the strip keeps what fits from the left.
+	const actions: NavItemConfig[] = [
+		...(hasSteps && !isAsking
+			? [
+					{
+						key: "steps",
+						name: "How I got this",
+						label: "How I got this",
+						onClick: () => setStepsOpen((v) => !v),
+					},
+				]
+			: []),
+		...(isAnswer && shareAnswer && answerRunId && sessionId
+			? [
+					{
+						key: "share",
+						name: "Share",
+						icon: Share2,
+						onClick: () =>
+							shareAnswer({
+								sessionId,
+								messageId: message.id,
+								runId: answerRunId,
+								question,
+								answer: message.content,
+								worldName: message.lensName,
+							}),
+					},
+				]
+			: []),
+		...(isAnswer && onSaveView && (graph || loaded)
+			? [{ key: "save", name: "Save view", icon: Save, onClick: onSaveView }]
+			: []),
+		...(isAnswer && scheduleQuestion
+			? [
+					{
+						key: "schedule",
+						name: "Schedule this",
+						icon: CalendarClock,
+						onClick: () => scheduleQuestion(question),
+					},
+				]
+			: []),
+		...(isAnswer && addToProject && answerRunId
+			? [
+					{
+						key: "project",
+						name: "Add to a project",
+						icon: FolderPlus,
+						onClick: () =>
+							addToProject({
+								runId: answerRunId,
+								statement: message.content,
+							}),
+					},
+				]
+			: []),
+	];
 
 	return (
 		<ReplyRow>
+			{/* What this reply asked, and what was answered — the question is
+			    the reply while the run waits on it. */}
+			<ClarifyRounds
+				clarifications={clarifications}
+				onSelectOption={isLatest && !isRunning ? onSelectOption : undefined}
+				onTypeInstead={onTypeInstead}
+			/>
 			{message.refusal ? (
 				<CastRefusalCard refusal={message.refusal} />
 			) : (
 				!echoed && <span className={textClass}>{message.content}</span>
 			)}
-			{meta && isAnswer && (
-				<span className="text-xs text-muted-foreground">
-					{onOpenConsole && message.rowCount ? (
-						<button
-							type="button"
-							className="underline-offset-2 hover:text-foreground hover:underline"
-							title="Read them in the console"
-							onClick={() => onOpenConsole("data")}
-						>
-							{meta}
-						</button>
-					) : (
-						meta
+			{/* What the answer stood on, and what can be done with it — one line,
+			    the actions folding into `⋯` as the panel narrows. */}
+			{(showMeta || actions.length > 0) && (
+				<div className="flex min-w-0 items-center gap-2">
+					{showMeta && (
+						<span className="shrink-0 text-xs text-muted-foreground">
+							{onOpenConsole && message.rowCount ? (
+								<button
+									type="button"
+									className="underline-offset-2 hover:text-foreground hover:underline"
+									title="Read them in the console"
+									onClick={() => onOpenConsole("data")}
+								>
+									{meta}
+								</button>
+							) : (
+								meta
+							)}
+						</span>
 					)}
-				</span>
-			)}
-			{(graph && !loaded) || isAnswer ? (
-				<span className="flex flex-wrap gap-1.5">
-					{graph && !loaded && (
-						<LoadToCanvasAction
-							onLoad={() => {
-								onLoadToCanvas(graph, message);
-								setClicked(true);
-							}}
+					{actions.length > 0 && (
+						<NavItems
+							items={actions}
+							overflow
+							overflowLabel="More actions"
+							activeKey={stepsOpen ? "steps" : ""}
+							className="flex-1 text-xs text-muted-foreground"
 						/>
 					)}
-					{isAnswer && onSaveView && (
-						<Button variant="outline" size="sm" onClick={onSaveView}>
-							<Save />
-							Save view
-						</Button>
-					)}
-					{isAnswer && scheduleQuestion && (
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() => scheduleQuestion(question)}
-						>
-							<CalendarClock />
-							Schedule this
-						</Button>
-					)}
-					{isAnswer && addToProject && answerRunId && (
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() =>
-								addToProject({
-									runId: answerRunId,
-									statement: message.content,
-								})
-							}
-						>
-							<FolderPlus />
-							Add to a project
-						</Button>
-					)}
-					{isAnswer && shareAnswer && answerRunId && sessionId && (
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() =>
-								shareAnswer({
-									sessionId,
-									messageId: message.id,
-									runId: answerRunId,
-									question,
-									answer: message.content,
-									worldName: message.lensName,
-								})
-							}
-						>
-							<Share2 />
-							Share
-						</Button>
-					)}
-				</span>
-			) : null}
+				</div>
+			)}
 			{/* After small talk, what the person could ask next — each one this
 			    run's world lets it answer. A tap is a new ask, never an answer
 			    to this settled run (NL14). */}
 			{choices.length > 0 && (
-				<div className="flex flex-col items-start gap-px">
-					<Eyebrow className="px-1">Try asking</Eyebrow>
-					{choices.map((choice) => (
-						<OptionRow
-							key={choice}
-							glyph="❯"
-							label={choice}
-							onSelect={
-								isLatest && !isRunning
-									? () => onSelectOption(choice)
-									: undefined
-							}
-						/>
-					))}
-				</div>
+				<SuggestionChips
+					lead="Try asking"
+					items={choices}
+					sent={isLatest && !isRunning ? undefined : choices}
+					onSelect={onSelectOption}
+				/>
 			)}
 			{isStopped && (
 				<span className="text-muted-foreground">
@@ -431,24 +456,12 @@ function SettledTurn({
 					}
 				/>
 			)}
-			{hasSteps && (
+			{hasSteps && stepsOpen && (
 				<div className="flex flex-col items-start gap-1">
-					<Button
-						variant="ghost"
-						size="sm"
-						aria-expanded={stepsOpen}
-						className={stepsOpen ? "font-semibold" : "text-muted-foreground"}
-						onClick={() => setStepsOpen((v) => !v)}
-					>
-						How I got this
-					</Button>
-					{stepsOpen && (
+					{
 						<div className="w-full rounded-control border border-border bg-muted/40 p-2">
 							<StepList
 								steps={steps}
-								clarifications={clarifications}
-								onSelectOption={onSelectOption}
-								onTypeInstead={onTypeInstead}
 								onOpenTrace={(s) =>
 									setOpenTraceId((id) => (id === s.id ? null : s.id))
 								}
@@ -486,12 +499,25 @@ function SettledTurn({
 								/>
 							)}
 						</div>
-					)}
+					}
 				</div>
 			)}
 			{/* The reply's emissions. A landed subgraph says so here — it is the
 			    emission's own line. */}
-			<ResultBlock result={result} onCanvas={loaded} runId={message.runId} />
+			<ResultBlock result={result} runId={message.runId} />
+			{/* The one offer a reply makes, chosen from its result (NL15) and
+			    read after the answer it acts on: a graph not yet drawn, or a
+			    table whose rows have a whole-node twin. */}
+			{offer && (
+				<SuggestionChips
+					items={[LOAD_TO_CANVAS]}
+					onSelect={() => {
+						if (offer === "graph" && graph) onLoadToCanvas(graph, message);
+						else if (offer === "twin") onLoadCanvasQuery?.(message);
+						setClicked(true);
+					}}
+				/>
+			)}
 		</ReplyRow>
 	);
 }
@@ -506,4 +532,66 @@ function conversedChoices(steps: RunNode[]): string[] {
 	return Array.isArray(options)
 		? options.filter((o): o is string => typeof o === "string")
 		: [];
+}
+
+const LOAD_TO_CANVAS = "Load to canvas";
+
+/**
+ * The questions a run asked, drawn as the kit's inline `ClarifyCard`: the
+ * answered rounds folded to one summary — `Answered · Most routes`, or
+ * `Answered · 2 questions` — and the round still open as the live question
+ * with its options and *Something else — let me type*.
+ */
+function ClarifyRounds({
+	clarifications,
+	onSelectOption,
+	onTypeInstead,
+}: {
+	clarifications?: Map<string, StepClarification[]>;
+	onSelectOption?: (text: string) => void;
+	onTypeInstead?: () => void;
+}) {
+	const rounds = clarifications ? [...clarifications.values()].flat() : [];
+	if (rounds.length === 0) return null;
+	const answered = rounds.filter((r) => r.answer != null);
+	const open = rounds.find((r) => r.answer == null);
+	return (
+		<>
+			{answered.length > 0 && (
+				<ClarifyCard
+					variant="inline"
+					state="answered"
+					collapsible
+					kind={answered.length > 1 ? "questions" : "question"}
+					questions={answered.map(toQuestion)}
+				/>
+			)}
+			{open && (
+				<ClarifyCard
+					variant="inline"
+					{...toQuestion(open)}
+					onSelect={
+						onSelectOption ? (value) => onSelectOption(value) : undefined
+					}
+					onTypeInstead={onSelectOption ? onTypeInstead : undefined}
+				/>
+			)}
+		</>
+	);
+}
+
+/** A round as the card reads it: each option's label is also its value — the words sent back. */
+function toQuestion(round: StepClarification) {
+	const options = round.options.map((label, i) => ({
+		value: label,
+		label,
+		description: round.descriptions?.[i] || undefined,
+	}));
+	const picked = options.some((o) => o.value === round.answer);
+	return {
+		question: round.question,
+		options,
+		value: picked ? round.answer : undefined,
+		answer: picked ? undefined : round.answer,
+	};
 }

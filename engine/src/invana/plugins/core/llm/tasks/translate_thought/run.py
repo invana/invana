@@ -80,7 +80,7 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
     await close_model(ctx, v, crossing, usage=usage, duration_ms=generated.duration_ms)
 
     if isinstance(generated, Clarification):
-        options = await _options(ctx, v, generated)
+        options, descriptions = await _options(ctx, v, generated)
         await _clarify_event(ctx, v, question=generated.question, usage=usage, duration_ms=generated.duration_ms)
         ctx.step.tokens_in, ctx.step.tokens_out = usage.input_tokens, usage.output_tokens
         ctx.step.input = {
@@ -89,12 +89,18 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
             "context_turns": turns,
             "model": v.via,
         }
-        ctx.step.output = {"question": generated.question, "options": options, **_exchange(generated)}
-        raise NeedsInput(question=generated.question, options=options)
+        ctx.step.output = {
+            "question": generated.question,
+            "options": options,
+            "option_descriptions": descriptions,
+            **_exchange(generated),
+        }
+        raise NeedsInput(question=generated.question, options=options, descriptions=descriptions)
 
     v.query = generated.query
     v.query_language = generated.language
     v.rationale = generated.rationale or None
+    v.canvas_query = generated.canvas_query or None
     ctx.step.skills_applied = _report_ids(v, generated.skills_applied)
     ctx.step.rules_cited = cited_rule_version_ids(v, generated.rules_cited)
     if generated.rationale:
@@ -134,6 +140,7 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
             "query": generated.query,
             "language": generated.language,
             "rationale": generated.rationale,
+            "canvas_query": generated.canvas_query,
             "ask": ask,
             **_exchange(generated),
         },

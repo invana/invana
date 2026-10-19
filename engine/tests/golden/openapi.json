@@ -18359,6 +18359,18 @@
             "title": "Mode",
             "type": "string"
           },
+          "operation": {
+            "anyOf": [
+              {
+                "const": "load",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operation"
+          },
           "parameters": {
             "anyOf": [
               {
@@ -18776,6 +18788,31 @@
       },
       "SessionMessageRead": {
         "properties": {
+          "canvas_query": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canvas Query"
+          },
+          "clarification_descriptions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clarification Descriptions"
+          },
           "clarification_options": {
             "anyOf": [
               {

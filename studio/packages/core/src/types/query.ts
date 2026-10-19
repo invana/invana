@@ -17,6 +17,9 @@ export type QueryRunPayload =
 			language: QueryLanguage;
 			/** Seconds to budget the query execution before giving up. */
 			timeoutS: number;
+			/** `load` when the system asks to draw a reply, not the person —
+			 *  the turn is a canvas operation the composer does not restore. */
+			operation?: "load";
 	  }
 	| {
 			mode: "nl";

@@ -92,20 +92,24 @@ async def _askable(ctx: TaskContext, v: RunVars, choices: list[Choice], listed: 
     return list(dict.fromkeys(kept))[:_MAX_CHOICES]
 
 
-async def _options(ctx: TaskContext, v: RunVars, clarification: Clarification) -> list[str]:
-    """The choices a clarification offers, read under the run's lens (CQ11).
+async def _options(ctx: TaskContext, v: RunVars, clarification: Clarification) -> tuple[list[str], list[str]]:
+    """The choices a clarification offers, read under the run's lens, and their descriptions.
+
+    Only the fixed options carry descriptions: values read from the graph are
+    their own label.
 
     The options query crosses ``graph_data`` like every other read the run
     makes: the crossing is opened around it and the touch recorded. A world
     that refuses the read leaves the fixed options, never an ungoverned read.
     """
     fallback = list(clarification.options)
+    fixed = (fallback, list(clarification.option_descriptions))
     if not clarification.options_query:
-        return fallback
+        return fixed
     try:
         crossing = await open_graph(ctx, v)
     except CannotAnswer:
-        return fallback
+        return fixed
     language = await query_language_for(ctx, v, strict=False)
     options, result = await ground_options(
         ctx.db,
@@ -126,7 +130,7 @@ async def _options(ctx: TaskContext, v: RunVars, clarification: Clarification) -
     else:
         # Nothing was read, so there is no touch — but the slot was taken.
         _give_pool_back(v, pool=POOL_GRAPHDB, holder=crossing.pool_holder)
-    return options
+    return fixed if options == fallback else (options, [])
 
 
 async def _clarify_event(ctx: TaskContext, v: RunVars, *, question: str, usage, duration_ms: float) -> None:

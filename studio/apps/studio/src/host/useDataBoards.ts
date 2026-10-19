@@ -769,6 +769,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		availableLanguages,
 		defaultLanguage,
 		handleLoadToCanvasClick,
+		handleLoadCanvasQuery,
 		handleRun,
 		handleRerun,
 	} = useAssistantCanvasBridge({
@@ -955,6 +956,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		propertyKeys,
 		expandHandlers,
 		handleLoadToCanvasClick,
+		handleLoadCanvasQuery,
 		handleRun,
 		handleRerun,
 		handleBack,

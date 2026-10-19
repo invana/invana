@@ -12,7 +12,7 @@ nothing.
 | | |
 |---|---|
 | Index | [§3 · Ask](../../README.md#3--ask) |
-| Features | [write-queries](features/write-queries.md) · [ask-in-natural-language](features/ask-in-natural-language.md) · [the-answer-surface](features/the-answer-surface.md) · [projections](features/projections.md) · [streaming-and-the-workflow](features/streaming-and-the-workflow.md) · [clarifying-questions](features/clarifying-questions.md) · [reasoning-trace](features/reasoning-trace.md) · [when-it-cannot-answer](features/when-it-cannot-answer.md) · [the-assistant](features/the-assistant.md) · [runtime-and-adapters](features/runtime-and-adapters.md) |
+| Features | [write-queries](features/write-queries.md) · [ask-in-natural-language](features/ask-in-natural-language.md) · [the-answer-surface](features/the-answer-surface.md) · [projections](features/projections.md) · [streaming-and-the-workflow](features/streaming-and-the-workflow.md) · [clarifying-questions](features/clarifying-questions.md) · [reasoning-trace](features/reasoning-trace.md) · [when-it-cannot-answer](features/when-it-cannot-answer.md) · [the-assistant](features/the-assistant.md) · [runtime-and-adapters](features/runtime-and-adapters.md) · [fork-a-session](features/fork-a-session.md) |
 | Depends on | [Agents](../agents/spec.md) (a run is executed through an agent) · Connect and model (the global model is the grounding context) |
 | Depended on by | [Work](../work/spec.md) (a task runs as a run) · Explore · Operate |
 | Owns the surface | [the-assistant](features/the-assistant.md) — the one place a question is asked, on every left panel of the graph page. It is Ask's surface, not Explore's |

@@ -212,6 +212,8 @@ surface and none of it exists in the kit.
 | 55 | `CannotAnswerCard` | ✅ | dashed, no citation strip, names what would change it |
 | 56 | `DiagnosisCard` | ✅ | with `RepairNote` + `RetryNote` — four components, no shared variant prop (DS8): repair and retry render *on the step*, cannot-answer and diagnosis are cards |
 | 57 | `ClarifyCard` | ✅ | parked, not failed. Options are measures the model declares, never generated — hence `detail` on every option and the footnote |
+| 57a | `ClarifyCard variant="inline"` · `ClarifyCardGroup` | ✅ | kit 0.0.35 (`@invana/assistant`). The thread's question: inline, folds to `Answered · <choice>`, a typed answer as the chosen row, an option's description only where the model wrote one. `ClarifyCardGroup` asks several at once, a tab each — in the kit, waiting on the engine's batched ask. Studio: `SessionTurn` › `ClarifyRounds` |
+| 57b | `SuggestionChips` | ✅ | kit 0.0.35 (`@invana/assistant`). A reply's follow-ups and offers in one line — *Try asking*, *Load to canvas*. Studio: `SessionTurn` |
 | 58 | `TemplatePicker` | ✅ | unavailable options are listed with their reason, not hidden; re-renders from records in hand, so the query does not run again |
 | 59 | `ProposalCard` | ✅ | draft and evidence together, so the decision is made against instances. `consequence` states what authoring will write |
 | 60 | `RatingControl` | ✅ | one control with two positions, not two buttons; states its consequence (`by`, `refines`) |

@@ -11,7 +11,7 @@ from typing import Any
 
 from invana.graph.connectors.base.exceptions import SerializationError
 from invana.graph.connectors.base.serializers import BaseSerializer
-from invana.graph.types.data_elements import Edge, GraphResponse, Path, ResultMetadata, Vertex
+from invana.graph.types.data_elements import Edge, GraphResponse, Path, ResultMetadata, Vertex, unique_by_id
 
 
 class OpenCypherSerializer(BaseSerializer):
@@ -97,6 +97,7 @@ class OpenCypherSerializer(BaseSerializer):
                     record_dict[key] = value
             records.append(record_dict)
 
+        nodes, edges = unique_by_id(nodes), unique_by_id(edges)
         metadata = ResultMetadata(
             node_count=len(nodes),
             edge_count=len(edges),

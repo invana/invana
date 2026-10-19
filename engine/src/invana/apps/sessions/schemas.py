@@ -44,6 +44,10 @@ class SendMessage(BaseModel):
     #: what it resolves to; the id alone would be a pointer at a row that can
     #: move ([GR3](docs/for-developers/modules/govern/features/guardrails.md)).
     lens_id: str | None = Field(default=None, max_length=36)
+    #: ``load`` when the system asks on the person's behalf to draw a reply —
+    #: a table's whole-node twin. The turn is a canvas operation, not a
+    #: composer query, so the composer and the conversation history skip it.
+    operation: Literal["load"] | None = None
 
 
 class SessionCreate(BaseModel):
@@ -138,9 +142,13 @@ class SessionMessageRead(BaseModel):
     via: str | None = None
     query_language: str | None = None
     source_query: str | None = None
+    # Whole-node twin of a table's ``source_query`` — what *Load to canvas* runs.
+    canvas_query: str | None = None
     # NL clarification only — answer options the user can pick
     # (docs/for-developers/modules/ask/features/clarifying-questions.md).
     clarification_options: list[str] | None = None
+    # One per option, "" where the label says enough; null when none says more.
+    clarification_descriptions: list[str] | None = None
     # 👍/👎 on this reply (docs/for-developers/modules/ask/features/clarifying-questions.md ·
     # docs/for-developers/modules/workflows/features/promote-a-plan.md). "up" | "down" | null.
     feedback: str | None = None

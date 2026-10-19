@@ -30,7 +30,9 @@ interface ApiMessage {
 	via?: string | null;
 	query_language?: string | null;
 	source_query?: string | null;
+	canvas_query?: string | null;
 	clarification_options?: string[] | null;
+	clarification_descriptions?: string[] | null;
 	feedback?: "up" | "down" | null;
 	row_count?: number | null;
 	execution_time_ms?: number | null;
@@ -116,6 +118,8 @@ export interface SendMessageBody {
 	 * is *Everything* for this ask only. The run freezes what this resolves to.
 	 */
 	lens_id?: string | null;
+	/** ql only — `load` marks a system-asked draw as a canvas operation. */
+	operation?: "load";
 }
 
 /** A client-driven canvas operation to log as a session turn (docs/for-developers/modules/explore/features/boards.md). Only
@@ -199,7 +203,9 @@ function toMessage(m: ApiMessage): SessionMessage {
 		timeoutS: m.timeout_s ?? undefined,
 		language: (m.query_language as QueryLanguage | null) ?? undefined,
 		sourceQuery: m.source_query ?? undefined,
+		canvasQuery: m.canvas_query ?? undefined,
 		clarificationOptions: m.clarification_options ?? undefined,
+		clarificationDescriptions: m.clarification_descriptions ?? undefined,
 		feedback: m.feedback ?? undefined,
 		runId: m.run_id ?? undefined,
 		steps: m.steps ? m.steps.map(toRunNode) : undefined,

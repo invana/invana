@@ -64,8 +64,10 @@ class TestWireForms:
         assert (failed.value.cls, failed.value.cause) == ("blocked", "robots_disallowed")
 
         with pytest.raises(NeedsInput) as asked:
-            outcome_from_json(outcome_to_json(NeedsInput(question="Which?", options=["A"])))
-        assert asked.value.options == ["A"]
+            outcome_from_json(
+                outcome_to_json(NeedsInput(question="Which?", options=["A", "B"], descriptions=["", "More"]))
+            )
+        assert (asked.value.options, asked.value.descriptions) == (["A", "B"], ["", "More"])
 
     async def test_an_exception_the_worker_cannot_name_is_a_defect(self):
         with pytest.raises(TaskFailure) as failed:

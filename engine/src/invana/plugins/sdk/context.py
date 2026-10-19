@@ -184,6 +184,7 @@ class RunVars:
     via: str | None = None
     llm_ms: float | None = None
     rationale: str | None = None
+    canvas_query: str | None = None
     # execute / project →
     result: QueryResponse | None = None
     nodes: int = 0

@@ -351,8 +351,11 @@ export function messageFromFrame(
 		timeoutS: (p.timeout_s as number | null) ?? undefined,
 		language: (p.query_language as SessionMessage["language"]) ?? undefined,
 		sourceQuery: (p.source_query as string | null) ?? undefined,
+		canvasQuery: (p.canvas_query as string | null) ?? undefined,
 		clarificationOptions:
 			(p.clarification_options as string[] | null) ?? undefined,
+		clarificationDescriptions:
+			(p.clarification_descriptions as string[] | null) ?? undefined,
 		feedback: (p.feedback as SessionMessage["feedback"]) ?? undefined,
 		runId: (p.run_id as string | null) ?? undefined,
 	};

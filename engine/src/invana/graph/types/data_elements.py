@@ -4,7 +4,7 @@ All models are Pydantic BaseModel subclasses used as the canonical
 return types across every connector implementation.
 """
 
-from typing import Any, Literal
+from typing import Any, Literal, TypeVar
 
 from pydantic import BaseModel, PrivateAttr
 
@@ -91,6 +91,25 @@ class ResultMetadata(BaseModel):
     @composed.setter
     def composed(self, value: ComposedQuery | None) -> None:
         self._composed = value
+
+
+_Element = TypeVar("_Element", Vertex, Edge)
+
+
+def unique_by_id(elements: list[_Element]) -> list[_Element]:
+    """The elements with each id once, in first-seen order.
+
+    A query that returns a node per row — ``MATCH (n)-[r]-(m) RETURN n, r, m``
+    — names the same node on every row it joins. The response describes the
+    subgraph, not the rows, so a node or edge is counted and drawn once.
+    """
+    seen: set[str] = set()
+    out: list[_Element] = []
+    for element in elements:
+        if element.id not in seen:
+            seen.add(element.id)
+            out.append(element)
+    return out
 
 
 class GraphResponse(BaseModel):

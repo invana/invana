@@ -23,6 +23,7 @@ export interface SessionThreadProps {
 	onSelectOption: (text: string) => void;
 	onTypeInstead: () => void;
 	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
+	onLoadCanvasQuery?: (message: SessionMessage) => void;
 	/** Open the console — on Records or on Log. */
 	onOpenConsole?: (tab: "data" | "queries", messageId?: string) => void;
 	/** Keep the board as it stands as a view — a reply's *Save view*. */
@@ -49,6 +50,7 @@ export function SessionThread({
 	onSelectOption,
 	onTypeInstead,
 	onLoadToCanvas,
+	onLoadCanvasQuery,
 	onOpenConsole,
 	onSaveView,
 }: SessionThreadProps) {
@@ -97,7 +99,9 @@ export function SessionThread({
 						x.role === "assistant" &&
 						!x.operation &&
 						!!m.sourceQuery &&
-						x.sourceQuery === m.sourceQuery,
+						// A table's twin folds into the table whose rows it drew.
+						(x.sourceQuery === m.sourceQuery ||
+							x.canvasQuery === m.sourceQuery),
 				) ?? before.find((x) => x.role === "assistant" && !x.operation);
 			if (!source) return; // nothing to fold into — leave the turn visible
 			loaded.add(source.id);
@@ -105,6 +109,18 @@ export function SessionThread({
 			const prompt = session.messages[i - 1];
 			if (prompt?.role === "user" && prompt.operation === "load")
 				hidden.add(prompt.id);
+		});
+		// A table's offer is spent once a later reply ran its whole-node twin.
+		session.messages.forEach((m, i) => {
+			if (m.role !== "assistant" || !m.canvasQuery) return;
+			if (
+				session.messages
+					.slice(i + 1)
+					.some(
+						(x) => x.role === "assistant" && x.sourceQuery === m.canvasQuery,
+					)
+			)
+				loaded.add(m.id);
 		});
 		return { hiddenLoadIds: hidden, loadedReplyIds: loaded };
 	}, [session.messages]);
@@ -168,6 +184,7 @@ export function SessionThread({
 							onTypeInstead={onTypeInstead}
 							result={results[message.id]}
 							onLoadToCanvas={onLoadToCanvas}
+							onLoadCanvasQuery={onLoadCanvasQuery}
 							onOpenConsole={onOpenConsole}
 							onSaveView={onSaveView}
 							sessionId={session.id}

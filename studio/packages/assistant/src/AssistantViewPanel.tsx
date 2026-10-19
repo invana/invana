@@ -1,4 +1,10 @@
-import { Badge, Button, ChatSessionTaskRow, SearchInput } from "@invana/ui";
+import {
+	Badge,
+	Button,
+	ChatSessionTaskRow,
+	EmptyState,
+	SearchInput,
+} from "@invana/ui";
 import type {
 	QueryLanguage,
 	QueryResponse,
@@ -51,6 +57,8 @@ export interface AssistantViewPanelProps {
 	/** Project a graph result onto the canvas (logs a `load` turn, docs/for-developers/modules/explore/features/boards.md). The
 	 *  message is the reply the result belongs to — its query is what was loaded. */
 	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
+	/** Draw a table reply's rows by asking its whole-node twin. */
+	onLoadCanvasQuery?: (message: SessionMessage) => void;
 	/** Open the console under the board — on Records from a reply's record
 	 *  count, on Log from a failure. Absent where the page has no console. */
 	onOpenConsole?: (tab: "data" | "queries", messageId?: string) => void;
@@ -111,6 +119,7 @@ export function AssistantViewPanel({
 	onFetchContext,
 	results,
 	onLoadToCanvas,
+	onLoadCanvasQuery,
 	onOpenConsole,
 	onSaveView,
 	onClose,
@@ -134,12 +143,18 @@ export function AssistantViewPanel({
 	const runViews = useRunStore((s) => s.views);
 
 	// The history is a view over the open thread, not a way out of it: the
-	// board keeps its canvas while the person looks back. With no thread open,
-	// the history is all there is.
+	// board keeps its canvas while the person looks back. It opens only when
+	// asked for — with no thread open, the panel is a blank new session.
 	const [historyOpen, setHistoryOpen] = useState(false);
-	const inDetail = activeSession !== null && !historyOpen;
+	const inDetail = !historyOpen;
 	// The history, searched by title.
 	const [search, setSearch] = useState("");
+	// A new session is a blank thread until its first ask creates the row.
+	const startNew = () => {
+		setHistoryOpen(false);
+		onBack();
+		setComposerFocus((n) => n + 1);
+	};
 
 	// `esc` stops the run, from anywhere on the page — like a console.
 	useEffect(() => {
@@ -269,7 +284,7 @@ export function AssistantViewPanel({
 	// Modeller: a Commit bar above the composer publishes the bound draft —
 	// identical to the Modeller's Publish, in the session's context (docs/for-developers/modules/ask/spec.md).
 	const commitBar =
-		isModeller && inDetail && onCommit ? (
+		isModeller && inDetail && activeSession && onCommit ? (
 			<div className="shrink-0 border-t border-border px-3 py-2 flex items-center justify-between gap-2">
 				<span className="text-muted-foreground">
 					Generated into the model's draft — Commit to publish.
@@ -294,7 +309,11 @@ export function AssistantViewPanel({
 				availableLanguages={availableLanguages}
 				defaultLanguage={defaultLanguage}
 				llmProviders={llmProviders}
-				onRun={onRun}
+				// Asking from the history returns to the thread the ask lands in.
+				onRun={(payload) => {
+					setHistoryOpen(false);
+					onRun(payload);
+				}}
 				onStop={onStop}
 				isRunning={isRunning}
 				sessionKey={activeSession?.id ?? null}
@@ -320,17 +339,25 @@ export function AssistantViewPanel({
 					className="min-w-0 truncate text-xs text-muted-foreground"
 					title={activeSession?.title || undefined}
 				>
-					{inDetail ? activeSession?.title || "New session" : "History"}
+					{historyOpen ? "History" : activeSession?.title || "New session"}
 				</span>
 				<span className="flex-1" />
 				<Button
 					variant="ghost"
 					size="icon-sm"
+					aria-label="New session"
+					title="New session"
+					onClick={startNew}
+				>
+					<Plus />
+				</Button>
+				<Button
+					variant="ghost"
+					size="icon-sm"
 					aria-label="Sessions"
-					aria-pressed={!inDetail}
-					title={inDetail ? "Sessions" : "Back to the thread"}
+					aria-pressed={historyOpen}
+					title={historyOpen ? "Back to the thread" : "Sessions"}
 					onClick={() => setHistoryOpen((v) => !v)}
-					disabled={!activeSession}
 				>
 					<History />
 				</Button>
@@ -356,7 +383,14 @@ export function AssistantViewPanel({
 				</Button>
 			</div>
 			<div className="min-h-0 flex-1 overflow-hidden">
-				{activeSession && inDetail ? (
+				{inDetail && !activeSession ? (
+					<EmptyState
+						className="h-full"
+						icon={<Star className="size-5" />}
+						title="New session"
+						description="Ask a question about the graph, or say what to draw."
+					/>
+				) : activeSession && inDetail ? (
 					<>
 						{onSetTokensPerRun && (
 							<SessionSettings
@@ -375,6 +409,7 @@ export function AssistantViewPanel({
 							onSelectOption={handleSelectOption}
 							onTypeInstead={handleTypeInstead}
 							onLoadToCanvas={onLoadToCanvas}
+							onLoadCanvasQuery={onLoadCanvasQuery}
 							onOpenConsole={onOpenConsole}
 							onSaveView={onSaveView}
 						/>
@@ -387,15 +422,7 @@ export function AssistantViewPanel({
 								<span className="font-semibold">Sessions</span>
 								<Badge variant="secondary">{sessions.length}</Badge>
 								<span className="flex-1" />
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={() => {
-										setHistoryOpen(false);
-										onBack();
-										setComposerFocus((n) => n + 1);
-									}}
-								>
+								<Button variant="outline" size="sm" onClick={startNew}>
 									<Plus />
 									New
 								</Button>

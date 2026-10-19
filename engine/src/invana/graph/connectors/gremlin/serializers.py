@@ -16,7 +16,7 @@ from gremlin_python.structure.graph import Vertex as GremlinVertex
 
 from invana.graph.connectors.base.exceptions import SerializationError
 from invana.graph.connectors.base.serializers import BaseSerializer
-from invana.graph.types.data_elements import Edge, GraphResponse, Path, ResultMetadata, Vertex
+from invana.graph.types.data_elements import Edge, GraphResponse, Path, ResultMetadata, Vertex, unique_by_id
 
 
 class GremlinSerializer(BaseSerializer):
@@ -178,6 +178,7 @@ class GremlinSerializer(BaseSerializer):
 
             records.append(self._as_record(record))
 
+        nodes, edges = unique_by_id(nodes), unique_by_id(edges)
         metadata = ResultMetadata(
             node_count=len(nodes),
             edge_count=len(edges),

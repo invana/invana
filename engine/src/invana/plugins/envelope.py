@@ -109,7 +109,12 @@ def outcome_to_json(result: Out | BaseException) -> dict[str, Any]:
             "raw": result.raw,
         }
     if isinstance(result, NeedsInput):
-        return {"kind": "needs_input", "question": result.question, "options": list(result.options)}
+        return {
+            "kind": "needs_input",
+            "question": result.question,
+            "options": list(result.options),
+            "descriptions": list(result.descriptions),
+        }
     if isinstance(result, CannotAnswer):
         return {"kind": "cannot_answer", "reason": result.reason, "exchange": result.exchange}
     if isinstance(result, Converse):
@@ -132,7 +137,11 @@ def outcome_from_json(outcome: dict[str, Any]) -> Out:
         case "out":
             return Out(**body)
         case "needs_input":
-            raise NeedsInput(question=body["question"], options=list(body.get("options") or []))
+            raise NeedsInput(
+                question=body["question"],
+                options=list(body.get("options") or []),
+                descriptions=list(body.get("descriptions") or []),
+            )
         case "cannot_answer":
             raise CannotAnswer(reason=body["reason"], exchange=body.get("exchange") or {})
         case "converse":

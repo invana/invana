@@ -65,7 +65,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Thread | The question card, then the answered state with who chose and when |
+| Thread | `ClarifyCard variant="inline"` in the reply: the question, its options as rows (a heading, and a description only where one was written), *Something else — let me type*. Once answered it folds to `Answered · <choice>` and opens to the question with the options not taken dimmed |
 | Task | `needs_input` with the question on the task itself |
 | Review | Questions sit first in the queue — they block a run |
 
@@ -76,6 +76,7 @@ flowchart TD
 | `task_prompts` | `run_id` · `step_seq` · `template_id` · `value` · `answered_by` |
 | Parking | the run suspends with its context; answering resumes it |
 | Routes | `POST …/task_runs/{id}/answer` |
+| Option descriptions | `option_descriptions` beside `options` on the Understand and Translate tool calls — one per option, `""` where the label says enough; kept on `session_messages.clarification_descriptions` (null when none says more) and on `clarification.requested` |
 | Events | `clarification.requested · answered` |
 
 ## Decisions
@@ -93,6 +94,7 @@ flowchart TD
 | CQ9 | **The loop is bounded by the envelope, and the bound is `max_clarifications`.** Hitting it is not a failure: the run states what it still does not know and answers on the reading it can defend, or parks for a person ([when-it-cannot-answer](when-it-cannot-answer.md)). An unbounded clarifier is a way to spend a person's attention without a ceiling. |
 | CQ10 | **Every answer is carried forward.** Round *n* sees rounds 1…*n−1*; the planner never re-asks something already answered, and the answers are on the run, so a rethink starts from them rather than from the original question. |
 | CQ11 | **The options are read under the run's lens.** When the model grounds its choices in the graph, the `options_query` it wrote crosses `graph_data` like any other read the run makes — the run's own lens is composed into it and the read is recorded as a touch — so a world that excludes a carrier never offers it as a choice. A refusal, a lens violation or a failed query falls back to the fixed options: the question still stands, its choices are only less grounded. |
+| CQ12 | **An option is described only when its label is not enough.** The model writes a heading for every option and a one-sentence description only where the person would otherwise be unsure which to pick — the model, or a skill steering it, decides. None described is the common case, and the options read as one line each. Options read from the graph (`options_query`) are their own label and are never described. |
 
 ## Not building
 

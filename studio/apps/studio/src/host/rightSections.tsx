@@ -73,6 +73,7 @@ export function rightSection(deps: RightSectionDeps) {
 		defaultLanguage,
 		handleOpenSession,
 		handleLoadToCanvasClick,
+		handleLoadCanvasQuery,
 		handleRun,
 		handleRerun,
 		handleBack,
@@ -106,6 +107,7 @@ export function rightSection(deps: RightSectionDeps) {
 			onFetchContext={fetchContext}
 			results={resultsByMessageId}
 			onLoadToCanvas={handleLoadToCanvasClick}
+			onLoadCanvasQuery={handleLoadCanvasQuery}
 			onOpenConsole={openConsoleTab}
 			onSaveView={() => void handleSaveState()}
 			onClose={right.close}
