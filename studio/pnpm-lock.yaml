@@ -81,14 +81,14 @@ importers:
         specifier: ^0.0.35
         version: 0.0.35(b058471369a1286bf5cf42b571bafa5c)
       '@invana/canvas':
-        specifier: ^0.0.15
-        version: 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+        specifier: ^0.0.16
+        version: 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
       '@invana/canvas-react':
-        specifier: ^0.0.15
-        version: 0.0.15(28fb1088fed78a7f2f8ef6a5ba2523d8)
+        specifier: ^0.0.16
+        version: 0.0.16(a3447dba9e13c297f906954d36f57b7d)
       '@invana/canvas-ui':
-        specifier: ^0.0.15
-        version: 0.0.15(cdf222e823037fb0657edc1258080e4b)
+        specifier: ^0.0.16
+        version: 0.0.16(06721342a7e044a2a432c4a49b160bc7)
       '@invana/charts':
         specifier: ^0.0.35
         version: 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/tables@0.0.35(@invana/forms@0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5))(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -99,26 +99,26 @@ importers:
         specifier: ^0.0.35
         version: 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
       '@invana/graph':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       '@invana/graph-layer-d3-contour':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.20.1)
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.20.1)
       '@invana/graph-layer-maplibre':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.20.1)
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.20.1)
       '@invana/graph-layout-d3-force':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
       '@invana/graph-layout-d3-sankey':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
       '@invana/graph-layout-elkjs':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
       '@invana/renderer-pixijs':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/canvas-store@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/canvas-store@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       '@invana/styling':
         specifier: ^0.0.35
         version: 0.0.35(tailwindcss@4.2.2)
@@ -412,20 +412,20 @@ importers:
         specifier: ^2.5.14
         version: 2.5.14
       '@invana/canvas':
-        specifier: ^0.0.15
-        version: 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+        specifier: ^0.0.16
+        version: 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
       '@invana/canvas-react':
-        specifier: ^0.0.15
-        version: 0.0.15(c04df3807be167400b4329ea5ff05b54)
+        specifier: ^0.0.16
+        version: 0.0.16(bbcf1219f3eb3082cc76869104174736)
       '@invana/canvas-ui':
-        specifier: ^0.0.15
-        version: 0.0.15(78866623c0f4f81e0c7386aa7b50820e)
+        specifier: ^0.0.16
+        version: 0.0.16(13d0413ce1ac7806efeebabd969ef0b7)
       '@invana/graph':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       '@invana/graph-layout-elkjs':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
       '@invana/styling':
         specifier: ^0.0.35
         version: 0.0.35(tailwindcss@4.2.2)
@@ -610,26 +610,26 @@ importers:
         specifier: ^0.0.35
         version: 0.0.35(b058471369a1286bf5cf42b571bafa5c)
       '@invana/canvas':
-        specifier: ^0.0.15
-        version: 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+        specifier: ^0.0.16
+        version: 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
       '@invana/canvas-react':
-        specifier: ^0.0.15
-        version: 0.0.15(c04df3807be167400b4329ea5ff05b54)
+        specifier: ^0.0.16
+        version: 0.0.16(bbcf1219f3eb3082cc76869104174736)
       '@invana/canvas-ui':
-        specifier: ^0.0.15
-        version: 0.0.15(f92567549dd42b88beaf9641d2e09864)
+        specifier: ^0.0.16
+        version: 0.0.16(d0f259e1f79cad8954dcc8e08e48c9e8)
       '@invana/forms':
         specifier: ^0.0.35
         version: 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
       '@invana/graph':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       '@invana/graph-layout-d3-force':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
       '@invana/graph-layout-elkjs':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
       '@invana/styling':
         specifier: ^0.0.35
         version: 0.0.35(tailwindcss@4.2.2)
@@ -832,8 +832,8 @@ importers:
         specifier: ^0.0.35
         version: 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
       '@invana/graph':
-        specifier: ^0.0.15
-        version: 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+        specifier: ^0.0.16
+        version: 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       '@invana/styling':
         specifier: ^0.0.35
         version: 0.0.35(tailwindcss@4.2.2)
@@ -1413,22 +1413,22 @@ packages:
       react-dom: ^18 || ^19
       react-hook-form: ^7
 
-  '@invana/canvas-core@0.0.15':
-    resolution: {integrity: sha512-aj6qDsDC25p1OL1tNxaMGTkpTPl0i94d5fP2Hl1SIsyRgTqiImquLTNkGauLw91v8Gd+41K1iBjPPMUd+KpEVA==}
+  '@invana/canvas-core@0.0.16':
+    resolution: {integrity: sha512-pWbTmrlC3j5wSHwluFB5h4RnSENgxxnusqQ+9oLfkqNha0/nexjK60L0mwsfzqy4BnV1cOvgMTmv+TiOnqyLfA==}
     peerDependencies:
       typescript: '>=5.0.0'
 
-  '@invana/canvas-react@0.0.15':
-    resolution: {integrity: sha512-EFDWUER+y8ren4EN4hmBh3tUuMUdF2D97ISQ9G7NZUuDNtSGLWp4HC50hsn5PFdXWygOZmt0VEnB1NmzzHnCqw==}
+  '@invana/canvas-react@0.0.16':
+    resolution: {integrity: sha512-2htM8EHVYAW2/1X6GnzNdIqubyECVSH4NNh38SKMqYNBqHrVJ+ImfD1gm4bQuRGS4r6GYGorCkPAO5XL7Bup0Q==}
     peerDependencies:
-      '@invana/canvas': 0.0.15
-      '@invana/graph': 0.0.15
-      '@invana/graph-layer-d3-contour': 0.0.15
-      '@invana/graph-layer-maplibre': 0.0.15
-      '@invana/graph-layout-d3-force': 0.0.15
-      '@invana/graph-layout-d3-sankey': 0.0.15
-      '@invana/graph-layout-elkjs': 0.0.15
-      '@invana/renderer-pixijs': 0.0.15
+      '@invana/canvas': 0.0.16
+      '@invana/graph': 0.0.16
+      '@invana/graph-layer-d3-contour': 0.0.16
+      '@invana/graph-layer-maplibre': 0.0.16
+      '@invana/graph-layout-d3-force': 0.0.16
+      '@invana/graph-layout-d3-sankey': 0.0.16
+      '@invana/graph-layout-elkjs': 0.0.16
+      '@invana/renderer-pixijs': 0.0.16
       pixi.js: ^8.21.0
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
@@ -1442,20 +1442,20 @@ packages:
       '@invana/graph-layout-elkjs':
         optional: true
 
-  '@invana/canvas-store@0.0.15':
-    resolution: {integrity: sha512-zHLAKCCS1oPyKiLZesZaL8Jj2hl4arc4pTux+mB5KPLzaW3ZWve9JtGYb7wbriv0KRWS4iqlfxsFDFAJuSmm3w==}
+  '@invana/canvas-store@0.0.16':
+    resolution: {integrity: sha512-Hh8+ygCZYSDco4QSUVOR8J2NPg6bYtMUc0lwRiZ4HQpkM8UuZk+KjuLY32JlNlLFK4YSrUvsxbUclSXiiFSQVA==}
     peerDependencies:
       typescript: '>=5.0.0'
 
-  '@invana/canvas-ui@0.0.15':
-    resolution: {integrity: sha512-onMnBlV1bYBkl4eKtUjReoPd30g2/7H9YoG/lFko/dxlsFmY6fSR1inJtdEBapx4cyXXDB/Cc83W7+kJyeCnBg==}
+  '@invana/canvas-ui@0.0.16':
+    resolution: {integrity: sha512-Ds7MnRDQ+xtEhqbBQI35p6dDSLPJSVdurr4MLrO0HkWdoIe38kMuSkol52GaMDkF68fRnHqVi/NFd8rQaOhxaQ==}
     peerDependencies:
       '@invana/boards': '>=0.0.32 <0.1.0'
-      '@invana/canvas': 0.0.15
-      '@invana/canvas-react': 0.0.15
+      '@invana/canvas': 0.0.16
+      '@invana/canvas-react': 0.0.16
       '@invana/forms': '>=0.0.32 <0.1.0'
-      '@invana/graph': 0.0.15
-      '@invana/graph-layout-d3-force': 0.0.15
+      '@invana/graph': 0.0.16
+      '@invana/graph-layout-d3-force': 0.0.16
       '@invana/styling': '>=0.0.32 <0.1.0'
       '@invana/themes': '>=0.0.32 <0.1.0'
       '@invana/ui': '>=0.0.32 <0.1.0'
@@ -1467,8 +1467,8 @@ packages:
       '@invana/boards':
         optional: true
 
-  '@invana/canvas@0.0.15':
-    resolution: {integrity: sha512-Qja3Lp22/TtZGdsEtBxl6PsNVf7+D1GiZhGggJxgPyJwQAArIXFF3z/WKDdbGdB7x4yRANyXGdq7W5f8e459Gw==}
+  '@invana/canvas@0.0.16':
+    resolution: {integrity: sha512-r7rbdK6vjtq5JM3WVIbJ9cma1tUWwbOgIZudsoZJ0oVuLVAJ4B0c9A/ephQzu0ywzR/ETIQFTTeT+25R2yoEJQ==}
     peerDependencies:
       typescript: '>=5.0.0'
 
@@ -1498,47 +1498,47 @@ packages:
       react-dom: ^18 || ^19
       react-hook-form: ^7
 
-  '@invana/graph-layer-d3-contour@0.0.15':
-    resolution: {integrity: sha512-zHp7AThEAORzagItMIRhL2cgTJ9LzQBOKq02Xwgo8jRbjqCS2bvwvOx2PAx1i0GWteVNCCmaX9nBlPyRuStutw==}
+  '@invana/graph-layer-d3-contour@0.0.16':
+    resolution: {integrity: sha512-PhDj62Pl4/Q6z/aeJ/Pfo+xUGS8h1vad4kqnAYFbgCtQ0mtL4nErICTaFiVn6eJOB+gsLIN51vHx2LULN4SKtA==}
     peerDependencies:
-      '@invana/canvas': 0.0.15
-      '@invana/graph': 0.0.15
+      '@invana/canvas': 0.0.16
+      '@invana/graph': 0.0.16
       pixi.js: ^8.21.0
 
-  '@invana/graph-layer-maplibre@0.0.15':
-    resolution: {integrity: sha512-4mKUxbBuWH5e56sEzAWsPWYm5DQg7C4pElZpWoI2dv4kvHZQLzM+PuPHLqCtLdUcBqkG4d946hTquuZ7p38PWw==}
+  '@invana/graph-layer-maplibre@0.0.16':
+    resolution: {integrity: sha512-gO6/n8lBVRFDXmg4Ivj352A8c0b/J+2y5scsgctOmeM6ABZseCLQkEsG3oOwzf6HP4IuENyqNM9bUC9VG8OunA==}
     peerDependencies:
-      '@invana/canvas': 0.0.15
+      '@invana/canvas': 0.0.16
       pixi.js: ^8.21.0
 
-  '@invana/graph-layout-d3-force@0.0.15':
-    resolution: {integrity: sha512-O/Gz5Bd2hMJ2JuLRcOkBPWeUwZ+HjdxDJmUguUH/co/a0SLGJCrjagxaemAfz5x9xaja0AUhTVTITqYiEZZRSQ==}
+  '@invana/graph-layout-d3-force@0.0.16':
+    resolution: {integrity: sha512-CyQtc4g8B1yTaTJnPg4VQJeuv77Aww3Df8x+K1IDvw6hs6fYZ/LX6ri+PdXOYS0/zE755ID4oIz4rbhjA5zzoQ==}
     peerDependencies:
-      '@invana/canvas-core': 0.0.15
-      '@invana/graph': 0.0.15
+      '@invana/canvas-core': 0.0.16
+      '@invana/graph': 0.0.16
 
-  '@invana/graph-layout-d3-sankey@0.0.15':
-    resolution: {integrity: sha512-7WLOOqUCAZdW3+kT2mfzaFVXgH+aTD77Z5XLnyN8pdDZ0jXyDENwLDGvt1uBlMQfRcnp3C/3w0OLfQgfLNK74Q==}
+  '@invana/graph-layout-d3-sankey@0.0.16':
+    resolution: {integrity: sha512-kPXlPGkgHzlmEgYCpm3qr2LVF3kRPHB5Rts5axwIznp3XQictcFm0yIxglki6qgNyoiem7dOd353hscm7dX4zA==}
     peerDependencies:
-      '@invana/canvas-core': 0.0.15
-      '@invana/graph': 0.0.15
+      '@invana/canvas-core': 0.0.16
+      '@invana/graph': 0.0.16
 
-  '@invana/graph-layout-elkjs@0.0.15':
-    resolution: {integrity: sha512-7V/y29cewjbq6F79QbGZ/Tvy5gRrFjb7r7/tfDC8JVw5eXsaSkredy5izHgNZ7H50/ja3zzC+McLi54IdqQnFw==}
+  '@invana/graph-layout-elkjs@0.0.16':
+    resolution: {integrity: sha512-9ntLxKj6rMhbJqmu6HVdA8WM0InWghQtAItTlohYUKlrYIg4CsrK4l9aro9bnuigxifpnU9XfoG20vEQSRoIkg==}
     peerDependencies:
-      '@invana/canvas-core': 0.0.15
-      '@invana/graph': 0.0.15
+      '@invana/canvas-core': 0.0.16
+      '@invana/graph': 0.0.16
 
-  '@invana/graph@0.0.15':
-    resolution: {integrity: sha512-geYajdtOcB8dZMq2LAGxxwDDUy/n8erdqEVeMlPBfKixV8Xf5VmVMfAT4vsClpU53Hk8xfpThCgEt2DNq2MPsQ==}
+  '@invana/graph@0.0.16':
+    resolution: {integrity: sha512-ru6g6sRf60vbtApZGupBTFZZ6rFnuqz+ESdLqLwDJ19YH4JBL52L6Rfk3Sen+pvY57X0ioRLnXcd6LWIXxfwnQ==}
     peerDependencies:
-      '@invana/canvas': 0.0.15
+      '@invana/canvas': 0.0.16
 
-  '@invana/renderer-pixijs@0.0.15':
-    resolution: {integrity: sha512-FJ2TlFpYPPYuInoAyEqxzDabM9QwhdyyO1Re02enW0Glm8kuE2r04RLgnKIntxDmIOwcTwUguQbSVfElqjVsqg==}
+  '@invana/renderer-pixijs@0.0.16':
+    resolution: {integrity: sha512-9HRySNlfEZHRl5zrj3X4T03Nrb1x2xq9fE9lQyjpsxKNy0UU5yXLOrS49ZkZkR44e8ijtG8eVshlZ5ujtIYsBg==}
     peerDependencies:
-      '@invana/canvas-core': 0.0.15
-      '@invana/canvas-store': 0.0.15
+      '@invana/canvas-core': 0.0.16
+      '@invana/canvas-store': 0.0.16
 
   '@invana/styling@0.0.35':
     resolution: {integrity: sha512-NOpFASzfFqUUVbs+MppT9pFflPEEIvYrTSlpp6E/Cdoxy3s0rFkYPi/onfX1hhw3QTI+Jf3E9CX3Bkpok0fQGA==}
@@ -1551,14 +1551,6 @@ packages:
       '@invana/forms': 0.0.35
       '@invana/styling': 0.0.35
       '@invana/ui': 0.0.35
-      react: ^18 || ^19
-      react-dom: ^18 || ^19
-
-  '@invana/themes@0.0.34':
-    resolution: {integrity: sha512-lwoltRGJyyQ2EeM2O6IutgoaCPpmdeqM6aIvdhwGKeYpOS2ulUzElyZiHmstnpKGhmb3qO/l4axnpQ4oPCalbw==}
-    peerDependencies:
-      '@invana/styling': 0.0.34
-      '@invana/ui': 0.0.34
       react: ^18 || ^19
       react-dom: ^18 || ^19
 
@@ -4272,27 +4264,27 @@ snapshots:
       react-hook-form: 7.87.0(react@19.2.5)
     optional: true
 
-  '@invana/canvas-core@0.0.15(typescript@6.0.2)':
+  '@invana/canvas-core@0.0.16(typescript@6.0.2)':
     dependencies:
       typescript: 6.0.2
 
-  '@invana/canvas-react@0.0.15(28fb1088fed78a7f2f8ef6a5ba2523d8)':
+  '@invana/canvas-react@0.0.16(a3447dba9e13c297f906954d36f57b7d)':
     dependencies:
-      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/canvas-store': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
-      '@invana/graph-layout-d3-force': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
-      '@invana/renderer-pixijs': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/canvas-store@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
-      '@invana/themes': 0.0.34(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/canvas': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas-store': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/graph': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/graph-layout-d3-force': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/renderer-pixijs': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/canvas-store@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/themes': 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       lucide-react: 0.562.0(react@19.2.5)
       pixi.js: 8.20.1
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
     optionalDependencies:
-      '@invana/graph-layer-d3-contour': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.20.1)
-      '@invana/graph-layer-maplibre': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.20.1)
-      '@invana/graph-layout-d3-sankey': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
-      '@invana/graph-layout-elkjs': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/graph-layer-d3-contour': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.20.1)
+      '@invana/graph-layer-maplibre': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.20.1)
+      '@invana/graph-layout-d3-sankey': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/graph-layout-elkjs': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
     transitivePeerDependencies:
       - '@invana/styling'
       - '@invana/ui'
@@ -4300,23 +4292,23 @@ snapshots:
       - typescript
       - use-sync-external-store
 
-  '@invana/canvas-react@0.0.15(c04df3807be167400b4329ea5ff05b54)':
+  '@invana/canvas-react@0.0.16(bbcf1219f3eb3082cc76869104174736)':
     dependencies:
-      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/canvas-store': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
-      '@invana/graph-layout-d3-force': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
-      '@invana/renderer-pixijs': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/canvas-store@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
-      '@invana/themes': 0.0.34(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/canvas': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas-store': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/graph': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/graph-layout-d3-force': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/renderer-pixijs': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/canvas-store@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/themes': 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       lucide-react: 0.562.0(react@19.2.5)
       pixi.js: 8.22.0
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
     optionalDependencies:
-      '@invana/graph-layer-d3-contour': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.22.0)
-      '@invana/graph-layer-maplibre': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.22.0)
-      '@invana/graph-layout-d3-sankey': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
-      '@invana/graph-layout-elkjs': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/graph-layer-d3-contour': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.22.0)
+      '@invana/graph-layer-maplibre': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.22.0)
+      '@invana/graph-layout-d3-sankey': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/graph-layout-elkjs': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
     transitivePeerDependencies:
       - '@invana/styling'
       - '@invana/ui'
@@ -4324,9 +4316,9 @@ snapshots:
       - typescript
       - use-sync-external-store
 
-  '@invana/canvas-store@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))':
+  '@invana/canvas-store@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))':
     dependencies:
-      '@invana/canvas-core': 0.0.15(typescript@6.0.2)
+      '@invana/canvas-core': 0.0.16(typescript@6.0.2)
       immer: 11.1.8
       rbush: 4.0.1
       typescript: 6.0.2
@@ -4336,13 +4328,30 @@ snapshots:
       - react
       - use-sync-external-store
 
-  '@invana/canvas-ui@0.0.15(78866623c0f4f81e0c7386aa7b50820e)':
+  '@invana/canvas-ui@0.0.16(06721342a7e044a2a432c4a49b160bc7)':
     dependencies:
-      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/canvas-react': 0.0.15(c04df3807be167400b4329ea5ff05b54)
+      '@invana/canvas': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas-react': 0.0.16(a3447dba9e13c297f906954d36f57b7d)
+      '@invana/forms': 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
+      '@invana/graph': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/graph-layout-d3-force': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/styling': 0.0.35(tailwindcss@4.2.2)
+      '@invana/themes': 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/ui': 0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      lucide-react: 0.475.0(react@19.2.5)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      react-hook-form: 7.72.1(react@19.2.5)
+    optionalDependencies:
+      '@invana/boards': 0.0.35(b058471369a1286bf5cf42b571bafa5c)
+
+  '@invana/canvas-ui@0.0.16(13d0413ce1ac7806efeebabd969ef0b7)':
+    dependencies:
+      '@invana/canvas': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas-react': 0.0.16(bbcf1219f3eb3082cc76869104174736)
       '@invana/forms': 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.87.0(react@19.2.5))(react@19.2.5)
-      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
-      '@invana/graph-layout-d3-force': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/graph': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/graph-layout-d3-force': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
       '@invana/styling': 0.0.35(tailwindcss@4.2.2)
       '@invana/themes': 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@invana/ui': 0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
@@ -4353,13 +4362,13 @@ snapshots:
     optionalDependencies:
       '@invana/boards': 0.0.35(eef2a3888efc854560779ad4663f9465)
 
-  '@invana/canvas-ui@0.0.15(cdf222e823037fb0657edc1258080e4b)':
+  '@invana/canvas-ui@0.0.16(d0f259e1f79cad8954dcc8e08e48c9e8)':
     dependencies:
-      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/canvas-react': 0.0.15(28fb1088fed78a7f2f8ef6a5ba2523d8)
+      '@invana/canvas': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas-react': 0.0.16(bbcf1219f3eb3082cc76869104174736)
       '@invana/forms': 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
-      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
-      '@invana/graph-layout-d3-force': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/graph': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/graph-layout-d3-force': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
       '@invana/styling': 0.0.35(tailwindcss@4.2.2)
       '@invana/themes': 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@invana/ui': 0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
@@ -4370,28 +4379,11 @@ snapshots:
     optionalDependencies:
       '@invana/boards': 0.0.35(b058471369a1286bf5cf42b571bafa5c)
 
-  '@invana/canvas-ui@0.0.15(f92567549dd42b88beaf9641d2e09864)':
+  '@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))':
     dependencies:
-      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/canvas-react': 0.0.15(c04df3807be167400b4329ea5ff05b54)
-      '@invana/forms': 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
-      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
-      '@invana/graph-layout-d3-force': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
-      '@invana/styling': 0.0.35(tailwindcss@4.2.2)
-      '@invana/themes': 0.0.35(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@invana/ui': 0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
-      lucide-react: 0.475.0(react@19.2.5)
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-      react-hook-form: 7.72.1(react@19.2.5)
-    optionalDependencies:
-      '@invana/boards': 0.0.35(b058471369a1286bf5cf42b571bafa5c)
-
-  '@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))':
-    dependencies:
-      '@invana/canvas-core': 0.0.15(typescript@6.0.2)
-      '@invana/canvas-store': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/renderer-pixijs': 0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/canvas-store@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/canvas-core': 0.0.16(typescript@6.0.2)
+      '@invana/canvas-store': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/renderer-pixijs': 0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/canvas-store@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       typescript: 6.0.2
     transitivePeerDependencies:
       - '@types/react'
@@ -4468,61 +4460,61 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@invana/graph-layer-d3-contour@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.20.1)':
+  '@invana/graph-layer-d3-contour@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.20.1)':
     dependencies:
-      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/canvas': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/graph': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       d3-contour: 4.0.2
       pixi.js: 8.20.1
 
-  '@invana/graph-layer-d3-contour@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.22.0)':
+  '@invana/graph-layer-d3-contour@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.22.0)':
     dependencies:
-      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/canvas': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/graph': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       d3-contour: 4.0.2
       pixi.js: 8.22.0
     optional: true
 
-  '@invana/graph-layer-maplibre@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.20.1)':
+  '@invana/graph-layer-maplibre@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.20.1)':
     dependencies:
-      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
       maplibre-gl: 4.7.1
       pixi.js: 8.20.1
 
-  '@invana/graph-layer-maplibre@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.22.0)':
+  '@invana/graph-layer-maplibre@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.22.0)':
     dependencies:
-      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
       maplibre-gl: 4.7.1
       pixi.js: 8.22.0
     optional: true
 
-  '@invana/graph-layout-d3-force@0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))':
+  '@invana/graph-layout-d3-force@0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))':
     dependencies:
-      '@invana/canvas-core': 0.0.15(typescript@6.0.2)
-      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/canvas-core': 0.0.16(typescript@6.0.2)
+      '@invana/graph': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       d3-force: 3.0.0
 
-  '@invana/graph-layout-d3-sankey@0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))':
+  '@invana/graph-layout-d3-sankey@0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))':
     dependencies:
-      '@invana/canvas-core': 0.0.15(typescript@6.0.2)
-      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/canvas-core': 0.0.16(typescript@6.0.2)
+      '@invana/graph': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       d3-sankey: 0.12.3
 
-  '@invana/graph-layout-elkjs@0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))':
+  '@invana/graph-layout-elkjs@0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))':
     dependencies:
-      '@invana/canvas-core': 0.0.15(typescript@6.0.2)
-      '@invana/graph': 0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/canvas-core': 0.0.16(typescript@6.0.2)
+      '@invana/graph': 0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       elkjs: 0.9.3
 
-  '@invana/graph@0.0.15(@invana/canvas@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))':
+  '@invana/graph@0.0.16(@invana/canvas@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))':
     dependencies:
-      '@invana/canvas': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
       rbush: 4.0.1
 
-  '@invana/renderer-pixijs@0.0.15(@invana/canvas-core@0.0.15(typescript@6.0.2))(@invana/canvas-store@0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))':
+  '@invana/renderer-pixijs@0.0.16(@invana/canvas-core@0.0.16(typescript@6.0.2))(@invana/canvas-store@0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))':
     dependencies:
-      '@invana/canvas-core': 0.0.15(typescript@6.0.2)
-      '@invana/canvas-store': 0.0.15(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas-core': 0.0.16(typescript@6.0.2)
+      '@invana/canvas-store': 0.0.16(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
       pixi.js: 8.22.0
 
   '@invana/styling@0.0.35(tailwindcss@4.2.2)':
@@ -4554,13 +4546,6 @@ snapshots:
       '@invana/ui': 0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
       '@tanstack/react-table': 8.21.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       lucide-react: 1.39.0(react@19.2.5)
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-
-  '@invana/themes@0.0.34(@invana/styling@0.0.35(tailwindcss@4.2.2))(@invana/ui@0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
-    dependencies:
-      '@invana/styling': 0.0.35(tailwindcss@4.2.2)
-      '@invana/ui': 0.0.35(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
 
