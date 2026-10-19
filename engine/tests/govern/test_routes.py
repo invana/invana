@@ -205,10 +205,12 @@ class TestWhatTheDrawerReads:
             },
         )
         assert tightened.status_code == 200, tightened.text
+        assert (tightened.json()["allow_rules"], tightened.json()["deny_rules"]) == (0, 2)
 
         resp = await client.get(f"{BASE}/lenses/{world_id}")
 
         assert resp.status_code == 200
+        assert resp.json()["usage"]["people"] == 0, "nobody has run under it yet"
         rows = {row["role"]: row for row in resp.json()["cast_resolved"]}
         assert set(rows) == {"extract", "decide", "judge", "embed"}
         decide = rows["decide"]

@@ -152,9 +152,7 @@ function bands(lens: Lens): BoardSpec["rows"] {
 							{
 								label: "Rules",
 								value: count(rules.length),
-								delta: `${count(rules.filter((r) => r.allow).length)} allow · ${count(
-									rules.filter((r) => !r.allow).length,
-								)} deny`,
+								delta: `${count(lens.allow_rules)} allow · ${count(lens.deny_rules)} deny`,
 							},
 							{
 								label: "Closed layers",
@@ -188,8 +186,8 @@ function bands(lens: Lens): BoardSpec["rows"] {
 								: {
 										label: "Last used",
 										value: since(usage?.last_used_at) ?? "—",
-										delta: usage?.actor_ids?.length
-											? `${count(usage.actor_ids.length)} people`
+										delta: usage?.people
+											? `${count(usage.people)} people`
 											: "no run has picked it",
 									},
 						]),

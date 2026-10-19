@@ -64,6 +64,12 @@ def to_rules(rules: list[RuleIn] | list[dict]) -> list[Rule]:
     return out
 
 
+def rule_counts(rules: list[dict] | None) -> tuple[int, int]:
+    """How many of a lens's rules allow, and how many deny."""
+    allow = sum(1 for r in rules or [] if r.get("allow"))
+    return allow, len(rules or []) - allow
+
+
 def bound_label(lens: Lens) -> str:
     """Which side a lens bounds from, as a refusal says it
     ([AG6](docs/for-developers/modules/agents/features/author-an-agent.md))."""

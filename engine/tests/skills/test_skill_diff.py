@@ -118,3 +118,10 @@ async def test_a_handful_of_runs_is_not_enough_to_read(session: AsyncSession, gr
     assert MIN_OFFERS_TO_READ > 1
     assert report.versions[0].offered == 1
     assert report.versions[0].enough_to_read is False
+    assert report.versions[0].applied_rate is None, "no share below the floor"
+
+    for _ in range(MIN_OFFERS_TO_READ - 1):
+        more = await _run(session, graph, agent_id=None, outcome="answered")
+        await _step(session, graph, more, offered=[skill.current_version_id], applied=[skill.current_version_id])
+    report = await usage.for_skill(session, skill=skill, graph_id=graph.id, limit=25)
+    assert report.versions[0].applied_rate == (MIN_OFFERS_TO_READ - 1) / MIN_OFFERS_TO_READ

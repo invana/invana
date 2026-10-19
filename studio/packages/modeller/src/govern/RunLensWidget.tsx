@@ -88,8 +88,10 @@ export function RunLensWidget({
 					label="Touched"
 					value={String(touched.length)}
 					caption={
+						// A frozen document carries no share to read, so the caption
+						// names the two lists it draws and the meter shows the fill.
 						allowed.length
-							? `${Math.round((touched.length / allowed.length) * 100)}% of what it could`
+							? `of ${allowed.length} allowed`
 							: "nothing was bounded"
 					}
 					meter={allowed.length ? touched.length / allowed.length : undefined}

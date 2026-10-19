@@ -96,14 +96,12 @@ const day = new Intl.DateTimeFormat(undefined, {
 export const dayLabel = (iso: string) =>
 	day.format(new Date(`${iso}T00:00:00`));
 
-/** `agent 61% · plan 22%` — the two biggest callers. */
-export function callerSplit(counts: Partial<Record<CallerKind, number>>) {
-	const total = Object.values(counts).reduce((a, v) => a + (v ?? 0), 0);
-	if (!total) return "no calls";
-	return CALLER_SERIES.map((c) => ({ ...c, n: counts[c.key] ?? 0 }))
-		.filter((c) => c.n)
-		.sort((a, b) => b.n - a.n)
-		.slice(0, 2)
-		.map((c) => `${c.label} ${fmtPct(c.n / total)}`)
-		.join(" · ");
+/** `agent 61% · plan 22%` — the two biggest callers, from the engine's shares. */
+export function callerSplit(shares: Partial<Record<CallerKind, number>>) {
+	const top = CALLER_SERIES.map((c) => ({ ...c, share: shares[c.key] ?? 0 }))
+		.filter((c) => c.share)
+		.sort((a, b) => b.share - a.share)
+		.slice(0, 2);
+	if (!top.length) return "no calls";
+	return top.map((c) => `${c.label} ${fmtPct(c.share)}`).join(" · ");
 }

@@ -27,10 +27,26 @@ const plan = {
 } as unknown as TaskPlanDetail;
 
 describe("taskFlowFromTaskPlan", () => {
-	it("marks a wide step and a rare branch, and says so in the summary", () => {
+	it("marks the steps the engine calls wide or rare, and says so in the summary", () => {
 		const steps = [
-			{ step_key: "a", p50_ms: 100, p95_ms: 900, ran_in: 1, failed: 1 },
-			{ step_key: "b", p50_ms: 50, p95_ms: 60, ran_in: 0.1, failed: 0 },
+			{
+				step_key: "a",
+				p50_ms: 100,
+				p95_ms: 900,
+				ran_in: 1,
+				failed: 1,
+				wide: true,
+				rare: false,
+			},
+			{
+				step_key: "b",
+				p50_ms: 50,
+				p95_ms: 60,
+				ran_in: 0.1,
+				failed: 0,
+				wide: false,
+				rare: true,
+			},
 		] as unknown as PlanPerformance["steps"];
 		const { nodes, edges } = taskFlowFromTaskPlan(plan, steps);
 		expect(nodes[0].states).toEqual(["wide"]);

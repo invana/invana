@@ -82,8 +82,7 @@ export function CompareBoardPage({
 		);
 	}
 
-	const { a, b, only_in_a, only_in_b, shared, differed } = compare.data;
-	const differedCount = Object.keys(differed ?? {}).length;
+	const { a, b, only_in_a, only_in_b, shared, differed, counts } = compare.data;
 
 	return (
 		<div className="flex h-full min-h-0 flex-col gap-3 overflow-y-auto p-3">
@@ -113,7 +112,7 @@ export function CompareBoardPage({
 			<MetricGrid minTileWidth={150}>
 				<MetricTile
 					label={`${sideName(a)} touched`}
-					value={String(a.touched.length)}
+					value={String(counts.touched_a)}
 					caption={
 						a.cost_usd != null
 							? `$${a.cost_usd.toFixed(4)}`
@@ -122,7 +121,7 @@ export function CompareBoardPage({
 				/>
 				<MetricTile
 					label={`${sideName(b)} touched`}
-					value={String(b.touched.length)}
+					value={String(counts.touched_b)}
 					caption={
 						b.cost_usd != null
 							? `$${b.cost_usd.toFixed(4)}`
@@ -131,7 +130,7 @@ export function CompareBoardPage({
 				/>
 				<MetricTile
 					label="Shared"
-					value={String(shared.length)}
+					value={String(counts.shared)}
 					caption="read by both"
 				/>
 				{/* — two counts, because they are two facts. *Only one reached
@@ -140,15 +139,15 @@ export function CompareBoardPage({
 				    printed for two runs that narrowed the same model two ways. */}
 				<MetricTile
 					label="Only one reached"
-					value={String(only_in_a.length + only_in_b.length)}
+					value={String(counts.only_one)}
 					caption="engaged by one run, not the other"
-					tone={only_in_a.length + only_in_b.length ? "warning" : undefined}
+					tone={counts.only_one ? "warning" : undefined}
 				/>
 				<MetricTile
 					label="Read differently"
-					value={String(differedCount)}
+					value={String(counts.read_differently)}
 					caption="shared, but not narrowed the same way"
-					tone={differedCount ? "warning" : undefined}
+					tone={counts.read_differently ? "warning" : undefined}
 				/>
 			</MetricGrid>
 
@@ -172,7 +171,7 @@ export function CompareBoardPage({
 						// is a real and interesting result — it means the difference in
 						// the answers is not in what grounded them.
 						<p className="text-sm text-muted-foreground">
-							{differedCount
+							{counts.read_differently
 								? "Both runs engaged exactly the same participants — but not in the same way. What each world did to them is below."
 								: "Both runs engaged exactly the same participants, and narrowed them identically. Whatever differs in the answers does not come from what grounded them — look at the cast."}
 						</p>
@@ -180,7 +179,7 @@ export function CompareBoardPage({
 				</div>
 			</PanelBox>
 
-			<PanelBox title="Shared" aside={`${shared.length} read by both`}>
+			<PanelBox title="Shared" aside={`${counts.shared} read by both`}>
 				<div className="flex min-w-0 flex-col gap-0.5 pt-1">
 					{shared.length ? (
 						shared.map((address) => (

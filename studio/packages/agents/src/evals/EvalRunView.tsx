@@ -21,22 +21,25 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { PanelSection } from "@invana-studio/ui";
+import type { Change } from "../fleet/types";
+import { changeText } from "../overview/fleetParts";
 import { isSettled } from "./queries";
-import type { EvalCase, EvalResult, EvalRun, EvalSide } from "./types";
+import type { EvalCase, EvalResult, EvalRun } from "./types";
 
 const seconds = (ms: number | null | undefined) =>
 	ms == null ? "—" : `${(ms / 1000).toFixed(1)}s`;
 
-/** `▲ 11% vs live` — the draft's change, or nothing when there is no live side. */
-function versus(draft?: number | null, live?: number | null): string {
-	if (draft == null || live == null || live === 0) return "no live side";
-	const pct = Math.round(((draft - live) / live) * 100);
-	if (pct === 0) return "same as live";
-	return `${pct > 0 ? "▲" : "▼"} ${Math.abs(pct)}% vs live`;
+/** `▲ 11% vs live` — the engine's change, or why there is none. */
+function versus(
+	c: Change | null | undefined,
+	sides: { live?: unknown; draft?: unknown } | undefined,
+): string {
+	if (!sides?.live) return "no live side";
+	if (!sides.draft) return "live only";
+	if (!c) return "draft against live";
+	if (c.direction === "flat") return "same as live";
+	return `${changeText(c, ["▲", "▼"])} vs live`;
 }
-
-const perRun = (side?: EvalSide) =>
-	side && side.cases > 0 ? Math.round(side.tokens / side.cases) : null;
 
 function sideCell(r?: EvalResult) {
 	if (!r) return "—";
@@ -94,13 +97,16 @@ export function EvalRunView({
 				<MetricTile
 					label="p95"
 					value={seconds(draft?.p95_ms)}
-					caption={versus(draft?.p95_ms, live?.p95_ms)}
+					caption={versus(summary?.versus_live?.p95_ms, summary?.sides)}
 					captionTone={verdict === "warn" ? "warning" : undefined}
 				/>
 				<MetricTile
 					label="Tokens / run"
-					value={perRun(draft)?.toLocaleString() ?? "—"}
-					caption={versus(perRun(draft), perRun(live))}
+					value={draft?.tokens_per_case?.toLocaleString() ?? "—"}
+					caption={versus(
+						summary?.versus_live?.tokens_per_case,
+						summary?.sides,
+					)}
 				/>
 			</MetricGrid>
 

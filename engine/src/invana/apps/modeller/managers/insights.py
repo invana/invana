@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
 from typing import TYPE_CHECKING, Literal
 
-from invana.apps.modeller.managers.query_insights import Facts, Line, QueryInsights
+from invana.apps.modeller.managers.query_insights import Facts, Line, QueryInsights, caller_share
 from invana.apps.modeller.querysets.graph_model import GraphModelQuerySet
 from invana.apps.modeller.querysets.graph_query_log import GraphQueryLogQuerySet
 from invana.apps.modeller.querysets.graph_version import GraphVersionQuerySet
@@ -39,6 +39,7 @@ from invana.apps.modeller.schemas import (
     WrittenBy,
 )
 from invana.core.errors import NotFoundError
+from invana.core.metrics import change_of
 from invana.core.utils import percentile
 from invana.graph.connectors.base.connector import BaseConnector
 from invana.graph.connectors.base.exceptions import ConnectorError
@@ -216,6 +217,7 @@ class InsightsManager:
             p50=_round(percentile(durations, 0.5)),
             p95=_round(percentile(durations, 0.95)),
             callers=callers,
+            caller_share=caller_share(callers),
             types=types,
             touched_from="plan" if any(r.touched_from == "plan" for r in calls) else "results",
             plan=list((explained.properties_touched or {}).get("plan", [])) if explained else [],
@@ -289,6 +291,7 @@ class InsightsManager:
         rows = []
         for key, name, kind, keys in lines:
             opening, current = total(keys, start), total(keys, now)
+            change = current - opening if current is not None and opening is not None else None
             rows.append(
                 GrowthRow(
                     key=key,
@@ -296,7 +299,9 @@ class InsightsManager:
                     kind=kind,
                     start=opening,
                     now=current,
-                    change=current - opening if current is not None and opening is not None else None,
+                    change=change,
+                    change_rate=change_of(current, opening, higher_is_better=None),
+                    unchanged=change == 0 or current is None,
                     last=last_write(keys),
                 )
             )
@@ -310,17 +315,40 @@ class InsightsManager:
             for (source, source_id), at in sorted(acts.items(), key=lambda a: a[1])
         ]
         in_scope = {k for _, _, types in scope.models for k in types}
+        imports = sum(1 for m in marks if m.source == "import")
+        stitch_commits = sum(1 for m in marks if m.source == "stitch_commit")
         return Growth(
             labels=[(first + timedelta(days=i)).isoformat() for i in range(days)],
             series=series,
             marks=marks,
             rows=rows,
-            writes=GrowthWrites(
-                imports=sum(1 for m in marks if m.source == "import"),
-                stitch_commits=sum(1 for m in marks if m.source == "stitch_commit"),
-            ),
+            writes=GrowthWrites(imports=imports, stitch_commits=stitch_commits, total=imports + stitch_commits),
             counted=any(k in timeline for k in in_scope),
+            **_growth_totals(rows),
         )
+
+
+def _growth_totals(rows: list[GrowthRow]) -> dict:
+    """The scope's records at the start and now, the change between, and which row grew fastest.
+
+    A row first counted inside the window adds to ``now`` and not to ``start``;
+    when no row was counted before the window there is no start, so no change —
+    a rise from nothing is not growth. The fastest row ranks by its rate, and a
+    row that grew from nothing ranks above every rate.
+    """
+    now = sum(r.now or 0 for r in rows)
+    opened = [r.start for r in rows if r.start is not None]
+    start = sum(opened) if opened else None
+    grown = [r for r in rows if (r.change or 0) > 0]
+    grown.sort(key=lambda r: -(r.change_rate.by if r.change_rate else float("inf")))
+    return {
+        "start": start,
+        "now": now,
+        "change": now - start if start is not None else None,
+        "change_rate": change_of(now, start, higher_is_better=None),
+        "fastest": grown[0].key if grown else None,
+        "unchanged": sum(1 for r in rows if r.unchanged),
+    }
 
 
 def _round(value: float | None) -> float | None:

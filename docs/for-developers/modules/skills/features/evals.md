@@ -88,7 +88,7 @@ flowchart TD
 | Its record | A root `TaskRun` `role=evaluate`, `workflow_key=eval`, `triggered_by` `user` (publish, manual) or `system` (drift, nightly), `params.trigger` naming why |
 | Its children | One replayed ask per case and side, `parent_run_id` the eval run; their tokens count on the eval budget, never on production |
 | Its candidate | `params.candidate` — `draft`, a `version` (a rollback) or a `model_pin` (an agent's pin move) — and `params.candidate_digest`, the sha256 of the candidate's text and pin |
-| Its summary | `result.eval` — per side: hard passed / total, p95 ms, tokens, judged mean; changed answers; the gate's verdict (`clean` · `warn` · `blocked`) with its reasons |
+| Its summary | `result.eval` — per side: hard passed / total, p95 ms, tokens, tokens per case, judged mean; changed answers; `versus_live` (the draft's `p95_ms` and `tokens_per_case` against live, each a `Change`, null on a one-side run); the gate's verdict (`clean` · `warn` · `blocked`) with its reasons |
 
 | Check `kind` | Passes when |
 |---|---|
@@ -129,6 +129,7 @@ flowchart TD
 | EL13 | **The judge reads a written answer.** The answer handed to the judge is the run's emissions as text — prose verbatim, a table's first rows, a subgraph's counts — capped at 4,000 characters; it scores 0–5 against the rubric. Its tokens are the eval run's own and count on the eval budget. |
 | EL14 | **The starter set is one model call, and every case it writes waits.** `POST …/propose` hands the subject's text — its draft when one is open, else what is live — to the subject's own pinned model (the Graph's decide model when it has no pin), which writes up to five questions, each with rule checks it can state without the graph (`cites_records`, `cannot_answer`, `guardrail_holds`). Every case lands `proposed`, created by the person who asked; the exact model version is on each case's `eval_case.create` event. It is not an eval run, so it is not on the eval budget. |
 | EL15 | **Studio draws the gate's answer, never predicts it.** A publish, a restore or a pin move goes to the engine as it is; a `409` whose `detail.error` is `eval_required` · `eval_running` · `eval_failed` · `eval_warned` is drawn as a refusal card, with *Run the evals* on `eval_required`. The evals view is a mode of the skill's Instructions tab, not a tab of its own ([agents.md › Decisions](../../../../products/agents.md#decisions) *Skill evals*). |
+| EL16 | **The draft's change against live is written into the summary when the run settles.** `score` stores each side's `tokens_per_case` (tokens over cases, rounded) and `versus_live` — the draft's p95 and tokens per case against live, read by the same `Change` helper as Performance ([FP17](../../agents/features/fleet-performance.md#decisions)): a ratio, `flat` within ±2%, up reading `worse`. Studio prints `▲ 11% vs live` · `same as live` from it and never divides; a run with one side carries `versus_live: null` and says *no live side* or *live only*. |
 | EL9 | **The eval budget is tokens per Graph per month**, counted from eval runs only. At the ceiling scheduled and drift runs settle *paused: budget*; a publish-time run still runs and its result carries the warning. |
 
 ## Not building

@@ -53,6 +53,7 @@ export function usageRows(
 		];
 
 	const one = !!opts.scopeName;
+	// The names a caption lists; every count comes from the engine.
 	const signalled = (kind: string) =>
 		usage.rows.flatMap((r) =>
 			r.signals.filter(
@@ -155,16 +156,16 @@ export function usageRows(
 						{
 							label: "Queries",
 							value: fmtNum(usage.total),
-							delta: `${opts.days} days · ${fmtNum(usage.total / opts.days)} a day`,
+							delta: `${opts.days} days · ${fmtNum(usage.per_day)} a day`,
 						},
 						{
 							label: "Callers",
 							value: String(callers.length),
-							delta: callerSplit(usage.callers),
+							delta: callerSplit(usage.caller_share),
 						},
 						{
 							label: "Unused types",
-							value: usage.too_few ? "—" : String(unused.length),
+							value: usage.too_few ? "—" : String(usage.unused_types),
 							delta: usage.too_few
 								? needs
 								: unused
@@ -175,7 +176,7 @@ export function usageRows(
 						one && usage.explains
 							? {
 									label: "Cold properties",
-									value: usage.too_few ? "—" : String(cold.length),
+									value: usage.too_few ? "—" : String(usage.cold_properties),
 									delta: usage.too_few
 										? needs
 										: cold
@@ -185,7 +186,7 @@ export function usageRows(
 								}
 							: {
 									label: "Hot types",
-									value: usage.too_few ? "—" : String(hot.length),
+									value: usage.too_few ? "—" : String(usage.hot_types),
 									delta: usage.too_few
 										? needs
 										: hot
@@ -193,7 +194,7 @@ export function usageRows(
 												.slice(0, 2)
 												.join(" · ") || "none past 25%",
 									tone:
-										hot.length && !usage.too_few
+										usage.hot_types && !usage.too_few
 											? ("warn" as const)
 											: undefined,
 								},
@@ -228,13 +229,12 @@ export function usageRows(
 	});
 
 	if (!one && usage.stitches.length) {
-		const crossed = usage.stitches.filter((s) => s.queries).length;
 		rows.push({
 			panels: [
 				{
 					kind: "text",
 					title: "Stitches crossed",
-					aside: `${usage.stitches.length} active · ${crossed} crossed by any query`,
+					aside: `${usage.stitches.length} active · ${usage.stitches_crossed} crossed by any query`,
 					flush: true,
 					options: { text: "" },
 					render: (

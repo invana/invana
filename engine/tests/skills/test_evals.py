@@ -29,7 +29,8 @@ from invana.core.errors import ConflictError, PermissionDeniedError, ValidationE
 from invana.core.events import actions
 from invana.core.events.models import Event
 from invana.runtime.managers import EvalManager, SkillDraftManager
-from invana.runtime.models import Emission, RunStatus, TaskRun
+from invana.runtime.managers.evals import summarize
+from invana.runtime.models import Emission, EvalResult, RunStatus, TaskRun
 from tests.skills.drawn import draw
 
 pytestmark = pytest.mark.asyncio
@@ -207,3 +208,20 @@ async def test_a_starter_set_on_a_graph_with_no_model_is_refused_and_writes_no_c
         )
     eval_set = await evals.get_set(session, graph_id=graph.id, subject_kind="skill", subject_id=skill.id)
     assert await evals.cases(session, eval_set=eval_set) == []
+
+
+def _result(side: str, *, ms: int, tokens: int) -> EvalResult:
+    return EvalResult(eval_case_id="c1", side=side, hard={}, latency_ms=ms, tokens=tokens, answer_digest="a")
+
+
+async def test_the_draft_is_read_against_live_once() -> None:
+    summary = summarize([_result("live", ms=1000, tokens=400), _result("draft", ms=1500, tokens=404)])
+    assert summary["sides"]["draft"]["tokens_per_case"] == 404
+    p95, per_case = summary["versus_live"]["p95_ms"], summary["versus_live"]["tokens_per_case"]
+    assert (p95["by"], p95["direction"], p95["tone"]) == (0.5, "up", "worse")
+    assert per_case["direction"] == "flat", "1% is the same as live"
+
+
+async def test_one_side_is_read_against_nothing() -> None:
+    summary = summarize([_result("draft", ms=1500, tokens=400)])
+    assert summary["versus_live"] is None

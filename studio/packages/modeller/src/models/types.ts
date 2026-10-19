@@ -1,3 +1,5 @@
+import type { Change } from "@invana-studio/core";
+
 // Graph models (modeller; docs/for-developers/modules/connect-and-model/features/domain-models.md). Response shapes for the version tree
 // (node/edge types, property keys, constraints, indexes) live in ./schemas.
 
@@ -8,6 +10,8 @@ type VersionStatus = "draft" | "active" | "archived";
 type ModelOrigin = "studio" | "yaml" | "introspected";
 
 // ── Publish review (publish-review.md) ─────────────────────────────────────
+
+export type { Change };
 
 export interface PublishChange {
 	kind: string;
@@ -31,6 +35,10 @@ export interface PublishClassification {
 	base_version: string | null;
 	draft_version_id: string;
 	changes: PublishChange[];
+	/** `changes` counted by what they did — by the engine. */
+	added: number;
+	changed: number;
+	removed: number;
 }
 
 export interface PublishRequest {
@@ -613,6 +621,10 @@ export interface GrowthRow {
 	start: number | null;
 	now: number | null;
 	change: number | null;
+	/** `change` against `start`; null from nothing or before any count. */
+	change_rate: Change | null;
+	/** Counted at the start and the same now, or never counted. */
+	unchanged: boolean;
 	last: WrittenBy | null;
 }
 
@@ -622,9 +634,19 @@ export interface Growth {
 	series: GrowthSeries[];
 	marks: GrowthMark[];
 	rows: GrowthRow[];
-	writes: { imports: number; stitch_commits: number };
+	writes: { imports: number; stitch_commits: number; total: number };
 	/** Anything in scope was ever counted — else the never-imported state. */
 	counted: boolean;
+	/** Records at the window's start; null when nothing was counted before it. */
+	start: number | null;
+	now: number;
+	/** `now − start`; null when `start` is. */
+	change: number | null;
+	change_rate: Change | null;
+	/** The key of the row that grew the most. */
+	fastest: string | null;
+	/** How many rows are unchanged. */
+	unchanged: number;
 }
 
 export type CallerKind = "agent" | "plan" | "explorer" | "api";
@@ -649,10 +671,14 @@ interface DayValue {
 }
 
 export interface Overview {
+	/** Queries in scope over the window. */
+	total: number;
 	queries_a_day: number;
 	p50: number | null;
 	p95: number | null;
 	graph_p95: number | null;
+	/** The scope's p95 is at or above the Graph's. */
+	slow: boolean;
 	by_caller_by_day: { label: string; counts: Record<CallerKind, number> }[];
 	p95_by_day: DayValue[];
 	rows: { key: string; share: number; p95: number | null; signals: Signal[] }[];
@@ -677,9 +703,16 @@ export interface UsageRow {
 
 export interface Usage {
 	total: number;
+	per_day: number;
 	/** Fewer than 50 queries on the Graph — counts, never signals. */
 	too_few: boolean;
 	callers: Record<CallerKind, number>;
+	/** Each caller's fraction of `total`. */
+	caller_share: Record<CallerKind, number>;
+	unused_types: number;
+	hot_types: number;
+	cold_properties: number;
+	stitches_crossed: number;
 	rows: UsageRow[];
 	stitches: {
 		id: string;
@@ -711,13 +744,19 @@ export interface ShapeRow {
 	types: string[];
 	touched_from: "plan" | "results";
 	has_advice: boolean;
+	/** Its p95 is at or above the Graph's. */
+	slow: boolean;
 }
 
 export interface Performance {
 	total: number;
 	p50: number | null;
 	p95: number | null;
+	/** The scope's p95 is at or above the Graph's. */
+	slow: boolean;
 	errors: number;
+	/** `errors` over `total`. */
+	error_rate: number;
 	slow_shapes: number;
 	p95_by_day: DayValue[];
 	shapes: ShapeRow[];
@@ -750,6 +789,7 @@ export interface ShapeCard {
 	p50: number | null;
 	p95: number | null;
 	callers: Partial<Record<CallerKind, number>>;
+	caller_share: Partial<Record<CallerKind, number>>;
 	types: string[];
 	touched_from: "plan" | "results";
 	plan: string[];
@@ -906,4 +946,27 @@ export interface PhysicalSchema {
 	relationship_types: PhysicalType[];
 	indexes: PhysicalRule[];
 	constraints: PhysicalRule[];
+	labels_tally: TypeTally;
+	relationship_types_tally: TypeTally;
+	/** Indexes and constraints the database holds. */
+	indexes_present: number;
+	constraints_present: number;
+	/** Null until a mirror was captured. */
+	drift: PhysicalDrift | null;
+}
+
+interface TypeTally {
+	modelled: number;
+	unmodelled: number;
+}
+
+/** Rows that disagree with the models, counted by the engine. */
+export interface PhysicalDrift {
+	total: number;
+	types: number;
+	rules: number;
+	unmodelled_types: number;
+	model_only_rules: number;
+	/** Rows not in both, per model name, among the rows it declares. */
+	by_model: Record<string, number>;
 }

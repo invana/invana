@@ -225,12 +225,17 @@ class TestInsights:
         assert ("airport", "hot_and_slow") in signals
         assert ("version", "unused") in signals and ("gate", "empty") in signals
         assert not read.usage.too_few and read.usage.callers["agent"] == 40
+        assert read.usage.caller_share["agent"] == 1.0 and read.usage.per_day == round(40 / 7, 1)
+        assert (read.usage.unused_types, read.usage.hot_types) == (1, 1)
+        assert read.overview.total == 40 and read.overview.slow
+        assert read.performance.error_rate == 0.0 and read.performance.shapes[0].slow
 
         shape = read.performance.shapes[0]
         assert shape.calls == 40 and shape.has_advice
         card = await InsightsManager().shape(
             session, graph_id=graph_id, shape_hash=shape.hash, window="7d", connector=None, today=TODAY
         )
+        assert card.caller_share == {"agent": 1.0}
         assert [(a.label, a.property, a.model_name) for a in card.advice] == [("airport", "city", "AirRoutes")]
 
     async def test_too_few_queries_call_nothing(self, session, store, graph_id):
@@ -242,4 +247,5 @@ class TestInsights:
 
         assert read.usage.too_few and read.usage.total == 31
         assert all(not r.signals for r in read.usage.rows)
+        assert (read.usage.unused_types, read.usage.hot_types, read.usage.stitches_crossed) == (0, 0, 0)
         assert read.overview.attention == []

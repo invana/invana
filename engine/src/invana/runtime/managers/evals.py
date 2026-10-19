@@ -61,6 +61,7 @@ from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedErr
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
+from invana.core.metrics import change_of
 from invana.runtime import eval_checks
 from invana.runtime.delegation import cost_rollup, descendants
 from invana.runtime.models import (
@@ -891,12 +892,15 @@ def _side_numbers(rows: list[EvalResult]) -> dict:
         "hard_total": len(hard),
         "p95_ms": eval_checks.p95([r.latency_ms for r in rows]),
         "tokens": sum(r.tokens for r in rows),
+        "tokens_per_case": round(sum(r.tokens for r in rows) / len(rows)) if rows else None,
         "judged_mean": round(sum(judged) / len(judged), 2) if judged else None,
     }
 
 
 def summarize(results: list[EvalResult]) -> dict:
-    """Per-side numbers, changed answers, and the gate's verdict with its reasons."""
+    """Per-side numbers, changed answers, the draft's p95 and tokens per case
+    against live — null on a run with one side — and the gate's verdict with
+    its reasons."""
     by_side = {s: [r for r in results if r.side == s] for s in SIDES}
     sides = {s: _side_numbers(rows) for s, rows in by_side.items() if rows}
     live_answers = {r.eval_case_id: r.answer_digest for r in by_side["live"]}
@@ -923,7 +927,22 @@ def summarize(results: list[EvalResult]) -> dict:
             reasons.append(f"Judged {draft['judged_mean']} against {live['judged_mean']} on live (labelled judge).")
         if reasons:
             verdict = "warn"
-    return {"sides": sides, "changed_answers": changed, "gate": {"verdict": verdict, "reasons": reasons}}
+    versus_live = None
+    if "draft" in sides and "live" in sides:
+        versus_live = {
+            name: (
+                c.model_dump()
+                if (c := change_of(sides["draft"][name], sides["live"][name], higher_is_better=False))
+                else None
+            )
+            for name in ("p95_ms", "tokens_per_case")
+        }
+    return {
+        "sides": sides,
+        "changed_answers": changed,
+        "versus_live": versus_live,
+        "gate": {"verdict": verdict, "reasons": reasons},
+    }
 
 
 def degraded(was: dict, now: dict) -> list[str]:

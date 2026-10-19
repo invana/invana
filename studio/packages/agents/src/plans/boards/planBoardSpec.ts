@@ -13,7 +13,7 @@ import { formatElapsed } from "@invana-studio/core";
 import type { FlowOptions } from "@invana-studio/shell";
 import { runAddress } from "@invana-studio/shell";
 import { planLayersGantt } from "../planLayers";
-import { taskFlowFromTaskPlan, WIDE_SPREAD } from "../taskFlowFromTaskPlan";
+import { taskFlowFromTaskPlan } from "../taskFlowFromTaskPlan";
 import type {
 	Measure,
 	PlanPerformance,
@@ -374,10 +374,7 @@ function stepsTable(data: PlanPageData, view: PlanView, ran: number): Panel {
 			],
 			rows: data.plan.nodes.map((node) => {
 				const s = measured.get(node.id);
-				const wide =
-					s?.p95_ms != null &&
-					s.p50_ms != null &&
-					s.p95_ms >= WIDE_SPREAD * s.p50_ms;
+				const wide = s?.wide ?? false;
 				return {
 					step: node.id,
 					layer: node.layer,

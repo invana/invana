@@ -119,8 +119,11 @@ class TestGrowth:
         assert [(m.index, m.source, m.source_id) for m in growth.marks] == [(2, "import", run)]
         row = growth.rows[0]
         assert (row.start, row.now, row.change) == (110, 170, 60)
+        assert row.change_rate.by == pytest.approx(60 / 110) and row.change_rate.direction == "up"
         assert row.last.source_id == run
-        assert growth.writes.imports == 1 and growth.counted
+        assert growth.writes.imports == 1 and growth.writes.total == 1 and growth.counted
+        assert (growth.start, growth.now, growth.change) == (110, 170, 60)
+        assert growth.fastest == model.id and growth.unchanged == 0
 
         one = (
             await InsightsManager().read(session, graph_id=graph_id, model_id=model.id, window="7d", today=TODAY)
@@ -136,3 +139,6 @@ class TestGrowth:
 
         assert not growth.counted
         assert growth.marks == [] and growth.rows[0].now is None
+        # Nothing counted before the window: no start, so no change and no rate.
+        assert growth.start is None and growth.change is None and growth.change_rate is None
+        assert growth.fastest is None and growth.unchanged == 1 and growth.rows[0].unchanged

@@ -38,26 +38,26 @@ function driftAttention(
 	physical: PhysicalSchema | undefined,
 	one: boolean,
 ): AttentionItem[] {
-	if (!physical?.captured_at) return [];
-	const rows = [...physical.labels, ...physical.relationship_types];
-	const rules = [...physical.indexes, ...physical.constraints];
+	const drift = physical?.captured_at ? physical.drift : null;
+	if (!physical || !drift) return [];
 	const out: AttentionItem[] = [];
-	const unmodelled = rows.filter((r) => r.drift === "database_only");
-	if (!one && unmodelled.length)
+	const unmodelled = drift.unmodelled_types;
+	if (!one && unmodelled)
 		out.push({
 			signal: "drift",
-			subject: `${unmodelled.length} unmodelled ${unmodelled.length === 1 ? "type" : "types"}`,
-			why: unmodelled
+			subject: `${unmodelled} unmodelled ${unmodelled === 1 ? "type" : "types"}`,
+			why: [...physical.labels, ...physical.relationship_types]
+				.filter((r) => r.drift === "database_only")
 				.slice(0, 3)
 				.map((r) => r.name)
 				.join(" · "),
 			tab: "database",
 		});
-	const missing = rules.filter((r) => r.drift === "model_only");
-	if (missing.length)
+	const missing = drift.model_only_rules;
+	if (missing)
 		out.push({
 			signal: "drift",
-			subject: `${missing.length} ${missing.length === 1 ? "index or constraint" : "indexes and constraints"} model only`,
+			subject: `${missing} ${missing === 1 ? "index or constraint" : "indexes and constraints"} model only`,
 			why: "declared, not in the database",
 			tab: "database",
 		});
@@ -133,14 +133,10 @@ export function attentionPanel(
 }
 
 export function callersPanel(overview: Overview, days: number): PanelSpec {
-	const total = overview.by_caller_by_day.reduce(
-		(a, d) => a + Object.values(d.counts).reduce((x, y) => x + y, 0),
-		0,
-	);
 	return {
 		kind: "text",
 		title: "Queries a day, by caller",
-		aside: `${fmtNum(total)} · ${days} days`,
+		aside: `${fmtNum(overview.total)} · ${days} days`,
 		options: { text: "" },
 		render: (
 			<StackedBarChartV

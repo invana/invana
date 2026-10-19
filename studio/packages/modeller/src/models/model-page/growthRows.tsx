@@ -48,9 +48,6 @@ const SOURCE_LABEL: Record<WrittenBy["source"], string> = {
 	introspect: "introspect",
 };
 
-const pct = (row: GrowthRow) =>
-	row.start && row.change != null ? row.change / row.start : null;
-
 function writtenBy(last: WrittenBy | null, onOpenRun: (id: string) => void) {
 	if (!last)
 		return <span className="text-muted-foreground">nothing imported</span>;
@@ -154,23 +151,11 @@ export function growthRows(
 		label: SOURCE_LABEL[m.source],
 	}));
 
-	const now = growth.rows.reduce((a, r) => a + (r.now ?? 0), 0);
-	const start = growth.rows.reduce((a, r) => a + (r.start ?? 0), 0);
-	const grown = growth.rows
-		.filter((r) => (r.change ?? 0) > 0)
-		.sort(
-			(a, b) =>
-				(pct(b) ?? Number.POSITIVE_INFINITY) -
-				(pct(a) ?? Number.POSITIVE_INFINITY),
-		);
-	// Counted at the start and the same now — or never counted at all. A row first
-	// counted inside the window is new, not unchanged.
-	const unchanged = growth.rows.filter((r) => r.change === 0 || r.now == null);
-	// Nothing was counted before the window opened: there is no "in 30 days" yet.
-	const opened = growth.rows.some((r) => r.start != null);
+	const { now, change } = growth;
+	// The engine picks the row; Studio only looks it up by key.
+	const fastest = growth.rows.find((r) => r.key === growth.fastest);
+	const unchanged = growth.rows.find((r) => r.unchanged);
 	const firstAt = growth.marks[0]?.at;
-	const fastest = grown[0];
-	const fastestPct = fastest ? pct(fastest) : null;
 
 	const columns: ColumnDef<GrowthRow>[] = [
 		{
@@ -230,39 +215,39 @@ export function growthRows(
 							{
 								label: "Records",
 								value: num(now),
-								delta: !opened
-									? firstAt
-										? `first counted ${formatRelativeTime(new Date(firstAt))}`
-										: "counted before any write"
-									: now - start
-										? `${now > start ? "↑" : "↓"} ${nf.format(Math.abs(now - start))} in ${opts.days} days`
-										: `unchanged in ${opts.days} days`,
+								// Nothing was counted before the window opened: there is no "in 30 days" yet.
+								delta:
+									change == null
+										? firstAt
+											? `first counted ${formatRelativeTime(new Date(firstAt))}`
+											: "counted before any write"
+										: change
+											? `${change > 0 ? "↑" : "↓"} ${nf.format(Math.abs(change))} in ${opts.days} days`
+											: `unchanged in ${opts.days} days`,
 							},
 							{
 								label: "Writes",
-								value: String(
-									growth.writes.imports + growth.writes.stitch_commits,
-								),
+								value: String(growth.writes.total),
 								delta: `${growth.writes.imports} ${growth.writes.imports === 1 ? "import" : "imports"} · ${growth.writes.stitch_commits} ${growth.writes.stitch_commits === 1 ? "stitch commit" : "stitch commits"}`,
 							},
 							{
 								label: "Fastest growing",
 								value: fastest ? fastest.name : "—",
 								delta: fastest
-									? fastestPct != null
-										? `+${Math.round(fastestPct * 100)}%`
+									? fastest.change_rate
+										? `+${Math.round(fastest.change_rate.by * 100)}%`
 										: `${signed(fastest.change)}, from nothing`
 									: "nothing grew",
 							},
 							{
 								label: "Unchanged",
-								value: unchanged.length ? unchanged[0].name : "—",
-								delta: unchanged.length
-									? unchanged.length === 1
-										? unchanged[0].now
+								value: unchanged ? unchanged.name : "—",
+								delta: unchanged
+									? growth.unchanged === 1
+										? unchanged.now
 											? "nothing written"
 											: "nothing imported"
-										: `and ${unchanged.length - 1} more`
+										: `and ${growth.unchanged - 1} more`
 									: "every one moved",
 							},
 						],

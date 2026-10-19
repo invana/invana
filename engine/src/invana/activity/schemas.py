@@ -16,6 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from invana.apps.modeller.schemas import SchemaDiff
 from invana.apps.task_plans.schemas import PlanVersionDiff
 from invana.core.events.models import ActorKind
+from invana.core.metrics import Change
 
 RecordKind = Literal["skill", "rule", "plan", "agent", "model", "dataset"]
 
@@ -30,10 +31,10 @@ class ChangeEffect(BaseModel):
     failed: int
     tokens_in: int
     tokens_out: int
-    #: The span it was the current version: from its publish to the next one's.
     tokens: int
     #: ``tokens / runs``, rounded; ``None`` when nothing ran.
     tokens_per_run: int | None
+    #: The span it was the current version: from its publish to the next one's.
     since: datetime | None
     until: datetime | None
 
@@ -362,16 +363,21 @@ FleetWindow = Literal[7, 30, 90]
 
 
 class FleetMeasure(BaseModel):
-    """One number over a window, and the same number over the window before."""
+    """One number over a window, the same number over the window before, and
+    the change between them."""
 
     value: float | None
     prior: float | None
+    #: Value against prior — in points for success, as a ratio otherwise; null with no prior.
+    change: Change | None = None
 
 
 class OverviewTiles(BaseModel):
     runs_today: int
     #: Roots queued on the same weekday a week ago.
     runs_week_ago: int
+    #: Today against that day; null when nothing ran then.
+    runs_change: Change | None = None
     failed_today: int
     #: The plan or agent of today's newest failed root.
     failed_latest: str | None
@@ -423,9 +429,9 @@ class RecentChange(BaseModel):
     summary: str
     runs: int
     failed: int
-    #: p95 after this version over p95 before it, minus one (``0.62`` is 62% slower);
-    #: null with fewer than 3 runs on either side.
-    p95_change: float | None
+    #: p95 on this version against p95 on the one before it; null with fewer
+    #: than 3 runs on either side.
+    p95_change: Change | None
 
 
 class FleetOverview(BaseModel):
@@ -463,6 +469,11 @@ class PerformanceRow(BaseModel):
     p95_ms: float | None
     #: The window before — or, for a skill, its previous version over this window.
     p95_prior_ms: float | None
+    #: p95 against ``p95_prior_ms``; null with no prior.
+    p95_change: Change | None = None
+    #: The version the prior was read off, for a skill read against its previous
+    #: version; null when the prior is the window before.
+    prior_version: str | None = None
     tokens_per_run: float | None
     tokens_per_run_prior: float | None
     #: Latest settled runs that failed, counted back to one that did not.

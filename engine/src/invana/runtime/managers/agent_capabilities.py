@@ -48,6 +48,10 @@ class AgentCapabilitiesManager:
     runs_qs = TaskRunQuerySet()
 
     async def read(self, session: AsyncSession, *, agent: Agent) -> AgentSkillsAndCallables:
+        """Both tables, plus what they add up to: offered and applied across the
+        bound skills — each on its current version, this agent's runs — and the
+        characters the published ones put in every ask. A skill with no
+        published version is bound, offered nothing and adds nothing."""
         envelope = Envelope.from_spec(agent.workflow_spec, effort=agent.effective_effort)
         needed_by: dict[str, list[str]] = {}
 
@@ -107,7 +111,15 @@ class AgentCapabilitiesManager:
             )
             for step_key in sorted(envelope.allow, key=order)
         ]
-        return AgentSkillsAndCallables(agent_id=agent.id, skills=rows, callables=callables, plans=plan_refs)
+        return AgentSkillsAndCallables(
+            agent_id=agent.id,
+            skills=rows,
+            callables=callables,
+            plans=plan_refs,
+            offered=sum(r.offered for r in rows),
+            applied=sum(r.applied for r in rows),
+            prompt_chars=sum(len(v.content) + len(v.when_to_use) for v in versions),
+        )
 
     async def _usage(self, session: AsyncSession, *, agent: Agent, version_id: str) -> tuple[int, int]:
         """Offered and applied, for this agent's runs and this version only

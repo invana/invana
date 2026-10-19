@@ -3,8 +3,8 @@
  * `modeller.global_model.diff`.
  *
  * When a model has a draft, the bar floats over the map: the model's
- * published version → its draft, the draft's changes counted as added ·
- * changed · removed from `GET …/draft/review`, and *Review and publish*,
+ * published version → its draft, the draft's changes as added · changed ·
+ * removed — counted by `GET …/draft/review` — and *Review and publish*,
  * which opens that model's Publish confirm. With several drafts a select
  * picks the model. With none, nothing is drawn.
  *
@@ -30,14 +30,7 @@ import { useQueries } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { modelsApi } from "../api";
-import type { GraphModelSummary, PublishChange } from "../types";
-
-/** A change's kind ends in what it did: `type_added`, `property_removed`. */
-function counts(changes: PublishChange[]) {
-	const added = changes.filter((c) => c.kind.endsWith("_added")).length;
-	const removed = changes.filter((c) => c.kind.endsWith("_removed")).length;
-	return { added, removed, changed: changes.length - added - removed };
-}
+import type { GraphModelSummary } from "../types";
 
 export function DraftCompareBar({
 	username,
@@ -66,7 +59,7 @@ export function DraftCompareBar({
 	const current = drafts.find((d) => d.model.id === picked) ?? drafts[0];
 	if (!current) return null;
 
-	const { added, changed, removed } = counts(current.review.changes);
+	const { added, changed, removed } = current.review;
 	const from = current.review.base_version
 		? `${current.model.name} v${current.review.base_version}`
 		: `${current.model.name} · nothing published`;

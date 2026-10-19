@@ -63,6 +63,8 @@ class LensUsageRead(BaseModel):
     runs: int = 0
     last_used_at: datetime | None = None
     actor_ids: list[str] = Field(default_factory=list)
+    #: How many people have run under it.
+    people: int = 0
 
 
 class CastResolutionRead(BaseModel):
@@ -85,6 +87,9 @@ class LensRead(BaseModel):
     display_name: str
     scope: str | None
     rules: list[dict[str, Any]]
+    #: ``rules`` split by what they say.
+    allow_rules: int = 0
+    deny_rules: int = 0
     cast: dict[str, Any]
     closed_layers: list[str]
     as_of: datetime | None
@@ -253,6 +258,18 @@ class AppliedDiffRead(BaseModel):
     b: dict[str, Any] = Field(default_factory=dict)
 
 
+class CompareCounts(BaseModel):
+    """The compare's tiles, counted once."""
+
+    touched_a: int = 0
+    touched_b: int = 0
+    shared: int = 0
+    #: Reached by one run and not the other, either way round.
+    only_one: int = 0
+    #: Shared, but narrowed differently.
+    read_differently: int = 0
+
+
 class CompareRead(BaseModel):
     """Two runs, side by side. **The diff is the deliverable**, not the answers.
 
@@ -270,3 +287,4 @@ class CompareRead(BaseModel):
     #: participant both runs read the same way is in ``shared`` and says no more
     #: ([WO18](docs/for-developers/modules/govern/features/worlds.md)).
     differed: dict[str, AppliedDiffRead] = Field(default_factory=dict)
+    counts: CompareCounts = Field(default_factory=CompareCounts)

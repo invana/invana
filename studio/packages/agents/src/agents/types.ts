@@ -146,6 +146,11 @@ export interface AgentSkillsAndCallables {
 	callables: AgentCallableRow[];
 	/** The base plans a Plan step may pick, `key@version`. */
 	plans: string[];
+	/** Σ offered and applied across the bound skills, this agent's runs. */
+	offered: number;
+	applied: number;
+	/** Characters the published bound skills put in every ask. */
+	prompt_chars: number;
 }
 
 /** What the agent is using now, each beside the limit that caps it. */

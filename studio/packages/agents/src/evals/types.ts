@@ -4,6 +4,8 @@
  * the gate reads. Mirrors `runtime/schemas` field for field.
  */
 
+import type { Change } from "../fleet/types";
+
 export type EvalSubjectKind = "skill" | "agent";
 
 export type EvalCheckKind =
@@ -67,12 +69,19 @@ export interface EvalSide {
 	hard_total: number;
 	p95_ms: number | null;
 	tokens: number;
+	/** Tokens over cases, rounded; null over no case. */
+	tokens_per_case: number | null;
 	judged_mean: number | null;
 }
 
 interface EvalSummary {
 	sides: Partial<Record<"live" | "draft", EvalSide>>;
 	changed_answers: number;
+	/** The draft against live; null on a run with one side. */
+	versus_live: {
+		p95_ms: Change | null;
+		tokens_per_case: Change | null;
+	} | null;
 	gate: { verdict: "clean" | "warn" | "blocked"; reasons: string[] };
 }
 

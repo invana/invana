@@ -32,11 +32,15 @@ import { Ban, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useCatalogueQuery } from "../plans/queries";
 import { useSkillsQuery } from "../skills/queries";
-import type { Skill } from "../skills/types";
 import { ALL_TASKS } from "./AgentDetail";
 import type { AgentDraft, Envelope } from "./agentDraft";
 import { useAgentSkillsAndCallablesQuery } from "./queries";
-import type { Agent, AgentCallableRow, AgentSkillRow } from "./types";
+import type {
+	Agent,
+	AgentCallableRow,
+	AgentSkillRow,
+	AgentSkillsAndCallables,
+} from "./types";
 
 /** Chips a Needs cell draws before folding the rest into `+N`. */
 const NEEDS_SHOWN = 3;
@@ -89,7 +93,7 @@ export function AgentSkillsTab({
 		refusal && refusedFor
 			? (graphSkills.find((s) => s.id === refusedFor) ?? null)
 			: null;
-	const bindings = bindingsCost(graphSkills, agent.skill_ids ?? []);
+	const bindings = bindingsCost(can.data);
 
 	const [editing, setEditing] = useState(false);
 	const build = useAccess().gate("build");
@@ -556,21 +560,18 @@ export function AgentSkillsTab({
 /**
  * `2 of 3 bound skills are offered — ~4,200 characters in every ask.`
  *
- * A draft is bound and offered to nothing ([]), so it is named apart
- * rather than folded into the cost: counting a draft's prose would report a
- * prompt that is never assembled. Characters, never tokens.
+ * A skill with no published version is bound and offered to nothing, so it is
+ * named apart. The characters are the engine's `prompt_chars`, which already
+ * leaves such a skill out. Characters, never tokens.
  */
-function bindingsCost(
-	skills: Skill[],
-	boundIds: string[],
-): { bound: number; sentence: string } {
-	const bound = skills.filter((s) => boundIds.includes(s.id));
-	const offered = bound.filter((s) => !s.is_draft);
+function bindingsCost(can: AgentSkillsAndCallables | undefined): {
+	bound: number;
+	sentence: string;
+} {
+	const bound = can?.skills ?? [];
+	const offered = bound.filter((s) => s.version != null);
 	const drafts = bound.length - offered.length;
-	const chars = offered.reduce(
-		(total, s) => total + s.content.length + s.when_to_use.length,
-		0,
-	);
+	const chars = can?.prompt_chars ?? 0;
 	const cost = offered.length
 		? `${offered.length === bound.length ? `${bound.length} bound` : `${offered.length} of ${bound.length} bound`} skill${bound.length === 1 ? " is" : "s are"} offered — ~${chars.toLocaleString()} characters in every ask.`
 		: "Nothing here is offered yet.";

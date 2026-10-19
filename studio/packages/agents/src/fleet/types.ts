@@ -1,3 +1,4 @@
+import type { Change } from "@invana-studio/core";
 // ─────────────────────────────────────────────────────────────────────────────
 // The fleet — mirrors the fleet shapes in engine/src/invana/activity/schemas.py
 // (fleet-performance.md).
@@ -11,16 +12,22 @@ export type FleetWindow = "7d" | "30d" | "90d";
 
 export const FLEET_WINDOWS: readonly FleetWindow[] = ["7d", "30d", "90d"];
 
-/** One number over a window, and the same number over the window before. */
+/** One number over a window, the same number over the window before, and the change. */
+export type { Change };
+
 export interface FleetMeasure {
 	value: number | null;
 	prior: number | null;
+	/** In points for success, a ratio otherwise; null with no prior. */
+	change: Change | null;
 }
 
 export interface OverviewTiles {
 	runs_today: number;
 	/** Roots queued on the same weekday a week ago. */
 	runs_week_ago: number;
+	/** Today against that day; null when nothing ran then. */
+	runs_change: Change | null;
 	failed_today: number;
 	/** The plan or agent of today's newest failed root. */
 	failed_latest: string | null;
@@ -69,8 +76,8 @@ export interface RecentChange {
 	summary: string;
 	runs: number;
 	failed: number;
-	/** `0.62` is 62% slower than the version before; null with too few runs. */
-	p95_change: number | null;
+	/** p95 against the version before; null with too few runs. */
+	p95_change: Change | null;
 }
 
 export interface FleetOverview {
@@ -108,6 +115,10 @@ export interface PerformanceRow {
 	p95_ms: number | null;
 	/** The window before — for a skill, its previous version over this window. */
 	p95_prior_ms: number | null;
+	/** p95 against `p95_prior_ms`; null with no prior. */
+	p95_change: Change | null;
+	/** The version the prior was read off; null when it is the window before. */
+	prior_version: string | null;
 	tokens_per_run: number | null;
 	tokens_per_run_prior: number | null;
 	/** Latest settled runs that failed, counted back to one that did not. */

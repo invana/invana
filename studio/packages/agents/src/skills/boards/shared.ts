@@ -55,22 +55,20 @@ export function gapTile(row: SkillUsageVersion | null | undefined): {
 }
 
 /**
- * How a bucket reads in words — never a percentage.
+ * How a version reads in words.
  *
- * The engine owns the floor and sends `enough_to_read`, so the API, the CLI and
- * Studio all say *too few to read* at the same point instead of each picking a
- * threshold ([usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
- * The percentage below is a **reading of a readable bucket**, computed nowhere
- * else and never shown for one the engine called unreadable.
+ * The engine owns the floor and the share: it sends `enough_to_read` and
+ * `applied_rate`, so the API, the CLI and Studio all say *too few to read* at
+ * the same point and the same percentage above it
+ * ([usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  */
 export function readsAs(row: {
 	offered: number;
-	applied: number;
-	enough_to_read: boolean;
+	applied_rate: number | null;
 }): string {
 	if (row.offered === 0) return "never offered";
-	if (!row.enough_to_read) return "too few to read";
-	return `${Math.round((row.applied / row.offered) * 100)}% applied`;
+	if (row.applied_rate == null) return "too few to read";
+	return `${Math.round(row.applied_rate * 100)}% applied`;
 }
 
 /** The version row the page is reading — the picked one, else the newest. */

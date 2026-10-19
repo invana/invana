@@ -16,7 +16,7 @@ import { EmptyState, Spinner } from "@invana/ui";
 import { formatCompact, formatElapsed } from "@invana-studio/core";
 import { CircleAlert } from "lucide-react";
 import type { ReactNode } from "react";
-import type { FleetMeasure } from "../fleet/types";
+import type { Change, FleetMeasure } from "../fleet/types";
 
 /** A scrolling page column that fills `mainSection`. */
 export function FleetPage({ children }: { children: ReactNode }) {
@@ -78,60 +78,40 @@ export const day = (iso: string) =>
 		{ day: "numeric", month: "short", timeZone: "UTC" },
 	);
 
-/** Value over prior, minus one; null when there is no prior to read against. */
-export function relChange(
-	value: number | null | undefined,
-	prior: number | null | undefined,
-): number | null {
-	if (value == null || prior == null || prior === 0) return null;
-	return value / prior - 1;
-}
-
-/** Under this a change reads as `flat`. */
-const FLAT = 0.02;
-
-export type Direction = "up" | "down" | "flat";
-
-function direction(change: number): Direction {
-	if (Math.abs(change) < FLAT) return "flat";
-	return change > 0 ? "up" : "down";
-}
-
-/** `↑ 38%` · `↓ 12%` · `flat`. */
-export function arrowPct(
-	change: number,
-	glyphs: [string, string] = ["↑", "↓"],
-) {
-	const d = direction(change);
-	if (d === "flat") return "flat";
-	return `${d === "up" ? glyphs[0] : glyphs[1]} ${Math.round(Math.abs(change) * 100)}%`;
-}
-
 /**
- * The tone a change carries. `higherIsWorse` for run time and tokens, where
- * up is the warning; success and runs read up as good.
+ * A change as words: `↑ 38%` · `▲ 1.2 pt` · `flat`. Formatting only — the
+ * engine decided the number, the direction and the band that reads flat.
  */
+export function changeText(c: Change, glyphs: [string, string] = ["↑", "↓"]) {
+	if (c.direction === "flat") return "flat";
+	const glyph = c.direction === "up" ? glyphs[0] : glyphs[1];
+	const size = Math.abs(c.by) * 100;
+	return c.unit === "points"
+		? `${glyph} ${size.toFixed(1)} pt`
+		: `${glyph} ${Math.round(size)}%`;
+}
+
+/** The text tone of a change: worse warns, better is success, else muted. */
 export function changeTone(
-	change: number | null,
-	higherIsWorse: boolean,
+	c: Change | null | undefined,
 ): "warning" | "success" | "muted" {
-	if (change == null) return "muted";
-	const d = direction(change);
-	if (d === "flat") return "muted";
-	return (d === "up") === higherIsWorse ? "warning" : "success";
+	if (!c) return "muted";
+	return c.tone === "worse"
+		? "warning"
+		: c.tone === "better"
+			? "success"
+			: "muted";
 }
 
 /** A tile caption's change against the window before: `↑ 38% · 7 days`. */
 export function measureCaption(
 	m: FleetMeasure,
 	span: string,
-	higherIsWorse: boolean,
 ): { caption: string; tone: "warning" | "success" | "muted" } {
-	const change = relChange(m.value, m.prior);
-	if (change == null) return { caption: span, tone: "muted" };
+	if (!m.change) return { caption: span, tone: "muted" };
 	return {
-		caption: `${arrowPct(change)} · ${span}`,
-		tone: changeTone(change, higherIsWorse),
+		caption: `${changeText(m.change)} · ${span}`,
+		tone: changeTone(m.change),
 	};
 }
 

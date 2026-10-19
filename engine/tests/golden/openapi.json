@@ -617,6 +617,17 @@
             ],
             "title": "Status"
           },
+          "tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens"
+          },
           "tokens_in": {
             "anyOf": [
               {
@@ -1532,6 +1543,11 @@
             "title": "Agent Id",
             "type": "string"
           },
+          "applied": {
+            "default": 0,
+            "title": "Applied",
+            "type": "integer"
+          },
           "callables": {
             "items": {
               "$ref": "#/components/schemas/AgentCallableRow"
@@ -1539,12 +1555,22 @@
             "title": "Callables",
             "type": "array"
           },
+          "offered": {
+            "default": 0,
+            "title": "Offered",
+            "type": "integer"
+          },
           "plans": {
             "items": {
               "type": "string"
             },
             "title": "Plans",
             "type": "array"
+          },
+          "prompt_chars": {
+            "default": 0,
+            "title": "Prompt Chars",
+            "type": "integer"
           },
           "skills": {
             "items": {
@@ -3744,6 +3770,49 @@
         "title": "CatalogueResponse",
         "type": "object"
       },
+      "Change": {
+        "description": "A number against the one before it, read once.",
+        "properties": {
+          "by": {
+            "title": "By",
+            "type": "number"
+          },
+          "direction": {
+            "enum": [
+              "up",
+              "down",
+              "flat"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "tone": {
+            "enum": [
+              "better",
+              "worse",
+              "neutral"
+            ],
+            "title": "Tone",
+            "type": "string"
+          },
+          "unit": {
+            "enum": [
+              "ratio",
+              "points"
+            ],
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "by",
+          "unit",
+          "direction",
+          "tone"
+        ],
+        "title": "Change",
+        "type": "object"
+      },
       "ChangeCompare": {
         "description": "Two versions of one record, from ``a`` to ``b``.\n\n``a`` is null when ``b`` is the first version \u2014 compared against nothing,\nwhich is not the same as an empty diff.",
         "properties": {
@@ -3863,6 +3932,10 @@
             ],
             "title": "Since"
           },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          },
           "tokens_in": {
             "title": "Tokens In",
             "type": "integer"
@@ -3870,6 +3943,17 @@
           "tokens_out": {
             "title": "Tokens Out",
             "type": "integer"
+          },
+          "tokens_per_run": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens Per Run"
           },
           "until": {
             "anyOf": [
@@ -3890,6 +3974,8 @@
           "failed",
           "tokens_in",
           "tokens_out",
+          "tokens",
+          "tokens_per_run",
           "since",
           "until"
         ],
@@ -4251,6 +4337,38 @@
         "title": "CommitResult",
         "type": "object"
       },
+      "CompareCounts": {
+        "description": "The compare's tiles, counted once.",
+        "properties": {
+          "only_one": {
+            "default": 0,
+            "title": "Only One",
+            "type": "integer"
+          },
+          "read_differently": {
+            "default": 0,
+            "title": "Read Differently",
+            "type": "integer"
+          },
+          "shared": {
+            "default": 0,
+            "title": "Shared",
+            "type": "integer"
+          },
+          "touched_a": {
+            "default": 0,
+            "title": "Touched A",
+            "type": "integer"
+          },
+          "touched_b": {
+            "default": 0,
+            "title": "Touched B",
+            "type": "integer"
+          }
+        },
+        "title": "CompareCounts",
+        "type": "object"
+      },
       "CompareRead": {
         "description": "Two runs, side by side. **The diff is the deliverable**, not the answers.\n\nNothing is simulated and no answer is synthesised from another\n([WO4](docs/for-developers/modules/govern/features/worlds.md)) \u2014 which is\nalso why comparing costs money and says so.",
         "properties": {
@@ -4259,6 +4377,9 @@
           },
           "b": {
             "$ref": "#/components/schemas/CompareSideRead"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/CompareCounts"
           },
           "differed": {
             "additionalProperties": {
@@ -8225,8 +8346,18 @@
         "type": "object"
       },
       "FleetMeasure": {
-        "description": "One number over a window, and the same number over the window before.",
+        "description": "One number over a window, the same number over the window before, and\nthe change between them.",
         "properties": {
+          "change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Change"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "prior": {
             "anyOf": [
               {
@@ -9289,9 +9420,41 @@
       },
       "Growth": {
         "properties": {
+          "change": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change"
+          },
+          "change_rate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Change"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "counted": {
             "title": "Counted",
             "type": "boolean"
+          },
+          "fastest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fastest"
           },
           "labels": {
             "items": {
@@ -9307,6 +9470,11 @@
             "title": "Marks",
             "type": "array"
           },
+          "now": {
+            "default": 0,
+            "title": "Now",
+            "type": "integer"
+          },
           "rows": {
             "items": {
               "$ref": "#/components/schemas/GrowthRow"
@@ -9320,6 +9488,22 @@
             },
             "title": "Series",
             "type": "array"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          },
+          "unchanged": {
+            "default": 0,
+            "title": "Unchanged",
+            "type": "integer"
           },
           "writes": {
             "$ref": "#/components/schemas/GrowthWrites"
@@ -9389,6 +9573,16 @@
             ],
             "title": "Change"
           },
+          "change_rate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Change"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "key": {
             "title": "Key",
             "type": "string"
@@ -9437,6 +9631,11 @@
               }
             ],
             "title": "Start"
+          },
+          "unchanged": {
+            "default": false,
+            "title": "Unchanged",
+            "type": "boolean"
           }
         },
         "required": [
@@ -9504,6 +9703,11 @@
           "stitch_commits": {
             "default": 0,
             "title": "Stitch Commits",
+            "type": "integer"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
             "type": "integer"
           }
         },
@@ -10397,6 +10601,11 @@
       },
       "LensRead": {
         "properties": {
+          "allow_rules": {
+            "default": 0,
+            "title": "Allow Rules",
+            "type": "integer"
+          },
           "as_of": {
             "anyOf": [
               {
@@ -10450,6 +10659,11 @@
               }
             ],
             "title": "Created In Run Id"
+          },
+          "deny_rules": {
+            "default": 0,
+            "title": "Deny Rules",
+            "type": "integer"
           },
           "display_name": {
             "title": "Display Name",
@@ -10653,6 +10867,11 @@
               }
             ],
             "title": "Last Used At"
+          },
+          "people": {
+            "default": 0,
+            "title": "People",
+            "type": "integer"
           },
           "runs": {
             "default": 0,
@@ -11760,6 +11979,11 @@
       },
       "ModelPublishClassification": {
         "properties": {
+          "added": {
+            "default": 0,
+            "title": "Added",
+            "type": "integer"
+          },
           "base_version": {
             "anyOf": [
               {
@@ -11782,6 +12006,11 @@
             ],
             "title": "Base Version Id"
           },
+          "changed": {
+            "default": 0,
+            "title": "Changed",
+            "type": "integer"
+          },
           "changes": {
             "default": [],
             "items": {
@@ -11801,6 +12030,11 @@
           "draft_version_id": {
             "title": "Draft Version Id",
             "type": "string"
+          },
+          "removed": {
+            "default": 0,
+            "title": "Removed",
+            "type": "integer"
           }
         },
         "required": [
@@ -13258,6 +13492,16 @@
             },
             "title": "Rows",
             "type": "array"
+          },
+          "slow": {
+            "default": false,
+            "title": "Slow",
+            "type": "boolean"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
           }
         },
         "required": [
@@ -13341,6 +13585,16 @@
           },
           "p95_ms": {
             "$ref": "#/components/schemas/FleetMeasure"
+          },
+          "runs_change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Change"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "runs_today": {
             "title": "Runs Today",
@@ -13440,6 +13694,11 @@
       },
       "Performance": {
         "properties": {
+          "error_rate": {
+            "default": 0.0,
+            "title": "Error Rate",
+            "type": "number"
+          },
           "errors": {
             "title": "Errors",
             "type": "integer"
@@ -13479,6 +13738,11 @@
             },
             "title": "Shapes",
             "type": "array"
+          },
+          "slow": {
+            "default": false,
+            "title": "Slow",
+            "type": "boolean"
           },
           "slow_shapes": {
             "title": "Slow Shapes",
@@ -13537,6 +13801,16 @@
             ],
             "title": "P50 Ms"
           },
+          "p95_change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Change"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "p95_ms": {
             "anyOf": [
               {
@@ -13558,6 +13832,17 @@
               }
             ],
             "title": "P95 Prior Ms"
+          },
+          "prior_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prior Version"
           },
           "runs": {
             "title": "Runs",
@@ -13862,6 +14147,46 @@
         "title": "PersonalAccessTokenOut",
         "type": "object"
       },
+      "PhysicalDrift": {
+        "description": "How many rows disagree with the models, counted once for every tile and caption.",
+        "properties": {
+          "by_model": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "default": {},
+            "title": "By Model",
+            "type": "object"
+          },
+          "model_only_rules": {
+            "default": 0,
+            "title": "Model Only Rules",
+            "type": "integer"
+          },
+          "rules": {
+            "default": 0,
+            "title": "Rules",
+            "type": "integer"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          },
+          "types": {
+            "default": 0,
+            "title": "Types",
+            "type": "integer"
+          },
+          "unmodelled_types": {
+            "default": 0,
+            "title": "Unmodelled Types",
+            "type": "integer"
+          }
+        },
+        "title": "PhysicalDrift",
+        "type": "object"
+      },
       "PhysicalRule": {
         "description": "An index or a constraint, matched by what it covers (MP27).",
         "properties": {
@@ -13945,6 +14270,11 @@
             "title": "Constraints",
             "type": "array"
           },
+          "constraints_present": {
+            "default": 0,
+            "title": "Constraints Present",
+            "type": "integer"
+          },
           "declared_constraints": {
             "default": 0,
             "title": "Declared Constraints",
@@ -13955,6 +14285,16 @@
             "title": "Declared Indexes",
             "type": "integer"
           },
+          "drift": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PhysicalDrift"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "indexes": {
             "default": [],
             "items": {
@@ -13963,6 +14303,11 @@
             "title": "Indexes",
             "type": "array"
           },
+          "indexes_present": {
+            "default": 0,
+            "title": "Indexes Present",
+            "type": "integer"
+          },
           "labels": {
             "default": [],
             "items": {
@@ -13970,6 +14315,13 @@
             },
             "title": "Labels",
             "type": "array"
+          },
+          "labels_tally": {
+            "$ref": "#/components/schemas/TypeTally",
+            "default": {
+              "modelled": 0,
+              "unmodelled": 0
+            }
           },
           "lists_schema": {
             "title": "Lists Schema",
@@ -13982,6 +14334,13 @@
             },
             "title": "Relationship Types",
             "type": "array"
+          },
+          "relationship_types_tally": {
+            "$ref": "#/components/schemas/TypeTally",
+            "default": {
+              "modelled": 0,
+              "unmodelled": 0
+            }
           },
           "stale": {
             "default": false,
@@ -15949,13 +16308,12 @@
           "p95_change": {
             "anyOf": [
               {
-                "type": "number"
+                "$ref": "#/components/schemas/Change"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "P95 Change"
+            ]
           },
           "previous": {
             "anyOf": [
@@ -17415,6 +17773,17 @@
           "task_key": {
             "title": "Task Key",
             "type": "string"
+          },
+          "tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens"
           },
           "tokens_in": {
             "anyOf": [
@@ -19416,6 +19785,14 @@
             "title": "Advice",
             "type": "array"
           },
+          "caller_share": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "default": {},
+            "title": "Caller Share",
+            "type": "object"
+          },
           "callers": {
             "additionalProperties": {
               "type": "integer"
@@ -19566,6 +19943,11 @@
               }
             ],
             "title": "Rows"
+          },
+          "slow": {
+            "default": false,
+            "title": "Slow",
+            "type": "boolean"
           },
           "text": {
             "title": "Text",
@@ -20877,6 +21259,17 @@
             "title": "Applied",
             "type": "integer"
           },
+          "applied_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied Rate"
+          },
           "enough_to_read": {
             "title": "Enough To Read",
             "type": "boolean"
@@ -22178,6 +22571,11 @@
             ],
             "title": "Ran In"
           },
+          "rare": {
+            "default": false,
+            "title": "Rare",
+            "type": "boolean"
+          },
           "retried": {
             "anyOf": [
               {
@@ -22203,6 +22601,11 @@
           "step_key": {
             "title": "Step Key",
             "type": "string"
+          },
+          "wide": {
+            "default": false,
+            "title": "Wide",
+            "type": "boolean"
           }
         },
         "required": [
@@ -23468,6 +23871,39 @@
             ],
             "title": "Rerun Of Run Id"
           },
+          "run_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Tokens"
+          },
+          "run_tokens_in": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Tokens In"
+          },
+          "run_tokens_out": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Tokens Out"
+          },
           "started_at": {
             "anyOf": [
               {
@@ -23768,6 +24204,11 @@
               }
             ],
             "title": "Task Title"
+          },
+          "tokens": {
+            "default": 0,
+            "title": "Tokens",
+            "type": "integer"
           },
           "tokens_in": {
             "default": 0,
@@ -24795,6 +25236,11 @@
             "title": "Steps",
             "type": "array"
           },
+          "tokens": {
+            "default": 0,
+            "title": "Tokens",
+            "type": "integer"
+          },
           "tokens_in": {
             "default": 0,
             "title": "Tokens In",
@@ -25048,6 +25494,17 @@
             ],
             "title": "Share Of Run"
           },
+          "share_of_run_tokens": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Of Run Tokens"
+          },
           "skills_applied": {
             "items": {},
             "title": "Skills Applied",
@@ -25088,6 +25545,17 @@
           "task_key": {
             "title": "Task Key",
             "type": "string"
+          },
+          "tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens"
           },
           "tokens_in": {
             "anyOf": [
@@ -25312,8 +25780,33 @@
         "title": "TypePropertyMappingResponse",
         "type": "object"
       },
+      "TypeTally": {
+        "description": "A section's types: declared by some model, or by none.",
+        "properties": {
+          "modelled": {
+            "default": 0,
+            "title": "Modelled",
+            "type": "integer"
+          },
+          "unmodelled": {
+            "default": 0,
+            "title": "Unmodelled",
+            "type": "integer"
+          }
+        },
+        "title": "TypeTally",
+        "type": "object"
+      },
       "Usage": {
         "properties": {
+          "caller_share": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "default": {},
+            "title": "Caller Share",
+            "type": "object"
+          },
           "callers": {
             "additionalProperties": {
               "type": "integer"
@@ -25321,9 +25814,24 @@
             "title": "Callers",
             "type": "object"
           },
+          "cold_properties": {
+            "default": 0,
+            "title": "Cold Properties",
+            "type": "integer"
+          },
           "explains": {
             "title": "Explains",
             "type": "boolean"
+          },
+          "hot_types": {
+            "default": 0,
+            "title": "Hot Types",
+            "type": "integer"
+          },
+          "per_day": {
+            "default": 0.0,
+            "title": "Per Day",
+            "type": "number"
           },
           "properties": {
             "default": [],
@@ -25348,12 +25856,22 @@
             "title": "Stitches",
             "type": "array"
           },
+          "stitches_crossed": {
+            "default": 0,
+            "title": "Stitches Crossed",
+            "type": "integer"
+          },
           "too_few": {
             "title": "Too Few",
             "type": "boolean"
           },
           "total": {
             "title": "Total",
+            "type": "integer"
+          },
+          "unused_types": {
+            "default": 0,
+            "title": "Unused Types",
             "type": "integer"
           }
         },

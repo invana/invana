@@ -182,6 +182,10 @@ class StepPerformance(BaseModel):
     retried: float | None
     cost_per_run: float | None
     share_of_work: float | None
+    #: p95 at least 4 times p50 — a step whose run time cannot be predicted.
+    wide: bool = False
+    #: Reached by under a quarter of the runs — a branch, not the main path.
+    rare: bool = False
 
 
 class FailureRow(BaseModel):

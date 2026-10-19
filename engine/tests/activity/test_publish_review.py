@@ -83,7 +83,9 @@ async def test_classify_marks_removals_and_new_constraints_breaking_and_new_type
     await store.create_node_type(session, version_id=draft.id, name="runway")
     await session.flush()
     draft, base = await publishing.draft_and_base(session, model=model)
-    assert classify(base, draft).classification == "additive"
+    first = classify(base, draft)
+    assert first.classification == "additive"
+    assert (first.added, first.changed, first.removed) == (1, 0, 0)
 
     await store.create_constraint(
         session,
@@ -103,6 +105,8 @@ async def test_classify_marks_removals_and_new_constraints_breaking_and_new_type
     assert found.classification == "breaking"
     assert {"type_removed", "constraint_added"} <= kinds
     assert "type_added" in {c.kind for c in found.changes if not c.breaking}
+    assert found.added + found.changed + found.removed == len(found.changes)
+    assert (found.added, found.changed, found.removed) == (2, 0, 1)
 
 
 async def test_an_additive_draft_publishes_at_once(session, graph, user, model):

@@ -5,6 +5,10 @@ only by ``Introspect`` — and each one is marked against every authored model's
 active version: declared and present is ``in_both``, declared and absent is
 ``model_only``, present and declared by nothing is ``database_only``. The counts
 are the only live read.
+
+The tallies a tab and the Overview show — modelled and not, present in the
+database, drift in total and per model — are counted here over the rows served,
+so a client counts nothing.
 """
 
 from __future__ import annotations
@@ -14,7 +18,7 @@ from typing import TYPE_CHECKING
 from invana.apps.modeller.querysets.graph_model import GraphModelQuerySet
 from invana.apps.modeller.querysets.graph_version import GraphVersionQuerySet
 from invana.apps.modeller.querysets.type_count_snapshot import TypeCountSnapshotQuerySet
-from invana.apps.modeller.schemas import PhysicalRule, PhysicalSchema, PhysicalType
+from invana.apps.modeller.schemas import PhysicalDrift, PhysicalRule, PhysicalSchema, PhysicalType, TypeTally
 from invana.apps.modeller.solve import ANCHOR_EDGE
 from invana.core.errors import NotFoundError
 from invana.graph.connectors.base.exceptions import ConnectorError
@@ -178,7 +182,49 @@ class PhysicalSchemaManager:
             relationship_types=rels,
             indexes=indexes,
             constraints=constraints,
+            **tallies(labels, rels, indexes, constraints),
         )
+
+
+def tallies(
+    labels: list[PhysicalType],
+    rels: list[PhysicalType],
+    indexes: list[PhysicalRule],
+    constraints: list[PhysicalRule],
+) -> dict:
+    """Each section's counts and the drift across all four, over the rows as served.
+
+    A type is modelled when some model declares it; a rule is present unless it
+    is ``model_only``. Drift is every row not ``in_both``, split into types and
+    rules, and counted per model among the rows that model declares.
+    """
+    types = [*labels, *rels]
+    rules = [*indexes, *constraints]
+    off_types = [r for r in types if r.drift != "in_both"]
+    off_rules = [r for r in rules if r.drift != "in_both"]
+    by_model: dict[str, int] = {}
+    for row in [*types, *rules]:
+        for model in row.models:
+            by_model[model] = by_model.get(model, 0) + int(row.drift != "in_both")
+
+    def tally(rows: list[PhysicalType]) -> TypeTally:
+        unmodelled = sum(1 for r in rows if r.drift == "database_only")
+        return TypeTally(modelled=len(rows) - unmodelled, unmodelled=unmodelled)
+
+    return {
+        "labels_tally": tally(labels),
+        "relationship_types_tally": tally(rels),
+        "indexes_present": sum(1 for r in indexes if r.drift != "model_only"),
+        "constraints_present": sum(1 for r in constraints if r.drift != "model_only"),
+        "drift": PhysicalDrift(
+            total=len(off_types) + len(off_rules),
+            types=len(off_types),
+            rules=len(off_rules),
+            unmodelled_types=sum(1 for r in types if r.drift == "database_only"),
+            model_only_rules=sum(1 for r in rules if r.drift == "model_only"),
+            by_model=by_model,
+        ),
+    }
 
 
 def _rules(

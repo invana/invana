@@ -111,13 +111,11 @@ function table<T>(columns: ColumnDef<T>[], data: T[], empty: string) {
 	);
 }
 
-const modelled = (rows: PhysicalType[]) => {
-	const not = rows.filter((r) => r.drift === "database_only").length;
-	return `${rows.length - not} modelled · ${not} not`;
-};
+const modelled = (tally: PhysicalSchema["labels_tally"]) =>
+	`${tally.modelled} modelled · ${tally.unmodelled} not`;
 
-const inDatabase = (rows: PhysicalRule[], declared: number) =>
-	`${declared} declared · ${rows.filter((r) => r.drift !== "model_only").length} in the database`;
+const inDatabase = (present: number, declared: number) =>
+	`${declared} declared · ${present} in the database`;
 
 export interface DatabaseRowsOptions {
 	/** One model's name when scoped — its rows only, no unmodelled section. */
@@ -221,7 +219,7 @@ export function databaseRows(
 				{
 					kind: "text",
 					title: "Labels",
-					aside: modelled(physical.labels),
+					aside: modelled(physical.labels_tally),
 					flush: true,
 					options: { text: "" },
 					render: table(
@@ -233,7 +231,7 @@ export function databaseRows(
 				{
 					kind: "text",
 					title: "Relationship types",
-					aside: modelled(physical.relationship_types),
+					aside: modelled(physical.relationship_types_tally),
 					flush: true,
 					options: { text: "" },
 					render: table(
@@ -250,7 +248,7 @@ export function databaseRows(
 					kind: "text",
 					title: "Indexes",
 					aside: physical.lists_schema
-						? inDatabase(physical.indexes, physical.declared_indexes)
+						? inDatabase(physical.indexes_present, physical.declared_indexes)
 						: "not reported",
 					flush: true,
 					options: { text: "" },
@@ -262,7 +260,10 @@ export function databaseRows(
 					kind: "text",
 					title: "Constraints",
 					aside: physical.lists_schema
-						? inDatabase(physical.constraints, physical.declared_constraints)
+						? inDatabase(
+								physical.constraints_present,
+								physical.declared_constraints,
+							)
 						: "not reported",
 					flush: true,
 					options: { text: "" },
@@ -275,18 +276,8 @@ export function databaseRows(
 	];
 }
 
-/** Rows that disagree with the models — the Overview's drift tile. */
+/** Rows that disagree with the models — the Overview's drift tile, as the engine counted them. */
 export function driftCount(physical: PhysicalSchema | undefined) {
 	if (!physical?.captured_at) return null;
-	const rows = [
-		...physical.labels,
-		...physical.relationship_types,
-		...physical.indexes,
-		...physical.constraints,
-	];
-	const off = rows.filter((r) => r.drift !== "in_both");
-	const labels = [...physical.labels, ...physical.relationship_types].filter(
-		(r) => r.drift !== "in_both",
-	).length;
-	return { total: off.length, labels, rules: off.length - labels };
+	return physical.drift;
 }

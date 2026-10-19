@@ -70,6 +70,8 @@ flowchart LR
 | `work_ms` | root | when the run settles | Sum of its nodes' `duration_ms`, except a node paused on a person |
 | `ask_ms` | root | when the run settles | Sum, over each paused node, of the gap until the next node started |
 | `wait_ms` | root | when the run settles | `duration_ms − work_ms`: time the run was open and no step was working |
+| `tokens` | every row | whenever the row is flushed | `tokens_in + tokens_out` of the row itself; empty when it spent none |
+| `run_tokens_in` · `run_tokens_out` · `run_tokens` | root | when the run settles | The root's own spend plus its direct nodes' |
 
 ## Decisions
 
@@ -82,6 +84,9 @@ flowchart LR
 | MS5 | **A windowed aggregate is computed by the engine from the columns, never stored as a counter.** p95 over 7 days or tokens today is an endpoint's query over `duration_ms` and tokens; a counter can disagree with the rows it counts. |
 | MS6 | **A change, a rate or a share is the engine's.** `↑ 38%`, `▲ 1.2 pt`, `61% applied` and `72% of the run` are returned by the endpoint that serves the values they compare, so thresholds and arrows are decided once. |
 | MS7 | **A count of a list that may be paged is the API's `total`.** `items.length` is never shown as a count. |
+| MS9 | **A token total is stored, never added in Studio.** Every row stores its `tokens`; a root stores `run_tokens_in`, `run_tokens_out` and `run_tokens` when it settles — its own spend plus its direct nodes', the one definition the run list, the trace and the Todos thread share. A run still going is summed by the engine on read, from the same rows, until it settles. |
+| MS10 | **Per-run and share figures come with the totals.** A change effect returns `tokens` and `tokens_per_run`; a trace step returns `share_of_run_tokens`; a touch returns `tokens` in its volume; an activity node returns `tokens`. |
+| MS11 | **A change has one shape.** Every endpoint that compares a number with its prior returns a `Change`: `by` (a ratio, or points for a rate), `direction` (flat within ±2%, or ±0.1 pt), and `tone` (better, worse, or neutral where up is neither). Studio picks the arrow and the colour from it and does no arithmetic. |
 | MS8 | **Not covered:** a count of a small list that is fully on screen (`Bound (3)`, a tab count, a selection), what the canvas draws right now, a live clock on something still running, "3m ago" from a stored timestamp, a meter's fill, and layout (a waterfall bar's width). |
 
 ## Phases
@@ -92,9 +97,9 @@ The audit found about 90 derived metrics across Studio. Each phase is one change
 |---|---|---|---|---|
 | 1 | Durations | MS1–MS4 columns, backfill, API fields; plan performance and fleet read the columns | Delete `totalDuration` · `durationMs`; `stepDuration` · `elapsedOf` keep only the live clock; the simulation reads `duration_ms` | ✅ |
 | 2 | Totals the API already returns | — | The list `total` on the run journal, sessions, projects, todos, decisions, skills, plans and LLM endpoints | ✅ |
-| 3 | Tokens | `tokens_total` on run, step, touch and change effect · tokens per run · share of the run's tokens | Delete every `tokens_in + tokens_out` | 🔵 |
-| 4 | Changes, rates, shares | Change and rate fields on fleet, performance, eval-vs-live, skill usage, model insights | Delete `relChange` · `measureCaption` · `arrowPct` · `readsAs` · `versus` | 🔵 |
-| 5 | Aggregates Studio builds from partial data | Endpoints for the Runs board tiles and the journal's live count · Imports stats · the Validation queue count · Provenance count · the Graph's node total · Modeller records, drift and draft-change counts · Project overview tiles · Impact reach · counts of a subset of a list (todos in review, current decisions, packaged plans, agents without the ephemeral ones) · a run's touches per layer and participant (`counts` is per direction) · a run's step progress on the run read (`steps_done`/`steps_total` are only on the list row) | Read them | 🔵 — each endpoint is designed in its own feature file first |
+| 3 | Tokens | MS9–MS10: `tokens` on every row, the root's roll-up, backfill; `tokens`/`tokens_per_run` on change effects, touches and activity nodes; a step's share of the run's tokens | Every `tokens_in + tokens_out` reads `tokens`; the step board reads `share_of_run_tokens`; the change history reads `tokens_per_run`; the Todos thread reads the run's stored spend | ✅ |
+| 4 | Changes, rates, shares | One `Change` shape (`by` · `unit` ratio or points · `direction` · `tone`) from `core/metrics.py`, on fleet and performance measures, eval draft-vs-live, plan-version p95 with its `prior_version`, model growth; rates and shares (`applied_rate`, `error_rate`, `caller_share`, `per_day`); classifications (`wide` · `rare` · `slow`); the totals and counts those endpoints already held (drift, draft added/changed/removed, compare, lens rules and people, skill offered/applied, `prompt_chars`) | Delete `relChange` · `arrowPct` · the flat threshold · `readsAs` math · `versus` math · `WIDE_SPREAD`/`RARE_BRANCH` · `callerSplit` math · `grewBy` math · the drift and draft counts; `Change` is one type in `@invana-studio/core` | ✅ |
+| 5 | Aggregates Studio builds from partial data | Endpoints for the Runs board tiles and the journal's live count · Imports stats · the Validation queue count · Provenance count · the Graph's node total · Modeller records, drift and draft-change counts · Project overview tiles · Impact reach · counts of a subset of a list (todos in review, current decisions, packaged plans, agents without the ephemeral ones) · a run's touches per layer and participant (`counts` is per direction) · a run's step progress on the run read (`steps_done`/`steps_total` are only on the list row) · a running run's token count in the stream (the assistant's live strip sums its steps) · the change history's *A → B* tokens-per-run ratio between two versions · tokens per participant on the run lens · the Modeller's records tiles and per-model record sums (live counts grouped by model) · the models-overview totals (published, drafts, node and edge types) · a frozen run report's *share of what it could touch* | Read them | 🔵 — each endpoint is designed in its own feature file first |
 
 ### Phase 1 sites
 

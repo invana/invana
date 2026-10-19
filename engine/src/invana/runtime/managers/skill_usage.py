@@ -50,6 +50,11 @@ def _readable(offered: int) -> bool:
     return offered >= MIN_OFFERS_TO_READ
 
 
+def _applied_rate(offered: int, applied: int) -> float | None:
+    """Applied over offered — only above the floor, where a share means something."""
+    return applied / offered if _readable(offered) else None
+
+
 class SkillUsageManager:
     task_runs_qs = TaskRunQuerySet()
     agents_qs = AgentQuerySet()
@@ -80,6 +85,7 @@ class SkillUsageManager:
                     applied=applied,
                     gap=offered - applied,
                     enough_to_read=_readable(offered),
+                    applied_rate=_applied_rate(offered, applied),
                 )
             )
 

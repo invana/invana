@@ -105,11 +105,6 @@ export function performanceRows(
 		];
 
 	const one = !!opts.scopeName;
-	const errorRate = performance.total
-		? performance.errors / performance.total
-		: 0;
-	const slow = (p: number | null) =>
-		p != null && graphP95 != null && p >= graphP95;
 
 	const columns: ColumnDef<ShapeRow>[] = [
 		{
@@ -146,7 +141,7 @@ export function performanceRows(
 			header: "p95",
 			cell: ({ row }) => (
 				<span
-					className={`font-mono tabular-nums ${slow(row.original.p95) ? "text-warning" : ""}`}
+					className={`font-mono tabular-nums ${row.original.slow ? "text-warning" : ""}`}
 				>
 					{fmtMs(row.original.p95)}
 				</span>
@@ -194,11 +189,11 @@ export function performanceRows(
 								label: "p95",
 								value: fmtMs(performance.p95),
 								delta: graphP95 != null ? `the Graph's ${fmtMs(graphP95)}` : "",
-								tone: one && slow(performance.p95) ? "warn" : undefined,
+								tone: one && performance.slow ? "warn" : undefined,
 							},
 							{
 								label: "Errors",
-								value: `${(errorRate * 100).toFixed(1)}%`,
+								value: `${(performance.error_rate * 100).toFixed(1)}%`,
 								delta: `${fmtNum(performance.errors)} of ${fmtNum(performance.total)}`,
 								tone: performance.errors ? "bad" : undefined,
 							},
@@ -316,7 +311,7 @@ export function ShapeSheet({
 								the {card.touched_from === "plan" ? "plan" : "results"}
 							</PropertyRow>
 							<PropertyRow label="callers">
-								{callerSplit(card.callers)}
+								{callerSplit(card.caller_share)}
 							</PropertyRow>
 						</PropertyList>
 						<pre className="overflow-x-auto whitespace-pre-wrap rounded-control border bg-muted/40 p-2 font-mono text-sm">

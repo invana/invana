@@ -134,6 +134,13 @@ class TouchManager:
             "only_in_b": sorted(b - a),
             "shared": shared,
             "differed": differed,
+            "counts": {
+                "touched_a": len(a),
+                "touched_b": len(b),
+                "shared": len(shared),
+                "only_one": len(a ^ b),
+                "read_differently": len(differed),
+            },
         }
 
 

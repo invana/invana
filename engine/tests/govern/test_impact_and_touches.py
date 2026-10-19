@@ -203,6 +203,7 @@ async def test_compare_is_the_diff_of_two_real_runs(session: AsyncSession, graph
     assert diff["shared"] == ["graph_data/model/Routes@v4"]
     assert diff["only_in_a"] == ["llm/anthropic-prod/claude-opus-5"]
     assert diff["only_in_b"] == ["llm/ollama-local/llama-3.3"]
+    assert diff["counts"] == {"touched_a": 2, "touched_b": 2, "shared": 1, "only_one": 2, "read_differently": 0}
 
 
 @pytest.mark.asyncio
@@ -247,6 +248,7 @@ async def test_compare_says_how_two_runs_narrowed_the_same_participant(
     assert entry["b"]["properties_excluded"] == {"Route": ["revenue"]}
     # `models` was equal on both, so it is not a difference.
     assert "models" not in entry["differs"]
+    assert diff["counts"]["read_differently"] == 1 and diff["counts"]["only_one"] == 0
 
 
 @pytest.mark.asyncio

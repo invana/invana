@@ -18,7 +18,7 @@ from invana.apps.govern.cast import resolve_all
 from invana.apps.govern.catalogue import CatalogueResolver
 from invana.apps.govern.impact import assess
 from invana.apps.govern.managers import LensManager, TouchManager
-from invana.apps.govern.managers.lens import to_effective, to_rules
+from invana.apps.govern.managers.lens import rule_counts, to_effective, to_rules
 from invana.apps.govern.models import Lens, LensKind
 from invana.apps.govern.rules import Decision, Effective, compose, from_snapshot
 from invana.apps.govern.schemas import (
@@ -66,6 +66,7 @@ def _read(
     usage: LensUsageRead | None = None,
     cast_resolved: list[CastResolutionRead] | None = None,
 ) -> LensRead:
+    allow_rules, deny_rules = rule_counts(lens.rules)
     return LensRead(
         id=lens.id,
         graph_id=lens.graph_id,
@@ -75,6 +76,8 @@ def _read(
         display_name=lens.display_name,
         scope=lens.scope,
         rules=list(lens.rules or []),
+        allow_rules=allow_rules,
+        deny_rules=deny_rules,
         cast=dict(lens.cast or {}),
         closed_layers=list(lens.closed_layers or []),
         as_of=lens.as_of,
@@ -148,7 +151,7 @@ async def get_lens(
     effective = ceiling if lens.kind == LensKind.guardrail.value else compose([ceiling, to_effective(lens)])
     return _read(
         lens,
-        usage=LensUsageRead(runs=runs, last_used_at=last, actor_ids=actors),
+        usage=LensUsageRead(runs=runs, last_used_at=last, actor_ids=actors, people=len(actors)),
         cast_resolved=[
             CastResolutionRead(
                 role=r.role.value,

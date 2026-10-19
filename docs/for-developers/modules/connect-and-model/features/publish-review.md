@@ -149,6 +149,7 @@ sequenceDiagram
 | PB11 | **A reviewed publish is the same publish.** SemVer bump, content hash and `model.commit` (with `review_id` and `why`), so the [change log](../../operate/features/change-log.md) reads it like any other. |
 | PB12 | **Who reads it** is the datasets bound to a touched type and the stitches on a touched type. Runs do not pin model versions, so a run is not a reader. |
 | PB13 | **Studio asks the engine before it confirms.** The Publish confirm branches on `draft/review`, a commit refused with `breaking_publish_needs_review` re-reads it, and Studio names the readers from the stitches and dataset bindings on the model; the rules are in [modeller.md › Decisions](../../../../products/modeller.md#decisions) *Publish asks the engine first* · *The review in the confirm* · *Compare on the map*. |
+| PB14 | **`draft/review` counts its changes.** It returns `added` (kinds ending `_added`), `removed` (ending `_removed`) and `changed` (the rest) beside `changes`, so the Comparing bar formats three numbers and counts nothing. |
 
 ## Not building
 

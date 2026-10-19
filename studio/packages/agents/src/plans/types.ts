@@ -161,6 +161,10 @@ export interface PlanPerformance {
 		retried: number | null;
 		cost_per_run: number | null;
 		share_of_work: number | null;
+		/** p95 far over p50 — the engine's threshold, marked not divided. */
+		wide: boolean;
+		/** Reached by few enough runs to be a branch. */
+		rare: boolean;
 	}[];
 	failures: {
 		step_key: string;

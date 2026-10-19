@@ -88,7 +88,9 @@ def classify(base: GraphVersion | None, draft: GraphVersion) -> ModelPublishClas
             _add(changes, "type_added", "node_type", type=nt.name, breaking=False, reason="additive")
         for et in draft.edge_types:
             _add(changes, "type_added", "edge_type", type=et.name, breaking=False, reason="additive")
-        return ModelPublishClassification(classification="additive", draft_version_id=draft.id, changes=changes)
+        return ModelPublishClassification(
+            classification="additive", draft_version_id=draft.id, changes=changes, **_tally(changes)
+        )
 
     diff = compute_diff(base, draft)
     for name in diff.removed_node_types:
@@ -176,7 +178,15 @@ def classify(base: GraphVersion | None, draft: GraphVersion) -> ModelPublishClas
         base_version_id=base.id,
         draft_version_id=draft.id,
         changes=changes,
+        **_tally(changes),
     )
+
+
+def _tally(changes: list[ModelPublishChange]) -> dict[str, int]:
+    """The changes counted by what they did — a kind ends in ``_added`` or ``_removed``, else it changed."""
+    added = sum(1 for c in changes if c.kind.endswith("_added"))
+    removed = sum(1 for c in changes if c.kind.endswith("_removed"))
+    return {"added": added, "removed": removed, "changed": len(changes) - added - removed}
 
 
 def _kind_of(version: GraphVersion, type_name: str) -> str:

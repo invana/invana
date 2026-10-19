@@ -764,10 +764,7 @@ function queryTiles(insights: Insights | undefined, one: boolean) {
 			delta: one
 				? `the Graph's is ${fmtMs(o.graph_p95)}`
 				: `p50 ${fmtMs(o.p50)}`,
-			tone:
-				one && o.p95 != null && o.graph_p95 != null && o.p95 > o.graph_p95
-					? ("warn" as const)
-					: undefined,
+			tone: one && o.slow ? ("warn" as const) : undefined,
 		},
 	];
 }
@@ -799,17 +796,14 @@ const fmtNum = (v: number) => nf.format(Math.round(v));
 /** `↑ 6.2% in 30 days` — the Records tile's caption once Growth has counted. */
 function grewBy(insights: Insights | undefined): string | null {
 	const growth = insights?.growth;
-	if (!insights || !growth?.counted) return null;
-	const start = growth.rows.reduce((a, r) => a + (r.start ?? 0), 0);
-	const now = growth.rows.reduce((a, r) => a + (r.now ?? 0), 0);
-	const days = Number.parseInt(insights.window, 10);
 	// Nothing counted before the window: a rise from nothing is not growth.
-	if (!growth.rows.some((r) => r.start != null)) return null;
-	if (now === start) return `unchanged in ${days} days`;
-	const by = start
-		? `${Math.abs(((now - start) / start) * 100).toFixed(1)}%`
-		: nf.format(Math.abs(now - start));
-	return `${now > start ? "↑" : "↓"} ${by} in ${days} days`;
+	if (!insights || !growth?.counted || growth.change == null) return null;
+	const days = Number.parseInt(insights.window, 10);
+	if (growth.change === 0) return `unchanged in ${days} days`;
+	const by = growth.change_rate
+		? `${Math.abs(growth.change_rate.by * 100).toFixed(1)}%`
+		: nf.format(Math.abs(growth.change));
+	return `${growth.change > 0 ? "↑" : "↓"} ${by} in ${days} days`;
 }
 
 /** Rows that disagree with the models, left out until a mirror exists. */
@@ -821,7 +815,7 @@ function driftTile(physical: PhysicalSchema | undefined) {
 			label: "Drift",
 			value: String(drift.total),
 			delta: drift.total
-				? `${drift.labels} ${drift.labels === 1 ? "type" : "types"} · ${drift.rules} ${drift.rules === 1 ? "index or constraint" : "indexes and constraints"}`
+				? `${drift.types} ${drift.types === 1 ? "type" : "types"} · ${drift.rules} ${drift.rules === 1 ? "index or constraint" : "indexes and constraints"}`
 				: "in sync with the database",
 			tone: drift.total ? ("warn" as const) : undefined,
 		},
@@ -830,13 +824,8 @@ function driftTile(physical: PhysicalSchema | undefined) {
 
 /** `in sync`, or how many of the model's rows the database lacks. */
 function modelDrift(physical: PhysicalSchema | undefined, model: string) {
-	if (!physical?.captured_at) return "—";
-	const off = [
-		...physical.labels,
-		...physical.relationship_types,
-		...physical.indexes,
-		...physical.constraints,
-	].filter((r) => r.models.includes(model) && r.drift !== "in_both").length;
+	if (!physical?.captured_at || !physical.drift) return "—";
+	const off = physical.drift.by_model[model] ?? 0;
 	return off ? `◐ ${off} model only` : "● in sync";
 }
 

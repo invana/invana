@@ -63,8 +63,6 @@ export function AgentOverviewTab({
 	const meters = useAgentMetersQuery(username, graphSlug, agent.id);
 
 	const skills = can.data?.skills ?? [];
-	const offered = skills.reduce((n, s) => n + s.offered, 0);
-	const applied = skills.reduce((n, s) => n + s.applied, 0);
 	const needAttention = skills.filter((s) => s.missing.length).length;
 	const m = meters.data;
 
@@ -141,7 +139,8 @@ export function AgentOverviewTab({
 						</PropertyRow>
 						{skills.length ? (
 							<PropertyRow label="offered">
-								{offered.toLocaleString()} · applied {applied.toLocaleString()}
+								{(can.data?.offered ?? 0).toLocaleString()} · applied{" "}
+								{(can.data?.applied ?? 0).toLocaleString()}
 							</PropertyRow>
 						) : null}
 						{needAttention ? (

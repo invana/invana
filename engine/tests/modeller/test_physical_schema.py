@@ -109,17 +109,23 @@ class TestDrift:
         assert legacy not in [r.name for r in one.labels]
 
     async def test_a_connector_that_does_not_list_says_so(self, session, store, graph_id):
-        await _version(session, store, name="global", graph_id=graph_id, origin="introspected", labels=["Zz"])
+        await _version(
+            session, store, name="global", graph_id=graph_id, origin="introspected", labels=["Zz", "ZzLegacy"]
+        )
+        await _version(session, store, name="AirRoutes", graph_id=graph_id, labels=["Zz", "ZzDeal"])
 
         read = await physical.read(session, graph_id=graph_id, connector=None)
 
         assert not read.lists_schema
         assert read.indexes == [] and read.constraints == []
         assert read.labels[0].count is None
+        assert (read.labels_tally.modelled, read.labels_tally.unmodelled) == (2, 1)
+        assert (read.drift.total, read.drift.types, read.drift.rules) == (2, 2, 0)
+        assert read.drift.unmodelled_types == 1 and read.drift.by_model == {"AirRoutes": 1}
 
     async def test_never_introspected_and_an_unknown_model(self, session, store, graph_id):
         read = await physical.read(session, graph_id=graph_id, connector=None)
-        assert read.captured_at is None and read.labels == []
+        assert read.captured_at is None and read.labels == [] and read.drift is None
 
         with pytest.raises(NotFoundError):
             await physical.read(session, graph_id=graph_id, connector=None, model_id=str(uuid.uuid4()))

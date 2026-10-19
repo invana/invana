@@ -50,7 +50,7 @@ import type {
 	RecentChange,
 } from "../fleet/types";
 import {
-	arrowPct,
+	changeText,
 	changeTone,
 	day,
 	FleetBody,
@@ -59,7 +59,6 @@ import {
 	measureCaption,
 	ms,
 	pct,
-	relChange,
 	spreadTicks,
 	TONE_TEXT,
 	tokens,
@@ -143,16 +142,10 @@ function Tiles({ tiles: t }: { tiles: OverviewTiles }) {
 	const weekday = new Date().toLocaleDateString(undefined, {
 		weekday: "long",
 	});
-	const runsChange = relChange(t.runs_today, t.runs_week_ago);
-	const p95 = measureCaption(t.p95_ms, "7 days", true);
-	const successChange =
-		t.success.value != null && t.success.prior != null
-			? (t.success.value - t.success.prior) * 100
-			: null;
+	const p95 = measureCaption(t.p95_ms, "7 days");
+	const success = t.success.change;
 	const successPt =
-		successChange != null && Math.abs(successChange) >= 0.1
-			? ` · ${successChange > 0 ? "↑" : "↓"} ${Math.abs(successChange).toFixed(1)} pt`
-			: "";
+		success && success.direction !== "flat" ? ` · ${changeText(success)}` : "";
 
 	return (
 		<MetricGrid minTileWidth={160}>
@@ -160,11 +153,11 @@ function Tiles({ tiles: t }: { tiles: OverviewTiles }) {
 				label="Runs today"
 				value={t.runs_today}
 				caption={
-					runsChange == null
+					t.runs_change == null
 						? t.runs_week_ago === 0
 							? `none last ${weekday}`
 							: undefined
-						: `${arrowPct(runsChange)} on last ${weekday}`
+						: `${changeText(t.runs_change)} on last ${weekday}`
 				}
 				captionTone="muted"
 			/>
@@ -208,8 +201,7 @@ function Tiles({ tiles: t }: { tiles: OverviewTiles }) {
 				captionTone={
 					t.success.value == null
 						? "muted"
-						: changeTone(relChange(t.success.value, t.success.prior), false) ===
-								"warning"
+						: t.success.change?.tone === "worse"
 							? "warning"
 							: "success"
 				}
@@ -328,11 +320,10 @@ function RunsADay({ daily }: { daily: DayCount[] }) {
 /** `p95 ▲ 62% since`, or the runs and failures when too few ran to say. */
 function ChangeEffect({ change: c }: { change: RecentChange }) {
 	if (c.p95_change != null) {
-		const tone = changeTone(c.p95_change, true);
 		return (
-			<span className={TONE_TEXT[tone]}>
-				p95 {arrowPct(c.p95_change, ["▲", "▼"])}
-				{arrowPct(c.p95_change) === "flat" ? "" : " since"}
+			<span className={TONE_TEXT[changeTone(c.p95_change)]}>
+				p95 {changeText(c.p95_change, ["▲", "▼"])}
+				{c.p95_change.direction === "flat" ? "" : " since"}
 			</span>
 		);
 	}

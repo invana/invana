@@ -13,6 +13,9 @@ The words every read shares:
 * **run time** is queued → finished, what a person waits for, measured on
   settled roots only — a run still going, paused or cancelled has none;
 * **success** is succeeded over settled (succeeded + failed);
+* **a change** against the window before — or a version against the one before
+  it — is ``invana.core.metrics``' reading: a ratio, in points for success, with
+  its direction and whether it is good news, so no client divides;
 * **tokens** of a root are its own and its direct steps', in and out. Tokens,
   never currency: ``cost_usd`` is not read;
 * **subjects** are agents (``agent_id``), skills (each skill version a root or
@@ -85,6 +88,7 @@ from invana.apps.task_plans.querysets import TaskPlanQuerySet
 from invana.core.errors import NotFoundError
 from invana.core.events import actions
 from invana.core.events.querysets import EventQuerySet
+from invana.core.metrics import change_of, points_change_of
 from invana.core.utils import percentile
 from invana.runtime.models import RunStatus, TaskRun, wall_ms
 from invana.runtime.querysets import EvalQuerySet, TaskRunQuerySet
@@ -195,6 +199,16 @@ def _success(roots: list[_Root]) -> float | None:
 
 def _tokens_per_run(roots: list[_Root]) -> float | None:
     return _mean([float(r.tokens) for r in roots])
+
+
+def _slower(value: float | None, prior: float | None) -> FleetMeasure:
+    """A run time or a token count, where up is the warning."""
+    return FleetMeasure(value=value, prior=prior, change=change_of(value, prior, higher_is_better=False))
+
+
+def _success_measure(value: float | None, prior: float | None) -> FleetMeasure:
+    """A success rate, read in points, where up is good news."""
+    return FleetMeasure(value=value, prior=prior, change=points_change_of(value, prior, higher_is_better=True))
 
 
 def _failing(roots: list[_Root]) -> int:
@@ -360,17 +374,19 @@ class FleetManager:
         ]
         budgets = [int(b) for a in listed if isinstance(b := (a.budget or {}).get("max_tokens_month"), int | float)]
 
+        runs_week_ago = sum(week_ago <= r.at < week_ago + timedelta(days=1) for r in roots)
         tiles = OverviewTiles(
             runs_today=len(todays),
-            runs_week_ago=sum(week_ago <= r.at < week_ago + timedelta(days=1) for r in roots),
+            runs_week_ago=runs_week_ago,
+            runs_change=change_of(len(todays), runs_week_ago, higher_is_better=None),
             failed_today=len(failed_today),
             failed_latest=fleet.subject_name(failed_today[-1]) if failed_today else None,
             waiting=len(pending) + len(paused),
             waiting_latest=waiting_latest,
-            p95_ms=FleetMeasure(value=_pct(last7, 0.95), prior=_pct(prior7, 0.95)),
+            p95_ms=_slower(_pct(last7, 0.95), _pct(prior7, 0.95)),
             tokens_this_month=sum(r.tokens for r in roots if r.at >= month),
             max_tokens_month=sum(budgets) if budgets else None,
-            success=FleetMeasure(value=_success(last7), prior=_success(prior7)),
+            success=_success_measure(_success(last7), _success(prior7)),
         )
 
         attention: list[AttentionItem] = []
@@ -487,9 +503,9 @@ class FleetManager:
                 now_roots, before = split(subject_roots)
                 if not now_roots:
                     continue
-                measured = now_roots
+                measured, prior_version = now_roots, None
                 if kind == "skill":
-                    measured, before = self._skill_prior(fleet, key, now_roots, before)
+                    measured, before, prior_version = self._skill_prior(fleet, key, now_roots, before)
                 slow = _degraded(subject_roots)
                 failing = _failing(subject_roots)
                 change = None
@@ -513,6 +529,8 @@ class FleetManager:
                         p50_ms=_pct(measured, 0.5),
                         p95_ms=_pct(measured, 0.95),
                         p95_prior_ms=_pct(before, 0.95),
+                        p95_change=change_of(_pct(measured, 0.95), _pct(before, 0.95), higher_is_better=False),
+                        prior_version=prior_version,
                         tokens_per_run=_tokens_per_run(measured),
                         tokens_per_run_prior=_tokens_per_run(before),
                         failing=failing,
@@ -550,11 +568,15 @@ class FleetManager:
         return FleetPerformance(
             window_days=window,
             tiles=FleetTiles(
-                success=FleetMeasure(value=_success(current), prior=_success(prior)),
-                p50_ms=FleetMeasure(value=_pct(current, 0.5), prior=_pct(prior, 0.5)),
-                p95_ms=FleetMeasure(value=_pct(current, 0.95), prior=_pct(prior, 0.95)),
-                runs=FleetMeasure(value=len(current), prior=len(prior)),
-                tokens_per_run=FleetMeasure(value=_tokens_per_run(current), prior=_tokens_per_run(prior)),
+                success=_success_measure(_success(current), _success(prior)),
+                p50_ms=_slower(_pct(current, 0.5), _pct(prior, 0.5)),
+                p95_ms=_slower(_pct(current, 0.95), _pct(prior, 0.95)),
+                runs=FleetMeasure(
+                    value=len(current),
+                    prior=len(prior),
+                    change=change_of(len(current), len(prior), higher_is_better=None),
+                ),
+                tokens_per_run=_slower(_tokens_per_run(current), _tokens_per_run(prior)),
                 degraded=sum(r.degradation is not None for r in agents),
                 failing=sum(r.failing >= _FAILING_SIGNAL for r in agents),
             ),
@@ -568,25 +590,26 @@ class FleetManager:
     @staticmethod
     def _skill_prior(
         fleet: _Fleet, skill_id: str, now_roots: list[_Root], before: list[_Root]
-    ) -> tuple[list[_Root], list[_Root]]:
-        """``(measured, prior)`` for a skill: its current version's runs against
-        its previous version's, both over this window — or every run in the
-        window against the window before, when the previous version ran none."""
+    ) -> tuple[list[_Root], list[_Root], str | None]:
+        """``(measured, prior, prior_version)`` for a skill: its current
+        version's runs against its previous version's, both over this window,
+        with that version's label — or every run in the window against the
+        window before, and no label, when either version ran none."""
         published = sorted((v for v in fleet.versions if v.skill_id == skill_id), key=lambda v: v.version)
         skill = fleet.skills.get(skill_id)
         head = next((v for v in published if skill is not None and v.id == skill.current_version_id), None)
         head = head or (published[-1] if published else None)
         if head is None:
-            return now_roots, before
+            return now_roots, before, None
         older = [v for v in published if v.version < head.version]
         if not older:
-            return now_roots, before
-        previous = older[-1].id
-        on_previous = [r for r in now_roots if r.skills[skill_id].id == previous]
+            return now_roots, before, None
+        previous = older[-1]
+        on_previous = [r for r in now_roots if r.skills[skill_id].id == previous.id]
         on_head = [r for r in now_roots if r.skills[skill_id].id == head.id]
         if not on_previous or not on_head:
-            return now_roots, before
-        return on_head, on_previous
+            return now_roots, before, None
+        return on_head, on_previous, str(previous.version)
 
     async def _trend(
         self,
@@ -856,9 +879,7 @@ class FleetManager:
         after, prior = on(str(mint.version)), on(previous)
         change = None
         if len(after) >= _CHANGE_MIN_RUNS and len(prior) >= _CHANGE_MIN_RUNS:
-            base = percentile(prior, 0.95)
-            if base:
-                change = (percentile(after, 0.95) or 0.0) / base - 1
+            change = change_of(percentile(after, 0.95), percentile(prior, 0.95), higher_is_better=False)
         return RecentChange(
             record_kind=mint.kind,
             record_id=mint.record_id,

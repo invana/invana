@@ -134,6 +134,9 @@ async def test_a_skill_needing_a_callable_the_envelope_lacks_is_marked_on_both_t
     by_key = {c.step_key: c for c in read.callables}
     assert by_key["create_task"].needed_by == []
     assert by_key["create_task"].bound == "work_write"
+    head = builtin.current_version
+    assert read.prompt_chars == len(head.content) + len(head.when_to_use) > 0
+    assert (read.offered, read.applied) == (0, 0), "nothing ran"
 
 
 async def test_meters_read_the_record_in_tokens(session: AsyncSession, graph: Graph, user: User):

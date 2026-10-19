@@ -57,7 +57,7 @@ import {
 	type PerformanceTrend,
 } from "../fleet/types";
 import {
-	arrowPct,
+	changeText,
 	changeTone,
 	day,
 	FleetBody,
@@ -66,7 +66,6 @@ import {
 	measureCaption,
 	ms,
 	pct,
-	relChange,
 	spreadTicks,
 	TONE_TEXT,
 	tokens,
@@ -237,14 +236,11 @@ function Tiles({
 	agents: PerformanceRow[];
 	span: string;
 }) {
-	const p50 = measureCaption(t.p50_ms, span, true);
-	const p95 = measureCaption(t.p95_ms, span, true);
-	const runs = measureCaption(t.runs, span, false);
-	const perRun = measureCaption(t.tokens_per_run, span, true);
-	const successPt =
-		t.success.value != null && t.success.prior != null
-			? (t.success.value - t.success.prior) * 100
-			: null;
+	const p50 = measureCaption(t.p50_ms, span);
+	const p95 = measureCaption(t.p95_ms, span);
+	const runs = measureCaption(t.runs, span);
+	const perRun = measureCaption(t.tokens_per_run, span);
+	const success = t.success.change;
 	const degraded = agents.find((a) => a.signal === "degraded");
 
 	return (
@@ -253,13 +249,11 @@ function Tiles({
 				label="Success rate"
 				value={pct(t.success.value)}
 				caption={
-					successPt != null && Math.abs(successPt) >= 0.1
-						? `${span} · ${successPt > 0 ? "▲" : "▼"} ${Math.abs(successPt).toFixed(1)} pt`
+					success && success.direction !== "flat"
+						? `${span} · ${changeText(success, ["▲", "▼"])}`
 						: span
 				}
-				captionTone={
-					successPt != null && successPt <= -0.1 ? "warning" : "muted"
-				}
+				captionTone={success?.tone === "worse" ? "warning" : "muted"}
 			/>
 			<MetricTile
 				label="p50 run time"
@@ -437,12 +431,12 @@ function WhatChanged({
 function TrendCell({ row }: { row: PerformanceRow }) {
 	if (row.failing >= 2)
 		return <span className="text-destructive">{row.failing} failures</span>;
-	const change = relChange(row.p95_ms, row.p95_prior_ms);
+	const change = row.p95_change;
 	if (change == null) return <span className="text-muted-foreground">—</span>;
-	const text = arrowPct(change, ["▲", "▼"]);
+	const text = changeText(change, ["▲", "▼"]);
 	const since = row.degradation?.change;
 	return (
-		<span className={TONE_TEXT[changeTone(change, true)]}>
+		<span className={TONE_TEXT[changeTone(change)]}>
 			{text}
 			{text !== "flat" && since
 				? ` since ${since.record_kind} v${since.version}`
@@ -578,11 +572,11 @@ function SkillTable({ rows, span }: { rows: PerformanceRow[]; span: string }) {
 					</TableHeader>
 					<TableBody>
 						{rows.map((r) => {
-							const change = relChange(r.p95_ms, r.p95_prior_ms);
+							const change = r.p95_change;
 							const prev =
-								r.version != null && /^\d+$/.test(r.version)
-									? `v${Number(r.version) - 1}`
-									: "previous";
+								r.prior_version != null
+									? `v${r.prior_version}`
+									: "the window before";
 							return (
 								<TableRow key={r.id}>
 									<TableCell>{r.name}</TableCell>
@@ -599,9 +593,9 @@ function SkillTable({ rows, span }: { rows: PerformanceRow[]; span: string }) {
 										{change == null ? (
 											<span className="text-muted-foreground">—</span>
 										) : (
-											<span className={TONE_TEXT[changeTone(change, true)]}>
-												{arrowPct(change, ["▲", "▼"])}
-												{arrowPct(change) === "flat" ? "" : ` vs ${prev}`}
+											<span className={TONE_TEXT[changeTone(change)]}>
+												{changeText(change, ["▲", "▼"])}
+												{change.direction === "flat" ? "" : ` vs ${prev}`}
 											</span>
 										)}
 									</TableCell>

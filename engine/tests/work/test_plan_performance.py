@@ -90,9 +90,28 @@ class TestPerformance:
         assert [s.step_key for s in perf.steps] == ["translate", "execute", "verify_result"]
         assert steps["execute"].failed == 1 and steps["execute"].retried == 0.5
         assert steps["verify_result"].ran_in == 0.5 and steps["verify_result"].failed == 0
+        assert not steps["translate"].wide and not steps["verify_result"].rare, "a 3x spread and half the runs"
         assert [(f.step_key, f.cause, f.count) for f in perf.failures] == [("execute", "query_invalid", 1)]
         assert [(b.step_key, b.limit, b.used, b.exhausted) for b in perf.bounds] == [("execute", 3, 1, 1)]
         assert perf.slowest["translate"][0].run_id == bad.id
+
+    async def test_a_wide_spread_and_a_rare_branch_are_named(self, session: AsyncSession, graph: Graph):
+        plan = await _plan(session, graph)
+        roots = [
+            _root(graph, status="succeeded", ago=timedelta(hours=i + 1), plan_origin="template:nl-single@2")
+            for i in range(5)
+        ]
+        session.add_all(roots)
+        await session.flush()
+        session.add_all([_step(r, "translate", ms=1000 if i == 4 else 100) for i, r in enumerate(roots)])
+        session.add(_step(roots[0], "verify_result", ms=5))
+        await session.flush()
+
+        perf = await PlanPerformanceManager().performance(session, plan=plan, window=7, now=NOW)
+
+        steps = {s.step_key: s for s in perf.steps}
+        assert steps["translate"].wide and not steps["translate"].rare
+        assert steps["verify_result"].rare and steps["verify_result"].ran_in == 0.2
 
     async def test_a_skill_that_inlined_it_counts_through_the_steps_it_copied(
         self, session: AsyncSession, graph: Graph

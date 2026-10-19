@@ -6,6 +6,7 @@
  * no status, because nothing ran *here*: given the page's `steps`, its third
  * line is its p50, plus the one fact worth a pixel — how often it runs if not
  * every time, its failure count if above zero, its p95 if the spread is wide.
+ * *Wide* and *rare* are the engine's verdicts; nothing here holds a threshold.
  */
 
 import {
@@ -24,23 +25,11 @@ type StepMeasures = PlanPerformance["steps"][number];
 
 const ms = (v: number) => formatElapsed(Math.round(v));
 
-/** A p95 this far over its p50 makes a step unpredictable. */
-export const WIDE_SPREAD = 4;
-/** A step fewer than this share of runs take is a branch, and is dim. */
-const RARE_BRANCH = 0.25;
-
-const isWide = (step: StepMeasures) =>
-	step.p50_ms != null &&
-	step.p95_ms != null &&
-	step.p95_ms >= WIDE_SPREAD * step.p50_ms;
-const isRare = (step: StepMeasures) =>
-	step.ran_in != null && step.ran_in < RARE_BRANCH;
-
 function statesOf(step: StepMeasures | undefined): TaskFlowState[] {
 	if (!step) return [];
 	return [
-		...(isWide(step) ? (["wide"] as const) : []),
-		...(isRare(step) ? (["rare"] as const) : []),
+		...(step.wide ? (["wide"] as const) : []),
+		...(step.rare ? (["rare"] as const) : []),
 	];
 }
 
@@ -50,7 +39,7 @@ function medianLine(step: StepMeasures | undefined): string {
 	if (step.ran_in != null && step.ran_in < 1)
 		facts.push(`runs in ${Math.round(step.ran_in * 100)}%`);
 	if (step.failed > 0) facts.push(`${step.failed} failed`);
-	if (isWide(step) && step.p95_ms != null) facts.push(`p95 ${ms(step.p95_ms)}`);
+	if (step.wide && step.p95_ms != null) facts.push(`p95 ${ms(step.p95_ms)}`);
 	return facts.join(" · ");
 }
 

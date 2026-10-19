@@ -273,6 +273,8 @@ export interface SkillUsageVersion {
 	applied: number;
 	gap: number;
 	enough_to_read: boolean;
+	/** Applied over offered; null below the floor. */
+	applied_rate: number | null;
 }
 
 interface SkillUsageByAgent {

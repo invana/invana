@@ -4,6 +4,10 @@ Everything here is computed at read time over the window's rows (MP16 · MP40):
 percentiles in the engine, signals by the fixed rules of MP10, stitches crossed
 by MP41, and advice candidates by MP39. Nothing is stored as a flag, so a rule
 that changes re-reads every window.
+
+Every count, rate and share a tab shows is returned here — the queries a day,
+each caller's share, the error rate, how many types a signal fired on, whether
+a p95 is slow against the Graph's — so a client formats and derives nothing.
 """
 
 from __future__ import annotations
@@ -90,6 +94,17 @@ def _p(rows: list[GraphQueryLog], q: float) -> float | None:
     return round(value, 1) if value is not None else None
 
 
+def share(part: int, whole: int) -> float:
+    """``part`` as a fraction of ``whole``, to four places; 0 of nothing."""
+    return round(part / whole, 4) if whole else 0.0
+
+
+def caller_share(counts: dict[str, int]) -> dict[str, float]:
+    """Each caller's fraction of all the calls counted."""
+    whole = sum(counts.values())
+    return {c: share(n, whole) for c, n in counts.items()}
+
+
 class QueryInsights:
     def __init__(self, facts: Facts) -> None:
         self.f = facts
@@ -117,7 +132,7 @@ class QueryInsights:
         share = len(hits) / self.total
         if share >= HOT_SHARE:
             p95 = _p(hits, 0.95)
-            slow = p95 is not None and self.graph_p95 is not None and p95 >= self.graph_p95
+            slow = self._slow(p95)
             out.append(
                 Signal(
                     signal="hot_and_slow" if slow else "hot",
@@ -139,6 +154,10 @@ class QueryInsights:
 
     def _line_signals(self, line: Line) -> list[Signal]:
         return [s for k in line.types for s in self.signals.get(k, [])]
+
+    def _slow(self, p95: float | None) -> bool:
+        """At or above the Graph's p95 — the line a scope or a shape is read against."""
+        return p95 is not None and self.graph_p95 is not None and p95 >= self.graph_p95
 
     # ── by day ───────────────────────────────────────────────────────────────
 
@@ -173,7 +192,7 @@ class QueryInsights:
             rows.append(
                 OverviewRow(
                     key=line.key,
-                    share=round(len(hits) / self.total, 4) if self.total else 0.0,
+                    share=share(len(hits), self.total),
                     p95=_p(hits, 0.95),
                     signals=self._line_signals(line),
                 )
@@ -197,11 +216,14 @@ class QueryInsights:
                         signal="advice", subject=item, why=f"filtered {nf(calls)} times, no index", tab="performance"
                     )
                 )
+        p95 = _p(self.scope_rows, 0.95)
         return Overview(
+            total=len(self.scope_rows),
             queries_a_day=round(len(self.scope_rows) / len(self.f.days), 1),
             p50=_p(self.scope_rows, 0.5),
-            p95=_p(self.scope_rows, 0.95),
+            p95=p95,
             graph_p95=self.graph_p95,
+            slow=self._slow(p95),
             by_caller_by_day=[
                 CallerDay(
                     label=d.isoformat(),
@@ -225,19 +247,29 @@ class QueryInsights:
                     name=line.name,
                     kind=line.kind,
                     queries=len(hits),
-                    share=round(len(hits) / self.total, 4) if self.total else 0.0,
+                    share=share(len(hits), self.total),
                     by_caller={c: sum(1 for r in hits if r.caller_kind == c) for c in CALLERS},
                     last_touched=max((r.at for r in hits), default=None),
                     signals=self._line_signals(line),
                 )
             )
+        callers = {c: sum(1 for r in self.scope_rows if r.caller_kind == c) for c in CALLERS}
+        signals = [s.signal for r in rows for s in r.signals]
+        stitches = [] if self.f.one else self._stitches()
+        properties = self._properties() if self.f.one and explains else []
         return Usage(
             total=len(self.scope_rows),
+            per_day=round(len(self.scope_rows) / len(self.f.days), 1),
             too_few=self.total < TOO_FEW,
-            callers={c: sum(1 for r in self.scope_rows if r.caller_kind == c) for c in CALLERS},
+            callers=callers,
+            caller_share=caller_share(callers),
+            unused_types=signals.count("unused"),
+            hot_types=signals.count("hot") + signals.count("hot_and_slow"),
+            cold_properties=sum(1 for p in properties if p.cold),
+            stitches_crossed=sum(1 for s in stitches if s.queries),
             rows=rows,
-            stitches=[] if self.f.one else self._stitches(),
-            properties=self._properties() if self.f.one and explains else [],
+            stitches=stitches,
+            properties=properties,
             explains=explains,
         )
 
@@ -264,7 +296,7 @@ class QueryInsights:
                     pair=pair,
                     kind=link.kind,
                     queries=len(crossed),
-                    share=round(len(crossed) / self.total, 4) if self.total else 0.0,
+                    share=share(len(crossed), self.total),
                     last_crossed=max((r.at for r in crossed), default=None),
                 )
             )
@@ -319,17 +351,21 @@ class QueryInsights:
                         types=types,
                         touched_from="plan" if any(r.touched_from == "plan" for r in calls) else "results",
                         has_advice=bool(self.scanned_without_index(calls)),
+                        slow=self._slow(p95),
                     ),
                 )
             )
         shapes.sort(key=lambda s: -s[0])
-        slow = sum(1 for _, s in shapes if s.p95 is not None and self.graph_p95 is not None and s.p95 >= self.graph_p95)
+        p95 = _p(self.scope_rows, 0.95)
+        errors = sum(1 for r in self.scope_rows if not r.ok)
         return Performance(
             total=len(self.scope_rows),
             p50=_p(self.scope_rows, 0.5),
-            p95=_p(self.scope_rows, 0.95),
-            errors=sum(1 for r in self.scope_rows if not r.ok),
-            slow_shapes=slow,
+            p95=p95,
+            slow=self._slow(p95),
+            errors=errors,
+            error_rate=share(errors, len(self.scope_rows)),
+            slow_shapes=sum(1 for _, s in shapes if s.slow),
             p95_by_day=self._p95_by_day(),
             shapes=[s for _, s in shapes[:_SHAPES_SHOWN]],
         )

@@ -247,6 +247,8 @@ class SkillUsageVersion(BaseModel):
     #: *too few to read* at the same point instead of inventing a percentage
     #: ([US6](docs/for-developers/modules/skills/features/usage.md)).
     enough_to_read: bool
+    #: Applied over offered; null below that floor, so no surface shows a share it cannot read.
+    applied_rate: float | None = None
 
 
 class SkillUsageByAgent(BaseModel):
@@ -341,6 +343,12 @@ class AgentSkillsAndCallables(BaseModel):
     #: The base plans a Plan step may pick, as `key@version` — the envelope's
     #: `templates`, resolved to the newest version the Graph holds.
     plans: list[str] = Field(default_factory=list)
+    #: Σ the skills' offered and applied, this agent's runs, each on its current version.
+    offered: int = 0
+    applied: int = 0
+    #: Characters every ask carries for the published bound skills — their
+    #: current text and *when to use*. A draft is offered nothing and adds none.
+    prompt_chars: int = 0
 
 
 class SoulPreviewRequest(BaseModel):

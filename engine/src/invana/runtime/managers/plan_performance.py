@@ -46,6 +46,10 @@ from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.workflows import retry_limit
 
 WINDOWS = (7, 30, 90)
+#: A p95 this many times its p50 makes a step unpredictable.
+_WIDE_SPREAD = 4
+#: A step fewer than this share of runs reach is a branch.
+_RARE_BRANCH = 0.25
 
 #: A root's status, in the run page's words (LB34). A pause on a person —
 #: an approval or a question — reads `at a gate`.
@@ -361,17 +365,21 @@ def _steps(tasks: list[Task], roots: list[_Root]) -> list[StepPerformance]:
         reached = [r for r in roots if t.key in r.reaches]
         costs = [c for r in reached if (c := r.step_cost(t.key)) is not None]
         work = [r.step_work(t.key) for r in reached]
+        ran_in = len(reached) / len(roots) if roots else None
+        p50, p95 = _pct(work, 0.5), _pct(work, 0.95)
         out.append(
             StepPerformance(
                 step_key=t.key,
                 layer=layer_for(form=t.form, step_key=t.step_key),
-                ran_in=len(reached) / len(roots) if roots else None,
-                p50_ms=_pct(work, 0.5),
-                p95_ms=_pct(work, 0.95),
+                ran_in=ran_in,
+                p50_ms=p50,
+                p95_ms=p95,
                 failed=sum(r.reaches[t.key][-1].status == RunStatus.failed.value for r in reached),
                 retried=(sum(r.retried(t.key) for r in reached) / len(reached)) if reached else None,
                 cost_per_run=_mean(costs) if len(costs) == len(reached) else None,
                 share_of_work=(sum(work) / total_work) if total_work else None,
+                wide=p50 is not None and p95 is not None and p95 >= _WIDE_SPREAD * p50,
+                rare=ran_in is not None and ran_in < _RARE_BRANCH,
             )
         )
     return out

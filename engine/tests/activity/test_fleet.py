@@ -24,6 +24,7 @@ from invana.apps.agents.models import Agent
 from invana.apps.graphs.models import Graph
 from invana.apps.skills.models import Skill, SkillBinding, SkillVersion
 from invana.apps.task_plans.models import TaskPlan
+from invana.core.metrics import change_of, points_change_of
 from invana.runtime.models import EvalSet, TaskRun
 
 NOW = datetime(2026, 10, 13, 12, tzinfo=UTC)
@@ -141,6 +142,8 @@ async def test_a_degradation_names_the_skill_version_before_it(session: AsyncSes
     skill_row = perf.skills[0]
     assert skill_row.version == "2"
     assert skill_row.p95_ms == 5000.0 and skill_row.p95_prior_ms == 1000.0, "against its previous version"
+    assert skill_row.prior_version == "1"
+    assert (skill_row.p95_change.by, skill_row.p95_change.direction, skill_row.p95_change.tone) == (4.0, "up", "worse")
     assert perf.trend.subject_id == analyst.id and len(perf.trend.points) == 7
     assert [m.label for m in perf.trend.marks] == ["Route brief v2"]
 
@@ -155,6 +158,7 @@ async def test_a_thin_baseline_is_not_a_degradation_and_nothing_is_not_an_error(
 ) -> None:
     empty = await fleet.performance(session, graph_id=graph.id, window=30, now=NOW)
     assert empty.agents == [] and empty.trend is None and empty.tiles.runs.value == 0
+    assert empty.tiles.runs.change is None and empty.tiles.success.change is None, "no change against nothing"
     view = await fleet.overview(session, graph_id=graph.id, now=NOW)
     assert view.attention == [] and view.changes == [] and view.tiles.p95_ms.value is None
 
@@ -191,3 +195,20 @@ async def test_pins_group_by_address(session: AsyncSession, graph: Graph) -> Non
     assert [a.name for a in by[address].agents] == ["Analyst"]
     assert [(s.name, s.version) for s in by[address].skills] == [("Route brief", 3)]
     assert [j.name for j in by["llm/a/judge"].judges] == ["Analyst"]
+
+
+def test_a_change_reads_its_direction_and_whether_it_is_good_news() -> None:
+    slower = change_of(1380, 1000, higher_is_better=False)
+    assert (round(slower.by, 2), slower.unit, slower.direction, slower.tone) == (0.38, "ratio", "up", "worse")
+    better = points_change_of(0.962, 0.95, higher_is_better=True)
+    assert (round(better.by, 3), better.unit, better.direction, better.tone) == (0.012, "points", "up", "better")
+    runs = change_of(8, 10, higher_is_better=None)
+    assert (runs.direction, runs.tone) == ("down", "neutral"), "a run count is neither good nor bad news"
+
+
+def test_no_prior_is_no_change_and_a_small_move_is_flat() -> None:
+    assert change_of(5, None, higher_is_better=False) is None
+    assert change_of(5, 0, higher_is_better=False) is None, "a change against zero is not a number"
+    assert points_change_of(None, 0.9, higher_is_better=True) is None
+    flat = change_of(1010, 1000, higher_is_better=False)
+    assert (flat.direction, flat.tone) == ("flat", "neutral")

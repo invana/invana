@@ -7,6 +7,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from invana.core.metrics import Change
+
 # ---------------------------------------------------------------------------
 # Validation Rules
 # ---------------------------------------------------------------------------
@@ -508,6 +510,30 @@ class PhysicalRule(BaseModel):
     drift: Drift
 
 
+class TypeTally(BaseModel):
+    """A section's types: declared by some model, or by none."""
+
+    modelled: int = 0
+    unmodelled: int = 0
+
+
+class PhysicalDrift(BaseModel):
+    """How many rows disagree with the models, counted once for every tile and caption."""
+
+    #: Rows not in both, across all four sections.
+    total: int = 0
+    #: Labels and relationship types not in both.
+    types: int = 0
+    #: Indexes and constraints not in both.
+    rules: int = 0
+    #: Labels and relationship types no model declares.
+    unmodelled_types: int = 0
+    #: Indexes and constraints a model declares and the database lacks.
+    model_only_rules: int = 0
+    #: Rows not in both per model (or stitch) name, among the rows it declares.
+    by_model: dict[str, int] = {}
+
+
 class PhysicalSchema(BaseModel):
     #: When the mirror was captured; ``None`` — never introspected.
     captured_at: datetime | None
@@ -523,6 +549,13 @@ class PhysicalSchema(BaseModel):
     relationship_types: list[PhysicalType] = []
     indexes: list[PhysicalRule] = []
     constraints: list[PhysicalRule] = []
+    labels_tally: TypeTally = TypeTally()
+    relationship_types_tally: TypeTally = TypeTally()
+    #: Indexes and constraints the database holds (not ``model_only``).
+    indexes_present: int = 0
+    constraints_present: int = 0
+    #: ``None`` until a mirror was captured.
+    drift: PhysicalDrift | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -559,12 +592,17 @@ class GrowthRow(BaseModel):
     start: int | None
     now: int | None
     change: int | None
+    #: ``change`` against ``start``; ``None`` from nothing or before any count.
+    change_rate: Change | None = None
+    #: Counted at the start and the same now, or never counted.
+    unchanged: bool = False
     last: WrittenBy | None
 
 
 class GrowthWrites(BaseModel):
     imports: int = 0
     stitch_commits: int = 0
+    total: int = 0
 
 
 class Growth(BaseModel):
@@ -573,6 +611,17 @@ class Growth(BaseModel):
     marks: list[GrowthMark]
     rows: list[GrowthRow]
     writes: GrowthWrites
+    #: Records at the window's start; ``None`` when nothing was counted before it.
+    start: int | None = None
+    #: Records now, summed over the rows.
+    now: int = 0
+    #: ``now - start``; ``None`` when ``start`` is.
+    change: int | None = None
+    change_rate: Change | None = None
+    #: The key of the row that grew the most, from nothing ranking first.
+    fastest: str | None = None
+    #: How many rows are unchanged.
+    unchanged: int = 0
     #: Anything in scope was ever counted — else the never-imported state.
     counted: bool
 
@@ -615,11 +664,15 @@ class Attention(BaseModel):
 
 
 class Overview(BaseModel):
+    #: Queries in scope over the window.
+    total: int = 0
     queries_a_day: float
     p50: float | None
     p95: float | None
     #: The Graph's p95, the line a scope's is read against.
     graph_p95: float | None
+    #: The scope's p95 is at or above the Graph's.
+    slow: bool = False
     by_caller_by_day: list[CallerDay]
     p95_by_day: list[DayValue]
     rows: list[OverviewRow]
@@ -657,9 +710,19 @@ class PropertyUse(BaseModel):
 
 class Usage(BaseModel):
     total: int
+    #: ``total`` over the window's days.
+    per_day: float = 0.0
     #: Fewer than 50 queries on the Graph: counts, never signals (MP10).
     too_few: bool
     callers: dict[str, int]
+    #: Each caller's fraction of ``total``.
+    caller_share: dict[str, float] = {}
+    #: Signals fired across the rows; zero below fifty queries.
+    unused_types: int = 0
+    hot_types: int = 0
+    cold_properties: int = 0
+    #: Active stitches some query crossed.
+    stitches_crossed: int = 0
     rows: list[UsageRow]
     stitches: list[StitchUse] = []
     properties: list[PropertyUse] = []
@@ -678,13 +741,19 @@ class ShapeRow(BaseModel):
     types: list[str]
     touched_from: Literal["plan", "results"]
     has_advice: bool
+    #: Its p95 is at or above the Graph's.
+    slow: bool = False
 
 
 class Performance(BaseModel):
     total: int
     p50: float | None
     p95: float | None
+    #: The scope's p95 is at or above the Graph's.
+    slow: bool = False
     errors: int
+    #: ``errors`` over ``total``; 0 with no queries.
+    error_rate: float = 0.0
     slow_shapes: int
     p95_by_day: list[DayValue]
     shapes: list[ShapeRow]
@@ -726,6 +795,8 @@ class ShapeCard(BaseModel):
     p50: float | None
     p95: float | None
     callers: dict[str, int]
+    #: Each caller's fraction of ``calls``.
+    caller_share: dict[str, float] = {}
     types: list[str]
     touched_from: Literal["plan", "results"]
     plan: list[str]
@@ -763,6 +834,10 @@ class ModelPublishClassification(BaseModel):
     base_version_id: str | None = None
     draft_version_id: str
     changes: list[ModelPublishChange] = []
+    #: ``changes`` by what they did: a ``*_added``, a ``*_removed``, and the rest.
+    added: int = 0
+    changed: int = 0
+    removed: int = 0
 
 
 class ModelPublishRequest(BaseModel):
