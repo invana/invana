@@ -8,7 +8,8 @@
  * counts, which open the console on Data and on Queries, then the message
  * line: what the pointer is over, else the canvas's latest message (a mode's
  * hint, a layout's progress). It is plain text, last, and truncates before the
- * right zone. Right: the selection, the zoom, and the live engine — the backend
+ * right zone. Right: whether edges are thinned, the selection, the zoom, and
+ * the live engine — the backend
  * the board was mounted with and its median frame rate over the last second,
  * polled once a second so the bar never repaints with the canvas.
  */
@@ -21,6 +22,7 @@ import { Button, cn, StatusDot } from "@invana/ui";
 import type { CanvasBackend } from "@invana-studio/canvases";
 import type { GraphConnectionRead } from "@invana-studio/core";
 import { useEffect, useState } from "react";
+import { edgesThinned, THIN_KEEP } from "../edgeDensity";
 
 const BACKEND_LABEL: Record<CanvasBackend, string> = {
 	webgl: "WebGL",
@@ -190,12 +192,29 @@ export function MessageLine({ canvas }: { canvas: GraphCanvasEngine }) {
 	);
 }
 
-/** The selection and the zoom, live off the engine. */
-export function ViewLine({ canvas }: { canvas: GraphCanvasEngine }) {
+/**
+ * The selection and the zoom, live off the engine — and, while a dense result
+ * is zoomed out far enough to thin its edges, that only some are drawn, so a
+ * missing line is never read as a missing relationship.
+ */
+export function ViewLine({
+	canvas,
+	relationships,
+}: {
+	canvas: GraphCanvasEngine;
+	/** Relationships on the canvas — decides whether edges thin. */
+	relationships: number;
+}) {
 	const { zoom } = useZoom(canvas);
 	const { count } = useSelection({}, canvas);
 	return (
 		<span className="flex items-center gap-3 px-2">
+			{edgesThinned(relationships, zoom) ? (
+				<span className="text-muted-foreground">
+					About 1 in {Math.round(1 / THIN_KEEP)} relationships drawn · zoom in
+					for all
+				</span>
+			) : null}
 			{count > 0 ? <span>{count} selected</span> : null}
 			<span className="tabular-nums">{Math.round(zoom * 100)}%</span>
 		</span>

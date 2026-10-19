@@ -1,7 +1,7 @@
 import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, type Plugin, searchForWorkspaceRoot } from "vite";
 
 /**
  * Work against a local `design-kit` checkout instead of the published packages.
@@ -286,5 +286,15 @@ export default defineConfig({
 	},
 	server: {
 		port: 8300,
+		// A linked checkout sits outside the workspace. Aliased imports reach it
+		// anyway, but a Web Worker is fetched by URL (`/@fs/…/forceSolver.worker.js`),
+		// which Vite refuses outside its allow list — the layout then silently
+		// solves on the main thread, freezing the page. So the checkouts are allowed.
+		fs: {
+			allow: [
+				searchForWorkspaceRoot(process.cwd()),
+				...[designKitRoot, canvasRoot].filter((r): r is string => !!r),
+			],
+		},
 	},
 });

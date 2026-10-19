@@ -185,7 +185,7 @@ function explorerFooter({
 		),
 		right: (
 			<span className="flex items-center">
-				<ViewLine canvas={canvas} />
+				<ViewLine canvas={canvas} relationships={counts.relationships} />
 				<RendererLine canvas={canvas} backend={backend} />
 			</span>
 		),

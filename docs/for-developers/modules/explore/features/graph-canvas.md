@@ -50,12 +50,14 @@ flowchart TD
 | Nothing selected | The panel says what a selection would show |
 | WebGPU unavailable | Falls back to WebGL, and says so once |
 | A huge answer | "24,477 nodes" before the draw, with a cap the user can raise |
+| A dense result, zoomed out | Edges drawn faint, about 1 in 10 drawn, and the footer says *About 1 in 10 relationships drawn · zoom in for all*; zooming in draws them all |
+| A large result still laying out | The footer counts the solve (*Laying out 2159 nodes · 80 / 149*); past 400 ms a toast says the graph appears when it settles, with *Cancel* |
 
 ## Surfaces
 
 | Surface | Shape |
 |---|---|
-| Canvas | The drawing; floating controls for layout, fit and layers |
+| Canvas | The drawing; floating controls for layout, fit and layers, and the *Size by connections* toggle |
 | Layers | A card over the canvas, opened from the page strip ([boards.md](boards.md) CV6): layers, then node/edge types with counts and visibility |
 | Status strip | What is drawn: types, counts, the canvas name |
 
@@ -108,6 +110,10 @@ sequenceDiagram
 | GC14 | **A canvas holds only what the current world returns.** The world is enforced at the read, and the canvas never learns what it left out — no *excluded* state, no count of what is hidden. Reopening a canvas runs `resolve_elements` (`graph_read`, trigger `system`) under the picked world: it answers **present** (in the graph and in this world) and **missing** (gone from the graph, kept and marked per GC5). An element the world excludes is in neither list and is **not drawn**; clearing the world brings it back, and the saved snapshot is never rewritten. The check matches on the element id and is built by the connector for either dialect, never a hard-coded Cypher query. |
 | GC15 | **A third-party node is badged on the canvas, drawn or kept.** The badge reads from the element's provenance — the drawn object before **Keep**, `_inv_origin = "third_party"` after — so it is there on reload and on every board the element reaches, and its tooltip carries the reference — the link, for the internet ([BG7](../../ask/features/beyond-the-graph.md#decisions)). |
 | GC16 | **A type's styling is stored as the patch the Styling card edits.** `styling.nodeTypes.<type>` holds `color` · `size` · `labelKey`, and `edgeTypes.<type>` holds `color` · `width`. `labelKey` is a root-relative dot path — `id`, `type`, or `data.<property>` — so a label can be a node's own id or type as well as a property; unset is the default label. Studio paints it and repaints on every edit; the card only edits, so a board keeps its styling while the card is closed. |
+| GC17 | **No two nodes overlap, however large the result.** The Explorer's force layout keeps a hard floor between nodes — each node's drawn radius plus 22 px for its bottom label — and runs ~150 iterations (`alphaDecay 0.035`, `alphaMin 0.005`), enough for that floor to hold across ~2,000 nodes. Repulsion is `-600` capped at 600 px and edges rest at 150 px, so a hub's fan opens out while distant clusters stay pulled together by their edges. |
+| GC18 | **Size by connections is a toolbar toggle, on by default.** `NodeCentralityBehaviour` sizes each node by its connection count on a square-root curve, radius 8 to 28, so a hub reads as a hub. It is derived on every draw, never saved, and it holds for the visit, like *Tools*. Flipping it re-runs the layout, because spacing follows size (GC17). While it is on, it wins over a type's `size` (GC16). |
+| GC19 | **A layout that is still solving says so.** The solve runs off-screen and reports its progress every 10 iterations. The footer's message line counts it on every run (*Laying out 2159 nodes · 80 / 149*), then says *Graph ready*. A run still going after 400 ms also raises one loading toast — *Arranging 2159 nodes · The graph appears when the layout settles* — with *Cancel*, which stops the solve and draws the nodes where they are. The toast carries no count, so one number moves in one place, and a quick expansion never flashes one. |
+| GC20 | **A dense result is drawn thinner, never cut.** Past 200 relationships, edges fade to `√(200 / n)` opacity, never below 0.15, so a hub's fan stays readable instead of a solid block of colour; a hovered, selected or highlighted edge is drawn solid. From 500 relationships, while the zoom is below 50%, an even sample of about 1 in 10 is drawn — every hub keeps its share, unlike ranking by connections, which would keep only the largest hub's — and the footer's view zone says *About 1 in 10 relationships drawn · zoom in for all* for as long as it holds, so a missing line is never read as a missing relationship (GC5). The thresholds live in one module the canvas and the footer both read. Spacing does not fix a dense overview: fitting to screen scales it away (GC17). |
 
 ## Not building
 

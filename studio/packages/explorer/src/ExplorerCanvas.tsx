@@ -26,12 +26,14 @@ import {
 	D3ForceLayout,
 	DragNodeBehaviour,
 	DragPanBehaviour,
+	EdgeLODBehaviour,
 	GraphCanvas,
 	GraphClipboardProvider,
 	GraphLayer,
 	HoverActivateBehaviour,
 	LassoSelectBehaviour,
 	type LayoutFactory,
+	NodeCentralityBehaviour,
 	PinchZoomBehaviour,
 	TextResolutionLODBehaviour,
 	type UseClipboardResult,
@@ -61,10 +63,11 @@ import {
 	ToolbarItems,
 } from "@invana/canvas-ui";
 import type * as graph from "@invana/graph";
-import type {
-	GraphCanvas as GraphCanvasEngine,
-	GraphData,
-	GraphNode,
+import {
+	DEFAULT_EDGE_STATES,
+	type GraphCanvas as GraphCanvasEngine,
+	type GraphData,
+	type GraphNode,
 } from "@invana/graph";
 import { D3ForceLayout as D3ForceLayoutEngine } from "@invana/graph-layout-d3-force";
 import { ElkLayout } from "@invana/graph-layout-elkjs";
@@ -119,7 +122,15 @@ import {
 	ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { toast } from "sonner";
 import { labelAt } from "./canvasItems";
+import { useSizeByConnections } from "./chrome/useSizeByConnections";
+import {
+	edgeAlpha,
+	THIN_BELOW_ZOOM,
+	THIN_KEEP,
+	thinsEdges,
+} from "./edgeDensity";
 import type { ExpandRequest } from "./types";
 
 /** Schema slice that drives the node-expand submenus (docs/for-developers/modules/explore/features/graph-canvas.md). */
@@ -171,30 +182,51 @@ const DEFAULT_EDGE_WIDTH = 1.5;
 //     other to opposite corners with vast empty gaps between them. Capped, the
 //     repulsion only un-piles nearby leaves; distant clusters feel nothing and
 //     stay pulled together by their connecting edges.
-//   - `link.distance` is the edge rest length (kept short so clusters sit close)
-//     and `collide.radius` is the hard floor on node spacing — above the 8px
-//     node radius plus its bottom label so a dense fan can't overlap.
-// `alphaDecay` / `alphaMin` cool the sim quickly (~90 ticks vs. d3's ~300) so it
-// settles in a beat instead of drifting for seconds; `velocityDecay` damps
-// overshoot. Cheap because new nodes are pre-placed near their anchor (see the
-// expand handler), so the sim only has to relax locally.
+//   - `link.distance` is the edge rest length and `collide.radius` is the hard
+//     floor on node spacing — per node, its drawn radius (which grows with its
+//     connections when *Size by connections* is on) plus room for its bottom
+//     label, so a hub keeps clear space around it and no two nodes overlap.
+// `alphaDecay` / `alphaMin` give the sim ~150 ticks: enough for collide to pull
+// a dense result of ~1000 nodes apart, which a faster cool left overlapping. The
+// solve runs in a worker and reports its progress (<LayoutProgressBridge>), so
+// the wait is said, not hidden.
 const FORCE_OPTS = {
 	animate: false,
-	// Looser spacing so dense leaf-fans (expand a hub → hundreds of leaves) spread
-	// out and read as a graph rather than a blob: stronger repulsion over a wider
-	// radius, longer edges, and a bigger hard floor on node spacing (node is 8px +
-	// a bottom label). distanceMax still caps repulsion to a local radius so distant
-	// clusters stay pulled together by their edges instead of flying to the corners.
-	charge: { strength: -520, distanceMax: 420 },
-	link: { distance: 110 },
+	charge: { strength: -600, distanceMax: 600 },
+	link: { distance: 150 },
 	center: { x: 0, y: 0 },
-	collide: { radius: 28 },
-	// Cool faster + damp harder so the looser forces above still settle quickly
-	// (~45 ticks, not a long drift) — fewer ticks = fewer full repaints, which is
-	// what makes a large expanded graph feel slow while it relaxes.
-	alphaDecay: 0.09,
-	alphaMin: 0.02,
-	velocityDecay: 0.6,
+	collide: {
+		radius: (node: GraphNode) =>
+			((node.style as { size?: number } | undefined)?.size ?? NODE_RADIUS) +
+			NODE_GAP,
+		iterations: 2,
+	},
+	alphaDecay: 0.035,
+	alphaMin: 0.005,
+	velocityDecay: 0.5,
+};
+
+// The node's drawn radius when nothing sizes it, and the clear space kept
+// around it for its bottom label.
+const NODE_RADIUS = 8;
+const NODE_GAP = 22;
+
+// Size-by-connections range, as node radii: a leaf stays at the default size,
+// the best-connected node draws at 28.
+const CENTRALITY_MIN = NODE_RADIUS;
+const CENTRALITY_MAX = 28;
+
+// A layout that settles faster than this shows no toast — only the footer.
+const LAYOUT_TOAST_DELAY_MS = 400;
+const LAYOUT_TOAST_ID = "explorer-layout";
+
+// Edges fade as a result grows (edgeDensity.ts), but one the user is looking
+// at — hovered, selected, highlighted — is drawn solid. A state overlay
+// replaces the default entry whole, so each keeps the default and adds alpha.
+const EDGE_STATES = {
+	hovered: { ...DEFAULT_EDGE_STATES.hovered, strokeAlpha: 1 },
+	selected: { ...DEFAULT_EDGE_STATES.selected, strokeAlpha: 1 },
+	highlighted: { ...DEFAULT_EDGE_STATES.highlighted, strokeAlpha: 1 },
 };
 
 // Id of the registered active layout — shared by the `<D3ForceLayout>` that
@@ -731,41 +763,38 @@ function AutoLayoutBridge({
 	});
 	useEffect(() => {
 		if (!canvas || data.nodes.length === 0) return;
-
-		// Surface layout progress on the shared message channel — a sticky
-		// "Laying out…" while d3-force settles, replaced by a "ready" that
-		// auto-clears after 3s. This is what lights up <CanvasMessageBar> on every
-		// query run (the only path that emits to the channel automatically).
-		canvas.showMessage(`Laying out ${data.nodes.length} nodes…`);
-
-		// No active query run → just lay out (e.g. theme repaint, session restore).
-		const interaction = interactionRef?.current ?? null;
-		if (!interaction) {
-			void canvas
-				.runLayout(ACTIVE_LAYOUT_ID)
-				.finally(() => canvas.showMessage("Graph ready", 3000));
-			return;
-		}
-
-		// `explorer.layout` span (docs/for-developers/modules/platform/features/telemetry.md) — d3-force settle. runLayout resolves
-		// when the layout settles; on settle we open a one-frame `explorer.render`
-		// span (first painted frame) and then close the run's root span.
-		const layoutSpan = startChild(interaction, "explorer.layout", {
-			"explorer.node_count": data.nodes.length,
-			"explorer.edge_count": data.edges.length,
-		});
 		let cancelled = false;
-		void canvas.runLayout(ACTIVE_LAYOUT_ID).finally(() => {
-			layoutSpan.end();
+		const interaction = interactionRef?.current ?? null;
+
+		// The layout runs a microtask late: `NodeCentralityBehaviour` re-sizes
+		// nodes on a microtask after the topology changes, and the solve reads
+		// each node's size for its spacing when it starts. Progress and "Graph
+		// ready" are said by <LayoutProgressBridge>.
+		queueMicrotask(() => {
 			if (cancelled) return;
-			canvas.showMessage("Graph ready", 3000);
-			const renderSpan = startChild(interaction, "explorer.render");
-			requestAnimationFrame(() => {
-				renderSpan.end();
-				// Closes the root span and clears the ref + module-level active slot,
-				// so post-run API calls aren't parented to a finished run.
-				if (interactionRef) endInteraction(interactionRef, interaction);
-				else interaction.span.end();
+			// No active query run → just lay out (e.g. theme repaint, session restore).
+			if (!interaction) {
+				void canvas.runLayout(ACTIVE_LAYOUT_ID);
+				return;
+			}
+			// `explorer.layout` span (docs/for-developers/modules/platform/features/telemetry.md) — d3-force settle. runLayout resolves
+			// when the layout settles; on settle we open a one-frame `explorer.render`
+			// span (first painted frame) and then close the run's root span.
+			const layoutSpan = startChild(interaction, "explorer.layout", {
+				"explorer.node_count": data.nodes.length,
+				"explorer.edge_count": data.edges.length,
+			});
+			void canvas.runLayout(ACTIVE_LAYOUT_ID).finally(() => {
+				layoutSpan.end();
+				if (cancelled) return;
+				const renderSpan = startChild(interaction, "explorer.render");
+				requestAnimationFrame(() => {
+					renderSpan.end();
+					// Closes the root span and clears the ref + module-level active slot,
+					// so post-run API calls aren't parented to a finished run.
+					if (interactionRef) endInteraction(interactionRef, interaction);
+					else interaction.span.end();
+				});
 			});
 		});
 		return () => {
@@ -773,6 +802,98 @@ function AutoLayoutBridge({
 		};
 	}, [canvas, data, interactionRef]);
 	return null;
+}
+
+/**
+ * Says why the board is empty while the active layout solves off-screen.
+ *
+ * The footer's message line carries the count — `Laying out 912 nodes · 140 /
+ * 150` — on every run, then "Graph ready". A run still going after
+ * `LAYOUT_TOAST_DELAY_MS` also raises one loading toast that names the wait and
+ * offers *Cancel*, which stops the solve and draws the nodes where they are; a
+ * quick expand never flashes one. The toast carries no count: one moving
+ * number, in one place.
+ */
+function LayoutProgressBridge() {
+	const canvas = useGraphCanvas();
+	const nodeCount = useRef(0);
+	const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const userStopped = useRef(false);
+
+	const clearToast = useCallback(() => {
+		if (toastTimer.current !== null) clearTimeout(toastTimer.current);
+		toastTimer.current = null;
+		toast.dismiss(LAYOUT_TOAST_ID);
+	}, []);
+	useEffect(() => clearToast, [clearToast]);
+
+	useCanvasEvent("layout:run:start", (e) => {
+		if (e.id !== ACTIVE_LAYOUT_ID || !canvas) return;
+		const n = e.nodeCount ?? 0;
+		nodeCount.current = n;
+		userStopped.current = false;
+		canvas.showMessage(`Laying out ${n} nodes…`);
+		clearToast();
+		toastTimer.current = setTimeout(() => {
+			toastTimer.current = null;
+			toast.loading(`Arranging ${n} nodes`, {
+				id: LAYOUT_TOAST_ID,
+				description: "The graph appears when the layout settles.",
+				action: {
+					label: "Cancel",
+					onClick: () => {
+						userStopped.current = true;
+						canvas.stopLayout();
+					},
+				},
+			});
+		}, LAYOUT_TOAST_DELAY_MS);
+	});
+	useCanvasEvent("layout:run:progress", (e) => {
+		if (e.id !== ACTIVE_LAYOUT_ID || !canvas) return;
+		canvas.showMessage(
+			`Laying out ${nodeCount.current} nodes · ${e.done} / ${e.total}`,
+		);
+	});
+	useCanvasEvent("layout:run:end", (e) => {
+		if (e.id !== ACTIVE_LAYOUT_ID || !canvas) return;
+		clearToast();
+		// A run superseded by the next one ends "stopped" too; that one's start
+		// has already taken the message line, so only a settle or a cancel speaks.
+		if (e.reason === "settled") canvas.showMessage("Graph ready", 3000);
+		else if (userStopped.current)
+			canvas.showMessage(
+				"Layout cancelled — nodes drawn where they were",
+				4000,
+			);
+	});
+	return null;
+}
+
+/**
+ * Sizes each node by its connection count while *Size by connections* is on,
+ * and re-runs the layout when it is flipped, so spacing follows the new sizes.
+ * A query result needs no re-run here: <AutoLayoutBridge> starts its layout a
+ * microtask after the behaviour has re-sized the new nodes.
+ */
+function SizeByConnectionsBridge() {
+	const [on] = useSizeByConnections();
+	const canvas = useGraphCanvas();
+	const shown = useRef(on);
+	useEffect(() => {
+		if (shown.current === on || !canvas) return;
+		shown.current = on;
+		queueMicrotask(() => void canvas.runLayout(ACTIVE_LAYOUT_ID));
+	}, [on, canvas]);
+	return (
+		<NodeCentralityBehaviour
+			id="size-by-connections"
+			targetLayerId="graph"
+			enabled={on}
+			minSize={CENTRALITY_MIN}
+			maxSize={CENTRALITY_MAX}
+		/>
+	);
 }
 
 /**
@@ -884,6 +1005,7 @@ export function ExplorerCanvas({
 	// unchanged. Every resolver is always present, returning `undefined` for the
 	// template default: `StylingBridge` merges them into the live layer, so a
 	// resolver left out would keep the previous one.
+	const edgeCount = data.edges.length;
 	const { nodeStyle, edgeStyle } = useMemo(() => {
 		const nt = styling?.nodeTypes ?? {};
 		const et = styling?.edgeTypes ?? {};
@@ -906,8 +1028,10 @@ export function ExplorerCanvas({
 		// dot shows in the Types panel — explicit styling first, palette after.
 		const edgeColor = (e: graph.GraphEdge) =>
 			typeColorNumber(String(e.type ?? ""), et[String(e.type ?? "")]?.color);
+		const alpha = edgeAlpha(edgeCount);
 		const edgeStyle = {
 			strokeColor: edgeColor,
+			strokeAlpha: () => alpha,
 			arrowTargetColor: edgeColor,
 			strokeWidth: (e: graph.GraphEdge) =>
 				et[String(e.type ?? "")]?.width ??
@@ -920,7 +1044,7 @@ export function ExplorerCanvas({
 			edgeStyle:
 				edgeStyle as unknown as graph.ResolvableEdgeStyle<graph.GraphEdge>,
 		};
-	}, [styling]);
+	}, [styling, edgeCount]);
 	return (
 		// `key={backend}`: the renderer backend is fixed at `Application.init`, so
 		// flipping `preference` only takes effect on a fresh mount — keying on it
@@ -940,7 +1064,7 @@ export function ExplorerCanvas({
 				id="graph"
 				data={data}
 				node={{ style: nodeStyle }}
-				edge={{ style: edgeStyle }}
+				edge={{ style: edgeStyle, state: EDGE_STATES }}
 			/>
 
 			{/* Registers the active layout under ACTIVE_LAYOUT_ID (config-first:
@@ -952,6 +1076,18 @@ export function ExplorerCanvas({
 				options={FORCE_OPTS}
 			/>
 			<AutoLayoutBridge data={data} interactionRef={interactionRef} />
+			<LayoutProgressBridge />
+			<SizeByConnectionsBridge />
+			{/* A dense result draws an even ~10% of its edges while zoomed out;
+			    the footer's ViewLine says so (edgeDensity.ts). */}
+			<EdgeLODBehaviour
+				id="edge-thin"
+				targetLayerId="graph"
+				enabled={thinsEdges(edgeCount)}
+				minZoom={THIN_BELOW_ZOOM}
+				keepFraction={THIN_KEEP}
+				keepBy="sample"
+			/>
 
 			<ThemeBridge />
 			<StylingBridge nodeStyle={nodeStyle} edgeStyle={edgeStyle} />

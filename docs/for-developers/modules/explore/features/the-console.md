@@ -108,6 +108,8 @@ flowchart TD
 | CO12 | **Collapsed is the param's absence.** A reload, a panel switch and a new tab all keep it. |
 | CO13 | **A query is a reply.** A reply runs one query step, retried in place; its row is keyed by the reply, so a typed query, an ask and a failure before execution are each one row. |
 | CO14 | **The footer says what a mode does.** Picking Select, Box or Lasso puts its gesture in the message line (*Shift + drag a rectangle…*); the message line never carries an action. |
+| CO15 | **The footer counts a layout while it solves.** The message line reads *Laying out N nodes · done / total* until the solve settles, then *Graph ready* — the canvas is empty for a reason, and the line says which ([GC19](graph-canvas.md#decisions)). What the pointer is over still takes the line first. |
+| CO16 | **The footer says when edges are thinned.** While a dense result is zoomed out past the thinning threshold, the view zone leads with *About 1 in 10 relationships drawn · zoom in for all* ([GC20](graph-canvas.md#decisions)); it goes the moment every edge is drawn again. |
 
 ## Not building
 

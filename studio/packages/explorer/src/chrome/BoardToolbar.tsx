@@ -3,7 +3,8 @@
  *
  * - **`BoardToolbar`**, top-left: select · lasso · box, always. With *Tools*
  *   on it grows to the full set — expand the selection, layers, history ·
- *   run the layout, styling, the legend · undo, redo · export an image. Off,
+ *   run the layout, size by connections, styling, the legend · undo, redo ·
+ *   export an image. Off,
  *   its last control turns the tools on, so the bar is never a dead end.
  * - **`ZoomControls`**, bottom-right: zoom in, zoom out, fit — never hidden,
  *   because a board you cannot frame is a board you cannot read.
@@ -34,6 +35,7 @@ import {
 	MousePointer2,
 	Network,
 	Palette,
+	Radius,
 	Redo2,
 	Share2,
 	SquareDashedMousePointer,
@@ -43,6 +45,7 @@ import {
 } from "lucide-react";
 import { ACTIVE_LAYOUT_ID } from "../ExplorerCanvas";
 import { useExplorerTools } from "./useExplorerTools";
+import { useSizeByConnections } from "./useSizeByConnections";
 
 /** Select-mode key → registered behaviour id; click arms no drag-select. */
 const SELECT_MODE_IDS = {
@@ -86,6 +89,7 @@ export function BoardToolbar({
 	onToggleLegend,
 }: BoardToolbarProps) {
 	const [toolsOn, setToolsOn] = useExplorerTools();
+	const [sized, setSized] = useSizeByConnections();
 	const selectMode = useSelectMode(SELECT_MODE_IDS, { initial: "click" });
 	const history = applyIconOverrides(useHistorySection(), {
 		undo: Undo2,
@@ -140,6 +144,22 @@ export function BoardToolbar({
 					icon: Network,
 					label: "Run layout",
 					onClick: () => void canvas.runLayout(ACTIVE_LAYOUT_ID),
+				},
+				{
+					type: "toggle",
+					key: "size-by-connections",
+					icon: Radius,
+					label: "Size by connections",
+					active: sized,
+					onToggle: () => {
+						setSized(!sized);
+						canvas.showMessage(
+							sized
+								? "Nodes drawn at one size"
+								: "Nodes sized by their connections",
+							3000,
+						);
+					},
 				},
 				overlayToggle("styling", "Styling", Palette),
 				{
