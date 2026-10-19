@@ -70,18 +70,26 @@ async def test_tiles_count_every_run_in_the_readers_days(session: AsyncSession, 
     )
     assert (today.runs, today.succeeded, today.live, today.waiting) == (3, 2, 1, 1)
     assert today.slowest is not None and today.slowest.title == "slow"
+    # A run paused on a person, however long ago, is not the slowest.
+    long_ago = _run(graph, datetime(2026, 10, 19, 0, 30, tzinfo=UTC), status=RunStatus.awaiting_input.value)
+    session.add(long_ago)
+    await session.flush()
+    waited = await RunStatsManager().stats(
+        session, graph_ids=[graph.id], kinds=None, days=1, tz="Europe/Lisbon", now=_NOW
+    )
+    assert waited.slowest is not None and waited.slowest.title == "slow"
     assert today.median_ms == 6_500
     assert (today.tokens, today.spending_runs) == (350, 1)
 
     week = await RunStatsManager().stats(
         session, graph_ids=[graph.id], kinds=None, days=2, tz="Europe/Lisbon", now=_NOW
     )
-    assert [d.runs for d in week.by_day] == [1, 3]
+    assert [d.runs for d in week.by_day] == [1, 4]
     assert week.failed == 1
 
     items, total = await services.list_runs(session, graph_id=graph.id, limit=2)
     assert len(items) == 2
-    assert total == 4
+    assert total == 5
 
 
 async def test_a_bad_zone_is_refused_and_nothing_counts_as_zero(session: AsyncSession, graph: Graph) -> None:

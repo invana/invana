@@ -77,7 +77,8 @@ class RunStatsManager:
 
         ``days=1`` is today. *Live* and *waiting* are counted now, whatever the
         window. A run's time is its stored ``duration_ms``; a run still going is
-        timed to *now*, so a long run in flight can be the slowest. Tokens are a
+        timed to *now*, so a long run in flight can be the slowest — but a run
+        waiting on a person is not timed at all. Tokens are a
         settled run's stored ``run_tokens``, or its own and its nodes' so far.
         Raises ``ValidationError`` for an unknown zone or a window out of range.
         """
@@ -133,6 +134,10 @@ class RunStatsManager:
 
     @staticmethod
     def _elapsed(run: TaskRun, now: datetime) -> int | None:
+        """How long a run took, or has taken so far — never the time a person
+        has left a question unanswered, which is not the run being slow."""
+        if run.status in WAITING:
+            return None
         if run.duration_ms is not None:
             return run.duration_ms
         if run.finished_at is None:
