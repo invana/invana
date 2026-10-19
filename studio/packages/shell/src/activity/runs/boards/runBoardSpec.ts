@@ -390,7 +390,7 @@ function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 	const done = groups.filter((g) => g.head.finished_at).length;
 	const total = groups.length;
 	const ms = clockMs(trace.duration_ms, originOf(trace), trace.finished_at);
-	const tokens = (trace.tokens_in ?? 0) + (trace.tokens_out ?? 0);
+	const tokens = trace.tokens;
 	const rows = trace.emissions.reduce(
 		(n, e) => n + (e.citation.record_count ?? 0),
 		0,

@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import Any
 
 from invana.runtime.catalogue import CATALOGUE
-from invana.runtime.models import RunStatus, TaskRun, span_ms
+from invana.runtime.models import RunStatus, TaskRun, span_ms, token_sum
 
 
 def _ms(start: datetime | None, end: datetime | None) -> int | None:
@@ -130,11 +130,24 @@ def run_result(run: TaskRun, steps: list[TaskRun]) -> dict[str, Any]:
     return result
 
 
-def roll_up_timing(run: TaskRun, nodes: list[TaskRun]) -> None:
-    """Write how a settled run's time was spent onto the run itself.
+def run_tokens(run: TaskRun, nodes: list[TaskRun]) -> tuple[int, int]:
+    """A root's spend: its own tokens plus its direct nodes', as ``(in, out)``.
+
+    A delegated run's spend is inside the node that delegated it, so only the
+    direct nodes are added. The run list reads this while a run is still going;
+    once it settles, the same numbers are stored on the root.
+    """
+    rows = [run, *nodes]
+    return sum(r.tokens_in or 0 for r in rows), sum(r.tokens_out or 0 for r in rows)
+
+
+def roll_up_run(run: TaskRun, nodes: list[TaskRun]) -> None:
+    """Write how a settled run's time and tokens were spent onto the run itself.
 
     Called wherever a root run finishes, beside its cost, from the same node
-    list. Three numbers, each over the run's direct nodes in plan order:
+    list. Its tokens (``run_tokens_in`` · ``run_tokens_out`` · ``run_tokens``,
+    see :func:`run_tokens`), and three times, each over the run's direct nodes
+    in plan order:
 
     - ``work_ms`` — what the nodes did. A node paused on a person
       (``needs_input``) is the wait, not work.
@@ -145,6 +158,9 @@ def roll_up_timing(run: TaskRun, nodes: list[TaskRun]) -> None:
     A run that never started has none of them. Delegated runs are not counted
     twice — their time is inside the node that delegated them.
     """
+    spent_in, spent_out = run_tokens(run, nodes)
+    run.run_tokens_in, run.run_tokens_out = spent_in, spent_out
+    run.run_tokens = token_sum(spent_in or None, spent_out or None)
     duration = span_ms(run.started_at, run.finished_at)
     if duration is None:
         run.work_ms = run.ask_ms = run.wait_ms = None

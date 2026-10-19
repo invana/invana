@@ -33,6 +33,7 @@ class RunNodeRead(BaseModel):
     error: dict | None = None
     tokens_in: int | None = None
     tokens_out: int | None = None
+    tokens: int | None = None
 
 
 class TaskRunRead(BaseModel):
@@ -66,6 +67,10 @@ class TaskRunRead(BaseModel):
     work_ms: int | None = None
     ask_ms: int | None = None
     wait_ms: int | None = None
+    #: The root's own spend plus its direct nodes'.
+    run_tokens_in: int | None = None
+    run_tokens_out: int | None = None
+    run_tokens: int | None = None
     stream_seq: int
     #: The trace the run was started in — opens it in the collector's UI.
     trace_id: str | None = None
@@ -137,6 +142,8 @@ class TaskRunSummary(BaseModel):
     #: line (SR45). `0` here is a run that recorded no tokens, which a load is.
     tokens_in: int = 0
     tokens_out: int = 0
+    #: ``tokens_in + tokens_out`` — the run's whole spend.
+    tokens: int = 0
     #: What the run spent, summed over its priced steps. ``None`` when none had
     #: a published rate — *unknown*, never `0` (SR40).
     cost_usd: float | None = None
@@ -233,6 +240,9 @@ class TraceStep(BaseModel):
     share_of_run: float | None = None
     tokens_in: int | None = None
     tokens_out: int | None = None
+    tokens: int | None = None
+    #: This step's ``tokens`` over the run's, from 0 to 1.
+    share_of_run_tokens: float | None = None
     #: What this step spent, in dollars. ``None`` when the model has no
     #: published rate — *unknown*, never `0` (SR40 · observability.md OB4).
     cost_usd: float | None = None
@@ -309,6 +319,7 @@ class TraceRead(BaseModel):
     wait_ms: int | None = None
     tokens_in: int = 0
     tokens_out: int = 0
+    tokens: int = 0
     #: The run's spend — the sum of the steps that had a price. ``None`` when
     #: none of them did, so the Cost tile is absent rather than `$0.00` (SR40).
     cost_usd: float | None = None

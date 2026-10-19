@@ -39,6 +39,9 @@ export interface ChangeEffect {
 	failed: number;
 	tokens_in: number;
 	tokens_out: number;
+	/** The engine's `in + out`, and that over `runs` — null when nothing ran. */
+	tokens: number;
+	tokens_per_run: number | null;
 	since: string | null;
 	until: string | null;
 }
@@ -181,7 +184,7 @@ export function useCompareQuery(
 /** `212 runs · 3 failed · 41k tokens` — or what an empty span means. */
 export function effectLine(e: ChangeEffect): string {
 	if (e.runs === 0) return e.until ? "no runs" : "no runs yet";
-	const tokens = e.tokens_in + e.tokens_out;
+	const tokens = e.tokens;
 	const t =
 		tokens >= 10_000
 			? `${Math.round(tokens / 1000)}k`
@@ -191,7 +194,7 @@ export function effectLine(e: ChangeEffect): string {
 
 /** Tokens per run on a version, or null when nothing ran. */
 export function tokensPerRun(e: ChangeEffect): number | null {
-	return e.runs ? Math.round((e.tokens_in + e.tokens_out) / e.runs) : null;
+	return e.tokens_per_run;
 }
 
 /** The event `target_kind` each record kind's changes carry. */

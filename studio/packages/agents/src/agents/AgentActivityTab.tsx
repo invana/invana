@@ -199,7 +199,7 @@ export function AgentActivityTab({
 													{outcome.text}
 												</TableCell>
 												<TableCell className="font-mono">
-													{formatCompact(run.tokens_in + run.tokens_out)}
+													{formatCompact(run.tokens)}
 												</TableCell>
 												<TableCell className="whitespace-nowrap text-muted-foreground">
 													{run.queued_at

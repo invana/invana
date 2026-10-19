@@ -574,6 +574,8 @@ function TaskDetail({
 								workflowKey={run.workflowKey}
 								steps={run.steps}
 								workMs={run.workMs}
+								tokensIn={run.runTokensIn}
+								tokensOut={run.runTokensOut}
 							/>
 						))
 					)}
@@ -691,16 +693,19 @@ function TodoRunsBlock({
 	workflowKey,
 	steps,
 	workMs,
+	tokensIn = 0,
+	tokensOut = 0,
 }: {
 	workflowKey: string;
 	steps: RunNode[];
 	workMs?: number;
+	/** The run's spend as the engine sums it. */
+	tokensIn?: number;
+	tokensOut?: number;
 }) {
 	const [open, setOpen] = useState(true);
 	const done = steps.filter((s) => s.status === "succeeded").length;
 	const total = new Set(steps.map((s) => s.seq)).size;
-	const tokensIn = steps.reduce((n, s) => n + (s.tokensIn ?? 0), 0);
-	const tokensOut = steps.reduce((n, s) => n + (s.tokensOut ?? 0), 0);
 
 	return (
 		<div className="flex flex-col gap-1">

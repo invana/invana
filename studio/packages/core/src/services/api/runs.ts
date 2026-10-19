@@ -47,6 +47,7 @@ export interface ApiTaskRunStep {
 	error?: RunNode["error"] | null;
 	tokens_in?: number | null;
 	tokens_out?: number | null;
+	tokens?: number | null;
 }
 
 interface ApiTaskRun {
@@ -62,6 +63,8 @@ interface ApiTaskRun {
 	started_at?: string | null;
 	finished_at?: string | null;
 	work_ms?: number | null;
+	run_tokens_in?: number | null;
+	run_tokens_out?: number | null;
 	error?: Record<string, unknown> | null;
 	/** The trace the run recorded under; null when telemetry was off. */
 	trace_id?: string | null;
@@ -84,6 +87,9 @@ export interface TaskRun {
 	steps: RunNode[];
 	/** The engine's stored time its steps worked; absent until it settles. */
 	workMs?: number;
+	/** The run's spend, its own and its steps', as the engine sums it. */
+	runTokensIn?: number;
+	runTokensOut?: number;
 	/** The run this row is a step of; absent on a root. */
 	parentRunId?: string;
 	/** The ask a root carries — `nl` · `ql` · `import`. */
@@ -124,6 +130,7 @@ export function toRunNode(s: ApiTaskRunStep): RunNode {
 		error: s.error ?? undefined,
 		tokensIn: s.tokens_in ?? undefined,
 		tokensOut: s.tokens_out ?? undefined,
+		tokens: s.tokens ?? undefined,
 	};
 }
 
@@ -147,6 +154,7 @@ export function stepFromFrame(p: Record<string, unknown>): RunNode {
 		error: (p.error as RunNode["error"] | null) ?? null,
 		tokens_in: (p.tokens_in as number | null) ?? null,
 		tokens_out: (p.tokens_out as number | null) ?? null,
+		tokens: (p.tokens as number | null) ?? null,
 	});
 }
 
@@ -231,6 +239,8 @@ export const runsApi = {
 			streamSeq: d.stream_seq,
 			steps: d.steps.map(toRunNode),
 			workMs: d.work_ms ?? undefined,
+			runTokensIn: d.run_tokens_in ?? undefined,
+			runTokensOut: d.run_tokens_out ?? undefined,
 			// `task_runs` is one table, so this is how a **step** names the run
 			// whose trace it is in — the one read a step board opened cold makes
 			// before it reads anything else.
@@ -555,6 +565,8 @@ export interface TraceRead {
 	wait_ms: number | null;
 	tokens_in: number;
 	tokens_out: number;
+	/** The run's whole spend — stored once it settles. */
+	tokens: number;
 	/** The run's spend — `null` when no step had a published rate. */
 	cost_usd: number | null;
 	/** The ceiling it ran under, so spend draws against it. */
@@ -581,6 +593,9 @@ export interface TraceStepRead {
 	share_of_run: number | null;
 	tokens_in: number | null;
 	tokens_out: number | null;
+	tokens: number | null;
+	/** This step's tokens over the run's, from 0 to 1. */
+	share_of_run_tokens: number | null;
 	/** What this step spent — `null` when the model has no published rate. */
 	cost_usd: number | null;
 	input: Record<string, unknown> | null;

@@ -105,10 +105,8 @@ function Row({
 								{node.status}
 							</span>
 						) : null}
-						{node.tokens_in || node.tokens_out ? (
-							<span className="text-muted-foreground">
-								{(node.tokens_in ?? 0) + (node.tokens_out ?? 0)} tok
-							</span>
+						{node.tokens ? (
+							<span className="text-muted-foreground">{node.tokens} tok</span>
 						) : null}
 					</div>
 

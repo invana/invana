@@ -77,7 +77,7 @@ from invana.runtime.models import (
     TriggeredBy,
 )
 from invana.runtime.querysets import EmissionQuerySet, EvalQuerySet, TaskRunQuerySet
-from invana.runtime.results import roll_up_timing
+from invana.runtime.results import roll_up_run
 from invana.runtime.workflows import NL_QUERY
 
 #: Over live by more than this, tokens or p95 warn at the gate.
@@ -687,7 +687,7 @@ class EvalManager:
         root.status = RunStatus.succeeded.value
         root.outcome = summary["gate"]["verdict"]
         root.finished_at = datetime.now(UTC)
-        roll_up_timing(root, await TaskRunQuerySet().nodes_of(db, run_id=root.id))
+        roll_up_run(root, await TaskRunQuerySet().nodes_of(db, run_id=root.id))
         root.result = {"eval": summary}
         await db.flush()
         await emit_event(

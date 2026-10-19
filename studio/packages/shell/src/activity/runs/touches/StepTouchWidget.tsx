@@ -102,7 +102,7 @@ export function StepTouchWidget({
 						{touch.volume.tokens_in != null ||
 						touch.volume.tokens_out != null ? (
 							<PropertyRow label="tokens">
-								{`${(touch.volume.tokens_in ?? 0) + (touch.volume.tokens_out ?? 0)} · ${touch.volume.tokens_in ?? 0} in, ${touch.volume.tokens_out ?? 0} out`}
+								{`${touch.volume.tokens ?? 0} · ${touch.volume.tokens_in ?? 0} in, ${touch.volume.tokens_out ?? 0} out`}
 							</PropertyRow>
 						) : null}
 						{touch.duration_ms != null ? (

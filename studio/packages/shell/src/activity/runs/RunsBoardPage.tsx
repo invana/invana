@@ -78,8 +78,7 @@ function Tiles({ rows, now }: { rows: RunListRow[]; now: number }) {
 	const cannot = today.filter((r) => r.run.outcome === "cannot_answer").length;
 
 	// Absent is not zero: a day where no run spent a token draws a dash.
-	const tokensOf = (r: RunListRow) =>
-		(r.run.tokens_in ?? 0) + (r.run.tokens_out ?? 0);
+	const tokensOf = (r: RunListRow) => r.run.tokens;
 	const spending = today.filter((r) => tokensOf(r) > 0);
 	const tokens = spending.reduce((sum, r) => sum + tokensOf(r), 0);
 
@@ -232,7 +231,7 @@ export function RunsBoardPage({
 							{runList.rows.map((row) => {
 								const t = row.run;
 								const elapsed = elapsedOf(row, now);
-								const tokens = (t.tokens_in ?? 0) + (t.tokens_out ?? 0);
+								const tokens = t.tokens;
 								const status = statusOf(row);
 								return (
 									<TableRow

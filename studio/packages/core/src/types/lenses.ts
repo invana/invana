@@ -61,6 +61,8 @@ interface LensUsage {
 	runs: number;
 	last_used_at: string | null;
 	actor_ids: string[];
+	/** How many people have run under it. */
+	people: number;
 }
 
 export interface Lens {
@@ -75,6 +77,9 @@ export interface Lens {
 	display_name: string;
 	scope: string | null;
 	rules: GovernRule[];
+	/** `rules` split by what they say — counted by the engine. */
+	allow_rules: number;
+	deny_rules: number;
 	cast: Partial<Record<CastRole, string>>;
 	/**
 	 * The layers this lens allow-lists. A layer named here admits only what its
@@ -224,6 +229,8 @@ export interface Touch {
 		rows?: number;
 		tokens_in?: number;
 		tokens_out?: number;
+		/** The engine's `in + out`, present when either is. */
+		tokens?: number;
 	};
 	applied: AppliedNarrowing;
 	sent: { classes?: EgressClass[]; cut?: EgressClass[] };
@@ -264,6 +271,18 @@ export interface CompareResponse {
 	 * is the one sentence compare exists not to say.
 	 */
 	differed: Record<string, AppliedDiff>;
+	counts: CompareCounts;
+}
+
+/** The compare's tiles, counted by the engine. */
+export interface CompareCounts {
+	touched_a: number;
+	touched_b: number;
+	shared: number;
+	/** Reached by one run and not the other, either way round. */
+	only_one: number;
+	/** Shared, but narrowed differently. */
+	read_differently: number;
 }
 
 /** How two runs narrowed the same participant differently. */

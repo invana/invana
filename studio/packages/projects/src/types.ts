@@ -510,6 +510,7 @@ export interface ActivityNode {
 	rules_cited: OfferedRule[];
 	tokens_in: number | null;
 	tokens_out: number | null;
+	tokens: number | null;
 	at: string | null;
 	children: ActivityNode[];
 }

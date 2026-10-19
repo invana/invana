@@ -31,6 +31,9 @@ class ChangeEffect(BaseModel):
     tokens_in: int
     tokens_out: int
     #: The span it was the current version: from its publish to the next one's.
+    tokens: int
+    #: ``tokens / runs``, rounded; ``None`` when nothing ran.
+    tokens_per_run: int | None
     since: datetime | None
     until: datetime | None
 

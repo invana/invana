@@ -40,6 +40,7 @@ function run(
 		promoted: false,
 		tokens_in: 0,
 		tokens_out: 0,
+		tokens: 0,
 		...extra,
 	};
 }

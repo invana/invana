@@ -60,6 +60,8 @@ describe("effectLine", () => {
 			failed: 1,
 			tokens_in: 9_000,
 			tokens_out: 3_000,
+			tokens: 12_000,
+			tokens_per_run: 6_000,
 			since: null,
 			until: null,
 		});

@@ -197,7 +197,7 @@ function stepTabs(
 			id: "overview",
 			label: "Overview",
 			rows: omit([
-				{ panels: [tiles(trace, group)] },
+				{ panels: [tiles(group)] },
 				{ panels: omit([input(step), resultJson(step)]) },
 				executedQuery(step)
 					? { panels: [executedQuery(step) as PanelSpec] }
@@ -251,11 +251,11 @@ function stepTabs(
  * contract the Output panel reads — `written`, `rows`, tokens — so a tile
  * cannot claim something the panel below it does not show.
  */
-function tiles(trace: TraceRead, group: TaskGroup): PanelSpec {
+function tiles(group: TaskGroup): PanelSpec {
 	const step = group.head;
 	const out = outputs(step);
 	const ms = clockMs(step.duration_ms, step.started_at, step.finished_at);
-	const tokens = (step.tokens_in ?? 0) + (step.tokens_out ?? 0);
+	const tokens = step.tokens;
 	const written = numberAt(out, "written");
 	const rows =
 		numberAt(out, "rows") ??
@@ -298,10 +298,7 @@ function tiles(trace: TraceRead, group: TaskGroup): PanelSpec {
 							value: compact(tokens),
 							delta: [
 								`in ${count(step.tokens_in ?? 0)} · out ${count(step.tokens_out ?? 0)}`,
-								shareOfTokens(
-									tokens,
-									(trace.tokens_in ?? 0) + (trace.tokens_out ?? 0),
-								),
+								shareOfTokens(step.share_of_run_tokens),
 							]
 								.filter(Boolean)
 								.join(" · "),
@@ -332,12 +329,12 @@ function shareOfRun(share: number | null): string | undefined {
 }
 
 /** `31% of the run's tokens` — the same reading the duration tile gives time. */
-function shareOfTokens(spent: number, runTokens: number): string | undefined {
-	if (runTokens <= 0 || spent >= runTokens) return undefined;
-	const share = (spent / runTokens) * 100;
-	return share < 1
+function shareOfTokens(share: number | null): string | undefined {
+	if (share == null || share >= 1) return undefined;
+	const pct = share * 100;
+	return pct < 1
 		? "<1% of the run's tokens"
-		: `${Math.round(share)}% of the run's tokens`;
+		: `${Math.round(pct)}% of the run's tokens`;
 }
 
 function readCaption(out: Record<string, unknown>): string | undefined {

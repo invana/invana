@@ -177,7 +177,7 @@ export function runSummary(
 
 	const ceiling =
 		trace.budget?.max_tokens_run ?? trace.budget?.max_tokens ?? null;
-	const tokens = (trace.tokens_in ?? 0) + (trace.tokens_out ?? 0);
+	const tokens = trace.tokens;
 	const usage: SummaryRow[] = [
 		...(tokens
 			? [

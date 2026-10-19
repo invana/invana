@@ -1167,9 +1167,15 @@ async def list_runs(
             # `cannot_answer` · `failed` · `cancelled` — once it has (CA8).
             "outcome": r.outcome,
             "promoted": r.id in promoted,
-            # A root can spend tokens of its own as well as through its tasks.
-            "tokens_in": (r.tokens_in or 0) + tokens.get(r.id, [0, 0])[0],
-            "tokens_out": (r.tokens_out or 0) + tokens.get(r.id, [0, 0])[1],
+            # A root can spend tokens of its own as well as through its tasks:
+            # stored once it settles, summed from the same rows while it runs.
+            "tokens_in": (
+                r.run_tokens_in if r.run_tokens is not None else (r.tokens_in or 0) + tokens.get(r.id, [0, 0])[0]
+            ),
+            "tokens_out": (
+                r.run_tokens_out if r.run_tokens is not None else (r.tokens_out or 0) + tokens.get(r.id, [0, 0])[1]
+            ),
+            "tokens": (r.run_tokens if r.run_tokens is not None else (r.tokens or 0) + sum(tokens.get(r.id, [0, 0]))),
             "cost_usd": (
                 None if r.cost_usd is None and r.id not in cost else (r.cost_usd or 0.0) + cost.get(r.id, 0.0)
             ),

@@ -12,7 +12,7 @@ import logging
 from datetime import UTC, datetime
 
 from invana.apps.sessions.models import SessionMessage
-from invana.runtime.models import TaskRun, span_ms
+from invana.runtime.models import TaskRun, span_ms, token_sum
 from invana.runtime.workflows import RETRY_BY_TASK, Retry
 
 log = logging.getLogger(__name__)
@@ -94,6 +94,7 @@ def _step_payload(row: TaskRun) -> dict:
         "error": row.error,
         "tokens_in": row.tokens_in,
         "tokens_out": row.tokens_out,
+        "tokens": token_sum(row.tokens_in, row.tokens_out),
     }
 
 

@@ -35,6 +35,7 @@ from invana.runtime.projections import (
     select_template,
 )
 from invana.runtime.querysets import TaskRunQuerySet
+from invana.runtime.results import run_tokens
 from invana.runtime.schemas import (
     AnswerPrompt,
     CancelResponse,
@@ -123,10 +124,15 @@ async def get_run(
 ) -> TaskRunRead:
     th = await services.get_run_or_404(session, run_id=run_id, graph_id=graph.id, user_id=user.id)
     steps = await services.list_steps(session, run_id=th.id)
-    return TaskRunRead(
+    read = TaskRunRead(
         **TaskRunRead.model_validate(th).model_dump(exclude={"steps"}),
         steps=[RunNodeRead.model_validate(s) for s in steps],
     )
+    if read.run_tokens is None:
+        # Still going: the same sum the settle stores, read from the rows so far.
+        read.run_tokens_in, read.run_tokens_out = run_tokens(th, steps)
+        read.run_tokens = read.run_tokens_in + read.run_tokens_out
+    return read
 
 
 @runs_router.get("/{run_id}/stream")
@@ -437,6 +443,12 @@ async def get_trace(
     # interpreter resolves it, so the page and the loop cannot disagree (SR67).
     workflow = WORKFLOWS.get(run.workflow_key)
     opened_by = await _username(session, run.on_behalf_of_user_id or run.author_id)
+    # The run's spend as the settle stored it; still going, the same sum so far.
+    if run.run_tokens is not None:
+        spent_in, spent_out = run.run_tokens_in or 0, run.run_tokens_out or 0
+    else:
+        spent_in, spent_out = run_tokens(run, steps)
+    spent = spent_in + spent_out
 
     trace_steps = [
         TraceStep(
@@ -458,6 +470,8 @@ async def get_trace(
             ),
             tokens_in=step.tokens_in,
             tokens_out=step.tokens_out,
+            tokens=step.tokens,
+            share_of_run_tokens=round(step.tokens / spent, 4) if step.tokens is not None and spent else None,
             input=step.input,
             output=step.output,
             error=step.error,
@@ -509,8 +523,9 @@ async def get_trace(
         work_ms=run.work_ms,
         ask_ms=run.ask_ms,
         wait_ms=run.wait_ms,
-        tokens_in=sum(s.tokens_in or 0 for s in steps),
-        tokens_out=sum(s.tokens_out or 0 for s in steps),
+        tokens_in=spent_in,
+        tokens_out=spent_out,
+        tokens=spent,
         # Summed over the rows that had a price. A run where nothing was priced
         # has no cost at all, not a total of the half it could price.
         cost_usd=round(sum(priced), 6) if priced else None,

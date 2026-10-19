@@ -49,6 +49,8 @@ export interface RunNode {
 	error?: { cls?: string; cause?: string; message?: string; raw?: string };
 	tokensIn?: number;
 	tokensOut?: number;
+	/** The engine's `in + out` for this step. */
+	tokens?: number;
 	/** Why the attempt after this one was scheduled — "timeout". Live only. */
 	retryReason?: string;
 }
@@ -188,6 +190,8 @@ export interface TaskRunSummary {
 	/** What the run spent, summed over its tasks. */
 	tokens_in: number;
 	tokens_out: number;
+	/** The engine's `in + out` — the run's whole spend. */
+	tokens: number;
 	/** Dollars over its priced steps; absent is *unknown*, never `$0.00`. */
 	cost_usd?: number | null;
 }

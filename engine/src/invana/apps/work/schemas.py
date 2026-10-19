@@ -118,6 +118,7 @@ class ActivityNode(BaseModel):
     rules_cited: list[OfferedRule] = []
     tokens_in: int | None = None
     tokens_out: int | None = None
+    tokens: int | None = None
     at: datetime | None = None
     children: list[ActivityNode] = []
 

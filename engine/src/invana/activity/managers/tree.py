@@ -121,6 +121,7 @@ class TreeManager:
                 rules_cited=[rules[r] for r in (step.rules_cited or []) if r in rules],
                 tokens_in=step.tokens_in,
                 tokens_out=step.tokens_out,
+                tokens=step.tokens,
                 at=step.started_at,
             )
             if step.output is None and step.finished_at is not None and step.status == "succeeded":

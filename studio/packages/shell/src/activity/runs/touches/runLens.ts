@@ -51,10 +51,7 @@ function noteOfTouched(rows: Touch[]): string {
 	const parts: string[] = [];
 	const records = rows.reduce((n, t) => n + (t.volume.rows ?? 0), 0);
 	if (records) parts.push(`${records.toLocaleString()} rows`);
-	const tokens = rows.reduce(
-		(n, t) => n + (t.volume.tokens_in ?? 0) + (t.volume.tokens_out ?? 0),
-		0,
-	);
+	const tokens = rows.reduce((n, t) => n + (t.volume.tokens ?? 0), 0);
 	if (tokens) parts.push(`${tokens.toLocaleString()} tokens`);
 	if (rows.length > 1) parts.push(`${rows.length} calls`);
 	const step = rows.find((t) => t.step_key)?.step_key;

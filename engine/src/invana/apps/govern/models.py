@@ -159,6 +159,13 @@ class Lens(Base):
         return None
 
 
+def _with_tokens(volume: dict[str, Any]) -> dict[str, Any]:
+    """The volume, with ``tokens`` beside its in and out when it spent any."""
+    if "tokens_in" not in volume and "tokens_out" not in volume:
+        return volume
+    return {**volume, "tokens": (volume.get("tokens_in") or 0) + (volume.get("tokens_out") or 0)}
+
+
 class RunTouch(Base):
     """One recorded engagement with one participant.
 
@@ -238,7 +245,7 @@ class RunTouch(Base):
             "direction": self.direction,
             "rule_matched": self.rule_matched,
             "why": self.why,
-            "volume": self.volume or {},
+            "volume": _with_tokens(self.volume or {}),
             "applied": self.applied or {},
             "sent": self.sent or {},
             "query": self.query or {},

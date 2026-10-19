@@ -362,6 +362,8 @@ class ChangeLogManager:
             failed=failed,
             tokens_in=tokens_in,
             tokens_out=tokens_out,
+            tokens=tokens_in + tokens_out,
+            tokens_per_run=round((tokens_in + tokens_out) / runs) if runs else None,
             since=version.at,
             until=until,
         )

@@ -264,6 +264,12 @@ class TaskRun(Base):
     error: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     tokens_in: Mapped[int | None] = mapped_column(Integer, nullable=True)
     tokens_out: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: `tokens_in + tokens_out` of this row, written by the timing hook below.
+    tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: A root's own spend plus its direct nodes'; written when the run settles.
+    run_tokens_in: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    run_tokens_out: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    run_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
     #: What this row spent, in dollars — tokens x the model's published rate,
     #: derived when the row settles (SR40). ``NULL`` means *the price is not
     #: known*, which is not `0`: an unpriced model draws no Cost tile rather
@@ -296,6 +302,13 @@ def span_ms(start: datetime | None, end: datetime | None) -> int | None:
     return max(0, round((end - start).total_seconds() * 1000))
 
 
+def token_sum(tokens_in: int | None, tokens_out: int | None) -> int | None:
+    """``in + out``, or ``None`` when neither was recorded — spent nothing is not zero."""
+    if tokens_in is None and tokens_out is None:
+        return None
+    return (tokens_in or 0) + (tokens_out or 0)
+
+
 def wall_ms(run: TaskRun) -> int | None:
     """Queued to finished, from the stored columns — what the person waited.
 
@@ -322,8 +335,10 @@ def _write_timing(_mapper, _connection, row: TaskRun) -> None:
     """
     row.duration_ms = span_ms(row.started_at, row.finished_at)
     row.queue_ms = span_ms(row.queued_at, row.started_at)
+    row.tokens = token_sum(row.tokens_in, row.tokens_out)
     if row.finished_at is None:
         row.work_ms = row.ask_ms = row.wait_ms = None
+        row.run_tokens_in = row.run_tokens_out = row.run_tokens = None
 
 
 class TaskStream(Base):
