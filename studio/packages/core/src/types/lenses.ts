@@ -248,6 +248,41 @@ export interface TouchesResponse {
 	touched: string[];
 	never_touched: string[];
 	refused: string[];
+	/** One per address allowed or engaged, classified and counted by the engine. */
+	participants: ParticipantReading[];
+	/** One per layer, in the strip's order, empty layers kept. */
+	layers: LayerTally[];
+	tallies: TouchTallies | null;
+}
+
+export interface ParticipantReading {
+	address: string;
+	layer: string;
+	verdict: "refused" | "touched" | "miss" | "never_touched";
+	/** Why it was refused or missed, when the ledger said. */
+	why: string | null;
+	calls: number;
+	rows: number;
+	tokens: number;
+}
+
+export interface LayerTally {
+	layer: string;
+	/** Participants drawn on the layer — allowed, or engaged without being. */
+	allowed: number;
+	touched: number;
+	refused: number;
+	/** Every ledger row on the layer, and the engaged ones. */
+	touches: number;
+	calls: number;
+	rows: number;
+}
+
+export interface TouchTallies {
+	allowed: number;
+	touched: number;
+	never_touched: number;
+	refused: number;
 }
 
 export interface CompareSide {

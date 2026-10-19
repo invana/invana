@@ -31,6 +31,15 @@ class ProjectBranchQuerySet:
         stmt = select(func.coalesce(func.max(ProjectBranch.number), 0)).where(ProjectBranch.project_id == project_id)
         return int((await session.execute(stmt)).scalar_one()) + 1
 
+    async def count_by_status(self, session: AsyncSession, *, project_id: str) -> dict[str, int]:
+        """How many of a project's branches sit in each status; a status with none is absent."""
+        stmt = (
+            select(ProjectBranch.status, func.count())
+            .where(ProjectBranch.project_id == project_id)
+            .group_by(ProjectBranch.status)
+        )
+        return {status: int(n) for status, n in (await session.execute(stmt)).all()}
+
     async def add(self, session: AsyncSession, branch: ProjectBranch) -> ProjectBranch:
         session.add(branch)
         await session.flush()

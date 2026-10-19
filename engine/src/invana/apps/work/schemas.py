@@ -252,6 +252,28 @@ class ProjectPlanResponse(BaseModel):
     critical_path: list[str]
 
 
+class ProjectSummary(BaseModel):
+    """Every count a project's Overview and its detail's status bar show."""
+
+    #: Every branch, and how many sit in each status; a status with none is absent.
+    branches: int = 0
+    branches_by_status: dict[str, int] = Field(default_factory=dict)
+    findings: int = 0
+    #: Findings a person reviewed.
+    findings_reviewed: int = 0
+    #: Distinct datasets the findings cite, any version.
+    datasets: int = 0
+    #: The project's own tasks per status; a status with none is absent.
+    todos_by_status: dict[str, int] = Field(default_factory=dict)
+    #: Tasks not done, failed or cancelled; and of those, assigned to an agent.
+    todos_open: int = 0
+    todos_open_for_agents: int = 0
+    #: Every decision, superseded ones included.
+    decisions: int = 0
+    #: Length of the plan's critical path.
+    critical_path: int = 0
+
+
 # ── Project records ──────────────────────────────────────────────────────────
 
 

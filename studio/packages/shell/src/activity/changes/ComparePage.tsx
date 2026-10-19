@@ -260,7 +260,7 @@ function CompareBody({
 					<SchemaDiffList diff={compare.schema_diff} />
 				</PanelSection>
 			) : null}
-			<EffectTiles a={entryA} b={entryB} />
+			<EffectTiles a={entryA} b={entryB} compare={compare} />
 		</>
 	);
 }
@@ -369,29 +369,29 @@ function SchemaDiffList({ diff }: { diff: SchemaDiff }) {
 function EffectTiles({
 	a,
 	b,
+	compare,
 }: {
 	a: ChangeEntry | null;
 	b: ChangeEntry | null;
+	compare: ChangeCompare;
 }) {
 	const tiles = useMemo(() => {
 		if (!b) return null;
 		const pair = (f: (e: ChangeEntry) => number | null) =>
 			`${a ? (f(a)?.toLocaleString() ?? "—") : "—"} → ${f(b)?.toLocaleString() ?? "—"}`;
-		const perRunA = a ? tokensPerRun(a.effect) : null;
-		const perRunB = tokensPerRun(b.effect);
-		const ratio =
-			perRunA && perRunB ? Math.round((perRunB / perRunA) * 10) / 10 : null;
+		// The change in tokens per run is the engine's (`tokens_per_run_change`).
+		const change = compare.tokens_per_run_change;
 		return {
 			runs: pair((e) => e.effect.runs),
 			failed: pair((e) => e.effect.failed),
 			perRun: pair((e) => tokensPerRun(e.effect)),
-			ratio,
+			change,
 			basis:
 				b.effect.basis === "window"
 					? "the Graph's runs while each was published"
 					: "runs that recorded the version",
 		};
-	}, [a, b]);
+	}, [a, b, compare]);
 	if (!tiles) return null;
 	return (
 		<MetricGrid columns={3}>
@@ -401,11 +401,11 @@ function EffectTiles({
 				label="Tokens per run"
 				value={tiles.perRun}
 				caption={
-					tiles.ratio != null ? `${tiles.ratio}×` : "nothing ran on one side"
+					tiles.change
+						? `${(1 + tiles.change.by).toFixed(1)}×`
+						: "nothing ran on one side"
 				}
-				captionTone={
-					tiles.ratio != null && tiles.ratio > 1.2 ? "warning" : undefined
-				}
+				captionTone={tiles.change?.tone === "worse" ? "warning" : undefined}
 			/>
 		</MetricGrid>
 	);

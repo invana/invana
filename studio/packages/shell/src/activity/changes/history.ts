@@ -18,7 +18,7 @@
  * Effect after is counted on the engine and only ever drawn in tokens.
  */
 
-import type { ProductId } from "@invana-studio/core";
+import type { Change, ProductId } from "@invana-studio/core";
 import { request } from "@invana-studio/core";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import type { AuditEvent } from "../events/types";
@@ -116,6 +116,8 @@ export interface ChangeCompare {
 	fields: ChangeField[];
 	plan: PlanDiff | null;
 	schema_diff: SchemaDiff | null;
+	/** Tokens per run on `b` against `a`; null when either ran nothing. */
+	tokens_per_run_change: Change | null;
 }
 
 interface GraphRef {

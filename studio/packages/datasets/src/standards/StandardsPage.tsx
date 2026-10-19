@@ -29,7 +29,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DatasetRef } from "../api";
 import { Page, PageBody } from "../parts";
-import { useClaims, useStandardsQuery } from "../queries";
+import { useClaimsQuery, useStandardsQuery } from "../queries";
 import type { Standard } from "../types";
 import { ImportSkosDialog } from "./ImportSkosDialog";
 import { WriteStandardDialog } from "./WriteStandardDialog";
@@ -37,17 +37,6 @@ import { WriteStandardDialog } from "./WriteStandardDialog";
 /** `/datasets/standards/<publisher>/<name>` */
 function standardPath(s: DatasetRef): string {
 	return `/datasets/standards/${encodeURIComponent(s.publisher)}/${encodeURIComponent(s.name)}`;
-}
-
-/** How many datasets claim each standard, keyed by its unversioned address. */
-function useClaimCounts(): Map<string, number> {
-	const { claims } = useClaims();
-	const counts = new Map<string, number>();
-	for (const c of claims) {
-		const address = c.attachment.standard.split("@")[0] ?? "";
-		counts.set(address, (counts.get(address) ?? 0) + 1);
-	}
-	return counts;
 }
 
 function summary(s: Standard, claimed: number): string {
@@ -71,7 +60,7 @@ export function StandardsPage() {
 	const [writing, setWriting] = useState(false);
 	const [importing, setImporting] = useState(false);
 	const library = useStandardsQuery(q.trim() || undefined);
-	const counts = useClaimCounts();
+	const counts = useClaimsQuery().data?.by_standard ?? {};
 	const items = library.data?.items ?? [];
 
 	return (
@@ -153,7 +142,7 @@ export function StandardsPage() {
 											{s.title || s.name}
 										</TableCell>
 										<TableCell className="max-w-0 truncate text-muted-foreground">
-											{summary(s, counts.get(s.address) ?? 0)}
+											{summary(s, counts[s.address] ?? 0)}
 										</TableCell>
 										<TableCell>
 											<Badge

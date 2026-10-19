@@ -85,6 +85,8 @@ async def test_versions_are_hashed_shared_and_a_record_keeps_its_change_log(sess
     assert ws2.provenance == {"origin": "observed", "note": "measured in our growth room"}
     assert "_provenance" not in ws2.values
     assert (await datasets.record(session, dataset=dataset, key="CS76778")).provenance is None
+    exceptions = await datasets.records_page(session, dataset=dataset, version=v1, offset=0, limit=50, provenance=True)
+    assert (exceptions.total, [r.key for r in exceptions.items]) == (1, ["CS76780"])
 
     # v2: Ler-1 corrected, Ws-2 dropped, a new accession added.
     v2_records = [
@@ -101,6 +103,8 @@ async def test_versions_are_hashed_shared_and_a_record_keeps_its_change_log(sess
         actor=user,
     )
     assert v2.version == 2 and v2.content_hash != v1.content_hash
+    none = await datasets.records_page(session, dataset=dataset, version=v2, offset=0, limit=50, provenance=True)
+    assert (none.total, none.items) == (0, [])
     assert dataset.current_version_id == v2.id
 
     history = await changes.history(session, graph_id=None, record_kind="dataset", record_id=dataset.id)

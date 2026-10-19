@@ -7,9 +7,9 @@
  * every dataset write invalidates the `["datasets"]` prefix, because a version,
  * a share or a retraction changes the catalogue row too.
  *
- * Two reads span the catalogue: `useClaims` asks each readable dataset which
- * standards it claims (the engine has no install-wide list of attachments), and
- * the validation queue and a standard's *Used by* are drawn from it.
+ * Two reads span the catalogue, each one request: `useClaims` (every claim on
+ * every readable dataset, with the claims per standard) and
+ * `useValidationQueue` (every violation, with the engine's totals).
  */
 
 import { useGraphsQuery } from "@invana-studio/core";
@@ -30,7 +30,6 @@ import {
 import type {
 	Dataset,
 	DatasetRecord,
-	DatasetStandard,
 	DatasetStandardCreate,
 	DatasetUpdate,
 	DatasetVersion,
@@ -66,10 +65,12 @@ export function useRecordsQuery(
 	version: number | null,
 	offset = 0,
 	limit = 50,
+	provenance = false,
 ) {
 	return useQuery({
-		queryKey: dsKey(d, "records", version, offset, limit),
-		queryFn: () => datasetsApi.records(d, version ?? 0, offset, limit),
+		queryKey: dsKey(d, "records", version, offset, limit, provenance),
+		queryFn: () =>
+			datasetsApi.records(d, version ?? 0, offset, limit, provenance),
 		enabled: version !== null,
 	});
 }
@@ -124,36 +125,24 @@ export function useDatasetStandardsQuery(d: DatasetRef) {
 	});
 }
 
-export interface Claim {
-	dataset: Dataset;
-	attachment: DatasetStandard;
+/**
+ * Every claim on every dataset the person can read, in one request; `standard`
+ * (`publisher/name`) narrows it. A dataset whose claims cannot be read is
+ * counted in `unreadable`, not hidden.
+ */
+export function useClaimsQuery(standard?: string) {
+	return useQuery({
+		queryKey: ["datasets", "claims", standard ?? ""],
+		queryFn: () => datasetsApi.claims(standard),
+	});
 }
 
-/**
- * Every attachment of every dataset the person can read — one request per
- * dataset. A dataset whose claims cannot be read is counted, not hidden.
- */
-export function useClaims() {
-	const catalogue = useCatalogueQuery();
-	const datasets = catalogue.data?.items ?? [];
-	const results = useQueries({
-		queries: datasets.map((d) => ({
-			queryKey: dsKey(d, "standards"),
-			queryFn: () => datasetsApi.standards(d),
-		})),
+/** The validation queue, with the engine's totals. */
+export function useValidationQueue() {
+	return useQuery({
+		queryKey: ["datasets", "validation"],
+		queryFn: () => datasetsApi.validation(),
 	});
-	const claims: Claim[] = datasets.flatMap((dataset, i) =>
-		(results[i]?.data?.items ?? []).map((attachment) => ({
-			dataset,
-			attachment,
-		})),
-	);
-	return {
-		claims,
-		datasetCount: datasets.length,
-		unreadable: results.filter((r) => r.isError).length,
-		isLoading: catalogue.isLoading || results.some((r) => r.isLoading),
-	};
 }
 
 export function useStandardsQuery(q?: string) {

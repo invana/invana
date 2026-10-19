@@ -301,16 +301,35 @@ class DatasetManager:
     # ── records ──────────────────────────────────────────────────────────────
 
     async def records_page(
-        self, session: AsyncSession, *, dataset: Dataset, version: DatasetVersion, offset: int, limit: int
+        self,
+        session: AsyncSession,
+        *,
+        dataset: Dataset,
+        version: DatasetVersion,
+        offset: int,
+        limit: int,
+        provenance: bool = False,
     ) -> DatasetRecordPage:
-        rows = await self.records_qs.page(session, version_id=version.id, offset=offset, limit=limit)
+        """One page of a version's records, by key.
+
+        *provenance* keeps only the records whose provenance differs from the
+        dataset's, and ``total`` is then their count over the whole version.
+        """
+        rows = await self.records_qs.page(
+            session, version_id=version.id, offset=offset, limit=limit, provenance=provenance
+        )
+        total = (
+            await self.records_qs.count_with_provenance(session, version_id=version.id)
+            if provenance
+            else version.record_count
+        )
         return DatasetRecordPage(
             address=f"{dataset.address}@{version.version}",
             items=[
                 DatasetRecordRead(key=r.key, version=version.version, values=r.values, provenance=r.provenance)
                 for r in rows
             ],
-            total=version.record_count,
+            total=total,
             offset=offset,
             limit=limit,
         )

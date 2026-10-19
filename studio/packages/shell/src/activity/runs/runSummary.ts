@@ -14,7 +14,7 @@
 
 import type { TouchItem } from "@invana/ui";
 import type {
-	Touch,
+	LayerTally,
 	TouchesResponse,
 	TraceRead,
 	TraceWindow,
@@ -94,15 +94,14 @@ const UNIT: Record<string, [string, string]> = {
 	cache: ["hit", "hits"],
 };
 
-function touchNote(layer: string, rows: Touch[]): string {
-	if (rows.some((t) => t.direction === "refused")) return "refused";
-	const engaged = rows.filter((t) => t.direction !== "skipped");
+/** A layer's line, worded from the engine's tally — refused, a miss, rows or calls. */
+function touchNote(layer: string, tally: LayerTally | undefined): string {
+	if (tally?.refused) return "refused";
 	// The cache's own word for a lookup that found nothing — not *untouched*.
-	if (!engaged.length) return rows.length ? "miss" : "not touched";
-	const records = engaged.reduce((n, t) => n + (t.volume.rows ?? 0), 0);
-	if (records) return `${records.toLocaleString()} rows`;
+	if (!tally?.calls) return tally?.touches ? "miss" : "not touched";
+	if (tally.rows) return `${tally.rows.toLocaleString()} rows`;
 	const [one, many] = UNIT[layer] ?? ["call", "calls"];
-	return `${engaged.length} ${engaged.length === 1 ? one : many}`;
+	return `${tally.calls} ${tally.calls === 1 ? one : many}`;
 }
 
 export function runSummary(
@@ -207,14 +206,14 @@ export function runSummary(
 	const touched: TouchItem[] = !trace.governed
 		? []
 		: BANDS.map((layer) => {
-				const rows = ledger.filter((t) => t.layer === layer);
-				const refused = rows.some((t) => t.direction === "refused");
+				const tally = touches?.layers.find((l) => l.layer === layer);
+				const refused = !!tally?.refused;
 				return {
 					layer,
-					note: touchNote(layer, rows),
+					note: touchNote(layer, tally),
 					refused,
 					// A layer nothing reached for is muted, never dropped.
-					dim: !refused && !rows.some((t) => t.direction !== "skipped"),
+					dim: !refused && !tally?.calls,
 				};
 			});
 

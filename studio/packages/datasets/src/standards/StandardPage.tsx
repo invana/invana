@@ -3,8 +3,8 @@
  * DS-08, board `datasets.standard`): its terms and the values each allows, its
  * version, and the datasets that claim it.
  *
- * *Used by* is drawn from `useClaims` — every claim on this standard, at any
- * pinned version, with its mode and the current conformance. *Attach to a
+ * *Used by* is the engine's list of claims on this standard, at any pinned
+ * version, with its mode, the current conformance and its `total`. *Attach to a
  * dataset* opens the attach dialog with the standard fixed; the person picks
  * one of the datasets they can write.
  */
@@ -30,7 +30,7 @@ import { AttachStandardDialog } from "../AttachStandardDialog";
 import { datasetPath } from "../dataset/context";
 import { percent } from "../labels";
 import { Page, PageBody, ReadState } from "../parts";
-import { useClaims, useStandardQuery } from "../queries";
+import { useClaimsQuery, useStandardQuery } from "../queries";
 import type { StandardTerm } from "../types";
 
 function allowed(t: StandardTerm): string {
@@ -42,7 +42,7 @@ export function StandardPage() {
 	const { publisher = "", name = "" } = useParams();
 	const navigate = useNavigate();
 	const query = useStandardQuery({ publisher, name });
-	const { claims, isLoading } = useClaims();
+	const claims = useClaimsQuery(`${publisher}/${name}`);
 	const [attaching, setAttaching] = useState(false);
 	const standard = query.data;
 
@@ -50,9 +50,7 @@ export function StandardPage() {
 		return <ReadState loading={query.isLoading} error={query.error} />;
 	}
 
-	const usedBy = claims.filter(
-		(c) => c.attachment.standard.split("@")[0] === standard.address,
-	);
+	const usedBy = claims.data?.items ?? [];
 
 	return (
 		<Page>
@@ -151,11 +149,11 @@ export function StandardPage() {
 					title="Used by"
 					action={
 						<span className="text-sm text-muted-foreground">
-							{usedBy.length}
+							{claims.data?.total ?? 0}
 						</span>
 					}
 				>
-					{isLoading ? (
+					{claims.isLoading ? (
 						<Spinner />
 					) : !usedBy.length ? (
 						<EmptyState

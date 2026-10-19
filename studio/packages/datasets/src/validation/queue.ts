@@ -1,6 +1,7 @@
 /**
- * The validation queue, as items: every standard violation on the current
- * version of every dataset the person can read, flattened from `useClaims`.
+ * The validation queue's helpers: an item's path and how a violation reads.
+ * The queue itself — its items and every count — is the engine's
+ * (`useValidationQueue`).
  *
  * An item is addressed by its dataset, record key and term — the path of its
  * page. Conflicts with official data are not here: they are found by a
@@ -8,25 +9,7 @@
  */
 
 import type { DatasetRef } from "../api";
-import type { Claim } from "../queries";
 import type { Violation } from "../types";
-
-export interface QueueItem {
-	claim: Claim;
-	violation: Violation;
-	/** The column the term is mapped to; the term itself when unmapped. */
-	column: string;
-}
-
-export function queueOf(claims: Claim[]): QueueItem[] {
-	return claims.flatMap((claim) =>
-		(claim.attachment.conformance?.violations ?? []).map((violation) => ({
-			claim,
-			violation,
-			column: claim.attachment.mapping[violation.term] ?? violation.term,
-		})),
-	);
-}
 
 /** `/datasets/validation/<publisher>/<name>/<key>/<term>` */
 export function itemPath(d: DatasetRef, key: string, term: string): string {

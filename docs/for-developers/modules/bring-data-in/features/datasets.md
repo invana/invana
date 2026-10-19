@@ -91,7 +91,7 @@ flowchart TD
 | `GET · PATCH /{publisher}/{name}` | `DatasetRead` — PATCH: title, description, visibility, sensitivity, column sensitivity, refresh (not a version) |
 | `GET · POST /{publisher}/{name}/versions` | `DatasetVersionListResponse` · 201 `DatasetVersionRead` |
 | `GET /{publisher}/{name}/versions/{v}` | `DatasetVersionRead` |
-| `GET /{publisher}/{name}/versions/{v}/records` `?offset=&limit=` | `DatasetRecordPage`, ordered by key |
+| `GET /{publisher}/{name}/versions/{v}/records` `?offset=&limit=&provenance=` | `DatasetRecordPage`, ordered by key; `provenance=true` keeps the records with their own provenance, and `total` counts them |
 | `GET /{publisher}/{name}/records/{key}` `?version=` | `DatasetRecordRead` — the current version when omitted |
 | `GET /{publisher}/{name}/records/{key}/history` | `RecordChangeLog` |
 | `GET /{publisher}/{name}/history` · `/history/compare?a=&b=` | `RecordHistory` · `ChangeCompare` (10.6 shapes; compare carries `records`) |
@@ -132,6 +132,7 @@ flowchart TD
 | DT13 | **A record's change log is read from the versions, never stored** — the same rule as CL1. For one key, each version whose values or provenance differ from the version before is an entry, its who/when/why the version's. Properties are compared by name; a property absent on one side reads as null. |
 | DT14 | **The API takes records in the request body; a file is the CLI's.** `invana datasets import` reads CSV (header row) or JSON (a list of objects), creates the dataset when absent, and mints a version through the same manager. |
 | DT15 | **Studio writes a version the way the API takes one: whole.** Observations by form and a validation fix read every record of the current version, make the change, and publish the result as the next version; a record's provenance exception is re-sent as `_provenance`. The engine publishes whatever it is sent and does not check the version a write started from, so Studio re-reads the dataset before publishing and refuses when a newer version has appeared — this narrows the window in which two writers drop each other's change; a base-version check on publish is the engine's to add. Studio creates no dataset — the empty catalogue shows `invana datasets import`. |
+| DT16 | **The engine counts provenance exceptions.** `?provenance=true` on a version's records filters to the records whose provenance differs from the dataset's, and the page's `total` is their count over the whole version. The Provenance tab shows that count and lists the first page of them. |
 
 ## Not building
 

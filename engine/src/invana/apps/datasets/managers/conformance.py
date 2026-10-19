@@ -40,6 +40,7 @@ from invana.apps.datasets.querysets import (
 from invana.apps.datasets.schemas import (
     ConformanceRead,
     DatasetStandardCreate,
+    DatasetStandardListResponse,
     DatasetStandardRead,
     Violation,
 )
@@ -65,6 +66,15 @@ class ConformanceManager:
 
     async def attachments(self, session: AsyncSession, *, dataset: Dataset) -> list[DatasetStandard]:
         return await self.claims_qs.for_dataset(session, dataset.id)
+
+    async def list_attachments(self, session: AsyncSession, *, dataset: Dataset) -> DatasetStandardListResponse:
+        """Every claim with the current version's score, and the lowest score across them."""
+        items = [
+            await self.read_attachment(session, dataset=dataset, claim=c)
+            for c in await self.attachments(session, dataset=dataset)
+        ]
+        scores = [a.conformance.score for a in items if a.conformance is not None]
+        return DatasetStandardListResponse(items=items, total=len(items), lowest_score=min(scores) if scores else None)
 
     async def _pinned(self, session: AsyncSession, claim: DatasetStandard) -> tuple[Standard, StandardVersion]:
         found = await self.standards.by_version_id(session, claim.standard_version_id)

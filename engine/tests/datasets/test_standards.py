@@ -15,7 +15,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.datasets.managers import ConformanceManager, DatasetManager
+from invana.apps.datasets.managers import ClaimsManager, ConformanceManager, DatasetManager
 from invana.apps.datasets.schemas import (
     AuthorStep,
     DatasetCreate,
@@ -39,6 +39,7 @@ from invana.runtime.managers import DatasetBindManager, RuleCheckManager
 
 datasets = DatasetManager()
 claims = ConformanceManager()
+install = ClaimsManager()
 standards = StandardManager()
 rules = RuleManager()
 checks = RuleCheckManager()
@@ -127,6 +128,32 @@ async def test_a_claimed_standard_scores_every_version_and_stays_pinned(session:
     assert next_version.version == 2
     read = await claims.read_attachment(session, dataset=dataset, claim=claim)
     assert (read.version, read.newer_version) == (1, 2)
+
+
+async def test_claims_and_the_validation_queue_are_counted_by_the_engine(session: AsyncSession, user: User) -> None:
+    admin = await _admin(session)
+    await _passport(session, admin)
+    dataset = await _dataset(session, user, BAD)
+    await claims.attach(session, dataset=dataset, payload=DatasetStandardCreate(standard="admin/passport"), actor=user)
+
+    listed = await claims.list_attachments(session, dataset=dataset)
+    assert (listed.total, listed.lowest_score) == (1, 0.5)
+    mine = await install.claims(session, reader=user)
+    assert (mine.total, mine.by_standard, mine.unreadable) == (1, {"admin/passport": 1}, 0)
+    queue = await install.validation(session, reader=user)
+    assert queue.total == 2 and [(d.address, d.total) for d in queue.datasets] == [(dataset.address, 2)]
+    assert {(i.violation.key, i.column, i.standard) for i in queue.items} == {
+        ("CS2", "country", "admin/passport@1"),
+        ("CS2", "year", "admin/passport@1"),
+    }
+
+    # A private dataset is no one else's to count, and a standard nobody claims has no claims.
+    other = User(email="other@example.com", username="other", password_hash="x", first_name="Other")
+    session.add(other)
+    await session.flush()
+    assert (await install.claims(session, reader=other)).total == 0
+    assert (await install.validation(session, reader=other)).total == 0
+    assert (await install.claims(session, reader=user, standard="admin/unclaimed")).items == []
 
 
 async def test_standards_refuse_a_breaking_block_an_unknown_term_and_a_pack_by_a_non_admin(

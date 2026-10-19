@@ -495,6 +495,30 @@ export interface ProjectPlan {
 	critical_path: string[];
 }
 
+/**
+ * Every count a project's Overview tiles and its detail's status bar show,
+ * computed by the engine from the rows the lists read. Studio formats these.
+ */
+export interface ProjectSummary {
+	branches: number;
+	/** How many branches sit in each status; a status with none is absent. */
+	branches_by_status: Record<string, number>;
+	findings: number;
+	/** Findings a person reviewed. */
+	findings_reviewed: number;
+	/** Distinct datasets the findings cite, any version. */
+	datasets: number;
+	/** The project's own Todos per status; a status with none is absent. */
+	todos_by_status: Record<string, number>;
+	/** Todos not done, failed or cancelled; and of those, assigned to an agent. */
+	todos_open: number;
+	todos_open_for_agents: number;
+	/** Every decision, superseded ones included. */
+	decisions: number;
+	/** Length of the plan's critical path. */
+	critical_path: number;
+}
+
 /** One row of the activity tree (docs/for-developers/modules/work/spec.md). */
 export interface ActivityNode {
 	id: string;

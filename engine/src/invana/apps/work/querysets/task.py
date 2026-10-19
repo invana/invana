@@ -74,6 +74,15 @@ class TaskQuerySet:
             stmt = stmt.where(Task.status.in_([s.value for s in OPEN_TASK_STATUSES]))
         return dict((await session.execute(stmt.group_by(Task.project_id))).all())
 
+    async def status_counts(
+        self, session: AsyncSession, *, project_id: str, assignee_kind: str | None = None
+    ) -> dict[str, int]:
+        """How many of a project's tasks sit in each status; a status with none is absent."""
+        stmt = select(Task.status, func.count(Task.id)).where(Task.project_id == project_id)
+        if assignee_kind is not None:
+            stmt = stmt.where(Task.assignee_kind == assignee_kind)
+        return {status: int(n) for status, n in (await session.execute(stmt.group_by(Task.status))).all()}
+
     async def list_for_project(self, session: AsyncSession, *, graph_id: str, project_id: str | None) -> list[Task]:
         """Tasks in one project, or the graph's "No project" bucket when
         ``project_id`` is ``None``."""

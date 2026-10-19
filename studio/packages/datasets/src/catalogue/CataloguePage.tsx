@@ -4,9 +4,9 @@
  *
  * The filter bar narrows by origin, publisher and the Graph that binds a
  * dataset on the server (`origin` · `publisher` · `bound_in` · `q`), and by
- * standard and licence here, over what the server returned — the engine has no
- * install-wide list of attachments, so a dataset's standards come from
- * `useClaims`. Under it, the origin legend: what each origin means, once.
+ * standard and licence here, over what the server returned — a dataset's
+ * standards come from the engine's install-wide claims (`useClaimsQuery`).
+ * Under it, the origin legend: what each origin means, once.
  *
  * A row opens the dataset's page. *Collect with an agent* is drawn and
  * disabled: the install has no collector agent to run. A dataset is created by
@@ -39,13 +39,8 @@ import { parseAddress } from "../api";
 import { datasetPath } from "../dataset/context";
 import { ORIGIN_LABEL, ORIGINS, percent } from "../labels";
 import { OriginBadge, Page, PageBody } from "../parts";
-import {
-	type Claim,
-	useBindTargets,
-	useCatalogueQuery,
-	useClaims,
-} from "../queries";
-import type { Dataset } from "../types";
+import { useBindTargets, useCatalogueQuery, useClaimsQuery } from "../queries";
+import type { DatasetClaim as Claim, Dataset } from "../types";
 
 const IMPORT_COMMAND =
 	"invana datasets import --path <file.csv> --as <publisher>/<name> --origin official --licence <licence>";
@@ -102,7 +97,11 @@ export function CataloguePage() {
 		boundIn: one(boundIn),
 		q: q.trim() || undefined,
 	});
-	const { claims } = useClaims();
+	const claimsQuery = useClaimsQuery();
+	const claims = useMemo(
+		() => claimsQuery.data?.items ?? [],
+		[claimsQuery.data],
+	);
 	const graphs = useBindTargets();
 
 	const all = everything.data?.items ?? [];

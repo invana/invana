@@ -110,11 +110,19 @@ flowchart TD
 | `DELETE /standards/{publisher}/{name}` | 204 |
 | `GET /versions/{v}/conformance` | `ConformanceListResponse` — one per attached standard |
 
+| Route (`/api/v1/datasets`) | Returns |
+|---|---|
+| `GET /claims` `?standard=p/n` | `DatasetClaimListResponse` — every claim on every readable dataset |
+| `GET /validation` | `ValidationQueue` — every violation on a readable dataset's current version |
+
 | Shape | Fields |
 |---|---|
 | `StandardRead` | `id` · `address` · `publisher` · `name` · `title` · `description` · `origin` · `current_version?` · `terms` · `content_hash?` · `created_by_id` · `created_at` · `updated_at` |
 | `StandardVersionRead` | `id` · `address` (`p/n@v`) · `version` · `terms` · `content_hash` · `why?` · `published_by_id` · `published_at` |
 | `DatasetStandardRead` | `standard` (`p/n@v`) · `version` · `newer_version?` · `mode` · `mapping` · `attached_by_id` · `attached_at` · `conformance: ConformanceRead?` (the current version's) |
+| `DatasetStandardListResponse` | `items` · `total` · `lowest_score?` |
+| `DatasetClaimListResponse` | `items: {dataset: DatasetRead, attachment: DatasetStandardRead}[]` · `total` · `by_standard: {p/n: count}` · `unreadable` |
+| `ValidationQueue` | `items: {dataset (p/n), standard (p/n@v), mode, column, violation}[]` · `total` · `datasets: {address, publisher, name, title, total}[]` · `unreadable` |
 | `ConformanceRead` | `dataset` (`p/n@v`) · `standard` (`p/n@v`) · `mode` · `record_count` · `conforming` · `score` · `conforms` · `violation_count` · `violations: [{key, term, kind, value?}]` · `checked_at` |
 | `DatasetVersionRead` · `DatasetRead` · `DatasetBindingRead` | gain `warnings: [str]` — filled only by the act that raised them |
 
@@ -139,7 +147,9 @@ flowchart TD
 | ST8 | **Conformance is stored, one row per dataset version × standard version,** recomputed in place when the mapping changes — it is derived, not a versioned record. At most 50 violations are kept; `violation_count` is the whole. |
 | ST9 | **Who attaches:** the dataset's owner or an install Admin — the same who mints its versions. |
 | ST10 | **Rules read conformance.** A rule's `dataset.conforms` check reads the attachment and its conformance row ([rules](../../skills/features/rules.md) RU16); a dataset that does not claim the standard fails it. |
-| ST11 | **Studio reads claims dataset by dataset.** The engine has no install-wide list of attachments, so the validation queue and a standard's *Used by* read `GET …/standards` for each readable dataset; one that cannot be read is counted, not hidden. A queue item is a violation on a current version; its fix is a new version. |
+| ST11 | **The engine reads claims across the install.** `GET /api/v1/datasets/claims` returns every claim on every dataset the reader may read — the catalogue's access rule — with `total` and `by_standard` (claims per standard address), and `?standard=` narrows it to one standard; the catalogue's standard filter, the library's *N datasets claim it* and a standard's *Used by* read it. A dataset whose claims cannot be read is counted in `unreadable`, not hidden. |
+| ST12 | **The validation queue is the engine's.** `GET /api/v1/datasets/validation` returns the violations kept on each claim's current-version conformance row, with `total` — the sum of `violation_count`, so a claim with more than 50 violations counts them all — and each dataset's own `total`. Studio narrows by dataset on the page and shows the engine's totals; the item count beside it is only what is listed. A queue item is a violation on a current version; its fix is a new version. |
+| ST13 | **A dataset's claims list carries its lowest score.** `DatasetStandardListResponse.lowest_score` is the lowest current-version score across its claims, null when none is scored; the Overview's *Conformance* tile shows it and `total` as the standards claimed. |
 
 ## Not building
 

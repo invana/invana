@@ -88,6 +88,7 @@ flowchart LR
 | Staffed strip | Who is on the project, under the Todos it is derived from — chips, and an agent's chip opens that agent |
 | Todo detail | Inside the Projects panel, behind the breadcrumb — tabs `Work · Activity · Runs`; the decision bar at the bottom. `Runs` is [10.5](../../operate/features/see-what-ran.md)'s journal filtered to one `todo_id` |
 | Plan canvas | Cards in waves; drag card → card writes a dependency |
+| Project counts | The **Overview** tiles (branches by status, findings and how many a person reviewed, datasets cited, open Todos and how many are for agents, decisions) and the detail's status bar (`running` · `needs input` · `in review` · `blocked`, the Plan tab's `critical path: N`) read `GET …/projects/{key}/summary` |
 
 ## Engine
 
@@ -100,7 +101,18 @@ flowchart LR
 | `todo_dependencies` | `on (success\|failure\|any_outcome)`, cycles rejected |
 | Derived | `wave` · `blocked_by[]` · `critical_path` |
 | Routes | `…/projects*` · `…/todos*` · `/start · /result · /accept · /reject · /cancel` · `GET …/projects/{key}/plan` |
+| `ProjectSummary` | `GET …/projects/{key}/summary` — see the table below |
 | Events | `Todo.created · assigned · started · result_posted · accepted · rejected · blocked` |
+
+| `ProjectSummary` field | Meaning |
+|---|---|
+| `branches` · `branches_by_status` | Every branch; how many sit in each status, a status with none absent |
+| `findings` · `findings_reviewed` | Every finding in the project; how many a person reviewed |
+| `datasets` | Distinct datasets its findings cite, any version |
+| `todos_by_status` | The project's own Todos per status, a status with none absent |
+| `todos_open` · `todos_open_for_agents` | Todos not `done` · `failed` · `cancelled`; of those, assigned to an agent |
+| `decisions` | Every decision in the project, superseded ones included |
+| `critical_path` | Length of the plan's critical path — the same derivation `…/plan` returns |
 
 ## Decisions
 
@@ -122,6 +134,7 @@ flowchart LR
 | PT15 | **Projects is a stack of two drawers, `Projects` over `Todos` — the same shape Tasks takes ([G33](../../../building-studio/graph-detail-page.md)).** It is how PT7 is built: with no project drilled into, the Todos drawer is **every Todo in the Graph**, and that *is* the *No project* bucket — a Todo nobody filed is still work somebody wrote, so it needs no separate list and no pseudo-project to live in. Drill into a project and the drawer narrows to its Todos while the projects list keeps its place above, so reading a Todo against the project it serves costs a glance rather than a click back. A Todo's own detail replaces the **Todos** drawer's body, never the panel: `&todo=` is the drill-in key and `&project=` is the one above it ([G35](../../../building-studio/graph-detail-page.md)). |
 | PT14 | **Agents is not a tab.** "Who is on this?" is answered by the Staffed strip under the Todos, where the assignments it is derived from are visible; a tab of its own restated the same list one click away and made the strip look like a summary of somewhere else. |
 | PT16 | **A Todos count of part of the list is the engine's.** `GET …/tasks` returns `by_status` beside `total` — how many of the listed Todos sit in each status, a status with none absent — and the drawer's `12 · 3 in review` and the status bar's `2 running` · `3 in review` read it. Studio filters the loaded rows to draw them, never to count them. |
+| PT17 | **A project's counts are one engine summary.** `GET …/projects/{key}/summary` returns every count the Overview tiles and the detail's status bar show, computed by `ProjectSummaryManager` from the rows the lists read — branches, findings, the findings' dataset cites, the project's own Todos, decisions, and the plan's derivation for the critical path. Studio formats it and counts no list. A task from another project drawn on the plan is not this project's work and is not counted. A tab count or a box count over a list fully on screen stays Studio's. |
 
 ## Not building
 

@@ -20,6 +20,7 @@ from invana.apps.work.managers import (
     DependencyManager,
     PlanManager,
     ProjectManager,
+    ProjectSummaryManager,
     ProposalManager,
     ReportManager,
     StaffingManager,
@@ -43,6 +44,7 @@ from invana.apps.work.schemas import (
     ProjectListResponse,
     ProjectPlanResponse,
     ProjectRead,
+    ProjectSummary,
     ProjectUpdate,
     ProposalCreate,
     ProposalListResponse,
@@ -77,6 +79,7 @@ staffing = StaffingManager()
 reads = TaskReadManager()
 tree = TreeManager()
 plans = PlanManager()
+summaries = ProjectSummaryManager()
 branches = BranchManager()
 decisions = DecisionManager()
 proposals = ProposalManager()
@@ -381,6 +384,17 @@ async def project_plan(
     the Plan tab and the Plan canvas are two renderings of the same fact."""
     project = await projects.get_by_key(session, key=key, graph_id=graph.id, reader_id=member.user_id)
     return await plans.for_project(session, graph=graph, project=project)
+
+
+async def project_summary(
+    key: str = Path(...),
+    member: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ProjectSummary:
+    """Every count the project's Overview tiles and status bar show — one call."""
+    project = await projects.get_by_key(session, key=key, graph_id=graph.id, reader_id=member.user_id)
+    return await summaries.for_project(session, project=project)
 
 
 # ── Project records — branches, findings, decisions, proposals, the report ──

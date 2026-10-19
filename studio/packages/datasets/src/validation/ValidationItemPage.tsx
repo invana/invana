@@ -37,13 +37,13 @@ import { coerce, withValue } from "../nextVersion";
 import { Page, PageBody, ReadState } from "../parts";
 import {
 	readBase,
-	useClaims,
 	useDatasetQuery,
 	useRecordQuery,
 	useStandardQuery,
+	useValidationQueue,
 } from "../queries";
 import type { AuthorStep } from "../types";
-import { KIND_LABEL, queueOf } from "./queue";
+import { KIND_LABEL } from "./queue";
 
 export function ValidationItemPage() {
 	const { publisher = "", name = "", key = "", term = "" } = useParams();
@@ -52,19 +52,18 @@ export function ValidationItemPage() {
 	const { user } = useAuth();
 	const dataset = useDatasetQuery(ref);
 	const record = useRecordQuery(ref, key);
-	const { claims, isLoading } = useClaims();
+	const queue = useValidationQueue();
 	const canWrite = useCanWrite(dataset.data);
 	const [value, setValue] = useState("");
 	const [reason, setReason] = useState("");
 
-	const item = queueOf(claims).find(
+	const item = queue.data?.items.find(
 		(i) =>
-			i.claim.dataset.publisher === publisher &&
-			i.claim.dataset.name === name &&
+			i.dataset === `${publisher}/${name}` &&
 			i.violation.key === key &&
 			i.violation.term === term,
 	);
-	const pinned = item ? parseAddress(item.claim.attachment.standard) : null;
+	const pinned = item ? parseAddress(item.standard) : null;
 	const standard = useStandardQuery(pinned ?? { publisher: "", name: "" });
 	const termDef = standard.data?.terms.find((t) => t.name === term);
 
@@ -126,7 +125,7 @@ export function ValidationItemPage() {
 					</Alert>
 				) : null}
 
-				{isLoading ? (
+				{queue.isLoading ? (
 					<Spinner />
 				) : !item && !fix.data ? (
 					<EmptyState
@@ -157,7 +156,7 @@ export function ValidationItemPage() {
 							)}
 						</PanelSection>
 						{item ? (
-							<PanelSection card title={item.claim.attachment.standard}>
+							<PanelSection card title={item.standard}>
 								<PropertyList labelWidth={130}>
 									<PropertyRow label="term">{term}</PropertyRow>
 									<PropertyRow label="column" mono>
@@ -174,9 +173,7 @@ export function ValidationItemPage() {
 											? termDef.values.map((v) => v.label || v.code).join(" · ")
 											: `any ${termDef?.type ?? "value"}`}
 									</PropertyRow>
-									<PropertyRow label="mode">
-										{item.claim.attachment.mode}
-									</PropertyRow>
+									<PropertyRow label="mode">{item.mode}</PropertyRow>
 								</PropertyList>
 							</PanelSection>
 						) : null}

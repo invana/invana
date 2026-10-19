@@ -25,6 +25,7 @@ from invana.apps.work.schemas import (
     ProjectListResponse,
     ProjectPlanResponse,
     ProjectRead,
+    ProjectSummary,
     ProposalListResponse,
     ProposalRead,
     ReportRead,
@@ -72,6 +73,7 @@ projects_router.delete("/{key}/assignments/{assignment_id}", status_code=status.
     views.unstaff_project
 )
 projects_router.get("/{key}/plan", response_model=ProjectPlanResponse)(views.project_plan)
+projects_router.get("/{key}/summary", response_model=ProjectSummary)(views.project_summary)
 projects_router.get("/{key}/branches", response_model=BranchListResponse)(views.list_branches)
 projects_router.get("/{key}/branches/{number}", response_model=BranchDetail)(views.get_branch)
 projects_router.post("/{key}/branches/{number}/fork", response_model=BranchListResponse, status_code=201)(

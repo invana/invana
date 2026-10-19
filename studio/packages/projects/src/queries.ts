@@ -67,6 +67,24 @@ export function useProjectPlanQuery(
 	});
 }
 
+/**
+ * The project's counts. Its key sits under the project's, so every write that
+ * re-reads the project — a Todo, a branch, a finding, a decision — re-reads it.
+ */
+export function useProjectSummaryQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	key: string | undefined,
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQuery({
+		queryKey: projectsKey(scope, [key, "summary"]),
+		queryFn: () =>
+			projectsApi.summary(scope.username, scope.graphSlug, key as string),
+		enabled: !!username && !!graphSlug && !!key,
+	});
+}
+
 export function useProjectMutations(username: string, graphSlug: string) {
 	const qc = useQueryClient();
 	const invalidate = () =>

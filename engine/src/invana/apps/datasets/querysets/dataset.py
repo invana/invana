@@ -7,7 +7,7 @@ the caller's id, and what a caller may do with a row is the manager's rule.
 
 from __future__ import annotations
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.datasets.models import (
@@ -114,15 +114,30 @@ class DatasetRecordQuerySet:
         session.add_all(records)
         await session.flush()
 
-    async def page(self, session: AsyncSession, *, version_id: str, offset: int, limit: int) -> list[DatasetRecord]:
+    @staticmethod
+    def _where(version_id: str, provenance: bool):
+        clauses = [DatasetRecord.version_id == version_id]
+        if provenance:
+            # A record that inherits holds SQL NULL or JSON ``null``; text is portable across both databases.
+            clauses.append(func.coalesce(cast(DatasetRecord.provenance, String), "null") != "null")
+        return clauses
+
+    async def page(
+        self, session: AsyncSession, *, version_id: str, offset: int, limit: int, provenance: bool = False
+    ) -> list[DatasetRecord]:
+        """Ordered by key; *provenance* keeps only records with their own provenance."""
         stmt = (
             select(DatasetRecord)
-            .where(DatasetRecord.version_id == version_id)
+            .where(*self._where(version_id, provenance))
             .order_by(DatasetRecord.key)
             .offset(offset)
             .limit(limit)
         )
         return list((await session.execute(stmt)).scalars().all())
+
+    async def count_with_provenance(self, session: AsyncSession, *, version_id: str) -> int:
+        stmt = select(func.count()).select_from(DatasetRecord).where(*self._where(version_id, True))
+        return (await session.execute(stmt)).scalar_one()
 
     async def all_for_version(self, session: AsyncSession, version_id: str) -> list[DatasetRecord]:
         stmt = select(DatasetRecord).where(DatasetRecord.version_id == version_id).order_by(DatasetRecord.key)

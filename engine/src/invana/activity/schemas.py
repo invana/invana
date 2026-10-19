@@ -103,6 +103,8 @@ class ChangeCompare(BaseModel):
     plan: PlanVersionDiff | None = None
     #: The schema diff, for a model.
     schema_diff: SchemaDiff | None = None
+    #: Tokens per run on ``b`` against ``a``; null when either ran nothing.
+    tokens_per_run_change: Change | None = None
 
 
 # ── Search (docs/for-developers/modules/platform/features/search.md) ─────────

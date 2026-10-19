@@ -112,6 +112,7 @@ flowchart TD
 | CL10 | **Restore is not here.** Restoring makes a new version through the record's own write (shell.md); the change log only reads. |
 | CL11 | **The agent and skill pages read their own history; the shared surfaces are C04.** Their History tabs read `history/<kind>/<id>`, and the skill's Plan tab reads its compare against the version before; Activity › Changes and the compare board stay with the shell ([agents.md › Decisions](../../../../products/agents.md#decisions) *Agent history* · *Skill history*). |
 | CL12 | **Studio draws one change log and one compare for every product.** The change log is the Events tab's *Changes* filter, a change's compare is a path under Activity, and a model's History and a dataset record's change log open the same compare; the rules are in [shell.md › Decisions](../../../../products/shell.md#decisions) *The Changes filter* · *The compare page* · *One compare for every product*. |
+| CL13 | **A compare carries the change in tokens per run.** `GET …/history/compare` returns `tokens_per_run_change` — `b`'s tokens per run against `a`'s, as a `Change` (how much, which way, better or worse), each read over the span its version was current. Null when either side ran nothing. The compare page's *Tokens per run* tile formats it (`1.4×`, toned by the change) and divides nothing. |
 
 ## Not building
 

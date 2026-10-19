@@ -29,6 +29,10 @@ class ProjectDecisionQuerySet:
             stmt = stmt.where(Project.id == project_id)
         return list((await session.execute(stmt)).scalars().all())
 
+    async def count_for_project(self, session: AsyncSession, *, project_id: str) -> int:
+        stmt = select(func.count()).where(ProjectDecision.project_id == project_id)
+        return int((await session.execute(stmt)).scalar_one())
+
     async def current_for(self, session: AsyncSession, *, branch_id: str) -> ProjectDecision | None:
         """The branch's decision nothing supersedes."""
         superseded = select(ProjectDecision.supersedes_id).where(ProjectDecision.supersedes_id.is_not(None))

@@ -65,6 +65,7 @@ import { NewProjectDialog } from "./project/NewProjectDialog";
 import {
 	useProjectMutations,
 	useProjectPlanQuery,
+	useProjectSummaryQuery,
 	useProjectsQuery,
 	useTodosQuery,
 } from "./queries";
@@ -366,15 +367,19 @@ function ProjectDetail({
 			(!assigneeFilter || t.assignee_id === assigneeFilter),
 	);
 
-	const running = planTasks.filter((t) => t.status === "in_progress").length;
+	// The status bar's counts are the engine's project summary — this project's
+	// own Todos, never another project's task the plan draws beside them.
+	const summary = useProjectSummaryQuery(username, graphSlug, project.key).data;
+	const count = (s: string) => summary?.todos_by_status[s] ?? 0;
+	const running = count("in_progress");
 	// Counted apart, because they need different things from you: `needs_input`
 	// is an agent waiting on an answer, `blocked` is a dependency that has not
 	// landed. Folding them into one number would send you looking for a question
 	// nobody asked.
-	const asking = planTasks.filter((t) => t.status === "needs_input").length;
-	const blocked = planTasks.filter((t) => t.status === "blocked").length;
-	const reviewing = planTasks.filter((t) => t.status === "review").length;
-	const critical = plan?.critical_path.length ?? 0;
+	const asking = count("needs_input");
+	const blocked = count("blocked");
+	const reviewing = count("review");
+	const critical = summary?.critical_path ?? 0;
 
 	const setTabAndNotify = (next: ProjectTab) => {
 		setTab(next);

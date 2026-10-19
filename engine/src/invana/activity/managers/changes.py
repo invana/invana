@@ -68,6 +68,7 @@ from invana.core.errors import NotFoundError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind, Event
 from invana.core.events.querysets import EventQuerySet
+from invana.core.metrics import change_of
 from invana.runtime.querysets.task_run import TaskRunQuerySet
 
 #: The record kinds and the event ``target_kind`` each one's changes carry.
@@ -204,7 +205,22 @@ class ChangeLogManager:
             source = record.versions[index - 1] if index > 0 else None
         else:
             source = self._find(record, a)
-        return await self._diff(session, record, source, to)
+        diff = await self._diff(session, record, source, to)
+        if source is not None:
+            # Tokens per run on ``b`` against ``a`` — each version's effect over
+            # the span it was current, the same numbers its history row shows.
+            before = await self._effect(session, graph_id, record, source, self._following(record, source))
+            after = await self._effect(session, graph_id, record, to, self._following(record, to))
+            if before.tokens_per_run is not None and after.tokens_per_run is not None:
+                diff.tokens_per_run_change = change_of(
+                    after.tokens_per_run, before.tokens_per_run, higher_is_better=False
+                )
+        return diff
+
+    @staticmethod
+    def _following(record: _Record, version: _Version) -> _Version | None:
+        index = record.versions.index(version)
+        return record.versions[index + 1] if index + 1 < len(record.versions) else None
 
     # ── loading a record's versions ──────────────────────────────────────────
 

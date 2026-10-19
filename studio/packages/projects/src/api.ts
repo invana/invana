@@ -22,6 +22,7 @@ import type {
 	ProjectCreate,
 	ProjectListResponse,
 	ProjectPlan,
+	ProjectSummary,
 	ProjectUpdate,
 	Proposal,
 	Report,
@@ -96,6 +97,12 @@ export const projectsApi = {
 	/** The Plan tab and the Plan canvas are two renderings of this one call. */
 	plan: (username: string, graphSlug: string, key: string) =>
 		request<ProjectPlan>(`${base(username, graphSlug)}/projects/${key}/plan`),
+
+	/** Every count the Overview tiles and the detail's status bar show. */
+	summary: (username: string, graphSlug: string, key: string) =>
+		request<ProjectSummary>(
+			`${base(username, graphSlug)}/projects/${key}/summary`,
+		),
 };
 
 /**

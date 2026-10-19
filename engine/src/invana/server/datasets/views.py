@@ -21,12 +21,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.managers import ChangeLogManager
 from invana.activity.schemas import ChangeCompare, RecordHistory
-from invana.apps.datasets.managers import ConformanceManager, DatasetManager
+from invana.apps.datasets.managers import ClaimsManager, ConformanceManager, DatasetManager
 from invana.apps.datasets.schemas import (
     ConformanceListResponse,
     DatasetBindingCreate,
     DatasetBindingListResponse,
     DatasetBindingRead,
+    DatasetClaimListResponse,
     DatasetCreate,
     DatasetListResponse,
     DatasetRead,
@@ -42,6 +43,7 @@ from invana.apps.datasets.schemas import (
     DatasetVersionRead,
     DatasetVersionUsage,
     RecordChangeLog,
+    ValidationQueue,
 )
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.core.auth.deps import get_current_user
@@ -54,6 +56,7 @@ datasets = DatasetManager()
 changes = ChangeLogManager()
 binds = DatasetBindManager()
 claims = ConformanceManager()
+install_claims = ClaimsManager()
 checks = RuleCheckManager()
 
 
@@ -69,6 +72,23 @@ async def list_datasets(
     rows = await datasets.catalogue(session, reader=user, origin=origin, publisher=publisher, bound_in=bound_in, text=q)
     items = [await datasets.read(session, d) for d in rows]
     return DatasetListResponse(items=items, total=len(items))
+
+
+async def list_claims(
+    standard: str | None = Query(default=None, description="A standard as <publisher>/<name>."),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> DatasetClaimListResponse:
+    """Every standard every readable dataset claims, with the claims per standard."""
+    return await install_claims.claims(session, reader=user, standard=standard)
+
+
+async def validation_queue(
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ValidationQueue:
+    """Every violation on the current version of every readable dataset, with the totals."""
+    return await install_claims.validation(session, reader=user)
 
 
 async def create_dataset(
@@ -182,13 +202,16 @@ async def list_records(
     version: int = Path(..., ge=1),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=100, ge=1, le=1000),
+    provenance: bool = Query(default=False, description="Only the records with their own provenance."),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> DatasetRecordPage:
-    """One version's records, ordered by key."""
+    """One version's records, ordered by key; ``total`` counts what the filter keeps."""
     dataset = await datasets.get(session, publisher=publisher, name=name, reader=user)
     row = await datasets.get_version(session, dataset=dataset, version=version)
-    return await datasets.records_page(session, dataset=dataset, version=row, offset=offset, limit=limit)
+    return await datasets.records_page(
+        session, dataset=dataset, version=row, offset=offset, limit=limit, provenance=provenance
+    )
 
 
 async def get_record(
@@ -248,9 +271,7 @@ async def list_standards(
 ) -> DatasetStandardListResponse:
     """The standards the dataset claims, each with the current version's score."""
     dataset = await datasets.get(session, publisher=publisher, name=name, reader=user)
-    rows = await claims.attachments(session, dataset=dataset)
-    items = [await claims.read_attachment(session, dataset=dataset, claim=c) for c in rows]
-    return DatasetStandardListResponse(items=items, total=len(items))
+    return await claims.list_attachments(session, dataset=dataset)
 
 
 async def attach_standard(

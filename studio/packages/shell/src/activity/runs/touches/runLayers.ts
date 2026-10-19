@@ -174,7 +174,8 @@ export function layersOptions(
 		// rather than leaving the reader to infer it from an empty track.
 		tasks: BANDS.map((layer) => {
 			const parts = [...(rows.get(layer)?.values() ?? [])];
-			const n = parts.reduce((sum, p) => sum + (p.segments?.length ?? 0), 0);
+			// The engine's count of every ledger row on the layer.
+			const n = touches?.layers.find((l) => l.layer === layer)?.touches ?? 0;
 			return {
 				key: layer,
 				label: layer.replace(/_/g, " "),

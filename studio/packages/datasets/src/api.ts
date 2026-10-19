@@ -10,6 +10,7 @@ import type {
 	Dataset,
 	DatasetBinding,
 	DatasetBindingListResponse,
+	DatasetClaimListResponse,
 	DatasetHistory,
 	DatasetListResponse,
 	DatasetRecord,
@@ -30,6 +31,7 @@ import type {
 	Standard,
 	StandardCreate,
 	StandardListResponse,
+	ValidationQueue,
 } from "./types";
 
 export interface DatasetRef {
@@ -83,10 +85,26 @@ export const datasetsApi = {
 	publish: (d: DatasetRef, data: DatasetVersionCreate) =>
 		request<DatasetVersion>(`${one(d)}/versions`, json("POST", data)),
 
-	records: (d: DatasetRef, version: number, offset = 0, limit = 100) =>
+	/** `provenance` keeps the records with their own provenance; `total` counts them. */
+	records: (
+		d: DatasetRef,
+		version: number,
+		offset = 0,
+		limit = 100,
+		provenance = false,
+	) =>
 		request<DatasetRecordPage>(
-			`${one(d)}/versions/${version}/records${query({ offset, limit })}`,
+			`${one(d)}/versions/${version}/records${query({ offset, limit, provenance: provenance ? "true" : undefined })}`,
 		),
+
+	/** Every claim on every dataset the person can read; `standard` narrows it. */
+	claims: (standard?: string) =>
+		request<DatasetClaimListResponse>(
+			`${DATASETS}/claims${query({ standard })}`,
+		),
+
+	/** Every violation on a readable dataset's current version, with the totals. */
+	validation: () => request<ValidationQueue>(`${DATASETS}/validation`),
 
 	record: (d: DatasetRef, key: string) =>
 		request<DatasetRecord>(`${one(d)}/records/${encodeURIComponent(key)}`),

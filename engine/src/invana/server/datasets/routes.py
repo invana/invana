@@ -2,6 +2,8 @@
 
 =================================================  ==========================================
 GET · POST ``""``                                  the catalogue · create (no version yet)
+GET ``/claims``                                    every claim on every readable dataset
+GET ``/validation``                                the validation queue, with its totals
 GET · PATCH ``/{publisher}/{name}``                detail · metadata (never a version)
 GET · POST ``/{publisher}/{name}/versions``        versions · mint the next one
 GET ``/{publisher}/{name}/versions/{v}``           one version
@@ -32,6 +34,7 @@ from invana.apps.datasets.schemas import (
     ConformanceListResponse,
     DatasetBindingListResponse,
     DatasetBindingRead,
+    DatasetClaimListResponse,
     DatasetListResponse,
     DatasetRead,
     DatasetRecordPage,
@@ -42,6 +45,7 @@ from invana.apps.datasets.schemas import (
     DatasetVersionRead,
     DatasetVersionUsage,
     RecordChangeLog,
+    ValidationQueue,
 )
 from invana.server.datasets import views
 
@@ -51,6 +55,8 @@ _ONE = "/{publisher}/{name}"
 
 datasets_router.get("", response_model=DatasetListResponse)(views.list_datasets)
 datasets_router.post("", response_model=DatasetRead, status_code=status.HTTP_201_CREATED)(views.create_dataset)
+datasets_router.get("/claims", response_model=DatasetClaimListResponse)(views.list_claims)
+datasets_router.get("/validation", response_model=ValidationQueue)(views.validation_queue)
 datasets_router.get(_ONE, response_model=DatasetRead)(views.get_dataset)
 datasets_router.patch(_ONE, response_model=DatasetRead)(views.update_dataset)
 datasets_router.get(f"{_ONE}/versions", response_model=DatasetVersionListResponse)(views.list_versions)

@@ -6,6 +6,9 @@
  * inquiry and how they stand, how much evidence and how much of it a person
  * reviewed, which datasets it rests on, what work is open, and which decision
  * is waiting. Under them, the tree and the datasets side by side.
+ *
+ * Every number on a tile is the engine's project summary; Studio counts no
+ * list for them. The boxes below count only the rows they draw.
  */
 
 import {
@@ -18,7 +21,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
-import { useTodosQuery } from "../queries";
+import { useProjectSummaryQuery } from "../queries";
 import { useLineageDatasets } from "../records/queries";
 import type { useProjectRecords } from "../records/useProjectRecords";
 import { branchLabel, plural } from "../records/words";
@@ -41,57 +44,70 @@ export function OverviewTab({
 	onOpenBranch: (n: number) => void;
 	onOpenDataset?: (address: string) => void;
 }) {
-	const { branches, findings, decisions, datasets } = records;
-	const todos = useTodosQuery(username, graphSlug, { project: project.key });
-	const open = (todos.data?.items ?? []).filter(
-		(t) => !["done", "cancelled", "failed"].includes(t.status),
-	);
+	const { branches, decisions, datasets } = records;
+	// Every tile's number is the engine's; the boxes below count what they draw.
+	const summary = useProjectSummaryQuery(username, graphSlug, project.key).data;
 	const datasetReads = useLineageDatasets(datasets.map((d) => d.address));
-	const by = (s: string) => branches.filter((b) => b.status === s).length;
+	const by = (s: string) => summary?.branches_by_status[s] ?? 0;
 	const waiting = branches.find(
 		(b) =>
 			b.current_decision === null &&
 			(b.status === "pursuing" ||
 				(b.status === "open" && b.parent_number !== null)),
 	);
-	const reviewed = findings.filter((f) => f.reviewed_by_id).length;
 
 	return (
 		<div className="flex flex-col gap-3 p-3">
 			<MetricGrid columns={5}>
 				<MetricTile
 					label="Branches"
-					value={branches.length}
+					value={summary?.branches ?? "—"}
 					caption={
-						[
-							by("pursuing") && `${by("pursuing")} pursuing`,
-							by("parked") && `${by("parked")} parked`,
-							by("dropped") && `${by("dropped")} dropped`,
-						]
-							.filter(Boolean)
-							.join(" · ") || "none decided yet"
+						summary
+							? [
+									by("pursuing") && `${by("pursuing")} pursuing`,
+									by("parked") && `${by("parked")} parked`,
+									by("dropped") && `${by("dropped")} dropped`,
+								]
+									.filter(Boolean)
+									.join(" · ") || "none decided yet"
+							: undefined
 					}
 				/>
 				<MetricTile
 					label="Findings"
-					value={findings.length}
-					caption={`${reviewed} person-reviewed`}
-					captionTone={reviewed === findings.length ? "success" : "warning"}
+					value={summary?.findings ?? "—"}
+					caption={
+						summary ? `${summary.findings_reviewed} person-reviewed` : undefined
+					}
+					captionTone={
+						summary && summary.findings_reviewed === summary.findings
+							? "success"
+							: "warning"
+					}
 				/>
 				<MetricTile
 					label="Datasets"
-					value={datasets.length}
+					value={summary?.datasets ?? "—"}
 					caption="cited by its findings"
 				/>
 				<MetricTile
 					label="Todos"
-					value={`${open.length} open`}
-					caption={`${open.filter((t) => t.assignee_kind === "agent").length} for agents`}
+					value={summary ? `${summary.todos_open} open` : "—"}
+					caption={
+						summary ? `${summary.todos_open_for_agents} for agents` : undefined
+					}
 				/>
 				<MetricTile
 					label="Decision open"
 					value={waiting ? branchLabel(project, waiting.number) : "none"}
-					caption={waiting ? waiting.title : `${decisions.length} decided`}
+					caption={
+						waiting
+							? waiting.title
+							: summary
+								? `${summary.decisions} decided`
+								: undefined
+					}
 					tone={waiting ? "warning" : undefined}
 				/>
 			</MetricGrid>

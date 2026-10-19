@@ -59,6 +59,35 @@ const touches = {
 		},
 		{ layer: "cache", direction: "skipped", volume: {}, address: "cache/q/x" },
 	],
+	layers: [
+		{
+			layer: "graph_data",
+			allowed: 1,
+			touched: 1,
+			refused: 0,
+			touches: 1,
+			calls: 1,
+			rows: 15,
+		},
+		{
+			layer: "llm",
+			allowed: 1,
+			touched: 0,
+			refused: 1,
+			touches: 1,
+			calls: 0,
+			rows: 0,
+		},
+		{
+			layer: "cache",
+			allowed: 1,
+			touched: 0,
+			refused: 0,
+			touches: 1,
+			calls: 0,
+			rows: 0,
+		},
+	],
 } as unknown as TouchesResponse;
 
 describe("runSummary", () => {
@@ -165,6 +194,26 @@ describe("runSummary", () => {
 						direction: "refused",
 						volume: {},
 						address: "human/y",
+					},
+				],
+				layers: [
+					{
+						layer: "llm",
+						allowed: 1,
+						touched: 1,
+						refused: 0,
+						touches: 1,
+						calls: 1,
+						rows: 0,
+					},
+					{
+						layer: "human",
+						allowed: 1,
+						touched: 0,
+						refused: 1,
+						touches: 1,
+						calls: 0,
+						rows: 0,
 					},
 				],
 			} as unknown as TouchesResponse,

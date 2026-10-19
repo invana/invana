@@ -217,6 +217,41 @@ class TouchRead(BaseModel):
     duration_ms: int | None
 
 
+class ParticipantReading(BaseModel):
+    """One participant of a run, classified and counted."""
+
+    address: str
+    layer: str
+    #: ``refused`` · ``touched`` · ``miss`` · ``never_touched``.
+    verdict: str
+    #: Why it was refused or missed, when the ledger said.
+    why: str | None
+    calls: int
+    rows: int
+    tokens: int
+
+
+class LayerTally(BaseModel):
+    """One layer of a run's ledger, counted."""
+
+    layer: str
+    #: Participants drawn on the layer — allowed, or engaged without being.
+    allowed: int
+    touched: int
+    refused: int
+    #: Every ledger row on the layer, and the engaged (not skipped) ones.
+    touches: int
+    calls: int
+    rows: int
+
+
+class TouchTallies(BaseModel):
+    allowed: int
+    touched: int
+    never_touched: int
+    refused: int
+
+
 class TouchesRead(BaseModel):
     """One run's ledger, and the three numbers the board leads with.
 
@@ -234,6 +269,9 @@ class TouchesRead(BaseModel):
     touched: list[str] = Field(default_factory=list)
     never_touched: list[str] = Field(default_factory=list)
     refused: list[str] = Field(default_factory=list)
+    participants: list[ParticipantReading] = Field(default_factory=list)
+    layers: list[LayerTally] = Field(default_factory=list)
+    tallies: TouchTallies | None = None
 
 
 class CompareSideRead(BaseModel):

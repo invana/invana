@@ -2,7 +2,8 @@
  * A dataset's **Provenance** (board `datasets.dataset.provenance`): the author
  * chain of its current version, oldest step first, ending at the version
  * itself; the licence and how to cite it; and the records whose origin differs
- * from the dataset's — the only place record-level provenance is stored.
+ * from the dataset's — the only place record-level provenance is stored. The
+ * engine counts those records over the whole version; the first page is listed.
  *
  * Every step is the one recorded on the version, never inferred. An observed
  * dataset with an empty chain was authored by whoever imported it.
@@ -22,7 +23,7 @@ import { PageBody } from "../parts";
 import { useRecordsQuery, useVersionsQuery } from "../queries";
 import { datasetPath, useDatasetOutlet } from "./context";
 
-const SCAN = 1000;
+const LISTED = 100;
 
 export function ProvenanceTab() {
 	const { dataset, ref } = useDatasetOutlet();
@@ -30,8 +31,9 @@ export function ProvenanceTab() {
 	const versions = useVersionsQuery(ref);
 	const version = dataset.current_version;
 	const current = versions.data?.items.find((v) => v.version === version);
-	const records = useRecordsQuery(ref, version, 0, SCAN);
-	const exceptions = (records.data?.items ?? []).filter((r) => r.provenance);
+	const records = useRecordsQuery(ref, version, 0, LISTED, true);
+	const exceptions = records.data?.items ?? [];
+	const differ = records.data?.total ?? 0;
 	const year = current ? new Date(current.published_at).getFullYear() : null;
 
 	return (
@@ -91,9 +93,10 @@ export function ProvenanceTab() {
 					title="Record-level exceptions"
 					action={
 						<span className="text-sm text-muted-foreground">
-							{records.data && records.data.total > SCAN
-								? `${exceptions.length} in the first ${SCAN.toLocaleString()} records`
-								: `${exceptions.length} record${exceptions.length === 1 ? "" : "s"} differ from the dataset`}
+							{`${differ.toLocaleString()} record${differ === 1 ? " differs" : "s differ"} from the dataset`}
+							{differ > exceptions.length
+								? ` · first ${exceptions.length} listed`
+								: ""}
 						</span>
 					}
 				>

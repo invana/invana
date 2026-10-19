@@ -4,9 +4,12 @@
  * standard its dataset claims, waiting for a person to decide.
  *
  * `?dataset=<publisher/name>` narrows it to one dataset — the conformance
- * tab's *Review* lands here that way. An item opens its page, where the
- * dataset's publisher fixes the value. An item leaves the queue when the next
- * version conforms; there is no separate *reviewed* record.
+ * tab's *Review* lands here that way. Every count to review is the engine's;
+ * a claim lists at most 50 of its violations, so the rows can be fewer.
+ *
+ * An item opens its page, where the dataset's publisher fixes the value. An
+ * item leaves the queue when the next version conforms; there is no separate
+ * *reviewed* record.
  */
 
 import {
@@ -29,19 +32,23 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { parseAddress } from "../api";
 import { cell } from "../labels";
 import { Page, PageBody } from "../parts";
-import { useClaims } from "../queries";
-import { itemPath, KIND_LABEL, queueOf } from "./queue";
+import { useValidationQueue } from "../queries";
+import { itemPath, KIND_LABEL } from "./queue";
 
 export function ValidationPage() {
 	const navigate = useNavigate();
 	const [params, setParams] = useSearchParams();
 	const only = params.get("dataset");
-	const { claims, isLoading, unreadable } = useClaims();
-	const all = queueOf(claims);
-	const items = only
-		? all.filter((i) => i.claim.dataset.address === only)
-		: all;
-	const datasets = [...new Set(all.map((i) => i.claim.dataset.address))];
+	const queue = useValidationQueue();
+	const all = queue.data?.items ?? [];
+	const datasets = queue.data?.datasets ?? [];
+	const total = queue.data?.total ?? 0;
+	const unreadable = queue.data?.unreadable ?? 0;
+	const items = only ? all.filter((i) => i.dataset === only) : all;
+	const toReview = only
+		? (datasets.find((d) => d.address === only)?.total ?? 0)
+		: total;
+	const titleOf = new Map(datasets.map((d) => [d.address, d.title || d.name]));
 
 	return (
 		<Page>
@@ -49,12 +56,8 @@ export function ValidationPage() {
 				size="lg"
 				crumbs={["Validation"]}
 				chips={
-					<Badge
-						variant="outline"
-						tone={all.length ? "warning" : "muted"}
-						size="xs"
-					>
-						{all.length} to review
+					<Badge variant="outline" tone={total ? "warning" : "muted"} size="xs">
+						{total} to review
 					</Badge>
 				}
 			/>
@@ -74,7 +77,7 @@ export function ValidationPage() {
 					<MultiFilterChip
 						label="Dataset"
 						multiple={false}
-						options={datasets}
+						options={datasets.map((d) => d.address)}
 						value={only ? [only] : []}
 						onChange={(next) =>
 							setParams(next[0] ? { dataset: next[0] } : {}, { replace: true })
@@ -85,12 +88,10 @@ export function ValidationPage() {
 					card
 					title="To review"
 					action={
-						<span className="text-sm text-muted-foreground">
-							{items.length}
-						</span>
+						<span className="text-sm text-muted-foreground">{toReview}</span>
 					}
 				>
-					{isLoading ? (
+					{queue.isLoading ? (
 						<Spinner />
 					) : !items.length ? (
 						<EmptyState
@@ -109,30 +110,32 @@ export function ValidationPage() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{items.map(({ claim, violation: v, column }) => (
-									<TableRow
-										key={`${claim.dataset.id}/${claim.attachment.standard}/${v.key}/${v.term}`}
-										className="cursor-pointer"
-										onClick={() =>
-											navigate(itemPath(claim.dataset, v.key, v.term))
-										}
-									>
-										<TableCell className="whitespace-nowrap font-medium">
-											{v.key} · {column}
-										</TableCell>
-										<TableCell className="max-w-0 truncate">
-											{`${cell(v.value)} · ${KIND_LABEL[v.kind]} · ${parseAddress(claim.attachment.standard).name} (${claim.attachment.mode})`}
-										</TableCell>
-										<TableCell className="whitespace-nowrap">
-											{claim.dataset.title || claim.dataset.name}
-										</TableCell>
-										<TableCell>
-											<Badge variant="outline" tone="warning" size="xs">
-												standard
-											</Badge>
-										</TableCell>
-									</TableRow>
-								))}
+								{items.map(
+									({ dataset, standard, mode, violation: v, column }) => (
+										<TableRow
+											key={`${dataset}/${standard}/${v.key}/${v.term}`}
+											className="cursor-pointer"
+											onClick={() =>
+												navigate(itemPath(parseAddress(dataset), v.key, v.term))
+											}
+										>
+											<TableCell className="whitespace-nowrap font-medium">
+												{v.key} · {column}
+											</TableCell>
+											<TableCell className="max-w-0 truncate">
+												{`${cell(v.value)} · ${KIND_LABEL[v.kind]} · ${parseAddress(standard).name} (${mode})`}
+											</TableCell>
+											<TableCell className="whitespace-nowrap">
+												{titleOf.get(dataset) ?? dataset}
+											</TableCell>
+											<TableCell>
+												<Badge variant="outline" tone="warning" size="xs">
+													standard
+												</Badge>
+											</TableCell>
+										</TableRow>
+									),
+								)}
 							</TableBody>
 						</Table>
 					)}

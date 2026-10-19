@@ -9,14 +9,88 @@ difference is a person's call, not one made for them.
 from __future__ import annotations
 
 import json
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.govern.addressing import parse_address
+from invana.apps.govern.addressing import Layer, parse_address
 from invana.apps.govern.models import RunTouch, TouchDirection
 from invana.apps.govern.querysets import TouchQuerySet
 from invana.apps.govern.rules import Verdict
 from invana.core.errors import NotFoundError
+
+
+def _layer_of(address: str) -> str:
+    return address.split("/", 1)[0]
+
+
+def classify_participants(allowed: list[str], ledger: list[RunTouch]) -> list[dict[str, Any]]:
+    """One reading per address the frozen world allowed or the run engaged.
+
+    An address the run engaged that the allow-list does not name is kept: a
+    refusal recorded against a participant nobody declared is the one row a
+    reader needs. The verdict is ``refused`` over ``touched`` over ``miss``
+    (only skipped lookups — the cache's own word) over ``never_touched``.
+    ``calls`` counts the engaged touches; ``rows`` and ``tokens`` sum theirs.
+    """
+    by_address: dict[str, list[RunTouch]] = {}
+    for touch in sorted(ledger, key=lambda t: t.seq):
+        by_address.setdefault(touch.address, []).append(touch)
+    readings = []
+    for address in sorted(set(allowed) | set(by_address)):
+        rows = by_address.get(address, [])
+        refused = next((t for t in rows if t.was_refused), None)
+        engaged = [t for t in rows if t.direction != TouchDirection.skipped.value]
+        if refused is not None:
+            verdict, why = (
+                "refused",
+                refused.why or (f"denied by {refused.rule_matched}" if refused.rule_matched else None),
+            )
+        elif engaged:
+            verdict, why = "touched", None
+        elif rows:
+            verdict, why = "miss", rows[0].why
+        else:
+            verdict, why = "never_touched", None
+        readings.append(
+            {
+                "address": address,
+                "layer": _layer_of(address),
+                "verdict": verdict,
+                "why": why,
+                "calls": len(engaged),
+                "rows": sum((t.volume or {}).get("rows") or 0 for t in engaged),
+                "tokens": sum(
+                    ((t.volume or {}).get("tokens_in") or 0) + ((t.volume or {}).get("tokens_out") or 0)
+                    for t in engaged
+                ),
+            }
+        )
+    return readings
+
+
+def layer_tallies(participants: list[dict[str, Any]], ledger: list[RunTouch]) -> list[dict[str, Any]]:
+    """One tally per layer, in the order the strip reads them, empty layers kept.
+
+    ``allowed`` is the participants drawn on the layer, ``touched`` and
+    ``refused`` those with that verdict, ``touches`` every ledger row on it,
+    ``calls`` the engaged ones, and ``rows`` the records they returned.
+    """
+    tallies = []
+    for layer in Layer:
+        mine = [p for p in participants if p["layer"] == layer.value]
+        tallies.append(
+            {
+                "layer": layer.value,
+                "allowed": len(mine),
+                "touched": sum(1 for p in mine if p["verdict"] == "touched"),
+                "refused": sum(1 for p in mine if p["verdict"] == "refused"),
+                "calls": sum(p["calls"] for p in mine),
+                "touches": sum(1 for t in ledger if _layer_of(t.address) == layer.value),
+                "rows": sum(p["rows"] for p in mine),
+            }
+        )
+    return tallies
 
 
 class TouchManager:
@@ -81,21 +155,37 @@ class TouchManager:
     async def counts(self, session: AsyncSession, *, run_id: str) -> dict[str, int]:
         return await self.touches_qs.counts_for_run(session, run_id)
 
-    async def readings(self, session: AsyncSession, *, run_id: str, allowed: list[str]) -> dict[str, list[str]]:
+    async def readings(self, session: AsyncSession, *, run_id: str, allowed: list[str]) -> dict[str, Any]:
         """*allowed · touched · never touched · refused* — the retune's evidence.
 
         **Declared is half of it.** The lens says what may participate; this
         says what did. Three allowed and never touched reads *narrow?*; two
         refused reads *widen, or accept cannot answer deliberately*.
+
+        Beside the four address lists it returns what the run lens and the
+        layers gantt draw, counted here so a reader formats and never tallies:
+        ``participants`` (see :func:`classify_participants`), ``layers`` (see
+        :func:`layer_tallies`) and ``tallies`` — the four lists' lengths.
         """
         touched = await self.touches_qs.distinct_addresses(session, run_id)
-        refused = [touch.address for touch in await self.touches_qs.list_for_run(session, run_id) if touch.was_refused]
+        ledger = await self.touches_qs.list_for_run(session, run_id)
+        refused = [touch.address for touch in ledger if touch.was_refused]
         touched_set, refused_set = set(touched), dict.fromkeys(refused)
+        never = sorted(set(allowed) - touched_set)
+        participants = classify_participants(allowed, ledger)
         return {
             "allowed": sorted(allowed),
             "touched": sorted(touched_set),
-            "never_touched": sorted(set(allowed) - touched_set),
+            "never_touched": never,
             "refused": list(refused_set),
+            "participants": participants,
+            "layers": layer_tallies(participants, ledger),
+            "tallies": {
+                "allowed": len(allowed),
+                "touched": len(touched_set),
+                "never_touched": len(never),
+                "refused": len(refused_set),
+            },
         }
 
     async def compare(self, session: AsyncSession, *, run_a: str, run_b: str) -> dict:

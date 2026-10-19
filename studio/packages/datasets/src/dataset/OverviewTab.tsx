@@ -48,14 +48,8 @@ export function OverviewTab() {
 	const current = versions.data?.items.find((v) => v.version === version);
 	const retracted = (versions.data?.items ?? []).filter((v) => v.retracted);
 	const columns = current?.columns ?? [];
-	const scored = (standards.data?.items ?? []).filter((s) => s.conformance);
-	const lowest = scored.reduce<number | null>(
-		(min, s) =>
-			min === null
-				? (s.conformance?.score ?? null)
-				: Math.min(min, s.conformance?.score ?? 1),
-		null,
-	);
+	const lowest = standards.data?.lowest_score ?? null;
+	const claimed = standards.data?.total ?? 0;
 
 	return (
 		<PageBody>
@@ -90,8 +84,8 @@ export function OverviewTab() {
 					value={lowest === null ? "—" : percent(lowest)}
 					tone={lowest !== null && lowest < 1 ? "warning" : undefined}
 					caption={
-						scored.length
-							? `${scored.length} standard${scored.length === 1 ? "" : "s"} claimed`
+						claimed
+							? `${claimed} standard${claimed === 1 ? "" : "s"} claimed`
 							: "no standard claimed"
 					}
 				/>

@@ -9,6 +9,7 @@ from invana.apps.work.managers.project import ProjectManager, slugify
 from invana.apps.work.managers.proposal import ProposalManager
 from invana.apps.work.managers.report import ReportManager
 from invana.apps.work.managers.staffing import StaffingManager
+from invana.apps.work.managers.summary import ProjectSummaryManager
 from invana.apps.work.managers.task import TaskManager, blocked_by_text
 
 __all__ = [
@@ -17,6 +18,7 @@ __all__ = [
     "DependencyManager",
     "PlanManager",
     "ProjectManager",
+    "ProjectSummaryManager",
     "ProposalManager",
     "ReportManager",
     "StaffingManager",

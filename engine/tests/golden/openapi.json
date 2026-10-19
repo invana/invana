@@ -3897,6 +3897,16 @@
           "summary": {
             "title": "Summary",
             "type": "string"
+          },
+          "tokens_per_run_change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Change"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -5001,6 +5011,58 @@
         "title": "DatasetBindingRead",
         "type": "object"
       },
+      "DatasetClaim": {
+        "description": "One standard one dataset claims.",
+        "properties": {
+          "attachment": {
+            "$ref": "#/components/schemas/DatasetStandardRead"
+          },
+          "dataset": {
+            "$ref": "#/components/schemas/DatasetRead"
+          }
+        },
+        "required": [
+          "dataset",
+          "attachment"
+        ],
+        "title": "DatasetClaim",
+        "type": "object"
+      },
+      "DatasetClaimListResponse": {
+        "description": "Every claim on every dataset the reader may read.",
+        "properties": {
+          "by_standard": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Standard",
+            "type": "object"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetClaim"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unreadable": {
+            "default": 0,
+            "title": "Unreadable",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "by_standard"
+        ],
+        "title": "DatasetClaimListResponse",
+        "type": "object"
+      },
       "DatasetCreate": {
         "properties": {
           "column_sensitivity": {
@@ -5383,6 +5445,17 @@
             },
             "title": "Items",
             "type": "array"
+          },
+          "lowest_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lowest Score"
           },
           "total": {
             "title": "Total",
@@ -10478,6 +10551,50 @@
         "title": "Layer",
         "type": "string"
       },
+      "LayerTally": {
+        "description": "One layer of a run's ledger, counted.",
+        "properties": {
+          "allowed": {
+            "title": "Allowed",
+            "type": "integer"
+          },
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "refused": {
+            "title": "Refused",
+            "type": "integer"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          },
+          "touched": {
+            "title": "Touched",
+            "type": "integer"
+          },
+          "touches": {
+            "title": "Touches",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "layer",
+          "allowed",
+          "touched",
+          "refused",
+          "touches",
+          "calls",
+          "rows"
+        ],
+        "title": "LayerTally",
+        "type": "object"
+      },
       "LensCreate": {
         "description": "A new lens. **Unnamed by default** \u2014 naming is a separate act, because\nnaming is what shares it ([WO1]).",
         "properties": {
@@ -13707,6 +13824,57 @@
         "title": "ParticipantRead",
         "type": "object"
       },
+      "ParticipantReading": {
+        "description": "One participant of a run, classified and counted.",
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          },
+          "verdict": {
+            "title": "Verdict",
+            "type": "string"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "address",
+          "layer",
+          "verdict",
+          "why",
+          "calls",
+          "rows",
+          "tokens"
+        ],
+        "title": "ParticipantReading",
+        "type": "object"
+      },
       "Performance": {
         "properties": {
           "error_rate": {
@@ -15496,6 +15664,67 @@
           "updated_at"
         ],
         "title": "ProjectRead",
+        "type": "object"
+      },
+      "ProjectSummary": {
+        "description": "Every count a project's Overview and its detail's status bar show.",
+        "properties": {
+          "branches": {
+            "default": 0,
+            "title": "Branches",
+            "type": "integer"
+          },
+          "branches_by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Branches By Status",
+            "type": "object"
+          },
+          "critical_path": {
+            "default": 0,
+            "title": "Critical Path",
+            "type": "integer"
+          },
+          "datasets": {
+            "default": 0,
+            "title": "Datasets",
+            "type": "integer"
+          },
+          "decisions": {
+            "default": 0,
+            "title": "Decisions",
+            "type": "integer"
+          },
+          "findings": {
+            "default": 0,
+            "title": "Findings",
+            "type": "integer"
+          },
+          "findings_reviewed": {
+            "default": 0,
+            "title": "Findings Reviewed",
+            "type": "integer"
+          },
+          "todos_by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Todos By Status",
+            "type": "object"
+          },
+          "todos_open": {
+            "default": 0,
+            "title": "Todos Open",
+            "type": "integer"
+          },
+          "todos_open_for_agents": {
+            "default": 0,
+            "title": "Todos Open For Agents",
+            "type": "integer"
+          }
+        },
+        "title": "ProjectSummary",
         "type": "object"
       },
       "ProjectUpdate": {
@@ -25082,6 +25311,34 @@
         "title": "TouchRead",
         "type": "object"
       },
+      "TouchTallies": {
+        "properties": {
+          "allowed": {
+            "title": "Allowed",
+            "type": "integer"
+          },
+          "never_touched": {
+            "title": "Never Touched",
+            "type": "integer"
+          },
+          "refused": {
+            "title": "Refused",
+            "type": "integer"
+          },
+          "touched": {
+            "title": "Touched",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "allowed",
+          "touched",
+          "never_touched",
+          "refused"
+        ],
+        "title": "TouchTallies",
+        "type": "object"
+      },
       "TouchesRead": {
         "description": "One run's ledger, and the three numbers the board leads with.\n\n``allowed`` is what the frozen lens permits across the catalogue; ``touched``\nis what actually happened. The **difference between the two** is what a\nperson reads when they retune \u2014 three allowed and never touched is *narrow?*,\ntwo refused is *widen, or accept cannot answer deliberately*.",
         "properties": {
@@ -25106,11 +25363,25 @@
             "title": "Items",
             "type": "array"
           },
+          "layers": {
+            "items": {
+              "$ref": "#/components/schemas/LayerTally"
+            },
+            "title": "Layers",
+            "type": "array"
+          },
           "never_touched": {
             "items": {
               "type": "string"
             },
             "title": "Never Touched",
+            "type": "array"
+          },
+          "participants": {
+            "items": {
+              "$ref": "#/components/schemas/ParticipantReading"
+            },
+            "title": "Participants",
             "type": "array"
           },
           "refused": {
@@ -25123,6 +25394,16 @@
           "run_id": {
             "title": "Run Id",
             "type": "string"
+          },
+          "tallies": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TouchTallies"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "total": {
             "title": "Total",
@@ -26294,6 +26575,40 @@
         "title": "ValidateRequest",
         "type": "object"
       },
+      "ValidationDataset": {
+        "description": "A dataset with something to review.",
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "publisher": {
+            "title": "Publisher",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "address",
+          "publisher",
+          "name",
+          "title",
+          "total"
+        ],
+        "title": "ValidationDataset",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -26332,6 +26647,73 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "ValidationItem": {
+        "description": "One violation on a dataset's current version.",
+        "properties": {
+          "column": {
+            "title": "Column",
+            "type": "string"
+          },
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Enforcement"
+          },
+          "standard": {
+            "title": "Standard",
+            "type": "string"
+          },
+          "violation": {
+            "$ref": "#/components/schemas/Violation"
+          }
+        },
+        "required": [
+          "dataset",
+          "standard",
+          "mode",
+          "column",
+          "violation"
+        ],
+        "title": "ValidationItem",
+        "type": "object"
+      },
+      "ValidationQueue": {
+        "description": "The validation queue across every dataset the reader may read.",
+        "properties": {
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationDataset"
+            },
+            "title": "Datasets",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unreadable": {
+            "default": 0,
+            "title": "Unreadable",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "datasets"
+        ],
+        "title": "ValidationQueue",
         "type": "object"
       },
       "ValidationRead": {
@@ -27448,6 +27830,90 @@
         ]
       }
     },
+    "/api/v1/datasets/claims": {
+      "get": {
+        "description": "Every standard every readable dataset claims, with the claims per standard.",
+        "operationId": "list_claims_api_v1_datasets_claims_get",
+        "parameters": [
+          {
+            "description": "A standard as <publisher>/<name>.",
+            "in": "query",
+            "name": "standard",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A standard as <publisher>/<name>.",
+              "title": "Standard"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetClaimListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Claims",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/validation": {
+      "get": {
+        "description": "Every violation on the current version of every readable dataset, with the totals.",
+        "operationId": "validation_queue_api_v1_datasets_validation_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationQueue"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Validation Queue",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
     "/api/v1/datasets/{publisher}/{name}": {
       "get": {
         "operationId": "get_dataset_api_v1_datasets__publisher___name__get",
@@ -28308,7 +28774,7 @@
     },
     "/api/v1/datasets/{publisher}/{name}/versions/{version}/records": {
       "get": {
-        "description": "One version's records, ordered by key.",
+        "description": "One version's records, ordered by key; ``total`` counts what the filter keeps.",
         "operationId": "list_records_api_v1_datasets__publisher___name__versions__version__records_get",
         "parameters": [
           {
@@ -28360,6 +28826,18 @@
               "minimum": 1,
               "title": "Limit",
               "type": "integer"
+            }
+          },
+          {
+            "description": "Only the records with their own provenance.",
+            "in": "query",
+            "name": "provenance",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only the records with their own provenance.",
+              "title": "Provenance",
+              "type": "boolean"
             }
           }
         ],
@@ -45269,6 +45747,76 @@
         "summary": "Get Simulation",
         "tags": [
           "simulations"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/summary": {
+      "get": {
+        "description": "Every count the project's Overview tiles and status bar show \u2014 one call.",
+        "operationId": "project_summary_api_v1_u__username___graphSlug__projects__key__summary_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Project Summary",
+        "tags": [
+          "projects"
         ]
       }
     },

@@ -267,3 +267,59 @@ class DatasetStandardRead(BaseModel):
 class DatasetStandardListResponse(BaseModel):
     items: list[DatasetStandardRead]
     total: int
+    #: The lowest current-version score across the claims; null when none is scored.
+    lowest_score: float | None = None
+
+
+class DatasetClaim(BaseModel):
+    """One standard one dataset claims."""
+
+    dataset: DatasetRead
+    attachment: DatasetStandardRead
+
+
+class DatasetClaimListResponse(BaseModel):
+    """Every claim on every dataset the reader may read."""
+
+    items: list[DatasetClaim]
+    total: int
+    #: Claims per standard, by its unversioned address.
+    by_standard: dict[str, int]
+    #: Datasets whose claims could not be read.
+    unreadable: int = 0
+
+
+class ValidationItem(BaseModel):
+    """One violation on a dataset's current version."""
+
+    #: ``publisher/name`` of the dataset.
+    dataset: str
+    #: ``publisher/name@v`` of the claimed standard version.
+    standard: str
+    mode: Enforcement
+    #: The column the term is mapped to; the term itself when unmapped.
+    column: str
+    violation: Violation
+
+
+class ValidationDataset(BaseModel):
+    """A dataset with something to review."""
+
+    address: str
+    publisher: str
+    name: str
+    title: str
+    #: Its violations across every claim, beyond the 50 a claim keeps.
+    total: int
+
+
+class ValidationQueue(BaseModel):
+    """The validation queue across every dataset the reader may read."""
+
+    #: The violations each claim keeps, at most 50 per claim.
+    items: list[ValidationItem]
+    #: Every violation to review, counted from ``violation_count``.
+    total: int
+    datasets: list[ValidationDataset]
+    #: Datasets whose claims could not be read.
+    unreadable: int = 0

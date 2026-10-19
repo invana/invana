@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.graphs.models import Graph
 from invana.apps.work.models import Project, Task
-from invana.apps.work.plan import derive
+from invana.apps.work.plan import DerivedPlan, derive
 from invana.apps.work.querysets import ProjectQuerySet, TaskDependencyQuerySet, TaskQuerySet
 from invana.apps.work.schemas import PlanEdge, PlanTaskRead, ProjectPlanResponse
 from invana.core.auth.querysets import UserQuerySet
@@ -25,10 +25,16 @@ class PlanManager:
     agents_qs = AgentQuerySet()
     users_qs = UserQuerySet()
 
-    async def for_project(self, session: AsyncSession, *, graph: Graph, project: Project | None) -> ProjectPlanResponse:
-        tasks = await self.tasks_qs.list_for_project(
-            session, graph_id=graph.id, project_id=project.id if project else None
-        )
+    async def derive_for(
+        self, session: AsyncSession, *, graph_id: str, project_id: str | None
+    ) -> tuple[list[Task], DerivedPlan]:
+        """The tasks a project's plan draws — its own and any other project's
+        task one of them depends on — and their derived topology.
+
+        The plan and the project summary both read the critical path from here,
+        so the two never disagree about its length.
+        """
+        tasks = await self.tasks_qs.list_for_project(session, graph_id=graph_id, project_id=project_id)
         ids = [t.id for t in tasks]
         edges = await self.dependencies_qs.edges_into(session, task_ids=ids)
 
@@ -38,7 +44,10 @@ class PlanManager:
         external = await self.tasks_qs.by_ids(session, list(external_ids))
 
         every = tasks + external
-        derived = derive([(t.id, t.status, t.due_at, t.created_at) for t in every], edges)
+        return every, derive([(t.id, t.status, t.due_at, t.created_at) for t in every], edges)
+
+    async def for_project(self, session: AsyncSession, *, graph: Graph, project: Project | None) -> ProjectPlanResponse:
+        every, derived = await self.derive_for(session, graph_id=graph.id, project_id=project.id if project else None)
         positions = derived.by_id()
 
         keys = await self.projects_qs.keys_by_ids(session, [t.project_id for t in every if t.project_id])

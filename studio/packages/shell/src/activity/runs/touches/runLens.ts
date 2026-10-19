@@ -36,25 +36,24 @@ import type {
 	LensSectionSpec,
 	ParticipantSpec,
 } from "@invana/boards";
-import type { Layer } from "@invana/ui";
-import type { Touch, TouchesResponse } from "@invana-studio/core";
+import type {
+	ParticipantReading,
+	Touch,
+	TouchesResponse,
+} from "@invana-studio/core";
 import { LAYER_PALETTE } from "@invana-studio/ui";
 import { BANDS } from "./runLayers";
 
 /** `graph_data/model/Routes@v4` → `graph_data`. The engine's own split. */
-function layerOf(address: string): Layer {
-	return address.split("/", 1)[0] as Layer;
-}
-
 /** `1,284 rows · 3 calls · step 7` — what came back, in the ledger's numbers. */
-function noteOfTouched(rows: Touch[]): string {
+function noteOfTouched(
+	p: ParticipantReading,
+	step: string | undefined,
+): string {
 	const parts: string[] = [];
-	const records = rows.reduce((n, t) => n + (t.volume.rows ?? 0), 0);
-	if (records) parts.push(`${records.toLocaleString()} rows`);
-	const tokens = rows.reduce((n, t) => n + (t.volume.tokens ?? 0), 0);
-	if (tokens) parts.push(`${tokens.toLocaleString()} tokens`);
-	if (rows.length > 1) parts.push(`${rows.length} calls`);
-	const step = rows.find((t) => t.step_key)?.step_key;
+	if (p.rows) parts.push(`${p.rows.toLocaleString()} rows`);
+	if (p.tokens) parts.push(`${p.tokens.toLocaleString()} tokens`);
+	if (p.calls > 1) parts.push(`${p.calls} calls`);
 	if (step) parts.push(step);
 	// Never empty: *touched* with nothing beside it reads as a record that
 	// failed to load rather than as a call that returned nothing measurable.
@@ -62,40 +61,40 @@ function noteOfTouched(rows: Touch[]): string {
 }
 
 /**
- * One participant's verdict and note, from its rows of the ledger.
- *
- * `miss` is the cache's own word for a lookup that found nothing — a distinct
- * fact from *never touched*, which is a participant nothing asked for at all.
+ * One participant, as the engine classified it — refused, touched, a cache
+ * miss, or allowed and never asked for. Studio only words it.
  */
-function participant(address: string, rows: Touch[]): ParticipantSpec {
-	const refused = rows.find((t) => t.direction === "refused");
-	if (refused) {
-		return {
-			address,
-			verdict: "refused",
-			note:
-				refused.why ??
-				(refused.rule_matched
-					? `denied by ${refused.rule_matched}`
-					: "outside this world — widen to answer"),
-		};
+function participant(p: ParticipantReading, ledger: Touch[]): ParticipantSpec {
+	switch (p.verdict) {
+		case "refused":
+			return {
+				address: p.address,
+				verdict: "refused",
+				note: p.why ?? "outside this world — widen to answer",
+			};
+		case "touched":
+			return {
+				address: p.address,
+				verdict: "touched",
+				note: noteOfTouched(
+					p,
+					ledger.find((t) => t.address === p.address && t.step_key)?.step_key ??
+						undefined,
+				),
+			};
+		case "miss":
+			return {
+				address: p.address,
+				verdict: "miss",
+				note: p.why ?? "nothing was reused",
+			};
+		default:
+			return {
+				address: p.address,
+				verdict: "never touched",
+				note: "allowed, and nothing asked for it",
+			};
 	}
-	const engaged = rows.filter((t) => t.direction !== "skipped");
-	if (engaged.length) {
-		return { address, verdict: "touched", note: noteOfTouched(engaged) };
-	}
-	if (rows.length) {
-		return {
-			address,
-			verdict: "miss",
-			note: rows[0].why ?? "nothing was reused",
-		};
-	}
-	return {
-		address,
-		verdict: "never touched",
-		note: "allowed, and nothing asked for it",
-	};
 }
 
 /**
@@ -111,25 +110,7 @@ export function runLensOptions(
 	opts: { selectAction?: string } = {},
 ): LensOptions {
 	const ledger = [...(touches?.items ?? [])].sort((a, b) => a.seq - b.seq);
-
-	const rowsByAddress = new Map<string, Touch[]>();
-	for (const touch of ledger) {
-		const rows = rowsByAddress.get(touch.address) ?? [];
-		rows.push(touch);
-		rowsByAddress.set(touch.address, rows);
-	}
-
-	const addresses = [
-		...new Set([...(touches?.allowed ?? []), ...rowsByAddress.keys()]),
-	].sort();
-
-	const byLayer = new Map<Layer, ParticipantSpec[]>();
-	for (const address of addresses) {
-		const layer = layerOf(address);
-		const list = byLayer.get(layer) ?? [];
-		list.push(participant(address, rowsByAddress.get(address) ?? []));
-		byLayer.set(layer, list);
-	}
+	const tallies = new Map((touches?.layers ?? []).map((l) => [l.layer, l]));
 
 	// Every band, in the order the strip reads them — a layer the world allowed
 	// nothing on is dim rather than dropped, because *nothing was permitted
@@ -137,15 +118,18 @@ export function runLensOptions(
 	const sections: LensSectionSpec[] = BANDS.filter(
 		(layer) => layer !== "agent",
 	).map((layer) => {
-		const participants = byLayer.get(layer) ?? [];
-		const touched = participants.filter((p) => p.verdict === "touched").length;
+		const participants = (touches?.participants ?? [])
+			.filter((p) => p.layer === layer)
+			.map((p) => participant(p, ledger));
+		const allowed = tallies.get(layer)?.allowed ?? 0;
+		const touched = tallies.get(layer)?.touched ?? 0;
 		return {
 			layer,
-			count: participants.length,
-			summary: participants.length
-				? `${participants.length} allowed · ${touched} touched`
+			count: allowed,
+			summary: allowed
+				? `${allowed} allowed · ${touched} touched`
 				: "nothing allowed here",
-			dim: participants.length === 0,
+			dim: allowed === 0,
 			participants,
 		};
 	});
@@ -159,10 +143,10 @@ export function runLensOptions(
 
 /** The four counts above the sections — the retune's evidence, as tiles. */
 export function lensSummary(touches: TouchesResponse | undefined) {
-	const allowed = touches?.allowed?.length ?? 0;
-	const touched = touches?.touched?.length ?? 0;
-	const never = touches?.never_touched?.length ?? 0;
-	const refused = touches?.refused?.length ?? 0;
+	const allowed = touches?.tallies?.allowed ?? 0;
+	const touched = touches?.tallies?.touched ?? 0;
+	const never = touches?.tallies?.never_touched ?? 0;
+	const refused = touches?.tallies?.refused ?? 0;
 	return [
 		{
 			label: "Allowed",

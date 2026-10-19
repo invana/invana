@@ -321,6 +321,52 @@ export interface DatasetStandard {
 export interface DatasetStandardListResponse {
 	items: DatasetStandard[];
 	total: number;
+	/** The lowest current-version score across the claims; null when none is scored. */
+	lowest_score?: number | null;
+}
+
+export interface DatasetClaim {
+	dataset: Dataset;
+	attachment: DatasetStandard;
+}
+
+export interface DatasetClaimListResponse {
+	items: DatasetClaim[];
+	total: number;
+	/** Claims per standard, by its unversioned address. */
+	by_standard: Record<string, number>;
+	/** Datasets whose claims could not be read. */
+	unreadable: number;
+}
+
+export interface ValidationItem {
+	/** `publisher/name` of the dataset. */
+	dataset: string;
+	/** `publisher/name@v` of the claimed standard version. */
+	standard: string;
+	mode: Enforcement;
+	/** The column the term is mapped to; the term itself when unmapped. */
+	column: string;
+	violation: Violation;
+}
+
+export interface ValidationDataset {
+	address: string;
+	publisher: string;
+	name: string;
+	title: string;
+	/** Its violations across every claim. */
+	total: number;
+}
+
+export interface ValidationQueue {
+	/** The violations each claim keeps, at most 50 per claim. */
+	items: ValidationItem[];
+	/** Every violation to review. */
+	total: number;
+	datasets: ValidationDataset[];
+	/** Datasets whose claims could not be read. */
+	unreadable: number;
 }
 
 export interface DatasetStandardCreate {
