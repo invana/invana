@@ -30,7 +30,13 @@ export {
 } from "./chrome/BoardToolbar";
 export { EmptyBoard, ExplorerLocked } from "./chrome/ExplorerLocked";
 export { RecordCard } from "./chrome/RecordCard";
-export { ConnectionLine, RendererLine } from "./chrome/StatusLine";
+export {
+	ConnectionLine,
+	ConsoleCounts,
+	MessageLine,
+	RendererLine,
+	ViewLine,
+} from "./chrome/StatusLine";
 export { ToolsSwitch } from "./chrome/ToolsSwitch";
 export { useExplorerTools } from "./chrome/useExplorerTools";
 export { ExpandNeighboursDialog } from "./ExpandNeighboursDialog";

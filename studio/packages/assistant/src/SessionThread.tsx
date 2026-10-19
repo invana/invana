@@ -24,7 +24,7 @@ export interface SessionThreadProps {
 	onTypeInstead: () => void;
 	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
 	/** Open the console — on Records or on Log. */
-	onOpenConsole?: (tab: "records" | "log") => void;
+	onOpenConsole?: (tab: "data" | "queries", messageId?: string) => void;
 	/** Keep the board as it stands as a view — a reply's *Save view*. */
 	onSaveView?: () => void;
 }

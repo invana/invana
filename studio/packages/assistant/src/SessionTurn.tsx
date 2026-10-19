@@ -127,7 +127,7 @@ export interface AssistantTurnProps {
 	/** Open the console under the board — on Records from the reply's record
 	 *  count, on Log where a failed query's whole error is read. Absent where
 	 *  the page has no console. */
-	onOpenConsole?: (tab: "records" | "log") => void;
+	onOpenConsole?: (tab: "data" | "queries", messageId?: string) => void;
 	/** Keep the board as it stands as a view — a reply's *Save view*. */
 	onSaveView?: () => void;
 	/** The thread this turn is in — what *Share*'s live link opens. */
@@ -311,7 +311,7 @@ function SettledTurn({
 							type="button"
 							className="underline-offset-2 hover:text-foreground hover:underline"
 							title="Read them in the console"
-							onClick={() => onOpenConsole("records")}
+							onClick={() => onOpenConsole("data")}
 						>
 							{meta}
 						</button>
@@ -424,7 +424,11 @@ function SettledTurn({
 						message.sourceQuery ? () => onRerun(message.id) : onTypeInstead
 					}
 					onFocusComposer={onTypeInstead}
-					onOpenLog={onOpenConsole ? () => onOpenConsole("log") : undefined}
+					onOpenLog={
+						onOpenConsole
+							? () => onOpenConsole("queries", message.id)
+							: undefined
+					}
 				/>
 			)}
 			{hasSteps && (

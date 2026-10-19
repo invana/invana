@@ -1,8 +1,13 @@
 import {
-	ContextBar,
+	Button,
 	cn,
 	EmptyState,
+	Eyebrow,
+	Item,
+	RecordPager,
+	ScrollArea,
 	SegmentedControl,
+	StatusDot,
 	TabbedPanel,
 	Table,
 	TableBody,
@@ -14,42 +19,45 @@ import {
 	TerminalLine,
 	TypographyPre,
 } from "@invana/ui";
-import type {
-	Emission,
-	QueryResponse,
-	SessionMessage,
-} from "@invana-studio/core";
-import { emissionsApi, useRunStore } from "@invana-studio/core";
-import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, Play } from "lucide-react";
-import { useState } from "react";
-import { emissionsFromResult } from "../answer-surface/emissions";
+import type { QueryResultItem, Session } from "@invana-studio/core";
+import { ChevronDown, ChevronLeft, Play } from "lucide-react";
+import { type ReactNode, useMemo, useState } from "react";
 import {
-	type ConsoleRecords,
 	type ConsoleTab,
+	countsOf,
+	type LabelGroup,
+	labelGroupsOf,
 	logOf,
-	queriesOf,
-	recordsOf,
+	pageOf,
+	type QueryStep,
+	queryStepsOf,
 } from "./consoleRecords";
-
-/** Rows drawn at once; the count above the table is always the full one. */
-const WINDOW = 200;
+import type { DataPlace } from "./useConsoleParam";
 
 export interface ConsolePanelProps {
-	username: string;
-	graphSlug: string;
-	/** The open thread's latest reply — what the canvas in front of it drew. */
-	message: SessionMessage | null;
-	/** That reply's result, when it is still in hand from this page's run. */
-	result: QueryResponse | null | undefined;
 	tab: ConsoleTab;
-	onTabChange: (tab: ConsoleTab) => void;
+	/** Data's label and page, from the param; absent is the first label. */
+	data: DataPlace | null;
+	/** The query open in Queries — its reply's id. */
+	query: string | null;
+	/** Everything drawn on the canvas in front. */
+	items: readonly QueryResultItem[];
+	/** The open thread — its replies are the session's queries. */
+	session: Session | null;
+	onOpenData: (place?: DataPlace) => void;
+	onOpenQueries: (messageId?: string | null) => void;
 	onCollapse: () => void;
-	/** Run the reply's query again, as a new run of the same reply. */
-	onRerun: () => void;
-	isRunning: boolean;
 	/** Select a drawn element on the canvas — a row is a view of that element. */
 	onSelectElement?: (id: string) => void;
+	/**
+	 * A query's detail: the run page's own step, which this package cannot
+	 * import. Absent, or for a query whose run left no step, the reply's log.
+	 */
+	renderStep?: (step: QueryStep) => ReactNode;
+	/** Run a query again, as a new run of the reply that ran it. */
+	onRerun?: (messageId: string) => void;
+	/** A run is in flight — Re-run waits for it. */
+	isRunning?: boolean;
 }
 
 function cell(value: unknown): string {
@@ -58,226 +66,102 @@ function cell(value: unknown): string {
 	return String(value);
 }
 
-function RecordsTable({
-	records,
-	onSelectElement,
+const STATUS_TONE = {
+	done: "success",
+	failed: "error",
+	running: "running",
+} as const;
+
+function LabelList({
+	groups,
+	active,
+	onPick,
 }: {
-	records: ConsoleRecords;
-	onSelectElement?: (id: string) => void;
+	groups: LabelGroup[];
+	active: LabelGroup;
+	onPick: (g: LabelGroup) => void;
 }) {
-	const shown = records.rows.slice(0, WINDOW);
+	const section = (title: string, kind: LabelGroup["kind"]) => {
+		const its = groups.filter((g) => g.kind === kind);
+		if (its.length === 0) return null;
+		return (
+			<div className="flex flex-col">
+				<Eyebrow className="px-2 pt-2 pb-1">{title}</Eyebrow>
+				{its.map((g) => (
+					<Item
+						key={`${g.kind}:${g.label}`}
+						asChild
+						size="xs"
+						selected={g === active}
+						aria-selected={g === active}
+					>
+						<button type="button" onClick={() => onPick(g)}>
+							<span className="min-w-0 flex-1 truncate font-mono">
+								{g.label}
+							</span>
+							<span className="text-muted-foreground tabular-nums">
+								{g.items.length.toLocaleString()}
+							</span>
+						</button>
+					</Item>
+				))}
+			</div>
+		);
+	};
 	return (
-		<Table>
-			<TableHeader>
-				<TableRow>
-					{records.columns.map((c) => (
-						<TableHead key={c}>{c}</TableHead>
-					))}
-				</TableRow>
-			</TableHeader>
-			<TableBody>
-				{shown.map((row, i) => {
-					const id = records.elementIds?.[i];
-					return (
-						<TableRow
-							// One element can come back on several rows, so the
-							// position keeps the key unique; rows are never reordered.
-							// biome-ignore lint/suspicious/noArrayIndexKey: the rows are a fixed page of one result
-							key={`${i}:${id ?? ""}`}
-							className={id && onSelectElement ? "cursor-pointer" : undefined}
-							onClick={
-								id && onSelectElement ? () => onSelectElement(id) : undefined
-							}
-						>
-							{records.columns.map((c) => {
-								// A node's properties are one JSON line, so a cell is capped
-								// and the whole value is its hover.
-								const text = cell(row[c]);
-								return (
-									<TableCell
-										key={c}
-										title={text}
-										className={cn(
-											"max-w-96 truncate",
-											c === "id" ? "font-mono" : "tabular-nums",
-										)}
-									>
-										{text}
-									</TableCell>
-								);
-							})}
-						</TableRow>
-					);
-				})}
-			</TableBody>
-		</Table>
+		<ScrollArea className="w-52 shrink-0 border-r border-border">
+			<div className="flex flex-col p-1">
+				{section("Nodes", "node")}
+				{section("Relationships", "relationship")}
+			</div>
+		</ScrollArea>
 	);
 }
 
-/**
- * The console — the records, the queries and the log behind what the canvas
- * drew, in `bottomSection` under the canvas only.
- *
- * It holds the open thread's latest reply, because the canvas is that thread's
- * layer. Records are read from the reply's emissions (the record, so a reload
- * reads rather than re-runs), falling back to the result this page still has
- * in hand. Query is read-only — writing one is the composer's job. Log lists
- * the run's steps and the error of a failed one, which is where a failed
- * query is read. Re-run and Collapse sit in the tab strip; the counts are its
- * last row. It names no key: the console has no editor, so `⌘↵` is the
- * composer's, named in the chat's status bar.
- */
-export function ConsolePanel({
-	username,
-	graphSlug,
-	message,
-	result,
-	tab,
-	onTabChange,
-	onCollapse,
-	onRerun,
-	isRunning,
+function DataTab({
+	items,
+	place,
+	onOpenData,
 	onSelectElement,
-}: ConsolePanelProps) {
+}: {
+	items: readonly QueryResultItem[];
+	place: DataPlace | null;
+	onOpenData: (place: DataPlace) => void;
+	onSelectElement?: (id: string) => void;
+}) {
 	const [format, setFormat] = useState<"table" | "json">("table");
-	const runId = message?.runId;
-	const views = useRunStore((s) => s.views);
-	const view = runId ? views[runId] : undefined;
-	// The same query, and so the same cache entry, as the reply's emission card.
-	const persisted = useQuery({
-		queryKey: ["emissions", username, graphSlug, runId] as const,
-		queryFn: () => emissionsApi.list(username, graphSlug, runId as string),
-		enabled: Boolean(runId),
-		staleTime: 60_000,
-	});
-	const emissions: Emission[] = persisted.data?.length
-		? persisted.data
-		: emissionsFromResult(result ?? view?.result, { onCanvas: true });
-
-	const failed = message?.status === "error";
-	const records = failed ? null : recordsOf(emissions);
-	const queries = queriesOf(emissions, message);
-	const steps = view?.steps ?? message?.steps ?? [];
-	const log = logOf(message, steps);
-	const doneSteps = steps.filter((s) => s.status === "succeeded").length;
-
-	const counters = failed
-		? `failed · ${log.find((l) => l.level === "error")?.source ?? "query"}`
-		: [
-				records ? `${records.rows.length.toLocaleString()} records` : null,
-				`${queries.length} ${queries.length === 1 ? "query" : "queries"}`,
-				message?.executionTimeMs != null
-					? `${message.executionTimeMs} ms`
-					: null,
-				steps.length > 0 ? `${doneSteps}/${steps.length} steps` : null,
-			]
-				.filter(Boolean)
-				.join(" · ");
-
-	const nothingRan = (
-		<EmptyState
-			title="Nothing has run on this canvas"
-			description="Ask a question or run a query — its records, the query and the log land here."
-		/>
-	);
-
-	const recordsBody = !message ? (
-		nothingRan
-	) : failed ? (
-		<EmptyState
-			title="Nothing ran"
-			description="The query failed before it returned records — Log has the line."
-		/>
-	) : !records ? (
-		<EmptyState
-			title="No records in hand"
-			description="This canvas was restored, not run — re-run its query to read the rows."
-		/>
-	) : records.rows.length === 0 ? (
-		<EmptyState
-			title="0 records"
-			description="The query returned nothing to show."
-		/>
-	) : format === "json" ? (
-		<TypographyPre className="m-0 rounded-none border-0">
-			{JSON.stringify(records.rows.slice(0, WINDOW), null, 2)}
-		</TypographyPre>
-	) : (
-		<RecordsTable records={records} onSelectElement={onSelectElement} />
-	);
-
-	const tabs = [
-		{
-			value: "records",
-			label: "Records",
-			content: (
-				<div className="flex h-full flex-col overflow-auto">
-					{records && records.rows.length > WINDOW ? (
-						<p className="px-3 py-1 text-muted-foreground">
-							Showing the first {WINDOW} of{" "}
-							{records.rows.length.toLocaleString()}
-						</p>
-					) : null}
-					{recordsBody}
-				</div>
-			),
-		},
-		{
-			value: "query",
-			label: "Query",
-			content: (
-				<div className="flex h-full flex-col gap-3 overflow-auto p-3">
-					{queries.length === 0
-						? nothingRan
-						: queries.map((q, i) => (
-								<div key={q.query} className="flex flex-col gap-1">
-									<p className="text-muted-foreground">
-										query {i + 1} of {queries.length}
-										{q.language ? ` · ${q.language}` : ""}
-										{q.executionTimeMs != null
-											? ` · ${q.executionTimeMs} ms`
-											: ""}
-									</p>
-									<TypographyPre className="m-0">{q.query}</TypographyPre>
-								</div>
-							))}
-				</div>
-			),
-		},
-		{
-			value: "log",
-			label: "Log",
-			content: (
-				<div className="flex h-full flex-col overflow-auto">
-					{log.length === 0 ? (
-						nothingRan
-					) : (
-						<Terminal
-							className="min-h-full border-0"
-							columnTemplate="5rem 3rem 10rem minmax(0,1fr)"
-						>
-							{log.map((l) => (
-								<TerminalLine
-									key={l.id}
-									level={l.level}
-									columns={[l.at, l.level, l.source, l.message]}
-								/>
-							))}
-						</Terminal>
-					)}
-				</div>
-			),
-		},
-	];
+	const groups = useMemo(() => labelGroupsOf(items), [items]);
+	if (groups.length === 0)
+		return (
+			<EmptyState
+				className="h-full"
+				title="Nothing on the canvas"
+				description="Ask a question or type a query — what it draws is listed here, one table per label."
+			/>
+		);
+	const active =
+		groups.find((g) => g.kind === place?.kind && g.label === place?.label) ??
+		groups[0];
+	const page = pageOf(active.items, place?.page ?? 1);
+	const go = (n: number) =>
+		onOpenData({ kind: active.kind, label: active.label, page: n });
+	const noun = active.kind === "node" ? "nodes" : "relationships";
 
 	return (
-		<TabbedPanel
-			className="h-full"
-			tabs={tabs}
-			activeTab={tab}
-			onTabChange={(v) => onTabChange(v as ConsoleTab)}
-			headerContent={
-				tab === "records" && records && records.rows.length > 0 ? (
+		<div className="flex h-full min-h-0">
+			<LabelList
+				groups={groups}
+				active={active}
+				onPick={(g) => onOpenData({ kind: g.kind, label: g.label, page: 1 })}
+			/>
+			<div className="flex min-w-0 flex-1 flex-col">
+				<div className="flex items-center gap-2 border-b border-border px-3 py-1">
+					<span className="font-mono font-medium">{active.label}</span>
+					<span className="text-muted-foreground">
+						{active.items.length.toLocaleString()} {noun} ·{" "}
+						{active.columns.length} properties
+					</span>
+					<span className="flex-1" />
 					<SegmentedControl
 						size="xs"
 						aria-label="Records as"
@@ -288,23 +172,277 @@ export function ConsolePanel({
 						value={format}
 						onValueChange={(v) => setFormat(v as "table" | "json")}
 					/>
-				) : undefined
-			}
+					<RecordPager
+						position={`${page.first}–${page.last} of ${active.items.length.toLocaleString()}`}
+						previousLabel="Previous page"
+						nextLabel="Next page"
+						onPrevious={page.page > 1 ? () => go(page.page - 1) : undefined}
+						onNext={
+							page.page < page.pages ? () => go(page.page + 1) : undefined
+						}
+					/>
+				</div>
+				<div className="min-h-0 flex-1 overflow-auto">
+					{format === "json" ? (
+						<TypographyPre className="m-0 rounded-none border-0">
+							{JSON.stringify(
+								page.rows.map((i) => ({
+									id: i.id,
+									label: i.label,
+									...(i.type === "edge"
+										? { source: i.source, target: i.target }
+										: {}),
+									properties: i.properties,
+								})),
+								null,
+								2,
+							)}
+						</TypographyPre>
+					) : (
+						<Table>
+							<TableHeader>
+								<TableRow>
+									{active.columns.map((c) => (
+										<TableHead key={c}>{c}</TableHead>
+									))}
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{page.rows.map((row) => (
+									<TableRow
+										key={row.id}
+										className={onSelectElement ? "cursor-pointer" : undefined}
+										onClick={
+											onSelectElement
+												? () => onSelectElement(row.id)
+												: undefined
+										}
+									>
+										{active.columns.map((c) => {
+											// A cell is capped; the whole value is its hover.
+											const text = cell(row.properties?.[c]);
+											return (
+												<TableCell
+													key={c}
+													title={text}
+													className="max-w-96 truncate tabular-nums"
+												>
+													{text}
+												</TableCell>
+											);
+										})}
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					)}
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function QueryList({
+	queries,
+	onOpen,
+}: {
+	queries: QueryStep[];
+	onOpen: (messageId: string) => void;
+}) {
+	if (queries.length === 0)
+		return (
+			<EmptyState
+				className="h-full"
+				title="No queries yet in this session"
+				description="Ask a question or type a query — each one it runs is listed here."
+			/>
+		);
+	return (
+		<Table>
+			<TableHeader>
+				<TableRow>
+					<TableHead className="w-6" />
+					<TableHead>query</TableHead>
+					<TableHead>language</TableHead>
+					<TableHead>ran</TableHead>
+					<TableHead>took</TableHead>
+					<TableHead>rows</TableHead>
+					<TableHead>asked by</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{queries.map((q) => (
+					<TableRow
+						key={q.messageId}
+						className="cursor-pointer"
+						onClick={() => onOpen(q.messageId)}
+					>
+						<TableCell>
+							<StatusDot tone={STATUS_TONE[q.status]} label={q.status} />
+						</TableCell>
+						<TableCell
+							title={q.query}
+							className="max-w-[40rem] truncate font-mono"
+						>
+							{q.query}
+						</TableCell>
+						<TableCell>{q.language ?? "—"}</TableCell>
+						<TableCell className="tabular-nums">
+							{q.at.toLocaleTimeString([], { hour12: false })}
+						</TableCell>
+						<TableCell className="tabular-nums">
+							{q.executionTimeMs != null ? `${q.executionTimeMs} ms` : "—"}
+						</TableCell>
+						<TableCell className="tabular-nums">
+							{q.rowCount != null ? q.rowCount.toLocaleString() : "—"}
+						</TableCell>
+						<TableCell
+							title={q.askedBy}
+							className={cn(
+								"max-w-80 truncate",
+								!q.askedBy && "text-muted-foreground",
+							)}
+						>
+							{q.askedBy ?? "typed in the chat"}
+						</TableCell>
+					</TableRow>
+				))}
+			</TableBody>
+		</Table>
+	);
+}
+
+/**
+ * The console — what is on the canvas and the queries this session ran, in
+ * `bottomSection` under the canvas only. The footer's counts open it.
+ *
+ * **Data** is the whole canvas, one table per node label and relationship
+ * type, because labels carry different properties: the list names each with
+ * its count, the table holds that one's own columns, 20 a page, as a table or
+ * the JSON the records arrived in. A row selects its element on the canvas.
+ * **Queries** is the session's query steps, newest first; one opens as the run
+ * page's own step — never a second drawing of it.
+ */
+export function ConsolePanel({
+	tab,
+	data,
+	query,
+	items,
+	session,
+	onOpenData,
+	onOpenQueries,
+	onCollapse,
+	onSelectElement,
+	renderStep,
+	onRerun,
+	isRunning = false,
+}: ConsolePanelProps) {
+	const queries = useMemo(() => queryStepsOf(session), [session]);
+	const open = query ? queries.find((q) => q.messageId === query) : undefined;
+	const counts = countsOf(items);
+
+	const detail = (q: QueryStep) => {
+		const step = q.stepId && q.runId ? renderStep?.(q) : null;
+		if (step) return step;
+		const message = session?.messages.find((m) => m.id === q.messageId) ?? null;
+		const log = logOf(message, message?.steps ?? []);
+		return log.length === 0 ? (
+			<EmptyState
+				className="h-full"
+				title="No trace for this query"
+				description="Its run left no steps to open."
+			/>
+		) : (
+			<Terminal
+				className="min-h-full border-0"
+				columnTemplate="5rem 3rem 12rem minmax(0,1fr)"
+			>
+				{log.map((l) => (
+					<TerminalLine
+						key={l.id}
+						level={l.level}
+						columns={[l.at, l.level, l.source, l.message]}
+					/>
+				))}
+			</Terminal>
+		);
+	};
+
+	const tabs = [
+		{
+			value: "data",
+			name: "Data",
+			label: (
+				<span className="flex items-center gap-1.5">
+					Data
+					<span className="text-muted-foreground tabular-nums">
+						{(counts.nodes + counts.relationships).toLocaleString()}
+					</span>
+				</span>
+			),
+			content: (
+				<DataTab
+					items={items}
+					place={data}
+					onOpenData={onOpenData}
+					onSelectElement={onSelectElement}
+				/>
+			),
+		},
+		{
+			value: "queries",
+			name: "Queries",
+			label: (
+				<span className="flex items-center gap-1.5">
+					Queries
+					<span className="text-muted-foreground tabular-nums">
+						{queries.length}
+					</span>
+				</span>
+			),
+			content: open ? (
+				<div className="flex h-full min-h-0 flex-col">
+					<div className="flex items-center border-b border-border px-1 py-0.5">
+						<Button variant="ghost" size="sm" onClick={() => onOpenQueries()}>
+							<ChevronLeft aria-hidden />
+							All queries
+						</Button>
+						<span className="flex-1" />
+						{onRerun ? (
+							<Button
+								variant="ghost"
+								size="sm"
+								disabled={isRunning || open.status === "running"}
+								onClick={() => onRerun(open.messageId)}
+							>
+								<Play aria-hidden />
+								Re-run
+							</Button>
+						) : null}
+					</div>
+					<div className="min-h-0 flex-1 overflow-auto">{detail(open)}</div>
+				</div>
+			) : (
+				<div className="h-full overflow-auto">
+					<QueryList queries={queries} onOpen={(id) => onOpenQueries(id)} />
+				</div>
+			),
+		},
+	];
+
+	return (
+		<TabbedPanel
+			className="h-full"
+			tabs={tabs}
+			activeTab={tab}
+			onTabChange={(v) => (v === "data" ? onOpenData() : onOpenQueries())}
 			headerActions={[
-				{
-					name: "Re-run",
-					label: "Re-run",
-					icon: Play,
-					disabled: isRunning || !message?.sourceQuery,
-					onClick: onRerun,
-				},
 				{
 					name: "Collapse the console",
 					icon: ChevronDown,
 					onClick: onCollapse,
 				},
 			]}
-			footerContent={<ContextBar counters={counters} />}
 		/>
 	);
 }

@@ -331,10 +331,15 @@ export function ProductHost() {
 	);
 
 	// `?console=` — the console under the data canvas. A query that fails while
-	// the page watches opens it on Log, where the failing line is.
+	// the page watches opens it on that query, where the failing line is.
 	const consoleParam = useConsoleParam();
-	const openConsoleTab = consoleParam.open;
-	useOpenConsoleOnSettle(activeSession, openConsoleTab);
+	const { openData, openQueries } = consoleParam;
+	const openConsoleTab = useCallback(
+		(tab: "data" | "queries", messageId?: string) =>
+			tab === "data" ? openData() : openQueries(messageId),
+		[openData, openQueries],
+	);
+	useOpenConsoleOnSettle(activeSession, consoleParam);
 
 	// The assistant starts centred: with nothing docked on the right and no
 	// left panel open — or in the Explorer, which draws no left panel — the
@@ -470,6 +475,9 @@ export function ProductHost() {
 		explorer: explorerOpen,
 		assistantShown,
 		connection: graphLoading ? undefined : (graph ?? null),
+		dataBoardInFront,
+		activeSession,
+		console: consoleParam,
 	});
 
 	// The Explorer with no canvas open is the centred start alone — no strip,
@@ -565,6 +573,8 @@ export function ProductHost() {
 								sessionState,
 								dataBoards,
 								dataBoardInFront,
+								onOpenRun: (runId, stepId) =>
+									openBoard({ kind: "run", subjectId: runId, runId, stepId }),
 							})}
 						/>
 					</SetupSlotsContext.Provider>

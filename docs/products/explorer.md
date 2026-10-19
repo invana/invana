@@ -31,7 +31,7 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | EX-F9 | Locked until set up | In Studio | EX-11 |
 | EX-F10 | Add an answer to a project branch — *Add to a project* on the reply line ([projects.md](projects.md) › `projects.addFinding`) | In Studio | EX-12 |
 | EX-F13 | Share — live link or frozen snapshot for members; PNG · CSV · Markdown export | In Studio (C09) | EX-15 |
-| EX-F12 | Console — records · query · log under the board, resizable, Table or JSON | New (the-console.md exists, not wired) | EX-08 · EX-14 |
+| EX-F12 | Console — the canvas’s data per label, Table or JSON, paged · the session’s queries and each one’s step, opened from the footer | New (the-console.md) | EX-08 · EX-14 |
 | EX-F11 | Assistant chat — centred to start, docked right once a conversation begins, closable | In Studio (chat) · New (centred start, close) | EX-01 · EX-02 · EX-13 |
 
 ## User stories
@@ -52,7 +52,7 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | EX-12 | analyst | to add an answer to a project branch as a finding | what I found feeds a decision | `explorer.answer.to_project` |
 | EX-13 | analyst | to close the assistant and have the canvas to myself, and reopen it from the header | the board gets the whole screen when I work by hand | `explorer.answer.closed` |
 | EX-15 | analyst | to share an answer as a live link or a frozen snapshot, or export it | others see what I found, with its citations | `explorer.answer.share` |
-| EX-14 | analyst | the records and queries behind what is drawn, in a console under the board | I can read the rows without losing the picture | `explorer.answer.console` |
+| EX-14 | analyst | the data on the board and every query this session ran, in a console under the board | I can read the rows without losing the picture | `explorer.answer.console` · `explorer.answer.console.json` · `explorer.answer.console.queries` · `explorer.answer.console.queries.step` · `explorer.answer.console.queries.empty` |
 
 ## CLI
 
@@ -79,8 +79,8 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | Switching the visual | The emission’s picker lists every template, eligible or not with the reason; switching re-renders from the same records and never re-runs the query |
 | Chat closes | The panel’s ✕ closes it; a pill and the header’s Assistant button reopen it where it left off |
 | Query in the composer | The composer switches Ask · Cypher · Gremlin; ⌘↵ runs. The query and its outcome are chat messages. No floating query bar |
-| A failed query | The chat says why and offers a fix; the console opens on Log with the failing line; the board is untouched |
-| Console | `AppLayoutV2` `bottomSection`, `bottomSpan: "main"` — under the canvas only, the chat stays full height. Resizable by its grip, collapsible, tabs Records · Query · Log, Records as Table or JSON, Re-run. It opens on Records when a query answers and on Log when one fails, while the page watches; a reply’s record count opens it on Records. The strip has no console toggle |
+| A failed query | The chat says why and offers a fix; the console opens on Queries, at that step’s Log; the board is untouched |
+| Console | `AppLayoutV2` `bottomSection`, `bottomSpan: "main"` — under the canvas only, the chat stays full height. Resizable by its grip, collapsible, tabs Data · Queries ([4.4](../for-developers/modules/explore/features/the-console.md)). Data is the whole canvas, one table per node label and relationship type, 20 a page, Table or JSON. Queries is the session’s query steps, newest first; one opens as the run page’s step — Overview · Touched · Log — with Re-run. The footer’s counts open it; a failed query opens it on that step’s Log. No strip button |
 | Sessions | Live in the chat’s history, not a second side panel: the header’s Sessions shows *Sessions `n`* · *New* · a search, and every session newest first — its outcome’s dot, its title, when, and *failed* when its last reply did. The history is a view over the open thread: the board keeps its canvas while it shows |
 | Sharing | Members get a live link (same board and chat) or a frozen snapshot (board image, answer, citations, dataset versions). Outside people get an exported file, never access; guardrails apply to what exports carry. The snapshot is a report on the answer's run, opened at `/explorer?page=run:<id>@<version>`; its board is kept as its records, and its datasets are the bindings when it was taken ([4.5](../for-developers/modules/explore/features/share-an-answer.md) SA1–SA11) |
 | Off entirely | The user menu’s *Assistant* switches it off in every product, per browser (SH-07): no header button, no docked chat whatever `?right=` says, no reopen pill, no *Ask the assistant* in ⌘K, no *Ask about* on a record. The Explorer’s start keeps *Your views* and says how to turn asking back on — queries are typed in the chat, so there is no question box without it |
@@ -89,7 +89,7 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | A reply | The assistant’s mark, then the words; under them what it stood on (`195 records · Everything · 9ms`); then *Load to canvas* (a graph not yet drawn) · *Save view* (keeps the board as it stands in its History) · *Schedule this* · *Add to a project* · *Share*; then *How I got this*, which unfolds the steps, the query and what the model was given. The question is a bubble on the right. While a run runs, the reply is its live steps |
 | A record opened | Clicking a node or relationship opens its card top-right on the board — name, type, provenance, properties — with *Ask about `<name>`* · *Expand* (a node) · *Hide*. The chat keeps the right side; opening a tool card closes the record card, they share the corner |
 | The strip | Tabs for the open canvases and *+*, nothing else; *Rename* and *Close* are on a tab’s menu |
-| The footer | Left: the database and its version, and whether it is connected (`Neo4j 5.26 · connected`). Right: the renderer and the board’s frame rate (`WebGPU · 60 fps`) |
+| The footer | Two zones. Left: the database and whether it is connected (`Neo4j 5.26 · connected`) · `195 nodes · 312 relationships` (opens Data) · `4 queries` (opens Queries, with a dot when one failed) · then the message line — a mode’s hint (*Shift + drag to select several*), progress (*Laying out 195 nodes…*), or what the pointer is over. Right: `3 selected · 87%` · the renderer and frame rate (`WebGPU · 59 fps`). The message is plain text, never a link, and truncates before the right zone |
 
 ## Drawn, not built yet
 

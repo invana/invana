@@ -1,98 +1,153 @@
 /**
- * What the console reads out of a reply — its records, the queries it ran and
- * the log of its run — as plain data, so the panel only lays it out.
+ * What the console reads — the canvas's data, grouped for one table per label,
+ * and the session's query steps — as plain data, so the panel only lays it out.
  *
- * Records come from the reply's emissions: a table's rows as they are, a
- * subgraph's nodes and relationships one row each (so a row can select its
- * element on the canvas). The queries are the emissions' citations, falling
- * back to the reply's own source query. The log is the run's steps in order,
- * then the failure the reply recorded when no step carried one.
+ * Data is everything drawn on the canvas. Labels carry different properties,
+ * so the records are grouped by node label and by relationship type, and each
+ * group's columns are the union of its own records' properties. A page is
+ * `PAGE_SIZE` records; the count is always the full one.
+ *
+ * Queries are the session's query steps, newest first: one per reply that ran
+ * a query — the `execute_graph_query` step of its run, or the step that failed
+ * before it got there. Sessions live in the chat and runs in Activity; this is
+ * only the queries.
  */
 
-import type { Emission, RunNode, SessionMessage } from "@invana-studio/core";
+import type {
+	QueryResultItem,
+	RunNode,
+	Session,
+	SessionMessage,
+} from "@invana-studio/core";
 
-/** The console's three tabs; the value is also what `?console=` holds. */
-export type ConsoleTab = "records" | "query" | "log";
+/** The console's two tabs; the value is also what `?console=` holds. */
+export type ConsoleTab = "data" | "queries";
 
-export const CONSOLE_TABS: readonly ConsoleTab[] = ["records", "query", "log"];
+export const CONSOLE_TABS: readonly ConsoleTab[] = ["data", "queries"];
 
-export interface ConsoleRecords {
+/** Records a page of Data holds. */
+export const PAGE_SIZE = 20;
+
+export type LabelKind = "node" | "relationship";
+
+export interface LabelGroup {
+	kind: LabelKind;
+	label: string;
+	/** Union of the group's property keys, in first-seen order. */
 	columns: string[];
-	rows: Record<string, unknown>[];
-	/** One canvas element id per row, when the rows are drawn elements. */
-	elementIds?: string[];
+	items: QueryResultItem[];
 }
 
-/** The records behind the reply, or `null` when nothing produced any. */
-export function recordsOf(
-	emissions: readonly Emission[],
-): ConsoleRecords | null {
-	for (const e of emissions) {
-		if (e.kind === "table") {
-			return {
-				columns: e.rows.length > 0 ? Object.keys(e.rows[0]) : [],
-				rows: e.rows,
-			};
+/** The canvas's records, nodes then relationships, one group per label. */
+export function labelGroupsOf(items: readonly QueryResultItem[]): LabelGroup[] {
+	const byKey = new Map<string, LabelGroup>();
+	for (const item of items) {
+		const kind: LabelKind = item.type === "edge" ? "relationship" : "node";
+		const key = `${kind}:${item.label}`;
+		let group = byKey.get(key);
+		if (!group) {
+			group = { kind, label: item.label, columns: [], items: [] };
+			byKey.set(key, group);
 		}
-		if (e.kind === "subgraph") {
-			const rows = [
-				...e.data.nodes.map((n) => ({
-					id: n.id,
-					element: "node",
-					label: n.label,
-					properties: n.properties,
-				})),
-				...e.data.edges.map((r) => ({
-					id: r.id,
-					element: "relationship",
-					label: r.label,
-					properties: r.properties,
-				})),
-			];
-			return {
-				columns: ["id", "element", "label", "properties"],
-				rows,
-				elementIds: rows.map((r) => r.id),
-			};
-		}
+		group.items.push(item);
+		for (const k of Object.keys(item.properties ?? {}))
+			if (!group.columns.includes(k)) group.columns.push(k);
 	}
-	// An empty emission is an answer with no rows — not "nothing ran".
-	return emissions.some((e) => e.kind === "empty")
-		? { columns: [], rows: [] }
-		: null;
+	const groups = [...byKey.values()];
+	return [
+		...groups.filter((g) => g.kind === "node"),
+		...groups.filter((g) => g.kind === "relationship"),
+	];
 }
 
-export interface ConsoleQuery {
+/** How many nodes and relationships the canvas holds. */
+export function countsOf(items: readonly QueryResultItem[]) {
+	let relationships = 0;
+	for (const i of items) if (i.type === "edge") relationships += 1;
+	return { nodes: items.length - relationships, relationships };
+}
+
+/** The page of a group, clamped to the pages it has. */
+export function pageOf<T>(rows: readonly T[], page: number) {
+	const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+	const at = Math.min(Math.max(1, page), pages);
+	const first = (at - 1) * PAGE_SIZE;
+	return {
+		page: at,
+		pages,
+		first: rows.length ? first + 1 : 0,
+		last: Math.min(first + PAGE_SIZE, rows.length),
+		rows: rows.slice(first, first + PAGE_SIZE),
+	};
+}
+
+export type QueryStatus = "done" | "failed" | "running";
+
+export interface QueryStep {
+	/** The reply the query ran under — the row's identity and `?query=`. */
+	messageId: string;
+	runId?: string;
+	/** The step to open: the query's own, or the one that failed before it. */
+	stepId?: string;
+	status: QueryStatus;
 	query: string;
 	language?: string;
+	at: Date;
 	executionTimeMs?: number;
+	rowCount?: number;
+	/** The question that ran it; absent when the query was typed. */
+	askedBy?: string;
 }
 
-/** The queries the reply ran, verbatim and in order, without repeats. */
-export function queriesOf(
-	emissions: readonly Emission[],
-	message: SessionMessage | null,
-): ConsoleQuery[] {
-	const seen = new Set<string>();
-	const out: ConsoleQuery[] = [];
-	for (const e of emissions) {
-		const q = e.citation.query;
-		if (!q || seen.has(q)) continue;
-		seen.add(q);
+const QUERY_TASK = "execute_graph_query";
+
+/** The step a query row opens: its latest query attempt, else the failed one. */
+function stepOf(steps: readonly RunNode[] | undefined): RunNode | undefined {
+	if (!steps?.length) return undefined;
+	const latest = (key: (s: RunNode) => boolean) =>
+		[...steps].filter(key).sort((a, b) => b.seq - a.seq)[0];
+	return (
+		latest((s) => s.taskKey === QUERY_TASK) ??
+		latest((s) => s.status === "failed")
+	);
+}
+
+function statusOf(m: SessionMessage): QueryStatus {
+	if (m.status === "error") return "failed";
+	if (m.status === "running") return "running";
+	return "done";
+}
+
+/** Every query this session ran, newest first. */
+export function queryStepsOf(session: Session | null): QueryStep[] {
+	if (!session) return [];
+	const out: QueryStep[] = [];
+	let prompt: SessionMessage | undefined;
+	for (const m of session.messages) {
+		if (m.role === "user") {
+			prompt = m;
+			continue;
+		}
+		// A refusal ran nothing; a canvas operation is the board's own act.
+		if (m.refusal || m.operation) continue;
+		const typed = m.mode === "ql";
+		const query = m.sourceQuery ?? (typed ? prompt?.content : undefined);
+		const step = stepOf(m.steps);
+		if (!query && !step) continue;
 		out.push({
-			query: q,
-			language: e.citation.queryLanguage,
-			executionTimeMs: e.citation.executionTimeMs,
+			messageId: m.id,
+			runId: m.runId,
+			stepId: step?.id,
+			status: statusOf(m),
+			query: query ?? step?.detail ?? "",
+			language: m.language,
+			at: step?.startedAt ?? m.createdAt,
+			executionTimeMs: m.executionTimeMs,
+			rowCount: m.rowCount,
+			askedBy: typed ? undefined : prompt?.content,
 		});
 	}
-	if (out.length === 0 && message?.sourceQuery) {
-		out.push({
-			query: message.sourceQuery,
-			language: message.language,
-			executionTimeMs: message.executionTimeMs,
-		});
-	}
-	return out;
+	return out.reverse();
 }
 
 export interface ConsoleLogLine {
@@ -100,7 +155,7 @@ export interface ConsoleLogLine {
 	/** When, already worded — `10:42:07`; empty when the step never started. */
 	at: string;
 	level: "info" | "error";
-	/** The step that wrote it — `graph.query`. */
+	/** The step that wrote it — `execute_graph_query`. */
 	source: string;
 	message: string;
 }
@@ -110,8 +165,9 @@ function clock(at: Date | undefined): string {
 }
 
 /**
- * The run's steps as log lines, oldest first, each failed one followed by its
- * error; then the reply's own failure when no step said why.
+ * A reply's run as log lines, oldest first, each failed step followed by its
+ * error; then the reply's own failure when no step said why. What a query's
+ * detail shows when its run left no trace to open.
  */
 export function logOf(
 	message: SessionMessage | null,

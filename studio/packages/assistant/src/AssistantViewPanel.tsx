@@ -53,7 +53,7 @@ export interface AssistantViewPanelProps {
 	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
 	/** Open the console under the board — on Records from a reply's record
 	 *  count, on Log from a failure. Absent where the page has no console. */
-	onOpenConsole?: (tab: "records" | "log") => void;
+	onOpenConsole?: (tab: "data" | "queries", messageId?: string) => void;
 	/** Keep the board as it stands as a view — a reply's *Save view*. */
 	onSaveView?: () => void;
 	/** Close the assistant. Its sessions live on the RIGHT and nowhere else,

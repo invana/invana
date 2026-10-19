@@ -538,7 +538,7 @@ governance and skills canvases, so `Shell ✅` means what it means there.
 | `Tokens` | F | a scoped read-only token as a **principal** — the secret shown once, an out-of-scope refusal naming the scope, what it read | 🔵 | 🔵 | ✅ |
 | `Evidence` | G | counts ranked by gap over a stated window, *12 runs — too few to read*, and the proposal that already cites them | 🔵 | 🔵 | ✅ |
 | `Recall` | G | recall as a **planned step**: the query in the trace, 14 read and 4 cited, and *no prior records* as a stated outcome | 🔵 | 🔵 | ✅ |
-| `Console` | J | `bottomSection` under the canvas only — Records · Query, the context bar as its last row | ✅ | 🔵 | ✅ |
+| `Console` | J | `bottomSection` under the canvas only — Data (per label, paged, Table or JSON) · Queries (the session's query steps, each the run page's step); opened from the footer's counts | ✅ | ✅ | ✅ |
 | `Capabilities` | J | a property type **refused where the author is typing**, and the banner when the database downgrades under two models | 🟡 | 🔵 | ✅ |
 | `Vector` | J | nodes with scores as records, and *unsupported* declared by vendor before anything runs | 🔵 | 🔵 | ✅ |
 | `RowShapes` | A | **G40** — a skill row (prose over sans) against a plan row (key over mono), and why they may not look alike | 🟡 | 🟡 | ✅ |

@@ -1,15 +1,23 @@
 /**
- * The Explorer's `footer`: what the board stands on, and how it is drawing.
+ * The Explorer's `footer` — one bar, two zones
+ * ([4.4](../../../../../docs/for-developers/modules/explore/features/the-console.md)):
  *
- *   ● Neo4j 5.26 · connected                                  WebGPU · 60 fps
+ *   ● Neo4j 5.26 · connected  41 nodes · 31 relationships  2 queries │ Graph ready      3 selected  87%  WebGPU · 60 fps
  *
- * The left reads the Graph's connection record — the database the connector
- * names and the version it detected. The right reads the live engine: the
- * backend the board was mounted with and its median frame rate over the last
- * second, polled once a second so the bar never repaints with the canvas.
+ * Left: the Graph's connection record, then — with a canvas in front — its
+ * counts, which open the console on Data and on Queries, then the message
+ * line: what the pointer is over, else the canvas's latest message (a mode's
+ * hint, a layout's progress). It is plain text, last, and truncates before the
+ * right zone. Right: the selection, the zoom, and the live engine — the backend
+ * the board was mounted with and its median frame rate over the last second,
+ * polled once a second so the bar never repaints with the canvas.
  */
-import type { GraphCanvas as GraphCanvasEngine } from "@invana/graph";
-import { StatusDot } from "@invana/ui";
+import { useCanvasMessage, useSelection, useZoom } from "@invana/canvas-react";
+import type {
+	GraphCanvas as GraphCanvasEngine,
+	GraphLayer,
+} from "@invana/graph";
+import { Button, cn, StatusDot } from "@invana/ui";
 import type { CanvasBackend } from "@invana-studio/canvases";
 import type { GraphConnectionRead } from "@invana-studio/core";
 import { useEffect, useState } from "react";
@@ -83,6 +91,113 @@ export function RendererLine({
 		<span className="px-2">
 			{BACKEND_LABEL[backend]}
 			{fps != null && ` · ${fps} fps`}
+		</span>
+	);
+}
+
+/**
+ * The canvas's counts, which are the console's toggles: the records open it on
+ * Data, the queries on Queries, and the count of the open tab collapses it.
+ */
+export function ConsoleCounts({
+	nodes,
+	relationships,
+	queries,
+	failed,
+	open,
+	onToggle,
+}: {
+	nodes: number;
+	relationships: number;
+	queries: number;
+	/** A query this session failed — a dot on the count. */
+	failed: boolean;
+	open: "data" | "queries" | null;
+	onToggle: (tab: "data" | "queries") => void;
+}) {
+	const count = (tab: "data" | "queries", text: string, dot?: boolean) => (
+		<Button
+			variant="link"
+			size="xs"
+			aria-pressed={open === tab}
+			className={cn(
+				"h-auto px-1 underline decoration-border",
+				open === tab ? "font-medium" : "text-foreground",
+			)}
+			onClick={() => onToggle(tab)}
+		>
+			{text}
+			{dot ? <StatusDot tone="error" label="a query failed" /> : null}
+		</Button>
+	);
+	return (
+		<span className="flex shrink-0 items-center gap-2">
+			{count(
+				"data",
+				`${nodes.toLocaleString()} nodes · ${relationships.toLocaleString()} relationships`,
+			)}
+			{count(
+				"queries",
+				`${queries} ${queries === 1 ? "query" : "queries"}`,
+				failed,
+			)}
+		</span>
+	);
+}
+
+/**
+ * The message line: what the pointer is over — a node's drawn label and type,
+ * a relationship's type — else the canvas's latest message.
+ */
+export function MessageLine({ canvas }: { canvas: GraphCanvasEngine }) {
+	const { message } = useCanvasMessage(canvas);
+	const [hover, setHover] = useState<string | null>(null);
+	useEffect(() => {
+		const layer = canvas.layers.get<GraphLayer>("graph");
+		const renderer = layer?.getRenderer();
+		const store = layer?.store;
+		if (!layer || !renderer || !store) return;
+		const onNode = ({ id }: { id: string }) => {
+			const node = store.getNode(id);
+			const label = node ? layer.resolveNodeStyle(node).labelText : "";
+			setHover([node?.type, label || id].filter(Boolean).join(" · "));
+		};
+		const onEdge = ({ id }: { id: string }) => {
+			const edge = store.getEdge(id);
+			setHover(edge?.type ?? id);
+		};
+		const onOut = () => setHover(null);
+		renderer.events.on("shape:pointerover", onNode);
+		renderer.events.on("shape:pointerout", onOut);
+		renderer.events.on("connector:pointerover", onEdge);
+		renderer.events.on("connector:pointerout", onOut);
+		return () => {
+			renderer.events.off("shape:pointerover", onNode);
+			renderer.events.off("shape:pointerout", onOut);
+			renderer.events.off("connector:pointerover", onEdge);
+			renderer.events.off("connector:pointerout", onOut);
+		};
+	}, [canvas]);
+	const text = hover ?? message;
+	if (!text) return null;
+	return (
+		<span
+			title={text}
+			className="min-w-0 truncate border-l border-border pl-3 text-muted-foreground"
+		>
+			{text}
+		</span>
+	);
+}
+
+/** The selection and the zoom, live off the engine. */
+export function ViewLine({ canvas }: { canvas: GraphCanvasEngine }) {
+	const { zoom } = useZoom(canvas);
+	const { count } = useSelection({}, canvas);
+	return (
+		<span className="flex items-center gap-3 px-2">
+			{count > 0 ? <span>{count} selected</span> : null}
+			<span className="tabular-nums">{Math.round(zoom * 100)}%</span>
 		</span>
 	);
 }

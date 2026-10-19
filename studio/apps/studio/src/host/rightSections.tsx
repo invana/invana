@@ -30,8 +30,8 @@ export interface RightSectionDeps {
 	/** The canvas selection was taken off the next ask. */
 	attachmentDetached: boolean;
 	setAttachmentDetached: Dispatch<SetStateAction<boolean>>;
-	/** Open the console — Records from a reply's count, Log from a failure. */
-	openConsoleTab: (tab: "records" | "log") => void;
+	/** Open the console — Data from a reply's count, its query from a failure. */
+	openConsoleTab: (tab: "data" | "queries", messageId?: string) => void;
 }
 
 /**

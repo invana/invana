@@ -44,7 +44,8 @@ Not a product. The layout and the features that appear in all five. Prototype pa
 | Floating toolbar acts | Vertical, top-left on every canvas (Explorer and Modeller) |
 | Floating cards hold detail | Legend and inspector float; a docked panel only where editing needs room |
 | Assistant docks right | `rightSection`; centred only on an empty board; closable |
-| Console docks bottom | `bottomSection` under the canvas only (`bottomSpan: "main"`), resizable — rows, queries and logs. No floating panel for results |
+| Console docks bottom | `bottomSection` under the canvas only (`bottomSpan: "main"`), resizable — the canvas's data and the session's queries. No floating panel for results |
+| One footer, two zones | Every product. Left: the connection · the page's counts · the message line (a hint, progress, or what the pointer is over — plain text, last, truncated). Right: the page's readouts (selection, zoom, renderer and fps on a canvas; the version elsewhere). With a data canvas in front its counts open the console ([4.4](../for-developers/modules/explore/features/the-console.md)); elsewhere they are text. There is no middle zone |
 | Artboards | 1920×1080 |
 
 ## Activity

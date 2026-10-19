@@ -3,12 +3,21 @@ import {
 	GraphStatusBar as CanvasStatusBar,
 } from "@invana/canvas-ui";
 import { Button, cn } from "@invana/ui";
-import type { GraphConnectionRead } from "@invana-studio/core";
+import {
+	type ConsoleTab,
+	countsOf,
+	queryStepsOf,
+	type useConsoleParam,
+} from "@invana-studio/assistant";
+import type { GraphConnectionRead, Session } from "@invana-studio/core";
 import {
 	ConnectionLine,
+	ConsoleCounts,
 	ExplorerHeaderToolbar,
+	MessageLine,
 	RendererLine,
 	ToolsSwitch,
+	ViewLine,
 } from "@invana-studio/explorer";
 import type { useRightSection } from "@invana-studio/shell";
 import { Star } from "lucide-react";
@@ -32,6 +41,12 @@ export interface HostChromeDeps {
 	/** The user menu's *Assistant* — off, the header has no Assistant button. */
 	assistantShown: boolean;
 	connection: GraphConnectionRead | null | undefined;
+	/** A data canvas is the page in front — the footer counts what it drew. */
+	dataBoardInFront: boolean;
+	/** The open thread — its replies are the queries the footer counts. */
+	activeSession: Session | null;
+	/** `?console=` — the footer's counts are its toggles. */
+	console: Pick<ReturnType<typeof useConsoleParam>, "tab" | "toggle">;
 }
 
 /**
@@ -52,6 +67,9 @@ export function hostChrome(deps: HostChromeDeps) {
 		explorer,
 		assistantShown,
 		connection,
+		dataBoardInFront,
+		activeSession,
+		console: consoleParam,
 	} = deps;
 	const { canvas, magnet, toggleMagnet, backend, setBackend } = dataBoards;
 
@@ -78,17 +96,18 @@ export function hostChrome(deps: HostChromeDeps) {
 		) : undefined,
 		// The Explorer's *Tools* switch, first in `header.right`.
 		headerRightExtras: explorer ? <ToolsSwitch /> : undefined,
-		// The Explorer's `footer`: the database it stands on, how it draws.
+		// The Explorer's `footer`: the database it stands on, then — with a
+		// canvas in front — its counts, which open the console, and the message
+		// line; on the right the selection, the zoom and how it draws.
 		footer: explorer
-			? {
-					left: <ConnectionLine connection={connection} />,
-					right: (
-						<RendererLine
-							canvas={activeSessionId ? canvas : null}
-							backend={dataBoards.backend}
-						/>
-					),
-				}
+			? explorerFooter({
+					connection,
+					canvas: activeSessionId && dataBoardInFront ? canvas : null,
+					backend: dataBoards.backend,
+					items: dataBoards.canvasData,
+					session: activeSession,
+					console: consoleParam,
+				})
 			: undefined,
 		headerCenter:
 			!explorer && canvas && activeSessionId ? (
@@ -124,5 +143,51 @@ export function hostChrome(deps: HostChromeDeps) {
 		// The shared message bar — shows whatever was last pushed via
 		// Board.showMessage (e.g. a layout's "Running… / ready"); empty when idle.
 		footerRightExtras: canvas && activeSessionId ? <CanvasMessageBar /> : null,
+	};
+}
+
+function explorerFooter({
+	connection,
+	canvas,
+	backend,
+	items,
+	session,
+	console: consoleParam,
+}: {
+	connection: GraphConnectionRead | null | undefined;
+	canvas: ReturnType<typeof useDataBoards>["canvas"];
+	backend: ReturnType<typeof useDataBoards>["backend"];
+	items: ReturnType<typeof useDataBoards>["canvasData"];
+	session: Session | null;
+	console: { tab: ConsoleTab | null; toggle: (tab: ConsoleTab) => void };
+}) {
+	if (!canvas)
+		return {
+			left: <ConnectionLine connection={connection} />,
+			right: <RendererLine canvas={null} backend={backend} />,
+		};
+	const counts = countsOf(items);
+	const queries = queryStepsOf(session);
+	return {
+		left: (
+			<span className="flex min-w-0 items-center gap-2">
+				<ConnectionLine connection={connection} />
+				<ConsoleCounts
+					nodes={counts.nodes}
+					relationships={counts.relationships}
+					queries={queries.length}
+					failed={queries.some((q) => q.status === "failed")}
+					open={consoleParam.tab}
+					onToggle={consoleParam.toggle}
+				/>
+				<MessageLine canvas={canvas} />
+			</span>
+		),
+		right: (
+			<span className="flex items-center">
+				<ViewLine canvas={canvas} />
+				<RendererLine canvas={canvas} backend={backend} />
+			</span>
+		),
 	};
 }

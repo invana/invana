@@ -59,6 +59,13 @@ const SELECT_MODES = [
 /** The board's overlays the toolbar opens — one at a time, top-right. */
 export type BoardOverlay = "layers" | "styling" | "history";
 
+/** What each select mode does, said in the footer when it is picked. */
+const MODE_HINT: Record<string, string> = {
+	click: "Select · click a node; Shift + click adds to the selection",
+	brush: "Box select · Shift + drag a rectangle to select what is inside",
+	lasso: "Lasso select · Shift + drag a loop to select what is inside",
+};
+
 export interface BoardToolbarProps {
 	/** Expand the selected node's neighbours — opens the fine-tune dialog. */
 	onExpandSelection: () => void;
@@ -93,7 +100,11 @@ export function BoardToolbar({
 		icon: m.icon,
 		label: m.label,
 		active: selectMode.mode === m.key,
-		onToggle: () => selectMode.setMode(m.key),
+		onToggle: () => {
+			selectMode.setMode(m.key);
+			// The mode's hint lands in the footer's message line.
+			canvas.showMessage(MODE_HINT[m.key], 4000);
+		},
 	}));
 	const overlayToggle = (
 		key: BoardOverlay,

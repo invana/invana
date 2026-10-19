@@ -118,3 +118,47 @@ test("SH-07 the user menu switches the assistant off, and back on", async ({
 	await expect(assistant).toBeVisible();
 	await expect(page.getByTestId("composer").first()).toBeVisible();
 });
+
+test("4.4 the footer's counts open the console on the canvas's data and on its queries", async ({
+	page,
+}) => {
+	await ask(page, "MATCH (a)-[r]->(b) RETURN a, r, b LIMIT 5");
+
+	// A typed query that answers opens Data: one table per label.
+	await expect(page).toHaveURL(/console=data/, { timeout: 30_000 });
+	await expect(page.getByText("Nodes", { exact: true })).toBeVisible();
+	await expect(page.getByRole("button", { name: "Next page" })).toBeVisible();
+
+	// Queries: the session's, from the footer's query count; a row opens its step.
+	const queries = page.getByRole("button", { name: /^\d+ quer(y|ies)$/ });
+	await queries.click();
+	await expect(page).toHaveURL(/console=queries/);
+	await page
+		.getByRole("cell", { name: /MATCH \(a\)-\[r\]->\(b\)/ })
+		.first()
+		.click();
+	await expect(page).toHaveURL(/console=queries(%3A|:)/);
+	await expect(page.getByRole("button", { name: "All queries" })).toBeVisible();
+
+	// The open count collapses it; the record count opens Data again.
+	await queries.click();
+	await expect(page).not.toHaveURL(/console=/);
+	await page.getByRole("button", { name: /nodes · .* relationships/ }).click();
+	await expect(page).toHaveURL(/console=data/);
+});
+
+test("4.4 a failed query opens the console on its step, and the footer marks it", async ({
+	page,
+}) => {
+	await ask(page, "MATCH (a)-[r]->(b) RETURN a, r, b LIMIT 3");
+	await expect(page).toHaveURL(/console=data/, { timeout: 30_000 });
+
+	// The same session: the next query is typed into the docked chat.
+	const composer = page.getByTestId("composer").getByRole("textbox").first();
+	await composer.fill("MATC (a) RETURN a");
+	await page.getByRole("button", { name: "Send" }).click();
+
+	await expect(page).toHaveURL(/console=queries(%3A|:)/, { timeout: 30_000 });
+	await expect(page.getByRole("button", { name: "All queries" })).toBeVisible();
+	await expect(page.getByLabel("a query failed")).toBeVisible();
+});
