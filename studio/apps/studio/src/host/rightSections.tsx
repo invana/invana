@@ -57,6 +57,7 @@ export function rightSection(deps: RightSectionDeps) {
 	} = deps;
 	const {
 		sessions,
+		sessionsTotal,
 		activeSession,
 		isRunning,
 		fetchContext,
@@ -98,6 +99,7 @@ export function rightSection(deps: RightSectionDeps) {
 			onStop={stop}
 			isRunning={isRunning}
 			sessions={sessions}
+			sessionsTotal={sessionsTotal}
 			activeSession={activeSession}
 			username={username}
 			graphSlug={graphSlug}

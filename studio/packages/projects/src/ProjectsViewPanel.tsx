@@ -198,7 +198,7 @@ function ProjectsCount({
 	graphSlug: string;
 }) {
 	const list = useProjectsQuery(username, graphSlug);
-	const n = list.data?.items?.length ?? 0;
+	const n = list.data?.total ?? 0;
 	if (!n) return null;
 	return <>{n}</>;
 }
@@ -218,9 +218,10 @@ function TodosCount({
 }) {
 	const list = useTodosQuery(username, graphSlug, useTodosScope(projectKey));
 	const items = list.data?.items ?? [];
-	if (items.length === 0) return null;
+	const total = list.data?.total ?? 0;
+	if (total === 0) return null;
 	const review = items.filter((t) => t.status === "review").length;
-	return <>{review ? `${items.length} · ${review} in review` : items.length}</>;
+	return <>{review ? `${total} · ${review} in review` : total}</>;
 }
 
 /**

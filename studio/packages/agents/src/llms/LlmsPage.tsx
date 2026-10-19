@@ -222,7 +222,7 @@ export function LlmsPage({ username, graphSlug }: FleetPageProps) {
 				chips={
 					providers.data ? (
 						<Badge variant="outline" tone="muted" size="xs">
-							{plural(items.length, "endpoint")} ·{" "}
+							{plural(providers.data.total, "endpoint")} ·{" "}
 							{plural(rows.length, "model version")}
 						</Badge>
 					) : null

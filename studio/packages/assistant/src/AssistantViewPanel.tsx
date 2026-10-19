@@ -44,6 +44,8 @@ export interface AssistantViewPanelProps {
 	isRunning: boolean;
 	// Sessions
 	sessions: Session[];
+	/** The engine's count of the list — `sessions` is one page of it. */
+	sessionsTotal: number;
 	activeSession: Session | null;
 	onOpenSession: (id: string) => void;
 	onBack: () => void;
@@ -112,6 +114,7 @@ export function AssistantViewPanel({
 	onStop,
 	isRunning,
 	sessions,
+	sessionsTotal,
 	activeSession,
 	onOpenSession,
 	onBack,
@@ -420,7 +423,7 @@ export function AssistantViewPanel({
 							<div className="flex items-center gap-2">
 								<MessageSquare className="size-3.5 text-muted-foreground" />
 								<span className="font-semibold">Sessions</span>
-								<Badge variant="secondary">{sessions.length}</Badge>
+								<Badge variant="secondary">{sessionsTotal}</Badge>
 								<span className="flex-1" />
 								<Button variant="outline" size="sm" onClick={startNew}>
 									<Plus />

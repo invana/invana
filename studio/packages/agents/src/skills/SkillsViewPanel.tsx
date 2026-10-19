@@ -138,7 +138,9 @@ export function SkillsViewPanel({
 	const sections: PanelStackSection[] = [
 		{
 			id: "skills",
-			title: <SectionTitle count={items.length}>Skills</SectionTitle>,
+			title: (
+				<SectionTitle count={skills.data?.total ?? 0}>Skills</SectionTitle>
+			),
 			// The header's one action area carries the act the section is for.
 			// The section does not drill in — the detail is the page.
 			headerActions: [

@@ -94,6 +94,7 @@ export function DecisionsPage({
 		projects.map((p) => p.key),
 	);
 	const items = decisions.data?.items ?? [];
+	const recorded = decisions.data?.total ?? 0;
 	const current = items.filter((d) => d.superseded_by_number === null).length;
 
 	return (
@@ -102,9 +103,9 @@ export function DecisionsPage({
 				crumbs={["Decisions"]}
 				chips={
 					<Badge variant="outline" tone="muted" size="xs">
-						{current === items.length
-							? items.length
-							: `${current} current · ${items.length} recorded`}
+						{current === recorded
+							? recorded
+							: `${current} current · ${recorded} recorded`}
 					</Badge>
 				}
 				actions={

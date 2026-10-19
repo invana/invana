@@ -654,6 +654,8 @@ export function useSessions(
 
 	return {
 		sessions,
+		/** How many sessions the list holds, as the engine counts them. */
+		sessionsTotal: sessionsQuery.data?.total ?? 0,
 		activeSession,
 		activeSessionId,
 		isRunning: running,

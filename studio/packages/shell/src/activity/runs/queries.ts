@@ -73,8 +73,8 @@ function sinceCutoff(since: RunsSince): number {
  *
  * The chips narrow here rather than server-side: the endpoint takes `kind` and
  * `agent_id` but not status, role or a date, and one page of fifty is what the
- * section reads either way. `total` is the unfiltered count, so the status bar
- * can say `11 of 24 shown`.
+ * section reads either way. `total` is the engine's count of the whole
+ * journal, so the status bar can say `11 of 240 shown`.
  */
 export function useRunListQuery(
 	username?: string,
@@ -116,7 +116,7 @@ export function useRunListQuery(
 
 	return {
 		rows,
-		total: items.length,
+		total: runs.data?.total ?? 0,
 		isLoading: runs.isLoading,
 		// The panel header's refresh control spins on `isFetching` and calls
 		// `refetch` — a list a person is watching needs a way to ask again.
