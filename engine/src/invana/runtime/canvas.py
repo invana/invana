@@ -25,7 +25,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.envelope import PlanStep
-from invana.apps.explorer.managers import ExploreManager
+from invana.apps.explorer.managers import ExploreManager, type_total
 from invana.apps.explorer.managers.explore import expand_prompt
 from invana.apps.explorer.schemas import (
     NeighborExpandResponse,
@@ -233,10 +233,15 @@ async def count_types(
         lens_id=lens_id,
     )
     out = await _settle(db, runtime, run, task_key="count_types", what="count")
+    nodes = [TypeCount.model_validate(t) for t in out.get("node_types") or []]
+    edges = [TypeCount.model_validate(t) for t in out.get("edge_types") or []]
+    counted = bool(out.get("counted", True))
     return TypeCountsResponse(
-        nodes=[TypeCount.model_validate(t) for t in out.get("node_types") or []],
-        edges=[TypeCount.model_validate(t) for t in out.get("edge_types") or []],
-        counted=bool(out.get("counted", True)),
+        nodes=nodes,
+        edges=edges,
+        counted=counted,
+        total_nodes=type_total(nodes, counted=counted),
+        total_edges=type_total(edges, counted=counted),
         run_id=out["run_id"],
     )
 

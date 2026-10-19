@@ -48,8 +48,13 @@ function fold(view: RunView, e: AskFrame): RunView {
 			};
 		case "step.started":
 		case "step.needs_input":
-		case "step.finished":
 			return { ...v, steps: upsertStep(v.steps, stepFromFrame(p)) };
+		case "step.finished":
+			return {
+				...v,
+				steps: upsertStep(v.steps, stepFromFrame(p)),
+				runTokens: (p.run_tokens as number | undefined) ?? v.runTokens,
+			};
 		case "step.retrying": {
 			const step = stepFromFrame(p);
 			step.retryReason = p.reason as string | undefined;

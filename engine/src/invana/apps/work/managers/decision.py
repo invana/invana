@@ -95,6 +95,16 @@ class DecisionManager:
         )
         return await self.read(session, rows)
 
+    @staticmethod
+    def count_current(decisions: list[DecisionRead]) -> int:
+        """How many of a listed set of decisions are current.
+
+        A decision is current while no later decision supersedes it; decisions
+        are append-only, so a superseded one stays recorded and stops counting.
+        The list header reads *2 current · 5 recorded* from this and ``total``.
+        """
+        return sum(1 for d in decisions if d.superseded_by_number is None)
+
     async def read(self, session: AsyncSession, decisions: list[ProjectDecision]) -> list[DecisionRead]:
         """Decisions with every id turned into the number a person types, and the type's words."""
         branch_numbers = await self.branches_qs.numbers_by_ids(

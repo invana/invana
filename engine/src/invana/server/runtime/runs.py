@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.apps.agents.models import Agent
 from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.graphs.querysets import GraphMemberQuerySet
 from invana.apps.sessions.schemas import SendMessageResponse, SessionMessageRead
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
@@ -27,6 +28,7 @@ from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.interpreter import TaskRuntime
 from invana.runtime.interpreter.payloads import _retry_for
 from invana.runtime.managers.rule_citations import offered_rules
+from invana.runtime.managers.run_stats import MAX_DAYS, RunStatsManager
 from invana.runtime.models import RunStatus, TaskPrompt, TaskRun, span_ms
 from invana.runtime.projections import (
     Shape,
@@ -35,7 +37,7 @@ from invana.runtime.projections import (
     select_template,
 )
 from invana.runtime.querysets import TaskRunQuerySet
-from invana.runtime.results import run_tokens
+from invana.runtime.results import run_tokens, step_progress
 from invana.runtime.schemas import (
     AnswerPrompt,
     CancelResponse,
@@ -44,6 +46,7 @@ from invana.runtime.schemas import (
     RunNodeRead,
     RunRerun,
     RunRerunResponse,
+    RunStats,
     SwitchTemplate,
     TaskPromptRead,
     TaskRunListResponse,
@@ -57,6 +60,8 @@ from invana.runtime.workflows import WORKFLOWS
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 runs_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/runs", tags=["runs"])
+#: Runs across every Graph the reader is a member of — the Imports page's tiles.
+install_runs_router = APIRouter(prefix="/api/v1/runs", tags=["runs"])
 
 
 def get_runtime(request: Request) -> TaskRuntime:
@@ -114,6 +119,34 @@ async def list_runs(
     return TaskRunListResponse(items=items, total=total)
 
 
+@runs_router.get("/stats", response_model=RunStats)
+async def run_stats(
+    days: int = Query(default=1, ge=1, le=MAX_DAYS, description="The window in the reader's days; 1 is today."),
+    tz: str = Query(default="UTC", description="The reader's IANA time zone — where midnight is."),
+    kind: list[str] | None = Query(default=None, description="Only these kinds of work — `ask`, `import`, `bulk`."),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> RunStats:
+    """The journal's tiles for this Graph — *In flight*, *Today*, *Tokens today*,
+    *Slowest* — counted over every root run in the window."""
+    return await RunStatsManager().stats(session, graph_ids=[graph.id], kinds=kind, days=days, tz=tz)
+
+
+@install_runs_router.get("/stats", response_model=RunStats)
+async def install_run_stats(
+    days: int = Query(default=30, ge=1, le=MAX_DAYS, description="The window in the reader's days; 1 is today."),
+    tz: str = Query(default="UTC", description="The reader's IANA time zone — where midnight is."),
+    kind: list[str] | None = Query(default=None, description="Only these kinds of work — `ask`, `import`, `bulk`."),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RunStats:
+    """The same tiles over every Graph the reader is a member of — the Imports
+    page's counts, median time and imports a day."""
+    graph_ids = await GraphMemberQuerySet().graph_ids_for_user(session, user_id=user.id)
+    return await RunStatsManager().stats(session, graph_ids=graph_ids, kinds=kind, days=days, tz=tz)
+
+
 @runs_router.get("/{run_id}", response_model=TaskRunRead)
 async def get_run(
     run_id: str = Path(...),
@@ -128,6 +161,7 @@ async def get_run(
         **TaskRunRead.model_validate(th).model_dump(exclude={"steps"}),
         steps=[RunNodeRead.model_validate(s) for s in steps],
     )
+    read.steps_done, read.steps_total = step_progress(steps)
     if read.run_tokens is None:
         # Still going: the same sum the settle stores, read from the rows so far.
         read.run_tokens_in, read.run_tokens_out = run_tokens(th, steps)

@@ -116,6 +116,10 @@ class AgentRead(BaseModel):
 class AgentListResponse(BaseModel):
     items: list[AgentRead]
     total: int
+    #: ``items`` split by lifetime: the standing agents, and the spawned helpers
+    #: the list hides by default. The two add up to ``total``.
+    persistent: int = 0
+    ephemeral: int = 0
     #: ``{agent_id: tokens}`` since the first of the month — what the list draws
     #: against ``max_tokens_month``. A **sidecar map, not a field on the agent**:
     #: it is a grouped read over ``task_runs``, which this band may not touch.

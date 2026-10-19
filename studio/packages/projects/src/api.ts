@@ -11,6 +11,7 @@ import type {
 	BranchDetail,
 	Decision,
 	DecisionCreate,
+	DecisionListResponse,
 	DerivedDatasetCreate,
 	Finding,
 	FindingCreate,
@@ -160,15 +161,13 @@ export const recordsApi = {
 		),
 
 	decisions: (username: string, graphSlug: string, key: string) =>
-		request<{ items: Decision[]; total: number }>(
+		request<DecisionListResponse>(
 			`${base(username, graphSlug)}/projects/${key}/decisions`,
 		),
 
 	/** Every decision on the Graph the reader may see, newest first. */
 	graphDecisions: (username: string, graphSlug: string) =>
-		request<{ items: Decision[]; total: number }>(
-			`${base(username, graphSlug)}/decisions`,
-		),
+		request<DecisionListResponse>(`${base(username, graphSlug)}/decisions`),
 
 	resolveProposal: (
 		username: string,

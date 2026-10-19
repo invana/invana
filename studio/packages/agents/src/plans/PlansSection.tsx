@@ -164,9 +164,8 @@ function PlansCount({
 	graphSlug: string;
 }) {
 	const list = useTaskPlansQuery(username, graphSlug);
-	const items = list.data?.items ?? [];
 	const total = list.data?.total ?? 0;
 	if (!total) return null;
-	const packaged = items.filter((w) => w.origin === "packaged").length;
+	const packaged = list.data?.packaged ?? 0;
 	return <>{packaged ? `${total} · ${packaged} packaged` : total}</>;
 }

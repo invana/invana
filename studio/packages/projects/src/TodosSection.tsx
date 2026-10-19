@@ -154,8 +154,8 @@ export function TodosSectionBody({
 		return [...seen].map(([value, label]) => ({ value, label }));
 	}, [tasks]);
 
-	const running = tasks.filter((t) => t.status === "in_progress").length;
-	const reviewing = tasks.filter((t) => t.status === "review").length;
+	const running = list.data?.by_status.in_progress ?? 0;
+	const reviewing = list.data?.by_status.review ?? 0;
 
 	const detailProjectKey = detail.data?.project_key ?? null;
 	useEffect(() => {
@@ -574,6 +574,8 @@ function TaskDetail({
 								workflowKey={run.workflowKey}
 								steps={run.steps}
 								workMs={run.workMs}
+								done={run.stepsDone}
+								total={run.stepsTotal}
 								tokensIn={run.runTokensIn}
 								tokensOut={run.runTokensOut}
 							/>
@@ -693,19 +695,22 @@ function TodoRunsBlock({
 	workflowKey,
 	steps,
 	workMs,
+	done,
+	total,
 	tokensIn = 0,
 	tokensOut = 0,
 }: {
 	workflowKey: string;
 	steps: RunNode[];
 	workMs?: number;
+	/** Steps that succeeded, of the plan's length so far — the engine's count. */
+	done: number;
+	total: number;
 	/** The run's spend as the engine sums it. */
 	tokensIn?: number;
 	tokensOut?: number;
 }) {
 	const [open, setOpen] = useState(true);
-	const done = steps.filter((s) => s.status === "succeeded").length;
-	const total = new Set(steps.map((s) => s.seq)).size;
 
 	return (
 		<div className="flex flex-col gap-1">

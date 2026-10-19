@@ -19,6 +19,8 @@ import type {
 	OfferedRule,
 	RunNode,
 	RunNodeStatus,
+	RunStats,
+	RunStatsQuery,
 	RunStatus,
 	TaskRunListResponse,
 } from "../../types/runs";
@@ -63,6 +65,8 @@ interface ApiTaskRun {
 	started_at?: string | null;
 	finished_at?: string | null;
 	work_ms?: number | null;
+	steps_done?: number;
+	steps_total?: number;
 	run_tokens_in?: number | null;
 	run_tokens_out?: number | null;
 	error?: Record<string, unknown> | null;
@@ -87,6 +91,9 @@ export interface TaskRun {
 	steps: RunNode[];
 	/** The engine's stored time its steps worked; absent until it settles. */
 	workMs?: number;
+	/** Steps that succeeded, of the plan's length so far — the engine's count. */
+	stepsDone: number;
+	stepsTotal: number;
 	/** The run's spend, its own and its steps', as the engine sums it. */
 	runTokensIn?: number;
 	runTokensOut?: number;
@@ -194,6 +201,15 @@ export interface RunStreamHandle {
 	close: () => void;
 }
 
+/** A stats read's query: the window, the reader's zone, and the kinds. */
+function statsParams({ days, kinds }: RunStatsQuery): string {
+	const params = new URLSearchParams();
+	if (days) params.set("days", String(days));
+	params.set("tz", Intl.DateTimeFormat().resolvedOptions().timeZone);
+	for (const kind of kinds ?? []) params.append("kind", kind);
+	return params.toString();
+}
+
 export const runsApi = {
 	/**
 	 * Runs as list rows — an agent's recent plans, the library's candidates, or
@@ -225,6 +241,16 @@ export const runsApi = {
 		);
 	},
 
+	/** The journal's tiles for one Graph, counted by the engine in the reader's days. */
+	stats: (username: string, graphSlug: string, query: RunStatsQuery = {}) =>
+		request<RunStats>(
+			`${base(username, graphSlug)}/stats?${statsParams(query)}`,
+		),
+
+	/** The same tiles over every Graph the reader is a member of. */
+	installStats: (query: RunStatsQuery = {}) =>
+		request<RunStats>(`/api/v1/runs/stats?${statsParams(query)}`),
+
 	get: async (
 		username: string,
 		graphSlug: string,
@@ -239,6 +265,8 @@ export const runsApi = {
 			streamSeq: d.stream_seq,
 			steps: d.steps.map(toRunNode),
 			workMs: d.work_ms ?? undefined,
+			stepsDone: d.steps_done ?? 0,
+			stepsTotal: d.steps_total ?? 0,
 			runTokensIn: d.run_tokens_in ?? undefined,
 			runTokensOut: d.run_tokens_out ?? undefined,
 			// `task_runs` is one table, so this is how a **step** names the run

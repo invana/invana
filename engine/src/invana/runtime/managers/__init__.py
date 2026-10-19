@@ -10,6 +10,7 @@ from invana.runtime.managers.plan_performance import PlanPerformanceManager
 from invana.runtime.managers.plugins import PluginManager
 from invana.runtime.managers.rule_checks import RuleCheckManager
 from invana.runtime.managers.rule_citations import RuleCitationManager
+from invana.runtime.managers.run_stats import RunStatsManager
 from invana.runtime.managers.simulation import SimulationManager
 from invana.runtime.managers.skill_bind import SkillBindManager
 from invana.runtime.managers.skill_draft import SkillDraftManager
@@ -29,6 +30,7 @@ __all__ = [
     "PluginManager",
     "RuleCheckManager",
     "RuleCitationManager",
+    "RunStatsManager",
     "SimulationManager",
     "SkillBindManager",
     "SkillDraftManager",

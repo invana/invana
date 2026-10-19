@@ -89,6 +89,8 @@ class TaskRead(BaseModel):
 class TaskListResponse(BaseModel):
     items: list[TaskRead]
     total: int
+    #: How many of ``items`` are in each status; a status with none is absent.
+    by_status: dict[str, int] = Field(default_factory=dict)
 
 
 class ActivityNode(BaseModel):
@@ -377,6 +379,8 @@ class DecisionRead(BaseModel):
 class DecisionListResponse(BaseModel):
     items: list[DecisionRead]
     total: int
+    #: How many of ``items`` no later decision supersedes.
+    current: int = 0
 
 
 class ProposalCreate(BaseModel):

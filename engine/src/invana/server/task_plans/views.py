@@ -11,6 +11,7 @@ from fastapi import Depends, Path, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.task_plans.managers import TaskPlanManager
 from invana.apps.task_plans.schemas import (
     PlanPerformance,
     PlanRunsPage,
@@ -42,7 +43,7 @@ async def list_workflows(
     session: AsyncSession = Depends(get_session),
 ) -> TaskPlanListResponse:
     items = await library.list_reads(session, graph_id=graph.id)
-    return TaskPlanListResponse(items=items, total=len(items))
+    return TaskPlanListResponse(items=items, total=len(items), packaged=TaskPlanManager.count_packaged(items))
 
 
 async def get_workflow(

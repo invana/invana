@@ -91,7 +91,7 @@ from invana.runtime.interpreter.tracing import (
 from invana.runtime.models import RunStatus, TaskRun, span_ms
 from invana.runtime.planning import plan_payload, queue_plan_steps
 from invana.runtime.querysets import TaskRunQuerySet
-from invana.runtime.results import roll_up_run, run_result, step_result
+from invana.runtime.results import roll_up_run, run_result, run_tokens, step_result
 from invana.runtime.services import BULK_PLAN_KEY, LOAD_PLAN_KEY, endpoint_for_run
 from invana.runtime.stream import Emitter, broadcaster
 from invana.runtime.workflows import WORKFLOWS, Step
@@ -845,7 +845,7 @@ class TaskRuntime:
                     self._record(row, ctx, v)
                     await self._drop_pending(db, th, message_id)
                     await db.commit()
-                    await emitter.emit("step.finished", _step_payload(row))
+                    await self._step_finished(db, emitter, th, row)
                     await self._finish_cannot_answer(db, emitter, th, v, assistant, cannot.reason)
                     return "cannot_answer"
                 except Converse as conv:
@@ -858,7 +858,7 @@ class TaskRuntime:
                     self._record(row, ctx, v)
                     await self._drop_pending(db, th, message_id)
                     await db.commit()
-                    await emitter.emit("step.finished", _step_payload(row))
+                    await self._step_finished(db, emitter, th, row)
                     await self._finish_conversed(db, emitter, th, v, assistant, conv.reply)
                     return "conversed"
                 except NeedsInput as ni:
@@ -891,7 +891,7 @@ class TaskRuntime:
                         self._record(row, ctx, v)
                         await self._drop_pending(db, th, message_id)
                         await db.commit()
-                        await emitter.emit("step.finished", _step_payload(row))
+                        await self._step_finished(db, emitter, th, row)
                         await emitter.emit("cannot_answer", {"reason": reason, "stage": step.task_key})
                         await self._finish_cannot_answer(db, emitter, th, v, assistant, reason)
                         await self._mark_task_needs_input(db, th, ni.question)
@@ -936,7 +936,7 @@ class TaskRuntime:
                     self._record(row, ctx, v)
                     will_retry = failure.cls in step.retry.on and attempt < step.retry.max_attempts
                     await db.commit()
-                    await emitter.emit("step.finished", _step_payload(row))
+                    await self._step_finished(db, emitter, th, row)
                     if will_retry:
                         attempt += 1
                         delay_ms = step.retry.delay_ms(attempt - 1, random.random())
@@ -973,7 +973,7 @@ class TaskRuntime:
                 row.tokens_out = out.tokens_out if out.tokens_out is not None else row.tokens_out
                 self._record(row, ctx, v)
                 await db.commit()
-                await emitter.emit("step.finished", _step_payload(row))
+                await self._step_finished(db, emitter, th, row)
                 # A Plan step appends the rest of the run. The rows are written
                 # and emitted **before** any of them starts, which is the
                 # "this is what I'm about to do" moment plan-first buys.
@@ -1517,6 +1517,16 @@ class TaskRuntime:
                 sess = await db.get(Session, m.session_id)
                 if sess is not None:
                     sess.last_status = m.status
+
+    async def _step_finished(self, db: AsyncSession, emitter: Emitter, th: TaskRun, row: TaskRun) -> None:
+        """Emit a settled step, with its run's spend so far beside it.
+
+        The assistant's live strip shows the run's tokens while it runs; the
+        engine sums them here, from the same rows a settle rolls up, so the
+        strip adds nothing.
+        """
+        spent_in, spent_out = run_tokens(th, await TaskRunQuerySet().nodes_of(db, run_id=th.id))
+        await emitter.emit("step.finished", {**_step_payload(row), "run_tokens": spent_in + spent_out})
 
     async def _roll_up_run(self, db: AsyncSession, th: TaskRun) -> None:
         """How a run that finished outside ``_settle`` spent its time and tokens."""

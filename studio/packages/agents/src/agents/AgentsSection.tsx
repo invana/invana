@@ -182,7 +182,7 @@ function AgentsBody({
 	const ordered = useMemo(() => visibleAgents(all, filters), [all, filters]);
 	const ephemeralHidden = filters.showEphemeral
 		? 0
-		: all.filter((a) => a.lifetime === "ephemeral").length;
+		: (query.data?.ephemeral ?? 0);
 
 	const rows = ordered.filter(({ agent }) =>
 		agent.name.toLowerCase().includes(search.toLowerCase()),
@@ -290,10 +290,9 @@ function AgentsBody({
 /**
  * Parents first, each followed by the helpers it spawned. Sorting the flat
  * list would scatter a family across the list, which is exactly the thing the
- * `└` gutter exists to prevent. Shared with the header's count, so the number
- * beside the title is the rows below it.
+ * `└` gutter exists to prevent.
  */
-export function visibleAgents(
+function visibleAgents(
 	all: Agent[],
 	filters: AgentFilters,
 ): { agent: Agent; depth: number }[] {

@@ -27,18 +27,20 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
-import { formatCompact, formatElapsed, useTicker } from "@invana-studio/core";
+import {
+	formatCompact,
+	formatElapsed,
+	type RunStats,
+	useTicker,
+} from "@invana-studio/core";
 import { PanelSection } from "@invana-studio/ui";
 import { RefreshCw } from "lucide-react";
 import { useActivitySlots } from "../ActivitySlots";
-import { type RunListRow, useRunListQuery } from "./queries";
+import { type RunListRow, useRunListQuery, useRunStatsQuery } from "./queries";
 import { RunsFilterBar } from "./RunsFilterBar";
 import { elapsedOf, shortRunId } from "./RunsList";
 import { useRunsFilters } from "./useRunsFilters";
 import { useRunsViewPanel } from "./useRunsViewPanel";
-
-const LIVE = ["queued", "running", "awaiting_input", "awaiting_approval"];
-const WAITING = ["awaiting_input", "awaiting_approval"];
 
 /** How a run stands, in the engine's word and the tone that word carries. */
 function statusOf(row: RunListRow): { text: string; tone: string } {
@@ -60,40 +62,16 @@ function statusOf(row: RunListRow): { text: string; tone: string } {
 	}
 }
 
-function startOfToday(): number {
-	const d = new Date();
-	d.setHours(0, 0, 0, 0);
-	return d.getTime();
-}
-
-function Tiles({ rows, now }: { rows: RunListRow[]; now: number }) {
-	const inFlight = rows.filter((r) => LIVE.includes(r.status));
-	const waiting = inFlight.filter((r) => WAITING.includes(r.status)).length;
-
-	const cutoff = startOfToday();
-	const today = rows.filter(
-		(r) => r.startedAt !== null && Date.parse(r.startedAt) >= cutoff,
-	);
-	const succeeded = today.filter((r) => r.status === "succeeded").length;
-	const cannot = today.filter((r) => r.run.outcome === "cannot_answer").length;
-
-	// Absent is not zero: a day where no run spent a token draws a dash.
-	const tokensOf = (r: RunListRow) => r.run.tokens;
-	const spending = today.filter((r) => tokensOf(r) > 0);
-	const tokens = spending.reduce((sum, r) => sum + tokensOf(r), 0);
-
-	let slowest: { row: RunListRow; ms: number } | null = null;
-	for (const row of today) {
-		const ms = elapsedOf(row, now);
-		if (ms !== null && (!slowest || ms > slowest.ms)) slowest = { row, ms };
-	}
-
+/** The journal's tiles — every number counted by the engine (`runs/stats`). */
+function Tiles({ stats }: { stats: RunStats | undefined }) {
+	if (!stats) return null;
+	const { live, waiting, runs, succeeded, cannot_answer: cannot } = stats;
 	return (
 		<MetricGrid minTileWidth={160}>
 			<MetricTile
 				label="In flight"
-				value={inFlight.length}
-				tone={inFlight.length ? "running" : undefined}
+				value={live}
+				tone={live ? "running" : undefined}
 				caption={
 					waiting
 						? `${waiting === 1 ? "one is" : `${waiting} are`} waiting on a person`
@@ -102,7 +80,7 @@ function Tiles({ rows, now }: { rows: RunListRow[]; now: number }) {
 			/>
 			<MetricTile
 				label="Today"
-				value={`${today.length} run${today.length === 1 ? "" : "s"}`}
+				value={`${runs} run${runs === 1 ? "" : "s"}`}
 				caption={[
 					`${succeeded} succeeded`,
 					...(cannot ? [`${cannot} cannot_answer`] : []),
@@ -110,18 +88,18 @@ function Tiles({ rows, now }: { rows: RunListRow[]; now: number }) {
 			/>
 			<MetricTile
 				label="Tokens today"
-				value={spending.length ? formatCompact(tokens) : "—"}
+				value={stats.spending_runs ? formatCompact(stats.tokens) : "—"}
 				caption={
-					spending.length
-						? `across ${spending.length} run${spending.length === 1 ? "" : "s"}`
+					stats.spending_runs
+						? `across ${stats.spending_runs} run${stats.spending_runs === 1 ? "" : "s"}`
 						: "no tokens spent today"
 				}
 			/>
 			<MetricTile
 				label="Slowest"
-				value={slowest ? formatElapsed(slowest.ms) : "—"}
-				tone={slowest ? "warning" : undefined}
-				caption={slowest ? slowest.row.title : "nothing has run today"}
+				value={stats.slowest ? formatElapsed(stats.slowest.duration_ms) : "—"}
+				tone={stats.slowest ? "warning" : undefined}
+				caption={stats.slowest ? stats.slowest.title : "nothing has run today"}
 			/>
 		</MetricGrid>
 	);
@@ -143,14 +121,14 @@ export function RunsBoardPage({
 	const openRun = onOpenRun ?? drillIn;
 	const { filters, patch } = useRunsFilters();
 	const runList = useRunListQuery(username, graphSlug, filters);
-	// The tiles read the whole fetched journal — the same query key, so no
-	// second request — while the table reads what the chips leave.
-	const all = useRunListQuery(username, graphSlug);
+	// The tiles are counted by the engine over today's runs, not over the page.
+	const stats = useRunStatsQuery(username, graphSlug).data;
+	const live = stats?.live ?? 0;
 	const { useAgents } = useActivitySlots();
 	const agentList = useAgents(username, graphSlug).data?.items ?? [];
 	const agentName = new Map(agentList.map((a) => [a.id, a.name]));
 	// A running row's elapsed moves; the ticker keeps it honest.
-	const now = useTicker(runList.live > 0);
+	const now = useTicker(live > 0);
 
 	const filtered = Object.values(filters).some(Boolean);
 
@@ -163,9 +141,9 @@ export function RunsBoardPage({
 						<Badge variant="outline" size="xs">
 							{runList.total}
 						</Badge>
-						{runList.live ? (
+						{live ? (
 							<Badge variant="outline" tone="info" size="xs">
-								{runList.live} running
+								{live} running
 							</Badge>
 						) : null}
 					</>
@@ -189,7 +167,7 @@ export function RunsBoardPage({
 				agents={agentList.map((a) => ({ id: a.id, name: a.name }))}
 			/>
 
-			<Tiles rows={all.rows} now={now} />
+			<Tiles stats={stats} />
 
 			<PanelSection
 				card

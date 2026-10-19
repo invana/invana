@@ -1,6 +1,11 @@
 import { runsApi, useGraphsQuery } from "@invana-studio/core";
-import { useQueries } from "@tanstack/react-query";
-import { IMPORT_KINDS, type ImportGraph, mergeImports } from "./journal";
+import { useQueries, useQuery } from "@tanstack/react-query";
+import {
+	IMPORT_KINDS,
+	type ImportGraph,
+	mergeImports,
+	WINDOW_DAYS,
+} from "./journal";
 
 /**
  * The Imports journal across the install: one runs request per readable Graph
@@ -53,4 +58,18 @@ export function useImportsJournal() {
 			for (const r of results) void r.refetch();
 		},
 	};
+}
+
+/**
+ * The Imports page's tiles and timeline — counts, median time and imports a
+ * day — counted by the engine over every load in every Graph the reader is in,
+ * in the reader's days. Never over the fifty newest rows per Graph the list
+ * above reads.
+ */
+export function useImportStatsQuery() {
+	return useQuery({
+		queryKey: ["runs", "install", "imports", "stats", WINDOW_DAYS] as const,
+		queryFn: () =>
+			runsApi.installStats({ days: WINDOW_DAYS, kinds: [...IMPORT_KINDS] }),
+	});
 }

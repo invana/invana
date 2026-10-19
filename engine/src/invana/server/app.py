@@ -211,7 +211,7 @@ def create_app() -> FastAPI:
     from invana.server.routes.schemas import schemas_router
     from invana.server.rules.routes import install_rules_router, rules_router
     from invana.server.runtime.catalogue import catalogue_router
-    from invana.server.runtime.runs import runs_router
+    from invana.server.runtime.runs import install_runs_router, runs_router
     from invana.server.runtime.templates import templates_router
     from invana.server.schedules.routes import schedules_router
     from invana.server.search.routes import search_router
@@ -309,6 +309,7 @@ def create_app() -> FastAPI:
     app.include_router(schemas_router)
     app.include_router(sessions_router)
     app.include_router(runs_router)
+    app.include_router(install_runs_router)
     app.include_router(templates_router)
     app.include_router(boards_router)
     app.include_router(explorer_router)

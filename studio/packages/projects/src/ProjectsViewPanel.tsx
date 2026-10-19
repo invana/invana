@@ -217,10 +217,9 @@ function TodosCount({
 	projectKey: string | null;
 }) {
 	const list = useTodosQuery(username, graphSlug, useTodosScope(projectKey));
-	const items = list.data?.items ?? [];
 	const total = list.data?.total ?? 0;
 	if (total === 0) return null;
-	const review = items.filter((t) => t.status === "review").length;
+	const review = list.data?.by_status.review ?? 0;
 	return <>{review ? `${total} · ${review} in review` : total}</>;
 }
 

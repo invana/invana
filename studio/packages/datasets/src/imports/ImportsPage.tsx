@@ -31,18 +31,13 @@ import {
 	Terminal,
 	TerminalLine,
 } from "@invana/ui";
-import { formatElapsed, useTicker } from "@invana-studio/core";
+import { formatElapsed, type RunStats, useTicker } from "@invana-studio/core";
 import { activityPath } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { RefreshCw, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {
-	type ImportRow,
-	importStats,
-	importsByDay,
-	WINDOW_DAYS,
-} from "./journal";
-import { useImportsJournal } from "./queries";
+import { type ImportRow, WINDOW_DAYS } from "./journal";
+import { useImportStatsQuery, useImportsJournal } from "./queries";
 
 const IMPORT_COMMAND =
 	"invana records import --graph <owner>/<graph> --model <model> --name <name> --path <folder>";
@@ -99,8 +94,7 @@ function CommandHint() {
 	);
 }
 
-function Timeline({ rows, now }: { rows: ImportRow[]; now: number }) {
-	const days = importsByDay(rows, now);
+function Timeline({ days }: { days: RunStats["by_day"] }) {
 	const last = days.length - 1;
 	return (
 		<BarChartV
@@ -109,9 +103,12 @@ function Timeline({ rows, now }: { rows: ImportRow[]; now: number }) {
 			labelMode="none"
 			data={days.map((d, i) => ({
 				// Only the window's ends are named; thirty dates would be texture.
-				label: i === 0 || i === last ? dayLabel(d.day) : "",
-				value: d.count,
-				display: `${d.count} import${d.count === 1 ? "" : "s"}`,
+				label:
+					i === 0 || i === last
+						? dayLabel(Date.parse(`${d.day}T00:00:00`))
+						: "",
+				value: d.runs,
+				display: `${d.runs} import${d.runs === 1 ? "" : "s"}`,
 			}))}
 		/>
 	);
@@ -120,7 +117,14 @@ function Timeline({ rows, now }: { rows: ImportRow[]; now: number }) {
 export function ImportsPage() {
 	const navigate = useNavigate();
 	const journal = useImportsJournal();
-	const stats = importStats(journal.rows, Date.now());
+	const statsQuery = useImportStatsQuery();
+	const counted = statsQuery.data;
+	const stats = {
+		total: counted?.runs ?? 0,
+		live: counted?.live ?? 0,
+		failed: counted?.failed ?? 0,
+		medianMs: counted?.median_ms ?? null,
+	};
 	// A running row's elapsed moves; the ticker keeps it honest.
 	const now = useTicker(stats.live > 0);
 
@@ -147,7 +151,10 @@ export function ImportsPage() {
 						variant="ghost"
 						size="icon-xs"
 						aria-label="Refresh"
-						onClick={journal.refetch}
+						onClick={() => {
+							journal.refetch();
+							void statsQuery.refetch();
+						}}
 					>
 						<RefreshCw
 							className={journal.isFetching ? "animate-spin" : undefined}
@@ -184,7 +191,7 @@ export function ImportsPage() {
 			</MetricGrid>
 
 			<PanelSection card title="Imports a day">
-				<Timeline rows={journal.rows} now={now} />
+				<Timeline days={counted?.by_day ?? []} />
 			</PanelSection>
 
 			<PanelSection

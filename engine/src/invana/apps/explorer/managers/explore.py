@@ -12,6 +12,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.explorer.schemas import TypeCount
 from invana.apps.graphs.models import Graph
 from invana.apps.sessions.models import Session
 from invana.apps.sessions.querysets import SessionQuerySet
@@ -26,6 +27,20 @@ def expand_prompt(req: Any) -> str:
         qualifier = f'"{req.neighbor_label}" '
     direction = {"in": " (incoming)", "out": " (outgoing)"}.get(req.direction, "")
     return f'Expand {qualifier}neighbours of "{req.vertex_id}"{direction}'
+
+
+def type_total(types: list[TypeCount], *, counted: bool) -> int | None:
+    """Every element of the listed types, added up once, in the engine.
+
+    The Explorer panel's footer reads it as *what this graph holds* — the sum
+    over every type the run counted, graph-wide and inside the lens, whatever
+    the canvas hides. ``None`` when the vendor could not count, or when any one
+    type came back without a count: a total over some of the types would read
+    as the graph's and be smaller than it.
+    """
+    if not counted or any(t.count is None for t in types):
+        return None
+    return sum(t.count or 0 for t in types)
 
 
 class ExploreManager:

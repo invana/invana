@@ -117,11 +117,18 @@ class TestBranchesAndDecisions:
         assert {f.via for f in await branches.findings(session, branch=late)} == {"fork", "merge"}
         (read,) = await decisions.read(session, [first])
         assert read.superseded_by_number == second.number and read.verdict_label == "supported"
+        # Both stay recorded; only the one nothing supersedes is current.
+        listed = await decisions.list_for_graph(session, graph_id=graph.id, reader_id=user.id, project=project)
+        assert len(listed) == 2 and decisions.count_current(listed) == 1
 
         draft = await reports.generate(session, project=project, actor=user)
         assert "## Hypothesis 2: Early" in draft.draft
         version = await reports.publish(session, project=project, actor=user)
         assert (await reports.version(session, project=project, number=version.version)).body == draft.draft
+
+    async def test_a_project_with_no_decision_has_none_current(self, session, graph, user, project):
+        listed = await decisions.list_for_graph(session, graph_id=graph.id, reader_id=user.id, project=project)
+        assert listed == [] and decisions.count_current(listed) == 0
 
     async def test_a_type_not_switched_on_is_refused(self, session, graph, user):
         with pytest.raises(ValidationError, match="not switched on"):

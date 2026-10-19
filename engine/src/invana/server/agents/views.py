@@ -71,9 +71,12 @@ async def list_agents(
     )
     # The read seeds on first touch, so it commits.
     reads = await agents.reads(session, items)
+    persistent, ephemeral = agents.count_by_lifetime(items)
     return AgentListResponse(
         items=reads,
         total=len(reads),
+        persistent=persistent,
+        ephemeral=ephemeral,
         default_agent_id=graph.default_agent_id,
         # One grouped read for the whole list, not one per row: the meter is
         # on every row, and a query per agent would be the shape the composite

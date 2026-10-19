@@ -95,7 +95,7 @@ export function DecisionsPage({
 	);
 	const items = decisions.data?.items ?? [];
 	const recorded = decisions.data?.total ?? 0;
-	const current = items.filter((d) => d.superseded_by_number === null).length;
+	const current = decisions.data?.current ?? 0;
 
 	return (
 		<Page>

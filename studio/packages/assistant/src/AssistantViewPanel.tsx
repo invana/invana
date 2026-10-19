@@ -254,10 +254,8 @@ export function AssistantViewPanel({
 						steps.find((s) => s.status === "running") ??
 						steps.find((s) => s.status === "needs_input") ??
 						steps.find((s) => s.status === "queued");
-					const tokens = steps.reduce(
-						(n, s) => n + (s.tokensIn ?? 0) + (s.tokensOut ?? 0),
-						0,
-					);
+					// The engine's sum, carried on each finished step.
+					const tokens = v.runTokens ?? 0;
 					return (
 						<ChatSessionTaskRow
 							key={message.id}

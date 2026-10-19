@@ -228,6 +228,8 @@ export interface PlanRunsPage {
 export interface TaskPlanListResponse {
 	items: TaskPlanSummary[];
 	total: number;
+	/** How many of `items` came with Invana or a plugin. */
+	packaged: number;
 	/** Rendered verbatim in the panel's status bar. Stating the deferral is the design. */
 	authoring: string;
 }

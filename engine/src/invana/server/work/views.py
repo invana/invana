@@ -109,7 +109,7 @@ async def list_tasks(
         parent_id=parent,
     )
     items = [await reads.compose(session, t) for t in rows]
-    return TaskListResponse(items=items, total=len(items))
+    return TaskListResponse(items=items, total=len(items), by_status=tasks.count_by_status(rows))
 
 
 async def create_task(
@@ -509,7 +509,7 @@ async def list_project_decisions(
 ) -> DecisionListResponse:
     project = await _project(session, graph, member, key)
     items = await decisions.list_for_graph(session, graph_id=graph.id, reader_id=member.user_id, project=project)
-    return DecisionListResponse(items=items, total=len(items))
+    return DecisionListResponse(items=items, total=len(items), current=decisions.count_current(items))
 
 
 async def list_decisions(
@@ -519,7 +519,7 @@ async def list_decisions(
 ) -> DecisionListResponse:
     """Every decision in the Graph the reader may see, newest first — the Decisions rail item."""
     items = await decisions.list_for_graph(session, graph_id=graph.id, reader_id=member.user_id)
-    return DecisionListResponse(items=items, total=len(items))
+    return DecisionListResponse(items=items, total=len(items), current=decisions.count_current(items))
 
 
 async def submit_proposal(

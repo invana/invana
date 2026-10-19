@@ -65,6 +65,10 @@ export interface Agent {
 export interface AgentListResponse {
 	items: Agent[];
 	total: number;
+	/** `items` split by lifetime; the two add up to `total`. */
+	persistent: number;
+	/** Spawned helpers — hidden from the list by default, and counted. */
+	ephemeral: number;
 	default_agent_id: string | null;
 	/**
 	 * `{agent_id: tokens}` since the first of the month — what a row draws

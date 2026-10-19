@@ -165,6 +165,13 @@ export interface Decision {
 	created_at: string;
 }
 
+export interface DecisionListResponse {
+	items: Decision[];
+	total: number;
+	/** How many of `items` no later decision supersedes. */
+	current: number;
+}
+
 export interface Proposal {
 	id: string;
 	project_id: string;
@@ -436,6 +443,8 @@ export interface Todo {
 export interface TodoListResponse {
 	items: Todo[];
 	total: number;
+	/** How many of `items` sit in each status; a status with none is absent. */
+	by_status: Partial<Record<TodoStatus, number>>;
 }
 
 export interface TodoCreate {

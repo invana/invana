@@ -23,8 +23,6 @@ export interface RunListRow {
 	run: TaskRunSummary;
 }
 
-const LIVE = ["queued", "running"];
-
 /** A plan reads better than an id: `nl-single@1` beats `template:nl-single@1`. */
 function planOf(t: TaskRunSummary): string {
 	const source = t.plan_origin ?? "";
@@ -122,8 +120,25 @@ export function useRunListQuery(
 		// `refetch` — a list a person is watching needs a way to ask again.
 		isFetching: runs.isFetching,
 		refetch: runs.refetch,
-		live: items.filter((t) => LIVE.includes(t.status)).length,
 	};
+}
+
+/**
+ * The journal's tiles, counted by the engine over every run in the reader's
+ * last *days* — never over the page the table loaded. Its key starts
+ * `["runs", owner, graph]`, so whatever refreshes the journal refreshes these.
+ */
+export function useRunStatsQuery(
+	username?: string,
+	graphSlug?: string,
+	days = 1,
+) {
+	return useQuery({
+		queryKey: ["runs", username, graphSlug, "stats", days] as const,
+		queryFn: () =>
+			runsApi.stats(username as string, graphSlug as string, { days }),
+		enabled: !!username && !!graphSlug,
+	});
 }
 
 // ── Thinkings behind a task ──────────────────────────────────────────────────

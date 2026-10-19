@@ -273,3 +273,18 @@ def _select_events(task_id: str):
     from sqlalchemy import select
 
     return select(Event).where(Event.task_id == task_id)
+
+
+class TestListCounts:
+    async def test_the_list_counts_its_todos_by_status(self, session, graph, user):
+        await _task(session, graph, user, title="Open one")
+        waiting = await _task(session, graph, user, title="Waiting on a person")
+        waiting.status = TaskStatus.review.value
+        await session.flush()
+
+        listed = await tasks.list_for_graph(session, reader_id=user.id, graph_id=graph.id)
+        assert tasks.count_by_status(listed) == {"open": 1, "review": 1}
+
+    async def test_an_empty_list_counts_no_status(self, session, graph, user):
+        listed = await tasks.list_for_graph(session, reader_id=user.id, graph_id=graph.id)
+        assert listed == [] and tasks.count_by_status(listed) == {}

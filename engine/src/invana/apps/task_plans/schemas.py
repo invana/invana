@@ -88,6 +88,8 @@ class TaskPlanRead(BaseModel):
 class TaskPlanListResponse(BaseModel):
     items: list[TaskPlanRead]
     total: int
+    #: How many of ``items`` came with Invana or a plugin (``origin = packaged``).
+    packaged: int = 0
     # Studio renders this verbatim in the panel's status bar. Stating the
     # deferral is the design (docs/for-developers/modules/explore/features/selection-and-the-panel.md, *not a gap*).
     authoring: str = "post-MVP"

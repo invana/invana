@@ -97,8 +97,8 @@ export function ExplorerViewPanel({
 		(type: string) => {
 			if (!store) return;
 			// A type row's eye is a canvas control, not a query: nothing re-runs,
-			// and the graph-wide count on the row does not move — only the
-			// footer's totals, which count what is shown.
+			// and no graph-wide count moves — the row's nor the footer's. What is
+			// hidden is said once, in the section's own header.
 			const ids: string[] = [];
 			for (const node of store.nodes())
 				if (node.type === type) ids.push(String(node.id));
@@ -118,9 +118,7 @@ export function ExplorerViewPanel({
 
 	const shown = nodes.filter((t) => !hidden.has(t.name)).length;
 	const hiddenCount = nodes.length - shown;
-	const totalNodes = nodes
-		.filter((t) => !hidden.has(t.name))
-		.reduce((sum, t) => sum + (t.count ?? 0), 0);
+	const totalNodes = counts.data?.total_nodes ?? null;
 
 	return (
 		<ListPanelChrome
@@ -135,7 +133,10 @@ export function ExplorerViewPanel({
 			footer={
 				<div className="flex items-center justify-between gap-2 border-t px-3 py-1.5 text-sm text-muted-foreground">
 					<span className="tabular-nums">
-						{shown} types · {totalNodes.toLocaleString()} nodes
+						{nodes.length} types
+						{totalNodes === null
+							? null
+							: ` · ${totalNodes.toLocaleString()} nodes`}
 					</span>
 					{canvasName ? <span className="truncate">{canvasName}</span> : null}
 				</div>

@@ -19,7 +19,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.models import Graph
 from invana.apps.skills.models import Skill, SkillVersion
-from invana.apps.task_plans.models import Task, TaskForm, TaskPlan
+from invana.apps.task_plans.managers import TaskPlanManager
+from invana.apps.task_plans.models import PlanOrigin, Task, TaskForm, TaskPlan
 from invana.runtime.layers import declared_bands
 from invana.runtime.managers import TaskPlanRunsManager
 
@@ -104,3 +105,17 @@ class TestCallers:
         assert detail.used_by, "the seeded agents may run it"
         assert detail.callers == []
         assert detail.caller_count == 0
+
+
+class TestPackagedCount:
+    def test_only_packaged_plans_count_as_packaged(self):
+        plans = [
+            TaskPlan(origin=PlanOrigin.packaged.value),
+            TaskPlan(origin=PlanOrigin.generated.value),
+            TaskPlan(origin=PlanOrigin.packaged.value),
+        ]
+        assert TaskPlanManager.count_packaged(plans) == 2
+
+    def test_a_library_of_promoted_plans_has_none_packaged(self):
+        assert TaskPlanManager.count_packaged([TaskPlan(origin=PlanOrigin.promoted.value)]) == 0
+        assert TaskPlanManager.count_packaged([]) == 0

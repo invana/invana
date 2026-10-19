@@ -16,4 +16,7 @@ export interface TypeCountsResponse {
 	edges: TypeCount[];
 	/** False when the vendor could not count; every `count` is then null. */
 	counted: boolean;
+	/** Every node and every edge the graph holds; null when not counted. */
+	total_nodes: number | null;
+	total_edges: number | null;
 }

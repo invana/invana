@@ -59,6 +59,10 @@ class TriggeredBy(enum.StrEnum):
     system = "system"
 
 
+#: The triggers a person does not read the journal for (orchestration § 4.1b).
+INTERACTIVE = (TriggeredBy.canvas.value, TriggeredBy.system.value)
+
+
 class RunStatus(enum.StrEnum):
     """How a run is going — one enum where there were two.
 

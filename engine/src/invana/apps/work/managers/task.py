@@ -13,6 +13,7 @@ The two rules that shape everything here:
 
 from __future__ import annotations
 
+from collections import Counter
 from datetime import UTC, datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -60,6 +61,17 @@ class TaskManager:
         """A Graph's todos, without those of private projects the reader is not on."""
         hidden = await self.projects.hidden_ids(session, graph_id=kwargs["graph_id"], reader_id=reader_id)
         return await self.tasks_qs.list_for_graph(session, exclude_project_ids=hidden, **kwargs)
+
+    @staticmethod
+    def count_by_status(tasks: list[Task]) -> dict[str, int]:
+        """How many of a listed set of todos sit in each status.
+
+        Served beside the list's ``total`` so a header's *3 in review* or a
+        status bar's *2 running* is the engine's count of the same rows, never
+        Studio filtering what it loaded. A status no todo holds is absent, so
+        the reader treats a missing key as zero.
+        """
+        return dict(Counter(t.status for t in tasks))
 
     async def get(self, session: AsyncSession, *, task_id: str, graph_id: str, reader_id: str | None = None) -> Task:
         """One todo; a todo of a private project the reader is not on reads as absent."""

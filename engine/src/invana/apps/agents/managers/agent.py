@@ -15,7 +15,7 @@ import copy
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.agents.models import DEFAULT_EFFORT, Agent, AgentKind, AgentStatus
+from invana.apps.agents.models import DEFAULT_EFFORT, Agent, AgentKind, AgentLifetime, AgentStatus
 from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.agents.registry import SEEDED_AGENTS, SURFACE_DEFAULT_AGENT
 from invana.apps.agents.schemas import (
@@ -199,6 +199,19 @@ class AgentManager:
         return await self.agents_qs.list_for_graph(
             session, graph.id, include_ephemeral=include_ephemeral, include_retired=include_retired
         )
+
+    @staticmethod
+    def count_by_lifetime(agents: list[Agent]) -> tuple[int, int]:
+        """How many of a listed set of agents are persistent, and how many ephemeral.
+
+        An ephemeral agent is a helper spawned for one task; the Agents list
+        hides it by default and says how many it hid. The header counts the
+        persistent ones until the reader shows the hidden, then the list's
+        ``total``. Returns ``(persistent, ephemeral)``, which add up to the
+        number of agents passed.
+        """
+        ephemeral = sum(1 for a in agents if a.lifetime == AgentLifetime.ephemeral.value)
+        return len(agents) - ephemeral, ephemeral
 
     async def get_or_404(self, session: AsyncSession, *, agent_id: str, graph_id: str) -> Agent:
         agent = await self.agents_qs.get(session, agent_id)

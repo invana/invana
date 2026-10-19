@@ -14,7 +14,7 @@ from http import HTTPStatus
 from pathlib import Path
 
 from fastapi import HTTPException
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.envelope import PlanStep
@@ -48,7 +48,7 @@ from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
 from invana.core.settings import settings
 from invana.plugins.core.ingest.records import LoadRefused
-from invana.runtime.models import RunRole, RunStatus, TaskRun, TriggeredBy
+from invana.runtime.models import INTERACTIVE, RunRole, RunStatus, TaskRun, TriggeredBy
 from invana.runtime.planning import opening_for, plan_payload, queue_plan_steps, select_plan_by_key
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.workflows import MODELLER_GENERATE, NL_QUERY, QL_QUERY, WORKFLOWS, Workflow
@@ -113,10 +113,6 @@ async def _next_attempt(db: AsyncSession, run_id: str, seq: int) -> int:
         .first()
     )
     return (prior or 0) + 1
-
-
-#: The triggers a person does not read the journal for (orchestration § 4.1b).
-INTERACTIVE = (TriggeredBy.canvas.value, TriggeredBy.system.value)
 
 
 async def _prune(db: AsyncSession, graph_id: str) -> None:
@@ -1056,8 +1052,11 @@ async def list_runs(
         # offering it would hand a person a button that always fails.
         stmt = stmt.where(TaskRun.plan_origin == "generated", TaskRun.plan_snapshot.isnot(None))
     rows = list((await db.execute(stmt.order_by(TaskRun.queued_at.desc()).limit(limit))).scalars())
+    # Every root the filters match, not the page: *11 of 240 shown*. Candidates
+    # are narrowed again below, so their count is the narrowed page.
+    total = int(await db.scalar(select(func.count()).select_from(stmt.subquery())) or 0)
     if not rows:
-        return [], 0
+        return [], total
 
     ids = [r.id for r in rows]
 
@@ -1184,7 +1183,8 @@ async def list_runs(
     ]
     if candidates:
         items = [i for i in items if i["served"] == "yes" and not i["promoted"]]
-    return items, len(items)
+        return items, len(items)
+    return items, total
 
 
 #: The builtin a load runs (BD7 · LB14). Records are imported **into a model**.

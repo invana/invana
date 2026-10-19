@@ -9,6 +9,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.managers import AgentManager
+from invana.apps.agents.models import Agent, AgentKind, AgentLifetime
 from invana.apps.agents.registry import SEEDED_AGENTS
 from invana.apps.agents.schemas import AgentCreate, AgentRead
 from invana.apps.govern.models import Lens, LensKind
@@ -97,3 +98,22 @@ async def test_tokens_this_month_sum_each_root_and_its_steps(session: AsyncSessi
     assert used[busy.id] == 1_320
     assert idle.id not in used
     assert (await lifecycle.meters(session, agent=idle)).tokens_this_month == 0
+
+
+async def test_the_list_counts_spawned_helpers_apart(session: AsyncSession, graph: Graph):
+    seeded = await AgentManager().list_agents(session, graph=graph)
+    # The negative half: a Graph that spawned nothing hides nothing.
+    assert AgentManager.count_by_lifetime(seeded) == (len(seeded), 0)
+
+    session.add(
+        Agent(
+            graph_id=graph.id,
+            name="helper-1",
+            kind=AgentKind.authored.value,
+            lifetime=AgentLifetime.ephemeral.value,
+            parent_agent_id=seeded[0].id,
+        )
+    )
+    await session.flush()
+    listed = await AgentManager().list_agents(session, graph=graph, include_ephemeral=True)
+    assert AgentManager.count_by_lifetime(listed) == (len(seeded), 1)

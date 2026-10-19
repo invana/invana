@@ -130,6 +130,14 @@ def run_result(run: TaskRun, steps: list[TaskRun]) -> dict[str, Any]:
     return result
 
 
+def step_progress(nodes: list[TaskRun]) -> tuple[int, int]:
+    """How far a run has got, as ``(done, total)``: the attempts that succeeded,
+    and the plan's length as far as its nodes reach — the journal row's rule."""
+    done = sum(1 for n in nodes if n.status == RunStatus.succeeded.value)
+    total = max((n.seq + 1 for n in nodes), default=0)
+    return done, total
+
+
 def run_tokens(run: TaskRun, nodes: list[TaskRun]) -> tuple[int, int]:
     """A root's spend: its own tokens plus its direct nodes', as ``(in, out)``.
 

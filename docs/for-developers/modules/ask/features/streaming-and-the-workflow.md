@@ -84,6 +84,7 @@ sequenceDiagram
 | SW2 | A retry is shown, with its attempt number. |
 | SW3 | Cancel keeps what completed and presents nothing partial as an answer. |
 | SW4 | The stream resumes after a reload from the last sequence delivered. |
+| SW5 | **A finished step carries its run's spend so far.** Every `step.finished` frame has `run_tokens` — the root's own tokens plus its nodes' to that moment, summed by the engine — so the assistant's live strip shows `↑ 12k tokens` without adding anything. |
 
 ## Not building
 

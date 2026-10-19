@@ -16,7 +16,6 @@ import {
 	type AgentFilters,
 	agentsSection,
 	NO_AGENT_FILTERS,
-	visibleAgents,
 } from "./AgentsSection";
 import { useAgentsQuery } from "./queries";
 import type { AgentEdge } from "./types";
@@ -51,15 +50,18 @@ export function AgentsViewPanel({
 	const ui = useStackSectionUi();
 	const { gate } = useAccess();
 	// Held here, not in the list: the funnel in the section's header and the
-	// rows under it read the same filters, and the count beside the title is
-	// the rows they leave.
+	// rows under it read the same filters. The count beside the title is the
+	// engine's — the standing agents, or every agent once the hidden helpers
+	// are shown; a kind or status filter narrows the rows, not the count.
 	const [filters, setFilters] = useState<AgentFilters>(NO_AGENT_FILTERS);
 	const agentList = useAgentsQuery(username, graphSlug, {
 		includeEphemeral: true,
 		includeRetired: true,
 	});
 	const count = agentList.data
-		? visibleAgents(agentList.data.items, filters).length
+		? filters.showEphemeral
+			? agentList.data.total
+			: agentList.data.persistent
 		: undefined;
 
 	// `&agent=` was the drill-in when the page lived in this section. A link that

@@ -123,6 +123,7 @@ Studio is [C02](../../../../products/migration-sessions.md#track-c--new-product-
 | BD15 | The Graph's decisions list (`GET …/decisions`) is a read across projects, filtered to the projects the reader may see ([9.7](private-projects.md)). |
 | BD16 | Studio fills in what the engine requires rather than asking: *Decide* addresses every contradicting finding and supersedes the current decision. A rule's 409 is drawn as a refusal card naming the findings, with *Remove fN from the cites*; reviewing one is the finding page's *Review*. |
 | BD17 | Studio draws the Branches tab as a tree on the layered canvas — fork edges, a dashed edge into the branch a merge went into, a dropped branch hollow — and a merge's dialog asks only *What moves*, which is also what the decision cites. A project, branch and finding are levels of the shell's breadcrumb, named for what they are, never their key. |
+| BD18 | **Current is counted by the engine.** The decisions lists (`GET …/decisions`, `GET …/projects/{key}/decisions`) return `current` beside `total`: the listed decisions no later one supersedes. The Decisions page's `2 current · 5 recorded` is those two numbers, and reads `5` alone when they match. |
 
 ## Not building
 

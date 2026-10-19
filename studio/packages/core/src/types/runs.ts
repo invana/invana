@@ -86,6 +86,8 @@ export interface RunView {
 	workflow?: string;
 	status: RunStatus;
 	steps: RunNode[];
+	/** The run's tokens so far, as the engine summed them on the last finished step. */
+	runTokens?: number;
 	/** The model's rationale while Understand thinks; folds into the trace on settle. */
 	reasoning?: string;
 	query?: QueryProposed;
@@ -194,6 +196,31 @@ export interface TaskRunSummary {
 	tokens: number;
 	/** Dollars over its priced steps; absent is *unknown*, never `$0.00`. */
 	cost_usd?: number | null;
+}
+
+/** The journal's tiles over a window, counted by the engine over every run. */
+export interface RunStats {
+	days: number;
+	since: string;
+	/** Standing now, whatever the window. */
+	live: number;
+	waiting: number;
+	runs: number;
+	succeeded: number;
+	failed: number;
+	cannot_answer: number;
+	tokens: number;
+	spending_runs: number;
+	median_ms: number | null;
+	slowest: { run_id: string; title: string; duration_ms: number } | null;
+	/** Oldest first, empty days included; `day` is `YYYY-MM-DD` in the reader's zone. */
+	by_day: { day: string; runs: number }[];
+}
+
+/** What a stats read asks for: the window in days, and kinds of work. */
+export interface RunStatsQuery {
+	days?: number;
+	kinds?: string[];
 }
 
 export interface TaskRunListResponse {

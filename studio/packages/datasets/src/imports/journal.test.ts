@@ -1,6 +1,6 @@
 import type { TaskRunSummary } from "@invana-studio/core";
 import { describe, expect, it } from "vitest";
-import { importStats, importsByDay, mergeImports } from "./journal";
+import { mergeImports } from "./journal";
 
 const airways = { username: "admin", graphSlug: "airways", name: "Airways" };
 const arabidopsis = {
@@ -45,8 +45,6 @@ function run(
 	};
 }
 
-const NOW = Date.parse("2026-10-11T12:00:00");
-
 describe("the imports journal", () => {
 	it("merges every Graph's loads newest first, each naming its Graph", () => {
 		const rows = mergeImports([
@@ -79,46 +77,5 @@ describe("the imports journal", () => {
 			},
 		]);
 		expect(rows).toEqual([]);
-	});
-
-	it("buckets loads a day, empty days included, and ignores what is outside the window", () => {
-		const rows = mergeImports([
-			{
-				graph: airways,
-				items: [
-					run("a1", "import", "2026-10-11T09:00:00"),
-					run("a2", "import", "2026-10-11T10:00:00"),
-					run("a3", "bulk", "2026-10-09T10:00:00"),
-					run("old", "import", "2026-08-01T10:00:00"),
-				],
-			},
-		]);
-		const days = importsByDay(rows, NOW, 3);
-		expect(days.map((d) => d.count)).toEqual([1, 0, 2]);
-	});
-
-	it("reads the tiles off the window, with no median when nothing finished", () => {
-		const rows = mergeImports([
-			{
-				graph: airways,
-				items: [
-					run("a1", "import", "2026-10-11T09:00:00", {
-						finished_at: "2026-10-11T09:01:00",
-					}),
-					run("a2", "import", "2026-10-11T10:00:00", { status: "running" }),
-					run("a3", "import", "2026-10-10T10:00:00", {
-						status: "failed",
-						finished_at: "2026-10-10T10:00:20",
-					}),
-				],
-			},
-		]);
-		expect(importStats(rows, NOW)).toEqual({
-			total: 3,
-			live: 1,
-			failed: 1,
-			medianMs: 40_000,
-		});
-		expect(importStats([], NOW).medianMs).toBeNull();
 	});
 });

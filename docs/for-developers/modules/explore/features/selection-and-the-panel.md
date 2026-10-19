@@ -78,7 +78,8 @@ own, closed by the same click that opens it (SP10).
 | `SELECTED` | the selected element's type | id · summary · relationship chips · the provenance line |
 
 The footer states `<n> types · <total> nodes` on the left and the open canvas's name on the right.
-The total sums the **shown** types, so hiding a type moves both numbers together.
+Both are the graph's: `<n>` is the types listed and `<total>` is the engine's `total_nodes`, so
+hiding a type moves neither — what is hidden is the section header's `6 shown · 1 hidden` (SP12).
 
 A row's colour dot is the same colour the canvas paints that type with, which is what makes the
 section a legend as well as a list.
@@ -99,6 +100,7 @@ section a legend as well as a list.
 | `nodes` | `[{ "name": "Observation", "count": 1912 }, …]`, biggest first |
 | `edges` | `[{ "name": "MENTIONS", "count": 52100 }, …]`, biggest first |
 | `counted` | `false` when the vendor cannot count; the lists still name every type, with `count: null` |
+| `total_nodes` · `total_edges` | Every node and every edge across the listed types, added once in the engine; `null` when not counted, or when any type came back without a count |
 
 ## Decisions
 
@@ -110,12 +112,13 @@ section a legend as well as a list.
 | SP4 | Provenance is always one click from the element. |
 | SP5 | The selection is what the assistant receives. |
 | SP6 | The panel counts the **graph**, the status bar counts the **canvas**. `24,477 nodes` in the panel footer and `26 nodes` in the status bar are both true and answer different questions — what this graph holds, and what I am looking at. |
-| SP7 | The eye on a type row is a canvas control, not a query. It hides that type on the open canvas; nothing re-runs, and the count stays graph-wide. Only the footer's totals follow it, because they count what is shown. |
+| SP7 | The eye on a type row is a canvas control, not a query. It hides that type on the open canvas; nothing re-runs, and every count stays graph-wide — the row's and the footer's. |
 | SP8 | Counts come from one call, served by the connector's schema reader. A vendor that cannot count says so and the panel lists the types without numbers — a type list with no numbers is still the legend, and blocking on a count nobody can produce is worse. |
 | SP10 | The Explorer panel is a `?panel` key, not the left column's resting state. No key means no left column: the canvas keeps the width, and the rail lights nothing. A panel that cannot be closed is a panel whose close control lies. |
 | SP11 | **Type counts are a run under the lens.** The panel's counts come from `count_types` (`graph_read`, trigger `canvas`): a type the lens denies is absent from the list, and every count is taken inside the slice. SP8's one-call rule holds — it is one step, not one call per label. |
 | SP9 | `SELECTED` is a section of the same stack, collapsible like the others — not a fixed detail area under them. It states the element short (id · summary · chips · provenance); the full property table is `InspectorViewPanel`, the right side's other occupant, which is where a reader who wants every field already is. |
 | SP10 | **A third-party element's provenance is its reference link.** Where a loaded element's provenance runs record → dataset → import run (SP4), a third-party one reads `third-party · <source>` → its reference — for the internet the link, title, source kind and when it was fetched; for any other source its locator; for the model the model and the run ([BG3](../../ask/features/beyond-the-graph.md#decisions)). Still one click. |
+| SP12 | **The footer's node total is the engine's `total_nodes`, never a sum Studio builds.** The type-counts run returns it beside the lists, summed once over every type it counted inside the lens. Hiding types is canvas state, so it is said where the eye is — the NODE TYPES header's `6 shown · 1 hidden` — and never subtracted from the graph's total. A vendor that cannot count, or a list with any uncounted type, has no total, and the footer drops the nodes figure rather than print a partial sum as the graph's. |
 
 ## Not building
 

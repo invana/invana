@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -71,6 +71,9 @@ class TaskRunRead(BaseModel):
     run_tokens_in: int | None = None
     run_tokens_out: int | None = None
     run_tokens: int | None = None
+    #: Attempts that succeeded, and the plan's length as far as its nodes reach.
+    steps_done: int = 0
+    steps_total: int = 0
     stream_seq: int
     #: The trace the run was started in — opens it in the collector's UI.
     trace_id: str | None = None
@@ -147,6 +150,44 @@ class TaskRunSummary(BaseModel):
     #: What the run spent, summed over its priced steps. ``None`` when none had
     #: a published rate — *unknown*, never `0` (SR40).
     cost_usd: float | None = None
+
+
+class RunDay(BaseModel):
+    """One calendar day of the window, in the reader's zone."""
+
+    day: date
+    runs: int
+
+
+class SlowestRun(BaseModel):
+    run_id: str
+    #: What the journal row calls it.
+    title: str
+    #: Stored, or timed to now for a run still going.
+    duration_ms: int
+
+
+class RunStats(BaseModel):
+    """The journal's tiles over a window, counted over every root run in it."""
+
+    days: int
+    #: Midnight in the reader's zone, the window's first day.
+    since: datetime
+    #: Standing now, whatever the window.
+    live: int
+    waiting: int
+    runs: int
+    succeeded: int
+    failed: int
+    cannot_answer: int
+    tokens: int
+    #: Runs in the window that spent any tokens.
+    spending_runs: int
+    #: Of the runs in the window that finished; null when none did.
+    median_ms: int | None
+    slowest: SlowestRun | None
+    #: Oldest first, empty days included.
+    by_day: list[RunDay]
 
 
 class TaskRunListResponse(BaseModel):

@@ -33,6 +33,8 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | EX-F13 | Share — live link or frozen snapshot for members; PNG · CSV · Markdown export | In Studio (C09) | EX-15 |
 | EX-F12 | Console — the canvas’s data per label, Table or JSON, paged · the session’s queries and each one’s step, opened from the footer | New (the-console.md) | EX-08 · EX-14 |
 | EX-F11 | Assistant chat — centred to start, docked right once a conversation begins, closable | In Studio (chat) · New (centred start, close) | EX-01 · EX-02 · EX-13 |
+| EX-F14 | Layout presets — Network · Tree ↓ · Flow → · Radial, each with its options ([graph-canvas.md](../for-developers/modules/explore/features/graph-canvas.md) GC22) | New | EX-16 |
+| EX-F15 | Walkthrough — *Present* plays the board one answer at a time ([walkthrough.md](../for-developers/modules/explore/features/walkthrough.md)) | New | EX-17 |
 
 ## User stories
 
@@ -53,6 +55,8 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | EX-13 | analyst | to close the assistant and have the canvas to myself, and reopen it from the header | the board gets the whole screen when I work by hand | `explorer.answer.closed` |
 | EX-15 | analyst | to share an answer as a live link or a frozen snapshot, or export it | others see what I found, with its citations | `explorer.answer.share` |
 | EX-14 | analyst | the data on the board and every query this session ran, in a console under the board | I can read the rows without losing the picture | `explorer.answer.console` · `explorer.answer.console.json` · `explorer.answer.console.queries` · `explorer.answer.console.queries.step` · `explorer.answer.console.queries.empty` |
+| EX-16 | analyst | to switch the board between Network, Tree, Flow and Radial and tune each | one answer reads as a network, a hierarchy or a flow | `explorer.layout` · `explorer.layout.tree` · `explorer.layout.flow` · `explorer.layout.flow.orthogonal` · `explorer.layout.radial` · `explorer.layout.too_large` |
+| EX-17 | analyst | to present a board one answer at a time, with the question and the reply | I can show someone how I got there | `explorer.present` · `explorer.presenting` · `explorer.presenting.expansion` · `explorer.presenting.your_changes` · `explorer.presenting.step_failed` |
 
 ## CLI
 

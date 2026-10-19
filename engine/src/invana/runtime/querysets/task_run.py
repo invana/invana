@@ -560,6 +560,44 @@ class TaskRunQuerySet:
         ).one()
         return int(runs), int(failed or 0), int(tokens_in or 0), int(tokens_out or 0)
 
+    async def journal_roots(
+        self,
+        session: AsyncSession,
+        *,
+        graph_ids: list[str],
+        kinds: list[str] | None,
+        exclude_triggers: tuple[str, ...],
+        since: datetime | None = None,
+        statuses: list[str] | None = None,
+    ) -> list[TaskRun]:
+        """The root runs the journal lists, in *graph_ids*, queued at or after *since*
+        or — with *statuses* — standing in one of them, whenever queued."""
+        if not graph_ids:
+            return []
+        stmt = select(TaskRun).where(
+            TaskRun.graph_id.in_(graph_ids),
+            TaskRun.parent_run_id.is_(None),
+            TaskRun.triggered_by.not_in(exclude_triggers),
+        )
+        if kinds:
+            stmt = stmt.where(TaskRun.ask_kind.in_(kinds))
+        if since is not None:
+            stmt = stmt.where(TaskRun.queued_at >= since)
+        if statuses is not None:
+            stmt = stmt.where(TaskRun.status.in_(statuses))
+        return list((await session.execute(stmt)).scalars())
+
+    async def node_tokens(self, session: AsyncSession, *, run_ids: list[str]) -> dict[str, int]:
+        """Each run's direct nodes' tokens so far, by run — for runs not yet settled."""
+        if not run_ids:
+            return {}
+        stmt = (
+            select(TaskRun.parent_run_id, func.coalesce(func.sum(TaskRun.tokens), 0))
+            .where(TaskRun.parent_run_id.in_(run_ids))
+            .group_by(TaskRun.parent_run_id)
+        )
+        return {run_id: int(n) for run_id, n in (await session.execute(stmt)).all()}
+
     async def add(self, session: AsyncSession, run: TaskRun) -> TaskRun:
         session.add(run)
         await session.flush()

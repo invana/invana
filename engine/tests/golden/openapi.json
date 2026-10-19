@@ -989,12 +989,22 @@
             ],
             "title": "Default Agent Id"
           },
+          "ephemeral": {
+            "default": 0,
+            "title": "Ephemeral",
+            "type": "integer"
+          },
           "items": {
             "items": {
               "$ref": "#/components/schemas/AgentRead"
             },
             "title": "Items",
             "type": "array"
+          },
+          "persistent": {
+            "default": 0,
+            "title": "Persistent",
+            "type": "integer"
           },
           "tokens_this_month": {
             "additionalProperties": {
@@ -6009,6 +6019,11 @@
       },
       "DecisionListResponse": {
         "properties": {
+          "current": {
+            "default": 0,
+            "title": "Current",
+            "type": "integer"
+          },
           "items": {
             "items": {
               "$ref": "#/components/schemas/DecisionRead"
@@ -17649,6 +17664,26 @@
         "title": "RuleVersionRead",
         "type": "object"
       },
+      "RunDay": {
+        "description": "One calendar day of the window, in the reader's zone.",
+        "properties": {
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "runs"
+        ],
+        "title": "RunDay",
+        "type": "object"
+      },
       "RunNodeRead": {
         "description": "One node of a run, read as a row of the trace.",
         "properties": {
@@ -17867,6 +17902,97 @@
           "stream_url"
         ],
         "title": "RunRerunResponse",
+        "type": "object"
+      },
+      "RunStats": {
+        "description": "The journal's tiles over a window, counted over every root run in it.",
+        "properties": {
+          "by_day": {
+            "items": {
+              "$ref": "#/components/schemas/RunDay"
+            },
+            "title": "By Day",
+            "type": "array"
+          },
+          "cannot_answer": {
+            "title": "Cannot Answer",
+            "type": "integer"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "live": {
+            "title": "Live",
+            "type": "integer"
+          },
+          "median_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Ms"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          },
+          "slowest": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SlowestRun"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "spending_runs": {
+            "title": "Spending Runs",
+            "type": "integer"
+          },
+          "succeeded": {
+            "title": "Succeeded",
+            "type": "integer"
+          },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          },
+          "waiting": {
+            "title": "Waiting",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "days",
+          "since",
+          "live",
+          "waiting",
+          "runs",
+          "succeeded",
+          "failed",
+          "cannot_answer",
+          "tokens",
+          "spending_runs",
+          "median_ms",
+          "slowest",
+          "by_day"
+        ],
+        "title": "RunStats",
         "type": "object"
       },
       "ScheduleCreate": {
@@ -21829,6 +21955,29 @@
         "title": "SlowRun",
         "type": "object"
       },
+      "SlowestRun": {
+        "properties": {
+          "duration_ms": {
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "title",
+          "duration_ms"
+        ],
+        "title": "SlowestRun",
+        "type": "object"
+      },
       "SortDirection": {
         "description": "Sort direction for a single property.",
         "enum": [
@@ -22913,6 +23062,13 @@
       },
       "TaskListResponse": {
         "properties": {
+          "by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Status",
+            "type": "object"
+          },
           "items": {
             "items": {
               "$ref": "#/components/schemas/TaskRead"
@@ -23211,6 +23367,11 @@
             },
             "title": "Items",
             "type": "array"
+          },
+          "packaged": {
+            "default": 0,
+            "title": "Packaged",
+            "type": "integer"
           },
           "total": {
             "title": "Total",
@@ -23927,6 +24088,16 @@
             },
             "title": "Steps",
             "type": "array"
+          },
+          "steps_done": {
+            "default": 0,
+            "title": "Steps Done",
+            "type": "integer"
+          },
+          "steps_total": {
+            "default": 0,
+            "title": "Steps Total",
+            "type": "integer"
           },
           "stream_seq": {
             "title": "Stream Seq",
@@ -25691,6 +25862,28 @@
               }
             ],
             "title": "Run Id"
+          },
+          "total_edges": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Edges"
+          },
+          "total_nodes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Nodes"
           }
         },
         "title": "TypeCountsResponse",
@@ -29240,6 +29433,92 @@
         "summary": "List Install Rule Versions",
         "tags": [
           "rules"
+        ]
+      }
+    },
+    "/api/v1/runs/stats": {
+      "get": {
+        "description": "The same tiles over every Graph the reader is a member of \u2014 the Imports\npage's counts, median time and imports a day.",
+        "operationId": "install_run_stats_api_v1_runs_stats_get",
+        "parameters": [
+          {
+            "description": "The window in the reader's days; 1 is today.",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "description": "The window in the reader's days; 1 is today.",
+              "maximum": 90,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The reader's IANA time zone \u2014 where midnight is.",
+            "in": "query",
+            "name": "tz",
+            "required": false,
+            "schema": {
+              "default": "UTC",
+              "description": "The reader's IANA time zone \u2014 where midnight is.",
+              "title": "Tz",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only these kinds of work \u2014 `ask`, `import`, `bulk`.",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these kinds of work \u2014 `ask`, `import`, `bulk`.",
+              "title": "Kind"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunStats"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Install Run Stats",
+        "tags": [
+          "runs"
         ]
       }
     },
@@ -45704,6 +45983,114 @@
           }
         ],
         "summary": "List Runs",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/runs/stats": {
+      "get": {
+        "description": "The journal's tiles for this Graph \u2014 *In flight*, *Today*, *Tokens today*,\n*Slowest* \u2014 counted over every root run in the window.",
+        "operationId": "run_stats_api_v1_u__username___graphSlug__runs_stats_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The window in the reader's days; 1 is today.",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "description": "The window in the reader's days; 1 is today.",
+              "maximum": 90,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The reader's IANA time zone \u2014 where midnight is.",
+            "in": "query",
+            "name": "tz",
+            "required": false,
+            "schema": {
+              "default": "UTC",
+              "description": "The reader's IANA time zone \u2014 where midnight is.",
+              "title": "Tz",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only these kinds of work \u2014 `ask`, `import`, `bulk`.",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these kinds of work \u2014 `ask`, `import`, `bulk`.",
+              "title": "Kind"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunStats"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Run Stats",
         "tags": [
           "runs"
         ]

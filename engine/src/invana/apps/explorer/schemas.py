@@ -112,5 +112,8 @@ class TypeCountsResponse(BaseModel):
     edges: list[TypeCount] = Field(default_factory=list)
     #: False when the vendor could not count; every ``count`` is then ``None``.
     counted: bool = True
+    #: Every node and every edge the graph holds; ``None`` when not counted.
+    total_nodes: int | None = None
+    total_edges: int | None = None
     #: The ``count-types@1`` run these came from (SP11).
     run_id: str | None = None

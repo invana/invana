@@ -65,6 +65,17 @@ class TaskPlanManager:
     async def list_for_graph(self, session: AsyncSession, *, graph_id: str) -> list[TaskPlan]:
         return await self.task_plans_qs.list_for_graph(session, graph_id=graph_id)
 
+    @staticmethod
+    def count_packaged(plans: list[Any]) -> int:
+        """How many of a listed set of plans came with Invana or a plugin.
+
+        Takes rows or reads — anything with an ``origin``. The library header
+        reads *6 · 3 packaged* from this and the list's ``total``: what there is
+        to pick from, and how much of it shipped rather than was generated or
+        promoted.
+        """
+        return sum(1 for p in plans if p.origin == PlanOrigin.packaged.value)
+
     async def get(self, session: AsyncSession, plan_id: str) -> TaskPlan | None:
         return await self.task_plans_qs.get(session, plan_id)
 

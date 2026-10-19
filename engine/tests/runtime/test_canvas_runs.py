@@ -10,7 +10,8 @@ from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.explorer.schemas import ExpandByEdgeTypeRequest
+from invana.apps.explorer.managers import type_total
+from invana.apps.explorer.schemas import ExpandByEdgeTypeRequest, TypeCount
 from invana.apps.graphs.models import Graph
 from invana.apps.sessions.models import Session, SessionMessage
 from invana.core.auth.models import User
@@ -64,3 +65,15 @@ async def test_a_session_somebody_else_owns_gets_no_turn(
     owned = await _explore.owned_session(session, graph=graph, actor_id=user.id, session_id=theirs.id)
 
     assert owned is None
+
+
+def test_the_type_counts_total_every_type_the_run_counted():
+    types = [TypeCount(name="Airport", count=3_500), TypeCount(name="Country", count=237)]
+    assert type_total(types, counted=True) == 3_737
+    assert type_total([], counted=True) == 0
+
+
+def test_a_vendor_that_cannot_count_has_no_total():
+    # A total over some of the types would read as the graph's and be smaller.
+    assert type_total([TypeCount(name="Airport", count=3_500), TypeCount(name="Country")], counted=True) is None
+    assert type_total([TypeCount(name="Airport")], counted=False) is None

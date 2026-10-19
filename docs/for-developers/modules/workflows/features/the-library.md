@@ -171,6 +171,7 @@ flowchart TD
 | # | Decision |
 |---|---|
 | LB7 | **A skill's drawing is not listed here either.** Every published skill version *is* a TaskPlan ([orchestration § 0.8](../../../orchestration.md#08-a-skill-drawn-as-a-flow)), but it is edited, versioned and published as a skill — it is read under **Skills**, and this list would show the same row under a second name. |
+| LB40 | **The packaged count is the engine's.** `GET …/workflows` returns `packaged` beside `total` — the listed plans whose `origin` is `packaged` — and the section header's `6 · 3 packaged` is those two numbers. |
 
 ## Not building
 
