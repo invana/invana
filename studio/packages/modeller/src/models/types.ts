@@ -762,8 +762,20 @@ export interface Performance {
 	shapes: ShapeRow[];
 }
 
+/** The page's model and type counts, counted by the engine. */
+export interface Catalog {
+	models: number;
+	published: number;
+	drafts: number;
+	node_types: number;
+	edge_types: number;
+	/** Each published model's declared types, by model id. */
+	types: Record<string, number>;
+}
+
 export interface Insights {
 	window: InsightsWindow;
+	catalog: Catalog | null;
 	/** `null` — the engine does not measure this slice. */
 	growth: Growth | null;
 	overview: Overview | null;

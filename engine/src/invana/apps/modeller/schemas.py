@@ -759,8 +759,21 @@ class Performance(BaseModel):
     shapes: list[ShapeRow]
 
 
+class Catalog(BaseModel):
+    """How many models the page reads, and the types their published versions declare."""
+
+    models: int
+    published: int
+    drafts: int
+    node_types: int
+    edge_types: int
+    #: Each published model's declared types, by model id.
+    types: dict[str, int]
+
+
 class Insights(BaseModel):
     window: Literal["7d", "30d", "90d"]
+    catalog: Catalog | None = None
     #: ``None`` — the engine does not measure this slice (MP33).
     growth: Growth | None = None
     overview: Overview | None = None

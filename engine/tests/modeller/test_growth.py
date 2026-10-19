@@ -110,9 +110,11 @@ class TestGrowth:
         )
         await session.flush()
 
-        growth = (
-            await InsightsManager().read(session, graph_id=graph_id, model_id=None, window="7d", today=TODAY)
-        ).growth
+        insights = await InsightsManager().read(session, graph_id=graph_id, model_id=None, window="7d", today=TODAY)
+        growth = insights.growth
+        catalog = insights.catalog
+        assert (catalog.models, catalog.published, catalog.drafts) == (1, 1, 0)
+        assert (catalog.node_types, catalog.edge_types, catalog.types) == (1, 1, {model.id: 2})
 
         assert growth.labels[0] == "2026-09-21" and len(growth.labels) == 7
         assert growth.series[0].values == [110, 110, 170, 170, 170, 170, 170]

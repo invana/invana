@@ -17,7 +17,6 @@ import type {
 	StagedSpec,
 	TabSpec,
 } from "@invana/boards";
-import type { TypeCountsResponse } from "@invana-studio/core";
 import type { ReactNode } from "react";
 import type { ModelFrame } from "../stitch/allModels";
 import type {
@@ -125,7 +124,6 @@ export interface ModelsPageData {
 	models: GraphModelSummary[];
 	/** Each model's active version's types — the Overview's counts. */
 	frames: ModelFrame[];
-	counts: TypeCountsResponse | undefined;
 	/** Stitches between active versions; undefined while they load. */
 	links: ModelLink[] | undefined;
 	/** The mirror, drift marked, at the page's scope. */
@@ -235,18 +233,15 @@ type Panel = PanelSpec;
 const nf = new Intl.NumberFormat();
 const num = (v: number | null | undefined) => (v == null ? "—" : nf.format(v));
 
-/** Records per type name, and per kind — `null` when the vendor could not count. */
-function recordsOf(counts: TypeCountsResponse | undefined) {
-	const nodes = new Map<string, number | null>();
-	const edges = new Map<string, number | null>();
-	for (const n of counts?.nodes ?? []) nodes.set(n.name, n.count ?? null);
-	for (const e of counts?.edges ?? []) edges.set(e.name, e.count ?? null);
-	return { nodes, edges, counted: !!counts?.counted };
-}
-
-function sum(values: (number | null | undefined)[]): number | null {
-	if (values.some((v) => v == null)) return null;
-	return values.reduce<number>((a, v) => a + (v ?? 0), 0);
+/**
+ * Records as Growth counted them — per row key (`<model id>`, `node:<name>`,
+ * `edge:<name>`) and in total — so a tile and the growth beneath it are one
+ * series. `null` per row when it was never counted.
+ */
+function recordsOf(insights: Insights | null | undefined) {
+	const growth = insights?.growth;
+	const byKey = new Map((growth?.rows ?? []).map((r) => [r.key, r.now]));
+	return { byKey, total: growth?.now ?? null, counted: !!growth?.counted };
 }
 
 /** A draft has no number until it is published. */
@@ -302,8 +297,9 @@ export function modelsPageSpec(
 function header(data: ModelsPageData): BoardSpec["header"] {
 	const { scope, canWrite } = data;
 	if (!scope) {
-		const drafts = data.models.filter((m) => !m.active_version).length;
-		const published = data.models.length - drafts;
+		const catalog = data.insights?.catalog;
+		const drafts = catalog?.drafts ?? 0;
+		const published = catalog?.published ?? 0;
 		// Unknown reads "—", never 0: nothing loaded yet is not nothing stitched.
 		const stitches = data.links?.filter((l) => l.status === "active").length;
 		return {
@@ -519,18 +515,12 @@ function overviewAll(
 	view: ModelsView,
 	slots: ModelsPageSlots,
 ): RowSpec[] {
-	const records = recordsOf(data.counts);
+	const records = recordsOf(data.insights);
+	const catalog = data.insights?.catalog;
 	const measured = measuredOf(data.insights);
 	const rows = data.models.map((m) => {
-		const frame = data.frames.find((f) => f.modelId === m.id);
-		const types =
-			(frame?.nodeTypes.length ?? 0) + (frame?.edgeTypes.length ?? 0);
-		const total = frame
-			? sum([
-					...frame.nodeTypes.map((t) => records.nodes.get(t.name)),
-					...frame.edgeTypes.map((t) => records.edges.get(t.name)),
-				])
-			: null;
+		const types = catalog?.types[m.id] ?? 0;
+		const total = records.byKey.get(m.id) ?? null;
 		return {
 			id: m.id,
 			model: m.name,
@@ -541,14 +531,11 @@ function overviewAll(
 			drift: modelDrift(data.physical, m.name),
 		};
 	});
-	const nodeTypes = data.frames.reduce((a, f) => a + f.nodeTypes.length, 0);
-	const edgeTypes = data.frames.reduce((a, f) => a + f.edgeTypes.length, 0);
-	const published = data.models.filter((m) => m.active_version).length;
-	const drafts = data.models.length - published;
-	const recordTotal = sum([
-		...records.nodes.values(),
-		...records.edges.values(),
-	]);
+	const nodeTypes = catalog?.node_types ?? 0;
+	const edgeTypes = catalog?.edge_types ?? 0;
+	const published = catalog?.published ?? 0;
+	const drafts = catalog?.drafts ?? 0;
+	const recordTotal = records.total;
 
 	const tiles: Panel = {
 		kind: "grid",
@@ -556,7 +543,7 @@ function overviewAll(
 			tiles: [
 				{
 					label: "Models",
-					value: String(data.models.length),
+					value: catalog ? String(catalog.models) : "—",
 					delta: drafts
 						? `${published} published · ${drafts} draft`
 						: "all published",
@@ -612,7 +599,8 @@ function overviewOne(
 	slots: ModelsPageSlots,
 ): RowSpec[] {
 	const measured = measuredOf(data.insights);
-	const records = recordsOf(data.counts);
+	const records = recordsOf(data.insights);
+	const catalog = data.insights?.catalog;
 	const frame = data.frames.find((f) => f.modelId === scope.model.id);
 	const nodeTypes = frame?.nodeTypes ?? [];
 	const edgeTypes = frame?.edgeTypes ?? [];
@@ -627,23 +615,19 @@ function overviewOne(
 		...nodeTypes.map((t) => ({
 			type: t.name,
 			kind: "node",
-			records: records.counted ? num(records.nodes.get(t.name)) : "—",
+			records: records.counted ? num(records.byKey.get(`node:${t.name}`)) : "—",
 			change: change("node", t.name),
 			...measured(`node:${t.name}`, true),
 		})),
 		...edgeTypes.map((t) => ({
 			type: t.name,
 			kind: "edge",
-			records: records.counted ? num(records.edges.get(t.name)) : "—",
+			records: records.counted ? num(records.byKey.get(`edge:${t.name}`)) : "—",
 			change: change("edge", t.name),
 			...measured(`edge:${t.name}`, true),
 		})),
 	];
-	const total = sum(
-		rows.map((r) =>
-			r.kind === "node" ? records.nodes.get(r.type) : records.edges.get(r.type),
-		),
-	);
+	const total = records.total;
 
 	const tiles: Panel = {
 		kind: "grid",
@@ -652,7 +636,9 @@ function overviewOne(
 				{
 					label: "Types",
 					value: String(rows.length),
-					delta: `${nodeTypes.length} node · ${edgeTypes.length} edge`,
+					delta: catalog
+						? `${catalog.node_types} node · ${catalog.edge_types} edge`
+						: "—",
 				},
 				{
 					label: "Records",

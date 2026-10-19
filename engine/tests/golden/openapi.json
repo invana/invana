@@ -3604,6 +3604,48 @@
         "title": "CastResolutionRead",
         "type": "object"
       },
+      "Catalog": {
+        "description": "How many models the page reads, and the types their published versions declare.",
+        "properties": {
+          "drafts": {
+            "title": "Drafts",
+            "type": "integer"
+          },
+          "edge_types": {
+            "title": "Edge Types",
+            "type": "integer"
+          },
+          "models": {
+            "title": "Models",
+            "type": "integer"
+          },
+          "node_types": {
+            "title": "Node Types",
+            "type": "integer"
+          },
+          "published": {
+            "title": "Published",
+            "type": "integer"
+          },
+          "types": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Types",
+            "type": "object"
+          }
+        },
+        "required": [
+          "models",
+          "published",
+          "drafts",
+          "node_types",
+          "edge_types",
+          "types"
+        ],
+        "title": "Catalog",
+        "type": "object"
+      },
       "CatalogueArgRead": {
         "properties": {
           "default": {
@@ -10057,6 +10099,16 @@
       },
       "Insights": {
         "properties": {
+          "catalog": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Catalog"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "growth": {
             "anyOf": [
               {

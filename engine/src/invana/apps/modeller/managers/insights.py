@@ -28,6 +28,7 @@ from invana.apps.modeller.querysets.graph_version import GraphVersionQuerySet
 from invana.apps.modeller.querysets.type_count_snapshot import TypeCountSnapshotQuerySet
 from invana.apps.modeller.schemas import (
     Advice,
+    Catalog,
     Growth,
     GrowthMark,
     GrowthRow,
@@ -62,6 +63,20 @@ class _Scope:
     models: list[tuple[str, str, list[TypeKey]]]  # (id, name, types)
     one: bool
     versions: dict[str, GraphVersion]
+    #: Every authored model in scope, published or not.
+    authored: int = 0
+
+    def catalog(self) -> Catalog:
+        """The page's model and type counts, over the models it reads."""
+        kinds = [kind for _, _, types in self.models for kind, _ in types]
+        return Catalog(
+            models=self.authored,
+            published=len(self.models),
+            drafts=self.authored - len(self.models),
+            node_types=kinds.count("node"),
+            edge_types=kinds.count("edge"),
+            types={mid: len(types) for mid, _, types in self.models},
+        )
 
 
 class InsightsManager:
@@ -87,6 +102,7 @@ class InsightsManager:
         queries = await self._queries(session, graph_id, scope, days, today, connector)
         return Insights(
             window=window,
+            catalog=scope.catalog(),
             growth=await self._growth(session, graph_id, scope, days, today),
             overview=queries.overview(),
             usage=queries.usage(),
@@ -110,7 +126,7 @@ class InsightsManager:
                 types = [("node", t.name) for t in version.node_types] + [("edge", t.name) for t in version.edge_types]
                 models.append((m.id, m.name, types))
                 versions[m.id] = version
-        return _Scope(models=models, one=model_id is not None, versions=versions)
+        return _Scope(models=models, one=model_id is not None, versions=versions, authored=len(authored))
 
     # ── Overview · Usage · Performance ────────────────────────────────────────
 

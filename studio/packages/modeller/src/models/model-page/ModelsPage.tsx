@@ -15,7 +15,6 @@ import {
 	ApiError,
 	graphsApi,
 	useGraphConnectionQuery,
-	useTypeCountsQuery,
 } from "@invana-studio/core";
 import {
 	ActButton,
@@ -125,7 +124,6 @@ export function ModelsPage({
 	);
 	const { frames } = useAllModels(username, graphSlug);
 	const allLinks = useModelLinksQuery(username, graphSlug);
-	const counts = useTypeCountsQuery(username, graphSlug);
 	const connection = useGraphConnectionQuery(username, graphSlug);
 
 	const scoped = authored.find((m) => m.id === view.scope) ?? null;
@@ -258,7 +256,6 @@ export function ModelsPage({
 		{
 			models: authored,
 			frames,
-			counts: counts.data,
 			links: allLinks.data,
 			physical: physical.data,
 			physicalLoading: physical.isLoading,
