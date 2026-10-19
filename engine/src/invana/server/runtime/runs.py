@@ -27,7 +27,7 @@ from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.interpreter import TaskRuntime
 from invana.runtime.interpreter.payloads import _retry_for
 from invana.runtime.managers.rule_citations import offered_rules
-from invana.runtime.models import RunStatus, TaskPrompt, TaskRun
+from invana.runtime.models import RunStatus, TaskPrompt, TaskRun, span_ms
 from invana.runtime.projections import (
     Shape,
     accepts_reason,
@@ -449,7 +449,13 @@ async def get_trace(
             detail=step.detail,
             started_at=step.started_at,
             finished_at=step.finished_at,
-            duration_ms=_duration_ms(step.started_at, step.finished_at),
+            duration_ms=step.duration_ms,
+            offset_ms=span_ms(run.started_at, step.started_at),
+            share_of_run=(
+                round(step.duration_ms / run.duration_ms, 4)
+                if step.duration_ms is not None and run.duration_ms
+                else None
+            ),
             tokens_in=step.tokens_in,
             tokens_out=step.tokens_out,
             input=step.input,
@@ -498,7 +504,11 @@ async def get_trace(
         governed=run.lens_snapshot is not None,
         started_at=run.started_at,
         finished_at=run.finished_at,
-        duration_ms=_duration_ms(run.started_at, run.finished_at),
+        duration_ms=run.duration_ms,
+        queue_ms=run.queue_ms,
+        work_ms=run.work_ms,
+        ask_ms=run.ask_ms,
+        wait_ms=run.wait_ms,
         tokens_in=sum(s.tokens_in or 0 for s in steps),
         tokens_out=sum(s.tokens_out or 0 for s in steps),
         # Summed over the rows that had a price. A run where nothing was priced
@@ -542,12 +552,6 @@ async def _username(session: AsyncSession, user_id: str | None) -> str | None:
     if not user_id:
         return None
     return await session.scalar(select(User.username).where(User.id == user_id))
-
-
-def _duration_ms(start, end) -> int | None:
-    if start is None or end is None:
-        return None
-    return int((end - start).total_seconds() * 1000)
 
 
 def _bound_of(task_key: str) -> str | None:

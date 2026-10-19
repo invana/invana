@@ -20,7 +20,7 @@ import type {
 	TraceWindow,
 } from "@invana-studio/core";
 import { formatCompact, formatElapsed } from "@invana-studio/core";
-import { durationMs, originOf } from "./boards/runBoards";
+import { clockMs, originOf } from "./boards/runBoards";
 import { BANDS } from "./touches/runLayers";
 
 interface SummaryRow {
@@ -111,23 +111,17 @@ export function runSummary(
 	agentName?: string,
 ): RunSummary {
 	const live = !trace.finished_at;
-	const elapsed =
-		trace.duration_ms ?? durationMs(originOf(trace), trace.finished_at);
-
-	// Work is what the steps did; a paused step's span is the wait, not work.
-	const working = trace.steps.filter((s) => s.status !== "needs_input");
-	const workMs = working.reduce((n, s) => n + (s.duration_ms ?? 0), 0);
-
-	// Asking is measurable: from the step that paused to the attempt that
-	// answered it. Anything else between elapsed and work is left unnamed.
-	const bySeq = [...trace.steps].sort((a, b) => a.seq - b.seq);
-	const askingMs = bySeq.reduce((n, s, i) => {
-		if (s.status !== "needs_input" || !s.finished_at) return n;
-		const next = bySeq.slice(i + 1).find((x) => x.started_at);
-		const gap = next ? durationMs(s.finished_at, next.started_at) : null;
-		return n + Math.max(0, gap ?? 0);
-	}, 0);
-	const waitingMs = elapsed != null ? elapsed - workMs : null;
+	const elapsed = clockMs(
+		trace.duration_ms,
+		originOf(trace),
+		trace.finished_at,
+	);
+	// How the run's time was spent is the engine's, written when it settled:
+	// work is what the steps did, asking is the wait on a person's answer, and
+	// waiting is the run open with no step working.
+	const workMs = trace.work_ms;
+	const askingMs = trace.ask_ms;
+	const waitingMs = trace.wait_ms;
 
 	// Only what the person asked, as they typed it — a `ql` run's body is its
 	// query, drawn monospace. What the runtime made of a question is the page's.

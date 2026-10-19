@@ -105,6 +105,7 @@ async def _tagged(session: AsyncSession, message) -> SessionMessageRead:
     world = (await run_services.worlds_for_messages(session, [message])).get(message.id)
     if world is not None:
         read.lens_id, read.lens_name = world
+    read.work_ms = (await run_services.work_for_messages(session, [message])).get(message.id)
     return read
 
 
@@ -115,6 +116,7 @@ async def _to_detail(session: AsyncSession, sess: Session) -> SessionDetail:
     # run, so a settled thread renders without a stream.
     steps = await run_services.steps_for_messages(session, messages)
     worlds = await run_services.worlds_for_messages(session, messages)
+    work = await run_services.work_for_messages(session, messages)
     return SessionDetail(
         **(await _summary(session, sess)).model_dump(),
         messages=[
@@ -123,6 +125,7 @@ async def _to_detail(session: AsyncSession, sess: Session) -> SessionDetail:
                     "steps": [RunNodeRead.model_validate(r) for r in steps.get(m.id, [])],
                     "lens_id": worlds[m.id][0] if m.id in worlds else None,
                     "lens_name": worlds[m.id][1] if m.id in worlds else None,
+                    "work_ms": work.get(m.id),
                 }
             )
             for m in messages
@@ -336,7 +339,7 @@ async def set_message_feedback(
     message = await sessions.set_feedback(session, message=message, value=payload.value)
     await session.commit()
     await session.refresh(message)
-    return SessionMessageRead.model_validate(message)
+    return await _tagged(session, message)
 
 
 async def rerun_message(

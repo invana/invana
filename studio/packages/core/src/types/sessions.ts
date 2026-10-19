@@ -60,6 +60,8 @@ export interface SessionMessage {
 	/** Result metadata, present on assistant replies to a query. */
 	rowCount?: number;
 	executionTimeMs?: number;
+	/** The run's stored `work_ms` — its steps' time, the meta line's number. */
+	workMs?: number;
 	/** NL only — time spent translating the prompt to a query (docs/for-developers/modules/ask/features/ask-in-natural-language.md). Null on
 	 *  QL and rerun, so the meta line can show LLM vs query time separately. */
 	llmTimeMs?: number;

@@ -274,6 +274,7 @@ class SimulationManager:
         step = next((n for n in nodes if n.task_key == row.simulator), None)
         read.status, read.outcome = run.status, run.outcome
         read.started_at, read.finished_at = run.started_at, run.finished_at
+        read.duration_ms = run.duration_ms
         read.tokens = sum((r.tokens_in or 0) + (r.tokens_out or 0) for r in (run, *nodes))
         failed = (step.error if step is not None else None) or run.error
         if run.status != RunStatus.succeeded.value and failed:

@@ -79,10 +79,12 @@ function startedLabel(iso: string): string {
 	});
 }
 
+/** The engine's stored duration; an import still running ticks from its start. */
 function elapsedOf(row: ImportRow, now: number): number | null {
-	const { started_at, finished_at } = row.run;
-	if (!started_at) return null;
-	return (finished_at ? Date.parse(finished_at) : now) - Date.parse(started_at);
+	const { started_at, finished_at, duration_ms } = row.run;
+	if (duration_ms != null) return duration_ms;
+	if (!started_at || finished_at) return null;
+	return Math.max(0, now - Date.parse(started_at));
 }
 
 function CommandHint() {

@@ -21,13 +21,13 @@ export function shortRunId(id: string): string {
 /**
  * The run's own clock, in milliseconds — `null` before it starts.
  *
- * Measured from `started_at`, not from `queued_at`: a run that sat in the
- * queue for a minute did not take a minute. A run still going is measured
- * against `now`, which is why the journal holds a ticker.
+ * A settled run reads the engine's stored `duration_ms` (started → finished;
+ * a run that sat queued for a minute did not take a minute). A run still
+ * going is a live clock against `now`, which is why the journal holds a ticker.
  */
 export function elapsedOf(row: RunListRow, now: number): number | null {
+	if (row.run.duration_ms != null) return row.run.duration_ms;
 	const started = row.run.started_at;
-	if (!started) return null;
-	const end = row.run.finished_at ? Date.parse(row.run.finished_at) : now;
-	return Math.max(0, end - Date.parse(started));
+	if (!started || row.run.finished_at) return null;
+	return Math.max(0, now - Date.parse(started));
 }

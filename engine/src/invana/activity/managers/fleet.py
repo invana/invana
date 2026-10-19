@@ -86,7 +86,7 @@ from invana.core.errors import NotFoundError
 from invana.core.events import actions
 from invana.core.events.querysets import EventQuerySet
 from invana.core.utils import percentile
-from invana.runtime.models import RunStatus, TaskRun
+from invana.runtime.models import RunStatus, TaskRun, wall_ms
 from invana.runtime.querysets import EvalQuerySet, TaskRunQuerySet
 
 #: How far Overview reads back: the 30 days of *Runs a day*, the 7 + 7 of the
@@ -138,11 +138,7 @@ class _Root:
         self.failed = root.status == RunStatus.failed.value
         self.succeeded = root.status == RunStatus.succeeded.value
         # Run time is only said of a settled run: queued → finished.
-        self.ms: float | None = (
-            (_aware(root.finished_at) - self.at).total_seconds() * 1000
-            if self.settled and root.finished_at is not None
-            else None
-        )
+        self.ms: float | None = wall_ms(root) if self.settled else None
         self.tokens = sum((r.tokens_in or 0) + (r.tokens_out or 0) for r in [root, *nodes])
         # The model reports what it applied on the step that called it; the
         # root carries the union in some paths. Both are read. Each entry is a

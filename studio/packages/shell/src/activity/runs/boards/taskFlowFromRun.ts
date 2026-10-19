@@ -15,7 +15,7 @@ import {
 	taskToneOf,
 } from "@invana-studio/canvases";
 import { formatDuration } from "@invana-studio/core";
-import { durationMs, type TaskGroup } from "./runBoards";
+import { clockMs, type TaskGroup } from "./runBoards";
 
 function iconOf(bound: string | null): string {
 	if (bound === "llm") return "lucide/sparkles";
@@ -28,8 +28,7 @@ function iconOf(bound: string | null): string {
 export function taskFlowFromRun(groups: TaskGroup[]): TaskFlowData {
 	const nodes: TaskFlowNode[] = groups.map((group, i) => {
 		const { head } = group;
-		const ms =
-			head.duration_ms ?? durationMs(head.started_at, head.finished_at);
+		const ms = clockMs(head.duration_ms, head.started_at, head.finished_at);
 		return {
 			id: head.id,
 			type: taskNodeTypeOf(head.bound),

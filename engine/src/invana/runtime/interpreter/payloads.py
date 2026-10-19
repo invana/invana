@@ -12,7 +12,7 @@ import logging
 from datetime import UTC, datetime
 
 from invana.apps.sessions.models import SessionMessage
-from invana.runtime.models import TaskRun
+from invana.runtime.models import TaskRun, span_ms
 from invana.runtime.workflows import RETRY_BY_TASK, Retry
 
 log = logging.getLogger(__name__)
@@ -20,12 +20,6 @@ log = logging.getLogger(__name__)
 
 def _now() -> datetime:
     return datetime.now(UTC)
-
-
-def _ms(start: datetime | None, end: datetime | None) -> int | None:
-    if start is None or end is None:
-        return None
-    return round((end - start).total_seconds() * 1000)
 
 
 def _retry_from_plan(plan: dict | None, row: TaskRun) -> Retry | None:
@@ -94,7 +88,7 @@ def _step_payload(row: TaskRun) -> dict:
         "detail": row.detail,
         "started_at": row.started_at,
         "finished_at": row.finished_at,
-        "duration_ms": _ms(row.started_at, row.finished_at),
+        "duration_ms": span_ms(row.started_at, row.finished_at),
         "input": row.input,
         "output": row.output,
         "error": row.error,
@@ -103,8 +97,12 @@ def _step_payload(row: TaskRun) -> dict:
     }
 
 
-def message_payload(m: SessionMessage) -> dict:
-    """The finalized assistant row, as the stream carries it (mirrors SessionMessageRead)."""
+def message_payload(m: SessionMessage, run: TaskRun | None = None) -> dict:
+    """The finalized assistant row, as the stream carries it (mirrors SessionMessageRead).
+
+    *run* is the run the reply settled from, when the caller holds it: its
+    ``work_ms`` is the reply's time. A reply sent mid-run has none yet.
+    """
     return {
         "id": m.id,
         "session_id": m.session_id,
@@ -128,6 +126,7 @@ def message_payload(m: SessionMessage) -> dict:
         "node_count": m.node_count,
         "edge_count": m.edge_count,
         "run_id": m.run_id,
+        "work_ms": run.work_ms if run is not None else None,
         "created_at": m.created_at,
     }
 

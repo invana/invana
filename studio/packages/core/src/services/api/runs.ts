@@ -40,6 +40,7 @@ export interface ApiTaskRunStep {
 	status: RunNodeStatus;
 	started_at?: string | null;
 	finished_at?: string | null;
+	duration_ms?: number | null;
 	detail?: string | null;
 	input?: Record<string, unknown> | null;
 	output?: Record<string, unknown> | null;
@@ -60,6 +61,7 @@ interface ApiTaskRun {
 	queued_at?: string | null;
 	started_at?: string | null;
 	finished_at?: string | null;
+	work_ms?: number | null;
 	error?: Record<string, unknown> | null;
 	/** The trace the run recorded under; null when telemetry was off. */
 	trace_id?: string | null;
@@ -80,6 +82,8 @@ export interface TaskRun {
 	assistantMessageId?: string;
 	streamSeq: number;
 	steps: RunNode[];
+	/** The engine's stored time its steps worked; absent until it settles. */
+	workMs?: number;
 	/** The run this row is a step of; absent on a root. */
 	parentRunId?: string;
 	/** The ask a root carries — `nl` · `ql` · `import`. */
@@ -113,6 +117,7 @@ export function toRunNode(s: ApiTaskRunStep): RunNode {
 		status: s.status,
 		startedAt: s.started_at ? new Date(s.started_at) : undefined,
 		finishedAt: s.finished_at ? new Date(s.finished_at) : undefined,
+		durationMs: s.duration_ms ?? undefined,
 		detail: s.detail ?? "",
 		input: s.input ?? undefined,
 		output: s.output ?? undefined,
@@ -135,6 +140,7 @@ export function stepFromFrame(p: Record<string, unknown>): RunNode {
 		status: p.status as RunNodeStatus,
 		started_at: (p.started_at as string | null) ?? null,
 		finished_at: (p.finished_at as string | null) ?? null,
+		duration_ms: (p.duration_ms as number | null) ?? null,
 		detail: (p.detail as string | null) ?? "",
 		input: (p.input as Record<string, unknown> | null) ?? null,
 		output: (p.output as Record<string, unknown> | null) ?? null,
@@ -224,6 +230,7 @@ export const runsApi = {
 			assistantMessageId: d.assistant_message_id ?? undefined,
 			streamSeq: d.stream_seq,
 			steps: d.steps.map(toRunNode),
+			workMs: d.work_ms ?? undefined,
 			// `task_runs` is one table, so this is how a **step** names the run
 			// whose trace it is in — the one read a step board opened cold makes
 			// before it reads anything else.
@@ -347,6 +354,7 @@ export function messageFromFrame(
 		via: (p.via as string | null) ?? undefined,
 		rowCount: (p.row_count as number | null) ?? undefined,
 		executionTimeMs: (p.execution_time_ms as number | null) ?? undefined,
+		workMs: (p.work_ms as number | null) ?? undefined,
 		llmTimeMs: (p.llm_time_ms as number | null) ?? undefined,
 		timeoutS: (p.timeout_s as number | null) ?? undefined,
 		language: (p.query_language as SessionMessage["language"]) ?? undefined,
@@ -539,7 +547,12 @@ export interface TraceRead {
 	trace_id?: string | null;
 	started_at: string | null;
 	finished_at: string | null;
+	/** The engine's stored timing — formatted, never derived. */
 	duration_ms: number | null;
+	queue_ms: number | null;
+	work_ms: number | null;
+	ask_ms: number | null;
+	wait_ms: number | null;
 	tokens_in: number;
 	tokens_out: number;
 	/** The run's spend — `null` when no step had a published rate. */
@@ -562,6 +575,10 @@ export interface TraceStepRead {
 	started_at: string | null;
 	finished_at: string | null;
 	duration_ms: number | null;
+	/** From the run's start to this step's start — the log's offset. */
+	offset_ms: number | null;
+	/** This step's duration over the run's, from 0 to 1. */
+	share_of_run: number | null;
 	tokens_in: number | null;
 	tokens_out: number | null;
 	/** What this step spent — `null` when the model has no published rate. */

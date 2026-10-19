@@ -21,7 +21,7 @@ import enum
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint, event
 from sqlalchemy.orm import Mapped, mapped_column
 
 from invana.core.models import Base
@@ -235,6 +235,16 @@ class TaskRun(Base):
     queued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    #: `started_at → finished_at`, written by the timing hook below.
+    duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: `queued_at → started_at`, written by the timing hook below.
+    queue_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: A root's nodes' time, a paused node excluded; written when the run settles.
+    work_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: A root's time waiting on a person's answer; written when the run settles.
+    ask_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: A root's open time with no node working; written when the run settles.
+    wait_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     #: Where to re-enter on resume: {"step": <index>}.
     cursor: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     stream_seq: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -269,6 +279,51 @@ class TaskRun(Base):
     rules_offered: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     rules_cited: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+def span_ms(start: datetime | None, end: datetime | None) -> int | None:
+    """Milliseconds from *start* to *end*, or ``None`` while either is unset.
+
+    SQLite hands back naive datetimes for columns written as UTC, so a naive
+    value is read as UTC rather than refused — the same instant either way.
+    """
+    if start is None or end is None:
+        return None
+    if start.tzinfo is None:
+        start = start.replace(tzinfo=UTC)
+    if end.tzinfo is None:
+        end = end.replace(tzinfo=UTC)
+    return max(0, round((end - start).total_seconds() * 1000))
+
+
+def wall_ms(run: TaskRun) -> int | None:
+    """Queued to finished, from the stored columns — what the person waited.
+
+    A run refused before it started has no ``queue_ms``; its whole span is the
+    queue, so it is read from the timestamps it does have.
+    """
+    if run.finished_at is None:
+        return None
+    if run.queue_ms is not None and run.duration_ms is not None:
+        return run.queue_ms + run.duration_ms
+    return span_ms(run.queued_at, run.finished_at)
+
+
+@event.listens_for(TaskRun, "before_insert")
+@event.listens_for(TaskRun, "before_update")
+def _write_timing(_mapper, _connection, row: TaskRun) -> None:
+    """Keep a row's own timing in step with its timestamps.
+
+    Every path that starts, finishes, resumes or stops a run sets timestamps;
+    none of them has to remember the durations, because this runs on every
+    flush of the row. A resumed run has ``finished_at`` cleared, which clears
+    its duration and the roll-up its settle wrote — the next settle writes them
+    again.
+    """
+    row.duration_ms = span_ms(row.started_at, row.finished_at)
+    row.queue_ms = span_ms(row.queued_at, row.started_at)
+    if row.finished_at is None:
+        row.work_ms = row.ask_ms = row.wait_ms = None
 
 
 class TaskStream(Base):

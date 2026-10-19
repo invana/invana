@@ -26,6 +26,7 @@ class RunNodeRead(BaseModel):
     status: str
     started_at: datetime | None = None
     finished_at: datetime | None = None
+    duration_ms: int | None = None
     detail: str = ""
     input: dict | None = None
     output: dict | None = None
@@ -59,6 +60,12 @@ class TaskRunRead(BaseModel):
     started_at: datetime | None = None
     finished_at: datetime | None = None
     error: dict | None = None
+    #: Stored when the run settles — the reader formats, never derives.
+    duration_ms: int | None = None
+    queue_ms: int | None = None
+    work_ms: int | None = None
+    ask_ms: int | None = None
+    wait_ms: int | None = None
     stream_seq: int
     #: The trace the run was started in — opens it in the collector's UI.
     trace_id: str | None = None
@@ -106,6 +113,12 @@ class TaskRunSummary(BaseModel):
     #: a run that sat queued for a minute did not take a minute (SR45).
     started_at: datetime | None = None
     finished_at: datetime | None = None
+    #: Stored when the run settles — the reader formats, never derives.
+    duration_ms: int | None = None
+    queue_ms: int | None = None
+    work_ms: int | None = None
+    ask_ms: int | None = None
+    wait_ms: int | None = None
     step_count: int = 0
     #: The furthest step that is not merely queued — the row's "Execute" in
     #: ``Execute 5/7``. ``None`` before anything has started.
@@ -214,6 +227,10 @@ class TraceStep(BaseModel):
     started_at: datetime | None = None
     finished_at: datetime | None = None
     duration_ms: int | None = None
+    #: From the run's start to this step's start — the log's offset.
+    offset_ms: int | None = None
+    #: This step's ``duration_ms`` over the run's, from 0 to 1.
+    share_of_run: float | None = None
     tokens_in: int | None = None
     tokens_out: int | None = None
     #: What this step spent, in dollars. ``None`` when the model has no
@@ -286,6 +303,10 @@ class TraceRead(BaseModel):
     started_at: datetime | None = None
     finished_at: datetime | None = None
     duration_ms: int | None = None
+    queue_ms: int | None = None
+    work_ms: int | None = None
+    ask_ms: int | None = None
+    wait_ms: int | None = None
     tokens_in: int = 0
     tokens_out: int = 0
     #: The run's spend — the sum of the steps that had a price. ``None`` when

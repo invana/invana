@@ -199,15 +199,9 @@ export function figure(n: number | undefined | null): string {
 }
 
 /** How long the run took — `41 s`, `2 m 5 s`; null until it has finished. */
-export function duration(
-	started: string | null,
-	finished: string | null,
-): string | null {
-	if (!started || !finished) return null;
-	const s = Math.max(
-		0,
-		Math.round((Date.parse(finished) - Date.parse(started)) / 1000),
-	);
+export function duration(ms: number | null): string | null {
+	if (ms == null) return null;
+	const s = Math.max(0, Math.round(ms / 1000));
 	return s < 60 ? `${s} s` : `${Math.floor(s / 60)} m ${s % 60} s`;
 }
 

@@ -546,6 +546,7 @@ class SimulationRead(BaseModel):
     created_at: datetime
     started_at: datetime | None = None
     finished_at: datetime | None = None
+    duration_ms: int | None = None
 
 
 class SimulationListResponse(BaseModel):

@@ -953,6 +953,20 @@ async def steps_for_messages(db: AsyncSession, messages: list[SessionMessage]) -
     return out
 
 
+async def work_for_messages(db: AsyncSession, messages: list[SessionMessage]) -> dict[str, int]:
+    """Each reply's time, as ``{message_id: work_ms}`` — its current run's stored ``work_ms``.
+
+    A reply whose run has not settled is absent.
+    """
+    wanted = {m.run_id: m.id for m in messages if m.run_id}
+    if not wanted:
+        return {}
+    rows = await db.execute(
+        select(TaskRun.id, TaskRun.work_ms).where(TaskRun.id.in_(list(wanted)), TaskRun.work_ms.is_not(None))
+    )
+    return {wanted[run_id]: work_ms for run_id, work_ms in rows}
+
+
 async def worlds_for_messages(db: AsyncSession, messages: list[SessionMessage]) -> dict[str, tuple[str, str]]:
     """The world each reply's run was frozen with, as ``{message_id: (lens_id, name)}``.
 
@@ -1139,6 +1153,11 @@ async def list_runs(
             "queued_at": r.queued_at,
             "started_at": r.started_at,
             "finished_at": r.finished_at,
+            "duration_ms": r.duration_ms,
+            "queue_ms": r.queue_ms,
+            "work_ms": r.work_ms,
+            "ask_ms": r.ask_ms,
+            "wait_ms": r.wait_ms,
             "step_count": counts.get(r.id, 0),
             "step_label": (progress.get(r.id) or {}).get("label"),
             "steps_done": (progress.get(r.id) or {}).get("done", 0),

@@ -36,9 +36,9 @@ import { runSummary } from "../runSummary";
 import { layersOptions } from "../touches/runLayers";
 import { lensSummary, runLensOptions } from "../touches/runLens";
 import {
+	clockMs,
 	compact,
 	count,
-	durationMs,
 	ganttStatusOf,
 	gaugeOf,
 	groupSteps,
@@ -389,8 +389,7 @@ function runLens(
 function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 	const done = groups.filter((g) => g.head.finished_at).length;
 	const total = groups.length;
-	const ms =
-		trace.duration_ms ?? durationMs(originOf(trace), trace.finished_at);
+	const ms = clockMs(trace.duration_ms, originOf(trace), trace.finished_at);
 	const tokens = (trace.tokens_in ?? 0) + (trace.tokens_out ?? 0);
 	const rows = trace.emissions.reduce(
 		(n, e) => n + (e.citation.record_count ?? 0),
@@ -597,9 +596,11 @@ function performanceAside(
 ): string | undefined {
 	if (selectedKey) {
 		const group = groups.find((g) => g.key === selectedKey);
-		const ms =
-			group?.head.duration_ms ??
-			durationMs(group?.head.started_at, group?.head.finished_at);
+		const ms = clockMs(
+			group?.head.duration_ms,
+			group?.head.started_at,
+			group?.head.finished_at,
+		);
 		return group && ms != null
 			? `${group.key} · ${formatDuration(ms)}`
 			: undefined;
@@ -684,7 +685,7 @@ function log(
 		steps.map((step) =>
 			step.detail
 				? {
-						time: offsetOf(trace, step.started_at),
+						time: offsetOf(step.offset_ms),
 						level: levelOf(step.status),
 						source: step.task_key || step.step_key || undefined,
 						message: step.detail,

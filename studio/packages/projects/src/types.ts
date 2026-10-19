@@ -306,6 +306,8 @@ export interface Simulation {
 	created_at: string;
 	started_at: string | null;
 	finished_at: string | null;
+	/** The engine's stored `started → finished`; null until it has finished. */
+	duration_ms: number | null;
 }
 
 /** What Save as dataset writes: the dataset, then its first version. */

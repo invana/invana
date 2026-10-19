@@ -27,6 +27,7 @@ function run(
 		queued_at: null,
 		started_at: new Date(NOW - finishedAgoMs).toISOString(),
 		finished_at: new Date(NOW - finishedAgoMs).toISOString(),
+		duration_ms: null,
 		step_count: 1,
 		step_label: null,
 		steps_done: 1,

@@ -18,6 +18,9 @@ const trace = (over: Partial<TraceRead> = {}) =>
 		started_at: "2026-09-28T10:00:00Z",
 		finished_at: "2026-09-28T10:00:05Z",
 		duration_ms: 5000,
+		work_ms: 1000,
+		ask_ms: 0,
+		wait_ms: 4000,
 		tokens_in: 8200,
 		tokens_out: 400,
 		governed: true,
@@ -86,6 +89,9 @@ describe("runSummary", () => {
 			trace({
 				finished_at: null,
 				duration_ms: 65_000,
+				work_ms: null,
+				ask_ms: null,
+				wait_ms: null,
 				governed: false,
 				plan_origin: "generated",
 				triggered_by: "schedule",
@@ -125,6 +131,9 @@ describe("runSummary", () => {
 				body: "  ",
 				budget: { max_replans: 2 },
 				replans: 1,
+				work_ms: 500,
+				ask_ms: 2000,
+				wait_ms: 4500,
 				steps: [
 					{
 						seq: 1,

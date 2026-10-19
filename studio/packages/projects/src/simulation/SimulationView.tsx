@@ -73,7 +73,7 @@ function subLine(project: Project, s: Simulation): string {
 			? `${plural(crosses, "cross", "crosses")} × ${progeny.toLocaleString()} progeny`
 			: null,
 		`read ${plural(s.inputs.length, "dataset version")}`,
-		duration(s.started_at, s.finished_at),
+		duration(s.duration_ms),
 		plural(s.tokens, "token"),
 		`seed ${s.seed}`,
 	]

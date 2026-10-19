@@ -41,7 +41,7 @@ from invana.apps.work.querysets import TaskQuerySet as TodoQuerySet
 from invana.core.auth.querysets import UserQuerySet
 from invana.core.utils import percentile
 from invana.runtime.layers import layer_for
-from invana.runtime.models import RunStatus, TaskRun
+from invana.runtime.models import RunStatus, TaskRun, wall_ms
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.workflows import retry_limit
 
@@ -119,10 +119,10 @@ class _Root:
 
     @property
     def elapsed_ms(self) -> float | None:
-        return _ms(self.root.queued_at, self.root.finished_at)
+        return wall_ms(self.root)
 
     def step_work(self, key: str) -> float:
-        return sum(_ms(r.started_at, r.finished_at) or 0 for r in self.reaches.get(key, []))
+        return sum(r.duration_ms or 0 for r in self.reaches.get(key, []))
 
     @property
     def work_ms(self) -> float | None:

@@ -34,7 +34,7 @@ export {
 } from "./console/useConsoleParam";
 export { RecentSessions } from "./RecentSessions";
 export { attachmentFor } from "./SessionComposer";
-export { StepList, totalDuration } from "./SessionSteps";
+export { StepList } from "./SessionSteps";
 export {
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,

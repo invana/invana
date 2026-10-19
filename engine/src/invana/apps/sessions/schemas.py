@@ -163,6 +163,8 @@ class SessionMessageRead(BaseModel):
     # attempt, from the reply's current run. Empty on user rows and on
     # replies from before the runtime existed.
     run_id: str | None = None
+    #: The run's ``work_ms`` — the reply's time on its meta line.
+    work_ms: int | None = None
     steps: list[RunNodeRead] = []
     #: The world this turn's run was frozen with, and its name as frozen — so a
     #: rename or a delete since never changes what a past turn says

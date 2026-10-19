@@ -31,6 +31,7 @@ function run(
 		queued_at: queued,
 		started_at: queued,
 		finished_at: null,
+		duration_ms: null,
 		step_count: 0,
 		step_label: null,
 		steps_done: 0,

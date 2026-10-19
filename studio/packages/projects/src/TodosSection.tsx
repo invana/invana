@@ -30,7 +30,7 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
-import { StepList, totalDuration } from "@invana-studio/assistant";
+import { StepList } from "@invana-studio/assistant";
 import type { RunNode, TaskRunSummary } from "@invana-studio/core";
 import { formatDuration } from "@invana-studio/core";
 import { ActButton, useAccess, useRunsQuery } from "@invana-studio/shell";
@@ -573,6 +573,7 @@ function TaskDetail({
 								key={run.id}
 								workflowKey={run.workflowKey}
 								steps={run.steps}
+								workMs={run.workMs}
 							/>
 						))
 					)}
@@ -689,9 +690,11 @@ function TaskDetail({
 function TodoRunsBlock({
 	workflowKey,
 	steps,
+	workMs,
 }: {
 	workflowKey: string;
 	steps: RunNode[];
+	workMs?: number;
 }) {
 	const [open, setOpen] = useState(true);
 	const done = steps.filter((s) => s.status === "succeeded").length;
@@ -710,8 +713,8 @@ function TodoRunsBlock({
 					✻
 				</span>
 				<span className="min-w-0 truncate">
-					Ask for {formatDuration(totalDuration(steps))} · {done} of {total}{" "}
-					step{total === 1 ? "" : "s"}
+					Ask{workMs != null ? ` for ${formatDuration(workMs)}` : ""} · {done}{" "}
+					of {total} step{total === 1 ? "" : "s"}
 					{tokensIn || tokensOut
 						? ` · ${tokensIn.toLocaleString()} + ${tokensOut.toLocaleString()} tok`
 						: ""}

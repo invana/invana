@@ -22,10 +22,11 @@ const TASK_STATUS: Record<RunNodeStatus, ChatSessionTaskStatus> = {
 	stopped: "needs-input", // amber — interrupted, like a retry
 };
 
+/** The engine's stored duration; a step still running ticks from its start. */
 function stepDuration(step: RunNode, now: number): string {
-	if (!step.startedAt) return "";
-	const end = step.finishedAt?.getTime() ?? now;
-	return formatDuration(Math.max(0, end - step.startedAt.getTime()));
+	if (step.durationMs != null) return formatDuration(step.durationMs);
+	if (step.status !== "running" || !step.startedAt) return "";
+	return formatDuration(Math.max(0, now - step.startedAt.getTime()));
 }
 
 /** The one-liner a step row shows for its status. */
@@ -37,13 +38,6 @@ function stepDescription(step: RunNode, nextAttempt?: RunNode): string {
 		return `retrying ${step.attempt}/3 · ${step.retryReason}`;
 	}
 	return step.detail;
-}
-
-export function totalDuration(steps: RunNode[]): number {
-	return steps.reduce((sum, s) => {
-		if (!s.startedAt || !s.finishedAt) return sum;
-		return sum + (s.finishedAt.getTime() - s.startedAt.getTime());
-	}, 0);
 }
 
 function isLiveStep(s: RunNode): boolean {
@@ -306,9 +300,7 @@ export function StepTrace({
 }) {
 	const meta = [
 		`attempt ${step.attempt}`,
-		step.startedAt && step.finishedAt
-			? formatDuration(step.finishedAt.getTime() - step.startedAt.getTime())
-			: null,
+		step.durationMs != null ? formatDuration(step.durationMs) : null,
 		step.tokensIn != null
 			? `${formatCompactCount(step.tokensIn)} in · ${formatCompactCount(step.tokensOut ?? 0)} out`
 			: null,

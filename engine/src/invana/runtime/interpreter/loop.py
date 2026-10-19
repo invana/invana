@@ -75,7 +75,6 @@ from invana.runtime.interpreter.bindings import resolve as resolve_bindings
 from invana.runtime.interpreter.payloads import (
     _OUTCOME_BY_STATUS,
     _awaiting_detail,
-    _ms,
     _now,
     _retry_for,
     _step_payload,
@@ -89,10 +88,10 @@ from invana.runtime.interpreter.tracing import (
     run_span,
     step_span,
 )
-from invana.runtime.models import RunStatus, TaskRun
+from invana.runtime.models import RunStatus, TaskRun, span_ms
 from invana.runtime.planning import plan_payload, queue_plan_steps
 from invana.runtime.querysets import TaskRunQuerySet
-from invana.runtime.results import run_result, step_result
+from invana.runtime.results import roll_up_timing, run_result, step_result
 from invana.runtime.services import BULK_PLAN_KEY, LOAD_PLAN_KEY, endpoint_for_run
 from invana.runtime.stream import Emitter, broadcaster
 from invana.runtime.workflows import WORKFLOWS, Step
@@ -313,6 +312,7 @@ class TaskRuntime:
                     root.outcome = "failed"
                     root.finished_at = _now()
                     root.error = {"cls": "defect", "cause": "internal", "message": "The eval run could not be scored."}
+                    await self._roll_up_timing(db, root)
                     await db.commit()
 
     def contention(self, graph_id: str, pools: dict[str, int] | None = None) -> dict:
@@ -1287,6 +1287,7 @@ class TaskRuntime:
         nodes = await TaskRunQuerySet().nodes_of(db, run_id=th.id)
         priced = [node.cost_usd for node in nodes if node.cost_usd is not None]
         th.cost_usd = round(sum(priced), 6) if priced else None
+        roll_up_timing(th, nodes)
         th.result = run_result(th, nodes)
         rollup = await cost_rollup(db, run_id=th.id)
         agent_kwargs: dict = {"actor_type": ActorType.system, "actor_id": None}
@@ -1311,7 +1312,7 @@ class TaskRuntime:
                 "workflow": th.workflow_key,
                 "status": status.value,
                 "outcome": th.outcome,
-                "duration_ms": _ms(th.started_at, th.finished_at),
+                "duration_ms": span_ms(th.started_at, th.finished_at),
                 "verdict": v.verdict,
                 **rollup,
             },
@@ -1330,7 +1331,7 @@ class TaskRuntime:
                 "outcome": th.outcome,
                 "verdict": v.verdict,
                 "cost": rollup,
-                "message": message_payload(m) if m else None,
+                "message": message_payload(m, th) if m else None,
             },
         )
 
@@ -1442,6 +1443,7 @@ class TaskRuntime:
             th.status = RunStatus.cancelled.value
             th.outcome = "cancelled"
             th.finished_at = _now()
+            await self._roll_up_timing(db, th)
             if m is not None:
                 m.status = SessionMessageStatus.stopped
                 m.content = "Stopped by you."
@@ -1461,7 +1463,7 @@ class TaskRuntime:
             await db.commit()
             await emitter.emit(
                 "run.cancelled",
-                {"run_id": th.id, "status": th.status, "message": message_payload(m) if m else None},
+                {"run_id": th.id, "status": th.status, "message": message_payload(m, th) if m else None},
             )
 
     async def _on_crash(self, run_id: str, exc: BaseException) -> None:
@@ -1480,6 +1482,7 @@ class TaskRuntime:
             th.outcome = "failed"
             th.finished_at = _now()
             th.error = {"cls": "defect", "cause": "internal", "message": failure.message, "raw": repr(exc)[:2000]}
+            await self._roll_up_timing(db, th)
             m = await db.get(SessionMessage, th.assistant_message_id) if th.assistant_message_id else None
             if m is not None:
                 m.status = SessionMessageStatus.error
@@ -1492,7 +1495,7 @@ class TaskRuntime:
                 await emitter.emit("diagnosis", diagnose(failure, mode="nl", attempts=1))
                 await emitter.emit(
                     "run.done",
-                    {"run_id": th.id, "status": th.status, "message": message_payload(m) if m else None},
+                    {"run_id": th.id, "status": th.status, "message": message_payload(m, th) if m else None},
                 )
 
     async def _fail_stale(self, db: AsyncSession, th: TaskRun) -> None:
@@ -1505,6 +1508,7 @@ class TaskRuntime:
         th.outcome = "failed"
         th.finished_at = _now()
         th.error = {"cls": "defect", "cause": "internal", "message": "The engine restarted while this was running."}
+        await self._roll_up_timing(db, th)
         if th.assistant_message_id:
             m = await db.get(SessionMessage, th.assistant_message_id)
             if m is not None and m.status == SessionMessageStatus.running:
@@ -1513,6 +1517,10 @@ class TaskRuntime:
                 sess = await db.get(Session, m.session_id)
                 if sess is not None:
                     sess.last_status = m.status
+
+    async def _roll_up_timing(self, db: AsyncSession, th: TaskRun) -> None:
+        """How a run that finished outside ``_settle`` spent its time."""
+        roll_up_timing(th, await TaskRunQuerySet().nodes_of(db, run_id=th.id))
 
     async def _open_rows(self, db: AsyncSession, th: TaskRun) -> list[TaskRun]:
         return list(

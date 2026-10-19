@@ -39,6 +39,8 @@ export interface RunNode {
 	status: RunNodeStatus;
 	startedAt?: Date;
 	finishedAt?: Date;
+	/** The engine's stored `started → finished`; absent while it runs. */
+	durationMs?: number;
 	/** The one-liner on the step row — "proposed Cypher · 5 lines". */
 	detail: string;
 	/** Trace: digests and small facts, never raw payloads. */
@@ -172,6 +174,8 @@ export interface TaskRunSummary {
 	/** When it actually began — what elapsed is measured from. */
 	started_at: string | null;
 	finished_at: string | null;
+	/** The engine's stored `started → finished`; null until it settles. */
+	duration_ms: number | null;
 	step_count: number;
 	/** The furthest step that is not merely queued — the `Execute` in `Execute 5/7`. */
 	step_label: string | null;

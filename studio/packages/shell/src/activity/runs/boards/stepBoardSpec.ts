@@ -26,9 +26,9 @@ import {
 } from "../touches/StepTouchWidget";
 import {
 	boundOf,
+	clockMs,
 	compact,
 	count,
-	durationMs,
 	groupSteps,
 	isLive,
 	offsetOf,
@@ -129,9 +129,11 @@ export function stepBoardSpec(
 			placeholder: "Jump to a step",
 			selected: group.head.id,
 			items: groups.map((g) => {
-				const ms =
-					g.head.duration_ms ??
-					durationMs(g.head.started_at, g.head.finished_at);
+				const ms = clockMs(
+					g.head.duration_ms,
+					g.head.started_at,
+					g.head.finished_at,
+				);
 				return {
 					id: g.head.id,
 					label: stepTitle(g.head),
@@ -236,7 +238,7 @@ function stepTabs(
 				artifacts(step) ? { panels: [artifacts(step) as PanelSpec] } : null,
 			]),
 		},
-		{ id: "log", label: "Log", rows: [{ panels: [log(trace, group)] }] },
+		{ id: "log", label: "Log", rows: [{ panels: [log(group)] }] },
 	];
 }
 
@@ -252,9 +254,7 @@ function stepTabs(
 function tiles(trace: TraceRead, group: TaskGroup): PanelSpec {
 	const step = group.head;
 	const out = outputs(step);
-	const ms = step.duration_ms ?? durationMs(step.started_at, step.finished_at);
-	const runMs =
-		trace.duration_ms ?? durationMs(trace.started_at, trace.finished_at);
+	const ms = clockMs(step.duration_ms, step.started_at, step.finished_at);
 	const tokens = (step.tokens_in ?? 0) + (step.tokens_out ?? 0);
 	const written = numberAt(out, "written");
 	const rows =
@@ -278,7 +278,7 @@ function tiles(trace: TraceRead, group: TaskGroup): PanelSpec {
 					: {
 							label: isLive(step.status) ? "Elapsed" : "Duration",
 							value: formatDuration(ms),
-							delta: shareOfRun(ms, runMs),
+							delta: shareOfRun(step.share_of_run),
 						},
 				written != null
 					? {
@@ -325,10 +325,10 @@ function tiles(trace: TraceRead, group: TaskGroup): PanelSpec {
  * A step that took 14ms of a 9s run did not take none of it, and a tile that
  * says `0%` reads as *this did not happen*.
  */
-function shareOfRun(ms: number, runMs: number | null): string | undefined {
-	if (!runMs || runMs <= 0) return undefined;
-	const share = (ms / runMs) * 100;
-	return share < 1 ? "<1% of the run" : `${Math.round(share)}% of the run`;
+function shareOfRun(share: number | null): string | undefined {
+	if (share == null) return undefined;
+	const pct = share * 100;
+	return pct < 1 ? "<1% of the run" : `${Math.round(pct)}% of the run`;
 }
 
 /** `31% of the run's tokens` — the same reading the duration tile gives time. */
@@ -566,12 +566,12 @@ function graphWritten(out: Record<string, unknown>): PanelSpec | null {
 
 // ── Log · Artifacts · where it sits ─────────────────────────────────────────
 
-function log(trace: TraceRead, group: TaskGroup): PanelSpec {
+function log(group: TaskGroup): PanelSpec {
 	const lines = omit(
 		group.steps.map((step) =>
 			step.detail
 				? {
-						time: offsetOf(trace, step.started_at),
+						time: offsetOf(step.offset_ms),
 						level:
 							step.status === "failed"
 								? ("error" as const)

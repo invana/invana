@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import Any
 
 from invana.runtime.catalogue import CATALOGUE
-from invana.runtime.models import TaskRun
+from invana.runtime.models import RunStatus, TaskRun, span_ms
 
 
 def _ms(start: datetime | None, end: datetime | None) -> int | None:
@@ -128,3 +128,36 @@ def run_result(run: TaskRun, steps: list[TaskRun]) -> dict[str, Any]:
     if run.error:
         result["error"] = run.error
     return result
+
+
+def roll_up_timing(run: TaskRun, nodes: list[TaskRun]) -> None:
+    """Write how a settled run's time was spent onto the run itself.
+
+    Called wherever a root run finishes, beside its cost, from the same node
+    list. Three numbers, each over the run's direct nodes in plan order:
+
+    - ``work_ms`` — what the nodes did. A node paused on a person
+      (``needs_input``) is the wait, not work.
+    - ``ask_ms`` — from each paused node's finish to the next node's start: the
+      time a person took to answer.
+    - ``wait_ms`` — the run's own span less its work: open, and no node working.
+
+    A run that never started has none of them. Delegated runs are not counted
+    twice — their time is inside the node that delegated them.
+    """
+    duration = span_ms(run.started_at, run.finished_at)
+    if duration is None:
+        run.work_ms = run.ask_ms = run.wait_ms = None
+        return
+    paused = RunStatus.needs_input.value
+    work = sum(span_ms(n.started_at, n.finished_at) or 0 for n in nodes if n.status != paused)
+    ask = 0
+    for i, node in enumerate(nodes):
+        if node.status != paused or node.finished_at is None:
+            continue
+        resumed = next((later for later in nodes[i + 1 :] if later.started_at is not None), None)
+        if resumed is not None:
+            ask += span_ms(node.finished_at, resumed.started_at) or 0
+    run.work_ms = work
+    run.ask_ms = ask
+    run.wait_ms = max(0, duration - work)

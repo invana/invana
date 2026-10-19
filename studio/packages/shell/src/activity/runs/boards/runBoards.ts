@@ -132,15 +132,22 @@ export function gaugeOf(
 	return { value: Math.min(1, value / ceiling), max: 1 };
 }
 
-/** Milliseconds between two instants, `null` when either is missing. */
-export function durationMs(
-	from: string | null | undefined,
-	to: string | null | undefined,
+/**
+ * A stored duration, else a live clock while the thing is still running.
+ *
+ * The engine stores every settled duration; the only arithmetic Studio does is
+ * the clock on something that has not settled yet. A settled row without a
+ * stored value says nothing rather than a number Studio made up.
+ */
+export function clockMs(
+	stored: number | null | undefined,
+	startedAt: string | null | undefined,
+	finishedAt: string | null | undefined,
 ): number | null {
-	if (!from) return null;
-	const a = new Date(from).getTime();
-	const b = to ? new Date(to).getTime() : Date.now();
-	return Number.isFinite(a) && Number.isFinite(b) ? b - a : null;
+	if (stored != null) return stored;
+	if (!startedAt || finishedAt) return null;
+	const started = Date.parse(startedAt);
+	return Number.isFinite(started) ? Math.max(0, Date.now() - started) : null;
 }
 
 /** The run's zero — the first step that started, or the run's own start. */
@@ -158,13 +165,7 @@ export function originOf(trace: TraceRead): string | null {
  * Wall-clock time answers *when did this happen last Tuesday*; a run is read
  * for *how far in did it happen*, which is what the design's log column shows.
  */
-export function offsetOf(
-	trace: TraceRead,
-	at: string | null,
-): string | undefined {
-	const origin = originOf(trace);
-	if (!origin || !at) return undefined;
-	const ms = durationMs(origin, at);
+export function offsetOf(ms: number | null | undefined): string | undefined {
 	if (ms == null || ms < 0) return undefined;
 	const s = ms / 1000;
 	return `${String(Math.floor(s / 60)).padStart(2, "0")}.${String(Math.floor(s % 60)).padStart(2, "0")}`;

@@ -17303,6 +17303,17 @@
             "title": "Detail",
             "type": "string"
           },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
           "error": {
             "anyOf": [
               {
@@ -19033,6 +19044,17 @@
               }
             ],
             "title": "Via"
+          },
+          "work_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Ms"
           }
         },
         "required": [
@@ -19724,6 +19746,17 @@
               }
             ],
             "title": "Created By Id"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
           },
           "error": {
             "anyOf": [
@@ -23292,6 +23325,17 @@
             ],
             "title": "Ask Kind"
           },
+          "ask_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ask Ms"
+          },
           "assistant_message_id": {
             "anyOf": [
               {
@@ -23313,6 +23357,17 @@
               }
             ],
             "title": "Body"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
           },
           "error": {
             "anyOf": [
@@ -23379,6 +23434,17 @@
             ],
             "title": "Parent Run Id"
           },
+          "queue_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Queue Ms"
+          },
           "queued_at": {
             "anyOf": [
               {
@@ -23441,6 +23507,28 @@
             ],
             "title": "Trace Id"
           },
+          "wait_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wait Ms"
+          },
+          "work_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Ms"
+          },
           "workflow_key": {
             "title": "Workflow Key",
             "type": "string"
@@ -23470,6 +23558,17 @@
             ],
             "title": "Agent Id"
           },
+          "ask_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ask Ms"
+          },
           "body": {
             "anyOf": [
               {
@@ -23491,6 +23590,17 @@
               }
             ],
             "title": "Cost Usd"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
           },
           "finished_at": {
             "anyOf": [
@@ -23550,6 +23660,17 @@
             "default": false,
             "title": "Promoted",
             "type": "boolean"
+          },
+          "queue_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Queue Ms"
           },
           "queued_at": {
             "anyOf": [
@@ -23657,6 +23778,28 @@
             "default": 0,
             "title": "Tokens Out",
             "type": "integer"
+          },
+          "wait_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wait Ms"
+          },
+          "work_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Ms"
           },
           "workflow_key": {
             "title": "Workflow Key",
@@ -24426,6 +24569,17 @@
             ],
             "title": "Ask Kind"
           },
+          "ask_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ask Ms"
+          },
           "body": {
             "anyOf": [
               {
@@ -24585,6 +24739,17 @@
             "title": "Plan Revision",
             "type": "integer"
           },
+          "queue_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Queue Ms"
+          },
           "replans": {
             "default": 0,
             "title": "Replans",
@@ -24655,6 +24820,28 @@
             "default": "user",
             "title": "Triggered By",
             "type": "string"
+          },
+          "wait_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wait Ms"
+          },
+          "work_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Ms"
           },
           "workflow_key": {
             "title": "Workflow Key",
@@ -24797,6 +24984,17 @@
             "title": "Max Attempts",
             "type": "integer"
           },
+          "offset_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offset Ms"
+          },
           "output": {
             "anyOf": [
               {
@@ -24838,6 +25036,17 @@
           "seq": {
             "title": "Seq",
             "type": "integer"
+          },
+          "share_of_run": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Of Run"
           },
           "skills_applied": {
             "items": {},
