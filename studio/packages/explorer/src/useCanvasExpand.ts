@@ -7,7 +7,7 @@ import type {
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { adaptItems, expandRefusal } from "./canvasItems";
-import { ACTIVE_LAYOUT_ID, type ExpandMenuSchema } from "./ExplorerCanvas";
+import type { ExpandMenuSchema } from "./ExplorerCanvas";
 import type { ExpandRequest, NeighborExpandResponse } from "./types";
 import { useExpandNode } from "./useExpandNode";
 
@@ -163,10 +163,12 @@ export function useCanvasExpand(deps: CanvasExpandDeps) {
 
 			// Append, then relax: d3-force seeds from the ring positions we just set,
 			// so existing nodes stay put and the new neighbours spread around their
-			// anchor. (`runLayout` is explicit rather than leaning on the engine's
-			// data:changed → active-layout wiring, so the re-layout is guaranteed.)
-			store.addData(seed);
-			void canvas?.runLayout(ACTIVE_LAYOUT_ID);
+			// anchor; the board's active layout re-runs on the new nodes. Written as
+			// the engine: data from the graph is not an unsaved change of the viewer's.
+			store.applyDelta(
+				{ added: seed },
+				{ actor: "engine", title: "expand neighbours" },
+			);
 		},
 		[canvas, setCanvasData],
 	);

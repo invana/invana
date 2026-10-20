@@ -148,7 +148,6 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		setSelectedId,
 		sessionTitleById,
 		handleStylingChange,
-		handleShowDetail,
 		handleSaveState,
 		openCanvasTab,
 		newCanvasTab,
@@ -224,7 +223,6 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			onStylingChange={handleStylingChange}
 			onReady={handleReady}
 			onViewTargetChange={setSelectedId}
-			onShowDetail={handleShowDetail}
 			selected={selected}
 			missingIds={missingIds}
 			modelName={modelName}

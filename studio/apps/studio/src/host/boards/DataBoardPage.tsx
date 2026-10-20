@@ -4,48 +4,56 @@
  * The Explorer's main region is a **page host**: a session canvas, a model
  * canvas and a work canvas are three kinds of page, not three branches of a
  * ternary (`docs/for-developers/building-studio/the-shell.md`). This is the
- * first kind — a session's canvas with its tab strip, its overlays and the
- * dialogs that act on it.
+ * first kind — a session's canvas, its panel rail and the dialogs that act on it.
  *
  * It owns the state that is about **this canvas and nothing else**: which
- * overlays are open, which vertex is being fine-tuned, which canvas is being
- * renamed. State the shell's own regions still read — the contents the
- * record card shows, the selection, the styling — stays above and arrives as
- * props. Moving that down is what turns this from one instance into one per
- * open canvas, and it is deliberately the next step rather than this one.
+ * vertex is being fine-tuned and which canvas is being renamed. State the
+ * shell's own regions still read — the selection, the styling — stays above
+ * and arrives as props.
  *
  * **The strip is not here.** `mainSection` is `Workbook`
  * (`docs/for-developers/building-studio/graph-detail-page.md`), which owns the
  * tabs for every open page. The strip holds tabs and nothing else; the tab
  * menu's *Rename* reaches this page through {@link BoardPageHandle}.
  *
- * What floats over the board (`docs/products/explorer.md`):
+ * The board — its modes, rows, dock, menus and rail — is canvas's `GraphBoard`,
+ * through `ExplorerCanvas`. This page adds what only Studio knows
+ * (`docs/products/explorer.md`): the model the Element panel edits against,
+ * the save, provenance, *Ask about*, the engine's expansion and its fine-tune
+ * dialog, and the *Versions* panel.
  *
- * | Where | What |
- * |---|---|
- * | top-left | the toolbar — select · lasso · box, the full set with *Tools* on |
- * | top-right | one card at a time: a record, Layers, Styling or History |
- * | bottom-left | the legend, with *Tools* on |
- * | bottom-right | zoom in · zoom out · fit |
+ * | Panel | Shows | Offered in |
+ * |---|---|---|
+ * | Legend | the drawn types; a click hides one | every work mode |
+ * | Styling | per-type colour, size, label; *Size by connections* | every work mode |
+ * | History | this board's undo history | every work mode |
+ * | Versions | the board's saved versions; a restore forks | every work mode |
+ * | Element | the clicked element, its provenance, *Ask about* · *Expand* · *Hide*; editable in Edit | Explore · Edit |
+ * | Changes | what is unsaved, saved to the graph | Edit, and any mode while something is unsaved |
+ * | Export | the board as an image or its data | every work mode |
  *
- * Opening a corner card closes the one before it — they share the corner.
+ * **Edit mode** (docs/for-developers/modules/explore/features/edit-the-graphs-data.md):
+ * the Element panel edits what is clicked or drawn, its types and keys from the
+ * graph's model at its active version; Changes saves to the graph. Save is
+ * disabled, with the reason, for a member below contributor, on a read-only
+ * connection, and on a graph with no published model.
  */
 
-import {
-	LayersViewPanel,
-	Panel,
-	PanelContent,
-	RendererCapabilityBanner,
-	StylingViewPanel,
-} from "@invana/canvas-ui";
+import type { BoardPanelSpec, ElementFooter } from "@invana/canvas-ui";
+import { RendererCapabilityBanner } from "@invana/canvas-ui";
 import type {
 	GraphCanvas as GraphCanvasEngine,
 	GraphData,
 	GraphLayer,
 } from "@invana/graph";
+import { Button } from "@invana/ui";
 import { SessionTutorialModal } from "@invana-studio/assistant";
 import type { CanvasBackend } from "@invana-studio/canvases";
-import type { InteractionRef, QueryResultItem } from "@invana-studio/core";
+import {
+	type InteractionRef,
+	type QueryResultItem,
+	useGraphConnectionQuery,
+} from "@invana-studio/core";
 import type {
 	ExpandMenuHandlers,
 	ExpandMenuSchema,
@@ -53,16 +61,16 @@ import type {
 	NeighborExpandResponse,
 } from "@invana-studio/explorer";
 import {
-	BoardLegend,
-	type BoardOverlay,
-	BoardToolbar,
 	ExpandNeighboursDialog,
 	ExplorerCanvas,
-	RecordCard,
-	useExplorerTools,
-	ZoomControls,
+	elementSchemaOf,
+	isProvenanceKey,
+	ProvenanceBlock,
+	readProvenance,
+	saveBoardChanges,
 } from "@invana-studio/explorer";
-import type { CanvasStyling } from "@invana-studio/shell";
+import { useActiveVersionQuery } from "@invana-studio/modeller";
+import { type CanvasStyling, useAccess } from "@invana-studio/shell";
 import {
 	forwardRef,
 	useCallback,
@@ -87,7 +95,7 @@ export interface BoardPageProps {
 	graphSlug: string;
 	/** The canvas this page draws. Null while none is open. */
 	boardId: string | null;
-	/** The live engine, for the Layers card. Null until `<Board>` publishes it. */
+	/** The live engine. Null until the board publishes it. */
 	canvas: GraphCanvasEngine | null;
 
 	/** Resolve a canvas's session, for the rename dialog. */
@@ -95,7 +103,7 @@ export interface BoardPageProps {
 	sessionTitle: (sessionId: string) => string;
 	onRenameSession: (id: string, title: string) => Promise<unknown>;
 
-	/** What `<GraphLayer data>` is seeded with. */
+	/** What the board's graph layer is seeded with. */
 	seedData: GraphData;
 	magnet: boolean;
 	backend: CanvasBackend;
@@ -104,29 +112,26 @@ export interface BoardPageProps {
 
 	onReady: (canvas: GraphCanvasEngine | null) => void;
 	onViewTargetChange: (id: string | null) => void;
-	onShowDetail: (id: string) => void;
 	interactionRef?: InteractionRef;
 
-	/** The record clicked on the board, drawn as the top-right card. */
+	/** The query record of the clicked element, for the Element panel's actions. */
 	selected: QueryResultItem | null;
-	/** Records the Graph no longer holds, marked on their card. */
+	/** Records the Graph no longer holds, marked in the Element panel. */
 	missingIds: ReadonlySet<string>;
 	modelName: (modelId: string) => string | undefined;
 	onOpenModel: (modelId: string) => void;
 	onCloseRecord: () => void;
-	/** The card's *Ask about* — the selection rides along as the attachment.
-	 *  Absent while the assistant is off. */
+	/** The Element panel's *Ask about* — the selection rides along as the
+	 *  attachment. Absent while the assistant is off. */
 	onAskAboutRecord?: () => void;
 
-	/** Node-expand. `onOpenFineTune` is supplied here, not by the caller — the
-	 *  panel it opens is this page's. */
+	/** Node-expand. The fine-tune dialog is this page's. */
 	expand: Omit<ExpandMenuHandlers, "onOpenFineTune">;
 	expandSchema: ExpandMenuSchema | null;
 	propertyKeys: string[];
 	onExpand: (req: ExpandRequest) => Promise<NeighborExpandResponse | null>;
 
-	/** Version history (boards.md). Forking closes the panel, so the page does
-	 *  it rather than reaching up for a setter. */
+	/** Saved versions (boards.md). A restore forks into a new canvas. */
 	onFork: (versionId: string) => void;
 	isForking: boolean;
 	onSave: () => void;
@@ -154,7 +159,6 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			onStylingChange,
 			onReady,
 			onViewTargetChange,
-			onShowDetail,
 			interactionRef,
 			selected,
 			missingIds,
@@ -175,44 +179,34 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 		},
 		ref,
 	) {
-		// Overlays. Each is about this canvas, so each lives with it. The
-		// corner cards share one slot — they share the corner — and a record
-		// card shows only while none of them is open.
-		const [overlay, setOverlay] = useState<BoardOverlay | null>(null);
-		const toggleOverlay = useCallback(
-			(next: BoardOverlay) =>
-				setOverlay((open) => (open === next ? null : next)),
-			[],
-		);
-		const [toolsOn] = useExplorerTools();
-		const [legendShown, setLegendShown] = useState(true);
-		// The board's graph store — read off the engine, since this page sits
-		// above the canvas root that the store hooks resolve from.
-		const store =
-			(canvas?.layers.get("graph") as GraphLayer | undefined)?.store ?? null;
 		const [tutorialOpen, setTutorialOpen] = useState(!tutorialSeen);
 		const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
 		const [fineTuneVertex, setFineTuneVertex] = useState<string | null>(null);
 
+		// Editing the graph's data (4.7): the model the editor follows, and whether
+		// this member may save to this graph now — and if not, why.
+		const activeVersion = useActiveVersionQuery(username, graphSlug);
+		const connection = useGraphConnectionQuery(username, graphSlug);
+		const { gate } = useAccess();
+		const schema = useMemo(
+			() => elementSchemaOf(activeVersion.data),
+			[activeVersion.data],
+		);
+		const work = gate("work");
+		const refusal: string | null = !work.allowed
+			? work.reason
+			: connection.data?.read_only
+				? "This graph's connection is read-only."
+				: activeVersion.isLoading
+					? "Reading the model…"
+					: !schema
+						? "Publish a model to edit this graph's data."
+						: null;
+		const modelVersionId = activeVersion.data?.id;
+
 		const editingSessionId = editingCanvasId
 			? sessionIdForTab(editingCanvasId)
 			: null;
-
-		// The fine-tune panel is this page's, so the handler that opens it is too —
-		// the caller supplies the rest of the expand menu and never this key.
-		const expandHandlers = useMemo<ExpandMenuHandlers>(
-			() => ({ ...expand, onOpenFineTune: setFineTuneVertex }),
-			[expand],
-		);
-
-		// A fork opens a *different* canvas, so the panel that offered it is done.
-		const handleFork = useCallback(
-			(versionId: string) => {
-				setOverlay(null);
-				onFork(versionId);
-			},
-			[onFork],
-		);
 
 		// The tab menu's *Rename*. A page menu item carries only the page id,
 		// so the shell holds the handle and calls straight into it.
@@ -222,16 +216,162 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			[],
 		);
 
-		// A clicked record opens its card in the corner, in place of whatever
-		// tool card was there.
-		const selectedId = selected ? String(selected.id) : null;
-		const selectedType = selected
-			? String(
-					(selected.type === "vertex"
-						? store?.getNode(selectedId as string)?.type
-						: store?.getEdge(selectedId as string)?.type) ?? selected.label,
-				)
-			: "";
+		// The board's *Expand neighbours* is the engine's expansion, per node.
+		const expandNeighbours = expand.onExpand;
+		const onExpandNodes = useCallback(
+			(nodeIds: string[]) => {
+				for (const id of nodeIds)
+					expandNeighbours?.({ kind: "neighbors", body: { vertex_id: id } });
+			},
+			[expandNeighbours],
+		);
+		// *Expand…* opens this page's fine-tune dialog.
+		const menus = useMemo(
+			() => ({
+				node: ({ id }: { id: string }) => [
+					{
+						id: "expand-by",
+						label: "Expand…",
+						onClick: () => setFineTuneVertex(id),
+					},
+				],
+			}),
+			[],
+		);
+
+		// The Element panel's acts follow the shown element, and act on the
+		// query record it came from — an element drawn and not saved has none.
+		const hideRecord = useCallback(
+			(item: QueryResultItem) => {
+				const store = canvas?.layers.get<GraphLayer>("graph")?.store;
+				if (item.type === "vertex") store?.setNodeHidden(String(item.id), true);
+				else store?.setEdgeHidden(String(item.id), true);
+				onCloseRecord();
+			},
+			[canvas, onCloseRecord],
+		);
+		const footer = useCallback<
+			Extract<ElementFooter, (...a: never[]) => unknown>
+		>(
+			(element) => {
+				const record =
+					selected && String(selected.id) === element.id ? selected : null;
+				if (!record) return null;
+				return (
+					<>
+						{onAskAboutRecord && (
+							<Button size="sm" variant="outline" onClick={onAskAboutRecord}>
+								Ask about
+							</Button>
+						)}
+						{record.type === "vertex" && (
+							<Button
+								size="sm"
+								variant="outline"
+								onClick={() => setFineTuneVertex(String(record.id))}
+							>
+								Expand…
+							</Button>
+						)}
+						<Button
+							size="sm"
+							variant="ghost"
+							onClick={() => hideRecord(record)}
+						>
+							Hide
+						</Button>
+					</>
+				);
+			},
+			[selected, onAskAboutRecord, hideRecord],
+		);
+		const renderExtra = useCallback(
+			(element: { id: string; data?: unknown }) => {
+				const provenance = readProvenance(
+					element.data as Record<string, unknown> | undefined,
+				);
+				return (
+					<>
+						{missingIds.has(element.id) && (
+							<p className="text-muted-foreground">
+								The graph no longer holds this record.
+							</p>
+						)}
+						<ProvenanceBlock
+							provenance={provenance}
+							{...(provenance
+								? { modelName: modelName(provenance.modelId) }
+								: {})}
+							onOpenModel={onOpenModel}
+						/>
+					</>
+				);
+			},
+			[missingIds, modelName, onOpenModel],
+		);
+
+		const panelOptions = useMemo(
+			() => ({
+				element: {
+					...(schema ? { schema, strictSchema: true } : {}),
+					hiddenKeys: isProvenanceKey,
+					labelField: false,
+					renderExtra,
+					footer,
+				},
+				changes: {
+					saveTarget: `Saves to the graph${schema ? " · checked against its model" : ""}`,
+					...(refusal ? { saveDisabledReason: refusal } : {}),
+					onSave: () =>
+						canvas
+							? saveBoardChanges(canvas, {
+									username,
+									graphSlug,
+									...(modelVersionId ? { modelVersionId } : {}),
+								})
+							: Promise.resolve(),
+				},
+				export: { filename: graphSlug },
+			}),
+			[
+				schema,
+				renderExtra,
+				footer,
+				refusal,
+				canvas,
+				username,
+				graphSlug,
+				modelVersionId,
+			],
+		);
+
+		// *Versions* — the board's saved states — sits after its undo history.
+		const panels = useCallback(
+			(rail: BoardPanelSpec[]): BoardPanelSpec[] => {
+				const versions: BoardPanelSpec = {
+					id: "versions",
+					title: "Versions",
+					icon: "versions",
+					render: () => (
+						<BoardHistoryWidget
+							open
+							embedded
+							onClose={() => {}}
+							username={username}
+							graphSlug={graphSlug}
+							boardId={boardId}
+							onFork={onFork}
+							isForking={isForking}
+							onSave={onSave}
+							isSaving={isSaving}
+						/>
+					),
+				};
+				const at = rail.findIndex((p) => p.id === "history") + 1;
+				return [...rail.slice(0, at), versions, ...rail.slice(at)];
+			},
+			[username, graphSlug, boardId, onFork, isForking, onSave, isSaving],
+		);
 
 		const closeTutorial = useCallback(() => {
 			onTutorialSeen();
@@ -242,54 +382,6 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 			<div className="flex h-full w-full flex-col overflow-hidden">
 				<div className="relative min-h-0 w-full flex-1 overflow-hidden">
 					<RendererCapabilityBanner />
-					{canvas && (
-						<Panel position="top-left" offset={12} zIndex={20}>
-							<BoardToolbar
-								overlay={overlay}
-								onToggleOverlay={toggleOverlay}
-								canExpand={selected?.type === "vertex"}
-								onExpandSelection={() =>
-									selectedId && setFineTuneVertex(selectedId)
-								}
-								legendShown={legendShown}
-								onToggleLegend={() => setLegendShown((v) => !v)}
-							/>
-						</Panel>
-					)}
-					{canvas && (
-						<Panel position="bottom-right" offset={12} zIndex={20}>
-							<ZoomControls />
-						</Panel>
-					)}
-					{canvas && toolsOn && legendShown && (
-						<Panel position="bottom-left" offset={12} zIndex={20}>
-							<BoardLegend styling={styling} />
-						</Panel>
-					)}
-					{selected && !overlay && (
-						<Panel position="top-right" offset={12} zIndex={20}>
-							<RecordCard
-								item={selected}
-								recordType={selectedType}
-								missing={missingIds.has(String(selected.id))}
-								modelName={modelName}
-								onOpenModel={onOpenModel}
-								onAsk={onAskAboutRecord}
-								onExpand={
-									selected.type === "vertex"
-										? () => setFineTuneVertex(String(selected.id))
-										: undefined
-								}
-								onHide={() => {
-									if (selected.type === "vertex")
-										store?.hideNode(String(selected.id));
-									else store?.hideEdge(String(selected.id));
-									onCloseRecord();
-								}}
-								onClose={onCloseRecord}
-							/>
-						</Panel>
-					)}
 					<ExplorerCanvas
 						data={seedData}
 						onReady={onReady}
@@ -297,51 +389,12 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 						magnet={magnet}
 						interactionRef={interactionRef}
 						backend={backend}
-						expand={expandHandlers}
-						onShowDetail={onShowDetail}
 						styling={styling}
-					/>
-					{overlay === "layers" && (
-						<Panel position="top-right" offset={12} zIndex={20}>
-							<PanelContent
-								width={320}
-								className="max-h-[70vh]"
-								header="Layers"
-								onClose={() => setOverlay(null)}
-							>
-								<LayersViewPanel canvas={canvas} />
-							</PanelContent>
-						</Panel>
-					)}
-					{overlay === "styling" && (
-						// The card only edits: `ExplorerCanvas` paints the styling,
-						// so a board keeps it while the card is closed.
-						<Panel position="top-right" offset={12} zIndex={20}>
-							<PanelContent
-								width={288}
-								className="max-h-[70vh]"
-								header="Styling"
-								onClose={() => setOverlay(null)}
-							>
-								<StylingViewPanel
-									canvas={canvas}
-									apply={false}
-									value={styling}
-									onChange={onStylingChange}
-								/>
-							</PanelContent>
-						</Panel>
-					)}
-					<BoardHistoryWidget
-						open={overlay === "history"}
-						onClose={() => setOverlay(null)}
-						username={username}
-						graphSlug={graphSlug}
-						boardId={boardId}
-						onFork={handleFork}
-						isForking={isForking}
-						onSave={onSave}
-						isSaving={isSaving}
+						onStylingChange={onStylingChange}
+						onExpand={onExpandNodes}
+						menus={menus}
+						panelOptions={panelOptions}
+						panels={panels}
 					/>
 					{fineTuneVertex && (
 						<ExpandNeighboursDialog

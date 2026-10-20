@@ -1,6 +1,9 @@
 import {
 	CanvasMessageBar,
 	GraphStatusBar as CanvasStatusBar,
+	MessageStatus,
+	RendererStatus,
+	ViewStatus,
 } from "@invana/canvas-ui";
 import { Button, cn } from "@invana/ui";
 import {
@@ -14,10 +17,6 @@ import {
 	ConnectionLine,
 	ConsoleCounts,
 	ExplorerHeaderToolbar,
-	MessageLine,
-	RendererLine,
-	ToolsSwitch,
-	ViewLine,
 } from "@invana-studio/explorer";
 import type { useRightSection } from "@invana-studio/shell";
 import { Star } from "lucide-react";
@@ -94,8 +93,6 @@ export function hostChrome(deps: HostChromeDeps) {
 				Assistant
 			</Button>
 		) : undefined,
-		// The Explorer's *Tools* switch, first in `header.right`.
-		headerRightExtras: explorer ? <ToolsSwitch /> : undefined,
 		// The Explorer's `footer`: the database it stands on, then — with a
 		// canvas in front — its counts, which open the console, and the message
 		// line; on the right the selection, the zoom and how it draws.
@@ -164,7 +161,7 @@ function explorerFooter({
 	if (!canvas)
 		return {
 			left: <ConnectionLine connection={connection} />,
-			right: <RendererLine canvas={null} backend={backend} />,
+			right: <RendererStatus canvas={null} backend={backend} />,
 		};
 	const counts = countsOf(items);
 	const queries = queryStepsOf(session);
@@ -180,13 +177,13 @@ function explorerFooter({
 					open={consoleParam.tab}
 					onToggle={consoleParam.toggle}
 				/>
-				<MessageLine canvas={canvas} />
+				<MessageStatus canvas={canvas} />
 			</span>
 		),
 		right: (
 			<span className="flex items-center">
-				<ViewLine canvas={canvas} relationships={counts.relationships} />
-				<RendererLine canvas={canvas} backend={backend} />
+				<ViewStatus canvas={canvas} />
+				<RendererStatus canvas={canvas} backend={backend} />
 			</span>
 		),
 	};

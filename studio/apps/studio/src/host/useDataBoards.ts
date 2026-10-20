@@ -274,13 +274,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		? (canvasData.find((i) => String(i.id) === selectedId) ?? null)
 		: null;
 
-	// "Node details" / "Edge details" context-menu items — select the element,
-	// which opens its record card on the board.
-	const handleShowDetail = useCallback(
-		(id: string) => setSelectedId(id),
-		[setSelectedId],
-	);
-
 	const paintCanvas = useCallback(
 		(result: QueryResponse | null) => {
 			if (result?.result_type !== "graph" || !result.data) return;
@@ -943,7 +936,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		sessionTitleById,
 		handleStylingChange,
 		selected,
-		handleShowDetail,
 		availableLanguages,
 		defaultLanguage,
 		handleSaveState,

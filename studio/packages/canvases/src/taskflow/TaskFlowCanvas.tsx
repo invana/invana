@@ -36,10 +36,8 @@ import type {
 	ClickSelectBehaviour as ClickSelect,
 	GraphCanvas,
 	GraphData,
-	GraphLayer as GraphLayerEngine,
 } from "@invana/graph";
 import { SIDE_SECTION } from "@invana-studio/core";
-import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import { Settings } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useStudioCanvasTheme } from "../theme";
@@ -120,15 +118,11 @@ export function TaskFlowCanvas({
 	);
 
 	// Lay out whatever arrives — `activeLayout` alone does not run on a graph
-	// seeded before the layout registers. **Redraw on settle**: a
-	// solve that lands in the same beat as the data flush leaves the viewport
-	// empty while the store holds the graph — `redraw()` is a pure render pass
-	// over the store.
+	// seeded before the layout registers.
 	useEffect(() => {
 		if (!canvas) return;
 		return canvas.events.on("layout:run:end", (e) => {
 			if (e.id !== LAYOUT) return;
-			canvas.layers.get<GraphLayerEngine>("graph")?.redraw();
 			// A fit frames a five-step plan at 2x on a wide page; nothing reads
 			// better larger than it was drawn, so the fit never zooms past 100%.
 			requestAnimationFrame(() => {
@@ -223,13 +217,7 @@ export function TaskFlowCanvas({
 			<DragNodeBehaviour id="drag-node" targetLayerId="graph" />
 			<HoverActivateBehaviour id="hover" targetLayerId="graph" />
 			<ClickSelectBehaviour id="click-select" targetLayerId="graph" />
-			<ElkLayout
-				id={LAYOUT}
-				targetLayerId="graph"
-				fitPadding={60}
-				// elkjs' worker must go through Vite's `?worker`, or it 404s.
-				options={{ workerFactory: () => new ElkWorker() }}
-			/>
+			<ElkLayout id={LAYOUT} targetLayerId="graph" fitPadding={60} />
 			<TextResolutionLODBehaviour id="label-resolution" targetLayerId="graph" />
 			<NodeLabelLODBehaviour id="text-lod" targetLayerId="graph" />
 			<HoverElementPreviewBehaviour

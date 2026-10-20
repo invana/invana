@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
@@ -24,9 +25,18 @@ import { defineConfig, type Plugin, searchForWorkspaceRoot } from "vite";
  * so it aliases to `src`. The rest alias to their local **build**, so what runs
  * here is what npm would ship: run `pnpm build` in design-kit after editing one.
  */
+// **On by default, for now**: the workspace links every `@invana/*` package to
+// the sibling checkouts (`pnpm-workspace.yaml` → `overrides`), so the hatches
+// open on their own when those checkouts sit beside this repo. The env vars
+// still override the paths.
+const sibling = (dir: string) => {
+	const p = path.resolve(__dirname, "../../..", "..", dir);
+	return fs.existsSync(path.join(p, "packages")) ? p : null;
+};
+
 const designKitRoot = process.env.INVANA_DESIGN_KIT
 	? path.resolve(__dirname, process.env.INVANA_DESIGN_KIT)
-	: null;
+	: sibling("design-kit");
 
 const dk = (...segments: string[]) =>
 	path.resolve(designKitRoot as string, ...segments);
@@ -73,7 +83,7 @@ const designKitAlias: Record<string, string> = designKitRoot
  */
 const canvasRoot = process.env.INVANA_CANVAS
 	? path.resolve(__dirname, process.env.INVANA_CANVAS)
-	: null;
+	: sibling("canvas");
 
 const cv = (...segments: string[]) =>
 	path.resolve(canvasRoot as string, ...segments);
@@ -233,6 +243,9 @@ export default defineConfig({
 			"@invana/blocks",
 			"@invana/boards",
 			"@invana/editor",
+			// The kit's forms and Studio's own must share one react-hook-form, or a
+			// kit field misses the FormProvider Studio put above it.
+			"react-hook-form",
 		],
 		alias: {
 			// `@/` is `src/`. Deep relative imports are positional — a file move

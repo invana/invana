@@ -42,11 +42,9 @@ import {
 import type {
 	ClickSelectBehaviour as ClickSelect,
 	GraphCanvas,
-	GraphLayer as GraphLayerEngine,
 } from "@invana/graph";
 import { useTheme } from "@invana/themes";
 import { SIDE_SECTION } from "@invana-studio/core";
-import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import { Link2, Settings } from "lucide-react";
 import {
 	type ReactNode,
@@ -274,42 +272,6 @@ export function GraphModelCanvas({
 		[message],
 	);
 
-	// The mount config again, once the canvas is ready. Under React StrictMode
-	// the engine is created, destroyed and created again, and on the second one
-	// the behaviours register after the root applied `config` — they keep their
-	// constructor defaults, so `collapse-expand` never re-lays out, `hover`
-	// loses its degree and `text-lod` its band. The definition holds the right
-	// config; this hands it to the live instances.
-	useEffect(() => {
-		if (canvas) canvas.update(config);
-	}, [canvas, config]);
-
-	// Redraw on settle: a solve that lands in the same beat as the data flush
-	// leaves the viewport empty while the store holds the graph.
-	useEffect(() => {
-		if (!canvas) return;
-		return canvas.events.on("layout:run:end", (e) => {
-			if (e.id === LAYOUT)
-				canvas.layers.get<GraphLayerEngine>(MODEL_LAYER_ID)?.redraw();
-		});
-	}, [canvas]);
-
-	// A theme change writes the palette's card and divider colours over every
-	// group node's own style (`GraphLayer.applyTheme`), which would leave each
-	// frame white. Its hue goes back on after the layer's pass — this listener
-	// subscribes after the layer's, so it runs second.
-	useEffect(() => {
-		if (!canvas) return;
-		const rehue = () => {
-			const store = canvas.layers.get<GraphLayerEngine>(MODEL_LAYER_ID)?.store;
-			if (!store) return;
-			for (const n of drawn.nodes)
-				if (n.style) store.updateNode(n.id, { style: n.style });
-		};
-		rehue();
-		return canvas.events.on("theme:change", rehue);
-	}, [canvas, drawn]);
-
 	// New data, a Detail switch, or a new theme: patch the template, then
 	// re-run ELK — a new node size needs new positions. `fitCamera`
 	// moves the camera with the nodes' glide, as the story does.
@@ -440,13 +402,7 @@ export function GraphModelCanvas({
 			<HoverActivateBehaviour id="hover" targetLayerId={MODEL_LAYER_ID} />
 			<ClickSelectBehaviour id="click-select" targetLayerId={MODEL_LAYER_ID} />
 			{/* ELK, and only ELK. */}
-			<ElkLayout
-				id={LAYOUT}
-				targetLayerId={MODEL_LAYER_ID}
-				fitPadding={60}
-				// elkjs' worker must go through Vite's `?worker`, or it 404s.
-				options={{ workerFactory: () => new ElkWorker() }}
-			/>
+			<ElkLayout id={LAYOUT} targetLayerId={MODEL_LAYER_ID} fitPadding={60} />
 			<CollapseExpandBehaviour
 				id="collapse-expand"
 				targetLayerId={MODEL_LAYER_ID}

@@ -1,4 +1,5 @@
 import { request } from "@invana-studio/core";
+import type { DataEdit, DataEditResult } from "./edit/dataEdits";
 import type {
 	BoundDataset,
 	ExpandByEdgeTypeRequest,
@@ -86,4 +87,19 @@ export const explorerApi = {
 			modelName: b.model_name,
 		}));
 	},
+
+	/**
+	 * Save a board's edits (4.7): checked against the model, written as one
+	 * `data-edit` run; answers with the new elements' database ids.
+	 */
+	saveDataEdits: (
+		username: string,
+		graphSlug: string,
+		edits: DataEdit[],
+		modelVersionId?: string,
+	) =>
+		request<DataEditResult>(`/api/v1/u/${username}/${graphSlug}/data-edits`, {
+			method: "POST",
+			body: JSON.stringify({ edits, model_version_id: modelVersionId ?? null }),
+		}),
 };

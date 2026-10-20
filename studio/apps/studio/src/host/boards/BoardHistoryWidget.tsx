@@ -21,6 +21,8 @@ interface Props {
 	onSave: () => void;
 	/** True while a manual save is in flight (disables the Save button). */
 	isSaving: boolean;
+	/** Inside the board's rail panel, which has its own frame and close. */
+	embedded?: boolean;
 }
 
 /**
@@ -45,6 +47,7 @@ export function BoardHistoryWidget({
 	isForking,
 	onSave,
 	isSaving,
+	embedded = false,
 }: Props) {
 	const { data, isLoading } = useCanvasStatesQuery(
 		username,
@@ -57,6 +60,7 @@ export function BoardHistoryWidget({
 
 	return (
 		<BoardHistoryCard
+			embedded={embedded}
 			title="History"
 			onClose={onClose}
 			isLoading={isLoading}

@@ -87,7 +87,7 @@ studio/src/canvases/
 | Header right: the theme toggle | ✅ | ❌. Studio's theme drives the canvas through `useStudioCanvasTheme` (TF7) |
 | Footer: `GraphStatusBar` · `CanvasMessageBar` | ✅ | ✅ |
 
-The canvas runs ELK itself whenever its data changes, and redraws the layer on `layout:run:end` (`activeLayout` alone does not lay out a graph seeded before the layout registers). elkjs' worker comes from Vite's `?worker` import, as in `AllModelsCanvas`. After a run the camera never stays past 100%: a fit would frame a five-step plan at 2x on a wide page.
+The canvas runs ELK itself whenever its data changes (`activeLayout` alone does not lay out a graph seeded before the layout registers), in the worker the layout package ships. After a run the camera never stays past 100%: a fit would frame a five-step plan at 2x on a wide page.
 
 When the Detail select changes: `stopLayout` → `update(templates[detail])` → `runLayout('elk', { fitCamera: { padding: 60 } })`. A new node size needs new positions.
 

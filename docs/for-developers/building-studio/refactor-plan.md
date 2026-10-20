@@ -176,6 +176,34 @@ worth waiting for.
 Steps 1–2 are the answer to "why is `react-hook-form` in Studio at all": because the kit does not
 yet own the two things a caller cannot do without — creating the form, and validating it.
 
+### 2.6 Canvas owns every canvas piece — Studio passes data and seams
+
+Studio is the first product on canvas, not its home. Every board, behaviour, panel, menu, layout
+rule, theme binding and data-editing rule lives in the canvas repo; Studio passes data,
+configuration and **seams** — callbacks for what needs the engine. The canvas record is
+`rfc:feat-2026-10-20-a-host-rebuilds-the-board-from-a-story` (canvas `docs/rfcs/feat/`).
+
+| Phase | Canvas gains | Studio deletes | Studio keeps (the seam) |
+|---|---|---|---|
+| P0 · engine defects | ELK's default worker loads; an un-animated layout draws; a StrictMode remount keeps config; a theme change keeps element styles | the `?worker` imports ×4, redraw-on-settle ×3, `canvas.update(config)` on ready, re-hue on `theme:change` | — |
+| P1 · the Explorer board | `GraphBoard` + presets, `defaultBoardMenus`, `defaultBoardPanels`, board policies, relayout-on-data, layout progress, type styling, label fallback, edge density, status-bar sections | `ExplorerCanvas.tsx` down to props; `edgeDensity.ts`; `labelAt`; `StatusLine` pieces; `DataBoardPage`'s rail and effects | *Expand…* + `ExpandNeighboursDialog` (menu `extra`), *Versions* panel, `ProvenanceBlock` (`renderExtra`, `hiddenKeys`), *Ask about* (`footer`), save refusals (`saveDisabledReason`), telemetry spans and the layout toast (callbacks) |
+| P2 · editing data | `unsavedToEditOps`, `GraphStore.remapIds`, `saveUnsaved(canvas, persist)`, `useUnsavedGuard` | `batchFromChanges`, `adoptSavedIds` | `DataEdit` wire type, `explorerApi.saveDataEdits`, `elementSchemaOf` |
+| P3 · theme and colour | one CSS-colour probe, `CanvasThemeSync` with a token map, one `typeColor`, hue binding | `canvases/theme.ts`, `typeColor.ts`, `readToken` / `readLiveColors` | — |
+| P4 · schema and DAG boards | `SchemaBoard` (frames, schema cards, Detail templates, connect veto), `LayeredDagBoard` | `canvases/model/*` but its data mapping, `layered/LayeredCanvas.tsx`, `taskflow/TaskFlowCanvas.tsx`, their JSON | `buildAllModelsData`, stitch semantics (`onConnect` veto, edge style), task / layered data mapping |
+| P5 · the rest | `useControlledSelection`, `captureThumbnail`, `useRenderPreference`, `GraphStore.positions`, `select(id)`, `isCanvasStateSnapshot` | the four `SelectionBridge`s, `captureBanner.ts`, `capturePositions`, the backend storage | — |
+
+| Phase | State |
+|---|---|
+| P0 · P1 · P2 | implemented — canvas `fix-2026-10-20-*` ×4 and `feat-2026-10-20-a-host-rebuilds-the-board-from-a-story` §8 |
+| P3 – P5 | accepted, not started |
+
+| Rule | Detail |
+|---|---|
+| A workaround is a canvas defect | Fixed in canvas with its own `fix/` RFC, then deleted here — never moved |
+| No Studio dependency in canvas | No toaster, telemetry, auth or HTTP in canvas; each is a callback |
+| Engine vocabulary stays here | `_inv_*` provenance, *Ask about*, the engine's expand filters, the save wire format |
+| Each phase leaves Studio green | `turbo run check-types`, Biome, the board e2e, before the next phase starts |
+
 ---
 
 ## 3. Mechanics of a safe move
@@ -291,10 +319,9 @@ that:
 
 | Not doing | Because |
 |---|---|
-| Rewriting the canvas integration | It works, it is already isolated, and 0.0.12 is a bump not a redesign |
 | A state-management change | Zustand + TanStack Query is fine. Moving files does not need a new store |
 | Chasing 80% coverage | §4.1 — tests where the type checker found something, not everywhere |
-| Touching the engine | This is `studio/` only |
+| Touching the engine | This is `studio/` and the canvas repo only (§2.6) |
 
 ---
 

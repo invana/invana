@@ -89,7 +89,7 @@ It takes **no children**: a host adds nothing to the canvas but its opt-in stitc
 | **Low** | `schema:<Model.Type>`: a header, then one row per property (type chip, name, `key`, type) | 300 × 240 |
 
 A Detail, Layout, data or theme change runs one sequence: `stopLayout` → `update(detailPatch(...) +
-activeLayout)` → `runLayout(layout, { fitCamera })`. `layout:run:end` redraws the layer (ME25).
+activeLayout)` → `runLayout(layout, { fitCamera })`. The types draw as the solve ends (ME25).
 
 ### What it renders
 

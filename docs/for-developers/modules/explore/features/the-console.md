@@ -79,7 +79,7 @@ flowchart TD
 | Queries · list | One row per query step: status glyph · the query, one line · language · when · duration · rows · the question that ran it. Newest first |
 | Queries · detail | The run page's step body (`operate.runs.detail.step.*`) — Overview · Touched · Log — fitted to the console, with *All queries* back and Re-run. Re-run is disabled while a run is in flight |
 | Param | One value: `?console=data`, `data:<node\|relationship>:<label>:<page>`, `queries`, `queries:<reply id>`. Absent is collapsed. One param, so it never collides with the Workbook's `?page=` or a run page's `&step=`; independent of `?panel=` and `?right=`, written through `useUpdateSearchParams` (`@invana-studio/core`) |
-| Code | `studio/packages/assistant/src/console/` — `ConsolePanel`, `useConsoleParam`, `consoleRecords`. The footer's counts and message line are `ConsoleCounts` · `MessageLine` · `ViewLine` in `@invana-studio/explorer`; a query's detail is `QueryStepBoard` in `@invana-studio/shell`, which composes the run page's `stepBoardSpec` |
+| Code | `studio/packages/assistant/src/console/` — `ConsolePanel`, `useConsoleParam`, `consoleRecords`. The footer's counts are `ConsoleCounts` in `@invana-studio/explorer`; its message, view and renderer sections are canvas-ui's `MessageStatus` · `ViewStatus` · `RendererStatus`; a query's detail is `QueryStepBoard` in `@invana-studio/shell`, which composes the run page's `stepBoardSpec` |
 
 ## Engine
 

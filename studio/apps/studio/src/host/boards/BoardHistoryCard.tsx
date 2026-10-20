@@ -33,6 +33,11 @@ export interface BoardHistoryCardProps {
 	/** `History` on a canvas, `Reports` on a board. */
 	title: string;
 	onClose: () => void;
+	/**
+	 * Drawn inside a panel that has its own frame and bar (the board's rail):
+	 * no floating card, no title row, no close — the toolbar and the list only.
+	 */
+	embedded?: boolean;
 	isLoading: boolean;
 	versions: BoardVersionSummary[];
 	/** Said when nothing was ever kept — the binding's own words. */
@@ -59,24 +64,33 @@ export function BoardHistoryCard({
 	thumbnail,
 	action,
 	fallbackLabel,
+	embedded = false,
 }: BoardHistoryCardProps) {
 	return (
-		<div className="absolute right-3 top-3 z-20 flex max-h-[calc(100%-1.5rem)] w-80 flex-col rounded-lg border border-border bg-background shadow-lg">
-			<div className="flex items-center justify-between border-b border-border px-3 py-2">
-				<span className="flex items-center gap-1.5 font-medium text-base">
-					<History className="h-4 w-4" />
-					{title}
-				</span>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="h-6 w-6"
-					aria-label={`Close ${title}`}
-					onClick={onClose}
-				>
-					<X className="h-4 w-4" />
-				</Button>
-			</div>
+		<div
+			className={
+				embedded
+					? "flex min-h-0 flex-col"
+					: "absolute right-3 top-3 z-20 flex max-h-[calc(100%-1.5rem)] w-80 flex-col rounded-lg border border-border bg-background shadow-lg"
+			}
+		>
+			{!embedded && (
+				<div className="flex items-center justify-between border-b border-border px-3 py-2">
+					<span className="flex items-center gap-1.5 font-medium text-base">
+						<History className="h-4 w-4" />
+						{title}
+					</span>
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-6 w-6"
+						aria-label={`Close ${title}`}
+						onClick={onClose}
+					>
+						<X className="h-4 w-4" />
+					</Button>
+				</div>
+			)}
 			{toolbar ? (
 				<div className="border-b border-border p-2">{toolbar}</div>
 			) : null}

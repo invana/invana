@@ -23,3 +23,34 @@ minimumReleaseAgeExclude:
   - '@invana/graph-layout-d3-force@0.0.9'
   - '@invana/graph-layout-elkjs@0.0.9'
   - '@invana/graph@0.0.9'
+
+# **Studio runs on the local canvas and design-kit checkouts, for now.** Every
+# `@invana/*` package resolves to its sibling checkout (`../../canvas`, `../../design-kit`),
+# so the type-check, the host dev server and the container all see the same copy and a
+# canvas or kit change needs no release. All or none: a mix splits React contexts.
+# A clone without the two sibling repos does not install until this block is removed.
+overrides:
+  '@invana/canvas': link:../../canvas/packages/canvas
+  '@invana/canvas-core': link:../../canvas/packages/canvas-core
+  '@invana/canvas-react': link:../../canvas/packages/canvas-react
+  '@invana/canvas-store': link:../../canvas/packages/canvas-store
+  '@invana/canvas-ui': link:../../canvas/packages/canvas-ui
+  '@invana/graph': link:../../canvas/packages/graph
+  '@invana/graph-layer-d3-contour': link:../../canvas/packages/graph-layer-d3-contour
+  '@invana/graph-layer-maplibre': link:../../canvas/packages/graph-layer-maplibre
+  '@invana/graph-layout-d3-force': link:../../canvas/packages/graph-layout-d3-force
+  '@invana/graph-layout-d3-sankey': link:../../canvas/packages/graph-layout-d3-sankey
+  '@invana/graph-layout-elkjs': link:../../canvas/packages/graph-layout-elkjs
+  '@invana/renderer-pixijs': link:../../canvas/packages/renderer-pixijs
+  '@invana/assistant': link:../../design-kit/packages/assistant
+  '@invana/blocks': link:../../design-kit/packages/blocks
+  '@invana/boards': link:../../design-kit/packages/boards
+  '@invana/charts': link:../../design-kit/packages/charts
+  '@invana/editor': link:../../design-kit/packages/editor
+  '@invana/forms': link:../../design-kit/packages/forms
+  '@invana/styling': link:../../design-kit/packages/styling
+  '@invana/tables': link:../../design-kit/packages/tables
+  '@invana/themes': link:../../design-kit/packages/themes
+  '@invana/ui': link:../../design-kit/packages/ui
+  # One react-hook-form for Studio and the linked kit's forms.
+  react-hook-form: 7.81.0

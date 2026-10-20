@@ -21,31 +21,33 @@ export {
 	isCanvasStateSnapshot,
 	resultToItems,
 } from "./canvasItems";
+export { ExplorerHeaderToolbar } from "./chrome/ExplorerHeaderToolbar";
 // What floats over the board, and the chrome around it.
-export { BoardLegend } from "./chrome/BoardLegend";
-export {
-	type BoardOverlay,
-	BoardToolbar,
-	ZoomControls,
-} from "./chrome/BoardToolbar";
 export { EmptyBoard, ExplorerLocked } from "./chrome/ExplorerLocked";
-export { RecordCard } from "./chrome/RecordCard";
-export {
-	ConnectionLine,
-	ConsoleCounts,
-	MessageLine,
-	RendererLine,
-	ViewLine,
-} from "./chrome/StatusLine";
-export { ToolsSwitch } from "./chrome/ToolsSwitch";
-export { useExplorerTools } from "./chrome/useExplorerTools";
+export { ConnectionLine, ConsoleCounts } from "./chrome/StatusLine";
 export { ExpandNeighboursDialog } from "./ExpandNeighboursDialog";
 export type {
 	ExpandMenuHandlers,
 	ExpandMenuSchema,
 } from "./ExplorerCanvas";
-export { ExplorerCanvas, ExplorerHeaderToolbar } from "./ExplorerCanvas";
+export { ExplorerCanvas } from "./ExplorerCanvas";
 export { ExplorerViewPanel } from "./ExplorerViewPanel";
+// Editing the graph's data on the board (4.7): the model as the panel reads
+// it, and a save as the engine takes it.
+export type { DataEdit, DataEditResult } from "./edit/dataEdits";
+export { saveBoardChanges } from "./edit/dataEdits";
+export {
+	type ElementSchema,
+	elementSchemaOf,
+	type ModelVersionLike,
+} from "./edit/elementSchema";
+// Where a record came from — its `_inv_*` stamps, hidden from its properties.
+export {
+	isProvenanceKey,
+	type Provenance,
+	ProvenanceBlock,
+	readProvenance,
+} from "./ProvenanceBlock";
 // The product: its routes, and the slot the app fills with the page.
 export { ExplorerSlotsContext, explorer } from "./product";
 export type {
