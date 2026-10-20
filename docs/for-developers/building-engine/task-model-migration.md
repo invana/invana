@@ -202,7 +202,7 @@ Grouped by the bound it spends, because **the group is what the envelope ceiling
 Roughly twenty-five entries, and the count is meant to stay near it — growth belongs in reusable
 TaskPlans, not in new callables.
 
-### 6.1 The catalogue as it actually is — twenty-nine entries
+### 6.1 The catalogue as it actually is — thirty entries
 
 `runtime/catalogue/registry.py` is the declaration; one module per bound holds the callables. **The
 keys do not change in M1.** They are stored in `thinking_steps.task_key` and read by Studio, so
@@ -243,6 +243,7 @@ adds its one task type to the catalogue beside them and is not counted here.
 | `commit_stitches` | `graph_write` | — | `written` int · `rejected` int · `links` list | — |
 | `withdraw_stitch` | `graph_write` | `link_id` str | `withdrawn` int | — |
 | `bulk_write` | `graph_write` | `root` str · `batch_size` int · `skip_on_error` bool · `keep_source_ids` bool | `nodes` int · `edges` int · `failed` int | **—** |
+| `apply_data_edits` | `graph_write` | `edits` list · `model_id` str | `applied` int · `ids` obj | — |
 
 **`snapshot_model` spends `ingest`, not `schema_write`.** It writes no schema: it pins the version the load
 *validated against* and records what landed on the dataset. An agent allowed to load may stamp what it
@@ -257,6 +258,14 @@ writes what the files say. Borrowing `write_graph` would have a bulk load claim 
 ran, and a plan naming `write_graph` without `validate_records` is refused by the validator — correctly.
 So the fast path gets its own entry rather than a relaxed version of somebody else's, and `bulk-load@1`
 is seeded once that entry exists ([LB14](../modules/workflows/features/the-library.md)).
+
+**`apply_data_edits` is the thirtieth entry: a board's saved edits are a write like any other.** Edit
+mode on the Explorer board adds, changes and deletes nodes and relationships
+([4.7](../modules/explore/features/edit-the-graphs-data.md)); Save sends them as one batch, which runs
+as `data-edit@1` under the Graph's guardrails and is checked against the model again in the run, since a
+model can be published between the route's check and the write. It is one entry, not one per op: an
+ordered batch is one act with one bound, and a per-op entry would turn one Save into dozens of runs. Its
+rule lives in the modeller app (`DataEditManager`), because every edit is read against the model.
 
 **`withdraw_stitch` is the twenty-fourth entry, and it is a write.** Removing an active stitch deletes the
 edges it wrote (ST48), which is a graph write like any other, so it runs as `stitch-withdraw@1` under the
@@ -341,7 +350,7 @@ resolving option values and its result is never returned to the model.
 `snapshot_model`**. [§ 6.2](#62-where-todays-set-and--06s-proposed-set-differ)
 lists § 0.6's *proposed* names — `import_dataset`, `import_report` — and taking
 those would rename a column whose values are stored on 179 live nodes and read
-by Studio, which [§ 6.1](#61-the-catalogue-as-it-actually-is--twenty-four-entries)
+by Studio, which [§ 6.1](#61-the-catalogue-as-it-actually-is--thirty-entries)
 already settles: **a stored key is renamed by a data migration, never by a
 declaration.** So M11 declares the keys that exist.
 

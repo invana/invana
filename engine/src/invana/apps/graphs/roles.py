@@ -80,6 +80,7 @@ _POLICY: tuple[tuple[tuple[str, ...], Area], ...] = (
     (("notifications", "read"), ASK),
     (("approvals",), ASK),
     (("projects",), WORK),
+    (("data-edits",), WORK),
     (("tasks",), WORK),
     (("schedules",), WORK),
     (("agents",), BUILD),

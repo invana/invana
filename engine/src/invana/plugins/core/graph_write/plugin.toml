@@ -2,5 +2,5 @@ name = "invana.core.graph_write"
 kind = "core"
 engine = "*"
 secrets = []
-tasks = ["write_graph", "stitch", "withdraw_stitch", "bulk_write", "apply_stitches", "commit_stitches"]
-flows = ["stitch-apply", "stitch-commit", "stitch-withdraw"]
+tasks = ["write_graph", "stitch", "withdraw_stitch", "bulk_write", "apply_stitches", "commit_stitches", "apply_data_edits"]
+flows = ["stitch-apply", "stitch-commit", "stitch-withdraw", "data-edit"]

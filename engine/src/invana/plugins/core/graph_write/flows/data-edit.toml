@@ -1,0 +1,10 @@
+key = "data-edit"
+version = 1
+kind = "data_edit"
+description = "Write a board's saved edits to the graph, checked against its model, under the Graph's guardrails."
+intents = []
+
+[[steps]]
+id = "apply_data_edits"
+task = "apply_data_edits"
+label = "Write edits"

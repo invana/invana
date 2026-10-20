@@ -19,8 +19,8 @@ edits. One rule, six canvas kinds, no exceptions added in code.
 |---|---|---|
 | C1 | One selection concept | The same object whatever the canvas draws |
 | C2 | Inspect is the default | Properties, provenance, relationships — stated, not editable |
-| C3 | Two kinds write from a gesture | `model` (add · connect · delete) and `plan` (drag card → card) — each writes an **edge or a placement**, which is the only thing a drawing says better than a form ([SP2](#decisions)) |
-| C4 | Everything else selects | The panel states the fact and offers actions, never inline editing |
+| C3 | Three kinds write from a gesture | `model` (add · connect · delete), `plan` (drag card → card) and `data` in Edit mode (add · connect · delete, [4.7](edit-the-graphs-data.md)) — each gesture places a node or draws an **edge**, which is the only thing a drawing says better than a form ([SP2](#decisions)) |
+| C4 | Everything else selects | The panel states the fact and offers actions; on `data` it edits only in Edit mode |
 | C5 | Provenance is one click | Element → record → dataset → import run |
 | C6 | Multi-select summarises | Counts by type, and the actions that apply to all of them |
 | C7 | The selection travels | Opening the assistant carries it |
@@ -29,7 +29,7 @@ edits. One rule, six canvas kinds, no exceptions added in code.
 
 | Canvas kind | The panel states | Editable? |
 |---|---|---|
-| `data` | properties · provenance · neighbours by type | no |
+| `data` | properties · provenance · neighbours by type | **in Edit mode** — type and keys from the model ([4.7](edit-the-graphs-data.md)) |
 | `model` | properties, keys, constraints of the type | **yes**, while drafting |
 | `plan` | the task: status, assignee, dependencies, criteria | **yes** — status and assignment |
 | `workflow` | the task: arguments, what it calls, the contract it came from | no — nobody edits a plan by hand ([6.5](../../skills/features/instructions-publish-rollback.md#decisions) IS3) |
@@ -43,7 +43,7 @@ flowchart LR
     A[Click on the canvas] --> B[Selection]
     B --> C[Panel states what it is]
     C --> D{This kind edits?}
-    D -->|model, plan| E[Edit in the panel · staged where staging applies]
+    D -->|model, plan, data in Edit| E[Edit in the panel · staged]
     D -->|otherwise| F[Actions only: open, expand, hide, ask about it]
     C --> G[Provenance → record → dataset]
     B --> H[Open the assistant · selection attached]
@@ -107,7 +107,7 @@ section a legend as well as a list.
 | # | Decision |
 |---|---|
 | SP1 | The canvas selects; the panel states or edits. Never the reverse. |
-| SP2 | Exactly **two** kinds write from a gesture — `model` and `plan`. A third is argued the same way. The gesture writes where the **geometry is the datum**; every field is still a form. `workflow` writes nothing: plans are generated or packaged, never edited by hand ([6.5](../../skills/features/instructions-publish-rollback.md#decisions) IS3). |
+| SP2 | **Three** kinds write from a gesture — `model`, `plan`, and `data` in Edit mode, argued in [4.7](edit-the-graphs-data.md) DE1. A fourth is argued the same way. The gesture writes where the **geometry is the datum**; every field is still a form. `workflow` writes nothing: plans are generated or packaged, never edited by hand ([6.5](../../skills/features/instructions-publish-rollback.md#decisions) IS3). |
 | SP3 | Inspect is the default; editing is opt-in and kind-specific. |
 | SP4 | Provenance is always one click from the element. |
 | SP5 | The selection is what the assistant receives. |

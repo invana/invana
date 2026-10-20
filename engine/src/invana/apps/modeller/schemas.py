@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -894,3 +894,81 @@ class ModelPublishOutcome(BaseModel):
     version: str | None = None
     version_id: str | None = None
     review: ModelPublishReviewRead | None = None
+
+
+# ── data edits: what the Explorer board saves (4.7) ─────────────────────
+
+
+class AddNode(BaseModel):
+    op: Literal["add_node"]
+    ref: str
+    type: str
+    properties: dict[str, Any] = {}
+
+
+class AddEdge(BaseModel):
+    op: Literal["add_edge"]
+    ref: str
+    type: str
+    #: A database id, or the ``ref`` of a node added earlier in the batch.
+    source: str
+    target: str
+    properties: dict[str, Any] = {}
+
+
+class UpdateNode(BaseModel):
+    op: Literal["update_node"]
+    id: str
+    #: The node's type after the edit.
+    type: str
+    #: Its type before, when the edit changes it.
+    from_type: str | None = None
+    set: dict[str, Any] = {}
+    unset: list[str] = []
+
+
+class UpdateEdge(BaseModel):
+    op: Literal["update_edge"]
+    id: str
+    #: The relationship's type; it does not change.
+    type: str
+    set: dict[str, Any] = {}
+    unset: list[str] = []
+
+
+class DeleteNode(BaseModel):
+    op: Literal["delete_node"]
+    id: str
+    type: str
+
+
+class DeleteEdge(BaseModel):
+    op: Literal["delete_edge"]
+    id: str
+    type: str
+
+
+DataEdit = Annotated[AddNode | AddEdge | UpdateNode | UpdateEdge | DeleteNode | DeleteEdge, Field(discriminator="op")]
+
+
+class DataEditBatch(BaseModel):
+    """What the board's Save sends: its edits since the last save, in order."""
+
+    #: The model version the editor read; the batch is checked against the active one.
+    model_version_id: str | None = None
+    edits: list[DataEdit] = Field(min_length=1, max_length=1000)
+
+
+class DataEditResult(BaseModel):
+    run_id: str
+    #: Each added element's database id, by the board's id.
+    ids: dict[str, str] = {}
+    applied: int = 0
+
+
+class ModelIndex(BaseModel):
+    """A model version reduced to what a check needs: each type's keys and their data types."""
+
+    version_id: str
+    nodes: dict[str, dict[str, str]]
+    edges: dict[str, dict[str, str]]

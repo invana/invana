@@ -119,6 +119,7 @@ this map.** Feature numbers do not change.
 | 4.3 | [Selection and the panel](modules/explore/features/selection-and-the-panel.md) | The canvas selects; the panel states the fact | ✅ | — | ✅ | S12 |
 | 4.4 | [The console](modules/explore/features/the-console.md) | The rows and the query under the canvas that drew them | ✅ | — | ✅ | S12f |
 | 4.5 | [Share an answer](modules/explore/features/share-an-answer.md) | A live link or a frozen snapshot for members; PNG · CSV · Markdown for anyone else | ✅ | 🔵 | ✅ | C09 |
+| 4.7 | [Edit the graph's data](modules/explore/features/edit-the-graphs-data.md) | Add, change and delete nodes and relationships on the board in Edit mode, with the model's types and keys; unsaved until saved as one run | 🔵 | — | 🔵 | — |
 
 ## 5 · [Agents](modules/agents/spec.md)
 

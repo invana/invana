@@ -173,7 +173,7 @@ rest is what the lesson links to when it explains why the step matters.
 | [Model editor](../../connect-and-model/features/model-editor.md) | 1.4 | where it is authored; the panel the step opens |
 | [Share a model](../../connect-and-model/features/share-a-model.md) | 1.5 | export, import, upgrade — a third way to arrive at a published version |
 | [Stitch models](../../connect-and-model/features/stitch-models.md) | 1.6 | **optional step** — done on a *committed* stitch; a staged one is a draft |
-| [Bring data in](../../bring-data-in/features/load-data.md) | 2.1 | **required step** — *Bring data in*. No Studio write path, so the lesson carries the command ([SU6](#decisions)) |
+| [Bring data in](../../bring-data-in/features/load-data.md) | 2.1 | **required step** — *Bring data in*. Importing has no Studio path, so the lesson carries the command ([SU6](#decisions)) |
 | [Inspect what landed](../../bring-data-in/features/inspect-what-landed.md) | 2.2 | the proof — the run reads *succeeded*, which is what `looksRight` points at |
 
 ### 3 · Reasoning — *it decides by reasoning over it*

@@ -12,6 +12,11 @@ from invana.graph.types.lens import QueryLens, TypeBound
 from invana.graph.types.sort import SortDirection, SortSpec
 
 
+def _quoted(name: str) -> str:
+    """A label or a key as a Cypher identifier — backticked, a backtick inside doubled."""
+    return "`" + name.replace("`", "``") + "`"
+
+
 class _ParamCounter:
     """Tracks parameter indices for a single query build."""
 
@@ -441,6 +446,24 @@ class OpenCypherQueryBuilder:
             f"MATCH ()-[r]->() WHERE {cls.ELEMENT_ID}(r) = $eid SET r += $props RETURN r",
             {"eid": edge_id, "props": properties},
         )
+
+    @classmethod
+    def relabel_node(cls, vertex_id: str, old_label: str, new_label: str) -> tuple[str, dict]:
+        return (
+            f"MATCH (n) WHERE {cls.ELEMENT_ID}(n) = $vid"
+            f" REMOVE n:{_quoted(old_label)} SET n:{_quoted(new_label)} RETURN n",
+            {"vid": vertex_id},
+        )
+
+    @classmethod
+    def unset_node_properties(cls, vertex_id: str, keys: list[str]) -> tuple[str, dict]:
+        removed = ", ".join(f"n.{_quoted(k)}" for k in keys)
+        return f"MATCH (n) WHERE {cls.ELEMENT_ID}(n) = $vid REMOVE {removed} RETURN n", {"vid": vertex_id}
+
+    @classmethod
+    def unset_edge_properties(cls, edge_id: str, keys: list[str]) -> tuple[str, dict]:
+        removed = ", ".join(f"r.{_quoted(k)}" for k in keys)
+        return f"MATCH ()-[r]->() WHERE {cls.ELEMENT_ID}(r) = $eid REMOVE {removed} RETURN r", {"eid": edge_id}
 
     @classmethod
     def delete_node(cls, vertex_id: str) -> tuple[str, dict]:

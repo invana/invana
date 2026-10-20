@@ -134,6 +134,8 @@ COMMIT_ALLOWED = {
     "server/datasets/views.py",
     # Simulating on a branch opens the simulator's run and then submits it, the same shape.
     "server/work/views.py",
+    # Saving a board's edits opens its `data-edit` run and works it inline, the same shape.
+    "server/data_edits/views.py",
     "server/admin/auth.py",
     "plugins/core/ingest/records.py",
     # A CLI command is not serving a request: it opens its own session and owns

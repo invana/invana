@@ -111,7 +111,7 @@ flowchart TD
 
 | Not building | Because |
 |---|---|
-| Editing records in Studio | data is imported, not typed |
+| Editing records on this page | it reads what an import landed; a record is edited on the Explorer board in Edit mode ([4.7](../../explore/features/edit-the-graphs-data.md)) |
 | Re-running a rejected subset from the UI | the extractor owns retries; the CLI re-imports |
 | A data browser over the whole graph | that is the Explorer's job |
 | A journal across Graphs | everything is Graph-scoped; a cross-Graph audit is a different product |

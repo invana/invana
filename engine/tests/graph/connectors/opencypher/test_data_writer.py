@@ -1,5 +1,7 @@
 """Integration tests for OpenCypher data writer queryset against a real Neo4j instance."""
 
+import pytest
+
 
 class TestCreateVertex:
     async def test_create_vertex_with_properties(self, connector):
@@ -136,3 +138,62 @@ class TestDeleteEdge:
         # Vertices should still exist
         node_count = await connector.data_reader.count_vertices("Person")
         assert node_count == 2
+
+
+class TestRelabelAndUnset:
+    async def test_relabel_vertex_keeps_its_properties(self, connector):
+        v = await connector.data_writer.create_vertex("Draft", {"name": "Alice"})
+        await connector.data_writer.relabel_vertex(v.id, "Draft", "Person")
+        read = await connector.data_reader.read_vertex_by_id(v.id)
+        assert read.label == "Person"
+        assert read.properties["name"] == "Alice"
+
+    async def test_unset_removes_only_the_named_keys(self, connector):
+        v = await connector.data_writer.create_vertex("Person", {"name": "Alice", "age": 30})
+        await connector.data_writer.unset_vertex_properties(v.id, ["age", "missing"])
+        read = await connector.data_reader.read_vertex_by_id(v.id)
+        assert read.properties == {"name": "Alice"}
+
+
+class TestApplyEdits:
+    """A board's batch, written through the data writer — refs resolve, a stale type stops it."""
+
+    async def test_a_batch_writes_in_order_and_maps_refs(self, connector):
+        from invana.apps.modeller.managers.data_edit import DataEditManager
+        from invana.apps.modeller.schemas import DataEditBatch, ModelIndex
+
+        index = ModelIndex(version_id="v", nodes={"airport": {"code": "string"}}, edges={"route": {"weekly": "int"}})
+        manager = DataEditManager()
+        batch = DataEditBatch.model_validate(
+            {
+                "edits": [
+                    {"op": "add_node", "ref": "a", "type": "airport", "properties": {"code": "DOH"}},
+                    {"op": "add_node", "ref": "b", "type": "airport", "properties": {"code": "DXB"}},
+                    {
+                        "op": "add_edge",
+                        "ref": "r",
+                        "type": "route",
+                        "source": "a",
+                        "target": "b",
+                        "properties": {"weekly": "7"},
+                    },
+                ]
+            }
+        )
+        ids, applied = await manager.apply_edits(connector, manager.check_batch(batch, index))
+        assert applied == 3
+        edge = await connector.data_reader.read_edge_by_id(ids["r"])
+        assert edge.properties["weekly"] == 7
+
+    async def test_an_element_of_another_type_is_refused(self, connector):
+        from invana.apps.modeller.managers.data_edit import DataEditManager, EditFailed
+        from invana.apps.modeller.schemas import DataEditBatch, ModelIndex
+
+        v = await connector.data_writer.create_vertex("country", {"name": "Qatar"})
+        index = ModelIndex(version_id="v", nodes={"airport": {"code": "string"}}, edges={})
+        manager = DataEditManager()
+        batch = DataEditBatch.model_validate({"edits": [{"op": "delete_node", "id": v.id, "type": "airport"}]})
+        with pytest.raises(EditFailed) as caught:
+            await manager.apply_edits(connector, manager.check_batch(batch, index))
+        assert caught.value.code == "stale_type"
+        assert caught.value.applied == 0

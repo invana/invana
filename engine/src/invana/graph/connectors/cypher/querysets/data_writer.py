@@ -35,6 +35,24 @@ class OpenCypherDataWriterQuerySet(BaseDataWriterQuerySet):
         response = await self._connector.execute(query, params)
         return response.edges[0]
 
+    async def relabel_vertex(self, vertex_id: str, old_label: str, new_label: str) -> None:
+        query, params = self._connector.query_builder.relabel_node(
+            self._connector.coerce_id(vertex_id), old_label, new_label
+        )
+        await self._connector.execute(query, params)
+
+    async def unset_vertex_properties(self, vertex_id: str, keys: list[str]) -> None:
+        if not keys:
+            return
+        query, params = self._connector.query_builder.unset_node_properties(self._connector.coerce_id(vertex_id), keys)
+        await self._connector.execute(query, params)
+
+    async def unset_edge_properties(self, edge_id: str, keys: list[str]) -> None:
+        if not keys:
+            return
+        query, params = self._connector.query_builder.unset_edge_properties(self._connector.coerce_id(edge_id), keys)
+        await self._connector.execute(query, params)
+
     async def delete_vertex(self, vertex_id: str) -> None:
         query, params = self._connector.query_builder.delete_node(self._connector.coerce_id(vertex_id))
         await self._connector.execute(query, params)

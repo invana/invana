@@ -193,6 +193,7 @@ def create_app() -> FastAPI:
     from invana.server.agents.routes import agents_router, atlas_agent_router
     from invana.server.approvals.routes import approvals_router
     from invana.server.boards.routes import boards_router
+    from invana.server.data_edits.routes import data_edits_router
     from invana.server.datasets.routes import dataset_bindings_router, datasets_router
     from invana.server.evals.routes import evals_router
     from invana.server.explorer.routes import explorer_router
@@ -319,6 +320,7 @@ def create_app() -> FastAPI:
     app.include_router(evals_router)
     app.include_router(datasets_router)
     app.include_router(dataset_bindings_router)
+    app.include_router(data_edits_router)
     app.include_router(standards_router)
     app.include_router(schedules_router)
     app.include_router(notifications_router)

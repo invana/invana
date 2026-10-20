@@ -696,6 +696,76 @@
         "title": "ActorRef",
         "type": "object"
       },
+      "AddEdge": {
+        "properties": {
+          "op": {
+            "const": "add_edge",
+            "title": "Op",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Properties",
+            "type": "object"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "ref",
+          "type",
+          "source",
+          "target"
+        ],
+        "title": "AddEdge",
+        "type": "object"
+      },
+      "AddNode": {
+        "properties": {
+          "op": {
+            "const": "add_node",
+            "title": "Op",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Properties",
+            "type": "object"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "ref",
+          "type"
+        ],
+        "title": "AddNode",
+        "type": "object"
+      },
       "Advice": {
         "properties": {
           "calls": {
@@ -4893,6 +4963,92 @@
         "title": "DailyRow",
         "type": "object"
       },
+      "DataEditBatch": {
+        "description": "What the board's Save sends: its edits since the last save, in order.",
+        "properties": {
+          "edits": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "add_edge": "#/components/schemas/AddEdge",
+                  "add_node": "#/components/schemas/AddNode",
+                  "delete_edge": "#/components/schemas/DeleteEdge",
+                  "delete_node": "#/components/schemas/DeleteNode",
+                  "update_edge": "#/components/schemas/UpdateEdge",
+                  "update_node": "#/components/schemas/UpdateNode"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AddNode"
+                },
+                {
+                  "$ref": "#/components/schemas/AddEdge"
+                },
+                {
+                  "$ref": "#/components/schemas/UpdateNode"
+                },
+                {
+                  "$ref": "#/components/schemas/UpdateEdge"
+                },
+                {
+                  "$ref": "#/components/schemas/DeleteNode"
+                },
+                {
+                  "$ref": "#/components/schemas/DeleteEdge"
+                }
+              ]
+            },
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Edits",
+            "type": "array"
+          },
+          "model_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Version Id"
+          }
+        },
+        "required": [
+          "edits"
+        ],
+        "title": "DataEditBatch",
+        "type": "object"
+      },
+      "DataEditResult": {
+        "properties": {
+          "applied": {
+            "default": 0,
+            "title": "Applied",
+            "type": "integer"
+          },
+          "ids": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "title": "Ids",
+            "type": "object"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id"
+        ],
+        "title": "DataEditResult",
+        "type": "object"
+      },
       "DatasetBindingCreate": {
         "properties": {
           "dataset": {
@@ -6402,6 +6558,30 @@
         "title": "Degradation",
         "type": "object"
       },
+      "DeleteEdge": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "op": {
+            "const": "delete_edge",
+            "title": "Op",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "id",
+          "type"
+        ],
+        "title": "DeleteEdge",
+        "type": "object"
+      },
       "DeleteMeRequest": {
         "properties": {
           "password": {
@@ -6413,6 +6593,30 @@
           "password"
         ],
         "title": "DeleteMeRequest",
+        "type": "object"
+      },
+      "DeleteNode": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "op": {
+            "const": "delete_node",
+            "title": "Op",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "id",
+          "type"
+        ],
+        "title": "DeleteNode",
         "type": "object"
       },
       "DependencyCreate": {
@@ -26323,6 +26527,93 @@
         "title": "TypeTally",
         "type": "object"
       },
+      "UpdateEdge": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "op": {
+            "const": "update_edge",
+            "title": "Op",
+            "type": "string"
+          },
+          "set": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Set",
+            "type": "object"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "unset": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Unset",
+            "type": "array"
+          }
+        },
+        "required": [
+          "op",
+          "id",
+          "type"
+        ],
+        "title": "UpdateEdge",
+        "type": "object"
+      },
+      "UpdateNode": {
+        "properties": {
+          "from_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Type"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "op": {
+            "const": "update_node",
+            "title": "Op",
+            "type": "string"
+          },
+          "set": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Set",
+            "type": "object"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "unset": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Unset",
+            "type": "array"
+          }
+        },
+        "required": [
+          "op",
+          "id",
+          "type"
+        ],
+        "title": "UpdateNode",
+        "type": "object"
+      },
       "Usage": {
         "properties": {
           "caller_share": {
@@ -34554,6 +34845,77 @@
         "summary": "Get Contention",
         "tags": [
           "graphs"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/data-edits": {
+      "post": {
+        "description": "Check the board's edits against the model, write them as one run, and return the new ids.\n\n422 names the first edit the model refuses; 409 is no published model or a\nread-only connection; 502 is the database refusing an edit, with how many\nwere written before it.",
+        "operationId": "save_data_edits_api_v1_u__username___graphSlug__data_edits_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditBatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEditResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Save Data Edits",
+        "tags": [
+          "data-edits"
         ]
       }
     },

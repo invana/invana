@@ -29,14 +29,14 @@ Six things get drawn, and they share every gesture — pan, zoom, select, hover,
 
 | Kind | Draws | Writes from a gesture? |
 |---|---|---|
-| `data` | records and their edges | no |
+| `data` | records and their edges | **yes**, in Edit mode — add · connect · edit · delete, staged until saved ([4.7](features/edit-the-graphs-data.md)) |
 | `model` | node types and edge types | **yes** — add · connect · delete, staged |
 | `plan` | tasks as cards, waves as columns | **yes** — drag card → card writes a dependency |
 | `workflow` | a plan's steps | no |
 | `envelope` | what an agent may run | no |
 | `lineage` | who authored or spawned whom | no |
 
-**Exactly two kinds write from a gesture** — `model` and `plan`. A `workflow` is read-only: nobody
+**Three kinds write from a gesture** — `model`, `plan`, and `data` in Edit mode. A `workflow` is read-only: nobody
 edits a plan by hand ([6.5](../skills/features/instructions-publish-rollback.md#decisions) IS3). Everything else selects, and the panel
 states the fact. A new exception is argued and written down, never added in code.
 
@@ -56,7 +56,7 @@ flowchart LR
 |---|---|
 | Selection is one concept | The same gesture on any kind produces the same selection object |
 | Inspect is the default | Editing is opt-in and only on the kinds that allow it |
-| Model edits stage | Nothing reaches the database until a commit; the staged set is visible and reversible |
+| Edits stage | Model and data edits reach the database only on a commit or a save; the staged set is visible and reversible |
 | The assistant inherits the selection | Opening it never means re-describing what is on screen |
 | An answer can land on the canvas | Emissions of kind subgraph draw into the current data canvas rather than replacing it |
 
@@ -86,7 +86,7 @@ flowchart LR
 | # | Decision |
 |---|---|
 | E1 | One page. The kind is a property of the board, not a mode in the header. |
-| E2 | Exactly two kinds write from a gesture — `model` and `plan`. `workflow` is read-only ([6.5](../skills/features/instructions-publish-rollback.md#decisions) IS3). Others select. |
+| E2 | Three kinds write from a gesture — `model`, `plan`, and `data` in Edit mode, against the graph's model ([4.7](features/edit-the-graphs-data.md) DE1). `workflow` is read-only ([6.5](../skills/features/instructions-publish-rollback.md#decisions) IS3). Others select. |
 | E3 | The canvas selects; the panel states or edits. Never the reverse. |
 | E4 | Canvases are named, saved and versioned; autosave never overwrites history. |
 | E5 | **The assistant is not an Explore feature.** It is one surface for the whole graph page, reachable from every left panel — Explorer, Model, Projects, Tasks, Agents, Workflows — so it belongs to [Ask](../ask/features/the-assistant.md), not here. Explore's stake in it is only where it sits (E7) and what it inherits (the selection, E3). |

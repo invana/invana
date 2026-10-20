@@ -46,6 +46,20 @@ class GremlinDataWriterQuerySet(BaseDataWriterQuerySet):
         result = await self._connector.execute_traversal(traversal)
         return self._serializer.deserialize_edge(result[0])
 
+    async def unset_vertex_properties(self, vertex_id: str, keys: list[str]) -> None:
+        """Remove ``keys`` from a vertex — a vertex's label is fixed, so there is no relabel."""
+        if not keys:
+            return
+        g = await self._connector.get_traversal_source()
+        await self._connector.execute_traversal(g.V(self._connector.coerce_id(vertex_id)).properties(*keys).drop())
+
+    async def unset_edge_properties(self, edge_id: str, keys: list[str]) -> None:
+        """Remove ``keys`` from an edge."""
+        if not keys:
+            return
+        g = await self._connector.get_traversal_source()
+        await self._connector.execute_traversal(g.E(self._connector.coerce_id(edge_id)).properties(*keys).drop())
+
     async def delete_vertex(self, vertex_id: str) -> None:
         """Delete a vertex and all its connected edges."""
         g = await self._connector.get_traversal_source()

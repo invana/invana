@@ -1192,6 +1192,7 @@ LOAD_PLAN_KEY = "model-import"
 BULK_PLAN_KEY = "bulk-load"
 #: The builtin a stitch commit runs — the drawer's and the CLI's, one plan.
 STITCH_COMMIT_PLAN_KEY = "stitch-commit"
+DATA_EDIT_PLAN_KEY = "data-edit"
 #: The builtin that withdraws a removed stitch's edges (ST55).
 STITCH_WITHDRAW_PLAN_KEY = "stitch-withdraw"
 #: The builtin that counts what stitch rules resolve — a read (ST43).
@@ -1391,21 +1392,31 @@ async def open_bulk_run(
     return run
 
 
-async def _refuse_unwritable(db: AsyncSession, *, graph: Graph, what: str) -> None:
-    """A stitch run writes edges; a Graph that cannot take them refuses before one opens."""
+async def _refuse_unwritable(db: AsyncSession, *, graph: Graph, what: str, writes: str = "edges") -> None:
+    """A run that writes to the graph refuses before it opens when the Graph cannot take the write."""
     connection = await GraphManager().get_graph_connection(db, graph_id=graph.id)
     if connection is None:
         raise ValidationError({"error": "no_connection", "graph_id": graph.id})
     if connection.read_only:
         raise PermissionDeniedError(
-            {"error": "read_only_graph", "message": f"This connection is marked read-only, and {what} writes edges."}
+            {"error": "read_only_graph", "message": f"This connection is marked read-only, and {what} writes {writes}."}
         )
 
 
 async def _open_stitch_run(
-    db: AsyncSession, *, graph: Graph, key: str, body: str, actor_id: str | None, args: dict | None = None
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    key: str,
+    body: str,
+    actor_id: str | None,
+    args: dict | None = None,
+    ask_kind: str = "stitch",
 ) -> TaskRun:
-    """Open a stitch builtin as a run under the Graph's guardrails — no agent, no world (GV36)."""
+    """Open a graph-writing builtin (a stitch, a board's edits) as a run under the Graph's guardrails.
+
+    No agent, no world (GV36).
+    """
     selected = await select_plan_by_key(db, graph_id=graph.id, key=key)
     if selected is None:
         raise RuntimeError(f"The plan library has no populated {key!r}.")
@@ -1418,7 +1429,7 @@ async def _open_stitch_run(
         graph_id=graph.id,
         author_id=actor_id,
         author_kind="user" if actor_id else "system",
-        ask_kind="stitch",
+        ask_kind=ask_kind,
         body=body,
         params=dict(args or {}),
         workflow_key=selected.ref,
@@ -1460,6 +1471,35 @@ async def open_stitch_commit_run(
     noun = "stitch" if len(staged) == 1 else "stitches"
     return await _open_stitch_run(
         db, graph=graph, key=STITCH_COMMIT_PLAN_KEY, body=f"Commit {len(staged)} staged {noun}", actor_id=actor_id
+    )
+
+
+async def open_data_edit_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    model_id: str,
+    edits: list[dict],
+    actor_id: str | None = None,
+) -> TaskRun:
+    """Open the run a board's Save runs as — the edits it saved, checked by the route already.
+
+    **Writing data is a run**
+    (docs/for-developers/modules/explore/features/edit-the-graphs-data.md):
+    ``apply_data_edits`` checks the edits against the model again and writes
+    them under the Graph's guardrails. A connection it may not write to refuses
+    before the run opens, as a load's does.
+    """
+    await _refuse_unwritable(db, graph=graph, what="saving a board's edits", writes="data")
+    noun = "edit" if len(edits) == 1 else "edits"
+    return await _open_stitch_run(
+        db,
+        graph=graph,
+        key=DATA_EDIT_PLAN_KEY,
+        body=f"Save {len(edits)} {noun} from the board",
+        actor_id=actor_id,
+        args={"edits": edits, "model_id": model_id},
+        ask_kind="data_edit",
     )
 
 
