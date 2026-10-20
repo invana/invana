@@ -9,8 +9,7 @@
  *
  * | Seam | Studio's |
  * |---|---|
- * | `colorForType` | the design-kit type palette (`typeColorNumber`), so the board, the legend and the type lists agree |
- * | theme | the live CSS tokens (`ThemeBridge`), until canvas's theme sync reads them |
+ * | theme | `'tokens'` — the board wears Studio's own CSS tokens, and a type's colour is its design-kit data slot, the same one the type lists show |
  * | `onLayoutStart` / `onLayoutEnd` | the query run's telemetry spans: `explorer.layout`, then a one-frame `explorer.render`, then the run's root closes |
  * | `onSlowLayout` | a loading toast with *Cancel* |
  *
@@ -18,7 +17,6 @@
  * its panels and their options, the expansion and the styling.
  */
 
-import { useGraphCanvasUpdate } from "@invana/canvas-react";
 import {
 	BOARD_IDS,
 	type BoardMenuExtras,
@@ -28,19 +26,14 @@ import {
 	type GraphBoardLayoutRun,
 } from "@invana/canvas-ui";
 import type { GraphCanvas, GraphData } from "@invana/graph";
-import { useTheme } from "@invana/themes";
-import {
-	type CanvasBackend,
-	readCanvasThemeConfig,
-	typeColorNumber,
-} from "@invana-studio/canvases";
+import type { CanvasBackend } from "@invana-studio/canvases";
 import {
 	endInteraction,
 	type InteractionRef,
 	startChild,
 } from "@invana-studio/core";
 import type { CanvasStyling } from "@invana-studio/shell";
-import { type ReactNode, useCallback, useEffect, useRef } from "react";
+import { type ReactNode, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import type { ExpandRequest } from "./types";
 
@@ -65,8 +58,6 @@ export interface ExpandMenuHandlers {
 export const ACTIVE_LAYOUT_ID = BOARD_IDS.layout;
 
 const LAYOUT_TOAST_ID = "explorer-layout";
-
-const colorForType = (type: string) => typeColorNumber(type);
 
 interface ExplorerCanvasProps {
 	data: GraphData;
@@ -118,8 +109,7 @@ export function ExplorerCanvas({
 		<GraphBoard
 			data={data}
 			preference={backend}
-			colorForType={colorForType}
-			theme={false}
+			theme="tokens"
 			sizeByConnections
 			styling={styling}
 			onStylingChange={onStylingChange}
@@ -134,7 +124,6 @@ export function ExplorerCanvas({
 			onLayoutEnd={telemetry.end}
 			onSlowLayout={slowLayoutToast}
 		>
-			<ThemeBridge />
 			{children}
 		</GraphBoard>
 	);
@@ -187,22 +176,4 @@ function slowLayoutToast(run: GraphBoardLayoutRun & { cancel: () => void }) {
 		action: { label: "Cancel", onClick: run.cancel },
 	});
 	return () => toast.dismiss(LAYOUT_TOAST_ID);
-}
-
-/**
- * Follows Studio's active theme: reads the live CSS tokens and pushes the
- * matching colour patch, so switching theme *or* mode retints the canvas.
- * The read waits a frame, for the ThemeProvider's class to land on the root.
- */
-function ThemeBridge() {
-	const { variantId, isDark } = useTheme();
-	const update = useGraphCanvasUpdate();
-	// biome-ignore lint/correctness/useExhaustiveDependencies: variantId/isDark are trigger-only — the effect re-reads the live DOM tokens on any theme/mode change
-	useEffect(() => {
-		const id = requestAnimationFrame(() =>
-			update(readCanvasThemeConfig({ edgeColor: false })),
-		);
-		return () => cancelAnimationFrame(id);
-	}, [variantId, isDark, update]);
-	return null;
 }

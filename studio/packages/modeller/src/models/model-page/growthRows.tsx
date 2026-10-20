@@ -8,9 +8,9 @@
 
 import type { RowSpec } from "@invana/boards";
 import { StackedAreaChart } from "@invana/charts";
+import { colorSlotByString } from "@invana/styling/color";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Button, EmptyState } from "@invana/ui";
-import { slotForType } from "@invana-studio/canvases";
 import { formatRelativeTime } from "@invana-studio/core";
 import { Activity, Upload } from "lucide-react";
 import type { Growth, GrowthRow, WrittenBy } from "../types";
@@ -132,7 +132,7 @@ export function growthRows(
 
 	const one = !!opts.scopeName;
 	const colorOf = (key: string, name: string) => {
-		const slot = one ? slotForType(name) : opts.hueOf(key);
+		const slot = one ? colorSlotByString(name) : opts.hueOf(key);
 		return `var(--color-data-${slot ?? 1})`;
 	};
 	const data = growth.labels.map((label, i) => ({

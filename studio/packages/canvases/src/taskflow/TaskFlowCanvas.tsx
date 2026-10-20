@@ -11,6 +11,7 @@
 import type { CanvasConfig } from "@invana/canvas";
 import {
 	BackgroundLayer,
+	CanvasThemeSync,
 	ClickSelectBehaviour,
 	DragNodeBehaviour,
 	DragPanBehaviour,
@@ -40,7 +41,6 @@ import type {
 import { SIDE_SECTION } from "@invana-studio/core";
 import { Settings } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useStudioCanvasTheme } from "../theme";
 import { renderTaskEdge, renderTaskNode } from "./preview";
 import type { Detail, TaskFlowData, TaskFlowTemplates } from "./types";
 
@@ -77,7 +77,6 @@ export function TaskFlowCanvas({
 }: TaskFlowCanvasProps) {
 	const [detail, setDetail] = useState<Detail>(initialDetail);
 	const [canvas, setCanvas] = useState<GraphCanvas | null>(null);
-	useStudioCanvasTheme(canvas);
 	const applied = useRef(initialDetail);
 	const openRef = useRef(onOpenNode);
 	openRef.current = onOpenNode;
@@ -212,6 +211,8 @@ export function TaskFlowCanvas({
 			<BackgroundLayer id="background" />
 			<GraphLayer id="graph" data={graph} />
 			<ThemeBehaviour id="theme" />
+			{/* The palette is Studio's own tokens, under any theme. */}
+			<CanvasThemeSync source="tokens" />
 			<DragPanBehaviour id="pan" />
 			<WheelZoomBehaviour id="wheel" />
 			<DragNodeBehaviour id="drag-node" targetLayerId="graph" />

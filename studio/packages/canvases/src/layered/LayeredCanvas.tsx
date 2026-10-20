@@ -39,6 +39,7 @@ import { WorldLayer } from "@invana/canvas";
 import {
 	BackgroundLayer,
 	type CanvasProps,
+	CanvasThemeSync,
 	ClickSelectBehaviour,
 	DragNodeBehaviour,
 	DragPanBehaviour,
@@ -47,9 +48,9 @@ import {
 	GraphLayer,
 	PinchZoomBehaviour,
 	TextResolutionLODBehaviour,
+	ThemeBehaviour,
 	useCanvasEvent,
 	useGraphCanvas,
-	useGraphCanvasUpdate,
 	useSelection,
 	WheelZoomBehaviour,
 } from "@invana/canvas-react";
@@ -62,16 +63,10 @@ import type {
 	ResolvableNodeStyle,
 } from "@invana/graph";
 import { ElkLayout } from "@invana/graph-layout-elkjs";
-import { useTheme } from "@invana/themes";
 import { cn, Legend, LegendItem, type LegendSwatchKind } from "@invana/ui";
 import type { Tone } from "@invana-studio/ui";
-// Vite's worker idiom: `?worker` makes the bundler emit the ELK solver as a
-// worker asset and hand back a constructor. See {@link newElkLayout} for why
-// the layout package's own default factory cannot be used.
-import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import { MousePointer2, Spline } from "lucide-react";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { readCanvasThemeConfig } from "../theme";
 
 const LAYER_ID = "graph";
 const LAYOUT_ID = "work-layered";
@@ -147,7 +142,7 @@ interface Props {
 //
 // Pixi wants numbers, so these are the theme's colours resolved once rather
 // than CSS variables: `--primary` (brand green), `--muted-foreground`, and the
-// three status hues the panels already use. <ThemeBridge> retints the canvas
+// three status hues the panels already use. the theme sync retints the canvas
 // chrome; the semantic tones stay stable across themes on purpose — "green
 // means it served" should not become "blue means it served" in a light theme.
 
@@ -285,14 +280,6 @@ const newElkLayout = () =>
 		 */
 		nodeSpacing: 76,
 		layerSpacing: 150,
-		// **The worker has to be ours.** `ElkLayout`'s default factory resolves
-		// `elkjs/lib/elk-worker.min.js` relative to the *package*, which Vite
-		// does not turn into a worker asset — the Worker is constructed, never
-		// answers, and the layout promise hangs with every node stacked on the
-		// origin. Its synchronous fallback is no help either (`BundledELK is not
-		// a constructor`, a CJS-interop bug in the layout package), so this
-		// override is the working path, not a nicety.
-		workerFactory: () => new ElkWorker(),
 	});
 
 export function LayeredCanvas({
@@ -374,7 +361,8 @@ export function LayeredCanvas({
 					edge={{ style: EDGE_STYLE }}
 				/>
 				<LayoutBridge data={data} run={layout === "layered"} />
-				<ThemeBridge />
+				<ThemeBehaviour id="theme" />
+				<CanvasThemeSync source="tokens" />
 
 				<DragPanBehaviour id="pan" />
 				{/* Node-drag and edge-draw both start on a node pointer-down, so
@@ -487,18 +475,6 @@ function LayoutBridge({ data, run }: { data: GraphData; run: boolean }) {
 		};
 	}, [ready, data, run, canvas]);
 
-	return null;
-}
-
-/** Board colours follow Studio's active theme, like every other canvas. */
-function ThemeBridge() {
-	const { variantId, isDark } = useTheme();
-	const update = useGraphCanvasUpdate();
-	// biome-ignore lint/correctness/useExhaustiveDependencies: variantId/isDark are trigger-only — the effect re-reads the live DOM tokens on any theme change
-	useEffect(() => {
-		const id = requestAnimationFrame(() => update(readCanvasThemeConfig()));
-		return () => cancelAnimationFrame(id);
-	}, [variantId, isDark, update]);
 	return null;
 }
 

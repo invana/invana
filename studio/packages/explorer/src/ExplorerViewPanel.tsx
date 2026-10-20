@@ -13,8 +13,8 @@
  */
 
 import type { GraphCanvas, GraphLayer, GraphStore } from "@invana/graph";
+import { colorByString } from "@invana/styling/color";
 import { cn, PanelStack, ScrollArea } from "@invana/ui";
-import { typeDotColor } from "@invana-studio/canvases";
 import {
 	type QueryResultItem,
 	type TypeCount,
@@ -167,7 +167,7 @@ export function ExplorerViewPanel({
 										}
 										rows={nodes.filter(matches)}
 										color={(name) =>
-											typeDotColor(name, styling?.nodeTypes?.[name]?.color)
+											colorByString(name, styling?.nodeTypes?.[name]?.color)
 										}
 										hidden={hidden}
 										onToggle={drawn.size ? toggle : undefined}
@@ -190,7 +190,7 @@ export function ExplorerViewPanel({
 										}
 										rows={edges.filter(matches)}
 										color={(name) =>
-											typeDotColor(name, styling?.edgeTypes?.[name]?.color)
+											colorByString(name, styling?.edgeTypes?.[name]?.color)
 										}
 										mono
 									/>
@@ -204,7 +204,7 @@ export function ExplorerViewPanel({
 										selected={selected}
 										modelName={modelName}
 										color={(name) =>
-											typeDotColor(name, styling?.nodeTypes?.[name]?.color)
+											colorByString(name, styling?.nodeTypes?.[name]?.color)
 										}
 									/>
 								),

@@ -1,8 +1,8 @@
 /**
  * `@invana-studio/canvases` — canvas compositions more than one product draws:
  * the model canvas, the task-flow canvas and the layered canvas (plan,
- * workflow, envelope and lineage), plus the theme bridge, the render
- * backend and the type colours every canvas kind shares.
+ * workflow, envelope and lineage), plus the render backend. Theme and type
+ * colours are canvas's: `CanvasThemeSync source="tokens"` and `typeColor`.
  *
  * Names are listed, not starred: both canvases declare a `Detail` level type,
  * and each keeps its own. Only what a caller imports is listed — knip fails
@@ -39,6 +39,3 @@ export {
 	taskNodeTypeOf,
 	taskToneOf,
 } from "./taskflow/types";
-export { readCanvasThemeConfig } from "./theme";
-// Engine adapters — PixiJS needs concrete values, not classes.
-export { slotForType, typeColorNumber, typeDotColor } from "./typeColor";

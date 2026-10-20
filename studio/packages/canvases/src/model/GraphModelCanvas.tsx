@@ -15,6 +15,7 @@
 import type { CanvasConfig } from "@invana/canvas";
 import {
 	BackgroundLayer,
+	CanvasThemeSync,
 	ClickSelectBehaviour,
 	CollapseExpandBehaviour,
 	DragNodeBehaviour,
@@ -54,7 +55,6 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { useStudioCanvasTheme } from "../theme";
 import {
 	detailPatch,
 	initialConfig,
@@ -178,7 +178,6 @@ export function GraphModelCanvas({
 	const [detail, setDetail] = useState<Detail>(initialDetail);
 	const [canvas, setCanvas] = useState<GraphCanvas | null>(null);
 	const colors = useLiveColors();
-	useStudioCanvasTheme(canvas);
 	const selectRef = useRef(onSelect);
 	selectRef.current = onSelect;
 	const selectedRef = useRef(selected);
@@ -384,6 +383,8 @@ export function GraphModelCanvas({
 			<BackgroundLayer id="background" />
 			<GraphLayer id={MODEL_LAYER_ID} data={drawn} />
 			<ThemeBehaviour id="theme" />
+			{/* The palette is Studio's own tokens, under any theme. */}
+			<CanvasThemeSync source="tokens" />
 			<DragPanBehaviour id="pan" />
 			<WheelZoomBehaviour id="wheel" />
 			<DragNodeBehaviour

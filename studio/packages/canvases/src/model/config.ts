@@ -9,7 +9,7 @@
  */
 
 import type { CanvasConfig } from "@invana/canvas";
-import { cssColorToNumber } from "@invana/graph";
+import { readCssColor } from "@invana/graph";
 import { colorSlotByString } from "@invana/styling/color";
 import {
 	type Detail,
@@ -36,14 +36,7 @@ const FALLBACK_HUES = [
 export const hueSlotForName = (name: string): number => colorSlotByString(name);
 
 function readToken(name: string): number | undefined {
-	if (typeof document === "undefined") return undefined;
-	const probe = document.createElement("span");
-	probe.style.color = `var(${name})`;
-	probe.style.display = "none";
-	document.documentElement.appendChild(probe);
-	const rgb = getComputedStyle(probe).color;
-	probe.remove();
-	return cssColorToNumber(rgb) ?? undefined;
+	return readCssColor(`var(${name})`);
 }
 
 /** What the live theme resolves for the colours the canvas paints per node. */

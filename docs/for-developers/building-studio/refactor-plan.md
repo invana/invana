@@ -188,14 +188,14 @@ configuration and **seams** — callbacks for what needs the engine. The canvas 
 | P0 · engine defects | ELK's default worker loads; an un-animated layout draws; a StrictMode remount keeps config; a theme change keeps element styles | the `?worker` imports ×4, redraw-on-settle ×3, `canvas.update(config)` on ready, re-hue on `theme:change` | — |
 | P1 · the Explorer board | `GraphBoard` + presets, `defaultBoardMenus`, `defaultBoardPanels`, board policies, relayout-on-data, layout progress, type styling, label fallback, edge density, status-bar sections | `ExplorerCanvas.tsx` down to props; `edgeDensity.ts`; `labelAt`; `StatusLine` pieces; `DataBoardPage`'s rail and effects | *Expand…* + `ExpandNeighboursDialog` (menu `extra`), *Versions* panel, `ProvenanceBlock` (`renderExtra`, `hiddenKeys`), *Ask about* (`footer`), save refusals (`saveDisabledReason`), telemetry spans and the layout toast (callbacks) |
 | P2 · editing data | `unsavedToEditOps`, `GraphStore.remapIds`, `saveUnsaved(canvas, persist)`, `useUnsavedGuard` | `batchFromChanges`, `adoptSavedIds` | `DataEdit` wire type, `explorerApi.saveDataEdits`, `elementSchemaOf` |
-| P3 · theme and colour | one CSS-colour probe, `CanvasThemeSync` with a token map, one `typeColor`, hue binding | `canvases/theme.ts`, `typeColor.ts`, `readToken` / `readLiveColors` | — |
-| P4 · schema and DAG boards | `SchemaBoard` (frames, schema cards, Detail templates, connect veto), `LayeredDagBoard` | `canvases/model/*` but its data mapping, `layered/LayeredCanvas.tsx`, `taskflow/TaskFlowCanvas.tsx`, their JSON | `buildAllModelsData`, stitch semantics (`onConnect` veto, edge style), task / layered data mapping |
+| P3 · theme and colour | one CSS-colour probe (`readCssColor`), `CanvasThemeSync source="tokens"`, minimap role colours, one `typeColor` on design-kit's slot | `canvases/theme.ts`, `typeColor.ts`, every canvas's `ThemeBridge` | — |
+| P4 · schema and DAG boards | `SchemaBoard` (frames, schema cards, Detail templates, connect veto, hue binding), `LayeredDagBoard` | `canvases/model/*` but its data mapping (with `readToken` / `readLiveColors`), `layered/LayeredCanvas.tsx`, `taskflow/TaskFlowCanvas.tsx`, their JSON | `buildAllModelsData`, stitch semantics (`onConnect` veto, edge style), task / layered data mapping |
 | P5 · the rest | `useControlledSelection`, `captureThumbnail`, `useRenderPreference`, `GraphStore.positions`, `select(id)`, `isCanvasStateSnapshot` | the four `SelectionBridge`s, `captureBanner.ts`, `capturePositions`, the backend storage | — |
 
 | Phase | State |
 |---|---|
-| P0 · P1 · P2 | implemented — canvas `fix-2026-10-20-*` ×4 and `feat-2026-10-20-a-host-rebuilds-the-board-from-a-story` §8 |
-| P3 – P5 | accepted, not started |
+| P0 – P3 | implemented — canvas `fix-2026-10-20-*` ×4 and `feat-2026-10-20-a-host-rebuilds-the-board-from-a-story` §8 |
+| P4 – P5 | accepted, not started |
 
 | Rule | Detail |
 |---|---|
