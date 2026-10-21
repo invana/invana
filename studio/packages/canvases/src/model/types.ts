@@ -1,55 +1,45 @@
-import type { CanvasConfig } from "@invana/canvas";
+import {
+	SCHEMA_FRAME_EMPTY_TYPE,
+	SCHEMA_FRAME_TYPE,
+	type SchemaBoardSelection,
+} from "@invana/canvas-ui";
+import type { SchemaCardProperty, SchemaTypeData } from "@invana/graph";
+import { colorSlotByString } from "@invana/styling/color";
 
-/** The three templates the Detail switcher picks between. */
+/** The three Detail levels the board switches between. */
 export type Detail = "high" | "medium" | "low";
 
 /** `node.type` of a model's frame. A member's `type` is its qualified name. */
-export const MODEL_FRAME_TYPE = "model";
+export const MODEL_FRAME_TYPE = SCHEMA_FRAME_TYPE;
 
 /**
  * `node.type` of a model with no types drawn — a sized frame, not a group,
  * because ELK sizes a group from its members and reserves nothing for one
  * with none.
  */
-export const MODEL_EMPTY_TYPE = "model.empty";
+export const MODEL_EMPTY_TYPE = SCHEMA_FRAME_EMPTY_TYPE;
 
 /**
- * The placeholder binding in `settings.json` and `templates.json`. It is
- * expanded into one binding per member type the data carries.
+ * A model's slot in the palette, `1`–`8`, by its name — so a model keeps its
+ * hue when another is added, deleted or the list is re-sorted.
  */
-export const MEMBER_BINDING = "model.type";
-
-/** The structure name a template uses for "each type's own schema card". */
-export const SCHEMA_CARD = "schema:*";
+export const hueSlotForName = (name: string): number => colorSlotByString(name);
 
 export interface ModelFrameData {
 	name: string;
 	description: string;
 	/** The version drawn. */
 	version: string | null;
-	/** `1`–`8`, the `--color-data-N` slot. */
+	/** `1`–`8`, the theme's categorical slot. */
 	hue: number;
 }
 
-export interface ModelProperty {
-	name: string;
-	type: string;
-	/** A stitch keys on it. */
-	identity?: boolean;
-	/** The stitches that key on it. */
-	stitches?: string[];
-}
+/** A property; `tags` are the stitches that key on it. */
+export type ModelProperty = SchemaCardProperty;
 
-export interface ModelTypeData {
-	label: string;
+export interface ModelTypeData extends SchemaTypeData {
 	/** The model's name. */
 	model: string;
-	/**
-	 * The model's name when the type sits in its frame — what the card and hover
-	 * card print under the type. Absent on the unframed one-model canvas, where
-	 * the page already names the model.
-	 */
-	frame?: string;
 	/** `1`–`8`, the slot the type's own name hashes to. */
 	hue: number;
 	description: string;
@@ -59,9 +49,8 @@ export interface ModelTypeData {
 	stitchCount: number;
 	/** The first property a stitch keys on — the card's `key …` footer. */
 	identity?: string;
-	/** An anchor names this type — the card's *anchored* chip. */
-	anchored?: boolean;
-	properties: ModelProperty[];
+	/** `anchored` when an anchor names this type — the card's chip. */
+	badge?: string;
 }
 
 export interface ModelEdgeData {
@@ -88,7 +77,7 @@ export interface ModelFrameNode {
 
 export interface ModelTypeNode {
 	id: string;
-	/** `Model.Type` — the key the expanded bindings are written under. */
+	/** `Model.Type` — one binding per type, expanded by the board. */
 	type: string;
 	/** The model's frame. Absent on the model canvas, which draws one model unframed. */
 	parentId?: string;
@@ -109,6 +98,4 @@ export interface ModelGraphData {
 }
 
 /** What a click selected — a node or an edge, by its canvas id. */
-export type ModelCanvasSelection = { kind: "node" | "edge"; id: string } | null;
-
-export type GraphModelTemplates = Record<Detail, Partial<CanvasConfig>>;
+export type ModelCanvasSelection = SchemaBoardSelection;

@@ -21,8 +21,6 @@ import { Button, EmptyState } from "@invana/ui";
 import {
 	type CanvasBackend,
 	GraphModelCanvas,
-	graphModelSettings,
-	graphModelTemplates,
 	hueSlotForName,
 	type ModelCanvasSelection,
 } from "@invana-studio/canvases";
@@ -206,8 +204,6 @@ export function ModelCanvas({
 				) : (
 					<GraphModelCanvas
 						data={build.data}
-						settings={graphModelSettings}
-						templates={graphModelTemplates}
 						message="Hover a type for its properties, an edge for what it connects"
 						selected={canvasSelection}
 						onSelect={onCanvasSelect}

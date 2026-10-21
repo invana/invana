@@ -46,14 +46,15 @@ test("ME25 — the board draws the model, not an empty viewport", async ({
 	// The solve is un-animated: it settles, redraws and frames in one beat.
 	await page.waitForTimeout(8000);
 
-	// The types are coloured circles on a near-grey ground, so *saturation* is
-	// the signal — a pixel whose channels disagree is paint, and the dotted
-	// background never produces one. The clip is the top of the canvas, which
-	// leaves the minimap out: it reads the store directly and drew the model
-	// even while the viewport was empty, which is the bug this proves gone.
-	const shot = await page.screenshot({
-		clip: { x: 580, y: 100, width: 1010, height: 600 },
-	});
+	// The board takes the tab's height — a collapsed one draws nothing at all.
+	const board = page.locator("canvas").first();
+	const box = await board.boundingBox();
+	expect(box?.height ?? 0).toBeGreaterThan(300);
+
+	// The types are cards with dark names and edges on a light dotted ground,
+	// so *dark ink* is the signal — the dots never produce it. The shot is the
+	// canvas alone, so no chrome around it can stand in for the drawing.
+	const shot = await board.screenshot();
 	const painted = await page.evaluate(async (b64) => {
 		const img = new Image();
 		img.src = `data:image/png;base64,${b64}`;
@@ -70,11 +71,11 @@ test("ME25 — the board draws the model, not an empty viewport", async ({
 			const r = data[i];
 			const g = data[i + 1];
 			const bl = data[i + 2];
-			if (Math.max(r, g, bl) - Math.min(r, g, bl) > 40) n++;
+			if (Math.max(r, g, bl) < 110) n++;
 		}
 		return n;
 	}, shot.toString("base64"));
 
-	// A single 14px type circle is ~600px of paint; an empty viewport is 0.
+	// One card's name alone is a few hundred dark pixels; an empty viewport is 0.
 	expect(painted).toBeGreaterThan(300);
 });

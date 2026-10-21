@@ -15,10 +15,9 @@ export {
 	type LayeredEdge,
 	type LayeredNode,
 } from "./layered/LayeredCanvas";
-export { graphModelSettings, graphModelTemplates } from "./model";
-export { hueSlotForName } from "./model/config";
 export { GraphModelCanvas } from "./model/GraphModelCanvas";
 export {
+	hueSlotForName,
 	MODEL_EMPTY_TYPE,
 	MODEL_FRAME_TYPE,
 	type ModelCanvasSelection,

@@ -75,6 +75,8 @@ studio/.pnpm-store/
 
 # ─── Studio end-to-end tests ───
 studio/apps/*/e2e/.auth/
+# Screenshots e2e specs write while probing — never source.
+studio/apps/*/e2e/**/*.png
 studio/apps/*/test-results/
 studio/apps/*/playwright-report/
 studio/apps/*/blob-report/

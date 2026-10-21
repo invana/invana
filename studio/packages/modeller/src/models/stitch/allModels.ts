@@ -227,7 +227,7 @@ export function buildAllModelsData(
 					return {
 						name: m.property_key.name,
 						type: m.property_key.type,
-						...(pairs ? { identity: true, stitches: pairs } : {}),
+						...(pairs ? { identity: true, tags: pairs } : {}),
 					};
 				});
 			nodes.push({
@@ -246,7 +246,7 @@ export function buildAllModelsData(
 					propertyCount: properties.length,
 					stitchCount: stitched?.count ?? 0,
 					identity: properties.find((p) => p.identity)?.name,
-					anchored: stitched?.anchored ?? false,
+					...(stitched?.anchored ? { badge: "anchored" } : {}),
 					properties,
 				},
 			});

@@ -15,12 +15,7 @@
  */
 
 import { EmptyState, Spinner } from "@invana/ui";
-import {
-	type CanvasBackend,
-	GraphModelCanvas,
-	graphModelSettings,
-	graphModelTemplates,
-} from "@invana-studio/canvases";
+import { type CanvasBackend, GraphModelCanvas } from "@invana-studio/canvases";
 import { ActButton, useAccess } from "@invana-studio/shell";
 import { AlertTriangle, Boxes, Check } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
@@ -182,8 +177,6 @@ export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 				<div className="min-h-0 min-w-0 flex-1">
 					<GraphModelCanvas
 						data={build.data}
-						settings={graphModelSettings}
-						templates={graphModelTemplates}
 						title="All models"
 						backend={backend}
 						stitching={{

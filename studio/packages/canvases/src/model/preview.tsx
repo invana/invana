@@ -1,38 +1,6 @@
-import {
-	EdgePreviewCard,
-	NodePreviewCard,
-	type PreviewCardRow,
-} from "@invana/canvas-ui";
-import type { GraphEdge, GraphNode } from "@invana/graph";
-import {
-	MODEL_EMPTY_TYPE,
-	MODEL_FRAME_TYPE,
-	type ModelEdgeData,
-	type ModelTypeData,
-} from "./types";
-
-/** A type's hover card — its description and one row per property. */
-export function renderModelNode(node: GraphNode) {
-	if (node.type === MODEL_FRAME_TYPE || node.type === MODEL_EMPTY_TYPE)
-		return null;
-	const d = node.data as unknown as ModelTypeData;
-	// The card keys its rows by label, so the label is the unique name.
-	const rows: PreviewCardRow[] = d.properties.map((p) => ({
-		label: p.name,
-		value: [p.type, p.identity ? "key" : "", ...(p.stitches ?? [])]
-			.filter(Boolean)
-			.join(" · "),
-		mono: true,
-	}));
-	return (
-		<NodePreviewCard
-			title={d.label}
-			subtitle={d.description || undefined}
-			tags={d.frame ? [d.frame] : undefined}
-			rows={rows}
-		/>
-	);
-}
+import { EdgePreviewCard, type PreviewCardRow } from "@invana/canvas-ui";
+import type { GraphEdge } from "@invana/graph";
+import type { ModelEdgeData } from "./types";
 
 /** An edge's hover card — what kind it is, and a stitch's rule. */
 export function renderModelEdge(edge: GraphEdge) {
