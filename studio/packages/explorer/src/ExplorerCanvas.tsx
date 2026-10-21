@@ -24,6 +24,7 @@ import {
 	type DefaultBoardPanelsOptions,
 	GraphBoard,
 	type GraphBoardLayoutRun,
+	type GraphBoardProps,
 } from "@invana/canvas-ui";
 import type { GraphCanvas, GraphData } from "@invana/graph";
 import type { CanvasBackend } from "@invana-studio/canvases";
@@ -82,6 +83,15 @@ interface ExplorerCanvasProps {
 	panelOptions?: Omit<DefaultBoardPanelsOptions, "styling" | "onStylingChange">;
 	/** Studio's own panels, placed into the rail. */
 	panels?: (defaults: BoardPanelSpec[]) => BoardPanelSpec[];
+	/** The graph's annotations and who is looking (4.8). */
+	annotations?: Pick<
+		GraphBoardProps,
+		| "annotations"
+		| "onAnnotationCreate"
+		| "onAnnotationUpdate"
+		| "onAnnotationDelete"
+		| "annotationActor"
+	>;
 	children?: ReactNode;
 }
 
@@ -98,8 +108,25 @@ export function ExplorerCanvas({
 	menus,
 	panelOptions,
 	panels,
+	annotations,
 	children,
 }: ExplorerCanvasProps) {
+	// The annotation view rides on the board's styling record, but the board
+	// paints type styling and the view separately.
+	const { annotations: annotationView, ...typeStyling } = styling;
+	const onAnnotationViewChange = useCallback(
+		(next: NonNullable<CanvasStyling["annotations"]>) =>
+			onStylingChange({ ...styling, annotations: next }),
+		[styling, onStylingChange],
+	);
+	const onTypeStylingChange = useCallback(
+		(next: CanvasStyling) =>
+			onStylingChange({
+				...next,
+				...(annotationView ? { annotations: annotationView } : {}),
+			}),
+		[annotationView, onStylingChange],
+	);
 	const telemetry = useLayoutTelemetry(interactionRef, data.edges.length);
 	const expand = useCallback(
 		(nodeIds: string[]) => onExpand?.(nodeIds),
@@ -111,8 +138,11 @@ export function ExplorerCanvas({
 			preference={backend}
 			theme="tokens"
 			sizeByConnections
-			styling={styling}
-			onStylingChange={onStylingChange}
+			styling={typeStyling}
+			onStylingChange={onTypeStylingChange}
+			{...(annotations ?? {})}
+			{...(annotationView ? { annotationView } : {})}
+			onAnnotationViewChange={onAnnotationViewChange}
 			hoverDegree={magnet ? 1 : 0}
 			{...(onExpand ? { onExpand: expand } : {})}
 			{...(menus ? { menus } : {})}

@@ -256,6 +256,11 @@ BOARD_CREATE = "board.create"
 BOARD_UPDATE = "board.update"
 BOARD_DELETE = "board.delete"
 
+# Annotations (4.8)
+ANNOTATION_CREATE = "annotation.create"
+ANNOTATION_UPDATE = "annotation.update"
+ANNOTATION_DELETE = "annotation.delete"
+
 # ── Schedules, notifications, approvals ───────────────────────────────────────
 # docs/for-developers/modules/operate/features/schedules.md · notifications.md ·
 # approvals.md. A rule never matches a delivery or a reminder, so nothing it
@@ -308,6 +313,7 @@ TARGET_USER = "user"
 TARGET_QUERY = "query"
 TARGET_SESSION = "session"
 TARGET_BOARD = "board"
+TARGET_ANNOTATION = "annotation"
 TARGET_PROJECT = "project"
 TARGET_TASK = "task"
 TARGET_AGENT = "agent"

@@ -35,6 +35,7 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | EX-F11 | Assistant chat — centred to start, docked right once a conversation begins, closable | In Studio (chat) · New (centred start, close) | EX-01 · EX-02 · EX-13 |
 | EX-F14 | Layout presets — Network · Tree ↓ · Flow → · Radial, each with its options ([graph-canvas.md](../for-developers/modules/explore/features/graph-canvas.md) GC22) | New | EX-16 |
 | EX-F15 | Walkthrough — *Present* plays the board one answer at a time ([walkthrough.md](../for-developers/modules/explore/features/walkthrough.md)) | New | EX-17 |
+| EX-F17 | Annotate — annotations on the graph's records (a record, a value, a highlight, a group), kept with the graph and shown on every board that loads them ([§ Annotate](#annotate), [4.8](../for-developers/modules/explore/features/annotations.md)) | New | EX-19 |
 
 ## User stories
 
@@ -57,6 +58,7 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | EX-14 | analyst | the data on the board and every query this session ran, in a console under the board | I can read the rows without losing the picture | `explorer.answer.console` · `explorer.answer.console.json` · `explorer.answer.console.queries` · `explorer.answer.console.queries.step` · `explorer.answer.console.queries.empty` |
 | EX-16 | analyst | to switch the board between Network, Tree, Flow and Radial and tune each | one answer reads as a network, a hierarchy or a flow | `explorer.layout` · `explorer.layout.tree` · `explorer.layout.flow` · `explorer.layout.flow.orthogonal` · `explorer.layout.radial` · `explorer.layout.too_large` |
 | EX-17 | analyst | to present a board one answer at a time, with the question and the reply | I can show someone how I got there | `explorer.present` · `explorer.presenting` · `explorer.presenting.expansion` · `explorer.presenting.your_changes` · `explorer.presenting.step_failed` |
+| EX-19 | analyst | to annotate the records themselves — a node, a relationship, a value, a path, a cluster — and see what others and the assistant noted on them | whoever loads those records next sees what the data says, and a walkthrough can point at it | `explorer.board.annotate` · `….in_explore*` · `….read_only` · `….legend.*` · `….record.*` · `….annotation.*` · `….highlight` · `….group.*` · `….detail.*` · `….session.*` · `….explain.*` · `….sources.*` · `….loaded.*` |
 
 ## CLI
 
@@ -94,6 +96,21 @@ The simplest product. Prototype page: *Invana Explorer › Ask and look*.
 | A record opened | Clicking a node or relationship opens its card top-right on the board — name, type, provenance, properties — with *Ask about `<name>`* · *Expand* (a node) · *Hide*. The chat keeps the right side; opening a tool card closes the record card, they share the corner |
 | The strip | Tabs for the open canvases and *+*, nothing else; *Rename* and *Close* are on a tab’s menu |
 | The footer | Two zones. Left: the database and whether it is connected (`Neo4j 5.26 · connected`) · `195 nodes · 312 relationships` (opens Data) · `4 queries` (opens Queries, with a dot when one failed) · then the message line — a mode’s hint (*Shift + drag to select several*), progress (*Laying out 195 nodes…*), or what the pointer is over. Right: `3 selected · 87%` · the renderer and frame rate (`WebGPU · 59 fps`). The message is plain text, never a link, and truncates before the right zone |
+
+## Annotate
+
+Design canvas: *Explorer · Annotate* (<https://claude.ai/artifact/Mqr1mcEde4MN4Hdf5kmK2B>), staging for EX-19. The feature and its
+decisions are [4.8 Annotate the data](../for-developers/modules/explore/features/annotations.md).
+
+| Decision | Detail |
+|---|---|
+| On data | Every annotation is on records: a node, a relationship, one value, a set (highlight) or a group. Nothing free on the board |
+| One noun | *Annotation*, with an author — a person or the assistant. Tools in Annotate: Annotate · Highlight · Group |
+| The graph's | Stored by the engine against record ids, never on a board and never in the customer's database; any board that loads a record shows its annotations |
+| Sessions | Each annotation records the session it was written in. People's reach the graph; the assistant's stay in their session until a person adds them (*Add to the graph*) or dismisses them |
+| Evidence | The assistant's carry their query, what came back and the reply; where the graph cannot answer, a gap annotation, never a number |
+| Hide and show | The Legend's *Annotations* section, by author and kind, with *In full / Badges*; saved with the board. The Annotations panel lists, opens and acts |
+| Walkthrough | A step shows its own annotations whatever the Legend hides; authored steps come with slice 3 |
 
 ## Drawn, not built yet
 

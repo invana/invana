@@ -19,6 +19,7 @@ from invana.activity.models import (
     ScheduleFiring,
 )
 from invana.apps.agents.models import Agent
+from invana.apps.annotations.models import Annotation, AnnotationAnchor
 from invana.apps.boards.models import Board, BoardVersion
 from invana.apps.datasets.models import (
     Dataset,
@@ -91,6 +92,7 @@ from invana.runtime.models import (
 )
 from invana.server.admin.auth import SuperuserAuthProvider
 from invana.server.agents.admin import AgentView
+from invana.server.annotations.admin import AnnotationAnchorView, AnnotationView
 from invana.server.approvals.admin import ApprovalView
 from invana.server.auth.admin import (
     PersonalAccessTokenView,
@@ -372,6 +374,8 @@ def mount_admin(app: FastAPI) -> None:
             views=[
                 BoardView(Board, label="Boards", icon="fa fa-diagram-project"),
                 BoardVersionView(BoardVersion, label="Board versions", icon="fa fa-clock-rotate-left"),
+                AnnotationView(Annotation, label="Annotations", icon="fa fa-note-sticky"),
+                AnnotationAnchorView(AnnotationAnchor, label="Annotation anchors", icon="fa fa-anchor"),
             ],
         ),
     )

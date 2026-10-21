@@ -14,6 +14,12 @@
  * on a page body goes through `BoardPageHandle` (graph-detail-page.md).
  */
 
+export type { AnnotationDto } from "./annotations";
+export {
+	annotationsApi,
+	toBoardAnnotation,
+	useBoardAnnotations,
+} from "./annotations";
 export { explorerApi } from "./api";
 // Query results as canvas items, and a saved state as the engine reads it.
 export {

@@ -37,6 +37,52 @@ CREATE INDEX ix_agents_parent_agent_id ON agents (parent_agent_id);
 
 CREATE INDEX ix_agents_status ON agents (status);
 
+CREATE TABLE annotation_anchors (
+	id VARCHAR(36) NOT NULL, 
+	annotation_id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	record_id VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(annotation_id) REFERENCES annotations (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_annotation_anchors_annotation_id ON annotation_anchors (annotation_id);
+
+CREATE INDEX ix_annotation_anchors_graph_record ON annotation_anchors (graph_id, record_id);
+
+CREATE TABLE annotations (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	records JSON NOT NULL, 
+	prop VARCHAR(255), 
+	value_then JSON, 
+	text TEXT NOT NULL, 
+	label VARCHAR(255) NOT NULL, 
+	color VARCHAR(16) NOT NULL, 
+	author_kind VARCHAR(16) NOT NULL, 
+	created_by_id VARCHAR(36), 
+	session_id VARCHAR(36), 
+	message_id VARCHAR(36), 
+	reach VARCHAR(16) NOT NULL, 
+	promoted_by_id VARCHAR(36), 
+	evidence JSON, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(session_id) REFERENCES sessions (id) ON DELETE SET NULL, 
+	FOREIGN KEY(message_id) REFERENCES session_messages (id) ON DELETE SET NULL, 
+	FOREIGN KEY(promoted_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_annotations_created_by_id ON annotations (created_by_id);
+
+CREATE INDEX ix_annotations_graph_created ON annotations (graph_id, created_at);
+
+CREATE INDEX ix_annotations_session_id ON annotations (session_id);
+
 CREATE TABLE approvals (
 	id VARCHAR(36) NOT NULL, 
 	graph_id VARCHAR(36) NOT NULL, 

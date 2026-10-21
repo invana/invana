@@ -54,7 +54,7 @@ this map.** Feature numbers do not change.
 | Group | Modules (the feature numbers they hold) |
 |---|---|
 | Data | `graphs` 1.1 · `models` 1.2–1.8 · `imports` 2.x · `graph-connectors` 12.x |
-| Exploration | `explorer` 4.1 · 4.3 · `queries` 3.1 · 4.4 · `boards` 4.2 |
+| Exploration | `explorer` 4.1 · 4.3 · 4.8 · `queries` 3.1 · 4.4 · `boards` 4.2 |
 | Answers | `assistant` 3.2–3.3 · 3.5–3.8 · 3.10–3.13 · `projections` 3.4 · `memory` 8.x |
 | Work | `projects` 9.1 · 9.2 · 9.4 · 9.5 · 9.6 · 9.7 · 9.8 |
 | Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 · `notifications` 10.7 · 10.8 |
@@ -120,6 +120,7 @@ this map.** Feature numbers do not change.
 | 4.4 | [The console](modules/explore/features/the-console.md) | The rows and the query under the canvas that drew them | ✅ | — | ✅ | S12f |
 | 4.5 | [Share an answer](modules/explore/features/share-an-answer.md) | A live link or a frozen snapshot for members; PNG · CSV · Markdown for anyone else | ✅ | 🔵 | ✅ | C09 |
 | 4.7 | [Edit the graph's data](modules/explore/features/edit-the-graphs-data.md) | Add, change and delete nodes and relationships on the board in Edit mode, with the model's types and keys; unsaved until saved as one run | 🔵 | — | 🔵 | — |
+| 4.8 | [Annotate the data](modules/explore/features/annotations.md) | Annotations on records — a node, a relationship, a value, a path or a group — kept with the graph, shown on every board that loads them; hidden and shown from the Legend | 🔵 | — | 🔵 | — |
 
 ## 5 · [Agents](modules/agents/spec.md)
 

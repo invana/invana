@@ -21,6 +21,7 @@ from invana.activity.models import (  # noqa: F401
     ScheduleFiring,
 )
 from invana.apps.agents.models import Agent  # noqa: F401
+from invana.apps.annotations.models import Annotation, AnnotationAnchor  # noqa: F401
 from invana.apps.boards.models import Board, BoardVersion  # noqa: F401
 from invana.apps.datasets.models import (  # noqa: F401
     Dataset,

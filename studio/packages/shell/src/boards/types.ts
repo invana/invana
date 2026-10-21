@@ -37,6 +37,17 @@ interface EdgeTypeStyle {
 export interface CanvasStyling {
 	nodeTypes?: Record<string, NodeTypeStyle>;
 	edgeTypes?: Record<string, EdgeTypeStyle>;
+	/** How the board shows annotations — the Legend's switches and density (4.8 AN9). */
+	annotations?: {
+		density: "full" | "badges";
+		hidden: Partial<
+			Record<
+				"all" | "mine" | "others" | "assistant" | "highlight" | "group",
+				boolean
+			>
+		>;
+		hiddenIds?: readonly string[];
+	};
 }
 
 /** List-row shape — omits the heavy render blobs (snapshot/positions/banner). */

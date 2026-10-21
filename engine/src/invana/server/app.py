@@ -191,6 +191,7 @@ def create_app() -> FastAPI:
     """Build and return the Invana FastAPI application."""
     from invana.server.admin.views import mount_admin
     from invana.server.agents.routes import agents_router, atlas_agent_router
+    from invana.server.annotations.routes import annotations_router
     from invana.server.approvals.routes import approvals_router
     from invana.server.boards.routes import boards_router
     from invana.server.data_edits.routes import data_edits_router
@@ -313,6 +314,7 @@ def create_app() -> FastAPI:
     app.include_router(install_runs_router)
     app.include_router(templates_router)
     app.include_router(boards_router)
+    app.include_router(annotations_router)
     app.include_router(explorer_router)
     app.include_router(events_router)
     app.include_router(graph_events_router)

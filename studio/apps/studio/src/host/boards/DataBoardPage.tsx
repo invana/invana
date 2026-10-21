@@ -29,6 +29,7 @@
  * | History | this board's undo history | every work mode |
  * | Versions | the board's saved versions; a restore forks | every work mode |
  * | Element | the clicked element, its provenance, *Ask about* · *Expand* · *Hide*; editable in Edit | Explore · Edit |
+ * | Annotations | what is said about the loaded records, and the graph's other annotations | every work mode |
  * | Changes | what is unsaved, saved to the graph | Edit, and any mode while something is unsaved |
  * | Export | the board as an image or its data | every work mode |
  *
@@ -37,6 +38,11 @@
  * graph's model at its active version; Changes saves to the graph. Save is
  * disabled, with the reason, for a member below contributor, on a read-only
  * connection, and on a graph with no published model.
+ *
+ * **Annotate mode** (docs/for-developers/modules/explore/features/annotations.md):
+ * the graph's annotations are drawn on the records the board loaded and written
+ * back through the engine; a member below contributor reads them, with Annotate
+ * off in the picker. How they show is saved in the board's styling.
  */
 
 import type { BoardPanelSpec, ElementFooter } from "@invana/canvas-ui";
@@ -52,6 +58,7 @@ import type { CanvasBackend } from "@invana-studio/canvases";
 import {
 	type InteractionRef,
 	type QueryResultItem,
+	useAuth,
 	useGraphConnectionQuery,
 } from "@invana-studio/core";
 import type {
@@ -68,6 +75,7 @@ import {
 	ProvenanceBlock,
 	readProvenance,
 	saveBoardChanges,
+	useBoardAnnotations,
 } from "@invana-studio/explorer";
 import { useActiveVersionQuery } from "@invana-studio/modeller";
 import { type CanvasStyling, useAccess } from "@invana-studio/shell";
@@ -203,6 +211,29 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 						? "Publish a model to edit this graph's data."
 						: null;
 		const modelVersionId = activeVersion.data?.id;
+
+		// The graph's annotations (4.8): read by every member, written by a contributor.
+		const { user } = useAuth();
+		const boardSessionId = boardId ? sessionIdForTab(boardId) : null;
+		const boardAnnotations = useBoardAnnotations(username, graphSlug, {
+			me: user?.id ?? null,
+			sessionId: boardSessionId,
+		});
+		const annotations = useMemo(
+			() => ({
+				annotations: boardAnnotations.annotations,
+				onAnnotationCreate: boardAnnotations.onCreate,
+				onAnnotationUpdate: boardAnnotations.onUpdate,
+				onAnnotationDelete: boardAnnotations.onDelete,
+				annotationActor: {
+					id: user?.id ?? null,
+					canWrite: work.allowed,
+					...(work.reason ? { whyNot: work.reason } : {}),
+					canSaveView: true,
+				},
+			}),
+			[boardAnnotations, user?.id, work.allowed, work.reason],
+		);
 
 		const editingSessionId = editingCanvasId
 			? sessionIdForTab(editingCanvasId)
@@ -395,6 +426,7 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 						menus={menus}
 						panelOptions={panelOptions}
 						panels={panels}
+						annotations={annotations}
 					/>
 					{fineTuneVertex && (
 						<ExpandNeighboursDialog

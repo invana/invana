@@ -282,6 +282,7 @@ layers = [
     "invana.apps.task_plans",
     "invana.apps.explorer",
     "invana.apps.boards",
+    "invana.apps.annotations",
     "invana.apps.sessions",
     "invana.apps.agents",
     "invana.apps.skills",
