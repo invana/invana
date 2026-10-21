@@ -19,7 +19,7 @@ them.
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | Annotate a record | A node or a relationship; the card sits beside it and follows it through layout, pan and zoom |
+| C1 | Annotate a record | A node or a relationship; the card is drawn in the graph beside it, linked by a dashed line, and laid out with the data |
 | C2 | Annotate a value | One property of a record; the annotation keeps the value it was written against and says so when the value changes |
 | C3 | Highlight | A set of nodes or a path: the nodes ringed, the relationships among them marked |
 | C4 | Group | A labelled frame around two or more nodes, recomputed from where they are |
@@ -70,7 +70,7 @@ flowchart TD
 | A viewer | Every annotation shows; Annotate is off in the picker: *You can view annotations — ask an admin to annotate* |
 | Someone else's annotation | Shows their initials; delete is off: *Only Priya Nair can delete it* |
 | Save fails | The card keeps its text and says *Couldn't save · Try again* |
-| Crowded board | Cards keep beside their record, moved only as far as needed to clear another card, a label or the chrome |
+| Crowded board | A new card takes the nearest spot clear of every node and card; the next layout run places every card with the data, so none overlaps a node or another card |
 | Hidden on the board | Saved with the board; the panel says how many are hidden, with *Show* |
 | Present | A walkthrough step shows its own annotations whatever the Legend hides |
 
@@ -78,12 +78,12 @@ flowchart TD
 
 | Surface | Where | Component | Reads / writes |
 |---|---|---|---|
-| Annotation layer | the board | canvas-ui `AnnotationsOverlay` over `GraphBoard` | `annotations` prop |
+| Annotation layer | the board | canvas-ui `AnnotationsProjection` — cards, links, rings, member frames and count pills as graph elements — and `AnnotationsOverlay` for the editor, the group name and the format bar, over `GraphBoard` | `annotations` prop |
 | Annotate tools | the row, in Annotate | canvas-ui `ANNOTATE_TOOLS` (annotate · highlight · group) | `onAnnotationCreate` |
 | Format bar | over the selected annotation | canvas-ui `AnnotationFormatBar` | `onAnnotationUpdate` · `onAnnotationDelete` |
 | Annotations panel | the rail | canvas-ui `AnnotationsViewPanel` (list · record · detail) | the same callbacks |
 | Legend section | the Legend panel | canvas-ui `LegendViewPanel` *Annotations* | `annotationView` · `onAnnotationViewChange` |
-| Card, row, author mark | — | `@invana/ui` `AnnotationCard` · `AnnotationRow` · `AuthorMark` | — |
+| Card, row, author mark | — | the card in the graph: `@invana/graph` `annotationTemplates()`; the panel's row and author mark: `@invana/ui` `AnnotationRow` · `AuthorMark` (`AnnotationCard` kept for off-board surfaces, slice 2) | — |
 | Host | Explorer board | Studio `useAnnotations` | `GET/POST/PATCH/DELETE …/annotations`; the hides in the board's `styling.annotations` |
 
 ## Engine
@@ -161,13 +161,13 @@ flowchart TD
 | AN8 | **Who.** Contributors and up write; every member reads; only the author changes or deletes a person's annotation |
 | AN9 | **Hidden is the board's.** The Legend's eyes and *In full / Badges* are saved in the board's `styling.annotations`, so everyone who opens the board sees the same; a viewer's toggles stay theirs and are not saved |
 | AN10 | **Colours are tokens.** `amber` `--warning` · `blue` `--primary` · `green` `--success` · `red` `--destructive` · `grey` `--muted-foreground` |
-| AN11 | **Cards never cover cards.** A card keeps beside its record unless that covers another card, a group's label, a node's label or the board's chrome; then it takes the nearest free spot, its leader line kept |
+| AN11 | **An annotation is part of the graph.** A card, its link, a highlight's rings, a group's frame and a badge's pill are graph elements the board draws from the host's annotations — never data: they are not saved, counted, typed, exported or undone. Layouts place cards like any node, so the layout considers them and an image export carries them. A group is a member frame round its records; it never re-parents them. Hiding annotations removes them, and the records stay where they are |
 
 ## Delivery
 
 | Slice | What | Status |
 |---|---|---|
-| 1 | People's annotations: engine table and routes, the layer, the tools, the Annotations panel, the Legend section, Studio wiring, stories | built — engine, canvas-ui, kit and Studio; uncommitted |
+| 1 | People's annotations: engine table and routes, the layer, the tools, the Annotations panel, the Legend section, Studio wiring, stories; cards drawn in the graph (AN11) | built — committed as the baseline, then the drawing moved into the graph |
 | 2 | The assistant's annotations: session reach, Add to the graph / Dismiss, evidence, gaps, *Explain this*, *From* (this session · + the graph · all sessions), conflicts | not started |
 | 3 | Authored walkthrough steps that show chosen annotations | not started — reverses [walkthrough](walkthrough.md) *Not building* rows on editing and reordering steps |
 
@@ -175,9 +175,9 @@ flowchart TD
 
 | Gap | Why it waits |
 |---|---|
-| Image export without the annotations | the overlay is DOM over the canvas; the export captures the canvas's pixels only. It needs the overlay composited into the export |
+| A card placed clear of the board's chrome | a new card avoids nodes and cards, not the row, rail, open panel or dock; it can sit under an open panel until the next layout run |
 | *Load* on an annotation elsewhere in the graph | the engine has no load-records-by-id route the board can call; the panel omits *Load* until it does |
-| Moving a card by hand | cards are placed by the layout pass; a dragged offset is not stored yet |
+| Moving a card by hand that survives a reload | a card can be dragged; its place is not stored with the annotation yet |
 | A deleted record listed as *its record was deleted* | the engine does not yet check the graph for the record; such an annotation lists as *elsewhere* |
 
 ## Not building

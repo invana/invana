@@ -12,7 +12,12 @@
  * because the count is graph-wide.
  */
 
-import type { GraphCanvas, GraphLayer, GraphStore } from "@invana/graph";
+import {
+	type GraphCanvas,
+	type GraphLayer,
+	type GraphStore,
+	isAnnotationElement,
+} from "@invana/graph";
 import { colorByString } from "@invana/styling/color";
 import { cn, PanelStack, ScrollArea } from "@invana/ui";
 import {
@@ -112,7 +117,8 @@ export function ExplorerViewPanel({
 	const drawn = useMemo(() => {
 		if (!store) return new Set<string>();
 		const seen = new Set<string>();
-		for (const node of store.nodes()) if (node.type) seen.add(node.type);
+		for (const node of store.nodes())
+			if (node.type && !isAnnotationElement(node)) seen.add(node.type);
 		return seen;
 	}, [store]);
 

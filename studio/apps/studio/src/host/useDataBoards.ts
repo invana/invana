@@ -1,5 +1,9 @@
 import { canUseWebGPU } from "@invana/canvas-react";
-import type { GraphCanvas, GraphLayer } from "@invana/graph";
+import {
+	type GraphCanvas,
+	type GraphLayer,
+	isAnnotationElement,
+} from "@invana/graph";
 import type { useSessions } from "@invana-studio/assistant";
 import {
 	sessionsApi,
@@ -329,6 +333,8 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		// Iterate the live store (source of truth for what's painted) rather than
 		// canvasData, which can lag/diverge across restore + backend remount.
 		for (const n of store.nodes()) {
+			// An annotation's card is the board's drawing, redrawn from its annotation.
+			if (isAnnotationElement(n)) continue;
 			const p = store.getPosition(String(n.id));
 			if (p) positions[String(n.id)] = { x: p.x, y: p.y };
 		}
@@ -345,6 +351,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		if (!store || store.nodeCount() === 0) return [];
 		const items: QueryResultItem[] = [];
 		for (const n of store.nodes()) {
+			if (isAnnotationElement(n)) continue;
 			items.push({
 				id: String(n.id),
 				type: "vertex",
@@ -353,6 +360,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 			});
 		}
 		for (const e of store.edges()) {
+			if (isAnnotationElement(e)) continue;
 			items.push({
 				id: String(e.id),
 				type: "edge",
