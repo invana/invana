@@ -78,7 +78,7 @@ flowchart TD
 
 | Surface | Where | Component | Reads / writes |
 |---|---|---|---|
-| Annotation layer | the board | canvas-ui `AnnotationsProjection` — cards, links, rings, member frames and count pills as graph elements — and `AnnotationsOverlay` for the editor, the group name and the format bar, over `GraphBoard` | `annotations` prop |
+| Annotation layer | the board | canvas-ui `AnnotationsProjection` — cards, links, rings and count pills as graph elements, a group's frame on graph's `GroupFramesLayer` under them — and `AnnotationsOverlay` for the editor, the group name and the format bar, over `GraphBoard` | `annotations` prop |
 | Annotate tools | the row, in Annotate | canvas-ui `ANNOTATE_TOOLS` (annotate · highlight · group) | `onAnnotationCreate` |
 | Format bar | over the selected annotation | canvas-ui `AnnotationFormatBar` | `onAnnotationUpdate` · `onAnnotationDelete` |
 | Annotations panel | the rail | canvas-ui `AnnotationsViewPanel` (list · record · detail) | the same callbacks |
@@ -161,7 +161,7 @@ flowchart TD
 | AN8 | **Who.** Contributors and up write; every member reads; only the author changes or deletes a person's annotation |
 | AN9 | **Hidden is the board's.** The Legend's eyes and *In full / Badges* are saved in the board's `styling.annotations`, so everyone who opens the board sees the same; a viewer's toggles stay theirs and are not saved |
 | AN10 | **Colours are tokens.** `amber` `--warning` · `blue` `--primary` · `green` `--success` · `red` `--destructive` · `grey` `--muted-foreground` |
-| AN11 | **An annotation is part of the graph.** A card, its link, a highlight's rings, a group's frame and a badge's pill are graph elements the board draws from the host's annotations — never data: they are not saved, counted, typed, exported or undone. Layouts place cards like any node, so the layout considers them and an image export carries them. A group is a member frame round its records; it never re-parents them. Hiding annotations removes them, and the records stay where they are |
+| AN11 | **An annotation is part of the graph.** A card, its link, a highlight's rings and a badge's pill are graph elements, and a group's frame is painted on a layer under the graph; the board draws them from the host's annotations — never data: they are not saved, counted, typed, exported or undone. Layouts place cards like any node, so the layout considers them and an image export carries them. A group is a frame round its records, read off their places every frame; it is not a node, never re-parents them and no layout places it. Hiding annotations removes them, and the records stay where they are |
 
 ## Delivery
 
