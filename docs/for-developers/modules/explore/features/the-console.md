@@ -110,6 +110,7 @@ flowchart TD
 | CO14 | **The footer says what a mode does.** Picking Select, Box or Lasso puts its gesture in the message line (*Shift + drag a rectangle…*); the message line never carries an action. |
 | CO15 | **The footer counts a layout while it solves.** The message line reads *Laying out N nodes · done / total* until the solve settles, then *Graph ready* — the canvas is empty for a reason, and the line says which ([GC19](graph-canvas.md#decisions)). What the pointer is over still takes the line first. |
 | CO16 | **The footer says when edges are thinned.** While a dense result is zoomed out past the thinning threshold, the view zone leads with *About 1 in 10 relationships drawn · zoom in for all* ([GC20](graph-canvas.md#decisions)); it goes the moment every edge is drawn again. |
+| CO17 | **The footer says where the view is, and copies it.** The right zone shows one view chip, `87% · 1,240, −380`: the zoom, then the **world point at the centre of the viewport**. It uses the centre rather than a corner because the centre means the same view on any screen size. The chip updates when a pan or zoom settles, never per frame, so the footer does not repaint with the canvas. Clicking it copies the view (`{x, y, zoom}`), and that is the value a shared or collaborative view restores. |
 
 ## Not building
 

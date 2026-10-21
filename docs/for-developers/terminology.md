@@ -145,6 +145,7 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Inspector** | The surface that states what is selected and edits it. The canvas selects; the Inspector edits. |
 | **Console** | The rows behind a drawing, and the query that drew them. |
 | **Annotation** | What a person or the assistant says about the graph's records — on a node, a relationship, one of its values, a set or a group of them — kept with the Graph, so every board that loads the records shows it. Its kinds are the anchor's shape; never *note*, *callout* or *comment* as separate things, and never a shape drawn free on the board. [4.8](modules/explore/features/annotations.md) |
+| **Walkthrough** | A board's answers replayed one **step** at a time — each step is the reply that drew it. *Presenting* is its read-only mode. [4.6](modules/explore/features/walkthrough.md) |
 | **Runs** | The journal of every TaskRun in a Graph — newest first, delegated children nested under their parent. **Imports** is this journal with `kind in (import, bulk)` preselected, and a Todo's `Runs` tab is it filtered to one Todo. Never "Jobs", never "Thoughts". **This renames the surface**: *Runs* was forbidden while a run was called a thinking; now `TaskRun` is the record and the journal takes its name. [10.5](modules/operate/features/see-what-ran.md) |
 | **Activity** | The tree of *events* — who wrote what, on whose behalf. Runs lists runs; Activity lists writes. Neither is the other. [10.2](modules/operate/features/audit-and-activity.md) |
 | **Explorer** | The screen the canvas is on — the `leftNav` item, the breadcrumb crumb and the `Explorer · …` artboards all name the same thing: the canvas, and what is selected on it. It is not the page (the graph's URL is the page) and it is not the tab strip (that is Boards). |
@@ -240,6 +241,7 @@ sub-slots, the URL params and the retired words are in
 | Subgraph (for a narrowed view) | **Lens**, named | *subgraph* already means an [emission](#4-asking-and-answering), and a second meaning would make both unreadable |
 | Scope (for what a run may see) | **Lens** | `rules.scope` already means `graph \| project`, and one word for two bounds hides both |
 | Note · callout · comment (on the board) | **Annotation** | one noun with an author; the kind is the anchor's shape ([4.8](modules/explore/features/annotations.md) AN2) |
+| Playbook (for replaying a board) | **Walkthrough** | *playbook* is what a Skill is. `playbook` stays the canvas package's word for the mechanism; the product never says it about a board |
 | Ground · grounding (as a record) | **Lens** | *Grounded* is a setup gate; grounding is what the product does, a lens is the thing that bounds it |
 | Orchestrator, unqualified | **agent orchestrator** for what Invana is · **runtime** for the thing that interprets a plan and dispatches its Tasks | the bare word means Airflow or Temporal to most readers; qualify it the way *graph connector* is qualified |
 | Connector, unqualified | **graph connector** | the bare word is reserved for a future source connector — a mailbox, a bucket, an API |

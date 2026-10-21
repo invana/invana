@@ -243,6 +243,8 @@ whole feature; a feature drawn only on its happy path is not drawn. The rules ar
 | [The Plan Page](https://claude.ai/artifact/Pt7EHjT74GcDxpiQ3LDwy3) | [7.1 Save a plan for reuse](modules/workflows/features/the-library.md) — a published plan as a report header over Overview · Layers · Flow · Activity, with the drawer's drill-in on the left — 9 artboards | Library › Plans › The plan page | **current.** Supersedes `library.plans.detail.overview`, `…overview.folded` and `…flow_canvas` on Govern, Agents and Skills (the two-reading `Overview ¦ Flow` switch); the draft, versions, arguments, export, retire and ceilings boards there stand |
 | [The Model Page](https://claude.ai/artifact/VjqhkUx3sYHJqM3FccEt9q) | [1.8 The model page](modules/connect-and-model/features/the-model-page.md) — Models as one page, Overview · Model · Database · Usage · Performance · Growth, with the model as a filter — 19 artboards | Models › The model page | **current.** Supersedes *All models* and *Global model* as separate destinations on *Modeller and Stitching* (T1 · T4); that canvas's declare, refusal, staged and remove boards stand, drawn on what is now the Model tab |
 | [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | the nine features nothing else drew — 11 artboards | D · F · G · J · A, by [sequence](the-sequence.md) block | current. **Its pages are blocks, not features** — the one canvas that predates the rule, and the next pass on any of its features re-pages it |
+| [Explorer Chrome](https://claude.ai/artifact/LL9XjrbaaBjDZdvLL5T8FR) | the review round for [4.1](modules/explore/features/graph-canvas.md) GC21–GC24 · [4.4](modules/explore/features/the-console.md) CO17 · [4.6](modules/explore/features/walkthrough.md) — 24 artboards | Explore › Graph canvas — 4.1 · Explore › Walk through an answer — 4.6 | **superseded by [Invana Products](https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg)** — the chrome is shared (`_shared/invana_chrome.py`: `explorer_tools` · `ftool` · `viewctl` · the footer's view chip) and the boards are Explorer stories EX-16 (layouts) and EX-17 (presenting). Its generator still supplies the drawings (`p_present.py` imports `ec.py`) |
+| [Explorer Element Panel](https://claude.ai/artifact/GDFt8Mz14gGz4ffeJgthRd) | the review round for the board's Element panel — one node, relationship or group, viewed and edited; property keys from the model (strict or open), each key once; canvas-ui `ElementViewPanel` · `ElementEditorPanel` — 26 artboards | one | current. The strict boards ship to Studio as Invana Products EX-21 ([explorer.md](../products/explorer.md)) |
 | *Governance · the lens in the UI* (`8591piJHezfLsUoSZXn3z8`) | Govern, first pass — 7 artboards | one | **superseded.** Kept so the D1 option comparison can be re-read |
 | *Skills · and the left rail* (`7c565h2z9irbFBwu1S1ebH`) | [6 Skills](modules/skills/spec.md), the Library panel and the rail — 6 artboards | one | **superseded for 6.1–6.4.** Its `Library` and `RailMap` artboards are still the reference for [7.1](modules/workflows/features/the-library.md) and the rail itself |
 | *The Tasks Panel* (`9sAby5rPvkjMLb9BcdCom4`) | the Tasks panel and what it drills into — rows 34b–34q above | four | current |
@@ -841,6 +843,25 @@ as Studio builds them in migration session C09. Decisions are in
 | `explorer.answer.share` | EX-15 | *Share* on an answer's reply line — live link · frozen snapshot (`/explorer?page=run:<id>@<version>`) · PNG · CSV · Markdown | ✅ |
 
 ---
+
+## Beyond the 42 · Explorer chrome
+
+Drawn first on Explorer Chrome, now on [Invana Products](https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg) — `explorer.layout*` (EX-16) and `explorer.present*` (EX-17); the chrome is on every Explorer and Modeller board. Nothing here is built yet.
+
+| Artboard | Draws | Feature | Built |
+|---|---|---|---|
+| `explore.graph_canvas.toolbar` | The toolbar as one light row top-left; legend bottom-left, minimap above zoom | 4.1 GC21 · GC24 | — |
+| `explore.graph_canvas.toolbar.tools_off` | Tools off — the three select modes and Show the tools | 4.1 GC21 | — |
+| `explore.graph_canvas.toolbar.folded` | A narrow board — the row folds from the end into ⋯ | 4.1 GC21 | — |
+| `explore.graph_canvas.layout` | The Layout popover — four preset cards, then the active preset's options | 4.1 GC22 | — |
+| `explore.graph_canvas.layout.tree` | Tree ↓ — ELK layered top to bottom, orthogonal edges | 4.1 GC22 | — |
+| `explore.graph_canvas.layout.flow` · `.flow.orthogonal` | Flow → — left to right, curved edges; then Edges set to Orthogonal and *Reset to Flow →* | 4.1 GC22 | — |
+| `explore.graph_canvas.layout.radial` · `.radial.options` | Radial around the selection; its options (no Direction, Centre) | 4.1 GC22 | — |
+| `explore.graph_canvas.layout.too_large` | The three ELK presets disabled past 3,000 nodes | 4.1 GC22 | — |
+| `explore.graph_canvas.overlay` · `.layers` · `.history` · `.none` | A form card dropping from its button at the toolbar's left end, one at a time; legend and minimap off | 4.1 GC24 · 4.2 CV6 | — |
+| `explore.graph_canvas.view_chip` · `.copied` | The footer's view chip, and the copy confirmed | 4.4 CO17 | — |
+| `explore.walkthrough.present` · `.one_answer` | *Present* ends the toolbar; with one answer it is not there | 4.6 WT3 | — |
+| `explore.walkthrough.presenting` · `.first` · `.expansion` · `.your_changes` · `.playing` · `.step_failed` | Presenting: the toolbar collapsed to ◀ n/N ▶ ✕, the bar with the question and the assistant's message, and each state | 4.6 WT2 · WT4 · WT7 · seams | — |
 
 ## The other direction — every feature, and the screen that draws it
 
