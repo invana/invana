@@ -196,7 +196,8 @@ configuration and **seams** — callbacks for what needs the engine. The canvas 
 |---|---|
 | P0 – P3 | implemented — canvas `fix-2026-10-20-*` ×4 and `feat-2026-10-20-a-host-rebuilds-the-board-from-a-story` §8 |
 | P4 · schema board | implemented — `SchemaBoard`, `detailConfig` / `useDetailTemplates`, `schemaCardStructure`, the categorical hue lookup, frame styling lookups, `fitCamera.maxZoom`; Studio's `model/config.ts`, `settings.json` and `templates.json` deleted |
-| P4 · DAG board · P5 | accepted, not started |
+| P4 · DAG board | implemented — `LayeredDagBoard` (panel and app faces, tones and a legend strip, seeded columns, connect with a veto, Detail levels); Studio's `LayeredCanvas` and `TaskFlowCanvas` are data mappings over it |
+| P5 | accepted, not started |
 
 | Rule | Detail |
 |---|---|
