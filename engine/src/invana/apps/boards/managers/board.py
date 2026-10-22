@@ -40,6 +40,7 @@ class BoardManager:
         sort: str = "updated",
         include_archived: bool = False,
         kind: str | None = None,
+        session_id: str | None = None,
     ) -> tuple[list[Board], int]:
         items = await self.boards_qs.list_for_graph(
             session,
@@ -49,9 +50,10 @@ class BoardManager:
             sort=sort,
             include_archived=include_archived,
             kind=kind,
+            session_id=session_id,
         )
         total = await self.boards_qs.count_for_graph(
-            session, graph_id=graph_id, include_archived=include_archived, kind=kind
+            session, graph_id=graph_id, include_archived=include_archived, kind=kind, session_id=session_id
         )
         return items, total
 

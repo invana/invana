@@ -44,6 +44,8 @@ async def list_boards(
     sort: Literal["updated", "created"] = Query(default="updated"),
     include_archived: bool = Query(default=False),
     kind: BoardKindName | None = Query(default=None),
+    # A session has at most one board; this is how a caller finds it.
+    session_id: str | None = Query(default=None),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
@@ -56,6 +58,7 @@ async def list_boards(
         sort=sort,
         include_archived=include_archived,
         kind=kind,
+        session_id=session_id,
     )
     return BoardListResponse(items=[BoardSummary.model_validate(b) for b in items], total=total)
 

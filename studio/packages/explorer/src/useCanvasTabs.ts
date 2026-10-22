@@ -195,6 +195,24 @@ export function useCanvasTabs(deps: CanvasTabsDeps) {
 				return;
 			}
 			void (async () => {
+				// The cached list is one page and may still be loading (a reload
+				// opens the session from the path first), so a miss there is not
+				// "no board" — ask the engine for this session's board before
+				// creating one, or the create is a refused second board.
+				try {
+					const found = await boardsApi.list(
+						username as string,
+						graphSlug as string,
+						{ sessionId, limit: 1, includeArchived: true },
+					);
+					const own = found.items[0];
+					if (own) {
+						await openCanvasTab(own.id);
+						return;
+					}
+				} catch {
+					// Fall through to create; a real conflict still surfaces below.
+				}
 				await persistActiveCanvas();
 				try {
 					const created = await createCanvas.mutateAsync({
@@ -235,6 +253,8 @@ export function useCanvasTabs(deps: CanvasTabsDeps) {
 			setActiveBoardId,
 			setOpenTabs,
 			restoredRef,
+			username,
+			graphSlug,
 		],
 	);
 

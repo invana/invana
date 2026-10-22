@@ -21,6 +21,7 @@ class BoardQuerySet:
         sort: str = "updated",
         include_archived: bool = False,
         kind: str | None = None,
+        session_id: str | None = None,
     ) -> list[Board]:
         # Shared graph-wide: scoped by graph only, NOT by creator. Pinned float
         # to the top; within each group, newest by the chosen field.
@@ -34,6 +35,8 @@ class BoardQuerySet:
         )
         if kind is not None:
             stmt = stmt.where(Board.kind == kind)
+        if session_id is not None:
+            stmt = stmt.where(Board.session_id == session_id)
         if not include_archived:
             stmt = stmt.where(Board.archived.is_(False))
         return list((await session.execute(stmt)).scalars().all())
@@ -45,10 +48,13 @@ class BoardQuerySet:
         graph_id: str,
         include_archived: bool = False,
         kind: str | None = None,
+        session_id: str | None = None,
     ) -> int:
         stmt = select(func.count()).select_from(Board).where(Board.graph_id == graph_id)
         if kind is not None:
             stmt = stmt.where(Board.kind == kind)
+        if session_id is not None:
+            stmt = stmt.where(Board.session_id == session_id)
         if not include_archived:
             stmt = stmt.where(Board.archived.is_(False))
         return int((await session.execute(stmt)).scalar_one())

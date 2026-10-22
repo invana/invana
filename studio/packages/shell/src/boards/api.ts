@@ -56,6 +56,8 @@ export interface BoardListOptions {
 	offset?: number;
 	sort?: BoardSort;
 	includeArchived?: boolean;
+	/** The board backed by this session — a session has at most one. */
+	sessionId?: string;
 }
 
 /** Body for creating a canvas — the backing session plus the live view state. */
@@ -141,6 +143,7 @@ export const boardsApi = {
 		if (opts?.offset != null) params.set("offset", String(opts.offset));
 		if (opts?.sort != null) params.set("sort", opts.sort);
 		if (opts?.includeArchived) params.set("include_archived", "true");
+		if (opts?.sessionId) params.set("session_id", opts.sessionId);
 		const qs = params.toString();
 		const data = await request<ApiListResponse>(
 			`${base(username, graphSlug)}${qs ? `?${qs}` : ""}`,

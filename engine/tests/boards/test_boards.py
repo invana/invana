@@ -99,6 +99,22 @@ async def test_second_board_for_same_session_is_409(session, graph, user, graph_
         )
 
 
+async def test_list_by_session_finds_its_board_or_nothing(session, graph, user, graph_session):
+    """Opening a session asks for its board by session id, not by scanning a page of boards."""
+    board = await boards.create(
+        session, graph_id=graph.id, user_id=user.id, payload=BoardCreate(session_id=graph_session.id)
+    )
+    items, total = await boards.list_for_graph(
+        session, graph_id=graph.id, limit=1, offset=0, session_id=graph_session.id
+    )
+    assert total == 1 and items[0].id == board.id
+
+    items, total = await boards.list_for_graph(
+        session, graph_id=graph.id, limit=1, offset=0, session_id="00000000-0000-0000-0000-000000000000"
+    )
+    assert total == 0 and items == []
+
+
 # ── The kind axis ────────────────────────────────────────────────────────────
 
 
