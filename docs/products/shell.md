@@ -69,7 +69,7 @@ Not a product. The layout and the features that appear in all five. Prototype pa
 | SH-F3 | Breadcrumbs with overflow | New | SH-05 |
 | SH-F4 | ⌘K palette | New | SH-06 |
 | SH-F5 | User menu: hide assistant, tools always shown | New | SH-07 |
-| SH-F6 | Runs journal and the run page | In Studio | SH-08 · SH-09 · SH-10 · SH-11 |
+| SH-F6 | Runs journal; a run opens on the Agents run page ([agent-fabric.md](agent-fabric.md)) | In Studio | SH-08 · SH-10 · SH-11 |
 | SH-F12 | Re-run on the same or current versions | In Studio (C09) | SH-18 |
 | SH-F13 | First run — three ways in | New | SH-19 |
 | SH-F14 | Read-only without the role, acts say who can | In Studio (C07) | SH-20 |
@@ -91,7 +91,6 @@ Not a product. The layout and the features that appear in all five. Prototype pa
 | SH-06 | anyone | ⌘K to jump to any record, model, run or schedule, or ask | I reach anything without the nav | `shell.command_palette` |
 | SH-07 | anyone | to hide the assistant or keep tools always shown | the product works my way | `shell.user_menu` |
 | SH-08 | anyone | every run from every product in one journal | I see what happened, wherever it started | `shell.runs` · `shell.activity.runs` |
-| SH-09 | anyone | to read a run: tokens, the model version it ran on, timeline, what it touched, its log and each step | I can trust or question it | `shell.run.overview` · `shell.run.touched` · `shell.run.log` · `shell.run.step` |
 | SH-10 | builder | a failed run to say which step broke and why | I fix the cause, not the symptom | `shell.run.failed` |
 | SH-11 | analyst | to compare two runs of one question | I see what a world or a change did | `shell.run.compare` |
 | SH-12 | approver | to see exactly what a run will send before it goes | nothing leaves without a person | `shell.activity.approvals` · `shell.run.approval` |
@@ -101,7 +100,7 @@ Not a product. The layout and the features that appear in all five. Prototype pa
 | SH-16 | anyone | rules that say which events reach whom, on which channel | failures and slowdowns find the right person | `shell.notifications.rules` · `shell.notifications.rule` · `shell.notifications.channels` |
 | SH-18 | anyone | to re-run a run on the exact model version it used, or on the current one | old results can be reproduced after a model upgrade | `shell.run.rerun` |
 | SH-19 | first user of a new install | to be asked what I am deciding and offered three ways in | an empty install is a start, not a wall | `shell.first_run` |
-| SH-20 | member without a role | to read a product and see who can act, instead of a dead end | I learn what exists and who to ask | `agents.skills.detail.readonly` |
+| SH-20 | member without a role | to read a product and see who can act, instead of a dead end | I learn what exists and who to ask | `agents.skill.locked` |
 | SH-17 | member | to manage my profile and access tokens | the CLI and API work as me | `shell.profile` · `shell.profile.tokens` |
 
 ## CLI
@@ -137,6 +136,7 @@ One binary, `invana`, for every product. Prerequisites are in the [README](READM
 
 | Decision | Detail |
 |---|---|
+| A detail page's head is its breadcrumb | One row in Agents, IAM and Modeller: the section's own rail icon in a tile, the section (and any parent) as links back, then the page's name, its chips and acts — `RecordHeader` with `variant="page"`, the section's `icon` (tinted by `iconTone`) and the section as a link crumb; never a second header component. The header then carries only the Graph. A page with no head of its own — a canvas, a modal flow over a list — keeps the header crumb |
 | Schedules are shared | A schedule needs no project; it names an agent + instructions (or a skill), a cron, delivery channels |
 | A schedule’s plan | Generated from its instructions, like a skill’s; edits regenerate and are logged |
 | Outward actions | Anything sent outside Invana waits for approval unless switched off per schedule |

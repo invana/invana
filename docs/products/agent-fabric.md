@@ -10,45 +10,62 @@ budget and end, where their work runs, who approves what, and how every act is r
 | For | builders · operators · reviewers · install admins |
 | Scope | One Graph; workers, pools and join tokens are install-wide |
 | Shell | header · **icon rail** · workbook tabs · a **page** or a **canvas** · the **assistant** docked right (collapsible) · the console under a canvas · footer |
-| Rail | Home · Fleet, Functions, Skills, Agents · Runs, Workers · Approvals, Ledger · Settings |
+| Rail | Home · Fleet, Performance · Agents, Skills, Functions, Connections, LLMs · Runs, Workers · Approvals, Ledger · Settings (the gear at its foot) |
 | Core rules | Agents are records, not processes. Workers are interchangeable and run any agent's steps. Every act is one function call and one ledger row. A canvas only where structure is the point; everything with numbers, lists or forms is a page |
 
 ## Features
 
 | ID | Feature | Status | Stories |
 |---|---|---|---|
-| AF-F1 | Home — a clean composer and eight boards to open | New | AF-01 |
-| AF-F2 | Fleet — agents → skills → namespaces → pools on one canvas; the list in the console | New | AF-01 |
-| AF-F3 | Functions and plans — the library by namespace, packaged plans, generated plans, as tables; a plan opens as a flow | New (registry ✅ B06b, dotted names new) | AF-02 |
-| AF-F4 | Skill builder — `instructions.md` as a document, its allowlist, a plan preview; tests, evals, exceptions | New | AF-03 · AF-04 |
-| AF-F5 | Agent builder — identity, skills, instructions; reach, limits, an estimate; Limits, Skills & grants, Deploy tabs; a published agent's dashboard | New | AF-05 · AF-06 |
-| AF-F6 | Runs — a list; a run's Overview, Agents, Stages, Assets, Data touched, Ledger — any size, 9 agents or 700 | New (records ✅ §0) | AF-07 · AF-08 · AF-09 |
-| AF-F7 | Workers — pools, every worker and its current step, scaling as it happens, one-shot containers, join tokens | New · Blocked · P-21 | AF-10 |
-| AF-F8 | Add workers — Docker, Python, Kubernetes or EC2; a join token per pool; checks as they join | New · Blocked · P-21 | AF-11 |
-| AF-F9 | An agent asks for workers — a higher pool max for its run, approved by a person | New | AF-12 |
-| AF-F10 | Approvals — Waiting · Access granted · Alert rules | New | AF-13 |
+| AF-F1 | Home — a clean composer and every section to open | New | AF-01 |
+| AF-F2 | Fleet — a dashboard first (how every agent is doing and what needs you, against a baseline); the Map (agents → skills → namespaces → pools) and the Table are its tabs | New (fleet performance ✅ 5.10) | AF-01 |
+| AF-F3 | Functions and plans — the library by namespace, packaged plans, generated plans, answer templates and the plugins functions come from, as tables; a plan opens as a flow, exports as YAML, and a run's revised plan can be promoted | New (registry ✅ B06b, templates ✅, dotted names new) | AF-02 · AF-23 |
+| AF-F4 | Skill builder — `instructions.md` as a document, the functions it needs, its **Flow**; the agents it is bound to and its usage (offered against applied); tests, evals, exceptions | New | AF-03 · AF-04 · AF-22 |
+| AF-F5 | Agent builder — identity, skills, instructions; reach, limits, an estimate; Soul, Model, Flow, Access, Limits, Deploy tabs; make default, pause, retire with its open work named; a published agent's dashboard | New | AF-05 · AF-06 · AF-21 |
+| AF-F6 | Runs — a list; a run's Overview, Agents, Stages, Assets, Data touched, Ledger — any size, 9 agents or 700; rerun as it was or retuned | New (records ✅ §0) | AF-07 · AF-08 · AF-09 · AF-24 |
+| AF-F7 | Workers — pools, every worker and its current step, capacity (where steps wait, suggested workers), join tokens | New | AF-10 |
+| AF-F8 | Add workers — Docker, Python or Kubernetes; a join token per pool; checks as they join; every pool scaled by hand | New | AF-11 |
+| AF-F10 | Approvals — Waiting · Alert rules; the one queue of asks. Granted access shows in IAM | New | AF-13 |
 | AF-F11 | Ledger — the log only: Rows · By actor · By record · Refusals · Export; a row's chain of custody | New (touch record ✅ migration 50) | AF-14 |
 | AF-F12 | The assistant — drafts skills, agents and eval cases; answers about any board; asks arrive in it | New (assistant ✅ 3.10) | AF-15 |
+| AF-F13 | Connections — where the Graph meets the outside: this Graph's MCP server (what it serves, to whom, recent calls), the MCP servers whose tools become functions, and the remote agents it delegates to | New (MCP plugins ✅ 13.13; the inbound server is new) | AF-17 · AF-18 |
+| AF-F14 | LLMs — endpoints, every model version by its exact name, who pins which, what is no longer offered; ping, offer, stop offering | ✅ in Studio today, redrawn | AF-19 |
+| AF-F15 | Performance — agents, skills, plans and model versions against their own baseline over 7, 30 or 90 days; what changed, compared | ✅ in Studio today, redrawn | AF-20 |
+| AF-F16 | Settings — the Graph's runs-at-once ceiling, queue or refuse at it, and what waits behind it | ✅ in Studio today, redrawn | AF-25 |
+| AF-F18 | Remote agents — an agent outside the Graph, connected by its A2A agent card, takes a delegated task and returns a verdict and artifacts; asked each time by default; only allowed fields leave; a person applies what comes back | New — implement later ([5.11](../for-developers/modules/agents/features/remote-agents.md)) | AF-27 · AF-28 |
+| AF-F17 | One list contract — every list is searched, filtered, sorted and paged the same way; the assistant opens a list with filters set; every list shows the filters it is showing | New | AF-26 |
 
 ## User stories
 
 | ID | As a | I want | So that | Boards |
 |---|---|---|---|---|
-| AF-01 | builder | to start from one composer, and see the whole fleet on one canvas | I begin with a question, not a menu | `agents.board.home` · `.open` · `.fleet` · `.fleet.agent` · `.fleet.table` · `.fleet.closed` |
-| AF-02 | builder | every function and plan as a table I can filter, and a plan's steps as a flow | catalogues scan fast; a flow reads as a flow | `agents.board.functions` · `.functions.detail` · `.functions.plans` · `.functions.closed` · `agents.board.plans` · `.plans.detail` |
-| AF-03 | builder | to write a skill as a document, with its allowed functions beside it and its plan only as a preview | the instructions are the work; the plan is their consequence | `agents.board.skills` · `.skill.new` · `.skill.draft` · `.skill.functions` · `.skill.unmapped` · `.skill.locked` |
-| AF-04 | builder | to test a skill on real data, keep eval cases, and adopt handlers runs keep improvising | a skill improves from evidence | `agents.board.skill.test` · `.skill.exceptions` · `.skill.evals` |
-| AF-05 | builder | to build an agent the way I build a skill — on a page, with the assistant drafting | I review a draft, not a blank form | `agents.board.agents` · `.agent.new` · `.agent.limits` · `.agent.grants` · `.agent.deploy` |
-| AF-06 | builder | a published agent's numbers in one place | I see if it is getting worse | `agents.board.agent.detail` |
-| AF-07 | reviewer | a run's numbers, agents over time and what waits on me | I know where a run stands at a glance | `agents.board.runs` · `.run.overview` |
-| AF-08 | reviewer | who spawned whom, and each stage's input, output, assets and touches | I can audit and replay any step | `agents.board.run` · `.run.closed` · `.run.approval` · `.run.step` · `.run.assets` · `.run.touched` |
-| AF-09 | operator | a run of 700 agents read like any run — grouped by role, as an icicle, with its rates | a big run is as traceable as a small one | `agents.board.run.many.overview` · `.run.many` · `.run.many.icicle` |
-| AF-10 | operator | every worker in every pool, what each is running, and why the system is adding workers | I trust the scaling, and see where it is short | `agents.board.pools` · `.pool.detail` · `.pool.scaling` · `.pool.worker` · `.containers` · `.workers.tokens` |
-| AF-11 | install admin | to add workers on my own machines with one command | capacity is a command away, not a code change | `agents.board.workers.add` · `.add.pool` · `.add.token` · `.add.run.docker` · `.add.run.python` · `.add.run.k8s` · `.add.waiting` · `.add.joined` |
-| AF-12 | install admin | an agent to ask me for more workers, never take them | scale stays under a person's control | `agents.board.approvals.workers` · `.workers.scaled` |
-| AF-13 | owner of an agent, world or pool | every ask routed to me, and what I granted, in one place | I decide access deliberately and can take it back | `agents.board.approvals` · `.approvals.access` · `.approvals.alerts` |
-| AF-14 | reviewer | the full log — by row, actor, record, refusal — exportable and provably unedited | access is proven, not assumed | `agents.board.ledger` · `.ledger.entry` · `.ledger.actor` · `.ledger.record` · `.ledger.refusals` · `.ledger.export` · `.ledger.member` |
+| AF-01 | builder | to start from one composer, see how the fleet is doing on a dashboard, and its wiring on a map | I begin with a question, not a menu, and see what needs me first | `agents.home` · `agents.open` · `agents.fleet.overview` · `agents.fleet.overview.empty` · `agents.fleet.map` · `agents.fleet.map.closed` · `agents.fleet.map.agent` · `agents.fleet.map.table` · `agents.fleet.table` |
+| AF-02 | builder | every function and plan as a table I can filter, and a plan's steps as a flow | catalogues scan fast; a flow reads as a flow | `agents.functions` · `agents.functions.detail` · `agents.functions.plans` · `agents.functions.closed` · `agents.plans` · `agents.plans.detail` |
+| AF-03 | builder | to write a skill as a document, with the functions it needs beside it, and see its Flow — what the instructions resolve to | the instructions are the work; the flow is their consequence | `agents.skills` · `agents.skill.new` · `agents.skill.draft` · `agents.skill.flow` · `agents.skill.flow.step` · `agents.skill.flow.unmapped` · `agents.skill.functions` · `agents.skill.unmapped` |
+| AF-04 | builder | to test a skill on real data, keep eval cases, and adopt handlers runs keep improvising | a skill improves from evidence | `agents.skill.test` · `agents.skill.exceptions` · `agents.skill.evals` |
+| AF-05 | builder | to build an agent the way I build a skill — on a page, with the assistant drafting — and see its Flow: what it does and who it talks to | I review a draft, not a blank form | `agents.agents` · `agents.agent.new` · `agents.agent.flow` · `agents.agent.limits` · `agents.agent.access` · `agents.agent.deploy` |
+| AF-06 | builder | a published agent's numbers in one place | I see if it is getting worse | `agents.agent.detail` · `agents.agent.runs` |
+| AF-07 | reviewer | a run's numbers, agents over time and what waits on me | I know where a run stands at a glance | `agents.runs` · `agents.run.overview` |
+| AF-08 | reviewer | who spawned whom, and each stage's input, output, assets and touches | I can audit and replay any step | `agents.run` · `agents.run.closed` · `agents.run.approval` · `agents.run.step` · `agents.run.assets` · `agents.run.touched` |
+| AF-09 | operator | a run of 700 agents read like any run — grouped by role, as an icicle, with its rates | a big run is as traceable as a small one | `agents.run.many.overview` · `agents.run.many` · `agents.run.many.icicle` |
+| AF-10 | operator | every worker in every pool, what each is running, and where steps wait for want of workers | I add workers where they are short | `agents.pools` · `agents.pool.detail` · `agents.pool.capacity` · `agents.pool.worker` · `agents.workers.tokens` |
+| AF-11 | install admin | to add workers on my own machines with one command | capacity is a command away, not a code change | `agents.workers.add` · `agents.workers.add.pool` · `agents.workers.add.token` · `agents.workers.add.run.docker` · `agents.workers.add.run.python` · `agents.workers.add.run.k8s` · `agents.workers.add.waiting` · `agents.workers.add.joined` |
+| AF-13 | owner of an agent, world or pool | every ask routed to me, and the rules that alert me, in one place | I decide deliberately | `agents.approvals` · `agents.approvals.alerts` |
+| AF-14 | reviewer | the full log — by row, actor, record, refusal — exportable and provably unedited | access is proven, not assumed | `agents.ledger` · `agents.ledger.entry` · `agents.ledger.actor` · `agents.ledger.record` · `agents.ledger.refusals` · `agents.ledger.export` · `agents.ledger.member` |
 | AF-15 | builder | the assistant to draft, test and explain, with proposals I apply | I start from a working draft and keep the decision | every board's assistant panel |
+| AF-16 | analyst or reviewer | an Explorer answer's run read like any run, its step drawn as Explorer's console draws it | everything an agent did is audited in one place, whoever asked | `agents.run.ask` |
+| AF-17 | builder | to add a third party's MCP server — Figma — and call its tools as functions | agents use outside tools, governed like any other function | `agents.connections.mcp` · `agents.connections.mcp.add` |
+| AF-18 | builder or data owner | Claude Code, or any MCP client, to use this Graph — check records, push a draft dataset, ask an agent | data arrives without Invana pulling it, and a person still publishes | `agents.connections` |
+| AF-19 | install admin | every LLM endpoint and model version, who pins which, and what is no longer offered | no agent breaks on a model nobody serves | `agents.llms` · `agents.llms.endpoint` · `agents.llms.add` |
+| AF-20 | owner | speed, success and tokens for every agent, skill and model against its own baseline | I see what got worse and which change did it | `agents.performance` · `agents.performance.skills` · `agents.performance.llms` |
+| AF-21 | builder | an agent's voice, its model version and effort, and its lifecycle — open work named before it retires | an agent changes deliberately | `agents.agent.soul` · `agents.agent.model` · `agents.agent.retire` |
+| AF-22 | builder | a skill's agents and its usage — offered against applied, and the gap | I know whether a skill is used as meant | `agents.skill.agents` · `agents.skill.usage` |
+| AF-23 | builder | the templates that shape answers and the plugins functions come from | I see every source of what agents can do | `agents.functions.templates` · `agents.functions.template.new` · `agents.functions.plugins` · `agents.functions.plugin` · `agents.plans.promote` |
+| AF-24 | reviewer | to rerun a run as it was, or retuned | I test a fix on the run that failed | `agents.run.rerun` |
+| AF-25 | Graph admin | how many runs this Graph runs at once, and what waits behind the ceiling | nothing is stuck without a reason | `agents.settings` |
+| AF-27 | install admin | to connect an agent outside the Graph by its agent card, and say which of our agents may delegate to it | outside agents join the fleet under the same rules | `agents.connections.agents` · `agents.connections.agent.add` · `agents.connections.agent` |
+| AF-28 | reviewer | an agent to hand a fix to a remote agent — approved, traced, only allowed fields sent, its PR returned for a person | work crosses to other agents without data or control leaking | `agents.run.remote.approval` · `agents.run.remote` · `agents.run.remote.refused` |
+| AF-26 | anyone | the assistant to open a list with filters, and every list to show the filters it is showing | I trust what a list leaves out | `agents.runs.filtered` · `agents.agents.filtered` |
 
 ## The function library
 
@@ -74,7 +91,7 @@ function, since one namespace can span bounds (`graph.stitch.preview` reads, `gr
 | `mail` | `read` · `send` (always approval) | network | tools.mail |
 | `science` | `pubmed.search` · `uniprot.get` · `pubchem.get` | network | tools.science |
 | `sim` | `genomic_prediction` | none | simulators.genomic |
-| `code` | `claude_code.run` — new | code | core.code |
+| `mcp.<server>` | one function per tool of an MCP server an Admin added (`mcp.figma.get_design_context`) — read-only tools are reads, every other tool a send | network | mcp.<server> |
 
 | Packaged plan | Steps | Bounds spanned |
 |---|---|---|
@@ -90,9 +107,10 @@ function, since one namespace can span bounds (`graph.stitch.preview` reads, `gr
 | Decision | Detail |
 |---|---|
 | One shell | Explorer's shell plus the icon rail: workbook tabs over one page or canvas, the assistant docked right, the console under a canvas. No leftSection |
-| The rail | 52 px, on every page: Home · Fleet, Functions, Skills, Agents · Runs (badge) · Workers · Approvals (badge), Ledger · Settings. Lit for the section of the open tab. Workers uses the compute icon, Approvals an inbox, Ledger a clipboard list |
-| Home | An empty canvas with the composer centred, suggestions, and eight boards to open |
+| The rail | 52 px, on every page: Home · Fleet, Performance · Agents, Skills, Functions, Connections, LLMs · Runs, Workers · Approvals, Ledger · Settings (the gear at its foot). Badges on Runs and Approvals. Lit for the section of the open tab. Every section Studio ships today has a place: Overview is Fleet, Library and Plugins are tabs of Functions, LLMs, Performance and Settings keep their own |
+| Home | An empty canvas with the composer centred, suggestions, and a tile for every section |
 | Canvas or page | A canvas where relationships are the point (fleet, who spawned whom, a plan's flow, a run's stages). A page for catalogues, records, forms and numbers. Not everything is a canvas |
+| Fleet is a dashboard | Fleet opens on **Overview** — agents live, runs, served, tokens, what waits on you, refusals; a *Needs attention* list with an act on each; runs a day, exits, every agent against its baseline, and what changed recently with what happened after. **Map** (the canvas) and **Table** are its tabs. Every number is stored by the engine |
 | The assistant collapses | ✕ collapses it and the tab takes the full width; the header button, a floating *Ask* pill or ⌘J reopens it; the conversation is kept |
 | Lists and details | On a canvas the list is the console's Table, synced with selection, and details are the element panel floating on the canvas. On a page, a row opens its detail in the same tab |
 | Charts | One series each, token colours, a recessive grid; every value is computed and stored by the engine (CLAUDE.md rule 13) |
@@ -101,12 +119,19 @@ function, since one namespace can span bounds (`graph.stitch.preview` reads, `gr
 
 | Decision | Detail |
 |---|---|
-| Dotted names | `namespace.verb`; today's keys stay aliases so recorded runs resolve |
+| Dotted names | `namespace.verb`, replacing today's keys outright — no aliases; recorded runs are rewritten or dropped |
 | One bound per function | A composite such as `nl.query` is a packaged **plan**, called like a function; each of its steps uses one bound |
 | `web` | `search`, `read_url` (text for the model), `download_file` (a file unpacked to cited rows) |
 | Functions come from code | Only plugin task types (core, tool, simulator, MCP), versioned, enabled by an install Admin. Studio never authors a function |
-| Grants are globs | A skill allows `graph.read.*`, `web.read_url`; the allowlist shows every bound a glob spans and marks writes and sends |
-| A skill is a document | The builder is a page: `instructions.md` in an editor, *Functions it may call* and a *Plan preview* (a numbered step list, regenerated on save, never edited) beside it; *Open as a flow* gives the canvas |
+| Connections is a section | Where the Graph meets the outside, in both directions — not a kind of function. Tabs: *This Graph's server* · *MCP servers* · *Remote agents*. Functions lists the tools an MCP server adds, as functions |
+| MCP carries tools, A2A carries tasks | A tool call is one request and one answer: MCP. A task — a fix, an implementation — has a lifecycle, asks back and returns artifacts: A2A (0.3, the version the official SDKs carry; 1.0 when it ships). Inside a Graph, agents still delegate |
+| Templates and plugins | Templates (result · prompt; a surface; the intents each accepts) shape answers; a template is authored, published, and removed only while no answer cites it. Plugins are the source of functions: a row per plugin, Core always on, a tool plugin enabled by an install Admin. Both are Functions tabs |
+| A plan, kept | A plan exports as read-only YAML. A run's revised plan is promoted into a reusable plan (`origin = promoted`) from a dialog that picks the run |
+| Add an MCP server | Under **Connections** › MCP servers, an install admin adds a third party's server — Figma, say — by URL and name. Its tools are listed in Functions as `mcp.<server>.<tool>` functions, the list frozen until refreshed, the server added disabled. The credential is a bearer token set on the workers (`INVANA_SECRET_MCP_<NAME>`), never stored. A read-only tool is a read; every other tool is a send and waits on an approval ([13.13](../for-developers/modules/platform/features/mcp-plugins.md)) |
+| This Graph's MCP server | One endpoint per Graph, under **Connections** › This Graph's server. It serves the agents and functions marked *served* — `ask_fare_lead`, `validate_records`, `push_draft_version`. A caller connects with a token made in IAM; each call is a run as the caller ∩ the agent, in the ledger. Claude Code and other MCP clients use it to check records and push **draft** dataset versions; a person publishes them |
+| Skills declare needs | A skill names the functions it **needs** (`graph.read.*`, `web.read_url`); it grants nothing. A **policy** in IAM allows them. A need no policy covers is refused before dispatch, naming the policy |
+| A skill is a document | The builder is a page: `instructions.md` in an editor, *Functions it needs* and a short preview beside it that opens its **Flow** tab |
+| Flow | A skill's and an agent's **Flow** tab draws what their instructions resolve to: a skill's steps top-down, each tied to the line it came from, its handlers branching to the side, a line that can't map drawn as a gap; an agent's triggers → skills → the agents it spawns or may delegate to (always · asks · never) → its outside callers. Every flow canvas says it is drawn from the instructions and that a run may replan within its bounds — the change shows on that run, never on the flow. *Flow* is the word on screen; the record is a TaskPlan |
 | Exceptions in the instructions | A `## When things go wrong` section; each line generates a handler on the plan |
 | A line that can't map | Flagged in place with its choices (leave it to a person · rewrite · allow the function); the preview says why it can't draw; publish waits |
 | Tests and evals | Test runs land in the console under the document; Evals is a tab with the gate's tiles and cases live against draft; publish takes a reason |
@@ -120,26 +145,88 @@ function, since one namespace can span bounds (`graph.stitch.preview` reads, `gr
 | Decision | Detail |
 |---|---|
 | The agent builder is a page | Left: identity (name, model version, voice), skills, instructions. Right: what it can reach (from its skills), limits, an estimate from its skills' history. Tabs: Overview · Instructions · Skills & grants · Limits · Deploy · Evals · History |
-| Effective grants | Skills' allowlists ∩ the agent's narrowing ∩ the world's lens. A child never holds a grant its parent lacks |
+| Access | An agent's **Access** tab lists the policies it holds (made in IAM; attaching one here is the same act) and every function its skills need, against its policies ∩ the person who started the run ∩ the world. An agent never does more than the person who started it; a child never more than its parent |
 | Budget escrow | Spawning or delegating moves tokens from the parent's remaining budget into the child's escrow; unspent escrow returns when the child ends |
 | Ceilings | Per run: depth, children per agent, descendants in all, and **live at once** (made agents queue until a slot frees). A spawn past a ceiling is refused before dispatch, naming it. A limit that can't hold is flagged on the Limits tab |
 | Exit rules | Every agent ends for one recorded reason: served · cannot answer · budget declined · time limit · step limit · no progress · loop · parent ended · stopped by a person |
 | Delegate to an existing agent | `work.delegate` hands a task to an authored agent: it runs with **its own grants**, sees the intersection of both worlds, is paid from the caller's escrow, and its result returns through the caller's lens. An agent already in the run's chain can't be called again |
 | May delegate to | Each agent lists the agents it may delegate to: always · ask each time · never. Anything else becomes an ask |
-| Deploy | A runtime (pooled worker · one-shot container · Claude Code), a pool per resource with its free slots, how many runs at once, and triggers (Todo · schedule · event); the tab shows what the next trigger will need from the pools |
+| Deploy | Runtime: a **pooled worker** — any worker in a pool whose labels cover its functions. A pool per resource with its free slots, how many runs at once, triggers (Todo · schedule · event), what the next trigger will need from the pools, and whether it is **callable over MCP** |
 | A published agent | Its Overview is a dashboard: runs, served, p95, tokens, helpers spawned; runs and tokens a day; exits by reason; recent runs |
+| Soul | How an agent speaks — its voice, caution, what it does when unsure — with a sample ask previewed before saving. A saved soul is a change in History |
+| Model | The pinned model version and its effort. Only an offered version is pinned; moving is a change gated by the agent's evals |
+| Lifecycle | Make default · Pause · Retire. Pause and Retire list every piece of open work and what happens to each — finishes, unassigned, paused, refused — before they apply |
+| Can be assigned · Unattended | Two switches on Deploy: a Todo may name it; it runs with no person to ask, so an ask ends the step |
+| A skill's agents and usage | A skill has **Agents** (bound to · applied · bind, unbind) and **Usage** (offered · applied · the gap, by agent and outcome) tabs |
+
+### LLMs, Performance and Settings
+
+| Decision | Detail |
+|---|---|
+| LLMs | Endpoints (kind, credential name, last ping, versions offered) and every model version by its exact name with who pins it. A pinned version no endpoint offers is a warning naming the agents. Endpoint details and adding one are modals |
+| Performance | Tabs Agents · Skills · Plans · LLMs; 7, 30 or 90 days; success, p50, p95, runs, tokens a run, degraded — each against its own baseline; *What changed* links each change to its compare page |
+| Settings | The gear at the rail's foot. The Graph's runs-at-once ceiling, *queue* or *refuse* at it, and every queued run with why it waits. Pools stay in Workers; an agent's own limits stay on its Limits tab |
+| Schedules | Stay in the shell's Activity › Schedules (SH-13) — anyone schedules from any product. An agent's Deploy triggers link there |
+
+### Remote agents
+
+| Decision | Detail |
+|---|---|
+| A remote agent | An agent outside the Graph — the Claude Code agent in a CI, a partner's agent — connected by its agent card (`/.well-known/agent-card.json`): endpoint, protocol version, auth, skills. Added disabled. It is listed in Agents with kind `remote` and appears in Flow, Runs and the Ledger like any agent |
+| Delegating to one | The agent's *May delegate to* list holds remote agents too — always · ask each time · never — and the skills it may ask for. Ask each time is the default. An ask lands in Approvals with what would be sent and what is held back |
+| What leaves | Only fields the run's world allows and the skill marks to send. A task that would carry anything else is refused before it is sent, naming the world |
+| The task | Its states are A2A's — submitted · working · input-required · completed · failed · canceled. *Input required* becomes a question to the person who started the run; the answer goes back on the same task |
+| Limits | Wall clock, attempts and tasks at once, per remote agent. Invana's token budget covers only its own side; a remote agent's cost is its own |
+| What comes back | A verdict and artifacts — a PR, a patch, a report — kept on the run. Invana applies none of it: a person merges the PR or publishes the draft |
+| Its words are data | Text a remote agent returns is never read as instructions by an Invana agent; it may cite it, not obey it |
+| No loops | A remote agent may not delegate back into the Graph inside the same task; depth counts across the boundary |
+| On-prem | Calls go out from workers in a pool that can reach the endpoint (`egress`), with the credential set on those workers. Nothing is relayed through a hosted service |
+
+### Lists, filters and the assistant
+
+| Decision | Detail |
+|---|---|
+| One list contract | Every list endpoint takes `q` (search), named filters (repeatable), `sort` and `cursor` + `limit`, and returns `{items, total, next_cursor, applied}`. `total` is a real count. Agents, skills, plans, runs, LLMs, members — every list the same way |
+| Filters live in the URL | `?q=` and `?f.<field>=`, so a list opened by a link, by ⌘K or by the assistant reads the same as one filtered by hand |
+| Applied filters are always shown | A strip above the rows: one chip per filter with ×, and *Clear all*. Filters the assistant set are marked *set by the assistant* |
+| The assistant opens boards | One function opens a board or list with filters set, and its reply carries a link to it. It uses the list contract, so it can filter anything a person can |
+| Rows filter on the server | Search and filters go to the engine; a list never narrows rows only in the browser |
+
+## Studio today, mapped
+
+Every surface of Studio's Agents product, where it lives in this design, and what the move deletes. A move is done when its row's deletions are gone.
+
+| Studio today | Here | Deletes |
+|---|---|---|
+| Overview (tiles, Needs attention, Runs a day, Changed recently) | Fleet › Overview | `overview/OverviewPage.tsx`'s *New agent* link to `agents/new`, which opens an agent that does not exist |
+| Agents (leftSection tree, lineage canvas) | Agents (page) · Fleet › Map | `AgentsViewPanel` and `AgentsSection` with their unused `onNewAgent` and `onOpenTask`; the legacy `&agent=` redirect |
+| An agent: Overview · Instructions · Skills & callables · Thinking · Soul · Activity · History | Overview · Runs · Instructions · Soul · Model · Flow · Access · Limits · Deploy · Evals · History | `agentsApi.create` · `remove` · `get` and `useAgentMutations().create` · `remove` until the builder calls them |
+| Skills (leftSection list) · a skill: Instructions · Plan · Bindings · Usage · History | Skills (page) · Instructions · Flow · Functions · Agents · Usage · Exceptions · Evals · Tests · History | `SkillsViewPanel` and its unused `onClose`; `skills/api.ts` `get` · `update` · `remove` · `versions` |
+| Library: plans, templates; a plan's page | Functions › Packaged plans · Generated plans · Templates; a plan as a flow | `LibraryViewPanel`; `PlanFlowCanvas` and the `workflow` canvas, which nothing opens |
+| Plugins: registry, catalogue, a plugin, a task type | Functions › Functions · Plugins; a plugin; a function | `PluginsViewPanel` |
+| LLMs | LLMs | `llms/api.ts` `get` · `listModels` |
+| Performance | Performance | — |
+| Settings (concurrency, pools) | Settings · Workers | `AgentsSettingsViewPanel` |
+| Activity › Runs · a run | Runs · a run | the client-side runs filters in zustand, replaced by the list contract |
+| Activity › Approvals (a placeholder) | Approvals | the placeholder tab |
+| Activity › Schedules · Inbox · Events · Changes | the shell's Activity, unchanged | — |
 
 ### Runs
 
 | Decision | Detail |
 |---|---|
-| A run's tabs | Overview · Agents · Stages · Assets · Data touched · Ledger — the same for 9 agents or 700 |
+| A run's tabs | Overview · Agents · Stages · Assets · Data touched · Ledger — the same for 9 agents or 700, and for one |
+| One runs list | Agents › Runs lists every run in the Graph, filtered by agent · started by · from (Explorer · Todo · Schedule · Project · API) · status. An agent's **Runs** tab and a person's runs are that list, filtered. Activity › Runs opens the same run page |
+| An Explorer answer is a run | Run by the Graph's assistant agent on behalf of whoever asked; the ledger actor is *person ▸ Analyst assistant*. Its run page names the session and opens it |
+| One drawing of a step | A step opened on a run's Stages tab and a query opened in Explorer's console are the same step view — Overview · Touched · Log, one component ([CO10](../for-developers/modules/explore/features/the-console.md)) |
+| Sessions stay with their author | Owners see the runs, steps and ledger rows a session made; the conversation itself is its author's, unless shared |
 | Overview | The run's numbers, a bar per agent over time with its state in words, steps a minute, and what waits on you. A large run adds agents finishing a minute, live against its limit, time left, and a by-role table |
 | Agents | Who spawned whom, with escrow and status per agent; asks appear in the chat with their subject dashed on the canvas. A large run is grouped by role with one cell per agent, or an icicle |
 | Stages | Dataflow-style: one card per stage with counts in and out on every edge; selecting a stage, or one lane of it, shows its input, output, the assets it produced and what it touched, side by side |
 | Assets | Every file, board emission, branch and Todo the run produced, with the step and agent that produced it |
 | Data touched | Graph types read and written, web domains, LLM tokens by model, secrets and repos used |
 | No Swarms section | A run with hundreds of agents is a run; it starts from any prompt (Explorer, a Todo, a schedule) after a preflight estimate of agents, tokens, pools and time |
+| Rerun | One dialog wherever a run is read: the same versions (reproduce it) · current versions (compare) · retune — agent version, model version, budget, world. A rerun is a new run and opens the comparison when it finishes; Activity's Re-run (SH-18) is the same dialog |
 
 ### Workers
 
@@ -147,23 +234,23 @@ function, since one namespace can span bounds (`graph.stitch.preview` reads, `gr
 |---|---|
 | Agents are records | An agent never owns a process; its steps leave as `TaskEnvelope`s and any worker in an eligible pool runs them |
 | Control plane, data plane | The orchestrator (plans, replans, approvals, budgets, ledger) is one service; workers only run envelopes |
-| Pools | A labelled set of workers on one target — Kubernetes, EC2, Docker or a machine — with the plugins, secrets and egress its workers get. A step goes to a pool whose labels cover its function's resources |
-| Workers tabs | Pools (workers over time, scaling events, slots, queue) · Workers (every worker, its state and the step it is running) · Scaling (why, the rule, workers starting, every event) · One-shot containers · Join tokens |
-| Three runtimes | Pooled worker (long-lived, any step) · One-shot container (one step or run, terminated after a TTL, reaped past a hard limit) · Claude Code (a coding run in a one-shot sandbox; reaches Invana only over MCP with its granted functions; a pull request is a send and needs approval) |
+| Pools | A labelled set of workers — Docker hosts, Python machines or a Kubernetes Deployment — with the plugins, secrets and egress its workers get. A step goes to a pool whose labels cover its function's resources |
+| Workers tabs | Pools (workers over time, worker events, slots, queue) · Workers (every worker, its state and the step it is running) · Capacity (where steps wait, for how long, the workers that would clear it — computed by the engine) · Join tokens |
+| One runtime | The pooled worker: long-lived, runs any step. One-shot containers and a Claude Code runtime are not in v1 — Claude Code reaches a Graph over its MCP server instead |
 | A worker dials out | A worker connects to the engine over HTTPS with a credential; no inbound ports, no database access. It runs the steps it is sent with only its pool's secrets |
-| Adding workers | Add workers is a five-step flow: **Where** (Docker · Python · Kubernetes · EC2) → **Pool** (existing or new; labels, plugins, secrets, egress, slots) → **Join token** → **Run it** → **Joined** |
-| How each runs | Docker: `docker run invana/worker` with `INVANA_ENGINE_URL`, `INVANA_JOIN_TOKEN`, `INVANA_POOL`, `INVANA_LABELS`, `INVANA_SLOTS`. Python: `pip install "invana[workers,…]"` then `invana worker --engine … --token … --pool …` (and `invana worker install-service`). Kubernetes: a Helm chart reading the token from a secret, scaled by Invana between min and max. EC2: a launch template's user-data plus a connected Auto Scaling group |
-| Join tokens | Scoped to one pool, shown once, with an expiry and a cap on how many workers may join. On joining each worker gets its own credential, rotated hourly. Revoking a token stops new joins; draining stops workers. Tokens kept in a secret store for autoscaling may have no expiry and are rotated from the Join tokens tab |
+| Adding workers | Add workers is a five-step flow: **Where** (Docker · Python · Kubernetes) → **Pool** (existing or new; labels, plugins, secrets, egress, slots) → **Join token** → **Run it** → **Joined** |
+| How each runs | Docker: `docker run invana/worker` with `INVANA_ENGINE_URL`, `INVANA_JOIN_TOKEN`, `INVANA_POOL`, `INVANA_LABELS`, `INVANA_SLOTS`. Python: `pip install "invana[workers,…]"` then `invana worker --engine … --token … --pool …` (and `invana worker install-service`). Kubernetes: the same image as a Deployment manifest, the token in a cluster secret, `replicas` set by you. No Helm chart, no cloud-provider integration |
+| Join tokens | Scoped to one pool, shown once, with an expiry and a cap on how many workers may join. On joining each worker gets its own credential, rotated hourly. Revoking a token stops new joins; draining stops workers. A token kept in a cluster secret, so pods can restart, may have no expiry and is rotated from the Join tokens tab |
 | Joining checks | Token used · engine reached · plugins loaded · labels match · first heartbeat — each shown as it happens, with what to check when one fails |
-| Who scales what | Docker and Python workers are scaled by hand. Kubernetes and EC2 pools are scaled by Invana from its queue, between the pool's min and max |
-| An agent asks, never takes | An agent can only **ask** to raise a pool's max, for its own run, with the reason and the time it would save. A person approves for this run or permanently, or declines. Approved for a run, the max returns when the run ends and the autoscaler scales back. Agents never start machines |
+| Who scales what | **Every pool is scaled by hand**: add or stop Docker and Python workers, or set a Deployment's replicas. Invana never starts machines. Capacity says where steps wait and how many workers would clear it |
+| Short of workers | A run whose steps wait on a pool says so — *waiting on workers · egress* — on its Overview and in Capacity. Agents do not ask for workers |
 | Lost and unroutable | A worker without a heartbeat for 30 s is lost; its steps are redelivered with the same idempotency key. A step whose resources no live pool covers waits as unroutable and says which label is missing |
 
 ### Approvals and the ledger
 
 | Decision | Detail |
 |---|---|
-| Approvals owns access | Tabs: **Waiting** (every ask — access, delegation, budget, workers, question, send, pool — with its actor chain and who it is routed to; approve or decline in place) · **Access granted** (what each agent can do now, standing or temporary, who granted it, when it ends, Revoke) · **Alert rules** (writes to a type, secrets out of place, refusal spikes, access granted, and who they notify) |
+| Approvals is the one queue | Tabs: **Waiting** (every ask — access, delegation, budget, question, send — with its actor chain and who it is routed to; approve or decline in place) · **Alert rules** (writes to a type, secrets out of place, refusal spikes, access granted, and who they notify). Access granted from an ask shows in IAM, on the person or policy, with when it ends |
 | Routing | An ask goes to whoever owns the thing asked for: the world's owner for data, the agent's owner for delegation and sends, the person who started the run for budget, an install admin for workers and pools |
 | Access is temporary by default | An approved ask is for this run; a grant reaches that agent only, never its children |
 | The ledger is the log only | Tabs: Rows · By actor · By record · Refusals · Export. It changes nothing; every grant, revoke, rule change and scale step appears in it as a row |
@@ -186,12 +273,17 @@ function, since one namespace can span bounds (`graph.stitch.preview` reads, `gr
 | Item | Why |
 |---|---|
 | A leftSection in Agents | The rail, the console's tables and the element panel replace it |
+| Remote agents delegating into this Graph | Inbound A2A comes later; today an outside agent reaches a Graph over its MCP server, under a token |
+| A remote agent applying its own result | A person merges or publishes; Invana never applies what crosses the boundary |
+| A Schedules section in Agents | Schedules belong to every product; the shell's Activity holds them |
 | A Swarms section | A large run is a run |
 | Functions authored in Studio | A function written in the UI would escape every bound |
 | Chat between agents | Delegation is a task with a verdict; an agent asks a person, never another agent |
-| Agents starting machines | They ask for a higher pool max; a person approves; the autoscaler acts within it |
+| Agents starting machines, or asking for workers | Workers are added and scaled by a person; Capacity shows where they are short |
 | An agent pinned to a machine | Placement is per step, by pool labels |
 | Unlimited replans | Three a run; past that, a person decides |
-| Claude Code without a sandbox | It edits and runs code; never on a shared worker |
+| A Claude Code runtime and one-shot containers | Not in v1 — both need Invana to start containers. Claude Code uses a Graph over its MCP server |
 | Agents spawning across Graphs | The Graph is the reasoning boundary |
 | Editing or deleting ledger rows | A correction is a new row |
+| Cloud-provider integrations — EC2, Auto Scaling groups, KEDA, a Helm chart | Docker, Python and a Kubernetes manifest cover every target without bias to a provider |
+| MCP between two Invana agents | Inside a Graph, agents delegate — budgets, lineage and limits come with it. MCP and A2A are for crossing the Graph's boundary |

@@ -205,6 +205,7 @@ sub-slots, the URL params and the retired words are in
 | **Budget** | The cost ceiling a run may spend — the smallest of the agent's, the plan's and the Todo's. **At the ceiling the run pauses and asks**, as an `approval`; in-flight work finishes and nothing is discarded. Never a hard stop — that is a separate `hard_ceiling`. |
 | **Role** | What a TaskRun is *for*: `execute` · `plan` · `evaluate`. Planning and evaluating are roles of a run, never kinds of a plan. |
 | **Delegation** | An agent spawning an agent, bounded by depth, fan-out and a budget ⊆ its parent's. |
+| **Remote agent** | An agent outside the Graph, connected by its A2A agent card, that takes a delegated task and returns a verdict and artifacts. Never *external agent*, never *partner bot*. [5.11](modules/agents/features/remote-agents.md) |
 | **Ephemeral** | A spawned agent that retires when its work closes. Its row stays so lineage resolves. |
 | **On behalf of** | The principal a run serves, distinct from the principal that ran it. |
 | **Personal access token** | A long-lived credential a person mints on their profile. It carries their identity — never a scope — and is revoked on its own. |

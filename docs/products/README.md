@@ -22,11 +22,12 @@
 | 3 | **Explorer** | analysts | Ask and look — the simplest product | [explorer.md](explorer.md) | 15 · 22 |
 | 4 | **Projects** | thinkers: scientists, policy makers, investors, marketers, investigators | Pursue a question — fork, gather evidence for and against, decide, keep the lineage; a project type sets the words | [projects.md](projects.md) | 14 · 17 |
 | 5 | **Agents** | builders | Build, tune and watch the agents that do the legwork | [agents.md](agents.md) | 16 · 30 |
+| 6 | **IAM** (proposal) | owners, admins | Who may do what — people, groups, agents, tokens and connections hold policies; limits and quotas | [iam.md](iam.md) | 13 · 21 |
 | — | **Shell** (not a product) | everyone | What every product shares: header, breadcrumbs, Assistant, Activity, Schedules, Notifications, ⌘K | [shell.md](shell.md) | 17 · 29 |
 
 - Launcher order is the thinker’s path: gather → give meaning → ask → pursue → delegate.
 - The split is by persona: an analyst never sees agent tuning; a builder never sees project branches.
-- Five is the ceiling. A sixth idea joins an existing product or the shell.
+- Five is the ceiling, with one proposed exception: IAM, because access spans every product and belongs to none ([iam.md](iam.md)).
 
 ## What lives where
 

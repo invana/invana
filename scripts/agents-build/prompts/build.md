@@ -1,0 +1,13 @@
+Build phase {{ID}} of docs/products/agents-build-sessions.md. You are running unattended; nobody will answer questions.
+
+1. Read docs/products/agents-build-sessions.md: "Rules for every session", the entry for {{ID}}, and the log row and hand-off notes of every phase {{ID}} needs. Read CLAUDE.md and the docs the entry lists under "Read".
+2. Docs first: the phase's features need a feature file and an index row in docs/for-developers/README.md. Write or correct them before any code, from docs/products/agent-fabric.md and docs/products/iam.md. Decisions in present tense, no history.
+3. Read scripts/migration/prompts/team.md and work as its lead: the contract (records, routes, shapes) alone first; then split the surfaces across up to 3 sub-agents with no file in two parts, when the phase is big enough. Do only this phase's work.
+4. No backward compatibility: rename and delete outright; a migration may drop and recreate. Keep every capability and keep demos/airways loadable — reload it when you reset the database.
+5. Studio UI only from @invana/* and tokens. A component the kit lacks is built in ~/Projects/invana/design-kit with a story (Studio links the local kit; rebuild its dist after editing).
+6. Validate before you finish: for every board the entry names, shoot it live and from the prototype (`node scripts/migration/shoot.mjs --live --boards … --out .migration-cache/{{ID}}/live` and `--proto --boards … --out .migration-cache/{{ID}}/proto`), view both and fix differences in layout regions, components, copy and states. Add or correct the boards' routes in scripts/migration/screen_map.py and regenerate screen-map.json.
+7. Run the gates yourself: engine `uv run ruff check .`; Studio `pnpm lint`, `pnpm check-types`, `pnpm test`; e2e for the surfaces you changed.
+8. A decision the docs do not settle: pick what agent-fabric.md, iam.md and CLAUDE.md support and record it in the feature file. A decision only Ravi can make: set {{ID}}'s row `blocked` with the question and stop.
+9. When done, leave the row's status as it is (the driver marks `done` after its own gates and the design review) and add a hand-off note row for {{ID}}: what a later phase must know that the code does not say.
+
+Standing rules: tokens, never currency. The engine owns every number. No decision ids in code or tests. Few positive and negative tests, against the graph database, never mocked; graph-database tests only when INVANA_ALLOW_GRAPH_TESTS=1 is set. Never commit, push or open a PR — the driver commits. Never edit scripts/migration/baseline.json and never set your own row to `done`.

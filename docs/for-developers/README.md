@@ -143,6 +143,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 5.8 | [Give an agent a soul](modules/agents/features/soul.md) | Who the agent is and how it speaks — Markdown on the agent, read only by the steps a person reads | 🟡 | — | ✅ | S-TBD |
 | 5.9 | [Pin a model version](modules/agents/features/pinned-model-versions.md) | Agents, skill versions and judges pin an exact model version; every run records the one it called; re-run on the same versions | 🟡 | 🟡 | 🟡 | B02 |
 | 5.10 | [Watch the fleet](modules/agents/features/fleet-performance.md) | What broke, waits, slowed or changed; speed, success and tokens per agent, skill, plan and model against a baseline; degradations named; who pins each model | ✅ | — | ✅ | C10 |
+| 5.11 | [Remote agents](modules/agents/features/remote-agents.md) | Hand a task to an agent outside the Graph over A2A — asked each time, only allowed fields sent, its PR returned for a person. **Implement later** | 🔵 | 🔵 | 🔵 | Later |
 
 ## 6 · [Skills](modules/skills/spec.md)
 
@@ -408,6 +409,16 @@ replacement lands.
 | S14 | 10.5 · 2.1 · 2.2 | Every run in the Graph reads from one journal, delegated children nest under their parent, and Imports is a filter of it rather than a second implementation — `import_jobs` is gone, and a load is dispatched by the interpreter like every other run ([BD12](modules/bring-data-in/spec.md)) |
 | S15 | 13.8 · 2.3 · 7.5 | A plan is a graph, the cursor is a frontier, a step fans out into lanes, a pool stops one workflow starving the rest, and a person is asked before a gated step runs — proven by a bundle load that branches, fans out and inlines the single-dataset plan, and startable from the library without phrasing a question |
 | S16 | 14.1 · 14.2 · 10.5 | **The lens governs five layers, and the run proves it.** A world narrows what a run may see, use and send; a guardrail refuses before dispatch; and the touch record shows which participants were read, called, refused and sent to. Done when the same question, run in two worlds, gives two answers whose difference is readable as a diff of what each touched — and when narrowing `Deal.revenue` out of a world means no query can return it, no aggregate can reveal it and no prompt can carry it |
+| F01 | 13 (list contract) · 13.14 · 13.1 | Each Agents list is searched, filtered and paged through one helper; a filtered URL reloads to the same rows and chips |
+| F02 | terminology · 7.x · 13.9 | A clean checkout migrates from one baseline, loads airways, and no `TaskPlan` or old task-type key is left in engine, API or Studio |
+| F03 | 5.1 · 5.7 · 5.10 · 6.x · 13.9 · 13.13 | Every surface the Agents product had is reachable from the new rail with no leftSection, and the code it replaced is deleted |
+| F04 | 5.2 · 5.3 · 5.5 · 5.8 · 5.9 · 6.x | An agent is built on its page from a drafted skill, its Flow matches its instructions, and publishing passes the eval gate |
+| F05 | 10.5 · 10.8 · 5.4 · 10.2 · 3.x | The assistant opens Runs with filters it set, and every act in a run has a ledger row |
+| I01 | 11.4–11.6 · the IAM features | A skill need no policy covers is refused naming the policy; a narrowed token can push a draft dataset and nothing else |
+| I02 | 10.4 · 13.13 | Claude Code, with a narrowed token, pushes a draft dataset version over this Graph's MCP server and a person publishes it |
+| F06 | 13.11 | A worker on a second machine joins with a service-account token and runs a tool step |
+
+F01–F06 and I01–I02 build the Agents design ([agent-fabric](../products/agent-fabric.md)) and then IAM ([iam](../products/iam.md)) on one branch, one commit a phase, run by [agents-build-sessions](../products/agents-build-sessions.md).
 
 #### S16 is ordered inside itself, and two of its steps are not in Govern
 
@@ -432,6 +443,7 @@ wearing a bound's name*.
 - Don't start a slice until the previous one is reproducible from a clean checkout.
 - Build Engine and Studio together — a feature is not done on one side.
 - A feature not listed here is out of scope; change this file before building it.
+- **No backward compatibility.** Invana has no production users: rename records, keys, routes and tables outright, delete the old path in the same change, and let a migration drop and recreate. No aliases, shims or deprecated fields — but every capability and the demo data keep working.
 - **Every Studio surface is built now, ahead of its slice** — see [The screen-first pass](#the-screen-first-pass).
   A screen whose engine has not landed is marked 🖼 and renders an `EmptyState` naming what unlocks it
   ([DS15](modules/platform/features/design-system.md)). The slice still owns the *wiring*: 🖼 → ✅ is the

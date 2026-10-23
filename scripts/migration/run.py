@@ -24,6 +24,13 @@ agent:
 Resumable: the log is the only state. Run it again and it continues from the
 first unfinished session.
 
+The same driver runs any runbook laid out like it. Point it elsewhere with
+``INVANA_RUNBOOK`` (the runbook), ``INVANA_RUNNER_PROMPTS`` (its prompts),
+``INVANA_RUNNER_REVIEWS`` (where reviews land), ``INVANA_RUNNER_SCOPE`` (the
+commit scope), ``INVANA_RUNNER_GATES=full`` (engine and Studio gates for every
+row) and ``INVANA_RUNNER_MAX_HANDOFFS``. ``docs/products/agents-build-sessions.md``
+is run that way.
+
 Usage::
 
     python3 scripts/migration/run.py              # run until done or blocked
@@ -43,8 +50,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = ROOT / "scripts" / "migration"
-SESSIONS = ROOT / "docs" / "products" / "migration-sessions.md"
-REVIEWS = HERE / "reviews"
+SESSIONS = ROOT / os.environ.get("INVANA_RUNBOOK", "docs/products/migration-sessions.md")
+PROMPTS = ROOT / os.environ.get("INVANA_RUNNER_PROMPTS", "scripts/migration/prompts")
+REVIEWS = ROOT / os.environ.get("INVANA_RUNNER_REVIEWS", "scripts/migration/reviews")
+SCOPE = os.environ.get("INVANA_RUNNER_SCOPE", "migration")
+FULL_GATES = os.environ.get("INVANA_RUNNER_GATES") == "full"
+MAX_HANDOFFS = int(os.environ.get("INVANA_RUNNER_MAX_HANDOFFS", "8"))
 CACHE = ROOT / ".migration-cache"
 STUDIO_URL = os.environ.get("INVANA_MIGRATION_STUDIO_URL", "http://localhost:8300")
 ENGINE_URL = os.environ.get("INVANA_MIGRATION_ENGINE_URL", "http://localhost:8200")
@@ -221,7 +232,7 @@ def reclaim(sid: str) -> None:
 TAMPERED: set[str] = set()
 
 
-def build_until_handoffs_end(sid: str, first_prompt: str, label: str, max_handoffs: int = 8) -> None:
+def build_until_handoffs_end(sid: str, first_prompt: str, label: str, max_handoffs: int = MAX_HANDOFFS) -> None:
     """Run a session; while it ends `partial` (a hand-off), continue in a fresh session from the note."""
     claude(first_prompt, sid, label)
     reclaim(sid)
@@ -236,7 +247,7 @@ def build_until_handoffs_end(sid: str, first_prompt: str, label: str, max_handof
 
 
 def prompt(name: str, **values: str) -> str:
-    text = (HERE / "prompts" / f"{name}.md").read_text()
+    text = (PROMPTS / f"{name}.md").read_text()
     for k, v in values.items():
         text = text.replace("{{" + k + "}}", v)
     return text
@@ -246,21 +257,24 @@ def prompt(name: str, **values: str) -> str:
 def gate_commands(sid: str) -> list[tuple[list[str], Path, dict]]:
     studio = ROOT / "studio"
     turbo = (studio / "turbo.json").exists()
-    if sid.startswith("B"):
+    if sid.startswith("B") or FULL_GATES:
         # Telemetry off, as in CI: its global httpx instrumentation and log handlers break the telemetry tests.
         env = {"INVANA_ALLOW_GRAPH_TESTS": "1", "INVANA_TELEMETRY_ENABLED": "false"} \
             if os.environ.get("INVANA_MIGRATION_GRAPH_DB") else {}
         cmds = [(["uv", "run", "ruff", "check", "."], ROOT / "engine", {})]
         if env:  # graph-DB tests only against the isolated database (README › Isolation)
             cmds.append((["uv", "run", "pytest", "tests/", "-x", "-q"], ROOT / "engine", {**env, **graph_db_env()}))
-        return cmds
+        if not FULL_GATES:
+            return cmds
+    else:
+        cmds = []
     base = [(["pnpm", "lint"], studio, {}), (["pnpm", "check-types"], studio, {}),
             (["pnpm", "test"], studio, {}), (["pnpm", "knip"], studio, {})]
     if turbo:
         base = [(["pnpm", "turbo", "run", "lint", "check-types", "test"], studio, {}), (["pnpm", "knip"], studio, {})]
     if sid not in ("A00",):
         base.append((["pnpm", "test:e2e", "--reporter=line"], studio, {}))
-    return base
+    return cmds + base
 
 
 def graph_db_env() -> dict:
@@ -402,10 +416,10 @@ def run_session(row: dict, max_fix: int) -> bool:
             ok, report = review(row)
             if ok:
                 set_status(sid, "done", "gates green · design review passed")
-                kind = {"A": "refactor", "B": "feat", "C": "feat", "R": "chore"}[sid[0]]
+                kind = {"A": "refactor", "R": "chore"}.get(sid[0], "feat")
                 sh(["git", "add", "-A"])
-                res = sh(["git", "commit", "-m", f"{kind}(migration): session {sid} ({row['kind']})\n\nGates green; design review in "
-                          f"scripts/migration/reviews/{sid}.md.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"])
+                res = sh(["git", "commit", "-m", f"{kind}({SCOPE}): {sid} · {row['phase']}\n\nGates green; design review in "
+                          f"{(REVIEWS / f'{sid}.md').relative_to(ROOT)}.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"])
                 if res.returncode != 0:
                     print(res.stdout[-3000:] + res.stderr[-3000:])
                     set_status(sid, "blocked", "commit refused by pre-commit hooks — see the runner output")

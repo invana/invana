@@ -126,6 +126,8 @@ One shape across every route, so a new endpoint needs no new rules.
 | Versioned prefix | `/api/v1/…` |
 | Graph scoping | everything about a Graph hangs off `/u/{username}/{graphSlug}/…`; user-level routes live under `/auth/…` |
 | Lists are keyset-paginated | a cursor, not an offset — stable under writes |
+| One list contract | every list takes `q` · named filters (`status`, `agent_id`, …, repeatable) · `sort` · `cursor` + `limit`, and answers `{ items, total, next_cursor, applied }`. `total` is a real count, never `len(items)`; `applied` echoes the filters the engine used, so Studio and the assistant show the same ones |
+| Filters run on the server | a list never narrows rows only in the browser; Studio carries them in the URL as `?q=` and `?f.<field>=` |
 | Streams are server-sent events | with a `?token=` fallback where a header cannot be set |
 | `PUT` is full replace | `PATCH` is partial; a blank secret on `PUT` means "keep the stored one" |
 | Deletes are hard, and cascade downward | there is no trash tier |
