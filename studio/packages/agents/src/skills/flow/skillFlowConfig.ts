@@ -141,8 +141,27 @@ const cardTypes = Object.fromEntries(
 
 const cardLayout = {
 	defaultNodeSize: CARD,
-	nodeSpacing: 90,
+	nodeSpacing: 60,
 	layerSpacing: 44,
+};
+
+/**
+ * The steps as one straight column, every side card in a column to their
+ * right. A side card is one layer below the step it hangs off, since ELK lays
+ * an edge's target a layer after its source; a card off the last step sits
+ * under it.
+ *
+ * - **Model order** keeps the steps first in every layer — they come first in
+ *   the data — so a side card never lands left of the column.
+ * - **Network-simplex placement** straightens the chain. The task flow's
+ *   `BALANCED` alignment averages four placements, which zigzags the steps as
+ *   soon as one layer holds a side card.
+ */
+const columnOptions = {
+	"elk.spacing.edgeNode": "40",
+	"elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+	"elk.layered.considerModelOrder.strategy": "NODES_AND_EDGES",
+	"elk.layered.crossingMinimization.forceNodeModelOrder": "true",
 };
 
 export const skillFlowSettings = {
@@ -164,10 +183,7 @@ export const skillFlowSettings = {
 			...base.layouts.elk,
 			...cardLayout,
 			direction: "DOWN",
-			layoutOptions: {
-				...base.layouts.elk.layoutOptions,
-				"elk.spacing.edgeNode": "40",
-			},
+			layoutOptions: { ...base.layouts.elk.layoutOptions, ...columnOptions },
 		},
 	},
 } as unknown as Props["settings"];

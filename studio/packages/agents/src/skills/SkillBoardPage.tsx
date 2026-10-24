@@ -1,6 +1,8 @@
 /**
- * The skill's page, as a page in `mainSection` — `skill:<id>` on the strip,
- * the Skills list left beside it in `leftSection`.
+ * The skill's page, as a page in `mainSection` — `skill:<id>` on the workbook
+ * strip, opened from a row of the Skills list or any opener that names a skill.
+ * Agents has no `leftSection`: the page fills `mainSection`, and its crumb leads
+ * back to the Skills list.
  *
  * This is the host half: which skill. {@link SkillDetail} is the page itself.
  * While the list loads the page draws nothing but a spinner; a skill that is
@@ -47,7 +49,7 @@ export function SkillBoardPage({
 			<EmptyState
 				className="h-full"
 				title="This skill is not in the Graph"
-				description="It may have been deleted. Close this page, or pick a skill in the Skills list."
+				description="It may have been deleted. Close this page, or open a skill from the Skills list."
 			/>
 		);
 

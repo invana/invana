@@ -13,6 +13,7 @@ import type {
 	SkillExceptions,
 	SkillExceptionsWindow,
 	SkillPage,
+	SkillPlanCompare,
 	SkillPlaybookRead,
 	SkillTestRead,
 	SkillTestStarted,
@@ -116,6 +117,17 @@ export const skillsApi = {
 	diff: (username: string, graphSlug: string, id: string, version: number) =>
 		request<SkillVersionDiff>(
 			`${base(username, graphSlug)}/${id}/versions/${version}/diff`,
+		),
+
+	/** What publishing `version` regenerated in the plan, against the one before. */
+	planCompare: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		version: number,
+	) =>
+		request<SkillPlanCompare>(
+			`/api/v1/u/${username}/${graphSlug}/history/skill/${encodeURIComponent(id)}/compare?b=${version}`,
 		),
 
 	usage: (username: string, graphSlug: string, id: string) =>

@@ -80,7 +80,7 @@ export function SkillUsageTab({
 				<MetricTile
 					label="Offered"
 					value={current.offered}
-					caption={`v${current.version}`}
+					caption={`v${current.version} · all time`}
 				/>
 				<MetricTile
 					label="Applied"

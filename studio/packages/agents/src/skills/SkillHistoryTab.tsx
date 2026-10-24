@@ -3,16 +3,27 @@
  * why, and what happened after. *Diff* opens the prose changes under a row;
  * *Roll back* makes the next version from an earlier one's text, asked with a
  * reason and gated by the skill's evals like a publish. Nothing is rewritten.
+ *
+ * Above the list, on a published skill past its first version, *Regenerated —
+ * vN* is what the publish that made the head did to the plan — steps added,
+ * removed and changed, from the engine's compare — and *Who picks it up*: the
+ * bound agents, each on its next run, since a run in flight keeps its plan.
  */
 
-import { Button, Spinner } from "@invana/ui";
+import { Badge, Button, DiffList, DiffRow, Spinner } from "@invana/ui";
 import { ActButton } from "@invana-studio/shell";
+import { PanelSection } from "@invana-studio/ui";
 import { GitBranch, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { ChangesTable } from "../changes/ChangesTable";
 import { GatedActDialog } from "../evals/GatedActDialog";
 import { useEvalMutations } from "../evals/queries";
-import { useRollbackSkillMutation, useSkillDiffQuery } from "./queries";
+import {
+	useRollbackSkillMutation,
+	useSkillAgentsQuery,
+	useSkillDiffQuery,
+	useSkillPlanCompareQuery,
+} from "./queries";
 import type { SkillPage } from "./useSkillPage";
 
 export function SkillHistoryTab({ page }: { page: SkillPage }) {
@@ -24,6 +35,9 @@ export function SkillHistoryTab({ page }: { page: SkillPage }) {
 
 	return (
 		<div className="flex flex-col gap-2.5 p-3.5">
+			{!skill.is_draft && skill.version > 1 ? (
+				<Regenerated page={page} />
+			) : null}
 			<ChangesTable
 				username={username}
 				graphSlug={graphSlug}
@@ -87,6 +101,84 @@ export function SkillHistoryTab({ page }: { page: SkillPage }) {
 				}
 				runningEvals={evals.open.isPending}
 			/>
+		</div>
+	);
+}
+
+/** What the head's publish regenerated, and which bound agents take it up. */
+function Regenerated({ page }: { page: SkillPage }) {
+	const { username, graphSlug, skill } = page;
+	const compare = useSkillPlanCompareQuery(
+		username,
+		graphSlug,
+		skill.id,
+		skill.version,
+	);
+	const standings = useSkillAgentsQuery(username, graphSlug, skill.id);
+	const diff = compare.data?.plan ?? null;
+	const bound = (standings.data?.items ?? []).filter((a) => a.bound);
+	const touched = diff
+		? diff.added.length + diff.removed.length + diff.changed.length
+		: 0;
+
+	return (
+		<div className="grid items-start gap-2.5 @[760px]:grid-cols-2">
+			<PanelSection
+				card
+				title={`Regenerated — v${skill.version}`}
+				hint={diff?.summary}
+			>
+				{compare.isLoading ? (
+					<Spinner />
+				) : compare.error ? (
+					<p className="text-muted-foreground">
+						{(compare.error as Error).message}
+					</p>
+				) : !diff || touched === 0 ? (
+					<p className="text-muted-foreground">
+						The plan did not change with this version.
+					</p>
+				) : (
+					<DiffList>
+						{diff.added.map((k) => (
+							<DiffRow key={`+${k}`} op="add" kind="step">
+								{k}
+							</DiffRow>
+						))}
+						{diff.removed.map((k) => (
+							<DiffRow key={`-${k}`} op="remove" kind="step">
+								{k}
+							</DiffRow>
+						))}
+						{diff.changed.map((c) => (
+							<DiffRow key={`~${c.step_key}`} op="change" kind="step">
+								{c.step_key} · {c.fields.join(", ")}
+							</DiffRow>
+						))}
+					</DiffList>
+				)}
+			</PanelSection>
+			<PanelSection
+				card
+				title="Who picks it up"
+				hint="a run in flight keeps its plan"
+			>
+				{standings.isLoading ? (
+					<Spinner />
+				) : bound.length === 0 ? (
+					<p className="text-muted-foreground">
+						No agent carries it, so no run picks it up.
+					</p>
+				) : (
+					<div className="flex flex-wrap gap-1">
+						{bound.map((a) => (
+							<Badge key={a.agent_id} variant="secondary">
+								{a.agent_name} · next run
+							</Badge>
+						))}
+					</div>
+				)}
+			</PanelSection>
 		</div>
 	);
 }

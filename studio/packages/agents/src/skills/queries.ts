@@ -52,6 +52,33 @@ export function useSkillDiffQuery(
 	});
 }
 
+/**
+ * The plan diff one publish made — the history compare read, keyed as the
+ * shell's compare board keys it, so a publish's history refresh refreshes it.
+ */
+export function useSkillPlanCompareQuery(
+	username: string,
+	graphSlug: string,
+	skillId: string,
+	version: number | null,
+) {
+	return useQuery({
+		queryKey: [
+			"history",
+			username,
+			graphSlug,
+			"skill",
+			skillId,
+			"compare",
+			null,
+			version === null ? null : String(version),
+		],
+		queryFn: () =>
+			skillsApi.planCompare(username, graphSlug, skillId, version as number),
+		enabled: version !== null,
+	});
+}
+
 export function useSkillUsageQuery(
 	username: string,
 	graphSlug: string,

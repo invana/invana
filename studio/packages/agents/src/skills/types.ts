@@ -309,6 +309,23 @@ export interface SkillVersionDiff {
 	fields: SkillVersionFieldDiff[];
 }
 
+/**
+ * What one publish regenerated in the plan, from the history compare read
+ * (`…/history/skill/{id}/compare?b=`). Only the plan diff is typed: the
+ * prose diff is {@link SkillVersionDiff}'s.
+ */
+export interface SkillPlanCompare {
+	a: string | null;
+	b: string;
+	plan: {
+		added: string[];
+		removed: string[];
+		moved: string[];
+		changed: { step_key: string; fields: string[] }[];
+		summary: string;
+	} | null;
+}
+
 // ── usage ────────────────────────────────────────────────────────────────────
 
 /**

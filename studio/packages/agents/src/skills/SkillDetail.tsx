@@ -1,5 +1,5 @@
 /**
- * A skill's page — `skill:<id>` in `mainSection`, the Skills list beside it
+ * A skill's page — `skill:<id>` in `mainSection`
  * ([the-skill-page.md](docs/for-developers/modules/skills/features/the-skill-page.md)).
  *
  * *As a builder, I want to write a skill as a document, with the functions it
@@ -18,7 +18,7 @@
  * | **Exceptions** | the replans stored on the runs it was offered in |
  * | **Evals** | the gate's tiles and every case, draft against live |
  * | **Tests** | real runs of the draft, marked test |
- * | **History** | every version, its diff, one-act rollback |
+ * | **History** | what the last publish regenerated and who picks it up; every version, its diff, one-act rollback |
  *
  * The open tab is `?tab=` beside `?page=`, written on every switch, so a
  * link or a reload opens the same tab. Publish lives in the head and on Evals,

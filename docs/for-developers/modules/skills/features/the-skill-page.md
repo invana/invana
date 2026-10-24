@@ -72,7 +72,7 @@ flowchart TD
 | Exceptions | `exceptions` | `SkillExceptionsTab` | `GET …/skills/{id}/exceptions` |
 | Evals | `evals` | `SkillEvalsTab` (`EvalSetPanel` · `EvalGateCard`) | `GET …/evals/skill/{id}` · runs · `POST …/skills/{id}/versions` |
 | Tests | `tests` | `SkillTestsTab` + `SkillConsole` under Instructions (Tests · Evals · Problems · Log, on the kit's `TabbedPanel`, foldable); *Run a test* in the head opens Instructions, where the console is | `GET …/skills/{id}/tests` · `POST …/skills/{id}/tests` |
-| History | `history` | `SkillHistoryTab` | `GET …/skills/{id}/versions` · diff · rollback |
+| History | `history` | `SkillHistoryTab` — *Regenerated — vN* · *Who picks it up* over the version list | `GET …/history/skill/{id}/compare?b=vN` · `GET …/skills/{id}/agents` · `GET …/skills/{id}/versions` · diff · rollback |
 
 | Board | Draws |
 |---|---|
@@ -93,7 +93,7 @@ flowchart TD
 | Nothing drawn yet | *Nothing to draw yet — the plan appears once the steps name things the allowed functions can do* |
 | A line cannot map | The flagged line and its choices; the preview names the line; Publish is disabled |
 | Never run | Usage, Exceptions and Tests say *Not run yet* with the act that fills them |
-| Member without `build` | The editor is read-only, acts are disabled naming the role; every tab still reads |
+| Member without `build` | The editor is read-only, acts are disabled naming the role; the page opens with *You can read this skill. Editing needs the builder role — ask <holders>*; every tab still reads |
 | The engine fails | The tab names what it could not read in the engine's words |
 
 ## Engine
@@ -131,6 +131,12 @@ appears in the text is drawn without a line.
 | SP16 | **A test is a one-question eval replay**: a root run with `role = evaluate` and the label `test:skill:<id>`, opened under no agent, replaying the draft (or the head) exactly as an eval case does. The label keeps it out of the skill's eval runs and every agent's numbers; the role puts its spend on the eval budget |
 | SP17 | **An unmapped line's *Leave it to a person* rewrites the line as `A person does this: <line>`**, keeping its list marker, and saves the draft. A sentence no function can do is drawn as a person's step, so the next draw maps it; the choice is disabled once the line reads that way. The flag sits under the document, not inside it, because the editor has no under-line widgets |
 | SP18 | **Instructions is the document over a docked console**: a vertical resizable split, the editor filling the space above, the console (Tests · Evals · Problems · Log) full width below; folding the console leaves its tab strip. The Flow draws every step chained in plan order, one gap card per unmapped line after the step written before it, and *From the instructions* has one row per line |
+| SP19 | **History opens with what the head's publish regenerated.** On a published skill past v1, *Regenerated — vN* lists the plan's steps added, removed and changed against the version before, from the engine's history compare (`plan` of `…/history/skill/{id}/compare?b=vN`), with its one-line summary; *Who picks it up* lists every bound agent as `<agent> · next run`, because a run in flight keeps the plan it started with. A publish that changed no step says *The plan did not change with this version* |
+| SP20 | **The Flow is one column of steps with the side cards in a column to their right.** The canvas lays the cards out with ELK's model order (steps come first in the data, so first in every layer) and network-simplex node placement, which keeps the chain straight; a side card sits one row below the step it hangs off, and a card off the last step sits under it. The fit is the board's own (padding 70, capped at 100%) |
+| SP21 | **While a line is unmapped, the Plan preview's steps are the last plan that drew.** The preview's hint reads *from an earlier text* and the alert says *The steps below are from an earlier text*; the plan draws again once every line maps |
+| SP22 | **The picker's act is *Add N*, not *Allow N*.** Picking writes a step line naming each function; it declares a need, and only a policy in IAM allows a function, so *Allow* would claim a grant the skill does not make |
+| SP23 | **Usage's *Offered* is captioned `vN · all time`.** The usage read counts every run offered the current version since it was published, with no window; Exceptions' window is its own (`?window=`, 30 days by default) |
+| SP24 | **The locked page names the role the engine enforces.** A member without `build` sees the shell's read-only notice, naming the builder role and who holds it; every write on a skill is gated by that one area, so there is no second, owner-only reason to name |
 
 ## Not building
 
@@ -146,3 +152,8 @@ appears in the text is drawn without a line.
 | Skills list *Agents*, *Functions* and *Evals* columns | The skills list carries no bound-agent count, function count or eval pass rate (engine); *Plan* shows its steps |
 | A Flow step's *Runs*, *Allowed by* and *In its test runs* cards | Per-step run counts and policies arrive with F05's runs and I01's policies |
 | Previewing writes and sends on a test run | A test runs the ask as an eval case does; holding its writes and sends for preview arrives with F05's runs work |
+| *Ask an owner* on a locked skill | Asking for access is an access request, and access requests arrive with IAM (I01); the notice names who to ask |
+| *Publishing a skill that writes needs a Graph owner* | The engine gates every skill write by the `build` area alone; an owner-only gate on skills that write arrives with IAM's policies (I01) |
+| An × on a *Functions it needs* row | A need is a line in the prose and is removed by editing that line; a skill has no allowed-but-unneeded function to remove, since a policy in IAM allows functions (I01) |
+| A window on Usage (*Offered · 7 days*) | The usage read counts all time per version; a windowed count needs a `window` on `GET …/skills/{id}/usage` (engine) |
+| A side card on its step's own row | ELK lays an edge's target a layer below its source, and the canvas passes no per-node layout options (a layer-choice constraint) to pin it beside its step (canvas) |

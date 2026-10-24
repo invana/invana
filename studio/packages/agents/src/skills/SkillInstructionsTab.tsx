@@ -535,7 +535,7 @@ function PlanPreviewCard({
 					? "Drawing…"
 					: !nodes.length
 						? undefined
-						: refusal || (draft && !draft.drawn)
+						: firstUnmapped || refusal || (draft && !draft.drawn)
 							? "from an earlier text"
 							: "drawn from the text"
 			}
@@ -546,8 +546,8 @@ function PlanPreviewCard({
 						<TriangleAlert className="size-4" />
 						<AlertDescription>
 							Line {lineOf(text, firstUnmapped) ?? "—"} needs a function this
-							skill may not use. The plan draws again once every line maps to an
-							allowed function.
+							skill may not use. The steps below are from an earlier text; the
+							plan draws again once every line maps to an allowed function.
 						</AlertDescription>
 					</Alert>
 				) : null}
