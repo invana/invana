@@ -1,5 +1,5 @@
 /**
- * TanStack Query hooks for agents: the list, one agent's lineage, skills and
+ * TanStack Query hooks for agents: the list, one agent and its Overview, its lineage, skills and
  * callables, meters, activity and sessions, a lifecycle or soul preview, and
  * the mutations that update or act on an agent. Keys are
  * `["agents", owner, graph, …]`; a mutation invalidates every agents key.
@@ -14,7 +14,13 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { agentsApi } from "./api";
-import type { AgentUpdate, LifecycleAct, SoulPreviewRequest } from "./types";
+import type {
+	AgentCreate,
+	AgentOverviewWindow,
+	AgentUpdate,
+	LifecycleAct,
+	SoulPreviewRequest,
+} from "./types";
 
 type Scope = { username: string; graphSlug: string };
 
@@ -28,9 +34,48 @@ const agentsKey = (s: Scope, extra: unknown[] = []) =>
  * caller that resolves ids to names rather than showing a list.
  */
 export const EVERY_AGENT: ListQuery = {
-	filters: { status: ["active", "paused", "retired"], ephemeral: ["shown"] },
+	filters: {
+		status: ["draft", "active", "paused", "retired"],
+		ephemeral: ["shown"],
+	},
 	limit: 200,
 };
+
+/** One agent — what the agent page reads. */
+export function useAgentQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	agentId: string | undefined,
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQuery({
+		queryKey: agentsKey(scope, ["detail", agentId]),
+		queryFn: () =>
+			agentsApi.get(scope.username, scope.graphSlug, agentId as string),
+		enabled: !!username && !!graphSlug && !!agentId,
+	});
+}
+
+/** A live agent's Overview over `window`; the window is part of the key. */
+export function useAgentOverviewQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	agentId: string | undefined,
+	window: AgentOverviewWindow = "30d",
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQuery({
+		queryKey: agentsKey(scope, ["overview", agentId, window]),
+		queryFn: () =>
+			agentsApi.overview(
+				scope.username,
+				scope.graphSlug,
+				agentId as string,
+				window,
+			),
+		enabled: !!username && !!graphSlug && !!agentId,
+	});
+}
 
 /** One page of the Agents list for `query` — what `useListParams` reads from the URL. */
 export function useAgentsQuery(
@@ -175,6 +220,21 @@ export function useAgentMutations(username: string, graphSlug: string) {
 	};
 
 	return {
+		/** A new agent, written as a draft. */
+		create: useMutation({
+			mutationFn: (data: AgentCreate) =>
+				agentsApi.create(username, graphSlug, data),
+			onSuccess: invalidate,
+		}),
+		/** *Create agent* — the draft goes live through its eval gate. */
+		makeLive: useMutation({
+			mutationFn: ({ id, why }: { id: string; why: string }) =>
+				agentsApi.makeLive(username, graphSlug, id, why),
+			onSuccess: () => {
+				invalidate();
+				qc.invalidateQueries({ queryKey: ["history", username, graphSlug] });
+			},
+		}),
 		update: useMutation({
 			mutationFn: ({ id, data }: { id: string; data: AgentUpdate }) =>
 				agentsApi.update(username, graphSlug, id, data),

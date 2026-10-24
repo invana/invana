@@ -103,6 +103,96 @@ class TaskRunQuerySet:
         )
         return int((await session.execute(stmt)).scalar_one())
 
+    async def agent_roots_since(self, session: AsyncSession, *, agent_id: str, since: datetime) -> list[TaskRun]:
+        """This agent's root runs queued since ``since``, oldest first — eval runs left out."""
+        stmt = (
+            select(TaskRun)
+            .where(
+                TaskRun.agent_id == agent_id,
+                TaskRun.parent_run_id.is_(None),
+                TaskRun.role != RunRole.evaluate.value,
+                TaskRun.queued_at >= since,
+            )
+            .order_by(TaskRun.queued_at)
+        )
+        return list((await session.execute(stmt)).scalars().all())
+
+    async def agent_recent_roots(self, session: AsyncSession, *, agent_id: str, limit: int) -> list[TaskRun]:
+        """This agent's newest root runs — eval runs left out."""
+        stmt = (
+            select(TaskRun)
+            .where(
+                TaskRun.agent_id == agent_id,
+                TaskRun.parent_run_id.is_(None),
+                TaskRun.role != RunRole.evaluate.value,
+            )
+            .order_by(TaskRun.queued_at.desc())
+            .limit(limit)
+        )
+        return list((await session.execute(stmt)).scalars().all())
+
+    async def agent_model_first_seen(self, session: AsyncSession, *, agent_id: str) -> dict[str, datetime]:
+        """``{model_version: first queued}`` over this agent's roots and their steps, all time."""
+        root = aliased(TaskRun)
+        stmt = (
+            select(TaskRun.model_version, func.min(root.queued_at))
+            .select_from(TaskRun)
+            .join(root, or_(TaskRun.id == root.id, TaskRun.parent_run_id == root.id))
+            .where(
+                root.agent_id == agent_id,
+                root.parent_run_id.is_(None),
+                root.role != RunRole.evaluate.value,
+                TaskRun.model_version.is_not(None),
+            )
+            .group_by(TaskRun.model_version)
+        )
+        return {version: at for version, at in (await session.execute(stmt)).all() if version}
+
+    async def delegated_agents(self, session: AsyncSession, *, run_ids: list[str]) -> dict[str, set[str]]:
+        """``{root_id: agent ids}`` its steps delegated to — the two hops
+        :meth:`children_of_nodes` reads, for many roots at once."""
+        if not run_ids:
+            return {}
+        node = aliased(TaskRun)
+        stmt = (
+            select(node.parent_run_id, TaskRun.agent_id)
+            .select_from(TaskRun)
+            .join(node, TaskRun.parent_run_id == node.id)
+            .where(node.parent_run_id.in_(run_ids), TaskRun.agent_id.is_not(None))
+            .distinct()
+        )
+        out: dict[str, set[str]] = {}
+        for root_id, agent_id in (await session.execute(stmt)).all():
+            out.setdefault(root_id, set()).add(agent_id)
+        return out
+
+    async def roots_offered(
+        self, session: AsyncSession, *, graph_id: str, version_ids: list[str], since: datetime
+    ) -> list[TaskRun]:
+        """Root runs queued since ``since`` whose prompt — on the root or one of
+        its steps — carried any of these skill versions. Eval runs left out.
+
+        The match is the quoted-substring test :meth:`skill_version_counts` explains.
+        """
+        if not version_ids:
+            return []
+        step = aliased(TaskRun)
+        offered = or_(*[step.skills_offered.cast(Text).like(f'%"{v}"%') for v in version_ids])
+        on_root = or_(*[TaskRun.skills_offered.cast(Text).like(f'%"{v}"%') for v in version_ids])
+        on_step = exists().where(step.parent_run_id == TaskRun.id, offered)
+        stmt = (
+            select(TaskRun)
+            .where(
+                TaskRun.graph_id == graph_id,
+                TaskRun.parent_run_id.is_(None),
+                TaskRun.role != RunRole.evaluate.value,
+                TaskRun.queued_at >= since,
+                or_(on_root, on_step),
+            )
+            .order_by(TaskRun.queued_at)
+        )
+        return list((await session.execute(stmt)).scalars().all())
+
     # ── what a world was used for ────────────────────────────────────────────
     async def lens_usage(self, session: AsyncSession, lens_id: str) -> tuple[int, datetime | None, list[str]]:
         """``(runs, last used, who)`` for one lens.

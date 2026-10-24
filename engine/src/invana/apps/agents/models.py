@@ -51,6 +51,8 @@ class AgentKind(enum.StrEnum):
 
 
 class AgentStatus(enum.StrEnum):
+    # Being built: never offered work until *Create agent* makes it active.
+    draft = "draft"
     active = "active"
     # No new runs open under it; running ones finish.
     paused = "paused"

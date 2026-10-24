@@ -57,6 +57,7 @@ from invana.apps.llm.judge import judge_answer
 from invana.apps.llm.starter import propose_cases
 from invana.apps.skills.models import Skill, SkillVersion
 from invana.apps.skills.querysets.skill_version import SkillVersionQuerySet
+from invana.apps.skills.schemas import SkillTestRead
 from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
@@ -117,6 +118,11 @@ def _fingerprint(text_sha: str, pin: str | None) -> str:
 
 def _subject(kind: str, subject_id: str) -> str:
     return f"{kind}:{subject_id}"
+
+
+def test_label(skill_id: str) -> str:
+    """The label a skill's test runs carry — apart from its eval runs' ``skill:<id>``."""
+    return f"test:{_subject(EvalSubject.skill.value, skill_id)}"
 
 
 def _month_start() -> datetime:
@@ -597,6 +603,86 @@ class EvalManager:
         else:
             _queue_steps(db, child, None, NL_QUERY)
         return child
+
+    # ── a skill's test runs ──────────────────────────────────────────────────
+
+    async def open_test(self, db: AsyncSession, *, graph_id: str, skill_id: str, question: str, actor_id: str):
+        """Write one test run of a skill: a real ask of ``question``, replaying
+        the draft — or the head when no draft is open. The caller commits and
+        submits it.
+
+        It is a root with ``role = evaluate`` and the label ``test:skill:<id>``,
+        so it spends from the Graph's eval budget, is left out of every agent's
+        numbers, and is never read as an eval run of the skill. It opens under
+        no agent, as an eval replay of a skill does.
+        """
+        skill = await self._require_subject(db, graph_id=graph_id, kind=EvalSubject.skill, subject_id=skill_id)
+        draft = await self.versions.get_draft(db, skill.id)
+        picked = await self.candidate(db, subject=skill) if draft is not None else self._live(skill)
+        root = TaskRun(
+            graph_id=graph_id,
+            role=RunRole.evaluate.value,
+            label=test_label(skill.id),
+            author_id=actor_id,
+            author_kind="user",
+            triggered_by=TriggeredBy.user.value,
+            on_behalf_of_user_id=actor_id,
+            params={"test": True, "side": picked.kind},
+            status=RunStatus.queued.value,
+        )
+        return await self._open_ask(db, root=root, question=question, picked=picked, skill_id=skill.id)
+
+    async def page_tests(self, db: AsyncSession, *, graph_id: str, skill_id: str, params):
+        """One page of a skill's test runs, newest first, each with its spend.
+
+        A settled run's tokens are its stored roll-up; one still going is its
+        own spend plus its steps' so far.
+        """
+        await self._require_subject(db, graph_id=graph_id, kind=EvalSubject.skill, subject_id=skill_id)
+        rows, info = await self.qs.page_tests(db, graph_id=graph_id, label=test_label(skill_id), params=params)
+        going = [r.id for r in rows if r.run_tokens is None]
+        so_far = await TaskRunQuerySet().node_tokens(db, run_ids=going) if going else {}
+        reads = [
+            SkillTestRead(
+                id=r.id,
+                question=r.body or "",
+                tokens=r.run_tokens if r.run_tokens is not None else (r.tokens or 0) + so_far.get(r.id, 0),
+                duration_ms=r.duration_ms,
+                outcome=r.outcome,
+                status=r.status,
+                finished_at=r.finished_at,
+            )
+            for r in rows
+        ]
+        return reads, info
+
+    async def _open_ask(self, db: AsyncSession, *, root: TaskRun, question: str, picked: Candidate, skill_id: str):
+        # planning and services both import this package, so either at module level is a cycle.
+        from invana.runtime.services import (  # noqa: PLC0415
+            _queue_steps,
+            freeze_lens,
+            resolve_endpoint,
+        )
+
+        frozen = await freeze_lens(db, graph_id=root.graph_id, agent_id=None, lens_id=None)
+        provider = await resolve_endpoint(
+            db, graph_id=root.graph_id, snapshot=frozen["lens_snapshot"], pins=(picked.model_pin, None)
+        )
+        root.ask_kind = "nl"
+        root.body = question
+        root.flow_key = NL_QUERY.key
+        root.model_version = provider.model_id
+        root.params = {
+            **root.params,
+            "llm_model_id": provider.model_row_id,
+            "eval": {"side": "draft", "skill_id": skill_id, "skill_version_id": picked.skill_version_id},
+        }
+        for key, value in frozen.items():
+            setattr(root, key, value)
+        db.add(root)
+        await db.flush()
+        _queue_steps(db, root, None, NL_QUERY)
+        return root
 
     async def case_runs(self, db: AsyncSession, *, run_id: str) -> list[TaskRun]:
         return await self.qs.children(db, run_id=run_id)

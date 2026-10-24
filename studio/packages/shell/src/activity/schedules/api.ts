@@ -25,7 +25,7 @@ const base = (g: GraphRef) =>
 	`/api/v1/u/${g.username}/${g.graphSlug}/schedules`;
 
 export const schedulesApi = {
-	/** `q` searches the name; `enabled` filters; sorted by name. */
+	/** `q` searches the name; `enabled` and `agent_id` filter; sorted by name. */
 	async list(g: GraphRef, query: ListQuery = {}): Promise<SchedulePage> {
 		return (
 			await apiClient.get<SchedulePage>(`${base(g)}${listQueryToApi(query)}`)

@@ -10,6 +10,7 @@ import { useMemo } from "react";
 import { skillsApi } from "./api";
 import type {
 	SkillCreate,
+	SkillExceptionsWindow,
 	SkillPlaybookRead,
 	SkillVersionPublish,
 } from "./types";
@@ -60,6 +61,62 @@ export function useSkillUsageQuery(
 		queryKey: [...key(username, graphSlug), skillId, "usage"] as const,
 		queryFn: () => skillsApi.usage(username, graphSlug, skillId as string),
 		enabled: !!skillId,
+	});
+}
+
+/** Replans over the runs offered this skill; the window is part of the key. */
+export function useSkillExceptionsQuery(
+	username: string,
+	graphSlug: string,
+	skillId: string | null,
+	window: SkillExceptionsWindow = "30d",
+) {
+	return useQuery({
+		queryKey: [
+			...key(username, graphSlug),
+			skillId,
+			"exceptions",
+			window,
+		] as const,
+		queryFn: () =>
+			skillsApi.exceptions(username, graphSlug, skillId as string, window),
+		enabled: !!skillId,
+	});
+}
+
+/**
+ * The skill's test runs, newest first. While one has not finished the list
+ * polls, so a run started here settles on screen.
+ */
+export function useSkillTestsQuery(
+	username: string,
+	graphSlug: string,
+	skillId: string | null,
+) {
+	return useQuery({
+		queryKey: [...key(username, graphSlug), skillId, "tests"] as const,
+		queryFn: () => skillsApi.tests(username, graphSlug, skillId as string),
+		enabled: !!skillId,
+		refetchInterval: (q) =>
+			q.state.data?.items.some((t) => t.finished_at === null) ? 2000 : false,
+	});
+}
+
+/** *Run a test* — takes the question; the list picks the run up. */
+export function useStartSkillTestMutation(
+	username: string,
+	graphSlug: string,
+	skillId: string,
+) {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: (question: string) =>
+			skillsApi.startTest(username, graphSlug, skillId, question),
+		onSuccess: () => {
+			qc.invalidateQueries({
+				queryKey: [...key(username, graphSlug), skillId, "tests"],
+			});
+		},
 	});
 }
 

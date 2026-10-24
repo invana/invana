@@ -7,12 +7,15 @@ indexed filter rather than a scan of ``params``.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.govern.models import RunTouch
+from invana.core.lists import ListParams, PageInfo
+from invana.core.lists.querysets import page_of_select
 from invana.runtime.models import (
     EvalBudget,
     EvalCase,
@@ -85,6 +88,20 @@ class EvalQuerySet:
             .limit(50)
         )
         return list((await session.execute(stmt)).scalars().all())
+
+    async def page_tests(
+        self, session: AsyncSession, *, graph_id: str, label: str, params: ListParams
+    ) -> tuple[Sequence[TaskRun], PageInfo]:
+        """One page of the test runs carrying ``label``, newest first."""
+        stmt = select(TaskRun).where(
+            TaskRun.graph_id == graph_id,
+            TaskRun.role == RunRole.evaluate.value,
+            TaskRun.parent_run_id.is_(None),
+            TaskRun.label == label,
+        )
+        return await page_of_select(
+            session, stmt, params, unfiltered=stmt, sorts={"created_at": TaskRun.created_at}, id_column=TaskRun.id
+        )
 
     async def children(self, session: AsyncSession, *, run_id: str) -> list[TaskRun]:
         stmt = select(TaskRun).where(TaskRun.parent_run_id == run_id).order_by(TaskRun.seq)

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -32,6 +32,15 @@ class AgentCreate(BaseModel):
     # vocabulary by the manager, which names what it refused (AG16).
     soul: str = Field(default="")
     soul_traits: dict[str, str] = Field(default_factory=dict)
+    #: ``llm/<provider>/<model id>``; null lets the cast decide.
+    model_pin: str | None = Field(default=None, max_length=255)
+
+
+class AgentMakeLive(BaseModel):
+    """*Create agent* — the draft becomes active through its eval gate."""
+
+    #: Required only when the gate warned.
+    why: str | None = Field(default=None, max_length=500)
 
 
 class AgentUpdate(BaseModel):
@@ -386,6 +395,84 @@ class SoulPreviewResponse(BaseModel):
     draft: str
     #: `llm/<provider>/<model>` — what spoke, so the preview is not anonymous.
     model: str | None = None
+
+
+class AgentOverviewDay(BaseModel):
+    """One UTC calendar day of the window — every day present, a quiet one at zero."""
+
+    date: date
+    runs: int
+    tokens: int
+
+
+class AgentOverviewExit(BaseModel):
+    """How this agent's runs ended, one row per exit, the most frequent first."""
+
+    #: The run's ``outcome`` when it has one, else its ``status``.
+    exit: str
+    runs: int
+    #: The newest run that ended this way.
+    last_run_id: str
+    last_title: str
+
+
+class AgentOverviewRun(BaseModel):
+    """One of the agent's newest root runs."""
+
+    id: str
+    title: str
+    #: This agent plus each distinct agent a step of the run delegated to.
+    agents: int
+    #: The run's own spend plus its steps'.
+    tokens: int
+    duration_ms: int | None = None
+    exit: str
+    finished_at: datetime | None = None
+
+
+class AgentOverviewModel(BaseModel):
+    """One model version this agent's runs called, over the window."""
+
+    model_version: str
+    #: The first time any of this agent's runs called it, whatever the window.
+    first_at: datetime
+    runs: int
+    #: Served over the runs Verify gave a verdict; null when none did.
+    served_rate: float | None = None
+    p95_ms: float | None = None
+
+
+class AgentOverview(BaseModel):
+    """A live agent's Overview, over its root runs in the window and the one before.
+
+    The window ends today (UTC) and is ``days`` calendar days long; the prior
+    window is the same length immediately before it. Eval runs are left out.
+    Times are queued-to-finished over settled runs, as on the Agents Performance page.
+    """
+
+    agent_id: str
+    days: int
+    #: Midnight UTC of the window's first day.
+    since: datetime
+    runs: int
+    runs_prior: int
+    #: Runs Verify said served (``yes``).
+    served: int
+    #: Served over the runs Verify gave a verdict; null when none did.
+    served_rate: float | None = None
+    served_rate_prior: float | None = None
+    p95_ms: float | None = None
+    p95_prior_ms: float | None = None
+    #: Since the first of this calendar month, beside the month budget.
+    tokens_this_month: int
+    max_tokens_month: int | None = None
+    #: Agents this one spawned in the window.
+    spawned: int
+    daily: list[AgentOverviewDay] = Field(default_factory=list)
+    exits: list[AgentOverviewExit] = Field(default_factory=list)
+    #: The ten newest root runs, whatever the window.
+    recent: list[AgentOverviewRun] = Field(default_factory=list)
+    models: list[AgentOverviewModel] = Field(default_factory=list)
 
 
 class AgentMeters(BaseModel):

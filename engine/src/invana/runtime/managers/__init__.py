@@ -2,6 +2,7 @@
 
 from invana.runtime.managers.agent_capabilities import AgentCapabilitiesManager
 from invana.runtime.managers.agent_lifecycle import AgentLifecycleManager
+from invana.runtime.managers.agent_overview import AgentOverviewManager
 from invana.runtime.managers.catalogue import CatalogueManager
 from invana.runtime.managers.dataset_bind import DatasetBindManager
 from invana.runtime.managers.evals import EvalManager
@@ -21,6 +22,7 @@ from invana.runtime.managers.skill_usage import SkillUsageManager
 __all__ = [
     "AgentCapabilitiesManager",
     "AgentLifecycleManager",
+    "AgentOverviewManager",
     "BuiltinSkillSeeder",
     "CatalogueManager",
     "DatasetBindManager",

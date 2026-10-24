@@ -31,7 +31,10 @@ class ScheduleQuerySet:
     async def page_for_graph(
         self, session: AsyncSession, *, graph_id: str, params: ListParams
     ) -> tuple[Sequence[Schedule], PageInfo]:
-        """One page of the Graph's schedules. ``enabled`` is an active schedule; not enabled, a paused one."""
+        """One page of the Graph's schedules. ``enabled`` is an active schedule; not enabled, a paused one.
+
+        ``agent_id`` narrows to the schedules that start those agents.
+        """
         unfiltered = select(Schedule).where(Schedule.graph_id == graph_id)
         stmt = unfiltered
         enabled = set(params.values("enabled"))
@@ -39,6 +42,8 @@ class ScheduleQuerySet:
             stmt = stmt.where(Schedule.status == ScheduleStatus.active.value)
         elif enabled == {"false"}:
             stmt = stmt.where(Schedule.status != ScheduleStatus.active.value)
+        if agent_ids := params.values("agent_id"):
+            stmt = stmt.where(Schedule.agent_id.in_(agent_ids))
         if params.q:
             stmt = stmt.where(contains(params.q, Schedule.name))
         return await page_of_select(

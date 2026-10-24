@@ -182,6 +182,15 @@ class PlanUseRead(BaseModel):
     latest_version: int
 
 
+class SkillPlanHandler(BaseModel):
+    """One line under the version's ``## When things go wrong``, in order."""
+
+    #: The line, verbatim, without its list marker.
+    span: str
+    #: The step whose function the line names; null when it names none.
+    step_id: str | None = None
+
+
 class SkillPlanRead(BaseModel):
     """The plan a version owns — the Flow tab, in one response."""
 
@@ -194,6 +203,8 @@ class SkillPlanRead(BaseModel):
     #: will this do for me* is answerable without opening them
     #: ([LB19](docs/for-developers/modules/workflows/features/the-library.md)).
     uses: list[PlanUseRead] = Field(default_factory=list)
+    #: Read from the version's text, never drawn.
+    handlers: list[SkillPlanHandler] = Field(default_factory=list)
 
 
 class SkillClarificationRead(BaseModel):
@@ -296,6 +307,8 @@ class SkillDraftRead(BaseModel):
     #: prose named does not hold together as a plan (SK31). Cleared by the next
     #: draw that writes rows.
     refusal: SkillDrawRefusal | None = None
+    #: The sentences the last settled draw could not map to a function, verbatim.
+    unmapped: list[str] = Field(default_factory=list)
     #: Whether the plan was drawn from the draft's text as it reads now; publish needs it.
     drawn: bool = False
 
@@ -305,6 +318,70 @@ class SkillDrawStarted(BaseModel):
 
     run_id: str
     stream_url: str
+
+
+class SkillExceptionRow(BaseModel):
+    """One exception a run met while this skill was offered, and how it was handled."""
+
+    exception: str
+    #: The dotted function it happened in; null when it was not a step's.
+    function: str | None = None
+    #: The handler line that caught it; null when the run improvised.
+    handled_by: str | None = None
+    #: ``declared`` · ``manifest`` · ``improvised`` · ``runtime``.
+    source: str
+    seen: int
+    #: Served over the runs that met it and Verify gave a verdict.
+    served_rate: float | None = None
+
+
+class SkillExceptions(BaseModel):
+    """The Exceptions tab: replans over the root runs offered this skill in the window.
+
+    ``items`` stays empty until runs record which handler fired.
+    """
+
+    days: int
+    since: datetime
+    runs: int
+    #: Runs that replanned at least once.
+    replanned: int
+    replans_p95: float | None = None
+    #: A skill carries no replan limit of its own; each run's agent's applies.
+    max_replans: int | None = None
+    #: Runs whose replans reached their agent's ``max_replans``.
+    hit_limit: int
+    items: list[SkillExceptionRow] = Field(default_factory=list)
+
+
+class SkillTestStart(BaseModel):
+    """*Run a test* — one question, asked of the draft (or the head with no draft)."""
+
+    question: str = Field(..., min_length=1, max_length=4000)
+
+
+class SkillTestRead(BaseModel):
+    """One test run of a skill — a real run, marked test, paid from the eval budget."""
+
+    id: str
+    question: str
+    #: The run's own spend plus its steps'.
+    tokens: int
+    duration_ms: int | None = None
+    outcome: str | None = None
+    status: str
+    finished_at: datetime | None = None
+
+
+class SkillTestStarted(BaseModel):
+    """The test run that was opened, and where to watch it."""
+
+    run_id: str
+    stream_url: str
+
+
+#: The Tests list: newest first, no filters.
+SKILL_TEST_LIST = ListSpec(filters={}, sorts=("-created_at",))
 
 
 class SkillRead(BaseModel):

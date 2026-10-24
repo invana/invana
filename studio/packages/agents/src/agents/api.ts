@@ -1,6 +1,6 @@
 /**
- * The agents endpoints under `/api/v1/u/{owner}/{graph}/agents`: list,
- * update, a lifecycle act and its preview, the soul preview, lineage,
+ * The agents endpoints under `/api/v1/u/{owner}/{graph}/agents`: list, one
+ * agent, create and make live, its Overview, update, a lifecycle act and its preview, the soul preview, lineage,
  * skills and callables, meters and activity. Each call is one `request` on the
  * shared client and returns the engine's shape unchanged.
  */
@@ -9,8 +9,11 @@ import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type { EventListResponse } from "@invana-studio/shell";
 import type {
 	Agent,
+	AgentCreate,
 	AgentLineage,
 	AgentMeters,
+	AgentOverview,
+	AgentOverviewWindow,
 	AgentPage,
 	AgentSkillsAndCallables,
 	AgentUpdate,
@@ -31,6 +34,39 @@ export const agentsApi = {
 	list: (username: string, graphSlug: string, query: ListQuery = {}) =>
 		request<AgentPage>(
 			`${base(username, graphSlug)}/agents${listQueryToApi(query)}`,
+		),
+
+	/** One agent, as the engine reads it. */
+	get: (username: string, graphSlug: string, id: string) =>
+		request<Agent>(`${base(username, graphSlug)}/agents/${id}`),
+
+	/** A new agent, written as a `draft` — offered no work until `makeLive`. */
+	create: (username: string, graphSlug: string, data: AgentCreate) =>
+		request<Agent>(`${base(username, graphSlug)}/agents`, {
+			method: "POST",
+			...json(data),
+		}),
+
+	/**
+	 * *Create agent*: the draft becomes active through its eval gate. 409 unless
+	 * it is a draft, and on `eval_required` · `eval_running` · `eval_failed` ·
+	 * `eval_warned` (a warning passes with a `why`).
+	 */
+	makeLive: (username: string, graphSlug: string, id: string, why: string) =>
+		request<Agent>(`${base(username, graphSlug)}/agents/${id}/create`, {
+			method: "POST",
+			...json({ why: why || null }),
+		}),
+
+	/** A live agent's Overview over the window — every number the engine's. */
+	overview: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		window: AgentOverviewWindow = "30d",
+	) =>
+		request<AgentOverview>(
+			`${base(username, graphSlug)}/agents/${id}/overview?window=${window}`,
 		),
 
 	update: (

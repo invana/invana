@@ -909,6 +909,18 @@
             "title": "Instructions",
             "type": "string"
           },
+          "model_pin": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Pin"
+          },
           "name": {
             "maxLength": 255,
             "minLength": 1,
@@ -1044,6 +1056,25 @@
           "edges"
         ],
         "title": "AgentLineageResponse",
+        "type": "object"
+      },
+      "AgentMakeLive": {
+        "description": "*Create agent* \u2014 the draft becomes active through its eval gate.",
+        "properties": {
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "title": "AgentMakeLive",
         "type": "object"
       },
       "AgentMeters": {
@@ -1227,6 +1258,297 @@
           "label"
         ],
         "title": "AgentNode",
+        "type": "object"
+      },
+      "AgentOverview": {
+        "description": "A live agent's Overview, over its root runs in the window and the one before.\n\nThe window ends today (UTC) and is ``days`` calendar days long; the prior\nwindow is the same length immediately before it. Eval runs are left out.\nTimes are queued-to-finished over settled runs, as on the Agents Performance page.",
+        "properties": {
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "daily": {
+            "items": {
+              "$ref": "#/components/schemas/AgentOverviewDay"
+            },
+            "title": "Daily",
+            "type": "array"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "exits": {
+            "items": {
+              "$ref": "#/components/schemas/AgentOverviewExit"
+            },
+            "title": "Exits",
+            "type": "array"
+          },
+          "max_tokens_month": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens Month"
+          },
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/AgentOverviewModel"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          },
+          "p95_prior_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Prior Ms"
+          },
+          "recent": {
+            "items": {
+              "$ref": "#/components/schemas/AgentOverviewRun"
+            },
+            "title": "Recent",
+            "type": "array"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          },
+          "runs_prior": {
+            "title": "Runs Prior",
+            "type": "integer"
+          },
+          "served": {
+            "title": "Served",
+            "type": "integer"
+          },
+          "served_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Served Rate"
+          },
+          "served_rate_prior": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Served Rate Prior"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          },
+          "spawned": {
+            "title": "Spawned",
+            "type": "integer"
+          },
+          "tokens_this_month": {
+            "title": "Tokens This Month",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "agent_id",
+          "days",
+          "since",
+          "runs",
+          "runs_prior",
+          "served",
+          "tokens_this_month",
+          "spawned"
+        ],
+        "title": "AgentOverview",
+        "type": "object"
+      },
+      "AgentOverviewDay": {
+        "description": "One UTC calendar day of the window \u2014 every day present, a quiet one at zero.",
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "runs",
+          "tokens"
+        ],
+        "title": "AgentOverviewDay",
+        "type": "object"
+      },
+      "AgentOverviewExit": {
+        "description": "How this agent's runs ended, one row per exit, the most frequent first.",
+        "properties": {
+          "exit": {
+            "title": "Exit",
+            "type": "string"
+          },
+          "last_run_id": {
+            "title": "Last Run Id",
+            "type": "string"
+          },
+          "last_title": {
+            "title": "Last Title",
+            "type": "string"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "exit",
+          "runs",
+          "last_run_id",
+          "last_title"
+        ],
+        "title": "AgentOverviewExit",
+        "type": "object"
+      },
+      "AgentOverviewModel": {
+        "description": "One model version this agent's runs called, over the window.",
+        "properties": {
+          "first_at": {
+            "format": "date-time",
+            "title": "First At",
+            "type": "string"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          },
+          "served_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Served Rate"
+          }
+        },
+        "required": [
+          "model_version",
+          "first_at",
+          "runs"
+        ],
+        "title": "AgentOverviewModel",
+        "type": "object"
+      },
+      "AgentOverviewRun": {
+        "description": "One of the agent's newest root runs.",
+        "properties": {
+          "agents": {
+            "title": "Agents",
+            "type": "integer"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "exit": {
+            "title": "Exit",
+            "type": "string"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "agents",
+          "tokens",
+          "exit"
+        ],
+        "title": "AgentOverviewRun",
         "type": "object"
       },
       "AgentPage": {
@@ -15034,6 +15356,50 @@
         "title": "Page[SkillRead]",
         "type": "object"
       },
+      "Page_SkillTestRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SkillTestRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[SkillTestRead]",
+        "type": "object"
+      },
       "Page_TaskRunSummary_": {
         "properties": {
           "applied": {
@@ -22313,6 +22679,13 @@
               }
             ]
           },
+          "unmapped": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unmapped",
+            "type": "array"
+          },
           "version": {
             "$ref": "#/components/schemas/SkillVersionRead"
           }
@@ -22364,6 +22737,127 @@
         "title": "SkillDrawStarted",
         "type": "object"
       },
+      "SkillExceptionRow": {
+        "description": "One exception a run met while this skill was offered, and how it was handled.",
+        "properties": {
+          "exception": {
+            "title": "Exception",
+            "type": "string"
+          },
+          "function": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Function"
+          },
+          "handled_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handled By"
+          },
+          "seen": {
+            "title": "Seen",
+            "type": "integer"
+          },
+          "served_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Served Rate"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "exception",
+          "source",
+          "seen"
+        ],
+        "title": "SkillExceptionRow",
+        "type": "object"
+      },
+      "SkillExceptions": {
+        "description": "The Exceptions tab: replans over the root runs offered this skill in the window.\n\n``items`` stays empty until runs record which handler fired.",
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "hit_limit": {
+            "title": "Hit Limit",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SkillExceptionRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "max_replans": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Replans"
+          },
+          "replanned": {
+            "title": "Replanned",
+            "type": "integer"
+          },
+          "replans_p95": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replans P95"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          }
+        },
+        "required": [
+          "days",
+          "since",
+          "runs",
+          "replanned",
+          "hit_limit"
+        ],
+        "title": "SkillExceptions",
+        "type": "object"
+      },
       "SkillPlanEdge": {
         "properties": {
           "kind": {
@@ -22390,6 +22884,31 @@
           "kind"
         ],
         "title": "SkillPlanEdge",
+        "type": "object"
+      },
+      "SkillPlanHandler": {
+        "description": "One line under the version's ``## When things go wrong``, in order.",
+        "properties": {
+          "span": {
+            "title": "Span",
+            "type": "string"
+          },
+          "step_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step Id"
+          }
+        },
+        "required": [
+          "span"
+        ],
+        "title": "SkillPlanHandler",
         "type": "object"
       },
       "SkillPlanNode": {
@@ -22466,6 +22985,13 @@
               "$ref": "#/components/schemas/SkillPlanEdge"
             },
             "title": "Edges",
+            "type": "array"
+          },
+          "handlers": {
+            "items": {
+              "$ref": "#/components/schemas/SkillPlanHandler"
+            },
+            "title": "Handlers",
             "type": "array"
           },
           "layers": {
@@ -22660,6 +23186,104 @@
           "version"
         ],
         "title": "SkillRollback",
+        "type": "object"
+      },
+      "SkillTestRead": {
+        "description": "One test run of a skill \u2014 a real run, marked test, paid from the eval budget.",
+        "properties": {
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "tokens",
+          "status"
+        ],
+        "title": "SkillTestRead",
+        "type": "object"
+      },
+      "SkillTestStart": {
+        "description": "*Run a test* \u2014 one question, asked of the draft (or the head with no draft).",
+        "properties": {
+          "question": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "SkillTestStart",
+        "type": "object"
+      },
+      "SkillTestStarted": {
+        "description": "The test run that was opened, and where to watch it.",
+        "properties": {
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "stream_url": {
+            "title": "Stream Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "stream_url"
+        ],
+        "title": "SkillTestStarted",
         "type": "object"
       },
       "SkillUpdate": {
@@ -31975,6 +32599,7 @@
         ]
       },
       "post": {
+        "description": "Write a new agent as a **draft**: built, never offered work until *Create agent*.",
         "operationId": "create_agent_api_v1_u__username___graphSlug__agents_post",
         "parameters": [
           {
@@ -32481,6 +33106,93 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/create": {
+      "post": {
+        "description": "*Create agent* \u2014 move a draft to active through its eval gate.\n\nRefused with 409 unless the agent is a draft, and by the gate:\n``eval_required`` \u00b7 ``eval_running`` \u00b7 ``eval_failed`` \u00b7 ``eval_warned``\n(a warning passes with a ``why``). With no eval set it passes unchecked.",
+        "operationId": "make_agent_live_api_v1_u__username___graphSlug__agents__agent_id__create_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/AgentMakeLive"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Make Agent Live",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/draft": {
       "delete": {
         "operationId": "discard_agent_draft_api_v1_u__username___graphSlug__agents__agent_id__draft_delete",
@@ -32762,6 +33474,87 @@
           }
         ],
         "summary": "Agent Meters",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/overview": {
+      "get": {
+        "description": "A live agent's Overview: its root runs over the window against the one\nbefore, a row per day, how runs ended, the newest runs and the model\nversions it ran on \u2014 every number stored or counted here, never by the reader.",
+        "operationId": "agent_overview_api_v1_u__username___graphSlug__agents__agent_id__overview_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window",
+            "required": false,
+            "schema": {
+              "default": "30d",
+              "pattern": "^(7d|30d|90d)$",
+              "title": "Window",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Agent Overview",
         "tags": [
           "agents"
         ]
@@ -52008,6 +52801,87 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/exceptions": {
+      "get": {
+        "description": "Replans over the root runs offered this skill in the window, from the\nstored ``task_runs.replans``. ``items`` stays empty until runs record which\nhandler fired.",
+        "operationId": "skill_exceptions_api_v1_u__username___graphSlug__skills__skill_id__exceptions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window",
+            "required": false,
+            "schema": {
+              "default": "30d",
+              "pattern": "^(7d|30d|90d)$",
+              "title": "Window",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillExceptions"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Skill Exceptions",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/rollback": {
       "post": {
         "description": "Restore an earlier version as the next one \u2014 its text and a copy of its plan.\n\nNothing is rewritten: the restore is a new published version that names the\none it copied. Refused while a draft is open, and for the current version.",
@@ -52083,6 +52957,154 @@
           }
         ],
         "summary": "Rollback Skill",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/tests": {
+      "get": {
+        "description": "This skill's test runs, newest first.",
+        "operationId": "list_skill_tests_api_v1_u__username___graphSlug__skills__skill_id__tests_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SkillTestRead_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Skill Tests",
+        "tags": [
+          "skills"
+        ]
+      },
+      "post": {
+        "description": "*Run a test* \u2014 a real run of the draft (or the head with no draft) on one\nquestion, marked test and paid from the eval budget. Stream it like any run.",
+        "operationId": "start_skill_test_api_v1_u__username___graphSlug__skills__skill_id__tests_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillTestStart"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillTestStarted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Start Skill Test",
         "tags": [
           "skills"
         ]

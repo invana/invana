@@ -19,7 +19,9 @@ from invana.apps.agents.schemas import (
     AgentCreate,
     AgentDraftWrite,
     AgentLineageResponse,
+    AgentMakeLive,
     AgentMeters,
+    AgentOverview,
     AgentPage,
     AgentPublish,
     AgentRead,
@@ -41,12 +43,19 @@ from invana.core.db import get_session
 from invana.core.events.schemas import EventListResponse
 from invana.core.events.store import EventFilter, EventStore
 from invana.core.lists import ListParams, applied_filters, list_params
-from invana.runtime.managers import AgentCapabilitiesManager, AgentLifecycleManager, EvalManager, SkillBindManager
+from invana.runtime.managers import (
+    AgentCapabilitiesManager,
+    AgentLifecycleManager,
+    AgentOverviewManager,
+    EvalManager,
+    SkillBindManager,
+)
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 agents = AgentManager()
 lifecycle = AgentLifecycleManager()
 capabilities = AgentCapabilitiesManager()
+overviews = AgentOverviewManager()
 souls = SoulManager()
 skills = SkillManager()
 bindings = SkillBindingManager()
@@ -94,8 +103,56 @@ async def create_agent(
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> AgentRead:
+    """Write a new agent as a **draft**: built, never offered work until *Create agent*."""
     agent = await agents.create_agent(session, graph=graph, payload=payload, actor=user, bind_check=binds.check)
     return await agents.read(session, agent)
+
+
+async def make_agent_live(
+    payload: AgentMakeLive | None = None,
+    agent_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> AgentRead:
+    """*Create agent* — move a draft to active through its eval gate.
+
+    Refused with 409 unless the agent is a draft, and by the gate:
+    ``eval_required`` · ``eval_running`` · ``eval_failed`` · ``eval_warned``
+    (a warning passes with a ``why``). With no eval set it passes unchecked.
+    """
+    payload = payload or AgentMakeLive()
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    evaluated = (
+        await evals.gate(
+            session,
+            graph_id=graph.id,
+            subject_kind="agent",
+            subject_id=agent.id,
+            unchanged_pin=False,
+            model_pin=agent.model_pin,
+            why=payload.why,
+        )
+        if agent.status == AgentStatus.draft.value
+        else None
+    )
+    agent = await agents.make_live(session, agent=agent, actor=user, why=payload.why, evaluated=evaluated)
+    return await agents.read(session, agent)
+
+
+async def agent_overview(
+    agent_id: str = Path(...),
+    window: str = Query(default="30d", pattern="^(7d|30d|90d)$"),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> AgentOverview:
+    """A live agent's Overview: its root runs over the window against the one
+    before, a row per day, how runs ended, the newest runs and the model
+    versions it ran on — every number stored or counted here, never by the reader."""
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    return await overviews.overview(session, agent=agent, days=_WINDOWS[window])
 
 
 async def get_agent(

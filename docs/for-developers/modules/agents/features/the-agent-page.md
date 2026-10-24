@@ -101,8 +101,8 @@ flowchart TD
 |---|---|
 | `AgentStatus` | `draft` · `active` · `paused` · `retired` |
 | `POST …/agents` | `AgentCreate` + `model_pin`; writes `status = draft`, instructions as given, skills bound through the bind check |
-| `POST …/agents/{id}/create` | body `why?` → `AgentRead` with `status = active`; `409` unless `draft`; runs `evals.gate(subject_kind="agent")` — `eval_failed` · `eval_running` · `eval_warned` (needs `why`) |
-| `GET …/agents/{id}/overview?window=30d` | `AgentOverview` — `runs` · `runs_prior` · `served` · `served_rate` · `served_rate_prior` · `p95_ms` · `p95_prior_ms` · `tokens_this_month` · `max_tokens_month` · `spawned` · `daily[]` (date, runs, tokens) · `exits[]` (exit, runs, last_run_id, last_title) · `recent[]` (id, title, agents, tokens, duration_ms, exit, finished_at) · `models[]` (model_version, first_at, runs, served_rate, p95_ms) |
+| `POST …/agents/{id}/create` | body `why?` → `AgentRead` with `status = active`; `409` unless `draft`; runs `evals.gate(subject_kind="agent")` — `eval_required` · `eval_failed` · `eval_running` · `eval_warned` (needs `why`) |
+| `GET …/agents/{id}/overview?window=30d` | `AgentOverview` — `agent_id` · `days` · `since` · `runs` · `runs_prior` · `served` · `served_rate` · `served_rate_prior` · `p95_ms` · `p95_prior_ms` · `tokens_this_month` · `max_tokens_month` · `spawned` · `daily[]` (date, runs, tokens) · `exits[]` (exit, runs, last_run_id, last_title) · `recent[]` (id, title, agents, tokens, duration_ms, exit, finished_at) · `models[]` (model_version, first_at, runs, served_rate, p95_ms) |
 | An exit | the run's `outcome` when it has one (`answered` · `conversed` · `cannot_answer` · `failed` · `cancelled`), else its `status`. Exit-rule reasons (time limit, no progress, loop) join with F05 |
 | `GET …/schedules?f.agent_id=` | the schedules that start this agent — Flow's and Deploy's triggers |
 | Runs | `GET …/runs?f.agent_id=` — the agent's root runs |
@@ -128,6 +128,9 @@ default is refused with `409` naming the state, as for `paused`.
 | AP13 | **Deploy reads the Graph's pools** (`GET …/contention`): *Where its steps run* lists each resource its functions declare (`resources` on the manifest) with the pool that serves it and its free slots; triggers are its schedules (each opens Activity › Schedules), *Can be assigned* and *Unattended* (`policy.can_be_assigned` · `policy.unattended`). An event trigger joins with workers (F06) |
 | AP14 | **Model's *Versions it has run on* is `overview.models`**, this agent's runs grouped by the recorded `model_version`; a move is `PATCH model_pin` with a reason, gated by the agent's evals |
 | AP12 | **A tab whose engine read is missing draws what exists and leaves the rest out**, never derived; the gaps are the build's hand-off |
+| AP15 | **`draft` is a stored status value, not a schema change** — `agents.status` is a string column, so no migration. Seeded and spawned agents are written `active`; only `POST …/agents` writes `draft`. *Pause* and *Resume* refuse a draft with `409` (a resume would skip the gate); *Retire* takes one |
+| AP16 | **Create's gate reads the agent as it is**: the candidate is its instructions with its `model_pin`, and with no eval set it passes `unchecked`. Success emits `agent.activate` carrying the gate's verdict and the `why` |
+| AP17 | **The Overview's window is `days` UTC calendar days ending today** (`7d` · `30d` · `90d`), so `daily` has exactly `days` rows, zero-filled; the prior window is the same length before it. Counted over the agent's root runs, eval runs left out. `served_rate` is Verify's `yes` over the runs Verify gave a verdict (null when none did); `p95_ms` is queued-to-finished over settled runs, the same reading Agents › Performance uses. `recent` is the ten newest runs whatever the window; a run's `agents` is the agent plus each distinct agent its steps delegated to. `models` groups the window's runs by every `model_version` their root or steps recorded; `first_at` is that version's first run by this agent, all time |
 
 ## Not building
 

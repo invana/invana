@@ -138,6 +138,7 @@ class TestLifecycle:
         authored = await AgentManager().create_agent(
             session, graph=graph, payload=AgentCreate(name="Analyst", envelope_from="explorer"), actor=user
         )
+        await AgentManager().make_live(session, agent=authored, actor=user)
         task = await tasks.create(session, graph=graph, payload=TaskCreate(title="t", body="b"), actor=user)
         await tasks.assign(session, graph=graph, task=task, assignee_kind="agent", assignee_id=authored.id, actor=user)
         await session.flush()

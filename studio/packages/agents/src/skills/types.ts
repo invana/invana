@@ -108,6 +108,16 @@ export interface SkillPlaybookRead {
 	layers: SkillLayer[];
 	/** The library plans this plan inlined, and what it tuned on each. */
 	uses: PlanUse[];
+	/** Each line under `## When things go wrong`, in order — read from the text, never drawn. */
+	handlers: SkillPlanHandler[];
+}
+
+/** One handler line, and the step whose function it names. */
+export interface SkillPlanHandler {
+	/** The line, verbatim, without its list marker. */
+	span: string;
+	/** Null when the line names no step's function. */
+	step_id: string | null;
 }
 
 /** One composition: which plan, which version, and the arguments it tuned. */
@@ -168,6 +178,8 @@ export interface SkillDraft {
 	 * a run that died. The next draw that writes rows clears it.
 	 */
 	refusal: SkillDrawRefusal | null;
+	/** The sentences the last settled draw could not map to a function, verbatim. */
+	unmapped: string[];
 }
 
 /**
@@ -195,6 +207,58 @@ interface SkillDrawRefusal {
 
 /** The `role = plan` run that is drawing the draft, and where to watch it. */
 export interface SkillDrawStarted {
+	run_id: string;
+	stream_url: string;
+}
+
+// ── exceptions and tests ─────────────────────────────────────────────────────
+
+/** One exception a run met while this skill was offered, and how it was handled. */
+export interface SkillExceptionRow {
+	exception: string;
+	/** The dotted function it happened in; null when not a step's. */
+	function: string | null;
+	/** The handler line that caught it; null when the run improvised. */
+	handled_by: string | null;
+	source: "declared" | "manifest" | "improvised" | "runtime";
+	seen: number;
+	served_rate: number | null;
+}
+
+/** The windows Exceptions takes. */
+export type SkillExceptionsWindow = "7d" | "30d" | "90d";
+
+/** Replans over the root runs offered this skill in the window. */
+export interface SkillExceptions {
+	days: number;
+	/** Midnight UTC of the window's first day. */
+	since: string;
+	runs: number;
+	/** Runs that replanned at least once. */
+	replanned: number;
+	replans_p95: number | null;
+	/** A skill has no limit of its own; each run's agent's applies. */
+	max_replans: number | null;
+	/** Runs whose replans reached their agent's `max_replans`. */
+	hit_limit: number;
+	/** Empty until runs record which handler fired. */
+	items: SkillExceptionRow[];
+}
+
+/** One test run — a real run of the draft (or the head), marked test. */
+export interface SkillTestRead {
+	id: string;
+	question: string;
+	/** The run's own spend plus its steps'. */
+	tokens: number;
+	duration_ms: number | null;
+	outcome: string | null;
+	status: string;
+	finished_at: string | null;
+}
+
+/** The test run that was opened, and where to watch it. */
+export interface SkillTestStarted {
 	run_id: string;
 	stream_url: string;
 }

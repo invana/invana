@@ -14,6 +14,9 @@ GET         ``/{id}/versions/{version}``  one version by number
 GET           ``/{id}/versions/{version}/diff``  against the one before it
 GET           ``/{id}/agents``  bound · refused · not bound, refusals dry-run
 GET           ``/{id}/usage``  carried · offered · reported
+GET           ``/{id}/exceptions``  replans over the runs offered it
+GET           ``/{id}/tests``  its test runs, newest first
+POST          ``/{id}/tests``  run one question against the draft
 ============  ==========  =================
 
 This file defines **no function** (migration-plan §4) — it maps a path to a
@@ -29,8 +32,11 @@ from invana.apps.skills.schemas import (
     SkillAgentsResponse,
     SkillDraftRead,
     SkillDrawStarted,
+    SkillExceptions,
     SkillPlanRead,
     SkillRead,
+    SkillTestRead,
+    SkillTestStarted,
     SkillVersionDiff,
     SkillVersionListResponse,
     SkillVersionRead,
@@ -74,3 +80,8 @@ skills_router.get("/{skill_id}/versions/{version}/tasks", response_model=SkillPl
 skills_router.get("/{skill_id}/versions/{version}/diff", response_model=SkillVersionDiff)(views.diff_skill_version)
 skills_router.get("/{skill_id}/agents", response_model=SkillAgentsResponse)(views.skill_agents)
 skills_router.get("/{skill_id}/usage", response_model=SkillUsageResponse)(views.skill_usage)
+skills_router.get("/{skill_id}/exceptions", response_model=SkillExceptions)(views.skill_exceptions)
+skills_router.get("/{skill_id}/tests", response_model=Page[SkillTestRead])(views.list_skill_tests)
+skills_router.post("/{skill_id}/tests", response_model=SkillTestStarted, status_code=status.HTTP_202_ACCEPTED)(
+    views.start_skill_test
+)

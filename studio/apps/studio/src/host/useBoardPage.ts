@@ -35,6 +35,8 @@ export function useBoardPage() {
 			setParams(
 				(prev) => {
 					const next = new URLSearchParams(prev);
+					// `?tab=` is the page's own tab; another page starts on its default.
+					if (prev.get(PAGE_PARAM) !== id) next.delete("tab");
 					if (id) next.set(PAGE_PARAM, id);
 					else next.delete(PAGE_PARAM);
 					for (const [key, value] of Object.entries(extra ?? {})) {

@@ -102,9 +102,9 @@ flowchart TD
 |---|---|
 | `SkillDraftRead.unmapped` | the sentences the last draw could not map to a function, verbatim — each is flagged under its line |
 | `SkillPlanRead.handlers` | one row per line under `## When things go wrong`, in order: `span` (the line, verbatim) · `step_id` (the step it guards, or null when the line names none) |
-| `GET …/skills/{id}/exceptions?window=30d` | `runs` · `replanned` · `replans_p95` · `max_replans` · `hit_limit` over the runs offered this skill, from `task_runs.replans`; `items[]` (exception, function, handled_by, source, seen, served_rate) — empty until runs record their handlers (F05) |
-| `POST …/skills/{id}/tests` | body `question` → a real run of the draft (or the head with no draft) on that question, marked `test`, paid from the eval budget; writes and sends previewed |
-| `GET …/skills/{id}/tests` | `Page` of test runs: id · question · tokens · duration_ms · outcome · finished_at |
+| `GET …/skills/{id}/exceptions?window=30d` | `days` · `since` · `runs` · `replanned` · `replans_p95` · `max_replans` · `hit_limit` over the runs offered this skill, from `task_runs.replans`; `items[]` (exception, function, handled_by, source, seen, served_rate) — empty until runs record their handlers (F05) |
+| `POST …/skills/{id}/tests` | body `question` → `202` `{run_id, stream_url}`: a real run of the draft (or the head with no draft) on that question, marked `test`, paid from the eval budget |
+| `GET …/skills/{id}/tests` | `Page` of test runs: id · question · tokens · duration_ms · outcome · status · finished_at |
 
 A step's line number is where its `source_span` reads in the text on screen; a span that no longer
 appears in the text is drawn without a line.
@@ -125,6 +125,10 @@ appears in the text is drawn without a line.
 | SP11 | **A handler guards the step it names**: `handlers[].step_id` is the step whose function the line names, else null and the handler is drawn under the plan's last step. Runs that record which handler fired arrive with replans (F05) |
 | SP12 | **Exceptions shows the stored replan numbers now**; its table fills when runs record their handlers (F05), and its empty state says *No exceptions recorded yet* |
 | SP10 | **Publish lives in the head and on Evals**, and both go through the eval gate with a reason ([IS4](instructions-publish-rollback.md#decisions) · [evals](evals.md)) |
+| SP13 | **`unmapped` is read off the last settled draw**, the `plan.draft` step's `output.unmapped`, beside its refusal; while a draw is in flight it is empty, as `refusal` is |
+| SP14 | **Handlers are parsed from the version's text, never drawn**: every non-empty line under a `When things go wrong` heading until the next level-one or level-two heading, its list marker dropped. `step_id` is the first plan node whose dotted function the line names as a whole word, else the first whose function's last segment it names, else null |
+| SP15 | **Exceptions counts root runs queued in the last `days` UTC calendar days whose root or a step was offered any published version of the skill**, eval and test runs left out. `hit_limit` is a run whose `replans` reached its own agent's `effort.max_replans`; a skill carries no limit, so `max_replans` is null |
+| SP16 | **A test is a one-question eval replay**: a root run with `role = evaluate` and the label `test:skill:<id>`, opened under no agent, replaying the draft (or the head) exactly as an eval case does. The label keeps it out of the skill's eval runs and every agent's numbers; the role puts its spend on the eval budget |
 
 ## Not building
 
@@ -134,3 +138,4 @@ appears in the text is drawn without a line.
 | A Playbook tab apart from Instructions | The document is the playbook |
 | A skill granting functions | A skill declares needs; a policy in IAM allows them (I01) |
 | Assistant proposals marked in the editor | The assistant's proposals arrive with F05's assistant work |
+| Previewing writes and sends on a test run | A test runs the ask as an eval case does; holding its writes and sends for preview arrives with F05's runs work |

@@ -202,7 +202,10 @@ class ScheduleRead(BaseModel):
 #: What the Schedules list takes. ``enabled=true`` is an active schedule,
 #: ``false`` a paused one.
 SCHEDULE_LIST = ListSpec(
-    filters={"enabled": Filter(values=("true", "false"), labels={"true": "enabled", "false": "disabled"})},
+    filters={
+        "enabled": Filter(values=("true", "false"), labels={"true": "enabled", "false": "disabled"}),
+        "agent_id": Filter(title="agent"),
+    },
     sorts=("name",),
     search_title="name",
 )

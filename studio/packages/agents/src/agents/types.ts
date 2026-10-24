@@ -11,7 +11,8 @@ import type { Page } from "@invana-studio/core";
 
 type AgentKind = "seeded" | "authored" | "spawned";
 
-type AgentStatus = "active" | "paused" | "retired";
+/** `draft` is built but never offered work until *Create agent*. */
+export type AgentStatus = "draft" | "active" | "paused" | "retired";
 
 type AgentLifetime = "persistent" | "ephemeral";
 
@@ -83,7 +84,8 @@ export interface AgentPage extends Page<Agent> {
 	tokens_this_month: Record<string, number>;
 }
 
-interface AgentCreate {
+/** A new agent — written as a `draft`. */
+export interface AgentCreate {
 	name: string;
 	description?: string;
 	instructions?: string;
@@ -98,12 +100,14 @@ interface AgentCreate {
 	/** `""` clears it back to the default voice. */
 	soul?: string;
 	soul_traits?: SoulTraits;
+	/** `llm/<provider>/<model id>`; null lets the cast decide. */
+	model_pin?: string | null;
 }
 
 /** No `skill_ids`: binding is its own write, so that a refusal can name the one
  *  skill it rejected rather than a whole list. */
 export type AgentUpdate = Partial<
-	Omit<AgentCreate, "envelope_from" | "skill_ids">
+	Omit<AgentCreate, "envelope_from" | "skill_ids" | "model_pin">
 > & {
 	/** Moving it is gated by the agent's evals. */
 	model_pin?: string | null;
@@ -180,6 +184,81 @@ export interface AgentMeters {
 	max_children?: number | null;
 	max_depth?: number | null;
 	max_fanout?: number | null;
+}
+
+/** One UTC calendar day of the Overview's window; a quiet day is zero. */
+export interface AgentOverviewDay {
+	date: string;
+	runs: number;
+	tokens: number;
+}
+
+/** How runs ended, one row per exit, the most frequent first. */
+export interface AgentOverviewExit {
+	/** The run's `outcome` when it has one, else its `status`. */
+	exit: string;
+	runs: number;
+	/** The newest run that ended this way. */
+	last_run_id: string;
+	last_title: string;
+}
+
+/** One of the agent's newest root runs. */
+export interface AgentOverviewRun {
+	id: string;
+	title: string;
+	/** This agent plus each distinct agent its steps delegated to. */
+	agents: number;
+	/** The run's own spend plus its steps'. */
+	tokens: number;
+	duration_ms: number | null;
+	exit: string;
+	finished_at: string | null;
+}
+
+/** One model version the window's runs called. */
+export interface AgentOverviewModel {
+	model_version: string;
+	/** The first run by this agent on it, all time. */
+	first_at: string;
+	runs: number;
+	/** Served over the runs Verify gave a verdict; null when none did. */
+	served_rate: number | null;
+	p95_ms: number | null;
+}
+
+/** The windows the Overview takes. */
+export type AgentOverviewWindow = "7d" | "30d" | "90d";
+
+/**
+ * A live agent's Overview over its root runs in the window — UTC days ending
+ * today — and the same-length window before. Every number is the engine's.
+ */
+export interface AgentOverview {
+	agent_id: string;
+	days: number;
+	/** Midnight UTC of the window's first day. */
+	since: string;
+	runs: number;
+	runs_prior: number;
+	/** Runs Verify said served. */
+	served: number;
+	served_rate: number | null;
+	served_rate_prior: number | null;
+	/** Queued-to-finished over settled runs. */
+	p95_ms: number | null;
+	p95_prior_ms: number | null;
+	/** Since the first of this calendar month. */
+	tokens_this_month: number;
+	max_tokens_month: number | null;
+	/** Agents this one spawned in the window. */
+	spawned: number;
+	/** One row per day of the window, oldest first. */
+	daily: AgentOverviewDay[];
+	exits: AgentOverviewExit[];
+	/** The ten newest runs, whatever the window. */
+	recent: AgentOverviewRun[];
+	models: AgentOverviewModel[];
 }
 
 export interface SoulPreviewRequest {

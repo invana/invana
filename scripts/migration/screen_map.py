@@ -62,8 +62,31 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("agents.plugins", f"{G}/agents/functions/plugins"),
     ("agents.connections.mcp", f"{G}/agents/connections/mcp"),
     ("agents.llms.endpoint", f"{G}/agents/llms/85a79982-172c-4649-a7eb-2d14c9406182"), ("agents.llms", f"{G}/agents/llms"),
-    ("agents.agents", f"{G}/agents/agents"), ("agents.agent", f"{G}/agents/agents?page=agent%3Aanalyst"),
-    ("agents.skills.detail", f"{G}/agents/skills?page=skill%3Aanswer-nl"), ("agents.skills", f"{G}/agents/skills"),
+    ("agents.agent.new", f"{G}/agents/agents"),
+    ("agents.agent.detail", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=overview"),
+    ("agents.agent.runs", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=runs"),
+    ("agents.agent.soul", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=soul"),
+    ("agents.agent.model", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=model"),
+    ("agents.agent.flow", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=flow"),
+    ("agents.agent.access", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=access"),
+    ("agents.agent.limits", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=limits"),
+    ("agents.agent.deploy", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=deploy"),
+    ("agents.agent.retire", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=overview"),
+    ("agents.agent.instructions", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=instructions"),
+    ("agents.agent.history", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=history"),
+    ("agents.skill.new", f"{G}/agents/skills"),
+    ("agents.skill.draft", f"{G}/agents/skills?page=skill%3A26ca4dad-e2bf-468e-a835-439e039b297e&tab=instructions"),
+    ("agents.skill.unmapped", f"{G}/agents/skills?page=skill%3A26ca4dad-e2bf-468e-a835-439e039b297e&tab=instructions"),
+    ("agents.skill.functions", f"{G}/agents/skills?page=skill%3A26ca4dad-e2bf-468e-a835-439e039b297e&tab=instructions"),
+    ("agents.skill.test", f"{G}/agents/skills?page=skill%3A26ca4dad-e2bf-468e-a835-439e039b297e&tab=tests"),
+    ("agents.skill.flow.unmapped", f"{G}/agents/skills?page=skill%3A26ca4dad-e2bf-468e-a835-439e039b297e&tab=flow"),
+    ("agents.skill.flow", f"{G}/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=flow"),
+    ("agents.skill.exceptions", f"{G}/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=exceptions"),
+    ("agents.skill.evals", f"{G}/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=evals"),
+    ("agents.skill.agents", f"{G}/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=agents"),
+    ("agents.skill.usage", f"{G}/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=usage"),
+    ("agents.agents", f"{G}/agents/agents"), ("agents.agent", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891"),
+    ("agents.skills.detail", f"{G}/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c"), ("agents.skills", f"{G}/agents/skills"),
     ("agents.settings", f"{G}/agents/settings"),
 ]
 
@@ -73,11 +96,13 @@ SESSION = "routes-out-of-lhr stands for a session id: ask “Which routes out of
 DARK = "theme dark: user menu › Appearance › Dark"
 DATASET = "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it)"
 BRANCH = "on branch H1.1 · …via lower FLC (needs B05)"
-AGENT = "analyst stands for an agent's slug: open any agent from Agents"
+AGENT = "the uuid stands for the Explorer agent: open any agent from Agents"
 MODEL = "m1 stands for the AirRoutes model id: click AirRoutes on the models board"
-SKILL = "answer-nl stands for a skill's slug: open any skill from Skills"
+SKILL = "the uuid stands for a published skill (Answer in natural language): open it from Skills"
+DRAFT_SKILL = "the uuid stands for a draft skill (Weekly route check): open it from Skills"
 #: A product doc whose stories enter the map phase by phase, as agents-build-sessions.md builds them.
-BUILT = {"agent-fabric": {"AF-26", "AF-02", "AF-01", "AF-17", "AF-19", "AF-20", "AF-23", "AF-25"}}
+BUILT = {"agent-fabric": {"AF-26", "AF-02", "AF-01", "AF-17", "AF-19", "AF-20", "AF-23", "AF-25",
+                         "AF-03", "AF-04", "AF-05", "AF-06", "AF-21", "AF-22"}}
 STATE = {  # board → how to reach it from its route; a board absent here is its route's landing view
     "shell.onboarding": "a Graph whose set-up is not finished: the set-up checklist open",
     "shell.launcher.open": "click the product launcher in the header",
@@ -210,6 +235,27 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "agents.connections.mcp": "MCP servers tab",
     "agents.connections.mcp.add": "MCP servers › Add MCP server",
     "agents.agent": AGENT,
+    "agents.agent.new": "Agents › New agent opens a draft on Overview (the builder)",
+    "agents.agent.detail": f"{AGENT}; Overview tab (`?tab=overview`)",
+    "agents.agent.runs": f"{AGENT}; Runs tab",
+    "agents.agent.model": f"{AGENT}; Model tab",
+    "agents.agent.flow": f"{AGENT}; Flow tab",
+    "agents.agent.access": f"{AGENT}; Access tab",
+    "agents.agent.limits": f"{AGENT}; Limits tab",
+    "agents.agent.deploy": f"{AGENT}; Deploy tab",
+    "agents.agent.retire": f"{AGENT}; Retire in the head",
+    "agents.skill.new": "Skills › New skill opens an untitled draft on Instructions",
+    "agents.skill.draft": f"{DRAFT_SKILL}; Instructions tab",
+    "agents.skill.unmapped": f"{DRAFT_SKILL}; a line the draw could not map",
+    "agents.skill.functions": f"{DRAFT_SKILL}; Add functions",
+    "agents.skill.test": f"{DRAFT_SKILL}; Tests tab after Run a test",
+    "agents.skill.flow": f"{SKILL}; Flow tab",
+    "agents.skill.flow.step": f"{SKILL}; Flow tab, click a step",
+    "agents.skill.flow.unmapped": f"{DRAFT_SKILL}; Flow tab with an unmapped line",
+    "agents.skill.exceptions": f"{SKILL}; Exceptions tab",
+    "agents.skill.evals": f"{SKILL}; Evals tab",
+    "agents.skill.agents": f"{SKILL}; Agents tab",
+    "agents.skill.usage": f"{SKILL}; Usage tab",
     "agents.agent.activity": f"{AGENT}; Activity tab",
     "agents.agent.instructions": f"{AGENT}; Instructions tab (needs B02)",
     "agents.agent.soul": f"{AGENT}; Soul tab",

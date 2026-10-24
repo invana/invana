@@ -119,7 +119,7 @@ export function useAgentsSections({
 				next.set("panel", key);
 				next.delete(SECTION_PARAM);
 				if (tab) next.set(SECTION_PARAM, tab);
-				for (const k of ["page", "step", "provider"]) next.delete(k);
+				for (const k of ["page", "tab", "step", "provider"]) next.delete(k);
 				if (endpoint) next.set("provider", endpoint);
 				return next;
 			});

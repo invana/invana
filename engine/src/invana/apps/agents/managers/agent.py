@@ -236,7 +236,8 @@ class AgentManager:
         """
         agent = await self.get_or_404(session, agent_id=agent_id, graph_id=graph_id)
         if not agent.is_available:
-            raise ConflictError(f"'{agent.name}' is {agent.status}. Pick another agent, or resume this one.")
+            fix = "create it" if agent.status == AgentStatus.draft.value else "resume this one"
+            raise ConflictError(f"'{agent.name}' is {agent.status}. Pick another agent, or {fix}.")
         return agent
 
     async def create_agent(
@@ -258,12 +259,19 @@ class AgentManager:
             # the author typed still wins, key by key.
             payload.effort = {**seeded.effort, **payload.effort}
 
+        pin = payload.model_pin or None
+        if pin is not None:
+            pin = await self.endpoints.check_pin(session, graph_id=graph.id, address=pin)
+
         agent = Agent(
             graph_id=graph.id,
             name=payload.name,
             description=payload.description,
             instructions=payload.instructions,
             kind=AgentKind.authored.value,
+            # Built first, offered work only once *Create agent* passes its gate.
+            status=AgentStatus.draft.value,
+            model_pin=pin,
             workflow_spec=spec or {},
             budget=payload.budget,
             effort=check_effort(payload.effort),
@@ -511,7 +519,13 @@ class AgentManager:
         return value
 
     async def set_status(self, session: AsyncSession, *, agent: Agent, status: AgentStatus, actor: User) -> Agent:
-        """Pause / resume. Retiring goes through :func:`retire_agent`."""
+        """Pause / resume. Retiring goes through :func:`retire_agent`.
+
+        A draft is neither: it becomes active only through :meth:`make_live`,
+        which runs the eval gate a resume would skip.
+        """
+        if agent.status == AgentStatus.draft.value:
+            raise ConflictError(f"'{agent.name}' is a draft. Create it before pausing or resuming it.")
         agent.status = status.value
         if status is AgentStatus.paused:
             await self._block_open_tasks(session, agent=agent, reason=f"'{agent.name}' is paused")
@@ -523,6 +537,41 @@ class AgentManager:
             graph_id=agent.graph_id,
             actor_id=actor.id,
             details={"name": agent.name},
+        )
+        return agent
+
+    async def make_live(
+        self,
+        session: AsyncSession,
+        *,
+        agent: Agent,
+        actor: User,
+        why: str | None = None,
+        evaluated: dict | None = None,
+    ) -> Agent:
+        """*Create agent*: move a draft to ``active``, so it may be offered work.
+
+        Refused with 409 unless the agent is a draft — an active agent is
+        already created, and a paused or retired one is resumed or left alone.
+        ``evaluated`` is the eval gate's verdict the caller already passed; it
+        rides on the ``agent.activate`` event beside the ``why``.
+        """
+        if agent.status != AgentStatus.draft.value:
+            raise ConflictError(f"'{agent.name}' is {agent.status}, not a draft — there is nothing to create.")
+        agent.status = AgentStatus.active.value
+        await session.flush()
+        await emit_event(
+            session,
+            action=actions.AGENT_ACTIVATE,
+            target_kind=actions.TARGET_AGENT,
+            target_id=agent.id,
+            graph_id=agent.graph_id,
+            actor_id=actor.id,
+            details={
+                "name": agent.name,
+                "why": why,
+                **({"eval": evaluated} if evaluated is not None else {}),
+            },
         )
         return agent
 
@@ -565,7 +614,9 @@ class AgentManager:
 
     async def set_default_agent(self, session: AsyncSession, *, graph: Graph, agent: Agent, actor: User) -> Graph:
         if not agent.is_available:
-            raise ConflictError(f"'{agent.name}' is {agent.status}; a paused or retired agent cannot be the default.")
+            raise ConflictError(
+                f"'{agent.name}' is {agent.status}; a draft, paused or retired agent cannot be the default."
+            )
         if not agent.answers_asks:
             # The default answers every Explorer ask that names no agent, so it
             # must be able to read the graph (AG3 · WQ5).

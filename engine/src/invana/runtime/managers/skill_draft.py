@@ -42,6 +42,7 @@ from invana.apps.flows.models import Flow, PlanKind, PlanOrigin, Task, TaskForm
 from invana.apps.flows.querysets import FlowQuerySet
 from invana.apps.govern.managers import LLMEndpointManager
 from invana.apps.llm.draft import PLAN_PREFIX
+from invana.apps.skills.handlers import handlers_of
 from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.models import Skill, SkillVersion, SkillVersionClarification
 from invana.apps.skills.querysets import SkillClarificationQuerySet
@@ -268,6 +269,7 @@ class SkillDraftManager:
             edges=view.edges,
             layers=ordered_layers(n["layer"] for n in view.nodes),
             uses=await self._uses_read(session, plan=view.plan),
+            handlers=handlers_of(version.content, view.nodes),
         )
 
     async def _uses_read(self, session: AsyncSession, *, plan: Flow) -> list[PlanUseRead]:
@@ -993,11 +995,11 @@ class SkillDraftManager:
         rows = await self.clarifications_qs.list_for_version(session, draft.id)
         reads = [SkillClarificationRead.model_validate(r) for r in rows]
         skill = await self.skills.skills_qs.get(session, draft.skill_id)
-        drawing, refusal = None, None
+        drawing, refusal, unmapped = None, None, []
         if skill is not None:
             drawing = await self.runs_qs.drawing_skill_version(session, graph_id=skill.graph_id, version_id=draft.id)
             if drawing is None:
-                refusal = await self._refusal(session, graph_id=skill.graph_id, version_id=draft.id)
+                refusal, unmapped = await self._last_draw(session, graph_id=skill.graph_id, version_id=draft.id)
         return SkillDraftRead(
             version=SkillVersionRead.model_validate(draft),
             plan=plan,
@@ -1005,25 +1007,28 @@ class SkillDraftManager:
             open_clarification=next((r for r in reads if r.answer is None), None),
             drawing_run_id=drawing,
             refusal=refusal,
+            unmapped=unmapped,
             drawn=draft.is_drawn,
         )
 
-    async def _refusal(self, session: AsyncSession, *, graph_id: str, version_id: str) -> SkillDrawRefusal | None:
-        """What the last draw refused, if it refused.
+    async def _last_draw(
+        self, session: AsyncSession, *, graph_id: str, version_id: str
+    ) -> tuple[SkillDrawRefusal | None, list[str]]:
+        """What the last draw refused, if it refused, and the sentences it could not map.
 
-        Read off the draw itself rather than kept on the draft: the reasons
-        belong to the reading that produced them, and the next draw that writes
-        rows is a newer run, so this clears itself
+        Read off the draw itself rather than kept on the draft: both belong to
+        the reading that produced them, and the next draw is a newer run, so
+        they clear themselves
         ([SK31](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
         """
         run = await self.runs_qs.last_draw_of_skill_version(session, graph_id=graph_id, version_id=version_id)
         if run is None:
-            return None
-        for node in await self.runs_qs.nodes_of(session, run_id=run.id):
-            reasons = (node.output or {}).get("refused") if node.step_key == "plan.draft" else None
-            if reasons:
-                return SkillDrawRefusal(run_id=run.id, reasons=[str(r) for r in reasons])
-        return None
+            return None, []
+        drafted = [n for n in await self.runs_qs.nodes_of(session, run_id=run.id) if n.step_key == "plan.draft"]
+        output = next((n.output for n in reversed(drafted) if n.output), None) or {}
+        reasons = output.get("refused")
+        refusal = SkillDrawRefusal(run_id=run.id, reasons=[str(r) for r in reasons]) if reasons else None
+        return refusal, [str(s) for s in output.get("unmapped") or []]
 
     async def discard_draft(self, session: AsyncSession, *, skill: Skill) -> None:
         """Throw away what was being written. The plan goes with it — it was

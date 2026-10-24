@@ -14,7 +14,7 @@ reuses the shared ones under their existing names.
 
 from __future__ import annotations
 
-from fastapi import Depends, Path, Request, Response, status
+from fastapi import Depends, Path, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.schemas import SkillUsageResponse
@@ -22,15 +22,20 @@ from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.schemas import (
     SKILL_LIST,
+    SKILL_TEST_LIST,
     SkillAgentsResponse,
     SkillAgentStanding,
     SkillClarificationAnswer,
     SkillCreate,
     SkillDraftRead,
     SkillDrawStarted,
+    SkillExceptions,
     SkillPlanRead,
     SkillRead,
     SkillRollback,
+    SkillTestRead,
+    SkillTestStart,
+    SkillTestStarted,
     SkillUpdate,
     SkillVersionDiff,
     SkillVersionListResponse,
@@ -42,11 +47,15 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.lists import ListParams, Page, applied_filters, list_params
 from invana.runtime import services as run_services
-from invana.runtime.managers import SkillBindManager, SkillDraftManager, SkillUsageManager
+from invana.runtime.managers import EvalManager, SkillBindManager, SkillDraftManager, SkillUsageManager
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 skills = SkillManager()
 usage = SkillUsageManager()
+#: Test runs are one-question eval replays of the draft.
+evals = EvalManager()
+#: `?window=` → days.
+_WINDOWS = {"7d": 7, "30d": 30, "90d": 90}
 #: Skills and plans are two apps, and the composition lives one band up
 #: (`runtime/managers/skill_draft.py`). A view still calls one manager.
 drafts = SkillDraftManager()
@@ -345,3 +354,50 @@ async def skill_usage(
     # when the logic it describes moves to a manager.
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
     return await usage.for_skill(session, skill=skill, graph_id=graph.id, limit=limit)
+
+
+async def skill_exceptions(
+    skill_id: str = Path(...),
+    window: str = Query(default="30d", pattern="^(7d|30d|90d)$"),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> SkillExceptions:
+    """Replans over the root runs offered this skill in the window, from the
+    stored ``task_runs.replans``. ``items`` stays empty until runs record which
+    handler fired."""
+    skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
+    return await usage.exceptions(session, skill=skill, graph_id=graph.id, days=_WINDOWS[window])
+
+
+async def list_skill_tests(
+    skill_id: str = Path(...),
+    params: ListParams = Depends(list_params(SKILL_TEST_LIST)),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> Page[SkillTestRead]:
+    """This skill's test runs, newest first."""
+    reads, info = await evals.page_tests(session, graph_id=graph.id, skill_id=skill_id, params=params)
+    return Page[SkillTestRead].of(reads, info, applied_filters(params, SKILL_TEST_LIST))
+
+
+async def start_skill_test(
+    payload: SkillTestStart,
+    request: Request,
+    skill_id: str = Path(...),
+    username: str = Path(...),
+    graphSlug: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> SkillTestStarted:
+    """*Run a test* — a real run of the draft (or the head with no draft) on one
+    question, marked test and paid from the eval budget. Stream it like any run."""
+    run = await evals.open_test(
+        session, graph_id=graph.id, skill_id=skill_id, question=payload.question, actor_id=user.id
+    )
+    await session.commit()
+    request.app.state.task_runtime.submit(run.id)
+    return SkillTestStarted(run_id=run.id, stream_url=run_services.stream_url(username, graphSlug, run.id))

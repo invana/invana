@@ -18,6 +18,8 @@ every read (US2).
 
 from __future__ import annotations
 
+from datetime import UTC, datetime, time, timedelta
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.managers import AgentManager
@@ -32,6 +34,8 @@ from invana.apps.agents.schemas import (
 from invana.apps.skills.managers import SkillBindingManager
 from invana.apps.skills.models import Skill
 from invana.apps.skills.querysets import SkillVersionQuerySet
+from invana.apps.skills.schemas import SkillExceptions
+from invana.core.utils import percentile
 from invana.runtime.querysets import TaskRunQuerySet
 
 # The *step list* is filtered in Python on a JSON column, so the scan is bounded
@@ -125,6 +129,37 @@ class SkillUsageManager:
             by_outcome=by_outcome,
             used_by=await AgentManager().reads(session, list(carried)),
             recent_steps=steps,
+        )
+
+    async def exceptions(self, session: AsyncSession, *, skill: Skill, graph_id: str, days: int) -> SkillExceptions:
+        """Replans over the root runs offered any version of this skill in the
+        last ``days`` UTC calendar days, from the stored ``task_runs.replans``.
+
+        *Hit the limit* is a run whose replans reached its own agent's
+        ``max_replans``; a skill has no limit of its own, so ``max_replans`` is
+        null. The exception rows stay empty until runs record which handler fired.
+        """
+        today = datetime.now(UTC).date()
+        since = datetime.combine(today - timedelta(days=days - 1), time.min, tzinfo=UTC)
+        versions = await self.versions_qs.list_for_skill(session, skill.id)
+        roots = await self.task_runs_qs.roots_offered(
+            session, graph_id=graph_id, version_ids=[v.id for v in versions], since=since
+        )
+        agent_ids = sorted({r.agent_id for r in roots if r.agent_id})
+        limits = {
+            a.id: a.effective_effort["max_replans"]
+            for a in await self.agents_qs.by_ids(session, graph_id=graph_id, ids=agent_ids)
+        }
+        return SkillExceptions(
+            days=days,
+            since=since,
+            runs=len(roots),
+            replanned=sum(1 for r in roots if r.replans > 0),
+            replans_p95=percentile([float(r.replans) for r in roots], 0.95),
+            max_replans=None,
+            hit_limit=sum(
+                1 for r in roots if r.agent_id in limits and limits[r.agent_id] and r.replans >= limits[r.agent_id]
+            ),
         )
 
     async def _breakdowns(

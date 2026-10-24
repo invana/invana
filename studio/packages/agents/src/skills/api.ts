@@ -1,12 +1,21 @@
-import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
+import {
+	type ListQuery,
+	listQueryToApi,
+	type Page,
+	request,
+} from "@invana-studio/core";
 import type {
 	Skill,
 	SkillAgentsResponse,
 	SkillCreate,
 	SkillDraft,
 	SkillDrawStarted,
+	SkillExceptions,
+	SkillExceptionsWindow,
 	SkillPage,
 	SkillPlaybookRead,
+	SkillTestRead,
+	SkillTestStarted,
 	SkillUsageResponse,
 	SkillVersion,
 	SkillVersionDiff,
@@ -111,4 +120,38 @@ export const skillsApi = {
 
 	usage: (username: string, graphSlug: string, id: string) =>
 		request<SkillUsageResponse>(`${base(username, graphSlug)}/${id}/usage`),
+
+	/** Replans over the runs offered this skill in the window. */
+	exceptions: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		window: SkillExceptionsWindow = "30d",
+	) =>
+		request<SkillExceptions>(
+			`${base(username, graphSlug)}/${id}/exceptions?window=${window}`,
+		),
+
+	/** The skill's test runs, newest first. */
+	tests: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		query: ListQuery = {},
+	) =>
+		request<Page<SkillTestRead>>(
+			`${base(username, graphSlug)}/${id}/tests${listQueryToApi(query)}`,
+		),
+
+	/** *Run a test*: one question, a real run of the draft (or the head). */
+	startTest: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		question: string,
+	) =>
+		request<SkillTestStarted>(`${base(username, graphSlug)}/${id}/tests`, {
+			method: "POST",
+			body: JSON.stringify({ question }),
+		}),
 };
