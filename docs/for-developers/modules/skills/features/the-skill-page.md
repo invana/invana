@@ -1,0 +1,136 @@
+# The skill page
+
+A skill is a document. Its page is `instructions.md` in an editor with the functions it needs and a
+short preview of its plan beside it, and nine tabs that read what those instructions became and how
+they are used: **Instructions · Flow · Functions · Agents · Usage · Exceptions · Evals · Tests · History**.
+
+| | |
+|---|---|
+| Index | [6.7](../../../README.md#6--skills) · Slice **F04** |
+| Module | [Skills](../spec.md) |
+| API / CLI / Studio | 🟡 / — / ✅ |
+| Related | [authoring-a-skill](authoring-a-skill.md) · [instructions-publish-rollback](instructions-publish-rollback.md) · [bindings](bindings.md) · [usage](usage.md) · [evals](evals.md) · [the-agent-page](../../agents/features/the-agent-page.md) · [the-agents-shell](../../agents/features/the-agents-shell.md) · products: [agent-fabric.md](../../../../products/agent-fabric.md) AF-03 · AF-04 · AF-22 |
+
+> **As** a builder, **I want** to write a skill as a document, with the functions it needs beside it,
+> and see its Flow — what the instructions resolve to — **so that** the instructions are the work and
+> the flow is their consequence.
+
+## Capabilities
+
+| # | Capability | Notes |
+|---|---|---|
+| C1 | New skill | *New skill* on Skills creates an `untitled` draft and opens its page on Instructions, the editor holding the four headings (`Goal · Arguments · Steps · When things go wrong`) |
+| C2 | Instructions | The editor (Edit · Preview, `instructions.md · Markdown`) on the left; **Functions it needs** and **Plan preview** on the right. Saving the draft draws the plan again |
+| C3 | Functions it needs | The functions the draft's plan names, each with its bound; *Add functions* opens the picker (namespace groups, a send marked *send*) and adding one is a need written into the draft |
+| C4 | A line that can't map | Marked in the gutter (`!`) and flagged under the line with its choices — *Leave it to a person* · *Rewrite the line* · *Allow `<function>`*; the preview says why it cannot draw; Publish waits |
+| C5 | Flow | The plan drawn top-down, each step tied to the line it came from, handlers to the side; **From the instructions** maps every line to its step or handler; **This flow** names its revision, bounds and test runs. Selecting a step shows its line, bound, side effect, who needs and allows it |
+| C6 | Functions | Every function the published plan (or the draft's) names, with its bound and the steps that call it |
+| C7 | Agents | Bound agents with version, applied in 7 days and last applied; Bind to an agent · Unbind |
+| C8 | Usage | Offered · Applied · The gap · Bound to, then by agent, by outcome and the gap's runs with why not |
+| C9 | Exceptions | Runs · Replanned · Replans a run p95 · Hit the limit, then every exception with where it happened, how it was handled, its source (declared · manifest · improvised · runtime), seen and served after |
+| C10 | Evals | The gate's tiles and every case live against the draft; publish takes a reason |
+| C11 | Tests | *Run a test* starts a real run marked **test**; the test runs list under the document in a console (Tests · Evals · Problems · Log) |
+| C12 | History | Every version, newest first, with its diff and one-act rollback |
+
+## Journey
+
+```mermaid
+flowchart TD
+    S[Skills page] -->|New skill| N[untitled draft · Instructions]
+    S -->|row| P[Skill page · Instructions]
+    N -->|type the four headings| D[Draft saved]
+    D --> DR{Draw}
+    DR -->|every line maps| PV[Plan preview + Functions it needs]
+    DR -->|a sentence is ambiguous| Q[/Clarification under the line — answer it/]
+    Q --> DR
+    DR -->|a line needs a function not allowed| UM[/Line flagged: leave to a person · rewrite · allow/]
+    UM -->|allow / rewrite / leave| DR
+    PV -->|Open its Flow| F[Flow tab — steps from lines, handlers aside]
+    F -->|select a step| FS[Step panel: line · bound · side effect · needed by · allowed by]
+    PV -->|Run a test| T[Tests console: real runs marked test]
+    T --> E[Evals tab: cases live vs draft]
+    E -->|hard check fails| EB[/Publish refused, naming the case/]
+    E -->|warning| EW[/Publish takes a reason/]
+    E -->|all pass| PUB[Publish → vN published]
+    P -->|Agents| AG[Bind · Unbind]
+    P -->|Usage · Exceptions| U[Offered vs applied · handlers seen]
+    U -->|improvised 3 runs| AD[Adopt → a When clause in the draft, gated by evals]
+    P -->|History| H[Versions · diff · Roll back]
+    P -->|loading| L[/Header and tabs drawn; spinner in the body/]
+    P -->|member without build| RO[/Editor read-only; acts disabled naming the role/]
+```
+
+## Surfaces
+
+| Tab | `?tab=` | Body | Reads / writes |
+|---|---|---|---|
+| Instructions | `instructions` (default) | `SkillInstructionsTab` — `MarkdownEditor` · `FunctionsNeededCard` · `PlanPreviewCard` | `GET/PATCH …/skills/{id}/draft` · `POST …/draft/draw` · `GET …/catalogue` |
+| Flow | `flow` | `SkillFlowTab` — `TaskFlowCanvas` + *From the instructions* + *This flow* / the step panel | `GET …/skills/{id}/draft` or `…/versions/{v}/tasks` |
+| Functions | `functions` | `SkillFunctionsTab` — kit `Table` | the plan's rows + `GET …/catalogue` |
+| Agents | `agents` | `SkillAgentsTab` | `GET …/skills/{id}/agents` · `POST/DELETE …/agents/{a}/skills/{id}` |
+| Usage | `usage` | `SkillUsageTab` | `GET …/skills/{id}/usage` |
+| Exceptions | `exceptions` | `SkillExceptionsTab` | `GET …/skills/{id}/exceptions` |
+| Evals | `evals` | `SkillEvalsTab` (`EvalSetPanel` · `EvalGateCard`) | `GET …/evals/skill/{id}` · runs · `POST …/skills/{id}/versions` |
+| Tests | `tests` | `SkillTestsTab` + the console under Instructions | `GET …/skills/{id}/tests` · `POST …/skills/{id}/tests` |
+| History | `history` | `SkillHistoryTab` | `GET …/skills/{id}/versions` · diff · rollback |
+
+| Board | Draws |
+|---|---|
+| `agents.skill.new` | a new draft: the four headings, *No functions yet*, *Nothing to draw yet* |
+| `agents.skill.draft` | a drafted skill: editor, Functions it needs, Plan preview with its handler |
+| `agents.skill.flow` · `.flow.step` · `.flow.unmapped` | the Flow; a step selected; a line that cannot map drawn as a gap |
+| `agents.skill.functions` | the *Add functions* picker open |
+| `agents.skill.unmapped` | a flagged line with its three choices |
+| `agents.skill.test` | the Tests console under the document |
+| `agents.skill.exceptions` · `.evals` · `.agents` · `.usage` | those tabs of a published skill |
+
+## Seams
+
+| Seam | What the user sees |
+|---|---|
+| While drawing | The preview reads *Drawing…*; the editor stays editable; the Flow tab keeps the last drawn revision |
+| Reload | `?page=skill:<id>&tab=<tab>` reopens the same tab; an unsaved edit is lost, a saved draft is kept |
+| Nothing drawn yet | *Nothing to draw yet — the plan appears once the steps name things the allowed functions can do* |
+| A line cannot map | The flagged line and its choices; the preview names the line; Publish is disabled |
+| Never run | Usage, Exceptions and Tests say *Not run yet* with the act that fills them |
+| Member without `build` | The editor is read-only, acts are disabled naming the role; every tab still reads |
+| The engine fails | The tab names what it could not read in the engine's words |
+
+## Engine
+
+| Shape | Fields |
+|---|---|
+| `SkillDraftRead.unmapped` | the sentences the last draw could not map to a function, verbatim — each is flagged under its line |
+| `SkillPlanRead.handlers` | one row per line under `## When things go wrong`, in order: `span` (the line, verbatim) · `step_id` (the step it guards, or null when the line names none) |
+| `GET …/skills/{id}/exceptions?window=30d` | `runs` · `replanned` · `replans_p95` · `max_replans` · `hit_limit` over the runs offered this skill, from `task_runs.replans`; `items[]` (exception, function, handled_by, source, seen, served_rate) — empty until runs record their handlers (F05) |
+| `POST …/skills/{id}/tests` | body `question` → a real run of the draft (or the head with no draft) on that question, marked `test`, paid from the eval budget; writes and sends previewed |
+| `GET …/skills/{id}/tests` | `Page` of test runs: id · question · tokens · duration_ms · outcome · finished_at |
+
+A step's line number is where its `source_span` reads in the text on screen; a span that no longer
+appears in the text is drawn without a line.
+
+## Decisions
+
+| # | Decision |
+|---|---|
+| SP1 | **The skill page has nine tabs: Instructions · Flow · Functions · Agents · Usage · Exceptions · Evals · Tests · History.** Instructions is the document and is where a skill opens; every other tab reads what it became or how it is used |
+| SP2 | **The open tab is `?tab=` beside `?page=`**, written on every switch, so a link, a board route or a reload opens the same tab. Opening another page drops it |
+| SP3 | **The head is `RecordHeader variant="page"`**: crumb `Skills`, the name, a state chip (`draft · empty` · `draft vN` · `vN · published`, and `draft vN+1` beside a published head), one meta line, and the acts — *Run a test* · *Publish* on a draft, *Edit instructions* on a published skill with no draft |
+| SP4 | **Instructions is one editor and two cards.** Editing writes the draft (`PATCH …/draft`); saving draws the plan again (`POST …/draft/draw`); the preview lists the plan's steps with their bounds and each handler under the step it guards, and *Open its Flow* switches tab |
+| SP5 | **Functions it needs is the plan's functions, not a second list.** A skill needs what its plan calls ([AG30](../../agents/features/author-an-agent.md#decisions)); *Add functions* opens the picker and adds, for each function picked, a step line under `## Steps` naming it (`- Use web.search to …`), so the need lives in the prose and the next draw maps it ([IS3](instructions-publish-rollback.md#decisions)). A need is removed by editing the line that asks for it |
+| SP6 | **A line that can't map is the draw's own refusal**, drawn under the line it names ([SK31](authoring-a-skill.md#decisions)); a clarification is drawn the same way with its readings as buttons ([SK26](authoring-a-skill.md#decisions)) |
+| SP7 | **Flow is read-only and drawn from the plan's rows**: a step's line is its `source_span`, a handler is a row under `## When things go wrong`, and the canvas foot says *Drawn from the instructions, vN. A run may replan within what this skill may use — the change shows on that run, never here.* |
+| SP8 | **Exceptions, Tests and the per-step test counts are engine reads.** A column the engine does not return is left out, never derived from a list of runs (CLAUDE.md rule 13) |
+| SP9 | **Adopt is a proposal**: it appends the handler as a `When` line to the draft and opens Instructions; evals gate the publish like any edit ([agent-fabric › Adopt a handler](../../../../products/agent-fabric.md#functions-skills-and-plans)) |
+| SP11 | **A handler guards the step it names**: `handlers[].step_id` is the step whose function the line names, else null and the handler is drawn under the plan's last step. Runs that record which handler fired arrive with replans (F05) |
+| SP12 | **Exceptions shows the stored replan numbers now**; its table fills when runs record their handlers (F05), and its empty state says *No exceptions recorded yet* |
+| SP10 | **Publish lives in the head and on Evals**, and both go through the eval gate with a reason ([IS4](instructions-publish-rollback.md#decisions) · [evals](evals.md)) |
+
+## Not building
+
+| Item | Why |
+|---|---|
+| Editing a plan by hand | Nobody draws a plan ([IS3](instructions-publish-rollback.md#decisions)) |
+| A Playbook tab apart from Instructions | The document is the playbook |
+| A skill granting functions | A skill declares needs; a policy in IAM allows them (I01) |
+| Assistant proposals marked in the editor | The assistant's proposals arrive with F05's assistant work |

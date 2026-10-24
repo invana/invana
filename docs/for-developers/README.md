@@ -145,6 +145,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 5.10 | [Watch the fleet](modules/agents/features/fleet-performance.md) | What broke, waits, slowed or changed; speed, success and tokens per agent, skill, plan and model against a baseline; degradations named; who pins each model | ✅ | — | ✅ | C10 |
 | 5.11 | [Remote agents](modules/agents/features/remote-agents.md) | Hand a task to an agent outside the Graph over A2A — asked each time, only allowed fields sent, its PR returned for a person. **Implement later** | 🔵 | 🔵 | 🔵 | Later |
 | 5.12 | [The Agents shell](modules/agents/features/the-agents-shell.md) | A rail and a workbook, no leftSection: Home, Fleet, Performance, Agents, Skills, Functions, Connections › MCP servers, LLMs and Settings as pages, each a tab | — | — | ✅ | F03 |
+| 5.13 | [The agent page](modules/agents/features/the-agent-page.md) | Build an agent on its page — a draft until *Create agent* — and read it in eleven tabs: Overview · Runs · Instructions · Soul · Model · Flow · Access · Limits · Deploy · Evals · History | 🟡 | — | 🟡 | F04 |
 
 ## 6 · [Skills](modules/skills/spec.md)
 
@@ -156,6 +157,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 6.4 | [Rules](modules/skills/features/rules.md) | Install rules, Graph invariants and project working rules, offered as statements; a rule with a check is enforced block · warn · report at the acts it names | ✅ | ✅ | 🟡 | S12b · B04 |
 | 6.5 | [Instructions, publish and roll back](modules/skills/features/instructions-publish-rollback.md) | `instructions.md` drafts on skills and agents; publish regenerates the plan; one-act rollback; plans generated or packaged | 🟡 | 🟡 | ✅ | B02 |
 | 6.6 | [Evals](modules/skills/features/evals.md) | Eval sets with rule checks and a labelled judge; the publish gate; drift re-runs; an eval token budget | ✅ | 🟡 | ✅ | B02 |
+| 6.7 | [The skill page](modules/skills/features/the-skill-page.md) | A skill as a document: Instructions with the functions it needs and a plan preview; Flow · Functions · Agents · Usage · Exceptions · Evals · Tests · History | 🟡 | — | 🟡 | F04 |
 
 ## 7 · [Workflows](modules/workflows/spec.md)
 
