@@ -14,7 +14,8 @@ Two things this router refuses:
 
 Routes
 ------
-GET    /projection-templates              this Graph's templates, plus the shipped ones
+GET    /projection-templates              this Graph's templates, plus the shipped ones — a ``Page``
+GET    /projection-templates/{id}         one of them
 POST   /projection-templates              author one
 PATCH  /projection-templates/{id}         edit a draft
 POST   /projection-templates/{id}/publish publish a draft
@@ -38,6 +39,8 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events import actions as event_actions
 from invana.core.events.services import emit_event
+from invana.core.lists import Filter, ListParams, ListSpec, Page, applied_filters, list_params
+from invana.core.lists.querysets import contains, page_of_select
 from invana.runtime.models import Emission, ProjectionTemplate
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 from invana.server.schemas import ActionResponse, action
@@ -57,6 +60,18 @@ SURFACES = (
     "subgraph",
     "markdown",
     "html",
+)
+
+
+#: Searched over name, surface and intent; ``kind`` and ``surface`` are the
+#: tab's presets.
+TEMPLATE_LIST = ListSpec(
+    filters={
+        "kind": Filter(values=("result", "prompt"), labels={"result": "Result", "prompt": "Prompt"}),
+        "surface": Filter(values=SURFACES),
+    },
+    sorts=("name", "-updated_at"),
+    search_title="name",
 )
 
 
@@ -123,20 +138,48 @@ def _read(template: ProjectionTemplate, used: int) -> TemplateRead:
     return out
 
 
-@templates_router.get("/projection-templates", response_model=list[TemplateRead])
+@templates_router.get("/projection-templates", response_model=Page[TemplateRead])
 async def list_templates(
+    params: ListParams = Depends(list_params(TEMPLATE_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> list[TemplateRead]:
-    stmt = (
-        select(ProjectionTemplate)
-        .where(or_(ProjectionTemplate.graph_id == graph.id, ProjectionTemplate.graph_id.is_(None)))
-        .order_by(ProjectionTemplate.kind, ProjectionTemplate.name)
+) -> Page[TemplateRead]:
+    unfiltered = select(ProjectionTemplate).where(
+        or_(ProjectionTemplate.graph_id == graph.id, ProjectionTemplate.graph_id.is_(None))
     )
-    rows = list((await session.execute(stmt)).scalars().all())
+    stmt = unfiltered
+    if params.q:
+        stmt = stmt.where(
+            contains(params.q, ProjectionTemplate.name, ProjectionTemplate.surface, ProjectionTemplate.intent)
+        )
+    if kinds := params.values("kind"):
+        stmt = stmt.where(ProjectionTemplate.kind.in_(kinds))
+    if surfaces := params.values("surface"):
+        stmt = stmt.where(ProjectionTemplate.surface.in_(surfaces))
+    rows, info = await page_of_select(
+        session,
+        stmt,
+        params,
+        unfiltered=unfiltered,
+        sorts={"name": ProjectionTemplate.name, "updated_at": ProjectionTemplate.updated_at},
+        id_column=ProjectionTemplate.id,
+    )
     used = await _usage(session, [row.id for row in rows])
-    return [_read(row, used.get(row.id, 0)) for row in rows]
+    reads = [_read(row, used.get(row.id, 0)) for row in rows]
+    return Page[TemplateRead].of(reads, info, applied_filters(params, TEMPLATE_LIST))
+
+
+@templates_router.get("/projection-templates/{template_id}", response_model=TemplateRead)
+async def get_template(
+    template_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> TemplateRead:
+    template = await _get_or_404(session, graph.id, template_id)
+    used = await _usage(session, [template.id])
+    return _read(template, used.get(template.id, 0))
 
 
 @templates_router.post(

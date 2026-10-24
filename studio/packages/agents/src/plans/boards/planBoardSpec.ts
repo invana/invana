@@ -23,10 +23,12 @@ import type {
 	PlanWindow,
 } from "../types";
 import type { PlanChartWidgets } from "./PlanChartWidgets";
+import type { PlanFactsOptions } from "./PlanFactsWidget";
 import type { PlanRevisionsOptions } from "./PlanRevisionsWidget";
 
 export type PlanPanels = PlanChartWidgets & {
 	flow: FlowOptions;
+	facts: PlanFactsOptions;
 	revisions: PlanRevisionsOptions;
 };
 
@@ -41,6 +43,8 @@ export const PLAN_ACTIONS = {
 	agent: "filter-agent",
 	more: "show-more",
 	reading: "open-reading",
+	functions: "open-functions",
+	openAgent: "open-agent",
 } as const;
 
 /** What `⋯` opens, each as its own page beside the plan's. */
@@ -136,7 +140,8 @@ export function planBoardSpec(
 	return {
 		title: `${plan.key}@${plan.version}`,
 		header: {
-			crumbs: ["library", `${plan.key}@${plan.version}`],
+			crumbs: ["Functions", plan.name || `${plan.key}@${plan.version}`],
+			crumbActions: [PLAN_ACTIONS.functions],
 			chips: [
 				{ label: `v${plan.version}` },
 				{ label: "published", variant: "outline" },
@@ -184,7 +189,29 @@ function was(m: Measure, fmt: (v: number) => string): string | undefined {
 	return m.prior == null ? undefined : `was ${fmt(m.prior)}`;
 }
 
-function overviewRows(data: PlanPageData, view: PlanView) {
+/** *The plan* — the library's facts about this entry, above how it behaved. */
+function factsPanel(plan: FlowDetail): Panel {
+	return {
+		kind: "facts",
+		title: "The plan",
+		options: {
+			origin: plan.origin,
+			owner: plan.reusable ? "the library · reusable" : "its Todo · one-off",
+			matches: plan.intent,
+			mayRun: plan.used_by.map((a) => ({ id: a.id, name: a.name })),
+			openAgent: PLAN_ACTIONS.openAgent,
+		},
+	};
+}
+
+function overviewRows(
+	data: PlanPageData,
+	view: PlanView,
+): TabSpec<PlanPanels>["rows"] {
+	return [{ panels: [factsPanel(data.plan)] }, ...behaviourRows(data, view)];
+}
+
+function behaviourRows(data: PlanPageData, view: PlanView) {
 	const perf = data.performance;
 	if (!perf)
 		return [{ panels: [waiting("Reading how this plan has behaved…")] }];

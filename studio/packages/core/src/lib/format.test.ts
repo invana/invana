@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { formatCompact, formatCompactCount } from "./format";
+import { formatCompact, formatCompactCount, formatGrouped } from "./format";
+
+describe("formatGrouped", () => {
+	it("prints the whole count, grouped, never a magnitude", () => {
+		expect(formatGrouped(999)).toBe("999");
+		expect(formatGrouped(8314)).toBe((8314).toLocaleString());
+		expect(formatGrouped(8314)).not.toBe("8.3k");
+	});
+});
 
 describe("formatCompact", () => {
 	it("reads a magnitude, dropping a trailing .0", () => {

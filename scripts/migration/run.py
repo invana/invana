@@ -73,7 +73,8 @@ os.environ.setdefault("E2E_GRAPH_PATH", "/u/admin/airways")
 ALLOWED_TOOLS = [
     "Read", "Edit", "Write", "Glob", "Grep", "Agent",
     "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(git mv *)", "Bash(git show *)",
-    "Bash(git add -A)", "Bash(git commit --no-verify -m *)",
+    "Bash(git add *)", "Bash(git commit --no-verify *)",
+    "Bash(git -C * add *)", "Bash(git -C * commit --no-verify *)",
     "Bash(pnpm *)", "Bash(node *)", "Bash(npx playwright *)",
     "Bash(uv run *)", "Bash(python3 *)", "Bash(make *)", "Bash(docker compose *)",
     "Bash(ls *)", "Bash(mkdir *)", "Bash(rm -rf node_modules/.vite*)",

@@ -19,3 +19,8 @@ per section.
 
 `+` on the strip opens ⌘K, and ⌘J opens or closes the assistant. The old `?panel=` links for the Agents overview, library and plugins
 are gone, and so is the plan canvas board kind: a plan opens as its page.
+
+A plan's Overview leads with *The plan* — origin, owner, what it matches and which agents may run it.
+`GET …/projection-templates` is a list-contract page (`q` · `kind` · `surface` → `{items, total, …}`),
+and `GET …/projection-templates/{id}` reads one template. A packaged plan's description follows its
+package on every seed.

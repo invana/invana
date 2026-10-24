@@ -47,6 +47,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("agents.runs.filtered", f"{G}/activity/runs?f.status=failed&f.since=30d&via=assistant"),
     ("agents.agents.filtered", f"{G}/agents/agents?q=fare&f.ephemeral=shown"),
     ("agents.home", f"{G}/agents/home"), ("agents.open", f"{G}/agents/home"),
+    ("agents.fleet.map.table", f"{G}/agents/fleet/map?console=table"),
     ("agents.fleet.map", f"{G}/agents/fleet/map"), ("agents.fleet.table", f"{G}/agents/fleet/table"),
     ("agents.fleet", f"{G}/agents/fleet"), ("agents.overview", f"{G}/agents/fleet"),
     ("agents.performance.skills", f"{G}/agents/performance/skills"),
@@ -201,7 +202,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "agents.fleet.overview.empty": "a Graph no agent has run on: Overview tab",
     "agents.fleet.map.closed": "Map tab with the assistant closed",
     "agents.fleet.map.agent": "Map tab, click an agent",
-    "agents.fleet.map.table": "Map tab, open the console's Table",
+    "agents.fleet.map.table": "Map tab with the console open on its Table (`?console=table`)",
     "agents.performance.skills": "Skills tab",
     "agents.performance.llms": "LLMs tab",
     "agents.llms.endpoint": "anthropic stands for an endpoint's id: click an endpoint's Open",
@@ -248,7 +249,7 @@ def main() -> None:
                 route = route_for(b)
                 if route is None or (variant and b not in STATE):
                     missing.append(b)
-                if (route and doc == "agent-fabric" and b.startswith("agents.") and not b.endswith(".closed")
+                if (route and b.startswith("agents.") and not b.endswith(".closed")
                         and b not in {"agents.home", "agents.open"}):
                     # The Agents boards draw the assistant docked; `.closed` boards draw it closed,
                     # and Home's composer is the assistant before a thread exists.

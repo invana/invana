@@ -24,7 +24,10 @@ import {
 import { ActButton } from "@invana-studio/shell";
 import { DetailStatus, FormError, PanelSection } from "@invana-studio/ui";
 import { Trash2 } from "lucide-react";
-import { useTemplateMutations, useTemplatesQuery } from "./templates";
+import { useContext } from "react";
+import { AgentsOpenContext } from "../open";
+import { SECTIONS } from "../sections/spec";
+import { useTemplateMutations, useTemplateQuery } from "./templates";
 
 export function TemplatePage({
 	username,
@@ -35,11 +38,13 @@ export function TemplatePage({
 	graphSlug: string;
 	templateId: string;
 }) {
-	const templates = useTemplatesQuery(username, graphSlug);
+	const template = useTemplateQuery(username, graphSlug, templateId);
 	const { publish, remove } = useTemplateMutations(username, graphSlug);
-	const t = templates.data?.find((x) => x.id === templateId);
+	const t = template.data;
+	const opener = useContext(AgentsOpenContext);
+	const Icon = SECTIONS.functions.icon;
 
-	if (templates.isLoading)
+	if (template.isLoading)
 		return (
 			<div className="flex h-full items-center justify-center">
 				<Spinner />
@@ -51,7 +56,7 @@ export function TemplatePage({
 				className="h-full"
 				title="That template is gone"
 				description={
-					templates.error?.message ??
+					template.error?.message ??
 					"It was removed, or it belongs to another Graph. Close this page, or pick a template in Functions › Templates."
 				}
 			/>
@@ -61,7 +66,16 @@ export function TemplatePage({
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
 				variant="page"
-				crumbs={["Functions", t.name]}
+				icon={<Icon />}
+				crumbs={[
+					opener
+						? {
+								label: SECTIONS.functions.label,
+								onClick: () => opener.section("functions", "templates"),
+							}
+						: SECTIONS.functions.label,
+					t.name,
+				]}
 				chips={
 					<>
 						<DetailStatus>{t.kind}</DetailStatus>

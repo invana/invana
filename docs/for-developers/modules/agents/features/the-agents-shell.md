@@ -115,7 +115,6 @@ flowchart TD
 | AS17 | **Home draws no recent chips, no views and no Graph subtitle.** A session records only the Explorer or Modeller surface, so no ask can be told apart as an Agents ask; Home shows the composer and the tiles until a session records the Agents surface |
 | AS18 | **Performance's trend and *What changed* are on its Agents tab only.** Skills is tiles + *Each skill* (Skill · Versions · Runs · Success · Against prior · p95 · Tokens / run); LLMs is tiles + *Each model version* (Version name · Runs · Success · p95 · Tokens / run) |
 | AS19 | **A list page shows only the columns the engine returns.** A prototype column with no engine field is left out, never derived; the missing fields are listed in the build's hand-off. Agents shows the spawned-helpers count in its toolbar; Skills reads *Runs 30d* from Performance's 30-day skill rows; Fleet's Overview and Table list every agent, `—` where nothing ran |
-
 | AS20 | **Fleet's Overview on a Graph nothing has run on leads with *Start here*** — *Ask the assistant to build one* and *Write a skill first* — above the Agents card. *New agent* joins it with the agent builder (F04) |
 | AS21 | **Fleet › Map's console has one tab, Table**: what the map draws, switched by type (Agents · Skills · Namespaces). Steps · Ledger · Log join it with runs and the ledger (F05) |
 | AS22 | **A click on the map selects; it does not navigate.** The selected agent shows in an inspector over the map with its skills and *Open*, which opens its page as a tab (AS5 holds for every *Open* and every list row) |
@@ -125,6 +124,17 @@ flowchart TD
 | AS26 | **Home's composer carries the context chips `Agents · <Graph>`** in place of the ask kind, world and agent: an Agents ask is a question about the product, not a query of the Graph |
 | AS27 | **A function's page reads *Used by N plans*, each output's fan-out rule and *Must come after* from the Graph's catalogue entry**, since the install-level function read carries neither; opened outside a Graph it says so in their place |
 | AS28 | **Library columns name what the engine returns**: a plan's *Layers* (no bounds on a flow row), a skill's *Plan* (its offered plan's steps and layers, not function keys), an endpoint model's *tier · power* (`cost_rank` is a rank, never a price) |
+| AS29 | **Fleet › Map's console starts folded**, so the map has the whole height. `?console=table` opens it on the Table, and its fold and show acts write that param, so a reload keeps it |
+| AS30 | **The Map legend's heading counts the types it lists** — *3 node · 2 line types*. A state is a tone of a node type, not a type of its own |
+| AS31 | **On a Graph nothing has run on, Fleet's Overview is the tiles, *Start here* and the Agents card.** *Needs attention*, *Runs a day* and *Changed recently* draw once something has run |
+| AS32 | **Fleet › Table's *Agents · Skills* switch and *Find in the fleet* share one toolbar row.** The search shows on Agents only: it is the agents list's `?q=` |
+| AS33 | **The closed assistant's pill sits in a row of its own under an Agents page**, never over its content; over a data canvas it floats at the bottom right |
+| AS34 | **A count tile prints the whole count, grouped** (*8,314*) — the number its table prints, never rounded to *8.3k* |
+| AS35 | **A plan's Overview leads with *The plan*: Origin · Owner · Matches · May run.** *May run* is the agents permitted to call it (`used_by`), whether or not they have run it; each chip opens its agent. Owner reads *the library · reusable* for a listed plan |
+| AS36 | **Every page under Functions is crumbed `Functions › <name>`, and `Functions` leads back** to the tab it belongs to (a plan to *Packaged* or *Promoted plans* by its origin, a plugin to Plugins, a template to Templates), with the section icon where the head takes one. The board head (`@invana/boards` `HeaderSpec`) has no icon field yet, so a plan's head draws none |
+| AS37 | ***Promote a plan* is one act, in the Functions head**, gated to the `build` area; the *Promoted plans* empty state opens that same dialog |
+| AS38 | **A plugin's Functions card heads its column *Function*** and draws each bound as a `BoundChip`, as the catalogue does |
+| AS39 | **LLMs' *Model versions N* counts a fully shown list**: every endpoint is read whole, and the rows join endpoints' models with the pins (agents, skills, judges) and the worlds' cast. An engine-owned count arrives with a `GET …/llm/versions` page that serves the rows themselves (F04) |
 
 ## Not building
 

@@ -39,7 +39,7 @@ import {
 	TableRow,
 	TypographyInlineCode,
 } from "@invana/ui";
-import { formatCompact } from "@invana-studio/core";
+import { formatGrouped } from "@invana-studio/core";
 import { comparePath } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useCallback } from "react";
@@ -256,7 +256,7 @@ function Tiles({
 			/>
 			<MetricTile
 				label="Runs"
-				value={formatCompact(t.runs.value ?? 0)}
+				value={formatGrouped(t.runs.value ?? 0)}
 				caption={runs.caption}
 				captionTone="muted"
 			/>

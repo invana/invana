@@ -51,7 +51,9 @@ test("Connections lists MCP servers or says none, and opens Add MCP server", asy
 	const dialog = page.getByRole("dialog", { name: "Add an MCP server" });
 	await expect(dialog).toBeVisible();
 	await dialog.getByLabel("Name").fill("figma");
-	await expect(dialog.getByText("INVANA_SECRET_MCP_FIGMA")).toBeVisible();
+	await expect(dialog.getByLabel("Credential")).toHaveValue(
+		"INVANA_SECRET_MCP_FIGMA",
+	);
 	await dialog.getByRole("button", { name: "Cancel" }).click();
 	await expect(dialog).toHaveCount(0);
 });

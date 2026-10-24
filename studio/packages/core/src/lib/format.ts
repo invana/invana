@@ -19,3 +19,14 @@ export function formatCompact(n: number): string {
 	if (n < 1_000_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
 	return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}m`;
 }
+
+/**
+ * `8,314` — a count read in full, grouped in the reader's locale.
+ *
+ * What a figure is read as when a table beside it prints the same count:
+ * the tile and the row read alike. Distinct from {@link formatCompact}, which
+ * rounds to a magnitude.
+ */
+export function formatGrouped(n: number): string {
+	return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+}

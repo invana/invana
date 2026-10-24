@@ -20,7 +20,7 @@
  * drawn in the accent, everything off them faded.
  *
  * The console under the map is its **Table**: one row per node the map draws,
- * of the type picked on its left. A row selects its node. A draft skill is
+ * of the type picked on its left. It starts folded; `?console=table` opens it. A row selects its node. A draft skill is
  * offered nothing, and a plan of only human steps calls no function, so
  * neither reaches a namespace. Pools join the map when Workers holds them.
  */
@@ -46,9 +46,12 @@ import {
 	type LayeredEdge,
 	type LayeredNode,
 } from "@invana-studio/canvases";
+import { useUpdateSearchParams } from "@invana-studio/core";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { Agent } from "../agents/types";
+import { namespaceOf } from "../functions/shared";
 import { PAGE } from "../lists";
 import { useAgentsOpen } from "../open";
 import { FleetReadState } from "../overview/fleetParts";
@@ -88,9 +91,13 @@ const COLUMNS: {
 	},
 ];
 
-/** `graph.read.query` → `graph.read`; a key with no dot is its own namespace. */
-const namespaceOf = (key: string) =>
-	key.includes(".") ? key.slice(0, key.lastIndexOf(".")) : key;
+/** The lines between the columns, as the legend lists them. */
+const RELATIONSHIPS: { label: string; kind: "line" | "dashed" }[] = [
+	{ label: "uses", kind: "line" },
+	{ label: "needs", kind: "dashed" },
+];
+
+const CONSOLE_PARAM = "console";
 
 const NONE = <span className="text-muted-foreground">—</span>;
 
@@ -109,7 +116,16 @@ export function FleetMap({
 	const [hidden, setHidden] = useState<ReadonlySet<Column>>(new Set());
 	const [folded, setFolded] = useState(false);
 	const [selected, setSelected] = useState<string | null>(null);
-	const [consoleFolded, setConsoleFolded] = useState(false);
+	// Folded until `?console=table` opens it, so a reload keeps it.
+	const [search] = useSearchParams();
+	const update = useUpdateSearchParams();
+	const consoleFolded = search.get(CONSOLE_PARAM) !== "table";
+	const setConsoleFolded = (fold: boolean) =>
+		update((params) => {
+			if (fold) params.delete(CONSOLE_PARAM);
+			else params.set(CONSOLE_PARAM, "table");
+			return params;
+		});
 	const [consoleType, setConsoleType] = useState<Column>("agent");
 
 	const fleet = useMemo(
@@ -180,7 +196,7 @@ export function FleetMap({
 						title="Legend"
 						aside={
 							<span className="text-muted-foreground">
-								{COLUMNS.length + 3} types
+								{COLUMNS.length} node · {RELATIONSHIPS.length} line types
 							</span>
 						}
 						collapsed={folded}
@@ -288,18 +304,15 @@ function MapLegend({
 			</Legend>
 			<Eyebrow>Relationships</Eyebrow>
 			<Legend orientation="column">
-				<LegendItem
-					kind="line"
-					color="var(--color-muted-foreground)"
-					label="uses"
-					count={lines("uses")}
-				/>
-				<LegendItem
-					kind="dashed"
-					color="var(--color-muted-foreground)"
-					label="needs"
-					count={lines("needs")}
-				/>
+				{RELATIONSHIPS.map((r) => (
+					<LegendItem
+						key={r.label}
+						kind={r.kind}
+						color="var(--color-muted-foreground)"
+						label={r.label}
+						count={lines(r.label)}
+					/>
+				))}
 			</Legend>
 		</div>
 	);

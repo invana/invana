@@ -1,13 +1,17 @@
 /**
  * Answer templates — the reads and writes Functions › Templates and a
- * template's page share. Keys are `["projection-templates", owner, graph]`,
- * so authoring, publishing or removing one re-reads both.
+ * template's page share. Keys start `["projection-templates", owner, graph]`,
+ * so authoring, publishing or removing one re-reads the list and the page.
  *
- * The engine returns a Graph's templates whole — the ones it authored and the
- * ones that ship with Invana — so the tab holds every row on screen.
+ * The list is on the list contract: the engine searches, filters and counts
+ * this Graph's templates and the ones that ship with Invana.
  */
 
-import { projectionTemplatesApi } from "@invana-studio/core";
+import {
+	type ListQuery,
+	listQueryKey,
+	projectionTemplatesApi,
+} from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /** The surfaces a result template renders to. */
@@ -22,10 +26,26 @@ export const RESULT_SURFACES = [
 const templatesKey = (username: string, graphSlug: string) =>
 	["projection-templates", username, graphSlug] as const;
 
-export function useTemplatesQuery(username: string, graphSlug: string) {
+export function useTemplateListQuery(
+	username: string,
+	graphSlug: string,
+	query: ListQuery,
+) {
 	return useQuery({
-		queryKey: templatesKey(username, graphSlug),
-		queryFn: () => projectionTemplatesApi.list(username, graphSlug),
+		queryKey: [...templatesKey(username, graphSlug), listQueryKey(query)],
+		queryFn: () => projectionTemplatesApi.list(username, graphSlug, query),
+	});
+}
+
+/** One template, for its page. */
+export function useTemplateQuery(
+	username: string,
+	graphSlug: string,
+	id: string,
+) {
+	return useQuery({
+		queryKey: [...templatesKey(username, graphSlug), "one", id],
+		queryFn: () => projectionTemplatesApi.get(username, graphSlug, id),
 	});
 }
 

@@ -51,11 +51,12 @@ export function FleetTable({
 			else params.delete(VIEW_PARAM);
 			return params;
 		});
+	const list = useListParams();
 	const count = (n: number | undefined) => (n == null ? "" : ` ${n}`);
 
 	return (
 		<>
-			<div className="flex items-center gap-2">
+			<div className="flex flex-wrap items-center gap-2">
 				<SegmentedControl
 					size="sm"
 					aria-label="Rows"
@@ -66,6 +67,16 @@ export function FleetTable({
 						{ value: "skills", label: `Skills${count(overview?.skills)}` },
 					]}
 				/>
+				{/* The agents' `?q=`; the skill rows are not searched. */}
+				{view === "agents" ? (
+					<SearchInput
+						inputSize="sm"
+						className="w-64"
+						placeholder="Find in the fleet"
+						value={list.query.q ?? ""}
+						onChange={list.setQ}
+					/>
+				) : null}
 			</div>
 			{view === "skills" ? (
 				<SkillRows username={username} graphSlug={graphSlug} />
@@ -95,15 +106,6 @@ function AgentRows({
 
 	return (
 		<>
-			<div className="flex items-center gap-2">
-				<SearchInput
-					inputSize="sm"
-					className="ml-auto w-64"
-					placeholder="Find in the fleet"
-					value={list.query.q ?? ""}
-					onChange={list.setQ}
-				/>
-			</div>
 			<ListStrip page={page} list={list} />
 			{loading || error ? (
 				<FleetReadState

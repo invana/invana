@@ -15,6 +15,7 @@
  */
 
 import {
+	BoundChip,
 	EmptyState,
 	PropertyList,
 	PropertyRow,
@@ -28,6 +29,9 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { DetailStatus, FormError, PanelSection } from "@invana-studio/ui";
+import { useContext } from "react";
+import { AgentsOpenContext } from "../open";
+import { SECTIONS } from "../sections/spec";
 import { PluginStateChip, PluginToggle } from "./PluginToggle";
 import { usePluginQuery, useSetPluginEnabledMutation } from "./queries";
 
@@ -40,7 +44,9 @@ export function PluginPage({
 }) {
 	const plugin = usePluginQuery(name);
 	const toggle = useSetPluginEnabledMutation(name);
+	const opener = useContext(AgentsOpenContext);
 	const p = plugin.data;
+	const Icon = SECTIONS.functions.icon;
 
 	if (plugin.isLoading)
 		return (
@@ -61,7 +67,16 @@ export function PluginPage({
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
 				variant="page"
-				crumbs={["Functions", p.name]}
+				icon={<Icon />}
+				crumbs={[
+					opener
+						? {
+								label: SECTIONS.functions.label,
+								onClick: () => opener.section("functions", "plugins"),
+							}
+						: SECTIONS.functions.label,
+					p.name,
+				]}
 				chips={
 					<>
 						<DetailStatus>{p.kind}</DetailStatus>
@@ -95,7 +110,7 @@ export function PluginPage({
 							<Table bordered={false} density="compact">
 								<TableHeader>
 									<TableRow>
-										<TableHead>Key</TableHead>
+										<TableHead>Function</TableHead>
 										<TableHead>Version</TableHead>
 										<TableHead>Bound</TableHead>
 										<TableHead>Side effect</TableHead>
@@ -111,7 +126,9 @@ export function PluginPage({
 										>
 											<TableCell className="font-mono">{t.key}</TableCell>
 											<TableCell>v{t.version}</TableCell>
-											<TableCell>{t.bound}</TableCell>
+											<TableCell>
+												<BoundChip bound={t.bound} />
+											</TableCell>
 											<TableCell>{t.side_effect}</TableCell>
 											<TableCell>{t.summary}</TableCell>
 										</TableRow>

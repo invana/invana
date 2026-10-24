@@ -15,6 +15,22 @@ import {
 import { useSearchParams } from "react-router-dom";
 import { PAGE } from "../lists";
 
+/** Namespaces two segments deep: `graph.read` · `graph.stitch` · `mcp.<server>`. */
+const TWO_SEGMENT = new Set(["graph", "mcp"]);
+
+/**
+ * The library namespace a function belongs to — `graph.read.query` →
+ * `graph.read`, `mcp.figma.get_design_context` → `mcp.figma`,
+ * `data.bundle.check` → `data`, `science.pubmed.search` → `science`.
+ * The catalogue groups by it and Fleet › Map draws one node per namespace.
+ */
+export function namespaceOf(key: string): string {
+	const parts = key.split(".");
+	return TWO_SEGMENT.has(parts[0]) && parts.length > 2
+		? `${parts[0]}.${parts[1]}`
+		: parts[0];
+}
+
 /** The URL's list, the query a tab sends, and the search box's raw text. */
 export function useTabList(fields: readonly string[]): {
 	list: ListUrl;

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from sqlalchemy import delete, func, or_, select
+from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.flows.models import Flow, PlanOrigin, Task
@@ -21,7 +21,7 @@ class FlowQuerySet:
 
         ``reusable_only`` is the default because a generated one-off plan
         belongs to its Todo and is read from the run that ran it — listing it
-        would make the library a log ([LB6](docs/for-developers/modules/workflows/features/the-library.md)).
+        would make the library a log.
         """
         stmt = select(Flow).where(Flow.graph_id == graph_id)
         if reusable_only:
@@ -73,6 +73,22 @@ class FlowQuerySet:
     async def key_versions(self, session: AsyncSession, *, graph_id: str) -> set[tuple[str, int]]:
         stmt = select(Flow.key, Flow.version).where(Flow.graph_id == graph_id)
         return {(key, version) for key, version in (await session.execute(stmt)).all() if key}
+
+    async def refresh_packaged_description(
+        self, session: AsyncSession, *, graph_id: str, key: str, version: int, description: str
+    ) -> None:
+        """Rewrite a packaged row's description to the packaged text, when they differ."""
+        await session.execute(
+            update(Flow)
+            .where(
+                Flow.graph_id == graph_id,
+                Flow.key == key,
+                Flow.version == version,
+                Flow.origin == PlanOrigin.packaged.value,
+                Flow.description.is_distinct_from(description),
+            )
+            .values(description=description)
+        )
 
     async def plans_without_nodes(self, session: AsyncSession, *, graph_id: str) -> dict[tuple[str, int], str]:
         """``(key, version) → plan_id`` for library rows that have no nodes.

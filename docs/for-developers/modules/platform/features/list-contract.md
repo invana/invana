@@ -83,6 +83,7 @@ flowchart TD
 | LLM providers | `GET …/llm` | name | `kind` | `created_at` · `name` · `-updated_at` |
 | LLM models | `GET …/llm/{provider_id}/models` | model id | `status` | `created_at` · `model_id` · `-updated_at` |
 | Plugins | `GET /api/v1/plugins` | name · title | `kind` · `enabled` (`true` · `false`) | `name` |
+| Templates | `GET …/projection-templates` | name · surface · intent | `kind` (`result` · `prompt`) · `surface` | `name` · `-updated_at` |
 | Catalogue | `GET …/catalogue` | step key · summary | `bound` · `plugin` | `bound` (declared order, then key) · `key` |
 | Approvals | `GET …/approvals` | title | `status` · `kind` (the subject's kind) · `mine=true` (waiting on the reader) | `-created_at` |
 | Schedules | `GET …/schedules` → `SchedulePage` with `paused` | name | `enabled` (`true` · `false`) | `name` |

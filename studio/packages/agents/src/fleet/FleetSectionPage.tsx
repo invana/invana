@@ -8,8 +8,8 @@
  *   agents, runs today, served over 7 days, tokens this month and what waits
  *   on you; *Needs attention* beside *Runs a day*; the *Agents* card
  *   ({@link FleetAgentsCard}) beside *Changed recently*. On a Graph nothing
- *   has run on, *Start here* sits above them: ask the assistant to build an
- *   agent, or write a skill first.
+ *   has run on, *Start here* takes their place above the *Agents* card: ask
+ *   the assistant to build an agent, or write a skill first.
  * - **Map** (`/agents/fleet/map`) — agents → skills → function namespaces
  *   ({@link FleetMap}).
  * - **Table** (`/agents/fleet/table`) — every agent's or skill's numbers over
@@ -131,6 +131,13 @@ function OverviewBody({ data, graph }: { data: FleetOverview; graph: Graph }) {
 		"90d",
 	).data?.tiles.runs;
 	const nothingRan = longest != null && !longest.value && !longest.prior;
+	const agentsCard = (
+		<FleetAgentsCard
+			rows={agents.rows}
+			loading={agents.loading}
+			error={agents.error}
+		/>
+	);
 	return (
 		<>
 			<Tiles
@@ -138,21 +145,24 @@ function OverviewBody({ data, graph }: { data: FleetOverview; graph: Graph }) {
 				helpers={agents.page?.ephemeral}
 				tiles={data.tiles}
 			/>
-			{nothingRan ? <StartHere /> : null}
-			<div className="grid gap-3 lg:grid-cols-2">
-				<NeedsAttention items={data.attention} graph={graph} />
-				<RunsADay daily={data.daily} />
-			</div>
-			<div className="grid gap-3 lg:grid-cols-3">
-				<div className="min-w-0 lg:col-span-2">
-					<FleetAgentsCard
-						rows={agents.rows}
-						loading={agents.loading}
-						error={agents.error}
-					/>
-				</div>
-				<ChangedRecently changes={data.changes} graph={graph} />
-			</div>
+			{nothingRan ? (
+				// Nothing to attend to, chart or compare yet.
+				<>
+					<StartHere />
+					{agentsCard}
+				</>
+			) : (
+				<>
+					<div className="grid gap-3 lg:grid-cols-2">
+						<NeedsAttention items={data.attention} graph={graph} />
+						<RunsADay daily={data.daily} />
+					</div>
+					<div className="grid gap-3 lg:grid-cols-3">
+						<div className="min-w-0 lg:col-span-2">{agentsCard}</div>
+						<ChangedRecently changes={data.changes} graph={graph} />
+					</div>
+				</>
+			)}
 		</>
 	);
 }

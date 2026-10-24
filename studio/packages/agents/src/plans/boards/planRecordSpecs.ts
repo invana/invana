@@ -20,7 +20,7 @@ export const RECORD_ACTIONS = {
 } as const;
 
 const header = (ref: string, reading: string) => ({
-	crumbs: ["library", ref, reading],
+	crumbs: ["Functions", ref, reading],
 	crumbActions: [undefined, RECORD_ACTIONS.openPlan],
 });
 

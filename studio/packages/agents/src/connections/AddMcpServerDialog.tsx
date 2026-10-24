@@ -10,7 +10,7 @@
  * shows the engine's reason in place.
  */
 
-import { Input, Label } from "@invana/forms";
+import { Field, FieldDescription, FieldLabel, Input } from "@invana/forms";
 import {
 	Button,
 	Dialog,
@@ -53,40 +53,47 @@ export function AddMcpServerDialog({
 					</DialogDescription>
 				</DialogHeader>
 				<div className="flex flex-col gap-4">
-					<div className="flex flex-col gap-1.5">
-						<Label htmlFor="mcp-name">Name</Label>
-						<Input
-							id="mcp-name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							placeholder="figma"
-						/>
-						<span className="text-sm text-muted-foreground">
-							Lower case, digits and _, up to 32.
-						</span>
+					<div className="grid gap-3 sm:grid-cols-2">
+						<Field>
+							<FieldLabel htmlFor="mcp-name">Name</FieldLabel>
+							<Input
+								id="mcp-name"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+								placeholder="figma"
+							/>
+							<FieldDescription>
+								Lower case, digits and _, up to 32.
+							</FieldDescription>
+						</Field>
+						<Field>
+							<FieldLabel htmlFor="mcp-url">Server URL</FieldLabel>
+							<Input
+								id="mcp-url"
+								value={url}
+								onChange={(e) => setUrl(e.target.value)}
+								placeholder="https://mcp.example.com/mcp"
+							/>
+						</Field>
 					</div>
-					<div className="flex flex-col gap-1.5">
-						<Label htmlFor="mcp-url">Server URL</Label>
+					<Field>
+						<FieldLabel htmlFor="mcp-credential">Credential</FieldLabel>
 						<Input
-							id="mcp-url"
-							value={url}
-							onChange={(e) => setUrl(e.target.value)}
-							placeholder="https://mcp.example.com/mcp"
+							id="mcp-credential"
+							className="font-mono"
+							value={credentialOf(server || "<name>")}
+							readOnly
 						/>
-					</div>
-					<div className="flex flex-col gap-1.5">
-						<Label>Credential</Label>
-						<p className="font-mono">{credentialOf(server || "<name>")}</p>
-						<span className="text-sm text-muted-foreground">
+						<FieldDescription>
 							A bearer token set on the workers that call it. Invana never
 							stores or shows it.
-						</span>
-					</div>
-					<p className="text-muted-foreground">
+						</FieldDescription>
+					</Field>
+					<FieldDescription>
 						It is added disabled, with its tool list frozen: a change on the
 						server's side reaches no plan until you refresh it. Enable it once
 						you have read its tools.
-					</p>
+					</FieldDescription>
 					<FormError error={add.error} />
 				</div>
 				<DialogFooter>

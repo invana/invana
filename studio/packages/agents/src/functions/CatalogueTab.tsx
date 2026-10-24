@@ -28,7 +28,7 @@ import { FilteredEmpty, filterValue, ListStrip, setOne } from "../lists";
 import { useAgentsOpen } from "../open";
 import { useCatalogueQuery } from "../plans/queries";
 import type { CatalogueEntry } from "../plans/types";
-import { RowsFailed, RowsLoading, useTabList } from "./shared";
+import { namespaceOf, RowsFailed, RowsLoading, useTabList } from "./shared";
 
 /** The bounds offered as presets of the `bound` filter, in the runtime's order. */
 const BOUNDS = [
@@ -47,21 +47,6 @@ const BOUND_OPTIONS = [
 	{ value: "all", label: "All bounds" },
 	...BOUNDS.map((b) => ({ value: b, label: b })),
 ];
-
-/** Namespaces two segments deep: `graph.read` · `graph.stitch` · `mcp.<server>`. */
-const TWO_SEGMENT = new Set(["graph", "mcp"]);
-
-/**
- * The library namespace a function belongs to — `graph.read.query` →
- * `graph.read`, `mcp.figma.get_design_context` → `mcp.figma`,
- * `data.bundle.check` → `data`, `science.pubmed.search` → `science`.
- */
-function namespaceOf(key: string): string {
-	const parts = key.split(".");
-	return TWO_SEGMENT.has(parts[0]) && parts.length > 2
-		? `${parts[0]}.${parts[1]}`
-		: parts[0];
-}
 
 export function CatalogueTab({
 	username,

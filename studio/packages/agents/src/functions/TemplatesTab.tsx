@@ -3,17 +3,20 @@
  * table, and *Author a template* as a modal.
  *
  * A template is to an answer what a plan is to a run: a definition, promoted
- * from what served. The engine returns a Graph's templates whole (its own and
- * the ones that ship with Invana), so the search and the kind and surface
- * presets — kept in the URL as `q`, `f.kind` and `f.surface`, shown as chips
- * with *N of M match* and *Clear all* — narrow the rows on screen. *Accepts* is the shape a template
- * declares it can render, as the engine stores it. A row opens the template's page as a tab
- * beside this one; publishing and removing are taken there.
+ * from what served. The list holds this Graph's templates and the ones that
+ * ship with Invana; the search and the kind and surface presets — kept in the
+ * URL as `q`, `f.kind` and `f.surface`, shown as chips with *N of M match* and
+ * *Clear all* — are sent to the engine, which narrows and counts the rows.
+ * *Accepts* is the shape a template declares it can render, as the engine
+ * stores it. A row opens the template's page as a tab beside this one;
+ * publishing and removing are taken there.
  */
 
 import {
+	Field,
+	FieldDescription,
+	FieldLabel,
 	Input,
-	Label,
 	Select,
 	SelectContent,
 	SelectItem,
@@ -40,7 +43,6 @@ import {
 	TableRow,
 	TypographyInlineCode,
 } from "@invana/ui";
-import type { Page } from "@invana-studio/core";
 import { ActButton } from "@invana-studio/shell";
 import { DetailStatus, FormError } from "@invana-studio/ui";
 import { Plus } from "lucide-react";
@@ -56,12 +58,12 @@ import { useAgentsOpen } from "../open";
 import { RowsFailed, RowsLoading, useTabList } from "./shared";
 import {
 	RESULT_SURFACES,
+	useTemplateListQuery,
 	useTemplateMutations,
-	useTemplatesQuery,
 } from "./templates";
 
-/** What this tab reads from the URL: the search and its two presets. */
-const FIELDS = ["q", "kind", "surface"];
+/** The filters this tab sends; `q` goes with them. */
+const FILTERS = ["kind", "surface"];
 
 const KIND_OPTIONS = [
 	{ value: "all", label: "All" },
@@ -82,32 +84,14 @@ export function TemplatesTab({
 	graphSlug: string;
 }) {
 	const open = useAgentsOpen();
-	const { list, search } = useTabList([]);
-	const templates = useTemplatesQuery(username, graphSlug);
+	const { list, query, search } = useTabList(FILTERS);
+	const templates = useTemplateListQuery(username, graphSlug, query);
 	const [authoring, setAuthoring] = useState(false);
 	const kind = filterValue(list, "kind");
 	const surface = filterValue(list, "surface");
 
-	// `/templates` is not on the list contract yet, so the URL's search and
-	// presets narrow the rows here until the endpoint returns a `Page`.
-	const all = templates.data ?? [];
-	const q = (list.query.q ?? "").trim().toLowerCase();
-	const rows = all.filter(
-		(t) =>
-			(!q || `${t.name} ${t.surface} ${t.intent}`.toLowerCase().includes(q)) &&
-			(!kind || t.kind === kind) &&
-			(!surface || t.surface === surface),
-	);
-	const applied = list.pending.filter((f) => FIELDS.includes(f.field));
-	const page: Page<unknown> | undefined = templates.data
-		? {
-				items: rows,
-				total: rows.length,
-				unfiltered_total: all.length,
-				next_cursor: null,
-				applied,
-			}
-		: undefined;
+	const page = templates.data;
+	const rows = page?.items ?? [];
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -156,10 +140,10 @@ export function TemplatesTab({
 			) : templates.isError ? (
 				<RowsFailed what="The templates" error={templates.error} />
 			) : rows.length === 0 ? (
-				applied.length ? (
+				page?.applied.length ? (
 					<FilteredEmpty
 						noun="template"
-						filters={applied}
+						filters={page.applied}
 						onClear={list.clear}
 					/>
 				) : (
@@ -279,19 +263,19 @@ function AuthorTemplateDialog({
 					</DialogDescription>
 				</DialogHeader>
 				<div className="flex flex-col gap-4">
-					<div className="flex flex-col gap-1.5">
-						<Label htmlFor="template-name">Name</Label>
+					<Field>
+						<FieldLabel htmlFor="template-name">Name</FieldLabel>
 						<Input
 							id="template-name"
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							placeholder="top-movers"
 						/>
-					</div>
-					<div className="flex flex-col gap-1.5">
-						<Label>Surface</Label>
+					</Field>
+					<Field>
+						<FieldLabel htmlFor="template-surface">Surface</FieldLabel>
 						<Select value={surface} onValueChange={setSurface}>
-							<SelectTrigger aria-label="Surface">
+							<SelectTrigger id="template-surface">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -302,20 +286,20 @@ function AuthorTemplateDialog({
 								))}
 							</SelectContent>
 						</Select>
-					</div>
-					<div className="flex flex-col gap-1.5">
-						<Label htmlFor="template-intent">Intent</Label>
+					</Field>
+					<Field>
+						<FieldLabel htmlFor="template-intent">Intent</FieldLabel>
 						<Input
 							id="template-intent"
 							value={intent}
 							onChange={(e) => setIntent(e.target.value)}
 							placeholder="a shape across categories"
 						/>
-						<span className="text-sm text-muted-foreground">
+						<FieldDescription>
 							What it is for, so an answer can select it the way a plan is
 							selected.
-						</span>
-					</div>
+						</FieldDescription>
+					</Field>
 					<FormError error={create.error} />
 				</div>
 				<DialogFooter>

@@ -126,6 +126,8 @@ flowchart LR
 | `emissions.template_id` | which template rendered it; null means the kind's default |
 | `select_template(templates, shape, kind=, prefer=)` | ranks eligible templates by `prefer` → `kind` → specificity → name ([P13](#7-decisions)); the switcher's offers call it with neither |
 | Routes | `…/projection-templates*` · `…/task_runs/{id}/answers` · `…/emissions/{id}/render?template=` |
+| `GET …/projection-templates` | `Page[TemplateRead]` on the [list contract](../../platform/features/list-contract.md): `q` · `kind` · `surface`; `unfiltered_total` counts this Graph's templates and the shipped ones, never another Graph's |
+| `GET …/projection-templates/{id}` | one template, this Graph's own or a shipped one; another Graph's reads as 404 |
 | Events | `projection_template.*` · `prompt.asked` · `prompt.answered` |
 
 ## 7. Decisions

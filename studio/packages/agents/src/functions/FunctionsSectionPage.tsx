@@ -10,7 +10,7 @@
  * library entry, and opens the plan it made.
  */
 
-import { Button } from "@invana/ui";
+import { ActButton } from "@invana-studio/shell";
 import { DetailStatus } from "@invana-studio/ui";
 import { GitBranchPlus } from "lucide-react";
 import { useState } from "react";
@@ -43,10 +43,15 @@ export function FunctionsSectionPage({
 			onTab={onTab}
 			chips={<Totals username={username} graphSlug={graphSlug} />}
 			actions={
-				<Button size="sm" variant="outline" onClick={() => setPromoting(true)}>
+				<ActButton
+					area="build"
+					size="sm"
+					variant="outline"
+					onClick={() => setPromoting(true)}
+				>
 					<GitBranchPlus />
 					Promote a plan
-				</Button>
+				</ActButton>
 			}
 		>
 			<SectionBody>
@@ -55,6 +60,7 @@ export function FunctionsSectionPage({
 						username={username}
 						graphSlug={graphSlug}
 						origin={tab === "plans" ? "packaged" : "promoted"}
+						onPromote={() => setPromoting(true)}
 					/>
 				) : tab === "templates" ? (
 					<TemplatesTab username={username} graphSlug={graphSlug} />

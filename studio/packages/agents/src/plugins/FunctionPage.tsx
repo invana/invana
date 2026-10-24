@@ -34,6 +34,7 @@ import { DetailStatus, PanelSection, RecordRow } from "@invana-studio/ui";
 import { useContext } from "react";
 import { AgentsOpenContext } from "../open";
 import { useCatalogueQuery } from "../plans/queries";
+import { SECTIONS } from "../sections/spec";
 import { useFunctionQuery } from "./queries";
 
 export function FunctionPage({
@@ -76,6 +77,7 @@ export function FunctionPage({
 			/>
 		);
 
+	const Icon = SECTIONS.functions.icon;
 	const pluginName = t.plugin.split("@")[0];
 	const args = Object.entries(t.args);
 	const outputs = Object.entries(t.outputs);
@@ -86,7 +88,16 @@ export function FunctionPage({
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
 				variant="page"
-				crumbs={["Functions", t.key]}
+				icon={<Icon />}
+				crumbs={[
+					opener
+						? {
+								label: SECTIONS.functions.label,
+								onClick: () => opener.section("functions"),
+							}
+						: SECTIONS.functions.label,
+					t.key,
+				]}
 				chips={
 					<>
 						<DetailStatus>v{t.version}</DetailStatus>

@@ -12,8 +12,9 @@ import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
 import { routedAction, TaskFlowWidget, useReport } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { EVERY } from "../../lists";
+import { AgentsOpenContext } from "../../open";
 import {
 	useFlowsQuery,
 	usePlanPerformanceQuery,
@@ -21,6 +22,7 @@ import {
 	usePlanVersionQuery,
 } from "../queries";
 import { PLAN_CHART_WIDGETS } from "./PlanChartWidgets";
+import { PlanFactsWidget } from "./PlanFactsWidget";
 import { PlanRevisionsWidget } from "./PlanRevisionsWidget";
 import {
 	ALL,
@@ -35,6 +37,7 @@ import {
 
 const REGISTRY = {
 	flow: TaskFlowWidget,
+	facts: PlanFactsWidget,
 	revisions: PlanRevisionsWidget,
 	...PLAN_CHART_WIDGETS,
 };
@@ -54,6 +57,9 @@ export function PlanBoardPage({
 	/** `⋯` — a reading of the version the header names, as its own page. */
 	onOpenReading: (reading: PlanReading, planId: string) => void;
 }) {
+	// The crumb back and the agent chips open through the Agents host when
+	// there is one; elsewhere they stay put.
+	const opener = useContext(AgentsOpenContext);
 	const library = useFlowsQuery(username, graphSlug, EVERY);
 	const opened = library.data?.items.find((p) => p.id === planId);
 	const key = opened?.key ?? undefined;
@@ -192,6 +198,15 @@ export function PlanBoardPage({
 							onOpenReading(ctx.option as PlanReading, shown.id);
 						return;
 					}
+					case PLAN_ACTIONS.functions:
+						opener?.section(
+							"functions",
+							opened.origin === "packaged" ? "plans" : "promoted",
+						);
+						return;
+					case PLAN_ACTIONS.openAgent:
+						if (ctx?.itemId) opener?.agent(ctx.itemId);
+						return;
 					case PLAN_ACTIONS.more:
 						void runs.fetchNextPage();
 						return;

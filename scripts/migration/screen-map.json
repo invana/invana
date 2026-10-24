@@ -1281,169 +1281,169 @@
   "agents.overview": {
    "story": "AG-01",
    "product": "agents",
-   "route": "/u/admin/airways/agents/fleet",
+   "route": "/u/admin/airways/agents/fleet?right=assistant",
    "state": ""
   },
   "agents.overview.dark": {
    "story": "AG-01",
    "product": "agents",
-   "route": "/u/admin/airways/agents/fleet",
+   "route": "/u/admin/airways/agents/fleet?right=assistant",
    "state": "theme dark: user menu \u203a Appearance \u203a Dark"
   },
   "agents.agents": {
    "story": "AG-02",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents",
+   "route": "/u/admin/airways/agents/agents?right=assistant",
    "state": ""
   },
   "agents.agents.lineage": {
    "story": "AG-02",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents",
+   "route": "/u/admin/airways/agents/agents?right=assistant",
    "state": "Lineage tab"
   },
   "agents.agent": {
    "story": "AG-03",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst&right=assistant",
    "state": "analyst stands for an agent's slug: open any agent from Agents"
   },
   "agents.agent.activity": {
    "story": "AG-03",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst&right=assistant",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Activity tab"
   },
   "agents.agent.instructions": {
    "story": "AG-04",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst&right=assistant",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Instructions tab (needs B02)"
   },
   "agents.agent.soul": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst&right=assistant",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Soul tab"
   },
   "agents.agent.thinking": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst&right=assistant",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Thinking tab"
   },
   "agents.agent.skills": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst&right=assistant",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Skills & callables tab"
   },
   "agents.agent.envelope": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst&right=assistant",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Envelope"
   },
   "agents.agent.history": {
    "story": "AG-06",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst&right=assistant",
    "state": "analyst stands for an agent's slug: open any agent from Agents; History tab"
   },
   "agents.agent.pause": {
    "story": "AG-07",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst&right=assistant",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Pause or retire"
   },
   "agents.skills": {
    "story": "AG-08",
    "product": "agents",
-   "route": "/u/admin/airways/agents/skills",
+   "route": "/u/admin/airways/agents/skills?right=assistant",
    "state": ""
   },
   "agents.skills.detail": {
    "story": "AG-08",
    "product": "agents",
-   "route": "/u/admin/airways/agents/skills?page=skill%3Aanswer-nl",
+   "route": "/u/admin/airways/agents/skills?page=skill%3Aanswer-nl&right=assistant",
    "state": "answer-nl stands for a skill's slug: open any skill from Skills"
   },
   "agents.skills.instructions.edit": {
    "story": "AG-08",
    "product": "agents",
-   "route": "/u/admin/airways/agents/skills",
+   "route": "/u/admin/airways/agents/skills?right=assistant",
    "state": "answer-nl stands for a skill's slug: open any skill from Skills; Edit instructions (needs B02)"
   },
   "agents.skills.evals": {
    "story": "AG-08",
    "product": "agents",
-   "route": "/u/admin/airways/agents/skills",
+   "route": "/u/admin/airways/agents/skills?right=assistant",
    "state": "answer-nl stands for a skill's slug: open any skill from Skills; Evals tab (needs B02)"
   },
   "agents.skills.plan.regenerated": {
    "story": "AG-08",
    "product": "agents",
-   "route": "/u/admin/airways/agents/skills",
+   "route": "/u/admin/airways/agents/skills?right=assistant",
    "state": "answer-nl stands for a skill's slug: open any skill from Skills; save an instructions edit (needs B02)"
   },
   "agents.skills.history": {
    "story": "AG-09",
    "product": "agents",
-   "route": "/u/admin/airways/agents/skills",
+   "route": "/u/admin/airways/agents/skills?right=assistant",
    "state": "answer-nl stands for a skill's slug: open any skill from Skills; History tab"
   },
   "agents.skills.usage": {
    "story": "AG-10",
    "product": "agents",
-   "route": "/u/admin/airways/agents/skills",
+   "route": "/u/admin/airways/agents/skills?right=assistant",
    "state": "answer-nl stands for a skill's slug: open any skill from Skills; Usage tab"
   },
   "agents.library": {
    "story": "AG-11",
    "product": "agents",
-   "route": "/u/admin/airways/agents/functions/plans",
+   "route": "/u/admin/airways/agents/functions/plans?right=assistant",
    "state": ""
   },
   "agents.library.plan": {
    "story": "AG-11",
    "product": "agents",
-   "route": "/u/admin/airways/agents/functions/plans",
+   "route": "/u/admin/airways/agents/functions/plans?right=assistant",
    "state": "Plans tab, click a plan"
   },
   "agents.library.plan.overview": {
    "story": "AG-11",
    "product": "agents",
-   "route": "/u/admin/airways/agents/functions/plans",
+   "route": "/u/admin/airways/agents/functions/plans?right=assistant",
    "state": "Plans tab, click a plan; Overview tab"
   },
   "agents.library.plan.revisions": {
    "story": "AG-11",
    "product": "agents",
-   "route": "/u/admin/airways/agents/functions/plans",
+   "route": "/u/admin/airways/agents/functions/plans?right=assistant",
    "state": "a run that replanned: its Revisions"
   },
   "agents.library.templates": {
    "story": "AG-12",
    "product": "agents",
-   "route": "/u/admin/airways/agents/functions/plans",
+   "route": "/u/admin/airways/agents/functions/plans?right=assistant",
    "state": "Templates tab"
   },
   "agents.plugins": {
    "story": "AG-13",
    "product": "agents",
-   "route": "/u/admin/airways/agents/functions/plugins",
+   "route": "/u/admin/airways/agents/functions/plugins?right=assistant",
    "state": "needs B06a for its rows"
   },
   "agents.plugins.plugin": {
    "story": "AG-13",
    "product": "agents",
-   "route": "/u/admin/airways/agents/functions/plugins",
+   "route": "/u/admin/airways/agents/functions/plugins?right=assistant",
    "state": "click a plugin (needs B06a)"
   },
   "agents.plugins.task": {
    "story": "AG-13",
    "product": "agents",
-   "route": "/u/admin/airways/agents/functions/plugins",
+   "route": "/u/admin/airways/agents/functions/plugins?right=assistant",
    "state": "click a plugin, then a task type (needs B06a)"
   },
   "agents.llms": {
@@ -1509,8 +1509,8 @@
   "agents.fleet.map.table": {
    "story": "AF-01",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/fleet/map?right=assistant",
-   "state": "Map tab, open the console's Table"
+   "route": "/u/admin/airways/agents/fleet/map?console=table&right=assistant",
+   "state": "Map tab with the console open on its Table (`?console=table`)"
   },
   "agents.fleet.table": {
    "story": "AF-01",

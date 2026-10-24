@@ -4,9 +4,8 @@
  * (see-what-ran.md `operate.runs.list`).
  *
  * Every control writes the URL through `useListParams`; the engine decides
- * which runs match. A set chip carries its value and a `×` that clears only
- * that filter, so a narrowed journal says how it was narrowed while it
- * scrolls — a funnel alone would hide that.
+ * which runs match. A set chip shows its value; clearing one filter is the
+ * applied-filters strip's `×`, so each filter is removed in one place.
  */
 
 import {
@@ -64,7 +63,6 @@ function Chip({
 					label={label}
 					value={set?.label ?? value}
 					active={Boolean(value)}
-					onRemove={value ? () => onChange(null) : undefined}
 				/>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="w-48">

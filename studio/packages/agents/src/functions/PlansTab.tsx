@@ -12,7 +12,8 @@
  * The layers a plan engages are on the row, because *what will this cost me*
  * is the question a library is scanned with. Packaged plans open under a
  * banner saying how one is called; Promoted plans say they are never drawn
- * by hand, carry when each last ran, and offer *Promote a plan*.
+ * by hand, carry when each last ran, and an empty list offers the head's *Promote a
+ * plan*.
  */
 
 import {
@@ -33,11 +34,9 @@ import {
 import { formatRelativeTime } from "@invana-studio/core";
 import { ActButton } from "@invana-studio/shell";
 import { LAYER_PALETTE, layerSlug } from "@invana-studio/ui";
-import { GitBranch, Plus } from "lucide-react";
-import { useState } from "react";
+import { GitBranch, GitBranchPlus } from "lucide-react";
 import { FilteredEmpty } from "../lists";
 import { useAgentsOpen } from "../open";
-import { PromoteDialog } from "../plans/PromoteDialog";
 import { useFlowsQuery } from "../plans/queries";
 import type { FlowSummary } from "../plans/types";
 import { RowsFailed, RowsLoading, useTabList } from "./shared";
@@ -52,10 +51,13 @@ export function PlansTab({
 	username,
 	graphSlug,
 	origin,
+	onPromote,
 }: {
 	username: string;
 	graphSlug: string;
 	origin: keyof typeof ORIGINS;
+	/** Opens the section head's *Promote a plan* — the one dialog the page has. */
+	onPromote: () => void;
 }) {
 	const open = useAgentsOpen();
 	const { list, query, search } = useTabList([]);
@@ -66,18 +68,6 @@ export function PlansTab({
 	});
 	const rows = plans.data?.items ?? [];
 	const promoted = origin === "promoted";
-	const [promoting, setPromoting] = useState(false);
-	const promoteButton = (
-		<ActButton
-			area="build"
-			size="sm"
-			variant="outline"
-			onClick={() => setPromoting(true)}
-		>
-			<Plus />
-			Promote a plan
-		</ActButton>
-	);
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -99,12 +89,9 @@ export function PlansTab({
 					className="w-72"
 				/>
 				{promoted ? (
-					<>
-						<span className="ml-auto text-muted-foreground">
-							Plans are generated, never drawn by hand
-						</span>
-						{promoteButton}
-					</>
+					<span className="ml-auto text-muted-foreground">
+						Plans are generated, never drawn by hand
+					</span>
 				) : null}
 			</div>
 			{plans.isLoading ? (
@@ -122,7 +109,17 @@ export function PlansTab({
 					<EmptyState
 						title="No promoted plans yet"
 						description="A plan the engine generated, that served, becomes a library entry when it is promoted."
-						actions={promoteButton}
+						actions={
+							<ActButton
+								area="build"
+								size="sm"
+								variant="outline"
+								onClick={onPromote}
+							>
+								<GitBranchPlus />
+								Promote a plan
+							</ActButton>
+						}
 					/>
 				) : (
 					<EmptyState title="No packaged plans in this Graph" />
@@ -157,15 +154,6 @@ export function PlansTab({
 					</TableBody>
 				</Table>
 			)}
-			{promoted ? (
-				<PromoteDialog
-					username={username}
-					graphSlug={graphSlug}
-					open={promoting}
-					onOpenChange={setPromoting}
-					onPromoted={(plan) => open.plan(plan.id)}
-				/>
-			) : null}
 		</div>
 	);
 }

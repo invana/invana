@@ -25,8 +25,11 @@
  */
 
 import {
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldLabel,
 	Input,
-	Label,
 	Select,
 	SelectContent,
 	SelectItem,
@@ -184,25 +187,26 @@ export function EndpointForm({
 			noValidate
 		>
 			<div className="grid gap-3 sm:grid-cols-2">
-				<div className="flex flex-col gap-1.5">
-					<Label htmlFor="endpoint_name">
+				<Field data-invalid={!nameOk && !!name.trim()}>
+					<FieldLabel htmlFor="endpoint_name">
 						Name <span className="text-destructive">*</span>
-					</Label>
+					</FieldLabel>
 					<Input
 						id="endpoint_name"
 						value={name}
 						placeholder="anthropic-prod"
+						aria-invalid={!nameOk && !!name.trim()}
 						onChange={(e) => {
 							setNameUntouched(false);
 							setName(e.target.value);
 						}}
 					/>
-				</div>
+				</Field>
 
-				<div className="flex flex-col gap-1.5">
-					<Label htmlFor="provider">
+				<Field>
+					<FieldLabel htmlFor="provider">
 						Kind <span className="text-destructive">*</span>
-					</Label>
+					</FieldLabel>
 					{isEdit ? (
 						// Immutable once set: the vendor decides how the credential is
 						// dispatched, and changing it would silently re-point every rule.
@@ -224,56 +228,56 @@ export function EndpointForm({
 							</SelectContent>
 						</Select>
 					)}
-				</div>
+				</Field>
 			</div>
 
 			<div className="flex flex-col gap-1">
-				<p className="text-sm text-muted-foreground">
+				<FieldDescription>
 					The address segment —{" "}
 					<code className="font-mono">llm/{name || "…"}/…</code>. Lowercase
 					words, digits, hyphens and underscores: it is the word a rule names
 					and a refusal reads back.
-				</p>
+				</FieldDescription>
 				{isEdit ? (
 					// Renaming moves `llm/<name>/*` in one write, so it is refused while
 					// a world names it and the refusal says which. Saying so here is
 					// cheaper than finding out at save.
-					<p className="text-sm text-muted-foreground">
+					<FieldDescription>
 						Renaming moves every address under this endpoint. It is refused
 						while a world or a guardrail names one.
-					</p>
+					</FieldDescription>
 				) : null}
 				{!nameOk && name.trim() ? (
-					<p className="text-sm text-destructive">
+					<FieldError>
 						Lowercase letters, digits, hyphens and underscores only, starting
 						with a letter or a digit.
-					</p>
+					</FieldError>
 				) : null}
 			</div>
 
 			{!isEdit ? (
-				<div className="flex flex-col gap-1.5">
-					<Label htmlFor="model_id">
+				<Field>
+					<FieldLabel htmlFor="model_id">
 						First model version <span className="text-destructive">*</span>
-					</Label>
+					</FieldLabel>
 					<Input
 						id="model_id"
 						placeholder={meta?.exampleModelId}
 						value={modelId}
 						onChange={(e) => setModelId(e.target.value)}
 					/>
-					<p className="text-sm text-muted-foreground">
+					<FieldDescription>
 						An endpoint that offers nothing answers nothing. More are offered on
 						the endpoint itself.
-					</p>
-				</div>
+					</FieldDescription>
+				</Field>
 			) : null}
 
 			{isClaudeAgentSdk || requiresKey || keyOptional || showsBaseUrl ? (
 				<div className="grid gap-3 sm:grid-cols-2">
 					{isClaudeAgentSdk ? (
-						<div className="flex flex-col gap-1.5">
-							<Label htmlFor="credential_kind">Credential type</Label>
+						<Field>
+							<FieldLabel htmlFor="credential_kind">Credential type</FieldLabel>
 							<Select
 								value={credentialKind}
 								onValueChange={(v) => {
@@ -291,12 +295,12 @@ export function EndpointForm({
 									</SelectItem>
 								</SelectContent>
 							</Select>
-						</div>
+						</Field>
 					) : null}
 
 					{requiresKey || keyOptional ? (
-						<div className="flex flex-col gap-1.5">
-							<Label htmlFor="api_key">
+						<Field>
+							<FieldLabel htmlFor="api_key">
 								{oauthTokenWanted ? "Subscription token" : "API key"}{" "}
 								{apiKeyNeeded ? (
 									<span className="text-destructive">*</span>
@@ -312,7 +316,7 @@ export function EndpointForm({
 										)
 									</span>
 								)}
-							</Label>
+							</FieldLabel>
 							<Input
 								id="api_key"
 								type="password"
@@ -322,18 +326,18 @@ export function EndpointForm({
 								autoComplete="new-password"
 							/>
 							{oauthTokenWanted ? (
-								<p className="text-sm text-muted-foreground">
+								<FieldDescription>
 									Generate one with{" "}
 									<code className="font-mono">claude setup-token</code>{" "}
 									(requires a Claude Pro/Max/Team/Enterprise plan).
-								</p>
+								</FieldDescription>
 							) : null}
-						</div>
+						</Field>
 					) : null}
 
 					{showsBaseUrl ? (
-						<div className="flex flex-col gap-1.5">
-							<Label htmlFor="base_url">Base URL</Label>
+						<Field>
+							<FieldLabel htmlFor="base_url">Base URL</FieldLabel>
 							<Input
 								id="base_url"
 								placeholder={
@@ -344,7 +348,7 @@ export function EndpointForm({
 								value={baseUrl}
 								onChange={(e) => setBaseUrl(e.target.value)}
 							/>
-						</div>
+						</Field>
 					) : null}
 				</div>
 			) : null}

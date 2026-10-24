@@ -681,8 +681,19 @@ function templatesBase(username: string, graphSlug: string): string {
 }
 
 export const projectionTemplatesApi = {
-	list: (username: string, graphSlug: string) =>
-		request<ProjectionTemplateRead[]>(templatesBase(username, graphSlug)),
+	/**
+	 * This Graph's templates and the shipped ones. Filters by plain name:
+	 * `kind` (`result` · `prompt`) · `surface`; `q` searches name, surface and
+	 * intent.
+	 */
+	list: (username: string, graphSlug: string, query: ListQuery = {}) =>
+		request<Page<ProjectionTemplateRead>>(
+			`${templatesBase(username, graphSlug)}${listQueryToApi(query)}`,
+		),
+	get: (username: string, graphSlug: string, id: string) =>
+		request<ProjectionTemplateRead>(
+			`${templatesBase(username, graphSlug)}/${id}`,
+		),
 	create: (
 		username: string,
 		graphSlug: string,

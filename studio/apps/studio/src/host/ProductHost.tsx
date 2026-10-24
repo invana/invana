@@ -476,19 +476,27 @@ export function ProductHost() {
 		agentsOpen && strip.activeId !== AGENTS_HOME_ID
 			? strip.pages.find((p) => p.id === strip.activeId)
 			: undefined;
-	const reopenPill =
+	const pill =
 		assistantShown &&
 		!right.is("assistant") &&
 		((dataBoardInFront && activeSessionId) || agentsPageInFront) ? (
-			<div className="absolute right-16 bottom-4 z-10">
-				<AssistantReopenPill
-					title={
-						activeSessionId ? (sessionTitleById.get(activeSessionId) ?? "") : ""
-					}
-					ask={agentsPageInFront ? String(agentsPageInFront.title) : undefined}
-					onOpen={() => right.open("assistant")}
-				/>
-			</div>
+			<AssistantReopenPill
+				title={
+					activeSessionId ? (sessionTitleById.get(activeSessionId) ?? "") : ""
+				}
+				ask={agentsPageInFront ? String(agentsPageInFront.title) : undefined}
+				onOpen={() => right.open("assistant")}
+			/>
+		) : null;
+	// Over a canvas the pill floats; an Agents page's tables and consoles run
+	// to the bottom edge, so there it takes a row of its own under the page.
+	const reopenPill =
+		pill && !agentsPageInFront ? (
+			<div className="absolute right-16 bottom-4 z-10">{pill}</div>
+		) : null;
+	const reopenRow =
+		pill && agentsPageInFront ? (
+			<div className="flex shrink-0 justify-end py-2 pr-16">{pill}</div>
 		) : null;
 
 	// ⌘J opens or closes the assistant from anywhere on the page.
@@ -617,15 +625,18 @@ export function ProductHost() {
 								content: (
 									<ErrorBoundary key="workbook" onError={reportBoundaryError}>
 										{agentsHome ?? explorerHome ?? (
-											<div className="relative h-full">
-												<Workbook
-													{...strip}
-													// Until each canvas owns its own engine, only the active page is
-													// mounted — today's behaviour, now stated rather than emergent.
-													keepMounted={false}
-													className="h-full"
-												/>
-												{reopenPill}
+											<div className="flex h-full flex-col">
+												<div className="relative min-h-0 flex-1">
+													<Workbook
+														{...strip}
+														// Until each canvas owns its own engine, only the active page is
+														// mounted — today's behaviour, now stated rather than emergent.
+														keepMounted={false}
+														className="h-full"
+													/>
+													{reopenPill}
+												</div>
+												{reopenRow}
 											</div>
 										)}
 									</ErrorBoundary>

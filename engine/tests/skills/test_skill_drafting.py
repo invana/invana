@@ -310,3 +310,19 @@ async def test_a_plan_that_cannot_be_inlined_refuses_the_draw_by_name(
     assert out.rejected and named in out.rejected[0] and "Answer it." in out.rejected[0]
     plan = await drafts.plan_read(session, version=draft)
     assert len(plan.nodes) == 1 and plan.nodes[0].form == "human", "the plan that was there is untouched"
+
+
+async def test_reseeding_rewrites_a_packaged_plans_description(session: AsyncSession, graph: Graph) -> None:
+    """A packaged plan's text is the package's, so a Graph seeded before an
+    edit reads the edited text; a promoted plan's own text is never touched."""
+    flows = list(load_plugins().flows.values())
+    await plans.ensure_seeded(session, graph_id=graph.id, flows=flows, requires=_REQUIRES)
+    plan = await plans.flows_qs.find_by_key(session, graph_id=graph.id, key="nl-single", version=2)
+    plan.description = "stale text"
+    await session.flush()
+
+    await plans.ensure_seeded(session, graph_id=graph.id, flows=flows, requires=_REQUIRES)
+
+    await session.refresh(plan)
+    packaged = next(f for f in flows if (f.key, f.version) == ("nl-single", 2))
+    assert plan.description == packaged.description

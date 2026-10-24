@@ -106,6 +106,15 @@ class FlowManager:
         empty = await self.flows_qs.plans_without_nodes(session, graph_id=graph_id)
         for template in flows:
             if (template.key, template.version) in existing:
+                # A packaged plan's text is the package's: an edited TOML
+                # reaches Graphs seeded before the edit.
+                await self.flows_qs.refresh_packaged_description(
+                    session,
+                    graph_id=graph_id,
+                    key=template.key,
+                    version=template.version,
+                    description=template.description,
+                )
                 if (plan_id := empty.get((template.key, template.version))) is not None:
                     await self.flows_qs.add_tasks(
                         session, explode(plan_id, template.steps, requires=requires, versions=versions)
@@ -125,7 +134,7 @@ class FlowManager:
                     # What this plan offers a caller that inlines it. Seeded
                     # with the rows, because a row binding `${args.N}` and a
                     # plan that does not declare `N` is a plan that cannot be
-                    # read ([LB20](docs/for-developers/modules/workflows/features/the-library.md)).
+                    # read.
                     args_schema=dict(template.args_schema),
                     reusable=True,
                     created_by_kind="system",
