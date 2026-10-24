@@ -131,7 +131,7 @@ export function useAgentsSections({
 		() => ({
 			agent: (id) => openBoard({ kind: "agent", subjectId: id }),
 			skill: (id) => openBoard({ kind: "skill", subjectId: id }),
-			func: (key) => openBoard({ kind: "task_type", subjectId: key }),
+			func: (key) => openBoard({ kind: "function", subjectId: key }),
 			plugin: (name) => openBoard({ kind: "plugin", subjectId: name }),
 			plan: (id) => openBoard({ kind: "plan_runs", subjectId: id }),
 			template: (id) => openBoard({ kind: "template", subjectId: id }),

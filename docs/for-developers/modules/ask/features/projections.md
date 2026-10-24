@@ -116,6 +116,7 @@ flowchart LR
 | Answered card | the chosen option, who chose it, when — never re-editable in place; re-asking is a new question |
 | Emission header | the template in use, with a switcher listing the others that accept this shape |
 | Templates page | list per Graph; `+` in the header; a template's usage shows every emission that used it |
+| *Author a template* | a modal: Name · Kind (`result` · `prompt`) · Surface (the kind's surfaces) · Accepts (one constraint per part, `result_type tabular · min_rows 1`, prefilled from the surface until edited) · Shape (`spec`, one `key: value` per line) · Intent; *Save as a draft* or *Publish* ([P15](#7-decisions)) |
 
 ## 6. Engine
 
@@ -148,6 +149,7 @@ flowchart LR
 | P12 | Between eligible templates, **intent first, then the most specific shape constraint**. A constraint that narrows the shape (`single_value`, `categorical`, `empty`) outranks one that barely does (`min_rows`), so a one-cell result reads as a number rather than as a one-row table. |
 | P13 | **Intent is the classifier's structured output, never the raw question.** Ranking is, in order: the asked-for visual (`prefer`), the intent `kind`, specificity, name. `prefer` is `graph · table · chart` or empty and maps to the surfaces `subgraph · table · chart`; `kind` ranks `aggregate_and_chart` toward `chart` then `metric`, and `exploration` toward `subgraph`; every other kind ranks nothing. Both only **rank eligible templates** — *as a chart* over a one-cell result still renders `single-value`, and the picker offers the chart disabled with its reason (P10). An ask with no intent (a QL ask, a scheduled firing) ranks by specificity alone. |
 | P14 | **Templates never enter the prompt.** `prefer` is a fixed enum in the classifier's tool schema, so the schema is a constant and stays in the cacheable prefix however many templates a Graph authors. |
+| P15 | **Authoring takes the whole template and may publish at once.** *Author a template* sends `kind`, `surface`, `accepts` and `spec` as the engine stores them; *Publish* is a create followed by the draft's publish, so a published template still passed through a draft row. `accepts` is the result-shape constraint the engine checks (P4) — never a list of intent kinds; intent ranking is `intent` and P13. |
 
 ## 8. Deliberately absent
 
@@ -160,6 +162,7 @@ flowchart LR
 | Conditional multi-step forms | a wizard is a workflow, not a projection |
 | Naming a template in the classifier's prompt, or `prefer` naming one | the prompt would grow with every template a Graph authors; code picks from the shape (P14) |
 | Matching the question's words against a template's `intent` text | a substring match is not a classification; *show me a table of charts* is not a request for a chart (P13) |
+| `Accepts` as a list of intent kinds (`aggregate_and_chart · single_query`) | `accepts` is the shape a template can render, checked before render (P4); an intent kind ranks eligible templates, it does not make one eligible (P13) |
 
 ## 9. Open
 

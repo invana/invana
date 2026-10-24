@@ -7,7 +7,7 @@
  * plan gets by naming its functions.*
  *
  * A record header with the plugin's kind, state, version and function count,
- * then two columns: its functions (each opens `task_type:<key>`) and the
+ * then two columns: its functions (each opens `function:<key>`) and the
  * skills it brings on the left; what it needs to run — the pip extra and the
  * secret names a worker may resolve — and the plans it brings on the right.
  * Enable and Disable act only on a plugin the engine marks `switchable`, and

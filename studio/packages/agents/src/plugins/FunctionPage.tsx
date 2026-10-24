@@ -1,5 +1,5 @@
 /**
- * A function's page — board `agents.functions.detail`, `task_type:<key>` in
+ * A function's page — board `agents.functions.detail`, `function:<key>` in
  * `mainSection` ([the-catalogue.md](docs/for-developers/modules/workflows/features/the-catalogue.md)).
  *
  * *As a builder, I want a function's contract, who names it and how its calls

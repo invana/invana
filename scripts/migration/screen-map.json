@@ -201,8 +201,8 @@
   "agents.skill.locked": {
    "story": "SH-20",
    "product": "shell",
-   "route": null,
-   "state": ""
+   "route": "/u/admin/airways/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=instructions&right=assistant",
+   "state": "the uuid stands for a published skill (Answer in natural language): open it from Skills, signed in as e2e-viewer (a viewer on the Graph; e2e/roles-agents.spec.ts makes the account, its password is in e2e/members.ts)"
   },
   "shell.profile": {
    "story": "SH-17",
@@ -1311,14 +1311,14 @@
   "agents.agent.activity": {
    "story": "AG-03",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Activity tab"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=runs&right=assistant",
+   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Runs tab, where its activity folded"
   },
   "agents.agent.instructions": {
    "story": "AG-04",
    "product": "agents",
    "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=instructions&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Instructions tab (needs B02)"
+   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Instructions tab"
   },
   "agents.agent.soul": {
    "story": "AF-21",
@@ -1329,20 +1329,20 @@
   "agents.agent.thinking": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Thinking tab"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=model&right=assistant",
+   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Model tab, where effort folded"
   },
   "agents.agent.skills": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Skills & callables tab"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=overview&right=assistant",
+   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Overview, its Skills card"
   },
   "agents.agent.envelope": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Envelope"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=limits&right=assistant",
+   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Limits tab, where the envelope folded"
   },
   "agents.agent.history": {
    "story": "AG-06",
@@ -1353,8 +1353,8 @@
   "agents.agent.pause": {
    "story": "AG-07",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Pause or retire"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=overview&right=assistant",
+   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Pause or Retire on the head"
   },
   "agents.skills": {
    "story": "AF-03",
@@ -1527,7 +1527,7 @@
   "agents.functions.detail": {
    "story": "AF-02",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/functions?page=task_type%3Agraph.read.query&right=assistant",
+   "route": "/u/admin/airways/agents/functions?page=function%3Agraph.read.query&right=assistant",
    "state": "graph.read.query stands for a function's dotted name: click any function in Functions"
   },
   "agents.functions.plans": {
@@ -1612,37 +1612,37 @@
    "story": "AF-04",
    "product": "agent-fabric",
    "route": "/u/admin/airways/agents/skills?page=skill%3A4fda731c-3fa6-48f4-9546-21b8cb764973&tab=evals&right=assistant",
-   "state": "the uuid stands for a bound skill that has run (Hey, on Coordinator): open it from Skills; Evals tab"
+   "state": "the uuid stands for a bound skill that has run (Hey, on Coordinator): open it from Skills; Evals tab (four cases and one live eval run)"
   },
   "agents.agent.new": {
    "story": "AF-05",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/agents?right=assistant",
-   "state": "Agents \u203a New agent opens a draft on Overview (the builder)"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A7b1a7963-e9f9-4b1a-8ab0-65435956a245&tab=overview&right=assistant",
+   "state": "the uuid stands for a draft agent with two bound skills (Route desk briefer): Agents \u203a Drafts; New agent opens a draft like it on its Overview, the builder"
   },
   "agents.agent.flow": {
    "story": "AF-05",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=flow&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Flow tab"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A7b1a7963-e9f9-4b1a-8ab0-65435956a245&tab=flow&right=assistant",
+   "state": "the uuid stands for a draft agent with two bound skills (Route desk briefer): Agents \u203a Drafts; Flow tab"
   },
   "agents.agent.limits": {
    "story": "AF-05",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=limits&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Limits tab"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A7b1a7963-e9f9-4b1a-8ab0-65435956a245&tab=limits&right=assistant",
+   "state": "the uuid stands for a draft agent with two bound skills (Route desk briefer): Agents \u203a Drafts; Limits tab"
   },
   "agents.agent.access": {
    "story": "AF-05",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=access&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Access tab"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A7b1a7963-e9f9-4b1a-8ab0-65435956a245&tab=access&right=assistant",
+   "state": "the uuid stands for a draft agent with two bound skills (Route desk briefer): Agents \u203a Drafts; Access tab"
   },
   "agents.agent.deploy": {
    "story": "AF-05",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=deploy&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Deploy tab"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A7b1a7963-e9f9-4b1a-8ab0-65435956a245&tab=deploy&right=assistant",
+   "state": "the uuid stands for a draft agent with two bound skills (Route desk briefer): Agents \u203a Drafts; Deploy tab"
   },
   "agents.agent.detail": {
    "story": "AF-06",
@@ -1702,7 +1702,7 @@
    "story": "AF-21",
    "product": "agent-fabric",
    "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=overview&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Retire in the head"
+   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Retire on the head"
   },
   "agents.skill.agents": {
    "story": "AF-22",
@@ -1731,14 +1731,14 @@
   "agents.functions.plugins": {
    "story": "AF-23",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/functions/plugins?page=plugin%3Ainvana.core.graph_read&right=assistant",
+   "route": "/u/admin/airways/agents/functions/plugins?right=assistant",
    "state": "Plugins tab"
   },
   "agents.functions.plugin": {
    "story": "AF-23",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/functions/plugins?page=plugin%3Ainvana.core.graph_read&right=assistant",
-   "state": "invana.core.graph_read stands for any plugin: Plugins tab, click a plugin"
+   "route": "/u/admin/airways/agents/functions/plugins?page=plugin%3Ainvana.tools.mail&right=assistant",
+   "state": "invana.tools.mail, a tool plugin that is off: Functions \u203a Plugins, click it"
   },
   "agents.plans.promote": {
    "story": "AF-23",

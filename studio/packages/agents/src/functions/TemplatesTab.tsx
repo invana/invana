@@ -9,7 +9,9 @@
  * *Clear all* — are sent to the engine, which narrows and counts the rows.
  * *Accepts* is the shape a template declares it can render, as the engine
  * stores it. A row opens the template's page as a tab beside this one;
- * publishing and removing are taken there.
+ * removing is taken there. *Author a template* takes the whole template —
+ * kind, surface, what it accepts and its shape — and saves it as a draft or
+ * publishes it at once.
  */
 
 import {
@@ -22,6 +24,7 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
+	Textarea,
 } from "@invana/forms";
 import {
 	Badge,
@@ -57,7 +60,13 @@ import {
 import { useAgentsOpen } from "../open";
 import { RowsFailed, RowsLoading, useTabList } from "./shared";
 import {
+	acceptsFor,
+	acceptsLine,
+	PROMPT_SURFACES,
+	parseAccepts,
+	parseShape,
 	RESULT_SURFACES,
+	type TemplateKind,
 	useTemplateListQuery,
 	useTemplateMutations,
 } from "./templates";
@@ -190,7 +199,7 @@ export function TemplatesTab({
 								</TableCell>
 								<TableCell>{t.surface}</TableCell>
 								<TableCell className="whitespace-nowrap font-mono text-muted-foreground">
-									{acceptsLine(t.accepts)}
+									{acceptsLine(t.accepts) || "anything"}
 								</TableCell>
 								<TableCell>v{t.version}</TableCell>
 								<TableCell className="text-right">
@@ -226,15 +235,16 @@ export function TemplatesTab({
 	);
 }
 
-/** The declared shape, one constraint per part: `result_type tabular · min_rows 1`. */
-function acceptsLine(accepts: Record<string, unknown>): string {
-	const parts = Object.entries(accepts ?? {}).map(([k, v]) =>
-		v === true ? k : `${k} ${String(v)}`,
-	);
-	return parts.length ? parts.join(" · ") : "anything";
-}
+const SURFACES_OF: Record<TemplateKind, readonly string[]> = {
+	result: RESULT_SURFACES,
+	prompt: PROMPT_SURFACES,
+};
 
-/** *Author a template* — a result template, saved as a draft. Mounted only while open. */
+/**
+ * *Author a template* — kind, name, surface, accepts, shape and intent;
+ * *Save as a draft* or *Publish*. Accepts follows the surface until it is
+ * edited. Mounted only while open.
+ */
 function AuthorTemplateDialog({
 	username,
 	graphSlug,
@@ -247,9 +257,37 @@ function AuthorTemplateDialog({
 	onAuthored: (id: string) => void;
 }) {
 	const { create } = useTemplateMutations(username, graphSlug);
+	const [kind, setKind] = useState<TemplateKind>("result");
 	const [name, setName] = useState("");
 	const [surface, setSurface] = useState<string>("table");
+	const [accepts, setAccepts] = useState(() =>
+		acceptsLine(acceptsFor("result", "table")),
+	);
+	const [acceptsEdited, setAcceptsEdited] = useState(false);
+	const [shape, setShape] = useState("");
 	const [intent, setIntent] = useState("");
+
+	const pick = (nextKind: TemplateKind, nextSurface: string) => {
+		setKind(nextKind);
+		setSurface(nextSurface);
+		if (!acceptsEdited)
+			setAccepts(acceptsLine(acceptsFor(nextKind, nextSurface)));
+	};
+	const submit = (publish: boolean) =>
+		create.mutate(
+			{
+				draft: {
+					name: name.trim(),
+					kind,
+					surface,
+					intent: intent.trim(),
+					accepts: parseAccepts(accepts),
+					spec: parseShape(shape),
+				},
+				publish,
+			},
+			{ onSuccess: (t) => onAuthored(t.id) },
+		);
 
 	return (
 		<Dialog open onOpenChange={(o) => !o && onClose()}>
@@ -257,9 +295,9 @@ function AuthorTemplateDialog({
 				<DialogHeader>
 					<DialogTitle>Author a template</DialogTitle>
 					<DialogDescription>
-						Saved as a draft. Publishing makes it offered to answers of the
-						shapes it accepts; removing it is refused while answers still cite
-						it.
+						Saved as a draft, or published at once. Publishing makes it offered
+						to answers of the shapes it accepts and read-only after; removing it
+						is refused while answers still cite it.
 					</DialogDescription>
 				</DialogHeader>
 				<div className="flex flex-col gap-4">
@@ -273,19 +311,75 @@ function AuthorTemplateDialog({
 						/>
 					</Field>
 					<Field>
+						<FieldLabel htmlFor="template-kind">Kind</FieldLabel>
+						<Select
+							value={kind}
+							onValueChange={(v) => {
+								const next = v as TemplateKind;
+								pick(next, SURFACES_OF[next][0]);
+							}}
+						>
+							<SelectTrigger id="template-kind">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="result">result</SelectItem>
+								<SelectItem value="prompt">prompt</SelectItem>
+							</SelectContent>
+						</Select>
+						<FieldDescription>
+							A result template renders an answer's records; a prompt template
+							asks a closed question.
+						</FieldDescription>
+					</Field>
+					<Field>
 						<FieldLabel htmlFor="template-surface">Surface</FieldLabel>
-						<Select value={surface} onValueChange={setSurface}>
+						<Select value={surface} onValueChange={(v) => pick(kind, v)}>
 							<SelectTrigger id="template-surface">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
-								{RESULT_SURFACES.map((s) => (
+								{SURFACES_OF[kind].map((s) => (
 									<SelectItem key={s} value={s}>
 										{s}
 									</SelectItem>
 								))}
 							</SelectContent>
 						</Select>
+					</Field>
+					<Field>
+						<FieldLabel htmlFor="template-accepts">Accepts</FieldLabel>
+						<Input
+							id="template-accepts"
+							className="font-mono"
+							value={accepts}
+							onChange={(e) => {
+								setAccepts(e.target.value);
+								setAcceptsEdited(true);
+							}}
+							placeholder="result_type tabular · min_rows 1"
+						/>
+						<FieldDescription>
+							The result shape it can render, one constraint per part — checked
+							before it renders, so a result that does not fit is never drawn
+							half-empty.
+						</FieldDescription>
+					</Field>
+					<Field>
+						<FieldLabel htmlFor="template-shape">Shape</FieldLabel>
+						<Textarea
+							id="template-shape"
+							className="font-mono"
+							rows={4}
+							value={shape}
+							onChange={(e) => setShape(e.target.value)}
+							placeholder={"x: month\ny: fare_median\nseries: carrier"}
+						/>
+						<FieldDescription>
+							The surface's own definition, one{" "}
+							<TypographyInlineCode>key: value</TypographyInlineCode> per line —
+							axes for a chart, columns for a table.
+						</FieldDescription>
 					</Field>
 					<Field>
 						<FieldLabel htmlFor="template-intent">Intent</FieldLabel>
@@ -307,15 +401,17 @@ function AuthorTemplateDialog({
 						Cancel
 					</Button>
 					<Button
+						variant="outline"
 						disabled={!name.trim() || create.isPending}
-						onClick={() =>
-							create.mutate(
-								{ name: name.trim(), surface, intent: intent.trim() },
-								{ onSuccess: (t) => onAuthored(t.id) },
-							)
-						}
+						onClick={() => submit(false)}
 					>
 						Save as a draft
+					</Button>
+					<Button
+						disabled={!name.trim() || create.isPending}
+						onClick={() => submit(true)}
+					>
+						Publish
 					</Button>
 				</DialogFooter>
 			</DialogContent>

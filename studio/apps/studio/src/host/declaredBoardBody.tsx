@@ -281,13 +281,13 @@ export function declaredBoardContent(
 			<PluginPage
 				name={board.subjectId}
 				onOpenFunction={(key) =>
-					openBoard({ kind: "task_type", subjectId: key })
+					openBoard({ kind: "function", subjectId: key })
 				}
 			/>
 		);
 	}
 
-	if (board.kind === "task_type") {
+	if (board.kind === "function") {
 		return (
 			<FunctionPage
 				taskKey={board.subjectId}
@@ -295,7 +295,7 @@ export function declaredBoardContent(
 				graphSlug={graphSlug as string}
 				onOpenPlugin={(name) => openBoard({ kind: "plugin", subjectId: name })}
 				onOpenFunction={(key) =>
-					openBoard({ kind: "task_type", subjectId: key })
+					openBoard({ kind: "function", subjectId: key })
 				}
 			/>
 		);
@@ -404,7 +404,7 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 							BOARD_KINDS[board.kind].label)
 						: board.kind === "project"
 							? (projectNameByKey.get(board.subjectId) ?? board.subjectId)
-							: board.kind === "plugin" || board.kind === "task_type"
+							: board.kind === "plugin" || board.kind === "function"
 								? board.subjectId
 								: board.kind === "run"
 									? runAddress(board.subjectId)

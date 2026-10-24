@@ -32,7 +32,6 @@
 
 import {
 	Bot,
-	Box,
 	Boxes,
 	Database,
 	FileCode,
@@ -44,12 +43,13 @@ import {
 	History,
 	LayoutDashboard,
 	ListTree,
-	Puzzle,
+	Pencil,
+	Plug,
 	Quote,
-	Scale,
 	ShieldCheck,
 	SlidersHorizontal,
 	SquareActivity,
+	SquareFunction,
 	WandSparkles,
 } from "lucide-react";
 import type { ElementType } from "react";
@@ -180,7 +180,7 @@ export type DeclaredKind =
 	| "project"
 	| "decisions"
 	| "plugin"
-	| "task_type"
+	| "function"
 	| "template";
 
 export type BoardKind = CanvasKind | DeclaredKind;
@@ -285,7 +285,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		kind: "skill",
 		renders: "declared",
 		label: "Skill",
-		icon: Scale,
+		icon: Pencil,
 		// `Open` on the Skills section's selected row.
 		panel: "skills",
 		subject: "a skills.id",
@@ -371,26 +371,26 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		panel: "decisions",
 		subject: "the graph's slug",
 	},
-	// A plugin's page — its task types, skills and flows. Studio-only and
+	// A plugin's page — its functions, skills and plans. Studio-only and
 	// install-level, like the registry it reads; titled with the plugin's name.
 	plugin: {
 		kind: "plugin",
 		renders: "declared",
 		label: "Plugin",
-		icon: Puzzle,
+		icon: Plug,
 		// A row in Functions › Plugins.
 		panel: "functions",
 		subject: "a plugin name",
 	},
-	// A task type's manifest. Studio-only; titled with its key.
-	task_type: {
-		kind: "task_type",
+	// A function's manifest. Studio-only; titled with its key.
+	function: {
+		kind: "function",
 		renders: "declared",
 		label: "Function",
-		icon: Box,
-		// A row in Functions › Functions, or a task type on a plugin's page.
+		icon: SquareFunction,
+		// A row in Functions › Functions, or a function on a plugin's page.
 		panel: "functions",
-		subject: "a task type key",
+		subject: "a function key",
 	},
 	// An answer template — the surface it draws, the intents it accepts, and
 	// which answers cite it. Studio-only; titled with its key.
