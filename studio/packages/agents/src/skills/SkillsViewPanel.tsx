@@ -19,20 +19,35 @@ import {
 	Badge,
 	Button,
 	CardFooter,
+	FilterBar,
 	PanelStack,
 	type PanelStackSection,
 	PropertyList,
 	PropertyRow,
 	Spinner,
 } from "@invana/ui";
-import { gateItem, useAccess } from "@invana-studio/shell";
+import { useListParams } from "@invana-studio/core";
+import { useAccess } from "@invana-studio/shell";
 import {
 	DetailStatus,
+	FilterSelect,
 	PanelStatusBar,
-	SectionTitle,
 	StatusCrumb,
+	stackSection,
+	useStackSectionUi,
 } from "@invana-studio/ui";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus, Wand2 } from "lucide-react";
+import { gateSection } from "../gateSection";
+import {
+	chipsOf,
+	FilteredEmpty,
+	filterValue,
+	ListStrip,
+	matchCount,
+	PAGE,
+	setOne,
+	useUrlSearchUi,
+} from "../lists";
 import {
 	useCreateSkillMutation,
 	useSkillAgentsQuery,
@@ -40,6 +55,15 @@ import {
 	useSkillUsageQuery,
 } from "./queries";
 import type { Skill } from "./types";
+
+const STATUS_OPTIONS = [
+	{ value: "published", label: "published" },
+	{ value: "draft", label: "draft" },
+];
+const ORIGIN_OPTIONS = [
+	{ value: "builtin", label: "built in" },
+	{ value: "authored", label: "authored" },
+];
 
 interface Props {
 	username: string;
@@ -61,7 +85,12 @@ export function SkillsViewPanel({
 	onSelectSkill,
 	onOpenSkillPage,
 }: Props) {
-	const skills = useSkillsQuery(username, graphSlug);
+	const list = useListParams();
+	const skills = useSkillsQuery(username, graphSlug, {
+		...list.query,
+		limit: PAGE,
+	});
+	const ui = useUrlSearchUi(useStackSectionUi(), "skills", list);
 	const create = useCreateSkillMutation(username, graphSlug);
 	const build = useAccess().gate("build");
 	const items = skills.data?.items ?? [];
@@ -75,7 +104,7 @@ export function SkillsViewPanel({
 	 */
 	const newSkill = () => {
 		create.mutate(
-			{ name: `Untitled skill ${items.length + 1}` },
+			{ name: `Untitled skill ${(skills.data?.unfiltered_total ?? 0) + 1}` },
 			{
 				onSuccess: (skill) => {
 					onSelectSkill(skill.id);
@@ -92,8 +121,11 @@ export function SkillsViewPanel({
 					<Spinner />
 				</div>
 			);
+		const chips = chipsOf(skills.data, list);
 		if (items.length === 0)
-			return (
+			return chips.length ? (
+				<FilteredEmpty noun="skill" filters={chips} onClear={list.clear} />
+			) : (
 				<p className="px-3 py-2 text-base text-muted-foreground">
 					No skills yet. A skill is a playbook an agent may be offered — how to
 					approach something, written once.
@@ -101,6 +133,7 @@ export function SkillsViewPanel({
 			);
 		return (
 			<div className="flex h-full min-h-0 flex-col">
+				<ListStrip page={skills.data} list={list} />
 				<div className="min-h-0 flex-1 overflow-y-auto">
 					{items.map((skill) => (
 						<SkillRow
@@ -136,19 +169,44 @@ export function SkillsViewPanel({
 	};
 
 	const sections: PanelStackSection[] = [
-		{
-			id: "skills",
-			title: (
-				<SectionTitle count={skills.data?.total ?? 0}>Skills</SectionTitle>
+		gateSection(
+			stackSection(
+				{
+					id: "skills",
+					label: "Skills",
+					icon: Wand2,
+					count: matchCount(skills.data),
+					searchable: true,
+					searchPlaceholder: "Search skills",
+					filtered: Object.keys(list.query.filters ?? {}).length > 0,
+					filterBar: (
+						<FilterBar>
+							<FilterSelect
+								label="status"
+								value={filterValue(list, "status")}
+								options={STATUS_OPTIONS}
+								onChange={(v) => setOne(list, "status", v)}
+							/>
+							<FilterSelect
+								label="origin"
+								value={filterValue(list, "origin")}
+								options={ORIGIN_OPTIONS}
+								onChange={(v) => setOne(list, "origin", v)}
+							/>
+						</FilterBar>
+					),
+					// The header's one action area carries the act the section is for.
+					// The section does not drill in — the detail is the page.
+					headerActions: [
+						{ key: "new", name: "New skill", icon: Plus, onClick: newSkill },
+					],
+					children: skillsBody,
+				},
+				ui,
 			),
-			// The header's one action area carries the act the section is for.
-			// The section does not drill in — the detail is the page.
-			headerActions: [
-				gateItem({ name: "New skill", icon: Plus, onClick: newSkill }, build),
-			],
-			actionsOnHover: false,
-			content: skillsBody(),
-		},
+			["new"],
+			build,
+		),
 	];
 
 	return (

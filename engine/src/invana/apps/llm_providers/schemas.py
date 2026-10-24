@@ -21,6 +21,7 @@ from invana.apps.llm_providers.models import (
     LLMProvider,
     LLMProviderKind,
 )
+from invana.core.lists import Filter, ListSpec
 
 #: The address segment: lowercase words, digits, hyphens and underscores. A rule
 #: is written against it and a refusal reads it back, so it stays a slug rather
@@ -124,14 +125,37 @@ class LLMProviderRead(BaseModel):
         return read
 
 
-class LLMProviderListResponse(BaseModel):
-    items: list[LLMProviderRead]
-    total: int
+#: What the endpoints list takes. ``kind`` is the vendor the endpoint calls.
+LLM_PROVIDER_LIST = ListSpec(
+    filters={
+        "kind": Filter(
+            values=tuple(k.value for k in LLMProviderKind),
+            labels={
+                "anthropic": "Anthropic",
+                "openai": "OpenAI",
+                "google": "Google",
+                "azure": "Azure",
+                "ollama": "Ollama",
+                "claude_agent_sdk": "Claude Agent SDK",
+            },
+        ),
+    },
+    sorts=("created_at", "name", "-updated_at"),
+    search_title="name",
+)
 
-
-class LLMModelListResponse(BaseModel):
-    items: list[LLMModelRead]
-    total: int
+#: What one endpoint's models list takes. With no ``status`` every model is
+#: listed, the removed ones too.
+LLM_MODEL_LIST = ListSpec(
+    filters={
+        "status": Filter(
+            values=tuple(s.value for s in LLMModelStatus),
+            labels={"active": "offered", "removed": "not offered"},
+        ),
+    },
+    sorts=("created_at", "model_id", "-updated_at"),
+    search_title="model",
+)
 
 
 class LLMPingResponse(BaseModel):

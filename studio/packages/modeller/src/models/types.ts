@@ -11,8 +11,6 @@ type ModelOrigin = "studio" | "yaml" | "introspected";
 
 // ── Publish review (publish-review.md) ─────────────────────────────────────
 
-export type { Change };
-
 export interface PublishChange {
 	kind: string;
 	target_kind:
@@ -763,7 +761,7 @@ export interface Performance {
 }
 
 /** The page's model and type counts, counted by the engine. */
-export interface Catalog {
+interface Catalog {
 	models: number;
 	published: number;
 	drafts: number;
@@ -973,7 +971,7 @@ interface TypeTally {
 }
 
 /** Rows that disagree with the models, counted by the engine. */
-export interface PhysicalDrift {
+interface PhysicalDrift {
 	total: number;
 	types: number;
 	rules: number;

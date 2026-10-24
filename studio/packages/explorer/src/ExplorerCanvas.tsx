@@ -18,7 +18,6 @@
  */
 
 import {
-	BOARD_IDS,
 	type BoardMenuExtras,
 	type BoardPanelSpec,
 	type DefaultBoardPanelsOptions,
@@ -54,9 +53,6 @@ export interface ExpandMenuHandlers {
 	onExpand?: (req: ExpandRequest) => void;
 	onOpenFineTune?: (vertexId: string) => void;
 }
-
-/** The board's active layout — re-run by an expand that seeds new neighbours. */
-export const ACTIVE_LAYOUT_ID = BOARD_IDS.layout;
 
 const LAYOUT_TOAST_ID = "explorer-layout";
 

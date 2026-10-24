@@ -18,12 +18,14 @@ import {
 	PropertyRow,
 	Spinner,
 } from "@invana/ui";
+import type { ListQuery } from "@invana-studio/core";
 import {
 	RecordRow,
 	type StackSectionUi,
 	stackSection,
 } from "@invana-studio/ui";
 import { BookMarked } from "lucide-react";
+import { EVERY, matchCount, PAGE } from "../lists";
 import { useCatalogueQuery } from "./queries";
 import type { CatalogueEntry } from "./types";
 
@@ -47,23 +49,36 @@ export function catalogueSection({
 	defaultSize,
 	defaultCollapsed,
 }: CatalogueSectionProps): PanelStackSection {
+	// The section shares its stack with Plugins, whose search is the URL's; this
+	// one's is the section's own, and the engine still does the searching.
+	const state = ui.get("catalogue");
+	const query = {
+		q: (state.searchOpen && state.search.trim()) || undefined,
+		limit: PAGE,
+	};
 	return stackSection(
 		{
 			id: "catalogue",
 			label: "Catalogue",
 			icon: BookMarked,
-			count: <CatalogueCount username={username} graphSlug={graphSlug} />,
+			count: (
+				<CatalogueCount
+					username={username}
+					graphSlug={graphSlug}
+					query={query}
+				/>
+			),
 			trail: entryKey ?? undefined,
 			onBack: () => onOpenEntry(null),
 			searchable: true,
 			searchPlaceholder: "Search tasks",
 			defaultSize,
 			defaultCollapsed,
-			children: ({ search }) => (
+			children: () => (
 				<CatalogueSectionBody
 					username={username}
 					graphSlug={graphSlug}
-					search={search}
+					query={query}
 					entryKey={entryKey}
 					onOpenEntry={onOpenEntry}
 				/>
@@ -76,29 +91,33 @@ export function catalogueSection({
 function CatalogueCount({
 	username,
 	graphSlug,
+	query,
 }: {
 	username: string;
 	graphSlug: string;
+	query: ListQuery;
 }) {
-	const total = useCatalogueQuery(username, graphSlug).data?.total;
-	return total ? <>{total}</> : null;
+	const page = useCatalogueQuery(username, graphSlug, query).data;
+	return page?.unfiltered_total ? matchCount(page) : null;
 }
 
 function CatalogueSectionBody({
 	username,
 	graphSlug,
-	search,
+	query,
 	entryKey,
 	onOpenEntry,
 }: {
 	username: string;
 	graphSlug: string;
-	search: string;
+	query: ListQuery;
 	entryKey: string | null;
 	onOpenEntry: (key: string | null) => void;
 }) {
-	const catalogue = useCatalogueQuery(username, graphSlug);
-	const items = catalogue.data?.items ?? [];
+	const catalogue = useCatalogueQuery(username, graphSlug, query);
+	// The drilled-in entry is found among every entry, whatever the search.
+	const every = useCatalogueQuery(username, graphSlug, EVERY);
+	const rows = catalogue.data?.items ?? [];
 
 	if (catalogue.isLoading)
 		return (
@@ -116,7 +135,13 @@ function CatalogueSectionBody({
 		);
 
 	if (entryKey) {
-		const entry = items.find((e) => e.step_key === entryKey);
+		if (every.isLoading)
+			return (
+				<div className="px-3 py-4">
+					<Spinner />
+				</div>
+			);
+		const entry = every.data?.items.find((e) => e.step_key === entryKey);
 		return entry ? (
 			<EntryDetail entry={entry} onOpenEntry={onOpenEntry} />
 		) : (
@@ -128,15 +153,12 @@ function CatalogueSectionBody({
 		);
 	}
 
-	// Search reads key, summary and bound; the groups stay the navigation.
-	const q = search.toLowerCase();
-	const rows = items.filter((e) =>
-		[e.step_key, e.summary, e.bound].some((s) => s.toLowerCase().includes(q)),
-	);
 	if (!rows.length)
 		return (
 			<p className="px-3 py-4 text-muted-foreground">
-				No task matches that search.
+				{query.q
+					? `No task matches "${query.q}".`
+					: "This engine's catalogue is empty."}
 			</p>
 		);
 

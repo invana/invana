@@ -26,6 +26,7 @@ import { PanelSection } from "@invana-studio/ui";
 import { useState } from "react";
 import { GatedActDialog } from "../evals/GatedActDialog";
 import { useEvalMutations } from "../evals/queries";
+import { EVERY } from "../lists";
 import { useLLMProvidersQuery } from "../llms/queries";
 import type { AgentDraft } from "./agentDraft";
 import { CeilingsTable } from "./CeilingsTable";
@@ -72,7 +73,7 @@ function ModelPin({
 	graphSlug: string;
 	agent: Agent;
 }) {
-	const providers = useLLMProvidersQuery(username, graphSlug);
+	const providers = useLLMProvidersQuery(username, graphSlug, EVERY);
 	const m = useAgentMutations(username, graphSlug);
 	const evals = useEvalMutations(username, graphSlug, "agent", agent.id);
 	const [picked, setPicked] = useState<string | null>(null);

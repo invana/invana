@@ -30,6 +30,7 @@ from invana.apps.task_plans.schemas import (
 )
 from invana.core.auth.models import User
 from invana.core.errors import NotFoundError, ValidationError
+from invana.core.lists import ListParams, PageInfo
 from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.layers import declared_bands, layer_for, ordered_layers
@@ -85,7 +86,14 @@ class TaskPlanRunsManager:
             raise NotFoundError(f"No workflow keyed '{key}'.")
         return workflow
 
-    async def list_reads(self, session: AsyncSession, *, graph_id: str) -> list[TaskPlanRead]:
+    async def page_reads(
+        self, session: AsyncSession, *, graph_id: str, params: ListParams
+    ) -> tuple[list[TaskPlanRead], PageInfo]:
+        """One page of the library, seeded first — each version row with its run statistics.
+
+        A row is a version, not a plan: a key with three versions is three
+        rows, and the surface groups them by key.
+        """
         await self.library.ensure_seeded(
             session,
             graph_id=graph_id,
@@ -93,7 +101,15 @@ class TaskPlanRunsManager:
             requires=_requires(),
             versions=load_plugins().versions(),
         )
-        rows = await self.workflows_qs.list_for_graph(session, graph_id=graph_id)
+        page, info = await self.workflows_qs.page_for_graph(session, graph_id=graph_id, params=params)
+        return await self._reads(session, graph_id=graph_id, rows=list(page)), info
+
+    async def count_packaged(self, session: AsyncSession, *, graph_id: str) -> int:
+        """The library's versions that shipped with Invana or a plugin, over the whole Graph."""
+        return await self.library.count_packaged(session, graph_id=graph_id)
+
+    async def _reads(self, session: AsyncSession, *, graph_id: str, rows: list[TaskPlan]) -> list[TaskPlanRead]:
+        """The listed rows as reads: step count, agents, bands, callers and run statistics."""
         # Every plan, because a caller is a skill's plan and those are not in
         # the library — the rows above are what is *listed*, these are what
         # counts as a use (LB16 · LB19).

@@ -15,10 +15,12 @@ from invana.apps.explorer.schemas import ExpandByEdgeTypeRequest, TypeCount
 from invana.apps.graphs.models import Graph
 from invana.apps.sessions.models import Session, SessionMessage
 from invana.core.auth.models import User
+from invana.core.lists.params import parse_list_params
 from invana.runtime import services
 from invana.runtime.canvas import _explore, open_expand_run
 from invana.runtime.models import TriggeredBy
 from invana.runtime.querysets import TaskRunQuerySet
+from invana.runtime.schemas import RUN_LIST
 
 
 async def _session(db: AsyncSession, graph: Graph, owner: User) -> Session:
@@ -51,8 +53,10 @@ async def test_an_expansion_is_a_canvas_run_and_the_turn_is_the_run(
     assert [s.id for s in listed[reply.id]] == [step.id]
 
     # Off the journal by default; on when asked for (GC7).
-    hidden, _ = await services.list_runs(session, graph_id=graph.id)
-    shown, _ = await services.list_runs(session, graph_id=graph.id, interactive=True)
+    hidden, _ = await services.list_runs(session, graph_id=graph.id, params=parse_list_params(RUN_LIST, {}))
+    shown, _ = await services.list_runs(
+        session, graph_id=graph.id, params=parse_list_params(RUN_LIST, {"interactive": ["true"]})
+    )
     assert run.id not in {r["id"] for r in hidden}
     assert run.id in {r["id"] for r in shown}
 

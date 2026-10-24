@@ -11,6 +11,7 @@ Retirement, deletion and lineage read `runs` and live in
 from __future__ import annotations
 
 import copy
+from collections.abc import Sequence
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,6 +37,8 @@ from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.querysets import EventQuerySet
 from invana.core.events.services import diff_changed_fields, emit_event
+from invana.core.lists import ListParams
+from invana.core.lists.schemas import PageInfo
 
 """Service layer for agents — the agents, the lifecycle, and lineage."""
 
@@ -200,18 +203,22 @@ class AgentManager:
             session, graph.id, include_ephemeral=include_ephemeral, include_retired=include_retired
         )
 
-    @staticmethod
-    def count_by_lifetime(agents: list[Agent]) -> tuple[int, int]:
-        """How many of a listed set of agents are persistent, and how many ephemeral.
+    async def page_agents(
+        self, session: AsyncSession, *, graph: Graph, params: ListParams
+    ) -> tuple[Sequence[Agent], PageInfo]:
+        """One page of the Agents list — seeding the Graph's agents on first touch."""
+        await self.seed_agents(session, graph=graph)
+        return await self.agents_qs.page_for_graph(session, graph.id, params=params)
+
+    async def count_by_lifetime(self, session: AsyncSession, *, graph_id: str) -> tuple[int, int]:
+        """How many of the Graph's agents that are not retired are persistent, and how many ephemeral.
 
         An ephemeral agent is a helper spawned for one task; the Agents list
-        hides it by default and says how many it hid. The header counts the
-        persistent ones until the reader shows the hidden, then the list's
-        ``total``. Returns ``(persistent, ephemeral)``, which add up to the
-        number of agents passed.
+        hides it by default and says how many it hid. Counted over the Graph,
+        not over a filtered page. Returns ``(persistent, ephemeral)``.
         """
-        ephemeral = sum(1 for a in agents if a.lifetime == AgentLifetime.ephemeral.value)
-        return len(agents) - ephemeral, ephemeral
+        counts = await self.agents_qs.count_by_lifetime(session, graph_id)
+        return counts.get(AgentLifetime.persistent.value, 0), counts.get(AgentLifetime.ephemeral.value, 0)
 
     async def get_or_404(self, session: AsyncSession, *, agent_id: str, graph_id: str) -> Agent:
         agent = await self.agents_qs.get(session, agent_id)

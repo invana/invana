@@ -59,7 +59,7 @@ this map.** Feature numbers do not change.
 | Work | `projects` 9.1 · 9.2 · 9.4 · 9.5 · 9.6 · 9.7 · 9.8 |
 | Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 · `notifications` 10.7 · 10.8 |
 | Governance | `lenses` 14.x · `events` 10.2 |
-| Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 13.11 · 13.12 · 13.13 · 13.14 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
+| Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 13.11 · 13.12 · 13.13 · 13.14 · 13.15 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
 
 ---
 
@@ -242,6 +242,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 13.12 | [Tool plugins](modules/platform/features/tool-plugins.md) | `tools/web` · `tools/mail` · `tools/science` as optional extras, Admin-enabled, run in workers; `send` waits for an approval; the plugin registry over API and CLI | ✅ | ✅ | ✅ | B06b |
 | 13.13 | [MCP plugins](modules/platform/features/mcp-plugins.md) | An MCP server's tools as task types in an `mcp` plugin, frozen when an Admin adds the server; refreshed by hand, loaded at start-up, switched like a tool plugin | ✅ | ✅ | 🔵 | B07 |
 | 13.14 | [Metrics are stored](modules/platform/features/metrics-are-stored.md) | Every number Studio shows is computed and stored by the engine; Studio formats it — durations, totals, rates and shares | 🟡 | — | 🟡 | — |
+| 13.15 | [One list contract](modules/platform/features/list-contract.md) | Every list searched, filtered, sorted and keyset-paged by one engine helper, answering `{items, total, unfiltered_total, next_cursor, applied}`; filters in the URL and shown as chips | ✅ | — | 🟡 | F01 |
 
 ---
 
@@ -409,7 +410,7 @@ replacement lands.
 | S14 | 10.5 · 2.1 · 2.2 | Every run in the Graph reads from one journal, delegated children nest under their parent, and Imports is a filter of it rather than a second implementation — `import_jobs` is gone, and a load is dispatched by the interpreter like every other run ([BD12](modules/bring-data-in/spec.md)) |
 | S15 | 13.8 · 2.3 · 7.5 | A plan is a graph, the cursor is a frontier, a step fans out into lanes, a pool stops one workflow starving the rest, and a person is asked before a gated step runs — proven by a bundle load that branches, fans out and inlines the single-dataset plan, and startable from the library without phrasing a question |
 | S16 | 14.1 · 14.2 · 10.5 | **The lens governs five layers, and the run proves it.** A world narrows what a run may see, use and send; a guardrail refuses before dispatch; and the touch record shows which participants were read, called, refused and sent to. Done when the same question, run in two worlds, gives two answers whose difference is readable as a diff of what each touched — and when narrowing `Deal.revenue` out of a world means no query can return it, no aggregate can reveal it and no prompt can carry it |
-| F01 | 13 (list contract) · 13.14 · 13.1 | Each Agents list is searched, filtered and paged through one helper; a filtered URL reloads to the same rows and chips |
+| F01 | 13.15 · 13.14 · 13.1 | Each Agents list is searched, filtered and paged through one helper; a filtered URL reloads to the same rows and chips |
 | F02 | terminology · 7.x · 13.9 | A clean checkout migrates from one baseline, loads airways, and no `TaskPlan` or old task-type key is left in engine, API or Studio |
 | F03 | 5.1 · 5.7 · 5.10 · 6.x · 13.9 · 13.13 | Every surface the Agents product had is reachable from the new rail with no leftSection, and the code it replaced is deleted |
 | F04 | 5.2 · 5.3 · 5.5 · 5.8 · 5.9 · 6.x | An agent is built on its page from a drafted skill, its Flow matches its instructions, and publishing passes the eval gate |

@@ -132,18 +132,15 @@ function SchedulesBody({
 		);
 	}
 
-	const pausedCount = items.filter((s) => s.status === "paused").length;
+	const total = list.data?.total ?? 0;
+	const pausedCount = list.data?.paused ?? 0;
 	return (
 		<div className="flex h-full flex-col gap-3 overflow-auto p-4">
 			<ComingUp graph={graph} schedules={items} />
 			<Card className="overflow-hidden">
 				<SectionHeader
 					title="Schedules"
-					count={
-						pausedCount
-							? `${items.length} · ${pausedCount} paused`
-							: items.length
-					}
+					count={pausedCount ? `${total} · ${pausedCount} paused` : total}
 					actions={newButton}
 					className="px-4"
 				/>

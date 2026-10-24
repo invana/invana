@@ -8,6 +8,9 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from invana.apps.agents.models import AgentKind, AgentStatus
+from invana.core.lists import Filter, ListSpec, Page
+
 
 class AgentCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
@@ -113,11 +116,22 @@ class AgentRead(BaseModel):
     updated_at: datetime
 
 
-class AgentListResponse(BaseModel):
-    items: list[AgentRead]
-    total: int
-    #: ``items`` split by lifetime: the standing agents, and the spawned helpers
-    #: the list hides by default. The two add up to ``total``.
+#: What the Agents list takes. With no ``status`` a retired agent is left out;
+#: with no ``ephemeral=shown`` a spawned helper is.
+AGENT_LIST = ListSpec(
+    filters={
+        "kind": Filter(values=tuple(k.value for k in AgentKind)),
+        "status": Filter(values=tuple(s.value for s in AgentStatus)),
+        "ephemeral": Filter(values=("shown",)),
+    },
+    sorts=("name", "-created_at", "-updated_at"),
+    search_title="name",
+)
+
+
+class AgentPage(Page[AgentRead]):
+    #: The Graph's agents that are not retired, by lifetime: the standing
+    #: agents, and the spawned helpers the list hides by default.
     persistent: int = 0
     ephemeral: int = 0
     #: ``{agent_id: tokens}`` since the first of the month — what the list draws

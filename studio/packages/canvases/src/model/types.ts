@@ -25,7 +25,7 @@ export const MODEL_EMPTY_TYPE = SCHEMA_FRAME_EMPTY_TYPE;
  */
 export const hueSlotForName = (name: string): number => colorSlotByString(name);
 
-export interface ModelFrameData {
+interface ModelFrameData {
 	name: string;
 	description: string;
 	/** The version drawn. */
@@ -37,7 +37,7 @@ export interface ModelFrameData {
 /** A property; `tags` are the stitches that key on it. */
 export type ModelProperty = SchemaCardProperty;
 
-export interface ModelTypeData extends SchemaTypeData {
+interface ModelTypeData extends SchemaTypeData {
 	/** The model's name. */
 	model: string;
 	/** `1`–`8`, the slot the type's own name hashes to. */

@@ -222,8 +222,3 @@ export interface RunStatsQuery {
 	days?: number;
 	kinds?: string[];
 }
-
-export interface TaskRunListResponse {
-	items: TaskRunSummary[];
-	total: number;
-}

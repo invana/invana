@@ -54,30 +54,6 @@
    "route": "/u/admin/airways/activity/runs",
    "state": ""
   },
-  "shell.run.overview": {
-   "story": "SH-09",
-   "product": "shell",
-   "route": "/u/admin/airways/activity/runs/15",
-   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Overview tab"
-  },
-  "shell.run.touched": {
-   "story": "SH-09",
-   "product": "shell",
-   "route": "/u/admin/airways/activity/runs/15",
-   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Touched tab"
-  },
-  "shell.run.log": {
-   "story": "SH-09",
-   "product": "shell",
-   "route": "/u/admin/airways/activity/runs/15",
-   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; Log tab"
-  },
-  "shell.run.step": {
-   "story": "SH-09",
-   "product": "shell",
-   "route": "/u/admin/airways/activity/runs/15",
-   "state": "15 stands for a run id: Activity \u203a Runs, open the newest succeeded run; click a step on its timeline"
-  },
   "shell.run.failed": {
    "story": "SH-10",
    "product": "shell",
@@ -144,6 +120,54 @@
    "route": "/u/admin/airways/activity/inbox",
    "state": ""
   },
+  "shell.notifications.tray": {
+   "story": "SH-15",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/inbox",
+   "state": ""
+  },
+  "shell.notifications.tray.review": {
+   "story": "SH-15",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/inbox",
+   "state": ""
+  },
+  "shell.notifications.tray.review.not_approver": {
+   "story": "SH-15",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/inbox",
+   "state": ""
+  },
+  "shell.notifications.tray.review.decided": {
+   "story": "SH-15",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/inbox",
+   "state": ""
+  },
+  "shell.notifications.tray.review.expired": {
+   "story": "SH-15",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/inbox",
+   "state": ""
+  },
+  "shell.notifications.tray.answer": {
+   "story": "SH-15",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/inbox",
+   "state": ""
+  },
+  "shell.notifications.tray.empty": {
+   "story": "SH-15",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/inbox",
+   "state": ""
+  },
+  "shell.notifications.toast": {
+   "story": "SH-15",
+   "product": "shell",
+   "route": "/u/admin/airways/activity/inbox",
+   "state": ""
+  },
   "shell.notifications.rules": {
    "story": "SH-16",
    "product": "shell",
@@ -174,11 +198,11 @@
    "route": "/graphs?first-run",
    "state": "an install with no Graph yet"
   },
-  "agents.skills.detail.readonly": {
+  "agents.skill.locked": {
    "story": "SH-20",
    "product": "shell",
-   "route": "/u/admin/airways/agents/skills/answer-nl",
-   "state": "answer-nl stands for a skill's slug: open any skill from Skills, signed in as e2e-viewer (a viewer on the Graph; e2e/roles-agents.spec.ts makes the account, its password is in e2e/members.ts)"
+   "route": null,
+   "state": ""
   },
   "shell.profile": {
    "story": "SH-17",
@@ -654,6 +678,504 @@
    "route": "/u/admin/airways/explorer/routes-out-of-lhr",
    "state": "routes-out-of-lhr stands for a session id: ask \u201cWhich routes out of LHR grew last quarter?\u201d; open the Console"
   },
+  "explorer.answer.console.json": {
+   "story": "EX-14",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.answer.console.queries": {
+   "story": "EX-14",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.answer.console.queries.step": {
+   "story": "EX-14",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.answer.console.queries.empty": {
+   "story": "EX-14",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.layout": {
+   "story": "EX-16",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.layout.tree": {
+   "story": "EX-16",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.layout.flow": {
+   "story": "EX-16",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.layout.flow.orthogonal": {
+   "story": "EX-16",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.layout.radial": {
+   "story": "EX-16",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.layout.too_large": {
+   "story": "EX-16",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.present": {
+   "story": "EX-17",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.presenting": {
+   "story": "EX-17",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.presenting.expansion": {
+   "story": "EX-17",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.presenting.your_changes": {
+   "story": "EX-17",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.presenting.step_failed": {
+   "story": "EX-17",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board": {
+   "story": "EX-18",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.in_explore": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.in_explore.full": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.read_only": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.legend": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.legend.hidden_assistant": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.legend.all_hidden": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.legend.all_hidden.panel": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.legend.one_hidden": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.legend.density": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.legend.menu": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.legend.read_only": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.record": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.record.value": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.record.relationship": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.annotation": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.annotation.editing": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.highlight": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.group": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.group.partial": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.detail": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.detail.changed": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.detail.deleted_record": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.session": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.session.evidence": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.session.promote": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.session.dismissed": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.session.gap": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.session.conflict": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.explain": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.explain.done": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.sources": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.sources.all_sessions": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.loaded": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.annotate.loaded.filtered": {
+   "story": "EX-19",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.changes": {
+   "story": "EX-20",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.changes.save_failed": {
+   "story": "EX-20",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.changes.read_only": {
+   "story": "EX-20",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.changes.cards": {
+   "story": "EX-20",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.edit": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.add_key": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.add_key.refused": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.duplicate_key": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.type_changed": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.new": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.new.typed": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.new.refused": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.unsaved": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.read_only": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.edge": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.edge.edit": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.edge.new": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.group": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.group.edit": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.empty": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.element.many": {
+   "story": "EX-21",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.walkthrough": {
+   "story": "EX-22",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.walkthrough.add_step": {
+   "story": "EX-22",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.walkthrough.from_annotation": {
+   "story": "EX-22",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.walkthrough.few": {
+   "story": "EX-22",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.walkthrough.present": {
+   "story": "EX-22",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.walkthrough.present.explains": {
+   "story": "EX-22",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.walkthrough.present.gap": {
+   "story": "EX-22",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.walkthrough.present.risk": {
+   "story": "EX-22",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.walkthrough.present.hidden": {
+   "story": "EX-22",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
+  "explorer.board.walkthrough.present.missing": {
+   "story": "EX-22",
+   "product": "explorer",
+   "route": "/u/admin/airways/explorer/routes-out-of-lhr",
+   "state": ""
+  },
   "projects.list": {
    "story": "PJ-01",
    "product": "projects",
@@ -941,6 +1463,18 @@
    "product": "agents",
    "route": "/u/admin/airways/agents/settings",
    "state": ""
+  },
+  "agents.runs.filtered": {
+   "story": "AF-26",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/activity/runs?f.status=failed&f.since=30d&via=assistant",
+   "state": "Runs filtered by status and since, as the assistant links them; add &f.agent_id=<an agent's id> for the agent chip"
+  },
+  "agents.agents.filtered": {
+   "story": "AF-26",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/agents?q=fare&f.ephemeral=shown",
+   "state": "Agents searched for fare with spawned helpers shown"
   }
  }
 }

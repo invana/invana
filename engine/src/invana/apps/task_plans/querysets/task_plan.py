@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
-from sqlalchemy import delete, func, select
+from collections.abc import Sequence
+
+from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.task_plans.models import Task, TaskPlan
+from invana.apps.task_plans.models import PlanOrigin, Task, TaskPlan
+from invana.core.lists import ListParams, PageInfo
+from invana.core.lists.querysets import contains, page_of_select
 
 
 class TaskPlanQuerySet:
@@ -26,6 +30,40 @@ class TaskPlanQuerySet:
             stmt = stmt.where(TaskPlan.reusable.is_(True))
         stmt = stmt.order_by(TaskPlan.key, TaskPlan.version.desc())
         return list((await session.execute(stmt)).scalars().all())
+
+    async def page_for_graph(
+        self, session: AsyncSession, *, graph_id: str, params: ListParams
+    ) -> tuple[Sequence[TaskPlan], PageInfo]:
+        """One page of the library's version rows — reusable plans only, as the library lists.
+
+        ``family`` matches a key that is the family or starts with it and a
+        dash, so ``nl`` takes ``nl`` and ``nl-compare`` but not ``nlx``.
+        """
+        unfiltered = select(TaskPlan).where(TaskPlan.graph_id == graph_id, TaskPlan.reusable.is_(True))
+        stmt = unfiltered
+        if origins := params.values("origin"):
+            stmt = stmt.where(TaskPlan.origin.in_(origins))
+        if families := params.values("family"):
+            stmt = stmt.where(or_(*(or_(TaskPlan.key == f, TaskPlan.key.like(f"{f}-%")) for f in families)))
+        if params.q:
+            stmt = stmt.where(contains(params.q, TaskPlan.name, TaskPlan.key))
+        return await page_of_select(
+            session,
+            stmt,
+            params,
+            unfiltered=unfiltered,
+            sorts={"key": TaskPlan.key, "name": TaskPlan.name, "created_at": TaskPlan.created_at},
+            id_column=TaskPlan.id,
+        )
+
+    async def count_packaged(self, session: AsyncSession, *, graph_id: str) -> int:
+        """How many of the library's version rows came with Invana or a plugin."""
+        stmt = select(func.count()).where(
+            TaskPlan.graph_id == graph_id,
+            TaskPlan.reusable.is_(True),
+            TaskPlan.origin == PlanOrigin.packaged.value,
+        )
+        return int((await session.execute(stmt)).scalar_one())
 
     async def find_by_key(
         self, session: AsyncSession, *, graph_id: str, key: str, version: int | None

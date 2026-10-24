@@ -21,6 +21,9 @@ from invana.apps.graphs.models import Graph
 from invana.apps.skills.models import Skill, SkillVersion
 from invana.apps.task_plans.managers import TaskPlanManager
 from invana.apps.task_plans.models import PlanOrigin, Task, TaskForm, TaskPlan
+from invana.apps.task_plans.schemas import TASK_PLAN_LIST
+from invana.core.errors import ValidationError
+from invana.core.lists.params import parse_list_params
 from invana.runtime.layers import declared_bands
 from invana.runtime.managers import TaskPlanRunsManager
 
@@ -107,15 +110,34 @@ class TestCallers:
         assert detail.caller_count == 0
 
 
-class TestPackagedCount:
-    def test_only_packaged_plans_count_as_packaged(self):
-        plans = [
-            TaskPlan(origin=PlanOrigin.packaged.value),
-            TaskPlan(origin=PlanOrigin.generated.value),
-            TaskPlan(origin=PlanOrigin.packaged.value),
-        ]
-        assert TaskPlanManager.count_packaged(plans) == 2
+@pytest.mark.asyncio
+class TestTheLibraryList:
+    async def test_it_filters_by_origin_and_family_and_counts_the_whole_library(
+        self, session: AsyncSession, graph: Graph
+    ):
+        library = TaskPlanRunsManager()
+        session.add_all(
+            [
+                TaskPlan(graph_id=graph.id, key="nl-custom", name="Custom", origin=PlanOrigin.promoted.value),
+                TaskPlan(graph_id=graph.id, key="nlx-other", name="Other", origin=PlanOrigin.promoted.value),
+                TaskPlan(graph_id=graph.id, key=None, reusable=False, origin=PlanOrigin.generated.value),
+            ]
+        )
+        await session.flush()
 
-    def test_a_library_of_promoted_plans_has_none_packaged(self):
-        assert TaskPlanManager.count_packaged([TaskPlan(origin=PlanOrigin.promoted.value)]) == 0
-        assert TaskPlanManager.count_packaged([]) == 0
+        params = parse_list_params(TASK_PLAN_LIST, {"origin": ["promoted"], "family": ["nl"]})
+        reads, info = await library.page_reads(session, graph_id=graph.id, params=params)
+        assert [r.key for r in reads] == ["nl-custom"]
+
+        listed = await TaskPlanManager().list_for_graph(session, graph_id=graph.id)
+        assert (info.total, info.unfiltered_total) == (1, len(listed))
+        assert await library.count_packaged(session, graph_id=graph.id) == sum(
+            1 for p in listed if p.origin == PlanOrigin.packaged.value
+        )
+
+
+def test_the_library_list_refuses_a_filter_it_does_not_take():
+    with pytest.raises(ValidationError, match="it takes"):
+        parse_list_params(TASK_PLAN_LIST, {"bound": ["yes"]})
+    with pytest.raises(ValidationError, match="one of"):
+        parse_list_params(TASK_PLAN_LIST, {"origin": ["generated"]})

@@ -10,8 +10,11 @@ import { skillsApi } from "./skills/api";
  */
 export async function searchAgents(graph: GraphRef): Promise<SearchHit[]> {
 	const [agents, skills] = await Promise.all([
-		agentsApi.list(graph.username, graph.graphSlug, { includeRetired: true }),
-		skillsApi.list(graph.username, graph.graphSlug),
+		agentsApi.list(graph.username, graph.graphSlug, {
+			filters: { status: ["active", "paused", "retired"] },
+			limit: 200,
+		}),
+		skillsApi.list(graph.username, graph.graphSlug, { limit: 200 }),
 	]);
 	return [
 		...agents.items.map((a) => ({

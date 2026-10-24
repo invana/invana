@@ -9,6 +9,9 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from invana.apps.skills.schemas import OfferedRule
+from invana.core.lists import Filter, ListSpec
+from invana.plugins.sdk.manifest import Bound
+from invana.runtime.models import RunStatus, TriggeredBy
 
 
 class RunNodeRead(BaseModel):
@@ -190,9 +193,30 @@ class RunStats(BaseModel):
     by_day: list[RunDay]
 
 
-class TaskRunListResponse(BaseModel):
-    items: list[TaskRunSummary]
-    total: int
+#: The windows ``since`` takes, over when a run was created.
+RUN_SINCE = {"24h": "last 24 hours", "7d": "last 7 days", "30d": "last 30 days", "90d": "last 90 days"}
+
+#: What the Runs list takes. Root runs only. With no ``interactive=true`` and no
+#: ``origin``, canvas and system runs are left out; ``candidates=true`` narrows
+#: to generated plans that served and were never promoted — the Promote picker.
+RUN_LIST = ListSpec(
+    filters={
+        "status": Filter(
+            values=tuple(s.value for s in RunStatus),
+            labels={s.value: s.value.replace("_", " ") for s in RunStatus},
+        ),
+        "agent_id": Filter(title="agent"),
+        "task_id": Filter(title="task"),
+        "kind": Filter(),
+        "origin": Filter(values=tuple(t.value for t in TriggeredBy)),
+        "started_by": Filter(title="started by"),
+        "since": Filter(values=tuple(RUN_SINCE), labels=RUN_SINCE),
+        "candidates": Filter(values=("true",), labels={"true": "never promoted"}),
+        "interactive": Filter(values=("true",), labels={"true": "canvas and system runs shown"}),
+    },
+    sorts=("-created_at",),
+    search_title="ask",
+)
 
 
 class ResumeTaskRun(BaseModel):
@@ -442,14 +466,24 @@ class CatalogueEntryRead(BaseModel):
     args: list[CatalogueArgRead]
     outputs: list[CatalogueOutputRead]
     requires: list[str]
-    #: Reusable plans in this Graph that name the entry — distinct keys, not versions (C9).
+    #: Reusable plans in this Graph that name the entry — distinct keys, not versions.
     used_by: int
+    #: The plugin that declares the entry, e.g. ``invana.core.graph_read``.
+    plugin: str = ""
 
 
-class CatalogueResponse(BaseModel):
-    #: Grouped by bound, in the bound's declared order, then by key (CA3).
-    items: list[CatalogueEntryRead]
-    total: int
+#: What the Catalogue list takes. The default sort groups by bound, in the
+#: bound's declared order, then by key; ``q`` matches the key and the summary.
+CATALOGUE_LIST = ListSpec(
+    filters={
+        "bound": Filter(
+            values=tuple(b.value for b in Bound), labels={b.value: b.value.replace("_", " ") for b in Bound}
+        ),
+        "plugin": Filter(),
+    },
+    sorts=("bound", "key"),
+    search_title="key",
+)
 
 
 # ── Evals (docs/for-developers/modules/skills/features/evals.md) ──
@@ -617,10 +651,15 @@ class PluginSummary(PluginBase):
     flows: int
 
 
-class PluginListResponse(BaseModel):
-    #: Core, then simulator, then tool plugins — the registry's load order.
-    items: list[PluginSummary]
-    total: int
+#: What the Plugins list takes. ``q`` matches the name and the title.
+PLUGIN_LIST = ListSpec(
+    filters={
+        "kind": Filter(values=("core", "simulator", "tool", "mcp")),
+        "enabled": Filter(values=("true", "false"), labels={"true": "enabled", "false": "disabled"}),
+    },
+    sorts=("name",),
+    search_title="name",
+)
 
 
 class TaskArgRead(BaseModel):

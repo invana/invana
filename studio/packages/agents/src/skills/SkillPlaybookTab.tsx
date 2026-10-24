@@ -39,6 +39,7 @@ import { FormError, PanelSection } from "@invana-studio/ui";
 import { Play, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useEvalMutations, useEvalSetQuery } from "../evals/queries";
+import { EVERY } from "../lists";
 import { useLLMProvidersQuery } from "../llms/queries";
 import {
 	useAnswerClarificationMutation,
@@ -93,7 +94,7 @@ export function SkillDraftEditor({
 	const answer = useAnswerClarificationMutation(username, graphSlug, skill.id);
 	const evals = useEvalMutations(username, graphSlug, "skill", skill.id);
 	const set = useEvalSetQuery(username, graphSlug, "skill", skill.id);
-	const providers = useLLMProvidersQuery(username, graphSlug);
+	const providers = useLLMProvidersQuery(username, graphSlug, EVERY);
 	const [fields, setFields] = useState<Fields | null>(null);
 
 	const version = draft.data?.version;

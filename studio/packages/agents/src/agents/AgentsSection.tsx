@@ -40,6 +40,7 @@ import {
 	Spinner,
 	StatusDot,
 } from "@invana/ui";
+import type { ListUrl } from "@invana-studio/core";
 import {
 	agentTone,
 	DetailBlock,
@@ -55,6 +56,15 @@ import {
 } from "@invana-studio/ui";
 import { Bot, ChevronRight, Plus, Shield } from "lucide-react";
 import { useMemo } from "react";
+import {
+	chipsOf,
+	FilteredEmpty,
+	filterValue,
+	ListStrip,
+	matchCount,
+	PAGE,
+	setOne,
+} from "../lists";
 import { tokenBudgetLine, tokenMonthLine } from "./CeilingsTable";
 import {
 	useAgentMetersQuery,
@@ -72,24 +82,14 @@ const STATUS_OPTIONS = ["active", "paused", "retired"].map((value) => ({
 	label: value,
 }));
 
-/** What narrows the list — behind the section's funnel. */
-export interface AgentFilters {
-	kind: string;
-	status: string;
-	showEphemeral: boolean;
+/** The page of agents the URL asks for — the header's count and the rows read one query. */
+function useAgentList(username: string, graphSlug: string, list: ListUrl) {
+	return useAgentsQuery(username, graphSlug, { ...list.query, limit: PAGE });
 }
 
-export const NO_AGENT_FILTERS: AgentFilters = {
-	kind: "",
-	status: "",
-	showEphemeral: false,
-};
-
 export interface AgentsSectionProps {
-	filters: AgentFilters;
-	onFilters: (next: AgentFilters) => void;
-	/** The rows the list shows, beside the section's title. */
-	count?: number;
+	/** The URL's search and filters — the funnel writes them, the rows are the engine's answer. */
+	list: ListUrl;
 	ui: StackSectionUi;
 	username: string;
 	graphSlug: string;
@@ -107,41 +107,41 @@ export interface AgentsSectionProps {
 }
 
 export function agentsSection(props: AgentsSectionProps): PanelStackSection {
-	const { ui, onNewAgent, defaultSize, filters, onFilters, count } = props;
-	const patch = (next: Partial<AgentFilters>) =>
-		onFilters({ ...filters, ...next });
+	const { ui, onNewAgent, defaultSize, list } = props;
+	const showEphemeral = filterValue(list, "ephemeral") === "shown";
 
 	return stackSection(
 		{
 			id: "agents",
 			label: "Agents",
 			icon: Bot,
-			count,
+			count: <AgentsCount {...props} />,
 			searchable: true,
 			searchPlaceholder: "Search agents",
-			filtered:
-				Boolean(filters.kind || filters.status) || filters.showEphemeral,
+			filtered: Object.keys(list.query.filters ?? {}).length > 0,
 			filterBar: (
 				<FilterBar>
 					<FilterSelect
 						label="kind"
-						value={filters.kind}
+						value={filterValue(list, "kind")}
 						options={KIND_OPTIONS}
-						onChange={(kind) => patch({ kind })}
+						onChange={(v) => setOne(list, "kind", v)}
 					/>
 					<FilterSelect
 						label="status"
-						value={filters.status}
+						value={filterValue(list, "status")}
 						options={STATUS_OPTIONS}
-						onChange={(status) => patch({ status })}
+						onChange={(v) => setOne(list, "status", v)}
 					/>
 					{/* A chip that toggles rather than selects. `active` is the kit's
 					    pressed look; `aria-pressed` is what says so out loud. */}
 					<FilterChip
 						label="show ephemeral"
-						active={filters.showEphemeral}
-						aria-pressed={filters.showEphemeral}
-						onClick={() => patch({ showEphemeral: !filters.showEphemeral })}
+						active={showEphemeral}
+						aria-pressed={showEphemeral}
+						onClick={() =>
+							setOne(list, "ephemeral", showEphemeral ? "" : "shown")
+						}
 					/>
 				</FilterBar>
 			),
@@ -149,10 +149,15 @@ export function agentsSection(props: AgentsSectionProps): PanelStackSection {
 				? [{ key: "new", name: "New agent", icon: Plus, onClick: onNewAgent }]
 				: undefined,
 			defaultSize,
-			children: ({ search }) => <AgentsBody {...props} search={search} />,
+			children: () => <AgentsBody {...props} />,
 		},
 		ui,
 	);
+}
+
+/** `7`, or `2 of 7 match` while a search or a filter is applied — the engine's two counts. */
+function AgentsCount({ username, graphSlug, list }: AgentsSectionProps) {
+	return <>{matchCount(useAgentList(username, graphSlug, list).data)}</>;
 }
 
 function AgentsBody({
@@ -163,44 +168,41 @@ function AgentsBody({
 	onSelectAgent,
 	selectedEdge,
 	onOpenLineage,
-	filters,
-	search,
-}: AgentsSectionProps & { search: string }) {
-	// Always fetch the full list (ephemeral included): the *count* of what is
-	// hidden belongs in the status bar, so the filter has to happen here rather
-	// than at the endpoint.
-	const query = useAgentsQuery(username, graphSlug, {
-		includeEphemeral: true,
-		includeRetired: true,
-	});
+	list,
+}: AgentsSectionProps) {
+	const query = useAgentList(username, graphSlug, list);
 
 	const all = query.data?.items ?? [];
 	const defaultId = query.data?.default_agent_id ?? null;
 	const selected = all.find((a) => a.id === selectedAgentId) ?? null;
+	const chips = chipsOf(query.data, list);
 
 	const byId = useMemo(() => new Map(all.map((a) => [a.id, a])), [all]);
-	const ordered = useMemo(() => visibleAgents(all, filters), [all, filters]);
-	const ephemeralHidden = filters.showEphemeral
-		? 0
-		: (query.data?.ephemeral ?? 0);
-
-	const rows = ordered.filter(({ agent }) =>
-		agent.name.toLowerCase().includes(search.toLowerCase()),
-	);
+	const rows = useMemo(() => byFamily(all), [all]);
+	// Spawned helpers are left out unless asked for; the Graph's count of them
+	// says how many.
+	const ephemeralHidden =
+		filterValue(list, "ephemeral") === "shown"
+			? 0
+			: (query.data?.ephemeral ?? 0);
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
+			<ListStrip page={query.data} list={list} />
 			<div className="min-h-0 flex-1 overflow-y-auto">
 				{query.isLoading ? (
 					<div className="px-3 py-4">
 						<Spinner />
 					</div>
 				) : rows.length === 0 ? (
-					<p className="px-3 py-4 text-base text-muted-foreground">
-						{all.length
-							? "No agent matches those filters."
-							: "No agents yet. Every graph is seeded with Explorer, Query and Modeller — try refreshing."}
-					</p>
+					chips.length ? (
+						<FilteredEmpty noun="agent" filters={chips} onClear={list.clear} />
+					) : (
+						<p className="px-3 py-4 text-base text-muted-foreground">
+							No agents yet. Every graph is seeded with Explorer, Query and
+							Modeller — try refreshing.
+						</p>
+					)
 				) : (
 					rows.map(({ agent, depth }) => (
 						<RecordRow
@@ -292,24 +294,15 @@ function AgentsBody({
  * list would scatter a family across the list, which is exactly the thing the
  * `└` gutter exists to prevent.
  */
-function visibleAgents(
-	all: Agent[],
-	filters: AgentFilters,
-): { agent: Agent; depth: number }[] {
-	const visible = all.filter(
-		(a) =>
-			(filters.showEphemeral || a.lifetime !== "ephemeral") &&
-			(!filters.kind || a.kind === filters.kind) &&
-			(!filters.status || a.status === filters.status),
-	);
-	const ids = new Set(visible.map((a) => a.id));
-	const roots = visible.filter(
+function byFamily(rows: Agent[]): { agent: Agent; depth: number }[] {
+	const ids = new Set(rows.map((a) => a.id));
+	const roots = rows.filter(
 		(a) => !a.parent_agent_id || !ids.has(a.parent_agent_id),
 	);
 	const out: { agent: Agent; depth: number }[] = [];
 	const walk = (agent: Agent, depth: number) => {
 		out.push({ agent, depth });
-		for (const child of visible.filter((c) => c.parent_agent_id === agent.id))
+		for (const child of rows.filter((c) => c.parent_agent_id === agent.id))
 			walk(child, depth + 1);
 	};
 	for (const root of roots) walk(root, 0);

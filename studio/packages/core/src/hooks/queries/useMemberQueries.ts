@@ -1,8 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { listQueryKey } from "../../lib/listQuery";
 import { authApi } from "../../services/api/auth";
 import { membersApi } from "../../services/api/members";
 import { useAuthStore } from "../../stores/auth.store";
 import type { GraphMemberAdd, GraphRole } from "../../types/access";
+import type { ListQuery } from "../../types/list";
 import type { GraphRef } from "../../types/product";
 
 /**
@@ -11,7 +18,7 @@ import type { GraphRef } from "../../types/product";
  *
  * | Hook | Reads | Key |
  * |---|---|---|
- * | `useMembersQuery` | `GET …/members` | `["members", owner, graph]` |
+ * | `useMembersQuery` | `GET …/members` | `["members", owner, graph, query]` |
  * | `useGraphAccessQuery` | `GET …/access` | `["access", owner, graph]` |
  * | `useMemberMutations` | add · set roles · remove | invalidates both |
  *
@@ -28,12 +35,20 @@ const memberKeys = {
 		["access", g?.username, g?.graphSlug] as const,
 };
 
-export function useMembersQuery(graph: GraphRef | undefined) {
+/** Every member, for a caller that names member ids rather than listing them. */
+const EVERY_MEMBER: ListQuery = { limit: 200 };
+
+/** One page of the members list for `query`; by default every member. */
+export function useMembersQuery(
+	graph: GraphRef | undefined,
+	query: ListQuery = EVERY_MEMBER,
+) {
 	return useQuery({
-		queryKey: memberKeys.members(graph),
-		queryFn: () => membersApi.list(graph as GraphRef),
+		queryKey: [...memberKeys.members(graph), listQueryKey(query)] as const,
+		queryFn: () => membersApi.list(graph as GraphRef, query),
 		enabled: !!graph,
 		staleTime: 60_000,
+		placeholderData: keepPreviousData,
 	});
 }
 

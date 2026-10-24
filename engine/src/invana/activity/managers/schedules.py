@@ -20,6 +20,7 @@ for an approval unless the schedule switched that off.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -53,6 +54,7 @@ from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
+from invana.core.lists import ListParams, PageInfo
 from invana.runtime.models import RunStatus, TaskRun
 from invana.runtime.services import open_schedule_run
 
@@ -86,6 +88,16 @@ class ScheduleManager:
 
     async def list(self, session: AsyncSession, *, graph: Graph) -> list[Schedule]:
         return await self.schedules_qs.list_for_graph(session, graph_id=graph.id)
+
+    async def page(
+        self, session: AsyncSession, *, graph: Graph, params: ListParams
+    ) -> tuple[Sequence[Schedule], PageInfo]:
+        """One page of the Schedules list, searched, filtered and sorted by ``params``."""
+        return await self.schedules_qs.page_for_graph(session, graph_id=graph.id, params=params)
+
+    async def paused_count(self, session: AsyncSession, *, graph: Graph) -> int:
+        """The Graph's paused schedules, whatever the list is filtered by."""
+        return await self.schedules_qs.paused_count(session, graph_id=graph.id)
 
     async def get(self, session: AsyncSession, *, graph: Graph, ref: str) -> Schedule:
         row = await self.schedules_qs.by_ref(session, graph_id=graph.id, ref=ref)

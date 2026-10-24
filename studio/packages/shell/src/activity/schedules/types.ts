@@ -7,6 +7,8 @@
  * skips and failures included, with the reason.
  */
 
+import type { Page } from "@invana-studio/core";
+
 export type MissedPolicy = "catch_up" | "run_all" | "skip";
 export type OverlapPolicy = "skip" | "allow";
 type ScheduleStatus = "active" | "paused";
@@ -35,6 +37,12 @@ export interface Schedule {
 	updated_at: string;
 }
 
+/** The Schedules list. Filters: `enabled`; sorted by name. */
+export interface SchedulePage extends Page<Schedule> {
+	/** The Graph's paused schedules — not the page's. */
+	paused: number;
+}
+
 /** What New schedule sends. Members and channels go by id or name. */
 export interface ScheduleWrite {
 	name: string;
@@ -54,11 +62,6 @@ export interface ScheduleWrite {
 }
 
 export type ScheduleUpdate = Partial<ScheduleWrite>;
-
-export interface ScheduleListResponse {
-	items: Schedule[];
-	total: number;
-}
 
 export interface Firing {
 	id: string;

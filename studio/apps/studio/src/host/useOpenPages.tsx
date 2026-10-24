@@ -1,5 +1,9 @@
 import type { WorkbookPage, WorkbookPageMenuItem } from "@invana/ui";
-import { useAgentsQuery, useSkillsQuery } from "@invana-studio/agents";
+import {
+	EVERY_AGENT,
+	useAgentsQuery,
+	useSkillsQuery,
+} from "@invana-studio/agents";
 import type { useSessions } from "@invana-studio/assistant";
 import {
 	hasSeenSessionTutorial,
@@ -171,16 +175,13 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		[lenses.data],
 	);
 	// An agent's page is named for the agent, for the same reason.
-	const agentsList = useAgentsQuery(username, graphSlug, {
-		includeEphemeral: true,
-		includeRetired: true,
-	});
+	const agentsList = useAgentsQuery(username, graphSlug, EVERY_AGENT);
 	const agentNameById = useMemo(
 		() => new Map((agentsList.data?.items ?? []).map((a) => [a.id, a.name])),
 		[agentsList.data],
 	);
 	// And a skill's page for the skill.
-	const skillsList = useSkillsQuery(username, graphSlug);
+	const skillsList = useSkillsQuery(username, graphSlug, { limit: 200 });
 	const skillNameById = useMemo(
 		() => new Map((skillsList.data?.items ?? []).map((s) => [s.id, s.name])),
 		[skillsList.data],

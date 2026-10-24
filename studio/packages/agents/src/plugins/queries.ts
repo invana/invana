@@ -3,11 +3,22 @@
  * with no Graph in them, because the registry is the install's.
  */
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { type ListQuery, listQueryKey } from "@invana-studio/core";
+import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { pluginsApi } from "./api";
 
-export function usePluginsQuery() {
-	return useQuery({ queryKey: ["plugins"], queryFn: pluginsApi.list });
+/** One page of the registry for `query`. */
+export function usePluginsQuery(query: ListQuery = {}) {
+	return useQuery({
+		queryKey: ["plugins", "list", listQueryKey(query)],
+		queryFn: () => pluginsApi.list(query),
+		placeholderData: keepPreviousData,
+	});
 }
 
 export function usePluginQuery(name: string) {

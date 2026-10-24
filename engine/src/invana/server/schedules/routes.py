@@ -7,12 +7,12 @@ from __future__ import annotations
 
 from fastapi import APIRouter, status
 
-from invana.activity.schemas import FiringListResponse, FiringRead, ScheduleListResponse, ScheduleRead
+from invana.activity.schemas import FiringListResponse, FiringRead, SchedulePage, ScheduleRead
 from invana.server.schedules import views
 
 schedules_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/schedules", tags=["schedules"])
 
-schedules_router.get("", response_model=ScheduleListResponse)(views.list_schedules)
+schedules_router.get("", response_model=SchedulePage)(views.list_schedules)
 schedules_router.post("", response_model=ScheduleRead, status_code=status.HTTP_201_CREATED)(views.create_schedule)
 schedules_router.get("/{schedule_id}", response_model=ScheduleRead)(views.get_schedule)
 schedules_router.patch("/{schedule_id}", response_model=ScheduleRead)(views.update_schedule)

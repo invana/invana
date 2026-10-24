@@ -15,9 +15,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.models import Graph
 from invana.core.errors import ValidationError
+from invana.core.lists.params import parse_list_params
 from invana.runtime import services
 from invana.runtime.managers.run_stats import RunStatsManager
 from invana.runtime.models import RunStatus, TaskRun
+from invana.runtime.schemas import RUN_LIST
 
 _NOW = datetime(2026, 10, 19, 12, 0, tzinfo=UTC)
 
@@ -87,9 +89,11 @@ async def test_tiles_count_every_run_in_the_readers_days(session: AsyncSession, 
     assert [d.runs for d in week.by_day] == [1, 4]
     assert week.failed == 1
 
-    items, total = await services.list_runs(session, graph_id=graph.id, limit=2)
+    items, info = await services.list_runs(
+        session, graph_id=graph.id, params=parse_list_params(RUN_LIST, {"limit": ["2"]})
+    )
     assert len(items) == 2
-    assert total == 5
+    assert info.total == 5
 
 
 async def test_a_bad_zone_is_refused_and_nothing_counts_as_zero(session: AsyncSession, graph: Graph) -> None:

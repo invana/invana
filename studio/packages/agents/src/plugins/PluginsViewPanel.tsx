@@ -14,6 +14,7 @@ import {
 	type PanelStackHandle,
 	type PanelStackSection,
 } from "@invana/ui";
+import { useListParams } from "@invana-studio/core";
 import { useStackSections } from "@invana-studio/shell";
 import {
 	PanelStatusBar,
@@ -21,6 +22,7 @@ import {
 	useStackSectionUi,
 } from "@invana-studio/ui";
 import { useEffect, useRef } from "react";
+import { useUrlSearchUi } from "../lists";
 import { catalogueSection } from "../plans/CatalogueSection";
 import { registrySection } from "./RegistrySection";
 
@@ -44,7 +46,10 @@ export function PluginsViewPanel({ username, graphSlug, onOpenPlugin }: Props) {
 		sectionKeys: SECTION_KEYS,
 		detailParam: DETAIL_PARAM,
 	});
-	const ui = useStackSectionUi();
+	// The registry's search and filters are the URL's; the catalogue below it
+	// keeps its own search, since one address bar holds one list's filters.
+	const list = useListParams();
+	const ui = useUrlSearchUi(useStackSectionUi(), "plugins", list);
 	const entryKey = stack.detail.catalogue;
 
 	// A drill-in expands the section holding it, as Library does, so a task
@@ -59,7 +64,7 @@ export function PluginsViewPanel({ username, graphSlug, onOpenPlugin }: Props) {
 		stack.sectionKey === d ? "60%" : "40%";
 
 	const sections: PanelStackSection[] = [
-		registrySection({ ui, onOpenPlugin, defaultSize: size("plugins") }),
+		registrySection({ ui, list, onOpenPlugin, defaultSize: size("plugins") }),
 		catalogueSection({
 			username,
 			graphSlug,

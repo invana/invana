@@ -30,6 +30,7 @@ import {
 } from "@invana-studio/ui";
 import { Ban, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
+import { EVERY } from "../lists";
 import { useCatalogueQuery } from "../plans/queries";
 import { useSkillsQuery } from "../skills/queries";
 import { ALL_TASKS } from "./AgentDetail";
@@ -74,7 +75,7 @@ export function AgentSkillsTab({
 	isBinding?: boolean;
 }) {
 	const can = useAgentSkillsAndCallablesQuery(username, graphSlug, agent.id);
-	const allSkills = useSkillsQuery(username, graphSlug);
+	const allSkills = useSkillsQuery(username, graphSlug, EVERY);
 	const graphSkills = allSkills.data?.items ?? [];
 	const unbound = graphSkills.filter(
 		(s) => !(agent.skill_ids ?? []).includes(s.id),
@@ -106,7 +107,7 @@ export function AgentSkillsTab({
 
 	// The allow-list is drawn against the whole catalogue, because what this
 	// agent may *not* run is as much of the answer as what it may.
-	const catalogue = useCatalogueQuery(username, graphSlug);
+	const catalogue = useCatalogueQuery(username, graphSlug, EVERY);
 	const allKeys = catalogue.data?.items.map((e) => e.step_key) ?? ALL_TASKS;
 	const allow = new Set(draft.spec.allow ?? []);
 	const patchSpec = (next: Partial<Envelope>) =>

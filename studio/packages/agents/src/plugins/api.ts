@@ -1,7 +1,7 @@
-import { request } from "@invana-studio/core";
+import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type {
 	PluginDetail,
-	PluginListResponse,
+	PluginPage,
 	PluginSummary,
 	TaskTypeRead,
 } from "./types";
@@ -13,7 +13,9 @@ const PLUGINS = "/api/v1/plugins";
  * Admin's acts, and only on a plugin the engine marks `switchable`.
  */
 export const pluginsApi = {
-	list: () => request<PluginListResponse>(PLUGINS),
+	/** One page of the registry — searched, filtered and sorted by the engine. */
+	list: (query: ListQuery = {}) =>
+		request<PluginPage>(`${PLUGINS}${listQueryToApi(query)}`),
 
 	get: (name: string) =>
 		request<PluginDetail>(`${PLUGINS}/${encodeURIComponent(name)}`),

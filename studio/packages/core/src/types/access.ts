@@ -54,11 +54,6 @@ export interface GraphMember {
 	added_at: string;
 }
 
-export interface GraphMemberList {
-	items: GraphMember[];
-	total: number;
-}
-
 /** Add a member: `user` is an email or a username; no roles means viewer. */
 export interface GraphMemberAdd {
 	user: string;

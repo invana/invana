@@ -9,11 +9,16 @@
  * | `approvalsApi` | `/approvals` · `/{id}/approve` · `/{id}/decline` |
  */
 
-import { ApiError, apiClient, type GraphRef } from "@invana-studio/core";
+import {
+	ApiError,
+	apiClient,
+	type GraphRef,
+	type ListQuery,
+	listQueryToApi,
+	type Page,
+} from "@invana-studio/core";
 import type {
 	Approval,
-	ApprovalListResponse,
-	ApprovalStatus,
 	Channel,
 	ChannelListResponse,
 	ChannelWrite,
@@ -82,16 +87,11 @@ export const notificationsApi = {
 };
 
 export const approvalsApi = {
-	async list(
-		g: GraphRef,
-		opts: { mine?: boolean; status?: ApprovalStatus } = {},
-	): Promise<ApprovalListResponse> {
-		const q = new URLSearchParams();
-		if (opts.mine) q.set("mine", "true");
-		if (opts.status) q.set("status", opts.status);
+	/** `q` searches the subject; `status` · `kind` · `mine=true` filter; newest first. */
+	async list(g: GraphRef, query: ListQuery = {}): Promise<Page<Approval>> {
 		return (
-			await apiClient.get<ApprovalListResponse>(
-				`${graphBase(g)}/approvals?${q}`,
+			await apiClient.get<Page<Approval>>(
+				`${graphBase(g)}/approvals${listQueryToApi(query)}`,
 			)
 		).data;
 	},

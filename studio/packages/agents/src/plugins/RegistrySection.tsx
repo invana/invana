@@ -16,13 +16,22 @@ import {
 	SegmentedControl,
 	Spinner,
 } from "@invana/ui";
+import type { ListUrl } from "@invana-studio/core";
 import {
 	RecordRow,
 	type StackSectionUi,
 	stackSection,
 } from "@invana-studio/ui";
 import { Puzzle } from "lucide-react";
-import { useState } from "react";
+import {
+	chipsOf,
+	FilteredEmpty,
+	filterValue,
+	ListStrip,
+	matchCount,
+	PAGE,
+	setOne,
+} from "../lists";
 import { usePluginsQuery } from "./queries";
 import type { PluginSummary } from "./types";
 
@@ -34,12 +43,19 @@ const KINDS = [
 	{ value: "simulator", label: "Simulator" },
 ];
 
+/** The page of plugins the URL asks for — the header's count and the rows read one query. */
+const usePluginList = (list: ListUrl) =>
+	usePluginsQuery({ ...list.query, limit: PAGE });
+
 export function registrySection({
 	ui,
+	list,
 	onOpenPlugin,
 	defaultSize,
 }: {
 	ui: StackSectionUi;
+	/** The URL's search and filters — the controls write them, the rows are the engine's answer. */
+	list: ListUrl;
 	onOpenPlugin?: (name: string) => void;
 	defaultSize?: number | string;
 }): PanelStackSection {
@@ -48,21 +64,19 @@ export function registrySection({
 			id: "plugins",
 			label: "Plugins",
 			icon: Puzzle,
-			count: <RegistryCount />,
+			count: <RegistryCount list={list} />,
 			searchable: true,
 			searchPlaceholder: "Search plugins",
 			defaultSize,
-			children: ({ search }) => (
-				<RegistryBody search={search} onOpenPlugin={onOpenPlugin} />
-			),
+			children: () => <RegistryBody list={list} onOpenPlugin={onOpenPlugin} />,
 		},
 		ui,
 	);
 }
 
-function RegistryCount() {
-	const total = usePluginsQuery().data?.total;
-	return total || null;
+function RegistryCount({ list }: { list: ListUrl }) {
+	const page = usePluginList(list).data;
+	return page?.unfiltered_total ? matchCount(page) : null;
 }
 
 /** `enabled` · `disabled` · `not installed` · `restart to load`. */
@@ -73,14 +87,13 @@ function stateOf(p: PluginSummary): string {
 }
 
 function RegistryBody({
-	search,
+	list,
 	onOpenPlugin,
 }: {
-	search: string;
+	list: ListUrl;
 	onOpenPlugin?: (name: string) => void;
 }) {
-	const plugins = usePluginsQuery();
-	const [kind, setKind] = useState("all");
+	const plugins = usePluginList(list);
 
 	if (plugins.isLoading)
 		return (
@@ -97,29 +110,31 @@ function RegistryBody({
 			/>
 		);
 
-	const q = search.toLowerCase();
-	const rows = (plugins.data?.items ?? []).filter(
-		(p) =>
-			(kind === "all" || p.kind === kind) &&
-			[p.name, p.title].some((s) => s.toLowerCase().includes(q)),
-	);
+	const rows = plugins.data?.items ?? [];
+	const chips = chipsOf(plugins.data, list);
 
 	return (
 		<div className="flex h-full flex-col">
 			<div className="px-3 pt-2 pb-1">
+				{/* A preset of the `kind` filter: picking one shows as its chip. */}
 				<SegmentedControl
 					size="xs"
 					options={KINDS}
-					value={kind}
-					onValueChange={setKind}
+					value={filterValue(list, "kind") || "all"}
+					onValueChange={(v) => setOne(list, "kind", v === "all" ? "" : v)}
 					aria-label="Kind"
 				/>
 			</div>
+			<ListStrip page={plugins.data} list={list} />
 			<div className="min-h-0 flex-1 overflow-y-auto pb-2">
 				{rows.length === 0 ? (
-					<p className="px-3 py-4 text-muted-foreground">
-						No plugin matches that.
-					</p>
+					chips.length ? (
+						<FilteredEmpty noun="plugin" filters={chips} onClear={list.clear} />
+					) : (
+						<p className="px-3 py-4 text-muted-foreground">
+							This install loaded no plugins.
+						</p>
+					)
 				) : (
 					rows.map((p) => (
 						<RecordRow

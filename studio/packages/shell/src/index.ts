@@ -91,7 +91,7 @@ export { GraphForm } from "./pages/graphs/GraphForm";
 export { GraphsListPage } from "./pages/graphs/GraphsListPage";
 export { PlatformEventsPage } from "./pages/platform/PlatformEventsPage";
 export * from "./pages/settings/ProfileSettingsPage";
-export { useAssistantShown, useToolsAlwaysShown } from "./preferences";
+export { useAssistantShown } from "./preferences";
 export * from "./products";
 export {
 	LEGACY_PANEL_PARAM,

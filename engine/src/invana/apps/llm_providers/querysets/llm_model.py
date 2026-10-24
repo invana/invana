@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.llm_providers.models import LLMModel, LLMModelStatus, LLMProvider
+from invana.core.lists import ListParams, PageInfo
+from invana.core.lists.querysets import contains, page_of_select
 
 
 class LLMModelQuerySet:
@@ -18,6 +22,35 @@ class LLMModelQuerySet:
             stmt = stmt.where(LLMModel.status == LLMModelStatus.active.value)
         stmt = stmt.order_by(LLMModel.created_at)
         return list((await session.execute(stmt)).scalars().all())
+
+    async def for_providers(self, session: AsyncSession, provider_ids: list[str]) -> dict[str, list[LLMModel]]:
+        """``{provider_id: [models]}`` in one read, each list in the order it was offered."""
+        if not provider_ids:
+            return {}
+        stmt = select(LLMModel).where(LLMModel.provider_id.in_(provider_ids)).order_by(LLMModel.created_at)
+        out: dict[str, list[LLMModel]] = {pid: [] for pid in provider_ids}
+        for model in (await session.execute(stmt)).scalars().all():
+            out[model.provider_id].append(model)
+        return out
+
+    async def page_for_provider(
+        self, session: AsyncSession, provider_id: str, *, params: ListParams
+    ) -> tuple[Sequence[LLMModel], PageInfo]:
+        """One page of what an endpoint offers, searched by model id and display name."""
+        unfiltered = select(LLMModel).where(LLMModel.provider_id == provider_id)
+        stmt = unfiltered
+        if statuses := params.values("status"):
+            stmt = stmt.where(LLMModel.status.in_(statuses))
+        if params.q:
+            stmt = stmt.where(contains(params.q, LLMModel.model_id, LLMModel.display_name))
+        return await page_of_select(
+            session,
+            stmt,
+            params,
+            unfiltered=unfiltered,
+            sorts={"created_at": LLMModel.created_at, "model_id": LLMModel.model_id, "updated_at": LLMModel.updated_at},
+            id_column=LLMModel.id,
+        )
 
     async def get(self, session: AsyncSession, model_row_id: str) -> LLMModel | None:
         stmt = select(LLMModel).where(LLMModel.id == model_row_id)

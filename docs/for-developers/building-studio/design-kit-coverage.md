@@ -632,6 +632,7 @@ folder named in the last column (design-kit convention: one story per file).
 | ~~`MetricTile` + `MetricGrid`~~ | ✅ shipped | 6 | `ui/ui-extended/metric-tile/` |
 | ~~`Legend`~~ | ✅ shipped — 5 swatch kinds, incl. `ring` | 30 | `ui/ui-extended/legend/` |
 | ~~`FilterBar`~~ | ✅ shipped — with `FilterChip` | 12 | `ui/ui-extended/filter-bar/` |
+| ~~`AppliedFilters`~~ | ✅ shipped — read-only `FilterChip`s from a list's `applied`, × each, *Clear all*, *set by …* | 2 (`agents.runs.filtered` · `agents.agents.filtered`) | `ui/ui-extended/applied-filters/` |
 | ~~`ContextBar`~~ | ✅ shipped | 36 | `ui/ui-extended/context-bar/` |
 | ~~`AgentChip`~~ | ✅ shipped | 10 | `ui/ui-extended/agent-chip/` |
 | ~~`CitationList`~~ | ✅ shipped — with `CitationRow` | 5 | `ui/ui-extended/citation-list/` |

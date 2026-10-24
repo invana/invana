@@ -71,6 +71,9 @@ ALLOWED_TOOLS = [
     "Bash(pnpm *)", "Bash(node *)", "Bash(npx playwright *)",
     "Bash(uv run *)", "Bash(python3 *)", "Bash(make *)", "Bash(docker compose *)",
     "Bash(ls *)", "Bash(mkdir *)", "Bash(rm -rf node_modules/.vite*)",
+    "Bash(cat *)", "Bash(head *)", "Bash(tail *)", "Bash(wc *)", "Bash(grep *)", "Bash(rg *)", "Bash(find *)",
+    "Bash(sed -n *)", "Bash(jq *)", "Bash(curl *)", "Bash(sort *)", "Bash(uniq *)", "Bash(diff *)",
+    "TodoWrite", "TaskCreate", "TaskUpdate", "TaskList", "TaskGet",
 ]
 
 
@@ -175,7 +178,9 @@ def claude(text: str, sid: str, label: str) -> str:
         proc.stdin.flush()
 
     send(text)
-    warned, result, peak, session_id = False, "", 0, ""
+    # Sub-agents run in the background: a lead's turn ends while it waits for them, and their
+    # completion starts its next turn. The session is over only at a result with none still running.
+    warned, result, peak, session_id, running = False, "", 0, "", set()
     with open(CACHE / sid / f"{label}.jsonl", "w") as log:
         for line in proc.stdout:
             log.write(line)
@@ -194,8 +199,18 @@ def claude(text: str, sid: str, label: str) -> str:
                     print(f"  context {ctx:,} > {CONTEXT_LIMIT:,} — asking {label} to hand off")
                     send(HANDOFF.format(limit=CONTEXT_LIMIT, sid=sid))
                     warned = True
+            elif event.get("type") == "system" and event.get("subtype") == "background_tasks_changed":
+                running = {t.get("task_id") for t in event.get("tasks") or []}
+            elif event.get("type") == "system" and event.get("subtype") == "task_started":
+                running.add(event.get("task_id"))
+            elif event.get("type") == "system" and event.get("subtype") in ("task_notification", "task_completed", "task_finished") \
+                    or (event.get("type") == "system" and event.get("status") in ("completed", "failed", "killed", "stopped")):
+                running.discard(event.get("task_id"))
             elif event.get("type") == "result":
                 result = event.get("result", "") or ""
+                if running:
+                    print(f"  {label}: turn ended with {len(running)} sub-agent(s) still running — waiting for them")
+                    continue
                 break
     proc.stdin.close()
     proc.wait()
@@ -372,6 +387,44 @@ def ensure_stack(wait: int = 120) -> bool:
     return False
 
 
+# ── demo data — a gate needs airways, and nothing may flush the developer's graph ─
+AIRWAYS = [("news-articles", "NewsArticles"), ("twitter", "Twitter"), ("deals", "Deals"), ("air-routes", "AirRoutes")]
+
+
+def isolate_graph_tests() -> None:
+    """Every session the driver starts inherits the isolated database, so a test a session runs itself
+    cannot fall back to the developer's Neo4j on :7687 and flush it."""
+    if os.environ.get("INVANA_MIGRATION_GRAPH_DB"):
+        os.environ.update(graph_db_env())
+
+
+def airways_nodes() -> int:
+    res = sh(["docker", "exec", "invana-neo4j", "cypher-shell", "-u", "neo4j", "-p",
+              os.environ.get("INVANA_DEV_GRAPH_PASSWORD", "testpassword"), "--format", "plain", "MATCH (n) RETURN count(n)"])
+    return int(res.stdout.split()[-1]) if res.returncode == 0 and res.stdout.split()[-1:] and res.stdout.split()[-1].isdigit() else -1
+
+
+def ensure_demo_data() -> bool:
+    """Reload demos/airways into the developer's graph when it is empty, then re-introspect the global model."""
+    if airways_nodes() != 0:
+        return True
+    print("  admin/airways is empty — reloading demos/airways")
+    cli, env = str(ROOT / "engine" / ".venv" / "bin" / "invana"), {"INVANA_TELEMETRY_ENABLED": "false"}
+    dev = {k: v for k, v in os.environ.items() if not k.startswith("NEO4J_")}  # the import writes to the Graph's own connection
+    for name, model in AIRWAYS:
+        res = subprocess.run([cli, "records", "import", "--graph", "admin/airways", "--name", name, "--model", model,
+                              "--path", f"demos/airways/{name}"], cwd=ROOT, env={**dev, **env}, text=True, capture_output=True)
+        if res.returncode != 0:
+            print(res.stdout[-1500:] + res.stderr[-1500:])
+            return False
+    sh(["pnpm", "exec", "playwright", "test", "--project=setup", "--reporter=line"], ROOT / "studio" / "apps" / "studio")
+    state = json.loads((ROOT / "studio" / "apps" / "studio" / "e2e" / ".auth" / "user.json").read_text())
+    auth = next(i["value"] for o in state["origins"] for i in o["localStorage"] if i["name"] == "invana.auth")
+    token = json.loads(auth)["state"]["accessToken"]
+    sh(["curl", "-sf", "-X", "POST", "-H", f"Authorization: Bearer {token}", f"{ENGINE_URL}/api/v1/u/admin/airways/connection/introspect"])
+    return airways_nodes() > 0
+
+
 # ── design review ──────────────────────────────────────────────────────────
 def review(row: dict) -> tuple[bool, str]:
     REVIEWS.mkdir(parents=True, exist_ok=True)
@@ -407,6 +460,9 @@ def run_session(row: dict, max_fix: int) -> bool:
     for attempt in range(max_fix + 1):
         if not sid.startswith("B") and not ensure_stack():
             set_status(sid, "blocked", "dev stack down — `docker compose up -d engine studio`, then re-run")
+            return False
+        if not ensure_demo_data():
+            set_status(sid, "blocked", "demos/airways would not reload into admin/airways — see the runner output")
             return False
         findings = run_gates(sid)
         if sid in TAMPERED:
@@ -447,6 +503,7 @@ def main() -> int:
     ap.add_argument("--track", choices=["A", "B", "C", "R"], help="only sessions of this track")
     ap.add_argument("--baseline", action="store_true", help="record what knip and e2e already fail on, then exit")
     args = ap.parse_args()
+    isolate_graph_tests()
     if args.baseline:
         return write_baseline()
     while True:

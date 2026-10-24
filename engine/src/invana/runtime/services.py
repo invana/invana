@@ -10,16 +10,18 @@ from __future__ import annotations
 
 import dataclasses
 from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from http import HTTPStatus
 from pathlib import Path
 
 from fastapi import HTTPException
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.envelope import PlanStep
 from invana.apps.agents.managers import AgentManager
 from invana.apps.agents.models import Agent
+from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.govern.managers import LensManager, LLMEndpointManager, NoEndpointError
 from invana.apps.govern.managers.lens import to_effective
 from invana.apps.govern.rules import compose, from_snapshot
@@ -42,10 +44,12 @@ from invana.apps.sessions.transcript import _title_from_text
 from invana.apps.skills.models import SkillVersion
 from invana.apps.task_plans.models import TaskPlan
 from invana.apps.work.models import Task
+from invana.core.auth.querysets import UserQuerySet
 from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
+from invana.core.lists import ListParams, PageInfo
 from invana.core.settings import settings
 from invana.plugins.core.ingest.records import LoadRefused
 from invana.runtime.models import INTERACTIVE, RunRole, RunStatus, TaskRun, TriggeredBy
@@ -995,68 +999,34 @@ async def cancel_waiting(db: AsyncSession, *, run: TaskRun) -> None:
     await db.flush()
 
 
-async def list_runs(
-    db: AsyncSession,
-    *,
-    graph_id: str,
-    agent_id: str | None = None,
-    task_id: str | None = None,
-    kind: str | None = None,
-    candidates: bool = False,
-    interactive: bool = False,
-    limit: int = 50,
-) -> tuple[list[dict], int]:
-    """TaskRuns as list rows, newest first (docs/for-developers/modules/agents/spec.md,
-    docs/for-developers/modules/work/spec.md J3/J6).
+#: How far back each ``since`` value reaches.
+_SINCE_WINDOWS = {
+    "24h": timedelta(hours=24),
+    "7d": timedelta(days=7),
+    "30d": timedelta(days=30),
+    "90d": timedelta(days=90),
+}
 
-    Two callers, one query. The Agent surface asks *what has this agent run?*;
-    the Workflows library asks *which generated plans served and were never
-    promoted?* — its **candidates**. Both want the plan and its verdict and
-    neither wants the steps, so the steps are not loaded.
 
-    **Roots only** (SR43). A step is not a journal row: it belongs to its run and
-    is read through that run's trace. This was enforced only as a side effect —
-    ``ask_kind`` is null on a child, so naming a ``kind`` already named a root —
-    and the journal names no kind, so it listed every step row in the Graph. The
-    filter is stated here now, because a rule that holds only while an unrelated
-    filter is applied is not being enforced.
+async def list_runs(db: AsyncSession, *, graph_id: str, params: ListParams) -> tuple[list[dict], PageInfo]:
+    """One page of the Runs list — the plan and its verdict, without the steps.
 
-    ``kind`` is the journal's filter — *what ran* asked of one kind of work
-    (task-model-migration § 6.7).
+    Three surfaces read it: an agent's *Recent plans* (``agent_id``), the
+    Workflows library's Promote picker (``candidates=true``) and the journal
+    (``kind``, ``status``, ``since``). All want the same few facts and none
+    wants the steps, so the steps are not loaded — only rolled up onto the row.
 
-    ``interactive`` turns on the runs a person does not read the journal for —
-    canvas expansions, system checks — which are off by default (§ 4.1b · GC7).
-
-    ``candidates=True`` is the narrower of the two and is defined negatively on
-    purpose: a candidate is a plan the engine *generated* (never one a template
-    produced — that shape is already in the library), that Verify said **served**,
-    and that no library entry claims as its origin. Anything looser would offer
-    a person a list of plans to promote that are already promoted, or that
-    nobody verified.
+    **Roots only.** A step is not a row of this list: it belongs to its run and
+    is read through that run's trace. Canvas and system runs are left out
+    unless ``interactive=true`` or an ``origin`` names them. What each filter
+    means is :meth:`TaskRunQuerySet.page_roots`'s; ``since`` is resolved here
+    against now.
     """
-    # A root is what a person or a schedule opened; everything else is a node of
-    # one of them (SR43).
-    stmt = select(TaskRun).where(TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_(None))
-    if agent_id:
-        stmt = stmt.where(TaskRun.agent_id == agent_id)
-    if task_id:
-        stmt = stmt.where(TaskRun.todo_id == task_id)
-    if kind:
-        stmt = stmt.where(TaskRun.ask_kind == kind)
-    if not interactive:
-        stmt = stmt.where(TaskRun.triggered_by.not_in(INTERACTIVE))
-    if candidates:
-        # `generated` only: a run off a template is the library entry already.
-        # And it must *have* a plan — promotion copies that document into the
-        # entry, so a run whose plan was never recorded is not promotable, and
-        # offering it would hand a person a button that always fails.
-        stmt = stmt.where(TaskRun.plan_origin == "generated", TaskRun.plan_snapshot.isnot(None))
-    rows = list((await db.execute(stmt.order_by(TaskRun.queued_at.desc()).limit(limit))).scalars())
-    # Every root the filters match, not the page: *11 of 240 shown*. Candidates
-    # are narrowed again below, so their count is the narrowed page.
-    total = int(await db.scalar(select(func.count()).select_from(stmt.subquery())) or 0)
+    window = params.one("since")
+    created_after = datetime.now(UTC) - _SINCE_WINDOWS[window] if window else None
+    rows, info = await TaskRunQuerySet().page_roots(db, graph_id=graph_id, params=params, created_after=created_after)
     if not rows:
-        return [], total
+        return [], info
 
     ids = [r.id for r in rows]
 
@@ -1181,10 +1151,18 @@ async def list_runs(
         }
         for r in rows
     ]
-    if candidates:
-        items = [i for i in items if i["served"] == "yes" and not i["promoted"]]
-        return items, len(items)
-    return items, total
+    return items, info
+
+
+async def run_filter_labels(db: AsyncSession, *, graph_id: str, params: ListParams) -> dict[str, dict[str, str]]:
+    """The words for the ids a Runs request filtered by — an agent's name, a person's username.
+
+    An agent is looked up inside the Graph only, so another Graph's agent id
+    labels as itself rather than naming something the reader cannot reach.
+    """
+    agents = await AgentQuerySet().by_ids(db, graph_id=graph_id, ids=list(params.values("agent_id")))
+    users = await UserQuerySet().usernames_by_ids(db, list(params.values("started_by")))
+    return {"agent_id": {a.id: a.name for a in agents}, "started_by": users}
 
 
 #: The builtin a load runs (BD7 · LB14). Records are imported **into a model**.

@@ -111,3 +111,17 @@ class TestCatalogueRoute:
 
         assert items["execute_graph_query"]["used_by"] == 1
         assert items["bulk_write"]["used_by"] == 0
+
+    async def test_the_list_is_filtered_labelled_and_paged_by_key(self, client):
+        writes = sorted(e.key for e in CATALOGUE.values() if e.bound is Bound.graph_write)
+        query = {"bound": "graph_write", "sort": "key"}
+        body = (await client.get(URL, params={**query, "limit": 1})).json()
+
+        assert (body["total"], body["unfiltered_total"]) == (len(writes), len(CATALOGUE))
+        assert [(a["field"], a["label"]) for a in body["applied"]] == [("bound", "graph write")]
+        assert [i["step_key"] for i in body["items"]] == writes[:1]
+
+        rest = (await client.get(URL, params={**query, "limit": 200, "cursor": body["next_cursor"]})).json()
+        assert [i["step_key"] for i in rest["items"]] == writes[1:]
+        assert rest["next_cursor"] is None
+        assert (await client.get(URL, params={"bound": "anywhere"})).status_code == 422

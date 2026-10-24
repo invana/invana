@@ -105,7 +105,7 @@ export interface InboxResponse {
 	approvals_waiting: number;
 }
 
-export type ApprovalStatus = "pending" | "approved" | "declined" | "expired";
+type ApprovalStatus = "pending" | "approved" | "declined" | "expired";
 
 export interface Approval {
 	id: string;
@@ -125,9 +125,4 @@ export interface Approval {
 	decided_at: string | null;
 	note: string;
 	created_at: string;
-}
-
-export interface ApprovalListResponse {
-	items: Approval[];
-	total: number;
 }

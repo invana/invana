@@ -15,12 +15,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.lists import ListParams, Page, applied_filters, list_params
 from invana.runtime.managers import McpManager, PluginManager
 from invana.runtime.schemas import (
+    PLUGIN_LIST,
     McpServerAdd,
     McpServerRead,
     PluginDetail,
-    PluginListResponse,
     PluginSummary,
     TaskTypeRead,
 )
@@ -30,11 +31,12 @@ mcp = McpManager()
 
 
 async def list_plugins(
+    params: ListParams = Depends(list_params(PLUGIN_LIST)),
     _: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-) -> PluginListResponse:
-    items = await plugins.list(session)
-    return PluginListResponse(items=items, total=len(items))
+) -> Page[PluginSummary]:
+    items, info = await plugins.page(session, params=params)
+    return Page[PluginSummary].of(items, info, applied_filters(params, PLUGIN_LIST))
 
 
 async def get_plugin(

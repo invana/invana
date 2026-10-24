@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.models import FiringOutcome, Schedule, ScheduleFiring, ScheduleStatus
+from invana.core.lists import ListParams, PageInfo
+from invana.core.lists.querysets import contains, page_of_select
 from invana.runtime.models import TaskRun
 
 
@@ -24,6 +27,28 @@ class ScheduleQuerySet:
     async def list_for_graph(self, session: AsyncSession, *, graph_id: str) -> list[Schedule]:
         stmt = select(Schedule).where(Schedule.graph_id == graph_id).order_by(Schedule.name)
         return list((await session.execute(stmt)).scalars())
+
+    async def page_for_graph(
+        self, session: AsyncSession, *, graph_id: str, params: ListParams
+    ) -> tuple[Sequence[Schedule], PageInfo]:
+        """One page of the Graph's schedules. ``enabled`` is an active schedule; not enabled, a paused one."""
+        unfiltered = select(Schedule).where(Schedule.graph_id == graph_id)
+        stmt = unfiltered
+        enabled = set(params.values("enabled"))
+        if enabled == {"true"}:
+            stmt = stmt.where(Schedule.status == ScheduleStatus.active.value)
+        elif enabled == {"false"}:
+            stmt = stmt.where(Schedule.status != ScheduleStatus.active.value)
+        if params.q:
+            stmt = stmt.where(contains(params.q, Schedule.name))
+        return await page_of_select(
+            session, stmt, params, unfiltered=unfiltered, sorts={"name": Schedule.name}, id_column=Schedule.id
+        )
+
+    async def paused_count(self, session: AsyncSession, *, graph_id: str) -> int:
+        """How many of the Graph's schedules are not active."""
+        stmt = select(func.count()).where(Schedule.graph_id == graph_id, Schedule.status != ScheduleStatus.active.value)
+        return int((await session.execute(stmt)).scalar_one())
 
     async def naming_channel(self, session: AsyncSession, *, graph_id: str) -> list[Schedule]:
         stmt = select(Schedule).where(Schedule.graph_id == graph_id)

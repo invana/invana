@@ -18,6 +18,7 @@ extra is not installed and the MCP servers this process has not loaded, listed
 
     plugins = PluginManager()
     await plugins.list(session)                                 # [PluginSummary, …]
+    await plugins.page(session, params=params)                  # one page of the list, and its counts
     await plugins.show(session, "invana.tools.web")             # PluginDetail
     await plugins.task_type(session, "execute_graph_query@1.0.0")  # TaskTypeRead, with runs_30d
     await plugins.is_enabled(session, "invana.tools.web")      # False until enabled
@@ -32,6 +33,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedError
+from invana.core.lists import ListParams, PageInfo, page_of_rows
 from invana.plugins import load_plugins
 from invana.plugins.mcp import plugin as mcp_plugin
 from invana.plugins.registry import LoadedPlugin
@@ -149,6 +151,27 @@ class PluginManager:
             if name not in registry.plugins
         ]
         return out
+
+    async def page(self, session: AsyncSession, *, params: ListParams) -> tuple[list[PluginSummary], PageInfo]:
+        """One page of the Plugins list — the registry read by :meth:`list`, searched, filtered and sorted.
+
+        The registry is in memory, so the rows are narrowed here and paged by
+        :func:`page_of_rows` over the plugin's name, which is unique.
+        """
+        every = await self.list(session)
+        rows = every
+        if kinds := params.values("kind"):
+            rows = [p for p in rows if p.kind in kinds]
+        enabled = set(params.values("enabled"))
+        if len(enabled) == 1:
+            want = "true" in enabled
+            rows = [p for p in rows if p.enabled is want]
+        if params.q:
+            q = params.q.lower()
+            rows = [p for p in rows if q in p.name.lower() or q in p.title.lower()]
+        return page_of_rows(
+            rows, params, unfiltered_total=len(every), sorts={"name": lambda p: p.name}, id_of=lambda p: p.name
+        )
 
     async def show(self, session: AsyncSession, name: str) -> PluginDetail:
         """One plugin with each task manifest, flow and skill it declares. 404 when no plugin has the name."""

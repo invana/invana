@@ -8,16 +8,13 @@
  */
 
 import { PanelStack } from "@invana/ui";
+import { useListParams } from "@invana-studio/core";
 import { useAccess } from "@invana-studio/shell";
 import { useStackSectionUi } from "@invana-studio/ui";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gateSection } from "../gateSection";
-import {
-	type AgentFilters,
-	agentsSection,
-	NO_AGENT_FILTERS,
-} from "./AgentsSection";
-import { useAgentsQuery } from "./queries";
+import { useUrlSearchUi } from "../lists";
+import { agentsSection } from "./AgentsSection";
 import type { AgentEdge } from "./types";
 import { useAgentsViewPanel } from "./useAgentsViewPanel";
 
@@ -47,22 +44,11 @@ export function AgentsViewPanel({
 	onNewAgent,
 }: AgentsViewPanelProps) {
 	const agents = useAgentsViewPanel();
-	const ui = useStackSectionUi();
+	// The URL holds the list's search and filters, so the section's header and
+	// the rows under it read the same ones — and a link opens the same rows.
+	const list = useListParams();
+	const ui = useUrlSearchUi(useStackSectionUi(), "agents", list);
 	const { gate } = useAccess();
-	// Held here, not in the list: the funnel in the section's header and the
-	// rows under it read the same filters. The count beside the title is the
-	// engine's — the standing agents, or every agent once the hidden helpers
-	// are shown; a kind or status filter narrows the rows, not the count.
-	const [filters, setFilters] = useState<AgentFilters>(NO_AGENT_FILTERS);
-	const agentList = useAgentsQuery(username, graphSlug, {
-		includeEphemeral: true,
-		includeRetired: true,
-	});
-	const count = agentList.data
-		? filters.showEphemeral
-			? agentList.data.total
-			: agentList.data.persistent
-		: undefined;
 
 	// `&agent=` was the drill-in when the page lived in this section. A link that
 	// still carries it opens the page, and the key is dropped — read, never
@@ -97,9 +83,7 @@ export function AgentsViewPanel({
 				gateSection(
 					agentsSection({
 						ui,
-						filters,
-						onFilters: setFilters,
-						count,
+						list,
 						username,
 						graphSlug,
 						onOpenAgentPage,

@@ -105,7 +105,7 @@ test("a rule's notification reaches the Inbox, opens its schedule and reads as r
 
 test("the bell and the Inbox tab carry one count", async ({ page }) => {
 	await page.goto(`${GRAPH}/activity/inbox`);
-	const bell = page.getByRole("link", { name: "Notifications" });
+	const bell = page.getByRole("button", { name: "Notifications" });
 	const tab = page.getByRole("tab", { name: /^Inbox/ });
 	await expect(tab).toBeVisible({ timeout: 30_000 });
 	// Both read one query; poll so a refetch landing between reads cannot split them.

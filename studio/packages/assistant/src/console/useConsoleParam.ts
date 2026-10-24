@@ -56,7 +56,7 @@ interface Parsed {
 	query: string | null;
 }
 
-export function parseConsole(raw: string | null): Parsed {
+function parseConsole(raw: string | null): Parsed {
 	const none = { tab: null, data: null, query: null };
 	if (!raw) return none;
 	const [head, ...rest] = raw.split(":");

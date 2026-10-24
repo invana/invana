@@ -23,6 +23,7 @@ from invana.apps.sessions.schemas import SendMessageResponse, SessionMessageRead
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.lists import ListParams, Page, applied_filters, list_params
 from invana.runtime import emissions, services
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.interpreter import TaskRuntime
@@ -39,6 +40,7 @@ from invana.runtime.projections import (
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.results import run_tokens, step_progress
 from invana.runtime.schemas import (
+    RUN_LIST,
     AnswerPrompt,
     CancelResponse,
     EmissionRead,
@@ -49,8 +51,8 @@ from invana.runtime.schemas import (
     RunStats,
     SwitchTemplate,
     TaskPromptRead,
-    TaskRunListResponse,
     TaskRunRead,
+    TaskRunSummary,
     TemplateOffer,
     TraceRead,
     TraceStep,
@@ -76,47 +78,26 @@ def _sse(generator) -> StreamingResponse:
     )
 
 
-@runs_router.get("", response_model=TaskRunListResponse)
+@runs_router.get("", response_model=Page[TaskRunSummary])
 async def list_runs(
-    agent_id: str | None = Query(default=None, description="Runs this agent actually performed."),
-    task_id: str | None = Query(default=None, description="Runs opened for this task."),
-    kind: str | None = Query(
-        default=None,
-        description="One kind of work — `ask`, `import`, `bulk`. The journal's filter.",
-    ),
-    candidates: bool = Query(
-        default=False,
-        description="Generated plans that served and were never promoted — the Promote picker's list.",
-    ),
-    interactive: bool = Query(
-        default=False,
-        description="Include canvas and system runs — expansions, checks — which the journal hides by default.",
-    ),
-    limit: int = Query(default=50, ge=1, le=200),
+    params: ListParams = Depends(list_params(RUN_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> TaskRunListResponse:
+) -> Page[TaskRunSummary]:
     """List runs as rows — the plan and its verdict, without the steps.
 
-    The route is deliberately one endpoint with filters rather than
-    ``/agents/{id}/plans`` and ``/workflows/candidates``: both questions are
-    "which runs match this?", and splitting them would have given *served* two
-    definitions to drift apart. **The journal is the same endpoint**: a load is
-    a run, so *what changed my graph* is ``?kind=import`` rather than a surface
-    of its own (§ 6.7).
+    One endpoint with filters rather than ``/agents/{id}/plans`` and
+    ``/workflows/candidates``: both questions are "which runs match this?", and
+    two endpoints would give *served* two definitions to drift apart. **The
+    journal is the same endpoint**: a load is a run, so *what changed my
+    graph* is ``?kind=import`` rather than a surface of its own.
     """
-    items, total = await services.list_runs(
-        session,
-        graph_id=graph.id,
-        agent_id=agent_id,
-        task_id=task_id,
-        kind=kind,
-        candidates=candidates,
-        interactive=interactive,
-        limit=limit,
+    items, info = await services.list_runs(session, graph_id=graph.id, params=params)
+    labels = await services.run_filter_labels(session, graph_id=graph.id, params=params)
+    return Page[TaskRunSummary].of(
+        [TaskRunSummary.model_validate(i) for i in items], info, applied_filters(params, RUN_LIST, labels)
     )
-    return TaskRunListResponse(items=items, total=total)
 
 
 @runs_router.get("/stats", response_model=RunStats)

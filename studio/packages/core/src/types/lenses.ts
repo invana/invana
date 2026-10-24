@@ -278,7 +278,7 @@ export interface LayerTally {
 	rows: number;
 }
 
-export interface TouchTallies {
+interface TouchTallies {
 	allowed: number;
 	touched: number;
 	never_touched: number;
@@ -310,7 +310,7 @@ export interface CompareResponse {
 }
 
 /** The compare's tiles, counted by the engine. */
-export interface CompareCounts {
+interface CompareCounts {
 	touched_a: number;
 	touched_b: number;
 	shared: number;

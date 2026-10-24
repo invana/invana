@@ -11,6 +11,8 @@
 // duplication Govern exists to remove.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { Page } from "@invana-studio/core";
+
 export type LLMProviderKind =
 	| "anthropic"
 	| "openai"
@@ -165,15 +167,17 @@ export interface LLMProviderUpdate {
 	guardrails?: Record<string, unknown>;
 }
 
-export interface LLMProviderListResponse {
-	items: LLMProvider[];
-	total: number;
-}
+/**
+ * A Graph's endpoints. Search: name. Filter: `kind`. Sorts: `created_at` ·
+ * `name` · `-updated_at`.
+ */
+export type LLMProviderPage = Page<LLMProvider>;
 
-export interface LLMModelListResponse {
-	items: LLMModel[];
-	total: number;
-}
+/**
+ * One endpoint's models. Search: model id. Filter: `status` (none lists the
+ * removed ones too). Sorts: `created_at` · `model_id` · `-updated_at`.
+ */
+export type LLMModelPage = Page<LLMModel>;
 
 export interface LLMPingResponse {
 	ok: boolean;

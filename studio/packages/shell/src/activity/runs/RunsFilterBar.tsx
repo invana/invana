@@ -1,10 +1,12 @@
 /**
- * The journal's filter chips — `kind · status · role · agent · since`
+ * The journal's controls — a search over the ask, then one chip per filter
+ * the engine takes: `kind · status · agent · since`
  * (see-what-ran.md `operate.runs.list`).
  *
- * One chip per dimension, each opening its own menu. A set chip carries its
- * value and a `×` that clears only that filter, so a narrowed journal says how
- * it was narrowed while it scrolls — a funnel alone would hide that.
+ * Every control writes the URL through `useListParams`; the engine decides
+ * which runs match. A set chip carries its value and a `×` that clears only
+ * that filter, so a narrowed journal says how it was narrowed while it
+ * scrolls — a funnel alone would hide that.
  */
 
 import {
@@ -15,8 +17,9 @@ import {
 	DropdownMenuTrigger,
 	FilterBar,
 	FilterChip,
+	SearchInput,
 } from "@invana/ui";
-import type { RunsFilters, RunsSince } from "./queries";
+import type { ListUrl } from "@invana-studio/core";
 
 const RUN_KINDS = ["nl", "ql", "import", "bulk"] as const;
 const RUN_STATUSES = [
@@ -28,11 +31,11 @@ const RUN_STATUSES = [
 	"failed",
 	"cancelled",
 ] as const;
-const RUN_ROLES = ["execute", "plan", "evaluate"] as const;
-const RUN_SINCE: { value: RunsSince; label: string }[] = [
-	{ value: "today", label: "today" },
-	{ value: "7d", label: "7 days" },
-	{ value: "30d", label: "30 days" },
+const RUN_SINCE: Option[] = [
+	{ value: "24h", label: "last 24 hours" },
+	{ value: "7d", label: "last 7 days" },
+	{ value: "30d", label: "last 30 days" },
+	{ value: "90d", label: "last 90 days" },
 ];
 
 interface Option {
@@ -48,7 +51,7 @@ function Chip({
 	onChange,
 }: {
 	label: string;
-	value: string | null | undefined;
+	value: string | undefined;
 	options: Option[];
 	allLabel: string;
 	onChange: (v: string | null) => void;
@@ -59,9 +62,9 @@ function Chip({
 			<DropdownMenuTrigger asChild>
 				<FilterChip
 					label={label}
-					value={set?.label}
-					active={Boolean(set)}
-					onRemove={set ? () => onChange(null) : undefined}
+					value={set?.label ?? value}
+					active={Boolean(value)}
+					onRemove={value ? () => onChange(null) : undefined}
 				/>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="w-48">
@@ -85,50 +88,50 @@ const plain = (values: readonly string[]): Option[] =>
 	values.map((v) => ({ value: v, label: v }));
 
 export function RunsFilterBar({
-	filters,
-	onChange,
+	list,
 	agents,
 }: {
-	filters: RunsFilters;
-	onChange: (patch: Partial<RunsFilters>) => void;
+	list: ListUrl;
 	agents: { id: string; name: string }[];
 }) {
+	const filters = list.query.filters ?? {};
+	const chip = (field: string) => ({
+		value: filters[field]?.[0],
+		onChange: (v: string | null) => list.setFilter(field, v ? [v] : []),
+	});
 	return (
 		<FilterBar className="h-auto flex-wrap px-3 py-2">
+			<SearchInput
+				inputSize="sm"
+				className="w-64"
+				placeholder="Search what was asked"
+				aria-label="Search runs"
+				value={list.query.q ?? ""}
+				onChange={list.setQ}
+			/>
 			<Chip
 				label="kind"
-				value={filters.kind}
 				options={plain(RUN_KINDS)}
 				allLabel="every kind"
-				onChange={(kind) => onChange({ kind })}
+				{...chip("kind")}
 			/>
 			<Chip
 				label="status"
-				value={filters.status}
 				options={plain(RUN_STATUSES)}
 				allLabel="every status"
-				onChange={(status) => onChange({ status })}
-			/>
-			<Chip
-				label="role"
-				value={filters.role}
-				options={plain(RUN_ROLES)}
-				allLabel="every role"
-				onChange={(role) => onChange({ role })}
+				{...chip("status")}
 			/>
 			<Chip
 				label="agent"
-				value={filters.agentId}
 				options={agents.map((a) => ({ value: a.id, label: a.name }))}
 				allLabel="every agent"
-				onChange={(agentId) => onChange({ agentId })}
+				{...chip("agent_id")}
 			/>
 			<Chip
 				label="since"
-				value={filters.since}
 				options={RUN_SINCE}
 				allLabel="all time"
-				onChange={(since) => onChange({ since: since as RunsSince | null })}
+				{...chip("since")}
 			/>
 		</FilterBar>
 	);

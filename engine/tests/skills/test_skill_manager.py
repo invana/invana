@@ -13,10 +13,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.models import Graph
 from invana.apps.skills.managers import SkillManager
-from invana.apps.skills.schemas import SkillCreate, SkillUpdate
+from invana.apps.skills.schemas import SKILL_LIST, SkillCreate, SkillUpdate
 from invana.core.auth.models import User
-from invana.core.errors import ConflictError, NotFoundError
+from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events.models import Event
+from invana.core.lists.params import parse_list_params
 from invana.runtime.managers import SkillDraftManager
 
 skills = SkillManager()
@@ -105,3 +106,26 @@ async def test_delete_removes_the_row_and_the_event_keeps_the_name(
     assert await skills.list_for_graph(session, graph_id=graph.id) == []
     events = await _events(session, "skill.delete")
     assert events[0].details["name"] == "Doomed"
+
+
+async def test_the_list_filters_by_status_and_counts_the_whole_graph(
+    session: AsyncSession, graph: Graph, user: User
+) -> None:
+    await drafts.create(
+        session, graph_id=graph.id, payload=SkillCreate(name="Live one"), actor_id=user.id, publish=True
+    )
+    await drafts.create(session, graph_id=graph.id, payload=SkillCreate(name="Unfinished"), actor_id=user.id)
+
+    reads, info = await drafts.page_reads(
+        session, graph_id=graph.id, params=parse_list_params(SKILL_LIST, {"status": ["draft"], "q": ["UNFIN"]})
+    )
+    assert [(r.name, r.is_draft) for r in reads] == [("Unfinished", True)]
+    every = await skills.list_for_graph(session, graph_id=graph.id)
+    assert (info.total, info.unfiltered_total) == (1, len(every))
+
+
+def test_the_list_refuses_a_filter_it_does_not_take() -> None:
+    with pytest.raises(ValidationError, match="it takes"):
+        parse_list_params(SKILL_LIST, {"owner": ["me"]})
+    with pytest.raises(ValidationError, match="one of"):
+        parse_list_params(SKILL_LIST, {"status": ["retired"]})

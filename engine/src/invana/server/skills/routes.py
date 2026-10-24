@@ -29,13 +29,13 @@ from invana.apps.skills.schemas import (
     SkillAgentsResponse,
     SkillDraftRead,
     SkillDrawStarted,
-    SkillListResponse,
     SkillPlanRead,
     SkillRead,
     SkillVersionDiff,
     SkillVersionListResponse,
     SkillVersionRead,
 )
+from invana.core.lists import Page
 from invana.server.skills import views
 
 skills_router = APIRouter(
@@ -43,7 +43,7 @@ skills_router = APIRouter(
     tags=["skills"],
 )
 
-skills_router.get("", response_model=SkillListResponse)(views.list_skills)
+skills_router.get("", response_model=Page[SkillRead])(views.list_skills)
 skills_router.post("", response_model=SkillRead, status_code=status.HTTP_201_CREATED)(views.create_skill)
 skills_router.get("/{skill_id}", response_model=SkillRead)(views.get_skill)
 skills_router.patch("/{skill_id}", response_model=SkillRead)(views.update_skill)

@@ -15,11 +15,12 @@ from invana.activity.schemas import FleetOverview, FleetPerformance
 from invana.apps.agents.managers import AgentManager, SoulManager
 from invana.apps.agents.models import AgentStatus
 from invana.apps.agents.schemas import (
+    AGENT_LIST,
     AgentCreate,
     AgentDraftWrite,
     AgentLineageResponse,
-    AgentListResponse,
     AgentMeters,
+    AgentPage,
     AgentPublish,
     AgentRead,
     AgentRollback,
@@ -39,6 +40,7 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events.schemas import EventListResponse
 from invana.core.events.store import EventFilter, EventStore
+from invana.core.lists import ListParams, applied_filters, list_params
 from invana.runtime.managers import AgentCapabilitiesManager, AgentLifecycleManager, EvalManager, SkillBindManager
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
@@ -60,21 +62,21 @@ _WINDOWS = {"7d": 7, "30d": 30, "90d": 90}
 
 
 async def list_agents(
-    include_ephemeral: bool = Query(default=False, description="Spawned helpers are hidden by default."),
-    include_retired: bool = Query(default=False),
+    params: ListParams = Depends(list_params(AGENT_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> AgentListResponse:
-    items = await agents.list_agents(
-        session, graph=graph, include_ephemeral=include_ephemeral, include_retired=include_retired
-    )
+) -> AgentPage:
     # The read seeds on first touch, so it commits.
-    reads = await agents.reads(session, items)
-    persistent, ephemeral = agents.count_by_lifetime(items)
-    return AgentListResponse(
+    rows, info = await agents.page_agents(session, graph=graph, params=params)
+    reads = await agents.reads(session, list(rows))
+    persistent, ephemeral = await agents.count_by_lifetime(session, graph_id=graph.id)
+    return AgentPage(
         items=reads,
-        total=len(reads),
+        total=info.total,
+        unfiltered_total=info.unfiltered_total,
+        next_cursor=info.next_cursor,
+        applied=applied_filters(params, AGENT_LIST),
         persistent=persistent,
         ephemeral=ephemeral,
         default_agent_id=graph.default_agent_id,

@@ -21,13 +21,13 @@ from invana.apps.agents.schemas import SkillUsageResponse
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.schemas import (
+    SKILL_LIST,
     SkillAgentsResponse,
     SkillAgentStanding,
     SkillClarificationAnswer,
     SkillCreate,
     SkillDraftRead,
     SkillDrawStarted,
-    SkillListResponse,
     SkillPlanRead,
     SkillRead,
     SkillRollback,
@@ -40,6 +40,7 @@ from invana.apps.skills.schemas import (
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.lists import ListParams, Page, applied_filters, list_params
 from invana.runtime import services as run_services
 from invana.runtime.managers import SkillBindManager, SkillDraftManager, SkillUsageManager
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
@@ -54,12 +55,14 @@ binds = SkillBindManager()
 
 
 async def list_skills(
+    params: ListParams = Depends(list_params(SKILL_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> SkillListResponse:
-    reads = await drafts.list_reads(session, graph_id=graph.id)
-    return SkillListResponse(items=reads, total=len(reads))
+) -> Page[SkillRead]:
+    # The read seeds the builtin playbook on first touch, so it commits.
+    reads, info = await drafts.page_reads(session, graph_id=graph.id, params=params)
+    return Page[SkillRead].of(reads, info, applied_filters(params, SKILL_LIST))
 
 
 async def create_skill(

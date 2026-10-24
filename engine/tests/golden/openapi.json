@@ -1046,55 +1046,6 @@
         "title": "AgentLineageResponse",
         "type": "object"
       },
-      "AgentListResponse": {
-        "properties": {
-          "default_agent_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Default Agent Id"
-          },
-          "ephemeral": {
-            "default": 0,
-            "title": "Ephemeral",
-            "type": "integer"
-          },
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/AgentRead"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "persistent": {
-            "default": 0,
-            "title": "Persistent",
-            "type": "integer"
-          },
-          "tokens_this_month": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "title": "Tokens This Month",
-            "type": "object"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "AgentListResponse",
-        "type": "object"
-      },
       "AgentMeters": {
         "description": "What the agent is using now, each beside the limit that caps it (AG23).\n\nUsage and budgets are in tokens, never currency.",
         "properties": {
@@ -1276,6 +1227,78 @@
           "label"
         ],
         "title": "AgentNode",
+        "type": "object"
+      },
+      "AgentPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "default_agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Agent Id"
+          },
+          "ephemeral": {
+            "default": 0,
+            "title": "Ephemeral",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AgentRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "persistent": {
+            "default": 0,
+            "title": "Persistent",
+            "type": "integer"
+          },
+          "tokens_this_month": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Tokens This Month",
+            "type": "object"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "AgentPage",
         "type": "object"
       },
       "AgentPublish": {
@@ -2253,6 +2276,35 @@
         "title": "AppliedDiffRead",
         "type": "object"
       },
+      "AppliedFilter": {
+        "description": "One filter the engine applied. ``q`` is echoed as field ``q``.",
+        "properties": {
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "title",
+          "value",
+          "label"
+        ],
+        "title": "AppliedFilter",
+        "type": "object"
+      },
       "ApprovalDecide": {
         "properties": {
           "note": {
@@ -2263,27 +2315,6 @@
           }
         },
         "title": "ApprovalDecide",
-        "type": "object"
-      },
-      "ApprovalListResponse": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/ApprovalRead"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "ApprovalListResponse",
         "type": "object"
       },
       "ApprovalRead": {
@@ -4146,6 +4177,11 @@
             "title": "Outputs",
             "type": "array"
           },
+          "plugin": {
+            "default": "",
+            "title": "Plugin",
+            "type": "string"
+          },
           "requires": {
             "items": {
               "type": "string"
@@ -4246,27 +4282,6 @@
           "layers_present"
         ],
         "title": "CatalogueRead",
-        "type": "object"
-      },
-      "CatalogueResponse": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/CatalogueEntryRead"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "CatalogueResponse",
         "type": "object"
       },
       "Change": {
@@ -10792,27 +10807,6 @@
         "title": "LLMModelCreate",
         "type": "object"
       },
-      "LLMModelListResponse": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/LLMModelRead"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "LLMModelListResponse",
-        "type": "object"
-      },
       "LLMModelRead": {
         "properties": {
           "address": {
@@ -11003,27 +10997,6 @@
         ],
         "title": "LLMProviderKind",
         "type": "string"
-      },
-      "LLMProviderListResponse": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/LLMProviderRead"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "LLMProviderListResponse",
-        "type": "object"
       },
       "LLMProviderRead": {
         "properties": {
@@ -12359,27 +12332,6 @@
           "user"
         ],
         "title": "MemberAdd",
-        "type": "object"
-      },
-      "MemberListResponse": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/MemberRead"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "MemberListResponse",
         "type": "object"
       },
       "MemberRead": {
@@ -14407,6 +14359,358 @@
         "title": "OverviewTiles",
         "type": "object"
       },
+      "Page_ApprovalRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ApprovalRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[ApprovalRead]",
+        "type": "object"
+      },
+      "Page_CatalogueEntryRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueEntryRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[CatalogueEntryRead]",
+        "type": "object"
+      },
+      "Page_LLMModelRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LLMModelRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[LLMModelRead]",
+        "type": "object"
+      },
+      "Page_LLMProviderRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LLMProviderRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[LLMProviderRead]",
+        "type": "object"
+      },
+      "Page_MemberRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MemberRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[MemberRead]",
+        "type": "object"
+      },
+      "Page_PluginSummary_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[PluginSummary]",
+        "type": "object"
+      },
+      "Page_SkillRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SkillRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[SkillRead]",
+        "type": "object"
+      },
+      "Page_TaskRunSummary_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TaskRunSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[TaskRunSummary]",
+        "type": "object"
+      },
       "ParticipantRead": {
         "properties": {
           "address": {
@@ -15895,27 +16199,6 @@
           "description"
         ],
         "title": "PluginFlowRead",
-        "type": "object"
-      },
-      "PluginListResponse": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/PluginSummary"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "PluginListResponse",
         "type": "object"
       },
       "PluginSkillRead": {
@@ -18952,8 +19235,15 @@
         "title": "ScheduleCreate",
         "type": "object"
       },
-      "ScheduleListResponse": {
+      "SchedulePage": {
         "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
           "items": {
             "items": {
               "$ref": "#/components/schemas/ScheduleRead"
@@ -18961,16 +19251,37 @@
             "title": "Items",
             "type": "array"
           },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "paused": {
+            "default": 0,
+            "title": "Paused",
+            "type": "integer"
+          },
           "total": {
             "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
             "type": "integer"
           }
         },
         "required": [
           "items",
-          "total"
+          "total",
+          "unfiltered_total"
         ],
-        "title": "ScheduleListResponse",
+        "title": "SchedulePage",
         "type": "object"
       },
       "ScheduleRead": {
@@ -21642,27 +21953,6 @@
         "title": "SkillDrawStarted",
         "type": "object"
       },
-      "SkillListResponse": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/SkillRead"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "SkillListResponse",
-        "type": "object"
-      },
       "SkillPlanEdge": {
         "properties": {
           "kind": {
@@ -24216,12 +24506,14 @@
         "title": "TaskPlanDetail",
         "type": "object"
       },
-      "TaskPlanListResponse": {
+      "TaskPlanPage": {
         "properties": {
-          "authoring": {
-            "default": "post-MVP",
-            "title": "Authoring",
-            "type": "string"
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
           },
           "items": {
             "items": {
@@ -24229,6 +24521,17 @@
             },
             "title": "Items",
             "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
           },
           "packaged": {
             "default": 0,
@@ -24238,13 +24541,18 @@
           "total": {
             "title": "Total",
             "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
           }
         },
         "required": [
           "items",
-          "total"
+          "total",
+          "unfiltered_total"
         ],
-        "title": "TaskPlanListResponse",
+        "title": "TaskPlanPage",
         "type": "object"
       },
       "TaskPlanRead": {
@@ -24715,27 +25023,6 @@
           }
         },
         "title": "TaskResultRequest",
-        "type": "object"
-      },
-      "TaskRunListResponse": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/TaskRunSummary"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "TaskRunListResponse",
         "type": "object"
       },
       "TaskRunRead": {
@@ -30065,7 +30352,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PluginListResponse"
+                  "$ref": "#/components/schemas/Page_PluginSummary_"
                 }
               }
             },
@@ -31609,28 +31896,6 @@
               "title": "Graphslug",
               "type": "string"
             }
-          },
-          {
-            "description": "Spawned helpers are hidden by default.",
-            "in": "query",
-            "name": "include_ephemeral",
-            "required": false,
-            "schema": {
-              "default": false,
-              "description": "Spawned helpers are hidden by default.",
-              "title": "Include Ephemeral",
-              "type": "boolean"
-            }
-          },
-          {
-            "in": "query",
-            "name": "include_retired",
-            "required": false,
-            "schema": {
-              "default": false,
-              "title": "Include Retired",
-              "type": "boolean"
-            }
           }
         ],
         "responses": {
@@ -31638,7 +31903,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AgentListResponse"
+                  "$ref": "#/components/schemas/AgentPage"
                 }
               }
             },
@@ -33650,36 +33915,6 @@
               "title": "Graphslug",
               "type": "string"
             }
-          },
-          {
-            "description": "pending \u00b7 approved \u00b7 declined \u00b7 expired",
-            "in": "query",
-            "name": "status",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "pending \u00b7 approved \u00b7 declined \u00b7 expired",
-              "title": "Status"
-            }
-          },
-          {
-            "description": "Only what waits on me.",
-            "in": "query",
-            "name": "mine",
-            "required": false,
-            "schema": {
-              "default": false,
-              "description": "Only what waits on me.",
-              "title": "Mine",
-              "type": "boolean"
-            }
           }
         ],
         "responses": {
@@ -33687,7 +33922,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApprovalListResponse"
+                  "$ref": "#/components/schemas/Page_ApprovalRead_"
                 }
               }
             },
@@ -34046,6 +34281,22 @@
                 }
               ],
               "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "session_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Session Id"
             }
           }
         ],
@@ -34960,7 +35211,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CatalogueResponse"
+                  "$ref": "#/components/schemas/Page_CatalogueEntryRead_"
                 }
               }
             },
@@ -38829,7 +39080,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LLMProviderListResponse"
+                  "$ref": "#/components/schemas/Page_LLMProviderRead_"
                 }
               }
             },
@@ -39233,7 +39484,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LLMModelListResponse"
+                  "$ref": "#/components/schemas/Page_LLMModelRead_"
                 }
               }
             },
@@ -39510,7 +39761,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MemberListResponse"
+                  "$ref": "#/components/schemas/Page_MemberRead_"
                 }
               }
             },
@@ -47519,7 +47770,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/runs": {
       "get": {
-        "description": "List runs as rows \u2014 the plan and its verdict, without the steps.\n\nThe route is deliberately one endpoint with filters rather than\n``/agents/{id}/plans`` and ``/workflows/candidates``: both questions are\n\"which runs match this?\", and splitting them would have given *served* two\ndefinitions to drift apart. **The journal is the same endpoint**: a load is\na run, so *what changed my graph* is ``?kind=import`` rather than a surface\nof its own (\u00a7 6.7).",
+        "description": "List runs as rows \u2014 the plan and its verdict, without the steps.\n\nOne endpoint with filters rather than ``/agents/{id}/plans`` and\n``/workflows/candidates``: both questions are \"which runs match this?\", and\ntwo endpoints would give *served* two definitions to drift apart. **The\njournal is the same endpoint**: a load is a run, so *what changed my\ngraph* is ``?kind=import`` rather than a surface of its own.",
         "operationId": "list_runs_api_v1_u__username___graphSlug__runs_get",
         "parameters": [
           {
@@ -47543,96 +47794,6 @@
               "title": "Graphslug",
               "type": "string"
             }
-          },
-          {
-            "description": "Runs this agent actually performed.",
-            "in": "query",
-            "name": "agent_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Runs this agent actually performed.",
-              "title": "Agent Id"
-            }
-          },
-          {
-            "description": "Runs opened for this task.",
-            "in": "query",
-            "name": "task_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Runs opened for this task.",
-              "title": "Task Id"
-            }
-          },
-          {
-            "description": "One kind of work \u2014 `ask`, `import`, `bulk`. The journal's filter.",
-            "in": "query",
-            "name": "kind",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "One kind of work \u2014 `ask`, `import`, `bulk`. The journal's filter.",
-              "title": "Kind"
-            }
-          },
-          {
-            "description": "Generated plans that served and were never promoted \u2014 the Promote picker's list.",
-            "in": "query",
-            "name": "candidates",
-            "required": false,
-            "schema": {
-              "default": false,
-              "description": "Generated plans that served and were never promoted \u2014 the Promote picker's list.",
-              "title": "Candidates",
-              "type": "boolean"
-            }
-          },
-          {
-            "description": "Include canvas and system runs \u2014 expansions, checks \u2014 which the journal hides by default.",
-            "in": "query",
-            "name": "interactive",
-            "required": false,
-            "schema": {
-              "default": false,
-              "description": "Include canvas and system runs \u2014 expansions, checks \u2014 which the journal hides by default.",
-              "title": "Interactive",
-              "type": "boolean"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "default": 50,
-              "maximum": 200,
-              "minimum": 1,
-              "title": "Limit",
-              "type": "integer"
-            }
           }
         ],
         "responses": {
@@ -47640,7 +47801,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TaskRunListResponse"
+                  "$ref": "#/components/schemas/Page_TaskRunSummary_"
                 }
               }
             },
@@ -48588,7 +48749,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ScheduleListResponse"
+                  "$ref": "#/components/schemas/SchedulePage"
                 }
               }
             },
@@ -50259,7 +50420,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SkillListResponse"
+                  "$ref": "#/components/schemas/Page_SkillRead_"
                 }
               }
             },
@@ -51577,7 +51738,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TaskPlanListResponse"
+                  "$ref": "#/components/schemas/TaskPlanPage"
                 }
               }
             },

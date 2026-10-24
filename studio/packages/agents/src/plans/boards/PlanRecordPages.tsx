@@ -11,6 +11,7 @@ import { EmptyState, Spinner } from "@invana/ui";
 import { routedAction } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { type ReactNode, useMemo, useState } from "react";
+import { EVERY } from "../../lists";
 import {
 	usePlanDiffsQuery,
 	usePlanExportQuery,
@@ -36,7 +37,7 @@ interface RecordPageProps {
 
 /** The version the board names, and every version of its key. */
 function usePlanRecord(username: string, graphSlug: string, planId: string) {
-	const library = useTaskPlansQuery(username, graphSlug);
+	const library = useTaskPlansQuery(username, graphSlug, EVERY);
 	const plan = library.data?.items.find((p) => p.id === planId);
 	const versions = useMemo(
 		() => (library.data?.items ?? []).filter((p) => plan && p.key === plan.key),

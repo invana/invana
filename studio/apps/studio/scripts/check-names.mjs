@@ -60,6 +60,9 @@ const ENGINE_ONLY = {
 	sessions: "served by the @invana-studio/assistant package, outside the host",
 	events: "served by the @invana-studio/shell package, outside the host",
 	explorer: "served by the @invana-studio/explorer package, outside the host",
+	annotations:
+		"served by the @invana-studio/explorer package, outside the host",
+	data_edits: "served by the @invana-studio/explorer package, outside the host",
 	modeller: "served by the @invana-studio/modeller package, outside the host",
 	govern: "served by the @invana-studio/modeller package, outside the host",
 	graphs:

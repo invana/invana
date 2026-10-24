@@ -8,6 +8,7 @@
 
 import { EmptyState, Spinner } from "@invana/ui";
 import { useState } from "react";
+import { EVERY } from "../lists";
 import { useSkillsQuery } from "./queries";
 import { SkillDetail } from "./SkillDetail";
 
@@ -26,7 +27,7 @@ export function SkillBoardPage({
 }) {
 	// The same list the section reads, so the page and the row never disagree
 	// about version or draft.
-	const skills = useSkillsQuery(username, graphSlug);
+	const skills = useSkillsQuery(username, graphSlug, EVERY);
 	const [editing, setEditing] = useState(false);
 	const skill = skills.data?.items.find((s) => s.id === skillId) ?? null;
 

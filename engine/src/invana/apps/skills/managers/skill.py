@@ -31,6 +31,7 @@ one band up in ``runtime/managers/skill_draft.py``.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from difflib import unified_diff
 
@@ -50,6 +51,7 @@ from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import diff_changed_fields, emit_event
+from invana.core.lists import ListParams, PageInfo
 
 #: What lives on a version. Changing any of these publishes.
 _VERSIONED = ["description", "content", "when_to_use"]
@@ -67,6 +69,12 @@ class SkillManager:
 
     async def list_for_graph(self, session: AsyncSession, *, graph_id: str) -> list[Skill]:
         return await self.skills_qs.list_for_graph(session, graph_id)
+
+    async def page_for_graph(
+        self, session: AsyncSession, *, graph_id: str, params: ListParams
+    ) -> tuple[Sequence[Skill], PageInfo]:
+        """One page of the Skills list, searched, filtered and sorted by ``params``."""
+        return await self.skills_qs.page_for_graph(session, graph_id, params=params)
 
     async def get(self, session: AsyncSession, *, skill_id: str, graph_id: str) -> Skill:
         """Fetch one Skill, scoped to its Graph.

@@ -339,7 +339,7 @@ export interface DatasetClaimListResponse {
 	unreadable: number;
 }
 
-export interface ValidationItem {
+interface ValidationItem {
 	/** `publisher/name` of the dataset. */
 	dataset: string;
 	/** `publisher/name@v` of the claimed standard version. */
@@ -350,7 +350,7 @@ export interface ValidationItem {
 	violation: Violation;
 }
 
-export interface ValidationDataset {
+interface ValidationDataset {
 	address: string;
 	publisher: string;
 	name: string;

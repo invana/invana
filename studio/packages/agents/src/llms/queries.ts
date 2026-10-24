@@ -1,4 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { type ListQuery, listQueryKey } from "@invana-studio/core";
+import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { llmProvidersApi } from "./api";
 import type {
 	LLMModelCreate,
@@ -9,15 +15,18 @@ import type {
 const key = (username: string, graphSlug: string) =>
 	["llm-providers", username, graphSlug] as const;
 
+/** One page of the endpoints for `query`; a caller that needs every endpoint asks `limit: 200`. */
 export function useLLMProvidersQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
+	query: ListQuery = {},
 ) {
 	return useQuery({
-		queryKey: key(username ?? "", graphSlug ?? ""),
+		queryKey: [...key(username ?? "", graphSlug ?? ""), listQueryKey(query)],
 		queryFn: () =>
-			llmProvidersApi.list(username as string, graphSlug as string),
+			llmProvidersApi.list(username as string, graphSlug as string, query),
 		enabled: !!username && !!graphSlug,
+		placeholderData: keepPreviousData,
 	});
 }
 

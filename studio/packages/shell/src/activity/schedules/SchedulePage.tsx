@@ -158,6 +158,7 @@ function ScheduleBody({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
+				variant="page"
 				size="lg"
 				tone={paused ? "muted" : lastFailed ? "error" : "success"}
 				crumbs={[schedule.name]}

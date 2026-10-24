@@ -35,7 +35,7 @@ function when(iso: string): string {
 }
 
 /** An engine row as the board draws it, for the member looking. */
-export function toBoardAnnotation(
+function toBoardAnnotation(
 	a: AnnotationDto,
 	me: string | null,
 	sessionTitle?: (id: string) => string,

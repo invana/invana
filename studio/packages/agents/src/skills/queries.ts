@@ -1,18 +1,32 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { type ListQuery, listQueryKey } from "@invana-studio/core";
+import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { skillsApi } from "./api";
 import type { SkillCreate, SkillVersionPublish } from "./types";
 
 const key = (username: string, graphSlug: string) =>
 	["skills", username, graphSlug] as const;
 
+/** One page of the Skills list for `query`; a caller that needs every skill asks `limit: 200`. */
 export function useSkillsQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
+	query: ListQuery = {},
 ) {
 	return useQuery({
-		queryKey: key(username ?? "", graphSlug ?? ""),
-		queryFn: () => skillsApi.list(username as string, graphSlug as string),
+		queryKey: [
+			...key(username ?? "", graphSlug ?? ""),
+			"list",
+			listQueryKey(query),
+		],
+		queryFn: () =>
+			skillsApi.list(username as string, graphSlug as string, query),
 		enabled: !!username && !!graphSlug,
+		placeholderData: keepPreviousData,
 	});
 }
 

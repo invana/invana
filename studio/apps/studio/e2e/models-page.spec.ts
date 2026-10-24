@@ -211,7 +211,8 @@ test("Usage calls nothing unused below 50 queries", async ({ page }) => {
 /** Ask in query language, then open the Performance card of that shape. */
 async function adviceFor(page: Page, query: string, shape: RegExp) {
 	await ask(page, query);
-	await expect(page.getByText(/\d+ rows?/).last()).toBeVisible({
+	// The reply's meta line settles every answer, an empty one too.
+	await expect(page.getByText(/\d+ records? · /).last()).toBeVisible({
 		timeout: 60_000,
 	});
 	// The log is written off the query's path (MP36), so the shape may land a

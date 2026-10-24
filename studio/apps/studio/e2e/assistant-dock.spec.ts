@@ -8,10 +8,18 @@ import { ask, GRAPH } from "./explorer";
  *
  * It starts centred on the Graph's page, docks on the right once a question
  * is asked, closes to give the canvas the width, and a failed query opens the
- * console under the canvas on Log.
+ * console under the canvas on the failed step's Log.
  */
 
 const QUERY = "MATCH (a:airport)-[r:route]->(b:airport) RETURN a, r, b LIMIT 6";
+
+/** A failed query opens the console on its step (`?console=queries:<id>`). */
+const FAILED_STEP = /console=queries(%3A|:)/;
+
+/** The failed step's Log tab, selected. */
+function logTab(page: Page) {
+	return page.getByRole("tab", { name: "Log", selected: true });
+}
 
 function closeAssistant(page: Page) {
 	return page.getByRole("button", { name: "Close the assistant" });
@@ -50,10 +58,8 @@ test("asking from the centred box docks the conversation on the right", async ({
 test("closing the assistant gives the canvas the width; the pill brings it back", async ({
 	page,
 }) => {
+	// A session's first result is drawn onto its canvas without an offer.
 	await ask(page, QUERY);
-	await page.getByRole("button", { name: "Load to canvas" }).click({
-		timeout: 30_000,
-	});
 	const canvas = page.locator("canvas").first();
 	await expect(canvas).toBeVisible({ timeout: 30_000 });
 	const docked = (await canvas.boundingBox())?.width ?? 0;
@@ -79,8 +85,10 @@ test("a first query that fails from the centred start docks the chat and opens L
 
 	await sendFromStart(page, "MATC (a:airport {code:'LHR'}) RETURN a LIMIT 1");
 
-	// Both regions' params land: the failure opening Log must not undo the dock.
-	await expect(page).toHaveURL(/console=log/, { timeout: 30_000 });
+	// Both regions' params land: the failure opening its step's Log must not
+	// undo the dock.
+	await expect(page).toHaveURL(FAILED_STEP, { timeout: 30_000 });
+	await expect(logTab(page)).toBeVisible();
 	await expect(page).toHaveURL(/right=assistant/);
 	await expect(closeAssistant(page)).toBeVisible();
 	await page.getByRole("button", { name: "Open the log" }).click();
@@ -93,15 +101,13 @@ test("a failed query opens the console on Log, read back after a reload", async 
 	const bad = "MATC (a:airport) RETURN a LIMIT 1";
 	await ask(page, bad);
 
-	await expect(page).toHaveURL(/console=log/, { timeout: 30_000 });
-	await expect(page.getByText("error", { exact: true }).first()).toBeVisible();
+	await expect(page).toHaveURL(FAILED_STEP, { timeout: 30_000 });
+	await expect(logTab(page)).toBeVisible();
 
-	// A reload closes the thread, and the console closes with its canvas; the
-	// param stays, so reopening the thread reads its log back from the record.
+	// The param stays across a reload, so the step's log is read back from
+	// the record.
 	await page.reload();
-	await expect(page).toHaveURL(/console=log/);
-	await page.getByText(bad).last().click({ timeout: 30_000 });
-	await expect(page.getByText("error", { exact: true }).first()).toBeVisible({
-		timeout: 30_000,
-	});
+	await expect(page).toHaveURL(FAILED_STEP);
+	await expect(logTab(page)).toBeVisible({ timeout: 30_000 });
+	await expect(page.getByText(/query rejected/).first()).toBeVisible();
 });

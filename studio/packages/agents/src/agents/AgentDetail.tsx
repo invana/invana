@@ -149,6 +149,7 @@ export function AgentDetail({
 		// grows to its content and the header and tabs scroll away with it.
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
+				variant="page"
 				crumbs={[agent.name]}
 				chips={
 					<>

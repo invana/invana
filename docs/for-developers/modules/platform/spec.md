@@ -6,7 +6,7 @@ own; everything here is why the rest can be built quickly and look like one thin
 | | |
 |---|---|
 | Index | [§11 · Platform](../../README.md#11--platform) |
-| Features | [design-system](features/design-system.md) · [theming](features/theming.md) · [command-line](features/command-line.md) · [logging](features/logging.md) · [telemetry](features/telemetry.md) · [admin-and-health](features/admin-and-health.md) · [setup](features/setup.md) · [runtime](features/runtime.md) · [plugins](features/plugins.md) · [search](features/search.md) · [distributed-execution](features/distributed-execution.md) · [tool-plugins](features/tool-plugins.md) · [mcp-plugins](features/mcp-plugins.md) |
+| Features | [design-system](features/design-system.md) · [theming](features/theming.md) · [command-line](features/command-line.md) · [logging](features/logging.md) · [telemetry](features/telemetry.md) · [admin-and-health](features/admin-and-health.md) · [setup](features/setup.md) · [runtime](features/runtime.md) · [plugins](features/plugins.md) · [search](features/search.md) · [distributed-execution](features/distributed-execution.md) · [tool-plugins](features/tool-plugins.md) · [mcp-plugins](features/mcp-plugins.md) · [list-contract](features/list-contract.md) |
 | Depends on | — |
 | Depended on by | every Studio surface, every install, and — through [the runtime](features/runtime.md) — every module that runs anything |
 
@@ -126,7 +126,7 @@ One shape across every route, so a new endpoint needs no new rules.
 | Versioned prefix | `/api/v1/…` |
 | Graph scoping | everything about a Graph hangs off `/u/{username}/{graphSlug}/…`; user-level routes live under `/auth/…` |
 | Lists are keyset-paginated | a cursor, not an offset — stable under writes |
-| One list contract | every list takes `q` · named filters (`status`, `agent_id`, …, repeatable) · `sort` · `cursor` + `limit`, and answers `{ items, total, next_cursor, applied }`. `total` is a real count, never `len(items)`; `applied` echoes the filters the engine used, so Studio and the assistant show the same ones |
+| One list contract | [list-contract](features/list-contract.md) — every list takes `q` · named filters (`status`, `agent_id`, …, repeatable) · `sort` · `cursor` + `limit`, and answers `{ items, total, unfiltered_total, next_cursor, applied }`. `total` and `unfiltered_total` are real counts, never `len(items)`; `applied` echoes the filters the engine used, so Studio and the assistant show the same ones |
 | Filters run on the server | a list never narrows rows only in the browser; Studio carries them in the URL as `?q=` and `?f.<field>=` |
 | Streams are server-sent events | with a `?token=` fallback where a header cannot be set |
 | `PUT` is full replace | `PATCH` is partial; a blank secret on `PUT` means "keep the stored one" |

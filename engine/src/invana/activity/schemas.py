@@ -13,9 +13,11 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from invana.activity.models import ApprovalStatus
 from invana.apps.modeller.schemas import SchemaDiff
 from invana.apps.task_plans.schemas import PlanVersionDiff
 from invana.core.events.models import ActorKind
+from invana.core.lists import Filter, ListSpec, Page
 from invana.core.metrics import Change
 
 RecordKind = Literal["skill", "rule", "plan", "agent", "model", "dataset"]
@@ -197,9 +199,18 @@ class ScheduleRead(BaseModel):
     updated_at: datetime
 
 
-class ScheduleListResponse(BaseModel):
-    items: list[ScheduleRead]
-    total: int
+#: What the Schedules list takes. ``enabled=true`` is an active schedule,
+#: ``false`` a paused one.
+SCHEDULE_LIST = ListSpec(
+    filters={"enabled": Filter(values=("true", "false"), labels={"true": "enabled", "false": "disabled"})},
+    sorts=("name",),
+    search_title="name",
+)
+
+
+class SchedulePage(Page[ScheduleRead]):
+    #: The Graph's paused schedules, counted over the whole Graph — not the filtered rows.
+    paused: int = 0
 
 
 class FiringRead(BaseModel):
@@ -347,9 +358,20 @@ class ApprovalRead(BaseModel):
     created_at: datetime
 
 
-class ApprovalListResponse(BaseModel):
-    items: list[ApprovalRead]
-    total: int
+#: What waits for an approval — the ``subject_kind`` an approval is opened with.
+APPROVAL_KINDS = ("step", "delivery", "model_publish", "agent", "skill")
+
+#: What the Approvals list takes. ``q`` matches the title; ``mine=true`` narrows
+#: to the approvals that name the reader as an approver.
+APPROVAL_LIST = ListSpec(
+    filters={
+        "status": Filter(values=tuple(s.value for s in ApprovalStatus)),
+        "kind": Filter(values=APPROVAL_KINDS, labels={"model_publish": "model publish"}),
+        "mine": Filter(values=("true",), labels={"true": "mine"}, title="waiting on"),
+    },
+    sorts=("-created_at",),
+    search_title="title",
+)
 
 
 class ApprovalDecide(BaseModel):

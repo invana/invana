@@ -6,15 +6,15 @@
  */
 
 import type { Interaction } from "@invana-studio/core";
-import { request } from "@invana-studio/core";
+import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type {
-	CatalogueResponse,
+	CataloguePage,
 	PlanPerformance,
 	PlanRunsPage,
 	PlanVersionDiff,
 	PlanWindow,
 	TaskPlanDetail,
-	TaskPlanListResponse,
+	TaskPlanPage,
 } from "./types";
 
 function base(username: string, graphSlug: string): string {
@@ -25,14 +25,19 @@ const json = (body: unknown) => ({ body: JSON.stringify(body) });
 
 /** The catalogue — the closed set a plan may name, read-only (7.6). */
 export const catalogueApi = {
-	list: (username: string, graphSlug: string) =>
-		request<CatalogueResponse>(`${base(username, graphSlug)}/catalogue`),
+	list: (username: string, graphSlug: string, query: ListQuery = {}) =>
+		request<CataloguePage>(
+			`${base(username, graphSlug)}/catalogue${listQueryToApi(query)}`,
+		),
 };
 
 /** The plan library — `task_plans` where `reusable`. */
 export const taskPlansApi = {
-	list: (username: string, graphSlug: string) =>
-		request<TaskPlanListResponse>(`${base(username, graphSlug)}/task-plans`),
+	/** One page of the library — searched, filtered and sorted by the engine. */
+	list: (username: string, graphSlug: string, query: ListQuery = {}) =>
+		request<TaskPlanPage>(
+			`${base(username, graphSlug)}/task-plans${listQueryToApi(query)}`,
+		),
 
 	get: (username: string, graphSlug: string, key: string, version?: number) =>
 		request<TaskPlanDetail>(

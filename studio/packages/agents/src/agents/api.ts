@@ -5,14 +5,14 @@
  * shared client and returns the engine's shape unchanged.
  */
 
-import { request } from "@invana-studio/core";
+import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type { EventListResponse } from "@invana-studio/shell";
 import type {
 	Agent,
 	AgentCreate,
 	AgentLineage,
-	AgentListResponse,
 	AgentMeters,
+	AgentPage,
 	AgentSkillsAndCallables,
 	AgentUpdate,
 	LifecycleAct,
@@ -28,21 +28,11 @@ function base(username: string, graphSlug: string): string {
 const json = (body: unknown) => ({ body: JSON.stringify(body) });
 
 export const agentsApi = {
-	list: (
-		username: string,
-		graphSlug: string,
-		opts: { includeEphemeral?: boolean; includeRetired?: boolean } = {},
-	) => {
-		const params = new URLSearchParams();
-		// Spawned helpers are hidden by default — they are still fully present
-		// in lineage and the trace (docs/for-developers/modules/work/spec.md).
-		if (opts.includeEphemeral) params.set("include_ephemeral", "true");
-		if (opts.includeRetired) params.set("include_retired", "true");
-		const q = params.toString();
-		return request<AgentListResponse>(
-			`${base(username, graphSlug)}/agents${q ? `?${q}` : ""}`,
-		);
-	},
+	/** One page of the Agents list — searched, filtered and sorted by the engine. */
+	list: (username: string, graphSlug: string, query: ListQuery = {}) =>
+		request<AgentPage>(
+			`${base(username, graphSlug)}/agents${listQueryToApi(query)}`,
+		),
 
 	get: (username: string, graphSlug: string, id: string) =>
 		request<Agent>(`${base(username, graphSlug)}/agents/${id}`),

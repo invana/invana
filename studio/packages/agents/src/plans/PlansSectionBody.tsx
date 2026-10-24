@@ -29,7 +29,7 @@ import {
 	RecordHeader,
 	Spinner,
 } from "@invana/ui";
-import { formatElapsed } from "@invana-studio/core";
+import { formatElapsed, type ListUrl } from "@invana-studio/core";
 import {
 	AgentChipRow,
 	DetailBlock,
@@ -41,6 +41,7 @@ import {
 } from "@invana-studio/ui";
 import { Wand2 } from "lucide-react";
 import type { ReactNode } from "react";
+import { chipsOf, FilteredEmpty, ListStrip, PAGE } from "../lists";
 import type { SkillLayer } from "../skills/types";
 import { PromoteDialog } from "./PromoteDialog";
 import {
@@ -99,14 +100,20 @@ export const PLAN_SOURCES = ["packaged", "authored", "promoted"] as const;
 /** The intent family a plan's key names. */
 export const PLAN_KINDS = ["nl", "ql"] as const;
 
+/** The page of plans the URL asks for — the header's count and the rows read one query. */
+export function usePlanList(
+	username: string,
+	graphSlug: string,
+	list: ListUrl,
+) {
+	return useTaskPlansQuery(username, graphSlug, { ...list.query, limit: PAGE });
+}
+
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** The section header's live search string — this body owns no chrome. */
-	search: string;
-	/** The section funnel's filters. The body reads them, never owns them. */
-	kindFilter: string;
-	sourceFilter: string;
+	/** The URL's search and filters, which the section's header writes. The body reads them, never owns them. */
+	list: ListUrl;
 	selectedKey: string | null;
 	onSelectKey: (key: string | null) => void;
 	/** The step selected on the DAG — the panel's detail swaps to it. */
@@ -125,9 +132,7 @@ interface Props {
 export function PlansSectionBody({
 	username,
 	graphSlug,
-	search,
-	kindFilter,
-	sourceFilter,
+	list,
 	selectedKey,
 	onSelectKey,
 	selectedStepId,
@@ -135,14 +140,20 @@ export function PlansSectionBody({
 	onPromoting,
 	onOpenAgent,
 }: Props) {
-	const list = useTaskPlansQuery(username, graphSlug);
+	const plans = usePlanList(username, graphSlug, list);
 	const detail = useTaskPlanQuery(
 		username,
 		graphSlug,
 		selectedKey ?? undefined,
 	);
+	// Every version of the drilled-in key, whatever the list is filtered by.
+	const sameKey = useTaskPlansQuery(username, graphSlug, {
+		q: selectedKey ?? undefined,
+		limit: PAGE,
+	});
 
-	const items = list.data?.items ?? [];
+	const rows = plans.data?.items ?? [];
+	const chips = chipsOf(plans.data, list);
 	const step = detail.data?.nodes.find((n) => n.id === selectedStepId) ?? null;
 
 	// **Drilled in, the body is the record**. The list is not drawn under
@@ -167,7 +178,9 @@ export function PlansSectionBody({
 				username={username}
 				graphSlug={graphSlug}
 				workflow={detail.data}
-				versions={items.filter((p) => p.key === detail.data?.key)}
+				versions={(sameKey.data?.items ?? []).filter(
+					(p) => p.key === detail.data?.key,
+				)}
 				onOpenAgent={onOpenAgent}
 			/>
 		);
@@ -175,69 +188,54 @@ export function PlansSectionBody({
 
 	return (
 		<>
-			{(() => {
-				// The library is reusable plans only, and a reusable plan always has
-				// a key — `key` is null exactly for the generated one-offs this
-				// list never shows.
-				const rows = items.filter(
-					(w) =>
-						(w.key ?? "").toLowerCase().includes(search.toLowerCase()) &&
-						(!sourceFilter || w.origin === sourceFilter) &&
-						// A workflow's kind is the intent family it matches — `nl-compare`
-						// is an NL entry, `ql` a query-language one. It is derived from
-						// the key rather than stored, because the key is the contract.
-						(!kindFilter || (w.key ?? "").split("-")[0] === kindFilter),
-				);
-				return (
-					<div className="flex h-full min-h-0 flex-col">
-						<div className="flex-1 overflow-y-auto">
-							{list.isLoading ? (
-								<div className="px-3 py-4">
-									<Spinner />
-								</div>
-							) : rows.length === 0 ? (
-								<p className="px-3 py-4 text-base text-muted-foreground">
-									{items.length
-										? "No workflow matches those filters."
-										: "No workflows in this graph yet."}
-								</p>
-							) : (
-								rows.map((workflow) => (
-									<RecordRow
-										key={workflow.id}
-										active={workflow.key === selectedKey}
-										onClick={() =>
-											onSelectKey(
-												workflow.key === selectedKey ? null : workflow.key,
-											)
-										}
-										// A candidate is a plan that served but nobody has
-										// promoted; drawing it quiet keeps the library's own
-										// entries the ones a reader reaches for first.
-										tone={workflow.origin === "packaged" ? "info" : "muted"}
-										title={
-											<span className="font-mono">
-												{workflow.key}@{workflow.version}
-											</span>
-										}
-										// Only a non-seeded entry earns a badge: labelling every
-										// row `seeded` would make the column noise.
-										status={
-											workflow.origin === "packaged"
-												? undefined
-												: workflow.origin
-										}
-										statusTone={
-											workflow.origin === "promoted" ? "success" : "warning"
-										}
-										subtitle={<PlanRowLines workflow={workflow} />}
-									/>
-								))
-							)}
+			<div className="flex h-full min-h-0 flex-col">
+				<ListStrip page={plans.data} list={list} />
+				<div className="flex-1 overflow-y-auto">
+					{plans.isLoading ? (
+						<div className="px-3 py-4">
+							<Spinner />
 						</div>
-					</div>
-				);
-			})()}
+					) : rows.length === 0 ? (
+						chips.length ? (
+							<FilteredEmpty noun="plan" filters={chips} onClear={list.clear} />
+						) : (
+							<p className="px-3 py-4 text-base text-muted-foreground">
+								No workflows in this graph yet.
+							</p>
+						)
+					) : (
+						rows.map((workflow) => (
+							<RecordRow
+								key={workflow.id}
+								active={workflow.key === selectedKey}
+								onClick={() =>
+									onSelectKey(
+										workflow.key === selectedKey ? null : workflow.key,
+									)
+								}
+								// A candidate is a plan that served but nobody has
+								// promoted; drawing it quiet keeps the library's own
+								// entries the ones a reader reaches for first.
+								tone={workflow.origin === "packaged" ? "info" : "muted"}
+								title={
+									<span className="font-mono">
+										{workflow.key}@{workflow.version}
+									</span>
+								}
+								// Only a non-seeded entry earns a badge: labelling every
+								// row `seeded` would make the column noise.
+								status={
+									workflow.origin === "packaged" ? undefined : workflow.origin
+								}
+								statusTone={
+									workflow.origin === "promoted" ? "success" : "warning"
+								}
+								subtitle={<PlanRowLines workflow={workflow} />}
+							/>
+						))
+					)}
+				</div>
+			</div>
 			<PromoteDialog
 				username={username}
 				graphSlug={graphSlug}

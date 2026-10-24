@@ -59,15 +59,12 @@ test("the Explorer has no leftNav; its tools float over the board", async ({
 	// The graph page's leftNav icons are not drawn on the Explorer.
 	await expect(page.getByRole("button", { name: "Runs" })).toHaveCount(0);
 
-	// Select · lasso · box until *Tools* is on; then the full set.
-	const tools = page.getByRole("switch", { name: "Tools" });
-	await expect(tools).toBeVisible();
-	const runLayout = page.getByRole("button", { name: "Run layout" });
-	await expect(runLayout).toHaveCount(0);
-	await tools.click();
-	await expect(tools).toBeChecked();
-	await expect(runLayout).toBeVisible();
-	await tools.click();
+	// The board's own chrome floats over it: the mode picker top-left with its
+	// tools, and the rail of panels; the layout verbs live on the menus.
+	await expect(page.getByRole("button", { name: /^Mode · / })).toBeVisible();
+	await expect(page.getByRole("button", { name: "Hand" })).toBeVisible();
+	await expect(page.getByRole("button", { name: "Legend" })).toBeVisible();
+	await expect(page.getByRole("button", { name: "Run layout" })).toHaveCount(0);
 });
 
 test("a rejected query is a diagnosis, never an answer", async ({ page }) => {
@@ -126,7 +123,8 @@ test("4.4 the footer's counts open the console on the canvas's data and on its q
 
 	// A typed query that answers opens Data: one table per label.
 	await expect(page).toHaveURL(/console=data/, { timeout: 30_000 });
-	await expect(page.getByText("Nodes", { exact: true })).toBeVisible();
+	const consolePanel = page.getByTestId("graph-detail-terminal-panel");
+	await expect(consolePanel.getByText("Nodes", { exact: true })).toBeVisible();
 	await expect(page.getByRole("button", { name: "Next page" })).toBeVisible();
 
 	// Queries: the session's, from the footer's query count; a row opens its step.

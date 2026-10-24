@@ -235,6 +235,7 @@ export function ProductHost() {
 	const { data: llmProvidersResponse } = useLLMProvidersQuery(
 		username,
 		graphSlug,
+		{ limit: 200 },
 	);
 	const llmProviders = llmProvidersResponse?.items ?? [];
 
@@ -347,7 +348,7 @@ export function ProductHost() {
 	// right as the session's canvas opens. A new session is answered by the
 	// Graph's default agent, so the start names it.
 	const explorerOpen = useActiveProduct()?.id === "explorer";
-	const agents = useAgentsQuery(username, graphSlug);
+	const agents = useAgentsQuery(username, graphSlug, { limit: 200 });
 	const defaultAgent = agents.data?.items.find(
 		(a) => a.id === agents.data?.default_agent_id,
 	);

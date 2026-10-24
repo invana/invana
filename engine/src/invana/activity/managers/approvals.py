@@ -15,6 +15,7 @@ touch, so two engine processes never remind or expire one approval twice.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,6 +29,7 @@ from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedErr
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
+from invana.core.lists import ListParams, PageInfo
 
 
 class ApprovalManager:
@@ -97,6 +99,14 @@ class ApprovalManager:
             rows = [r for r in rows if mine.id in r.approver_ids]
         # Waiting first, nearest deadline first.
         return sorted(rows, key=lambda r: (r.status != ApprovalStatus.pending.value, r.deadline_at))
+
+    async def page(
+        self, session: AsyncSession, *, graph: Graph, params: ListParams, mine: User | None = None
+    ) -> tuple[Sequence[Approval], PageInfo]:
+        """One page of the Approvals list, newest first; with ``mine``, only what names that member."""
+        return await self.approvals_qs.page_for_graph(
+            session, graph_id=graph.id, params=params, approver_id=mine.id if mine is not None else None
+        )
 
     async def get(self, session: AsyncSession, *, graph: Graph, approval_id: str) -> Approval:
         row = await self.approvals_qs.get(session, graph_id=graph.id, approval_id=approval_id)

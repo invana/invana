@@ -4,8 +4,17 @@
  * schedule and its firings at once.
  */
 
-import type { GraphRef } from "@invana-studio/core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	type GraphRef,
+	type ListQuery,
+	listQueryKey,
+} from "@invana-studio/core";
+import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { schedulesApi } from "./api";
 import type { ScheduleUpdate, ScheduleWrite } from "./types";
 
@@ -20,12 +29,24 @@ export const scheduleKeys = {
 		[...scheduleKeys.all(g), "firings", id, limit] as const,
 };
 
-export function useSchedulesQuery(graph: GraphRef | undefined) {
+/** Every schedule — the tab draws them all, and Coming up reads each one. */
+const EVERY_SCHEDULE: ListQuery = { limit: 200 };
+
+/** One page of the schedules list for `query`; by default every schedule. */
+export function useSchedulesQuery(
+	graph: GraphRef | undefined,
+	query: ListQuery = EVERY_SCHEDULE,
+) {
 	return useQuery({
-		queryKey: [...scheduleKeys.all(graph), "list"] as const,
-		queryFn: () => schedulesApi.list(graph as GraphRef),
+		queryKey: [
+			...scheduleKeys.all(graph),
+			"list",
+			listQueryKey(query),
+		] as const,
+		queryFn: () => schedulesApi.list(graph as GraphRef, query),
 		enabled: !!graph,
 		staleTime: STALE_MS,
+		placeholderData: keepPreviousData,
 	});
 }
 

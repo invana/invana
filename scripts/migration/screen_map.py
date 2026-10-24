@@ -44,6 +44,8 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("explorer.sessions", f"{G}/explorer?history"), ("explorer.home", f"{G}/explorer"), ("explorer", f"{G}/explorer/routes-out-of-lhr"),
     ("projects.list", f"{AR}/projects"), ("projects.new", f"{AR}/projects"), ("projects.todo", f"{AR}/projects/todos"), ("projects.decisions", f"{AR}/projects/decisions"),
     ("projects.impact", f"{AR}/projects/gene-edited-field-trials"), ("projects", f"{AR}/projects/early-flowering-under-drought"),
+    ("agents.runs.filtered", f"{G}/activity/runs?f.status=failed&f.since=30d&via=assistant"),
+    ("agents.agents.filtered", f"{G}/agents/agents?q=fare&f.ephemeral=shown"),
     ("agents.overview", f"{G}/agents"), ("agents.agents", f"{G}/agents/agents"), ("agents.agent", f"{G}/agents/agents/analyst"),
     ("agents.skills.detail", f"{G}/agents/skills/answer-nl"), ("agents.skills", f"{G}/agents/skills"),
     ("agents.library", f"{G}/agents/library"), ("agents.plugins", f"{G}/agents/plugins"), ("agents.llms", f"{G}/agents/llms"),
@@ -59,6 +61,8 @@ BRANCH = "on branch H1.1 · …via lower FLC (needs B05)"
 AGENT = "analyst stands for an agent's slug: open any agent from Agents"
 MODEL = "m1 stands for the AirRoutes model id: click AirRoutes on the models board"
 SKILL = "answer-nl stands for a skill's slug: open any skill from Skills"
+#: A product doc whose stories enter the map phase by phase, as agents-build-sessions.md builds them.
+BUILT = {"agent-fabric": {"AF-26"}}
 STATE = {  # board → how to reach it from its route; a board absent here is its route's landing view
     "shell.onboarding": "a Graph whose set-up is not finished: the set-up checklist open",
     "shell.launcher.open": "click the product launcher in the header",
@@ -165,6 +169,8 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "projects.report": "Report tab (needs B05)",
     "agents.overview.dark": DARK,
     "agents.agents.lineage": "Lineage tab",
+    "agents.runs.filtered": "Runs filtered by status and since, as the assistant links them; add &f.agent_id=<an agent's id> for the agent chip",
+    "agents.agents.filtered": "Agents searched for fare with spawned helpers shown",
     "agents.agent": AGENT,
     "agents.agent.activity": f"{AGENT}; Activity tab",
     "agents.agent.instructions": f"{AGENT}; Instructions tab (needs B02)",
@@ -196,8 +202,10 @@ def route_for(board: str) -> str | None:
 
 def main() -> None:
     boards, missing = {}, []
-    for doc in ["shell", "datasets", "modeller", "explorer", "projects", "agents"]:
+    for doc in ["shell", "datasets", "modeller", "explorer", "projects", "agents", "agent-fabric"]:
         for m in re.finditer(r"^\| ([A-Z]{2}-\d{2}) \|(.*)$", (DOCS / f"{doc}.md").read_text(), re.M):
+            if doc in BUILT and m.group(1) not in BUILT[doc]:
+                continue
             for b in re.findall(r"`([a-z_.]+)`", m.group(2)):
                 variant = b.split(".")[-1] in {"dark", "readonly", "error", "closed"} or b.count(".") > 2
                 route = route_for(b)

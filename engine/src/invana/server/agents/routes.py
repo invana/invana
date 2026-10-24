@@ -13,8 +13,8 @@ from fastapi import APIRouter, status
 from invana.activity.schemas import FleetOverview, FleetPerformance
 from invana.apps.agents.schemas import (
     AgentLineageResponse,
-    AgentListResponse,
     AgentMeters,
+    AgentPage,
     AgentRead,
     AgentSkillsAndCallables,
     LifecyclePreview,
@@ -26,7 +26,7 @@ from invana.server.agents import views
 agents_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/agents", tags=["agents"])
 atlas_agent_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}", tags=["agents"])
 
-agents_router.get("", response_model=AgentListResponse)(views.list_agents)
+agents_router.get("", response_model=AgentPage)(views.list_agents)
 # Before `/{agent_id}`, which would read `overview` as an id.
 agents_router.get("/overview", response_model=FleetOverview)(views.fleet_overview)
 agents_router.get("/performance", response_model=FleetPerformance)(views.fleet_performance)

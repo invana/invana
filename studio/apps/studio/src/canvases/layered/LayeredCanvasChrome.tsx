@@ -14,6 +14,7 @@
 
 import { cn } from "@invana/ui";
 import {
+	EVERY_AGENT,
 	useAgentLineageQuery,
 	useAgentsQuery,
 	useTaskPlanQuery,
@@ -53,9 +54,7 @@ function useSubject({ username, graphSlug, target }: Scope): {
 		graphSlug,
 		target.kind === "plan" ? target.projectKey : undefined,
 	);
-	const agents = useAgentsQuery(username, graphSlug, {
-		includeEphemeral: true,
-		includeRetired: true,
+	const agents = useAgentsQuery(username, graphSlug, EVERY_AGENT, {
 		enabled: target.kind === "envelope" || target.kind === "lineage",
 	});
 	// Served from the same cache entry the LineageCanvas populates — the footer

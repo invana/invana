@@ -8,13 +8,17 @@ says which it returns without a second class to look up.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
 
-from sqlalchemy import Text, func, or_, select, update
+from sqlalchemy import Text, exists, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
-from invana.runtime.models import RunRole, RunStatus, TaskRun
+from invana.apps.task_plans.models import TaskPlan
+from invana.core.lists import ListParams, PageInfo
+from invana.core.lists.querysets import contains, page_of_select
+from invana.runtime.models import INTERACTIVE, RunRole, RunStatus, TaskRun
 
 
 class TaskRunQuerySet:
@@ -586,6 +590,62 @@ class TaskRunQuerySet:
         if statuses is not None:
             stmt = stmt.where(TaskRun.status.in_(statuses))
         return list((await session.execute(stmt)).scalars())
+
+    async def page_roots(
+        self,
+        session: AsyncSession,
+        *,
+        graph_id: str,
+        params: ListParams,
+        created_after: datetime | None = None,
+    ) -> tuple[Sequence[TaskRun], PageInfo]:
+        """One page of the Graph's root runs — the Runs list.
+
+        The unfiltered list is the default view: every root a person reads the
+        journal for, so canvas and system runs are outside it. ``interactive``
+        brings them in; naming an ``origin`` asks for exactly those triggers,
+        canvas and system included. ``candidates`` is a generated plan that has
+        a recorded plan, that Verify said served, and that no library entry
+        names as its origin. ``created_after`` is the ``since`` window, resolved
+        by the caller.
+        """
+        roots = select(TaskRun).where(TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_(None))
+        unfiltered = roots.where(TaskRun.triggered_by.not_in(INTERACTIVE))
+        origins = params.values("origin")
+        stmt = roots if origins or params.one("interactive") else unfiltered
+        if origins:
+            stmt = stmt.where(TaskRun.triggered_by.in_(origins))
+        if statuses := params.values("status"):
+            stmt = stmt.where(TaskRun.status.in_(statuses))
+        if agent_ids := params.values("agent_id"):
+            stmt = stmt.where(TaskRun.agent_id.in_(agent_ids))
+        if task_ids := params.values("task_id"):
+            stmt = stmt.where(TaskRun.todo_id.in_(task_ids))
+        if kinds := params.values("kind"):
+            stmt = stmt.where(TaskRun.ask_kind.in_(kinds))
+        if starters := params.values("started_by"):
+            stmt = stmt.where(TaskRun.author_id.in_(starters))
+        if created_after is not None:
+            stmt = stmt.where(TaskRun.created_at >= created_after)
+        if params.one("candidates"):
+            verify = aliased(TaskRun)
+            served = exists().where(
+                verify.parent_run_id == TaskRun.id,
+                verify.task_key == "verify_result",
+                verify.output["served"].as_string() == "yes",
+            )
+            promoted = exists().where(TaskPlan.promoted_from_run_id == TaskRun.id)
+            stmt = stmt.where(TaskRun.plan_origin == "generated", TaskRun.plan_snapshot.is_not(None), served, ~promoted)
+        if params.q:
+            stmt = stmt.where(contains(params.q, TaskRun.body))
+        return await page_of_select(
+            session,
+            stmt,
+            params,
+            unfiltered=unfiltered,
+            sorts={"created_at": TaskRun.created_at},
+            id_column=TaskRun.id,
+        )
 
     async def node_tokens(self, session: AsyncSession, *, run_ids: list[str]) -> dict[str, int]:
         """Each run's direct nodes' tokens so far, by run — for runs not yet settled."""

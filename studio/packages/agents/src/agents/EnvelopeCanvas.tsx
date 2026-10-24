@@ -9,7 +9,7 @@ import {
 	type LayeredEdge,
 	type LayeredNode,
 } from "@invana-studio/canvases";
-import { useAgentsQuery } from "./queries";
+import { EVERY_AGENT, useAgentsQuery } from "./queries";
 
 interface Scope {
 	username: string;
@@ -43,10 +43,7 @@ export function EnvelopeCanvas({
 	selectedStepId: string | null;
 	onSelectStep: (id: string | null) => void;
 }) {
-	const agents = useAgentsQuery(username, graphSlug, {
-		includeEphemeral: true,
-		includeRetired: true,
-	});
+	const agents = useAgentsQuery(username, graphSlug, EVERY_AGENT);
 	const agent = agents.data?.items.find((a) => a.id === agentId);
 
 	const spec = (agent?.workflow_spec ?? {}) as {

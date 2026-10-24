@@ -1,11 +1,11 @@
-import { request } from "@invana-studio/core";
+import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type {
 	Skill,
 	SkillAgentsResponse,
 	SkillCreate,
 	SkillDraft,
 	SkillDrawStarted,
-	SkillListResponse,
+	SkillPage,
 	SkillPlaybookRead,
 	SkillUpdate,
 	SkillUsageResponse,
@@ -20,8 +20,9 @@ function base(username: string, graphSlug: string): string {
 }
 
 export const skillsApi = {
-	list: (username: string, graphSlug: string) =>
-		request<SkillListResponse>(base(username, graphSlug)),
+	/** One page of the Skills list — searched, filtered and sorted by the engine. */
+	list: (username: string, graphSlug: string, query: ListQuery = {}) =>
+		request<SkillPage>(`${base(username, graphSlug)}${listQueryToApi(query)}`),
 
 	get: (username: string, graphSlug: string, id: string) =>
 		request<Skill>(`${base(username, graphSlug)}/${id}`),

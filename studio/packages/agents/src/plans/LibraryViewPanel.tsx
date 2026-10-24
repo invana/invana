@@ -35,6 +35,7 @@
  */
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
+import { useListParams } from "@invana-studio/core";
 import { useAccess } from "@invana-studio/shell";
 import {
 	PanelStatusBar,
@@ -43,6 +44,7 @@ import {
 } from "@invana-studio/ui";
 import { useEffect, useRef, useState } from "react";
 import { gateSection } from "../gateSection";
+import { useUrlSearchUi } from "../lists";
 import { templatesSection } from "../projections/TemplatesSection";
 import { plansSection } from "./PlansSection";
 import {
@@ -67,14 +69,12 @@ export function LibraryViewPanel({
 	planExportUrl,
 }: LibraryViewPanelProps) {
 	const library = useLibraryViewPanel();
-	const ui = useStackSectionUi();
+	// Plans' search and filters are the URL's, so a link opens the same rows.
+	const list = useListParams();
+	const ui = useUrlSearchUi(useStackSectionUi(), "plans", list);
 	const build = useAccess().gate("build");
 
-	// Filters are per section and in-memory: they narrow a list, and a narrowed
-	// list is not a place — `?section=` and the drill-in keys are what a link
-	// carries.
-	const [planKind, setPlanKind] = useState("");
-	const [planSource, setPlanSource] = useState("");
+	// Templates' filters are per section and in-memory.
 	const [templateKind, setTemplateKind] = useState("");
 	const [templateSurface, setTemplateSurface] = useState("");
 	// Authoring a template is a body this section shows, not a record the URL
@@ -130,10 +130,7 @@ export function LibraryViewPanel({
 								promoting: promotingPlan,
 								onPromoting: setPromotingPlan,
 								exportUrl: planExportUrl,
-								kindFilter: planKind,
-								onKindFilter: setPlanKind,
-								sourceFilter: planSource,
-								onSourceFilter: setPlanSource,
+								list,
 								defaultSize: size("plans"),
 							}),
 							["promote"],

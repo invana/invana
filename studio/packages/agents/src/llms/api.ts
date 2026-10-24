@@ -1,12 +1,12 @@
-import { request } from "@invana-studio/core";
+import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type {
 	LLMModel,
 	LLMModelCreate,
-	LLMModelListResponse,
+	LLMModelPage,
 	LLMPingResponse,
 	LLMProvider,
 	LLMProviderCreate,
-	LLMProviderListResponse,
+	LLMProviderPage,
 	LLMProviderUpdate,
 } from "./types";
 
@@ -23,8 +23,11 @@ function base(username: string, graphSlug: string): string {
  * refused by the engine, naming the worlds.
  */
 export const llmProvidersApi = {
-	list: (username: string, graphSlug: string) =>
-		request<LLMProviderListResponse>(base(username, graphSlug)),
+	/** One page of the endpoints — searched, filtered and sorted by the engine. */
+	list: (username: string, graphSlug: string, query: ListQuery = {}) =>
+		request<LLMProviderPage>(
+			`${base(username, graphSlug)}${listQueryToApi(query)}`,
+		),
 
 	get: (username: string, graphSlug: string, id: string) =>
 		request<LLMProvider>(`${base(username, graphSlug)}/${id}`),
@@ -56,8 +59,16 @@ export const llmProvidersApi = {
 			method: "POST",
 		}),
 
-	listModels: (username: string, graphSlug: string, id: string) =>
-		request<LLMModelListResponse>(`${base(username, graphSlug)}/${id}/models`),
+	/** One page of an endpoint's models. */
+	listModels: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		query: ListQuery = {},
+	) =>
+		request<LLMModelPage>(
+			`${base(username, graphSlug)}/${id}/models${listQueryToApi(query)}`,
+		),
 
 	addModel: (
 		username: string,

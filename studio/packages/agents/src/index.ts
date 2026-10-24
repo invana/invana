@@ -17,6 +17,7 @@ export { AgentsViewPanel } from "./agents/AgentsViewPanel";
 export { EnvelopeCanvas } from "./agents/EnvelopeCanvas";
 export { LineageCanvas } from "./agents/LineageCanvas";
 export {
+	EVERY_AGENT,
 	useAgentLineageQuery,
 	useAgentsQuery,
 } from "./agents/queries";

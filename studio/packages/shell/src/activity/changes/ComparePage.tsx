@@ -154,6 +154,7 @@ export function ComparePage({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
+				variant="page"
 				// Agents › Agents says one thing twice: a kind named as its product drops out.
 				crumbs={[
 					product,

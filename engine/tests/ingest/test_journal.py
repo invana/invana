@@ -12,10 +12,15 @@ from datetime import UTC, datetime, timedelta
 import pytest
 import pytest_asyncio
 
+from invana.apps.agents.models import Agent, AgentKind
 from invana.apps.graphs.models import Graph
 from invana.core.auth.models import User
+from invana.core.errors import ValidationError
+from invana.core.lists import applied_filters
+from invana.core.lists.params import parse_list_params
 from invana.runtime import services
 from invana.runtime.models import TaskRun
+from invana.runtime.schemas import RUN_LIST
 
 
 async def _graph(session, name: str) -> Graph:
@@ -65,7 +70,8 @@ class TestJournal:
     async def test_every_run_newest_first_whatever_kind_it_is(self, session, journal):
         graph, _ = journal
 
-        items, total = await services.list_runs(session, graph_id=graph.id, limit=50)
+        items, info = await services.list_runs(session, graph_id=graph.id, params=parse_list_params(RUN_LIST, {}))
+        total = info.total
 
         # Filtered, not selective: an ask is in the same list as a load (SR23).
         assert [i["kind"] for i in items] == ["bulk", "ask", "import"]
@@ -75,7 +81,9 @@ class TestJournal:
     async def test_kind_narrows_to_one_kind_of_work(self, session, journal):
         graph, _ = journal
 
-        items, _ = await services.list_runs(session, graph_id=graph.id, kind="import", limit=50)
+        items, _ = await services.list_runs(
+            session, graph_id=graph.id, params=parse_list_params(RUN_LIST, {"kind": ["import"]})
+        )
 
         assert [i["body"] for i in items] == ["Import news-tv"]
 
@@ -102,7 +110,8 @@ class TestJournal:
             )
         await session.flush()
 
-        items, total = await services.list_runs(session, graph_id=graph.id, limit=50)
+        items, info = await services.list_runs(session, graph_id=graph.id, params=parse_list_params(RUN_LIST, {}))
+        total = info.total
 
         ids = {i["id"] for i in items}
         assert root.id in ids
@@ -132,7 +141,7 @@ class TestJournal:
             )
         await session.flush()
 
-        items, _ = await services.list_runs(session, graph_id=graph.id, limit=50)
+        items, _ = await services.list_runs(session, graph_id=graph.id, params=parse_list_params(RUN_LIST, {}))
 
         row = next(i for i in items if i["id"] == root.id)
         assert (row["tokens_in"], row["tokens_out"]) == (5200, 1200), "summed over the run's tasks"
@@ -145,10 +154,50 @@ class TestJournal:
     async def test_another_graphs_run_is_not_in_this_journal(self, session, journal):
         graph, stray = journal
 
-        items, _ = await services.list_runs(session, graph_id=graph.id, limit=50)
+        items, _ = await services.list_runs(session, graph_id=graph.id, params=parse_list_params(RUN_LIST, {}))
 
         # A scoping refusal reads as absent, never as forbidden.
         assert stray.id not in {i["id"] for i in items}
+
+    async def test_filters_are_applied_labelled_counted_and_paged(self, session, journal):
+        graph, _ = journal
+        agent = Agent(graph_id=graph.id, name="Analyst", kind=AgentKind.authored.value)
+        session.add(agent)
+        await session.flush()
+        recent = await _run(session, graph, kind="ask", body="Which routes are late?", minutes_ago=2)
+        old = await _run(session, graph, kind="ask", body="Which routes were late?", minutes_ago=2)
+        recent.agent_id = old.agent_id = agent.id
+        old.created_at = datetime.now(UTC) - timedelta(days=10)
+        await session.flush()
+
+        query = {"agent_id": [agent.id, "gone"], "status": ["succeeded", "failed"], "since": ["7d"], "q": ["ROUTES"]}
+        params = parse_list_params(RUN_LIST, query)
+        items, info = await services.list_runs(session, graph_id=graph.id, params=params)
+        labels = await services.run_filter_labels(session, graph_id=graph.id, params=params)
+        applied = {(a.field, a.value): a.label for a in applied_filters(params, RUN_LIST, labels)}
+
+        assert [i["id"] for i in items] == [recent.id]
+        assert (info.total, info.unfiltered_total) == (1, 5)
+        assert applied[("agent_id", agent.id)] == "Analyst"
+        assert applied[("agent_id", "gone")] == "gone"
+        assert applied[("since", "7d")] == "last 7 days"
+
+        first, page = await services.list_runs(
+            session, graph_id=graph.id, params=parse_list_params(RUN_LIST, {"limit": ["3"]})
+        )
+        rest, last = await services.list_runs(
+            session,
+            graph_id=graph.id,
+            params=parse_list_params(RUN_LIST, {"limit": ["3"], "cursor": [page.next_cursor]}),
+        )
+        assert (page.total, len(first), last.next_cursor) == (5, 3, None)
+        assert len({i["id"] for i in [*first, *rest]}) == 5
+
+    async def test_a_filter_or_window_the_list_does_not_take_is_refused(self):
+        with pytest.raises(ValidationError, match="it takes"):
+            parse_list_params(RUN_LIST, {"colour": ["red"]})
+        with pytest.raises(ValidationError, match="one of"):
+            parse_list_params(RUN_LIST, {"since": ["1y"]})
 
 
 @pytest.mark.asyncio

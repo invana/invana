@@ -7,6 +7,7 @@
 // `@invana-studio/core`.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { Page } from "@invana-studio/core";
 import type { BindRefusal } from "@invana-studio/ui";
 
 /**
@@ -55,10 +56,11 @@ export interface SkillUpdate {
 	when_to_use?: string;
 }
 
-export interface SkillListResponse {
-	items: Skill[];
-	total: number;
-}
+/**
+ * The Skills list. Filters: `status` (published · draft) · `origin` (builtin ·
+ * authored). Sorts: `name` · `-updated_at` · `-created_at`.
+ */
+export type SkillPage = Page<Skill>;
 
 // ── the plan a version owns ─────────────────────────────────────────────────
 

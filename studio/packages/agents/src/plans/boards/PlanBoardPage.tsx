@@ -13,6 +13,7 @@ import { EmptyState, Spinner } from "@invana/ui";
 import { routedAction, TaskFlowWidget, useReport } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
+import { EVERY } from "../../lists";
 import {
 	usePlanPerformanceQuery,
 	usePlanRunsQuery,
@@ -53,7 +54,7 @@ export function PlanBoardPage({
 	/** `⋯` — a reading of the version the header names, as its own page. */
 	onOpenReading: (reading: PlanReading, planId: string) => void;
 }) {
-	const library = useTaskPlansQuery(username, graphSlug);
+	const library = useTaskPlansQuery(username, graphSlug, EVERY);
 	const opened = library.data?.items.find((p) => p.id === planId);
 	const key = opened?.key ?? undefined;
 	const versions = useMemo(

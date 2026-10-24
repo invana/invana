@@ -113,6 +113,7 @@ export function SkillDetail({
 		// grows to its content and the header and tabs scroll away with it.
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
+				variant="page"
 				crumbs={[skill.name]}
 				chips={
 					<>

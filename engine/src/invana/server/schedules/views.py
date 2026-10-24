@@ -12,10 +12,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.managers import ScheduleManager
 from invana.activity.schemas import (
+    SCHEDULE_LIST,
     FiringListResponse,
     FiringRead,
     ScheduleCreate,
-    ScheduleListResponse,
+    SchedulePage,
     ScheduleRead,
     ScheduleUpdate,
 )
@@ -23,18 +24,27 @@ from invana.apps.graphs.models import Graph, GraphMember
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.lists import ListParams, applied_filters, list_params
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 _schedules = ScheduleManager()
 
 
 async def list_schedules(
+    params: ListParams = Depends(list_params(SCHEDULE_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> ScheduleListResponse:
-    rows = await _schedules.list(session, graph=graph)
-    return ScheduleListResponse(items=[_schedules.read(r) for r in rows], total=len(rows))
+) -> SchedulePage:
+    rows, info = await _schedules.page(session, graph=graph, params=params)
+    return SchedulePage(
+        items=[_schedules.read(r) for r in rows],
+        total=info.total,
+        unfiltered_total=info.unfiltered_total,
+        next_cursor=info.next_cursor,
+        applied=applied_filters(params, SCHEDULE_LIST),
+        paused=await _schedules.paused_count(session, graph=graph),
+    )
 
 
 async def create_schedule(

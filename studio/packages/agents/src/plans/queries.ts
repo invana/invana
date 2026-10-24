@@ -5,8 +5,9 @@
  * route name, so promoting invalidates every plan reading at once.
  */
 
-import { startAction } from "@invana-studio/core";
+import { type ListQuery, listQueryKey, startAction } from "@invana-studio/core";
 import {
+	keepPreviousData,
 	useInfiniteQuery,
 	useMutation,
 	useQueries,
@@ -27,25 +28,30 @@ const taskPlansKey = (s: Scope, extra: unknown[] = []) =>
 export function useCatalogueQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
+	query: ListQuery = {},
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: taskPlansKey(scope, ["catalogue"]),
-		queryFn: () => catalogueApi.list(scope.username, scope.graphSlug),
+		queryKey: taskPlansKey(scope, ["catalogue", listQueryKey(query)]),
+		queryFn: () => catalogueApi.list(scope.username, scope.graphSlug, query),
 		enabled: !!username && !!graphSlug,
 		staleTime: 5 * 60_000,
+		placeholderData: keepPreviousData,
 	});
 }
 
+/** One page of the plan library for `query`; a caller that needs every plan asks `limit: 200`. */
 export function useTaskPlansQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
+	query: ListQuery = {},
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: taskPlansKey(scope),
-		queryFn: () => taskPlansApi.list(scope.username, scope.graphSlug),
+		queryKey: taskPlansKey(scope, ["list", listQueryKey(query)]),
+		queryFn: () => taskPlansApi.list(scope.username, scope.graphSlug, query),
 		enabled: !!username && !!graphSlug,
+		placeholderData: keepPreviousData,
 	});
 }
 

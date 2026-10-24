@@ -24,11 +24,9 @@ export { ConsolePanel } from "./console/ConsolePanel";
 export {
 	type ConsoleTab,
 	countsOf,
-	type QueryStep,
 	queryStepsOf,
 } from "./console/consoleRecords";
 export {
-	type DataPlace,
 	useConsoleParam,
 	useOpenConsoleOnSettle,
 } from "./console/useConsoleParam";

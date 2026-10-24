@@ -23,12 +23,11 @@ from fastapi import APIRouter, status
 
 from invana.activity.schemas import ModelPins
 from invana.apps.llm_providers.schemas import (
-    LLMModelListResponse,
     LLMModelRead,
     LLMPingResponse,
-    LLMProviderListResponse,
     LLMProviderRead,
 )
+from invana.core.lists import Page
 from invana.server.llm_providers import views
 
 llm_providers_router = APIRouter(
@@ -36,7 +35,7 @@ llm_providers_router = APIRouter(
     tags=["llm-providers"],
 )
 
-llm_providers_router.get("", response_model=LLMProviderListResponse)(views.list_llm_providers)
+llm_providers_router.get("", response_model=Page[LLMProviderRead])(views.list_llm_providers)
 llm_providers_router.post("", response_model=LLMProviderRead, status_code=status.HTTP_201_CREATED)(
     views.create_llm_provider
 )
@@ -46,7 +45,7 @@ llm_providers_router.get("/{provider_id}", response_model=LLMProviderRead)(views
 llm_providers_router.patch("/{provider_id}", response_model=LLMProviderRead)(views.update_llm_provider)
 llm_providers_router.delete("/{provider_id}", status_code=status.HTTP_204_NO_CONTENT)(views.delete_llm_provider)
 llm_providers_router.post("/{provider_id}/ping", response_model=LLMPingResponse)(views.ping_llm_provider)
-llm_providers_router.get("/{provider_id}/models", response_model=LLMModelListResponse)(views.list_llm_models)
+llm_providers_router.get("/{provider_id}/models", response_model=Page[LLMModelRead])(views.list_llm_models)
 llm_providers_router.post("/{provider_id}/models", response_model=LLMModelRead, status_code=status.HTTP_201_CREATED)(
     views.add_llm_model
 )

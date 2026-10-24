@@ -63,7 +63,7 @@ export interface EvalRunOpened {
 }
 
 /** One side's numbers, as the engine summarised them. */
-export interface EvalSide {
+interface EvalSide {
 	cases: number;
 	hard_passed: number;
 	hard_total: number;

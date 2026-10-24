@@ -15,14 +15,20 @@ import {
 	DropdownMenuSeparator,
 	type PanelStackSection,
 } from "@invana/ui";
+import type { ListUrl } from "@invana-studio/core";
 import { type StackSectionUi, stackSection } from "@invana-studio/ui";
 import {
 	ArrowUpFromLine,
 	Download,
 	Workflow as WorkflowIcon,
 } from "lucide-react";
-import { PLAN_KINDS, PLAN_SOURCES, PlansSectionBody } from "./PlansSectionBody";
-import { useTaskPlansQuery } from "./queries";
+import { filterValue, matchCount, setOne } from "../lists";
+import {
+	PLAN_KINDS,
+	PLAN_SOURCES,
+	PlansSectionBody,
+	usePlanList,
+} from "./PlansSectionBody";
 
 export interface PlansSectionProps {
 	username: string;
@@ -37,10 +43,8 @@ export interface PlansSectionProps {
 	promoting: boolean;
 	onPromoting: (v: boolean) => void;
 	exportUrl?: (key: string) => string;
-	kindFilter: string;
-	onKindFilter: (v: string) => void;
-	sourceFilter: string;
-	onSourceFilter: (v: string) => void;
+	/** The URL's search and filters — the funnel writes them, the rows are the engine's answer. */
+	list: ListUrl;
 	defaultSize?: number | string;
 	defaultCollapsed?: boolean;
 }
@@ -56,19 +60,22 @@ export function plansSection({
 	promoting,
 	onPromoting,
 	exportUrl,
-	kindFilter,
-	onKindFilter,
-	sourceFilter,
-	onSourceFilter,
+	list,
 	defaultSize,
 	defaultCollapsed,
 }: PlansSectionProps): PanelStackSection {
+	const kindFilter = filterValue(list, "family");
+	const sourceFilter = filterValue(list, "origin");
+	const onKindFilter = (v: string) => setOne(list, "family", v);
+	const onSourceFilter = (v: string) => setOne(list, "origin", v);
 	return stackSection(
 		{
 			id: "plans",
 			label: "Plans",
 			icon: WorkflowIcon,
-			count: <PlansCount username={username} graphSlug={graphSlug} />,
+			count: (
+				<PlansCount username={username} graphSlug={graphSlug} list={list} />
+			),
 			trail: planKey ?? undefined,
 			onBack: () => onOpenPlan(null),
 			// The list's one write, in the slot every section puts its own act in —
@@ -130,13 +137,11 @@ export function plansSection({
 			),
 			defaultSize,
 			defaultCollapsed,
-			children: ({ search }) => (
+			children: () => (
 				<PlansSectionBody
 					username={username}
 					graphSlug={graphSlug}
-					search={search}
-					kindFilter={kindFilter}
-					sourceFilter={sourceFilter}
+					list={list}
 					selectedKey={planKey}
 					onSelectKey={onOpenPlan}
 					selectedStepId={selectedStepId}
@@ -154,18 +159,23 @@ export function plansSection({
  * `6 · 3 packaged` — what the section header carries beside its label. The
  * total is *how much there is to pick from*; the packaged share is *how much
  * of it came with Invana or a plugin*, which is the one split a reader asks
- * about first.
+ * about first. While a search or a filter is applied it reads `2 of 6 match`.
  */
 function PlansCount({
 	username,
 	graphSlug,
+	list,
 }: {
 	username: string;
 	graphSlug: string;
+	list: ListUrl;
 }) {
-	const list = useTaskPlansQuery(username, graphSlug);
-	const total = list.data?.total ?? 0;
-	if (!total) return null;
-	const packaged = list.data?.packaged ?? 0;
-	return <>{packaged ? `${total} · ${packaged} packaged` : total}</>;
+	const page = usePlanList(username, graphSlug, list).data;
+	if (!page?.unfiltered_total) return null;
+	if (page.applied.length) return <>{matchCount(page)}</>;
+	return (
+		<>
+			{page.packaged ? `${page.total} · ${page.packaged} packaged` : page.total}
+		</>
+	);
 }

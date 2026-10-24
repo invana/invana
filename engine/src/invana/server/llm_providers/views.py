@@ -16,18 +16,19 @@ from invana.apps.govern.managers import LLMEndpointManager
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.llm_providers.managers import LLMProviderManager
 from invana.apps.llm_providers.schemas import (
+    LLM_MODEL_LIST,
+    LLM_PROVIDER_LIST,
     LLMModelCreate,
-    LLMModelListResponse,
     LLMModelRead,
     LLMPingResponse,
     LLMProviderCreate,
-    LLMProviderListResponse,
     LLMProviderRead,
     LLMProviderUpdate,
 )
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.lists import ListParams, Page, applied_filters, list_params
 from invana.core.settings import settings
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
@@ -49,13 +50,14 @@ async def list_model_pins(
 
 
 async def list_llm_providers(
+    params: ListParams = Depends(list_params(LLM_PROVIDER_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> LLMProviderListResponse:
-    items = await providers.list_for_graph(session, graph_id=graph.id)
-    reads = [LLMProviderRead.of(p, await providers.list_models(session, provider=p)) for p in items]
-    return LLMProviderListResponse(items=reads, total=len(reads))
+) -> Page[LLMProviderRead]:
+    rows, info = await providers.page_for_graph(session, graph_id=graph.id, params=params)
+    reads = [LLMProviderRead.of(p, models) for p, models in rows]
+    return Page[LLMProviderRead].of(reads, info, applied_filters(params, LLM_PROVIDER_LIST))
 
 
 async def create_llm_provider(
@@ -139,14 +141,15 @@ async def ping_llm_provider(
 
 async def list_llm_models(
     provider_id: str = Path(...),
+    params: ListParams = Depends(list_params(LLM_MODEL_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> LLMModelListResponse:
+) -> Page[LLMModelRead]:
     provider = await providers.get(session, provider_id=provider_id, graph_id=graph.id)
-    items = await providers.list_models(session, provider=provider)
-    reads = [LLMModelRead.of(provider, m) for m in items]
-    return LLMModelListResponse(items=reads, total=len(reads))
+    rows, info = await providers.page_models(session, provider=provider, params=params)
+    reads = [LLMModelRead.of(provider, m) for m in rows]
+    return Page[LLMModelRead].of(reads, info, applied_filters(params, LLM_MODEL_LIST))
 
 
 async def add_llm_model(

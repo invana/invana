@@ -60,6 +60,7 @@ from invana.apps.task_plans.managers.task_plan import TaskPlanManager, explode
 from invana.apps.task_plans.models import PlanKind, PlanOrigin, Task, TaskForm, TaskPlan
 from invana.apps.task_plans.querysets import TaskPlanQuerySet
 from invana.core.errors import ConflictError, NotFoundError, ValidationError
+from invana.core.lists import ListParams, PageInfo
 from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.layers import layer_for, ordered_layers
@@ -197,7 +198,18 @@ class SkillDraftManager:
         the list is the first thing every surface asks for.
         """
         await self.seeder.ensure_seeded(session, graph_id=graph_id)
-        skills = await self.skills.list_for_graph(session, graph_id=graph_id)
+        return await self._reads(session, await self.skills.list_for_graph(session, graph_id=graph_id))
+
+    async def page_reads(
+        self, session: AsyncSession, *, graph_id: str, params: ListParams
+    ) -> tuple[list[SkillRead], PageInfo]:
+        """One page of the Skills list, seeded first, each row read as the drawer reads it."""
+        await self.seeder.ensure_seeded(session, graph_id=graph_id)
+        skills, info = await self.skills.page_for_graph(session, graph_id=graph_id, params=params)
+        return await self._reads(session, list(skills)), info
+
+    async def _reads(self, session: AsyncSession, skills: list[Skill]) -> list[SkillRead]:
+        """Each skill with its draft and the summary of the plan it is offered."""
         drafts = await self.skills.versions_qs.drafts_for_skills(session, [s.id for s in skills])
 
         # The row summarises the plan that is **offered** — the head's — and

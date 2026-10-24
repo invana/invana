@@ -5,10 +5,10 @@ import { request } from "@invana-studio/core";
  * under `/api/v1/u/{username}/{graphSlug}/annotations`. Shapes are the wire's, snake_case.
  */
 
-export type AnnotationKindDto = "note" | "value" | "highlight" | "group";
-export type AnnotationColorDto = "amber" | "blue" | "green" | "red" | "grey";
+type AnnotationKindDto = "note" | "value" | "highlight" | "group";
+type AnnotationColorDto = "amber" | "blue" | "green" | "red" | "grey";
 
-export interface AnnotationRecordDto {
+interface AnnotationRecordDto {
 	id: string;
 	kind: "node" | "edge";
 	label: string;

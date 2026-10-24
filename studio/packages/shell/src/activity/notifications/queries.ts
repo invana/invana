@@ -5,7 +5,13 @@
  * the tabs share one read and one invalidation each.
  */
 
-import { type GraphRef, useAuth, useMembersQuery } from "@invana-studio/core";
+import {
+	type GraphRef,
+	type ListQuery,
+	listQueryKey,
+	useAuth,
+	useMembersQuery,
+} from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { approvalsApi, notificationsApi } from "./api";
@@ -121,16 +127,19 @@ export function useDeleteChannel(graph: GraphRef) {
 	});
 }
 
+const MINE_PENDING: ListQuery = {
+	filters: { mine: ["true"], status: ["pending"] },
+	limit: 200,
+};
+
 /** Approvals still waiting on the signed-in member. */
 export function usePendingApprovalsQuery(graph: GraphRef | undefined) {
 	return useQuery({
 		queryKey: [
 			...notificationKeys.approvals(graph),
-			"mine",
-			"pending",
+			listQueryKey(MINE_PENDING),
 		] as const,
-		queryFn: () =>
-			approvalsApi.list(graph as GraphRef, { mine: true, status: "pending" }),
+		queryFn: () => approvalsApi.list(graph as GraphRef, MINE_PENDING),
 		enabled: !!graph,
 		staleTime: STALE_MS,
 		refetchInterval: 60_000,

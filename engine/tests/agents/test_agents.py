@@ -11,10 +11,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.apps.agents.managers import AgentManager
 from invana.apps.agents.models import Agent, AgentKind, AgentLifetime
 from invana.apps.agents.registry import SEEDED_AGENTS
-from invana.apps.agents.schemas import AgentCreate, AgentRead
+from invana.apps.agents.schemas import AGENT_LIST, AgentCreate, AgentRead
 from invana.apps.govern.models import Lens, LensKind
 from invana.apps.graphs.models import Graph
 from invana.core.auth.models import User
+from invana.core.errors import ValidationError
+from invana.core.lists.params import parse_list_params
 from invana.runtime.managers import AgentLifecycleManager
 from invana.runtime.models import TaskRun
 
@@ -101,9 +103,10 @@ async def test_tokens_this_month_sum_each_root_and_its_steps(session: AsyncSessi
 
 
 async def test_the_list_counts_spawned_helpers_apart(session: AsyncSession, graph: Graph):
-    seeded = await AgentManager().list_agents(session, graph=graph)
+    manager = AgentManager()
+    seeded = await manager.list_agents(session, graph=graph)
     # The negative half: a Graph that spawned nothing hides nothing.
-    assert AgentManager.count_by_lifetime(seeded) == (len(seeded), 0)
+    assert await manager.count_by_lifetime(session, graph_id=graph.id) == (len(seeded), 0)
 
     session.add(
         Agent(
@@ -115,5 +118,30 @@ async def test_the_list_counts_spawned_helpers_apart(session: AsyncSession, grap
         )
     )
     await session.flush()
-    listed = await AgentManager().list_agents(session, graph=graph, include_ephemeral=True)
-    assert AgentManager.count_by_lifetime(listed) == (len(seeded), 1)
+    assert await manager.count_by_lifetime(session, graph_id=graph.id) == (len(seeded), 1)
+
+    hidden, _ = await manager.page_agents(session, graph=graph, params=parse_list_params(AGENT_LIST, {}))
+    assert "helper-1" not in {a.name for a in hidden}
+    shown, info = await manager.page_agents(
+        session, graph=graph, params=parse_list_params(AGENT_LIST, {"ephemeral": ["shown"], "q": ["HELPER"]})
+    )
+    assert [a.name for a in shown] == ["helper-1"]
+    assert (info.total, info.unfiltered_total) == (1, len(seeded))
+
+
+async def test_the_list_pages_by_cursor_and_refuses_what_it_does_not_take(session: AsyncSession, graph: Graph):
+    manager = AgentManager()
+    every = await manager.list_agents(session, graph=graph)
+    first, info = await manager.page_agents(
+        session, graph=graph, params=parse_list_params(AGENT_LIST, {"limit": ["1"]})
+    )
+    rest, _ = await manager.page_agents(
+        session, graph=graph, params=parse_list_params(AGENT_LIST, {"limit": ["200"], "cursor": [info.next_cursor]})
+    )
+    assert info.total == len(every)
+    assert [a.id for a in [*first, *rest]] == [a.id for a in every]
+
+    with pytest.raises(ValidationError, match="it takes"):
+        parse_list_params(AGENT_LIST, {"colour": ["red"]})
+    with pytest.raises(ValidationError, match="made for sort"):
+        parse_list_params(AGENT_LIST, {"sort": ["-created_at"], "cursor": [info.next_cursor]})

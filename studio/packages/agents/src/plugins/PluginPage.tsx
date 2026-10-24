@@ -61,6 +61,7 @@ export function PluginPage({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
+				variant="page"
 				crumbs={["Plugins", p.name]}
 				chips={
 					<>

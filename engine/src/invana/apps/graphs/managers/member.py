@@ -32,6 +32,7 @@ from invana.core.auth.managers import AuthManager
 from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.services import emit_event
+from invana.core.lists import ListParams, PageInfo
 
 
 def _roles(raw: list[str]) -> list[str]:
@@ -48,6 +49,13 @@ class GraphMemberManager:
     async def members(self, session: AsyncSession, *, graph: Graph) -> list[MemberRead]:
         rows = await self.members_qs.list_for_graph(session, graph_id=graph.id)
         return [self.read(row) for row in rows]
+
+    async def page(
+        self, session: AsyncSession, *, graph: Graph, params: ListParams
+    ) -> tuple[list[MemberRead], PageInfo]:
+        """One page of the Members list, searched, filtered and sorted by ``params``."""
+        rows, info = await self.members_qs.page_for_graph(session, graph_id=graph.id, params=params)
+        return [self.read(row) for row in rows], info
 
     @staticmethod
     def read(row: GraphMember) -> MemberRead:

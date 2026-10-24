@@ -15,16 +15,17 @@ approved sends, declined fails the step as *not sent*.
 
 from __future__ import annotations
 
-from fastapi import BackgroundTasks, Depends, Path, Query, Request
+from fastapi import BackgroundTasks, Depends, Path, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.managers import ApprovalManager
 from invana.activity.models import Approval
-from invana.activity.schemas import ApprovalDecide, ApprovalListResponse, ApprovalRead
+from invana.activity.schemas import APPROVAL_LIST, ApprovalDecide, ApprovalRead
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.lists import ListParams, Page, applied_filters, list_params
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 _approvals = ApprovalManager()
@@ -44,15 +45,17 @@ def _resume_run(request: Request, background: BackgroundTasks, row: Approval) ->
 
 
 async def list_approvals(
-    status: str | None = Query(None, description="pending · approved · declined · expired"),
-    mine: bool = Query(False, description="Only what waits on me."),
+    params: ListParams = Depends(list_params(APPROVAL_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-) -> ApprovalListResponse:
-    rows = await _approvals.list(session, graph=graph, status=status, mine=user if mine else None)
-    return ApprovalListResponse(items=[ApprovalRead.model_validate(r) for r in rows], total=len(rows))
+) -> Page[ApprovalRead]:
+    mine = user if params.one("mine") else None
+    rows, info = await _approvals.page(session, graph=graph, params=params, mine=mine)
+    return Page[ApprovalRead].of(
+        [ApprovalRead.model_validate(r) for r in rows], info, applied_filters(params, APPROVAL_LIST)
+    )
 
 
 async def get_approval(

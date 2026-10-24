@@ -18,6 +18,7 @@ from invana.apps.llm.intent import Choice
 from invana.apps.sessions.managers import SessionManager
 from invana.apps.sessions.models import SessionMessage
 from invana.apps.sessions.schemas import SendMessage
+from invana.core.lists.params import parse_list_params
 from invana.plugins.core.llm.shared import _askable
 from invana.runtime import catalogue as task_registry
 from invana.runtime import services as run_services
@@ -25,6 +26,7 @@ from invana.runtime import workflows
 from invana.runtime.catalogue import CannotAnswer, Converse, NeedsInput, Out, TaskFailure
 from invana.runtime.interpreter import TaskRuntime
 from invana.runtime.models import TaskRun
+from invana.runtime.schemas import RUN_LIST
 from invana.runtime.stream import replay
 from invana.runtime.workflows import Retry, Step, Workflow
 
@@ -203,7 +205,9 @@ class TestRuntime:
         kinds = [e.kind for e in await replay(session, run_id=th.id, after=0)]
         assert "cannot_answer" not in kinds and kinds[-1] == "run.done"
         # The run list says how it ended, beside its status (CA8 · AG38).
-        listed, _ = await run_services.list_runs(session, graph_id=graph.id, interactive=True)
+        listed, _ = await run_services.list_runs(
+            session, graph_id=graph.id, params=parse_list_params(RUN_LIST, {"interactive": ["true"]})
+        )
         assert {i["id"]: i["outcome"] for i in listed}[th.id] == "conversed"
 
     async def test_a_cannot_answer_is_still_a_cannot_answer(self, session, session_factory, graph, user, stub_tasks):

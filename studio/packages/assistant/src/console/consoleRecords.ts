@@ -81,7 +81,7 @@ export function pageOf<T>(rows: readonly T[], page: number) {
 	};
 }
 
-export type QueryStatus = "done" | "failed" | "running";
+type QueryStatus = "done" | "failed" | "running";
 
 export interface QueryStep {
 	/** The reply the query ran under — the row's identity and `?query=`. */

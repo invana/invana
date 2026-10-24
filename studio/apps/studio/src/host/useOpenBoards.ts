@@ -29,7 +29,7 @@ export function useOpenBoards(
 	// And the plan page for a library plan: keyed by `task_plans.id`,
 	// titled `key@version`, and opened from the section by key — the newest
 	// version, which is the one the section reads.
-	const planLibrary = useTaskPlansQuery(username, graphSlug);
+	const planLibrary = useTaskPlansQuery(username, graphSlug, { limit: 200 });
 	const planRefById = useMemo(
 		() =>
 			new Map(

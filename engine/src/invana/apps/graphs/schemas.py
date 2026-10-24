@@ -14,6 +14,8 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from invana.apps.graphs.models import GraphStatus
+from invana.apps.graphs.roles import GraphRole
+from invana.core.lists import Filter, ListSpec
 from invana.graph.types.data_elements import GraphResponse
 from invana.graph.types.lens import ComposedQuery
 
@@ -268,9 +270,13 @@ class MemberRead(BaseModel):
     added_at: datetime
 
 
-class MemberListResponse(BaseModel):
-    items: list[MemberRead]
-    total: int
+#: What the Members list takes. ``q`` matches the username and the email;
+#: ``role`` matches a role the member holds as stored, not one it implies.
+MEMBER_LIST = ListSpec(
+    filters={"role": Filter(values=tuple(r.value for r in GraphRole))},
+    sorts=("username",),
+    search_title="username or email",
+)
 
 
 class MemberAdd(BaseModel):

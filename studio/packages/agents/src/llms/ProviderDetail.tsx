@@ -36,6 +36,7 @@ import { Check, Loader2, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAgentsQuery } from "../agents/queries";
+import { EVERY } from "../lists";
 import { llmProvidersApi } from "./api";
 import { ProviderForm } from "./ProviderForm";
 import {
@@ -84,7 +85,7 @@ export function ProviderDetail({
 	/** The refusal from the last remove, held against the model it refused. */
 	const [refusedId, setRefusedId] = useState<string | null>(null);
 
-	const agents = useAgentsQuery(username, graphSlug);
+	const agents = useAgentsQuery(username, graphSlug, EVERY);
 	const pinnedBy = (address: string) =>
 		(agents.data?.items ?? [])
 			.filter((a) => a.model_pin === address)

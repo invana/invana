@@ -31,7 +31,10 @@ export function useImportsJournal() {
 		queries: pairs.map(({ graph, kind }) => ({
 			queryKey: ["runs", graph.username, graph.graphSlug, "imports", kind],
 			queryFn: () =>
-				runsApi.list(graph.username, graph.graphSlug, { kind, limit: 50 }),
+				runsApi.list(graph.username, graph.graphSlug, {
+					filters: { kind: [kind] },
+					limit: 50,
+				}),
 		})),
 	});
 

@@ -6,12 +6,17 @@
  * the run after the request commits, so the firing's run appears on a refetch.
  */
 
-import { apiClient, type GraphRef } from "@invana-studio/core";
+import {
+	apiClient,
+	type GraphRef,
+	type ListQuery,
+	listQueryToApi,
+} from "@invana-studio/core";
 import type {
 	Firing,
 	FiringListResponse,
 	Schedule,
-	ScheduleListResponse,
+	SchedulePage,
 	ScheduleUpdate,
 	ScheduleWrite,
 } from "./types";
@@ -20,8 +25,11 @@ const base = (g: GraphRef) =>
 	`/api/v1/u/${g.username}/${g.graphSlug}/schedules`;
 
 export const schedulesApi = {
-	async list(g: GraphRef): Promise<ScheduleListResponse> {
-		return (await apiClient.get<ScheduleListResponse>(base(g))).data;
+	/** `q` searches the name; `enabled` filters; sorted by name. */
+	async list(g: GraphRef, query: ListQuery = {}): Promise<SchedulePage> {
+		return (
+			await apiClient.get<SchedulePage>(`${base(g)}${listQueryToApi(query)}`)
+		).data;
 	},
 	async get(g: GraphRef, id: string): Promise<Schedule> {
 		return (await apiClient.get<Schedule>(`${base(g)}/${id}`)).data;

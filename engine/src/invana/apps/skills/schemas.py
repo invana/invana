@@ -8,6 +8,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from invana.apps.standards.models import Enforcement
+from invana.core.lists import Filter, ListSpec
 
 
 class OfferedRule(BaseModel):
@@ -338,9 +339,16 @@ class SkillRead(BaseModel):
     plan: SkillPlanSummary | None = None
 
 
-class SkillListResponse(BaseModel):
-    items: list[SkillRead]
-    total: int
+#: What the Skills list takes. ``status`` is ``published`` for a skill with a
+#: current version and ``draft`` for one nothing has published yet.
+SKILL_LIST = ListSpec(
+    filters={
+        "status": Filter(values=("published", "draft")),
+        "origin": Filter(values=("builtin", "authored"), labels={"builtin": "built in"}),
+    },
+    sorts=("name", "-updated_at", "-created_at"),
+    search_title="name",
+)
 
 
 # ── Rules ─────────────────────────────────────────────────────────────────────

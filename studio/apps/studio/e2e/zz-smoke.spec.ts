@@ -14,9 +14,10 @@ test("every panel renders with no module or runtime error", async ({
 
 	for (const panel of PANELS) {
 		await page.goto(`/u/admin/airways?panel=${panel}`);
-		await expect(page.getByLabel("Breadcrumb")).toBeVisible({
-			timeout: 30_000,
-		});
+		// The Graph switcher, not the breadcrumb: a product's root (Projects) has no crumb.
+		await expect(
+			page.getByRole("button", { name: "Switch graph" }),
+		).toBeVisible({ timeout: 30_000 });
 		await page.waitForTimeout(1500);
 	}
 

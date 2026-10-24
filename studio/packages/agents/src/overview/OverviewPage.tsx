@@ -83,6 +83,7 @@ export function OverviewPage(props: FleetPageProps) {
 		<FleetPage>
 			<RecordHeader
 				size="lg"
+				variant="page"
 				crumbs={["Overview"]}
 				chips={
 					data ? (

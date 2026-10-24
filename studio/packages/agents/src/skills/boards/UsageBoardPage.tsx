@@ -13,6 +13,7 @@ import { EmptyState, Spinner } from "@invana/ui";
 import { useReport, VIEW_BOARD } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
+import { EVERY } from "../../lists";
 import { useSkillsQuery, useSkillUsageQuery } from "../queries";
 import { SKILL_ACTIONS } from "./shared";
 import { usageBoardSpec } from "./usageBoardSpec";
@@ -35,7 +36,7 @@ export function UsageBoardPage({
 	onOpenSkill,
 	onOpenRun,
 }: UsageBoardPageProps) {
-	const skills = useSkillsQuery(username, graphSlug);
+	const skills = useSkillsQuery(username, graphSlug, EVERY);
 	const skill = skills.data?.items.find((s) => s.id === skillId) ?? null;
 	const usage = useSkillUsageQuery(username, graphSlug, skillId);
 	const [view, setView] = useState(VIEW_BOARD);

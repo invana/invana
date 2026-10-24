@@ -56,7 +56,7 @@ export function PromoteDialog({
 	const candidates = useRunsQuery(
 		username,
 		graphSlug,
-		{ candidates: true, limit: 25 },
+		{ filters: { candidates: ["true"] }, limit: 25 },
 		open,
 	);
 	const promote = usePromoteTaskPlanMutation(username, graphSlug);

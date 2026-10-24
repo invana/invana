@@ -10,12 +10,13 @@ from __future__ import annotations
 
 from fastapi import APIRouter, status
 
-from invana.apps.graphs.schemas import AccessRead, MemberListResponse, MemberRead
+from invana.apps.graphs.schemas import AccessRead, MemberRead
+from invana.core.lists import Page
 from invana.server.members import views
 
 members_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}", tags=["members"])
 
-members_router.get("/members", response_model=MemberListResponse)(views.list_members)
+members_router.get("/members", response_model=Page[MemberRead])(views.list_members)
 members_router.post("/members", response_model=MemberRead, status_code=status.HTTP_201_CREATED)(views.add_member)
 members_router.patch("/members/{member}", response_model=MemberRead)(views.update_member)
 members_router.delete("/members/{member}", status_code=status.HTTP_204_NO_CONTENT)(views.remove_member)

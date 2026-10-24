@@ -116,6 +116,7 @@ export function PerformancePage(props: FleetPageProps) {
 		<FleetPage>
 			<RecordHeader
 				size="lg"
+				variant="page"
 				crumbs={["Performance"]}
 				chips={
 					data ? (

@@ -4,6 +4,8 @@
  * not Graph-scoped: the registry is the process's, the same for every Graph.
  */
 
+import type { Page } from "@invana-studio/core";
+
 /** `core` · `simulator` · `tool` · `mcp`. */
 type PluginKind = "core" | "simulator" | "tool" | "mcp";
 
@@ -28,11 +30,11 @@ export interface PluginSummary extends PluginBase {
 	flows: number;
 }
 
-export interface PluginListResponse {
-	/** Core, then simulator, then tool plugins — the registry's load order. */
-	items: PluginSummary[];
-	total: number;
-}
+/**
+ * The registry. Search: name · key. Filters: `kind` · `enabled` (true ·
+ * false). Sort: `name`.
+ */
+export type PluginPage = Page<PluginSummary>;
 
 interface TaskArg {
 	type: string;

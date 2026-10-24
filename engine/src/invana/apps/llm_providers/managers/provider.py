@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import time
+from collections.abc import Sequence
 from datetime import UTC, datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,6 +29,7 @@ from invana.apps.llm_providers.schemas import LLMModelCreate, LLMProviderCreate,
 from invana.core.errors import ConflictError, InvanaError, NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.services import diff_changed_fields, emit_event
+from invana.core.lists import ListParams, PageInfo
 
 # Providers that can run without a stored key. `claude_agent_sdk` falls through
 # to the local Claude Code CLI's own login when none is set.
@@ -47,6 +49,14 @@ class LLMProviderManager:
 
     async def list_for_graph(self, session: AsyncSession, *, graph_id: str) -> list[LLMProvider]:
         return await self.llm_providers_qs.list_for_graph(session, graph_id)
+
+    async def page_for_graph(
+        self, session: AsyncSession, *, graph_id: str, params: ListParams
+    ) -> tuple[list[tuple[LLMProvider, list[LLMModel]]], PageInfo]:
+        """One page of the endpoints list, each endpoint with every model it has, read in one query."""
+        rows, info = await self.llm_providers_qs.page_for_graph(session, graph_id, params=params)
+        models = await self.models_qs.for_providers(session, [p.id for p in rows])
+        return [(p, models.get(p.id, [])) for p in rows], info
 
     async def get(self, session: AsyncSession, *, provider_id: str, graph_id: str) -> LLMProvider:
         provider = await self.llm_providers_qs.get(session, provider_id)
@@ -239,6 +249,12 @@ class LLMProviderManager:
         self, session: AsyncSession, *, provider: LLMProvider, active_only: bool = False
     ) -> list[LLMModel]:
         return await self.models_qs.list_for_provider(session, provider.id, active_only=active_only)
+
+    async def page_models(
+        self, session: AsyncSession, *, provider: LLMProvider, params: ListParams
+    ) -> tuple[Sequence[LLMModel], PageInfo]:
+        """One page of what this endpoint offers, searched, filtered and sorted by ``params``."""
+        return await self.models_qs.page_for_provider(session, provider.id, params=params)
 
     async def get_model(self, session: AsyncSession, *, provider: LLMProvider, model_row_id: str) -> LLMModel:
         model = await self.models_qs.get(session, model_row_id)

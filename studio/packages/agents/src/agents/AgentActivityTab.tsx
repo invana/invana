@@ -120,7 +120,7 @@ export function AgentActivityTab({
 }) {
 	const meters = useAgentMetersQuery(username, graphSlug, agent.id);
 	const runs = useRunsQuery(username, graphSlug, {
-		agentId: agent.id,
+		filters: { agent_id: [agent.id] },
 		limit: 8,
 	});
 	const sessions = useAgentSessionsQuery(username, graphSlug, agent.id);

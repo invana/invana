@@ -1,6 +1,16 @@
-import type { RerunVersions, TaskRunSummary } from "@invana-studio/core";
-import { runsApi } from "@invana-studio/core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	type ListQuery,
+	listQueryKey,
+	type RerunVersions,
+	runsApi,
+	type TaskRunSummary,
+} from "@invana-studio/core";
+import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 
 /** What a journal row is, whatever kind of work produced it. */
 type RunKind = "import" | "bulk" | "ask";
@@ -45,77 +55,52 @@ function titleOf(t: TaskRunSummary): string {
 	return t.body?.trim() || t.task_title || planOf(t);
 }
 
-/** How far back the journal reads — the `since` chip. */
-export type RunsSince = "today" | "7d" | "30d";
-
-/** What the journal's filter chips are set to; `null` is "not filtered". */
-export interface RunsFilters {
-	kind?: string | null;
-	status?: string | null;
-	role?: string | null;
-	agentId?: string | null;
-	since?: RunsSince | null;
-}
-
-function sinceCutoff(since: RunsSince): number {
-	const now = new Date();
-	if (since === "today") {
-		now.setHours(0, 0, 0, 0);
-		return now.getTime();
-	}
-	return now.getTime() - (since === "7d" ? 7 : 30) * 86_400_000;
-}
-
 /**
- * The journal, newest first.
- *
- * The chips narrow here rather than server-side: the endpoint takes `kind` and
- * `agent_id` but not status, role or a date, and one page of fifty is what the
- * section reads either way. `total` is the engine's count of the whole
- * journal, so the status bar can say `11 of 240 shown`.
+ * The journal under `query`, newest first — what `useListParams` reads from
+ * the URL. The engine searches, filters, sorts and counts: `total` is every
+ * run that matches and `unfilteredTotal` the whole journal, so the page can
+ * say `2 of 61 match`, and `applied` names each filter as its chip reads.
  */
 export function useRunListQuery(
 	username?: string,
 	graphSlug?: string,
-	{ kind, status, role, agentId, since }: RunsFilters = {},
+	query: ListQuery = {},
 ) {
+	const asked: ListQuery = { ...query, limit: query.limit ?? 50 };
 	const runs = useQuery({
-		queryKey: ["runs", username, graphSlug, "journal"] as const,
-		queryFn: () =>
-			runsApi.list(username as string, graphSlug as string, { limit: 50 }),
+		queryKey: [
+			"runs",
+			username,
+			graphSlug,
+			"journal",
+			listQueryKey(asked),
+		] as const,
+		queryFn: () => runsApi.list(username as string, graphSlug as string, asked),
 		enabled: !!username && !!graphSlug,
+		placeholderData: keepPreviousData,
 	});
 
-	const items = runs.data?.items ?? [];
-	const cutoff = since ? sinceCutoff(since) : null;
-	const rows: RunListRow[] = items
-		.filter((t) => !status || t.status === status)
-		.filter((t) => !kind || t.kind === kind)
-		.filter((t) => !role || t.role === role)
-		.filter((t) => !agentId || t.agent_id === agentId)
-		.filter(
-			(t) =>
-				cutoff === null ||
-				(t.queued_at !== null && Date.parse(t.queued_at) >= cutoff),
-		)
-		.map((t) => ({
-			id: t.id,
-			// A run with no kind predates the column; it is an ask, which is
-			// what every run was before a load became one.
-			kind: (t.kind ?? "ask") as RunKind,
-			title: titleOf(t),
-			isQuery: t.workflow_key.startsWith("ql-") && !!t.body?.trim(),
-			plan: planOf(t),
-			status: t.status,
-			startedAt: t.queued_at,
-			run: t,
-		}))
-		.sort((a, b) => (b.startedAt ?? "").localeCompare(a.startedAt ?? ""));
+	const rows: RunListRow[] = (runs.data?.items ?? []).map((t) => ({
+		id: t.id,
+		// A run with no kind predates the column; it is an ask, which is
+		// what every run was before a load became one.
+		kind: (t.kind ?? "ask") as RunKind,
+		title: titleOf(t),
+		isQuery: t.workflow_key.startsWith("ql-") && !!t.body?.trim(),
+		plan: planOf(t),
+		status: t.status,
+		startedAt: t.queued_at,
+		run: t,
+	}));
 
 	return {
 		rows,
 		total: runs.data?.total ?? 0,
+		unfilteredTotal: runs.data?.unfiltered_total ?? 0,
+		applied: runs.data?.applied,
 		isLoading: runs.isLoading,
+		isError: runs.isError,
+		error: runs.error,
 		// The panel header's refresh control spins on `isFetching` and calls
 		// `refetch` — a list a person is watching needs a way to ask again.
 		isFetching: runs.isFetching,
@@ -155,25 +140,21 @@ export function useRunStatsQuery(
  * exists — and a task has one or two runs, not a page of them.
  */
 /**
- * Runs as list rows — an agent's **Recent plans**, or the library's
- * **candidates** (generated plans that served and were never promoted).
+ * Runs as list rows — an agent's **Recent plans** (`agent_id`), a task's runs
+ * (`task_id`), or the library's **candidates** (`candidates=true`: generated
+ * plans that served and were never promoted).
  */
 export function useRunsQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
-	filters: {
-		agentId?: string;
-		taskId?: string;
-		candidates?: boolean;
-		limit?: number;
-	} = {},
+	query: ListQuery = {},
 	enabled = true,
 ) {
 	return useQuery({
-		queryKey: ["runs", username, graphSlug, filters] as const,
-		queryFn: () =>
-			runsApi.list(username as string, graphSlug as string, filters),
+		queryKey: ["runs", username, graphSlug, listQueryKey(query)] as const,
+		queryFn: () => runsApi.list(username as string, graphSlug as string, query),
 		enabled: enabled && !!username && !!graphSlug,
+		placeholderData: keepPreviousData,
 	});
 }
 

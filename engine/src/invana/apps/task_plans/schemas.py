@@ -6,6 +6,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from invana.core.lists import Filter, ListSpec, Page
+
 
 class AgentChip(BaseModel):
     id: str
@@ -85,14 +87,27 @@ class TaskPlanRead(BaseModel):
     caller_count: int = 0
 
 
-class TaskPlanListResponse(BaseModel):
-    items: list[TaskPlanRead]
-    total: int
-    #: How many of ``items`` came with Invana or a plugin (``origin = packaged``).
+#: What the plan library takes. A row is one version of a plan, so a key with
+#: three versions is three rows; ``family`` is the intent family a key names
+#: (``nl-compare`` is ``nl``), read off the key because the key is the contract.
+TASK_PLAN_LIST = ListSpec(
+    filters={
+        "origin": Filter(values=("packaged", "authored", "promoted")),
+        "family": Filter(
+            values=("nl", "ql"),
+            labels={"nl": "natural language", "ql": "query language"},
+            title="kind",
+        ),
+    },
+    sorts=("key", "name", "-created_at"),
+    search_title="name or key",
+)
+
+
+class TaskPlanPage(Page[TaskPlanRead]):
+    #: The library's versions that came with Invana or a plugin, counted over
+    #: the whole Graph rather than the page.
     packaged: int = 0
-    # Studio renders this verbatim in the panel's status bar. Stating the
-    # deferral is the design (docs/for-developers/modules/explore/features/selection-and-the-panel.md, *not a gap*).
-    authoring: str = "post-MVP"
 
 
 class DagNode(BaseModel):

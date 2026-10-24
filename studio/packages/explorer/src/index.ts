@@ -14,12 +14,7 @@
  * on a page body goes through `BoardPageHandle` (graph-detail-page.md).
  */
 
-export type { AnnotationDto } from "./annotations";
-export {
-	annotationsApi,
-	toBoardAnnotation,
-	useBoardAnnotations,
-} from "./annotations";
+export { useBoardAnnotations } from "./annotations";
 export { explorerApi } from "./api";
 // Query results as canvas items, and a saved state as the engine reads it.
 export {
@@ -40,17 +35,11 @@ export { ExplorerCanvas } from "./ExplorerCanvas";
 export { ExplorerViewPanel } from "./ExplorerViewPanel";
 // Editing the graph's data on the board (4.7): the model as the panel reads
 // it, and a save as the engine takes it.
-export type { DataEdit, DataEditResult } from "./edit/dataEdits";
 export { saveBoardChanges } from "./edit/dataEdits";
-export {
-	type ElementSchema,
-	elementSchemaOf,
-	type ModelVersionLike,
-} from "./edit/elementSchema";
+export { elementSchemaOf } from "./edit/elementSchema";
 // Where a record came from — its `_inv_*` stamps, hidden from its properties.
 export {
 	isProvenanceKey,
-	type Provenance,
 	ProvenanceBlock,
 	readProvenance,
 } from "./ProvenanceBlock";

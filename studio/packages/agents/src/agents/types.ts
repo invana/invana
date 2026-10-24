@@ -5,6 +5,8 @@
  * agents schemas field for field; nothing here is derived.
  */
 
+import type { Page } from "@invana-studio/core";
+
 // ── Agents ───────────────────────────────────────────────────────────────────
 
 type AgentKind = "seeded" | "authored" | "spawned";
@@ -62,10 +64,13 @@ export interface Agent {
 	updated_at: string;
 }
 
-export interface AgentListResponse {
-	items: Agent[];
-	total: number;
-	/** `items` split by lifetime; the two add up to `total`. */
+/**
+ * The Agents list. Filters: `kind` · `status` (no status leaves out retired) ·
+ * `ephemeral=shown` (else spawned helpers are left out). Sorts: `name` ·
+ * `-created_at` · `-updated_at`.
+ */
+export interface AgentPage extends Page<Agent> {
+	/** The Graph's agents that are not retired, by lifetime — not the page's. */
 	persistent: number;
 	/** Spawned helpers — hidden from the list by default, and counted. */
 	ephemeral: number;

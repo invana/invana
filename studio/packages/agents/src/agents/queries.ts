@@ -6,7 +6,13 @@
  */
 
 import { sessionsApi } from "@invana-studio/assistant";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { type ListQuery, listQueryKey } from "@invana-studio/core";
+import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { agentsApi } from "./api";
 import type {
 	AgentCreate,
@@ -22,22 +28,32 @@ const agentsKey = (s: Scope, extra: unknown[] = []) =>
 
 // ── Agents ───────────────────────────────────────────────────────────────────
 
+/**
+ * Every agent the Graph has — retired agents and spawned helpers too — for a
+ * caller that resolves ids to names rather than showing a list.
+ */
+export const EVERY_AGENT: ListQuery = {
+	filters: { status: ["active", "paused", "retired"], ephemeral: ["shown"] },
+	limit: 200,
+};
+
+/** One page of the Agents list for `query` — what `useListParams` reads from the URL. */
 export function useAgentsQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
+	query: ListQuery = {},
 	opts: {
-		includeEphemeral?: boolean;
-		includeRetired?: boolean;
 		/** Off for a caller that only wants the list on some kinds. */
 		enabled?: boolean;
 	} = {},
 ) {
-	const { enabled = true, ...list } = opts;
+	const { enabled = true } = opts;
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: agentsKey(scope, [list.includeEphemeral, list.includeRetired]),
-		queryFn: () => agentsApi.list(scope.username, scope.graphSlug, list),
+		queryKey: agentsKey(scope, ["list", listQueryKey(query)]),
+		queryFn: () => agentsApi.list(scope.username, scope.graphSlug, query),
 		enabled: !!username && !!graphSlug && enabled,
+		placeholderData: keepPreviousData,
 	});
 }
 

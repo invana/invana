@@ -248,6 +248,11 @@ class GraphMember(Base):
     graph: Mapped[Graph] = relationship(back_populates="members")
     user: Mapped[User] = relationship(back_populates="memberships")
 
+    @property
+    def username(self) -> str:
+        """The member's username, read off the loaded ``user`` — what the Members list pages by."""
+        return self.user.username
+
     def holds(self, role: GraphRole | str) -> bool:
         """Whether this member may act as ``role`` — ``owner`` implies the rest."""
         return holds(self.roles or [], role)

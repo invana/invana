@@ -54,6 +54,7 @@ import { useCallback, useMemo } from "react";
 import type { FleetPageProps } from "../fleet/FleetPageProps";
 import { useModelPinsQuery } from "../fleet/queries";
 import type { ModelPin } from "../fleet/types";
+import { EVERY } from "../lists";
 import { ProviderDetail } from "./ProviderDetail";
 import { ProviderForm } from "./ProviderForm";
 import { useLLMProvidersQuery } from "./queries";
@@ -193,7 +194,7 @@ function useProviderParam(): [string | null, (id: string | null) => void] {
 
 export function LlmsPage({ username, graphSlug }: FleetPageProps) {
 	const [providerId, openProvider] = useProviderParam();
-	const providers = useLLMProvidersQuery(username, graphSlug);
+	const providers = useLLMProvidersQuery(username, graphSlug, EVERY);
 	const pins = useModelPinsQuery(username, graphSlug);
 	const lenses = useLensesQuery(username, graphSlug);
 
@@ -218,6 +219,7 @@ export function LlmsPage({ username, graphSlug }: FleetPageProps) {
 		<div className="flex h-full min-h-0 flex-col overflow-y-auto">
 			<RecordHeader
 				size="lg"
+				variant="page"
 				crumbs={["LLMs"]}
 				chips={
 					providers.data ? (

@@ -40,21 +40,34 @@ test("zero rows come back as the empty emission, not a blank table", async ({
 	await expect(emission(page, "table")).toHaveCount(0);
 });
 
-test("a subgraph loaded to the canvas says what it added", async ({ page }) => {
+test("a session's first subgraph is drawn; a later one is offered until loaded", async ({
+	page,
+}) => {
 	await ask(
 		page,
 		"MATCH (a:airport)-[r:route]->(b:airport) RETURN a, r, b LIMIT 6",
 	);
 
-	// Before it lands, the offer is the surface — no subgraph card yet.
+	// The first result is painted onto the session's canvas, so it offers
+	// nothing; drawn or not, a subgraph has no card.
 	const offer = page.getByRole("button", { name: "Load to canvas" });
-	await expect(offer).toBeVisible({ timeout: 30_000 });
+	await expect(
+		page.getByRole("button", { name: /nodes · .* relationships/ }),
+	).toBeVisible({ timeout: 30_000 });
+	await expect(offer).toHaveCount(0);
 	await expect(emission(page, "subgraph")).toHaveCount(0);
 
+	// A later graph answer in the thread carries the offer; a click spends it.
+	await page
+		.getByTestId("composer")
+		.getByRole("textbox")
+		.first()
+		.fill(
+			"MATCH (a:airport)-[r:route]->(b:airport) RETURN a, r, b SKIP 6 LIMIT 3",
+		);
+	await page.getByRole("button", { name: "Send" }).click();
+	await expect(offer).toBeVisible({ timeout: 30_000 });
 	await offer.click();
-
-	const card = emission(page, "subgraph");
-	await expect(card).toBeVisible();
-	// AS5: a subgraph adds to the canvas; it never replaces it.
-	await expect(card).toContainText("added to the canvas — nothing replaced");
+	await expect(offer).toHaveCount(0);
+	await expect(emission(page, "subgraph")).toHaveCount(0);
 });

@@ -13,6 +13,7 @@ import { useState } from "react";
 import { AgentDetail } from "./AgentDetail";
 import { LifecycleDialog } from "./LifecycleDialog";
 import {
+	EVERY_AGENT,
 	useAgentMutations,
 	useAgentsQuery,
 	useLifecyclePreviewQuery,
@@ -34,10 +35,7 @@ export function AgentBoardPage({
 }) {
 	// The same list the section reads, so the page and the row never disagree
 	// about status or default — and a retired or ephemeral agent still opens.
-	const query = useAgentsQuery(username, graphSlug, {
-		includeEphemeral: true,
-		includeRetired: true,
-	});
+	const query = useAgentsQuery(username, graphSlug, EVERY_AGENT);
 	const mutations = useAgentMutations(username, graphSlug);
 	const [confirming, setConfirming] = useState<LifecycleAct | null>(null);
 	const preview = useLifecyclePreviewQuery(

@@ -13,6 +13,7 @@
  */
 
 import {
+	AppliedFilters,
 	Badge,
 	Button,
 	EmptyState,
@@ -31,15 +32,15 @@ import {
 	formatCompact,
 	formatElapsed,
 	type RunStats,
+	useListParams,
 	useTicker,
 } from "@invana-studio/core";
 import { PanelSection } from "@invana-studio/ui";
-import { RefreshCw } from "lucide-react";
+import { History, RefreshCw } from "lucide-react";
 import { useActivitySlots } from "../ActivitySlots";
 import { type RunListRow, useRunListQuery, useRunStatsQuery } from "./queries";
 import { RunsFilterBar } from "./RunsFilterBar";
 import { elapsedOf, shortRunId } from "./RunsList";
-import { useRunsFilters } from "./useRunsFilters";
 import { useRunsViewPanel } from "./useRunsViewPanel";
 
 /** How a run stands, in the engine's word and the tone that word carries. */
@@ -119,8 +120,10 @@ export function RunsBoardPage({
 }: RunsBoardPageProps) {
 	const { runId, openRun: drillIn } = useRunsViewPanel();
 	const openRun = onOpenRun ?? drillIn;
-	const { filters, patch } = useRunsFilters();
-	const runList = useRunListQuery(username, graphSlug, filters);
+	// The search and chips live in the URL; the engine decides what matches.
+	const list = useListParams();
+	const runList = useRunListQuery(username, graphSlug, list.query);
+	const chips = runList.applied ?? list.pending;
 	// The tiles are counted by the engine over today's runs, not over the page.
 	const stats = useRunStatsQuery(username, graphSlug).data;
 	const live = stats?.live ?? 0;
@@ -130,16 +133,19 @@ export function RunsBoardPage({
 	// A running row's elapsed moves; the ticker keeps it honest.
 	const now = useTicker(live > 0);
 
-	const filtered = Object.values(filters).some(Boolean);
+	const filtered = chips.length > 0;
+	const setBy = list.viaAssistant ? "the assistant" : undefined;
 
 	return (
 		<div className="flex h-full min-h-0 flex-col gap-3 overflow-y-auto p-3">
 			<RecordHeader
+				variant="page"
+				icon={<History />}
 				crumbs={["Runs"]}
 				chips={
 					<>
 						<Badge variant="outline" size="xs">
-							{runList.total}
+							{runList.unfilteredTotal}
 						</Badge>
 						{live ? (
 							<Badge variant="outline" tone="info" size="xs">
@@ -162,24 +168,52 @@ export function RunsBoardPage({
 				}
 			/>
 			<RunsFilterBar
-				filters={filters}
-				onChange={patch}
+				list={list}
 				agents={agentList.map((a) => ({ id: a.id, name: a.name }))}
 			/>
 
 			<Tiles stats={stats} />
 
+			<AppliedFilters
+				filters={chips}
+				onRemove={list.remove}
+				onClearAll={list.clear}
+				setBy={setBy}
+			/>
+
 			<PanelSection
 				card
 				title="Runs — newest first"
 				action={
-					<span className="text-muted-foreground">
-						{runList.rows.length} of {runList.total} shown
-					</span>
+					runList.isLoading ? null : (
+						<span className="text-muted-foreground">
+							{filtered
+								? `${runList.total} of ${runList.unfilteredTotal} runs match`
+								: `${runList.total} runs`}
+						</span>
+					)
 				}
 			>
 				{runList.isLoading ? (
 					<Spinner />
+				) : runList.isError ? (
+					<EmptyState
+						title="The runs could not be read"
+						description={
+							runList.error instanceof Error
+								? runList.error.message
+								: "The journal did not load."
+						}
+						actions={
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => void runList.refetch()}
+							>
+								Try again
+							</Button>
+						}
+					/>
 				) : !runList.rows.length ? (
 					<EmptyState
 						title={
@@ -187,8 +221,17 @@ export function RunsBoardPage({
 						}
 						description={
 							filtered
-								? "Clear a chip to widen the journal."
+								? `Nothing in the journal matches ${chips
+										.map((c) => `${c.title} ${c.label}`)
+										.join(" · ")}.`
 								: "An ask, a load, a stitch and an enrichment all land here as they run."
+						}
+						actions={
+							filtered ? (
+								<Button variant="outline" size="sm" onClick={list.clear}>
+									Clear all
+								</Button>
+							) : undefined
 						}
 					/>
 				) : (

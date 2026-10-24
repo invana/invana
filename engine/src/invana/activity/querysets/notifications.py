@@ -3,9 +3,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
 
-from sqlalchemy import func, or_, select, tuple_, update
+from sqlalchemy import Text, cast, func, or_, select, tuple_, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,6 +21,8 @@ from invana.activity.models import (
     NotificationRule,
 )
 from invana.core.events.models import Event
+from invana.core.lists import ListParams, PageInfo
+from invana.core.lists.querysets import contains, page_of_select
 from invana.runtime.models import Emission
 
 
@@ -188,6 +191,35 @@ class ApprovalQuerySet:
         if status:
             stmt = stmt.where(Approval.status == status)
         return list((await session.execute(stmt.order_by(Approval.deadline_at).limit(limit))).scalars())
+
+    async def page_for_graph(
+        self, session: AsyncSession, *, graph_id: str, params: ListParams, approver_id: str | None = None
+    ) -> tuple[Sequence[Approval], PageInfo]:
+        """One page of the Graph's approvals; with ``approver_id``, only those that name that member.
+
+        ``approver_id`` is the ``mine`` filter resolved to the reader, so the
+        unfiltered count leaves it out. ``approver_ids`` is a JSON list, matched
+        as text on the quoted id so the one statement reads the same on SQLite
+        and Postgres.
+        """
+        unfiltered = select(Approval).where(Approval.graph_id == graph_id)
+        stmt = unfiltered
+        if approver_id is not None:
+            stmt = stmt.where(cast(Approval.approver_ids, Text).like(f'%"{approver_id}"%'))
+        if statuses := params.values("status"):
+            stmt = stmt.where(Approval.status.in_(statuses))
+        if kinds := params.values("kind"):
+            stmt = stmt.where(Approval.subject_kind.in_(kinds))
+        if params.q:
+            stmt = stmt.where(contains(params.q, Approval.title))
+        return await page_of_select(
+            session,
+            stmt,
+            params,
+            unfiltered=unfiltered,
+            sorts={"created_at": Approval.created_at},
+            id_column=Approval.id,
+        )
 
     async def to_remind(self, session: AsyncSession, *, now: datetime) -> list[Approval]:
         halfway = Approval.created_at + (Approval.deadline_at - Approval.created_at) / 2

@@ -13,22 +13,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.managers import GraphMemberManager
 from invana.apps.graphs.models import Graph, GraphMember
-from invana.apps.graphs.schemas import AccessRead, MemberAdd, MemberListResponse, MemberRead, MemberUpdate
+from invana.apps.graphs.schemas import MEMBER_LIST, AccessRead, MemberAdd, MemberRead, MemberUpdate
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.lists import ListParams, Page, applied_filters, list_params
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 _members = GraphMemberManager()
 
 
 async def list_members(
+    params: ListParams = Depends(list_params(MEMBER_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> MemberListResponse:
-    items = await _members.members(session, graph=graph)
-    return MemberListResponse(items=items, total=len(items))
+) -> Page[MemberRead]:
+    items, info = await _members.page(session, graph=graph, params=params)
+    return Page[MemberRead].of(items, info, applied_filters(params, MEMBER_LIST))
 
 
 async def add_member(

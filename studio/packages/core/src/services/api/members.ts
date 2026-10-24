@@ -1,10 +1,11 @@
+import { listQueryToApi } from "../../lib/listQuery";
 import type {
 	GraphAccess,
 	GraphMember,
 	GraphMemberAdd,
-	GraphMemberList,
 	GraphRole,
 } from "../../types/access";
+import type { ListQuery, Page } from "../../types/list";
 import type { GraphRef } from "../../types/product";
 import { apiClient } from "./client";
 
@@ -16,8 +17,13 @@ import { apiClient } from "./client";
 const graphBase = (g: GraphRef) => `/api/v1/u/${g.username}/${g.graphSlug}`;
 
 export const membersApi = {
-	list: async (g: GraphRef) =>
-		(await apiClient.get<GraphMemberList>(`${graphBase(g)}/members`)).data,
+	/** `q` searches username and email; `role` filters; sorted by username. */
+	list: async (g: GraphRef, query: ListQuery = {}) =>
+		(
+			await apiClient.get<Page<GraphMember>>(
+				`${graphBase(g)}/members${listQueryToApi(query)}`,
+			)
+		).data,
 
 	add: async (g: GraphRef, body: GraphMemberAdd) =>
 		(await apiClient.post<GraphMember>(`${graphBase(g)}/members`, body)).data,

@@ -9,11 +9,13 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { ROOT_CONTEXT } from "@opentelemetry/api";
+import { listQueryToApi } from "../../lib/listQuery";
 import type {
 	Emission,
 	EmissionKind,
 	TemplateOffer,
 } from "../../types/emissions";
+import type { ListQuery, Page } from "../../types/list";
 import type {
 	AskFrame,
 	OfferedRule,
@@ -22,7 +24,7 @@ import type {
 	RunStats,
 	RunStatsQuery,
 	RunStatus,
-	TaskRunListResponse,
+	TaskRunSummary,
 } from "../../types/runs";
 import type { SessionMessage } from "../../types/sessions";
 import { recordStreamReconnect } from "../telemetry/metrics";
@@ -213,33 +215,18 @@ function statsParams({ days, kinds }: RunStatsQuery): string {
 export const runsApi = {
 	/**
 	 * Runs as list rows — an agent's recent plans, the library's candidates, or
-	 * the journal filtered by kind. One endpoint with filters, because every one
+	 * the journal under its filters. One endpoint with filters, because every one
 	 * of those is "which runs match this?" and splitting them would give
 	 * *served* two definitions to drift apart.
+	 *
+	 * Filters by plain name: `status` · `agent_id` · `task_id` · `kind` ·
+	 * `since` (`24h` · `7d` · `30d` · `90d`) · `candidates=true` ·
+	 * `interactive=true`; `q` searches the ask.
 	 */
-	list: (
-		username: string,
-		graphSlug: string,
-		filters: {
-			agentId?: string;
-			taskId?: string;
-			/** One kind of work — `ask`, `import`, `bulk`. */
-			kind?: string;
-			candidates?: boolean;
-			limit?: number;
-		} = {},
-	) => {
-		const params = new URLSearchParams();
-		if (filters.agentId) params.set("agent_id", filters.agentId);
-		if (filters.taskId) params.set("task_id", filters.taskId);
-		if (filters.kind) params.set("kind", filters.kind);
-		if (filters.candidates) params.set("candidates", "true");
-		if (filters.limit) params.set("limit", String(filters.limit));
-		const q = params.toString();
-		return request<TaskRunListResponse>(
-			`${base(username, graphSlug)}${q ? `?${q}` : ""}`,
-		);
-	},
+	list: (username: string, graphSlug: string, query: ListQuery = {}) =>
+		request<Page<TaskRunSummary>>(
+			`${base(username, graphSlug)}${listQueryToApi(query)}`,
+		),
 
 	/** The journal's tiles for one Graph, counted by the engine in the reader's days. */
 	stats: (username: string, graphSlug: string, query: RunStatsQuery = {}) =>

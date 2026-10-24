@@ -10,4 +10,6 @@ Build phase {{ID}} of docs/products/agents-build-sessions.md. You are running un
 8. A decision the docs do not settle: pick what agent-fabric.md, iam.md and CLAUDE.md support and record it in the feature file. A decision only Ravi can make: set {{ID}}'s row `blocked` with the question and stop.
 9. When done, leave the row's status as it is (the driver marks `done` after its own gates and the design review) and add a hand-off note row for {{ID}}: what a later phase must know that the code does not say.
 
-Standing rules: tokens, never currency. The engine owns every number. No decision ids in code or tests. Few positive and negative tests, against the graph database, never mocked; graph-database tests only when INVANA_ALLOW_GRAPH_TESTS=1 is set. Never commit, push or open a PR — the driver commits. Never edit scripts/migration/baseline.json and never set your own row to `done`.
+Standing rules: tokens, never currency. The engine owns every number. No decision ids in code or tests. Few positive and negative tests, against the graph database, never mocked; graph-database tests only when INVANA_ALLOW_GRAPH_TESTS=1 is set. Never commit, push or open a PR — the driver commits. Keep your plan in the todo list (TodoWrite) and update it as you go — the build dashboard shows it.
+
+Never edit scripts/migration/baseline.json and never set your own row to `done`.

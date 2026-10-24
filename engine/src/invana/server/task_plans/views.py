@@ -11,14 +11,14 @@ from fastapi import Depends, Path, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.models import Graph, GraphMember
-from invana.apps.task_plans.managers import TaskPlanManager
 from invana.apps.task_plans.schemas import (
+    TASK_PLAN_LIST,
     PlanPerformance,
     PlanRunsPage,
     PlanVersionDiff,
     PromoteRequest,
     TaskPlanDetail,
-    TaskPlanListResponse,
+    TaskPlanPage,
     TaskPlanRead,
     TasksResponse,
 )
@@ -29,6 +29,7 @@ from invana.core.db import get_session
 from invana.core.errors import ValidationError
 from invana.core.events import actions
 from invana.core.events.services import emit_event
+from invana.core.lists import ListParams, applied_filters, list_params
 from invana.runtime.managers import PlanPerformanceManager, TaskPlanRunsManager
 from invana.runtime.managers.plan_performance import WINDOWS
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
@@ -38,12 +39,21 @@ behaviour = PlanPerformanceManager()
 
 
 async def list_workflows(
+    params: ListParams = Depends(list_params(TASK_PLAN_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> TaskPlanListResponse:
-    items = await library.list_reads(session, graph_id=graph.id)
-    return TaskPlanListResponse(items=items, total=len(items), packaged=TaskPlanManager.count_packaged(items))
+) -> TaskPlanPage:
+    # The read seeds the packaged plans on first touch, so it commits.
+    reads, info = await library.page_reads(session, graph_id=graph.id, params=params)
+    return TaskPlanPage(
+        items=reads,
+        total=info.total,
+        unfiltered_total=info.unfiltered_total,
+        next_cursor=info.next_cursor,
+        applied=applied_filters(params, TASK_PLAN_LIST),
+        packaged=await library.count_packaged(session, graph_id=graph.id),
+    )
 
 
 async def get_workflow(

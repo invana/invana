@@ -6,6 +6,7 @@
  * task-plan schemas field for field.
  */
 
+import type { Page } from "@invana-studio/core";
 import type { AgentChip } from "../agents/types";
 import type { PlanArg, SkillLayer } from "../skills/types";
 
@@ -225,13 +226,13 @@ export interface PlanRunsPage {
 	live: { running: number; at_gate: number; called_by: number; agents: number };
 }
 
-export interface TaskPlanListResponse {
-	items: TaskPlanSummary[];
-	total: number;
-	/** How many of `items` came with Invana or a plugin. */
+/**
+ * The plan library. Search: name · key. Filters: `origin` (packaged · authored
+ * · promoted) · `family` (nl · ql). Sorts: `key` · `name` · `-created_at`.
+ */
+export interface TaskPlanPage extends Page<TaskPlanSummary> {
+	/** The library's versions that came with Invana or a plugin — the Graph's, not the page's. */
 	packaged: number;
-	/** Rendered verbatim in the panel's status bar. Stating the deferral is the design. */
-	authoring: string;
 }
 
 // ── Catalogue (the-catalogue.md 7.6) ────────────────────────────────────────
@@ -262,8 +263,9 @@ export interface CatalogueEntry {
 	used_by: number;
 }
 
-export interface CatalogueResponse {
-	/** Grouped by bound in the runtime's order, then by key. */
-	items: CatalogueEntry[];
-	total: number;
-}
+/**
+ * The catalogue. Search: step key · summary. Filters: `bound` · `plugin`.
+ * Sorts: `bound` (the default — by bound in the runtime's order, then by key) ·
+ * `key`.
+ */
+export type CataloguePage = Page<CatalogueEntry>;
