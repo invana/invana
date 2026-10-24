@@ -7,13 +7,15 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.activity.managers import AgentActsManager
+from invana.activity.models import Schedule, ScheduleStatus
 from invana.apps.agents.managers import AgentManager
 from invana.apps.agents.models import AgentStatus
-from invana.apps.agents.schemas import AgentCreate
+from invana.apps.agents.schemas import AgentCreate, LifecycleAct
 from invana.apps.graphs.models import Graph
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError
-from invana.runtime.managers import AgentOverviewManager
+from invana.runtime.managers import AgentLifecycleManager, AgentOverviewManager
 from invana.runtime.models import TaskRun
 
 pytestmark = pytest.mark.asyncio
@@ -77,3 +79,38 @@ async def test_the_overview_counts_root_runs_and_their_verdict(session: AsyncSes
     assert overview.daily[-1].tokens == 16
     assert [(e.exit, e.runs, e.last_title) for e in overview.exits] == [("answered", 1, "Which routes?")]
     assert overview.recent[0].agents == 1
+
+
+async def test_a_draft_is_discarded_and_an_agent_that_ran_is_not(session: AsyncSession, graph: Graph, user: User):
+    lifecycle = AgentLifecycleManager()
+    draft = await agents.create_agent(session, graph=graph, payload=AgentCreate(name="Scratch"), actor=user)
+    await lifecycle.delete_agent(session, agent=draft, actor=user)
+    assert await agents.agents_qs.get(session, draft.id) is None
+
+    ran = await agents.create_agent(session, graph=graph, payload=AgentCreate(name="Ran"), actor=user)
+    session.add(TaskRun(graph_id=graph.id, agent_id=ran.id, status="succeeded"))
+    await session.flush()
+    with pytest.raises(ConflictError):
+        await lifecycle.delete_agent(session, agent=ran, actor=user)
+
+
+async def test_retire_names_and_pauses_the_schedules_that_start_the_agent(
+    session: AsyncSession, graph: Graph, user: User
+):
+    acts = AgentActsManager()
+    agent = await agents.create_agent(session, graph=graph, payload=AgentCreate(name="Nightly"), actor=user)
+    await agents.make_live(session, agent=agent, actor=user)
+    schedule = Schedule(
+        graph_id=graph.id, name="Route brief", agent_id=agent.id, instructions="Brief me", cron="0 2 * * *"
+    )
+    session.add(schedule)
+    await session.flush()
+
+    paused = await acts.preview(session, agent=agent, act=LifecycleAct.pause)
+    assert [(i.kind, i.effect) for i in paused.items] == [("schedule", "refused")], "a pause leaves it on"
+    retire = await acts.preview(session, agent=agent, act=LifecycleAct.retire)
+    assert [(i.kind, i.title, i.effect) for i in retire.items] == [("schedule", "Route brief", "paused")]
+
+    await acts.retire(session, agent=agent, actor=user, why="Replaced")
+    assert schedule.status == ScheduleStatus.paused.value and schedule.next_fire_at is None
+    assert (await acts.preview(session, agent=agent, act=LifecycleAct.retire)).items == []

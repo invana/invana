@@ -28,6 +28,15 @@ class ScheduleQuerySet:
         stmt = select(Schedule).where(Schedule.graph_id == graph_id).order_by(Schedule.name)
         return list((await session.execute(stmt)).scalars())
 
+    async def active_for_agent(self, session: AsyncSession, *, agent_id: str) -> list[Schedule]:
+        """The active schedules that start ``agent_id``, by name."""
+        stmt = (
+            select(Schedule)
+            .where(Schedule.agent_id == agent_id, Schedule.status == ScheduleStatus.active.value)
+            .order_by(Schedule.name)
+        )
+        return list((await session.execute(stmt)).scalars())
+
     async def page_for_graph(
         self, session: AsyncSession, *, graph_id: str, params: ListParams
     ) -> tuple[Sequence[Schedule], PageInfo]:

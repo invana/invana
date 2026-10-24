@@ -10,7 +10,7 @@ from __future__ import annotations
 from fastapi import Depends, Path, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.activity.managers import FleetManager
+from invana.activity.managers import AgentActsManager, FleetManager
 from invana.activity.schemas import FleetOverview, FleetPerformance
 from invana.apps.agents.managers import AgentManager, SoulManager
 from invana.apps.agents.models import AgentStatus
@@ -54,6 +54,7 @@ from invana.server.graphs.deps import require_graph_member, resolve_graph_by_use
 
 agents = AgentManager()
 lifecycle = AgentLifecycleManager()
+acts = AgentActsManager()
 capabilities = AgentCapabilitiesManager()
 overviews = AgentOverviewManager()
 souls = SoulManager()
@@ -61,7 +62,7 @@ skills = SkillManager()
 bindings = SkillBindingManager()
 #: The bind-time checks. Skills and plans are two apps, so the check that reads
 #: both is composed one band up (`runtime/managers/skill_bind.py`) and handed to
-#: the binding manager (BN5).
+#: the binding manager.
 binds = SkillBindManager()
 evals = EvalManager()
 fleet = FleetManager()
@@ -313,9 +314,10 @@ async def preview_pause(
     session: AsyncSession = Depends(get_session),
 ) -> LifecyclePreview:
     """What pausing would do. Pausing blocks the same todos retiring blocks, so
-    it names them the same way before it happens (LC10)."""
+    it names them the same way before it happens, and names each schedule
+    that starts the agent."""
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
-    return await lifecycle.preview(session, agent=agent, act=LifecycleAct.pause)
+    return await acts.preview(session, agent=agent, act=LifecycleAct.pause)
 
 
 async def preview_retire(
@@ -325,9 +327,10 @@ async def preview_retire(
     session: AsyncSession = Depends(get_session),
 ) -> LifecyclePreview:
     """What retiring would do. The confirm dialog **names the open work item by
-    item** — a count is not enough to decide with (LC6)."""
+    item** — a count is not enough to decide with — and each schedule that
+    starts the agent, which retiring pauses."""
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
-    return await lifecycle.preview(session, agent=agent, act=LifecycleAct.retire)
+    return await acts.preview(session, agent=agent, act=LifecycleAct.retire)
 
 
 async def retire_agent(
@@ -340,7 +343,7 @@ async def retire_agent(
 ) -> AgentRead:
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
     payload = payload or RetireRequest()
-    agent = await agents.retire_agent(
+    agent = await acts.retire(
         session,
         agent=agent,
         actor=user,
@@ -386,7 +389,7 @@ async def agent_meters(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> AgentMeters:
-    """What the agent is using now, beside the limits that cap it (AG23)."""
+    """What the agent is using now, beside the limits that cap it."""
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
     return await lifecycle.meters(session, agent=agent)
 
@@ -397,7 +400,7 @@ async def skills_and_callables(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> AgentSkillsAndCallables:
-    """Both tables of *What this agent can do*, each naming the other (C12)."""
+    """Both tables of *What this agent can do*, each naming the other."""
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
     return await capabilities.read(session, agent=agent)
 
@@ -409,7 +412,7 @@ async def preview_soul(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> SoulPreviewResponse:
-    """One ask, in the current voice and in the draft (SO7). Saves nothing."""
+    """One ask, in the current voice and in the draft. Saves nothing."""
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
     return await souls.preview(session, agent=agent, payload=payload)
 
@@ -442,11 +445,10 @@ async def bind_skill(
     the bindings, and it is not.
 
     A skill this agent could **never** run is refused here rather than inside a
-    run ([BN5](docs/for-developers/modules/skills/features/bindings.md)): if the
-    plan its current version draws names a `step_key` the agent's envelope does
-    not allow, the 409 body names the step, its bound, and which checks ran —
+    run: if the plan its current version draws names a `step_key` the agent's
+    envelope does not allow, the 409 body names the step, its bound, and which checks ran —
     `checked` and `not_checked`, because a bind is never refused on grounds it
-    did not check ([BN7](docs/for-developers/modules/skills/features/bindings.md)).
+    did not check.
     """
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)

@@ -415,7 +415,7 @@ class OverviewTiles(BaseModel):
     #: The last 7 days against the 7 before.
     p95_ms: FleetMeasure
     tokens_this_month: int
-    #: Σ the agents' ``max_tokens_month``; null when none declares one.
+    #: Σ the live agents' effective ``max_tokens_month``; null when none is live.
     max_tokens_month: int | None
     #: Succeeded over settled, the last 7 days against the 7 before.
     success: FleetMeasure

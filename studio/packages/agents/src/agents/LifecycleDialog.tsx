@@ -10,6 +10,9 @@
  * what happens to each piece differs — a Todo in review is untouched by a
  * pause and blocked by a retire. Resume opens nothing: it takes nothing away.
  *
+ * The schedules that start the agent are listed last: a retire pauses each,
+ * a pause leaves it on and its firings fail, naming the state.
+ *
  * Retire also takes a *Why*, at most 500 characters, handed to `onConfirm` and
  * written on the retire event so History shows it. A pause takes none.
  */
@@ -38,6 +41,14 @@ const KIND: Record<LifecycleItem["kind"], string> = {
 	run: "Run",
 	task: "Todo",
 	session: "Thread",
+	schedule: "Schedule",
+};
+
+/** How a row's effect reads: refused work in red, a paused schedule in amber. */
+const EFFECT_TONE: Partial<Record<LifecycleItem["effect"], string>> = {
+	blocked: "text-destructive",
+	refused: "text-destructive",
+	paused: "text-warning",
 };
 
 interface LifecycleDialogProps {
@@ -103,13 +114,7 @@ export function LifecycleDialog({
 										<TableCell className="max-w-0 truncate">
 											{KIND[item.kind]} · {item.title}
 										</TableCell>
-										<TableCell
-											className={
-												item.effect === "blocked" || item.effect === "refused"
-													? "text-destructive"
-													: undefined
-											}
-										>
+										<TableCell className={EFFECT_TONE[item.effect]}>
 											{item.note}
 										</TableCell>
 									</TableRow>

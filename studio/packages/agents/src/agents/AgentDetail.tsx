@@ -25,7 +25,7 @@
 import { Button, RecordHeader, TabbedPanel } from "@invana/ui";
 import { ActButton, ReadOnlyNotice } from "@invana-studio/shell";
 import { agentTone, DetailStatus, humanStatus } from "@invana-studio/ui";
-import { Bot, Check, Pause, Play, Save, Star } from "lucide-react";
+import { Bot, Check, Pause, Play, Save, Star, Trash2 } from "lucide-react";
 import { useContext, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { EvalSetPanel } from "../evals/EvalSetPanel";
@@ -90,6 +90,8 @@ export function AgentDetail({
 	onSetDefault,
 	onCreate,
 	creating,
+	onDiscard,
+	discarding,
 	onOpenLineage,
 	onOpenEnvelope,
 	saveError,
@@ -107,6 +109,9 @@ export function AgentDetail({
 	/** *Create agent* — the draft goes live through the eval gate. */
 	onCreate: () => void;
 	creating?: boolean;
+	/** *Discard draft* — deletes a draft, after a confirm. */
+	onDiscard: () => void;
+	discarding?: boolean;
 	onOpenLineage: () => void;
 	onOpenEnvelope: () => void;
 	/** The last Save's refusal, in the engine's words. */
@@ -157,9 +162,25 @@ export function AgentDetail({
 			</ActButton>
 		</>
 	) : isDraft ? (
-		<ActButton area="build" size="sm" disabled={creating} onClick={onCreate}>
-			<Check /> {creating ? "Creating…" : "Create agent"}
-		</ActButton>
+		<>
+			<ActButton
+				area="build"
+				size="sm"
+				variant="ghost"
+				disabled={creating || discarding}
+				onClick={onDiscard}
+			>
+				<Trash2 /> {discarding ? "Discarding…" : "Discard draft"}
+			</ActButton>
+			<ActButton
+				area="build"
+				size="sm"
+				disabled={creating || discarding}
+				onClick={onCreate}
+			>
+				<Check /> {creating ? "Creating…" : "Create agent"}
+			</ActButton>
+		</>
 	) : (
 		<>
 			{!isDefault && agent.status === "active" && agent.answers_asks ? (

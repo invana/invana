@@ -37,7 +37,7 @@ export interface OverviewTiles {
 	/** The last 7 days against the 7 before. */
 	p95_ms: FleetMeasure;
 	tokens_this_month: number;
-	/** Σ the agents' month budgets; null when none declares one. */
+	/** Σ the live agents' effective month budgets; null when none is live. */
 	max_tokens_month: number | null;
 	/** Succeeded over settled, the last 7 days against the 7 before. */
 	success: FleetMeasure;

@@ -194,6 +194,25 @@ class ScheduleManager:
             await self._emit(session, row, actions.SCHEDULE_PAUSE, actor_id)
         return row
 
+    async def starting(self, session: AsyncSession, *, agent: Agent) -> list[Schedule]:
+        """The active schedules that start ``agent``."""
+        return await self.schedules_qs.active_for_agent(session, agent_id=agent.id)
+
+    async def pause_for_retired(self, session: AsyncSession, *, agent: Agent, actor_id: str) -> list[Schedule]:
+        """Pause every active schedule that starts ``agent``, which was retired.
+
+        A retired agent refuses every run, so a schedule left active would
+        fail at each firing with nobody told; paused, it waits for a person to
+        point it at another agent and resume it. The event names the reason.
+        """
+        rows = await self.starting(session, agent=agent)
+        for row in rows:
+            row.status, row.next_fire_at = ScheduleStatus.paused.value, None
+        await session.flush()
+        for row in rows:
+            await self._emit(session, row, actions.SCHEDULE_PAUSE, actor_id, reason=f"'{agent.name}' was retired")
+        return rows
+
     async def resume(self, session: AsyncSession, *, graph: Graph, ref: str, actor_id: str) -> Schedule:
         """Fire from now: what came due while paused is not missed."""
         row = await self.get(session, graph=graph, ref=ref)

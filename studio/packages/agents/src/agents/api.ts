@@ -104,6 +104,15 @@ export const agentsApi = {
 			{ method: "DELETE" },
 		),
 
+	/**
+	 * Delete an agent that never ran — what *Discard draft* sends. The engine
+	 * refuses an agent with a run (`409`): retire it, so its trace resolves.
+	 */
+	remove: (username: string, graphSlug: string, id: string) =>
+		request<void>(`${base(username, graphSlug)}/agents/${id}`, {
+			method: "DELETE",
+		}),
+
 	pause: (username: string, graphSlug: string, id: string) =>
 		request<Agent>(`${base(username, graphSlug)}/agents/${id}/pause`, {
 			method: "POST",

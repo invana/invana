@@ -340,8 +340,10 @@ class FleetManager:
 
         Tiles compare today with the same day last week, and the last 7 days
         with the 7 before. *Waiting* is pending approvals plus roots paused on
-        a question. The month budget is the sum of the agents'
-        ``max_tokens_month``, null when none declares one. *Needs attention*
+        a question. The month budget is the sum of the live agents' effective
+        ``max_tokens_month`` — each agent's own, else the Graph's default, the
+        ceiling a run reads — so it agrees with every row's *of N*; null when
+        no agent is live. *Needs attention*
         lists failing plans and agents, pending approvals and degraded agents;
         *Changed recently* the newest five agent and skill versions.
         """
@@ -372,7 +374,12 @@ class FleetManager:
             for a in fleet.agents.values()
             if a.lifetime == AgentLifetime.persistent.value and a.status != AgentStatus.retired.value
         ]
-        budgets = [int(b) for a in listed if isinstance(b := (a.budget or {}).get("max_tokens_month"), int | float)]
+        budgets = [
+            int(b)
+            for a in listed
+            if a.status != AgentStatus.draft.value
+            and isinstance(b := a.effective_budget.get("max_tokens_month"), int | float)
+        ]
 
         runs_week_ago = sum(week_ago <= r.at < week_ago + timedelta(days=1) for r in roots)
         tiles = OverviewTiles(

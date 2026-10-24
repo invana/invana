@@ -189,9 +189,7 @@ def claude(text: str, sid: str, label: str) -> str:
         cmd.append("--dangerously-skip-permissions")
     else:
         cmd += ["--permission-mode", "acceptEdits", "--allowedTools", *ALLOWED_TOOLS]
-    # Langfuse (when its Claude Code plugin is enabled) files the session under these tags.
-    env = {**os.environ, "CC_LANGFUSE_TRACE_TAGS": f"migration,{sid},{label}"}
-    proc = subprocess.Popen(cmd, cwd=ROOT, env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+    proc = subprocess.Popen(cmd, cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT, text=True)
 
     def send(msg: str) -> None:
@@ -234,7 +232,13 @@ def claude(text: str, sid: str, label: str) -> str:
                     continue
                 break
     proc.stdin.close()
-    proc.wait()
+    # A slow exit hook can hold the process open after the result.
+    try:
+        proc.wait(timeout=120)
+    except subprocess.TimeoutExpired:
+        print(f"  {label}: still open 120s after its result — terminating")
+        proc.terminate()
+        proc.wait()
     print(f"  {label}: peak context {peak:,} tokens{' · handed off' if warned else ''}")
     index = CACHE / "sessions.md"
     if not index.exists():

@@ -14,7 +14,14 @@ describe("formatCompact", () => {
 		expect(formatCompact(820)).toBe("820");
 		expect(formatCompact(8214)).toBe("8.2k");
 		expect(formatCompact(3000)).toBe("3k");
-		expect(formatCompact(1_400_000)).toBe("1.4m");
+		expect(formatCompact(1_400_000)).toBe("1.4M");
+		expect(formatCompact(5_000_000)).toBe("5M");
+		expect(formatCompact(2_000_000_000)).toBe("2B");
+	});
+
+	it("moves up a rung rather than print 1000k", () => {
+		expect(formatCompact(999_960)).toBe("1M");
+		expect(formatCompact(999_940)).not.toBe("1000k");
 	});
 });
 

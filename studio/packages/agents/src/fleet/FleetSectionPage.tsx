@@ -221,7 +221,7 @@ function Tiles({
 				value={tokens(t.tokens_this_month)}
 				caption={
 					t.max_tokens_month == null
-						? "no month budget"
+						? "no live agent"
 						: `of ${tokens(t.max_tokens_month)}`
 				}
 				captionTone="muted"

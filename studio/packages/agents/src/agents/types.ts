@@ -311,10 +311,15 @@ export type LifecycleAct = "pause" | "retire";
  * What an act does to one piece of open work — a closed vocabulary, because a
  * sentence per row is a sentence nobody can compare.
  */
-type LifecycleEffect = "finishes" | "blocked" | "unchanged" | "refused";
+type LifecycleEffect =
+	| "finishes"
+	| "blocked"
+	| "unchanged"
+	| "refused"
+	| "paused";
 
 export interface LifecycleItem {
-	kind: "run" | "task" | "session";
+	kind: "run" | "task" | "session" | "schedule";
 	id: string;
 	title: string;
 	effect: LifecycleEffect;

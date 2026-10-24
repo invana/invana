@@ -1,5 +1,6 @@
 """Activity rules, as classes (migration-plan §5)."""
 
+from invana.activity.managers.agent_acts import AgentActsManager
 from invana.activity.managers.approvals import ApprovalManager, ApprovalSendGate
 from invana.activity.managers.changes import ChangeLogManager
 from invana.activity.managers.channels import ChannelManager
@@ -14,6 +15,7 @@ from invana.activity.managers.task_read import TaskReadManager
 from invana.activity.managers.tree import TreeManager
 
 __all__ = [
+    "AgentActsManager",
     "ApprovalManager",
     "ApprovalSendGate",
     "ChangeLogManager",

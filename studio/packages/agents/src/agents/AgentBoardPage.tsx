@@ -6,14 +6,27 @@
  * Create agent, pause, resume, retire, make default. {@link AgentDetail} is
  * the page itself. Pause and Retire go through one confirm that names the
  * open work they would disturb; *Create agent* goes through the eval gate,
- * and a refusal opens the gated confirm with the engine's words.
+ * and a refusal opens the gated confirm with the engine's words. *Discard
+ * draft* deletes a draft after a confirm and returns to the Agents list; a
+ * refusal reopens the confirm with the engine's words.
  */
 
-import { RecordHeader } from "@invana/ui";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	RecordHeader,
+} from "@invana/ui";
 import { Bot } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { GatedActDialog } from "../evals/GatedActDialog";
 import { useEvalMutations } from "../evals/queries";
+import { AgentsOpenContext } from "../open";
 import { AgentDetail } from "./AgentDetail";
 import { TabReadState } from "./agentParts";
 import { LifecycleDialog } from "./LifecycleDialog";
@@ -47,6 +60,8 @@ export function AgentBoardPage({
 	const evals = useEvalMutations(username, graphSlug, "agent", agentId);
 	const [confirming, setConfirming] = useState<LifecycleAct | null>(null);
 	const [gated, setGated] = useState(false);
+	const [discarding, setDiscarding] = useState(false);
+	const open = useContext(AgentsOpenContext);
 	const preview = useLifecyclePreviewQuery(
 		username,
 		graphSlug,
@@ -77,6 +92,15 @@ export function AgentBoardPage({
 			},
 		);
 
+	const discard = () =>
+		mutations.discard
+			.mutateAsync(agent.id)
+			.then(() => {
+				setDiscarding(false);
+				open?.section("agents");
+			})
+			.catch(() => setDiscarding(true));
+
 	return (
 		<>
 			<AgentDetail
@@ -89,6 +113,11 @@ export function AgentBoardPage({
 				onSave={(data) => mutations.update.mutate({ id: agent.id, data })}
 				onCreate={() => makeLive("")}
 				creating={mutations.makeLive.isPending}
+				onDiscard={() => {
+					mutations.discard.reset();
+					setDiscarding(true);
+				}}
+				discarding={mutations.discard.isPending}
 				onPause={() => setConfirming("pause")}
 				onResume={() => mutations.resume.mutate(agent.id)}
 				onRetire={() => setConfirming("retire")}
@@ -109,6 +138,27 @@ export function AgentBoardPage({
 					setConfirming(null);
 				}}
 			/>
+			<AlertDialog open={discarding} onOpenChange={setDiscarding}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Discard {agent.name}?</AlertDialogTitle>
+						<AlertDialogDescription>
+							{mutations.discard.error instanceof Error
+								? mutations.discard.error.message
+								: "A draft never ran, so it is deleted: its instructions, soul, limits and skill bindings go with it."}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Keep it</AlertDialogCancel>
+						<AlertDialogAction
+							disabled={mutations.discard.isPending}
+							onClick={() => void discard()}
+						>
+							Discard draft
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 			<GatedActDialog
 				open={gated}
 				title={`Create ${agent.name}`}

@@ -7,7 +7,7 @@ requires = ["graph.read.validate"]
 resources = ["cpu"]
 
 [args]
-query = { type = "str" }
+query = { type = "str", required = true }
 read_only = { type = "bool", default = true }
 
 [outputs]

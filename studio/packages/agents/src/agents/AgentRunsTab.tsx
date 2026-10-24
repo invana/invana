@@ -14,11 +14,16 @@
  * never the kind of work it is: a badge per row (Asked · Schedule · Todo ·
  * Delegated), named once in the legend beside the filters. Who started a run and the size of its team
  * are not columns: the list row carries neither. A row opens the run's page.
+ *
+ * The list is paged on the engine's `next_cursor`, 50 a page: *Show 50 more*
+ * asks for the next until the last page has none. The count beside the
+ * filters is the engine's `total`.
  */
 
 import {
 	AppliedFilters,
 	Badge,
+	Button,
 	Card,
 	EmptyState,
 	FilterBar,
@@ -37,13 +42,13 @@ import {
 	type TaskRunSummary,
 	useMembersQuery,
 } from "@invana-studio/core";
-import { useRunsQuery } from "@invana-studio/shell";
 import { FilterSelect } from "@invana-studio/ui";
 import { useContext, useMemo, useState } from "react";
 import { FilteredEmpty } from "../lists";
 import { AgentsOpenContext } from "../open";
 import { ms, tokens } from "../overview/fleetParts";
 import { exitTone, RUN_ORIGIN, runLabel, TabReadState } from "./agentParts";
+import { RUNS_PAGE, useAgentRunPagesQuery } from "./queries";
 import type { Agent } from "./types";
 
 const SHOWING = [
@@ -96,11 +101,12 @@ export function AgentRunsTab({
 			...(startedBy ? { started_by: [startedBy] } : {}),
 			...(origin ? { origin: [origin] } : {}),
 		},
-		limit: 50,
 	};
-	const runs = useRunsQuery(username, graphSlug, query);
+	const runs = useAgentRunPagesQuery(username, graphSlug, query);
 	const members = useMembersQuery({ username, graphSlug });
-	const rows: TaskRunSummary[] = runs.data?.items ?? [];
+	const pages = runs.data?.pages ?? [];
+	const first = pages[0];
+	const rows: TaskRunSummary[] = pages.flatMap((p) => p.items);
 
 	const memberOptions = useMemo(
 		() =>
@@ -111,7 +117,7 @@ export function AgentRunsTab({
 		[members.data],
 	);
 	// The agent is the tab's, not a filter the reader applied or can remove.
-	const chips = (runs.data?.applied ?? []).filter(
+	const chips = (first?.applied ?? []).filter(
 		(f) => f.field === "started_by" || f.field === "origin",
 	);
 	const remove = (field: string) => {
@@ -149,8 +155,8 @@ export function AgentRunsTab({
 				</FilterBar>
 				<span className="ml-auto text-sm text-muted-foreground">
 					{ORIGIN_OPTIONS.map((o) => o.label).join(" · ")}
-					{runs.data
-						? ` — ${runs.data.total} run${runs.data.total === 1 ? "" : "s"}`
+					{first
+						? ` — ${first.total} run${first.total === 1 ? "" : "s"}`
 						: null}
 				</span>
 			</div>
@@ -234,6 +240,18 @@ export function AgentRunsTab({
 					</Table>
 				</Card>
 			)}
+			{runs.hasNextPage ? (
+				<div className="flex items-center gap-2">
+					<Button
+						size="sm"
+						variant="outline"
+						disabled={runs.isFetchingNextPage}
+						onClick={() => void runs.fetchNextPage()}
+					>
+						{runs.isFetchingNextPage ? "Loading…" : `Show ${RUNS_PAGE} more`}
+					</Button>
+				</div>
+			) : null}
 		</div>
 	);
 }

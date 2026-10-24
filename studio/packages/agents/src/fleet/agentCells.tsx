@@ -61,9 +61,13 @@ export function AgainstCell({ row }: { row: FleetAgentRow }) {
 	);
 }
 
-/** The month's tokens against the agent's own month budget, when it set one. */
+/**
+ * The month's tokens against the ceiling a run reads — the agent's own month
+ * budget, else the Graph's default (`effective_budget`), as the Agents list
+ * prints it.
+ */
 export function BudgetCell({ row }: { row: FleetAgentRow }) {
-	const max = row.agent.budget?.max_tokens_month;
+	const max = row.agent.effective_budget?.max_tokens_month;
 	if (!max)
 		return (
 			<span className="font-mono text-muted-foreground">

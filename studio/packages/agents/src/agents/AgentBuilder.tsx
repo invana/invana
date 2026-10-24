@@ -89,7 +89,11 @@ export function AgentBuilder({
 					onPatch={onPatch}
 					onGoTo={onGoTo}
 				/>
-				<Skills username={username} graphSlug={graphSlug} agent={agent} />
+				<AgentSkillsCard
+					username={username}
+					graphSlug={graphSlug}
+					agent={agent}
+				/>
 				<Instructions username={username} graphSlug={graphSlug} agent={agent} />
 			</div>
 			<div className="flex min-w-0 flex-col gap-2.5">
@@ -180,7 +184,11 @@ function Identity({
 	);
 }
 
-function Skills({
+/**
+ * The agent's bound skills, with *Add skill* and an unbind per row — the
+ * builder's Skills, and the Skills card on a live agent's Overview.
+ */
+export function AgentSkillsCard({
 	username,
 	graphSlug,
 	agent,

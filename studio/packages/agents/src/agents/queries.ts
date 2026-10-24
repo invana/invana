@@ -5,9 +5,11 @@
  * `["agents", owner, graph, …]`; a mutation invalidates every agents key.
  */
 
-import { type ListQuery, listQueryKey } from "@invana-studio/core";
+import { sessionsApi } from "@invana-studio/assistant";
+import { type ListQuery, listQueryKey, runsApi } from "@invana-studio/core";
 import {
 	keepPreviousData,
+	useInfiniteQuery,
 	useMutation,
 	useQuery,
 	useQueryClient,
@@ -170,6 +172,63 @@ export function useAgentMetersQuery(
 }
 
 /**
+ * The caller's own sessions bound to this agent, most recently used first.
+ * Sessions stay private to whoever opened them; the Graph-wide number is
+ * `meters.sessions`, a count that names no thread.
+ */
+export function useAgentSessionsQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	agentId: string | undefined,
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQuery({
+		queryKey: agentsKey(scope, ["sessions", agentId]),
+		queryFn: () =>
+			sessionsApi.list(scope.username, scope.graphSlug, {
+				agentId,
+				sort: "updated",
+				limit: 20,
+			}),
+		enabled: !!username && !!graphSlug && !!agentId,
+	});
+}
+
+/** How many runs a page of an agent's Runs asks for. */
+export const RUNS_PAGE = 50;
+
+/**
+ * An agent's runs under `query`, a page at a time: each page asks for the
+ * next on the last one's `next_cursor`. The key starts `["runs", owner,
+ * graph]`, so whatever refreshes the journal refreshes this list.
+ */
+export function useAgentRunPagesQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	query: ListQuery,
+) {
+	return useInfiniteQuery({
+		queryKey: [
+			"runs",
+			username,
+			graphSlug,
+			"agent-pages",
+			listQueryKey(query),
+		] as const,
+		queryFn: ({ pageParam }) =>
+			runsApi.list(username as string, graphSlug as string, {
+				...query,
+				limit: RUNS_PAGE,
+				cursor: pageParam,
+			}),
+		initialPageParam: null as string | null,
+		getNextPageParam: (page) => page.next_cursor,
+		enabled: !!username && !!graphSlug,
+		placeholderData: keepPreviousData,
+	});
+}
+
+/**
  * The soul preview. A mutation, not a query: it is two model calls the author
  * asks for, never something a re-render may fire.
  */
@@ -212,6 +271,11 @@ export function useAgentMutations(username: string, graphSlug: string) {
 				qc.invalidateQueries({ queryKey: ["history", username, graphSlug] });
 			},
 		}),
+		/** *Discard draft* — a draft never ran, so it is deleted outright. */
+		discard: useMutation({
+			mutationFn: (id: string) => agentsApi.remove(username, graphSlug, id),
+			onSuccess: invalidate,
+		}),
 		update: useMutation({
 			mutationFn: ({ id, data }: { id: string; data: AgentUpdate }) =>
 				agentsApi.update(username, graphSlug, id, data),
@@ -245,7 +309,11 @@ export function useAgentMutations(username: string, graphSlug: string) {
 				reassign?: { reassign_to_kind: string; reassign_to_id: string };
 				why?: string;
 			}) => agentsApi.retire(username, graphSlug, id, reassign, why),
-			onSuccess: invalidate,
+			onSuccess: () => {
+				invalidate();
+				// A retire pauses every schedule that starts the agent.
+				qc.invalidateQueries({ queryKey: ["schedules", username, graphSlug] });
+			},
 		}),
 		writeDraft: useMutation({
 			mutationFn: ({

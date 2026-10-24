@@ -8,12 +8,19 @@
  * Recent runs — every number from `GET …/agents/{id}/overview`, stored by the
  * engine; Studio formats, never derives. A tile's caption is the engine's
  * prior window as it returned it. A run row opens the run's page.
+ *
+ * Under them, the bound skills (with *Add skill*, as on the builder) and the
+ * reader's own sessions with this agent. Sessions are private to whoever
+ * opened them, so the list is the reader's and the Graph-wide figure is
+ * `meters.sessions`, a count that names no thread.
  */
 
 import { LineChart, StackedBarChartV } from "@invana/charts";
 import {
+	Eyebrow,
 	MetricGrid,
 	MetricTile,
+	Spinner,
 	StatusDot,
 	Table,
 	TableBody,
@@ -23,12 +30,18 @@ import {
 	TableRow,
 	TypographyInlineCode,
 } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { PanelSection } from "@invana-studio/ui";
 import { useContext } from "react";
 import { AgentsOpenContext } from "../open";
 import { day, ms, pct, spreadTicks, tokens } from "../overview/fleetParts";
+import { AgentSkillsCard } from "./AgentBuilder";
 import { exitTone, runLabel, TabReadState } from "./agentParts";
-import { useAgentOverviewQuery } from "./queries";
+import {
+	useAgentMetersQuery,
+	useAgentOverviewQuery,
+	useAgentSessionsQuery,
+} from "./queries";
 import type { Agent } from "./types";
 
 const WINDOW = "30d";
@@ -235,7 +248,7 @@ export function AgentDashboard({
 											{r.agents ?? "—"}
 										</TableCell>
 										<TableCell className="font-mono">
-											{tokens(r.tokens)}
+											{r.tokens > 0 ? tokens(r.tokens) : "—"}
 										</TableCell>
 										<TableCell className="font-mono">
 											{ms(r.duration_ms)}
@@ -252,6 +265,65 @@ export function AgentDashboard({
 					)}
 				</PanelSection>
 			</div>
+
+			<div className="grid items-start gap-2.5 @[760px]:grid-cols-2">
+				<AgentSkillsCard
+					username={username}
+					graphSlug={graphSlug}
+					agent={agent}
+				/>
+				<YourSessions username={username} graphSlug={graphSlug} agent={agent} />
+			</div>
 		</div>
+	);
+}
+
+/** The reader's own sessions with this agent, beside the Graph-wide count. */
+function YourSessions({
+	username,
+	graphSlug,
+	agent,
+}: {
+	username: string;
+	graphSlug: string;
+	agent: Agent;
+}) {
+	const sessions = useAgentSessionsQuery(username, graphSlug, agent.id);
+	const meters = useAgentMetersQuery(username, graphSlug, agent.id);
+	const mine = sessions.data?.items ?? [];
+	const all = meters.data?.sessions;
+	return (
+		<PanelSection
+			card
+			title="Sessions"
+			hint={
+				all == null
+					? undefined
+					: `${all.toLocaleString()} asking through ${agent.name}, in the Graph`
+			}
+		>
+			<Eyebrow aside={sessions.data?.total || undefined}>Yours</Eyebrow>
+			{sessions.isLoading ? (
+				<Spinner />
+			) : mine.length ? (
+				<ul className="space-y-1">
+					{mine.map((s) => (
+						<li key={s.id} className="flex items-baseline gap-2">
+							<span className="min-w-0 flex-1 truncate">
+								{s.title || "Untitled session"}
+							</span>
+							<span className="shrink-0 text-sm text-muted-foreground">
+								{formatRelativeTime(s.updatedAt)}
+							</span>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p className="text-muted-foreground">
+					You have no sessions with this agent. Others' sessions are theirs —
+					only their count is shown.
+				</p>
+			)}
+		</PanelSection>
 	);
 }

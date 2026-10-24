@@ -217,14 +217,17 @@ class LifecycleEffect(enum.StrEnum):
     #: about, and the one a count could never show.
     unchanged = "unchanged"
     #: A thread bound to this agent: its next ask is a 409 naming the state,
-    #: never a silent switch to another mind.
+    #: never a silent switch to another mind. A schedule under a pause: its
+    #: firings fail naming the state until the agent resumes.
     refused = "refused"
+    #: A schedule that starts this agent, paused by a retire.
+    paused = "paused"
 
 
 class LifecycleItem(BaseModel):
     """One piece of open work, and what the act would do to it."""
 
-    #: ``run`` · ``task`` · ``session``
+    #: ``run`` · ``task`` · ``session`` · ``schedule``
     kind: str
     id: str
     title: str

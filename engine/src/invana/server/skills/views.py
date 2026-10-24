@@ -59,7 +59,7 @@ _WINDOWS = {"7d": 7, "30d": 30, "90d": 90}
 #: Skills and plans are two apps, and the composition lives one band up
 #: (`runtime/managers/skill_draft.py`). A view still calls one manager.
 drafts = SkillDraftManager()
-#: Both halves of the bind check, and the dry run the Bindings tab reads (BN10).
+#: Both halves of the bind check, and the dry run the Bindings tab reads.
 binds = SkillBindManager()
 
 
@@ -84,8 +84,7 @@ async def create_skill(
     """Create a skill. It starts as a **draft** with a one-node plan.
 
     Nothing is offered a draft: a skill reaches a step through its current
-    version, and there is not one until someone publishes
-    ([SK21 · SK22](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    version, and there is not one until someone publishes.
     """
     skill = await drafts.create(session, graph_id=graph.id, payload=payload, actor_id=user.id)
     return await drafts.read_for(session, skill=skill)
@@ -188,8 +187,7 @@ async def get_skill_draft(
     """The version being written — its text, its plan, and any open question.
 
     Opening a draft over a published version **copies that version's plan**, so
-    a redraw is a revision and the diff reads against what was drawn
-    ([SK12](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    a redraw is a revision and the diff reads against what was drawn.
     """
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
     return await drafts.draft_read(session, skill=skill)
@@ -202,7 +200,7 @@ async def update_skill_draft(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> SkillDraftRead:
-    """Edit the draft's prose. A published version is never touched (SK2)."""
+    """Edit the draft's prose. A published version is never touched."""
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
     return await drafts.write_draft(session, skill=skill, payload=payload)
 
@@ -231,9 +229,7 @@ async def draw_skill_draft(
 ) -> SkillDrawStarted:
     """Draw the draft's playbook as a plan.
 
-    It is an ordinary run with `role = plan`
-    ([SK23](docs/for-developers/modules/skills/features/authoring-a-skill.md)):
-    stream it like any other, and read what it did in Runs. If a sentence
+    It is an ordinary run with `role = plan`: stream it like any other, and read what it did in Runs. If a sentence
     carries two readings the run **settles** having written nothing and
     recorded the question against that sentence — the card in the editor is
     where it is answered.
@@ -256,14 +252,11 @@ async def answer_clarification(
 ) -> SkillDraftRead:
     """Answer the question the planner stopped on.
 
-    The answer is recorded on the version, so a redraw never re-asks
-    ([SK11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    The answer is recorded on the version, so a redraw never re-asks.
 
-    It opens **no** run. The draw that asked has already settled
-    ([SK26](docs/for-developers/modules/skills/features/authoring-a-skill.md)) —
+    It opens **no** run. The draw that asked has already settled —
     there is nothing to resume — so this records and returns the draft, and the
-    surface opens the next draw with what comes back
-    ([SK30](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    surface opens the next draw with what comes back.
     """
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
     return await drafts.answer(
@@ -327,8 +320,8 @@ async def skill_agents(
     """Where this skill stands with every agent — bound, refused, not bound.
 
     The refusals are the bind checks run as a **dry run**, not a prediction the
-    surface makes ([BN10](docs/for-developers/modules/skills/features/bindings.md)):
-    the agents a skill cannot be offered are worth seeing before a click, and
+    surface makes: the agents a skill cannot be offered are worth seeing before
+    a click, and
     the only reading of the rules that cannot go stale is the one that refuses.
     """
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)

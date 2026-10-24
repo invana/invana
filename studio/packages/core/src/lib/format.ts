@@ -8,16 +8,30 @@ export function formatCompactCount(n: number): string {
 }
 
 /**
- * `820` · `8.2k` · `1.4m` — a magnitude, not a number.
+ * `820` · `8.2k` · `1.4M` · `2B` — a magnitude, not a number.
  *
  * What a token total is read as: nobody compares run A's 8,214 against run B's
- * 8,190, they compare *thousands*. Distinct from {@link formatCompactCount},
- * which is always in `k` because its subject is records.
+ * 8,190, they compare *thousands*. Thousands are `k`, millions `M` and billions
+ * `B` — a lowercase `m` reads as minutes. A value that rounds up to the next
+ * rung is printed on it (`999,960` is `1M`, not `1000k`). Distinct from
+ * {@link formatCompactCount}, which is always in `k` because its subject is
+ * records.
  */
 export function formatCompact(n: number): string {
 	if (n < 1000) return String(n);
-	if (n < 1_000_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
-	return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}m`;
+	const rungs: [number, string][] = [
+		[1_000_000_000, "B"],
+		[1_000_000, "M"],
+		[1000, "k"],
+	];
+	const one = (v: number) => v.toFixed(1).replace(/\.0$/, "");
+	for (const [i, [size, unit]] of rungs.entries()) {
+		if (n < size) continue;
+		const up = rungs[i - 1];
+		if (up && Number(one(n / size)) >= 1000) return `${one(n / up[0])}${up[1]}`;
+		return `${one(n / size)}${unit}`;
+	}
+	return String(n);
 }
 
 /**

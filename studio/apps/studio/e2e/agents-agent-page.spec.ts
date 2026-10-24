@@ -8,7 +8,7 @@
  * `demos/airways`.
  */
 import { expect, type Page, test } from "@playwright/test";
-import { graphApi } from "./api";
+import { graphApi, graphStatus } from "./api";
 import { GRAPH } from "./explorer";
 
 const AGENTS = `${GRAPH}/agents`;
@@ -66,6 +66,28 @@ test("Create agent makes the draft live", async ({ page }) => {
 			page.getByRole("button", { name: "Create agent" }),
 		).toHaveCount(0);
 		await expect(page.getByRole("button", { name: "Pause" })).toBeVisible();
+	} finally {
+		await dropAgent(page, id);
+	}
+});
+
+test("Discard draft deletes the draft after a confirm", async ({ page }) => {
+	const id = await makeDraft(page);
+	try {
+		await page.goto(`${AGENTS}/agents?page=agent:${id}`);
+		await page
+			.getByRole("button", { name: "Discard draft" })
+			.click({ timeout: 30_000 });
+		await page
+			.getByRole("alertdialog")
+			.getByRole("button", { name: "Discard draft" })
+			.click();
+		await expect(page.getByRole("alertdialog")).toHaveCount(0, {
+			timeout: 15_000,
+		});
+		await expect
+			.poll(() => graphStatus(page, `/agents/${id}`), { timeout: 15_000 })
+			.toBe(404);
 	} finally {
 		await dropAgent(page, id);
 	}

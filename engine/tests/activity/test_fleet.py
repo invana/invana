@@ -95,7 +95,7 @@ async def test_overview_names_what_broke_and_what_waits(session: AsyncSession, g
     assert view.tiles.failed_today == 2 and view.tiles.failed_latest == "nightly-load"
     assert view.tiles.waiting == 2 and view.tiles.waiting_latest == "Monthly deals brief"
     assert view.tiles.tokens_this_month == 115, "a root's tokens are its own and its steps'"
-    assert view.tiles.max_tokens_month is None, "no agent declares a month budget"
+    assert view.tiles.max_tokens_month == 5_000_000, "an agent without its own reads the default"
     kinds = [(a.kind, a.title) for a in view.attention]
     assert kinds == [
         ("failing", "nightly-load failed 2 runs running"),

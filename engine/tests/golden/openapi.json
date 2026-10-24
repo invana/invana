@@ -12667,7 +12667,8 @@
           "finishes",
           "blocked",
           "unchanged",
-          "refused"
+          "refused",
+          "paused"
         ],
         "title": "LifecycleEffect",
         "type": "string"
@@ -33676,7 +33677,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/meters": {
       "get": {
-        "description": "What the agent is using now, beside the limits that cap it (AG23).",
+        "description": "What the agent is using now, beside the limits that cap it.",
         "operationId": "agent_meters_api_v1_u__username___graphSlug__agents__agent_id__meters_get",
         "parameters": [
           {
@@ -33827,7 +33828,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/pause": {
       "get": {
-        "description": "What pausing would do. Pausing blocks the same todos retiring blocks, so\nit names them the same way before it happens (LC10).",
+        "description": "What pausing would do. Pausing blocks the same todos retiring blocks, so\nit names them the same way before it happens, and names each schedule\nthat starts the agent.",
         "operationId": "preview_pause_api_v1_u__username___graphSlug__agents__agent_id__pause_get",
         "parameters": [
           {
@@ -34113,7 +34114,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/retire": {
       "get": {
-        "description": "What retiring would do. The confirm dialog **names the open work item by\nitem** \u2014 a count is not enough to decide with (LC6).",
+        "description": "What retiring would do. The confirm dialog **names the open work item by\nitem** \u2014 a count is not enough to decide with \u2014 and each schedule that\nstarts the agent, which retiring pauses.",
         "operationId": "preview_retire_api_v1_u__username___graphSlug__agents__agent_id__retire_get",
         "parameters": [
           {
@@ -34347,7 +34348,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/skills-and-callables": {
       "get": {
-        "description": "Both tables of *What this agent can do*, each naming the other (C12).",
+        "description": "Both tables of *What this agent can do*, each naming the other.",
         "operationId": "skills_and_callables_api_v1_u__username___graphSlug__agents__agent_id__skills_and_callables_get",
         "parameters": [
           {
@@ -34494,7 +34495,7 @@
         ]
       },
       "post": {
-        "description": "Offer a skill to this agent.\n\nA skill reaches a step only through a binding, and a binding names one\nskill and one agent \u2014 which is what gives a refusal something to name.\nBinding what is already bound is a 409: the caller believes it is changing\nthe bindings, and it is not.\n\nA skill this agent could **never** run is refused here rather than inside a\nrun ([BN5](docs/for-developers/modules/skills/features/bindings.md)): if the\nplan its current version draws names a `step_key` the agent's envelope does\nnot allow, the 409 body names the step, its bound, and which checks ran \u2014\n`checked` and `not_checked`, because a bind is never refused on grounds it\ndid not check ([BN7](docs/for-developers/modules/skills/features/bindings.md)).",
+        "description": "Offer a skill to this agent.\n\nA skill reaches a step only through a binding, and a binding names one\nskill and one agent \u2014 which is what gives a refusal something to name.\nBinding what is already bound is a 409: the caller believes it is changing\nthe bindings, and it is not.\n\nA skill this agent could **never** run is refused here rather than inside a\nrun: if the plan its current version draws names a `step_key` the agent's\nenvelope does not allow, the 409 body names the step, its bound, and which checks ran \u2014\n`checked` and `not_checked`, because a bind is never refused on grounds it\ndid not check.",
         "operationId": "bind_skill_api_v1_u__username___graphSlug__agents__agent_id__skills__skill_id__post",
         "parameters": [
           {
@@ -34573,7 +34574,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/soul/preview": {
       "post": {
-        "description": "One ask, in the current voice and in the draft (SO7). Saves nothing.",
+        "description": "One ask, in the current voice and in the draft. Saves nothing.",
         "operationId": "preview_soul_api_v1_u__username___graphSlug__agents__agent_id__soul_preview_post",
         "parameters": [
           {
@@ -52491,7 +52492,7 @@
         ]
       },
       "post": {
-        "description": "Create a skill. It starts as a **draft** with a one-node plan.\n\nNothing is offered a draft: a skill reaches a step through its current\nversion, and there is not one until someone publishes\n([SK21 \u00b7 SK22](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "description": "Create a skill. It starts as a **draft** with a one-node plan.\n\nNothing is offered a draft: a skill reaches a step through its current\nversion, and there is not one until someone publishes.",
         "operationId": "create_skill_api_v1_u__username___graphSlug__skills_post",
         "parameters": [
           {
@@ -52768,7 +52769,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/agents": {
       "get": {
-        "description": "Where this skill stands with every agent \u2014 bound, refused, not bound.\n\nThe refusals are the bind checks run as a **dry run**, not a prediction the\nsurface makes ([BN10](docs/for-developers/modules/skills/features/bindings.md)):\nthe agents a skill cannot be offered are worth seeing before a click, and\nthe only reading of the rules that cannot go stale is the one that refuses.",
+        "description": "Where this skill stands with every agent \u2014 bound, refused, not bound.\n\nThe refusals are the bind checks run as a **dry run**, not a prediction the\nsurface makes: the agents a skill cannot be offered are worth seeing before\na click, and\nthe only reading of the rules that cannot go stale is the one that refuses.",
         "operationId": "skill_agents_api_v1_u__username___graphSlug__skills__skill_id__agents_get",
         "parameters": [
           {
@@ -52899,7 +52900,7 @@
         ]
       },
       "get": {
-        "description": "The version being written \u2014 its text, its plan, and any open question.\n\nOpening a draft over a published version **copies that version's plan**, so\na redraw is a revision and the diff reads against what was drawn\n([SK12](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "description": "The version being written \u2014 its text, its plan, and any open question.\n\nOpening a draft over a published version **copies that version's plan**, so\na redraw is a revision and the diff reads against what was drawn.",
         "operationId": "get_skill_draft_api_v1_u__username___graphSlug__skills__skill_id__draft_get",
         "parameters": [
           {
@@ -52967,7 +52968,7 @@
         ]
       },
       "patch": {
-        "description": "Edit the draft's prose. A published version is never touched (SK2).",
+        "description": "Edit the draft's prose. A published version is never touched.",
         "operationId": "update_skill_draft_api_v1_u__username___graphSlug__skills__skill_id__draft_patch",
         "parameters": [
           {
@@ -53047,7 +53048,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/draft/clarifications/{clarification_id}": {
       "post": {
-        "description": "Answer the question the planner stopped on.\n\nThe answer is recorded on the version, so a redraw never re-asks\n([SK11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).\n\nIt opens **no** run. The draw that asked has already settled\n([SK26](docs/for-developers/modules/skills/features/authoring-a-skill.md)) \u2014\nthere is nothing to resume \u2014 so this records and returns the draft, and the\nsurface opens the next draw with what comes back\n([SK30](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "description": "Answer the question the planner stopped on.\n\nThe answer is recorded on the version, so a redraw never re-asks.\n\nIt opens **no** run. The draw that asked has already settled \u2014\nthere is nothing to resume \u2014 so this records and returns the draft, and the\nsurface opens the next draw with what comes back.",
         "operationId": "answer_clarification_api_v1_u__username___graphSlug__skills__skill_id__draft_clarifications__clarification_id__post",
         "parameters": [
           {
@@ -53136,7 +53137,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/draft/draw": {
       "post": {
-        "description": "Draw the draft's playbook as a plan.\n\nIt is an ordinary run with `role = plan`\n([SK23](docs/for-developers/modules/skills/features/authoring-a-skill.md)):\nstream it like any other, and read what it did in Runs. If a sentence\ncarries two readings the run **settles** having written nothing and\nrecorded the question against that sentence \u2014 the card in the editor is\nwhere it is answered.",
+        "description": "Draw the draft's playbook as a plan.\n\nIt is an ordinary run with `role = plan`: stream it like any other, and read what it did in Runs. If a sentence\ncarries two readings the run **settles** having written nothing and\nrecorded the question against that sentence \u2014 the card in the editor is\nwhere it is answered.",
         "operationId": "draw_skill_draft_api_v1_u__username___graphSlug__skills__skill_id__draft_draw_post",
         "parameters": [
           {
