@@ -12,7 +12,7 @@ from invana.apps.skills.schemas import OfferedRule
 from invana.core.lists import Filter, ListSpec
 from invana.core.metrics import Change
 from invana.plugins.sdk.manifest import Bound
-from invana.runtime.models import RunStatus, TriggeredBy
+from invana.runtime.models import ExitReason, RunStatus, TriggeredBy
 
 
 class RunNodeRead(BaseModel):
@@ -156,6 +156,18 @@ class TaskRunSummary(BaseModel):
     #: What the run spent, summed over its priced steps. ``None`` when none had
     #: a published rate — *unknown*, never `0` (SR40).
     cost_usd: float | None = None
+    #: The run's number in its Graph — ``#2291``.
+    number: int | None = None
+    #: The root agent's name, as it is now.
+    agent_name: str | None = None
+    #: ``Explorer`` · ``Todo`` · ``Schedule`` · ``Project`` · ``API``.
+    origin: str | None = None
+    #: The person the run is on behalf of, by username.
+    started_by_name: str | None = None
+    #: How many agents the run used — the root and every child with an agent.
+    agents: int = 0
+    #: Why it ended; ``None`` while it runs.
+    exit_reason: str | None = None
 
 
 class RunDay(BaseModel):
@@ -194,7 +206,18 @@ class RunStats(BaseModel):
     slowest: SlowestRun | None
     #: Oldest first, empty days included.
     by_day: list[RunDay]
+    #: Ended runs in the window whose exit reason is ``served``.
+    served: int = 0
+    #: Ended runs in the window that did not serve, and why.
+    not_served: int = 0
+    not_served_by_reason: dict[str, int] = Field(default_factory=dict)
+    #: Pending asks routed to the reader, standing now.
+    waiting_approvals: int = 0
 
+
+#: The list's tabs: ``live`` is queued or running, ``waiting`` held on a person,
+#: ``ended`` every terminal status.
+RUN_STATES = {"live": "live", "waiting": "waiting on a person", "ended": "ended"}
 
 #: The windows ``since`` takes, over when a run was created.
 RUN_SINCE = {"24h": "last 24 hours", "7d": "last 7 days", "30d": "last 30 days", "90d": "last 90 days"}
@@ -214,6 +237,12 @@ RUN_LIST = ListSpec(
         "origin": Filter(values=tuple(t.value for t in TriggeredBy)),
         "started_by": Filter(title="started by"),
         "since": Filter(values=tuple(RUN_SINCE), labels=RUN_SINCE),
+        "state": Filter(values=tuple(RUN_STATES), labels=RUN_STATES),
+        "exit_reason": Filter(
+            title="exit",
+            values=(*(r.value for r in ExitReason), "not_served"),
+            labels={**{r.value: r.value.replace("_", " ") for r in ExitReason}, "not_served": "not served"},
+        ),
         "candidates": Filter(values=("true",), labels={"true": "never promoted"}),
         "interactive": Filter(values=("true",), labels={"true": "canvas and system runs shown"}),
     },
@@ -234,9 +263,270 @@ class CancelResponse(BaseModel):
 
 
 class RunRerun(BaseModel):
-    """Re-run a settled ask on the versions it recorded, or on today's."""
+    """Re-run a settled run on the versions it recorded, on today's, or retuned.
 
-    versions: Literal["same", "current"] = "same"
+    A retune names what changes; anything left out stays as the run recorded it.
+    """
+
+    versions: Literal["same", "current", "retune"] = "same"
+    agent_version: int | None = None
+    model_version: str | None = None
+    max_tokens_run: int | None = Field(default=None, gt=0)
+    lens_id: str | None = None
+
+
+# ── The run page (docs/for-developers/modules/agents/features/the-run-page.md) ──
+
+
+class RunHead(BaseModel):
+    """What the run page's head says."""
+
+    id: str
+    number: int | None = None
+    agent_id: str | None = None
+    agent_name: str | None = None
+    status: str
+    exit_reason: str | None = None
+    #: ``Explorer`` · ``Todo`` · ``Schedule`` · ``Project`` · ``API``.
+    origin: str | None = None
+    started_by_name: str | None = None
+    #: What was asked, verbatim.
+    body: str | None = None
+    #: The session an Explorer ask came from, to open it.
+    session_id: str | None = None
+    session_title: str | None = None
+    task_id: str | None = None
+    task_title: str | None = None
+    tokens: int = 0
+    #: The run's token ceiling; ``None`` when it has none.
+    max_tokens_run: int | None = None
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+    duration_ms: int | None = None
+    #: True when the run may be stopped (it has not ended).
+    can_stop: bool = False
+    #: True when the run may be rerun (it has ended).
+    can_rerun: bool = False
+
+
+class RunTiles(BaseModel):
+    elapsed_ms: int | None = None
+    #: The run's time limit; ``None`` when it has none.
+    time_limit_ms: int | None = None
+    tokens: int = 0
+    max_tokens_run: int | None = None
+    agents: int = 0
+    #: Deepest child below the root.
+    depth: int = 0
+    steps: int = 0
+    #: Steps that ran more than one attempt.
+    redelivered: int = 0
+    assets: int = 0
+    files: int = 0
+    branches: int = 0
+    records_touched: int = 0
+    writes_refused: int = 0
+    #: Large runs: agents live now, queued now, and finishing a minute (last minute).
+    live: int = 0
+    queued: int = 0
+    live_limit: int | None = None
+    finishing_per_minute: int = 0
+    peak_finishing: int = 0
+    peak_finishing_at: datetime | None = None
+    tokens_per_minute: int = 0
+    served: int = 0
+    not_served: int = 0
+    #: Seconds until the last agent finishes at the last ten minutes' rate.
+    eta_s: int | None = None
+
+
+class AgentBar(BaseModel):
+    """One agent's span on the run's clock."""
+
+    run_id: str
+    agent_id: str | None = None
+    agent_name: str
+    depth: int = 0
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+    status: str
+    exit_reason: str | None = None
+    #: Its state in words — ``served · 22k``, ``asking for 15k``, ``stopped by ravi``.
+    state_line: str
+    tokens: int = 0
+
+
+class MinuteCount(BaseModel):
+    minute: datetime
+    count: int
+
+
+class WaitingAsk(BaseModel):
+    approval_id: str
+    #: ``budget`` · ``send`` · ``access`` · ``delegation`` · ``question``.
+    kind: str
+    line: str
+    #: True when the reader may decide it.
+    for_you: bool = False
+
+
+class RoleRow(BaseModel):
+    """One role of a large run — every agent of one name."""
+
+    role: str
+    depth: int = 0
+    agents: int
+    served: int
+    not_served: int
+    running: int = 0
+    waiting: int = 0
+    tokens_p50: int | None = None
+    tokens_p95: int | None = None
+    time_p95_ms: int | None = None
+
+
+class RunOverview(BaseModel):
+    head: RunHead
+    tiles: RunTiles
+    #: True past 50 agents: the large-run reading.
+    large: bool = False
+    agents_over_time: list[AgentBar] = Field(default_factory=list)
+    steps_per_minute: list[MinuteCount] = Field(default_factory=list)
+    waiting: list[WaitingAsk] = Field(default_factory=list)
+    finished_per_minute: list[MinuteCount] = Field(default_factory=list)
+    live_over_time: list[MinuteCount] = Field(default_factory=list)
+    by_role: list[RoleRow] = Field(default_factory=list)
+
+
+class RunAgentNode(BaseModel):
+    """One agent in a run's tree."""
+
+    run_id: str
+    parent_run_id: str | None = None
+    agent_id: str | None = None
+    agent_name: str
+    #: Agents of one name are one role.
+    role: str
+    depth: int = 0
+    status: str
+    exit_reason: str | None = None
+    state_line: str
+    tokens: int = 0
+    #: The tokens it may spend: its escrow, or the root's run budget.
+    budget: int | None = None
+    #: ``spawned`` · ``delegated`` · ``root``.
+    how: str = "root"
+
+
+class DelegationAsk(BaseModel):
+    """A delegation waiting on a person, drawn dashed from the asking agent."""
+
+    approval_id: str
+    from_run_id: str
+    agent_id: str | None = None
+    agent_name: str
+    line: str
+
+
+class RoleCell(BaseModel):
+    run_id: str
+    status: str
+    exit_reason: str | None = None
+
+
+class RoleGroup(BaseModel):
+    role: str
+    depth: int = 0
+    agents: int
+    #: ``{status word: count}`` — served · running · waiting · not served · stopped.
+    by_state: dict[str, int] = Field(default_factory=dict)
+    line: str = ""
+    cells: list[RoleCell] = Field(default_factory=list)
+
+
+class RunAgents(BaseModel):
+    origin_label: str
+    origin_line: str
+    nodes: list[RunAgentNode] = Field(default_factory=list)
+    asks: list[DelegationAsk] = Field(default_factory=list)
+    roles: list[RoleGroup] = Field(default_factory=list)
+
+
+class RunStage(BaseModel):
+    """Every step of one step key, in plan order."""
+
+    step_key: str
+    function: str
+    status: str
+    calls: int
+    lanes: int = 1
+    duration_ms: int | None = None
+    p95_ms: int | None = None
+    tokens: int = 0
+    in_count: int | None = None
+    out_count: int | None = None
+    #: The card's last line — ``1 → 214 routes``.
+    line: str = ""
+    #: One line of what happened — ``9 pages ok · 2 refused · 3 failed``.
+    summary: str = ""
+    step_ids: list[str] = Field(default_factory=list)
+
+
+class RunStages(BaseModel):
+    stages: list[RunStage] = Field(default_factory=list)
+    pruned: bool = False
+
+
+class RunAsset(BaseModel):
+    name: str
+    #: ``emission`` · ``file · csv`` · ``branch`` · ``Todo for a person``.
+    kind: str
+    produced_by: str
+    size_line: str = "—"
+    where: str = ""
+    step_run_id: str | None = None
+    emission_id: str | None = None
+    task_id: str | None = None
+
+
+class RunAssets(BaseModel):
+    items: list[RunAsset] = Field(default_factory=list)
+
+
+class TouchedGraphRow(BaseModel):
+    type: str
+    read: int = 0
+    written: int = 0
+    refused: int = 0
+    refused_line: str = ""
+
+
+class TouchedWebRow(BaseModel):
+    domain: str
+    pages: int = 0
+    refused: int = 0
+    refused_line: str = ""
+
+
+class TouchedLlmRow(BaseModel):
+    model: str
+    calls: int = 0
+    tokens_in: int = 0
+    tokens_out: int = 0
+
+
+class TouchedSecretRow(BaseModel):
+    name: str
+    used_by: str = "—"
+    where: str = ""
+
+
+class RunTouched(BaseModel):
+    graph: list[TouchedGraphRow] = Field(default_factory=list)
+    web: list[TouchedWebRow] = Field(default_factory=list)
+    llm: list[TouchedLlmRow] = Field(default_factory=list)
+    secrets: list[TouchedSecretRow] = Field(default_factory=list)
+    records_touched: int = 0
 
 
 class RunRerunResponse(BaseModel):

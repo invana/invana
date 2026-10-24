@@ -302,4 +302,39 @@ class Approval(Base):
     decided_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     note: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    #: The reader's word: ``access`` · ``budget`` · ``delegation`` · ``send`` · ``question`` · ``publish``.
+    kind: Mapped[str] = mapped_column(String(16), default="send", nullable=False, index=True)
+    #: ``[{kind, id, name}]`` — the person at the root, then each agent to the one asking.
+    asked_by: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    #: One line: what is wanted.
+    wants: Mapped[str] = mapped_column(String(512), default="", nullable=False)
+    #: Why it went to these approvers: ``world owner`` · ``agent owner`` · ``started the run`` · …
+    routed_reason: Mapped[str] = mapped_column(String(64), default="", nullable=False)
+    step_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    #: ``run`` (this run only) or ``always`` — how a delegation was allowed.
+    scope: Mapped[str | None] = mapped_column(String(8), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class AlertRule(Base):
+    """A rule over ledger rows that notifies people when it matches."""
+
+    __tablename__ = "alert_rules"
+    __table_args__ = (UniqueConstraint("graph_id", "name", name="uq_alert_rule_name"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    graph_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("graphs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    #: When it fires, in words: *An agent writes to Fare*.
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    #: ``{act, touched, verdict[], refused_by[], threshold {count, window_s}}`` — patterns take ``*``.
+    match: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    notify_user_ids: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    last_fired_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    #: The last ledger row the clock matched this rule against.
+    last_seq: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    created_by_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)

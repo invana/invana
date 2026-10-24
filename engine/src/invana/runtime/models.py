@@ -21,7 +21,20 @@ import enum
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint, event
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    event,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from invana.core.models import Base
@@ -100,6 +113,21 @@ class RunRole(enum.StrEnum):
     evaluate = "evaluate"
 
 
+class ExitReason(enum.StrEnum):
+    """Why a run ended — the one reason an agent stops, written when it settles."""
+
+    served = "served"
+    cannot_answer = "cannot_answer"
+    budget_declined = "budget_declined"
+    time_limit = "time_limit"
+    step_limit = "step_limit"
+    no_progress = "no_progress"
+    loop = "loop"
+    parent_ended = "parent_ended"
+    stopped = "stopped"
+    failed = "failed"
+
+
 class PromptKind(enum.StrEnum):
     """Why a run stopped to ask (task-model-migration §2.5)."""
 
@@ -131,6 +159,7 @@ class TaskRun(Base):
         # root of a run has no parent and no lane, so it is excluded rather
         # than squeezed into the same uniqueness.
         UniqueConstraint("parent_run_id", "task_id", "lane", "iteration", "attempt", name="uq_task_run_attempt"),
+        UniqueConstraint("graph_id", "number", name="uq_task_runs_graph_number"),
         # *1.2M of 5M tokens this month* is a windowed ``SUM`` of tokens per agent
         # ([EB15](docs/for-developers/modules/agents/features/envelope-and-budget.md)),
         # never a counter column — a counter can disagree with the runs it
@@ -254,6 +283,14 @@ class TaskRun(Base):
     stream_seq: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     clarifications: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     replans: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    #: A root run's number in its Graph (``#2291``); steps and children have none.
+    number: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: Why it ended (:class:`ExitReason`); set when it settles.
+    exit_reason: Mapped[str | None] = mapped_column(String(24), nullable=True, index=True)
+    #: On a child run: tokens moved from its parent's remaining budget.
+    escrow_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: On a child run: the unspent escrow that went back when it ended.
+    escrow_returned: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     # ── what it produced ─────────────────────────────────────────────────────
     #: The one-liner the row shows ("proposed Cypher · 5 lines").
@@ -324,6 +361,23 @@ def wall_ms(run: TaskRun) -> int | None:
     if run.queue_ms is not None and run.duration_ms is not None:
         return run.queue_ms + run.duration_ms
     return span_ms(run.queued_at, run.finished_at)
+
+
+@event.listens_for(TaskRun, "before_insert")
+def _number_root_run(_mapper, connection, row: TaskRun) -> None:
+    """Give a root run the next number in its Graph.
+
+    Taken under a per-Graph advisory lock on Postgres, so two runs created at
+    once never share a number; SQLite holds one writer at a time already.
+    """
+    if row.parent_run_id is not None or row.number is not None or not row.graph_id:
+        return
+    if connection.dialect.name == "postgresql":
+        connection.execute(text("SELECT pg_advisory_xact_lock(hashtext(:k))"), {"k": "run-number:" + row.graph_id})
+    last = connection.execute(
+        text("SELECT COALESCE(MAX(number), 0) FROM task_runs WHERE graph_id = :g"), {"g": row.graph_id}
+    ).scalar()
+    row.number = int(last or 0) + 1
 
 
 @event.listens_for(TaskRun, "before_insert")

@@ -58,6 +58,7 @@ from invana.apps.work.models import (  # noqa: F401
 # Import all models so metadata is fully populated for autogenerate.
 from invana.core.auth.models import RefreshToken, User  # noqa: F401
 from invana.core.events.models import Event  # noqa: F401
+from invana.core.ledger.models import LedgerCheck, LedgerExport, LedgerRow  # noqa: F401
 from invana.core.models import Base
 from invana.core.settings import settings
 from invana.runtime.models import (  # noqa: F401

@@ -359,17 +359,46 @@ class ApprovalRead(BaseModel):
     decided_at: datetime | None
     note: str
     created_at: datetime
+    #: ``access`` · ``budget`` · ``delegation`` · ``send`` · ``question`` · ``publish``.
+    kind: str = "send"
+    #: ``[{kind, id, name}]`` — the person at the root, then each agent to the one asking.
+    asked_by: list[dict[str, Any]] = Field(default_factory=list)
+    wants: str = ""
+    routed_reason: str = ""
+    #: The approvers by username, in the order named.
+    approver_names: list[str] = Field(default_factory=list)
+    step_run_id: str | None = None
+    #: The run's number, to quote it.
+    run_number: int | None = None
+    scope: str | None = None
+    #: True when the reader is a named approver and it is still pending.
+    can_decide: bool = False
+    #: Who decided, by username.
+    decided_by_name: str | None = None
 
 
-#: What waits for an approval — the ``subject_kind`` an approval is opened with.
-APPROVAL_KINDS = ("step", "delivery", "model_publish", "agent", "skill")
+class ApprovalPage(Page[ApprovalRead]):
+    """A page of asks, with the engine's counts for the Waiting tabs."""
+
+    #: Pending asks the reader may decide.
+    for_you: int = 0
+    #: Pending asks in the Graph the reader can see.
+    pending: int = 0
+
+
+#: The reader's words for what an ask wants.
+APPROVAL_KINDS = ("access", "budget", "delegation", "send", "question", "publish")
+#: The Waiting tabs.
+APPROVAL_VIEWS = {"for_you": "for you", "all": "all pending", "answered": "answered"}
 
 #: What the Approvals list takes. ``q`` matches the title; ``mine=true`` narrows
 #: to the approvals that name the reader as an approver.
 APPROVAL_LIST = ListSpec(
     filters={
         "status": Filter(values=tuple(s.value for s in ApprovalStatus)),
-        "kind": Filter(values=APPROVAL_KINDS, labels={"model_publish": "model publish"}),
+        "kind": Filter(values=APPROVAL_KINDS),
+        "view": Filter(values=tuple(APPROVAL_VIEWS), labels=APPROVAL_VIEWS, title="showing"),
+        "run_id": Filter(title="run"),
         "mine": Filter(values=("true",), labels={"true": "mine"}, title="waiting on"),
     },
     sorts=("-created_at",),
@@ -379,6 +408,56 @@ APPROVAL_LIST = ListSpec(
 
 class ApprovalDecide(BaseModel):
     note: str = Field(default="", max_length=2000)
+    #: A delegation only: ``always`` also writes the caller's *May delegate to*.
+    scope: Literal["run", "always"] = "run"
+
+
+# ── Alert rules (docs/for-developers/modules/operate/features/approvals.md) ──
+
+
+class AlertThreshold(BaseModel):
+    count: int = Field(ge=1)
+    window_s: int = Field(ge=60)
+
+
+class AlertMatch(BaseModel):
+    """What a ledger row must be to match. Patterns take ``*``; empty matches any."""
+
+    act: str = ""
+    touched: str = ""
+    verdict: list[str] = Field(default_factory=list)
+    refused_by: list[str] = Field(default_factory=list)
+    threshold: AlertThreshold | None = None
+
+
+class AlertRuleRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    name: str
+    enabled: bool
+    match: AlertMatch
+    #: The match in one line — ``graph.write.* on Fare · allowed``.
+    match_line: str = ""
+    notify_user_ids: list[str]
+    #: Who it notifies, by username.
+    notify_line: str = ""
+    last_fired_at: datetime | None
+    created_at: datetime
+
+
+class AlertRuleCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=128)
+    enabled: bool = True
+    match: AlertMatch
+    notify_user_ids: list[str] = Field(min_length=1)
+
+
+class AlertRuleUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=128)
+    enabled: bool | None = None
+    match: AlertMatch | None = None
+    notify_user_ids: list[str] | None = None
 
 
 # ── The fleet: the Agents Overview, Performance and who pins each model ────────
