@@ -22,7 +22,6 @@ import { createContext, useContext } from "react";
 /** A declared kind whose whole address is its subject. */
 export type RecordBoardKind =
 	| "skill"
-	| "skill_usage"
 	| "rule"
 	| "world"
 	| "guardrail";

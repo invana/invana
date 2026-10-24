@@ -120,8 +120,8 @@ export function useOpenBoards(
 
 	// Opening a board focuses it, the way opening a canvas focuses that tab.
 	//
-	// **Identity is the pair, not the subject.** `skill:abc` and
-	// `skill_usage:abc` name one skill and are two pages, so a board is
+	// **Identity is the pair, not the subject.** `run:abc` and
+	// `plan_runs:abc` may share a subject and are two pages, so a board is
 	// already open only when its *kind* and its subject both match — keying on
 	// the subject alone made opening the second one a silent no-op.
 	const openBoard = useCallback(

@@ -9,7 +9,6 @@ import {
 	PluginPage,
 	SkillBoardPage,
 	TemplatePage,
-	UsageBoardPage,
 } from "@invana-studio/agents";
 import type { CanvasBackend } from "@invana-studio/canvases";
 import type { useLensesViewPanel } from "@invana-studio/modeller";
@@ -166,8 +165,8 @@ export function declaredBoardContent(
 	}
 
 	// The skill's page — it authors, like the agent's, and
-	// reads no trace, so it takes no `board.runId`. Its usage and a
-	// rule are readings, and stay boards.
+	// reads no trace, so it takes no `board.runId`. A rule is a reading,
+	// and stays a board.
 	if (board.kind === "skill") {
 		return (
 			<SkillBoardPage
@@ -175,23 +174,6 @@ export function declaredBoardContent(
 				graphSlug={graphSlug as string}
 				skillId={board.subjectId}
 				onOpenAgent={openAgentPage}
-				onOpenUsageBoard={(id) =>
-					openBoard({ kind: "skill_usage", subjectId: id })
-				}
-			/>
-		);
-	}
-
-	if (board.kind === "skill_usage") {
-		return (
-			<UsageBoardPage
-				username={username as string}
-				graphSlug={graphSlug as string}
-				skillId={board.subjectId}
-				onOpenSkill={(id) => openBoard({ kind: "skill", subjectId: id })}
-				onOpenRun={(runId) =>
-					openBoard({ kind: "run", subjectId: runId, runId })
-				}
 			/>
 		);
 	}

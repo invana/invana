@@ -8,7 +8,7 @@
  * tests prove is Studio's threading of a real response, not the engine's read.
  */
 import { expect, type Page, test } from "@playwright/test";
-import { askForRun, graphApi, me, ruleWithStatement, skillNamed } from "./api";
+import { askForRun, graphApi, me, ruleWithStatement } from "./api";
 import { GRAPH } from "./explorer";
 
 const STATEMENT = "Airport codes are IATA, never ICAO.";
@@ -183,14 +183,11 @@ test("RU12 — a Todo's Activity tab draws offered and marks cited", async ({
 });
 
 // Every declared kind that keeps readings renders inside `DeclaredBoard` and
-// carries both acts (B21). The skill's own page is not one of them: it is the
-// page that authors the playbook, and nothing freezes a playbook.
-for (const kind of ["skill_usage", "rule"] as const) {
+// carries both acts. The skill's own page is not one of them: it is the page
+// that authors the playbook, and nothing freezes a playbook.
+for (const kind of ["rule"] as const) {
 	test(`${kind} board carries both acts`, async ({ page }) => {
-		const subject =
-			kind === "rule"
-				? await ruleWithStatement(page, STATEMENT)
-				: await skillNamed(page, "Answer in natural language");
+		const subject = await ruleWithStatement(page, STATEMENT);
 		const errors: string[] = [];
 		page.on("pageerror", (e) => errors.push(e.message));
 		await page.goto(`${GRAPH}?page=${kind}:${subject}`);

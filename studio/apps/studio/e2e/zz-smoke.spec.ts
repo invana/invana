@@ -44,8 +44,10 @@ test("every panel and Agents page renders with no module or runtime error", asyn
 	await page
 		.getByText("Brief the route desk", { exact: true })
 		.click({ timeout: 30_000 });
-	await page.getByRole("tab", { name: /^Plan/ }).click();
-	await expect(page.getByText(/^Composed —/)).toBeVisible({ timeout: 30_000 });
+	await page.getByRole("tab", { name: "Flow" }).click();
+	await expect(
+		page.getByText(/^Drawn from the instructions, v\d+\./),
+	).toBeVisible({ timeout: 30_000 });
 	await page.waitForTimeout(1000);
 
 	console.log("ERRORS:", JSON.stringify(errors, null, 1));

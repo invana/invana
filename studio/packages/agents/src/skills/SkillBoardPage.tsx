@@ -1,13 +1,13 @@
 /**
- * The skill's page, as a page in `mainSection` — `skill:<id>`
- * on the strip, the Skills list left beside it in `leftSection`.
+ * The skill's page, as a page in `mainSection` — `skill:<id>` on the strip,
+ * the Skills list left beside it in `leftSection`.
  *
- * This is the host half: which skill, and whether its Playbook is being
- * edited. {@link SkillDetail} is the page itself.
+ * This is the host half: which skill. {@link SkillDetail} is the page itself.
+ * While the list loads the page draws nothing but a spinner; a skill that is
+ * not in the Graph says so.
  */
 
 import { EmptyState, Spinner } from "@invana/ui";
-import { useState } from "react";
 import { EVERY } from "../lists";
 import { useSkillsQuery } from "./queries";
 import { SkillDetail } from "./SkillDetail";
@@ -17,18 +17,15 @@ export function SkillBoardPage({
 	graphSlug,
 	skillId,
 	onOpenAgent,
-	onOpenUsageBoard,
 }: {
 	username: string;
 	graphSlug: string;
 	skillId: string;
-	onOpenAgent: (agentId: string) => void;
-	onOpenUsageBoard: (skillId: string) => void;
+	onOpenAgent?: (agentId: string) => void;
 }) {
 	// The same list the section reads, so the page and the row never disagree
 	// about version or draft.
 	const skills = useSkillsQuery(username, graphSlug, EVERY);
-	const [editing, setEditing] = useState(false);
 	const skill = skills.data?.items.find((s) => s.id === skillId) ?? null;
 
 	if (skills.isLoading)
@@ -36,6 +33,14 @@ export function SkillBoardPage({
 			<div className="flex h-full items-center justify-center">
 				<Spinner />
 			</div>
+		);
+	if (skills.error)
+		return (
+			<EmptyState
+				className="h-full"
+				title="The skills did not load"
+				description={(skills.error as Error).message}
+			/>
 		);
 	if (!skill)
 		return (
@@ -51,11 +56,7 @@ export function SkillBoardPage({
 			username={username}
 			graphSlug={graphSlug}
 			skill={skill}
-			// A draft has nothing to read yet, so it opens editing.
-			editing={editing || skill.is_draft}
-			onEditing={setEditing}
 			onOpenAgent={onOpenAgent}
-			onOpenUsageBoard={onOpenUsageBoard}
 		/>
 	);
 }

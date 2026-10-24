@@ -50,7 +50,6 @@ import {
 	ShieldCheck,
 	SlidersHorizontal,
 	SquareActivity,
-	TrendingUp,
 	WandSparkles,
 } from "lucide-react";
 import type { ElementType } from "react";
@@ -173,7 +172,6 @@ export type DeclaredKind =
 	| "plan_export"
 	| "compare"
 	| "skill"
-	| "skill_usage"
 	| "rule"
 	| "world"
 	| "guardrail"
@@ -282,27 +280,13 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		subject: 'two root task_runs.id joined by ":"',
 	},
 	// Skills (docs/for-developers/building-studio/skills-boards.md).
-	// `skill` is the skill's page — it authors, like `agent`. `skill_usage`
-	// names the same record and is **not** the same page: it is what happened
-	// when the skill was offered, drawn from `task_runs`.
+	// `skill` is the skill's page — it authors, like `agent`; its usage is a tab.
 	skill: {
 		kind: "skill",
 		renders: "declared",
 		label: "Skill",
 		icon: Scale,
 		// `Open` on the Skills section's selected row.
-		panel: "skills",
-		subject: "a skills.id",
-	},
-	// Addressed by the skill, not by a version: one read returns every version,
-	// and the page's job is reading one count against the next — so a board per
-	// version would be seven boards each holding a seventh of one reading.
-	skill_usage: {
-		kind: "skill_usage",
-		renders: "declared",
-		label: "Usage",
-		icon: TrendingUp,
-		// `Usage…` on the skill board, or `More` on the section's Usage tab.
 		panel: "skills",
 		subject: "a skills.id",
 	},

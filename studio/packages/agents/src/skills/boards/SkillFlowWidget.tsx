@@ -1,12 +1,13 @@
 /**
- * The `skillFlow` panel kind — kept for **reports**. `skill:<id>` is now the
- * skill's page, not a board, so nothing live composes this panel; a
- * reading saved from the retired skill board still names it, and a frozen
- * document renders whatever it names ([boards-migration.md](../../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * The `skillFlow` panel kind — kept for **reports**. `skill:<id>` is the
+ * skill's page, not a board, so nothing live composes this panel; a reading
+ * saved from the retired skill board still names it, and a frozen document
+ * renders whatever it names.
  */
 
 import type { PanelRendererProps } from "@invana/boards";
-import { SkillFlowTab } from "../SkillFlowTab";
+import { EmptyState, Spinner } from "@invana/ui";
+import { PlanFlow } from "../SkillFlowTab";
 import type { SkillPlaybookRead } from "../types";
 
 export interface SkillFlowOptions {
@@ -19,11 +20,17 @@ export interface SkillFlowOptions {
 export function SkillFlowWidget({
 	options,
 }: PanelRendererProps<SkillFlowOptions>) {
+	if (options.loading) return <Spinner />;
+	if (!options.plan)
+		return (
+			<EmptyState
+				title={options.empty?.title ?? "No plan to draw"}
+				description={options.empty?.description}
+			/>
+		);
 	return (
-		<SkillFlowTab
-			plan={options.plan ?? undefined}
-			loading={options.loading}
-			empty={options.empty}
-		/>
+		<div className="h-80">
+			<PlanFlow plan={options.plan} />
+		</div>
 	);
 }

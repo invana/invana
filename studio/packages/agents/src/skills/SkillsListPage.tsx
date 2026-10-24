@@ -15,8 +15,9 @@
  * *Runs 30d* is Performance's 30-day skill row, joined by id — the engine's
  * count, never one made here.
  *
- * *New skill* creates a draft and opens its page — nothing is offered it until
- * it is published. A row opens the skill's page as a workbook tab.
+ * *New skill* creates an `untitled` draft holding the four headings and opens
+ * its page on Instructions — nothing is offered it until it is published. A
+ * row opens the skill's page as a workbook tab.
  */
 
 import { type ColumnDef, DataTable } from "@invana/tables";
@@ -36,6 +37,7 @@ import { useFleetPerformanceQuery } from "../fleet/queries";
 import type { PerformanceRow } from "../fleet/types";
 import {
 	chipsOf,
+	EVERY,
 	FilteredEmpty,
 	filterValue,
 	ListStrip,
@@ -47,6 +49,7 @@ import { useAgentsOpen } from "../open";
 import { FleetReadState } from "../overview/fleetParts";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";
+import { newSkillContent } from "./instructionsText";
 import { useCreateSkillMutation, useSkillsQuery } from "./queries";
 import type { Skill } from "./types";
 
@@ -78,11 +81,17 @@ export function SkillsListPage({ username, graphSlug }: SectionPageProps) {
 	const chips = chipsOf(page, list);
 	const status = filterValue(list, "status");
 
-	const newSkill = () =>
+	// Names are unique in a Graph, so a second untitled draft is `untitled-2`.
+	const every = useSkillsQuery(username, graphSlug, EVERY);
+	const newSkill = () => {
+		const taken = new Set((every.data?.items ?? []).map((s) => s.name));
+		let name = "untitled";
+		for (let n = 2; taken.has(name); n++) name = `untitled-${n}`;
 		create.mutate(
-			{ name: `Untitled skill ${(page?.unfiltered_total ?? 0) + 1}` },
+			{ name, content: newSkillContent(name) },
 			{ onSuccess: (skill) => open.skill(skill.id) },
 		);
+	};
 
 	return (
 		<SectionPage

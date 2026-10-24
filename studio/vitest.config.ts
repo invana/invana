@@ -14,6 +14,7 @@ export default defineConfig({
 		coverage: {
 			include: [
 				"packages/core/src/lib/**/*.ts",
+				"packages/agents/src/skills/instructionsText.ts",
 				"packages/core/src/stores/**/*.ts",
 				"packages/core/src/services/telemetry/*.ts",
 				"packages/assistant/src/answer-surface/emissions.ts",

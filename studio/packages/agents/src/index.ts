@@ -44,6 +44,5 @@ export {
 } from "./sections/spec";
 export { SkillFlowWidget } from "./skills/boards/SkillFlowWidget";
 export { ruleTitle, SKILL_ACTIONS, when } from "./skills/boards/shared";
-export { UsageBoardPage } from "./skills/boards/UsageBoardPage";
 export { useSkillsQuery } from "./skills/queries";
 export { SkillBoardPage } from "./skills/SkillBoardPage";
