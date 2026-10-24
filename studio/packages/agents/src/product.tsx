@@ -110,11 +110,7 @@ export const agents: ProductDefinition = {
 				{ index: true },
 				level("home"),
 				level("fleet", "Fleet", tabs("map", "table")),
-				level(
-					"performance",
-					"Performance",
-					tabs("skills", "plans", "llms"),
-				),
+				level("performance", "Performance", tabs("skills", "plans", "llms")),
 				level("agents", "Agents"),
 				level("skills", "Skills"),
 				level(
@@ -123,7 +119,8 @@ export const agents: ProductDefinition = {
 					tabs("plans", "generated", "templates", "plugins"),
 				),
 				level("connections", "Connections", tabs("mcp")),
-				level("llms", "LLMs", [level(":provider", (p) => p.provider)]),
+				// The endpoint's crumb is its name, which the host reads; the id is no label.
+				level("llms", "LLMs", [level(":provider")]),
 				level("settings", "Settings"),
 			],
 		},

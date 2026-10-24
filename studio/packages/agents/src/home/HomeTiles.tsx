@@ -20,12 +20,11 @@ import {
 	ItemTitle,
 } from "@invana/ui";
 import { type ListQuery, useGraphQuery } from "@invana-studio/core";
-import { type ReactNode, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import type { ReactNode } from "react";
 import { useAgentsQuery } from "../agents/queries";
 import { useFleetPerformanceQuery } from "../fleet/queries";
 import { useLLMProvidersQuery } from "../llms/queries";
-import { AgentsOpenContext } from "../open";
+import { useAgentsOpen } from "../open";
 import { useCatalogueQuery } from "../plans/queries";
 import { usePluginsQuery } from "../plugins/queries";
 import { type AgentsSectionKey, SECTIONS } from "../sections/spec";
@@ -59,16 +58,11 @@ export function HomeTiles({
 }) {
 	const lines = useTileLines(username, graphSlug);
 	return (
-		<div className="flex w-full flex-col gap-2">
+		<div className="flex w-full max-w-4xl flex-col gap-2">
 			<Eyebrow>Or open a section</Eyebrow>
 			<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 				{ORDER.map((key) => (
-					<Tile
-						key={key}
-						section={key}
-						line={lines[key]}
-						graph={{ username, graphSlug }}
-					/>
+					<Tile key={key} section={key} line={lines[key]} />
 				))}
 			</div>
 		</div>
@@ -78,23 +72,14 @@ export function HomeTiles({
 function Tile({
 	section,
 	line,
-	graph,
 }: {
 	section: Exclude<AgentsSectionKey, "home">;
 	line: ReactNode;
-	graph: { username: string; graphSlug: string };
 }) {
-	const open = useContext(AgentsOpenContext);
-	const navigate = useNavigate();
+	const open = useAgentsOpen();
 	const spec = SECTIONS[section];
 	const Icon = spec.icon;
-	// Home may draw outside the workbook's openers; the path opens it there.
-	const go = () =>
-		open
-			? open.section(section)
-			: navigate(
-					`/u/${graph.username}/${graph.graphSlug}/agents/${section === "concurrency" ? "settings" : section}`,
-				);
+	const go = () => open.section(section);
 	return (
 		<Item variant="outline" size="sm" asChild>
 			<button type="button" onClick={go}>

@@ -16,7 +16,7 @@ import type { PluginSummary } from "./types";
 export const NEEDS_INSTALL_ADMIN = "Needs an install Admin";
 
 /** `enabled` · `disabled` · `not installed` · `restart to load`. */
-export function pluginState(p: PluginSummary): string {
+function pluginState(p: PluginSummary): string {
 	if (p.restart_required) return "restart to load";
 	if (!p.installed) return "not installed";
 	return p.enabled ? "enabled" : "disabled";

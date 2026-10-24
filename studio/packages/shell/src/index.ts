@@ -91,6 +91,7 @@ export { GraphForm } from "./pages/graphs/GraphForm";
 export { GraphsListPage } from "./pages/graphs/GraphsListPage";
 export { PlatformEventsPage } from "./pages/platform/PlatformEventsPage";
 export * from "./pages/settings/ProfileSettingsPage";
+export { useOpenPalette } from "./palette/CommandPalette";
 export { useAssistantShown } from "./preferences";
 export * from "./products";
 export {
@@ -118,4 +119,3 @@ export type { SetupSlots } from "./setup/SetupSlots";
 export { SetupSlotsContext } from "./setup/SetupSlots";
 export { SetupTimeline } from "./setup/SetupTimeline";
 export { useOnboarding } from "./setup/useOnboarding";
-export { useOpenPalette } from "./palette/CommandPalette";

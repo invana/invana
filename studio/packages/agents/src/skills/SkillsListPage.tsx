@@ -12,6 +12,9 @@
  * box write the URL (`?f.status=` · `?q=`), the engine filters, and the
  * applied-filters strip names what is applied with *N of M match*.
  *
+ * *Runs 30d* is Performance's 30-day skill row, joined by id — the engine's
+ * count, never one made here.
+ *
  * *New skill* creates a draft and opens its page — nothing is offered it until
  * it is published. A row opens the skill's page as a workbook tab.
  */
@@ -29,6 +32,8 @@ import { ActButton } from "@invana-studio/shell";
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useFleetPerformanceQuery } from "../fleet/queries";
+import type { PerformanceRow } from "../fleet/types";
 import {
 	chipsOf,
 	FilteredEmpty,
@@ -61,7 +66,12 @@ export function SkillsListPage({ username, graphSlug }: SectionPageProps) {
 		limit: PAGE,
 	});
 	const create = useCreateSkillMutation(username, graphSlug);
-	const columns = useMemo(skillColumns, []);
+	const perf = useFleetPerformanceQuery(username, graphSlug, "30d");
+	const columns = useMemo(
+		() =>
+			skillColumns(new Map((perf.data?.skills ?? []).map((r) => [r.id, r]))),
+		[perf.data],
+	);
 
 	const page = query.data;
 	const rows = page?.items ?? [];
@@ -145,7 +155,7 @@ export function SkillsListPage({ username, graphSlug }: SectionPageProps) {
 	);
 }
 
-function skillColumns(): ColumnDef<Skill>[] {
+function skillColumns(perf: Map<string, PerformanceRow>): ColumnDef<Skill>[] {
 	return [
 		{
 			id: "skill",
@@ -170,7 +180,7 @@ function skillColumns(): ColumnDef<Skill>[] {
 		},
 		{
 			id: "functions",
-			header: "Plan",
+			header: "Functions",
 			cell: ({ row }) => {
 				const plan = row.original.plan;
 				if (!plan) return <span className="text-muted-foreground">—</span>;
@@ -181,6 +191,15 @@ function skillColumns(): ColumnDef<Skill>[] {
 					</span>
 				);
 			},
+		},
+		{
+			id: "runs",
+			header: "Runs 30d",
+			cell: ({ row }) => (
+				<span className="font-mono">
+					{perf.get(row.original.id)?.runs.toLocaleString() ?? "—"}
+				</span>
+			),
 		},
 		{
 			id: "changed",

@@ -17,7 +17,7 @@
  * is what stops a read-only detail from reading as broken (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
  */
 
-import { AgentChip, Badge, cn, PropertyList } from "@invana/ui";
+import { Badge, cn, PropertyList } from "@invana/ui";
 import type { ReactNode } from "react";
 import type { Tone } from "./statusTone";
 
@@ -91,41 +91,6 @@ export function DetailStatus({
 		<Badge variant={variant} tone={badgeTone} size="xs" className={className}>
 			{children}
 		</Badge>
-	);
-}
-
-/**
- * An agent chip. Plural by construction — which is the point: a pin lives on
- * one agent's envelope and a library entry is used by N, so the answer to
- * *whose* is a list, never a link to "the" agent (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
- */
-export function AgentChipRow({
-	agents,
-	onOpen,
-}: {
-	agents: { id: string; name: string; status?: string }[];
-	onOpen?: (id: string) => void;
-}) {
-	if (!agents.length) return null;
-	return (
-		<div className="flex flex-wrap gap-1">
-			{agents.map((a) => (
-				// The kit's `AgentChip` is "who did this, as a 22px chip" — identity,
-				// deliberately not a `Badge`, because an agent is not a status. A
-				// retired agent is struck through rather than toned, for the same
-				// reason: it is still the same agent.
-				<AgentChip
-					key={a.id}
-					name={a.name}
-					onClick={onOpen ? () => onOpen(a.id) : undefined}
-					title={onOpen ? `Open ${a.name}` : a.name}
-					className={cn(
-						onOpen && "cursor-pointer hover:text-primary",
-						a.status === "retired" && "text-muted-foreground line-through",
-					)}
-				/>
-			))}
-		</div>
 	);
 }
 

@@ -79,7 +79,7 @@ interface FlowStepSpec {
 	args: Record<string, unknown>;
 }
 
-export interface FlowDagNode extends FlowStepSpec {
+interface FlowDagNode extends FlowStepSpec {
 	/** `callable` · `composite` · `human`. */
 	form: string;
 	/** The band this node sits in — sent by the engine, never derived here,

@@ -60,7 +60,7 @@ import {
 } from "./types";
 
 /** What the footer needs to draw its submit. */
-export interface EndpointFormState {
+interface EndpointFormState {
 	valid: boolean;
 	pending: boolean;
 }

@@ -252,7 +252,11 @@ export function LlmsPage({
 							</div>
 						) : null}
 
-						<PanelSection card title="Model versions">
+						<PanelSection
+							card
+							title="Model versions"
+							hint={rows.length ? rows.length : undefined}
+						>
 							{rows.length ? (
 								<VersionsTable rows={rows} onDetail={onDetail} />
 							) : (

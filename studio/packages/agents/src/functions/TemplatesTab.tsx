@@ -5,7 +5,8 @@
  * A template is to an answer what a plan is to a run: a definition, promoted
  * from what served. The engine returns a Graph's templates whole (its own and
  * the ones that ship with Invana), so the search and the kind and surface
- * presets narrow the rows on screen. A row opens the template's page as a tab
+ * presets narrow the rows on screen. *Accepts* is the shape a template
+ * declares it can render, as the engine stores it. A row opens the template's page as a tab
  * beside this one; publishing and removing are taken there.
  */
 
@@ -35,6 +36,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	TypographyInlineCode,
 } from "@invana/ui";
 import { ActButton } from "@invana-studio/shell";
 import { DetailStatus, FormError } from "@invana-studio/ui";
@@ -138,6 +140,7 @@ export function TemplatesTab({
 							<TableHead>Name</TableHead>
 							<TableHead className="w-full">What it shows</TableHead>
 							<TableHead>Surface</TableHead>
+							<TableHead>Accepts</TableHead>
 							<TableHead>Version</TableHead>
 							<TableHead className="whitespace-nowrap text-right">
 								Answers citing it
@@ -155,8 +158,8 @@ export function TemplatesTab({
 								<TableCell>
 									<DetailStatus>{t.kind}</DetailStatus>
 								</TableCell>
-								<TableCell className="whitespace-nowrap font-mono">
-									{t.name}
+								<TableCell className="whitespace-nowrap">
+									<TypographyInlineCode>{t.name}</TypographyInlineCode>
 								</TableCell>
 								<TableCell>
 									{t.intent || (
@@ -166,6 +169,9 @@ export function TemplatesTab({
 									)}
 								</TableCell>
 								<TableCell>{t.surface}</TableCell>
+								<TableCell className="whitespace-nowrap font-mono text-muted-foreground">
+									{acceptsLine(t.accepts)}
+								</TableCell>
 								<TableCell>v{t.version}</TableCell>
 								<TableCell className="text-right">
 									{t.used.toLocaleString()}
@@ -198,6 +204,14 @@ export function TemplatesTab({
 			) : null}
 		</div>
 	);
+}
+
+/** The declared shape, one constraint per part: `result_type tabular · min_rows 1`. */
+function acceptsLine(accepts: Record<string, unknown>): string {
+	const parts = Object.entries(accepts ?? {}).map(([k, v]) =>
+		v === true ? k : `${k} ${String(v)}`,
+	);
+	return parts.length ? parts.join(" · ") : "anything";
 }
 
 /** *Author a template* — a result template, saved as a draft. Mounted only while open. */

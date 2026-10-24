@@ -60,7 +60,7 @@ export function TaskTypePage({
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
 				variant="page"
-				crumbs={["Plugins", pluginName, t.key]}
+				crumbs={["Functions", t.key]}
 				chips={
 					<>
 						<DetailStatus>v{t.version}</DetailStatus>

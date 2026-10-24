@@ -5,7 +5,6 @@
  *
  * - {@link EVERY} — the query of a caller that resolves ids or picks one record
  *   rather than showing a list: the most a page holds.
- * - {@link useUrlSearchUi} — a stack section's search box, written to `?q=`.
  * - {@link ListStrip} · {@link FilteredEmpty} · {@link matchCount} — the
  *   applied-filters strip, the empty state that names them, and the count.
  */
@@ -17,52 +16,12 @@ import type {
 	ListUrl,
 	Page,
 } from "@invana-studio/core";
-import type { StackSectionUi } from "@invana-studio/ui";
-import { useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
 
 /** Everything a Graph has today, in one page. */
 export const EVERY: ListQuery = { limit: 200 };
 
 /** A list that shows its rows asks for a full page and pages on from there. */
 export const PAGE = 200;
-
-type SectionPatch = Parameters<StackSectionUi["set"]>[1];
-
-/**
- * `ui` with one section's search box bound to the URL's `?q=`.
- *
- * The box shows the address bar's own text — untrimmed, so a space typed
- * between two words survives — and opens itself when a link arrives with a
- * search. Closing it clears the search, as it always did.
- */
-export function useUrlSearchUi(
-	ui: StackSectionUi,
-	sectionId: string,
-	list: ListUrl,
-): StackSectionUi {
-	const [search] = useSearchParams();
-	const raw = search.get("q") ?? "";
-	return useMemo(
-		() => ({
-			get: (id) => {
-				const state = ui.get(id);
-				if (id !== sectionId) return state;
-				return { ...state, searchOpen: state.searchOpen || !!raw, search: raw };
-			},
-			set: (id, patch: SectionPatch) => {
-				if (id !== sectionId || patch.search === undefined) {
-					ui.set(id, patch);
-					return;
-				}
-				const { search: q, ...rest } = patch;
-				if (q !== raw) list.setQ(q);
-				ui.set(id, rest);
-			},
-		}),
-		[ui, sectionId, raw, list],
-	);
-}
 
 /** The first value of one URL filter — what a single-value select shows. */
 export function filterValue(list: ListUrl, field: string): string {

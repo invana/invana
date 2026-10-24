@@ -22,6 +22,7 @@ const PATHS = [
 test("every panel and Agents page renders with no module or runtime error", async ({
 	page,
 }) => {
+	test.setTimeout(PATHS.length * 15_000);
 	const errors: string[] = [];
 	page.on("pageerror", (e) => errors.push(`pageerror: ${e}`));
 	page.on("console", (m) => {

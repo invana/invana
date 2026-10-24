@@ -53,6 +53,10 @@ test("an endpoint opens as a modal in the path, and a reload keeps it open", asy
 		await expect(page).toHaveURL(new RegExp(`${LLMS}/${made.id}(\\?|$)`));
 		const dialog = page.getByRole("dialog");
 		await expect(dialog.getByText("e2e-model").first()).toBeVisible();
+		// The trail names the endpoint by its name, never its id.
+		const crumbs = page.getByLabel("Breadcrumb");
+		await expect(crumbs.getByText(name, { exact: true })).toBeVisible();
+		await expect(crumbs.getByText(made.id, { exact: true })).toHaveCount(0);
 
 		await page.reload();
 		await expect(

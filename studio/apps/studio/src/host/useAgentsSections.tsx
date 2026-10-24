@@ -181,6 +181,8 @@ export function useAgentsSections({
 			? (activeSectionId ?? (current === "home" ? AGENTS_HOME_ID : null))
 			: null,
 		openers,
+		/** The LLM endpoint open in its modal, when the path names one. */
+		endpointId: provider,
 		select: (id: string) => {
 			const key = sectionOfPage(id);
 			const entry = open.find((t) => t.key === key);

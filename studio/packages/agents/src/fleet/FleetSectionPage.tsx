@@ -4,9 +4,10 @@
  *
  * Three tabs, each the path's last segment:
  *
- * - **Overview** (`/agents/fleet`) — the fleet dashboard: tiles for runs
- *   today, failures, what waits on a person, p95 run time, tokens this month
- *   and success; *Needs attention* beside *Runs a day*; *Changed recently*.
+ * - **Overview** (`/agents/fleet`) — the fleet dashboard: tiles for the
+ *   agents, runs today, served over 7 days, tokens this month and what waits
+ *   on you; *Needs attention* beside *Runs a day*; the *Agents* card
+ *   ({@link FleetAgentsCard}) beside *Changed recently*.
  * - **Map** (`/agents/fleet/map`) — agents → skills → function namespaces
  *   ({@link FleetMap}).
  * - **Table** (`/agents/fleet/table`) — every agent's numbers over 7 days
@@ -40,8 +41,6 @@ import {
 	changeTone,
 	day,
 	FleetReadState,
-	measureCaption,
-	ms,
 	pct,
 	spreadTicks,
 	TONE_TEXT,
@@ -49,6 +48,8 @@ import {
 } from "../overview/fleetParts";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";
+import { useFleetAgentRows } from "./agentRows";
+import { FleetAgentsCard } from "./FleetAgentsCard";
 import { FleetMap } from "./FleetMap";
 import { FleetTable } from "./FleetTable";
 import { useFleetOverviewQuery } from "./queries";
@@ -114,30 +115,56 @@ export function FleetSectionPage({
 }
 
 function OverviewBody({ data, graph }: { data: FleetOverview; graph: Graph }) {
+	const agents = useFleetAgentRows(graph.username, graph.graphSlug);
 	return (
 		<>
-			<Tiles tiles={data.tiles} />
+			<Tiles
+				agents={data.agents}
+				helpers={agents.page?.ephemeral}
+				tiles={data.tiles}
+			/>
 			<div className="grid gap-3 lg:grid-cols-2">
 				<NeedsAttention items={data.attention} graph={graph} />
 				<RunsADay daily={data.daily} />
 			</div>
-			<ChangedRecently changes={data.changes} graph={graph} />
+			<div className="grid gap-3 lg:grid-cols-3">
+				<div className="min-w-0 lg:col-span-2">
+					<FleetAgentsCard
+						rows={agents.rows}
+						loading={agents.loading}
+						error={agents.error}
+					/>
+				</div>
+				<ChangedRecently changes={data.changes} graph={graph} />
+			</div>
 		</>
 	);
 }
 
-function Tiles({ tiles: t }: { tiles: OverviewTiles }) {
+function Tiles({
+	agents,
+	helpers,
+	tiles: t,
+}: {
+	agents: number;
+	/** Spawned helpers the Agents list counts; undefined until it is read. */
+	helpers: number | undefined;
+	tiles: OverviewTiles;
+}) {
 	// Today's weekday is the one a week ago.
 	const weekday = new Date().toLocaleDateString(undefined, {
 		weekday: "long",
 	});
-	const p95 = measureCaption(t.p95_ms, "7 days");
-	const success = t.success.change;
-	const successPt =
-		success && success.direction !== "flat" ? ` · ${changeText(success)}` : "";
-
 	return (
 		<MetricGrid minTileWidth={160}>
+			<MetricTile
+				label="Agents"
+				value={agents}
+				caption={
+					helpers == null ? undefined : plural(helpers, "spawned helper")
+				}
+				captionTone="muted"
+			/>
 			<MetricTile
 				label="Runs today"
 				value={t.runs_today}
@@ -151,22 +178,14 @@ function Tiles({ tiles: t }: { tiles: OverviewTiles }) {
 				captionTone="muted"
 			/>
 			<MetricTile
-				label="Failed"
-				value={t.failed_today}
-				caption={t.failed_latest ?? "none today"}
-				captionTone={t.failed_today > 0 ? "error" : "muted"}
-			/>
-			<MetricTile
-				label="Waiting on a person"
-				value={t.waiting}
-				caption={t.waiting_latest ?? "nobody waiting"}
-				captionTone={t.waiting > 0 ? "warning" : "muted"}
-			/>
-			<MetricTile
-				label="p95 run time"
-				value={ms(t.p95_ms.value)}
-				caption={p95.caption}
-				captionTone={p95.tone}
+				label="Served · 7 days"
+				value={pct(t.success.value)}
+				caption={
+					t.success.change
+						? `${changeText(t.success.change)} on the 7 days before`
+						: undefined
+				}
+				captionTone={changeTone(t.success.change)}
 			/>
 			<MetricTile
 				label="Tokens this month"
@@ -184,16 +203,10 @@ function Tiles({ tiles: t }: { tiles: OverviewTiles }) {
 				}
 			/>
 			<MetricTile
-				label="Success rate"
-				value={pct(t.success.value)}
-				caption={`7 days${successPt}`}
-				captionTone={
-					t.success.value == null
-						? "muted"
-						: t.success.change?.tone === "worse"
-							? "warning"
-							: "success"
-				}
+				label="Waiting on you"
+				value={t.waiting}
+				caption={t.waiting_latest ?? "nobody waiting"}
+				captionTone={t.waiting > 0 ? "warning" : "muted"}
 			/>
 		</MetricGrid>
 	);

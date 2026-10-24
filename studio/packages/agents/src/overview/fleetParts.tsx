@@ -1,8 +1,6 @@
 /**
- * What the fleet's two pages — Overview and Performance — draw the same way.
+ * What the fleet's pages — Fleet and Performance — draw the same way.
  *
- * - The page frame: a scrolling column under the shell's header, the header
- *   drawn at once and the body under it.
  * - The read's two seams: the kit's spinner line while the fleet is read, and
  *   the engine's own words in an `EmptyState` when it refuses.
  * - The formatters: run time as an elapsed figure, success as a percentage,
@@ -15,21 +13,7 @@
 import { EmptyState, Spinner } from "@invana/ui";
 import { formatCompact, formatElapsed } from "@invana-studio/core";
 import { CircleAlert } from "lucide-react";
-import type { ReactNode } from "react";
 import type { Change, FleetMeasure } from "../fleet/types";
-
-/** A scrolling page column that fills `mainSection`. */
-export function FleetPage({ children }: { children: ReactNode }) {
-	return (
-		<div className="flex h-full min-h-0 flex-col overflow-y-auto">
-			{children}
-		</div>
-	);
-}
-
-export function FleetBody({ children }: { children: ReactNode }) {
-	return <div className="flex flex-col gap-3 p-3">{children}</div>;
-}
 
 /** Loading, or the read's refusal as the engine worded it; null once read. */
 export function FleetReadState({

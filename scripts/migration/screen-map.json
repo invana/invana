@@ -1545,13 +1545,13 @@
   "agents.plans": {
    "story": "AF-02",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/functions/plans",
+   "route": "/u/admin/airways/agents/functions/generated",
    "state": ""
   },
   "agents.plans.detail": {
    "story": "AF-02",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/functions/plans?page=plan_runs%3Anl-single",
+   "route": "/u/admin/airways/agents/functions/generated",
    "state": "nl-single stands for a plan's flows.id: Packaged plans, click a plan"
   },
   "agents.connections.mcp": {
@@ -1617,7 +1617,7 @@
   "agents.plans.promote": {
    "story": "AF-23",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/functions/plans",
+   "route": "/u/admin/airways/agents/functions/generated",
    "state": "Functions \u203a Promote a plan"
   },
   "agents.runs.filtered": {

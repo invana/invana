@@ -8,6 +8,7 @@
  * path (`/agents/fleet` is Overview).
  */
 
+import type { ProductIcon } from "@invana-studio/core";
 import {
 	Bot,
 	BrainCircuit,
@@ -19,7 +20,6 @@ import {
 	Settings,
 	SquareFunction,
 } from "lucide-react";
-import type { ProductIcon } from "@invana-studio/core";
 
 export type AgentsSectionKey =
 	| "home"
@@ -32,7 +32,7 @@ export type AgentsSectionKey =
 	| "llms"
 	| "concurrency";
 
-export interface SectionTab {
+interface SectionTab {
 	key: string;
 	label: string;
 }
@@ -120,7 +120,7 @@ export const SECTIONS: Record<AgentsSectionKey, SectionSpec> = {
 		label: "Settings",
 		icon: Settings,
 		description:
-			"This Graph's agent settings — how many runs at once, and what happens at the ceiling",
+			"This Graph's agent settings — the at-once ceiling and what it does at the ceiling",
 		tabs: [],
 	},
 };

@@ -44,12 +44,12 @@ import {
 } from "@/host/declaredBoardBody";
 import { GraphHomePage } from "@/host/GraphHomePage";
 import { canvasEmptyHint } from "@/host/layeredCanvasBody";
-import type { useDataBoards } from "@/host/useDataBoards";
 import {
 	AGENTS_HOME_ID,
 	sectionOfPage,
 	type useAgentsSections,
 } from "@/host/useAgentsSections";
+import type { useDataBoards } from "@/host/useDataBoards";
 import type { useLayeredCanvas } from "@/host/useLayeredCanvas";
 import type { useOpenBoards } from "@/host/useOpenBoards";
 
@@ -279,7 +279,9 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			? activeBoardId
 			: null;
 
-	const dataPageId = activeCanvasId ? boardPageId("data", activeCanvasId) : null;
+	const dataPageId = activeCanvasId
+		? boardPageId("data", activeCanvasId)
+		: null;
 	const workPage = workCanvas && workPageId ? workPageId : null;
 	const { activeSectionId } = agentsSections;
 	// In Agents a record tab is in front first, then the section the path
@@ -294,12 +296,12 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		: onboardingOpen
 			? GRAPH_PAGE_ID
 			: focusedBoard
-			? focusedBoard
-			: workCanvas && workPageId
-				? workPageId
-				: activeCanvasId
-					? boardPageId("data", activeCanvasId)
-					: GRAPH_PAGE_ID;
+				? focusedBoard
+				: workCanvas && workPageId
+					? workPageId
+					: activeCanvasId
+						? boardPageId("data", activeCanvasId)
+						: GRAPH_PAGE_ID;
 
 	const declaredDeps: DeclaredBoardDeps = {
 		username,
@@ -332,28 +334,28 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	// has none either: with nothing open its workbook shows Home.
 	const graphPage: WorkbookPage[] =
 		explorerOpen || agentsOpen
-		? []
-		: [
-				{
-					id: GRAPH_PAGE_ID,
-					// The page says what it is *showing*. While setup is unfinished the
-					// graph page is the setup board, so the strip tab and the
-					// breadcrumb's last crumb both read `Setup` — a tab named for the slug
-					// over a board of gates names the container and not the content. The id
-					// does not change with it: it is the same page, and `?page=graph` has
-					// to keep resolving.
-					title: setupOutstanding ? "Setup" : (graphSlug ?? "Graph"),
-					icon: setupOutstanding ? Route : Home,
-					content: (
-						<GraphHomePage
-							username={username as string}
-							graphSlug={graphSlug as string}
-							hint={canvasEmptyHint(settingsSection)}
-							start={homeStart}
-						/>
-					),
-				},
-			];
+			? []
+			: [
+					{
+						id: GRAPH_PAGE_ID,
+						// The page says what it is *showing*. While setup is unfinished the
+						// graph page is the setup board, so the strip tab and the
+						// breadcrumb's last crumb both read `Setup` — a tab named for the slug
+						// over a board of gates names the container and not the content. The id
+						// does not change with it: it is the same page, and `?page=graph` has
+						// to keep resolving.
+						title: setupOutstanding ? "Setup" : (graphSlug ?? "Graph"),
+						icon: setupOutstanding ? Route : Home,
+						content: (
+							<GraphHomePage
+								username={username as string}
+								graphSlug={graphSlug as string}
+								hint={canvasEmptyHint(settingsSection)}
+								start={homeStart}
+							/>
+						),
+					},
+				];
 	const pages: WorkbookPage[] = [
 		...agentsSections.pages,
 		...graphPage,

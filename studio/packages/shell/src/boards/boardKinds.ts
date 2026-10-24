@@ -55,12 +55,7 @@ import {
 } from "lucide-react";
 import type { ElementType } from "react";
 
-export type CanvasKind =
-	| "data"
-	| "model"
-	| "plan"
-	| "envelope"
-	| "lineage"; // nothing to show, and nowhere to go
+export type CanvasKind = "data" | "model" | "plan" | "envelope" | "lineage"; // nothing to show, and nowhere to go
 
 export interface CanvasKindSpec {
 	kind: CanvasKind;

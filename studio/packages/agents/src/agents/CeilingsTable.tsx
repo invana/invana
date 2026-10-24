@@ -148,16 +148,6 @@ export function tokenBudgetLine(
 		: `up to ${show(maxTokensRun)} tokens a run`;
 }
 
-/** `1.2m of 5m tokens this month` — or the count alone with no month budget. */
-export function tokenMonthLine(
-	used: number,
-	maxTokensMonth: number | null | undefined,
-): string {
-	return maxTokensMonth == null
-		? `${formatCompact(used)} tokens this month`
-		: `${formatCompact(used)} of ${formatCompact(maxTokensMonth)} tokens this month`;
-}
-
 export function CeilingsTable({
 	group,
 	values,

@@ -101,15 +101,15 @@ test("the breadcrumbs are the path's levels, each a link up", async ({
 
 test("an Agents trail names the section, never its tab", async ({ page }) => {
 	// graph › LLMs › endpoint: the product has no crumb of its own, since the
-	// wordmark reads `Invana Agents`, and a section's tab is not a level.
+	// wordmark reads `Invana Agents`, and a section's tab is not a level. An
+	// open endpoint's crumb is its name (agents-llms.spec); an id is never one.
 	await page.goto(`${GRAPH}/agents/llms/p1`);
 	const crumbs = page.getByLabel("Breadcrumb");
-	await expect(crumbs.getByText("p1", { exact: true })).toBeVisible({
+	await expect(crumbs.getByText("LLMs", { exact: true })).toBeVisible({
 		timeout: 30_000,
 	});
+	await expect(crumbs.getByText("p1", { exact: true })).toHaveCount(0);
 	await expect(crumbs.getByText("Agents", { exact: true })).toHaveCount(0);
-	await crumbs.getByRole("link", { name: "LLMs" }).click();
-	await expect(page).toHaveURL(`${GRAPH}/agents/llms`);
 
 	await page.goto(`${GRAPH}/agents/fleet/map`);
 	await expect(crumbs.getByText("Fleet", { exact: true })).toBeVisible({
@@ -131,7 +131,8 @@ test("a rail item opens its section as a tab; closing it goes back to Home", asy
 	});
 	// No left column in Agents: the section is a page in the main area.
 	await expect(page.locator("#graph-detail-left-section")).toHaveCount(0);
-	await page.getByRole("tab", { name: "Skills" }).getByRole("button").click();
+	// A Workbook tab's × is a sibling control, named for the tab it closes.
+	await page.getByRole("button", { name: "Close Skills" }).click();
 	await expect(page).toHaveURL(`${GRAPH}/agents/home`);
 });
 

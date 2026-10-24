@@ -11,13 +11,13 @@
  *
  * - **Tiles** — success rate, p50, p95, runs, tokens per run and degraded over
  *   the window, each against the window before.
- * - **The trend** beside **What changed** — p95 a day for the most degraded
- *   agent (else the busiest), its baseline dashed and the publishes in the
- *   window marked; and the change named before its first slow run, with a link
- *   to compare the two versions.
- * - **The tables** — *Each agent* and *Each skill* on Agents; one table on each
- *   of the other tabs. An agent's row opens the agent's page, a skill's the
- *   skill's.
+ * - **The trend** beside **What changed**, on Agents only — p95 a day for the
+ *   most degraded agent (else the busiest), its baseline dashed and the
+ *   publishes in the window marked; and the change named before its first slow
+ *   run, with a link to compare the two versions.
+ * - **One table a tab** — *Each agent*, *Each skill* (each at its current
+ *   version against the one before), *Each plan* and *Each model version*. An
+ *   agent's row opens the agent's page, a skill's the skill's.
  *
  * Read-only: the compare is the change log's, and rollback lives on the
  * skill's History. Every number is the engine's. Tokens, never currency.
@@ -37,6 +37,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	TypographyInlineCode,
 } from "@invana/ui";
 import { comparePath } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
@@ -181,12 +182,12 @@ function PerformanceBody({
 	return (
 		<>
 			<Tiles tiles={data.tiles} agents={data.agents} span={span} />
-			<div className="grid gap-3 lg:grid-cols-2">
-				<Trend trend={data.trend} span={span} />
-				<WhatChanged data={data} span={span} graph={graph} />
-			</div>
 			{tab === "agents" ? (
 				<>
+					<div className="grid gap-3 lg:grid-cols-2">
+						<Trend trend={data.trend} span={span} />
+						<WhatChanged data={data} span={span} graph={graph} />
+					</div>
 					<SubjectTable
 						title="Each agent"
 						nameLabel="Agent"
@@ -194,7 +195,6 @@ function PerformanceBody({
 						span={span}
 						onOpen={open.agent}
 					/>
-					<SkillTable rows={data.skills} span={span} onOpen={open.skill} />
 				</>
 			) : tab === "skills" ? (
 				<SkillTable rows={data.skills} span={span} onOpen={open.skill} />
@@ -207,12 +207,7 @@ function PerformanceBody({
 					showVersion
 				/>
 			) : (
-				<SubjectTable
-					title="Each model"
-					nameLabel="Model"
-					rows={data.models}
-					span={span}
-				/>
+				<ModelTable rows={data.models} span={span} />
 			)}
 		</>
 	);
@@ -569,20 +564,17 @@ function SkillTable({
 					<TableHeader>
 						<TableRow>
 							<TableHead>Skill</TableHead>
-							<TableHead>Version</TableHead>
-							<TableHead className="text-right">Applied</TableHead>
+							<TableHead>Versions</TableHead>
+							<TableHead className="text-right">Runs</TableHead>
+							<TableHead className="text-right">Success</TableHead>
+							<TableHead>Against prior</TableHead>
 							<TableHead className="text-right">p95</TableHead>
-							<TableHead>Vs previous</TableHead>
 							<TableHead className="text-right">Tokens / run</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{rows.map((r) => {
 							const change = r.p95_change;
-							const prev =
-								r.prior_version != null
-									? `v${r.prior_version}`
-									: "the window before";
 							return (
 								<TableRow
 									key={r.id}
@@ -590,37 +582,105 @@ function SkillTable({
 									onClick={() => onOpen(r.id)}
 								>
 									<TableCell className="font-medium">{r.name}</TableCell>
-									<TableCell className="font-mono">
-										{r.version != null ? `v${r.version}` : "—"}
+									<TableCell className="text-muted-foreground">
+										{r.version == null
+											? "—"
+											: r.prior_version != null
+												? `v${r.version} against v${r.prior_version}`
+												: `v${r.version}`}
 									</TableCell>
 									<TableCell className="text-right font-mono">
 										{r.runs}
 									</TableCell>
-									<TableCell className="text-right font-mono">
-										{ms(r.p95_ms)}
+									<TableCell
+										className={cn(
+											"text-right font-mono",
+											r.signal === "failing" && "text-destructive",
+										)}
+									>
+										{pct(r.success)}
 									</TableCell>
 									<TableCell>
 										{change == null ? (
 											<span className="text-muted-foreground">—</span>
 										) : (
 											<span className={TONE_TEXT[changeTone(change)]}>
-												{changeText(change, ["▲", "▼"])}
-												{change.direction === "flat" ? "" : ` vs ${prev}`}
+												{change.direction === "flat"
+													? "flat"
+													: `p95 ${changeText(change, ["▲", "▼"])}`}
 											</span>
 										)}
 									</TableCell>
+									<TableCell
+										className={cn(
+											"text-right font-mono",
+											r.signal === "degraded" && "text-warning",
+										)}
+									>
+										{ms(r.p95_ms)}
+									</TableCell>
 									<TableCell className="text-right font-mono">
 										{tokens(r.tokens_per_run)}
-										{r.tokens_per_run_prior != null ? (
-											<span className="text-muted-foreground">
-												{" "}
-												({prev}: {tokens(r.tokens_per_run_prior)})
-											</span>
-										) : null}
 									</TableCell>
 								</TableRow>
 							);
 						})}
+					</TableBody>
+				</Table>
+			) : (
+				<EmptyLine span={span} />
+			)}
+		</PanelSection>
+	);
+}
+
+/** Each model version the window's runs were served by. */
+function ModelTable({ rows, span }: { rows: PerformanceRow[]; span: string }) {
+	return (
+		<PanelSection
+			card
+			title="Each model version"
+			action={<span className="text-sm text-muted-foreground">{span}</span>}
+		>
+			{rows.length ? (
+				<Table bordered={false} density="compact">
+					<TableHeader>
+						<TableRow>
+							<TableHead>Version name</TableHead>
+							<TableHead className="text-right">Runs</TableHead>
+							<TableHead className="text-right">Success</TableHead>
+							<TableHead className="text-right">p95</TableHead>
+							<TableHead className="text-right">Tokens / run</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{rows.map((r) => (
+							<TableRow key={r.id}>
+								<TableCell>
+									<TypographyInlineCode>{r.name}</TypographyInlineCode>
+								</TableCell>
+								<TableCell className="text-right font-mono">{r.runs}</TableCell>
+								<TableCell
+									className={cn(
+										"text-right font-mono",
+										r.signal === "failing" && "text-destructive",
+									)}
+								>
+									{pct(r.success)}
+								</TableCell>
+								<TableCell
+									className={cn(
+										"text-right font-mono",
+										r.signal === "degraded" && "text-warning",
+									)}
+								>
+									{ms(r.p95_ms)}
+								</TableCell>
+								<TableCell className="text-right font-mono">
+									{tokens(r.tokens_per_run)}
+								</TableCell>
+							</TableRow>
+						))}
 					</TableBody>
 				</Table>
 			) : (

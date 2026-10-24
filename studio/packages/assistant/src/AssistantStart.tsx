@@ -56,6 +56,9 @@ interface AssistantStartProps
 	heading?: string;
 	/** The box's placeholder. */
 	placeholder?: string;
+	/** Whether the chips repeat the person's recent Explorer questions. A
+	 *  product whose asks are not Explorer sessions turns them off. */
+	recent?: boolean;
 	/** What a product draws under the start — Agents' section tiles. */
 	children?: ReactNode;
 }
@@ -89,6 +92,7 @@ export function AssistantStart({
 	asking,
 	heading,
 	placeholder = "Ask a question, or say what to draw…",
+	recent: showRecent = true,
 	children,
 	...composer
 }: AssistantStartProps) {
@@ -100,7 +104,7 @@ export function AssistantStart({
 				includeArchived: false,
 				surface: "explorer",
 			}),
-		enabled: asking && !!username && !!graphSlug,
+		enabled: asking && showRecent && !!username && !!graphSlug,
 	});
 	// The distinct questions most recently asked — a session's title is its
 	// first question until someone renames it.
@@ -150,7 +154,7 @@ export function AssistantStart({
 					/>
 				</div>
 			)}
-			{asking && recent.length > 0 && (
+			{asking && showRecent && recent.length > 0 && (
 				<div className="flex flex-wrap justify-center gap-2">
 					{recent.map((q) => (
 						<Button

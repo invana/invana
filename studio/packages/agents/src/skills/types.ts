@@ -46,17 +46,6 @@ export interface SkillCreate {
 }
 
 /**
- * A rename, a republish, or both. Changing any text field publishes the next
- * version; changing only the name does not.
- */
-export interface SkillUpdate {
-	name?: string;
-	description?: string;
-	content?: string;
-	when_to_use?: string;
-}
-
-/**
  * The Skills list. Filters: `status` (published · draft) · `origin` (builtin ·
  * authored). Sorts: `name` · `-updated_at` · `-created_at`.
  */
@@ -229,11 +218,6 @@ export interface SkillVersion {
 	model_pin: string | null;
 	/** The version this one restored, when it is a rollback. */
 	restored_from_version: number | null;
-}
-
-export interface SkillVersionListResponse {
-	items: SkillVersion[];
-	total: number;
 }
 
 /** The next version's text. Anything omitted carries over from the head. */

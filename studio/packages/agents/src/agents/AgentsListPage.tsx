@@ -13,9 +13,9 @@
  * with *N of M match* and *Clear all*. The browser never narrows a row.
  *
  * - **Spawned helpers are hidden, not absent.** One exists for one task and
- *   would grow the list without bound; the engine counts them, the footer
+ *   would grow the list without bound; the engine counts them, the toolbar
  *   says how many, and the toggle reveals them nested under their parent.
- * - **Every number is the engine's.** Runs, served and p95 are Performance's
+ * - **Every number is the engine's.** Runs and served are Performance's
  *   7-day agent rows, joined by id; the month budget is the list's
  *   `tokens_this_month` against the agent's own `max_tokens_month`.
  *
@@ -51,7 +51,7 @@ import {
 	setOne,
 } from "../lists";
 import { useAgentsOpen } from "../open";
-import { FleetReadState, ms, pct, tokens } from "../overview/fleetParts";
+import { FleetReadState, pct, tokens } from "../overview/fleetParts";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";
 import { useSkillsQuery } from "../skills/queries";
@@ -165,6 +165,12 @@ export function AgentsListPage({ username, graphSlug }: SectionPageProps) {
 							}
 						/>
 					</FilterBar>
+					{page && page.ephemeral > 0 ? (
+						<span className="ml-auto text-muted-foreground">
+							{page.ephemeral} spawned helper{page.ephemeral === 1 ? "" : "s"} ·
+							see them in their runs
+						</span>
+					) : null}
 				</div>
 				<ListStrip page={page} list={list} />
 				{query.isLoading ? (
@@ -194,12 +200,6 @@ export function AgentsListPage({ username, graphSlug }: SectionPageProps) {
 						onRowClick={(row) => open.agent(row.agent.id)}
 					/>
 				)}
-				{page && page.ephemeral > 0 && !showEphemeral ? (
-					<p className="text-sm text-muted-foreground">
-						{page.ephemeral} spawned helper{page.ephemeral === 1 ? "" : "s"} —
-						see them in their runs
-					</p>
-				) : null}
 			</SectionBody>
 		</SectionPage>
 	);
@@ -215,8 +215,8 @@ function agentColumns(): ColumnDef<Row>[] {
 			),
 		},
 		{
-			id: "kind",
-			header: "Kind",
+			id: "version",
+			header: "Version",
 			cell: ({ row }) => (
 				<span className="text-muted-foreground">
 					{row.original.agent.kind} · v{row.original.agent.version}
@@ -255,13 +255,6 @@ function agentColumns(): ColumnDef<Row>[] {
 			header: "Served",
 			cell: ({ row }) => (
 				<span className="font-mono">{pct(row.original.perf?.success)}</span>
-			),
-		},
-		{
-			id: "p95",
-			header: "p95",
-			cell: ({ row }) => (
-				<span className="font-mono">{ms(row.original.perf?.p95_ms)}</span>
 			),
 		},
 		{

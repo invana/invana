@@ -1,6 +1,7 @@
 import { CanvasContext } from "@invana/canvas-react";
 import { ErrorBoundary, Workbook } from "@invana/ui";
 import {
+	AgentsOpenContext,
 	HomeTiles,
 	useAgentsQuery,
 	useLLMProvidersQuery,
@@ -353,6 +354,18 @@ export function ProductHost() {
 	const defaultAgent = agents.data?.items.find(
 		(a) => a.id === agents.data?.default_agent_id,
 	);
+	// Agents' sections, each a tab of the Workbook.
+	const agentsSections = useAgentsSections({
+		username,
+		graphSlug,
+		enabled: agentsOpen,
+		openBoard,
+		boardPage,
+		setActiveBoardId,
+		activeCanvasId: dataBoards.activeCanvasId,
+		workPageId: workCanvas ? layered.workPageId : null,
+	});
+
 	const homeStart =
 		username &&
 		graphSlug &&
@@ -364,11 +377,17 @@ export function ProductHost() {
 				username={username}
 				graphSlug={graphSlug}
 				graphName={graphContainer?.name ?? graphSlug}
-				subtitle={startSubtitle(
-					graphContainer?.description,
-					modelList.data?.length,
-					graph,
-				)}
+				// Agents' Home is about the agents, not the Graph's models, and
+				// its asks are not Explorer sessions: no subtitle, chips or views.
+				subtitle={
+					agentsOpen
+						? undefined
+						: startSubtitle(
+								graphContainer?.description,
+								modelList.data?.length,
+								graph,
+							)
+				}
 				availableLanguages={dataBoards.availableLanguages}
 				defaultLanguage={dataBoards.defaultLanguage}
 				llmProviders={llmProviders}
@@ -382,39 +401,33 @@ export function ProductHost() {
 				}}
 				onStop={sessionState.stop}
 				isRunning={sessionState.isRunning}
-				views={(dataBoards.canvasList?.items ?? []).map((c) => ({
-					id: c.id,
-					sessionId: c.sessionId,
-					title: c.title || sessionTitleById.get(c.sessionId) || "Untitled",
-					pinned: c.pinned,
-					updatedAt: c.updatedAt,
-				}))}
+				views={(agentsOpen ? [] : (dataBoards.canvasList?.items ?? [])).map(
+					(c) => ({
+						id: c.id,
+						sessionId: c.sessionId,
+						title: c.title || sessionTitleById.get(c.sessionId) || "Untitled",
+						pinned: c.pinned,
+						updatedAt: c.updatedAt,
+					}),
+				)}
 				onOpenSession={(id) => {
 					right.open("assistant");
 					dataBoards.handleOpenSession(id);
 				}}
 				{...(agentsOpen && {
 					heading: "What should your agents do?",
-					placeholder: "Ask about your agents, or open a section…",
+					placeholder:
+						"Ask about your agents, draft a skill, or open a section…",
+					recent: false,
 				})}
 			>
 				{agentsOpen ? (
-					<HomeTiles username={username} graphSlug={graphSlug} />
+					<AgentsOpenContext.Provider value={agentsSections.openers}>
+						<HomeTiles username={username} graphSlug={graphSlug} />
+					</AgentsOpenContext.Provider>
 				) : null}
 			</AssistantStart>
 		) : undefined;
-
-	// Agents' sections, each a tab of the Workbook.
-	const agentsSections = useAgentsSections({
-		username,
-		graphSlug,
-		enabled: agentsOpen,
-		openBoard,
-		boardPage,
-		setActiveBoardId,
-		activeCanvasId: dataBoards.activeCanvasId,
-		workPageId: workCanvas ? layered.workPageId : null,
-	});
 
 	// The pages open in `mainSection`, the active one, and the strip's actions.
 	const strip = useOpenPages({
@@ -519,17 +532,16 @@ export function ProductHost() {
 				<div className="min-h-0 flex-1">{homeStart ?? <EmptyBoard />}</div>
 			</div>
 		) : null;
-	const explorerHome =
-		explorerOpen ? (
-			explorerLock ? (
-				<ExplorerLocked
-					lock={explorerLock}
-					graphBase={`/u/${username}/${graphSlug}`}
-				/>
-			) : strip.activeId === GRAPH_PAGE_ID ? (
-				(homeStart ?? <EmptyBoard />)
-			) : null
-		) : null;
+	const explorerHome = explorerOpen ? (
+		explorerLock ? (
+			<ExplorerLocked
+				lock={explorerLock}
+				graphBase={`/u/${username}/${graphSlug}`}
+			/>
+		) : strip.activeId === GRAPH_PAGE_ID ? (
+			(homeStart ?? <EmptyBoard />)
+		) : null
+	) : null;
 
 	return (
 		// Lifted context: the live engine reaches the header toolbar, which lives
@@ -553,10 +565,14 @@ export function ProductHost() {
 							// There is no screen crumb before it. `Explorer` used to sit there,
 							// which named the page after one of its eight `leftNav` items
 							// (graph-detail-page.md).
+							// On LLMs, the open endpoint is named by its name, not its id.
 							objectLabel={
-								activeSessionId
-									? sessionTitleById.get(activeSessionId)
-									: undefined
+								agentsSections.endpointId
+									? llmProviders.find((p) => p.id === agentsSections.endpointId)
+											?.name
+									: activeSessionId
+										? sessionTitleById.get(activeSessionId)
+										: undefined
 							}
 							// A project's page names its own levels: Projects › the project
 							// › its branch › the finding.
@@ -568,10 +584,7 @@ export function ProductHost() {
 								// component, so the tabs cannot drift from what they switch
 								// (graph-detail-page.md the-shell.md).
 								content: (
-									<ErrorBoundary
-										key="workbook"
-										onError={reportBoundaryError}
-									>
+									<ErrorBoundary key="workbook" onError={reportBoundaryError}>
 										{agentsHome ?? explorerHome ?? (
 											<div className="relative h-full">
 												<Workbook

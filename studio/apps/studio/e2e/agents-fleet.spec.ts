@@ -14,11 +14,11 @@ const FLEET = `${GRAPH}/agents/fleet`;
 test("Fleet › Overview draws its tiles and sections", async ({ page }) => {
 	await page.goto(FLEET);
 	for (const tile of [
+		"Agents",
 		"Runs today",
-		"Waiting on a person",
-		"p95 run time",
+		"Served · 7 days",
 		"Tokens this month",
-		"Success rate",
+		"Waiting on you",
 	]) {
 		await expect(page.getByText(tile, { exact: true })).toBeVisible({
 			timeout: 30_000,

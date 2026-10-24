@@ -21,6 +21,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	TypographyInlineCode,
 } from "@invana/ui";
 import { Fragment } from "react";
 import { FilteredEmpty, filterValue, ListStrip, setOne } from "../lists";
@@ -139,8 +140,8 @@ export function CatalogueTab({
 										className="cursor-pointer"
 										onClick={() => open.func(e.step_key)}
 									>
-										<TableCell className="whitespace-nowrap font-mono">
-											{e.step_key}
+										<TableCell className="whitespace-nowrap">
+											<TypographyInlineCode>{e.step_key}</TypographyInlineCode>
 										</TableCell>
 										<TableCell>{e.summary}</TableCell>
 										<TableCell>

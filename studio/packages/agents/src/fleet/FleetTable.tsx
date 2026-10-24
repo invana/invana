@@ -4,25 +4,23 @@
  * are Performance's agent rows, read from the same fleet read, so the two
  * pages cannot disagree (the-agents-shell.md › Fleet).
  *
+ * Every agent the Agents list holds gets a row; one that ran nothing in the
+ * window reads `—`. *Find in the fleet* is the list contract's `?q=`: the
+ * engine searches the agents, the browser never narrows a row.
+ *
  * A row opens the agent's page as a workbook tab. Every figure is the
  * engine's; this only formats it. Tokens, never currency.
  */
 
 import { type ColumnDef, DataTable } from "@invana/tables";
-import { Badge } from "@invana/ui";
+import { Badge, EmptyState, SearchInput } from "@invana/ui";
+import { useListParams } from "@invana-studio/core";
 import { useMemo } from "react";
+import { chipsOf, FilteredEmpty, ListStrip } from "../lists";
 import { useAgentsOpen } from "../open";
-import {
-	changeText,
-	changeTone,
-	FleetReadState,
-	ms,
-	pct,
-	TONE_TEXT,
-	tokens,
-} from "../overview/fleetParts";
-import { useFleetPerformanceQuery } from "./queries";
-import type { PerformanceRow } from "./types";
+import { FleetReadState, pct, tokens } from "../overview/fleetParts";
+import { P95Cell } from "./agentCells";
+import { type FleetAgentRow, useFleetAgentRows } from "./agentRows";
 
 export function FleetTable({
 	username,
@@ -32,37 +30,70 @@ export function FleetTable({
 	graphSlug: string;
 }) {
 	const open = useAgentsOpen();
-	const query = useFleetPerformanceQuery(username, graphSlug, "7d");
+	const list = useListParams();
+	const { rows, page, loading, error } = useFleetAgentRows(
+		username,
+		graphSlug,
+		list.query,
+	);
 	const columns = useMemo(agentColumns, []);
-
-	if (!query.data)
-		return (
-			<FleetReadState
-				loading={query.isLoading}
-				error={query.error}
-				what="the fleet's numbers"
-			/>
-		);
+	const chips = chipsOf(page, list);
 
 	return (
-		<DataTable
-			columns={columns}
-			data={query.data.agents}
-			enableSorting={false}
-			getRowId={(row) => row.id}
-			onRowClick={(row) => open.agent(row.id)}
-			emptyState="Nothing ran in the last 7 days"
-		/>
+		<>
+			<div className="flex items-center gap-2">
+				<SearchInput
+					inputSize="sm"
+					className="ml-auto w-64"
+					placeholder="Find in the fleet"
+					value={list.query.q ?? ""}
+					onChange={list.setQ}
+				/>
+			</div>
+			<ListStrip page={page} list={list} />
+			{loading || error ? (
+				<FleetReadState
+					loading={loading}
+					error={error}
+					what="the fleet's numbers"
+				/>
+			) : rows.length === 0 ? (
+				chips.length ? (
+					<FilteredEmpty noun="agent" filters={chips} onClear={list.clear} />
+				) : (
+					<EmptyState
+						title="No agents yet"
+						description="Every Graph is seeded with its own agents — try refreshing."
+					/>
+				)
+			) : (
+				<DataTable
+					columns={columns}
+					data={rows}
+					enableSorting={false}
+					getRowId={(row) => row.agent.id}
+					onRowClick={(row) => open.agent(row.agent.id)}
+				/>
+			)}
+		</>
 	);
 }
 
-function agentColumns(): ColumnDef<PerformanceRow>[] {
+function agentColumns(): ColumnDef<FleetAgentRow>[] {
 	return [
-		{ accessorKey: "name", header: "Agent" },
 		{
-			accessorKey: "runs",
+			id: "agent",
+			header: "Agent",
+			cell: ({ row }) => (
+				<span className="font-medium">{row.original.agent.name}</span>
+			),
+		},
+		{
+			id: "runs",
 			header: "Runs · 7 days",
-			cell: ({ row }) => <span className="font-mono">{row.original.runs}</span>,
+			cell: ({ row }) => (
+				<span className="font-mono">{row.original.perf?.runs ?? "—"}</span>
+			),
 		},
 		{
 			id: "success",
@@ -70,12 +101,12 @@ function agentColumns(): ColumnDef<PerformanceRow>[] {
 			cell: ({ row }) => (
 				<span
 					className={
-						row.original.signal === "failing"
+						row.original.perf?.signal === "failing"
 							? "font-mono text-destructive"
 							: "font-mono"
 					}
 				>
-					{pct(row.original.success)}
+					{pct(row.original.perf?.success)}
 				</span>
 			),
 		},
@@ -88,40 +119,28 @@ function agentColumns(): ColumnDef<PerformanceRow>[] {
 			id: "tokens",
 			header: "Tokens / run",
 			cell: ({ row }) => (
-				<span className="font-mono">{tokens(row.original.tokens_per_run)}</span>
+				<span className="font-mono">
+					{tokens(row.original.perf?.tokens_per_run)}
+				</span>
 			),
 		},
 		{
 			id: "signal",
 			header: "Signal",
-			cell: ({ row }) =>
-				row.original.signal ? (
+			cell: ({ row }) => {
+				const signal = row.original.perf?.signal;
+				return signal ? (
 					<Badge
 						variant="outline"
-						tone={row.original.signal === "failing" ? "destructive" : "warning"}
+						tone={signal === "failing" ? "destructive" : "warning"}
 						size="xs"
 					>
-						{row.original.signal}
+						{signal}
 					</Badge>
 				) : (
 					<span className="text-muted-foreground">—</span>
-				),
+				);
+			},
 		},
 	];
-}
-
-/** `48 s ▲ 38%` — p95 and its change against the 7 days before. */
-function P95Cell({ row }: { row: PerformanceRow }) {
-	const change = row.p95_change;
-	return (
-		<span className="font-mono">
-			{ms(row.p95_ms)}
-			{change ? (
-				<span className={TONE_TEXT[changeTone(change)]}>
-					{" "}
-					{changeText(change, ["▲", "▼"])}
-				</span>
-			) : null}
-		</span>
-	);
 }

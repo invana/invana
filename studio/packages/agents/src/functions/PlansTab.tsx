@@ -10,10 +10,14 @@
  * versions, its export — as a tab beside this one.
  *
  * The bands a plan engages are on the row, because *what will this cost me*
- * is the question a library is scanned with.
+ * is the question a library is scanned with. Packaged plans open under a
+ * banner saying how one is called; Generated plans say they are never drawn
+ * by hand, and carry when each last ran.
  */
 
 import {
+	Alert,
+	AlertDescription,
 	type Layer,
 	LayerChip,
 	SearchInput,
@@ -23,8 +27,11 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	TypographyInlineCode,
 } from "@invana/ui";
+import { formatRelativeTime } from "@invana-studio/core";
 import { LAYER_PALETTE, layerSlug } from "@invana-studio/ui";
+import { GitBranch } from "lucide-react";
 import { FilteredEmpty } from "../lists";
 import { useAgentsOpen } from "../open";
 import { useFlowsQuery } from "../plans/queries";
@@ -58,13 +65,29 @@ export function PlansTab({
 
 	return (
 		<div className="flex flex-col gap-2">
-			<SearchInput
-				inputSize="sm"
-				value={search}
-				onChange={list.setQ}
-				placeholder="Search plans by name or key"
-				className="w-72"
-			/>
+			{generated ? null : (
+				<Alert tone="info">
+					<GitBranch className="size-4" />
+					<AlertDescription>
+						A packaged plan is called like a function and runs as a plan — every
+						step one function with one bound.
+					</AlertDescription>
+				</Alert>
+			)}
+			<div className="flex flex-wrap items-center gap-2">
+				<SearchInput
+					inputSize="sm"
+					value={search}
+					onChange={list.setQ}
+					placeholder="Search plans by name or key"
+					className="w-72"
+				/>
+				{generated ? (
+					<span className="ml-auto text-muted-foreground">
+						Plans are generated, never drawn by hand
+					</span>
+				) : null}
+			</div>
 			{plans.isLoading ? (
 				<RowsLoading />
 			) : plans.isError ? (
@@ -98,6 +121,9 @@ export function PlansTab({
 							<TableHead className="whitespace-nowrap">Used by</TableHead>
 							<TableHead className="text-right">Runs</TableHead>
 							<TableHead>Served</TableHead>
+							{generated ? (
+								<TableHead className="whitespace-nowrap">Last run</TableHead>
+							) : null}
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -127,8 +153,10 @@ function PlanRow({
 }) {
 	return (
 		<TableRow className="cursor-pointer" onClick={onOpen}>
-			<TableCell className="whitespace-nowrap font-mono">
-				{p.key ?? p.name}@{p.version}
+			<TableCell className="whitespace-nowrap">
+				<TypographyInlineCode>
+					{p.key ?? p.name}@{p.version}
+				</TypographyInlineCode>
 			</TableCell>
 			<TableCell>{p.description || p.name}</TableCell>
 			{generated ? <TableCell>{p.origin}</TableCell> : null}
@@ -158,6 +186,11 @@ function PlanRow({
 				{/* Never 0%: *never verified* and *verified and failed* are different facts. */}
 				{p.served_rate == null ? "—" : `${Math.round(p.served_rate * 100)}%`}
 			</TableCell>
+			{generated ? (
+				<TableCell className="whitespace-nowrap text-muted-foreground">
+					{p.last_run_at ? formatRelativeTime(new Date(p.last_run_at)) : "—"}
+				</TableCell>
+			) : null}
 		</TableRow>
 	);
 }

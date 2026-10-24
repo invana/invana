@@ -136,7 +136,7 @@ export function PlanBoardPage({
 			<EmptyState
 				className="h-full"
 				title="This plan is not in the library"
-				description="It may have been retired. Close this page, or pick a plan in Library › Plans."
+				description="It may have been retired. Close this page, or pick a plan in Functions › Packaged plans."
 			/>
 		);
 
