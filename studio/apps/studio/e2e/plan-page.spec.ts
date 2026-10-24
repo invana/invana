@@ -1,6 +1,7 @@
 /**
- * The plan page (LB24) — picking a plan in Library › Plans opens it as a page
- * of four tabs read over a window, and a run row opens that run's page.
+ * The plan page — picking a plan in Agents › Functions › Packaged plans opens
+ * it as a page of four tabs read over a window, and a run row opens that
+ * run's page.
  *
  * Reads only. It needs a Graph where `nl-single` has run and
  * `stitch-withdraw` never has — `demos/airways` after a few asks. (Expanding a
@@ -12,8 +13,8 @@ import { expect, type Page, test } from "@playwright/test";
 const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 
 async function openPlan(page: Page, key: string) {
-	await page.goto(`${GRAPH}?panel=library&section=plans`);
-	const row = page.getByRole("button", { name: new RegExp(`^${key}`) }).first();
+	await page.goto(`${GRAPH}/agents/functions/plans`);
+	const row = page.getByRole("row", { name: new RegExp(`^${key}@`) }).first();
 	await expect(row).toBeVisible({ timeout: 30_000 });
 	await row.click();
 }

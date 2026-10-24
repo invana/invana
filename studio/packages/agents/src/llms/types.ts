@@ -173,12 +173,6 @@ export interface LLMProviderUpdate {
  */
 export type LLMProviderPage = Page<LLMProvider>;
 
-/**
- * One endpoint's models. Search: model id. Filter: `status` (none lists the
- * removed ones too). Sorts: `created_at` · `model_id` · `-updated_at`.
- */
-export type LLMModelPage = Page<LLMModel>;
-
 export interface LLMPingResponse {
 	ok: boolean;
 	latency_ms?: number;

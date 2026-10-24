@@ -1,5 +1,5 @@
 /**
- * The Graph's ceiling — the third group in the settings form.
+ * The Graph's ceiling — how many runs at once, and what happens at it.
  *
  * A budget bounds one agent's spend. Nothing bounded the Graph
  * (docs/for-developers/modules/agents/features/concurrency-and-contention.md):
@@ -7,12 +7,9 @@
  * ten claims on one provider's rate limit, and ten connections from a pool that
  * has fewer.
  *
- * It sits beside the connection because that is what it is really about — the
- * database and the provider behind it — and because five recurrences firing at
- * 08:00 is a question about this Graph, not about any one agent.
- *
- * The live counts sit under the fields rather than on a board elsewhere:
- * contention has to be visible where the number that causes it is set.
+ * The *Runs at once* card on Settings. What the ceiling holds back right now is
+ * drawn beside it, by the page: contention has to be visible where the number
+ * that causes it is set.
  */
 
 import {
@@ -24,16 +21,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@invana/forms";
-import {
-	graphsApi,
-	useGraphQuery,
-	useUpdateGraphMutation,
-} from "@invana-studio/core";
+import { Spinner } from "@invana/ui";
+import { useGraphQuery, useUpdateGraphMutation } from "@invana-studio/core";
 import { ActButton } from "@invana-studio/shell";
-import { useQuery } from "@tanstack/react-query";
+import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { PoolsTable } from "./PoolsTable";
 
 interface Props {
 	username: string;
@@ -41,7 +34,7 @@ interface Props {
 }
 
 export function ConcurrencyFields({ username, graphSlug }: Props) {
-	const { data: graph } = useGraphQuery(username, graphSlug);
+	const { data: graph, isLoading } = useGraphQuery(username, graphSlug);
 	const mutation = useUpdateGraphMutation();
 
 	const [ceiling, setCeiling] = useState("4");
@@ -53,26 +46,26 @@ export function ConcurrencyFields({ username, graphSlug }: Props) {
 		setPolicy(graph.concurrency_policy ?? "queue");
 	}, [graph]);
 
-	// What it is holding back right now. Polled while the panel is open, because
-	// the queue lives in the runtime and changes without anything else changing.
-	const contention = useQuery({
-		queryKey: ["contention", username, graphSlug] as const,
-		queryFn: () => graphsApi.contention(username, graphSlug),
-		refetchInterval: 5_000,
-	});
-
-	if (!graph) return null;
+	if (!graph)
+		return isLoading ? (
+			<div className="flex items-center gap-2 text-muted-foreground">
+				<Spinner />
+				Reading this Graph's ceiling…
+			</div>
+		) : null;
 
 	const dirty =
 		Number(ceiling) !== graph.max_concurrent_runs ||
 		policy !== graph.concurrency_policy;
 
 	return (
-		<div className="space-y-3">
-			<div className="flex gap-3">
-				<div className="w-28">
-					<Label>At once</Label>
+		<div className="flex flex-col gap-3">
+			<div className="flex flex-col gap-1.5">
+				<Label htmlFor="max_concurrent_runs">At once</Label>
+				<div className="flex items-center gap-2">
 					<Input
+						id="max_concurrent_runs"
+						className="w-28"
 						type="number"
 						min={0}
 						max={64}
@@ -81,55 +74,34 @@ export function ConcurrencyFields({ username, graphSlug }: Props) {
 							setCeiling(e.target.value)
 						}
 					/>
+					<span className="text-muted-foreground">
+						runs in this Graph · 0 means no ceiling
+					</span>
 				</div>
-				<div className="flex-1">
-					<Label>At the ceiling</Label>
-					<Select
-						value={policy}
-						onValueChange={(v: string) => setPolicy(v as "queue" | "refuse")}
-					>
-						<SelectTrigger>
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="queue">queue — wait for a slot</SelectItem>
-							<SelectItem value="refuse">
-								refuse — say so immediately
-							</SelectItem>
-						</SelectContent>
-					</Select>
-				</div>
+			</div>
+
+			<div className="flex flex-col gap-1.5">
+				<Label htmlFor="concurrency_policy">At the ceiling</Label>
+				<Select
+					value={policy}
+					onValueChange={(v: string) => setPolicy(v as "queue" | "refuse")}
+				>
+					<SelectTrigger id="concurrency_policy">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="queue">queue — wait for a slot</SelectItem>
+						<SelectItem value="refuse">refuse — say so immediately</SelectItem>
+					</SelectContent>
+				</Select>
 			</div>
 
 			<p className="text-sm text-muted-foreground">
 				A person's question is served before a scheduled run, and a delegated
-				child takes a slot like anything else. `0` means no ceiling.
+				child takes a slot like anything else.
 			</p>
 
-			{contention.data ? (
-				<>
-					<p className="text-sm">
-						<span className="text-muted-foreground">Right now:</span>{" "}
-						<span
-							className={contention.data.running_count ? "text-primary" : ""}
-						>
-							{contention.data.running_count} running
-						</span>
-						{contention.data.queued_count ? (
-							<span className="text-warning">
-								{" "}
-								· {contention.data.queued_count} queued
-							</span>
-						) : null}
-					</p>
-					{/* — the pools, busy or quiet, where the ceiling that causes the
-					    contention is set. The running count alone cannot say
-					    a Graph is stalled on `graphdb` with two runs going. */}
-					<PoolsTable contention={contention.data} />
-				</>
-			) : null}
-
-			{dirty ? (
+			<div className="flex justify-end">
 				<ActButton
 					area="settings"
 					size="sm"
@@ -143,14 +115,18 @@ export function ConcurrencyFields({ username, graphSlug }: Props) {
 									concurrency_policy: policy,
 								},
 							},
-							{ onError: (err) => toast.error(err.message) },
+							{
+								onSuccess: () => toast.success("Ceiling saved"),
+								onError: (err) => toast.error(err.message),
+							},
 						)
 					}
-					disabled={mutation.isPending}
+					disabled={!dirty || mutation.isPending}
 				>
-					Save the ceiling
+					<Check />
+					{mutation.isPending ? "Saving…" : "Save"}
 				</ActButton>
-			) : null}
+			</div>
 		</div>
 	);
 }

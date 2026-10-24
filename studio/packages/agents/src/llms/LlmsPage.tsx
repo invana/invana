@@ -1,42 +1,41 @@
 /**
- * **LLMs** — the model versions this Graph offers, as a page of its own at
- * `/agents/llms` ([fleet-performance.md](../../../../../docs/for-developers/modules/agents/features/fleet-performance.md) ·
+ * **LLMs** — the endpoints this Graph calls and every model version they offer,
+ * as a section page at `/agents/llms` ([the-agents-shell.md](../../../../../docs/for-developers/modules/agents/features/the-agents-shell.md) ·
  * [providers-and-models.md](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md)).
  *
  * *As the person who looks after this Graph's models, I want every version it
  * offers beside who pins it, so that I know what a version change would move
  * before I make one.*
  *
- * **One row per model version.** Each endpoint's models are rows — model ·
- * version name · endpoint · pinned by · status — and a pinned address that no
- * endpoint offers is a row too, because it is the one that refuses runs. A
- * removed model is listed only while something still pins it.
+ * Top to bottom:
  *
- * **A status is what the Graph offers, nothing else.** `offered`, or `no longer
- * offered`. Invana reads no vendor release feed, so the page never says a newer
- * version exists; the notice above the table names each pinned version that is
- * no longer offered and who pins it.
+ * - **The warning** — each pinned version no endpoint offers, naming who pins
+ *   it: those runs refuse until they move.
+ * - **The endpoints** — one card each: its kind, its credential, the versions
+ *   it offers by name. *Open* opens its modal.
+ * - **Model versions** — one row per version: model · version name · endpoint ·
+ *   pinned by · status. A pinned address no endpoint offers is a row too,
+ *   because it is the one that refuses runs. A removed version is listed only
+ *   while something still pins it.
  *
- * **Pinned by is read where pins live** — agents, the current published skill
- * versions, eval judges — plus the worlds whose `cast` names the address. The
- * pins are a separate read; if it fails the table still draws, without them.
+ * **A status is what the Graph offers, nothing else.** Invana reads no vendor
+ * release feed, so the page never says a newer version exists.
  *
- * **An endpoint opens in a sheet over the page.** `provider` is the page's one
- * URL key: `/agents/llms/<id>` is that endpoint's detail, `/agents/llms/new` the
- * form that configures one. Closing the sheet clears it.
+ * **The endpoint modal is in the path** — `/agents/llms/<id>` is `detail` —
+ * so a link opens it and a reload keeps it. *Add endpoint* is a modal of local
+ * state: adding is an act, not a place.
+ *
+ * The pins are a separate read; if it fails the page still draws, without them.
  */
 
 import {
 	Alert,
 	AlertDescription,
 	Badge,
+	Button,
 	EmptyState,
-	RecordHeader,
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
+	PropertyList,
+	PropertyRow,
 	Spinner,
 	StatusDot,
 	Table,
@@ -46,41 +45,21 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
-import { type Lens, useLensesQuery } from "@invana-studio/core";
-import { ActButton, usePageParams } from "@invana-studio/shell";
+import { useLensesQuery } from "@invana-studio/core";
+import { ActButton } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
-import { Plus } from "lucide-react";
-import { useCallback, useMemo } from "react";
-import type { FleetPageProps } from "../fleet/FleetPageProps";
+import { BrainCircuit, Plus } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useModelPinsQuery } from "../fleet/queries";
-import type { ModelPin } from "../fleet/types";
 import { EVERY } from "../lists";
-import { ProviderDetail } from "./ProviderDetail";
-import { ProviderForm } from "./ProviderForm";
+import { useAgentsOpen } from "../open";
+import { SectionBody, SectionPage } from "../sections/SectionPage";
+import type { SectionPageProps } from "../sections/spec";
+import { AddEndpointDialog } from "./AddEndpointDialog";
+import { EndpointDialog } from "./EndpointDialog";
+import { castByAddress, PinnedBy, type Pinner, pinnersOf } from "./pinnedBy";
 import { useLLMProvidersQuery } from "./queries";
-import type { LLMProvider } from "./types";
-
-/** `provider=new` is the form, a value of the one key rather than a second key. */
-const NEW_PROVIDER = "new";
-const PROVIDER_PARAM = "provider";
-
-/**
- * Which worlds name each address in their `cast`, read off the lens list —
- * never a counter, which can disagree with the rows it counts.
- */
-function castByAddress(lenses: Lens[]): Map<string, string[]> {
-	const out = new Map<string, string[]>();
-	for (const lens of lenses) {
-		for (const address of Object.values(lens.cast ?? {})) {
-			if (!address) continue;
-			const names = out.get(address) ?? [];
-			// A world can cast one address in two roles; it is one world either way.
-			if (!names.includes(lens.display_name)) names.push(lens.display_name);
-			out.set(address, names);
-		}
-	}
-	return out;
-}
+import { LLM_PROVIDER_OPTIONS, type LLMProvider } from "./types";
 
 /** `llm/<provider>/<model_id>` → its two segments; a model id may hold `/`. */
 function splitAddress(address: string): { provider: string; model: string } {
@@ -99,33 +78,19 @@ interface VersionRow {
 	offered: boolean;
 	/** An endpoint once offered it; false for an address nothing offers. */
 	removed: boolean;
-	pinnedBy: string[];
-}
-
-/** Who pins an address, in the words the cell reads. */
-function pinnedByWords(pin: ModelPin | undefined, worlds: string[]): string[] {
-	return [
-		...(pin?.agents ?? []).map((a) => a.name),
-		...(pin?.skills ?? []).map((s) => `${s.name} v${s.version}`),
-		...(pin?.judges ?? []).map((j) => `${j.name} evals judge`),
-		...worlds.map((w) => `the ${w} world`),
-	];
+	pinnedBy: Pinner[];
 }
 
 function versionRows(
 	providers: LLMProvider[],
-	pins: ModelPin[],
-	castBy: Map<string, string[]>,
+	pinnedAddresses: string[],
+	pinnersAt: (address: string) => Pinner[],
 ): VersionRow[] {
-	const pinOf = new Map(pins.map((p) => [p.address, p]));
 	const rows: VersionRow[] = [];
 	const listed = new Set<string>();
 	for (const provider of providers) {
 		for (const model of provider.models) {
-			const pinnedBy = pinnedByWords(
-				pinOf.get(model.address),
-				castBy.get(model.address) ?? [],
-			);
+			const pinnedBy = pinnersAt(model.address);
 			const offered = model.status === "active";
 			// A version nobody pins and nobody is offered is not the Graph's any more.
 			if (!offered && !pinnedBy.length) continue;
@@ -142,13 +107,13 @@ function versionRows(
 			});
 		}
 	}
-	for (const pin of pins) {
-		if (listed.has(pin.address)) continue;
-		const pinnedBy = pinnedByWords(pin, []);
+	for (const address of pinnedAddresses) {
+		if (listed.has(address)) continue;
+		const pinnedBy = pinnersAt(address);
 		if (!pinnedBy.length) continue;
-		const { provider: name, model } = splitAddress(pin.address);
+		const { provider: name, model } = splitAddress(address);
 		rows.push({
-			address: pin.address,
+			address,
 			model,
 			versionName: model,
 			provider: providers.find((p) => p.name === name) ?? null,
@@ -161,250 +126,271 @@ function versionRows(
 	return rows;
 }
 
-/** `ollama · local` — the endpoint's name, and its kind where that differs. */
-function endpointWords(row: VersionRow): string {
-	const kind = row.provider?.provider;
-	return kind && kind !== row.providerName
-		? `${row.providerName} · ${kind}`
-		: row.providerName;
-}
-
-function plural(n: number, one: string, many = `${one}s`): string {
-	return `${n} ${n === 1 ? one : many}`;
-}
-
-/** The page's one URL key, read and written as a path segment. */
-function useProviderParam(): [string | null, (id: string | null) => void] {
-	const [params, setParams] = usePageParams();
-	const set = useCallback(
-		(id: string | null) =>
-			setParams(
-				(prev) => {
-					const next = new URLSearchParams(prev);
-					if (id) next.set(PROVIDER_PARAM, id);
-					else next.delete(PROVIDER_PARAM);
-					return next;
-				},
-				{ replace: true },
-			),
-		[setParams],
+function kindLabel(provider: LLMProvider): string {
+	return (
+		LLM_PROVIDER_OPTIONS.find((o) => o.value === provider.provider)?.label ??
+		provider.provider
 	);
-	return [params.get(PROVIDER_PARAM), set];
 }
 
-export function LlmsPage({ username, graphSlug }: FleetPageProps) {
-	const [providerId, openProvider] = useProviderParam();
+/** What the credential is, in words — the engine never returns the secret. */
+function credentialWords(provider: LLMProvider): string {
+	if (!provider.has_api_key)
+		return provider.provider === "claude_agent_sdk"
+			? "none — the local Claude Code login answers"
+			: "none";
+	return provider.credential_kind === "oauth_token"
+		? "subscription token, stored"
+		: "key, stored";
+}
+
+export function LlmsPage({
+	username,
+	graphSlug,
+	detail,
+	onDetail,
+}: SectionPageProps) {
+	const open = useAgentsOpen();
+	const [adding, setAdding] = useState(false);
 	const providers = useLLMProvidersQuery(username, graphSlug, EVERY);
 	const pins = useModelPinsQuery(username, graphSlug);
 	const lenses = useLensesQuery(username, graphSlug);
 
 	const items = providers.data?.items ?? [];
-	const castBy = useMemo(
-		() => castByAddress(lenses.data?.items ?? []),
-		[lenses.data],
-	);
+	const pinnersAt = useMemo(() => {
+		const castBy = castByAddress(lenses.data?.items ?? []);
+		const pinOf = new Map((pins.data?.items ?? []).map((p) => [p.address, p]));
+		return (address: string) =>
+			pinnersOf(pinOf.get(address), castBy.get(address) ?? [], open);
+	}, [lenses.data, pins.data, open]);
 	// A failed pins read draws the table without them, never an error page.
 	const rows = useMemo(
-		() => versionRows(items, pins.data?.items ?? [], castBy),
-		[items, pins.data, castBy],
+		() =>
+			versionRows(
+				items,
+				(pins.data?.items ?? []).map((p) => p.address),
+				pinnersAt,
+			),
+		[items, pins.data, pinnersAt],
 	);
 	const stale = rows.filter((r) => !r.offered);
+	const openProvider = detail
+		? (items.find((p) => p.id === detail) ?? null)
+		: null;
 
-	const authoring = providerId === NEW_PROVIDER;
-	const open = authoring
-		? null
-		: (items.find((p) => p.id === providerId) ?? null);
+	const addAct = (
+		<ActButton area="settings" size="sm" onClick={() => setAdding(true)}>
+			<Plus />
+			Add endpoint
+		</ActButton>
+	);
 
 	return (
-		<div className="flex h-full min-h-0 flex-col overflow-y-auto">
-			<RecordHeader
-				size="lg"
-				variant="page"
-				crumbs={["LLMs"]}
-				chips={
-					providers.data ? (
-						<Badge variant="outline" tone="muted" size="xs">
-							{plural(providers.data.total, "endpoint")} ·{" "}
-							{plural(rows.length, "model version")}
-						</Badge>
-					) : null
-				}
-				actions={
-					<ActButton
-						area="settings"
-						size="sm"
-						onClick={() => openProvider(NEW_PROVIDER)}
-					>
-						<Plus />
-						Add endpoint
-					</ActButton>
-				}
-			/>
-			<div className="flex flex-col gap-3 p-3">
-				<p className="text-sm text-muted-foreground">
-					A run records the version it used; moving an agent to a new version is
-					a change, with evals, in its History
-				</p>
+		<SectionPage
+			section="llms"
+			chips={
+				providers.data ? (
+					<Badge variant="outline" tone="muted" size="xs">
+						{providers.data.total}{" "}
+						{providers.data.total === 1 ? "endpoint" : "endpoints"}
+					</Badge>
+				) : null
+			}
+			actions={addAct}
+		>
+			<SectionBody>
+				{providers.isLoading ? (
+					<div className="flex items-center gap-2 text-muted-foreground">
+						<Spinner />
+						Reading this Graph's endpoints…
+					</div>
+				) : providers.error ? (
+					<EmptyState
+						title="Could not read this Graph's endpoints"
+						description={providers.error.message}
+					/>
+				) : !items.length && !rows.length ? (
+					// Nothing configured is the state that makes every NL run refuse,
+					// so it says what that costs.
+					<EmptyState
+						icon={<BrainCircuit className="size-6" />}
+						title="No endpoints"
+						description="Every question that needs a model is refused until one is configured. Add an endpoint and the cast can name what it offers."
+						actions={addAct}
+					/>
+				) : (
+					<>
+						{stale.length ? (
+							<Alert tone="warning">
+								<AlertDescription className="flex flex-col gap-1">
+									{stale.map((r) => (
+										<p key={r.address}>
+											<span className="font-mono font-semibold">
+												{r.versionName}
+											</span>{" "}
+											{r.removed
+												? `is no longer offered by ${r.providerName}`
+												: "is not offered by any endpoint of this Graph"}
+											, and <PinnedBy pinners={r.pinnedBy} /> still{" "}
+											{r.pinnedBy.length === 1 ? "pins" : "pin"} it — those runs
+											refuse until they move to an offered version.
+										</p>
+									))}
+								</AlertDescription>
+							</Alert>
+						) : null}
 
-				{stale.length ? (
-					<Alert tone="warning">
-						<AlertDescription className="flex flex-col gap-1">
-							{stale.map((r) => (
-								<p key={r.address}>
-									<span className="font-mono font-semibold">
-										{r.versionName}
-									</span>{" "}
-									{r.removed
-										? `is no longer offered by ${r.providerName}`
-										: "is not offered by any endpoint of this Graph"}
-									. Pinned by {r.pinnedBy.join(" · ")} — their runs refuse until
-									they are moved to an offered version.
-								</p>
-							))}
-						</AlertDescription>
-					</Alert>
-				) : null}
-
-				<PanelSection
-					card
-					title="Model versions"
-					action={
-						providers.data ? (
-							<span className="text-sm text-muted-foreground">
-								{rows.length}
-							</span>
-						) : null
-					}
-				>
-					{providers.isLoading ? (
-						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<Spinner className="size-3" />
-							reading this Graph's endpoints
-						</div>
-					) : providers.error ? (
-						<EmptyState
-							title="Could not read this Graph's endpoints"
-							description={
-								providers.error instanceof Error
-									? providers.error.message
-									: "The request failed."
-							}
-						/>
-					) : !items.length && !rows.length ? (
-						// A sentence, never an empty table: nothing configured is the state
-						// that makes every NL run refuse, so it says what that costs.
-						<div className="flex flex-col items-start gap-2">
-							<p className="text-muted-foreground">
-								None configured — every question that needs a model is refused
-								until one is. Add an endpoint and the cast can name what it
-								offers.
-							</p>
-							<ActButton
-								area="settings"
-								size="sm"
-								variant="outline"
-								onClick={() => openProvider(NEW_PROVIDER)}
-							>
-								<Plus />
-								Add endpoint
-							</ActButton>
-						</div>
-					) : (
-						<Table bordered={false} density="compact">
-							<TableHeader>
-								<TableRow>
-									<TableHead>Model</TableHead>
-									<TableHead className="whitespace-nowrap">
-										Version name
-									</TableHead>
-									<TableHead>Endpoint</TableHead>
-									<TableHead className="whitespace-nowrap">Pinned by</TableHead>
-									<TableHead>Status</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{rows.map((r) => (
-									<TableRow
-										key={r.address}
-										className={r.provider ? "cursor-pointer" : undefined}
-										onClick={
-											r.provider
-												? () => openProvider(r.provider?.id ?? null)
-												: undefined
-										}
-									>
-										<TableCell className="whitespace-nowrap">
-											{r.model}
-										</TableCell>
-										<TableCell className="whitespace-nowrap font-mono">
-											{r.versionName}
-										</TableCell>
-										<TableCell className="whitespace-nowrap">
-											{endpointWords(r)}
-										</TableCell>
-										<TableCell className="w-full">
-											{r.pinnedBy.length ? (
-												r.pinnedBy.join(" · ")
-											) : (
-												<span className="text-muted-foreground">—</span>
-											)}
-										</TableCell>
-										<TableCell className="whitespace-nowrap">
-											<span className="flex items-center gap-1.5">
-												<StatusDot tone={r.offered ? "success" : "warning"} />
-												{r.offered
-													? "offered"
-													: r.removed
-														? "no longer offered"
-														: "not offered"}
-											</span>
-										</TableCell>
-									</TableRow>
+						{items.length ? (
+							<div className="grid gap-3 lg:grid-cols-2">
+								{items.map((p) => (
+									<EndpointCard
+										key={p.id}
+										provider={p}
+										onOpen={() => onDetail(p.id)}
+									/>
 								))}
-							</TableBody>
-						</Table>
-					)}
-				</PanelSection>
-			</div>
+							</div>
+						) : null}
 
-			<Sheet
-				open={authoring || !!open}
-				onOpenChange={(next) => {
-					if (!next) openProvider(null);
+						<PanelSection card title="Model versions">
+							{rows.length ? (
+								<VersionsTable rows={rows} onDetail={onDetail} />
+							) : (
+								<p className="py-2 text-muted-foreground">
+									No endpoint offers a version yet — open one and offer it.
+								</p>
+							)}
+						</PanelSection>
+					</>
+				)}
+			</SectionBody>
+
+			<EndpointDialog
+				username={username}
+				graphSlug={graphSlug}
+				id={detail}
+				provider={openProvider}
+				loading={providers.isLoading}
+				pinnersOf={pinnersAt}
+				onClose={() => onDetail(null)}
+			/>
+			<AddEndpointDialog
+				username={username}
+				graphSlug={graphSlug}
+				open={adding}
+				onOpenChange={setAdding}
+				onAdded={(id) => {
+					setAdding(false);
+					onDetail(id);
 				}}
-			>
-				<SheetContent className="flex w-full flex-col gap-0 overflow-y-auto p-0 sm:max-w-xl">
-					<SheetHeader className="border-b p-3">
-						<SheetTitle className="font-mono">
-							{authoring ? "New endpoint" : open?.name}
-						</SheetTitle>
-						<SheetDescription>
-							{authoring
-								? "A name a rule can write against, a vendor and one credential."
-								: "What this endpoint offers, and who casts or pins each model."}
-						</SheetDescription>
-					</SheetHeader>
-					{authoring ? (
-						<div className="p-3">
-							<ProviderForm
-								username={username}
-								graphSlug={graphSlug}
-								existing={null}
-								onDone={(id) => openProvider(id ?? null)}
-								onCancel={() => openProvider(null)}
-							/>
-						</div>
-					) : open ? (
-						<ProviderDetail
-							username={username}
-							graphSlug={graphSlug}
-							provider={open}
-							castBy={castBy}
-							onGone={() => openProvider(null)}
-						/>
-					) : null}
-				</SheetContent>
-			</Sheet>
-		</div>
+			/>
+		</SectionPage>
+	);
+}
+
+/** One endpoint: what it is, how it authenticates, the versions it offers. */
+function EndpointCard({
+	provider,
+	onOpen,
+}: {
+	provider: LLMProvider;
+	onOpen: () => void;
+}) {
+	const offered = provider.models.filter((m) => m.status === "active");
+	return (
+		<PanelSection
+			card
+			title={provider.name}
+			action={
+				<Button
+					variant="ghost"
+					size="sm"
+					aria-label={`Open ${provider.name}`}
+					onClick={onOpen}
+				>
+					Open
+				</Button>
+			}
+		>
+			<PropertyList>
+				<PropertyRow label="Kind">{kindLabel(provider)}</PropertyRow>
+				<PropertyRow label="Credential">
+					{credentialWords(provider)}
+				</PropertyRow>
+				{provider.base_url ? (
+					<PropertyRow label="Base URL" mono>
+						<span className="truncate">{provider.base_url}</span>
+					</PropertyRow>
+				) : null}
+				<PropertyRow label="Versions">
+					{offered.length ? (
+						<span className="font-mono">
+							{offered.map((m) => m.model_id).join(" · ")}
+						</span>
+					) : (
+						<span className="text-muted-foreground">none offered</span>
+					)}
+				</PropertyRow>
+			</PropertyList>
+		</PanelSection>
+	);
+}
+
+function VersionsTable({
+	rows,
+	onDetail,
+}: {
+	rows: VersionRow[];
+	onDetail: (id: string) => void;
+}) {
+	return (
+		<Table bordered={false} density="compact">
+			<TableHeader>
+				<TableRow>
+					<TableHead>Model</TableHead>
+					<TableHead className="whitespace-nowrap">Version name</TableHead>
+					<TableHead>Endpoint</TableHead>
+					<TableHead className="whitespace-nowrap">Pinned by</TableHead>
+					<TableHead>Status</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{rows.map((r) => (
+					<TableRow key={r.address}>
+						<TableCell className="whitespace-nowrap">{r.model}</TableCell>
+						<TableCell className="whitespace-nowrap font-mono">
+							{r.versionName}
+						</TableCell>
+						<TableCell className="whitespace-nowrap font-mono">
+							{r.provider ? (
+								<Button
+									variant="link"
+									size="sm"
+									className="h-auto p-0 font-mono"
+									onClick={() => r.provider && onDetail(r.provider.id)}
+								>
+									{r.providerName}
+								</Button>
+							) : (
+								r.providerName
+							)}
+						</TableCell>
+						<TableCell className="w-full">
+							<PinnedBy pinners={r.pinnedBy} />
+						</TableCell>
+						<TableCell className="whitespace-nowrap">
+							<span className="flex items-center gap-1.5">
+								<StatusDot tone={r.offered ? "success" : "error"} />
+								{r.offered
+									? "offered"
+									: r.removed
+										? "no longer offered"
+										: "not offered"}
+							</span>
+						</TableCell>
+					</TableRow>
+				))}
+			</TableBody>
+		</Table>
 	);
 }

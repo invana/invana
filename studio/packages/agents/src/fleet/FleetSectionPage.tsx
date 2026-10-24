@@ -1,25 +1,21 @@
 /**
- * **Overview** — what broke, what waits on a person, what slowed down and what
- * changed, across every agent and skill of a Graph, at `/agents/overview`
- * (board `agents.overview`, story AG-01).
+ * **Fleet** — every agent in the Graph: how it is doing, what it needs from
+ * you, and how it is wired, at `/agents/fleet` (the-agents-shell.md › Fleet).
  *
- * A full-width page: the host draws it as the whole `mainSection`, with no
- * `leftSection` beside it. Its regions, top to bottom:
+ * Three tabs, each the path's last segment:
  *
- * - **Header** — *Overview*, the `n agents · n skills` count, and *New agent*,
- *   which opens the Agents list's new-agent form.
- * - **Tiles** — runs today against the same weekday last week, failed today
- *   with the newest failure, waiting on a person with the newest, p95 run time
- *   over 7 days against the 7 before, tokens this month against the agents'
- *   month budgets, and success over 7 days.
- * - **Needs attention** beside **Runs a day** — each item carries the one act
- *   that answers it; the chart stacks succeeded over failed for 30 days.
- * - **Changed recently** — the newest agent and skill versions, who made them,
- *   and what ran on them after.
+ * - **Overview** (`/agents/fleet`) — the fleet dashboard: tiles for runs
+ *   today, failures, what waits on a person, p95 run time, tokens this month
+ *   and success; *Needs attention* beside *Runs a day*; *Changed recently*.
+ * - **Map** (`/agents/fleet/map`) — agents → skills → function namespaces
+ *   ({@link FleetMap}).
+ * - **Table** (`/agents/fleet/table`) — every agent's numbers over 7 days
+ *   ({@link FleetTable}).
  *
- * Nothing is decided here: every act is a link to the place the act already
- * lives — Activity › Runs, Activity › Approvals, Performance, the change log's
- * compare, the agent's page. Every number comes from the engine's fleet read.
+ * Nothing is decided here: every act opens the place it already lives — a
+ * run, an agent or Performance as a workbook tab, Activity › Approvals, the
+ * change log's compare. Every number comes from the engine's fleet read.
+ * Tokens, never currency.
  */
 
 import { StackedBarChartV } from "@invana/charts";
@@ -34,27 +30,15 @@ import {
 	ItemTitle,
 	MetricGrid,
 	MetricTile,
-	RecordHeader,
 } from "@invana/ui";
 import { activityPath, comparePath } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
-import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { FleetPageProps } from "../fleet/FleetPageProps";
-import { useFleetOverviewQuery } from "../fleet/queries";
-import type {
-	AttentionItem,
-	DayCount,
-	FleetOverview,
-	OverviewTiles,
-	RecentChange,
-} from "../fleet/types";
+import { type AgentsOpen, useAgentsOpen } from "../open";
 import {
 	changeText,
 	changeTone,
 	day,
-	FleetBody,
-	FleetPage,
 	FleetReadState,
 	measureCaption,
 	ms,
@@ -62,70 +46,74 @@ import {
 	spreadTicks,
 	TONE_TEXT,
 	tokens,
-} from "./fleetParts";
+} from "../overview/fleetParts";
+import { SectionBody, SectionPage } from "../sections/SectionPage";
+import type { SectionPageProps } from "../sections/spec";
+import { FleetMap } from "./FleetMap";
+import { FleetTable } from "./FleetTable";
+import { useFleetOverviewQuery } from "./queries";
+import type {
+	AttentionItem,
+	DayCount,
+	FleetOverview,
+	OverviewTiles,
+	RecentChange,
+} from "./types";
 
 const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"}`;
 
-/** The agent's page, opened beside the Agents list. */
-const agentPagePath = (
-	{ username, graphSlug }: FleetPageProps,
-	agentId: string,
-) =>
-	`/u/${username}/${graphSlug}/agents/agents?page=${encodeURIComponent(`agent:${agentId}`)}`;
+interface Graph {
+	username: string;
+	graphSlug: string;
+}
 
-export function OverviewPage(props: FleetPageProps) {
-	const { username, graphSlug } = props;
-	const navigate = useNavigate();
-	const query = useFleetOverviewQuery(username, graphSlug);
-	const data = query.data;
+export function FleetSectionPage({
+	username,
+	graphSlug,
+	tab,
+	onTab,
+}: SectionPageProps) {
+	const overview = useFleetOverviewQuery(username, graphSlug);
+	const data = overview.data;
+	const graph = { username, graphSlug };
 
 	return (
-		<FleetPage>
-			<RecordHeader
-				size="lg"
-				variant="page"
-				crumbs={["Overview"]}
-				chips={
-					data ? (
-						<Badge variant="outline" tone="muted" size="xs">
-							{plural(data.agents, "agent")} · {plural(data.skills, "skill")}
-						</Badge>
-					) : null
-				}
-				actions={
-					<Button
-						size="sm"
-						onClick={() =>
-							navigate(`/u/${username}/${graphSlug}/agents/agents/new`)
-						}
-					>
-						<Plus />
-						New agent
-					</Button>
-				}
-			/>
-			<FleetBody>
-				{data ? (
-					<OverviewBody data={data} graph={props} />
-				) : (
-					<FleetReadState
-						loading={query.isLoading}
-						error={query.error}
-						what="the fleet"
-					/>
-				)}
-			</FleetBody>
-		</FleetPage>
+		<SectionPage
+			section="fleet"
+			tab={tab}
+			onTab={onTab}
+			chips={
+				data ? (
+					<Badge variant="outline" tone="muted" size="xs">
+						{plural(data.agents, "agent")} · {plural(data.skills, "skill")}
+					</Badge>
+				) : null
+			}
+		>
+			{tab === "map" ? (
+				<FleetMap {...graph} />
+			) : tab === "table" ? (
+				<SectionBody>
+					<FleetTable {...graph} />
+				</SectionBody>
+			) : (
+				<SectionBody>
+					{data ? (
+						<OverviewBody data={data} graph={graph} />
+					) : (
+						<FleetReadState
+							loading={overview.isLoading}
+							error={overview.error}
+							what="the fleet"
+						/>
+					)}
+				</SectionBody>
+			)}
+		</SectionPage>
 	);
 }
 
-function OverviewBody({
-	data,
-	graph,
-}: {
-	data: FleetOverview;
-	graph: FleetPageProps;
-}) {
+function OverviewBody({ data, graph }: { data: FleetOverview; graph: Graph }) {
 	return (
 		<>
 			<Tiles tiles={data.tiles} />
@@ -211,22 +199,23 @@ function Tiles({ tiles: t }: { tiles: OverviewTiles }) {
 	);
 }
 
-/** The act that answers an item, and where it goes. */
+/** The act that answers an item: a tab it opens, or a path it moves to. */
 function attentionAct(
 	item: AttentionItem,
-	graph: FleetPageProps,
-): { label: string; to: string } | null {
+	graph: Graph,
+	open: AgentsOpen,
+): { label: string; act: () => void } | { label: string; to: string } | null {
 	switch (item.kind) {
-		case "failing":
-			return item.run_id
-				? { label: "Open run", to: activityPath(graph, "runs", item.run_id) }
-				: null;
+		case "failing": {
+			const runId = item.run_id;
+			return runId ? { label: "Open run", act: () => open.run(runId) } : null;
+		}
 		case "waiting":
 			return { label: "Review", to: activityPath(graph, "approvals") };
 		case "degraded":
 			return {
 				label: "Investigate",
-				to: `/u/${graph.username}/${graph.graphSlug}/agents/performance`,
+				act: () => open.section("performance"),
 			};
 		default:
 			return null;
@@ -238,9 +227,10 @@ function NeedsAttention({
 	graph,
 }: {
 	items: AttentionItem[];
-	graph: FleetPageProps;
+	graph: Graph;
 }) {
 	const navigate = useNavigate();
+	const open = useAgentsOpen();
 	return (
 		<PanelSection
 			card
@@ -252,7 +242,7 @@ function NeedsAttention({
 			{items.length ? (
 				<ItemGroup>
 					{items.map((item) => {
-						const act = attentionAct(item, graph);
+						const act = attentionAct(item, graph, open);
 						return (
 							<Item
 								key={`${item.kind}:${item.run_id ?? item.approval_id ?? item.agent_id ?? item.title}`}
@@ -267,7 +257,9 @@ function NeedsAttention({
 										<Button
 											variant="outline"
 											size="sm"
-											onClick={() => navigate(act.to)}
+											onClick={() =>
+												"act" in act ? act.act() : navigate(act.to)
+											}
 										>
 											{act.label}
 										</Button>
@@ -285,6 +277,7 @@ function NeedsAttention({
 }
 
 function RunsADay({ daily }: { daily: DayCount[] }) {
+	// The chart's scale, not a figure on screen: the tallest day's stack.
 	const top = Math.max(1, ...daily.map((d) => d.succeeded + d.failed));
 	return (
 		<PanelSection
@@ -340,9 +333,10 @@ function ChangedRecently({
 	graph,
 }: {
 	changes: RecentChange[];
-	graph: FleetPageProps;
+	graph: Graph;
 }) {
 	const navigate = useNavigate();
+	const open = useAgentsOpen();
 	return (
 		<PanelSection
 			card
@@ -400,9 +394,7 @@ function ChangedRecently({
 										<Button
 											variant="outline"
 											size="sm"
-											onClick={() =>
-												navigate(agentPagePath(graph, c.record_id))
-											}
+											onClick={() => open.agent(c.record_id)}
 										>
 											{c.previous != null ? "History" : "Open"}
 										</Button>

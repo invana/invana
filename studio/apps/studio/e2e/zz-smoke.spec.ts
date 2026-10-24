@@ -1,8 +1,25 @@
 import { expect, test } from "@playwright/test";
 
-const PANELS = ["govern", "library", "skills", "projects", "agents"];
+const PATHS = [
+	"modeller/worlds",
+	"projects",
+	"agents/home",
+	"agents/fleet",
+	"agents/fleet/map",
+	"agents/fleet/table",
+	"agents/performance",
+	"agents/agents",
+	"agents/skills",
+	"agents/functions",
+	"agents/functions/plans",
+	"agents/functions/templates",
+	"agents/functions/plugins",
+	"agents/connections/mcp",
+	"agents/llms",
+	"agents/settings",
+];
 
-test("every panel renders with no module or runtime error", async ({
+test("every panel and Agents page renders with no module or runtime error", async ({
 	page,
 }) => {
 	const errors: string[] = [];
@@ -12,8 +29,8 @@ test("every panel renders with no module or runtime error", async ({
 			errors.push(m.text());
 	});
 
-	for (const panel of PANELS) {
-		await page.goto(`/u/admin/airways?panel=${panel}`);
+	for (const path of PATHS) {
+		await page.goto(`/u/admin/airways/${path}`);
 		// The Graph switcher, not the breadcrumb: a product's root (Projects) has no crumb.
 		await expect(
 			page.getByRole("button", { name: "Switch graph" }),
@@ -21,19 +38,11 @@ test("every panel renders with no module or runtime error", async ({
 		await page.waitForTimeout(1500);
 	}
 
-	// The two surfaces this session changed, drilled in.
-	await page.goto(
-		"/u/admin/airways?panel=library&section=plans&plan=nl-single",
-	);
-	await expect(page.getByText(/^Each step, across \d+ runs?$/)).toBeVisible({
-		timeout: 30_000,
-	});
-
-	await page.goto("/u/admin/airways?panel=skills");
+	// A skill opens as a tab of its own beside Skills, its plan drawn.
+	await page.goto("/u/admin/airways/agents/skills");
 	await page
 		.getByText("Brief the route desk", { exact: true })
 		.click({ timeout: 30_000 });
-	await page.getByRole("button", { name: "Open", exact: true }).click();
 	await page.getByRole("tab", { name: /^Plan/ }).click();
 	await expect(page.getByText(/^Composed —/)).toBeVisible({ timeout: 30_000 });
 	await page.waitForTimeout(1000);

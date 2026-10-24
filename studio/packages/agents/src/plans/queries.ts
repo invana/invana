@@ -55,19 +55,6 @@ export function useFlowsQuery(
 	});
 }
 
-export function useFlowQuery(
-	username: string | undefined,
-	graphSlug: string | undefined,
-	key: string | undefined,
-) {
-	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
-	return useQuery({
-		queryKey: flowsKey(scope, [key]),
-		queryFn: () => flowsApi.get(scope.username, scope.graphSlug, key as string),
-		enabled: !!username && !!graphSlug && !!key,
-	});
-}
-
 /** One version of a plan, by key — the plan page names a version, not the newest. */
 export function usePlanVersionQuery(
 	username: string | undefined,
@@ -84,29 +71,8 @@ export function usePlanVersionQuery(
 	});
 }
 
-/** A published version is immutable, so its diff never goes stale. */
-export function usePlanDiffQuery(
-	username: string | undefined,
-	graphSlug: string | undefined,
-	key: string | undefined,
-	version: number | undefined,
-) {
-	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
-	return useQuery({
-		queryKey: flowsKey(scope, [key, "diff", version]),
-		queryFn: () =>
-			flowsApi.diff(
-				scope.username,
-				scope.graphSlug,
-				key as string,
-				version as number,
-			),
-		enabled: !!username && !!graphSlug && !!key && version != null,
-		staleTime: Number.POSITIVE_INFINITY,
-	});
-}
-
-/** Every version's diff at once — the Versions page's column. */
+/** Every version's diff at once — the Versions page's column. A published
+ *  version is immutable, so its diff never goes stale. */
 export function usePlanDiffsQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,

@@ -25,6 +25,7 @@ import {
 	parseBoardPageId,
 	useActiveProduct,
 	useAssistantShown,
+	useOpenPalette,
 } from "@invana-studio/shell";
 import { Home, Pencil, Route, X } from "lucide-react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
@@ -44,6 +45,11 @@ import {
 import { GraphHomePage } from "@/host/GraphHomePage";
 import { canvasEmptyHint } from "@/host/layeredCanvasBody";
 import type { useDataBoards } from "@/host/useDataBoards";
+import {
+	AGENTS_HOME_ID,
+	sectionOfPage,
+	type useAgentsSections,
+} from "@/host/useAgentsSections";
 import type { useLayeredCanvas } from "@/host/useLayeredCanvas";
 import type { useOpenBoards } from "@/host/useOpenBoards";
 
@@ -67,7 +73,8 @@ export interface OpenPagesDeps {
 	workCanvas: ReactNode;
 	dataBoards: ReturnType<typeof useDataBoards>;
 	runStep: string | null;
-	openWorkPanel: DeclaredBoardDeps["openWorkPanel"];
+	/** The Agents sections as tabs; none outside Agents. */
+	agentsSections: ReturnType<typeof useAgentsSections>;
 	openAgentPage: DeclaredBoardDeps["openAgentPage"];
 	showAgentCanvas: DeclaredBoardDeps["showAgentCanvas"];
 	modelSelection: ModelSelection | null;
@@ -110,7 +117,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		workCanvas,
 		dataBoards,
 		runStep,
-		openWorkPanel,
+		agentsSections,
 		openAgentPage,
 		showAgentCanvas,
 		modelSelection,
@@ -198,7 +205,10 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	// canvas, but a page menu item carries only the page id
 	// (graph-detail-page.md), so the shell calls into the page.
 	const boardPageRef = useRef<BoardPageHandle>(null);
-	const explorerOpen = useActiveProduct()?.id === "explorer";
+	const productId = useActiveProduct()?.id;
+	const explorerOpen = productId === "explorer";
+	const agentsOpen = productId === "agents";
+	const openPalette = useOpenPalette();
 	const [assistantShown] = useAssistantShown();
 
 	// Clicking a node/edge feeds `selectedId` via <SelectionBridge>; the
@@ -269,9 +279,21 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			? activeBoardId
 			: null;
 
-	const activePageId = onboardingOpen
-		? GRAPH_PAGE_ID
-		: focusedBoard
+	const dataPageId = activeCanvasId ? boardPageId("data", activeCanvasId) : null;
+	const workPage = workCanvas && workPageId ? workPageId : null;
+	const { activeSectionId } = agentsSections;
+	// In Agents a record tab is in front first, then the section the path
+	// names — or Home — unless a canvas came forward since.
+	const activePageId = agentsOpen
+		? (focusedBoard ??
+			agentsSections.frontId ??
+			workPage ??
+			dataPageId ??
+			activeSectionId ??
+			AGENTS_HOME_ID)
+		: onboardingOpen
+			? GRAPH_PAGE_ID
+			: focusedBoard
 			? focusedBoard
 			: workCanvas && workPageId
 				? workPageId
@@ -287,7 +309,6 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		runStep,
 		settingsPanel,
 		governPanel,
-		openWorkPanel,
 		openAgentPage,
 		showAgentCanvas,
 		backend,
@@ -307,8 +328,10 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	};
 
 	// The Explorer has no graph page: with no canvas open it draws the centred
-	// start in place of the strip, so the strip only ever holds canvases.
-	const graphPage: WorkbookPage[] = explorerOpen
+	// start in place of the strip, so the strip only ever holds canvases. Agents
+	// has none either: with nothing open its workbook shows Home.
+	const graphPage: WorkbookPage[] =
+		explorerOpen || agentsOpen
 		? []
 		: [
 				{
@@ -332,6 +355,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 				},
 			];
 	const pages: WorkbookPage[] = [
+		...agentsSections.pages,
 		...graphPage,
 		...openTabs.map((tab) => ({
 			id: boardPageId("data", tab.id),
@@ -395,6 +419,11 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	// putting the page state that produced it back, which is why this dispatches
 	// rather than setting one id.
 	const selectPage = (id: string) => {
+		if (sectionOfPage(id)) {
+			agentsSections.select(id);
+			return;
+		}
+		agentsSections.stepBack();
 		// A declared board is reached by its id alone — there is no panel state
 		// behind it to put back, which is what `subject_id` buys.
 		if (declaredPage(id)) {
@@ -421,6 +450,10 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	// Closing a page is closing whatever opened it. The graph page has no close —
 	// it is the resting state of the region, not a tab.
 	const closePage = (id: string) => {
+		if (sectionOfPage(id)) {
+			agentsSections.close(id);
+			return;
+		}
 		const board = declaredPage(id);
 		if (board) {
 			// The pair again — closing the usage board must not close the skill
@@ -470,7 +503,10 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		pages,
 		activeId: activePageId,
 		onSelect: selectPage,
-		onAdd: () => void newCanvasTab(),
+		// In Agents `+` opens a section or a record, through ⌘K; elsewhere it
+		// opens a canvas.
+		onAdd: agentsOpen && openPalette ? openPalette : () => void newCanvasTab(),
+		addLabel: agentsOpen ? "Open a section or a record" : "New canvas",
 		onClose: closePage,
 		pageMenuItems,
 	};

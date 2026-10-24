@@ -24,15 +24,16 @@ export type LeftNavKey =
 	| "model"
 	| "projects"
 	| "runs"
-	| "library"
 	| "govern"
 	| "agents"
 	// The Modeller's requests and rules.
 	| "requests"
 	| "rules"
-	// The Agents rail items that are panels of their own.
-	| "overview"
-	| "plugins"
+	// The Agents rail's sections, each a page.
+	| "home"
+	| "fleet"
+	| "functions"
+	| "connections"
 	| "llms"
 	| "performance"
 	| "concurrency"
@@ -58,8 +59,8 @@ export const PANEL_PARAM = "panel";
 export const LEGACY_PANEL_PARAM = "settings";
 
 // A stacked panel's own keys (useStackSections): which section holds the height,
-// and what is drilled into inside it. **Library** (Plans · Templates),
-// **Plugins** (Plugins · Catalogue) and **Projects** (Projects · Todos) are stacks;
+// and what is drilled into inside it. **Projects** (Projects · Todos) and
+// **Govern** (Worlds · Guardrails) are stacks;
 // **Runs** is a list, so it carries `run` and no `sectionKey`. These are
 // dropped whenever the section changes, exactly as `?tab=` is — a run left in
 // the URL under a different rail icon names a body that is not on screen.
@@ -67,14 +68,10 @@ export const STACK_PARAMS = [
 	SECTION_PARAM,
 	LEGACY_SECTION_PARAM,
 	"run",
-	"plan",
-	"entry",
-	"template",
 	"project",
 	"todo",
 	"world",
 	"guardrail",
-	"agent",
 	"provider",
 ] as const;
 
@@ -84,19 +81,18 @@ export const STACK_PARAMS = [
 const STACK_KEYS_OF: Partial<Record<LeftNavKey, readonly string[]>> = {
 	// Runs takes no `?section=` — one list, so there is nothing to choose between.
 	runs: ["run"],
-	library: [SECTION_PARAM, "plan", "template"],
-	// **Plugins** — the registry over the task catalogue; `entry` is a task type.
-	plugins: [SECTION_PARAM, "entry"],
 	projects: [SECTION_PARAM, "project", "todo"],
 	// **Govern** is the third stack — Worlds over Guardrails. Both keys
 	// name a `Lens` id, because a guardrail and a world are one record separated
 	// by `kind`; they are two keys because reading the ceiling is not
 	// reading the world drawn inside it.
 	govern: [SECTION_PARAM, "world", "guardrail"],
-	// **Agents** is the fourth stack, of one section; `agent` is an agent's
-	// own surface.
-	agents: [SECTION_PARAM, "agent"],
-	// **LLMs** is a page; `provider` is the endpoint open in its sheet.
+	// The Agents sections with tabs say which through `?section=`; LLMs drills
+	// into the endpoint its modal opens.
+	fleet: [SECTION_PARAM],
+	performance: [SECTION_PARAM],
+	functions: [SECTION_PARAM],
+	connections: [SECTION_PARAM],
 	llms: ["provider"],
 	// **Model** keeps `?section=` for which Modeller rail item reads it —
 	// Global model, Models or Stitches — so a write never moves the path.
@@ -125,13 +121,14 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"model",
 	"projects",
 	"runs",
-	"library",
 	"govern",
 	"agents",
 	"requests",
 	"rules",
-	"overview",
-	"plugins",
+	"home",
+	"fleet",
+	"functions",
+	"connections",
 	"llms",
 	"performance",
 	"concurrency",

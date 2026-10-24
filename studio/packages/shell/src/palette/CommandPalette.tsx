@@ -68,6 +68,12 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
 	);
 }
 
+/** Opens the palette, for a way in other than the header's — Agents' `+`. */
+export function useOpenPalette(): (() => void) | undefined {
+	const palette = useContext(PaletteContext);
+	return palette ? () => palette.setOpen(true) : undefined;
+}
+
 /** The header's ⌘K: a search field that opens the palette. */
 export function SearchTrigger() {
 	const palette = useContext(PaletteContext);

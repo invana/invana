@@ -27,14 +27,10 @@ const OLD_PANEL_LINKS: [string, string][] = [
 	["?panel=skills", "/agents/skills"],
 	["?panel=agents", "/agents/agents"],
 	["?panel=llms", "/agents/llms"],
-	["?panel=agents&section=llms&provider=p1", "/agents/llms/p1"],
-	["?panel=library", "/agents/library"],
-	["?panel=library&section=plans&plan=nl-single", "/agents/library/nl-single"],
-	["?panel=library&section=catalogue&entry=k1", "/agents/plugins/tasks/k1"],
-	[
-		"?panel=library&section=templates&template=t1",
-		"/agents/library/templates/t1",
-	],
+	["?panel=llms&provider=p1", "/agents/llms/p1"],
+	["?panel=fleet&section=map", "/agents/fleet/map"],
+	["?panel=functions&section=templates", "/agents/functions/templates"],
+	["?panel=connections", "/agents/connections/mcp"],
 	["?panel=runs&run=r1", "/activity/runs/r1"],
 	["?panel=events", "/activity/events"],
 	["?panel=projects&project=p1", "/projects/p1"],
@@ -42,7 +38,6 @@ const OLD_PANEL_LINKS: [string, string][] = [
 	["?panel=govern&section=worlds&world=w1", "/modeller/worlds/w1"],
 	["?panel=govern&section=guardrails&guardrail=g1", "/modeller/guardrails/g1"],
 	["?settings=agents", "/agents/agents"],
-	["?panel=library&drawer=catalogue", "/agents/plugins/tasks"],
 ];
 
 test("the Graph's own URL opens the last product, else Explorer", async ({
@@ -88,6 +83,8 @@ test("a product's root opens its first section", async ({ page }) => {
 	await expect(page).toHaveURL(`${GRAPH}/modeller/global-model`);
 	await page.goto(`${GRAPH}/activity`);
 	await expect(page).toHaveURL(`${GRAPH}/activity/runs`);
+	await page.goto(`${GRAPH}/agents`);
+	await expect(page).toHaveURL(`${GRAPH}/agents/home`);
 });
 
 test("the breadcrumbs are the path's levels, each a link up", async ({
@@ -102,17 +99,40 @@ test("the breadcrumbs are the path's levels, each a link up", async ({
 	await expect(page).toHaveURL(`${GRAPH}/activity/runs`);
 });
 
-test("an Agents trail names each level and walks back up", async ({ page }) => {
-	// graph › Plugins › Tasks › entry: the product has no crumb of its own,
-	// since the wordmark reads `Invana Agents`.
-	await page.goto(`${GRAPH}/agents/plugins/tasks/k1`);
+test("an Agents trail names the section, never its tab", async ({ page }) => {
+	// graph › LLMs › endpoint: the product has no crumb of its own, since the
+	// wordmark reads `Invana Agents`, and a section's tab is not a level.
+	await page.goto(`${GRAPH}/agents/llms/p1`);
 	const crumbs = page.getByLabel("Breadcrumb");
-	await expect(crumbs.getByText("k1", { exact: true })).toBeVisible({
+	await expect(crumbs.getByText("p1", { exact: true })).toBeVisible({
 		timeout: 30_000,
 	});
 	await expect(crumbs.getByText("Agents", { exact: true })).toHaveCount(0);
-	await crumbs.getByRole("link", { name: "Plugins" }).click();
-	await expect(page).toHaveURL(`${GRAPH}/agents/plugins`);
+	await crumbs.getByRole("link", { name: "LLMs" }).click();
+	await expect(page).toHaveURL(`${GRAPH}/agents/llms`);
+
+	await page.goto(`${GRAPH}/agents/fleet/map`);
+	await expect(crumbs.getByText("Fleet", { exact: true })).toBeVisible({
+		timeout: 30_000,
+	});
+	await expect(crumbs.getByText("map", { exact: true })).toHaveCount(0);
+});
+
+test("a rail item opens its section as a tab; closing it goes back to Home", async ({
+	page,
+}) => {
+	await page.goto(`${GRAPH}/agents/home`);
+	await expect(page.getByText("What should your agents do?")).toBeVisible({
+		timeout: 30_000,
+	});
+	await page.goto(`${GRAPH}/agents/skills`);
+	await expect(page.getByRole("tab", { name: "Skills" })).toBeVisible({
+		timeout: 30_000,
+	});
+	// No left column in Agents: the section is a page in the main area.
+	await expect(page.locator("#graph-detail-left-section")).toHaveCount(0);
+	await page.getByRole("tab", { name: "Skills" }).getByRole("button").click();
+	await expect(page).toHaveURL(`${GRAPH}/agents/home`);
 });
 
 test("a reload on a path lands on the same screen", async ({ page }) => {

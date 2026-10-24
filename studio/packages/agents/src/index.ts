@@ -1,19 +1,17 @@
 /**
- * `@invana-studio/agents` — the Agents product's public surface: the agents
- * that do the legwork (`agents/`), the skills they may be offered (`skills/`),
- * the Library of plans (`plans/`) and answer templates (`projections/`), the
- * LLM endpoints they think with (`llms/`), and how much of it may run at once
- * (`settings/`) (agents.md); the Plugins panel; the full-width Overview,
- * Performance and LLMs pages over the fleet's reads (`fleet/`); and the
- * product's `ProductDefinition`.
+ * `@invana-studio/agents` — the Agents product's public surface: the section
+ * pages the rail opens as tabs (`sections/`), Home's tiles, the record pages a
+ * row opens beside them — an agent, a skill, a plugin, a function, a plan, a
+ * template — the canvases an agent's page draws, and the product's
+ * `ProductDefinition` (agent-fabric.md, the-agents-shell.md).
  *
  * Nothing outside this package reaches past this file. What the product
- * borrows from its host comes through `AgentsSlotsContext`.
+ * borrows from its host comes through `AgentsSlotsContext`; how a page opens a
+ * record comes through `AgentsOpenContext`.
  */
 
 export { AgentsSlotsContext } from "./AgentsSlots";
 export { AgentBoardPage } from "./agents/AgentBoardPage";
-export { AgentsViewPanel } from "./agents/AgentsViewPanel";
 export { EnvelopeCanvas } from "./agents/EnvelopeCanvas";
 export { LineageCanvas } from "./agents/LineageCanvas";
 export {
@@ -22,12 +20,11 @@ export {
 	useAgentsQuery,
 } from "./agents/queries";
 export type { AgentEdge } from "./agents/types";
-export { LlmsPage } from "./llms/LlmsPage";
+export { TemplatePage } from "./functions/TemplatePage";
+export { HomeTiles } from "./home/HomeTiles";
 export { useLLMProvidersQuery } from "./llms/queries";
 export type { LLMProvider } from "./llms/types";
-export { OverviewPage } from "./overview/OverviewPage";
-export { PerformancePage } from "./performance/PerformancePage";
-export { flowsApi } from "./plans/api";
+export { type AgentsOpen, AgentsOpenContext } from "./open";
 export { PlanBoardPage } from "./plans/boards/PlanBoardPage";
 export { PLAN_CHART_WIDGETS } from "./plans/boards/PlanChartWidgets";
 export {
@@ -35,21 +32,18 @@ export {
 	PlanExportPage,
 	PlanVersionsPage,
 } from "./plans/boards/PlanRecordPages";
-export { LibraryViewPanel } from "./plans/LibraryViewPanel";
-export { PlanFlowCanvas } from "./plans/PlanFlowCanvas";
-export {
-	useFlowQuery,
-	useFlowsQuery,
-} from "./plans/queries";
-export { useLibraryViewPanel } from "./plans/useLibraryViewPanel";
+export { useFlowsQuery } from "./plans/queries";
 export { PluginPage } from "./plugins/PluginPage";
-export { PluginsViewPanel } from "./plugins/PluginsViewPanel";
 export { TaskTypePage } from "./plugins/TaskTypePage";
 export { agents } from "./product";
-export { AgentsSettingsViewPanel } from "./settings/AgentsSettingsViewPanel";
+export { AgentsSectionBody } from "./sections/AgentsSectionBody";
+export {
+	type AgentsSectionKey,
+	firstTab,
+	SECTIONS,
+} from "./sections/spec";
 export { SkillFlowWidget } from "./skills/boards/SkillFlowWidget";
 export { ruleTitle, SKILL_ACTIONS, when } from "./skills/boards/shared";
 export { UsageBoardPage } from "./skills/boards/UsageBoardPage";
 export { useSkillsQuery } from "./skills/queries";
 export { SkillBoardPage } from "./skills/SkillBoardPage";
-export { SkillsViewPanel } from "./skills/SkillsViewPanel";

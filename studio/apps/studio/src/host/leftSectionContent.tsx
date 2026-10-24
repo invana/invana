@@ -1,13 +1,5 @@
 import type { GraphCanvas } from "@invana/graph";
 import { ErrorBoundary } from "@invana/ui";
-import {
-	AgentsSettingsViewPanel,
-	AgentsViewPanel,
-	flowsApi,
-	LibraryViewPanel,
-	PluginsViewPanel,
-	SkillsViewPanel,
-} from "@invana-studio/agents";
 import type { useSessions } from "@invana-studio/assistant";
 import type { LensKind, QueryResultItem } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
@@ -39,11 +31,7 @@ export interface LeftSectionDeps {
 	layered: ReturnType<typeof useLayeredCanvas>;
 	openBoard: (board: OpenBoard) => void;
 	openLensBoard: (kind: LensKind, lensId: string) => void;
-	openWorkPanel: (
-		section: "projects" | "runs" | "library" | "agents" | "skills",
-	) => void;
 	openAgentPage: (id: string) => void;
-	showAgentCanvas: (kind: "envelope" | "lineage", id: string) => void;
 	/** The project's plan canvas, brought in front of any focused page. */
 	showPlanCanvas: () => void;
 	modelSelection: ModelSelection | null;
@@ -72,9 +60,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		layered,
 		openBoard,
 		openLensBoard,
-		openWorkPanel,
 		openAgentPage,
-		showAgentCanvas,
 		showPlanCanvas,
 		modelSelection,
 		setModelSelection,
@@ -87,18 +73,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		activeSessionId,
 		sessionTitleById,
 	} = deps;
-	const {
-		setSelectedProjectKey,
-		setWorkKind,
-		setSelectedAgentId,
-		selectedStepId,
-		selectedSkillId,
-		setSelectedSkillId,
-		selectedAgentId,
-		setSelectedLineageEdge,
-		selectedLineageEdge,
-		setSelectedTaskId,
-	} = layered;
+	const { setSelectedProjectKey, setWorkKind } = layered;
 	return settingsPanel.section === "model" ? (
 		// The panel lists; the page acts. Its selection is the page's
 		// scope, and both are the URL's — so a row picked here reads on the
@@ -123,41 +98,10 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 				if (!key) setWorkKind(null);
 			}}
 			onOpenPlanCanvas={showPlanCanvas}
-			onOpenAgent={(id) => {
-				setSelectedAgentId(id);
-				setWorkKind("lineage");
-				openWorkPanel("agents");
-			}}
+			onOpenAgent={openAgentPage}
 			// A statement on a step row opens the rule's board beside the
 			// section, the same way `More` does from Rules.
 			onOpenRule={(ruleId) => openBoard({ kind: "rule", subjectId: ruleId })}
-		/>
-	) : settingsPanel.section === "library" ? (
-		// **Library is definition** — Plans · Templates, stacked, with no panel
-		// header above them: what can be run, and how its output renders.
-		<LibraryViewPanel
-			username={username as string}
-			graphSlug={graphSlug as string}
-			selectedStepId={selectedStepId}
-			onOpenAgent={(id) => {
-				openWorkPanel("agents");
-				openAgentPage(id);
-			}}
-			planExportUrl={(key) =>
-				flowsApi.exportUrl(username as string, graphSlug as string, key)
-			}
-		/>
-	) : settingsPanel.section === "skills" ? (
-		// A skill is a setting that hangs over the work, so its panel opens
-		// beside whatever canvas is already there — it takes no kind of its own.
-		<SkillsViewPanel
-			username={username as string}
-			graphSlug={graphSlug as string}
-			onClose={closeLeftPanel}
-			selectedSkillId={selectedSkillId}
-			onSelectSkill={setSelectedSkillId}
-			// `Open` — the skill's page, and the stack stays.
-			onOpenSkillPage={(id) => openBoard({ kind: "skill", subjectId: id })}
 		/>
 	) : settingsPanel.section === "govern" ? (
 		// Govern holds Worlds over Guardrails as two sections of one panel,
@@ -182,40 +126,6 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		/>
 	) : settingsPanel.section === "requests" ? (
 		<RequestsViewPanel />
-	) : settingsPanel.section === "plugins" ? (
-		// The plugin registry over the task catalogue a plan is written in.
-		<PluginsViewPanel
-			username={username as string}
-			graphSlug={graphSlug as string}
-			onOpenPlugin={(name) => openBoard({ kind: "plugin", subjectId: name })}
-		/>
-	) : settingsPanel.section === "concurrency" ? (
-		<AgentsSettingsViewPanel
-			username={username as string}
-			graphSlug={graphSlug as string}
-		/>
-	) : settingsPanel.section === "agents" ? (
-		// Agents holds the agents over the LLMs as two sections of one panel
-		// — a provider is what an agent's cast resolves against,
-		// so it is read where agents are rather than in a tab of Settings.
-		<AgentsViewPanel
-			username={username as string}
-			graphSlug={graphSlug as string}
-			selectedAgentId={selectedAgentId}
-			onSelectAgent={(id) => {
-				setSelectedAgentId(id);
-				setSelectedLineageEdge(null);
-			}}
-			onOpenAgentPage={openAgentPage}
-			selectedEdge={selectedLineageEdge}
-			onOpenLineage={(id) => showAgentCanvas("lineage", id)}
-			onOpenTask={(id) => {
-				// A Todo lives under Projects; the rail's Tasks icon is
-				// execution only.
-				setSelectedTaskId(id);
-				openWorkPanel("projects");
-			}}
-		/>
 	) : settingsPanel.section === "explorer" ? (
 		// Sessions is not a left panel; the Explorer's own is the graph's
 		// type list and the selection (selection-and-the-panel.md) — the legend

@@ -1281,13 +1281,13 @@
   "agents.overview": {
    "story": "AG-01",
    "product": "agents",
-   "route": "/u/admin/airways/agents",
+   "route": "/u/admin/airways/agents/fleet",
    "state": ""
   },
   "agents.overview.dark": {
    "story": "AG-01",
    "product": "agents",
-   "route": "/u/admin/airways/agents",
+   "route": "/u/admin/airways/agents/fleet",
    "state": "theme dark: user menu \u203a Appearance \u203a Dark"
   },
   "agents.agents": {
@@ -1305,55 +1305,55 @@
   "agents.agent": {
    "story": "AG-03",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents/analyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
    "state": "analyst stands for an agent's slug: open any agent from Agents"
   },
   "agents.agent.activity": {
    "story": "AG-03",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents/analyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Activity tab"
   },
   "agents.agent.instructions": {
    "story": "AG-04",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents/analyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Instructions tab (needs B02)"
   },
   "agents.agent.soul": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents/analyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Soul tab"
   },
   "agents.agent.thinking": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents/analyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Thinking tab"
   },
   "agents.agent.skills": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents/analyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Skills & callables tab"
   },
   "agents.agent.envelope": {
    "story": "AG-05",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents/analyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Envelope"
   },
   "agents.agent.history": {
    "story": "AG-06",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents/analyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
    "state": "analyst stands for an agent's slug: open any agent from Agents; History tab"
   },
   "agents.agent.pause": {
    "story": "AG-07",
    "product": "agents",
-   "route": "/u/admin/airways/agents/agents/analyst",
+   "route": "/u/admin/airways/agents/agents?page=agent%3Aanalyst",
    "state": "analyst stands for an agent's slug: open any agent from Agents; Pause or retire"
   },
   "agents.skills": {
@@ -1365,7 +1365,7 @@
   "agents.skills.detail": {
    "story": "AG-08",
    "product": "agents",
-   "route": "/u/admin/airways/agents/skills/answer-nl",
+   "route": "/u/admin/airways/agents/skills?page=skill%3Aanswer-nl",
    "state": "answer-nl stands for a skill's slug: open any skill from Skills"
   },
   "agents.skills.instructions.edit": {
@@ -1401,104 +1401,224 @@
   "agents.library": {
    "story": "AG-11",
    "product": "agents",
-   "route": "/u/admin/airways/agents/library",
+   "route": "/u/admin/airways/agents/functions/plans",
    "state": ""
   },
   "agents.library.plan": {
    "story": "AG-11",
    "product": "agents",
-   "route": "/u/admin/airways/agents/library",
+   "route": "/u/admin/airways/agents/functions/plans",
    "state": "Plans tab, click a plan"
   },
   "agents.library.plan.overview": {
    "story": "AG-11",
    "product": "agents",
-   "route": "/u/admin/airways/agents/library",
+   "route": "/u/admin/airways/agents/functions/plans",
    "state": "Plans tab, click a plan; Overview tab"
   },
   "agents.library.plan.revisions": {
    "story": "AG-11",
    "product": "agents",
-   "route": "/u/admin/airways/agents/library",
+   "route": "/u/admin/airways/agents/functions/plans",
    "state": "a run that replanned: its Revisions"
   },
   "agents.library.templates": {
    "story": "AG-12",
    "product": "agents",
-   "route": "/u/admin/airways/agents/library",
+   "route": "/u/admin/airways/agents/functions/plans",
    "state": "Templates tab"
   },
   "agents.plugins": {
    "story": "AG-13",
    "product": "agents",
-   "route": "/u/admin/airways/agents/plugins",
+   "route": "/u/admin/airways/agents/functions/plugins",
    "state": "needs B06a for its rows"
   },
   "agents.plugins.plugin": {
    "story": "AG-13",
    "product": "agents",
-   "route": "/u/admin/airways/agents/plugins",
+   "route": "/u/admin/airways/agents/functions/plugins",
    "state": "click a plugin (needs B06a)"
   },
   "agents.plugins.task": {
    "story": "AG-13",
    "product": "agents",
-   "route": "/u/admin/airways/agents/plugins",
+   "route": "/u/admin/airways/agents/functions/plugins",
    "state": "click a plugin, then a task type (needs B06a)"
   },
   "agents.llms": {
-   "story": "AG-14",
-   "product": "agents",
+   "story": "AF-19",
+   "product": "agent-fabric",
    "route": "/u/admin/airways/agents/llms",
    "state": ""
   },
   "agents.performance": {
-   "story": "AG-15",
-   "product": "agents",
+   "story": "AF-20",
+   "product": "agent-fabric",
    "route": "/u/admin/airways/agents/performance",
    "state": ""
   },
   "agents.settings": {
-   "story": "AG-16",
-   "product": "agents",
+   "story": "AF-25",
+   "product": "agent-fabric",
    "route": "/u/admin/airways/agents/settings",
+   "state": ""
+  },
+  "agents.home": {
+   "story": "AF-01",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/home",
+   "state": ""
+  },
+  "agents.open": {
+   "story": "AF-01",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/home",
+   "state": "click + on the tab strip: the palette lists the sections and recent records"
+  },
+  "agents.fleet.overview": {
+   "story": "AF-01",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/fleet",
+   "state": "Overview tab"
+  },
+  "agents.fleet.overview.empty": {
+   "story": "AF-01",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/fleet",
+   "state": "a Graph no agent has run on: Overview tab"
+  },
+  "agents.fleet.map": {
+   "story": "AF-01",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/fleet/map",
+   "state": ""
+  },
+  "agents.fleet.map.closed": {
+   "story": "AF-01",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/fleet/map",
+   "state": "Map tab with the assistant closed"
+  },
+  "agents.fleet.map.agent": {
+   "story": "AF-01",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/fleet/map",
+   "state": "Map tab, click an agent"
+  },
+  "agents.fleet.map.table": {
+   "story": "AF-01",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/fleet/map",
+   "state": "Map tab, open the console's Table"
+  },
+  "agents.fleet.table": {
+   "story": "AF-01",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/fleet/table",
    "state": ""
   },
   "agents.functions": {
    "story": "AF-02",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/plugins/tasks",
+   "route": "/u/admin/airways/agents/functions",
    "state": ""
   },
   "agents.functions.detail": {
    "story": "AF-02",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/plugins/tasks/graph.read.query",
-   "state": "graph.read.query stands for a function's dotted name: click any function in the catalogue"
+   "route": "/u/admin/airways/agents/functions?page=task_type%3Agraph.read.query",
+   "state": "graph.read.query stands for a function's dotted name: click any function in Functions"
   },
   "agents.functions.plans": {
    "story": "AF-02",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/library",
-   "state": "Packaged plans: the plan library"
+   "route": "/u/admin/airways/agents/functions/plans",
+   "state": "Packaged plans tab"
   },
   "agents.functions.closed": {
    "story": "AF-02",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/plugins/tasks",
-   "state": "the catalogue with the assistant closed"
+   "route": "/u/admin/airways/agents/functions",
+   "state": "Functions with the assistant closed"
   },
   "agents.plans": {
    "story": "AF-02",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/library",
+   "route": "/u/admin/airways/agents/functions/plans",
    "state": ""
   },
   "agents.plans.detail": {
    "story": "AF-02",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/library/nl-single",
-   "state": "nl-single stands for a plan's key: click any plan in the library"
+   "route": "/u/admin/airways/agents/functions/plans?page=plan_runs%3Anl-single",
+   "state": "nl-single stands for a plan's flows.id: Packaged plans, click a plan"
+  },
+  "agents.connections.mcp": {
+   "story": "AF-17",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/connections/mcp",
+   "state": "MCP servers tab"
+  },
+  "agents.connections.mcp.add": {
+   "story": "AF-17",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/connections/mcp",
+   "state": "MCP servers \u203a Add MCP server"
+  },
+  "agents.llms.endpoint": {
+   "story": "AF-19",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/llms/anthropic",
+   "state": "anthropic stands for an endpoint's id: click an endpoint's Open"
+  },
+  "agents.llms.add": {
+   "story": "AF-19",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/llms",
+   "state": "Add endpoint"
+  },
+  "agents.performance.skills": {
+   "story": "AF-20",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/performance/skills",
+   "state": "Skills tab"
+  },
+  "agents.performance.llms": {
+   "story": "AF-20",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/performance/llms",
+   "state": "LLMs tab"
+  },
+  "agents.functions.templates": {
+   "story": "AF-23",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/functions/templates",
+   "state": "Templates tab"
+  },
+  "agents.functions.template.new": {
+   "story": "AF-23",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/functions/templates",
+   "state": "Templates tab \u203a New template"
+  },
+  "agents.functions.plugins": {
+   "story": "AF-23",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/functions/plugins",
+   "state": "Plugins tab"
+  },
+  "agents.functions.plugin": {
+   "story": "AF-23",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/functions/plugins",
+   "state": "Plugins tab, click a plugin"
+  },
+  "agents.plans.promote": {
+   "story": "AF-23",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/functions/plans",
+   "state": "Functions \u203a Promote a plan"
   },
   "agents.runs.filtered": {
    "story": "AF-26",

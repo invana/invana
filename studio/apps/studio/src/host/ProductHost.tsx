@@ -1,6 +1,10 @@
 import { CanvasContext } from "@invana/canvas-react";
 import { ErrorBoundary, Workbook } from "@invana/ui";
-import { useAgentsQuery, useLLMProvidersQuery } from "@invana-studio/agents";
+import {
+	HomeTiles,
+	useAgentsQuery,
+	useLLMProvidersQuery,
+} from "@invana-studio/agents";
 import {
 	AssistantReopenPill,
 	AssistantSlotsContext,
@@ -35,7 +39,6 @@ import {
 } from "@invana-studio/shell";
 import { useCallback, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { agentsPage } from "@/host/agentsPages";
 import { assistantSlots } from "@/host/assistantSlots";
 import { OpenBoardContext } from "@/host/boards";
 import { consoleSection } from "@/host/consoleSection";
@@ -45,6 +48,7 @@ import { layeredCanvasBody } from "@/host/layeredCanvasBody";
 import { leftSection } from "@/host/leftSectionContent";
 import { rightSection } from "@/host/rightSections";
 import { setupSlots } from "@/host/setupSlots";
+import { AGENTS_HOME_ID, useAgentsSections } from "@/host/useAgentsSections";
 import { useBoardPageTrail } from "@/host/useBoardPageTrail";
 import { useDataBoards } from "@/host/useDataBoards";
 import { useLayeredCanvas } from "@/host/useLayeredCanvas";
@@ -92,8 +96,9 @@ function startSubtitle(
  * The product host — the one page every graph product's routes draw. It owns
  * the state the regions share (the open sessions, the canvas, the declared
  * boards, the layered canvases, the selection) and fills each region for the
- * open product: the Workbook in `mainSection`, the product's panel in
- * `leftSection`, the assistant on the right and the Console
+ * open product: the Workbook in `mainSection` — in Agents, its sections as
+ * tabs and Home when nothing is open — the product's panel in `leftSection`,
+ * the assistant on the right and the Console
  * underneath. The open product is the route's (`useActiveProduct`); the open
  * panel is the path's (`useLeftSection`).
  */
@@ -194,15 +199,11 @@ export function ProductHost() {
 	);
 
 	const openWorkPanel = useCallback(
-		(section: "projects" | "runs" | "library" | "agents" | "skills") => {
-			settingsPanel.setSection(section);
-		},
+		(section: "projects") => settingsPanel.setSection(section),
 		[settingsPanel],
 	);
 
-	// The agent's page is a declared board in `mainSection`; the Agents
-	// list stays in `leftSection` with the agent selected beside it. **Stable**:
-	// the Agents panel calls it from an effect when an old `&agent=` link lands.
+	// The agent's page is a declared board in `mainSection`, a tab of its own.
 	const openAgentPage = useCallback(
 		(id: string) => {
 			setSelectedAgentId(id);
@@ -308,9 +309,7 @@ export function ProductHost() {
 		layered,
 		openBoard,
 		openLensBoard,
-		openWorkPanel,
 		openAgentPage,
-		showAgentCanvas,
 		showPlanCanvas,
 		modelSelection,
 		setModelSelection,
@@ -347,7 +346,9 @@ export function ProductHost() {
 	// home page is one question box. Sending from it docks the conversation on the
 	// right as the session's canvas opens. A new session is answered by the
 	// Graph's default agent, so the start names it.
-	const explorerOpen = useActiveProduct()?.id === "explorer";
+	const activeProductId = useActiveProduct()?.id;
+	const explorerOpen = activeProductId === "explorer";
+	const agentsOpen = activeProductId === "agents";
 	const agents = useAgentsQuery(username, graphSlug, { limit: 200 });
 	const defaultAgent = agents.data?.items.find(
 		(a) => a.id === agents.data?.default_agent_id,
@@ -357,7 +358,7 @@ export function ProductHost() {
 		graphSlug &&
 		!connectionMissing &&
 		!right.is("assistant") &&
-		(explorerOpen || !settingsPanel.isOpen) ? (
+		(explorerOpen || agentsOpen || !settingsPanel.isOpen) ? (
 			<AssistantStart
 				asking={assistantShown}
 				username={username}
@@ -392,8 +393,28 @@ export function ProductHost() {
 					right.open("assistant");
 					dataBoards.handleOpenSession(id);
 				}}
-			/>
+				{...(agentsOpen && {
+					heading: "What should your agents do?",
+					placeholder: "Ask about your agents, or open a section…",
+				})}
+			>
+				{agentsOpen ? (
+					<HomeTiles username={username} graphSlug={graphSlug} />
+				) : null}
+			</AssistantStart>
 		) : undefined;
+
+	// Agents' sections, each a tab of the Workbook.
+	const agentsSections = useAgentsSections({
+		username,
+		graphSlug,
+		enabled: agentsOpen,
+		openBoard,
+		boardPage,
+		setActiveBoardId,
+		activeCanvasId: dataBoards.activeCanvasId,
+		workPageId: workCanvas ? layered.workPageId : null,
+	});
 
 	// The pages open in `mainSection`, the active one, and the strip's actions.
 	const strip = useOpenPages({
@@ -409,7 +430,7 @@ export function ProductHost() {
 		workCanvas,
 		dataBoards,
 		runStep,
-		openWorkPanel,
+		agentsSections,
 		openAgentPage,
 		showAgentCanvas,
 		modelSelection,
@@ -440,14 +461,6 @@ export function ProductHost() {
 				/>
 			</div>
 		) : null;
-
-	// An Agents page — Overview, Performance, LLMs — fills the main area in
-	// place of the Workbook while its rail item is open.
-	const page = agentsPage(
-		settingsPanel.isOpen ? settingsPanel.section : null,
-		username,
-		graphSlug,
-	);
 
 	// The right side's occupant, and the header controls and `footer`.
 	const regionDeps = {
@@ -493,8 +506,21 @@ export function ProductHost() {
 			: null;
 	// With the chat docked and nothing drawn yet, the board is its empty
 	// ground: one question box on screen, never two.
+	// Agents with nothing open: Home under the strip, no tab lit.
+	const agentsHome =
+		agentsOpen && strip.activeId === AGENTS_HOME_ID ? (
+			<div className="flex h-full flex-col">
+				<Workbook
+					{...strip}
+					keepMounted={false}
+					className="h-auto flex-none"
+					bodyClassName="hidden"
+				/>
+				<div className="min-h-0 flex-1">{homeStart ?? <EmptyBoard />}</div>
+			</div>
+		) : null;
 	const explorerHome =
-		explorerOpen && !page ? (
+		explorerOpen ? (
 			explorerLock ? (
 				<ExplorerLocked
 					lock={explorerLock}
@@ -543,14 +569,13 @@ export function ProductHost() {
 								// (graph-detail-page.md the-shell.md).
 								content: (
 									<ErrorBoundary
-										key={page ? settingsPanel.section : "workbook"}
+										key="workbook"
 										onError={reportBoundaryError}
 									>
-										{page ?? explorerHome ?? (
+										{agentsHome ?? explorerHome ?? (
 											<div className="relative h-full">
 												<Workbook
 													{...strip}
-													addLabel="New canvas"
 													// Until each canvas owns its own engine, only the active page is
 													// mounted — today's behaviour, now stated rather than emergent.
 													keepMounted={false}

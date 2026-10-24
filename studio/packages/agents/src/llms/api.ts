@@ -2,7 +2,6 @@ import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type {
 	LLMModel,
 	LLMModelCreate,
-	LLMModelPage,
 	LLMPingResponse,
 	LLMProvider,
 	LLMProviderCreate,
@@ -28,9 +27,6 @@ export const llmProvidersApi = {
 		request<LLMProviderPage>(
 			`${base(username, graphSlug)}${listQueryToApi(query)}`,
 		),
-
-	get: (username: string, graphSlug: string, id: string) =>
-		request<LLMProvider>(`${base(username, graphSlug)}/${id}`),
 
 	create: (username: string, graphSlug: string, data: LLMProviderCreate) =>
 		request<LLMProvider>(base(username, graphSlug), {
@@ -58,17 +54,6 @@ export const llmProvidersApi = {
 		request<LLMPingResponse>(`${base(username, graphSlug)}/${id}/ping`, {
 			method: "POST",
 		}),
-
-	/** One page of an endpoint's models. */
-	listModels: (
-		username: string,
-		graphSlug: string,
-		id: string,
-		query: ListQuery = {},
-	) =>
-		request<LLMModelPage>(
-			`${base(username, graphSlug)}/${id}/models${listQueryToApi(query)}`,
-		),
 
 	addModel: (
 		username: string,

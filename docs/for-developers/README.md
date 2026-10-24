@@ -144,6 +144,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 5.9 | [Pin a model version](modules/agents/features/pinned-model-versions.md) | Agents, skill versions and judges pin an exact model version; every run records the one it called; re-run on the same versions | 🟡 | 🟡 | 🟡 | B02 |
 | 5.10 | [Watch the fleet](modules/agents/features/fleet-performance.md) | What broke, waits, slowed or changed; speed, success and tokens per agent, skill, plan and model against a baseline; degradations named; who pins each model | ✅ | — | ✅ | C10 |
 | 5.11 | [Remote agents](modules/agents/features/remote-agents.md) | Hand a task to an agent outside the Graph over A2A — asked each time, only allowed fields sent, its PR returned for a person. **Implement later** | 🔵 | 🔵 | 🔵 | Later |
+| 5.12 | [The Agents shell](modules/agents/features/the-agents-shell.md) | A rail and a workbook, no leftSection: Home, Fleet, Performance, Agents, Skills, Functions, Connections › MCP servers, LLMs and Settings as pages, each a tab | — | — | ✅ | F03 |
 
 ## 6 · [Skills](modules/skills/spec.md)
 

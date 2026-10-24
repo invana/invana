@@ -1,6 +1,6 @@
 /**
- * The agents endpoints under `/api/v1/u/{owner}/{graph}/agents`: list, read,
- * create, update, a lifecycle act and its preview, the soul preview, lineage,
+ * The agents endpoints under `/api/v1/u/{owner}/{graph}/agents`: list,
+ * update, a lifecycle act and its preview, the soul preview, lineage,
  * skills and callables, meters and activity. Each call is one `request` on the
  * shared client and returns the engine's shape unchanged.
  */
@@ -9,7 +9,6 @@ import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type { EventListResponse } from "@invana-studio/shell";
 import type {
 	Agent,
-	AgentCreate,
 	AgentLineage,
 	AgentMeters,
 	AgentPage,
@@ -34,15 +33,6 @@ export const agentsApi = {
 			`${base(username, graphSlug)}/agents${listQueryToApi(query)}`,
 		),
 
-	get: (username: string, graphSlug: string, id: string) =>
-		request<Agent>(`${base(username, graphSlug)}/agents/${id}`),
-
-	create: (username: string, graphSlug: string, data: AgentCreate) =>
-		request<Agent>(`${base(username, graphSlug)}/agents`, {
-			method: "POST",
-			...json(data),
-		}),
-
 	update: (
 		username: string,
 		graphSlug: string,
@@ -52,11 +42,6 @@ export const agentsApi = {
 		request<Agent>(`${base(username, graphSlug)}/agents/${id}`, {
 			method: "PATCH",
 			...json(data),
-		}),
-
-	remove: (username: string, graphSlug: string, id: string) =>
-		request<void>(`${base(username, graphSlug)}/agents/${id}`, {
-			method: "DELETE",
 		}),
 
 	/** Offer a skill to this agent. One skill, one agent — so a refusal names it. */

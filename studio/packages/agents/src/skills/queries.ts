@@ -2,11 +2,17 @@ import { type ListQuery, listQueryKey } from "@invana-studio/core";
 import {
 	keepPreviousData,
 	useMutation,
+	useQueries,
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { skillsApi } from "./api";
-import type { SkillCreate, SkillVersionPublish } from "./types";
+import type {
+	SkillCreate,
+	SkillPlaybookRead,
+	SkillVersionPublish,
+} from "./types";
 
 const key = (username: string, graphSlug: string) =>
 	["skills", username, graphSlug] as const;
@@ -111,6 +117,50 @@ export function useSkillPlaybookQuery(
 			skillsApi.plan(username, graphSlug, skillId as string, version as number),
 		enabled: !!skillId && !!version,
 	});
+}
+
+/**
+ * The published plan of each skill in `skills`, one read apiece — what the
+ * fleet map reads each skill's functions off. A skill never published is
+ * offered nothing, so it is not read. Shares its keys with
+ * {@link useSkillPlaybookQuery}, so a plan read here is not read again there.
+ */
+export function useSkillPlaybooksQuery(
+	username: string,
+	graphSlug: string,
+	skills: { id: string; version: number; is_draft: boolean }[],
+) {
+	const published = useMemo(
+		() => skills.filter((s) => !s.is_draft && s.version > 0),
+		[skills],
+	);
+	const { data, pending } = useQueries({
+		queries: published.map((s) => ({
+			queryKey: [...key(username, graphSlug), s.id, "plan", s.version],
+			queryFn: () => skillsApi.plan(username, graphSlug, s.id, s.version),
+			enabled: !!username && !!graphSlug,
+		})),
+		combine: playbooks,
+	});
+	/** `{skillId: its plan}`, for every plan read so far. */
+	const plans = useMemo(() => {
+		const out = new Map<string, SkillPlaybookRead>();
+		data.forEach((plan, i) => {
+			if (plan && published[i]) out.set(published[i].id, plan);
+		});
+		return out;
+	}, [data, published]);
+	return { plans, pending };
+}
+
+/** Module-level, so the combined result keeps its identity between renders. */
+function playbooks(
+	results: { data?: SkillPlaybookRead; isPending: boolean }[],
+) {
+	return {
+		data: results.map((r) => r.data),
+		pending: results.some((r) => r.isPending),
+	};
 }
 
 export function useSaveDraftMutation(

@@ -261,6 +261,8 @@ export interface CatalogueEntry {
 	requires: string[];
 	/** Reusable plans in this Graph naming it. */
 	used_by: number;
+	/** The plugin that declares it — `invana.core.graph_read`. */
+	plugin: string;
 }
 
 /**

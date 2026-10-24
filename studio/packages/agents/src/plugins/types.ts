@@ -1,6 +1,7 @@
 /**
  * The plugin registry as the engine returns it — `GET /api/v1/plugins`,
- * `GET /api/v1/plugins/{name}`, `GET /api/v1/task-types/{ref}`. Install-level,
+ * `GET /api/v1/plugins/{name}`, `GET /api/v1/task-types/{ref}` — and an MCP
+ * server as adding or refreshing one returns it. Install-level,
  * not Graph-scoped: the registry is the process's, the same for every Graph.
  */
 
@@ -69,6 +70,31 @@ export interface PluginDetail extends PluginBase {
 		when_to_use: string;
 		description: string;
 	}[];
+}
+
+/** One tool of an MCP server, as frozen. */
+interface McpTool {
+	key: string;
+	version: string;
+	/** `read` when the server marks it read-only, else `send`. */
+	side_effect: string;
+	summary: string;
+}
+
+/** An MCP server as stored — what `POST /plugins/mcp` and its refresh return. */
+export interface McpServerRead {
+	name: string;
+	/** `invana.mcp.<name>`. */
+	plugin: string;
+	url: string;
+	revision: number;
+	/** The revision this process loaded; null when it loaded none. */
+	loaded_revision: number | null;
+	restart_required: boolean;
+	tools: McpTool[];
+	/** Tool names that could not be keyed. */
+	skipped: string[];
+	frozen_at: string;
 }
 
 export interface TaskTypeRead extends TaskManifest {

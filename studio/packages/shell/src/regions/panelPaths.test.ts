@@ -15,9 +15,9 @@ describe("panelPaths", () => {
 		expect(canonicalRedirect(G, "?panel=runs&run=r1&right=assistant")).toBe(
 			`${G}/activity/runs/r1?right=assistant`,
 		);
-		expect(
-			canonicalRedirect(G, "?settings=library&drawer=catalogue&entry=k"),
-		).toBe(`${G}/agents/plugins/tasks/k`);
+		expect(canonicalRedirect(G, "?settings=functions&drawer=templates")).toBe(
+			`${G}/agents/functions/templates`,
+		);
 		expect(canonicalRedirect(G, "?panel=info")).toBe(
 			`${G}/modeller/settings?tab=info`,
 		);
@@ -50,19 +50,22 @@ describe("panelPaths", () => {
 		);
 	});
 
-	it("gives each Agents rail item its own path", () => {
-		expect(canonicalRedirect(`${G}/agents`, "")).toBe(`${G}/agents/overview`);
+	it("gives each Agents section, and each of its tabs, its own path", () => {
+		expect(canonicalRedirect(`${G}/agents`, "")).toBe(`${G}/agents/home`);
 		expect(pageParamsOf("agents/settings", "").get("panel")).toBe(
 			"concurrency",
 		);
-		const template = pageParamsOf("agents/library/templates/t1", "");
-		expect(template.get("section")).toBe("templates");
-		expect(template.get("template")).toBe("t1");
-		expect(canonicalRedirect(`${G}/agents/plugins`, "")).toBeNull();
+		const map = pageParamsOf("agents/fleet/map", "");
+		expect(map.get("panel")).toBe("fleet");
+		expect(map.get("section")).toBe("map");
+		expect(canonicalRedirect(`${G}/agents/fleet`, "")).toBeNull();
+		expect(canonicalRedirect(`${G}/agents/connections`, "")).toBe(
+			`${G}/agents/connections/mcp`,
+		);
 		expect(canonicalRedirect(G, "?panel=llms")).toBe(`${G}/agents/llms`);
-		expect(
-			canonicalRedirect(G, "?panel=agents&section=llms&provider=openai"),
-		).toBe(`${G}/agents/llms/openai`);
+		expect(canonicalRedirect(G, "?panel=llms&provider=openai")).toBe(
+			`${G}/agents/llms/openai`,
+		);
 	});
 
 	it("puts a project under the Projects root and Decisions beside My todos", () => {

@@ -1,9 +1,9 @@
 /**
- * the pools, busy or quiet — and what is waiting behind the ceiling.
+ * The pools, busy or quiet.
  *
  * *As the person who set this Graph's ceiling, I want to see which pool is
- * full and who is queued behind it, so that "why is nothing moving?" has an
- * answer on the screen where the number is set.*
+ * full, so that "why is nothing moving?" has an answer on the screen where the
+ * number is set.*
  *
  * **A pool that appeared only once it was busy would make *is this Graph
  * stalled on connections?* a question nobody could answer in the quiet case**
@@ -15,10 +15,6 @@
  * many runs may proceed; a pool says how many crossings of one kind may be in
  * flight — a Graph with two runs going and `graphdb` full is stalled, and the
  * running count alone says it is fine.
- *
- * **A queued run names why it is waiting**, and *a person is waiting* is the
- * one reason that changes what anybody does about it: a person's question is
- * served before a scheduled run.
  */
 
 import { type ColumnDef, DataTable } from "@invana/tables";
@@ -26,13 +22,12 @@ import type { GraphContention } from "@invana-studio/core";
 import { useMemo } from "react";
 
 type Pool = GraphContention["pools"][number];
-type Queued = GraphContention["queued"][number];
 
 export interface PoolsTableProps {
-	contention: GraphContention;
+	pools: Pool[];
 }
 
-export function PoolsTable({ contention }: PoolsTableProps) {
+export function PoolsTable({ pools }: PoolsTableProps) {
 	const columns = useMemo<ColumnDef<Pool>[]>(
 		() => [
 			{
@@ -61,44 +56,19 @@ export function PoolsTable({ contention }: PoolsTableProps) {
 		[],
 	);
 
-	return (
-		<div className="space-y-2">
-			{contention.pools.length ? (
-				<DataTable
-					columns={columns}
-					data={contention.pools}
-					enableSorting={false}
-					// Two columns, both of which the reader needs: no column chooser.
-				/>
-			) : (
-				// A sentence, never an empty table: no pool configured means every
-				// crossing is unbounded, which is a state and not an absence.
-				<p className="text-sm text-muted-foreground">
-					No pool is configured, so nothing bounds how many crossings are in
-					flight — only the run ceiling above.
-				</p>
-			)}
-
-			{contention.queued.length ? (
-				<ul className="space-y-0.5">
-					{contention.queued.map((run) => (
-						<li key={run.run_id} className="text-sm">
-							<span className="text-warning">#{run.position} queued</span>
-							<span className="text-muted-foreground">
-								{" "}
-								· {waitingBecause(run)}
-							</span>
-						</li>
-					))}
-				</ul>
-			) : null}
-		</div>
+	return pools.length ? (
+		<DataTable
+			columns={columns}
+			data={pools}
+			enableSorting={false}
+			// Two columns, both of which the reader needs: no column chooser.
+		/>
+	) : (
+		// A sentence, never an empty table: no pool configured means every
+		// crossing is unbounded, which is a state and not an absence.
+		<p className="text-muted-foreground">
+			No pool is configured, so nothing bounds how many crossings are in flight
+			— only the run ceiling above.
+		</p>
 	);
-}
-
-/** Why this run is waiting, in the words that decide what to do about it. */
-function waitingBecause(run: Queued): string {
-	return run.triggered_by === "user" || run.triggered_by === "person"
-		? "a person is waiting"
-		: `triggered by ${run.triggered_by}`;
 }

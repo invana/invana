@@ -118,3 +118,4 @@ export type { SetupSlots } from "./setup/SetupSlots";
 export { SetupSlotsContext } from "./setup/SetupSlots";
 export { SetupTimeline } from "./setup/SetupTimeline";
 export { useOnboarding } from "./setup/useOnboarding";
+export { useOpenPalette } from "./palette/CommandPalette";

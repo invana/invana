@@ -8,6 +8,7 @@ import {
 	PluginPage,
 	SkillBoardPage,
 	TaskTypePage,
+	TemplatePage,
 	UsageBoardPage,
 } from "@invana-studio/agents";
 import type { CanvasBackend } from "@invana-studio/canvases";
@@ -45,9 +46,6 @@ export interface DeclaredBoardDeps {
 	runStep: string | null;
 	settingsPanel: Pick<ReturnType<typeof useLeftSection>, "setSection">;
 	governPanel: Pick<ReturnType<typeof useLensesViewPanel>, "reveal">;
-	openWorkPanel: (
-		section: "projects" | "runs" | "library" | "agents" | "skills",
-	) => void;
 	openAgentPage: (id: string) => void;
 	showAgentCanvas: (kind: "envelope" | "lineage", id: string) => void;
 	backend: CanvasBackend;
@@ -76,7 +74,6 @@ export function declaredBoardContent(
 		runStep,
 		settingsPanel,
 		governPanel,
-		openWorkPanel,
 		openAgentPage,
 		showAgentCanvas,
 		backend,
@@ -177,10 +174,7 @@ export function declaredBoardContent(
 				username={username as string}
 				graphSlug={graphSlug as string}
 				skillId={board.subjectId}
-				onOpenAgent={(id) => {
-					openWorkPanel("agents");
-					openAgentPage(id);
-				}}
+				onOpenAgent={openAgentPage}
 				onOpenUsageBoard={(id) =>
 					openBoard({ kind: "skill_usage", subjectId: id })
 				}
@@ -208,7 +202,7 @@ export function declaredBoardContent(
 				username={username as string}
 				graphSlug={graphSlug as string}
 				ruleId={board.subjectId}
-				onEdit={() => settingsPanel.setSection("skills")}
+				onEdit={() => settingsPanel.setSection("rules")}
 				onOpenRun={(runId) =>
 					openBoard({ kind: "run", subjectId: runId, runId })
 				}
@@ -315,6 +309,16 @@ export function declaredBoardContent(
 			<TaskTypePage
 				taskKey={board.subjectId}
 				onOpenPlugin={(name) => openBoard({ kind: "plugin", subjectId: name })}
+			/>
+		);
+	}
+
+	if (board.kind === "template") {
+		return (
+			<TemplatePage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				templateId={board.subjectId}
 			/>
 		);
 	}

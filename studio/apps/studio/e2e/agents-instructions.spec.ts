@@ -99,8 +99,11 @@ test("AG-09 a skill's History lists its versions", async ({ page }) => {
 });
 
 test("AG-11 a plan with no replanned run says so", async ({ page }) => {
-	await page.goto(`${GRAPH}?panel=library&section=plans`);
-	const row = page.getByRole("button", { name: /^expand-neighbours/ }).first();
+	await page.goto(`${AGENTS}/functions/plans`);
+	const row = page
+		.getByRole("row")
+		.filter({ hasText: "expand-neighbours" })
+		.first();
 	await row.click({ timeout: 30_000 });
 	await page.getByRole("tab", { name: "Revisions in runs" }).click({
 		timeout: 20_000,
@@ -123,13 +126,16 @@ test("AG-13 Plugins lists the registry; a plugin and a function open", async ({
 	expect(core, "a core plugin with functions").toBeTruthy();
 	const name = (core as { name: string }).name;
 
-	await page.goto(`${AGENTS}/plugins`);
-	await page.getByRole("button", { name: new RegExp(`^${name}`) }).click({
-		timeout: 30_000,
-	});
-	await expect(page.getByText("Functions", { exact: true })).toBeVisible({
-		timeout: 15_000,
-	});
+	await page.goto(`${AGENTS}/functions/plugins`);
+	await page
+		.getByRole("row")
+		.filter({ hasText: name })
+		.first()
+		.click({ timeout: 30_000 });
+	await expect(page).toHaveURL(/[?&]page=plugin(:|%3A)/);
+	await expect(
+		page.getByText("Functions", { exact: true }).first(),
+	).toBeVisible({ timeout: 15_000 });
 	await page.getByRole("row").nth(1).click();
 	await expect(page.getByText("Manifest", { exact: true })).toBeVisible({
 		timeout: 15_000,

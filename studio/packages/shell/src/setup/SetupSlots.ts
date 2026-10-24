@@ -27,7 +27,7 @@ export type SetupTarget =
 	| "llms"
 	| "skills"
 	| "sessions"
-	| "library"
+	| "functions"
 	| "projects"
 	| "events";
 

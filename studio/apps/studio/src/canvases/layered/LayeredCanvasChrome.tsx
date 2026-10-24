@@ -17,7 +17,6 @@ import {
 	EVERY_AGENT,
 	useAgentLineageQuery,
 	useAgentsQuery,
-	useFlowQuery,
 } from "@invana-studio/agents";
 import { useProjectPlanQuery } from "@invana-studio/projects";
 import { CANVAS_KINDS } from "@invana-studio/shell";
@@ -25,7 +24,6 @@ import { X } from "lucide-react";
 
 /** What the open work canvas is drawing. One shape per kind, id included. */
 export type LayeredCanvasTarget =
-	| { kind: "workflow"; workflowKey: string }
 	| { kind: "plan"; projectKey: string }
 	| { kind: "envelope"; agentId: string }
 	| { kind: "lineage"; agentId: string };
@@ -44,11 +42,6 @@ function useSubject({ username, graphSlug, target }: Scope): {
 	title: string;
 	metrics: string[];
 } {
-	const workflow = useFlowQuery(
-		username,
-		graphSlug,
-		target.kind === "workflow" ? target.workflowKey : undefined,
-	);
 	const plan = useProjectPlanQuery(
 		username,
 		graphSlug,
@@ -65,29 +58,6 @@ function useSubject({ username, graphSlug, target }: Scope): {
 		target.kind === "lineage" ? target.agentId : undefined,
 	);
 
-	if (target.kind === "workflow") {
-		const detail = workflow.data;
-		// A plan has no `spec`: it is its `tasks` rows. Declared parameters come
-		// from `args_schema` when the parameter form lands (7.7).
-		const params: string[] = [];
-		return {
-			title: detail ? `${detail.key}@${detail.version}` : target.workflowKey,
-			metrics: detail
-				? [
-						plural(detail.nodes.length, "step"),
-						...(params.length ? [plural(params.length, "param")] : []),
-						plural(detail.used_by.length, "agent"),
-						// A rate with no verified run behind it is not 0% — it is
-						// "not asked yet", and the footer says which.
-						detail.served_rate === null
-							? detail.runs
-								? `${plural(detail.runs, "run")} · not verified`
-								: "never run"
-							: `served ${Math.round(detail.served_rate * 100)}% of ${plural(detail.runs, "run")}`,
-					]
-				: [],
-		};
-	}
 	if (target.kind === "plan") {
 		const tasks = plan.data?.tasks ?? [];
 		return {
@@ -162,8 +132,8 @@ export function LayeredCanvasHeader({
 
 /**
  * The status line, in the slot the data canvas's telemetry uses. The first
- * word is the kind's own footer (`LIBRARY` · `PLAN` · `ENVELOPE` · `TRACE`) —
- * a workflow canvas is not `ACTIVE`, because nothing on it is running.
+ * word is the kind's own footer (`PLAN` · `ENVELOPE` · `TRACE`) —
+ * a work canvas is not `ACTIVE`, because nothing on it is running.
  */
 export function LayeredCanvasStatus({ username, graphSlug, target }: Scope) {
 	const spec = CANVAS_KINDS[target.kind];

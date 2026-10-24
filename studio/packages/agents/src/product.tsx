@@ -1,113 +1,102 @@
 /**
  * `agents` — the Agents product's `ProductDefinition`: build, tune and watch
- * the agents that do the legwork (agents.md).
+ * the agents that do the legwork (agent-fabric.md, the-agents-shell.md).
  *
- * The rail is three groups — the fleet, what it runs on, and its settings at
- * the bottom:
+ * A rail and a workbook, with no leftSection. Every rail item is a section
+ * page that opens as a tab of the workbook; a section with tabs gives each
+ * one a path under it:
  *
- * | Rail | Path | Draws |
+ * | Rail | Path | Tabs |
  * |---|---|---|
- * | Overview | `/agents/overview` | page: what broke, waits, slowed or changed |
- * | Agents | `/agents/agents[/:agent]` | the Agents panel |
- * | Skills | `/agents/skills` | the skills an agent may be offered |
- * | Library | `/agents/library[/:plan]` · `/agents/library/templates[/:template]` | Plans over Templates |
- * | Plugins | `/agents/plugins[/tasks/:entry]` | the plugin registry over the task catalogue |
- * | LLMs | `/agents/llms[/:provider]` | page: the model versions offered and who pins them; an endpoint in a sheet |
- * | Performance | `/agents/performance` | page: speed, success and tokens against each one's baseline |
- * | Settings | `/agents/settings` | how much may run at once, pool by pool |
+ * | Home | `/agents/home` | — the workbook with nothing open |
+ * | Fleet | `/agents/fleet` | Overview · `map` · `table` |
+ * | Performance | `/agents/performance` | Agents · `skills` · `plans` · `llms` |
+ * | Agents | `/agents/agents` | — |
+ * | Skills | `/agents/skills` | — |
+ * | Functions | `/agents/functions` | Functions · `plans` · `generated` · `templates` · `plugins` |
+ * | Connections | `/agents/connections/mcp` | MCP servers |
+ * | LLMs | `/agents/llms[/:provider]` | — an endpoint opens in a modal |
+ * | Settings | `/agents/settings` | — |
  *
- * A *page* fills the main area and opens no panel. The product lands on
- * Overview, the first rail item.
- * The levels under the product's route have no element of their own, so
- * moving along the rail never remounts the page. The page itself is the app's
- * product host, which composes every graph product's regions, so the route's
- * element is whatever the app puts in `AgentsSlotsContext`.
+ * A tab is not a level of the trail, so only a section and an endpoint carry
+ * a crumb. The page itself is the app's product host, which composes every
+ * graph product's regions, so the route's element is whatever the app puts in
+ * `AgentsSlotsContext`.
  */
 import type { ProductDefinition } from "@invana-studio/core";
 import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";
-import {
-	Bot,
-	BrainCircuit,
-	Gauge,
-	LayoutGrid,
-	Library,
-	Puzzle,
-	Settings,
-	Wand2,
-} from "lucide-react";
 import type { Params, RouteObject } from "react-router-dom";
 import { useAgentsSlots } from "./AgentsSlots";
 import { searchAgents } from "./search";
+import { SECTIONS } from "./sections/spec";
 
 function AgentsRoute() {
 	const { Page } = useAgentsSlots();
 	return <Page />;
 }
 
-/** A level of the trail: a fixed label, or the drill-in's id. */
+/** A section's level of the trail; its tabs and drill-in sit under it. */
 function level(
 	path: string,
-	crumb: string | ((params: Params) => string | undefined),
+	crumb?: string | ((params: Params) => string | undefined),
 	children?: RouteObject[],
 ): RouteObject {
-	const handle: ShellRouteHandle = { crumb };
+	const handle: ShellRouteHandle | undefined = crumb ? { crumb } : undefined;
 	return children
 		? { path, handle, children: [{ index: true }, ...children] }
 		: { path, handle };
 }
 
-/** A section whose records drill in one level down: `llms` › `<provider>`. */
-const drillable = (path: string, label: string, param: string) =>
-	level(path, label, [level(`:${param}`, (p) => p[param])]);
+/** A section's tabs — levels with no crumb of their own. */
+const tabs = (...paths: string[]) => paths.map((p) => level(p));
+
+const rail = (id: keyof typeof SECTIONS) => ({
+	id,
+	label: SECTIONS[id].label,
+	icon: SECTIONS[id].icon,
+	to: id === "concurrency" ? "settings" : id,
+});
 
 export const agents: ProductDefinition = {
 	id: "agents",
 	name: "Agents",
 	tagline: "Build, tune, watch",
-	icon: Bot,
+	icon: SECTIONS.agents.icon,
 	scope: "graph",
-	landing: "overview",
+	landing: "home",
 	nav: {
 		groups: [
+			[rail("home")],
+			[rail("fleet"), rail("performance")],
 			[
-				{
-					id: "overview",
-					label: "Overview",
-					icon: LayoutGrid,
-					to: "overview",
-				},
-				{ id: "agents", label: "Agents", icon: Bot, to: "agents" },
-				{ id: "skills", label: "Skills", icon: Wand2, to: "skills" },
-			],
-			[
-				{ id: "library", label: "Library", icon: Library, to: "library" },
-				{ id: "plugins", label: "Plugins", icon: Puzzle, to: "plugins" },
-				{ id: "llms", label: "LLMs", icon: BrainCircuit, to: "llms" },
-				{
-					id: "performance",
-					label: "Performance",
-					icon: Gauge,
-					to: "performance",
-				},
+				rail("agents"),
+				rail("skills"),
+				rail("functions"),
+				rail("connections"),
+				rail("llms"),
 			],
 		],
-		bottom: [
-			{ id: "settings", label: "Settings", icon: Settings, to: "settings" },
-		],
+		bottom: [rail("concurrency")],
 	},
 	search: searchAgents,
 	commands: [
 		{
 			id: "templates",
 			label: "Templates",
-			keywords: ["projection", "library"],
-			to: "library/templates",
+			keywords: ["projection", "answer"],
+			to: "functions/templates",
 		},
 		{
-			id: "task-catalogue",
-			label: "Task catalogue",
-			keywords: ["tasks", "plugins"],
-			to: "plugins/tasks",
+			id: "plugins",
+			label: "Plugins",
+			keywords: ["registry", "tools"],
+			to: "functions/plugins",
+		},
+		{
+			id: "mcp-servers",
+			label: "MCP servers",
+			keywords: ["connections", "mcp", "tools"],
+			to: "connections/mcp",
 		},
 	],
 	routes: [
@@ -119,18 +108,22 @@ export const agents: ProductDefinition = {
 			errorElement: <ErrorPage />,
 			children: [
 				{ index: true },
-				level("overview", "Overview"),
-				drillable("agents", "Agents", "agent"),
+				level("home"),
+				level("fleet", "Fleet", tabs("map", "table")),
+				level(
+					"performance",
+					"Performance",
+					tabs("skills", "plans", "llms"),
+				),
+				level("agents", "Agents"),
 				level("skills", "Skills"),
-				// Templates is Library's second section, so it sits under Library's
-				// path and its rail item stays lit; a plan is Library's drill-in.
-				level("library", "Library", [
-					drillable("templates", "Templates", "template"),
-					level(":plan", (p) => p.plan),
-				]),
-				level("plugins", "Plugins", [drillable("tasks", "Tasks", "entry")]),
-				drillable("llms", "LLMs", "provider"),
-				level("performance", "Performance"),
+				level(
+					"functions",
+					"Functions",
+					tabs("plans", "generated", "templates", "plugins"),
+				),
+				level("connections", "Connections", tabs("mcp")),
+				level("llms", "LLMs", [level(":provider", (p) => p.provider)]),
 				level("settings", "Settings"),
 			],
 		},

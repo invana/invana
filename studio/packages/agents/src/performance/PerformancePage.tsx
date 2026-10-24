@@ -1,15 +1,14 @@
 /**
  * **Performance** — speed, success and tokens for every agent, skill, plan and
- * model of a Graph, each against its own baseline, at `/agents/performance`
- * (board `agents.performance`, story AG-15).
+ * model version of a Graph, each against its own baseline, as a section page
+ * at `/agents/performance` ([fleet-performance.md](../../../../../docs/for-developers/modules/agents/features/fleet-performance.md)).
  *
- * A full-width page: the host draws it as the whole `mainSection`, with no
- * `leftSection` beside it. Its regions, top to bottom:
+ * Drawn in the section frame: the head carries *Performance*, the
+ * `n degraded` · `n failing` badges and the 7 · 30 · 90 days window; the tabs
+ * *Agents · Skills · Plans · LLMs* are the path's last segment
+ * (`/agents/performance/skills`). The window rides `?window=`, so a reload or
+ * a shared link reopens the same reading. Under them:
  *
- * - **Header** — *Performance* and the `n degraded` · `n failing` badges.
- * - **Tabs and window** — *Agents · Skills · Plans · LLMs*, and the 7 · 30 · 90
- *   days control. Both ride the URL (`?tab=` · `?window=`), so a reload or a
- *   shared link reopens the same reading.
  * - **Tiles** — success rate, p50, p95, runs, tokens per run and degraded over
  *   the window, each against the window before.
  * - **The trend** beside **What changed** — p95 a day for the most degraded
@@ -17,10 +16,11 @@
  *   window marked; and the change named before its first slow run, with a link
  *   to compare the two versions.
  * - **The tables** — *Each agent* and *Each skill* on Agents; one table on each
- *   of the other tabs.
+ *   of the other tabs. An agent's row opens the agent's page, a skill's the
+ *   skill's.
  *
  * Read-only: the compare is the change log's, and rollback lives on the
- * skill's History. Tokens, never currency.
+ * skill's History. Every number is the engine's. Tokens, never currency.
  */
 
 import { LineChart } from "@invana/charts";
@@ -30,7 +30,6 @@ import {
 	cn,
 	MetricGrid,
 	MetricTile,
-	RecordHeader,
 	SegmentedControl,
 	Table,
 	TableBody,
@@ -38,15 +37,11 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-	Tabs,
-	TabsList,
-	TabsTrigger,
 } from "@invana/ui";
 import { comparePath } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import type { FleetPageProps } from "../fleet/FleetPageProps";
 import { useFleetPerformanceQuery } from "../fleet/queries";
 import {
 	FLEET_WINDOWS,
@@ -56,12 +51,11 @@ import {
 	type PerformanceRow,
 	type PerformanceTrend,
 } from "../fleet/types";
+import { useAgentsOpen } from "../open";
 import {
 	changeText,
 	changeTone,
 	day,
-	FleetBody,
-	FleetPage,
 	FleetReadState,
 	measureCaption,
 	ms,
@@ -70,103 +64,97 @@ import {
 	TONE_TEXT,
 	tokens,
 } from "../overview/fleetParts";
+import { SectionBody, SectionPage } from "../sections/SectionPage";
+import { SECTIONS, type SectionPageProps } from "../sections/spec";
 
-const TABS = [
-	{ id: "agents", label: "Agents" },
-	{ id: "skills", label: "Skills" },
-	{ id: "plans", label: "Plans" },
-	{ id: "llms", label: "LLMs" },
-] as const;
+type Tab = "agents" | "skills" | "plans" | "llms";
 
-type Tab = (typeof TABS)[number]["id"];
-
-const isTab = (v: string | null): v is Tab => TABS.some((t) => t.id === v);
+const isTab = (v: string): v is Tab =>
+	SECTIONS.performance.tabs.some((t) => t.key === v);
 const isWindow = (v: string | null): v is FleetWindow =>
 	FLEET_WINDOWS.includes(v as FleetWindow);
 
-/** `?tab=` and `?window=`, read and written in place (a reading, not a visit). */
-function usePerformanceView() {
+/** The graph a compare link is built under. */
+interface GraphRef {
+	username: string;
+	graphSlug: string;
+}
+
+/** `?window=`, read and written in place (a reading, not a visit). */
+function useWindowParam(): [FleetWindow, (next: string) => void] {
 	const [params, setParams] = useSearchParams();
-	const rawTab = params.get("tab");
-	const rawWindow = params.get("window");
-	const tab: Tab = isTab(rawTab) ? rawTab : "agents";
-	const window: FleetWindow = isWindow(rawWindow) ? rawWindow : "7d";
+	const raw = params.get("window");
 	const set = useCallback(
-		(key: "tab" | "window", value: string) =>
+		(value: string) =>
 			setParams(
 				(prev) => {
 					const next = new URLSearchParams(prev);
-					next.set(key, value);
+					next.set("window", value);
 					return next;
 				},
 				{ replace: true },
 			),
 		[setParams],
 	);
-	return { tab, window, set };
+	return [isWindow(raw) ? raw : "7d", set];
 }
 
-export function PerformancePage(props: FleetPageProps) {
-	const { username, graphSlug } = props;
-	const { tab, window, set } = usePerformanceView();
+export function PerformancePage({
+	username,
+	graphSlug,
+	tab: rawTab,
+	onTab,
+}: SectionPageProps) {
+	const tab: Tab = isTab(rawTab) ? rawTab : "agents";
+	const [window, setWindow] = useWindowParam();
 	const query = useFleetPerformanceQuery(username, graphSlug, window);
 	const data = query.data;
 
 	return (
-		<FleetPage>
-			<RecordHeader
-				size="lg"
-				variant="page"
-				crumbs={["Performance"]}
-				chips={
-					data ? (
-						<>
-							<Badge
-								variant="outline"
-								tone={data.tiles.degraded ? "warning" : "muted"}
-								size="xs"
-							>
-								{data.tiles.degraded} degraded
-							</Badge>
-							<Badge
-								variant="outline"
-								tone={data.tiles.failing ? "destructive" : "muted"}
-								size="xs"
-							>
-								{data.tiles.failing} failing
-							</Badge>
-						</>
-					) : null
-				}
-			/>
-			<div className="flex items-center gap-3 border-b pr-3">
-				<Tabs
-					className="min-w-0 flex-1"
-					value={tab}
-					onValueChange={(next) => set("tab", next)}
-				>
-					<TabsList className="w-full justify-start gap-1 px-3">
-						{TABS.map((t) => (
-							<TabsTrigger key={t.id} value={t.id}>
-								{t.label}
-							</TabsTrigger>
-						))}
-					</TabsList>
-				</Tabs>
+		<SectionPage
+			section="performance"
+			tab={tab}
+			onTab={onTab}
+			chips={
+				data ? (
+					<>
+						<Badge
+							variant="outline"
+							tone={data.tiles.degraded ? "warning" : "muted"}
+							size="xs"
+						>
+							{data.tiles.degraded} degraded
+						</Badge>
+						<Badge
+							variant="outline"
+							tone={data.tiles.failing ? "destructive" : "muted"}
+							size="xs"
+						>
+							{data.tiles.failing} failing
+						</Badge>
+					</>
+				) : null
+			}
+			actions={
 				<SegmentedControl
 					size="sm"
 					aria-label="Window"
 					value={window}
-					onValueChange={(next) => set("window", next)}
+					onValueChange={setWindow}
 					options={FLEET_WINDOWS.map((w) => ({
 						value: w,
 						label: `${w.slice(0, -1)} days`,
 					}))}
 				/>
-			</div>
-			<FleetBody>
+			}
+		>
+			<SectionBody>
 				{data ? (
-					<PerformanceBody data={data} tab={tab} graph={props} />
+					<PerformanceBody
+						data={data}
+						tab={tab}
+						graph={{ username, graphSlug }}
+					/>
 				) : (
 					<FleetReadState
 						loading={query.isLoading}
@@ -174,8 +162,8 @@ export function PerformancePage(props: FleetPageProps) {
 						what="performance"
 					/>
 				)}
-			</FleetBody>
-		</FleetPage>
+			</SectionBody>
+		</SectionPage>
 	);
 }
 
@@ -186,9 +174,10 @@ function PerformanceBody({
 }: {
 	data: FleetPerformance;
 	tab: Tab;
-	graph: FleetPageProps;
+	graph: GraphRef;
 }) {
 	const span = `${data.window_days} days`;
+	const open = useAgentsOpen();
 	return (
 		<>
 			<Tiles tiles={data.tiles} agents={data.agents} span={span} />
@@ -203,11 +192,12 @@ function PerformanceBody({
 						nameLabel="Agent"
 						rows={data.agents}
 						span={span}
+						onOpen={open.agent}
 					/>
-					<SkillTable rows={data.skills} span={span} />
+					<SkillTable rows={data.skills} span={span} onOpen={open.skill} />
 				</>
 			) : tab === "skills" ? (
-				<SkillTable rows={data.skills} span={span} />
+				<SkillTable rows={data.skills} span={span} onOpen={open.skill} />
 			) : tab === "plans" ? (
 				<SubjectTable
 					title="Each plan"
@@ -373,7 +363,7 @@ function WhatChanged({
 }: {
 	data: FleetPerformance;
 	span: string;
-	graph: FleetPageProps;
+	graph: GraphRef;
 }) {
 	const navigate = useNavigate();
 	const subject = data.trend
@@ -472,12 +462,15 @@ function SubjectTable({
 	rows,
 	span,
 	showVersion,
+	onOpen,
 }: {
 	title: string;
 	nameLabel: string;
 	rows: PerformanceRow[];
 	span: string;
 	showVersion?: boolean;
+	/** A row opens its record's page; absent where the row has none. */
+	onOpen?: (id: string) => void;
 }) {
 	return (
 		<PanelSection
@@ -502,8 +495,12 @@ function SubjectTable({
 					</TableHeader>
 					<TableBody>
 						{rows.map((r) => (
-							<TableRow key={r.id}>
-								<TableCell>{r.name}</TableCell>
+							<TableRow
+								key={r.id}
+								className={onOpen ? "cursor-pointer" : undefined}
+								onClick={onOpen ? () => onOpen(r.id) : undefined}
+							>
+								<TableCell className="font-medium">{r.name}</TableCell>
 								{showVersion ? (
 									<TableCell className="font-mono">
 										{r.version != null ? `v${r.version}` : "—"}
@@ -550,7 +547,15 @@ function SubjectTable({
 }
 
 /** Each skill at its current version, against the version before it. */
-function SkillTable({ rows, span }: { rows: PerformanceRow[]; span: string }) {
+function SkillTable({
+	rows,
+	span,
+	onOpen,
+}: {
+	rows: PerformanceRow[];
+	span: string;
+	onOpen: (id: string) => void;
+}) {
 	return (
 		<PanelSection
 			card
@@ -579,8 +584,12 @@ function SkillTable({ rows, span }: { rows: PerformanceRow[]; span: string }) {
 									? `v${r.prior_version}`
 									: "the window before";
 							return (
-								<TableRow key={r.id}>
-									<TableCell>{r.name}</TableCell>
+								<TableRow
+									key={r.id}
+									className="cursor-pointer"
+									onClick={() => onOpen(r.id)}
+								>
+									<TableCell className="font-medium">{r.name}</TableCell>
 									<TableCell className="font-mono">
 										{r.version != null ? `v${r.version}` : "—"}
 									</TableCell>

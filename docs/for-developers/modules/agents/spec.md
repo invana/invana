@@ -249,20 +249,19 @@ Cancelling the parent cascades. A retired agent keeps its row.
 
 ## 5. Surfaces
 
-**Agents is a `leftNav` item holding two drawers** — `Agents` and `LLMs`
-([GV18](../govern/spec.md)). A provider is what an agent's cast resolves against, so it is read where
-agents are read, not in a settings tab reached from elsewhere.
+**Agents is a rail and a workbook, with no leftSection** ([the Agents shell](features/the-agents-shell.md)):
+every section is a page in a tab of its own, and a record's page opens as a tab beside it.
 
 | Surface | Region | Shape |
 |---|---|---|
-| Agents | first drawer of the **Agents** stack | one list; `+ New agent` in the header; a row carries its kind, a shield when it has a guardrail of its own, and its **spend meter** |
-| Agent page | the drill-in | five tabs — Overview · Skills & callables · Thinking · Soul · Activity ([AG23](features/author-an-agent.md#decisions)) |
-| `LLMs` | second drawer of the same stack | the providers, the models under each, and the cast role that names each one |
-| Lineage | a page | who authored whom, who spawned whom, on what run — with the depth marked and the floor's refusal drawn |
-| Concurrency | a page, or the drawer's footer | running · queued with positions and reasons · every ceiling in force |
-
-Components, routes and build order:
-[building-studio/govern-and-agents-panels.md](../../building-studio/govern-and-agents-panels.md).
+| Home | the workbook with nothing open | the composer, the person's recent asks, a tile per section |
+| Fleet | a page — Overview · Map · Table | the dashboard ([5.10](features/fleet-performance.md)); agents → skills → namespaces; every agent's numbers |
+| Agents | a page | one table on the list contract; a row opens the agent's page |
+| Agent page | a tab | its tabs ([AG23](features/author-an-agent.md#decisions)) |
+| Skills · Functions · Connections | pages | tables; Functions holds plans, templates and plugins as tabs |
+| LLMs | a page | endpoints and every model version with who pins it; an endpoint opens in a modal |
+| Lineage | a canvas tab, from an agent's page | who authored whom, who spawned whom, on what run |
+| Settings | a page | the runs-at-once ceiling · running · queued with reasons · the pools |
 
 ## 5a. The drawn states
 

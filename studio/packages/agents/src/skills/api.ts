@@ -7,11 +7,9 @@ import type {
 	SkillDrawStarted,
 	SkillPage,
 	SkillPlaybookRead,
-	SkillUpdate,
 	SkillUsageResponse,
 	SkillVersion,
 	SkillVersionDiff,
-	SkillVersionListResponse,
 	SkillVersionPublish,
 } from "./types";
 
@@ -24,29 +22,11 @@ export const skillsApi = {
 	list: (username: string, graphSlug: string, query: ListQuery = {}) =>
 		request<SkillPage>(`${base(username, graphSlug)}${listQueryToApi(query)}`),
 
-	get: (username: string, graphSlug: string, id: string) =>
-		request<Skill>(`${base(username, graphSlug)}/${id}`),
-
 	create: (username: string, graphSlug: string, data: SkillCreate) =>
 		request<Skill>(base(username, graphSlug), {
 			method: "POST",
 			body: JSON.stringify(data),
 		}),
-
-	/** Text that changed publishes the next version; a rename does not. */
-	update: (
-		username: string,
-		graphSlug: string,
-		id: string,
-		data: SkillUpdate,
-	) =>
-		request<Skill>(`${base(username, graphSlug)}/${id}`, {
-			method: "PATCH",
-			body: JSON.stringify(data),
-		}),
-
-	remove: (username: string, graphSlug: string, id: string) =>
-		request<void>(`${base(username, graphSlug)}/${id}`, { method: "DELETE" }),
 
 	/** The draft being written — opened if it is not open yet. */
 	draft: (username: string, graphSlug: string, id: string) =>
@@ -96,11 +76,6 @@ export const skillsApi = {
 	plan: (username: string, graphSlug: string, id: string, version: number) =>
 		request<SkillPlaybookRead>(
 			`${base(username, graphSlug)}/${id}/versions/${version}/tasks`,
-		),
-
-	versions: (username: string, graphSlug: string, id: string) =>
-		request<SkillVersionListResponse>(
-			`${base(username, graphSlug)}/${id}/versions`,
 		),
 
 	/** Publish the next version. Fields left out carry over from the current one. */

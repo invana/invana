@@ -15,15 +15,12 @@
  * > *is* creating the relationship — and even then it hands off to the same
  * > form the panel uses.
  *
- * Exactly **three** of the six drawn kinds write from a gesture — `model`,
- * `plan`, and `workflow` while drafting — and each writes an edge or a
- * placement, because drawing it is the only natural way to say it. Everything
- * a user would call a "setting" — a name, an arg, a budget, an assignee, a
- * colour — is edited in a form, on every kind, with no exception; on
- * `workflow` that form is `bottomSection`, not the panel and never a card
- * floating over the drawing (draft-a-plan.md). A new exception is argued
- * in the feature file, never added in code. A declared kind has no gesture at
- * all.
+ * Exactly **two** of the five drawn kinds write from a gesture — `model` and
+ * `plan` — and each writes an edge or a placement, because drawing it is the
+ * only natural way to say it. Everything a user would call a "setting" — a
+ * name, an arg, a budget, an assignee, a colour — is edited in a form, on
+ * every kind, with no exception. A new exception is argued in the feature
+ * file, never added in code. A declared kind has no gesture at all.
  *
  * ## Why this file exists
  *
@@ -54,7 +51,7 @@ import {
 	SlidersHorizontal,
 	SquareActivity,
 	TrendingUp,
-	Workflow,
+	WandSparkles,
 } from "lucide-react";
 import type { ElementType } from "react";
 
@@ -62,7 +59,6 @@ export type CanvasKind =
 	| "data"
 	| "model"
 	| "plan"
-	| "workflow"
 	| "envelope"
 	| "lineage"; // nothing to show, and nowhere to go
 
@@ -125,22 +121,6 @@ export const CANVAS_KINDS: Record<CanvasKind, CanvasKindSpec> = {
 		panel: "projects",
 		hasLayers: false,
 		footer: "PLAN",
-	},
-	workflow: {
-		kind: "workflow",
-		label: "Workflow",
-		icon: Workflow,
-		nodes: "steps",
-		// biome-ignore lint/suspicious/noTemplateCurlyInString: the copy shows the binding syntax itself
-		edges: "required order + ${steps.X.y} bindings",
-		// Authoring a workflow is out of MVP; a canvas is not a loophole in a
-		// threat model (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
-		writesFromGesture: false,
-		// The library is **Library › Plans**; a workflow is a reusable Flow, not
-		// a panel of its own.
-		panel: "library",
-		hasLayers: false,
-		footer: "LIBRARY",
 	},
 	envelope: {
 		kind: "envelope",
@@ -207,7 +187,8 @@ export type DeclaredKind =
 	| "project"
 	| "decisions"
 	| "plugin"
-	| "task_type";
+	| "task_type"
+	| "template";
 
 export type BoardKind = CanvasKind | DeclaredKind;
 
@@ -249,7 +230,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		label: "Plan",
 		icon: LayoutDashboard,
 		// A plan in Library › Plans — its flow with per-task medians and its runs.
-		panel: "library",
+		panel: "functions",
 		subject: "a flows.id",
 	},
 	// `⋯` on the plan page — records, not readings over a window, so
@@ -259,7 +240,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "declared",
 		label: "Versions",
 		icon: History,
-		panel: "library",
+		panel: "functions",
 		subject: "a flows.id",
 	},
 	plan_arguments: {
@@ -267,7 +248,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "declared",
 		label: "Arguments",
 		icon: SlidersHorizontal,
-		panel: "library",
+		panel: "functions",
 		subject: "a flows.id",
 	},
 	plan_export: {
@@ -275,7 +256,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "declared",
 		label: "Export YAML",
 		icon: FileCode,
-		panel: "library",
+		panel: "functions",
 		subject: "a flows.id",
 	},
 	task_run: {
@@ -372,7 +353,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "declared",
 		label: "Agent",
 		icon: Bot,
-		// `Open` on the Agents section; the list stays beside it.
+		// A row on the Agents page; the list keeps its tab.
 		panel: "agents",
 		subject: "an agents.id",
 	},
@@ -418,8 +399,8 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "declared",
 		label: "Plugin",
 		icon: Puzzle,
-		// A row in the Plugins section.
-		panel: "plugins",
+		// A row in Functions › Plugins.
+		panel: "functions",
 		subject: "a plugin name",
 	},
 	// A task type's manifest. Studio-only; titled with its key.
@@ -428,9 +409,20 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "declared",
 		label: "Function",
 		icon: Box,
-		// A task type on a plugin's page.
-		panel: "plugins",
+		// A row in Functions › Functions, or a task type on a plugin's page.
+		panel: "functions",
 		subject: "a task type key",
+	},
+	// An answer template — the surface it draws, the intents it accepts, and
+	// which answers cite it. Studio-only; titled with its key.
+	template: {
+		kind: "template",
+		renders: "declared",
+		label: "Template",
+		icon: WandSparkles,
+		// A row in Functions › Templates.
+		panel: "functions",
+		subject: "a projection template id",
 	},
 };
 

@@ -474,6 +474,8 @@ def run_session(row: dict, max_fix: int) -> bool:
     ensure_branch(row["branch"])
     if not resuming:
         sh(["git", "tag", "-f", f"{SCOPE}/{sid}-start"])
+    else:
+        checkpoint(sid, row["phase"], "work left by an interrupted run")
     set_status(sid, "in progress")
     if not resuming and sid.startswith(("A", "C")) and row["kind"].startswith("move"):
         sh(["node", "scripts/migration/shoot.mjs", "--live", "--smoke", "--out", f".migration-cache/{sid}/before"])

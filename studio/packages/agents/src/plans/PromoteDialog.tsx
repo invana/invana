@@ -31,6 +31,7 @@ import { useRunsQuery } from "@invana-studio/shell";
 import { DetailStatus } from "@invana-studio/ui";
 import { useState } from "react";
 import { usePromoteFlowMutation } from "./queries";
+import type { FlowDetail } from "./types";
 
 /** `nl-compare` — a key is the contract, so it is constrained like one. */
 const KEY_PATTERN = /^[a-z][a-z0-9-]{1,62}$/;
@@ -46,7 +47,8 @@ export function PromoteDialog({
 	graphSlug: string;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onPromoted?: (key: string) => void;
+	/** The library entry it made — the caller opens it. */
+	onPromoted?: (plan: FlowDetail) => void;
 }) {
 	const [selected, setSelected] = useState<TaskRunSummary | null>(null);
 	const [key, setKey] = useState("");
@@ -193,7 +195,7 @@ export function PromoteDialog({
 									onSuccess: (workflow) => {
 										reset();
 										onOpenChange(false);
-										onPromoted?.(workflow.key ?? "");
+										onPromoted?.(workflow);
 									},
 									onError: (err) =>
 										setError(

@@ -1,5 +1,6 @@
 import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type {
+	McpServerRead,
 	PluginDetail,
 	PluginPage,
 	PluginSummary,
@@ -10,7 +11,8 @@ const PLUGINS = "/api/v1/plugins";
 
 /**
  * The install's plugin registry. Enabling and disabling are an install
- * Admin's acts, and only on a plugin the engine marks `switchable`.
+ * Admin's acts, and only on a plugin the engine marks `switchable`; so are
+ * adding an MCP server and refreshing its frozen tools.
  */
 export const pluginsApi = {
 	/** One page of the registry — searched, filtered and sorted by the engine. */
@@ -23,6 +25,20 @@ export const pluginsApi = {
 	setEnabled: (name: string, enabled: boolean) =>
 		request<PluginSummary>(
 			`${PLUGINS}/${encodeURIComponent(name)}/${enabled ? "enable" : "disable"}`,
+			{ method: "POST" },
+		),
+
+	/** Add an MCP server by name and URL; it is stored disabled, its tools frozen. */
+	addMcp: (body: { name: string; url: string }) =>
+		request<McpServerRead>(`${PLUGINS}/mcp`, {
+			method: "POST",
+			body: JSON.stringify(body),
+		}),
+
+	/** List a server's tools again, as its next revision. */
+	refreshMcp: (server: string) =>
+		request<McpServerRead>(
+			`${PLUGINS}/mcp/${encodeURIComponent(server)}/refresh`,
 			{ method: "POST" },
 		),
 

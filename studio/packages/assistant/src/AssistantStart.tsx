@@ -52,6 +52,12 @@ interface AssistantStartProps
 	/** The user menu's *Assistant*. Off, there is no question box and no
 	 *  recent questions — only the views, and the way to turn asking on. */
 	asking: boolean;
+	/** The question over the box; by default it asks about the Graph. */
+	heading?: string;
+	/** The box's placeholder. */
+	placeholder?: string;
+	/** What a product draws under the start — Agents' section tiles. */
+	children?: ReactNode;
 }
 
 /**
@@ -81,6 +87,9 @@ export function AssistantStart({
 	views,
 	onOpenSession,
 	asking,
+	heading,
+	placeholder = "Ask a question, or say what to draw…",
+	children,
 	...composer
 }: AssistantStartProps) {
 	const { data } = useQuery({
@@ -109,7 +118,7 @@ export function AssistantStart({
 	return (
 		<BoardGround data-testid="explorer-start" className="gap-4 p-6">
 			<h1 className="text-2xl font-semibold">
-				What do you want to know about {graphName}?
+				{heading ?? `What do you want to know about ${graphName}?`}
 			</h1>
 			{subtitle && (
 				<p className="-mt-2 text-xs text-muted-foreground">{subtitle}</p>
@@ -125,7 +134,7 @@ export function AssistantStart({
 						{...composer}
 						sessionKey={null}
 						takesAsk={false}
-						placeholder="Ask a question, or say what to draw…"
+						placeholder={placeholder}
 						worldControl={
 							<WorldPicker
 								username={username}
@@ -185,6 +194,7 @@ export function AssistantStart({
 					</div>
 				</section>
 			)}
+			{children}
 		</BoardGround>
 	);
 }

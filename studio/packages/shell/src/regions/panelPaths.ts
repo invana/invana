@@ -64,36 +64,25 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	},
 	{ path: "modeller/rules", panel: "rules" },
 	{ path: "modeller/settings", panel: "settings" },
-	// The Agents rail. Templates is Library's second section, under its path.
-	{ path: "agents/overview", panel: "overview" },
-	{
-		path: "agents/agents",
-		panel: "agents",
-		section: "agents",
-		detail: "agent",
-	},
+	// The Agents rail. Every section is a page; a section with tabs gives each
+	// tab a path under it, and the first is the section's own path.
+	{ path: "agents/home", panel: "home" },
+	{ path: "agents/fleet", panel: "fleet", section: "overview" },
+	{ path: "agents/fleet/map", panel: "fleet", section: "map" },
+	{ path: "agents/fleet/table", panel: "fleet", section: "table" },
+	{ path: "agents/performance", panel: "performance", section: "agents" },
+	{ path: "agents/performance/skills", panel: "performance", section: "skills" },
+	{ path: "agents/performance/plans", panel: "performance", section: "plans" },
+	{ path: "agents/performance/llms", panel: "performance", section: "llms" },
+	{ path: "agents/agents", panel: "agents" },
 	{ path: "agents/skills", panel: "skills" },
-	{
-		path: "agents/library",
-		panel: "library",
-		section: "plans",
-		detail: "plan",
-	},
-	{
-		path: "agents/library/templates",
-		panel: "library",
-		section: "templates",
-		detail: "template",
-	},
-	{ path: "agents/plugins", panel: "plugins", section: "plugins" },
-	{
-		path: "agents/plugins/tasks",
-		panel: "plugins",
-		section: "catalogue",
-		detail: "entry",
-	},
+	{ path: "agents/functions", panel: "functions", section: "functions" },
+	{ path: "agents/functions/plans", panel: "functions", section: "plans" },
+	{ path: "agents/functions/generated", panel: "functions", section: "generated" },
+	{ path: "agents/functions/templates", panel: "functions", section: "templates" },
+	{ path: "agents/functions/plugins", panel: "functions", section: "plugins" },
+	{ path: "agents/connections/mcp", panel: "connections", section: "mcp" },
 	{ path: "agents/llms", panel: "llms", detail: "provider" },
-	{ path: "agents/performance", panel: "performance" },
 	{ path: "agents/settings", panel: "concurrency" },
 	// Activity's tabs (the shell's page). Runs and Events keep the panel keys
 	// their rail icons write; the tabs with no panel share one key.
@@ -134,7 +123,8 @@ const INFO_TAB = "info";
 // segment — opens the first section under it.
 const LEVEL_LANDINGS: Record<string, string> = {
 	modeller: "modeller/global-model",
-	agents: "agents/overview",
+	agents: "agents/home",
+	"agents/connections": "agents/connections/mcp",
 	activity: "activity/runs",
 };
 
@@ -145,14 +135,6 @@ const ALIASES: Record<string, string> = {
 	layers: "explorer",
 	canvases: "explorer",
 	connection: "settings",
-};
-
-// A section that left its panel, as `panel:section` → the panel that holds it
-// now. The Catalogue was Library's; it is Plugins'. LLMs was the Agents
-// stack's second section; it is a page of its own.
-const SECTION_MOVES: Record<string, string> = {
-	"library:catalogue": "plugins",
-	"agents:llms": "llms",
 };
 
 // Pages of Activity with no panel behind them — the change log and a change's
@@ -239,12 +221,7 @@ export function pageUrlOf(params: URLSearchParams): {
 		return { tail: INFO_PATH, search };
 	}
 
-	const aliased = ALIASES[raw] ?? raw;
-	const moved =
-		SECTION_MOVES[
-			`${aliased}:${search.get(SECTION) ?? search.get(LEGACY_SECTION)}`
-		];
-	const panel = moved ?? aliased;
+	const panel = ALIASES[raw] ?? raw;
 	const entries = PANEL_PATHS.filter((e) => e.panel === panel);
 	if (entries.length === 0) return { tail: "", search };
 

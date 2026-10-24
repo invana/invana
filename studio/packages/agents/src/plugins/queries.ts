@@ -35,6 +35,25 @@ export function useTaskTypeQuery(ref: string) {
 	});
 }
 
+/** Add an MCP server; the registry re-reads. */
+export function useAddMcpServerMutation() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: (body: { name: string; url: string }) =>
+			pluginsApi.addMcp(body),
+		onSuccess: () => qc.invalidateQueries({ queryKey: ["plugins"] }),
+	});
+}
+
+/** Refresh an MCP server's frozen tools; the registry re-reads. */
+export function useRefreshMcpServerMutation() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: (server: string) => pluginsApi.refreshMcp(server),
+		onSuccess: () => qc.invalidateQueries({ queryKey: ["plugins"] }),
+	});
+}
+
 /** Enable or disable a switchable plugin; the registry and its page re-read. */
 export function useSetPluginEnabledMutation(name: string) {
 	const qc = useQueryClient();

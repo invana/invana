@@ -25,9 +25,6 @@ export function useLayeredCanvas(
 	);
 	const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 	const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
-	const [selectedWorkflowKey, setSelectedWorkflowKey] = useState<string | null>(
-		null,
-	);
 	const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
 	const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
 	const [selectedLineageEdge, setSelectedLineageEdge] =
@@ -41,7 +38,7 @@ export function useLayeredCanvas(
 	const taskMutations = useTodoMutations(username ?? "", graphSlug ?? "");
 
 	/**
-	 * **The main area is always a canvas, and it belongs to the open panel.**
+	 * **A panel's canvas belongs to the panel.**
 	 *
 	 * Every work panel owns a kind, and selecting a row is the gesture that opens
 	 * it — there is no separate "draw it" step to discover. Before this, picking a
@@ -50,29 +47,17 @@ export function useLayeredCanvas(
 	 *
 	 * Two rules keep it predictable:
 	 *
-	 * - **A canvas is replaced only by its own panel's kind.** Switching from
-	 *   Projects to Agents swaps the plan for the lineage, because a plan drawn
-	 *   under the agents list answers a question nobody asked. But switching
-	 *   between an agent's *envelope* and its *lineage* — both `agents` — is the
-	 *   panel's own choice and is left alone, which is what lets the Agent
-	 *   surface's tabs drive the canvas.
+	 * - **A canvas is replaced only by its own panel's kind.** An agent's
+	 *   *envelope* and *lineage* are opened from its page, never by a panel.
 	 * - **It never closes one.** Closing is the tab's X; a click that silently
 	 *   threw away what you were looking at would make the canvas feel unstable.
-	 *
-	 * `skills` is deliberately absent: a skill hangs over the work rather than
-	 * having a shape, so its panel opens beside whatever canvas is already there.
 	 */
 	useEffect(() => {
 		// The kind this panel would draw, given what is selected in it.
+		// Projects owns both sections, so it owns the `plan` canvas whether the
+		// project or one of its Todos is what was picked.
 		const own: CanvasKind | null =
-			// Projects owns both sections, so it owns the `plan` canvas whether the
-			// project or one of its Todos is what was picked.
-			settingsSection === "projects" && selectedProjectKey
-				? "plan"
-				: // Library's plan opens as a page, not a canvas.
-					settingsSection === "agents" && selectedAgentId
-					? "lineage"
-					: null;
+			settingsSection === "projects" && selectedProjectKey ? "plan" : null;
 		if (!own) return;
 		setWorkKind((current) => {
 			if (!current) return own;
@@ -81,7 +66,7 @@ export function useLayeredCanvas(
 			const owner = CANVAS_KINDS[current].panel;
 			return owner === settingsSection ? current : own;
 		});
-	}, [settingsSection, selectedProjectKey, selectedAgentId]);
+	}, [settingsSection, selectedProjectKey]);
 
 	// The main area, when a work canvas is open. The Explorer's data canvas is
 	// still the default — these replace it only while their panel drove them
@@ -91,19 +76,13 @@ export function useLayeredCanvas(
 	const workTarget: LayeredCanvasTarget | null =
 		workKind === "plan" && selectedProjectKey
 			? { kind: "plan", projectKey: selectedProjectKey }
-			: workKind === "workflow" && selectedWorkflowKey
-				? { kind: "workflow", workflowKey: selectedWorkflowKey }
-				: (workKind === "envelope" || workKind === "lineage") && selectedAgentId
-					? { kind: workKind, agentId: selectedAgentId }
-					: null;
+			: (workKind === "envelope" || workKind === "lineage") && selectedAgentId
+				? { kind: workKind, agentId: selectedAgentId }
+				: null;
 
 	const workPageId = workTarget
 		? `${workTarget.kind}:${
-				"projectKey" in workTarget
-					? workTarget.projectKey
-					: "workflowKey" in workTarget
-						? workTarget.workflowKey
-						: workTarget.agentId
+				"projectKey" in workTarget ? workTarget.projectKey : workTarget.agentId
 			}`
 		: null;
 
@@ -114,8 +93,6 @@ export function useLayeredCanvas(
 		setSelectedTaskId,
 		selectedAgentId,
 		setSelectedAgentId,
-		selectedWorkflowKey,
-		setSelectedWorkflowKey,
 		selectedStepId,
 		setSelectedStepId,
 		selectedSkillId,

@@ -83,7 +83,7 @@ export interface AgentPage extends Page<Agent> {
 	tokens_this_month: Record<string, number>;
 }
 
-export interface AgentCreate {
+interface AgentCreate {
 	name: string;
 	description?: string;
 	instructions?: string;

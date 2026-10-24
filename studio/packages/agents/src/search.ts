@@ -5,8 +5,7 @@ import { skillsApi } from "./skills/api";
 
 /**
  * ⌘K's Agents records: the Graph's agents, retired ones included, and its
- * skills. An agent opens its page in the Workbook; a skill has no path of
- * its own, so it opens Skills.
+ * skills. Each opens its page as a tab beside its section's.
  */
 export async function searchAgents(graph: GraphRef): Promise<SearchHit[]> {
 	const [agents, skills] = await Promise.all([
@@ -29,7 +28,7 @@ export async function searchAgents(graph: GraphRef): Promise<SearchHit[]> {
 			label: s.name,
 			detail: "skill",
 			icon: Wand2,
-			to: "skills",
+			to: `skills?page=${encodeURIComponent(`skill:${s.id}`)}`,
 		})),
 	];
 }

@@ -63,32 +63,27 @@ interface HostLayoutProps {
 	footer?: { left: ReactNode; right: ReactNode };
 }
 
-// The panels the host draws in its own `leftSection`, keyed into the shared
-// `panel` param. Every other key the path can name — Info and Graph settings —
-// docks the SettingsViewPanel instead. Each is a product's panel: Explorer's
-// type list, the Modeller's, the Agents product's and the Projects product's.
-//
-// `skills` is page-owned rather than a settings section. That is deliberate: a
-// skill is *configured* like a connection but *read* like work — "is this prose
-// doing anything?" is answered by the usage list, which only exists beside the
-// agents and steps it is talking about.
+// The keys the host itself owns, keyed into the shared `panel` param. Every
+// other key the path can name — Info and Graph settings — docks the
+// SettingsViewPanel instead. A product panel draws in `leftSection`; an Agents
+// section is a page in the Workbook and draws no left column at all.
 const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"explorer",
 	"model",
 	"projects",
-	"library",
 	"govern",
-	"agents",
-	"skills",
 	// The Modeller's requests and rules.
 	"requests",
 	"rules",
-	// The Agents product's own panels, and its pages — Overview, LLMs and
-	// Performance draw no panel, so the column stays closed.
-	"overview",
-	"plugins",
-	"llms",
+	// The Agents sections — pages, so the column stays closed.
+	"home",
+	"fleet",
 	"performance",
+	"agents",
+	"skills",
+	"functions",
+	"connections",
+	"llms",
 	"concurrency",
 	// The Projects product's own panel.
 	"decisions",

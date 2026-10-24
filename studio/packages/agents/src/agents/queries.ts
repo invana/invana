@@ -1,7 +1,7 @@
 /**
  * TanStack Query hooks for agents: the list, one agent's lineage, skills and
  * callables, meters, activity and sessions, a lifecycle or soul preview, and
- * the mutations that create, update or act on an agent. Keys are
+ * the mutations that update or act on an agent. Keys are
  * `["agents", owner, graph, …]`; a mutation invalidates every agents key.
  */
 
@@ -14,12 +14,7 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { agentsApi } from "./api";
-import type {
-	AgentCreate,
-	AgentUpdate,
-	LifecycleAct,
-	SoulPreviewRequest,
-} from "./types";
+import type { AgentUpdate, LifecycleAct, SoulPreviewRequest } from "./types";
 
 type Scope = { username: string; graphSlug: string };
 
@@ -180,18 +175,9 @@ export function useAgentMutations(username: string, graphSlug: string) {
 	};
 
 	return {
-		create: useMutation({
-			mutationFn: (data: AgentCreate) =>
-				agentsApi.create(username, graphSlug, data),
-			onSuccess: invalidate,
-		}),
 		update: useMutation({
 			mutationFn: ({ id, data }: { id: string; data: AgentUpdate }) =>
 				agentsApi.update(username, graphSlug, id, data),
-			onSuccess: invalidate,
-		}),
-		remove: useMutation({
-			mutationFn: (id: string) => agentsApi.remove(username, graphSlug, id),
 			onSuccess: invalidate,
 		}),
 		bindSkill: useMutation({

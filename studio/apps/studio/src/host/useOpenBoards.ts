@@ -1,4 +1,4 @@
-import { useFlowsQuery, useLibraryViewPanel } from "@invana-studio/agents";
+import { useFlowsQuery } from "@invana-studio/agents";
 import type { LensKind } from "@invana-studio/core";
 import { runsApi } from "@invana-studio/core";
 import {
@@ -18,17 +18,13 @@ import { useBoardPage } from "@/host/useBoardPage";
  * A board is a page like any other, keyed `<kind>:<subject_id>`, and `?page=`
  * names the focused one — so a cold link or a reload reopens it here, once, on
  * the way in. `openBoard` is the one writer: it adds or replaces the board,
- * focuses it and writes the URL. The plan page follows the Library's `&plan=`,
- * which names a plan by key, to that plan's newest version; `planRefById` names
- * a plan page's tab.
+ * focuses it and writes the URL. `planRefById` names a plan page's tab.
  */
 export function useOpenBoards(
 	username: string | undefined,
 	graphSlug: string | undefined,
 ) {
-	// And the plan page for a library plan: keyed by `flows.id`,
-	// titled `key@version`, and opened from the section by key — the newest
-	// version, which is the one the section reads.
+	// A plan page is keyed by `flows.id` and titled `key@version`.
 	const planLibrary = useFlowsQuery(username, graphSlug, { limit: 200 });
 	const planRefById = useMemo(
 		() =>
@@ -40,16 +36,6 @@ export function useOpenBoards(
 			),
 		[planLibrary.data],
 	);
-	const newestPlanIdByKey = useMemo(() => {
-		const out = new Map<string, { id: string; version: number }>();
-		for (const p of planLibrary.data?.items ?? []) {
-			const seen = p.key ? out.get(p.key) : undefined;
-			if (p.key && (!seen || p.version > seen.version))
-				out.set(p.key, { id: p.id, version: p.version });
-		}
-		return out;
-	}, [planLibrary.data]);
-	const libraryPlanKey = useLibraryViewPanel().planKey;
 	// The **declared** boards that are open — a run board, and a step's
 	// (see-what-ran.md). They are pages like any other, keyed
 	// `<kind>:<subject_id>`, so the tab strip carries them beside the canvases
@@ -164,26 +150,8 @@ export function useOpenBoards(
 	);
 	// What `OpenBoardContext` publishes — a record's board, opened from wherever
 	// a link to one is drawn. Narrower than `openBoard` on purpose: these
-	// three kinds bind to a record and read no trace, so there is no `runId` to
+	// kinds bind to a record and read no trace, so there is no `runId` to
 	// forget.
-	// **Picking a plan opens its page**. The Plans section names
-	// what it drilled into in the URL, so the page follows `&plan=`. Only ever
-	// *opens*: going back to the list clears `&plan=` and leaves the page where
-	// it is — a panel opens a page and never closes one.
-	const libraryPlanId = libraryPlanKey
-		? newestPlanIdByKey.get(libraryPlanKey)?.id
-		: undefined;
-	// Once per pick, not per render: `openBoard` is new on every URL write, so
-	// keyed on it alone this would pull the plan page back to the front each
-	// time a page it opened — a run — took focus.
-	const openedPlanId = useRef<string | undefined>(undefined);
-	useEffect(() => {
-		if (openedPlanId.current === libraryPlanId) return;
-		openedPlanId.current = libraryPlanId;
-		if (libraryPlanId)
-			openBoard({ kind: "plan_runs", subjectId: libraryPlanId });
-	}, [libraryPlanId, openBoard]);
-
 	const openRecordBoard = useCallback(
 		(kind: RecordBoardKind, subjectId: string) =>
 			openBoard({ kind, subjectId }),
