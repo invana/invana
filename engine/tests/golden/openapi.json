@@ -1676,6 +1676,11 @@
             "title": "Description",
             "type": "string"
           },
+          "effective_budget": {
+            "additionalProperties": true,
+            "title": "Effective Budget",
+            "type": "object"
+          },
           "effective_effort": {
             "additionalProperties": {
               "type": "integer"
@@ -1844,6 +1849,7 @@
           "workflow_spec",
           "skill_ids",
           "budget",
+          "effective_budget",
           "effort",
           "effective_effort",
           "answers_asks",
@@ -9947,6 +9953,343 @@
         "title": "FlowRead",
         "type": "object"
       },
+      "FunctionCallRead": {
+        "description": "One run step that called the function.",
+        "properties": {
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "queued_at": {
+            "format": "date-time",
+            "title": "Queued At",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens"
+          }
+        },
+        "required": [
+          "id",
+          "run_id",
+          "title",
+          "status",
+          "queued_at"
+        ],
+        "title": "FunctionCallRead",
+        "type": "object"
+      },
+      "FunctionCallsRead": {
+        "description": "A function's calls over the window against the window before, read once by the engine.",
+        "properties": {
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "calls_change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Change"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "calls_prior": {
+            "title": "Calls Prior",
+            "type": "integer"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "failed_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failed Rate"
+          },
+          "failed_rate_change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Change"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failed_rate_prior": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failed Rate Prior"
+          },
+          "p95_change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Change"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          },
+          "p95_prior_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Prior Ms"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          }
+        },
+        "required": [
+          "days",
+          "since",
+          "calls",
+          "calls_prior",
+          "failed"
+        ],
+        "title": "FunctionCallsRead",
+        "type": "object"
+      },
+      "FunctionPlanRef": {
+        "description": "A reusable plan in this Graph that names the function \u2014 its newest version.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "origin"
+        ],
+        "title": "FunctionPlanRef",
+        "type": "object"
+      },
+      "FunctionRead": {
+        "description": "A function's page: its catalogue entry, its manifest, who names it and its calls.",
+        "properties": {
+          "args": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueArgRead"
+            },
+            "title": "Args",
+            "type": "array"
+          },
+          "bound": {
+            "title": "Bound",
+            "type": "string"
+          },
+          "calls": {
+            "$ref": "#/components/schemas/FunctionCallsRead"
+          },
+          "needed_by": {
+            "items": {
+              "$ref": "#/components/schemas/FunctionSkillRef"
+            },
+            "title": "Needed By",
+            "type": "array"
+          },
+          "outputs": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueOutputRead"
+            },
+            "title": "Outputs",
+            "type": "array"
+          },
+          "plans": {
+            "items": {
+              "$ref": "#/components/schemas/FunctionPlanRef"
+            },
+            "title": "Plans",
+            "type": "array"
+          },
+          "plugin": {
+            "default": "",
+            "title": "Plugin",
+            "type": "string"
+          },
+          "requires": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requires",
+            "type": "array"
+          },
+          "resources": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Resources",
+            "type": "array"
+          },
+          "retries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retries"
+          },
+          "side_effect": {
+            "title": "Side Effect",
+            "type": "string"
+          },
+          "step_key": {
+            "title": "Step Key",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "timeout_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timeout S"
+          },
+          "used_by": {
+            "title": "Used By",
+            "type": "integer"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step_key",
+          "bound",
+          "summary",
+          "args",
+          "outputs",
+          "requires",
+          "used_by",
+          "version",
+          "side_effect",
+          "resources",
+          "plans",
+          "needed_by",
+          "calls"
+        ],
+        "title": "FunctionRead",
+        "type": "object"
+      },
+      "FunctionSkillRef": {
+        "description": "A skill whose current version's plan names the function.",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "skill_id": {
+            "title": "Skill Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "skill_id",
+          "name",
+          "version"
+        ],
+        "title": "FunctionSkillRef",
+        "type": "object"
+      },
       "GlobalModel": {
         "description": "The union of a Graph's published models plus its declared links.",
         "properties": {
@@ -15136,6 +15479,50 @@
         "title": "Page[CatalogueEntryRead]",
         "type": "object"
       },
+      "Page_FunctionCallRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FunctionCallRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[FunctionCallRead]",
+        "type": "object"
+      },
       "Page_LLMModelRead_": {
         "properties": {
           "applied": {
@@ -18966,6 +19353,18 @@
               }
             ],
             "title": "Reassign To Kind"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
           }
         },
         "title": "RetireRequest",
@@ -26212,6 +26611,17 @@
             "title": "Tokens Out",
             "type": "integer"
           },
+          "triggered_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Triggered By"
+          },
           "wait_ms": {
             "anyOf": [
               {
@@ -26241,104 +26651,6 @@
           "status"
         ],
         "title": "TaskRunSummary",
-        "type": "object"
-      },
-      "TaskTypeRead": {
-        "description": "One task type, its plugin, and how often it ran.",
-        "properties": {
-          "args": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/TaskArgRead"
-            },
-            "title": "Args",
-            "type": "object"
-          },
-          "bound": {
-            "title": "Bound",
-            "type": "string"
-          },
-          "key": {
-            "title": "Key",
-            "type": "string"
-          },
-          "outputs": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "title": "Outputs",
-            "type": "object"
-          },
-          "plugin": {
-            "title": "Plugin",
-            "type": "string"
-          },
-          "requires": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Requires",
-            "type": "array"
-          },
-          "resources": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Resources",
-            "type": "array"
-          },
-          "retries": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Retries"
-          },
-          "runs_30d": {
-            "title": "Runs 30D",
-            "type": "integer"
-          },
-          "side_effect": {
-            "title": "Side Effect",
-            "type": "string"
-          },
-          "summary": {
-            "title": "Summary",
-            "type": "string"
-          },
-          "timeout_s": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Timeout S"
-          },
-          "version": {
-            "title": "Version",
-            "type": "string"
-          }
-        },
-        "required": [
-          "key",
-          "version",
-          "summary",
-          "bound",
-          "side_effect",
-          "args",
-          "outputs",
-          "requires",
-          "resources",
-          "plugin",
-          "runs_30d"
-        ],
-        "title": "TaskTypeRead",
         "type": "object"
       },
       "TaskUpdate": {
@@ -32193,53 +32505,6 @@
         ]
       }
     },
-    "/api/v1/task-types/{ref}": {
-      "get": {
-        "operationId": "get_task_type_api_v1_task_types__ref__get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "ref",
-            "required": true,
-            "schema": {
-              "title": "Ref",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskTypeRead"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Get Task Type",
-        "tags": [
-          "plugins"
-        ]
-      }
-    },
     "/api/v1/telemetry/logs": {
       "post": {
         "description": "Forward an OTLP/HTTP log export \u2014 the studio's error logs \u2014 to the collector.",
@@ -36071,6 +36336,144 @@
           }
         ],
         "summary": "List Catalogue",
+        "tags": [
+          "catalogue"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/catalogue/{step_key}": {
+      "get": {
+        "operationId": "get_function_api_v1_u__username___graphSlug__catalogue__step_key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "step_key",
+            "required": true,
+            "schema": {
+              "title": "Step Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FunctionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Function",
+        "tags": [
+          "catalogue"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/catalogue/{step_key}/calls": {
+      "get": {
+        "operationId": "list_function_calls_api_v1_u__username___graphSlug__catalogue__step_key__calls_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "step_key",
+            "required": true,
+            "schema": {
+              "title": "Step Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_FunctionCallRead_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Function Calls",
         "tags": [
           "catalogue"
         ]

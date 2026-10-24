@@ -12,7 +12,7 @@ import type { Page } from "@invana-studio/core";
 type AgentKind = "seeded" | "authored" | "spawned";
 
 /** `draft` is built but never offered work until *Create agent*. */
-export type AgentStatus = "draft" | "active" | "paused" | "retired";
+type AgentStatus = "draft" | "active" | "paused" | "retired";
 
 type AgentLifetime = "persistent" | "ephemeral";
 
@@ -42,6 +42,8 @@ export interface Agent {
 	/** Read-only — the bindings live in `skill_bindings`; change it with bind/unbind. */
 	skill_ids: string[];
 	budget: Record<string, number>;
+	/** The ceilings a run reads — its own budget over the defaults. */
+	effective_budget: Record<string, number>;
 	/**
 	 * How hard it tries — `max_steps` · `max_replans` · `max_clarifications` —
 	 * as stored; a missing key is the default. `effective_effort` is what
@@ -126,7 +128,7 @@ export interface SoulTraits {
 }
 
 /** One bound skill, and the callables its current plan names. */
-export interface AgentSkillRow {
+interface AgentSkillRow {
 	skill_id: string;
 	name: string;
 	/** Null for a skill with no published version — offered nothing yet. */
@@ -144,7 +146,7 @@ export interface AgentSkillRow {
 }
 
 /** One callable the envelope allows. */
-export interface AgentCallableRow {
+interface AgentCallableRow {
 	step_key: string;
 	/** `graph_read` · `llm` · `none` … or `unknown` for a retired key. */
 	bound: string;
@@ -187,14 +189,14 @@ export interface AgentMeters {
 }
 
 /** One UTC calendar day of the Overview's window; a quiet day is zero. */
-export interface AgentOverviewDay {
+interface AgentOverviewDay {
 	date: string;
 	runs: number;
 	tokens: number;
 }
 
 /** How runs ended, one row per exit, the most frequent first. */
-export interface AgentOverviewExit {
+interface AgentOverviewExit {
 	/** The run's `outcome` when it has one, else its `status`. */
 	exit: string;
 	runs: number;
@@ -204,7 +206,7 @@ export interface AgentOverviewExit {
 }
 
 /** One of the agent's newest root runs. */
-export interface AgentOverviewRun {
+interface AgentOverviewRun {
 	id: string;
 	title: string;
 	/** This agent plus each distinct agent its steps delegated to. */
@@ -217,7 +219,7 @@ export interface AgentOverviewRun {
 }
 
 /** One model version the window's runs called. */
-export interface AgentOverviewModel {
+interface AgentOverviewModel {
 	model_version: string;
 	/** The first run by this agent on it, all time. */
 	first_at: string;
@@ -309,7 +311,7 @@ export type LifecycleAct = "pause" | "retire";
  * What an act does to one piece of open work — a closed vocabulary, because a
  * sentence per row is a sentence nobody can compare.
  */
-export type LifecycleEffect = "finishes" | "blocked" | "unchanged" | "refused";
+type LifecycleEffect = "finishes" | "blocked" | "unchanged" | "refused";
 
 export interface LifecycleItem {
 	kind: "run" | "task" | "session";

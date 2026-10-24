@@ -6,10 +6,15 @@
  *
  * Drawn from records, never from a model call:
  *
- * - **Triggers** — whether a Todo may name it (`policy.can_be_assigned`) and
- *   whether it may run with nobody to ask (`policy.unattended`).
+ * - **Triggers** — the schedules that start it (`…/schedules?f.agent_id=`),
+ *   whether a Todo may name it (`policy.can_be_assigned`) and whether it may
+ *   run with nobody to ask (`policy.unattended`).
  * - **Skills** — its bindings, each with its offered plan's step count.
  * - **Spawned** — the lineage's `spawned` edges out of this agent.
+ *
+ * Each kind is one column, left to right — triggers · the agent · the skills
+ * it uses · the agents it spawned — and the columns stay where they are
+ * seeded: the picture is a reading order, not a layout to settle.
  *
  * *From the instructions* lists each line of `instructions.md` that names a
  * bound skill or a spawned agent. Delegation targets join with delegation;
@@ -36,6 +41,7 @@ import {
 	type LayeredEdge,
 	type LayeredNode,
 } from "@invana-studio/canvases";
+import { useSchedulesQuery } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { Pencil } from "lucide-react";
 import { useMemo } from "react";
@@ -69,9 +75,19 @@ export function AgentFlowTab({
 }) {
 	const skills = useSkillsQuery(username, graphSlug, EVERY);
 	const lineage = useAgentLineageQuery(username, graphSlug, agent.id);
+	const schedules = useSchedulesQuery(
+		{ username, graphSlug },
+		{ filters: { agent_id: [agent.id] }, limit: 50 },
+	);
 	const flow = useMemo(
-		() => flowModel(agent, skills.data?.items ?? [], lineage.data),
-		[agent, skills.data, lineage.data],
+		() =>
+			flowModel(
+				agent,
+				skills.data?.items ?? [],
+				lineage.data,
+				schedules.data?.items ?? [],
+			),
+		[agent, skills.data, lineage.data, schedules.data],
 	);
 
 	return (
@@ -175,17 +191,32 @@ export function AgentFlowTab({
 	);
 }
 
+/** What a trigger column reads off one schedule. */
+interface ScheduleTrigger {
+	id: string;
+	name: string;
+	cron: string;
+	status: string;
+}
+
 function flowModel(
 	agent: Agent,
 	skills: Skill[],
 	lineage: AgentLineage | undefined,
+	schedules: ScheduleTrigger[],
 ): FlowModel {
 	const nodes: LayeredNode[] = [];
 	const edges: LayeredEdge[] = [];
 	const self = `agent:${agent.id}`;
 	const model = versionName(agent.model_pin);
 
-	const triggers: { id: string; label: string; sub: string }[] = [];
+	const triggers: { id: string; label: string; sub: string }[] = schedules.map(
+		(s) => ({
+			id: `trigger:schedule:${s.id}`,
+			label: s.name,
+			sub: `schedule · ${s.cron}${s.status === "paused" ? " · paused" : ""}`,
+		}),
+	);
 	if (agent.policy.can_be_assigned)
 		triggers.push({
 			id: "trigger:assigned",

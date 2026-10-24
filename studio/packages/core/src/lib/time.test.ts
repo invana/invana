@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { formatDuration, formatElapsed, formatRelativeTime } from "./time";
+import {
+	formatDuration,
+	formatElapsed,
+	formatRelativeTime,
+	formatShortDate,
+} from "./time";
 
 describe("formatDuration", () => {
 	it("reads a step in ms under a second and in seconds after", () => {
@@ -35,6 +40,6 @@ describe("formatRelativeTime", () => {
 
 	it("falls back to a date past a week", () => {
 		const old = ago(30 * 86_400_000);
-		expect(formatRelativeTime(old)).toBe(old.toLocaleDateString());
+		expect(formatRelativeTime(old)).toBe(formatShortDate(old));
 	});
 });

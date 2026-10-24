@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { handlerNodeId, taskFlowFromPlan } from "./taskFlowFromPlan";
+import { gapNodeId, handlerNodeId, taskFlowFromPlan } from "./taskFlowFromPlan";
 import type { SkillPlaybookRead } from "./types";
 
 const plan = {
@@ -36,6 +36,8 @@ describe("taskFlowFromPlan", () => {
 		expect(nodes[0].data).toMatchObject({
 			title: "graph_read",
 			icon: "lucide/database",
+			kind: "step",
+			caption: "step 1 · from line 12",
 			rows: [
 				{ label: "step", value: "1 · from line 12" },
 				{ label: "from", value: "base", mono: true },
@@ -63,5 +65,23 @@ describe("taskFlowFromPlan", () => {
 			["a", handlerNodeId(0)],
 			["b", handlerNodeId(1)],
 		]);
+	});
+
+	it("draws a line the draw could not map as a gap beside the step before it", () => {
+		const lines: Record<string, number> = {
+			"List the routes.": 3,
+			"Email it.": 4,
+		};
+		const { nodes, edges } = taskFlowFromPlan(
+			plan,
+			[],
+			(s) => (s ? (lines[s] ?? null) : null),
+			["Email it."],
+		);
+		expect(nodes.find((n) => n.id === gapNodeId(0))?.data).toMatchObject({
+			kind: "gap",
+			caption: "line 4 · “Email it.”",
+		});
+		expect(edges.at(-1)).toMatchObject({ source: "a", target: gapNodeId(0) });
 	});
 });

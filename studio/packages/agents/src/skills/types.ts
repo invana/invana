@@ -113,7 +113,7 @@ export interface SkillPlaybookRead {
 }
 
 /** One handler line, and the step whose function it names. */
-export interface SkillPlanHandler {
+interface SkillPlanHandler {
 	/** The line, verbatim, without its list marker. */
 	span: string;
 	/** Null when the line names no step's function. */
@@ -121,7 +121,7 @@ export interface SkillPlanHandler {
 }
 
 /** One composition: which plan, which version, and the arguments it tuned. */
-export interface PlanUse {
+interface PlanUse {
 	key: string;
 	version: number;
 	args: Record<string, unknown>;
@@ -189,7 +189,7 @@ export interface SkillDraft {
  * engine. Studio never re-reads the rules to predict one: a second
  * reading of a bound is a copy to keep in step, and the copy goes stale.
  */
-export interface SkillAgentStanding {
+interface SkillAgentStanding {
 	agent_id: string;
 	agent_name: string;
 	bound: boolean;
@@ -197,7 +197,6 @@ export interface SkillAgentStanding {
 }
 
 /** What a bind refused on — declared beside the card that draws it. */
-export type { BindRefusal };
 
 /** What the last draw refused, in the validator's own words. */
 interface SkillDrawRefusal {
@@ -214,7 +213,7 @@ export interface SkillDrawStarted {
 // ── exceptions and tests ─────────────────────────────────────────────────────
 
 /** One exception a run met while this skill was offered, and how it was handled. */
-export interface SkillExceptionRow {
+interface SkillExceptionRow {
 	exception: string;
 	/** The dotted function it happened in; null when not a step's. */
 	function: string | null;
@@ -316,7 +315,7 @@ export interface SkillVersionDiff {
  * `enough_to_read` is false below a floor the engine owns. Below it the surface
  * says *too few to read* rather than drawing a percentage.
  */
-export interface SkillUsageVersion {
+interface SkillUsageVersion {
 	skill_version_id: string;
 	version: number;
 	offered: number;

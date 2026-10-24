@@ -1,15 +1,25 @@
 /**
  * An agent › **Runs** (board `agents.agent.runs`): the one runs list,
- * filtered to this agent (`f.agent_id`), with its status tabs.
+ * filtered to this agent (`f.agent_id`), with its status tabs and filters.
  *
  * *All · Live · Waiting · Ended* each ask the engine for a set of statuses;
- * the engine filters and counts. The columns are what a list row carries — who
- * started a run and the size of its team are not on the row, so they are not
- * drawn. A row opens the run's page.
+ * *Started by* (`f.started_by`, a member's id) and *From* (`f.origin`, what
+ * opened the run) narrow it further. The engine filters and counts; the
+ * applied-filters strip names what is applied, leaving out the agent, which
+ * the tab fixes. The filters are this tab's own state — the agent page's URL
+ * carries its page and tab, and a list filter there would leak into the
+ * section lists beside it.
+ *
+ * *From* is where the run came from — a Todo, a schedule, a person asking —
+ * never the kind of work it is. Who started a run and the size of its team
+ * are not columns: the list row carries neither. A row opens the run's page.
  */
 
 import {
+	AppliedFilters,
+	Badge,
 	EmptyState,
+	FilterBar,
 	SegmentedControl,
 	StatusDot,
 	Table,
@@ -19,13 +29,18 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
-import type { ListQuery } from "@invana-studio/core";
+import {
+	type ListQuery,
+	type TaskRunSummary,
+	useMembersQuery,
+} from "@invana-studio/core";
 import { useRunsQuery } from "@invana-studio/shell";
-import { PanelSection } from "@invana-studio/ui";
-import { useContext, useState } from "react";
+import { FilterSelect, PanelSection } from "@invana-studio/ui";
+import { useContext, useMemo, useState } from "react";
+import { FilteredEmpty } from "../lists";
 import { AgentsOpenContext } from "../open";
 import { ms, tokens } from "../overview/fleetParts";
-import { exitTone, runLabel, TabReadState } from "./agentParts";
+import { exitTone, RUN_ORIGIN, runLabel, TabReadState } from "./agentParts";
 import type { Agent } from "./types";
 
 const SHOWING = [
@@ -45,6 +60,18 @@ const SHOWING = [
 
 type Showing = (typeof SHOWING)[number]["value"];
 
+/** The origins a person filters an agent's runs by. */
+const ORIGIN_OPTIONS = ["task", "schedule", "user", "delegation"].map(
+	(value) => ({ value, label: RUN_ORIGIN[value] }),
+);
+
+/** Where a run came from, in the words the *From* filter uses. */
+function originOf(run: TaskRunSummary): string | null {
+	return run.triggered_by
+		? (RUN_ORIGIN[run.triggered_by] ?? run.triggered_by)
+		: null;
+}
+
 export function AgentRunsTab({
 	username,
 	graphSlug,
@@ -56,20 +83,46 @@ export function AgentRunsTab({
 }) {
 	const open = useContext(AgentsOpenContext);
 	const [showing, setShowing] = useState<Showing>("all");
+	const [startedBy, setStartedBy] = useState("");
+	const [origin, setOrigin] = useState("");
 	const statuses = SHOWING.find((s) => s.value === showing)?.statuses ?? [];
 	const query: ListQuery = {
 		filters: {
 			agent_id: [agent.id],
 			...(statuses.length ? { status: [...statuses] } : {}),
+			...(startedBy ? { started_by: [startedBy] } : {}),
+			...(origin ? { origin: [origin] } : {}),
 		},
 		limit: 50,
 	};
 	const runs = useRunsQuery(username, graphSlug, query);
-	const rows = runs.data?.items ?? [];
+	const members = useMembersQuery({ username, graphSlug });
+	const rows: TaskRunSummary[] = runs.data?.items ?? [];
+
+	const memberOptions = useMemo(
+		() =>
+			(members.data?.items ?? []).map((m) => ({
+				value: m.user_id,
+				label: m.username,
+			})),
+		[members.data],
+	);
+	// The agent is the tab's, not a filter the reader applied or can remove.
+	const chips = (runs.data?.applied ?? []).filter(
+		(f) => f.field === "started_by" || f.field === "origin",
+	);
+	const remove = (field: string) => {
+		if (field === "started_by") setStartedBy("");
+		if (field === "origin") setOrigin("");
+	};
+	const clear = () => {
+		setStartedBy("");
+		setOrigin("");
+	};
 
 	return (
 		<div className="flex flex-col gap-2.5 p-3.5">
-			<div className="flex items-center gap-2">
+			<div className="flex flex-wrap items-center gap-2">
 				<SegmentedControl
 					size="sm"
 					aria-label="Showing"
@@ -77,12 +130,27 @@ export function AgentRunsTab({
 					onValueChange={(v) => setShowing(v as Showing)}
 					options={SHOWING.map(({ value, label }) => ({ value, label }))}
 				/>
+				<FilterBar>
+					<FilterSelect
+						label="started by"
+						value={startedBy}
+						options={memberOptions}
+						onChange={setStartedBy}
+					/>
+					<FilterSelect
+						label="from"
+						value={origin}
+						options={ORIGIN_OPTIONS}
+						onChange={setOrigin}
+					/>
+				</FilterBar>
 				{runs.data ? (
 					<span className="ml-auto text-sm text-muted-foreground">
 						{runs.data.total} run{runs.data.total === 1 ? "" : "s"}
 					</span>
 				) : null}
 			</div>
+			<AppliedFilters filters={chips} onRemove={remove} onClearAll={clear} />
 			{runs.isLoading || runs.error ? (
 				<TabReadState
 					loading={runs.isLoading}
@@ -91,14 +159,18 @@ export function AgentRunsTab({
 					onRetry={() => void runs.refetch()}
 				/>
 			) : rows.length === 0 ? (
-				<EmptyState
-					title={agent.status === "draft" ? "Not run yet" : "No runs here"}
-					description={
-						agent.status === "draft"
-							? "A draft is never offered work — create the agent first."
-							: "Nothing this agent ran matches this tab."
-					}
-				/>
+				chips.length ? (
+					<FilteredEmpty noun="run" filters={chips} onClear={clear} />
+				) : (
+					<EmptyState
+						title={agent.status === "draft" ? "Not run yet" : "No runs here"}
+						description={
+							agent.status === "draft"
+								? "A draft is never offered work — create the agent first."
+								: "Nothing this agent ran matches this tab."
+						}
+					/>
+				)
 			) : (
 				<PanelSection card title="Runs — newest first">
 					<Table bordered={false} density="compact">
@@ -115,6 +187,7 @@ export function AgentRunsTab({
 						<TableBody>
 							{rows.map((run) => {
 								const exit = run.outcome ?? run.status;
+								const from = originOf(run);
 								return (
 									<TableRow
 										key={run.id}
@@ -127,8 +200,14 @@ export function AgentRunsTab({
 										<TableCell className="w-full max-w-0 truncate">
 											{run.body?.trim() || run.task_title || run.flow_key}
 										</TableCell>
-										<TableCell className="whitespace-nowrap text-muted-foreground">
-											{run.task_id ? "Todo" : (run.kind ?? "ask")}
+										<TableCell className="whitespace-nowrap">
+											{from ? (
+												<Badge variant="outline" tone="muted" size="xs">
+													{from}
+												</Badge>
+											) : (
+												<span className="text-muted-foreground">—</span>
+											)}
 										</TableCell>
 										<TableCell className="font-mono">
 											{run.tokens > 0 ? tokens(run.tokens) : "—"}

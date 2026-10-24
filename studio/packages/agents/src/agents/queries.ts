@@ -5,7 +5,6 @@
  * `["agents", owner, graph, …]`; a mutation invalidates every agents key.
  */
 
-import { sessionsApi } from "@invana-studio/assistant";
 import { type ListQuery, listQueryKey } from "@invana-studio/core";
 import {
 	keepPreviousData,
@@ -171,28 +170,6 @@ export function useAgentMetersQuery(
 }
 
 /**
- * The caller's own sessions bound to this agent. Sessions stay private to
- * whoever opened them; the Graph-wide number is `meters.sessions`.
- */
-export function useAgentSessionsQuery(
-	username: string | undefined,
-	graphSlug: string | undefined,
-	agentId: string | undefined,
-) {
-	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
-	return useQuery({
-		queryKey: agentsKey(scope, ["sessions", agentId]),
-		queryFn: () =>
-			sessionsApi.list(scope.username, scope.graphSlug, {
-				agentId,
-				sort: "updated",
-				limit: 20,
-			}),
-		enabled: !!username && !!graphSlug && !!agentId,
-	});
-}
-
-/**
  * The soul preview. A mutation, not a query: it is two model calls the author
  * asks for, never something a re-render may fire.
  */
@@ -262,10 +239,12 @@ export function useAgentMutations(username: string, graphSlug: string) {
 			mutationFn: ({
 				id,
 				reassign,
+				why,
 			}: {
 				id: string;
 				reassign?: { reassign_to_kind: string; reassign_to_id: string };
-			}) => agentsApi.retire(username, graphSlug, id, reassign),
+				why?: string;
+			}) => agentsApi.retire(username, graphSlug, id, reassign, why),
 			onSuccess: invalidate,
 		}),
 		writeDraft: useMutation({

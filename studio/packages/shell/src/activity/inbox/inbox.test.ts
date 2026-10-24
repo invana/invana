@@ -22,6 +22,7 @@ function run(
 		replans: 0,
 		agent_id: null,
 		role: "execute",
+		triggered_by: "user",
 		task_id: null,
 		task_title: null,
 		queued_at: null,

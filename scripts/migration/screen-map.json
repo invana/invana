@@ -1581,8 +1581,8 @@
   "agents.skill.flow.unmapped": {
    "story": "AF-03",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/skills?page=skill%3A26ca4dad-e2bf-468e-a835-439e039b297e&tab=flow&right=assistant",
-   "state": "the uuid stands for a draft skill (Weekly route check): open it from Skills; Flow tab with an unmapped line"
+   "route": "/u/admin/airways/agents/skills?page=skill%3A8afc2fcc-b566-48fb-b548-2d09aeb9c876&tab=flow&right=assistant",
+   "state": "the uuid stands for a draft whose last draw left a line unmapped (Mail the route desk): open it from Skills; Flow tab with an unmapped line"
   },
   "agents.skill.functions": {
    "story": "AF-03",
@@ -1593,26 +1593,26 @@
   "agents.skill.unmapped": {
    "story": "AF-03",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/skills?page=skill%3A26ca4dad-e2bf-468e-a835-439e039b297e&tab=instructions&right=assistant",
-   "state": "the uuid stands for a draft skill (Weekly route check): open it from Skills; a line the draw could not map"
+   "route": "/u/admin/airways/agents/skills?page=skill%3A8afc2fcc-b566-48fb-b548-2d09aeb9c876&tab=instructions&right=assistant",
+   "state": "the uuid stands for a draft whose last draw left a line unmapped (Mail the route desk): open it from Skills; a line the draw could not map"
   },
   "agents.skill.test": {
    "story": "AF-04",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/skills?page=skill%3A26ca4dad-e2bf-468e-a835-439e039b297e&tab=tests&right=assistant",
-   "state": "the uuid stands for a draft skill (Weekly route check): open it from Skills; Tests tab after Run a test"
+   "route": "/u/admin/airways/agents/skills?page=skill%3A26ca4dad-e2bf-468e-a835-439e039b297e&tab=instructions&right=assistant",
+   "state": "the uuid stands for a draft skill (Weekly route check): open it from Skills; the console under Instructions after Run a test"
   },
   "agents.skill.exceptions": {
    "story": "AF-04",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=exceptions&right=assistant",
-   "state": "the uuid stands for a published skill (Answer in natural language): open it from Skills; Exceptions tab"
+   "route": "/u/admin/airways/agents/skills?page=skill%3A4fda731c-3fa6-48f4-9546-21b8cb764973&tab=exceptions&right=assistant",
+   "state": "the uuid stands for a bound skill that has run (Hey, on Coordinator): open it from Skills; Exceptions tab"
   },
   "agents.skill.evals": {
    "story": "AF-04",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=evals&right=assistant",
-   "state": "the uuid stands for a published skill (Answer in natural language): open it from Skills; Evals tab"
+   "route": "/u/admin/airways/agents/skills?page=skill%3A4fda731c-3fa6-48f4-9546-21b8cb764973&tab=evals&right=assistant",
+   "state": "the uuid stands for a bound skill that has run (Hey, on Coordinator): open it from Skills; Evals tab"
   },
   "agents.agent.new": {
    "story": "AF-05",
@@ -1707,14 +1707,14 @@
   "agents.skill.agents": {
    "story": "AF-22",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=agents&right=assistant",
-   "state": "the uuid stands for a published skill (Answer in natural language): open it from Skills; Agents tab"
+   "route": "/u/admin/airways/agents/skills?page=skill%3A4fda731c-3fa6-48f4-9546-21b8cb764973&tab=agents&right=assistant",
+   "state": "the uuid stands for a bound skill that has run (Hey, on Coordinator): open it from Skills; Agents tab"
   },
   "agents.skill.usage": {
    "story": "AF-22",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=usage&right=assistant",
-   "state": "the uuid stands for a published skill (Answer in natural language): open it from Skills; Usage tab"
+   "route": "/u/admin/airways/agents/skills?page=skill%3A4fda731c-3fa6-48f4-9546-21b8cb764973&tab=usage&right=assistant",
+   "state": "the uuid stands for a bound skill that has run (Hey, on Coordinator): open it from Skills; Usage tab"
   },
   "agents.functions.templates": {
    "story": "AF-23",
@@ -1731,14 +1731,14 @@
   "agents.functions.plugins": {
    "story": "AF-23",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/functions/plugins?right=assistant",
+   "route": "/u/admin/airways/agents/functions/plugins?page=plugin%3Ainvana.core.graph_read&right=assistant",
    "state": "Plugins tab"
   },
   "agents.functions.plugin": {
    "story": "AF-23",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/functions/plugins?right=assistant",
-   "state": "Plugins tab, click a plugin"
+   "route": "/u/admin/airways/agents/functions/plugins?page=plugin%3Ainvana.core.graph_read&right=assistant",
+   "state": "invana.core.graph_read stands for any plugin: Plugins tab, click a plugin"
   },
   "agents.plans.promote": {
    "story": "AF-23",

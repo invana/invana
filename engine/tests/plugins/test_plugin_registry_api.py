@@ -1,4 +1,4 @@
-"""`/api/v1/plugins` and `/api/v1/task-types` — the registry, and switching a tool plugin
+"""`/api/v1/plugins` — the registry, and switching a tool plugin
 (docs/for-developers/modules/platform/features/tool-plugins.md).
 
 Real Postgres, no mocks. Only `get_current_user` is overridden — auth has its
@@ -89,14 +89,3 @@ class TestPluginRegistry:
         assert (await client.post("/api/v1/plugins/invana.core.graph_read/enable")).status_code == 409
         assert (await client.post("/api/v1/plugins/invana.tools.nope/enable")).status_code == 404
         assert (await client.get("/api/v1/plugins/invana.tools.nope")).status_code == 404
-
-    async def test_a_task_type_by_ref_carries_its_plugin_and_usage(self, api):
-        client, _, _ = api
-        resp = await client.get("/api/v1/task-types/graph.read.query@1.0.0")
-
-        assert resp.status_code == 200
-        body = resp.json()
-        assert body["key"] == "graph.read.query"
-        assert body["plugin"].startswith("invana.core.graph_read@")
-        assert body["runs_30d"] == 0
-        assert (await client.get("/api/v1/task-types/no_such_task")).status_code == 404

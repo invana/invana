@@ -133,10 +133,11 @@ export const agentsApi = {
 		graphSlug: string,
 		id: string,
 		reassign?: { reassign_to_kind: string; reassign_to_id: string },
+		why?: string,
 	) =>
 		request<Agent>(`${base(username, graphSlug)}/agents/${id}/retire`, {
 			method: "POST",
-			...json(reassign ?? {}),
+			...json({ ...reassign, ...(why ? { why } : {}) }),
 		}),
 
 	lineage: (username: string, graphSlug: string, id: string) =>

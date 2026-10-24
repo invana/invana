@@ -50,7 +50,7 @@ import { useSkillOpen } from "./skillOpen";
 import type { Skill } from "./types";
 import { canPublish, type SkillPage, useSkillPage } from "./useSkillPage";
 
-export const SKILL_TABS = [
+const SKILL_TABS = [
 	"instructions",
 	"flow",
 	"functions",
@@ -170,7 +170,7 @@ export function SkillDetail({
 								area="build"
 								size="sm"
 								variant="outline"
-								onClick={() => setTab("tests")}
+								onClick={() => setTab("instructions")}
 							>
 								<Play /> Run a test
 							</ActButton>

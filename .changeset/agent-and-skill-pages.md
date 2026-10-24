@@ -16,3 +16,9 @@ The open tab is in the URL (`?tab=`), so a link or a reload opens the same tab. 
 live; `GET …/agents/{id}/overview` serves an agent's dashboard numbers; a skill's draft lists the
 lines its draw could not map, its plan lists its handlers, and `GET …/skills/{id}/exceptions`
 serves its replan numbers.
+
+**A function has a page** — Contract · Used by · Calls — with its calls, p95 and failed rate over 30
+days and the skills that need it: `GET …/catalogue/{step_key}` and `…/catalogue/{step_key}/calls`.
+The Graph-less `GET /api/v1/task-types/{ref}` is removed. Retire takes a *Why*, shown in History.
+An agent's Overview reads *served* as Fleet does — succeeded over settled runs — so one agent shows
+one served rate everywhere.

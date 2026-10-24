@@ -3,10 +3,14 @@
  * edges. `order` is drawn as `require` — the canvas's word for *must settle
  * first* — and `binding` stays `binding`.
  *
- * Handlers — the lines under `## When things go wrong` — are drawn beside the
- * step they guard, joined by a `binding` edge; a handler that names no step
- * hangs off the plan's last step. `lineOf` says where a span reads in the text
- * on screen, so each node can say which line it came from.
+ * Every node is a card: a **step** reads `step N · from line N` and its bound
+ * — the catalogue's, through `boundOf`, else the step's layer;
+ * a **handler** — a line under `## When things go wrong` — reads
+ * `handler · from line N` and hangs off the step it guards (the plan's last
+ * step when it names none); a **gap** — a line the draw could not map —
+ * reads `line N · "…"` and hangs off the step written just before it. Both
+ * side cards join by a `binding` edge, so the layout puts them beside the
+ * spine of steps. `kind` on a node's data is what the card's outline reads.
  */
 
 import {
@@ -31,11 +35,17 @@ export const LAYER_ICON: Record<SkillLayer, string> = {
 /** A handler's node id, by its place under `## When things go wrong`. */
 export const handlerNodeId = (i: number) => `handler:${i}`;
 
+/** A gap's node id, by its place in the draw's unmapped lines. */
+export const gapNodeId = (i: number) => `gap:${i}`;
+
 /** One handler row as the plan carries it. */
 export interface PlanHandler {
 	span: string;
 	step_id: string | null;
 }
+
+/** What a card on the skill's Flow is — the outline its template draws. */
+type FlowCardKind = "step" | "handler" | "gap";
 
 /** The step a handler guards: the one it names, else the plan's last step. */
 export function guardedStep(
@@ -49,27 +59,45 @@ export function guardedStep(
 
 const fromLine = (n: number | null) => (n ? `from line ${n}` : "no line");
 
+/** The step written last before `line` — else the first step. */
+function stepBefore(
+	plan: SkillPlaybookRead,
+	line: number | null,
+	lineOf: (span: string | null) => number | null,
+): string | null {
+	let at: string | null = plan.nodes[0]?.id ?? null;
+	if (line == null) return plan.nodes.at(-1)?.id ?? null;
+	for (const node of plan.nodes) {
+		const l = lineOf(node.source_span);
+		if (l != null && l <= line) at = node.id;
+	}
+	return at;
+}
+
 export function taskFlowFromPlan(
 	plan: SkillPlaybookRead,
 	handlers: PlanHandler[] = [],
 	lineOf: (span: string | null) => number | null = () => null,
+	unmapped: string[] = [],
+	boundOf: (task: string) => string | null | undefined = () => null,
 ): TaskFlowData {
-	const nodes: TaskFlowNode[] = plan.nodes.map((node, i) => ({
-		id: node.id,
-		type: taskNodeTypeOf(node.layer),
-		data: {
+	const nodes: TaskFlowNode[] = plan.nodes.map((node, i) => {
+		const line = lineOf(node.source_span);
+		const bound = (node.task && boundOf(node.task)) || node.layer;
+		const data = {
 			title: node.task || node.label || node.id,
-			bound: node.layer,
-			tone: taskToneOf(node.layer),
+			bound,
+			tone: taskToneOf(bound),
 			icon: LAYER_ICON[node.layer] ?? "lucide/square-function",
 			summary: node.source_span ?? "",
 			stepKey: node.form === "human" ? "a person" : node.task,
 			ordinal: i,
+			kind: "step" as FlowCardKind,
+			caption: `step ${i + 1} · ${fromLine(line)}`,
+			/** A step's card draws its bound beside a swatch; a side card does not. */
+			swatch: true,
 			rows: [
-				{
-					label: "step",
-					value: `${i + 1} · ${fromLine(lineOf(node.source_span))}`,
-				},
+				{ label: "step", value: `${i + 1} · ${fromLine(line)}` },
 				...(node.source_plan_key
 					? [{ label: "from", value: node.source_plan_key, mono: true }]
 					: []),
@@ -79,8 +107,9 @@ export function taskFlowFromPlan(
 					mono: true,
 				})),
 			],
-		},
-	}));
+		};
+		return { id: node.id, type: taskNodeTypeOf(bound), data };
+	});
 
 	// A plan with no edges is its steps in order, drawn as a sequence.
 	const sequence: TaskFlowEdge[] = plan.edges.length
@@ -102,30 +131,59 @@ export function taskFlowFromPlan(
 	}));
 	edges.push(...sequence);
 
-	handlers.forEach((h, i) => {
-		const id = handlerNodeId(i);
-		nodes.push({
-			id,
-			type: "task.none",
-			data: {
-				title: h.span,
-				bound: "handler",
-				tone: "none",
-				icon: "lucide/shield-alert",
-				summary: h.span,
-				stepKey: "handler",
-				ordinal: plan.nodes.length + i,
-				rows: [{ label: "handler", value: fromLine(lineOf(h.span)) }],
-			},
-		});
-		const guarded = guardedStep(plan, h);
-		if (guarded)
+	const aside = (
+		id: string,
+		kind: FlowCardKind,
+		title: string,
+		caption: string,
+		ordinal: number,
+		from: string | null,
+		description: string,
+	) => {
+		const data = {
+			title,
+			bound: kind,
+			tone: "none" as const,
+			icon: kind === "gap" ? "lucide/circle-help" : "lucide/shield-alert",
+			summary: title,
+			stepKey: kind,
+			ordinal,
+			kind,
+			caption,
+			rows: [{ label: kind, value: caption }],
+		};
+		nodes.push({ id, type: "task.none", data });
+		if (from)
 			edges.push({
-				id: `${guarded}->${id}`,
-				source: guarded,
+				id: `${from}->${id}`,
+				source: from,
 				target: id,
-				data: { kind: "binding", description: "when it goes wrong" },
+				data: { kind: "binding", description },
 			});
+	};
+
+	handlers.forEach((h, i) => {
+		aside(
+			handlerNodeId(i),
+			"handler",
+			h.span,
+			`handler · ${fromLine(lineOf(h.span))}`,
+			plan.nodes.length + i,
+			guardedStep(plan, h),
+			"when it goes wrong",
+		);
+	});
+	unmapped.forEach((span, i) => {
+		const line = lineOf(span);
+		aside(
+			gapNodeId(i),
+			"gap",
+			"? no function",
+			`${line ? `line ${line}` : "no line"} · “${span}”`,
+			plan.nodes.length + handlers.length + i,
+			stepBefore(plan, line, lineOf),
+			"no function this skill may use does this",
+		);
 	});
 
 	return { nodes, edges };

@@ -1,8 +1,10 @@
 /**
  * A skill › **Flow** — what the instructions resolve to, read-only.
  *
- * The plan on `TaskFlowCanvas`, top-down, each step tied to the line it came
- * from and each handler beside the step it guards. Beside it, **From the
+ * The plan on `TaskFlowCanvas`, top-down as step cards — each reads its
+ * function, `step N · from line N` and its bound — with each handler card
+ * beside the step it guards and a line the draw could not map drawn as a
+ * *? no function* gap card beside the step written before it. Beside it, **From the
  * instructions** maps every line to its step or handler — a line the draw
  * could not map reads as a gap — and **This flow** names the version it was
  * drawn from and the bounds it spends. Selecting a step swaps those for the
@@ -18,6 +20,7 @@ import {
 	EmptyState,
 	PropertyList,
 	PropertyRow,
+	RefusalCard,
 	Spinner,
 	TypographyInlineCode,
 } from "@invana/ui";
@@ -30,6 +33,7 @@ import { PanelSection } from "@invana-studio/ui";
 import { ArrowLeft, PencilLine, Workflow } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useFunctionQuery } from "../plugins/queries";
+import { skillFlowSettings, skillFlowTemplates } from "./flow/skillFlowConfig";
 import { guardedStep, taskFlowFromPlan } from "./taskFlowFromPlan";
 import type { SkillPlaybookNode, SkillPlaybookRead } from "./types";
 import type { SkillPage } from "./useSkillPage";
@@ -38,8 +42,17 @@ export function SkillFlowTab({ page }: { page: SkillPage }) {
 	const { plan } = page;
 	const [selected, setSelected] = useState<string | null>(null);
 	const data = useMemo(
-		() => (plan ? taskFlowFromPlan(plan, page.handlers, page.lineOf) : null),
-		[plan, page.handlers, page.lineOf],
+		() =>
+			plan
+				? taskFlowFromPlan(
+						plan,
+						page.handlers,
+						page.lineOf,
+						page.unmapped,
+						(task) => page.catalogue.get(task)?.bound,
+					)
+				: null,
+		[plan, page.handlers, page.lineOf, page.unmapped, page.catalogue],
 	);
 
 	if (page.planLoading)
@@ -78,9 +91,9 @@ export function SkillFlowTab({ page }: { page: SkillPage }) {
 				<div className="min-h-80 flex-1">
 					<TaskFlowCanvas
 						data={data}
-						settings={taskFlowSettings}
-						templates={taskFlowTemplates}
-						initialDetail="circles"
+						settings={skillFlowSettings}
+						templates={skillFlowTemplates}
+						initialDetail="cards"
 						selectedId={selected}
 						onOpenNode={(id) =>
 							setSelected(plan.nodes.some((n) => n.id === id) ? id : null)
@@ -104,6 +117,15 @@ export function SkillFlowTab({ page }: { page: SkillPage }) {
 					/>
 				) : (
 					<>
+						{page.unmapped.map((span) => (
+							<RefusalCard
+								key={span}
+								label={`line ${page.lineOf(span) ?? "—"} can't be drawn · no function this skill may use does this`}
+								remedy="Rewrite it, or leave it to a person, on Instructions. Publishing waits until every line maps."
+							>
+								“{span}”
+							</RefusalCard>
+						))}
 						<FromTheInstructions
 							page={page}
 							plan={plan}
@@ -289,7 +311,7 @@ function StepPanel({
 				<PropertyRow label="Bound">
 					{bound ? <BoundChip bound={bound} /> : step.layer}
 				</PropertyRow>
-				{step.task ? <SideEffect task={step.task} /> : null}
+				{step.task ? <SideEffect page={page} task={step.task} /> : null}
 				<PropertyRow label="Needed by">this skill</PropertyRow>
 				<PropertyRow label="Handler">
 					{guards.length === 0 ? (
@@ -316,8 +338,8 @@ function StepPanel({
 }
 
 /** The function's declared side effect, when its manifest has one. */
-function SideEffect({ task }: { task: string }) {
-	const fn = useFunctionQuery(task);
+function SideEffect({ page, task }: { page: SkillPage; task: string }) {
+	const fn = useFunctionQuery(page.username, page.graphSlug, task);
 	if (!fn.data?.side_effect) return null;
 	return <PropertyRow label="Side effect">{fn.data.side_effect}</PropertyRow>;
 }

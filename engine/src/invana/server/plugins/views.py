@@ -23,7 +23,6 @@ from invana.runtime.schemas import (
     McpServerRead,
     PluginDetail,
     PluginSummary,
-    TaskTypeRead,
 )
 
 plugins = PluginManager()
@@ -61,14 +60,6 @@ async def disable_plugin(
     session: AsyncSession = Depends(get_session),
 ) -> PluginSummary:
     return await plugins.switch(session, name=name, enabled=False, actor=user)
-
-
-async def get_task_type(
-    ref: str,
-    _: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-) -> TaskTypeRead:
-    return await plugins.task_type(session, ref)
 
 
 async def add_mcp_server(

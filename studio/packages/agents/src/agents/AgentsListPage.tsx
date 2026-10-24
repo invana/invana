@@ -17,7 +17,7 @@
  *   says how many, and the toggle reveals them nested under their parent.
  * - **Every number is the engine's.** Runs and served are Performance's
  *   7-day agent rows, joined by id; the month budget is the list's
- *   `tokens_this_month` against the agent's own `max_tokens_month`.
+ *   `tokens_this_month` against `effective_budget.max_tokens_month`.
  *
  * A row opens the agent's page as a workbook tab beside this one. A row
  * carries no acts: pausing, retiring and editing are the page's. *New agent*
@@ -286,9 +286,9 @@ function agentColumns(): ColumnDef<Row>[] {
 	];
 }
 
-/** The month's tokens against the agent's own month budget, when it set one. */
+/** The month's tokens against the month budget the agent runs inside. */
 function BudgetCell({ row }: { row: Row }) {
-	const max = row.agent.budget?.max_tokens_month;
+	const max = row.agent.effective_budget?.max_tokens_month;
 	if (!max)
 		return (
 			<span className="font-mono text-muted-foreground">

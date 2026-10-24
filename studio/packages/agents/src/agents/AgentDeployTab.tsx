@@ -6,8 +6,10 @@
  *   on the function's manifest), the functions that need it, and the Graph's
  *   pool of that name with what is in use now (`GET …/contention`). A resource
  *   with no pool of its name is unbounded, and says so.
- * - **Triggers** — *Can be assigned* and *Unattended* (`policy.can_be_assigned`
- *   · `policy.unattended`), riding the page's one buffer.
+ * - **Triggers** — the schedules that start it (`GET …/schedules?f.agent_id=`),
+ *   or *No schedule starts it*; then *Can be assigned* and *Unattended*
+ *   (`policy.can_be_assigned` · `policy.unattended`), riding the page's one
+ *   buffer.
  *
  * The functions are the ones its envelope allows. An event trigger and pool
  * labels join with workers; callable over MCP with this Graph's MCP server.
@@ -16,6 +18,7 @@
 import { Checkbox, Field, FieldLabel } from "@invana/forms";
 import {
 	Badge,
+	StatusDot,
 	Table,
 	TableBody,
 	TableCell,
@@ -24,10 +27,10 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { graphsApi } from "@invana-studio/core";
-import { useAccess } from "@invana-studio/shell";
+import { useAccess, useSchedulesQuery } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { pluginsApi } from "../plugins/api";
+import { functionsApi } from "../plugins/api";
 import type { AgentDraft } from "./agentDraft";
 import { TabReadState } from "./agentParts";
 import { useAgentSkillsAndCallablesQuery } from "./queries";
@@ -61,10 +64,14 @@ export function AgentDeployTab({
 	// The same cache entry the function page reads.
 	const manifests = useQueries({
 		queries: keys.map((ref) => ({
-			queryKey: ["plugins", "function", ref],
-			queryFn: () => pluginsApi.function(ref),
+			queryKey: ["functions", username, graphSlug, ref],
+			queryFn: () => functionsApi.get(username, graphSlug, ref),
 		})),
 	});
+	const schedules = useSchedulesQuery(
+		{ username, graphSlug },
+		{ filters: { agent_id: [agent.id] }, limit: 200 },
+	);
 	const contention = useQuery({
 		queryKey: ["contention", username, graphSlug] as const,
 		queryFn: () => graphsApi.contention(username, graphSlug),
@@ -140,6 +147,43 @@ export function AgentDeployTab({
 
 			<PanelSection card title="Triggers">
 				<div className="flex flex-col gap-2">
+					{schedules.isLoading || schedules.error ? (
+						<TabReadState
+							loading={schedules.isLoading}
+							error={schedules.error}
+							what="the schedules that start it"
+						/>
+					) : schedules.data?.items.length ? (
+						<Table bordered={false} density="compact">
+							<TableHeader>
+								<TableRow>
+									<TableHead>Schedule</TableHead>
+									<TableHead>When</TableHead>
+									<TableHead>Now</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{schedules.data.items.map((s) => (
+									<TableRow key={s.id}>
+										<TableCell className="max-w-0 truncate">{s.name}</TableCell>
+										<TableCell className="whitespace-nowrap font-mono text-muted-foreground">
+											{s.cron} {s.timezone}
+										</TableCell>
+										<TableCell className="whitespace-nowrap">
+											<span className="inline-flex items-center gap-1.5">
+												<StatusDot
+													tone={s.status === "active" ? "success" : "muted"}
+												/>
+												{s.status}
+											</span>
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					) : (
+						<p className="text-muted-foreground">No schedule starts it</p>
+					)}
 					{TRIGGERS.map((t) => (
 						<Field key={t.key} orientation="horizontal">
 							<Checkbox

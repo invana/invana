@@ -82,7 +82,7 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | `invana plans list` · `show` | generated plans, read-only | New · P-11 |
 | `invana llms list` · `models` | endpoints and model versions | New |
 | `invana agents pin <agent> --model claude-opus-5-5` | pin a model version; evals run first | New · P-17 |
-| `invana plugins list` · `show` · `enable` · `disable` · `mcp add <url>` · `invana tasks show <key>[@version]` | the plugin registry and task manifests | New · P-01 P-02 |
+| `invana plugins list` · `show` · `enable` · `disable` · `mcp add <url>` | the plugin registry and task manifests | New · P-01 P-02 |
 | `invana performance [--agent --skill] --since 7d` | speed, success, tokens; degradations | New |
 
 ## Decisions

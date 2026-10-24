@@ -9,8 +9,12 @@
  * One dialog for both acts: the work is the same list either way and only
  * what happens to each piece differs — a Todo in review is untouched by a
  * pause and blocked by a retire. Resume opens nothing: it takes nothing away.
+ *
+ * Retire also takes a *Why*, at most 500 characters, handed to `onConfirm` and
+ * written on the retire event so History shows it. A pause takes none.
  */
 
+import { Field, FieldDescription, FieldLabel, Textarea } from "@invana/forms";
 import {
 	Button,
 	Dialog,
@@ -27,6 +31,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import { useState } from "react";
 import type { Agent, LifecycleAct, LifecycleItem } from "./types";
 
 const KIND: Record<LifecycleItem["kind"], string> = {
@@ -41,8 +46,12 @@ interface LifecycleDialogProps {
 	items: LifecycleItem[] | undefined;
 	isLoading: boolean;
 	onCancel: () => void;
-	onConfirm: () => void;
+	/** The act confirmed; a retire passes its *Why*, a pause an empty one. */
+	onConfirm: (why: string) => void;
 }
+
+/** What `RetireRequest.why` holds at most. */
+const WHY_MAX = 500;
 
 export function LifecycleDialog({
 	agent,
@@ -54,12 +63,17 @@ export function LifecycleDialog({
 }: LifecycleDialogProps) {
 	const isRetire = act === "retire";
 	const verb = isRetire ? "Retire" : "Pause";
+	const isOpen = agent !== null && act !== null;
+	const [why, setWhy] = useState("");
+	// A dialog opened again starts with no reason, never the last one typed.
+	const [wasOpen, setWasOpen] = useState(isOpen);
+	if (wasOpen !== isOpen) {
+		setWasOpen(isOpen);
+		if (isOpen) setWhy("");
+	}
 
 	return (
-		<Dialog
-			open={agent !== null && act !== null}
-			onOpenChange={(open) => !open && onCancel()}
-		>
+		<Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>
@@ -108,11 +122,31 @@ export function LifecycleDialog({
 						Nothing open — there is nothing to disturb.
 					</p>
 				)}
+				{isRetire ? (
+					<Field>
+						<FieldLabel htmlFor="retire-why">Why</FieldLabel>
+						<Textarea
+							id="retire-why"
+							rows={2}
+							maxLength={WHY_MAX}
+							value={why}
+							onChange={(e) => setWhy(e.target.value)}
+							placeholder="Replaced by another agent, no longer needed…"
+						/>
+						<FieldDescription>
+							Shown in its History · {why.length} of {WHY_MAX}
+						</FieldDescription>
+					</Field>
+				) : null}
 				<DialogFooter>
 					<Button variant="ghost" onClick={onCancel}>
 						Cancel
 					</Button>
-					<Button variant="outline" disabled={isLoading} onClick={onConfirm}>
+					<Button
+						variant="outline"
+						disabled={isLoading}
+						onClick={() => onConfirm(isRetire ? why.trim() : "")}
+					>
 						{verb}
 					</Button>
 				</DialogFooter>

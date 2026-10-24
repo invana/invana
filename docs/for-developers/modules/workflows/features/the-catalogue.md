@@ -80,7 +80,7 @@ flowchart TD
 | Surface | Shape |
 |---|---|
 | **Catalogue** drawer | The third drawer of the **Tasks** stack ([G33](../../../building-studio/graph-detail-page.md)). Rows grouped under their bound, the group header carrying the bound and its count. A row is `step_key` (mono) · one-line summary · **how many plans name it**, or `unused`. The main column stays empty and says why an entry opens no page (CA6) |
-| Entry detail | **In the drawer only** (CA6): the bound, then `args`, `outputs` (with roll-up), `requires`, *Used by*, *Agents granted this bound*. There is no board page for an entry |
+| Function page | `agents.functions.detail` (CA6): tabs Contract · Used by · Calls, the head and the 30-day tiles |
 | The contract, where it is used | The same fields render as the **contract card** beside a selected step's arguments, and inside a refusal. That is where an entry is actually read |
 | Deep links | A task on a run's canvas and a task on a plan's canvas both link to `?panel=library&section=catalogue&entry=<step_key>` — the refusal message links to the same place |
 
@@ -94,7 +94,8 @@ The declaration already exists — one `manifest.toml` per task type in the core
 | Source | `invana.plugins.load_plugins()` — the frozen registry, re-exported as `invana.runtime.catalogue.CATALOGUE`; derived nowhere else |
 | Entries | Declared in the engine, not registered by the feature that needed them ([CA1](#decisions)) — folding a flow into the runtime means *declaring its function*, never *opening the set* |
 | `GET …/catalogue` | Every entry: `step_key · bound · summary · args · outputs (with rollup) · requires · used_by`, ordered by bound then key. Graph-scoped only so *used by* and *granted to* can be answered. `used_by` counts this Graph's reusable plan **keys**, not versions |
-| `GET …/catalogue/{step_key}` | One entry, plus `used_by` (reusable plans naming it) and `granted_to` (agents whose envelope carries its bound) |
+| `GET …/catalogue/{step_key}` | `FunctionRead` — the entry's fields, its manifest (`version` · `side_effect` · timeout · retries · resources; the line it reads by is the entry's `summary`), `plugin` (`name@version`), `plans[]` (reusable plans naming it: id · key · name · origin), `needed_by[]` (skill_id · name · version), `calls` (`calls` · `calls_prior` · `p95_ms` · `p95_prior_ms` · `failed` · `failed_rate` · each change) — CA10. 404 for an unknown key |
+| `GET …/catalogue/{step_key}/calls` | `Page[FunctionCallRead]` on the list contract — `id` (the step) · `run_id` (its root) · `title` · `status` · `duration_ms` · `tokens` · `queued_at`, newest first; `f.status` filters |
 | Cache | The entry list is engine-static: it is versioned with the engine build and served from memory |
 
 ## Decisions
@@ -105,10 +106,11 @@ The declaration already exists — one `manifest.toml` per task type in the core
 | CA2 | **It is rendered from the declaration, never re-described.** No prose copy of an entry's args lives in Studio or in docs; the route serves the task manifests, and an entry that changes changes there first. |
 | CA3 | **Grouped by bound, not alphabetically.** The bound is what the envelope ceilings and what a refusal names, so the group a person scans is the group the system enforces. |
 | CA4 | **A drawer of Tasks, not an icon.** A run is an execution of a plan; a plan is a composition of catalogue entries — the catalogue is the bottom of that same sentence, and it is where *this run → the plan it ran → the callable that failed* ends ([G33](../../../building-studio/graph-detail-page.md)). |
-| CA6 | **An entry gets a drawer detail, not a page.** Fourteen entries, five or six fields each, and nothing per-entry to chart: a board would be a contract with whitespace around it. The two places an entry is genuinely read are the **selected step whose arguments it declares** and the **refusal that names its bound**, and both show the contract in place. Browsing all of them is the drawer's job. |
+| CA6 | **A function has a page**, opened from the Catalogue tab as a workbook tab crumbed `Functions › <key>`. The head is the dotted name, its bound, its side effect, its plugin `name@version`; the tabs are **Contract** (arguments, returns with each fan-out rule, *Must come after*, *Runs as*; beside them *Calls · 30 days* — calls, p95, failed — and *Needed by skills*) · **Used by** (the reusable plans that name it and the skills that need it) · **Calls** (the run steps that called it, newest first). Every number is the engine's, over this Graph's runs |
 | CA7 | **An entry's summary is declared on the entry.** `summary` is one line in the task type's `manifest.toml`, and the route serves it — not a docstring parsed at read time, and not a string in Studio. A golden test refuses an entry without one. |
 | CA8 | **A function is named `namespace.verb`.** The namespace names what it touches (`graph.read`, `graph.stitch`, `graph.write`, `data`, `model`, `nl`, `plan`, `work`, `answer`, `web`, `mail`, `science`, `sim`, `mcp.<server>`); the bound stays a property of the function, since one namespace spans bounds (`graph.stitch.preview` reads, `graph.stitch.commit` writes). The map is [agent-fabric › The function library](../../../../products/agent-fabric.md#the-function-library). The route, a refusal and Studio show the dotted name; no old key is kept as an alias. |
 | CA9 | **Studio says *function*.** Every label, header, empty state and count that said *task type* or *callable* says *function* — *Functions* on a plugin, *No such function*, *Skills & functions* on an agent, *5 functions* on a plan. The read shapes that still carry the old word (`task_types` on a plugin, `…/skills-and-callables`, board kind `task_type`) are renamed with the surfaces that replace them, not before. |
+| CA10 | **A function's numbers are its steps', in this Graph.** *Calls* counts run steps whose `task_key` is the function over the last 30 UTC days, eval runs left out; *p95* is queued-to-finished over settled steps; *failed* is failed over settled. The prior window is the 30 days before, and each change is `invana.core.metrics`' reading. *Needed by skills* lists the skills whose current version's plan names the function |
 | CA5 | **Control flow is not in the catalogue.** `if` · `loop` · `map` · `retry` · `stop` are plan grammar ([§ 5](../../../orchestration.md)); they are documented with the plan, and a person looking for them here is told where they live rather than shown an entry that does not exist. |
 
 ## Not building
@@ -117,6 +119,6 @@ The declaration already exists — one `manifest.toml` per task type in the core
 |---|---|
 | Registering an entry from an app, or while plans run | the set is closed per process — task types come only from the plugins loaded at start-up ([13.9](../../platform/features/plugins.md)); an app that could register one would make the envelope advisory ([the-runtime-package.md](../../../building-engine/the-runtime-package.md) §1) |
 | Enabling / disabling an entry per Graph | the bound is the knob, and it is the envelope's ([7.3](envelope-validation.md)) — a second switch would have two answers to *may this run* |
-| A playground that executes an entry | a callable runs inside a plan, under an envelope, with a run row behind it; a bare invoke is a write with no trace |
-| Per-entry metrics | cost and duration belong to the run that spent them ([10.5](../../operate/features/see-what-ran.md)); an average over a callable answers nobody's question |
+| *Try it* — a playground that executes an entry | a callable runs inside a plan, under an envelope, with a run row behind it; a bare invoke is a write with no trace |
+| *Allowed by policies* on a function's page | Policies are IAM's (I01) |
 | Editing `requires` | it is part of the entry's contract, read by the planner while drafting — a Graph-level override would make a plan legal in one Graph and refused in the next |

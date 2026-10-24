@@ -102,9 +102,9 @@ export function AgentBoardPage({
 				items={preview.data?.items}
 				isLoading={preview.isLoading}
 				onCancel={() => setConfirming(null)}
-				onConfirm={() => {
+				onConfirm={(why) => {
 					if (confirming === "retire")
-						mutations.retire.mutate({ id: agent.id });
+						mutations.retire.mutate({ id: agent.id, why: why || undefined });
 					else if (confirming === "pause") mutations.pause.mutate(agent.id);
 					setConfirming(null);
 				}}

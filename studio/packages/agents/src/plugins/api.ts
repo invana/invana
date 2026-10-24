@@ -1,5 +1,6 @@
 import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type {
+	FunctionCallsPage,
 	FunctionRead,
 	McpServerRead,
 	PluginDetail,
@@ -41,8 +42,27 @@ export const pluginsApi = {
 			`${PLUGINS}/mcp/${encodeURIComponent(server)}/refresh`,
 			{ method: "POST" },
 		),
+};
 
-	/** One function by key; the engine's route is still `/task-types`. */
-	function: (ref: string) =>
-		request<FunctionRead>(`/api/v1/task-types/${encodeURIComponent(ref)}`),
+const catalogue = (username: string, graphSlug: string, key: string) =>
+	`/api/v1/u/${username}/${graphSlug}/catalogue/${encodeURIComponent(key)}`;
+
+/**
+ * A function's page, read in a Graph: its contract, the plans and skills
+ * naming it, and its calls — the numbers are the engine's.
+ */
+export const functionsApi = {
+	get: (username: string, graphSlug: string, key: string) =>
+		request<FunctionRead>(catalogue(username, graphSlug, key)),
+
+	/** One page of the run steps that called it, newest first. */
+	calls: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		query: ListQuery = {},
+	) =>
+		request<FunctionCallsPage>(
+			`${catalogue(username, graphSlug, key)}/calls${listQueryToApi(query)}`,
+		),
 };

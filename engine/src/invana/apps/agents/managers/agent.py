@@ -583,6 +583,7 @@ class AgentManager:
         actor: User,
         reassign_to_kind: str | None = None,
         reassign_to_id: str | None = None,
+        why: str | None = None,
     ) -> Agent:
         """Retire, not delete. **The row stays** so lineage and every trace row
         still resolve to a name (docs/for-developers/modules/work/spec.md)."""
@@ -608,6 +609,7 @@ class AgentManager:
                 "name": agent.name,
                 "open_tasks": [t.id for t in tasks],
                 "reassigned_to": reassign_to_id,
+                "why": why,
             },
         )
         return agent

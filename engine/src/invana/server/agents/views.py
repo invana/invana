@@ -346,6 +346,7 @@ async def retire_agent(
         actor=user,
         reassign_to_kind=payload.reassign_to_kind,
         reassign_to_id=payload.reassign_to_id,
+        why=payload.why,
     )
     return await agents.read(session, agent)
 

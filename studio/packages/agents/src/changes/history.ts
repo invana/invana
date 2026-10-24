@@ -1,8 +1,8 @@
 /**
  * A record's change log (`/history/<kind>/<id>`) as the agent and skill pages
  * read it: every change with who made it, why, and what happened after.
- * Mirrors the engine's `RecordHistory` and `ChangeCompare`; the shared compare
- * board is the shell's, so only what these pages draw is typed here.
+ * Mirrors the engine's `RecordHistory`; the shared compare board is the
+ * shell's, so only what these pages draw is typed here.
  */
 
 import { request } from "@invana-studio/core";
@@ -45,27 +45,6 @@ export interface RecordHistory {
 	items: ChangeEntry[];
 }
 
-interface PlanVersionDiff {
-	key: string;
-	version: number;
-	against_version: number | null;
-	added: string[];
-	removed: string[];
-	moved: string[];
-	unchanged: string[];
-	changed: { step_key: string; fields: string[] }[];
-	summary: string;
-}
-
-export interface ChangeCompare {
-	record_kind: RecordKind;
-	record_id: string;
-	a: string | null;
-	b: string;
-	summary: string;
-	plan: PlanVersionDiff | null;
-}
-
 const base = (u: string, g: string, kind: RecordKind, id: string) =>
 	`/api/v1/u/${u}/${g}/history/${kind}/${id}`;
 
@@ -78,28 +57,6 @@ export function useRecordHistoryQuery(
 	return useQuery({
 		queryKey: ["history", username, graphSlug, kind, id],
 		queryFn: () => request<RecordHistory>(base(username, graphSlug, kind, id)),
-	});
-}
-
-/** The engine's compare of two versions — `a` empty compares `b` with the one before. */
-export function useCompareQuery(
-	username: string,
-	graphSlug: string,
-	kind: RecordKind,
-	id: string,
-	b: string | null,
-	a?: string | null,
-) {
-	return useQuery({
-		queryKey: ["history", username, graphSlug, kind, id, "compare", a, b],
-		queryFn: () => {
-			const q = new URLSearchParams({ b: b as string });
-			if (a) q.set("a", a);
-			return request<ChangeCompare>(
-				`${base(username, graphSlug, kind, id)}/compare?${q}`,
-			);
-		},
-		enabled: !!b,
 	});
 }
 

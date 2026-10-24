@@ -1,4 +1,4 @@
-"""Paths for the plugin registry — ``/api/v1/plugins`` and ``/api/v1/task-types``.
+"""Paths for the plugin registry — ``/api/v1/plugins``.
 
 docs/for-developers/modules/platform/features/tool-plugins.md and
 docs/for-developers/modules/platform/features/mcp-plugins.md. Install-level,
@@ -12,7 +12,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from invana.core.lists import Page
-from invana.runtime.schemas import McpServerRead, PluginDetail, PluginSummary, TaskTypeRead
+from invana.runtime.schemas import McpServerRead, PluginDetail, PluginSummary
 from invana.server.plugins import views
 
 plugins_router = APIRouter(prefix="/api/v1/plugins", tags=["plugins"])
@@ -24,8 +24,4 @@ plugins_router.get("/{name}", response_model=PluginDetail)(views.get_plugin)
 plugins_router.post("/{name}/enable", response_model=PluginSummary)(views.enable_plugin)
 plugins_router.post("/{name}/disable", response_model=PluginSummary)(views.disable_plugin)
 
-task_types_router = APIRouter(prefix="/api/v1/task-types", tags=["plugins"])
-
-task_types_router.get("/{ref}", response_model=TaskTypeRead)(views.get_task_type)
-
-__all__ = ["plugins_router", "task_types_router"]
+__all__ = ["plugins_router"]

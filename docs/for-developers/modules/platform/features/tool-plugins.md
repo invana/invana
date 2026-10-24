@@ -27,8 +27,8 @@ and a terminal read the same thing.
 | C4 | A composite task type | `web.download_and_extract`: download → unzip → parse, one task type, one envelope, one step on the run page |
 | C5 | A skill in a plugin | `plugins/tools/web/skills/collect-dataset/` — `skill.toml` + `instructions.md`; seeded into every Graph like the built-in playbook, `origin = builtin` |
 | C6 | Enable · disable | An install Admin enables or disables a tool plugin; disabled is the default. Core and simulator plugins are always on |
-| C7 | The registry API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` · `GET /api/v1/task-types/{ref}` |
-| C8 | The CLI | `invana plugins list · show · enable · disable` · `invana tasks show <key>[@version]` · `invana worker` |
+| C7 | The registry API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` — a function's read is Graph-scoped, `GET …/catalogue/{step_key}` ([the-catalogue](../../workflows/features/the-catalogue.md)) |
+| C8 | The CLI | `invana plugins list · show · enable · disable` · `invana worker` |
 | C9 | Tools run in workers | Under `executor = "procrastinate"`, every tool step is deferred as a `TaskEnvelope` to the `tools` queue and run by `invana worker`; the API process waits for its outcome |
 | C10 | `send` waits for an approval | A step whose task type is `side_effect = "send"` (`mail.send`) holds the run on an approval in the inbox; approve resumes it, decline fails the step as *not sent* |
 | C11 | Secrets stay in the worker | A task type reads only the secrets its plugin declares, from the worker's environment (`INVANA_SECRET_<NAME>`); nothing rides an envelope |
@@ -106,7 +106,7 @@ sequenceDiagram
 | `runtime/managers/plugins.py` | `PluginManager` — list, show, enable, disable, task type by ref, enabled set |
 | `runtime/models.py` | `PluginState` · `EnvelopeOutcome` |
 | `server/plugins/` | routes · views · admin |
-| `cli/commands/plugins.py` · `worker.py` | `invana plugins …` · `invana tasks show` · `invana worker` |
+| `cli/commands/plugins.py` · `worker.py` | `invana plugins …` · `invana worker` |
 
 | `plugin_states` column | Type | Notes |
 |---|---|---|
@@ -127,7 +127,6 @@ sequenceDiagram
 | `GET /api/v1/plugins` | any signed-in user | `PluginSummary[]` — `name · kind · version · title · extra · installed · enabled · task_types · skills · flows` |
 | `GET /api/v1/plugins/{name}` | any signed-in user | `PluginDetail` — the summary plus each task manifest, flow and skill |
 | `POST /api/v1/plugins/{name}/enable` · `/disable` | install Admin | `PluginSummary`; 409 for a core or simulator plugin, 404 for an unknown one, 409 to enable one not installed |
-| `GET /api/v1/task-types/{ref}` | any signed-in user | `TaskTypeRead` — one manifest by `key` or `key@version`, its plugin, `runs_30d` |
 
 | Task type | Args | Outputs | Side effect · secret |
 |---|---|---|---|

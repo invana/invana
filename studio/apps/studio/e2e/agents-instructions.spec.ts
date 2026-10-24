@@ -144,12 +144,12 @@ test("AG-13 Plugins lists the registry; a plugin and a function open", async ({
 		page.getByText("Functions", { exact: true }).first(),
 	).toBeVisible({ timeout: 15_000 });
 	await page.getByRole("row").nth(1).click();
-	await expect(page.getByText("Manifest", { exact: true })).toBeVisible({
+	await expect(page.getByRole("tab", { name: "Contract" })).toBeVisible({
 		timeout: 15_000,
 	});
-	await expect(
-		page.getByText(/each run records the version it used/),
-	).toBeVisible();
+	await expect(page.getByText("Calls · 30 days").first()).toBeVisible();
+	await page.getByRole("tab", { name: "Used by" }).click();
+	await expect(page).toHaveURL(/[?&]tab=used_by/);
 });
 
 test("AG-14 an agent pins a model version and History names it", async ({

@@ -62,3 +62,24 @@ async def test_exceptions_count_replans_over_the_runs_offered_the_skill(
 
     read = await usage.exceptions(session, skill=skill, graph_id=graph.id, days=30)
     assert (read.runs, read.replanned, read.replans_p95, read.max_replans) == (1, 1, 2.0, None)
+
+
+async def test_a_draft_reads_the_lines_its_last_draw_could_not_map(session: AsyncSession, graph: Graph, user: User):
+    skill = await drafts.create(session, graph_id=graph.id, payload=SkillCreate(name="Mail the desk"), actor_id=user.id)
+    draft = await drafts.ensure_draft(session, skill=skill)
+    assert (await drafts.draft_read(session, skill=skill)).unmapped == []
+
+    draw = TaskRun(
+        graph_id=graph.id,
+        role="plan",
+        flow_key="skill-draft",
+        params={"skill_version_id": draft.id},
+        status="succeeded",
+    )
+    session.add(draw)
+    await session.flush()
+    span = "The desk prefers short notes."
+    session.add(TaskRun(graph_id=graph.id, parent_run_id=draw.id, task_key="plan.draft", output={"unmapped": [span]}))
+    await session.flush()
+
+    assert (await drafts.draft_read(session, skill=skill)).unmapped == [span]

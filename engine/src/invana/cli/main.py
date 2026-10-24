@@ -47,7 +47,7 @@ from invana.cli.commands.migrate import migrate_cmd
 from invana.cli.commands.models import models_cmd
 from invana.cli.commands.notifications import notifications_cmd
 from invana.cli.commands.plans import plans_cmd
-from invana.cli.commands.plugins import plugins_cmd, tasks_cmd
+from invana.cli.commands.plugins import plugins_cmd
 from invana.cli.commands.projects import (
     branches_cmd,
     findings_cmd,
@@ -243,5 +243,4 @@ app.add_command(evals_cmd)
 app.add_command(llms_cmd)
 app.add_command(plans_cmd)
 app.add_command(plugins_cmd)
-app.add_command(tasks_cmd)
 app.add_command(worker_cmd)

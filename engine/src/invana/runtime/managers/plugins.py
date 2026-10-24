@@ -20,14 +20,11 @@ extra is not installed and the MCP servers this process has not loaded, listed
     await plugins.list(session)                                 # [PluginSummary, …]
     await plugins.page(session, params=params)                  # one page of the list, and its counts
     await plugins.show(session, "invana.tools.web")             # PluginDetail
-    await plugins.task_type(session, "graph.read.query@1.0.0")  # TaskTypeRead, with runs_30d
     await plugins.is_enabled(session, "invana.tools.web")      # False until enabled
     await plugins.switch(session, name="invana.tools.web", enabled=True, actor=admin)
 """
 
 from __future__ import annotations
-
-from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -39,7 +36,7 @@ from invana.plugins.mcp import plugin as mcp_plugin
 from invana.plugins.registry import LoadedPlugin
 from invana.plugins.sdk.manifest import PluginManifest, TaskManifest
 from invana.runtime.models import McpServer, PluginState
-from invana.runtime.querysets.plugins import McpServerQuerySet, PluginStateQuerySet, TaskTypeUsageQuerySet
+from invana.runtime.querysets.plugins import McpServerQuerySet, PluginStateQuerySet
 from invana.runtime.schemas import (
     PluginDetail,
     PluginFlowRead,
@@ -47,14 +44,10 @@ from invana.runtime.schemas import (
     PluginSummary,
     TaskArgRead,
     TaskManifestRead,
-    TaskTypeRead,
 )
 
 #: The kinds an Admin switches — and whose steps run where tool steps run; every other kind is always on.
 SWITCHABLE = frozenset({"tool", "mcp"})
-
-#: The window ``runs_30d`` counts over.
-USAGE_WINDOW = timedelta(days=30)
 
 
 def _manifest_fields(task: TaskManifest) -> dict:
@@ -106,7 +99,6 @@ class PluginManager:
     """Stateless. The session is the first argument of every method."""
 
     states_qs = PluginStateQuerySet()
-    usage_qs = TaskTypeUsageQuerySet()
     mcp_qs = McpServerQuerySet()
 
     async def _mcp_rows(self, session: AsyncSession) -> dict[str, McpServer]:
@@ -203,19 +195,6 @@ class PluginManager:
                 for s in (plugin.skills if plugin else ())
             ],
         )
-
-    async def task_type(self, session: AsyncSession, ref: str) -> TaskTypeRead:
-        """One task type by ``key`` or ``key@version``, its plugin and how often it ran in 30 days.
-
-        404 when no loaded plugin declares it.
-        """
-        registry = load_plugins()
-        task = registry.task(ref)
-        if task is None:
-            raise NotFoundError(f"No task type {ref}.")
-        plugin = registry.plugins[task.plugin].manifest
-        runs = await self.usage_qs.runs_since(session, key=task.key, since=datetime.now(UTC) - USAGE_WINDOW)
-        return TaskTypeRead(**_manifest_fields(task), plugin=f"{plugin.name}@{plugin.version}", runs_30d=runs)
 
     async def switch(self, session: AsyncSession, *, name: str, enabled: bool, actor: User) -> PluginSummary:
         """:meth:`set_enabled`, answered with the plugin's summary as it now stands."""

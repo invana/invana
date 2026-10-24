@@ -1,7 +1,8 @@
 /**
  * What the agent page's tabs share: the tab list and its URL key, the model
- * versions the Graph's endpoints offer, how a run's exit reads, and the
- * small read states every tab draws the same way.
+ * versions the Graph's endpoints offer, how a run's origin and exit read, the
+ * one way a tab dates a moment, and the small read states every tab draws the
+ * same way.
  */
 
 import type { StatusDotProps } from "@invana/ui";
@@ -54,6 +55,19 @@ export const versionName = (address: string | null | undefined) =>
 
 /** `#a1b2` — a run as a row names it. */
 export const runLabel = (id: string) => `#${id.slice(0, 4)}`;
+
+/**
+ * What opened a run, as a person reads it — the run's `triggered_by`.
+ * `canvas` and `system` runs are left out of a runs list unless asked for.
+ */
+export const RUN_ORIGIN: Record<string, string> = {
+	user: "Asked",
+	schedule: "Schedule",
+	task: "Todo",
+	delegation: "Delegated",
+	canvas: "Canvas",
+	system: "System",
+};
 
 /** An exit's tone: served is good, a failure is bad, the rest are plain. */
 export function exitTone(exit: string): NonNullable<StatusDotProps["tone"]> {

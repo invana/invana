@@ -5,12 +5,13 @@
  * - **Budget** — `max_tokens_run` · `max_tokens_month`. A run budget above the
  *   month budget is flagged under the field.
  * - **Delegation** — `policy.can_spawn`, `max_depth` · `max_children` ·
- *   `max_concurrent_runs`.
+ *   `max_concurrent_runs`. Depth and children bound the helpers it creates,
+ *   so they are disabled while it may create none.
  * - **Effort** — `max_steps` · `max_replans` · `max_clarifications`.
  *
  * Empty is *the default applies*, never zero: the placeholder is what a run
  * reads where this agent is silent. Edits ride the page's one buffer; Save in
- * the head writes them. Tokens, never currency.
+ * the head writes them. Tokens, never currency, and read as a magnitude.
  */
 
 import {
@@ -68,10 +69,13 @@ export function AgentLimitsTab({
 		key: string,
 		label: string,
 		unit: string,
-		opts: { hint?: string; error?: string } = {},
+		opts: { hint?: string; error?: string; off?: boolean } = {},
 	) => {
 		const own = draft[group][key];
 		const fallback = effective(key);
+		// A token budget reads as a magnitude — `200k`, never `200000`.
+		const shown = (v: number) =>
+			unit === "tokens" ? formatCompact(v) : String(v);
 		return (
 			<Field data-invalid={opts.error ? true : undefined}>
 				<FieldLabel htmlFor={`limit-${key}`}>{label}</FieldLabel>
@@ -80,10 +84,10 @@ export function AgentLimitsTab({
 						id={`limit-${key}`}
 						type="number"
 						min={0}
-						disabled={readOnly}
+						disabled={readOnly || opts.off}
 						aria-invalid={opts.error ? true : undefined}
 						value={own ?? ""}
-						placeholder={fallback != null ? String(fallback) : "—"}
+						placeholder={fallback != null ? shown(fallback) : "—"}
 						onChange={(e) => set(group, key, e.target.value)}
 					/>
 					<InputGroupAddon align="inline-end">
@@ -91,7 +95,13 @@ export function AgentLimitsTab({
 					</InputGroupAddon>
 				</InputGroup>
 				{opts.error ? <FieldError>{opts.error}</FieldError> : null}
-				{opts.hint ? <FieldDescription>{opts.hint}</FieldDescription> : null}
+				{unit === "tokens" && own != null ? (
+					<FieldDescription>
+						{shown(own)} tokens{opts.hint ? ` · ${opts.hint}` : ""}
+					</FieldDescription>
+				) : opts.hint ? (
+					<FieldDescription>{opts.hint}</FieldDescription>
+				) : null}
 			</Field>
 		);
 	};
@@ -135,8 +145,12 @@ export function AgentLimitsTab({
 							</FieldLabel>
 						</Field>
 						<div className="grid gap-3 @[560px]:grid-cols-2">
-							{limit("budget", "max_depth", "Depth", "levels")}
-							{limit("budget", "max_children", "Children", "a run")}
+							{limit("budget", "max_depth", "Depth", "levels", {
+								off: !canSpawn,
+							})}
+							{limit("budget", "max_children", "Children", "a run", {
+								off: !canSpawn,
+							})}
 						</div>
 						{limit("budget", "max_concurrent_runs", "Live at once", "runs", {
 							hint: "the rest queue",

@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from invana.apps.skills.schemas import OfferedRule
 from invana.core.lists import Filter, ListSpec
+from invana.core.metrics import Change
 from invana.plugins.sdk.manifest import Bound
 from invana.runtime.models import RunStatus, TriggeredBy
 
@@ -114,8 +115,10 @@ class TaskRunSummary(BaseModel):
     plan_revision: int = 0
     replans: int = 0
     agent_id: str | None = None
-    #: ``execute`` · ``plan`` · ``evaluate`` — what the run was for (SR10).
+    #: ``execute`` · ``plan`` · ``evaluate`` — what the run was for.
     role: str = "execute"
+    #: What started it — the run's origin, as ``f.origin`` filters it.
+    triggered_by: str | None = None
     task_id: str | None = None
     #: The task's title, so a row reads without a second round-trip.
     task_title: str | None = None
@@ -486,6 +489,86 @@ CATALOGUE_LIST = ListSpec(
 )
 
 
+class FunctionPlanRef(BaseModel):
+    """A reusable plan in this Graph that names the function — its newest version."""
+
+    id: str
+    key: str
+    name: str
+    #: ``packaged`` · ``generated`` · ``promoted``.
+    origin: str
+
+
+class FunctionSkillRef(BaseModel):
+    """A skill whose current version's plan names the function."""
+
+    skill_id: str
+    name: str
+    version: int
+
+
+class FunctionCallsRead(BaseModel):
+    """A function's calls over the window against the window before, read once by the engine."""
+
+    days: int
+    #: The first day of the window, 00:00 UTC.
+    since: datetime
+    calls: int
+    calls_prior: int
+    calls_change: Change | None = None
+    #: Queued to finished over settled calls; null when none settled.
+    p95_ms: float | None = None
+    p95_prior_ms: float | None = None
+    p95_change: Change | None = None
+    failed: int
+    #: Failed over settled; null when none settled.
+    failed_rate: float | None = None
+    failed_rate_prior: float | None = None
+    failed_rate_change: Change | None = None
+
+
+class FunctionRead(CatalogueEntryRead):
+    """A function's page: its catalogue entry, its manifest, who names it and its calls."""
+
+    #: ``name@version`` of the plugin that declares it.
+    plugin: str = ""
+    version: str
+    side_effect: str
+    resources: list[str]
+    #: Declared on the manifest; null means the engine's default.
+    timeout_s: int | None = None
+    retries: int | None = None
+    plans: list[FunctionPlanRef]
+    needed_by: list[FunctionSkillRef]
+    calls: FunctionCallsRead
+
+
+class FunctionCallRead(BaseModel):
+    """One run step that called the function."""
+
+    #: The step's ``task_runs.id``.
+    id: str
+    #: The run the step ran in.
+    run_id: str
+    title: str
+    status: str
+    duration_ms: int | None = None
+    tokens: int | None = None
+    queued_at: datetime
+
+
+#: What a function's Calls list takes — newest first.
+FUNCTION_CALLS_LIST = ListSpec(
+    filters={
+        "status": Filter(
+            values=tuple(s.value for s in RunStatus),
+            labels={s.value: s.value.replace("_", " ") for s in RunStatus},
+        ),
+    },
+    sorts=("-queued_at",),
+)
+
+
 # ── Evals (docs/for-developers/modules/skills/features/evals.md) ──
 
 
@@ -739,12 +822,3 @@ class McpServerRead(BaseModel):
     #: ``{name, version, protocol}`` from the server's ``initialize``.
     server: dict
     frozen_at: datetime
-
-
-class TaskTypeRead(TaskManifestRead):
-    """One task type, its plugin, and how often it ran."""
-
-    #: ``name@version`` of the plugin that declares it.
-    plugin: str
-    #: Run nodes that named this key in the last 30 days.
-    runs_30d: int

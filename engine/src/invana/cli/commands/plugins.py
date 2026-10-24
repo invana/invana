@@ -1,4 +1,4 @@
-"""`invana plugins …` and `invana tasks show` — the plugin registry from a shell.
+"""`invana plugins …` — the plugin registry from a shell.
 
 docs/for-developers/modules/platform/features/tool-plugins.md. The registry is
 the install's, not a Graph's, so reads name no user; switching a tool plugin is
@@ -8,7 +8,6 @@ an install Admin's act and names one with ``--user``::
     invana plugins show invana.tools.web
     invana plugins enable  invana.tools.web --user admin
     invana plugins disable invana.tools.web --user admin
-    invana tasks show execute_graph_query@1.0.0
     invana plugins mcp add http://localhost:9000/mcp --name files --user admin
     invana plugins mcp refresh files --user admin
 
@@ -19,9 +18,8 @@ each process — the API and every worker — restarts. Every command here loads
 the stored MCP servers first, as a process does at start-up.
 
 ``list`` prints one tab-separated row per plugin — name, kind, version,
-installed, enabled, task types. ``show`` and ``tasks show`` print JSON, the
-shape ``GET /api/v1/plugins/{name}`` and ``GET /api/v1/task-types/{ref}``
-return. A refusal — an unknown name, a core plugin, a user who is not an
+installed, enabled, functions. ``show`` prints JSON, the shape
+``GET /api/v1/plugins/{name}`` returns. A refusal — an unknown name, a core plugin, a user who is not an
 install Admin — prints the manager's sentence and exits 1.
 """
 
@@ -156,16 +154,3 @@ def mcp_refresh(name: str, user_ref: str) -> None:
             _print_server(await _mcp.refresh(session, name=name, actor=actor))
 
     asyncio.run(go())
-
-
-@click.group("tasks")
-def tasks_cmd() -> None:
-    """Task types: what one declares, and how often it ran."""
-
-
-@tasks_cmd.command("show")
-@click.argument("ref")
-def show_task(ref: str) -> None:
-    """One task type by `key` or `key@version`, as JSON."""
-    task = _read(lambda session: _plugins.task_type(session, ref))
-    click.echo(json.dumps(task.model_dump(mode="json"), indent=2))

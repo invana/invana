@@ -22,7 +22,17 @@ export function formatRelativeTime(date: Date): string {
 	const days = Math.floor(hours / 24);
 	if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
 
-	return date.toLocaleDateString();
+	return formatShortDate(date);
+}
+
+/** A day as a person reads it: "Sep 14", with the year only when it is not this one. */
+export function formatShortDate(date: Date): string {
+	const thisYear = date.getFullYear() === new Date().getFullYear();
+	return date.toLocaleDateString(undefined, {
+		month: "short",
+		day: "numeric",
+		...(thisYear ? {} : { year: "numeric" }),
+	});
 }
 
 /** A moment as a person reads it, in their own time: "Oct 2, 9:29 PM". */

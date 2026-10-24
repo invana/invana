@@ -104,6 +104,8 @@ class AgentRead(BaseModel):
     guardrail_id: str | None = None
     guardrail_name: str | None = None
     budget: dict[str, Any]
+    #: The ceilings a run reads — its own budget over the defaults.
+    effective_budget: dict[str, Any]
     #: The model address this agent thinks with; null lets the cast decide.
     model_pin: str | None = None
     #: As stored — a missing key is the default. ``effective_effort`` is what a
@@ -188,6 +190,8 @@ class RetireRequest(BaseModel):
     # Where the agent's open tasks go. None leaves them `blocked` (docs/for-developers/modules/work/spec.md).
     reassign_to_kind: str | None = None
     reassign_to_id: str | None = None
+    #: Why it was retired, kept on the History row.
+    why: str | None = Field(default=None, max_length=500)
 
 
 class LifecycleAct(enum.StrEnum):
@@ -437,7 +441,7 @@ class AgentOverviewModel(BaseModel):
     #: The first time any of this agent's runs called it, whatever the window.
     first_at: datetime
     runs: int
-    #: Served over the runs Verify gave a verdict; null when none did.
+    #: Succeeded over settled runs; null when none settled.
     served_rate: float | None = None
     p95_ms: float | None = None
 
@@ -456,9 +460,9 @@ class AgentOverview(BaseModel):
     since: datetime
     runs: int
     runs_prior: int
-    #: Runs Verify said served (``yes``).
+    #: Settled runs that succeeded.
     served: int
-    #: Served over the runs Verify gave a verdict; null when none did.
+    #: Succeeded over settled runs, as Fleet reads it; null when none settled.
     served_rate: float | None = None
     served_rate_prior: float | None = None
     p95_ms: float | None = None

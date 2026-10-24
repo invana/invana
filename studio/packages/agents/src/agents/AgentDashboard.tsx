@@ -95,7 +95,7 @@ export function AgentDashboard({
 					caption={
 						o.max_tokens_month == null
 							? "no month budget"
-							: `of ${tokens(o.max_tokens_month)}`
+							: `of ${tokens(o.max_tokens_month)} tokens`
 					}
 					captionTone="muted"
 					meter={

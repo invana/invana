@@ -172,6 +172,8 @@ export interface TaskRunSummary {
 	agent_id: string | null;
 	/** `execute` · `plan` · `evaluate` — what the run was for. */
 	role: string;
+	/** What started it — the run's origin, as `f.origin` filters it. */
+	triggered_by: string | null;
 	task_id: string | null;
 	task_title: string | null;
 	queued_at: string | null;

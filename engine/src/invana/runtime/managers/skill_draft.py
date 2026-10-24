@@ -1024,7 +1024,7 @@ class SkillDraftManager:
         run = await self.runs_qs.last_draw_of_skill_version(session, graph_id=graph_id, version_id=version_id)
         if run is None:
             return None, []
-        drafted = [n for n in await self.runs_qs.nodes_of(session, run_id=run.id) if n.step_key == "plan.draft"]
+        drafted = [n for n in await self.runs_qs.nodes_of(session, run_id=run.id) if n.task_key == "plan.draft"]
         output = next((n.output for n in reversed(drafted) if n.output), None) or {}
         reasons = output.get("refused")
         refusal = SkillDrawRefusal(run_id=run.id, reasons=[str(r) for r in reasons]) if reasons else None

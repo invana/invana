@@ -12,6 +12,9 @@
  * readings (one of them leaves the step to a person), and any flagged line can
  * be rewritten in place. Publish waits until every line maps.
  *
+ * Under both, the **console** — Tests · Evals · Problems · Log — where a test
+ * run lands while the person stays on the text it tests.
+ *
  * A published skill with no draft reads its head text; *Edit instructions* in
  * the page head opens a draft.
  */
@@ -34,18 +37,17 @@ import { FormError, PanelSection } from "@invana-studio/ui";
 import { ArrowRight, Save, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { AddFunctionsPicker } from "./AddFunctionsPicker";
+import { SkillConsole } from "./console/SkillConsole";
 import { addFunctionLines, lineOf, replaceLine } from "./instructionsText";
 import {
 	useAnswerClarificationMutation,
 	useSaveDraftMutation,
-	useSkillTestsQuery,
 } from "./queries";
-import { TestRunsTable } from "./SkillTestsTab";
 import { guardedStep } from "./taskFlowFromPlan";
 import type { SkillClarification } from "./types";
 import { planFunctions, type SkillPage } from "./useSkillPage";
 
-export const NOTHING_TO_DRAW =
+const NOTHING_TO_DRAW =
 	"Nothing to draw yet — the plan appears once the steps name things the allowed functions can do.";
 
 export function SkillInstructionsTab({
@@ -168,7 +170,6 @@ export function SkillInstructionsTab({
 							)
 						}
 					/>
-					<RecentTests page={page} />
 				</div>
 
 				<div className="flex min-w-0 flex-col gap-2.5">
@@ -180,19 +181,9 @@ export function SkillInstructionsTab({
 					<PlanPreviewCard page={page} text={text} onOpenFlow={onOpenFlow} />
 				</div>
 			</div>
+			<SkillConsole page={page} />
 		</div>
 	);
-}
-
-/** The test runs under the document, once there are any. */
-function RecentTests({ page }: { page: SkillPage }) {
-	const tests = useSkillTestsQuery(
-		page.username,
-		page.graphSlug,
-		page.skill.id,
-	);
-	const rows = tests.data?.items ?? [];
-	return rows.length ? <TestRunsTable rows={rows} /> : null;
 }
 
 /**
@@ -390,7 +381,15 @@ function PlanPreviewCard({
 		<PanelSection
 			card
 			title="Plan preview"
-			hint={page.drawing ? "Drawing…" : nodes.length ? "generated" : undefined}
+			hint={
+				page.drawing
+					? "Drawing…"
+					: !nodes.length
+						? undefined
+						: draft && !draft.drawn
+							? "from an earlier text"
+							: "drawn from the text"
+			}
 		>
 			<div className="flex flex-col gap-2">
 				{firstUnmapped ? (

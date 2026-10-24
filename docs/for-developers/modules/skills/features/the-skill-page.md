@@ -65,13 +65,13 @@ flowchart TD
 | Tab | `?tab=` | Body | Reads / writes |
 |---|---|---|---|
 | Instructions | `instructions` (default) | `SkillInstructionsTab` — `MarkdownEditor` · `FunctionsNeededCard` · `PlanPreviewCard` | `GET/PATCH …/skills/{id}/draft` · `POST …/draft/draw` · `GET …/catalogue` |
-| Flow | `flow` | `SkillFlowTab` — `TaskFlowCanvas` + *From the instructions* + *This flow* / the step panel | `GET …/skills/{id}/draft` or `…/versions/{v}/tasks` |
+| Flow | `flow` | `SkillFlowTab` — `TaskFlowCanvas` on Cards (`skills/flow/skillFlowConfig.ts`): a card per step (`step N` · function · `from line N` · bound), a handler card off its step, a gap card per unmapped line; + *From the instructions* + *This flow* / the step panel | `GET …/skills/{id}/draft` or `…/versions/{v}/tasks` |
 | Functions | `functions` | `SkillFunctionsTab` — kit `Table` | the plan's rows + `GET …/catalogue` |
 | Agents | `agents` | `SkillAgentsTab` | `GET …/skills/{id}/agents` · `POST/DELETE …/agents/{a}/skills/{id}` |
 | Usage | `usage` | `SkillUsageTab` | `GET …/skills/{id}/usage` |
 | Exceptions | `exceptions` | `SkillExceptionsTab` | `GET …/skills/{id}/exceptions` |
 | Evals | `evals` | `SkillEvalsTab` (`EvalSetPanel` · `EvalGateCard`) | `GET …/evals/skill/{id}` · runs · `POST …/skills/{id}/versions` |
-| Tests | `tests` | `SkillTestsTab` + the console under Instructions | `GET …/skills/{id}/tests` · `POST …/skills/{id}/tests` |
+| Tests | `tests` | `SkillTestsTab` + `SkillConsole` under Instructions (Tests · Evals · Problems · Log, on the kit's `TabbedPanel`, foldable); *Run a test* in the head opens Instructions, where the console is | `GET …/skills/{id}/tests` · `POST …/skills/{id}/tests` |
 | History | `history` | `SkillHistoryTab` | `GET …/skills/{id}/versions` · diff · rollback |
 
 | Board | Draws |
