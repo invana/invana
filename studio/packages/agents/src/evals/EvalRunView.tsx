@@ -145,7 +145,7 @@ export function EvalRunView({
 										<TableCell className="whitespace-nowrap font-mono">
 											{sideCell(row.draft)}
 										</TableCell>
-										<TableCell>
+										<TableCell className="whitespace-nowrap">
 											<span className="flex flex-wrap gap-1">
 												{Object.entries(checked?.hard ?? {}).map(
 													([kind, verdict]) => (

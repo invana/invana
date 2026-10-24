@@ -1701,8 +1701,8 @@
   "agents.agent.retire": {
    "story": "AF-21",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=overview&right=assistant",
-   "state": "the uuid stands for the Explorer agent: open any agent from Agents; Retire on the head"
+   "route": "/u/admin/airways/agents/agents?page=agent%3A850f6a82-de3a-432c-a663-a5dcba4dc32a&tab=overview&right=assistant",
+   "state": "the uuid stands for an agent a schedule starts (Coordinator): Retire on the head"
   },
   "agents.skill.agents": {
    "story": "AF-22",

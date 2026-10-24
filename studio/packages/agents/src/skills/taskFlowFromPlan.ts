@@ -78,6 +78,30 @@ function stepBefore(
 	return at;
 }
 
+/** The edges left once every edge reachable through another path is dropped. */
+function withoutSkips(edges: TaskFlowEdge[]): TaskFlowEdge[] {
+	const next = new Map<string, string[]>();
+	for (const e of edges)
+		next.set(e.source, [...(next.get(e.source) ?? []), e.target]);
+	const reachesAround = (edge: TaskFlowEdge) => {
+		const seen = new Set<string>();
+		const stack = [edge.source];
+		while (stack.length > 0) {
+			const at = stack.pop() as string;
+			for (const to of next.get(at) ?? []) {
+				if (at === edge.source && to === edge.target) continue;
+				if (to === edge.target) return true;
+				if (!seen.has(to)) {
+					seen.add(to);
+					stack.push(to);
+				}
+			}
+		}
+		return false;
+	};
+	return edges.filter((e) => !reachesAround(e));
+}
+
 export function taskFlowFromPlan(
 	plan: SkillPlaybookRead,
 	handlers: PlanHandler[] = [],
@@ -143,6 +167,9 @@ export function taskFlowFromPlan(
 			data: { kind: "sequence", description: "" },
 		});
 	});
+	// An edge that skips over a step it already reaches through is not drawn,
+	// so the spine stays one column instead of bending around the long edge.
+	edges.splice(0, edges.length, ...withoutSkips(edges));
 
 	const aside = (
 		id: string,

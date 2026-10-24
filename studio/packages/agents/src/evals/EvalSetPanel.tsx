@@ -207,7 +207,7 @@ export function EvalSetPanel({
 									) : null}
 								</TableCell>
 								<TableCell className="whitespace-nowrap">{c.label}</TableCell>
-								<TableCell>
+								<TableCell className="whitespace-nowrap">
 									<span className="flex flex-wrap gap-1">
 										{c.checks.map((k) => (
 											<Badge key={checkLabel(k)} size="xs" variant="outline">
