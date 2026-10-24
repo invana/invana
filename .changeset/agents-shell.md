@@ -12,10 +12,10 @@ per section.
 | Fleet | `/agents/fleet[/map · /table]` | Overview, the agents → skills → functions map, and every agent's numbers |
 | Performance | `/agents/performance[/skills · /plans · /llms]` | The fleet's numbers by agent, skill, plan and LLM |
 | Agents · Skills | `/agents/agents` · `/agents/skills` | One table each; a row opens its record as a tab |
-| Functions | `/agents/functions[/plans · /generated · /templates · /plugins]` | The catalogue by namespace, packaged and generated plans, templates, plugins |
+| Functions | `/agents/functions[/plans · /promoted · /templates · /plugins]` | The catalogue by namespace, packaged and promoted plans, templates, plugins |
 | Connections | `/agents/connections/mcp` | MCP servers, and *Add MCP server* |
 | LLMs | `/agents/llms[/:endpoint]` | Endpoints and model versions; an endpoint and *Add endpoint* are modals |
 | Settings | `/agents/settings` | The Graph's run ceiling and pools |
 
-`+` on the strip opens ⌘K. The old `?panel=` links for the Agents overview, library and plugins
+`+` on the strip opens ⌘K, and ⌘J opens or closes the assistant. The old `?panel=` links for the Agents overview, library and plugins
 are gone, and so is the plan canvas board kind: a plan opens as its page.

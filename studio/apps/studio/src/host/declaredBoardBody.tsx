@@ -1,13 +1,13 @@
 import { EmptyState, Spinner } from "@invana/ui";
 import {
 	AgentBoardPage,
+	FunctionPage,
 	PlanArgumentsPage,
 	PlanBoardPage,
 	PlanExportPage,
 	PlanVersionsPage,
 	PluginPage,
 	SkillBoardPage,
-	TaskTypePage,
 	TemplatePage,
 	UsageBoardPage,
 } from "@invana-studio/agents";
@@ -291,13 +291,14 @@ export function declaredBoardContent(
 		);
 	}
 
-	// The plugin registry's two pages — install-level, so neither takes the
-	// Graph. A task type on a plugin opens beside it, and back.
+	// The plugin registry's pages are install-level; a function's page also
+	// reads the Graph's catalogue for who uses it and how it fans out. A
+	// function on a plugin opens beside it, and back.
 	if (board.kind === "plugin") {
 		return (
 			<PluginPage
 				name={board.subjectId}
-				onOpenTaskType={(key) =>
+				onOpenFunction={(key) =>
 					openBoard({ kind: "task_type", subjectId: key })
 				}
 			/>
@@ -306,9 +307,14 @@ export function declaredBoardContent(
 
 	if (board.kind === "task_type") {
 		return (
-			<TaskTypePage
+			<FunctionPage
 				taskKey={board.subjectId}
+				username={username as string}
+				graphSlug={graphSlug as string}
 				onOpenPlugin={(name) => openBoard({ kind: "plugin", subjectId: name })}
+				onOpenFunction={(key) =>
+					openBoard({ kind: "task_type", subjectId: key })
+				}
 			/>
 		);
 	}

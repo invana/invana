@@ -56,11 +56,11 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("agents.functions.template", f"{G}/agents/functions/templates"),
     ("agents.functions.plugin", f"{G}/agents/functions/plugins"),
     ("agents.functions", f"{G}/agents/functions"),
-    ("agents.plans.detail", f"{G}/agents/functions/generated"),
-    ("agents.plans", f"{G}/agents/functions/generated"), ("agents.library", f"{G}/agents/functions/plans"),
+    ("agents.plans.detail", f"{G}/agents/functions/plans?page=plan_runs%3A0938814c-7522-42ec-acd2-2d52d3636a5a"),
+    ("agents.plans", f"{G}/agents/functions/promoted"), ("agents.library", f"{G}/agents/functions/plans"),
     ("agents.plugins", f"{G}/agents/functions/plugins"),
     ("agents.connections.mcp", f"{G}/agents/connections/mcp"),
-    ("agents.llms.endpoint", f"{G}/agents/llms/anthropic"), ("agents.llms", f"{G}/agents/llms"),
+    ("agents.llms.endpoint", f"{G}/agents/llms/85a79982-172c-4649-a7eb-2d14c9406182"), ("agents.llms", f"{G}/agents/llms"),
     ("agents.agents", f"{G}/agents/agents"), ("agents.agent", f"{G}/agents/agents?page=agent%3Aanalyst"),
     ("agents.skills.detail", f"{G}/agents/skills?page=skill%3Aanswer-nl"), ("agents.skills", f"{G}/agents/skills"),
     ("agents.settings", f"{G}/agents/settings"),
@@ -100,8 +100,8 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "shell.notifications.channels": "",
     "shell.run.rerun": f"{RUN} that answered a question or a query; Re-run… on its header",
     "shell.first_run": "an install with no Graph yet",
-    "agents.plans.detail": "open the first generated plan: its page opens as a tab after Functions",
-    "agents.llms.endpoint": "open any endpoint card: its modal opens in the path",
+    "agents.plans.detail": "the uuid stands for the newest nl-single flow's id: Functions › Packaged plans, click nl-single; its page opens as a tab after Functions",
+    "agents.llms.endpoint": "the uuid stands for an endpoint's id: open any endpoint card; its modal opens in the path",
     "agents.skills.detail.readonly": f"{SKILL}, signed in as e2e-viewer (a viewer on the Graph; e2e/roles-agents.spec.ts makes the account, its password is in e2e/members.ts)",
     "shell.profile.tokens": "Access tokens tab",
     "datasets.dataset": DATASET,
@@ -248,6 +248,11 @@ def main() -> None:
                 route = route_for(b)
                 if route is None or (variant and b not in STATE):
                     missing.append(b)
+                if (route and doc == "agent-fabric" and b.startswith("agents.") and not b.endswith(".closed")
+                        and b not in {"agents.home", "agents.open"}):
+                    # The Agents boards draw the assistant docked; `.closed` boards draw it closed,
+                    # and Home's composer is the assistant before a thread exists.
+                    route += ("&" if "?" in route else "?") + "right=assistant"
                 boards[b] = {"story": m.group(1), "product": doc, "route": route, "state": STATE.get(b, "")}
     (ROOT / "scripts" / "migration" / "screen-map.json").write_text(json.dumps({"boards": boards}, indent=1))
     stale = sorted(set(STATE) - set(boards))

@@ -1,7 +1,7 @@
 key = "stitch-preview"
 version = 1
 kind = "stitch"
-description = "Count what stitch rules resolve, under the Graph's guardrails (ST43)."
+description = "Count what stitch rules resolve, under the Graph's guardrails."
 intents = []
 
 [[steps]]

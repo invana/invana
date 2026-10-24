@@ -16,7 +16,6 @@ import {
 	Item,
 	ItemContent,
 	ItemDescription,
-	ItemMedia,
 	ItemTitle,
 } from "@invana/ui";
 import { type ListQuery, useGraphQuery } from "@invana-studio/core";
@@ -58,8 +57,8 @@ export function HomeTiles({
 }) {
 	const lines = useTileLines(username, graphSlug);
 	return (
-		<div className="flex w-full max-w-4xl flex-col gap-2">
-			<Eyebrow>Or open a section</Eyebrow>
+		<div className="flex w-full max-w-5xl flex-col gap-3">
+			<Eyebrow className="justify-center">Or open a section</Eyebrow>
 			<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 				{ORDER.map((key) => (
 					<Tile key={key} section={key} line={lines[key]} />
@@ -81,13 +80,15 @@ function Tile({
 	const Icon = spec.icon;
 	const go = () => open.section(section);
 	return (
-		<Item variant="outline" size="sm" asChild>
+		// The icon sits in the title row, and the tile reads from the top, so a
+		// one-line description and a two-line one start their titles level.
+		<Item variant="outline" size="sm" className="items-start" asChild>
 			<button type="button" onClick={go}>
-				<ItemMedia>
-					<Icon className="size-4" />
-				</ItemMedia>
 				<ItemContent>
-					<ItemTitle>{spec.label}</ItemTitle>
+					<ItemTitle>
+						<Icon className="size-4" />
+						{spec.label}
+					</ItemTitle>
 					<ItemDescription>{line}</ItemDescription>
 				</ItemContent>
 			</button>

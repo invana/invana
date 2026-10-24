@@ -1,7 +1,7 @@
 /**
- * **Promote a plan** — the workflow library's only write (docs/for-developers/modules/agents/spec.md).
+ * **Promote a plan** — the plan library's only write (docs/for-developers/modules/agents/spec.md).
  *
- * Authoring a workflow from scratch is post-MVP, because a spec drives dispatch
+ * Authoring a plan from scratch is post-MVP, because a spec drives dispatch
  * and authoring one is therefore an execution surface with its own threat
  * model. Promotion is the deliberate exception, and it is safe for a reason
  * worth stating: **the plan already ran, inside an envelope, and Verify said it
@@ -9,26 +9,35 @@
  * successfully gets a key and a version so the next promotion is diffable
  * against it (docs/for-developers/modules/workflows/features/promote-a-plan.md's review stage, applied to plans).
  *
- * That is why the picker offers candidates and nothing else. A free-text
+ * That is why the picker offers candidates and nothing else — a table of
+ * them, one row a run, every column a field the run list returns. A free-text
  * run id, or a list including plans that failed or were never verified,
- * would quietly turn this into the authoring surface MVP does not have.
+ * would quietly turn this into the authoring surface MVP does not have. The
+ * entry it makes lands under Functions › Promoted plans.
  */
 
+import { Field, FieldDescription, FieldLabel, Input } from "@invana/forms";
 import {
 	Button,
-	cn,
 	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
+	EmptyState,
 	Spinner,
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
 } from "@invana/ui";
 import type { TaskRunSummary } from "@invana-studio/core";
 import { ApiError } from "@invana-studio/core";
 import { useRunsQuery } from "@invana-studio/shell";
-import { DetailStatus } from "@invana-studio/ui";
+import { FormError } from "@invana-studio/ui";
 import { useState } from "react";
 import { usePromoteFlowMutation } from "./queries";
 import type { FlowDetail } from "./types";
@@ -81,7 +90,7 @@ export function PromoteDialog({
 				onOpenChange(next);
 			}}
 		>
-			<DialogContent className="max-w-lg">
+			<DialogContent className="max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>Promote a plan</DialogTitle>
 					<DialogDescription>
@@ -91,83 +100,100 @@ export function PromoteDialog({
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="space-y-3">
-					<div className="max-h-56 overflow-y-auto rounded-sm border">
-						{candidates.isLoading ? (
-							<div className="p-4">
-								<Spinner />
-							</div>
-						) : items.length === 0 ? (
-							<p className="p-4 text-base text-muted-foreground">
-								Nothing to promote yet. A candidate is a plan the engine
-								generated, that Verify said served, and that no entry already
-								claims.
-							</p>
-						) : (
-							items.map((item) => (
-								<button
-									key={item.id}
-									type="button"
-									onClick={() => {
-										setSelected(item);
-										setError(null);
-										if (!key && item.task_title)
-											setKey(slugify(item.task_title));
-									}}
-									className={cn(
-										"flex w-full items-start gap-2 border-b px-3 py-2 text-left last:border-b-0 hover:bg-accent",
-										selected?.id === item.id && "bg-accent",
-									)}
-								>
-									<span className="min-w-0 flex-1">
-										<span className="block truncate text-base text-foreground">
-											{item.task_title ?? item.flow_key}
-										</span>
-										<span className="block truncate text-base text-muted-foreground">
-											generated · {item.step_count} step
-											{item.step_count === 1 ? "" : "s"}
-											{item.replans
-												? ` · ${item.replans} replan${item.replans === 1 ? "" : "s"}`
-												: ""}
-											{item.finished_at
-												? ` · ${new Date(item.finished_at).toLocaleDateString()}`
-												: ""}
-										</span>
-									</span>
-									<DetailStatus tone="success">served</DetailStatus>
-								</button>
-							))
-						)}
-					</div>
+				<div className="flex flex-col gap-4">
+					{candidates.isLoading ? (
+						<div className="flex justify-center p-4">
+							<Spinner />
+						</div>
+					) : items.length === 0 ? (
+						<EmptyState
+							title="Nothing to promote yet"
+							description="A candidate is a plan the engine generated, that Verify said served, and that no entry already claims."
+						/>
+					) : (
+						<div className="max-h-56 overflow-y-auto rounded-sm border">
+							<Table density="compact">
+								<TableHeader>
+									<TableRow>
+										<TableHead className="w-full">Run</TableHead>
+										<TableHead className="whitespace-nowrap">
+											Plan it ran
+										</TableHead>
+										<TableHead>Exit</TableHead>
+										<TableHead className="text-right">Steps</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{items.map((item) => {
+										const isSelected = selected?.id === item.id;
+										return (
+											<TableRow
+												key={item.id}
+												className="cursor-pointer"
+												data-state={isSelected ? "selected" : undefined}
+												aria-selected={isSelected}
+												onClick={() => {
+													setSelected(item);
+													setError(null);
+													if (!key && item.task_title)
+														setKey(slugify(item.task_title));
+												}}
+											>
+												<TableCell className="max-w-0 truncate">
+													{item.task_title ?? item.body ?? item.id}
+												</TableCell>
+												<TableCell className="whitespace-nowrap font-mono">
+													{item.flow_key ?? "—"}
+												</TableCell>
+												<TableCell className="whitespace-nowrap">
+													{item.outcome ?? item.status}
+												</TableCell>
+												<TableCell className="text-right">
+													{item.step_count}
+												</TableCell>
+											</TableRow>
+										);
+									})}
+								</TableBody>
+							</Table>
+						</div>
+					)}
 
 					{selected ? (
 						<>
-							<label className="block text-base text-muted-foreground">
-								Key
-								<input
+							<Field>
+								<FieldLabel htmlFor="promote-key">Key</FieldLabel>
+								<Input
+									id="promote-key"
+									className="font-mono"
 									value={key}
 									onChange={(e) => setKey(e.target.value)}
 									placeholder="supplier-exposure"
-									className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 font-mono text-base text-foreground"
 								/>
-								<span className="mt-0.5 block text-base text-muted-foreground/80">
+								<FieldDescription>
 									Lower-case, digits and dashes. Reusing an existing key adds
 									the next version rather than overwriting it.
-								</span>
-							</label>
-							<label className="block text-base text-muted-foreground">
-								Description
-								<input
+								</FieldDescription>
+							</Field>
+							<Field>
+								<FieldLabel htmlFor="promote-description">
+									Description
+								</FieldLabel>
+								<Input
+									id="promote-description"
 									value={description}
 									onChange={(e) => setDescription(e.target.value)}
 									placeholder="What this plan does, in one line."
-									className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 text-base text-foreground"
 								/>
-							</label>
+							</Field>
+							<Field>
+								<FieldLabel htmlFor="promote-origin">Origin</FieldLabel>
+								<Input id="promote-origin" value="promoted" readOnly />
+							</Field>
 						</>
 					) : null}
 
-					{error ? <p className="text-base text-destructive">{error}</p> : null}
+					<FormError error={error} />
 				</div>
 
 				<DialogFooter>
@@ -192,10 +218,10 @@ export function PromoteDialog({
 									description: description.trim() || undefined,
 								},
 								{
-									onSuccess: (workflow) => {
+									onSuccess: (plan) => {
 										reset();
 										onOpenChange(false);
-										onPromoted?.(workflow);
+										onPromoted?.(plan);
 									},
 									onError: (err) =>
 										setError(

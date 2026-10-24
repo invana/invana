@@ -1,7 +1,7 @@
 key = "expand-neighbours"
 version = 1
 kind = "canvas"
-description = "Read one vertex's neighbours under the canvas session's lens (GC6 · GC9)."
+description = "Read one vertex's neighbours under the canvas session's lens."
 intents = []
 
 [[steps]]

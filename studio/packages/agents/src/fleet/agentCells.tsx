@@ -17,12 +17,15 @@ import {
 	tokens,
 } from "../overview/fleetParts";
 import type { FleetAgentRow } from "./agentRows";
+import type { PerformanceRow } from "./types";
 
 const NONE = <span className="text-muted-foreground">—</span>;
 
-/** `48s ▲ 38%` — p95 and its change against the 7 days before. */
-export function P95Cell({ row }: { row: FleetAgentRow }) {
-	const perf = row.perf;
+/**
+ * `48s ▲ 38%` — p95 and its change against its prior: the 7 days before for an
+ * agent, the previous version for a skill.
+ */
+export function P95Cell({ perf }: { perf: PerformanceRow | null }) {
 	if (!perf) return NONE;
 	const change = perf.p95_change;
 	return (

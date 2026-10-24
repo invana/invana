@@ -5,7 +5,8 @@
  * A template is to an answer what a plan is to a run: a definition, promoted
  * from what served. The engine returns a Graph's templates whole (its own and
  * the ones that ship with Invana), so the search and the kind and surface
- * presets narrow the rows on screen. *Accepts* is the shape a template
+ * presets — kept in the URL as `q`, `f.kind` and `f.surface`, shown as chips
+ * with *N of M match* and *Clear all* — narrow the rows on screen. *Accepts* is the shape a template
  * declares it can render, as the engine stores it. A row opens the template's page as a tab
  * beside this one; publishing and removing are taken there.
  */
@@ -20,6 +21,7 @@ import {
 	SelectValue,
 } from "@invana/forms";
 import {
+	Badge,
 	Button,
 	Dialog,
 	DialogContent,
@@ -38,10 +40,18 @@ import {
 	TableRow,
 	TypographyInlineCode,
 } from "@invana/ui";
+import type { Page } from "@invana-studio/core";
 import { ActButton } from "@invana-studio/shell";
 import { DetailStatus, FormError } from "@invana-studio/ui";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import {
+	FilteredEmpty,
+	filterValue,
+	ListStrip,
+	matchCount,
+	setOne,
+} from "../lists";
 import { useAgentsOpen } from "../open";
 import { RowsFailed, RowsLoading, useTabList } from "./shared";
 import {
@@ -49,6 +59,9 @@ import {
 	useTemplateMutations,
 	useTemplatesQuery,
 } from "./templates";
+
+/** What this tab reads from the URL: the search and its two presets. */
+const FIELDS = ["q", "kind", "surface"];
 
 const KIND_OPTIONS = [
 	{ value: "all", label: "All" },
@@ -71,18 +84,30 @@ export function TemplatesTab({
 	const open = useAgentsOpen();
 	const { list, search } = useTabList([]);
 	const templates = useTemplatesQuery(username, graphSlug);
-	const [kind, setKind] = useState("all");
-	const [surface, setSurface] = useState("all");
 	const [authoring, setAuthoring] = useState(false);
+	const kind = filterValue(list, "kind");
+	const surface = filterValue(list, "surface");
 
+	// `/templates` is not on the list contract yet, so the URL's search and
+	// presets narrow the rows here until the endpoint returns a `Page`.
 	const all = templates.data ?? [];
-	const q = search.trim().toLowerCase();
+	const q = (list.query.q ?? "").trim().toLowerCase();
 	const rows = all.filter(
 		(t) =>
 			(!q || `${t.name} ${t.surface} ${t.intent}`.toLowerCase().includes(q)) &&
-			(kind === "all" || t.kind === kind) &&
-			(surface === "all" || t.surface === surface),
+			(!kind || t.kind === kind) &&
+			(!surface || t.surface === surface),
 	);
+	const applied = list.pending.filter((f) => FIELDS.includes(f.field));
+	const page: Page<unknown> | undefined = templates.data
+		? {
+				items: rows,
+				total: rows.length,
+				unfiltered_total: all.length,
+				next_cursor: null,
+				applied,
+			}
+		: undefined;
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -94,44 +119,55 @@ export function TemplatesTab({
 					placeholder="Find a template"
 					className="w-72"
 				/>
+				{/* Presets of the `kind` and `surface` filters: picking one shows as its chip. */}
 				<SegmentedControl
 					size="xs"
 					options={KIND_OPTIONS}
-					value={kind}
-					onValueChange={setKind}
+					value={kind || "all"}
+					onValueChange={(v) => setOne(list, "kind", v === "all" ? "" : v)}
 					aria-label="Kind"
 				/>
 				<SegmentedControl
 					size="xs"
 					options={SURFACE_OPTIONS}
-					value={surface}
-					onValueChange={setSurface}
+					value={surface || "all"}
+					onValueChange={(v) => setOne(list, "surface", v === "all" ? "" : v)}
 					aria-label="Surface"
 				/>
+				{page ? (
+					<Badge variant="outline" tone="muted" size="xs" className="ml-auto">
+						{matchCount(page, "templates")}
+					</Badge>
+				) : null}
 				<ActButton
 					area="build"
 					size="sm"
 					variant="outline"
-					className="ml-auto"
+					className={page ? undefined : "ml-auto"}
 					onClick={() => setAuthoring(true)}
 				>
 					<Plus />
 					Author a template
 				</ActButton>
 			</div>
+			<ListStrip page={page} list={list} />
 			{templates.isLoading ? (
 				<RowsLoading />
 			) : templates.isError ? (
 				<RowsFailed what="The templates" error={templates.error} />
 			) : rows.length === 0 ? (
-				<EmptyState
-					title={all.length ? "No template matches" : "No templates yet"}
-					description={
-						all.length
-							? "Nothing in this Graph renders under that name, kind or surface."
-							: "A template decides what an answer looks like. Author one, or promote the one an answer already served with."
-					}
-				/>
+				applied.length ? (
+					<FilteredEmpty
+						noun="template"
+						filters={applied}
+						onClear={list.clear}
+					/>
+				) : (
+					<EmptyState
+						title="No templates yet"
+						description="A template decides what an answer looks like. Author one, or promote the one an answer already served with."
+					/>
+				)
 			) : (
 				<Table density="compact">
 					<TableHeader>

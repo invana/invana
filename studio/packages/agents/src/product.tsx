@@ -13,7 +13,7 @@
  * | Performance | `/agents/performance` | Agents · `skills` · `plans` · `llms` |
  * | Agents | `/agents/agents` | — |
  * | Skills | `/agents/skills` | — |
- * | Functions | `/agents/functions` | Functions · `plans` · `generated` · `templates` · `plugins` |
+ * | Functions | `/agents/functions` | Functions · `plans` · `promoted` · `templates` · `plugins` |
  * | Connections | `/agents/connections/mcp` | MCP servers |
  * | LLMs | `/agents/llms[/:provider]` | — an endpoint opens in a modal |
  * | Settings | `/agents/settings` | — |
@@ -116,7 +116,7 @@ export const agents: ProductDefinition = {
 				level(
 					"functions",
 					"Functions",
-					tabs("plans", "generated", "templates", "plugins"),
+					tabs("plans", "promoted", "templates", "plugins"),
 				),
 				level("connections", "Connections", tabs("mcp")),
 				// The endpoint's crumb is its name, which the host reads; the id is no label.

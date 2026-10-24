@@ -264,7 +264,7 @@ function rankWords(model: LLMModel): string {
 	const { cost_rank, power_rank } = model.capabilities;
 	return cost_rank == null && power_rank == null
 		? "unranked — the shipped cast reads it as mid"
-		: `cost ${cost_rank ?? "—"} · power ${power_rank ?? "—"}`;
+		: `tier ${cost_rank ?? "—"} · power ${power_rank ?? "—"}`;
 }
 
 /** The versions this endpoint offers, who pins each, and offering one more. */

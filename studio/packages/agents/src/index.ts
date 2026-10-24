@@ -33,8 +33,8 @@ export {
 	PlanVersionsPage,
 } from "./plans/boards/PlanRecordPages";
 export { useFlowsQuery } from "./plans/queries";
+export { FunctionPage } from "./plugins/FunctionPage";
 export { PluginPage } from "./plugins/PluginPage";
-export { TaskTypePage } from "./plugins/TaskTypePage";
 export { agents } from "./product";
 export { AgentsSectionBody } from "./sections/AgentsSectionBody";
 export {

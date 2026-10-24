@@ -7,11 +7,13 @@
  * - **Overview** (`/agents/fleet`) — the fleet dashboard: tiles for the
  *   agents, runs today, served over 7 days, tokens this month and what waits
  *   on you; *Needs attention* beside *Runs a day*; the *Agents* card
- *   ({@link FleetAgentsCard}) beside *Changed recently*.
+ *   ({@link FleetAgentsCard}) beside *Changed recently*. On a Graph nothing
+ *   has run on, *Start here* sits above them: ask the assistant to build an
+ *   agent, or write a skill first.
  * - **Map** (`/agents/fleet/map`) — agents → skills → function namespaces
  *   ({@link FleetMap}).
- * - **Table** (`/agents/fleet/table`) — every agent's numbers over 7 days
- *   ({@link FleetTable}).
+ * - **Table** (`/agents/fleet/table`) — every agent's or skill's numbers over
+ *   7 days ({@link FleetTable}).
  *
  * Nothing is decided here: every act opens the place it already lives — a
  * run, an agent or Performance as a workbook tab, Activity › Approvals, the
@@ -32,8 +34,13 @@ import {
 	MetricGrid,
 	MetricTile,
 } from "@invana/ui";
-import { activityPath, comparePath } from "@invana-studio/shell";
+import {
+	activityPath,
+	comparePath,
+	useRightSection,
+} from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
+import { Pencil, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { type AgentsOpen, useAgentsOpen } from "../open";
 import {
@@ -52,7 +59,7 @@ import { useFleetAgentRows } from "./agentRows";
 import { FleetAgentsCard } from "./FleetAgentsCard";
 import { FleetMap } from "./FleetMap";
 import { FleetTable } from "./FleetTable";
-import { useFleetOverviewQuery } from "./queries";
+import { useFleetOverviewQuery, useFleetPerformanceQuery } from "./queries";
 import type {
 	AttentionItem,
 	DayCount,
@@ -95,7 +102,7 @@ export function FleetSectionPage({
 				<FleetMap {...graph} />
 			) : tab === "table" ? (
 				<SectionBody>
-					<FleetTable {...graph} />
+					<FleetTable {...graph} overview={data} />
 				</SectionBody>
 			) : (
 				<SectionBody>
@@ -116,6 +123,14 @@ export function FleetSectionPage({
 
 function OverviewBody({ data, graph }: { data: FleetOverview; graph: Graph }) {
 	const agents = useFleetAgentRows(graph.username, graph.graphSlug);
+	// The longest window Performance reads, and the one before it: no runs in
+	// either is a Graph nothing has run on yet.
+	const longest = useFleetPerformanceQuery(
+		graph.username,
+		graph.graphSlug,
+		"90d",
+	).data?.tiles.runs;
+	const nothingRan = longest != null && !longest.value && !longest.prior;
 	return (
 		<>
 			<Tiles
@@ -123,6 +138,7 @@ function OverviewBody({ data, graph }: { data: FleetOverview; graph: Graph }) {
 				helpers={agents.page?.ephemeral}
 				tiles={data.tiles}
 			/>
+			{nothingRan ? <StartHere /> : null}
 			<div className="grid gap-3 lg:grid-cols-2">
 				<NeedsAttention items={data.attention} graph={graph} />
 				<RunsADay daily={data.daily} />
@@ -209,6 +225,40 @@ function Tiles({
 				captionTone={t.waiting > 0 ? "warning" : "muted"}
 			/>
 		</MetricGrid>
+	);
+}
+
+/**
+ * A Graph nothing has run on: the two ways in. The assistant drafts an agent
+ * on the right; a skill is written first in Skills.
+ */
+function StartHere() {
+	const right = useRightSection();
+	const open = useAgentsOpen();
+	return (
+		<PanelSection card title="Start here">
+			<div className="flex flex-col gap-2 py-1">
+				<p className="text-muted-foreground">
+					Nothing has run on this Graph yet. Tell the assistant what an agent
+					should do and it drafts one for you to review — or write the skill it
+					will be offered first.
+				</p>
+				<div className="flex flex-wrap gap-2">
+					<Button size="sm" onClick={() => right.open("assistant")}>
+						<Sparkles />
+						Ask the assistant to build one
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => open.section("skills")}
+					>
+						<Pencil />
+						Write a skill first
+					</Button>
+				</div>
+			</div>
+		</PanelSection>
 	);
 }
 

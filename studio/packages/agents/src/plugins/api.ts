@@ -1,10 +1,10 @@
 import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type {
+	FunctionRead,
 	McpServerRead,
 	PluginDetail,
 	PluginPage,
 	PluginSummary,
-	TaskTypeRead,
 } from "./types";
 
 const PLUGINS = "/api/v1/plugins";
@@ -42,6 +42,7 @@ export const pluginsApi = {
 			{ method: "POST" },
 		),
 
-	taskType: (ref: string) =>
-		request<TaskTypeRead>(`/api/v1/task-types/${encodeURIComponent(ref)}`),
+	/** One function by key; the engine's route is still `/task-types`. */
+	function: (ref: string) =>
+		request<FunctionRead>(`/api/v1/task-types/${encodeURIComponent(ref)}`),
 };

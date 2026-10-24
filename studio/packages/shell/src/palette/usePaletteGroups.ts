@@ -51,8 +51,9 @@ const PER_GROUP = 4;
  *
  * Each product's records are read once per opening (`open`), through its
  * definition's `search`, and matched here as the person types — no request
- * per keystroke. With nothing typed it lists the open product's entries, or
- * the Graphs when no product is open.
+ * per keystroke. With nothing typed it lists the open product's sections and
+ * its first records, then the Graph's newest runs as *Recent* — or the Graphs
+ * when no product is open.
  */
 export function usePaletteGroups(query: string, open: boolean) {
 	const products = useProducts();
@@ -133,12 +134,14 @@ export function usePaletteGroups(query: string, open: boolean) {
 		const entries = q
 			? rankByName(q, [...records, ...sections, ...commands], PER_GROUP)
 			: product === active
-				? [...commands, ...sections]
+				? [...commands, ...sections, ...records.slice(0, PER_GROUP)]
 				: [];
 		if (entries.length) groups.push({ heading: product.name, entries });
 	}
 
-	if (graph && q) {
+	// Typed, the runs are ranked as *Activity*; with nothing typed on a Graph's
+	// product, the newest are offered as *Recent*.
+	if (graph && (q || active?.scope === "graph")) {
 		const runEntries: PaletteEntry[] = (runs.data?.items ?? []).map((r) => {
 			const at = r.finished_at ?? r.started_at ?? r.queued_at;
 			return {
@@ -155,8 +158,11 @@ export function usePaletteGroups(query: string, open: boolean) {
 				run: () => navigate(activityPath(graph, "runs", r.id)),
 			};
 		});
-		const ranked = rankByName(q, runEntries, PER_GROUP);
-		if (ranked.length) groups.push({ heading: "Activity", entries: ranked });
+		const ranked = q
+			? rankByName(q, runEntries, PER_GROUP)
+			: runEntries.slice(0, PER_GROUP);
+		if (ranked.length)
+			groups.push({ heading: q ? "Activity" : "Recent", entries: ranked });
 	}
 
 	const graphEntries: PaletteEntry[] = (graphs.data?.items ?? [])

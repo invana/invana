@@ -28,10 +28,11 @@ export function usePluginQuery(name: string) {
 	});
 }
 
-export function useTaskTypeQuery(ref: string) {
+/** One function's manifest, its plugin and its calls over 30 days. */
+export function useFunctionQuery(ref: string) {
 	return useQuery({
-		queryKey: ["plugins", "task-type", ref],
-		queryFn: () => pluginsApi.taskType(ref),
+		queryKey: ["plugins", "function", ref],
+		queryFn: () => pluginsApi.function(ref),
 	});
 }
 

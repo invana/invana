@@ -1,7 +1,7 @@
 /**
  * Functions — every function agents may call, the plans made of them, the
  * templates that shape answers and the plugins they come from, as one page of
- * five tabs: Functions · Packaged plans · Generated plans · Templates ·
+ * five tabs: Functions · Packaged plans · Promoted plans · Templates ·
  * Plugins. The tab is the path's last segment.
  *
  * The head's chips are the engine's totals — the catalogue's, the library's
@@ -50,11 +50,11 @@ export function FunctionsSectionPage({
 			}
 		>
 			<SectionBody>
-				{tab === "plans" || tab === "generated" ? (
+				{tab === "plans" || tab === "promoted" ? (
 					<PlansTab
 						username={username}
 						graphSlug={graphSlug}
-						origin={tab === "plans" ? "packaged" : "generated"}
+						origin={tab === "plans" ? "packaged" : "promoted"}
 					/>
 				) : tab === "templates" ? (
 					<TemplatesTab username={username} graphSlug={graphSlug} />

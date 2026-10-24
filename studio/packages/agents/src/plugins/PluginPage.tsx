@@ -2,19 +2,19 @@
  * A plugin's page — `plugin:<name>` in `mainSection`, the Plugins stack
  * beside it.
  *
- * *As a builder, I want one plugin in full — the task types it declares, the
- * skills and flows it brings, and whether it may run — so that I know what a
- * plan gets by naming its task types.*
+ * *As a builder, I want one plugin in full — the functions it declares, the
+ * skills and plans it brings, and whether it may run — so that I know what a
+ * plan gets by naming its functions.*
  *
- * A record header with the plugin's kind, version and state, then its task
- * types (each opens `task_type:<key>`), its skills, its flows, and what it
- * needs to run: the pip extra and the secret names a worker may resolve.
- * Enable and Disable are offered only on a plugin the engine marks
- * `switchable`, and only to an install Admin; a core plugin always runs.
+ * A record header with the plugin's kind, version and state, then its
+ * functions (each opens `task_type:<key>`), its skills, its plans, and what
+ * it needs to run: the pip extra and the secret names a worker may resolve.
+ * Enable and Disable act only on a plugin the engine marks `switchable`, and
+ * only for an install Admin — anyone else sees the act drawn disabled,
+ * naming the role; a core plugin always runs.
  */
 
 import {
-	Button,
 	EmptyState,
 	PropertyList,
 	PropertyRow,
@@ -27,20 +27,19 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
-import { useAuth } from "@invana-studio/core";
 import { DetailStatus, FormError, PanelSection } from "@invana-studio/ui";
+import { PluginStateChip, PluginToggle } from "./PluginToggle";
 import { usePluginQuery, useSetPluginEnabledMutation } from "./queries";
 
 export function PluginPage({
 	name,
-	onOpenTaskType,
+	onOpenFunction,
 }: {
 	name: string;
-	onOpenTaskType?: (key: string) => void;
+	onOpenFunction?: (key: string) => void;
 }) {
 	const plugin = usePluginQuery(name);
 	const toggle = useSetPluginEnabledMutation(name);
-	const { isSuperuser } = useAuth();
 	const p = plugin.data;
 
 	if (plugin.isLoading)
@@ -62,33 +61,20 @@ export function PluginPage({
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
 				variant="page"
-				crumbs={["Plugins", p.name]}
+				crumbs={["Functions", p.name]}
 				chips={
 					<>
 						<DetailStatus>{p.kind}</DetailStatus>
 						<DetailStatus>v{p.version}</DetailStatus>
-						<DetailStatus>
-							{!p.installed
-								? "not installed"
-								: p.restart_required
-									? "restart to load"
-									: p.enabled
-										? "enabled"
-										: "disabled"}
-						</DetailStatus>
+						<PluginStateChip plugin={p} />
 					</>
 				}
 				actions={
-					p.switchable && p.installed && isSuperuser ? (
-						<Button
-							size="sm"
-							variant={p.enabled ? "ghost" : "default"}
-							disabled={toggle.isPending}
-							onClick={() => toggle.mutate(!p.enabled)}
-						>
-							{p.enabled ? "Disable" : "Enable"}
-						</Button>
-					) : null
+					<PluginToggle
+						plugin={p}
+						toggle={toggle}
+						variant={p.enabled ? "ghost" : "default"}
+					/>
 				}
 			/>
 			<div className="min-h-0 flex-1 overflow-y-auto p-3.5">
@@ -121,7 +107,7 @@ export function PluginPage({
 										<TableRow
 											key={t.key}
 											className="cursor-pointer"
-											onClick={() => onOpenTaskType?.(t.key)}
+											onClick={() => onOpenFunction?.(t.key)}
 										>
 											<TableCell className="font-mono">{t.key}</TableCell>
 											<TableCell>v{t.version}</TableCell>
@@ -149,7 +135,7 @@ export function PluginPage({
 						)}
 					</PanelSection>
 
-					<PanelSection card title="Flows" hint={`${p.flows.length}`}>
+					<PanelSection card title="Plans" hint={`${p.flows.length}`}>
 						{p.flows.length === 0 ? (
 							<p className="text-muted-foreground">It brings none.</p>
 						) : (

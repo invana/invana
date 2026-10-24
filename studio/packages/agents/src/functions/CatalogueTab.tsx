@@ -48,9 +48,20 @@ const BOUND_OPTIONS = [
 	...BOUNDS.map((b) => ({ value: b, label: b })),
 ];
 
-/** `graph.read.query` → `graph.read`; a one-segment key is its own namespace. */
-const namespaceOf = (key: string): string =>
-	key.includes(".") ? key.slice(0, key.lastIndexOf(".")) : key;
+/** Namespaces two segments deep: `graph.read` · `graph.stitch` · `mcp.<server>`. */
+const TWO_SEGMENT = new Set(["graph", "mcp"]);
+
+/**
+ * The library namespace a function belongs to — `graph.read.query` →
+ * `graph.read`, `mcp.figma.get_design_context` → `mcp.figma`,
+ * `data.bundle.check` → `data`, `science.pubmed.search` → `science`.
+ */
+function namespaceOf(key: string): string {
+	const parts = key.split(".");
+	return TWO_SEGMENT.has(parts[0]) && parts.length > 2
+		? `${parts[0]}.${parts[1]}`
+		: parts[0];
+}
 
 export function CatalogueTab({
 	username,

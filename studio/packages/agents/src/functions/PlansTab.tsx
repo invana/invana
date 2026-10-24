@@ -1,23 +1,24 @@
 /**
- * Functions › Packaged plans and Generated plans — the plan library, split by
+ * Functions › Packaged plans and Promoted plans — the plan library, split by
  * where a plan came from.
  *
  * *Packaged* is what came with Invana or a plugin (`origin=packaged`);
- * *Generated* is what this Graph made — a plan that served and was promoted,
+ * *Promoted* is what this Graph made — a plan that served and was promoted,
  * or one authored before promotion was the way in (`origin=promoted ·
- * authored`). A one-off plan belongs to its Todo and is never listed. The
- * engine searches and filters; a row opens the plan's page — its flow, its
- * versions, its export — as a tab beside this one.
+ * authored`). A one-off `generated` plan belongs to its Todo and is never
+ * listed. The engine searches and filters; a row opens the plan's page — its
+ * flow, its versions, its export — as a tab beside this one.
  *
- * The bands a plan engages are on the row, because *what will this cost me*
+ * The layers a plan engages are on the row, because *what will this cost me*
  * is the question a library is scanned with. Packaged plans open under a
- * banner saying how one is called; Generated plans say they are never drawn
- * by hand, and carry when each last ran.
+ * banner saying how one is called; Promoted plans say they are never drawn
+ * by hand, carry when each last ran, and offer *Promote a plan*.
  */
 
 import {
 	Alert,
 	AlertDescription,
+	EmptyState,
 	type Layer,
 	LayerChip,
 	SearchInput,
@@ -30,10 +31,13 @@ import {
 	TypographyInlineCode,
 } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
+import { ActButton } from "@invana-studio/shell";
 import { LAYER_PALETTE, layerSlug } from "@invana-studio/ui";
-import { GitBranch } from "lucide-react";
+import { GitBranch, Plus } from "lucide-react";
+import { useState } from "react";
 import { FilteredEmpty } from "../lists";
 import { useAgentsOpen } from "../open";
+import { PromoteDialog } from "../plans/PromoteDialog";
 import { useFlowsQuery } from "../plans/queries";
 import type { FlowSummary } from "../plans/types";
 import { RowsFailed, RowsLoading, useTabList } from "./shared";
@@ -41,7 +45,7 @@ import { RowsFailed, RowsLoading, useTabList } from "./shared";
 /** The origins each tab lists. */
 const ORIGINS = {
 	packaged: ["packaged"],
-	generated: ["promoted", "authored"],
+	promoted: ["promoted", "authored"],
 } as const;
 
 export function PlansTab({
@@ -61,11 +65,23 @@ export function PlansTab({
 		sort: "key",
 	});
 	const rows = plans.data?.items ?? [];
-	const generated = origin === "generated";
+	const promoted = origin === "promoted";
+	const [promoting, setPromoting] = useState(false);
+	const promoteButton = (
+		<ActButton
+			area="build"
+			size="sm"
+			variant="outline"
+			onClick={() => setPromoting(true)}
+		>
+			<Plus />
+			Promote a plan
+		</ActButton>
+	);
 
 	return (
 		<div className="flex flex-col gap-2">
-			{generated ? null : (
+			{promoted ? null : (
 				<Alert tone="info">
 					<GitBranch className="size-4" />
 					<AlertDescription>
@@ -82,10 +98,13 @@ export function PlansTab({
 					placeholder="Search plans by name or key"
 					className="w-72"
 				/>
-				{generated ? (
-					<span className="ml-auto text-muted-foreground">
-						Plans are generated, never drawn by hand
-					</span>
+				{promoted ? (
+					<>
+						<span className="ml-auto text-muted-foreground">
+							Plans are generated, never drawn by hand
+						</span>
+						{promoteButton}
+					</>
 				) : null}
 			</div>
 			{plans.isLoading ? (
@@ -99,12 +118,14 @@ export function PlansTab({
 						filters={list.pending}
 						onClear={list.clear}
 					/>
+				) : promoted ? (
+					<EmptyState
+						title="No promoted plans yet"
+						description="A plan the engine generated, that served, becomes a library entry when it is promoted."
+						actions={promoteButton}
+					/>
 				) : (
-					<p className="p-3 text-muted-foreground">
-						{generated
-							? "No generated plans yet. A plan that served is promoted from Promote a plan."
-							: "No packaged plans in this Graph."}
-					</p>
+					<EmptyState title="No packaged plans in this Graph" />
 				)
 			) : (
 				<Table density="compact">
@@ -112,16 +133,14 @@ export function PlansTab({
 						<TableRow>
 							<TableHead>Plan</TableHead>
 							<TableHead className="w-full">What it does</TableHead>
-							{generated ? <TableHead>Origin</TableHead> : null}
+							{promoted ? <TableHead>Origin</TableHead> : null}
 							<TableHead>Kind</TableHead>
 							<TableHead>Steps</TableHead>
-							<TableHead className="whitespace-nowrap">
-								Bounds spanned
-							</TableHead>
+							<TableHead>Layers</TableHead>
 							<TableHead className="whitespace-nowrap">Used by</TableHead>
 							<TableHead className="text-right">Runs</TableHead>
 							<TableHead>Served</TableHead>
-							{generated ? (
+							{promoted ? (
 								<TableHead className="whitespace-nowrap">Last run</TableHead>
 							) : null}
 						</TableRow>
@@ -131,24 +150,33 @@ export function PlansTab({
 							<PlanRow
 								key={p.id}
 								plan={p}
-								generated={generated}
+								promoted={promoted}
 								onOpen={() => open.plan(p.id)}
 							/>
 						))}
 					</TableBody>
 				</Table>
 			)}
+			{promoted ? (
+				<PromoteDialog
+					username={username}
+					graphSlug={graphSlug}
+					open={promoting}
+					onOpenChange={setPromoting}
+					onPromoted={(plan) => open.plan(plan.id)}
+				/>
+			) : null}
 		</div>
 	);
 }
 
 function PlanRow({
 	plan: p,
-	generated,
+	promoted,
 	onOpen,
 }: {
 	plan: FlowSummary;
-	generated: boolean;
+	promoted: boolean;
 	onOpen: () => void;
 }) {
 	return (
@@ -159,7 +187,7 @@ function PlanRow({
 				</TypographyInlineCode>
 			</TableCell>
 			<TableCell>{p.description || p.name}</TableCell>
-			{generated ? <TableCell>{p.origin}</TableCell> : null}
+			{promoted ? <TableCell>{p.origin}</TableCell> : null}
 			<TableCell>{p.kind}</TableCell>
 			<TableCell>{p.step_count}</TableCell>
 			<TableCell className="whitespace-nowrap">
@@ -186,7 +214,7 @@ function PlanRow({
 				{/* Never 0%: *never verified* and *verified and failed* are different facts. */}
 				{p.served_rate == null ? "—" : `${Math.round(p.served_rate * 100)}%`}
 			</TableCell>
-			{generated ? (
+			{promoted ? (
 				<TableCell className="whitespace-nowrap text-muted-foreground">
 					{p.last_run_at ? formatRelativeTime(new Date(p.last_run_at)) : "—"}
 				</TableCell>

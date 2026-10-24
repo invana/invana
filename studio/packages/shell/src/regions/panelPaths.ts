@@ -83,9 +83,9 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	{ path: "agents/functions", panel: "functions", section: "functions" },
 	{ path: "agents/functions/plans", panel: "functions", section: "plans" },
 	{
-		path: "agents/functions/generated",
+		path: "agents/functions/promoted",
 		panel: "functions",
-		section: "generated",
+		section: "promoted",
 	},
 	{
 		path: "agents/functions/templates",

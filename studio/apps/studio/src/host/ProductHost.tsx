@@ -38,7 +38,8 @@ import {
 	useRightSection,
 	useRunStep,
 } from "@invana-studio/shell";
-import { useCallback, useRef, useState } from "react";
+import { BoardGround } from "@invana-studio/ui";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { assistantSlots } from "@/host/assistantSlots";
 import { OpenBoardContext } from "@/host/boards";
@@ -366,12 +367,22 @@ export function ProductHost() {
 		workPageId: workCanvas ? layered.workPageId : null,
 	});
 
+	// With the assistant docked there is one question box already: Agents'
+	// Home keeps its tiles and drops its own composer.
+	const homeTiles =
+		agentsOpen && username && graphSlug ? (
+			<AgentsOpenContext.Provider value={agentsSections.openers}>
+				<HomeTiles username={username} graphSlug={graphSlug} />
+			</AgentsOpenContext.Provider>
+		) : null;
 	const homeStart =
-		username &&
-		graphSlug &&
-		!connectionMissing &&
-		!right.is("assistant") &&
-		(explorerOpen || agentsOpen || !settingsPanel.isOpen) ? (
+		homeTiles && right.is("assistant") ? (
+			<BoardGround className="gap-4 p-6">{homeTiles}</BoardGround>
+		) : username &&
+			graphSlug &&
+			!connectionMissing &&
+			!right.is("assistant") &&
+			(explorerOpen || agentsOpen || !settingsPanel.isOpen) ? (
 			<AssistantStart
 				asking={assistantShown}
 				username={username}
@@ -415,17 +426,15 @@ export function ProductHost() {
 					dataBoards.handleOpenSession(id);
 				}}
 				{...(agentsOpen && {
+					// The ask is about the product on this Graph, not a query of it.
+					context: ["Agents", graphContainer?.name ?? graphSlug],
 					heading: "What should your agents do?",
 					placeholder:
 						"Ask about your agents, draft a skill, or open a section…",
 					recent: false,
 				})}
 			>
-				{agentsOpen ? (
-					<AgentsOpenContext.Provider value={agentsSections.openers}>
-						<HomeTiles username={username} graphSlug={graphSlug} />
-					</AgentsOpenContext.Provider>
-				) : null}
+				{homeTiles}
 			</AssistantStart>
 		) : undefined;
 
@@ -462,18 +471,40 @@ export function ProductHost() {
 	// The pill that reopens a closed conversation floats over the data canvas
 	// it belongs to — never over a declared board or the home page.
 	const dataBoardInFront = parseBoardPageId(strip.activeId)?.kind === "data";
+	// On Agents, a page in front (a section or a record) is what the pill asks about.
+	const agentsPageInFront =
+		agentsOpen && strip.activeId !== AGENTS_HOME_ID
+			? strip.pages.find((p) => p.id === strip.activeId)
+			: undefined;
 	const reopenPill =
 		assistantShown &&
-		dataBoardInFront &&
-		activeSessionId &&
-		!right.is("assistant") ? (
+		!right.is("assistant") &&
+		((dataBoardInFront && activeSessionId) || agentsPageInFront) ? (
 			<div className="absolute right-16 bottom-4 z-10">
 				<AssistantReopenPill
-					title={sessionTitleById.get(activeSessionId) ?? ""}
+					title={
+						activeSessionId ? (sessionTitleById.get(activeSessionId) ?? "") : ""
+					}
+					ask={agentsPageInFront ? String(agentsPageInFront.title) : undefined}
 					onOpen={() => right.open("assistant")}
 				/>
 			</div>
 		) : null;
+
+	// ⌘J opens or closes the assistant from anywhere on the page.
+	const toggleAssistant = right.toggle;
+	useEffect(() => {
+		if (!assistantShown) return;
+		const onKey = (event: KeyboardEvent) => {
+			if (event.key.toLowerCase() !== "j") return;
+			if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey)
+				return;
+			event.preventDefault();
+			toggleAssistant("assistant");
+		};
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, [assistantShown, toggleAssistant]);
 
 	// The right side's occupant, and the header controls and `footer`.
 	const regionDeps = {

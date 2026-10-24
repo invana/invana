@@ -4,7 +4,7 @@ import { cypher } from "@codemirror/legacy-modes/mode/cypher";
 import { groovy } from "@codemirror/legacy-modes/mode/groovy";
 import { Annotation, Compartment, EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
-import { Button, ChatSessionComposer, RichSelect } from "@invana/ui";
+import { Badge, Button, ChatSessionComposer, RichSelect } from "@invana/ui";
 import type {
 	QueryLanguage,
 	QueryMode,
@@ -240,6 +240,10 @@ export interface SessionComposerProps {
 	takesAsk?: boolean;
 	/** The input's prompt — the start asks, the docked chat follows up. */
 	placeholder?: string;
+	/** What the ask is about, as chips (`Agents · airways`). Given, the
+	 *  toolbar draws them in place of the ask kind, world and agent: the ask
+	 *  is a question about the product, not a query of the Graph. */
+	context?: readonly string[];
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -270,6 +274,7 @@ export function SessionComposer({
 	onAskKindChange,
 	takesAsk = true,
 	placeholder = "Ask a follow-up, or say what to draw…",
+	context,
 }: SessionComposerProps) {
 	const isModeller = surface === "modeller";
 	const [mode, setMode] = useState<QueryMode>("nl");
@@ -579,7 +584,20 @@ export function SessionComposer({
 	// Every control is the kit's inline `RichSelect`, opening upward:
 	// ask kind (Ask · Cypher · Gremlin) · world · agent — the agent last,
 	// because it is who answers, and the world is where it looks.
-	const toolbarStart = (
+	const toolbarStart = context ? (
+		<>
+			{context.map((chip) => (
+				<Badge key={chip} variant="secondary" className="shrink-0">
+					{chip}
+				</Badge>
+			))}
+			{noLlmProviders && (
+				<span className="text-muted-foreground px-1 truncate">
+					No model — add one in Agents › LLMs.
+				</span>
+			)}
+		</>
+	) : (
 		<>
 			{/* Modeller sessions author a model — NL only, so the kind is hidden
 			    (QL is unreachable). */}

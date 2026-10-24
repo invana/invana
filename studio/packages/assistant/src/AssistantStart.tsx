@@ -34,6 +34,7 @@ interface AssistantStartProps
 		| "isRunning"
 		| "agentName"
 		| "agentStatus"
+		| "context"
 	> {
 	username: string;
 	graphSlug: string;

@@ -179,8 +179,8 @@ function skillColumns(perf: Map<string, PerformanceRow>): ColumnDef<Skill>[] {
 			cell: ({ row }) => <StateBadge skill={row.original} />,
 		},
 		{
-			id: "functions",
-			header: "Functions",
+			id: "plan",
+			header: "Plan",
 			cell: ({ row }) => {
 				const plan = row.original.plan;
 				if (!plan) return <span className="text-muted-foreground">—</span>;

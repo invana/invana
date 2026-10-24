@@ -12,41 +12,87 @@
  *   `graph.read.*`), from each published skill's offered plan; *needs*.
  *
  * The legend floats over the map: what each colour and line means, how many
- * of each the map draws, and a switch per type that hides it. A click on an
- * agent or a skill opens its page as a workbook tab. A draft skill is offered
- * nothing, and a plan of only human steps calls no function, so neither
- * reaches a namespace. Pools join the map when Workers holds them.
+ * of each the map draws, and a switch per type that hides it.
+ *
+ * A click selects. The selected node's inspector takes the legend's place —
+ * what it is, what it is wired to, and *Open*, which opens its page as a
+ * workbook tab — and the map highlights what it reaches: the lines it is on
+ * drawn in the accent, everything off them faded.
+ *
+ * The console under the map is its **Table**: one row per node the map draws,
+ * of the type picked on its left. A row selects its node. A draft skill is
+ * offered nothing, and a plan of only human steps calls no function, so
+ * neither reaches a namespace. Pools join the map when Workers holds them.
  */
 
-import { Eyebrow, FloatingPanel, Legend, LegendItem } from "@invana/ui";
+import { type ColumnDef, DataTable } from "@invana/tables";
+import {
+	Button,
+	Eyebrow,
+	FloatingPanel,
+	Item,
+	ItemActions,
+	ItemContent,
+	ItemGroup,
+	ItemTitle,
+	Legend,
+	LegendItem,
+	PropertyList,
+	PropertyRow,
+	TabbedPanel,
+} from "@invana/ui";
 import {
 	LayeredCanvas,
 	type LayeredEdge,
 	type LayeredNode,
 } from "@invana-studio/canvases";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useAgentsQuery } from "../agents/queries";
 import type { Agent } from "../agents/types";
 import { PAGE } from "../lists";
 import { useAgentsOpen } from "../open";
 import { FleetReadState } from "../overview/fleetParts";
 import { useSkillPlaybooksQuery, useSkillsQuery } from "../skills/queries";
 import type { Skill, SkillPlaybookRead } from "../skills/types";
+import { BudgetCell, StatusCell } from "./agentCells";
+import { type FleetAgentRow, useFleetAgentRows } from "./agentRows";
 
 const LIST = { limit: PAGE };
 
 /** A node id's prefix — the column it sits in. */
 type Column = "agent" | "skill" | "ns";
 
-const COLUMNS: { kind: Column; label: string; color: string }[] = [
-	{ kind: "agent", label: "Agent", color: "var(--color-success)" },
-	{ kind: "skill", label: "Skill", color: "var(--color-success)" },
-	{ kind: "ns", label: "Namespace", color: "var(--color-muted-foreground)" },
+const COLUMNS: {
+	kind: Column;
+	label: string;
+	plural: string;
+	color: string;
+}[] = [
+	{
+		kind: "agent",
+		label: "Agent",
+		plural: "Agents",
+		color: "var(--color-success)",
+	},
+	{
+		kind: "skill",
+		label: "Skill",
+		plural: "Skills",
+		color: "var(--color-info)",
+	},
+	{
+		kind: "ns",
+		label: "Namespace",
+		plural: "Namespaces",
+		color: "var(--color-muted-foreground)",
+	},
 ];
 
 /** `graph.read.query` → `graph.read`; a key with no dot is its own namespace. */
 const namespaceOf = (key: string) =>
 	key.includes(".") ? key.slice(0, key.lastIndexOf(".")) : key;
+
+const NONE = <span className="text-muted-foreground">—</span>;
 
 export function FleetMap({
 	username,
@@ -56,79 +102,136 @@ export function FleetMap({
 	graphSlug: string;
 }) {
 	const open = useAgentsOpen();
-	const agents = useAgentsQuery(username, graphSlug, LIST);
+	const agents = useFleetAgentRows(username, graphSlug);
 	const skills = useSkillsQuery(username, graphSlug, LIST);
 	const skillRows = useMemo(() => skills.data?.items ?? [], [skills.data]);
 	const { plans } = useSkillPlaybooksQuery(username, graphSlug, skillRows);
 	const [hidden, setHidden] = useState<ReadonlySet<Column>>(new Set());
 	const [folded, setFolded] = useState(false);
+	const [selected, setSelected] = useState<string | null>(null);
+	const [consoleFolded, setConsoleFolded] = useState(false);
+	const [consoleType, setConsoleType] = useState<Column>("agent");
 
-	const graph = useMemo(
-		() => fleetGraph(agents.data?.items ?? [], skillRows, plans),
-		[agents.data, skillRows, plans],
+	const fleet = useMemo(
+		() => fleetModel(agents.rows, skillRows, plans),
+		[agents.rows, skillRows, plans],
 	);
-	const shown = useMemo(() => withoutHidden(graph, hidden), [graph, hidden]);
+	const shown = useMemo(
+		() => withReach(withoutHidden(fleet.graph, hidden), selected),
+		[fleet.graph, hidden, selected],
+	);
 
 	const error = agents.error ?? skills.error;
-	if (agents.isLoading || skills.isLoading || error)
+	if (agents.loading || skills.isLoading || error)
 		return (
 			<div className="p-3">
 				<FleetReadState
-					loading={agents.isLoading || skills.isLoading}
+					loading={agents.loading || skills.isLoading}
 					error={error}
 					what="the fleet"
 				/>
 			</div>
 		);
 
-	const toggle = (kind: Column) =>
+	const toggle = (kind: Column) => {
 		setHidden((prev) => {
 			const next = new Set(prev);
 			if (next.has(kind)) next.delete(kind);
 			else next.add(kind);
 			return next;
 		});
+		if (selected && splitId(selected)[0] === kind) setSelected(null);
+	};
+	const select = (nodeId: string | null) =>
+		setSelected(
+			nodeId && shown.nodes.some((n) => n.id === nodeId) ? nodeId : null,
+		);
 
 	return (
-		<div className="relative h-full min-h-0">
-			<LayeredCanvas
-				kind="data"
-				// Three piles in reading order; layering moves them for no reason.
-				layout="fixed"
-				nodes={shown.nodes}
-				edges={shown.edges}
-				selectedNodeId={null}
-				onSelectNode={(_, node) => {
-					const [kind, id] = splitId(node?.id);
-					if (kind === "agent") open.agent(id);
-					else if (kind === "skill") open.skill(id);
-				}}
-				emptyHint={
-					graph.nodes.length
-						? "Every type is hidden — show one in the legend."
-						: "No agents yet — an agent and the skills it is offered draw here."
-				}
-			/>
-			{graph.nodes.length ? (
-				<FloatingPanel
-					className="absolute top-3 right-3 w-64"
-					bodyClassName="px-3 py-2"
-					title="Legend"
-					aside={
-						<span className="text-muted-foreground">
-							{COLUMNS.length + 2} types
-						</span>
+		<div className="flex h-full min-h-0 flex-col">
+			<div className="relative min-h-0 flex-1">
+				<LayeredCanvas
+					kind="data"
+					// Three piles in reading order; layering moves them for no reason.
+					layout="fixed"
+					nodes={shown.nodes}
+					edges={shown.edges}
+					selectedNodeId={selected}
+					onSelectNode={(id) => select(id)}
+					emptyHint={
+						fleet.graph.nodes.length
+							? "Every type is hidden — show one in the legend."
+							: "No agents yet — an agent and the skills it is offered draw here."
 					}
-					collapsed={folded}
-					onCollapsedChange={setFolded}
-					footer={
-						<span className="text-muted-foreground">
-							Click a type to hide it on the map.
-						</span>
-					}
+				/>
+				{selected ? (
+					<Inspector
+						nodeId={selected}
+						fleet={fleet}
+						onClose={() => setSelected(null)}
+						onOpen={(kind, id) =>
+							kind === "agent" ? open.agent(id) : open.skill(id)
+						}
+					/>
+				) : fleet.graph.nodes.length ? (
+					<FloatingPanel
+						className="absolute top-3 right-3 w-64"
+						bodyClassName="px-3 py-2"
+						title="Legend"
+						aside={
+							<span className="text-muted-foreground">
+								{COLUMNS.length + 3} types
+							</span>
+						}
+						collapsed={folded}
+						onCollapsedChange={setFolded}
+						footer={
+							<span className="text-muted-foreground">
+								Click a type to hide it on the map.
+							</span>
+						}
+					>
+						<MapLegend graph={fleet.graph} hidden={hidden} onToggle={toggle} />
+					</FloatingPanel>
+				) : null}
+			</div>
+			{fleet.graph.nodes.length ? (
+				<div
+					className={consoleFolded ? "h-control-md shrink-0" : "h-72 shrink-0"}
 				>
-					<MapLegend graph={graph} hidden={hidden} onToggle={toggle} />
-				</FloatingPanel>
+					<TabbedPanel
+						className="border-x-0 border-b-0"
+						tabs={[
+							{
+								value: "table",
+								label: "Table",
+								content: (
+									<MapTable
+										fleet={fleet}
+										type={consoleType}
+										onType={setConsoleType}
+										hidden={hidden}
+										selected={selected}
+										onSelect={select}
+									/>
+								),
+							},
+						]}
+						headerActions={[
+							consoleFolded
+								? {
+										name: "Show the console",
+										icon: ChevronUp,
+										onClick: () => setConsoleFolded(false),
+									}
+								: {
+										name: "Fold the console",
+										icon: ChevronDown,
+										onClick: () => setConsoleFolded(true),
+									},
+						]}
+					/>
+				</div>
 			) : null}
 		</div>
 	);
@@ -175,7 +278,12 @@ function MapLegend({
 				<LegendItem
 					kind="dot"
 					color="var(--color-muted-foreground)"
-					label="agent · retired · skill · draft"
+					label="agent · retired"
+				/>
+				<LegendItem
+					kind="dot"
+					color="var(--color-muted-foreground)"
+					label="skill · draft"
 				/>
 			</Legend>
 			<Eyebrow>Relationships</Eyebrow>
@@ -195,6 +303,307 @@ function MapLegend({
 			</Legend>
 		</div>
 	);
+}
+
+/** The selected node: what it is, what it is wired to, and the act that opens it. */
+function Inspector({
+	nodeId,
+	fleet,
+	onClose,
+	onOpen,
+}: {
+	nodeId: string;
+	fleet: FleetModel;
+	onClose: () => void;
+	onOpen: (kind: "agent" | "skill", id: string) => void;
+}) {
+	const [kind, id] = splitId(nodeId);
+	const agent =
+		kind === "agent" ? fleet.agents.find((a) => a.row.agent.id === id) : null;
+	const skill =
+		kind === "skill" ? fleet.skills.find((s) => s.skill.id === id) : null;
+	const ns = kind === "ns" ? fleet.namespaces.find((n) => n.ns === id) : null;
+	const words = (names: string[]) => (names.length ? names.join(" · ") : NONE);
+
+	const title = agent?.row.agent.name ?? skill?.skill.name ?? `${id}.*`;
+	const aside = agent
+		? `agent · ${agent.row.agent.kind}`
+		: skill
+			? "skill"
+			: "namespace";
+	const act = agent
+		? () => onOpen("agent", agent.row.agent.id)
+		: skill
+			? () => onOpen("skill", skill.skill.id)
+			: null;
+
+	return (
+		<FloatingPanel
+			className="absolute top-3 right-3 w-80"
+			bodyClassName="px-3 py-2"
+			title={title}
+			aside={<span className="text-muted-foreground">{aside}</span>}
+			onClose={onClose}
+			footer={
+				act ? (
+					<div className="flex justify-end">
+						<Button size="sm" onClick={act}>
+							Open
+						</Button>
+					</div>
+				) : undefined
+			}
+		>
+			<PropertyList>
+				{agent ? (
+					<>
+						<PropertyRow label="Now">
+							<StatusCell row={agent.row} />
+						</PropertyRow>
+						<PropertyRow label="Version">
+							v{agent.row.agent.version}
+						</PropertyRow>
+						<PropertyRow label="Skills">{words(agent.skills)}</PropertyRow>
+						<PropertyRow label="Budget">
+							<BudgetCell row={agent.row} />
+						</PropertyRow>
+					</>
+				) : skill ? (
+					<>
+						<PropertyRow label="Version">
+							{skillVersion(skill.skill)}
+						</PropertyRow>
+						<PropertyRow label="Plan">{planWords(skill.skill)}</PropertyRow>
+						<PropertyRow label="Used by">{words(skill.usedBy)}</PropertyRow>
+						<PropertyRow label="Needs">
+							{words(skill.needs.map((n) => `${n}.*`))}
+						</PropertyRow>
+					</>
+				) : ns ? (
+					<>
+						<PropertyRow label="Functions" mono>
+							{words(ns.functions)}
+						</PropertyRow>
+						<PropertyRow label="Needed by">{words(ns.neededBy)}</PropertyRow>
+					</>
+				) : null}
+			</PropertyList>
+		</FloatingPanel>
+	);
+}
+
+/** The console's Table: the type list on the left, its rows on the right. */
+function MapTable({
+	fleet,
+	type,
+	onType,
+	hidden,
+	selected,
+	onSelect,
+}: {
+	fleet: FleetModel;
+	type: Column;
+	onType: (type: Column) => void;
+	hidden: ReadonlySet<Column>;
+	selected: string | null;
+	onSelect: (nodeId: string) => void;
+}) {
+	// The rows the map draws — a small list, fully on screen.
+	const counts: Record<Column, number> = {
+		agent: fleet.agents.length,
+		skill: fleet.skills.length,
+		ns: fleet.namespaces.length,
+	};
+	// The selected node's row, marked the way a selected list row is.
+	const marked = (nodeId: string) =>
+		nodeId === selected ? "bg-accent" : undefined;
+	const pick = (nodeId: string) => {
+		if (!hidden.has(splitId(nodeId)[0] as Column)) onSelect(nodeId);
+	};
+	return (
+		<div className="grid h-full min-h-0 grid-cols-[12rem_minmax(0,1fr)]">
+			<ItemGroup className="border-r p-1">
+				{COLUMNS.map((c) => (
+					<Item
+						key={c.kind}
+						size="xs"
+						selected={c.kind === type}
+						aria-selected={c.kind === type}
+						asChild
+					>
+						<button type="button" onClick={() => onType(c.kind)}>
+							<ItemContent>
+								<ItemTitle>{c.label}</ItemTitle>
+							</ItemContent>
+							<ItemActions className="text-muted-foreground">
+								{counts[c.kind]}
+							</ItemActions>
+						</button>
+					</Item>
+				))}
+			</ItemGroup>
+			<div className="min-h-0 overflow-auto">
+				{type === "agent" ? (
+					<DataTable
+						columns={AGENT_COLUMNS}
+						data={fleet.agents}
+						enableSorting={false}
+						getRowId={(row) => `agent:${row.row.agent.id}`}
+						rowClassName={(row) => marked(`agent:${row.row.agent.id}`)}
+						onRowClick={(row) => pick(`agent:${row.row.agent.id}`)}
+						emptyState="No agents on the map"
+					/>
+				) : type === "skill" ? (
+					<DataTable
+						columns={SKILL_COLUMNS}
+						data={fleet.skills}
+						enableSorting={false}
+						getRowId={(row) => `skill:${row.skill.id}`}
+						rowClassName={(row) => marked(`skill:${row.skill.id}`)}
+						onRowClick={(row) => pick(`skill:${row.skill.id}`)}
+						emptyState="No agent is offered a skill yet"
+					/>
+				) : (
+					<DataTable
+						columns={NS_COLUMNS}
+						data={fleet.namespaces}
+						enableSorting={false}
+						getRowId={(row) => `ns:${row.ns}`}
+						rowClassName={(row) => marked(`ns:${row.ns}`)}
+						onRowClick={(row) => pick(`ns:${row.ns}`)}
+						emptyState="No published plan calls a function yet"
+					/>
+				)}
+			</div>
+		</div>
+	);
+}
+
+const AGENT_COLUMNS: ColumnDef<AgentLine>[] = [
+	{
+		id: "agent",
+		header: "Agent",
+		cell: ({ row }) => (
+			<span className="font-medium">{row.original.row.agent.name}</span>
+		),
+	},
+	{
+		id: "version",
+		header: "Version",
+		cell: ({ row }) => (
+			<span className="text-muted-foreground">
+				{row.original.row.agent.kind} · v{row.original.row.agent.version}
+			</span>
+		),
+	},
+	{
+		id: "skills",
+		header: "Skills",
+		cell: ({ row }) =>
+			row.original.skills.length ? (
+				<span className="text-muted-foreground">
+					{row.original.skills.join(" · ")}
+				</span>
+			) : (
+				NONE
+			),
+	},
+	{
+		id: "now",
+		header: "Now",
+		cell: ({ row }) => <StatusCell row={row.original.row} />,
+	},
+	{
+		id: "budget",
+		header: "Month budget",
+		cell: ({ row }) => <BudgetCell row={row.original.row} />,
+	},
+];
+
+const SKILL_COLUMNS: ColumnDef<SkillLine>[] = [
+	{
+		id: "skill",
+		header: "Skill",
+		cell: ({ row }) => (
+			<span className="font-medium">{row.original.skill.name}</span>
+		),
+	},
+	{
+		id: "version",
+		header: "Version",
+		cell: ({ row }) => (
+			<span className="font-mono">{skillVersion(row.original.skill)}</span>
+		),
+	},
+	{
+		id: "plan",
+		header: "Plan",
+		cell: ({ row }) => (
+			<span className="text-muted-foreground">
+				{planWords(row.original.skill)}
+			</span>
+		),
+	},
+	{
+		id: "used",
+		header: "Used by",
+		cell: ({ row }) => (
+			<span className="text-muted-foreground">
+				{row.original.usedBy.join(" · ")}
+			</span>
+		),
+	},
+	{
+		id: "needs",
+		header: "Needs",
+		cell: ({ row }) =>
+			row.original.needs.length ? (
+				<span className="font-mono text-muted-foreground">
+					{row.original.needs.map((n) => `${n}.*`).join(" · ")}
+				</span>
+			) : (
+				NONE
+			),
+	},
+];
+
+const NS_COLUMNS: ColumnDef<NamespaceLine>[] = [
+	{
+		id: "ns",
+		header: "Namespace",
+		cell: ({ row }) => (
+			<span className="font-mono font-medium">{row.original.ns}.*</span>
+		),
+	},
+	{
+		id: "functions",
+		header: "Functions",
+		cell: ({ row }) => (
+			<span className="font-mono text-muted-foreground">
+				{row.original.functions.join(" · ")}
+			</span>
+		),
+	},
+	{
+		id: "needed",
+		header: "Needed by",
+		cell: ({ row }) => (
+			<span className="text-muted-foreground">
+				{row.original.neededBy.join(" · ")}
+			</span>
+		),
+	},
+];
+
+const skillVersion = (skill: Skill) =>
+	skill.is_draft ? "draft" : `v${skill.version}`;
+
+/** `4 steps · read · write` — the plan's size and the layers it reaches. */
+function planWords(skill: Skill): string {
+	const plan = skill.plan;
+	if (!plan) return "—";
+	const steps = `${plan.step_count} step${plan.step_count === 1 ? "" : "s"}`;
+	return plan.layers.length ? `${steps} · ${plan.layers.join(" · ")}` : steps;
 }
 
 /** A node id is `<column kind>:<record id>`. */
@@ -217,6 +626,35 @@ interface FleetGraph {
 	edges: LayeredEdge[];
 }
 
+interface AgentLine {
+	row: FleetAgentRow;
+	/** The names of the skills it is offered. */
+	skills: string[];
+}
+
+interface SkillLine {
+	skill: Skill;
+	/** The names of the agents offered it. */
+	usedBy: string[];
+	/** The namespaces its offered plan calls. */
+	needs: string[];
+}
+
+interface NamespaceLine {
+	ns: string;
+	functions: string[];
+	/** The names of the skills whose plans call it. */
+	neededBy: string[];
+}
+
+/** The map, and the same wiring as the console's rows. */
+interface FleetModel {
+	graph: FleetGraph;
+	agents: AgentLine[];
+	skills: SkillLine[];
+	namespaces: NamespaceLine[];
+}
+
 /** The map without the hidden types, and without the lines that reached them. */
 function withoutHidden(
 	graph: FleetGraph,
@@ -233,18 +671,54 @@ function withoutHidden(
 	};
 }
 
-/** The three columns and the two kinds of edge between them. */
-function fleetGraph(
-	agents: Agent[],
+/**
+ * The map with what the selected node reaches marked: the lines downstream of
+ * it and upstream of it highlighted, every node off them faded.
+ */
+function withReach(graph: FleetGraph, selected: string | null): FleetGraph {
+	if (!selected || !graph.nodes.some((n) => n.id === selected)) return graph;
+	const reached = new Set([selected]);
+	const lit = new Set<string>();
+	const walk = (from: "source" | "target", to: "source" | "target") => {
+		const queue = [selected];
+		while (queue.length) {
+			const at = queue.shift() as string;
+			for (const e of graph.edges) {
+				if (e[from] !== at || lit.has(e.id)) continue;
+				lit.add(e.id);
+				if (!reached.has(e[to])) {
+					reached.add(e[to]);
+					queue.push(e[to]);
+				}
+			}
+		}
+	};
+	walk("source", "target");
+	walk("target", "source");
+	return {
+		nodes: graph.nodes.map((n) =>
+			reached.has(n.id) ? n : { ...n, disabled: true },
+		),
+		edges: graph.edges.map((e) =>
+			lit.has(e.id) ? { ...e, highlight: true } : e,
+		),
+	};
+}
+
+/** The three columns, the two kinds of edge between them, and the rows they make. */
+function fleetModel(
+	rows: FleetAgentRow[],
 	skills: Skill[],
 	plans: Map<string, SkillPlaybookRead>,
-): FleetGraph {
+): FleetModel {
 	const skillById = new Map(skills.map((s) => [s.id, s]));
 	const nodes: LayeredNode[] = [];
 	const edges: LayeredEdge[] = [];
-	const bound = new Set<string>();
+	const agentLines: AgentLine[] = [];
+	const usedBy = new Map<string, string[]>();
 
-	for (const agent of agents) {
+	for (const row of rows) {
+		const agent = row.agent;
 		nodes.push({
 			id: `agent:${agent.id}`,
 			label: agent.name,
@@ -252,9 +726,12 @@ function fleetGraph(
 			column: 0,
 			tone: agentTone(agent.status),
 		});
+		const names: string[] = [];
 		for (const skillId of agent.skill_ids) {
-			if (!skillById.has(skillId)) continue;
-			bound.add(skillId);
+			const skill = skillById.get(skillId);
+			if (!skill) continue;
+			names.push(skill.name);
+			usedBy.set(skillId, [...(usedBy.get(skillId) ?? []), agent.name]);
 			edges.push({
 				id: `uses:${agent.id}:${skillId}`,
 				source: `agent:${agent.id}`,
@@ -262,26 +739,30 @@ function fleetGraph(
 				label: "uses",
 			});
 		}
+		agentLines.push({ row, skills: names });
 	}
 
 	// The functions each namespace is reached for, in first-seen order.
-	const namespaces = new Map<string, Set<string>>();
+	const namespaces = new Map<string, { fns: Set<string>; by: string[] }>();
+	const skillLines: SkillLine[] = [];
 	for (const skill of skills) {
-		if (!bound.has(skill.id)) continue;
+		const by = usedBy.get(skill.id);
+		if (!by) continue;
 		nodes.push({
 			id: `skill:${skill.id}`,
 			label: skill.name,
-			sub: skill.is_draft ? "draft" : `v${skill.version}`,
+			sub: skillVersion(skill),
 			column: 1,
-			tone: skill.is_draft ? "muted" : "success",
+			tone: skill.is_draft ? "muted" : "info",
 		});
 		const reached = new Set<string>();
 		for (const node of plans.get(skill.id)?.nodes ?? []) {
 			if (!node.task) continue;
 			const ns = namespaceOf(node.task);
-			const fns = namespaces.get(ns) ?? new Set<string>();
-			fns.add(node.task.slice(ns.length + 1) || node.task);
-			namespaces.set(ns, fns);
+			const entry = namespaces.get(ns) ?? { fns: new Set<string>(), by: [] };
+			entry.fns.add(node.task.slice(ns.length + 1) || node.task);
+			if (!reached.has(ns)) entry.by.push(skill.name);
+			namespaces.set(ns, entry);
 			reached.add(ns);
 		}
 		for (const ns of reached)
@@ -292,9 +773,11 @@ function fleetGraph(
 				label: "needs",
 				dashed: true,
 			});
+		skillLines.push({ skill, usedBy: by, needs: [...reached] });
 	}
 
-	for (const [ns, fns] of namespaces)
+	const nsLines: NamespaceLine[] = [];
+	for (const [ns, { fns, by }] of namespaces) {
 		nodes.push({
 			id: `ns:${ns}`,
 			label: `${ns}.*`,
@@ -302,6 +785,13 @@ function fleetGraph(
 			column: 2,
 			tone: "muted",
 		});
+		nsLines.push({ ns, functions: [...fns], neededBy: by });
+	}
 
-	return { nodes, edges };
+	return {
+		graph: { nodes, edges },
+		agents: agentLines,
+		skills: skillLines,
+		namespaces: nsLines,
+	};
 }

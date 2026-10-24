@@ -1,6 +1,6 @@
 /**
  * The plugin registry as the engine returns it — `GET /api/v1/plugins`,
- * `GET /api/v1/plugins/{name}`, `GET /api/v1/task-types/{ref}` — and an MCP
+ * `GET /api/v1/plugins/{name}`, one function by key — and an MCP
  * server as adding or refreshing one returns it. Install-level,
  * not Graph-scoped: the registry is the process's, the same for every Graph.
  */
@@ -10,7 +10,7 @@ import type { Page } from "@invana-studio/core";
 /** `core` · `simulator` · `tool` · `mcp`. */
 type PluginKind = "core" | "simulator" | "tool" | "mcp";
 
-interface PluginBase {
+export interface PluginBase {
 	name: string;
 	kind: PluginKind;
 	version: string;
@@ -26,6 +26,7 @@ interface PluginBase {
 }
 
 export interface PluginSummary extends PluginBase {
+	/** How many functions it declares. */
 	task_types: number;
 	skills: number;
 	flows: number;
@@ -37,20 +38,20 @@ export interface PluginSummary extends PluginBase {
  */
 export type PluginPage = Page<PluginSummary>;
 
-interface TaskArg {
+interface FunctionArg {
 	type: string;
 	required: boolean;
 	default: unknown;
 }
 
-/** One task type's manifest, as declared on disk. */
-interface TaskManifest {
+/** One function's manifest, as declared on disk. */
+interface FunctionManifest {
 	key: string;
 	version: string;
 	summary: string;
 	bound: string;
 	side_effect: string;
-	args: Record<string, TaskArg>;
+	args: Record<string, FunctionArg>;
 	outputs: Record<string, string>;
 	requires: string[];
 	resources: string[];
@@ -59,9 +60,10 @@ interface TaskManifest {
 }
 
 export interface PluginDetail extends PluginBase {
-	/** Names its task types may resolve in a worker — never their values. */
+	/** Names its functions may resolve in a worker — never their values. */
 	secrets: string[];
-	task_types: TaskManifest[];
+	/** The functions it declares. */
+	task_types: FunctionManifest[];
 	flows: { key: string; version: number; kind: string; description: string }[];
 	skills: {
 		slug: string;
@@ -97,7 +99,8 @@ export interface McpServerRead {
 	frozen_at: string;
 }
 
-export interface TaskTypeRead extends TaskManifest {
+/** One function, the plugin that declares it, and how often runs called it. */
+export interface FunctionRead extends FunctionManifest {
 	/** `name@version` of the plugin that declares it. */
 	plugin: string;
 	/** Run nodes that named this key in the last 30 days. */

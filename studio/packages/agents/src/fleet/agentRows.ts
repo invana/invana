@@ -1,6 +1,6 @@
 /**
  * Every agent the Agents list holds, each beside Performance's 7-day row for
- * it — what Fleet's *Agents* card and its Table draw.
+ * it — what Fleet's *Agents* card, its Table and its Map's console draw.
  *
  * Performance leaves out an agent that ran nothing in the window, so the rows
  * start from the list, not from Performance: every agent gets a row, and one

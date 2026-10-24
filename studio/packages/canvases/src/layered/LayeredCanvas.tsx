@@ -1,5 +1,5 @@
 /**
- * **One canvas, four kinds** — `plan` · `workflow` · `envelope` · `lineage`
+ * **One canvas, many kinds** — `plan` · `envelope` · `lineage` and the rest,
  * drawn through `@invana/canvas-react`, the same stack the Explorer and the
  * Modeller use ([canvas kinds](../../../../../docs/for-developers/modules/explore/spec.md)).
  *
@@ -18,7 +18,6 @@
  * | Kind | Column is | An edge is | Writes from a gesture |
  * |---|---|---|---|
  * | `plan` | a wave | a dependency (finish → start) | **yes** — drag card → card |
- * | `workflow` | required order | order · `${steps.X.y}` binding | no |
  * | `envelope` | allowed vs not | a `require` precondition | no |
  * | `lineage` | causal depth | authored · spawned · delegated-for | no |
  * | `branches` | fork depth | a fork · a merge (dashed) | no |
@@ -50,7 +49,6 @@ type LayeredTone = Tone;
 /** The canvas kinds a board may draw here; `data` and `model` have no legend. */
 type LayeredKind =
 	| "plan"
-	| "workflow"
 	| "envelope"
 	| "lineage"
 	| "branches"
@@ -238,20 +236,6 @@ const LEGENDS: Record<LayeredKind, DagLegendSpec> = {
 			{ swatch: "edge", label: "finish → start" },
 		],
 		note: "Order is derived: dependencies first, then due date · columns are waves — what can run in parallel.",
-	},
-	workflow: {
-		keys: [
-			{
-				swatch: "node",
-				tone: "muted",
-				label: "always present (plan · verify)",
-			},
-			{ swatch: "node", tone: "info", label: "template step" },
-			{ swatch: "edge", label: "required order" },
-			// biome-ignore lint/suspicious/noTemplateCurlyInString: the copy shows the binding syntax itself
-			{ swatch: "edge", dashed: true, label: "${steps.X.y} binding" },
-		],
-		note: "A workflow is the reusable plan. Each agent's envelope decides which workflows it may select and pins what a plan cannot change. Clicking a step selects it; nothing here is editable.",
 	},
 	envelope: {
 		keys: [

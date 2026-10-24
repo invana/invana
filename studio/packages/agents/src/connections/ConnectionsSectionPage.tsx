@@ -7,7 +7,7 @@
  * know what an agent reaches beyond this Graph.*
  *
  * The rows are the registry's MCP plugins (`GET /api/v1/plugins?kind=mcp`);
- * the selected server's tools are its plugin's task types, each `read` or
+ * the selected server's tools are its plugin's functions, each `read` or
  * `send` — a send waits on an approval. A server's credential is the name of
  * the variable its bearer token is read from, never the token. Enabling,
  * disabling, refreshing the frozen tools and adding a server are an install

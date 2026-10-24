@@ -97,7 +97,7 @@ export const SECTIONS: Record<AgentsSectionKey, SectionSpec> = {
 		tabs: [
 			{ key: "functions", label: "Functions" },
 			{ key: "plans", label: "Packaged plans" },
-			{ key: "generated", label: "Generated plans" },
+			{ key: "promoted", label: "Promoted plans" },
 			{ key: "templates", label: "Templates" },
 			{ key: "plugins", label: "Plugins" },
 		],

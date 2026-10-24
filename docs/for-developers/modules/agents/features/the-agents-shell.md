@@ -25,7 +25,7 @@ Home, Fleet, Performance, Agents, Skills, Functions, Connections, LLMs and Setti
 | C5 | Performance | Tabs Agents · Skills · Plans · LLMs, over 7, 30 or 90 days ([5.10](fleet-performance.md) C5–C8) |
 | C6 | Agents | One table of the authored agents — `All · Live · Drafts`, search, kind and status — on the [list contract](../../platform/features/list-contract.md); a row opens the agent's page |
 | C7 | Skills | One table of skills — `All · Published · Drafts`, search; a row opens the skill's page |
-| C8 | Functions | Tabs Functions · Packaged plans · Generated plans · Templates · Plugins. Functions groups the catalogue by namespace with a bound filter; a row opens the function's page; a plan opens as its flow; *Promote a plan* opens the promote dialog |
+| C8 | Functions | Tabs Functions · Packaged plans · Promoted plans · Templates · Plugins. Functions groups the catalogue by namespace with a bound filter; a row opens the function's page; a plan opens as its flow; *Promote a plan* opens the promote dialog |
 | C9 | Connections › MCP servers | Every MCP server an install admin added: URL, its tools (reads and sends), the credential's variable name, when the list froze, enabled or disabled, *Refresh tools*; the selected server's tools as functions. *Add MCP server* is a modal |
 | C10 | LLMs | Endpoints as cards and every model version with who pins it; a pinned version no endpoint offers is a warning naming the agents. An endpoint's details and adding one are modals |
 | C11 | Settings | The Graph's runs-at-once ceiling, queue or refuse at it, what runs now and every queued run with why it waits; the pools until Workers holds them |
@@ -66,7 +66,7 @@ flowchart TD
 | Performance | `/agents/performance` | Agents · `skills` · `plans` · `llms` | `PerformancePage` | `GET …/agents/performance?window=` |
 | Agents | `/agents/agents` | — | `AgentsListPage` | `GET …/agents` (list contract), `…/agents/performance?window=7d` |
 | Skills | `/agents/skills` | — | `SkillsListPage` | `GET …/skills` (list contract) |
-| Functions | `/agents/functions` | Functions · `plans` · `generated` · `templates` · `plugins` | `FunctionsPage` | `GET …/catalogue` · `…/flows` · `…/templates` · `/api/v1/plugins` |
+| Functions | `/agents/functions` | Functions · `plans` · `promoted` · `templates` · `plugins` | `FunctionsPage` | `GET …/catalogue` · `…/flows` · `…/templates` · `/api/v1/plugins` |
 | Connections | `/agents/connections/mcp` (`/agents/connections` lands here) | MCP servers | `ConnectionsPage` | `GET /api/v1/plugins?kind=mcp` · `GET /api/v1/plugins/:name` · `POST /api/v1/plugins/mcp` · `…/mcp/:name/refresh` · `…/:name/enable·disable` |
 | LLMs | `/agents/llms[/:provider]` | — | `LlmsPage` + `EndpointDialog` · `AddEndpointDialog` | `GET …/llm/providers` · `…/llm/pins` |
 | Settings | `/agents/settings` | — | `AgentsSettingsPage` | `GET/PUT …/agents/concurrency` · pools |
@@ -77,7 +77,7 @@ flowchart TD
 | A skill | Skills, Performance | `skill` |
 | A function | Functions › Functions, a plugin's page | `task_type` |
 | A plugin | Functions › Plugins | `plugin` |
-| A plan | Functions › Packaged plans · Generated plans | `plan_runs` |
+| A plan | Functions › Packaged plans · Promoted plans | `plan_runs` |
 | A template | Functions › Templates | `template` |
 
 ## Seams
@@ -108,18 +108,32 @@ flowchart TD
 | AS10 | **A tile's count is a list's `total` or an engine field**, never a count Studio makes; a tile with no such number names the section in words |
 | AS11 | **Settings keeps the pools** until Workers holds them; the ceiling is the page's first card |
 | AS12 | **The rail holds only built sections.** Runs, Workers, Approvals and Ledger join it with their phases; until then runs are read in the shell's Activity |
-| AS13 | **`+` on the strip opens ⌘K**, which lists the sections, the agents and skills, and the recent runs — the one way to open anything, not a second menu |
-| AS14 | **Packaged plans are `origin=packaged`; Generated plans are `origin=promoted · authored`.** Each tab sends its own origin filter to `/flows`; neither filters in the browser |
+| AS13 | **`+` on the strip opens ⌘K**, which lists the sections, the agents and skills, and the recent runs — the one way to open anything, not a second menu. With nothing typed it shows the product's sections, its first records and the Graph's newest runs as *Recent*; sections carry no counts (the palette reads no totals) |
+| AS14 | **Packaged plans are `origin=packaged`; Promoted plans are `origin=promoted · authored`.** A one-off `generated` plan belongs to its Todo and is never listed ([LB6](../../workflows/features/the-library.md)), so no tab is named for it. Each tab sends its own origin filter to `/flows`; neither filters in the browser. The path is `/agents/functions/promoted` |
 | AS15 | **Functions' tabs share one URL search (`?q=`) and each sends only its own filters.** Switching tabs keeps the search and drops filters the next tab does not know |
 | AS16 | **Home's tiles open their section as a tab** through the same openers as every row; an open LLM endpoint's crumb is its name, never its id; a function's page is crumbed `Functions › graph.read.query` |
 | AS17 | **Home draws no recent chips, no views and no Graph subtitle.** A session records only the Explorer or Modeller surface, so no ask can be told apart as an Agents ask; Home shows the composer and the tiles until a session records the Agents surface |
 | AS18 | **Performance's trend and *What changed* are on its Agents tab only.** Skills is tiles + *Each skill* (Skill · Versions · Runs · Success · Against prior · p95 · Tokens / run); LLMs is tiles + *Each model version* (Version name · Runs · Success · p95 · Tokens / run) |
 | AS19 | **A list page shows only the columns the engine returns.** A prototype column with no engine field is left out, never derived; the missing fields are listed in the build's hand-off. Agents shows the spawned-helpers count in its toolbar; Skills reads *Runs 30d* from Performance's 30-day skill rows; Fleet's Overview and Table list every agent, `—` where nothing ran |
 
+| AS20 | **Fleet's Overview on a Graph nothing has run on leads with *Start here*** — *Ask the assistant to build one* and *Write a skill first* — above the Agents card. *New agent* joins it with the agent builder (F04) |
+| AS21 | **Fleet › Map's console has one tab, Table**: what the map draws, switched by type (Agents · Skills · Namespaces). Steps · Ledger · Log join it with runs and the ledger (F05) |
+| AS22 | **A click on the map selects; it does not navigate.** The selected agent shows in an inspector over the map with its skills and *Open*, which opens its page as a tab (AS5 holds for every *Open* and every list row) |
+| AS23 | **Fleet › Table switches Agents · Skills.** Agents is AS7's rows; Skills is Performance's skill rows over the same window. Namespaces and Pools are not drawn — the engine has no per-namespace numbers, and pools join with Workers |
+| AS24 | **A library row is one version of a plan** (`nl-single@1`, `nl-single@2`), as `/flows` lists it; a plan's versions read as one row when the engine lists the live version per key |
+| AS25 | **The assistant on the right is closed until asked** — `?right=assistant` is the occupant, on Agents as everywhere. Over an Agents page it is closed, a pill reads *Ask about <page> ⌘J*; ⌘J opens or closes it from any page |
+| AS26 | **Home's composer carries the context chips `Agents · <Graph>`** in place of the ask kind, world and agent: an Agents ask is a question about the product, not a query of the Graph |
+| AS27 | **A function's page reads *Used by N plans*, each output's fan-out rule and *Must come after* from the Graph's catalogue entry**, since the install-level function read carries neither; opened outside a Graph it says so in their place |
+| AS28 | **Library columns name what the engine returns**: a plan's *Layers* (no bounds on a flow row), a skill's *Plan* (its offered plan's steps and layers, not function keys), an endpoint model's *tier · power* (`cost_rank` is a rank, never a price) |
+
 ## Not building
 
 | Item | Why |
 |---|---|
+| A preview of an MCP server's tools before *Add* | The engine has no endpoint that lists a server's tools without saving it; *Add* saves, then the tools show |
+| Who holds the install Admin role in a refusal | The holders read covers Graph roles only; the refusal names the role (*Needs the install Admin role*) |
+| The product line in the status bar (*airways · 7 agents · 3 live runs · 3 waiting on you*) and *Console · Assistant · Builder* | The shell's status bar has no product slot yet; it arrives with the shell's status-bar work, fed from engine fields |
+| Card nodes, minimap and zoom on Fleet › Map | `LayeredCanvas` in panel mode has none; they arrive with a fleet kind in canvas |
 | A leftSection in Agents | The rail and its pages replace it |
 | Invented suggestions on Home | A suggestion the assistant cannot serve is a promise nobody keeps |
 | Tabs for Connections › This Graph's server and Remote agents | They arrive with the features that serve them |

@@ -1,7 +1,7 @@
 key = "count-types"
 version = 1
 kind = "canvas"
-description = "Count the types the canvas's world holds (SP11)."
+description = "Count the types the canvas's world holds."
 intents = []
 
 [[steps]]

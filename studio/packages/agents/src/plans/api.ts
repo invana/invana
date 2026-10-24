@@ -2,7 +2,7 @@
  * The task-plan and catalogue endpoints: the catalogue a plan is composed from,
  * and the plans themselves — list, read, a version, diffs, export, performance
  * and runs over a window, promotion. The engine's route for plans is
- * `…/workflows`. Each call is one `request` on the shared client.
+ * `…/flows`. Each call is one `request` on the shared client.
  */
 
 import type { Interaction } from "@invana-studio/core";
