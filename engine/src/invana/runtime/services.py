@@ -1117,6 +1117,7 @@ async def list_runs(db: AsyncSession, *, graph_id: str, params: ListParams) -> t
             "agent_id": r.agent_id,
             # What the run was *for* — the journal's `role` filter (SR10).
             "role": r.role,
+            "triggered_by": r.triggered_by,
             "task_id": r.todo_id,
             "task_title": titles.get(r.todo_id or ""),
             "queued_at": r.queued_at,

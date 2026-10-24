@@ -1,7 +1,9 @@
 /**
- * An agent › **Deploy** (board `agents.agent.deploy`): where its steps run and
- * what starts it.
+ * An agent › **Deploy** (board `agents.agent.deploy`): its runtime, where its
+ * steps run and what starts it.
  *
+ * - **Runtime** — a pooled worker: its steps run on any worker in a pool that
+ *   has what they need.
  * - **Where its steps run** — each resource its functions declare (`resources`
  *   on the function's manifest), the functions that need it, and the Graph's
  *   pool of that name with what is in use now (`GET …/contention`). A resource
@@ -89,6 +91,13 @@ export function AgentDeployTab({
 
 	return (
 		<div className="flex flex-col gap-2.5 p-3.5">
+			<div className="flex flex-col gap-0.5">
+				<p className="font-medium">Runtime</p>
+				<p className="text-sm text-muted-foreground">
+					Pooled worker — its steps run on any worker in a pool that has what
+					they need
+				</p>
+			</div>
 			<PanelSection card title="Where its steps run">
 				{loading || can.error || contention.error ? (
 					<TabReadState
@@ -101,9 +110,9 @@ export function AgentDeployTab({
 						<TableHeader>
 							<TableRow>
 								<TableHead>Resource</TableHead>
-								<TableHead>Its functions</TableHead>
+								<TableHead className="w-full">Its functions</TableHead>
 								<TableHead>Pool</TableHead>
-								<TableHead>In use now</TableHead>
+								<TableHead className="whitespace-nowrap">In use now</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -122,13 +131,19 @@ export function AgentDeployTab({
 												{resource}
 											</Badge>
 										</TableCell>
-										<TableCell className="max-w-0 truncate font-mono text-muted-foreground">
+										<TableCell className="whitespace-normal break-words font-mono text-muted-foreground">
 											{fns.join(" · ")}
 										</TableCell>
-										<TableCell className="font-mono">
+										<TableCell className="whitespace-nowrap font-mono">
 											{pool ? pool.pool : "no pool — unbounded"}
 										</TableCell>
-										<TableCell className={full ? "text-warning" : undefined}>
+										<TableCell
+											className={
+												full
+													? "whitespace-nowrap text-warning"
+													: "whitespace-nowrap"
+											}
+										>
 											{pool
 												? `${pool.in_use} of ${pool.size}${full ? " · full" : ""}`
 												: "—"}

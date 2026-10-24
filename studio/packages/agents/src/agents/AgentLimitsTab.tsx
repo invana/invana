@@ -19,10 +19,7 @@ import {
 	FieldDescription,
 	FieldError,
 	FieldLabel,
-	InputGroup,
-	InputGroupAddon,
-	InputGroupInput,
-	InputGroupText,
+	Input,
 	Switch,
 } from "@invana/forms";
 import { PropertyList, PropertyRow } from "@invana/ui";
@@ -79,21 +76,20 @@ export function AgentLimitsTab({
 		return (
 			<Field data-invalid={opts.error ? true : undefined}>
 				<FieldLabel htmlFor={`limit-${key}`}>{label}</FieldLabel>
-				<InputGroup>
-					<InputGroupInput
+				<div className="flex items-center gap-2">
+					<Input
 						id={`limit-${key}`}
 						type="number"
 						min={0}
+						className="w-32 shrink-0 font-mono"
 						disabled={readOnly || opts.off}
 						aria-invalid={opts.error ? true : undefined}
 						value={own ?? ""}
 						placeholder={fallback != null ? shown(fallback) : "—"}
 						onChange={(e) => set(group, key, e.target.value)}
 					/>
-					<InputGroupAddon align="inline-end">
-						<InputGroupText>{unit}</InputGroupText>
-					</InputGroupAddon>
-				</InputGroup>
+					<span className="text-sm text-muted-foreground">{unit}</span>
+				</div>
 				{opts.error ? <FieldError>{opts.error}</FieldError> : null}
 				{unit === "tokens" && own != null ? (
 					<FieldDescription>
@@ -153,7 +149,7 @@ export function AgentLimitsTab({
 							})}
 						</div>
 						{limit("budget", "max_concurrent_runs", "Live at once", "runs", {
-							hint: "the rest queue",
+							hint: "the rest queue; a large run goes as fast as this and the pools allow",
 						})}
 					</div>
 				</PanelSection>

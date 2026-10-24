@@ -120,5 +120,6 @@ The declaration already exists — one `manifest.toml` per task type in the core
 | Registering an entry from an app, or while plans run | the set is closed per process — task types come only from the plugins loaded at start-up ([13.9](../../platform/features/plugins.md)); an app that could register one would make the envelope advisory ([the-runtime-package.md](../../../building-engine/the-runtime-package.md) §1) |
 | Enabling / disabling an entry per Graph | the bound is the knob, and it is the envelope's ([7.3](envelope-validation.md)) — a second switch would have two answers to *may this run* |
 | *Try it* — a playground that executes an entry | a callable runs inside a plan, under an envelope, with a run row behind it; a bare invoke is a write with no trace |
+| A plugin's *Skills that need it* | There is no plugin-level read of the skills needing its functions; the plugin page lists the skills it brings, and a function's page lists the skills that need it |
 | *Allowed by policies* on a function's page | Policies are IAM's (I01) |
 | Editing `requires` | it is part of the entry's contract, read by the planner while drafting — a Graph-level override would make a plan legal in one Graph and refused in the next |

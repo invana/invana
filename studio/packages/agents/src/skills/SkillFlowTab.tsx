@@ -10,6 +10,10 @@
  * drawn from and the bounds it spends. Selecting a step swaps those for the
  * step's panel: its line, bound, side effect, who needs it and its handler.
  *
+ * A line the draw could not map also gets a **Choices** card — *Leave it to a
+ * person* · *Rewrite the line*, as on Instructions — which saves the draft
+ * and draws again. One click on a step selects it and opens its panel.
+ *
  * Nobody edits a plan here: a plan that reads wrong is fixed in the text.
  */
 
@@ -29,11 +33,15 @@ import {
 	taskFlowSettings,
 	taskFlowTemplates,
 } from "@invana-studio/canvases";
+import { useAccess } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { ArrowLeft, PencilLine, Workflow } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useFunctionQuery } from "../plugins/queries";
 import { skillFlowSettings, skillFlowTemplates } from "./flow/skillFlowConfig";
+import { replaceLine } from "./instructionsText";
+import { useSaveDraftMutation } from "./queries";
+import { UnmappedChoices } from "./SkillInstructionsTab";
 import { guardedStep, taskFlowFromPlan } from "./taskFlowFromPlan";
 import type { SkillPlaybookNode, SkillPlaybookRead } from "./types";
 import type { SkillPage } from "./useSkillPage";
@@ -41,6 +49,12 @@ import type { SkillPage } from "./useSkillPage";
 export function SkillFlowTab({ page }: { page: SkillPage }) {
 	const { plan } = page;
 	const [selected, setSelected] = useState<string | null>(null);
+	// Keyed on what the lists say, not their identity: a list re-made on every
+	// render would hand the canvas new data, which lays it out again and drops
+	// the click that selected a step.
+	const handlersKey = JSON.stringify(page.handlers);
+	const unmappedKey = JSON.stringify(page.unmapped);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: the keys stand for the lists
 	const data = useMemo(
 		() =>
 			plan
@@ -52,7 +66,7 @@ export function SkillFlowTab({ page }: { page: SkillPage }) {
 						(task) => page.catalogue.get(task)?.bound,
 					)
 				: null,
-		[plan, page.handlers, page.lineOf, page.unmapped, page.catalogue],
+		[plan, handlersKey, page.lineOf, unmappedKey, page.catalogue],
 	);
 
 	if (page.planLoading)
@@ -117,14 +131,8 @@ export function SkillFlowTab({ page }: { page: SkillPage }) {
 					/>
 				) : (
 					<>
-						{page.unmapped.map((span) => (
-							<RefusalCard
-								key={span}
-								label={`line ${page.lineOf(span) ?? "—"} can't be drawn · no function this skill may use does this`}
-								remedy="Rewrite it, or leave it to a person, on Instructions. Publishing waits until every line maps."
-							>
-								“{span}”
-							</RefusalCard>
+						{[...new Set(page.unmapped)].map((span) => (
+							<UnmappedCards key={span} page={page} span={span} />
 						))}
 						<FromTheInstructions
 							page={page}
@@ -139,7 +147,59 @@ export function SkillFlowTab({ page }: { page: SkillPage }) {
 	);
 }
 
-/** One row per line the plan came from — a step, a handler, or a gap. */
+/**
+ * A line no allowed function does: what it says and why it cannot be drawn,
+ * then its **Choices** — the same two as on Instructions, saved straight to
+ * the draft and drawn again.
+ */
+function UnmappedCards({ page, span }: { page: SkillPage; span: string }) {
+	const canBuild = useAccess().gate("build").allowed;
+	const save = useSaveDraftMutation(
+		page.username,
+		page.graphSlug,
+		page.skill.id,
+	);
+	const text = page.draft?.version.content ?? "";
+	const line = page.lineOf(span);
+	return (
+		<>
+			<RefusalCard
+				label={`line ${line ?? "—"} can't be drawn · no function this skill may use does this`}
+				remedy="Publishing waits until every line maps to a function the skill may use."
+			>
+				“{span}”
+			</RefusalCard>
+			<PanelSection
+				card
+				title="Choices"
+				hint={line ? `line ${line}` : undefined}
+			>
+				<UnmappedChoices
+					line={line}
+					text={text}
+					editable={page.hasDraft && !!page.draft && canBuild}
+					busy={save.isPending || page.drawing}
+					onRewrite={(n, next) =>
+						save.mutate(
+							{ content: replaceLine(text, n, next) },
+							{ onSuccess: page.draw },
+						)
+					}
+					note="Either choice saves the draft and draws the flow again."
+				/>
+			</PanelSection>
+		</>
+	);
+}
+
+/** One step's function as a row names it — a person's step reads as words. */
+const stepName = (n: SkillPlaybookNode) =>
+	n.form === "human" || !n.task ? null : n.task;
+
+/**
+ * One row per line the plan came from: a line's steps — several when it
+ * inlined a plan — as one row, a handler, or a gap.
+ */
 function FromTheInstructions({
 	page,
 	plan,
@@ -154,25 +214,34 @@ function FromTheInstructions({
 		line: number | null;
 		text: string;
 		kind: "step" | "handler" | "gap";
-		task?: string;
-		id?: string;
+		/** A line's steps, each function once, with the first step that calls it. */
+		steps?: { id: string; task: string | null }[];
 	};
-	const rows: Row[] = [
-		...plan.nodes.map((n) => ({
-			key: n.id,
-			line: page.lineOf(n.source_span),
+	const byLine = new Map<string, Row>();
+	for (const n of plan.nodes) {
+		const line = page.lineOf(n.source_span);
+		const key = line != null ? `l${line}` : `n${n.id}`;
+		const row = byLine.get(key) ?? {
+			key,
+			line,
 			text: n.source_span ?? n.label,
 			kind: "step" as const,
-			task: n.task || "a person",
-			id: n.id,
-		})),
+			steps: [],
+		};
+		const task = stepName(n);
+		if (!row.steps?.some((s) => s.task === task))
+			row.steps?.push({ id: n.id, task });
+		byLine.set(key, row);
+	}
+	const rows: Row[] = [
+		...byLine.values(),
 		...page.handlers.map((h, i) => ({
 			key: `h${i}`,
 			line: page.lineOf(h.span),
 			text: h.span,
 			kind: "handler" as const,
 		})),
-		...page.unmapped.map((s, i) => ({
+		...[...new Set(page.unmapped)].map((s, i) => ({
 			key: `u${i}`,
 			line: page.lineOf(s),
 			text: s,
@@ -194,14 +263,31 @@ function FromTheInstructions({
 						</span>
 						<span className="min-w-0 flex-1">{r.text}</span>
 						{r.kind === "step" ? (
-							<Button
-								size="xs"
-								variant="ghost"
-								className="font-mono"
-								onClick={() => r.id && onSelect(r.id)}
-							>
-								{r.task}
-							</Button>
+							<span className="flex max-w-[50%] shrink-0 flex-wrap justify-end gap-0.5">
+								{r.steps?.map((s) =>
+									s.task ? (
+										<Button
+											key={s.id}
+											size="xs"
+											variant="ghost"
+											className="font-mono"
+											onClick={() => onSelect(s.id)}
+										>
+											{s.task}
+										</Button>
+									) : (
+										<Button
+											key={s.id}
+											size="xs"
+											variant="ghost"
+											className="text-muted-foreground"
+											onClick={() => onSelect(s.id)}
+										>
+											a person
+										</Button>
+									),
+								)}
+							</span>
 						) : r.kind === "handler" ? (
 							<Badge size="xs" variant="soft" tone="warning">
 								handler
@@ -233,6 +319,10 @@ function ThisFlow({
 				.filter((b): b is string => !!b),
 		),
 	];
+	// A plan inlined twice is composed once.
+	const uses = [
+		...new Map(plan.uses.map((u) => [`${u.key}@${u.version}`, u])).values(),
+	];
 	return (
 		<PanelSection card title="This flow">
 			<PropertyList labelWidth={110}>
@@ -253,12 +343,12 @@ function ThisFlow({
 				<PropertyRow label="Every function">
 					needed by the skill · allowed by a policy in IAM
 				</PropertyRow>
-				{plan.uses.length ? (
+				{uses.length ? (
 					// Copied in when the plan was written; a newer library
 					// version is said, never applied.
 					<PropertyRow label="Composed">
 						<span className="flex flex-wrap items-center gap-1.5">
-							{plan.uses.map((u) => (
+							{uses.map((u) => (
 								<span key={u.key} className="inline-flex items-center gap-1">
 									<TypographyInlineCode>
 										{u.key}@{u.version}
@@ -297,7 +387,7 @@ function StepPanel({
 	return (
 		<PanelSection
 			card
-			title={`Step ${i + 1} · ${step.task || "a person"}`}
+			title={`Step ${i + 1} · ${stepName(step) ?? "a person does this"}`}
 			action={
 				<Button size="xs" variant="ghost" onClick={onBack}>
 					<ArrowLeft /> Every line

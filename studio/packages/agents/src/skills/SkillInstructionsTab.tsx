@@ -7,13 +7,17 @@
  * guards. *Save* writes the draft and draws the plan again; while it draws the
  * preview says so and keeps the last plan.
  *
- * A line the draw could not map is flagged under the editor with the choices
- * the engine supports: a question the planner asked is answered from its
- * readings (one of them leaves the step to a person), and any flagged line can
- * be rewritten in place. Publish waits until every line maps.
+ * A line the draw could not map is flagged in the warning tone directly under
+ * the editor, naming its line, with the choices the engine supports: a
+ * question the planner asked is answered from its readings (one of them leaves
+ * the step to a person); an unmapped line is either *left to a person* — the
+ * line is written as a person's step, which the next draw keeps as one — or
+ * *rewritten* in place. Publish waits until every line maps.
  *
- * Under both, the **console** — Tests · Evals · Problems · Log — where a test
- * run lands while the person stays on the text it tests.
+ * The editor fills the page; the **console** — Tests · Evals · Problems · Log —
+ * docks under it, full width, behind a resize handle, where a test run lands
+ * while the person stays on the text it tests. Folding the console leaves its
+ * tab strip and gives the editor the rest.
  *
  * A published skill with no draft reads its head text; *Edit instructions* in
  * the page head opens a draft.
@@ -24,10 +28,17 @@ import { Input } from "@invana/forms";
 import {
 	Alert,
 	AlertDescription,
+	AlertTitle,
 	BoundChip,
 	Button,
+	Card,
 	ClarifyCard,
+	Eyebrow,
 	RefusalCard,
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+	SectionHeader,
 	SegmentedControl,
 	Spinner,
 	TypographyInlineCode,
@@ -35,9 +46,9 @@ import {
 import { ActButton, useAccess } from "@invana-studio/shell";
 import { FormError, PanelSection } from "@invana-studio/ui";
 import { ArrowRight, Save, TriangleAlert } from "lucide-react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { AddFunctionsPicker } from "./AddFunctionsPicker";
-import { SkillConsole } from "./console/SkillConsole";
+import { type ConsoleTab, SkillConsole } from "./console/SkillConsole";
 import { addFunctionLines, lineOf, replaceLine } from "./instructionsText";
 import {
 	useAnswerClarificationMutation,
@@ -62,6 +73,8 @@ export function SkillInstructionsTab({
 	const save = useSaveDraftMutation(username, graphSlug, skill.id);
 	const answer = useAnswerClarificationMutation(username, graphSlug, skill.id);
 	const [view, setView] = useState<"edit" | "preview">("edit");
+	const [consoleTab, setConsoleTab] = useState<ConsoleTab>("tests");
+	const [folded, setFolded] = useState(false);
 	// The buffer is taken once per draft row, so a poll never overwrites typing.
 	const [buffer, setBuffer] = useState<{ id: string; text: string } | null>(
 		null,
@@ -88,107 +101,176 @@ export function SkillInstructionsTab({
 		else page.draw();
 	};
 
+	const console_ = (
+		<SkillConsole
+			page={page}
+			tab={consoleTab}
+			onTabChange={setConsoleTab}
+			folded={folded}
+			onFoldedChange={setFolded}
+		/>
+	);
+
 	return (
-		<div className="flex flex-col gap-2.5 p-3.5">
-			<FormError
-				error={
-					(page.draftError ?? save.error ?? page.drawError) as Error | null
-				}
-			/>
-			<div className="grid items-start gap-2.5 @[900px]:grid-cols-[1.7fr_1fr]">
-				<div className="flex min-w-0 flex-col gap-2.5">
-					<PanelSection
-						card
-						title="instructions.md · Markdown"
-						hint={
-							!page.hasDraft
-								? `v${skill.version} · published · read-only`
-								: dirty
-									? "editing · not saved"
-									: "saved on the draft"
-						}
-						action={
-							<span className="flex items-center gap-1.5">
-								<SegmentedControl
-									size="xs"
-									aria-label="Editor view"
-									value={view}
-									onValueChange={(v) => setView(v as "edit" | "preview")}
-									options={[
-										{ value: "edit", label: "Edit" },
-										{ value: "preview", label: "Preview" },
-									]}
+		<div className="flex h-full min-h-0 flex-col">
+			<ResizablePanelGroup orientation="vertical" className="min-h-0 flex-1">
+				<ResizablePanel id="document" minSize={240}>
+					<div className="flex h-full min-h-0 flex-col gap-2.5 overflow-y-auto p-3.5">
+						<FormError
+							error={
+								(page.draftError ??
+									save.error ??
+									page.drawError) as Error | null
+							}
+						/>
+						<div className="grid min-h-0 flex-1 gap-2.5 @[900px]:grid-cols-[1.7fr_1fr] @[900px]:grid-rows-[minmax(0,1fr)]">
+							<div className="flex min-h-0 min-w-0 flex-col gap-2.5">
+								<EditorCard
+									title="instructions.md · Markdown"
+									hint={
+										!page.hasDraft
+											? `v${skill.version} · published · read-only`
+											: dirty
+												? "editing · not saved"
+												: "saved on the draft"
+									}
+									action={
+										<span className="flex items-center gap-1.5">
+											<SegmentedControl
+												size="xs"
+												aria-label="Editor view"
+												value={view}
+												onValueChange={(v) => setView(v as "edit" | "preview")}
+												options={[
+													{ value: "edit", label: "Edit" },
+													{ value: "preview", label: "Preview" },
+												]}
+											/>
+											{page.hasDraft ? (
+												<ActButton
+													area="build"
+													size="xs"
+													disabled={
+														!draft ||
+														save.isPending ||
+														page.drawing ||
+														(!dirty && draft.drawn)
+													}
+													onClick={saveAndDraw}
+												>
+													<Save />
+													{save.isPending
+														? "Saving…"
+														: page.drawing
+															? "Drawing…"
+															: dirty
+																? "Save"
+																: "Draw"}
+												</ActButton>
+											) : null}
+										</span>
+									}
+								>
+									{view === "edit" && editable ? (
+										<MarkdownEditorBlock
+											aria-label="instructions.md"
+											value={text}
+											onChange={setText}
+											version={`v${page.planVersion}${dirty ? " · editing" : ""}`}
+											className="min-h-64 flex-1 overflow-y-auto"
+										/>
+									) : (
+										<div className="min-h-64 flex-1 overflow-y-auto">
+											<CodeBlock
+												value={text}
+												language="plain"
+												showLineNumbers
+											/>
+										</div>
+									)}
+								</EditorCard>
+
+								<LineFlags
+									page={page}
+									text={text}
+									editable={editable}
+									onRewrite={(n, line) => setText(replaceLine(text, n, line))}
+									answering={answer.isPending}
+									onAnswer={(c, value) =>
+										answer.mutate(
+											{ clarificationId: c.id, answer: value },
+											{ onSuccess: page.draw },
+										)
+									}
 								/>
-								{page.hasDraft ? (
-									<ActButton
-										area="build"
-										size="xs"
-										disabled={
-											!draft ||
-											save.isPending ||
-											page.drawing ||
-											(!dirty && draft.drawn)
-										}
-										onClick={saveAndDraw}
-									>
-										<Save />
-										{save.isPending
-											? "Saving…"
-											: page.drawing
-												? "Drawing…"
-												: dirty
-													? "Save"
-													: "Draw"}
-									</ActButton>
-								) : null}
-							</span>
-						}
-					>
-						{view === "edit" && editable ? (
-							<MarkdownEditorBlock
-								aria-label="instructions.md"
-								value={text}
-								onChange={setText}
-								version={`v${page.planVersion}${dirty ? " · editing" : ""}`}
-								className="min-h-96"
-							/>
-						) : (
-							<CodeBlock value={text} language="plain" showLineNumbers />
-						)}
-					</PanelSection>
+							</div>
 
-					<LineFlags
-						page={page}
-						text={text}
-						editable={editable}
-						onRewrite={(n, line) => setText(replaceLine(text, n, line))}
-						answering={answer.isPending}
-						onAnswer={(c, value) =>
-							answer.mutate(
-								{ clarificationId: c.id, answer: value },
-								{ onSuccess: page.draw },
-							)
-						}
-					/>
-				</div>
-
-				<div className="flex min-w-0 flex-col gap-2.5">
-					<FunctionsNeededCard
-						page={page}
-						canAdd={editable}
-						onAdd={(fns) => setText(addFunctionLines(text, fns))}
-					/>
-					<PlanPreviewCard page={page} text={text} onOpenFlow={onOpenFlow} />
-				</div>
-			</div>
-			<SkillConsole page={page} />
+							<div className="flex min-h-0 min-w-0 flex-col gap-2.5 overflow-y-auto">
+								<FunctionsNeededCard
+									page={page}
+									canAdd={editable}
+									onAdd={(fns) => setText(addFunctionLines(text, fns))}
+								/>
+								<PlanPreviewCard
+									page={page}
+									text={text}
+									onOpenFlow={onOpenFlow}
+								/>
+							</div>
+						</div>
+					</div>
+				</ResizablePanel>
+				{folded ? null : (
+					<>
+						<ResizableHandle withHandle />
+						<ResizablePanel id="console" defaultSize="32" minSize={120}>
+							{console_}
+						</ResizablePanel>
+					</>
+				)}
+			</ResizablePanelGroup>
+			{folded ? console_ : null}
 		</div>
 	);
 }
 
 /**
- * The draw's own refusals, each under the line it names: a question with its
- * readings as buttons, and an unmapped line with *Rewrite the line*.
+ * The document's card: the eyebrow head of a page section, with a body that
+ * fills the height it is given so the editor takes the page.
+ */
+function EditorCard({
+	title,
+	hint,
+	action,
+	children,
+}: {
+	title: ReactNode;
+	hint: ReactNode;
+	action: ReactNode;
+	children: ReactNode;
+}) {
+	return (
+		<Card className="flex min-h-0 flex-1 flex-col rounded-none shadow-none">
+			<SectionHeader
+				title={
+					<span className="flex min-w-0 items-baseline gap-2">
+						<Eyebrow className="shrink-0">{title}</Eyebrow>
+						<span className="min-w-0 truncate font-normal text-sm text-muted-foreground">
+							{hint}
+						</span>
+					</span>
+				}
+				actions={action}
+			/>
+			<div className="flex min-h-0 flex-1 flex-col px-3 py-2">{children}</div>
+		</Card>
+	);
+}
+
+/**
+ * The draw's own refusals, directly under the editor, each naming its line: a
+ * question with its readings as buttons, and an unmapped line with *Leave it to
+ * a person* · *Rewrite the line*.
  */
 function LineFlags({
 	page,
@@ -257,51 +339,118 @@ function UnmappedLine({
 	editable: boolean;
 	onRewrite: (line: number, next: string) => void;
 }) {
+	return (
+		<Alert tone="warning">
+			<TriangleAlert className="size-4" />
+			<AlertTitle>
+				line {line ?? "—"} · no function this skill may use does this
+			</AlertTitle>
+			<AlertDescription className="flex flex-col gap-2">
+				<span className="font-mono text-sm">“{span}”</span>
+				<UnmappedChoices
+					line={line}
+					text={text}
+					editable={editable}
+					onRewrite={onRewrite}
+					note="Leaving it to a person writes the line as a person's step; save and the plan draws it as one."
+				/>
+			</AlertDescription>
+		</Alert>
+	);
+}
+
+/**
+ * What a person can do about a line no allowed function does: *Leave it to a
+ * person* writes it as a person's step, *Rewrite the line* edits it in place.
+ * `onRewrite` takes the line's new text; where it lands — the editor's buffer
+ * or a saved draft — is the caller's.
+ */
+export function UnmappedChoices({
+	line,
+	text,
+	editable,
+	onRewrite,
+	note,
+	busy = false,
+}: {
+	line: number | null;
+	text: string;
+	editable: boolean;
+	onRewrite: (line: number, next: string) => void;
+	note: string;
+	busy?: boolean;
+}) {
 	const current = line ? (text.split("\n")[line - 1] ?? "") : "";
 	const [draft, setDraft] = useState<string | null>(null);
+	const person = toPersonStep(current);
+	if (!line)
+		return (
+			<span className="text-sm text-muted-foreground">
+				The line no longer reads in the text — save to draw again.
+			</span>
+		);
+	if (!editable) return null;
+	if (draft === null)
+		return (
+			<span className="flex flex-col gap-1.5">
+				<span className="flex flex-wrap items-center gap-1.5">
+					<Button
+						size="xs"
+						variant="outline"
+						disabled={busy || person === current}
+						onClick={() => onRewrite(line, person)}
+					>
+						Leave it to a person
+					</Button>
+					<Button
+						size="xs"
+						variant="outline"
+						disabled={busy}
+						onClick={() => setDraft(current)}
+					>
+						Rewrite the line
+					</Button>
+				</span>
+				<span className="text-sm text-muted-foreground">{note}</span>
+			</span>
+		);
 	return (
-		<RefusalCard
-			label={`line ${line ?? "—"} · no function this skill may use does this`}
-			remedy={
-				line && editable ? (
-					draft === null ? (
-						<Button
-							size="xs"
-							variant="outline"
-							onClick={() => setDraft(current)}
-						>
-							Rewrite the line
-						</Button>
-					) : (
-						<span className="flex w-full items-center gap-1">
-							<Input
-								aria-label={`Line ${line}`}
-								value={draft}
-								className="font-mono"
-								onChange={(e) => setDraft(e.target.value)}
-							/>
-							<Button
-								size="xs"
-								onClick={() => {
-									onRewrite(line, draft);
-									setDraft(null);
-								}}
-							>
-								Replace
-							</Button>
-							<Button size="xs" variant="ghost" onClick={() => setDraft(null)}>
-								Cancel
-							</Button>
-						</span>
-					)
-				) : line ? null : (
-					"The line no longer reads in the text — save to draw again."
-				)
-			}
-		>
-			“{span}”
-		</RefusalCard>
+		<span className="flex w-full items-center gap-1">
+			<Input
+				aria-label={`Line ${line}`}
+				value={draft}
+				className="font-mono"
+				onChange={(e) => setDraft(e.target.value)}
+			/>
+			<Button
+				size="xs"
+				disabled={busy}
+				onClick={() => {
+					onRewrite(line, draft);
+					setDraft(null);
+				}}
+			>
+				Replace
+			</Button>
+			<Button size="xs" variant="ghost" onClick={() => setDraft(null)}>
+				Cancel
+			</Button>
+		</span>
 	);
+}
+
+const PERSON_STEP = "A person does this: ";
+
+/**
+ * The line as an explicit person's step, its list marker kept — a sentence no
+ * allowed function can do and that names a person to do it draws as a
+ * person's step.
+ */
+function toPersonStep(line: string): string {
+	const [, marker = "", rest = ""] =
+		/^(\s*(?:(?:[-*+]|\d+[.)])\s+)?)(.*)$/.exec(line) ?? [];
+	if (!rest.trim() || rest.startsWith(PERSON_STEP)) return line;
+	return `${marker}${PERSON_STEP}${rest}`;
 }
 
 /** The functions the plan calls, each with its bound; *Add functions* writes a need. */
@@ -386,7 +535,7 @@ function PlanPreviewCard({
 					? "Drawing…"
 					: !nodes.length
 						? undefined
-						: draft && !draft.drawn
+						: refusal || (draft && !draft.drawn)
 							? "from an earlier text"
 							: "drawn from the text"
 			}
@@ -433,9 +582,13 @@ function PlanPreviewCard({
 										<span className="w-4 text-muted-foreground tabular-nums">
 											{i + 1}
 										</span>
-										<TypographyInlineCode>
-											{node.task || "a person"}
-										</TypographyInlineCode>
+										{node.form === "human" || !node.task ? (
+											<span className="text-muted-foreground">
+												a person does this
+											</span>
+										) : (
+											<TypographyInlineCode>{node.task}</TypographyInlineCode>
+										)}
 										<span className="ms-auto">
 											{bound ? <BoundChip bound={bound} /> : null}
 										</span>
@@ -454,11 +607,15 @@ function PlanPreviewCard({
 					<span>
 						{page.drawing
 							? "the last plan stays until this one lands"
-							: draft && !draft.drawn
-								? "regenerates when you save"
-								: page.hasDraft
-									? `up to date · v${page.planVersion} draft`
-									: `v${page.skill.version} · published`}
+							: firstUnmapped
+								? `waits on line ${lineOf(text, firstUnmapped) ?? "—"} · Publish waits`
+								: refusal
+									? "refused · the plan above is the last that drew"
+									: draft && !draft.drawn
+										? "regenerates when you save"
+										: page.hasDraft
+											? `up to date · v${page.planVersion} draft`
+											: `v${page.skill.version} · published`}
 					</span>
 					{nodes.length ? (
 						<Button

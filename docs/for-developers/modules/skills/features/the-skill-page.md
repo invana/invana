@@ -22,7 +22,7 @@ they are used: **Instructions · Flow · Functions · Agents · Usage · Excepti
 | C1 | New skill | *New skill* on Skills creates an `untitled` draft and opens its page on Instructions, the editor holding the four headings (`Goal · Arguments · Steps · When things go wrong`) |
 | C2 | Instructions | The editor (Edit · Preview, `instructions.md · Markdown`) on the left; **Functions it needs** and **Plan preview** on the right. Saving the draft draws the plan again |
 | C3 | Functions it needs | The functions the draft's plan names, each with its bound; *Add functions* opens the picker (namespace groups, a send marked *send*) and adding one is a need written into the draft |
-| C4 | A line that can't map | Marked in the gutter (`!`) and flagged under the line with its choices — *Leave it to a person* · *Rewrite the line* · *Allow `<function>`*; the preview says why it cannot draw; Publish waits |
+| C4 | A line that can't map | Flagged in amber under the document, naming its line, with its choices — *Leave it to a person* · *Rewrite the line*; the preview says why it cannot draw; Publish waits |
 | C5 | Flow | The plan drawn top-down, each step tied to the line it came from, handlers to the side; **From the instructions** maps every line to its step or handler; **This flow** names its revision, bounds and test runs. Selecting a step shows its line, bound, side effect, who needs and allows it |
 | C6 | Functions | Every function the published plan (or the draft's) names, with its bound and the steps that call it |
 | C7 | Agents | Bound agents with version, applied in 7 days and last applied; Bind to an agent · Unbind |
@@ -80,7 +80,7 @@ flowchart TD
 | `agents.skill.draft` | a drafted skill: editor, Functions it needs, Plan preview with its handler |
 | `agents.skill.flow` · `.flow.step` · `.flow.unmapped` | the Flow; a step selected; a line that cannot map drawn as a gap |
 | `agents.skill.functions` | the *Add functions* picker open |
-| `agents.skill.unmapped` | a flagged line with its three choices |
+| `agents.skill.unmapped` | a flagged line with its two choices |
 | `agents.skill.test` | the Tests console under the document |
 | `agents.skill.exceptions` · `.evals` · `.agents` · `.usage` | those tabs of a published skill |
 
@@ -129,6 +129,8 @@ appears in the text is drawn without a line.
 | SP14 | **Handlers are parsed from the version's text, never drawn**: every non-empty line under a `When things go wrong` heading until the next level-one or level-two heading, its list marker dropped. `step_id` is the first plan node whose dotted function the line names as a whole word, else the first whose function's last segment it names, else null |
 | SP15 | **Exceptions counts root runs queued in the last `days` UTC calendar days whose root or a step was offered any published version of the skill**, eval and test runs left out. `hit_limit` is a run whose `replans` reached its own agent's `effort.max_replans`; a skill carries no limit, so `max_replans` is null |
 | SP16 | **A test is a one-question eval replay**: a root run with `role = evaluate` and the label `test:skill:<id>`, opened under no agent, replaying the draft (or the head) exactly as an eval case does. The label keeps it out of the skill's eval runs and every agent's numbers; the role puts its spend on the eval budget |
+| SP17 | **An unmapped line's *Leave it to a person* rewrites the line as `A person does this: <line>`**, keeping its list marker, and saves the draft. A sentence no function can do is drawn as a person's step, so the next draw maps it; the choice is disabled once the line reads that way. The flag sits under the document, not inside it, because the editor has no under-line widgets |
+| SP18 | **Instructions is the document over a docked console**: a vertical resizable split, the editor filling the space above, the console (Tests · Evals · Problems · Log) full width below; folding the console leaves its tab strip. The Flow draws every step chained in plan order, one gap card per unmapped line after the step written before it, and *From the instructions* has one row per line |
 
 ## Not building
 
@@ -138,4 +140,9 @@ appears in the text is drawn without a line.
 | A Playbook tab apart from Instructions | The document is the playbook |
 | A skill granting functions | A skill declares needs; a policy in IAM allows them (I01) |
 | Assistant proposals marked in the editor | The assistant's proposals arrive with F05's assistant work |
+| *Allow / Need <function>* on an unmapped line | There is no allow act, and an unmapped line names no function; *Leave it to a person* and *Rewrite the line* are its choices |
+| Agents' *Version* and *Last applied* columns, *Applied · 7 days* | The skill's agents read carries no per-agent applied window or last applied (engine) |
+| Usage's *The gap — offered, not applied* table | The engine records no reason a run passed a skill over; the gap is shown as a number only |
+| Skills list *Agents*, *Functions* and *Evals* columns | The skills list carries no bound-agent count, function count or eval pass rate (engine); *Plan* shows its steps |
+| A Flow step's *Runs*, *Allowed by* and *In its test runs* cards | Per-step run counts and policies arrive with F05's runs and I01's policies |
 | Previewing writes and sends on a test run | A test runs the ask as an eval case does; holding its writes and sends for preview arrives with F05's runs work |

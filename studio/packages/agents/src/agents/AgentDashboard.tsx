@@ -21,6 +21,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	TypographyInlineCode,
 } from "@invana/ui";
 import { PanelSection } from "@invana-studio/ui";
 import { useContext } from "react";
@@ -222,8 +223,10 @@ export function AgentDashboard({
 										className={openRun ? "cursor-pointer" : undefined}
 										onClick={openRun ? () => openRun(r.id) : undefined}
 									>
-										<TableCell className="font-mono">
-											{runLabel(r.id)}
+										<TableCell className="whitespace-nowrap">
+											<TypographyInlineCode>
+												{runLabel(r.id)}
+											</TypographyInlineCode>
 										</TableCell>
 										<TableCell className="w-full max-w-0 truncate">
 											{r.title}

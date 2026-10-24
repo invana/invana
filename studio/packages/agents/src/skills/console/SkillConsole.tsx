@@ -11,7 +11,9 @@
  * | **Log** | the draw's state and each test run's status, newest first |
  *
  * Each tab's count is the length of a list that is fully on screen. The
- * strip's last action folds the console to its tabs and back.
+ * strip's last action folds the console to its tabs and back. The host docks
+ * it and owns the open tab and the fold, so docking it elsewhere when folded
+ * keeps both; unfolded, the console fills the height it is given.
  */
 
 import {
@@ -30,21 +32,31 @@ import {
 import { formatShortDateTime } from "@invana-studio/core";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import type { ReactNode } from "react";
 import { evalsApi } from "../../evals/api";
 import { useSkillTestsQuery } from "../queries";
 import type { SkillPage } from "../useSkillPage";
 import { TestQuestionForm, TestRunsTable } from "./TestRuns";
 
-type ConsoleTab = "tests" | "evals" | "problems" | "log";
+export type ConsoleTab = "tests" | "evals" | "problems" | "log";
 
 const when = (at: string | null) =>
 	at ? formatShortDateTime(new Date(at)) : "running";
 
-export function SkillConsole({ page }: { page: SkillPage }) {
+export function SkillConsole({
+	page,
+	tab,
+	onTabChange,
+	folded,
+	onFoldedChange,
+}: {
+	page: SkillPage;
+	tab: ConsoleTab;
+	onTabChange: (tab: ConsoleTab) => void;
+	folded: boolean;
+	onFoldedChange: (folded: boolean) => void;
+}) {
 	const { username, graphSlug, skill } = page;
-	const [tab, setTab] = useState<ConsoleTab>("tests");
-	const [folded, setFolded] = useState(false);
 	const tests = useSkillTestsQuery(username, graphSlug, skill.id);
 	// The Evals tab's own key, so a run opened there re-reads this list too.
 	const evalRuns = useQuery({
@@ -66,18 +78,18 @@ export function SkillConsole({ page }: { page: SkillPage }) {
 
 	return (
 		<TabbedPanel
-			className="h-auto"
-			bodyClassName={folded ? "hidden" : "max-h-80"}
+			className={folded ? "h-auto" : undefined}
+			bodyClassName={folded ? "hidden" : undefined}
 			activeTab={tab}
 			onTabChange={(v) => {
-				setTab(v as ConsoleTab);
-				setFolded(false);
+				onTabChange(v as ConsoleTab);
+				onFoldedChange(false);
 			}}
 			headerActions={[
 				{
 					name: folded ? "Open the console" : "Fold the console",
 					icon: folded ? ChevronUp : ChevronDown,
-					onClick: () => setFolded((f) => !f),
+					onClick: () => onFoldedChange(!folded),
 				},
 			]}
 			tabs={[

@@ -11,13 +11,15 @@
  * section lists beside it.
  *
  * *From* is where the run came from — a Todo, a schedule, a person asking —
- * never the kind of work it is. Who started a run and the size of its team
+ * never the kind of work it is: a badge per row (Asked · Schedule · Todo ·
+ * Delegated), named once in the legend beside the filters. Who started a run and the size of its team
  * are not columns: the list row carries neither. A row opens the run's page.
  */
 
 import {
 	AppliedFilters,
 	Badge,
+	Card,
 	EmptyState,
 	FilterBar,
 	SegmentedControl,
@@ -28,6 +30,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	TypographyInlineCode,
 } from "@invana/ui";
 import {
 	type ListQuery,
@@ -35,7 +38,7 @@ import {
 	useMembersQuery,
 } from "@invana-studio/core";
 import { useRunsQuery } from "@invana-studio/shell";
-import { FilterSelect, PanelSection } from "@invana-studio/ui";
+import { FilterSelect } from "@invana-studio/ui";
 import { useContext, useMemo, useState } from "react";
 import { FilteredEmpty } from "../lists";
 import { AgentsOpenContext } from "../open";
@@ -144,11 +147,12 @@ export function AgentRunsTab({
 						onChange={setOrigin}
 					/>
 				</FilterBar>
-				{runs.data ? (
-					<span className="ml-auto text-sm text-muted-foreground">
-						{runs.data.total} run{runs.data.total === 1 ? "" : "s"}
-					</span>
-				) : null}
+				<span className="ml-auto text-sm text-muted-foreground">
+					{ORIGIN_OPTIONS.map((o) => o.label).join(" · ")}
+					{runs.data
+						? ` — ${runs.data.total} run${runs.data.total === 1 ? "" : "s"}`
+						: null}
+				</span>
 			</div>
 			<AppliedFilters filters={chips} onRemove={remove} onClearAll={clear} />
 			{runs.isLoading || runs.error ? (
@@ -172,7 +176,7 @@ export function AgentRunsTab({
 					/>
 				)
 			) : (
-				<PanelSection card title="Runs — newest first">
+				<Card className="rounded-none shadow-none">
 					<Table bordered={false} density="compact">
 						<TableHeader>
 							<TableRow>
@@ -194,8 +198,10 @@ export function AgentRunsTab({
 										className={open ? "cursor-pointer" : undefined}
 										onClick={open ? () => open.run(run.id) : undefined}
 									>
-										<TableCell className="font-mono">
-											{runLabel(run.id)}
+										<TableCell className="whitespace-nowrap">
+											<TypographyInlineCode>
+												{runLabel(run.id)}
+											</TypographyInlineCode>
 										</TableCell>
 										<TableCell className="w-full max-w-0 truncate">
 											{run.body?.trim() || run.task_title || run.flow_key}
@@ -226,7 +232,7 @@ export function AgentRunsTab({
 							})}
 						</TableBody>
 					</Table>
-				</PanelSection>
+				</Card>
 			)}
 		</div>
 	);

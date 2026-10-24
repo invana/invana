@@ -8,9 +8,13 @@
  * a **handler** — a line under `## When things go wrong` — reads
  * `handler · from line N` and hangs off the step it guards (the plan's last
  * step when it names none); a **gap** — a line the draw could not map —
- * reads `line N · "…"` and hangs off the step written just before it. Both
- * side cards join by a `binding` edge, so the layout puts them beside the
- * spine of steps. `kind` on a node's data is what the card's outline reads.
+ * reads `line N · "…"` and hangs off the step written just before it, one
+ * card per line. Both side cards join by a `binding` edge, so the layout puts
+ * them beside the spine of steps.
+ *
+ * The steps are one chain in plan order: the plan's own edges, and a
+ * `sequence` edge between any two neighbours it leaves apart — where one
+ * inlined plan ends and the next begins, or around a person's step. `kind` on a node's data is what the card's outline reads.
  */
 
 import {
@@ -111,15 +115,6 @@ export function taskFlowFromPlan(
 		return { id: node.id, type: taskNodeTypeOf(bound), data };
 	});
 
-	// A plan with no edges is its steps in order, drawn as a sequence.
-	const sequence: TaskFlowEdge[] = plan.edges.length
-		? []
-		: plan.nodes.slice(1).map((node, i) => ({
-				id: `${plan.nodes[i].id}->${node.id}:seq`,
-				source: plan.nodes[i].id,
-				target: node.id,
-				data: { kind: "sequence", description: "" },
-			}));
 	const edges: TaskFlowEdge[] = plan.edges.map((edge, i) => ({
 		id: `${edge.source}->${edge.target}:${i}`,
 		source: edge.source,
@@ -129,7 +124,25 @@ export function taskFlowFromPlan(
 			description: edge.label,
 		},
 	}));
-	edges.push(...sequence);
+	// Every step follows the one written before it: two neighbours the plan
+	// does not join — the seam between two inlined plans, a person's step —
+	// are joined in order, so the flow reads as one chain.
+	const joined = new Set(
+		plan.edges.flatMap((e) => [
+			`${e.source}>${e.target}`,
+			`${e.target}>${e.source}`,
+		]),
+	);
+	plan.nodes.slice(1).forEach((node, i) => {
+		const prev = plan.nodes[i].id;
+		if (joined.has(`${prev}>${node.id}`)) return;
+		edges.push({
+			id: `${prev}->${node.id}:seq`,
+			source: prev,
+			target: node.id,
+			data: { kind: "sequence", description: "" },
+		});
+	});
 
 	const aside = (
 		id: string,
@@ -173,7 +186,7 @@ export function taskFlowFromPlan(
 			"when it goes wrong",
 		);
 	});
-	unmapped.forEach((span, i) => {
+	[...new Set(unmapped)].forEach((span, i) => {
 		const line = lineOf(span);
 		aside(
 			gapNodeId(i),

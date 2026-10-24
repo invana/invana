@@ -6,9 +6,10 @@
  * skills and plans it brings, and whether it may run — so that I know what a
  * plan gets by naming its functions.*
  *
- * A record header with the plugin's kind, version and state, then its
- * functions (each opens `task_type:<key>`), its skills, its plans, and what
- * it needs to run: the pip extra and the secret names a worker may resolve.
+ * A record header with the plugin's kind, state, version and function count,
+ * then two columns: its functions (each opens `task_type:<key>`) and the
+ * skills it brings on the left; what it needs to run — the pip extra and the
+ * secret names a worker may resolve — and the plans it brings on the right.
  * Enable and Disable act only on a plugin the engine marks `switchable`, and
  * only for an install Admin — anyone else sees the act drawn disabled,
  * naming the role; a core plugin always runs.
@@ -27,6 +28,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	TypographyInlineCode,
 } from "@invana/ui";
 import { DetailStatus, FormError, PanelSection } from "@invana-studio/ui";
 import { useContext } from "react";
@@ -63,6 +65,8 @@ export function PluginPage({
 			/>
 		);
 
+	const functions = p.task_types.length;
+
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
@@ -80,8 +84,11 @@ export function PluginPage({
 				chips={
 					<>
 						<DetailStatus>{p.kind}</DetailStatus>
-						<DetailStatus>v{p.version}</DetailStatus>
 						<PluginStateChip plugin={p} />
+						<span className="text-sm text-muted-foreground">
+							v{p.version} · {functions}{" "}
+							{functions === 1 ? "function" : "functions"}
+						</span>
 					</>
 				}
 				actions={
@@ -103,79 +110,101 @@ export function PluginPage({
 						</p>
 					) : null}
 
-					<PanelSection card title="Functions" hint={`${p.task_types.length}`}>
-						{p.task_types.length === 0 ? (
-							<p className="text-muted-foreground">It declares none.</p>
-						) : (
-							<Table bordered={false} density="compact">
-								<TableHeader>
-									<TableRow>
-										<TableHead>Function</TableHead>
-										<TableHead>Version</TableHead>
-										<TableHead>Bound</TableHead>
-										<TableHead>Side effect</TableHead>
-										<TableHead className="w-full">What it does</TableHead>
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{p.task_types.map((t) => (
-										<TableRow
-											key={t.key}
-											className="cursor-pointer"
-											onClick={() => onOpenFunction?.(t.key)}
-										>
-											<TableCell className="font-mono">{t.key}</TableCell>
-											<TableCell>v{t.version}</TableCell>
-											<TableCell>
-												<BoundChip bound={t.bound} />
-											</TableCell>
-											<TableCell>{t.side_effect}</TableCell>
-											<TableCell>{t.summary}</TableCell>
-										</TableRow>
-									))}
-								</TableBody>
-							</Table>
-						)}
-					</PanelSection>
+					<div className="grid items-start gap-2.5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+						<div className="flex min-w-0 flex-col gap-2.5">
+							<PanelSection card title="Functions">
+								{functions === 0 ? (
+									<p className="text-muted-foreground">It declares none.</p>
+								) : (
+									<Table bordered={false} density="compact">
+										<TableHeader>
+											<TableRow>
+												<TableHead>Function</TableHead>
+												<TableHead className="w-full">What it does</TableHead>
+												<TableHead>Version</TableHead>
+												<TableHead>Bound</TableHead>
+												<TableHead className="whitespace-nowrap">
+													Side effect
+												</TableHead>
+											</TableRow>
+										</TableHeader>
+										<TableBody>
+											{p.task_types.map((t) => (
+												<TableRow
+													key={t.key}
+													className="cursor-pointer"
+													onClick={() => onOpenFunction?.(t.key)}
+												>
+													<TableCell className="whitespace-nowrap">
+														<TypographyInlineCode>{t.key}</TypographyInlineCode>
+													</TableCell>
+													<TableCell>{t.summary}</TableCell>
+													<TableCell className="whitespace-nowrap">
+														v{t.version}
+													</TableCell>
+													<TableCell>
+														<BoundChip bound={t.bound} />
+													</TableCell>
+													<TableCell>{t.side_effect}</TableCell>
+												</TableRow>
+											))}
+										</TableBody>
+									</Table>
+								)}
+							</PanelSection>
 
-					<PanelSection card title="Skills" hint={`${p.skills.length}`}>
-						{p.skills.length === 0 ? (
-							<p className="text-muted-foreground">It brings none.</p>
-						) : (
-							<PropertyList>
-								{p.skills.map((s) => (
-									<PropertyRow key={s.slug} label={`${s.name} · v${s.version}`}>
-										{s.when_to_use || s.description}
+							<PanelSection card title="Skills it brings">
+								{p.skills.length === 0 ? (
+									<p className="text-muted-foreground">It brings none.</p>
+								) : (
+									<PropertyList labelWidth="auto">
+										{p.skills.map((s) => (
+											<PropertyRow
+												key={s.slug}
+												label={`${s.name} v${s.version}`}
+											>
+												{s.when_to_use || s.description}
+											</PropertyRow>
+										))}
+									</PropertyList>
+								)}
+							</PanelSection>
+						</div>
+
+						<div className="flex min-w-0 flex-col gap-2.5">
+							<PanelSection card title="To run">
+								<PropertyList>
+									<PropertyRow label="Extra" mono>
+										{p.extra || "none — it ships with the engine"}
 									</PropertyRow>
-								))}
-							</PropertyList>
-						)}
-					</PanelSection>
-
-					<PanelSection card title="Plans" hint={`${p.flows.length}`}>
-						{p.flows.length === 0 ? (
-							<p className="text-muted-foreground">It brings none.</p>
-						) : (
-							<PropertyList>
-								{p.flows.map((f) => (
-									<PropertyRow key={f.key} label={`${f.key}@${f.version}`} mono>
-										{f.description}
+									<PropertyRow label="Secrets" mono>
+										{p.secrets.length ? p.secrets.join(", ") : "none"}
 									</PropertyRow>
-								))}
-							</PropertyList>
-						)}
-					</PanelSection>
+								</PropertyList>
+							</PanelSection>
 
-					<PanelSection card title="To run">
-						<PropertyList>
-							<PropertyRow label="Extra" mono>
-								{p.extra || "none — it ships with the engine"}
-							</PropertyRow>
-							<PropertyRow label="Secrets" mono>
-								{p.secrets.length ? p.secrets.join(", ") : "none"}
-							</PropertyRow>
-						</PropertyList>
-					</PanelSection>
+							<PanelSection card title="Plans">
+								{p.flows.length === 0 ? (
+									<p className="text-muted-foreground">It brings none.</p>
+								) : (
+									<PropertyList labelWidth="auto">
+										{p.flows.map((f) => (
+											<PropertyRow
+												key={f.key}
+												label={
+													<span className="font-mono">
+														{f.key}@{f.version}
+													</span>
+												}
+											>
+												{f.description}
+											</PropertyRow>
+										))}
+									</PropertyList>
+								)}
+							</PanelSection>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

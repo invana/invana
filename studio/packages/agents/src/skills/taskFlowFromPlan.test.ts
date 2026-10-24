@@ -48,11 +48,26 @@ describe("taskFlowFromPlan", () => {
 		expect(edges.map((e) => e.data?.kind)).toEqual(["require", "binding"]);
 	});
 
-	it("chains the steps in order when the plan carries no edges", () => {
-		const { edges } = taskFlowFromPlan({ ...plan, edges: [] });
-		expect(edges.map((e) => [e.source, e.target, e.data.kind])).toEqual([
-			["a", "b", "sequence"],
-		]);
+	it("chains every step in plan order and draws one gap per unmapped line", () => {
+		const c = { ...plan.nodes[0], id: "c", source_span: "Count them." };
+		const lines: Record<string, number> = {
+			"List the routes.": 1,
+			"Email it.": 2,
+			"Count them.": 3,
+		};
+		const { nodes, edges } = taskFlowFromPlan(
+			{ ...plan, nodes: [...plan.nodes, c] },
+			[],
+			(s) => (s ? (lines[s] ?? null) : null),
+			["Email it.", "Email it."],
+		);
+		expect(
+			edges
+				.filter((e) => e.data.kind === "sequence")
+				.map((e) => [e.source, e.target]),
+		).toEqual([["b", "c"]]);
+		expect(nodes.filter((n) => n.id.startsWith("gap:"))).toHaveLength(1);
+		expect(edges.at(-1)).toMatchObject({ source: "a", target: gapNodeId(0) });
 	});
 
 	it("hangs a handler off the step it names, else off the last step", () => {
