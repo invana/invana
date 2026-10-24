@@ -4,14 +4,15 @@
  * A viewer opens a skill and reads it: the page opens with the line saying
  * what they may do and who to ask, and *Edit instructions* is drawn disabled —
  * never hidden. The admin, who holds every role, sees neither. Reads a seeded
- * skill; needs `demos/airways`.
+ * skill with no open draft; needs `demos/airways`.
  */
 import { expect, test } from "@playwright/test";
 import { skillNamed } from "./api";
 import { GRAPH } from "./explorer";
 import { memberWithRoles, signInAs } from "./members";
 
-const SKILL = "Answer in natural language";
+// A skill with no open draft: *Edit instructions* is drawn only then.
+const SKILL = "Ask about routes and airports";
 const NOTICE =
 	/You can read this skill\. Editing needs the builder role — ask .+\./;
 

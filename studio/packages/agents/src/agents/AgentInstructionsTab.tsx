@@ -7,9 +7,9 @@
  *
  * Read, the published text sits beside *What it shapes*. *Edit* writes the
  * agent's draft — a row the engine keeps, so it survives a reload and nothing
- * runs on it. *Publish* asks for a reason and goes through the eval gate; the
- * agent's eval set is edited below, and *Run the evals* replays it on the
- * draft against live. A restore is made from History.
+ * runs on it. *Publish* asks for a reason and goes through the eval gate;
+ * *Run the evals* replays the agent's eval set (edited on Evals) on the draft
+ * against live. A restore is made from History.
  */
 
 import { Textarea } from "@invana/forms";
@@ -20,7 +20,6 @@ import { PencilLine, Play, Send, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useRecordHistoryQuery } from "../changes/history";
 import { EvalRunView } from "../evals/EvalRunView";
-import { EvalSetPanel } from "../evals/EvalSetPanel";
 import { GatedActDialog } from "../evals/GatedActDialog";
 import {
 	useEvalMutations,
@@ -35,11 +34,13 @@ export function AgentInstructionsTab({
 	graphSlug,
 	agent,
 	onGoToHistory,
+	onGoToEvals,
 }: {
 	username: string;
 	graphSlug: string;
 	agent: Agent;
 	onGoToHistory: () => void;
+	onGoToEvals: () => void;
 }) {
 	const m = useAgentMutations(username, graphSlug);
 	const evals = useEvalMutations(username, graphSlug, "agent", agent.id);
@@ -173,7 +174,12 @@ export function AgentInstructionsTab({
 							every plan this agent runs is generated with these
 						</PropertyRow>
 						<PropertyRow label="skills">
-							offered {agent.skill_ids.length} · listed under Skills & functions
+							offered {agent.skill_ids.length} · listed on Overview
+						</PropertyRow>
+						<PropertyRow label="evals">
+							<Button size="xs" variant="link" onClick={onGoToEvals}>
+								the eval set a publish is gated by
+							</Button>
 						</PropertyRow>
 						<PropertyRow label="last change">
 							{last ? (
@@ -191,13 +197,6 @@ export function AgentInstructionsTab({
 			{runId ? (
 				<EvalRunView run={run.data} cases={set.data?.cases ?? []} />
 			) : null}
-
-			<EvalSetPanel
-				username={username}
-				graphSlug={graphSlug}
-				kind="agent"
-				subjectId={agent.id}
-			/>
 
 			<GatedActDialog
 				open={publishing}

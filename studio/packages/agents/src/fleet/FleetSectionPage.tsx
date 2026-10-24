@@ -15,7 +15,8 @@
  * - **Table** (`/agents/fleet/table`) — every agent's or skill's numbers over
  *   7 days ({@link FleetTable}).
  *
- * Nothing is decided here: every act opens the place it already lives — a
+ * *New agent* in the head makes a draft agent and opens it on its builder.
+ * Otherwise nothing is decided here: every act opens the place it already lives — a
  * run, an agent or Performance as a workbook tab, Activity › Approvals, the
  * change log's compare. Every number comes from the engine's fleet read.
  * Tokens, never currency.
@@ -42,6 +43,7 @@ import {
 import { PanelSection } from "@invana-studio/ui";
 import { Pencil, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { NewAgentButton } from "../agents/NewAgentButton";
 import { type AgentsOpen, useAgentsOpen } from "../open";
 import {
 	changeText,
@@ -90,6 +92,7 @@ export function FleetSectionPage({
 			section="fleet"
 			tab={tab}
 			onTab={onTab}
+			actions={<NewAgentButton username={username} graphSlug={graphSlug} />}
 			chips={
 				data ? (
 					<Badge variant="outline" tone="muted" size="xs">

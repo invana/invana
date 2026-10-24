@@ -88,7 +88,8 @@ test("an agent's budget reads in tokens, never money", async ({ page }) => {
 	});
 	try {
 		await page.goto(`${AGENTS}/agents?page=agent:${made.id}`);
-		await expect(page.getByText("up to 8k tokens a run").first()).toBeVisible({
+		// A new agent is a draft: its builder's Limits names the run budget.
+		await expect(page.getByText(/^8k a run · /).first()).toBeVisible({
 			timeout: 30_000,
 		});
 		await expect(page.locator("body")).not.toContainText("$");

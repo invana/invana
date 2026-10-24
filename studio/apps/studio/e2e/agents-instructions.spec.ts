@@ -19,6 +19,11 @@ async function makeAgent(page: Page, tag: string): Promise<string> {
 		method: "POST",
 		data: { name: `e2e-${tag}-${stamp}`, instructions: "Answer briefly." },
 	});
+	// A new agent is a draft; these stories read a live one.
+	await graphApi(page, `/agents/${made.id}/create`, {
+		method: "POST",
+		data: {},
+	});
 	return made.id;
 }
 
@@ -72,7 +77,7 @@ test("AG-04 · AG-06 a draft publishes and History names the change", async ({
 test("AG-08 an eval case is added through the panel", async ({ page }) => {
 	const id = await makeAgent(page, "evals");
 	try {
-		await openAgentTab(page, id, "Instructions");
+		await openAgentTab(page, id, "Evals");
 		await page.getByRole("button", { name: "Add a case" }).click();
 		await page.getByLabel("Question").fill("Which routes leave LHR?");
 		await page.getByRole("button", { name: "Add case" }).click();
@@ -92,8 +97,10 @@ test("AG-09 a skill's History lists its versions", async ({ page }) => {
 	await expect(page.getByRole("cell", { name: /^v\d+$/ }).first()).toBeVisible({
 		timeout: 15_000,
 	});
-	await page.getByRole("tab", { name: /^Plan/ }).click();
-	await expect(page.getByText(/\d+ steps? · \d of 6 layers/)).toBeVisible({
+	await page.getByRole("tab", { name: "Flow" }).click();
+	await expect(
+		page.getByText(/^Drawn from the instructions, v\d+\./),
+	).toBeVisible({
 		timeout: 15_000,
 	});
 });
@@ -150,11 +157,11 @@ test("AG-14 an agent pins a model version and History names it", async ({
 }) => {
 	const id = await makeAgent(page, "pin");
 	try {
-		await openAgentTab(page, id, "Thinking");
+		await openAgentTab(page, id, "Model");
 		await expect(page.getByText("Model version").first()).toBeVisible({
 			timeout: 15_000,
 		});
-		await page.getByLabel("Move to").click();
+		await page.getByLabel("Pinned").click();
 		const option = page.getByRole("option").first();
 		const address = (await option.textContent())?.trim() ?? "";
 		expect(address).toMatch(/^llm\//);
@@ -168,7 +175,7 @@ test("AG-14 an agent pins a model version and History names it", async ({
 			.getByRole("button", { name: `Pin ${address}` })
 			.click();
 		await expect(page.getByRole("dialog")).toHaveCount(0, { timeout: 15_000 });
-		await expect(page.getByText(address).first()).toBeVisible();
+		await expect(page.getByLabel("Pinned")).toContainText(address);
 
 		await page.getByRole("tab", { name: "History" }).click();
 		await expect(page.getByText("model version changed").first()).toBeVisible({

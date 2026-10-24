@@ -1,5 +1,7 @@
 import type { WorkbookPage, WorkbookPageMenuItem } from "@invana/ui";
 import {
+	type AgentsOpen,
+	AgentsOpenContext,
 	EVERY_AGENT,
 	useAgentsQuery,
 	useSkillsQuery,
@@ -59,6 +61,8 @@ export const GRAPH_PAGE_ID = "graph";
 /** What the open pages read from the page that hosts them. */
 export interface OpenPagesDeps {
 	username: string | undefined;
+	/** The Agents openers, so a record page opened as a declared page links like a section row. */
+	agentsOpeners?: AgentsOpen | null;
 	graphSlug: string | undefined;
 	/** The setup wizard is open, which puts the graph page in front. */
 	onboardingOpen: boolean;
@@ -391,7 +395,9 @@ export function useOpenPages(deps: OpenPagesDeps) {
 					// page becomes `kind:id@version`.
 					onOpenVersion={(versionId) => openBoard({ ...board, versionId })}
 				>
-					{declaredBoardContent(board, declaredDeps)}
+					<AgentsOpenContext.Provider value={deps.agentsOpeners ?? null}>
+						{declaredBoardContent(board, declaredDeps)}
+					</AgentsOpenContext.Provider>
 				</DeclaredBoard>
 			),
 		})),

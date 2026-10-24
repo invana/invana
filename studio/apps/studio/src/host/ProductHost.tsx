@@ -441,6 +441,7 @@ export function ProductHost() {
 	// The pages open in `mainSection`, the active one, and the strip's actions.
 	const strip = useOpenPages({
 		username,
+		agentsOpeners: agentsSections.openers,
 		graphSlug,
 		onboardingOpen,
 		setupOutstanding,

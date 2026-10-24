@@ -20,6 +20,7 @@ export interface Envelope {
 }
 
 export interface AgentDraft {
+	name: string;
 	budget: Record<string, number>;
 	effort: Record<string, number>;
 	policy: Record<string, boolean>;
@@ -29,6 +30,7 @@ export interface AgentDraft {
 }
 
 export const draftOf = (agent: Agent): AgentDraft => ({
+	name: agent.name ?? "",
 	budget: { ...(agent.budget ?? {}) },
 	effort: { ...(agent.effort ?? {}) } as Record<string, number>,
 	policy: { ...(agent.policy ?? {}) },
@@ -44,6 +46,8 @@ const same = (a: unknown, b: unknown) =>
 export function changesOf(agent: Agent, draft: AgentDraft): AgentUpdate {
 	const saved = draftOf(agent);
 	const out: AgentUpdate = {};
+	if (draft.name.trim() && draft.name !== saved.name)
+		out.name = draft.name.trim();
 	if (!same(draft.budget, saved.budget)) out.budget = draft.budget;
 	if (!same(draft.effort, saved.effort)) out.effort = draft.effort;
 	if (!same(draft.policy, saved.policy)) out.policy = draft.policy;

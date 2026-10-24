@@ -32,6 +32,7 @@ export { useRunStep } from "./activity/runs/boards/useRunStep";
 export { useRunsQuery } from "./activity/runs/queries";
 export { RunsBoardPage } from "./activity/runs/RunsBoardPage";
 export { StepTouchWidget } from "./activity/runs/touches/StepTouchWidget";
+export { useSchedulesQuery } from "./activity/schedules/queries";
 export { ScheduleDialog } from "./activity/schedules/ScheduleDialog";
 // The board record and its versions and reports — what a canvas tab saves.
 export { boardsApi } from "./boards/api";

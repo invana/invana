@@ -6,7 +6,7 @@
  * offered, what it is doing and how it ran this week — so that I can find the
  * one to look at without opening each.*
  *
- * The list is on the list contract (list-contract.md): `All · Live`, the
+ * The list is on the list contract (list-contract.md): `All · Live · Drafts`, the
  * search box, the kind and status selects and the spawned-helpers toggle all
  * write the URL (`?q=` · `?f.status=` · `?f.kind=` · `?f.ephemeral=shown`),
  * the engine filters, and the applied-filters strip names what is applied
@@ -20,7 +20,8 @@
  *   `tokens_this_month` against the agent's own `max_tokens_month`.
  *
  * A row opens the agent's page as a workbook tab beside this one. A row
- * carries no acts: pausing, retiring and editing are the page's.
+ * carries no acts: pausing, retiring and editing are the page's. *New agent*
+ * makes a draft and opens it on the builder.
  */
 
 import { type ColumnDef, DataTable } from "@invana/tables";
@@ -55,6 +56,7 @@ import { FleetReadState, pct, tokens } from "../overview/fleetParts";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";
 import { useSkillsQuery } from "../skills/queries";
+import { NewAgentButton } from "./NewAgentButton";
 import { useAgentsQuery } from "./queries";
 import type { Agent } from "./types";
 
@@ -62,16 +64,26 @@ const KIND_OPTIONS = ["seeded", "authored", "spawned"].map((value) => ({
 	value,
 	label: value,
 }));
-const STATUS_OPTIONS = ["active", "paused", "retired"].map((value) => ({
-	value,
-	label: value,
-}));
+const STATUS_OPTIONS = ["draft", "active", "paused", "retired"].map(
+	(value) => ({
+		value,
+		label: value,
+	}),
+);
 
-/** `All` asks for no status (the engine leaves retired out); `Live` is `active`. */
+/**
+ * `All` asks for no status (the engine leaves retired out); `Live` is
+ * `active`; `Drafts` is `draft` — agents not yet created.
+ */
 const SHOWING = [
 	{ value: "all", label: "All" },
 	{ value: "live", label: "Live" },
+	{ value: "drafts", label: "Drafts" },
 ];
+const SHOWING_STATUS: Record<string, string> = {
+	live: "active",
+	drafts: "draft",
+};
 
 interface Row {
 	agent: Agent;
@@ -116,6 +128,7 @@ export function AgentsListPage({ username, graphSlug }: SectionPageProps) {
 	return (
 		<SectionPage
 			section="agents"
+			actions={<NewAgentButton username={username} graphSlug={graphSlug} />}
 			chips={
 				page ? (
 					<Badge variant="outline" tone="muted" size="xs">
@@ -129,9 +142,17 @@ export function AgentsListPage({ username, graphSlug }: SectionPageProps) {
 					<SegmentedControl
 						size="sm"
 						aria-label="Showing"
-						value={status === "active" ? "live" : status ? "" : "all"}
+						value={
+							status === "active"
+								? "live"
+								: status === "draft"
+									? "drafts"
+									: status
+										? ""
+										: "all"
+						}
 						onValueChange={(v) =>
-							setOne(list, "status", v === "live" ? "active" : "")
+							setOne(list, "status", SHOWING_STATUS[v] ?? "")
 						}
 						options={SHOWING}
 					/>

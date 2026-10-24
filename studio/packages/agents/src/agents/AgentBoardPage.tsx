@@ -1,24 +1,32 @@
 /**
- * The agent's page, as a page in `mainSection` — `agent:<id>` on the
- * strip, the Agents list left beside it in `leftSection`.
+ * The agent's page as a page in `mainSection` — `agent:<id>` on the strip.
  *
- * This is the host half: which agent, whether it is the Graph default, and the
- * writes — Save, bind, pause, resume, retire, make default. {@link AgentDetail}
- * is the page itself. Pause and Retire go through the same confirm the section
- * uses, naming the open work they would disturb.
+ * This is the host half: which agent (read by id, so a draft or a retired
+ * agent opens), whether it is the Graph default, and the writes — Save,
+ * Create agent, pause, resume, retire, make default. {@link AgentDetail} is
+ * the page itself. Pause and Retire go through one confirm that names the
+ * open work they would disturb; *Create agent* goes through the eval gate,
+ * and a refusal opens the gated confirm with the engine's words.
  */
 
-import { EmptyState, Spinner } from "@invana/ui";
+import { RecordHeader } from "@invana/ui";
+import { Bot } from "lucide-react";
 import { useState } from "react";
+import { GatedActDialog } from "../evals/GatedActDialog";
+import { useEvalMutations } from "../evals/queries";
 import { AgentDetail } from "./AgentDetail";
+import { TabReadState } from "./agentParts";
 import { LifecycleDialog } from "./LifecycleDialog";
 import {
-	EVERY_AGENT,
 	useAgentMutations,
+	useAgentQuery,
 	useAgentsQuery,
 	useLifecyclePreviewQuery,
 } from "./queries";
 import type { LifecycleAct } from "./types";
+
+/** One row is enough: the page reads `default_agent_id`, not the list. */
+const DEFAULT_ONLY = { limit: 1 };
 
 export function AgentBoardPage({
 	username,
@@ -33,11 +41,12 @@ export function AgentBoardPage({
 	onOpenLineage: (agentId: string) => void;
 	onOpenEnvelope: (agentId: string) => void;
 }) {
-	// The same list the section reads, so the page and the row never disagree
-	// about status or default — and a retired or ephemeral agent still opens.
-	const query = useAgentsQuery(username, graphSlug, EVERY_AGENT);
+	const query = useAgentQuery(username, graphSlug, agentId);
+	const defaults = useAgentsQuery(username, graphSlug, DEFAULT_ONLY);
 	const mutations = useAgentMutations(username, graphSlug);
+	const evals = useEvalMutations(username, graphSlug, "agent", agentId);
 	const [confirming, setConfirming] = useState<LifecycleAct | null>(null);
+	const [gated, setGated] = useState(false);
 	const preview = useLifecyclePreviewQuery(
 		username,
 		graphSlug,
@@ -45,20 +54,27 @@ export function AgentBoardPage({
 		confirming ?? undefined,
 	);
 
-	const agent = query.data?.items.find((a) => a.id === agentId) ?? null;
-	if (query.isLoading)
-		return (
-			<div className="flex h-full items-center justify-center">
-				<Spinner />
-			</div>
-		);
+	const agent = query.data;
 	if (!agent)
 		return (
-			<EmptyState
-				className="h-full"
-				title="This agent is not in the Graph"
-				description="It may have been removed. Close this page, or pick an agent in the Agents list."
-			/>
+			<div className="flex h-full min-h-0 flex-col">
+				<RecordHeader variant="page" icon={<Bot />} crumbs={["Agents"]} />
+				<TabReadState
+					loading={query.isLoading}
+					error={query.error ?? new Error("This agent is not in the Graph.")}
+					what="this agent"
+					onRetry={() => void query.refetch()}
+				/>
+			</div>
+		);
+
+	const makeLive = (why: string) =>
+		mutations.makeLive.mutate(
+			{ id: agent.id, why },
+			{
+				onSuccess: () => setGated(false),
+				onError: () => setGated(true),
+			},
 		);
 
 	return (
@@ -67,30 +83,18 @@ export function AgentBoardPage({
 				username={username}
 				graphSlug={graphSlug}
 				agent={agent}
-				isDefault={agent.id === query.data?.default_agent_id}
+				isDefault={agent.id === defaults.data?.default_agent_id}
 				isSaving={mutations.update.isPending}
 				saveError={mutations.update.error}
 				onSave={(data) => mutations.update.mutate({ id: agent.id, data })}
+				onCreate={() => makeLive("")}
+				creating={mutations.makeLive.isPending}
 				onPause={() => setConfirming("pause")}
 				onResume={() => mutations.resume.mutate(agent.id)}
 				onRetire={() => setConfirming("retire")}
 				onSetDefault={() => mutations.setDefault.mutate(agent.id)}
 				onOpenLineage={() => onOpenLineage(agent.id)}
 				onOpenEnvelope={() => onOpenEnvelope(agent.id)}
-				onBindSkill={(skillId) => {
-					// Cleared first, so the card under the skill is this pick's
-					// refusal and never the last one's.
-					mutations.bindSkill.reset();
-					mutations.bindSkill.mutate({ id: agent.id, skillId });
-				}}
-				onUnbindSkill={(skillId) => {
-					mutations.bindSkill.reset();
-					mutations.unbindSkill.mutate({ id: agent.id, skillId });
-				}}
-				bindError={mutations.bindSkill.error}
-				isBinding={
-					mutations.bindSkill.isPending || mutations.unbindSkill.isPending
-				}
 			/>
 			<LifecycleDialog
 				agent={confirming ? agent : null}
@@ -104,6 +108,21 @@ export function AgentBoardPage({
 					else if (confirming === "pause") mutations.pause.mutate(agent.id);
 					setConfirming(null);
 				}}
+			/>
+			<GatedActDialog
+				open={gated}
+				title={`Create ${agent.name}`}
+				description="It goes live as v1: it can be assigned, scheduled and asked once it is created."
+				confirm="Create agent"
+				pending={mutations.makeLive.isPending}
+				error={mutations.makeLive.error}
+				onConfirm={makeLive}
+				onClose={() => {
+					mutations.makeLive.reset();
+					setGated(false);
+				}}
+				onRunEvals={() => evals.open.mutate({ side: "draft" })}
+				runningEvals={evals.open.isPending}
 			/>
 		</>
 	);
