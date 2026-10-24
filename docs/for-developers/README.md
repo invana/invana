@@ -109,6 +109,7 @@ this map.** Feature numbers do not change.
 | 3.12 | [The answer, in words](modules/ask/features/the-answer-in-words.md) | A few cited sentences over the records, in the agent's voice — words first, records after | 🔵 | — | 🔵 | S-TBD |
 | 3.13 | [Beyond the graph](modules/ask/features/beyond-the-graph.md) | The internet — the first third-party source — and the model's own knowledge, where a world allows; badged third-party, with the reference | 🔵 | — | 🔵 | S-TBD |
 | 3.14 | [Fork a session](modules/ask/features/fork-a-session.md) | Branch a thread at a reply — its turns and its board copied, its parent named, its forks listed | 🔵 | — | 🔵 | S-TBD |
+| 3.15 | [The assistant opens boards](modules/ask/features/the-assistant-opens-boards.md) | Ask for a list and the assistant opens it with the filters set, marked *set by the assistant*, its reply carrying the link | 🟡 | — | 🟡 | F05 |
 
 ## 4 · [Explore](modules/explore/spec.md)
 
@@ -136,7 +137,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 5.1 | [Providers and models](modules/agents/features/providers-and-models.md) | A provider row per Graph, holding its models; ping it. **No default — the cast picks** | 🟡 | — | 🟡 | S5 · **S16** |
 | 5.2 | [Author an agent](modules/agents/features/author-an-agent.md) | Author an agent; give it skills and the callables they need, standing limits, a way of thinking and a voice. The world comes with the work | 🟡 | — | 🟡 | S12c · **S16** |
 | 5.3 | [Set what an agent may run](modules/agents/features/envelope-and-budget.md) | What an agent may run, with what arguments, and its token budgets — a run and a month | 🟡 | — | 🟡 | S12c · **S16** |
-| 5.4 | [Delegation](modules/agents/features/delegation.md) | Agents that spawn agents, bounded by the parent | ✅ | — | ✅ | S12d |
+| 5.4 | [Delegation](modules/agents/features/delegation.md) | Agents that spawn agents, bounded by the parent — escrow, four ceilings, exit reasons, may delegate to | 🟡 | — | ✅ | S12d · F05 |
 | 5.5 | [Pause, resume, retire](modules/agents/features/lifecycle.md) | Pause · resume · retire; the row stays so lineage resolves | ✅ | — | 🟡 | S12c |
 | 5.6 | [Who spawned whom](modules/agents/features/lineage.md) | Who authored whom, who spawned whom, on what run | ✅ | — | ✅ | S12c |
 | 5.7 | [How many run at once](modules/agents/features/concurrency-and-contention.md) | How many run at once in a Graph, the pools, and what happens at the ceiling | 🟡 | — | 🔵 | S12e · **S16** |
@@ -146,6 +147,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 5.11 | [Remote agents](modules/agents/features/remote-agents.md) | Hand a task to an agent outside the Graph over A2A — asked each time, only allowed fields sent, its PR returned for a person. **Implement later** | 🔵 | 🔵 | 🔵 | Later |
 | 5.12 | [The Agents shell](modules/agents/features/the-agents-shell.md) | A rail and a workbook, no leftSection: Home, Fleet, Performance, Agents, Skills, Functions, Connections › MCP servers, LLMs and Settings as pages, each a tab | — | — | ✅ | F03 |
 | 5.13 | [The agent page](modules/agents/features/the-agent-page.md) | Build an agent on its page — a draft until *Create agent* — and read it in eleven tabs: Overview · Runs · Instructions · Soul · Model · Flow · Access · Limits · Deploy · Evals · History | 🟡 | — | 🟡 | F04 |
+| 5.14 | [Runs and the run page](modules/agents/features/the-run-page.md) | One runs list; a run read in six tabs at any size — Overview · Agents · Stages · Assets · Data touched · Ledger; rerun as it was, on today's versions, or retuned | 🟡 | — | 🟡 | F05 |
 
 ## 6 · [Skills](modules/skills/spec.md)
 
@@ -204,7 +206,8 @@ provider row and its models, and reopens four rows below. The shapes:
 | 10.5 | [See what ran](modules/operate/features/see-what-ran.md) | **Runs** — every run in the Graph, children nested; Imports is a filter of it | 🟡 | — | 🟡 | S14 |
 | 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | ✅ | B01 |
 | 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | 🟡 | B08 |
-| 10.8 | [Approvals](modules/operate/features/approvals.md) | Anything sent outside waits for a named approver; a reminder at half-time; at the deadline *expired, not sent* | ✅ | ✅ | 🟡 | B08 |
+| 10.8 | [Approvals](modules/operate/features/approvals.md) | Every ask — access, budget, delegation, send, question — in one queue routed to its owner; alert rules over the ledger; a reminder at half-time; at the deadline *expired, not sent* | 🟡 | ✅ | 🟡 | B08 · F05 |
+| 10.9 | [The ledger](modules/operate/features/the-ledger.md) | Every act by a person or an agent — who, through which agents, what it touched, allowed or refused — append-only, hash-chained, by row · actor · record · refusal, exportable | 🟡 | — | 🟡 | F05 |
 
 
 ## 11 · [Identity and access](modules/identity-and-access/spec.md)
@@ -417,7 +420,7 @@ replacement lands.
 | F02 | terminology · 7.x · 13.9 | A clean checkout migrates from one baseline, loads airways, and no `TaskPlan` or old task-type key is left in engine, API or Studio |
 | F03 | 5.1 · 5.7 · 5.10 · 6.x · 13.9 · 13.13 | Every surface the Agents product had is reachable from the new rail with no leftSection, and the code it replaced is deleted |
 | F04 | 5.2 · 5.3 · 5.5 · 5.8 · 5.9 · 6.x | An agent is built on its page from a drafted skill, its Flow matches its instructions, and publishing passes the eval gate |
-| F05 | 10.5 · 10.8 · 5.4 · 10.2 · 3.x | The assistant opens Runs with filters it set, and every act in a run has a ledger row |
+| F05 | 5.14 · 10.9 · 10.8 · 5.4 · 3.15 | The assistant opens Runs with filters it set, and every act in a run has a ledger row |
 | I01 | 11.4–11.6 · the IAM features | A skill need no policy covers is refused naming the policy; a narrowed token can push a draft dataset and nothing else |
 | I02 | 10.4 · 13.13 | Claude Code, with a narrowed token, pushes a draft dataset version over this Graph's MCP server and a person publishes it |
 | F06 | 13.11 | A worker on a second machine joins with a service-account token and runs a tool step |

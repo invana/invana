@@ -107,7 +107,7 @@ flowchart TD
 | AS9 | **Connections shows only MCP servers.** *This Graph's server* arrives with I02 and *Remote agents* with 5.11; neither tab is drawn before it works |
 | AS10 | **A tile's count is a list's `total` or an engine field**, never a count Studio makes; a tile with no such number names the section in words |
 | AS11 | **Settings keeps the pools** until Workers holds them; the ceiling is the page's first card |
-| AS12 | **The rail holds only built sections.** Runs, Workers, Approvals and Ledger join it with their phases; until then runs are read in the shell's Activity |
+| AS12 | **The rail holds only built sections.** Runs, Approvals and Ledger sit between LLMs and Settings with a divider before them; Workers joins with its phase. Runs and Approvals carry a badge — live runs, asks for you — counted by the engine |
 | AS13 | **`+` on the strip opens ⌘K**, which lists the sections, the agents and skills, and the recent runs — the one way to open anything, not a second menu. With nothing typed it shows the product's sections, its first records and the Graph's newest runs as *Recent*; sections carry no counts (the palette reads no totals) |
 | AS14 | **Packaged plans are `origin=packaged`; Promoted plans are `origin=promoted · authored`.** A one-off `generated` plan belongs to its Todo and is never listed ([LB6](../../workflows/features/the-library.md)), so no tab is named for it. Each tab sends its own origin filter to `/flows`; neither filters in the browser. The path is `/agents/functions/promoted` |
 | AS15 | **Functions' tabs share one URL search (`?q=`) and each sends only its own filters.** Switching tabs keeps the search and drops filters the next tab does not know |
