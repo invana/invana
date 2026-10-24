@@ -112,6 +112,9 @@ function useTileLines(
 
 	return {
 		fleet: "agents, skills, functions",
+		runs: "every run, any size",
+		approvals: "asks waiting on a person",
+		ledger: "every act, allowed or refused",
 		performance: perf
 			? `${perf.tiles.degraded} degraded against its baseline`
 			: reading,

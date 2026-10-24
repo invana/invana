@@ -109,8 +109,16 @@ export interface TaskRun {
 	rerunOfRunId?: string;
 }
 
-/** Which versions a re-run replays: the ones the run recorded, or today's. */
-export type RerunVersions = "same" | "current";
+/** Which versions a re-run replays: the ones the run recorded, today's, or retuned. */
+export type RerunVersions = "same" | "current" | "retune";
+
+/** What a retune changes; anything left out stays as the run recorded it. */
+export interface RerunRetune {
+	agent_version?: number;
+	model_version?: string;
+	max_tokens_run?: number;
+	lens_id?: string;
+}
 
 /** A re-run, opened: the new root run, linked to the one it re-ran. */
 export interface RunRerunResult {
@@ -276,6 +284,7 @@ export const runsApi = {
 		graphSlug: string,
 		id: string,
 		versions: RerunVersions,
+		retune: RerunRetune = {},
 	): Promise<RunRerunResult> => {
 		const d = await request<{
 			run_id: string;
@@ -283,7 +292,7 @@ export const runsApi = {
 			model_version?: string | null;
 		}>(`${base(username, graphSlug)}/${id}/rerun`, {
 			method: "POST",
-			body: JSON.stringify({ versions }),
+			body: JSON.stringify({ versions, ...retune }),
 		});
 		return {
 			runId: d.run_id,

@@ -25,6 +25,11 @@ export { activityPath, comparePath } from "./activity/activityPath";
 export type { ChangeEntry } from "./activity/changes/history";
 export { effectLine, useRecordHistories } from "./activity/changes/history";
 export type { EventListResponse } from "./activity/events/types";
+export { approvalsApi } from "./activity/notifications/api";
+export type {
+	Approval,
+	ApprovalPage,
+} from "./activity/notifications/types";
 export { QueryStepBoard } from "./activity/runs/boards/QueryStepBoard";
 export { RunBoardPage } from "./activity/runs/boards/RunBoardPage";
 export { runAddress } from "./activity/runs/boards/runBoards";

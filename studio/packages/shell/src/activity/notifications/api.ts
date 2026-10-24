@@ -15,10 +15,10 @@ import {
 	type GraphRef,
 	type ListQuery,
 	listQueryToApi,
-	type Page,
 } from "@invana-studio/core";
 import type {
 	Approval,
+	ApprovalPage,
 	Channel,
 	ChannelListResponse,
 	ChannelWrite,
@@ -88,9 +88,9 @@ export const notificationsApi = {
 
 export const approvalsApi = {
 	/** `q` searches the subject; `status` · `kind` · `mine=true` filter; newest first. */
-	async list(g: GraphRef, query: ListQuery = {}): Promise<Page<Approval>> {
+	async list(g: GraphRef, query: ListQuery = {}): Promise<ApprovalPage> {
 		return (
-			await apiClient.get<Page<Approval>>(
+			await apiClient.get<ApprovalPage>(
 				`${graphBase(g)}/approvals${listQueryToApi(query)}`,
 			)
 		).data;
@@ -99,11 +99,17 @@ export const approvalsApi = {
 		return (await apiClient.get<Approval>(`${graphBase(g)}/approvals/${id}`))
 			.data;
 	},
-	async approve(g: GraphRef, id: string, note = ""): Promise<Approval> {
+	/** Approve; `always` only on a delegation, which also writes *May delegate to*. */
+	async approve(
+		g: GraphRef,
+		id: string,
+		note = "",
+		scope: "run" | "always" = "run",
+	): Promise<Approval> {
 		return (
 			await apiClient.post<Approval>(
 				`${graphBase(g)}/approvals/${id}/approve`,
-				{ note },
+				{ note, scope },
 			)
 		).data;
 	},

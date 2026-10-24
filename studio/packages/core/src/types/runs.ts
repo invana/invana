@@ -198,6 +198,18 @@ export interface TaskRunSummary {
 	tokens: number;
 	/** Dollars over its priced steps; absent is *unknown*, never `$0.00`. */
 	cost_usd?: number | null;
+	/** The run's number in its Graph — `#2291`. */
+	number?: number | null;
+	/** The root agent's name, as it is now. */
+	agent_name?: string | null;
+	/** `Explorer` · `Todo` · `Schedule` · `Project` · `API`. */
+	origin?: string | null;
+	/** The person it is on behalf of, by username. */
+	started_by_name?: string | null;
+	/** How many agents the run used. */
+	agents?: number;
+	/** Why it ended; null while it runs. */
+	exit_reason?: string | null;
 }
 
 /** The journal's tiles over a window, counted by the engine over every run. */
@@ -217,6 +229,12 @@ export interface RunStats {
 	slowest: { run_id: string; title: string; duration_ms: number } | null;
 	/** Oldest first, empty days included; `day` is `YYYY-MM-DD` in the reader's zone. */
 	by_day: { day: string; runs: number }[];
+	/** Ended runs in the window that served, and those that did not, by reason. */
+	served?: number;
+	not_served?: number;
+	not_served_by_reason?: Record<string, number>;
+	/** Pending asks routed to the reader, standing now. */
+	waiting_approvals?: number;
 }
 
 /** What a stats read asks for: the window in days, and kinds of work. */

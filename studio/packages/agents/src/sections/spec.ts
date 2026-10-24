@@ -12,10 +12,13 @@ import type { ProductIcon } from "@invana-studio/core";
 import {
 	Bot,
 	BrainCircuit,
+	ClipboardList,
 	Gauge,
 	House,
+	Inbox,
 	Network,
 	Pencil,
+	Play,
 	Plug,
 	Settings,
 	SquareFunction,
@@ -30,6 +33,9 @@ export type AgentsSectionKey =
 	| "functions"
 	| "connections"
 	| "llms"
+	| "runs"
+	| "approvals"
+	| "ledger"
 	| "concurrency";
 
 interface SectionTab {
@@ -115,6 +121,36 @@ export const SECTIONS: Record<AgentsSectionKey, SectionSpec> = {
 		description:
 			"Every model by its exact version name — a run records the version it used; moving an agent is a change, with evals",
 		tabs: [],
+	},
+	runs: {
+		label: "Runs",
+		icon: Play,
+		description:
+			"Every run in this Graph — the numbers are the engine's, stored when each run settles",
+		tabs: [],
+	},
+	approvals: {
+		label: "Approvals",
+		icon: Inbox,
+		description:
+			"Every ask waiting on a person — access, budget, delegation, sends, questions — routed to whoever owns the thing asked for",
+		tabs: [
+			{ key: "waiting", label: "Waiting" },
+			{ key: "alerts", label: "Alert rules" },
+		],
+	},
+	ledger: {
+		label: "Ledger",
+		icon: ClipboardList,
+		description:
+			"Every act by a person or an agent — who, through which agents, what it touched, allowed or refused",
+		tabs: [
+			{ key: "rows", label: "Rows" },
+			{ key: "actor", label: "By actor" },
+			{ key: "record", label: "By record" },
+			{ key: "refusals", label: "Refusals" },
+			{ key: "export", label: "Export" },
+		],
 	},
 	concurrency: {
 		label: "Settings",

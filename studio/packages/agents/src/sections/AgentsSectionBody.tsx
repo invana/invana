@@ -5,6 +5,9 @@
  */
 
 import { AgentsListPage } from "../agents/AgentsListPage";
+import { ApprovalsPage } from "../approvals/ApprovalsPage";
+import { LedgerPage } from "../ledger/LedgerPage";
+import { RunsListPage } from "../runs/RunsListPage";
 import { ConnectionsSectionPage } from "../connections/ConnectionsSectionPage";
 import { FleetSectionPage } from "../fleet/FleetSectionPage";
 import { FunctionsSectionPage } from "../functions/FunctionsSectionPage";
@@ -22,6 +25,9 @@ const PAGES = {
 	functions: FunctionsSectionPage,
 	connections: ConnectionsSectionPage,
 	llms: LlmsPage,
+	runs: RunsListPage,
+	approvals: ApprovalsPage,
+	ledger: LedgerPage,
 	concurrency: SettingsSectionPage,
 } satisfies Record<
 	Exclude<AgentsSectionKey, "home">,

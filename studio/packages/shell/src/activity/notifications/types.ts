@@ -125,4 +125,30 @@ export interface Approval {
 	decided_at: string | null;
 	note: string;
 	created_at: string;
+	/** `access` · `budget` · `delegation` · `send` · `question` · `publish`. */
+	kind?: string;
+	/** The person at the root, then each agent to the one asking. */
+	asked_by?: { kind: string; id?: string | null; name: string }[];
+	/** One line: what is wanted. */
+	wants?: string;
+	/** Why it went to these approvers — `world owner`, `started the run`. */
+	routed_reason?: string;
+	approver_names?: string[];
+	step_run_id?: string | null;
+	run_number?: number | null;
+	/** `run` · `always` — how a delegation was allowed. */
+	scope?: string | null;
+	/** The reader is a named approver and it is still pending. */
+	can_decide?: boolean;
+	decided_by_name?: string | null;
+}
+
+/** A page of asks, with the engine's counts for the Waiting tabs. */
+export interface ApprovalPage {
+	items: Approval[];
+	total: number;
+	next_cursor?: string | null;
+	applied?: unknown;
+	for_you: number;
+	pending: number;
 }

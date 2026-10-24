@@ -16,6 +16,9 @@
  * | Functions | `/agents/functions` | Functions · `plans` · `promoted` · `templates` · `plugins` |
  * | Connections | `/agents/connections/mcp` | MCP servers |
  * | LLMs | `/agents/llms[/:provider]` | — an endpoint opens in a modal |
+ * | Runs | `/agents/runs` | — a run opens as a tab (`?page=run:<id>`) |
+ * | Approvals | `/agents/approvals` | Waiting · `alerts` |
+ * | Ledger | `/agents/ledger` | Rows · `actor` · `record` · `refusals` · `export` |
  * | Settings | `/agents/settings` | — |
  *
  * A tab is not a level of the trail, so only a section and an endpoint carry
@@ -75,6 +78,8 @@ export const agents: ProductDefinition = {
 				rail("connections"),
 				rail("llms"),
 			],
+			[rail("runs")],
+			[rail("approvals"), rail("ledger")],
 		],
 		bottom: [rail("concurrency")],
 	},
@@ -121,6 +126,9 @@ export const agents: ProductDefinition = {
 				level("connections", "Connections", tabs("mcp")),
 				// The endpoint's crumb is its name, which the host reads; the id is no label.
 				level("llms", "LLMs", [level(":provider")]),
+				level("runs", "Runs"),
+				level("approvals", "Approvals", tabs("alerts")),
+				level("ledger", "Ledger", tabs("actor", "record", "refusals", "export")),
 				level("settings", "Settings"),
 			],
 		},
