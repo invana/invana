@@ -45,7 +45,7 @@ def _send(srv: Server, message: EmailMessage) -> None:
         conn.send_message(message)
 
 
-async def send(ctx: TaskContext, v: RunVars) -> Out:
+async def mail_send(ctx: TaskContext, v: RunVars) -> Out:
     """Send ``body`` to ``to`` (one address, or several comma-separated) under ``subject``.
 
     The sender is the SMTP URL's ``?from=``, else its user name. Nothing is
@@ -93,4 +93,4 @@ async def send(ctx: TaskContext, v: RunVars) -> Out:
     )
 
 
-run = send
+run = mail_send

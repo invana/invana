@@ -1,4 +1,4 @@
-import { useLibraryViewPanel, useTaskPlansQuery } from "@invana-studio/agents";
+import { useFlowsQuery, useLibraryViewPanel } from "@invana-studio/agents";
 import type { LensKind } from "@invana-studio/core";
 import { runsApi } from "@invana-studio/core";
 import {
@@ -26,10 +26,10 @@ export function useOpenBoards(
 	username: string | undefined,
 	graphSlug: string | undefined,
 ) {
-	// And the plan page for a library plan: keyed by `task_plans.id`,
+	// And the plan page for a library plan: keyed by `flows.id`,
 	// titled `key@version`, and opened from the section by key — the newest
 	// version, which is the one the section reads.
-	const planLibrary = useTaskPlansQuery(username, graphSlug, { limit: 200 });
+	const planLibrary = useFlowsQuery(username, graphSlug, { limit: 200 });
 	const planRefById = useMemo(
 		() =>
 			new Map(

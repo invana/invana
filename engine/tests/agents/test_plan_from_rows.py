@@ -1,7 +1,7 @@
 """The runtime executes the library, not a dict.
 
 [the-library **LB12**](docs/for-developers/modules/workflows/features/the-library.md):
-``select_plan`` reads ``task_plans`` + ``tasks``. Before it, ``plan_workflow``
+``select_plan`` reads ``flows`` + ``tasks``. Before it, ``plan.compose``
 resolved against ``TEMPLATES`` and the rows were something only Studio read — so
 *a plan is its rows* was true for the library and false for execution, and
 ``TaskRun.task_id`` could not be populated from the runtime at all.
@@ -18,8 +18,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.envelope import Envelope
 from invana.apps.agents.registry import EXPLORER
+from invana.apps.flows.models import Task as PlanTask
 from invana.apps.graphs.models import Graph
-from invana.apps.task_plans.models import Task as PlanTask
 from invana.plugins import load_plugins
 from invana.runtime.models import RunStatus, TaskRun
 from invana.runtime.planning import queue_plan_steps, resolve_plan, select_plan
@@ -69,11 +69,7 @@ class TestTheRowsAreThePlan:
 
         # Every step carries the `tasks` row it was read from, and every one of
         # those rows belongs to the plan that was selected.
-        rows = (
-            (await session.execute(select(PlanTask.id).where(PlanTask.task_plan_id == selected.plan_id)))
-            .scalars()
-            .all()
-        )
+        rows = (await session.execute(select(PlanTask.id).where(PlanTask.flow_id == selected.plan_id))).scalars().all()
         assert {s["task_id"] for s in selected.steps} == set(rows)
 
     async def test_a_queued_node_names_the_row_it_runs(self, session: AsyncSession, graph: Graph) -> None:
@@ -98,7 +94,7 @@ class TestTheRowsAreThePlan:
         assert [row.task_id for row in queued] == [s["task_id"] for s in selected.steps]
         assert all(row.task_id is not None for row in queued)
         # The pin survives selection: a plan read from rows is still ceilinged.
-        execute = next(row for row in queued if row.task_key == "execute_graph_query")
+        execute = next(row for row in queued if row.task_key == "graph.read.query")
         assert execute.args["read_only"] is True
 
 

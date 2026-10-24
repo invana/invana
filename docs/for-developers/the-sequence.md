@@ -22,7 +22,7 @@ at the document that governs it.
 |---|---|
 | Closed modules | 1 Connect and model · 3 Ask · 4 Explore (bar 4.4) · 5 Agents |
 | In flight | **S16 · the lens.** P1 is done — the connector composes, projects and rejects. P0 is next |
-| Records landed | M1 (the catalogue declares `bound · args · outputs · requires`) · M2 (`task_plans` + `tasks`) · M3 (`task_runs`) · boards (`canvases` → `boards`, migration 43) |
+| Records landed | M1 (the catalogue declares `bound · args · outputs · requires`) · M2 (`flows` + `tasks`) · M3 (`task_runs`) · boards (`canvases` → `boards`, migration 43) |
 | Records open | M4 partly (`todos` exists and carries `closed_at`, but still a `status` column and `TaskStatus`) · M5 · M6 · M7 · M8 · M9 · M10 · M11 · M12 · M13 · M14 |
 | Still the dispatch authority | `runtime/workflows.py`'s `WORKFLOWS` dict — three hardcoded plans. M11 is what ends that |
 | Studio | 18 of 42 screens built, 0 on the shell contract |
@@ -110,7 +110,7 @@ file.
 | | |
 |---|---|
 | Ships | [7.1](modules/workflows/features/the-library.md) · [7.2](modules/workflows/features/plan-selection.md) · [7.3](modules/workflows/features/envelope-validation.md) · [7.4](modules/workflows/features/promote-a-plan.md) · [7.6](modules/workflows/features/the-catalogue.md) out of 🟡 |
-| Records | **M11** — `resolve_plan` reads `task_plans` + `tasks` rows, every builtin is seeded, `WORKFLOWS` stops being the dispatch authority · **M5** — `draft_plan` and envelope validation of a generated plan |
+| Records | **M11** — `resolve_plan` reads `flows` + `tasks` rows, every builtin is seeded, `WORKFLOWS` stops being the dispatch authority · **M5** — `draft_plan` and envelope validation of a generated plan |
 | Why here | five of Workflows' seven features are 🟡 for the same reason: the library is a list of rows nothing dispatches from |
 | Done when | `nl-single@1` answers end to end with `template_for` deleted from the run path, and a generated plan is validated before it runs |
 
@@ -263,7 +263,7 @@ from a wrong map.
 | Where | Says | Is |
 |---|---|---|
 | Six module specs the sequence has to build | — | no **The drawn states** section although their artboards exist: `govern` · `workflows` · `operate` · `work` · `skills` · `memory`. **This is the gate on those blocks' step 3** ([§5](#5-is-it-drawn--design-readiness-per-block)). `graph-connectors` · `identity-and-access` also lack one, and for them it is correct — they have no artboards. `agents` has one now, for [5.8](modules/agents/features/soul.md) |
-| [task-model-migration.md](building-engine/task-model-migration.md) slice table | only M3 is ✅ | M1 and M2 have landed (the catalogue declares its four fields; `task_plans` and `tasks` are rows, migration 38) |
+| [task-model-migration.md](building-engine/task-model-migration.md) slice table | only M3 is ✅ | M1 and M2 have landed (the catalogue declares its four fields; `flows` and `tasks` are rows, migration 38) |
 | [task-model-migration.md](building-engine/task-model-migration.md) M11 | `import_jobs` is deleted **by** M11 | the table is already gone (migration 41). What M11 still owns is the plan source and the seeded builtins |
 | [code-shape.md §5.2](building-studio/code-shape.md) | the query string wins — then, four lines later, *"the rail switches routes, not a param"* | one of the two. **Settle before the Studio track's phase 7** |
 | [the-screens.md](the-screens.md) *every feature and the screen that draws it* | 10.5 and 6.2 were listed as **not drawn** while `RunDetail`, the `DrawerRun*` set, the `Step*` set and `SkillBindings` draw them; 2.3 · 3.11 · 7.6 · 7.7 · 14.1 · 14.2 had no row at all; the console was `4.5` | **fixed in this pass** |

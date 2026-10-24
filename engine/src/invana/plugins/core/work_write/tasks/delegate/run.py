@@ -1,4 +1,4 @@
-"""The ``delegate`` task type; ``manifest.toml`` beside this file declares it."""
+"""The ``work.delegate`` task type; ``manifest.toml`` beside this file declares it."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from invana.plugins.sdk.context import Out, RunVars, TaskContext, _plural
 from invana.plugins.sdk.errors import TaskFailure
 
 
-async def delegate(ctx: TaskContext, v: RunVars) -> Out:
+async def work_delegate(ctx: TaskContext, v: RunVars) -> Out:
     """Open a run under a child agent and wait for it.
 
     The parent step stays *running* while the child works, and the child's rows
@@ -92,4 +92,4 @@ async def delegate(ctx: TaskContext, v: RunVars) -> Out:
     )
 
 
-run = delegate
+run = work_delegate

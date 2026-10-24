@@ -18,7 +18,7 @@ import type { PlanArg, SkillLayer } from "../skills/types";
  * a reader is checking for, and a band that vanished when empty would be
  * indistinguishable from one that failed to load.
  */
-interface TaskPlanLayer {
+interface FlowLayer {
 	layer: SkillLayer;
 	declared: boolean;
 	steps: number;
@@ -27,7 +27,7 @@ interface TaskPlanLayer {
 }
 
 /** A caller that inlined this plan, and what it tuned. */
-export interface TaskPlanCaller {
+export interface FlowCaller {
 	/** `skill` when a skill version owns the calling plan, `plan` when none does. */
 	kind: string;
 	name: string;
@@ -38,7 +38,7 @@ export interface TaskPlanCaller {
 	args: Record<string, unknown>;
 }
 
-export interface TaskPlanSummary {
+export interface FlowSummary {
 	id: string;
 	/** Null unless reusable — a one-off plan is named by the Todo it serves. */
 	key: string | null;
@@ -72,14 +72,14 @@ export interface TaskPlanSummary {
 	caller_count: number;
 }
 
-interface TaskPlanStepSpec {
+interface FlowStepSpec {
 	id: string;
 	task: string;
 	label: string;
 	args: Record<string, unknown>;
 }
 
-export interface TaskPlanDagNode extends TaskPlanStepSpec {
+export interface FlowDagNode extends FlowStepSpec {
 	/** `callable` · `composite` · `human`. */
 	form: string;
 	/** The band this node sits in — sent by the engine, never derived here,
@@ -101,7 +101,7 @@ export interface TaskPlanDagNode extends TaskPlanStepSpec {
 	pinned_by: AgentChip[];
 }
 
-interface TaskPlanDagEdge {
+interface FlowDagEdge {
 	source: string;
 	target: string;
 	/** `order` = required sequence; `binding` = this step consumes that output. */
@@ -109,13 +109,13 @@ interface TaskPlanDagEdge {
 	label: string;
 }
 
-export interface TaskPlanDetail extends TaskPlanSummary {
-	nodes: TaskPlanDagNode[];
-	edges: TaskPlanDagEdge[];
+export interface FlowDetail extends FlowSummary {
+	nodes: FlowDagNode[];
+	edges: FlowDagEdge[];
 	/** The five governed bands, each with what this plan declares in it. */
-	declared_layers: TaskPlanLayer[];
+	declared_layers: FlowLayer[];
 	/** Who inlines it, and what each tuned. */
-	callers: TaskPlanCaller[];
+	callers: FlowCaller[];
 	/** What a caller may tune. */
 	args_schema: Record<string, PlanArg>;
 }
@@ -230,7 +230,7 @@ export interface PlanRunsPage {
  * The plan library. Search: name · key. Filters: `origin` (packaged · authored
  * · promoted) · `family` (nl · ql). Sorts: `key` · `name` · `-created_at`.
  */
-export interface TaskPlanPage extends Page<TaskPlanSummary> {
+export interface FlowPage extends Page<FlowSummary> {
 	/** The library's versions that came with Invana or a plugin — the Graph's, not the page's. */
 	packaged: number;
 }

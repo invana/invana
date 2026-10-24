@@ -54,7 +54,7 @@ async def _answered_nl_turn(session, graph, user, *, source_query: str | None = 
         ask_kind="nl",
         body=QUESTION,
         params={"language": "cypher", "timeout_s": None},
-        workflow_key=NL_QUERY.key,
+        flow_key=NL_QUERY.key,
         assistant_message_id=reply.id,
         status="succeeded",
     )
@@ -72,7 +72,7 @@ class TestRerun:
 
         th = await run_services.rerun_turn(session, sess=sess, graph=graph, message=reply, actor_id=user.id)
 
-        assert th.ask_kind == "ql" and th.workflow_key == "ql-query"
+        assert th.ask_kind == "ql" and th.flow_key == "ql-query"
         # The ask is the query the first run produced, not the sentence it translated.
         assert th.body == CYPHER
         assert reply.run_id == th.id and reply.status == SessionMessageStatus.running
@@ -99,8 +99,8 @@ class TestRerun:
         async def project(ctx, v):
             return Out(detail="1 row → table")
 
-        monkeypatch.setitem(task_registry.TASKS, "execute_graph_query", execute)
-        monkeypatch.setitem(task_registry.TASKS, "shape_for_canvas", project)
+        monkeypatch.setitem(task_registry.TASKS, "graph.read.query", execute)
+        monkeypatch.setitem(task_registry.TASKS, "answer.shape", project)
 
         sess, reply = await _answered_nl_turn(session, graph, user)
         th = await run_services.rerun_turn(session, sess=sess, graph=graph, message=reply, actor_id=user.id)

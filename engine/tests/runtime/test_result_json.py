@@ -21,7 +21,7 @@ _END = datetime(2026, 9, 17, 12, 0, 2, tzinfo=UTC)
 def _step(**kwargs) -> TaskRun:
     return TaskRun(
         graph_id="g",
-        task_key="validate_records",
+        task_key="data.records.validate",
         step_key="validate_a",
         started_at=_START,
         finished_at=_END,
@@ -31,7 +31,7 @@ def _step(**kwargs) -> TaskRun:
 
 
 def test_a_task_records_only_what_its_entry_declares() -> None:
-    """`validate_records` declares total · reported · model · version — and nothing else."""
+    """`data.records.validate` declares total · reported · model · version — and nothing else."""
     row = _step(output={"total": 12, "reported": 1, "model": "orders", "version": 2, "scratch": "internal"})
     result = step_result(row)
 

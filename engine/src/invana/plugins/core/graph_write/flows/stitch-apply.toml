@@ -5,11 +5,11 @@ description = "Declare a bundle's join rules, staged, then write their edges on 
 intents = []
 
 [[steps]]
-id = "apply_stitches"
-task = "apply_stitches"
+id = "graph_stitch_declare"
+task = "graph.stitch.declare"
 label = "Apply"
 
 [[steps]]
-id = "commit_stitches"
-task = "commit_stitches"
+id = "graph_stitch_commit"
+task = "graph.stitch.commit"
 label = "Commit"

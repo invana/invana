@@ -4,7 +4,7 @@ Invana is a **destination**. Something else extracts and transforms; what arrive
 that already conforms to a model. Loading it is a run like any other — same trace, same retries, same
 failure vocabulary — and everything it writes carries the record it came from.
 
-> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `TaskPlan` ·
+> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
 > [task-model-migration.md](../../building-engine/task-model-migration.md).

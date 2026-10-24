@@ -11,11 +11,11 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.envelope import Envelope
+from invana.apps.flows.managers import FlowManager
 from invana.apps.graphs.models import Graph
 from invana.apps.llm.draft import Candidate, DraftedPlaybook, DraftedSentence
 from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.schemas import SkillCreate, SkillVersionPublish
-from invana.apps.task_plans.managers import TaskPlanManager
 from invana.core.auth.models import User
 from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
@@ -26,13 +26,11 @@ pytestmark = pytest.mark.asyncio
 
 skills = SkillManager()
 drafts = SkillDraftManager()
-plans = TaskPlanManager()
+plans = FlowManager()
 #: The catalogue's `requires`, handed down — an app may not read band 3.
 _REQUIRES = {key: entry.requires for key, entry in CATALOGUE.items()}
 
-ENVELOPE = Envelope.from_spec(
-    {"allow": ["translate_thought", "validate_query", "execute_graph_query", "shape_for_canvas"]}
-)
+ENVELOPE = Envelope.from_spec({"allow": ["nl.translate", "graph.read.validate", "graph.read.query", "answer.shape"]})
 
 
 def _drafted(*sentences: DraftedSentence) -> DraftedPlaybook:
@@ -57,7 +55,7 @@ async def test_one_reading_is_a_step_none_is_a_person_and_prose_is_unmapped(
         DraftedSentence(
             span="Turn the question into a query.",
             kind="step",
-            candidates=(Candidate(task="translate_thought", label="Understand"),),
+            candidates=(Candidate(task="nl.translate", label="Understand"),),
         ),
         DraftedSentence(span="Telephone the supplier.", kind="step", candidates=()),
         DraftedSentence(span="Be concise.", kind="not_an_instruction"),
@@ -72,7 +70,7 @@ async def test_one_reading_is_a_step_none_is_a_person_and_prose_is_unmapped(
     assert out.output["unmapped"] == ["Be concise."]
 
     plan = await drafts.plan_read(session, version=draft)
-    assert [(n.task, n.layer) for n in plan.nodes] == [("translate_thought", "llm"), ("", "human")]
+    assert [(n.task, n.layer) for n in plan.nodes] == [("nl.translate", "llm"), ("", "human")]
     # Every node names the sentence it came from (C11).
     assert plan.nodes[0].source_span == "Turn the question into a query."
     assert plan.nodes[1].source_span == "Telephone the supplier."
@@ -88,8 +86,8 @@ async def test_two_readings_stop_and_ask_and_the_answer_is_not_asked_again(
         span="Check it before it runs.",
         kind="step",
         candidates=(
-            Candidate(task="validate_query", label="Validate", why="check the query is read-only"),
-            Candidate(task="shape_for_canvas", label="Project", why="check what the canvas gets"),
+            Candidate(task="graph.read.validate", label="Validate", why="check the query is read-only"),
+            Candidate(task="answer.shape", label="Project", why="check what the canvas gets"),
         ),
     )
 
@@ -99,7 +97,7 @@ async def test_two_readings_stop_and_ask_and_the_answer_is_not_asked_again(
 
     assert asked.output["steps"] == 0, "nothing is written until it is answered (C10)"
     assert asked.output["span"] == "Check it before it runs."
-    assert asked.output["options"] == ["validate_query", "shape_for_canvas"]
+    assert asked.output["options"] == ["graph.read.validate", "answer.shape"]
     plan = await drafts.plan_read(session, version=draft)
     assert len(plan.nodes) == 1 and plan.nodes[0].form == "human", "the draft still has its one node"
 
@@ -107,20 +105,20 @@ async def test_two_readings_stop_and_ask_and_the_answer_is_not_asked_again(
         session,
         skill=skill,
         clarification_id=asked.output["clarification_id"],
-        answer="validate_query",
+        answer="graph.read.validate",
         actor_id=user.id,
     )
     assert read.open_clarification is None
 
     # The redraw reads the answer rather than asking again (SK11).
     subject = await drafts.drawing(session, version_id=draft.id)
-    assert subject.answered == {"Check it before it runs.": "validate_query"}
+    assert subject.answered == {"Check it before it runs.": "graph.read.validate"}
     again = await drafts.apply_drawing(
         session, version_id=draft.id, drafted=_drafted(ambiguous), envelope=ENVELOPE, validate=resolve_plan
     )
     assert again.output["steps"] == 1
     plan = await drafts.plan_read(session, version=draft)
-    assert [n.task for n in plan.nodes] == ["validate_query"]
+    assert [n.task for n in plan.nodes] == ["graph.read.validate"]
 
 
 async def test_a_step_the_envelope_forbids_is_rejected_rather_than_written(
@@ -131,7 +129,7 @@ async def test_a_step_the_envelope_forbids_is_rejected_rather_than_written(
         DraftedSentence(
             span="Write the answer back into the graph.",
             kind="step",
-            candidates=(Candidate(task="write_graph", label="Write"),),
+            candidates=(Candidate(task="graph.write.records", label="Write"),),
         )
     )
 
@@ -154,7 +152,7 @@ async def test_a_prerequisite_the_prose_never_named_is_refused_by_name(
     """SK31 — the refusal a real playbook actually hits.
 
     *Read it, run it* draws two allowed steps, and still does not hold together:
-    ``execute_graph_query`` requires ``validate_query``, which the catalogue
+    ``graph.read.query`` requires ``graph.read.validate``, which the catalogue
     declares and the prose never said. The reason names the step, so rewriting
     the sentence is something the author can actually do.
     """
@@ -163,12 +161,12 @@ async def test_a_prerequisite_the_prose_never_named_is_refused_by_name(
         DraftedSentence(
             span="Turn the question into a query.",
             kind="step",
-            candidates=(Candidate(task="translate_thought", label="Translate"),),
+            candidates=(Candidate(task="nl.translate", label="Translate"),),
         ),
         DraftedSentence(
             span="Run it against the graph.",
             kind="step",
-            candidates=(Candidate(task="execute_graph_query", label="Run"),),
+            candidates=(Candidate(task="graph.read.query", label="Run"),),
         ),
     )
 
@@ -176,7 +174,7 @@ async def test_a_prerequisite_the_prose_never_named_is_refused_by_name(
         session, version_id=draft.id, drafted=drafted, envelope=ENVELOPE, validate=resolve_plan
     )
 
-    assert out.rejected and any("requires 'validate_query'" in reason for reason in out.rejected)
+    assert out.rejected and any("requires 'graph.read.validate'" in reason for reason in out.rejected)
     assert out.output["refused"] == out.rejected
     plan = await drafts.plan_read(session, version=draft)
     assert len(plan.nodes) == 1, "a refused draw leaves the plan that was there untouched"
@@ -222,15 +220,15 @@ async def test_a_plan_a_person_does_every_step_of_is_written_not_refused(
 
 # ── a sentence that names a library plan ─────────────────────────────────────
 
-#: `nl-single@2` ends in `verify_result`, so the drawing envelope must allow it.
+#: `nl-single@2` ends in `plan.verify`, so the drawing envelope must allow it.
 ANSWERING = Envelope.from_spec(
     {
         "allow": [
-            "translate_thought",
-            "validate_query",
-            "execute_graph_query",
-            "shape_for_canvas",
-            "verify_result",
+            "nl.translate",
+            "graph.read.validate",
+            "graph.read.query",
+            "answer.shape",
+            "plan.verify",
         ]
     }
 )
@@ -262,13 +260,13 @@ async def test_a_sentence_that_names_a_library_plan_draws_its_rows_flat_and_tune
     assert out.rejected is None
     read = await drafts.plan_read(session, version=draft)
     steps = [n for n in read.nodes if n.form == "callable"]
-    copied = ("translate_thought", "validate_query", "execute_graph_query", "shape_for_canvas", "verify_result")
+    copied = ("nl_translate", "graph_read_validate", "graph_read_query", "answer_shape", "plan_verify")
     assert [n.id for n in steps] == [f"nl_single_{step}" for step in copied], "flat, prefixed siblings"
     assert {n.source_span for n in steps} == {"Answer it, writes allowed."}
-    execute = next(n for n in steps if n.task == "execute_graph_query")
+    execute = next(n for n in steps if n.task == "graph.read.query")
     assert execute.args["read_only"] is False, "the tuned value, not the declared default"
     # The copied plan's own binding follows its rows.
-    assert execute.args["query"] == "${steps.nl_single_translate_thought.query}"
+    assert execute.args["query"] == "${steps.nl_single_nl_translate.query}"
 
     plan = await drafts.plans_qs.get(session, draft.plan_id)
     assert plan.origin == "generated"

@@ -198,6 +198,7 @@ def create_app() -> FastAPI:
     from invana.server.datasets.routes import dataset_bindings_router, datasets_router
     from invana.server.evals.routes import evals_router
     from invana.server.explorer.routes import explorer_router
+    from invana.server.flows.routes import flows_router
     from invana.server.govern.routes import govern_router
     from invana.server.graphs.routes import graph_router, graphs_collection_router
     from invana.server.health import health_router
@@ -220,7 +221,6 @@ def create_app() -> FastAPI:
     from invana.server.sessions.routes import sessions_router
     from invana.server.skills.routes import skills_router
     from invana.server.standards.routes import standards_router
-    from invana.server.task_plans.routes import task_plans_router
     from invana.server.work.routes import (
         decisions_router,
         projects_router,
@@ -304,7 +304,7 @@ def create_app() -> FastAPI:
     app.include_router(simulations_router)
     app.include_router(simulators_router)
     app.include_router(tasks_router)
-    app.include_router(task_plans_router)
+    app.include_router(flows_router)
     app.include_router(catalogue_router)
     app.include_router(models_router)
     app.include_router(model_links_router)

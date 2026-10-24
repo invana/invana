@@ -44,7 +44,7 @@ class TaskRunRead(BaseModel):
 
     id: str
     graph_id: str
-    workflow_key: str
+    flow_key: str
     #: The run this row is a step of, and ``None`` on a root
     #: (:doc:`see-what-ran SR44 <../../../docs/for-developers/modules/operate/features/see-what-ran>`).
     #: ``task_runs`` is one table, so this route answers for a step as well as
@@ -91,7 +91,7 @@ class TaskRunSummary(BaseModel):
     """One run, as a **list** row — the plan and its verdict, without the steps.
 
     Three surfaces read this and they want the same few facts: an agent's
-    *Recent plans* (what has this agent actually run?), the Workflows library's
+    *Recent plans* (what has this agent actually run?), the flow library's
     *candidates* (which generated plans served and were never promoted?) and the
     **journal** (what ran in this Graph, filtered by kind). Returning the step
     rows here would make any of them an order of magnitude larger for nothing —
@@ -101,7 +101,7 @@ class TaskRunSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    workflow_key: str
+    flow_key: str
     status: str
     #: What kind of work this run is — ``nl`` · ``ql`` · ``canvas`` · ``import``
     #: · ``bulk`` · ``stitch``. Null on a child run, a root-only fact.
@@ -324,8 +324,8 @@ class TraceStep(BaseModel):
     #: with the entry it belongs to.
     bound: str | None = None
     #: How many attempts this step was allowed — the plan node's retry policy,
-    #: else the workflow's, else the task's default. The bound a run page reads
-    #: *attempts 2 of 3* against (SR67).
+    #: else the flow's, else the task's default. The bound a run page reads
+    #: *attempts 2 of 3* against.
     max_attempts: int = 1
     #: Where it sits — the plan's own id for this node, and the lane it ran in
     #: when its parent fanned out.
@@ -352,7 +352,7 @@ class TraceRead(BaseModel):
     """The whole run, after the fact — part of the answer, not an admin view (RT1)."""
 
     run_id: str
-    workflow_key: str
+    flow_key: str
     status: str
     #: The ask this run carries — ``nl`` · ``ql`` · ``import``.
     ask_kind: str | None = None

@@ -38,13 +38,17 @@ async def test_an_expansion_is_a_canvas_run_and_the_turn_is_the_run(
 
     run = await open_expand_run(session, graph=graph, actor_id=user.id, req=req, sess=sess)
 
-    assert run.workflow_key == "expand-neighbours@1"
+    assert run.flow_key == "expand-neighbours@1"
     assert run.triggered_by == TriggeredBy.canvas.value
     assert run.lens_snapshot is not None
     # The session's agent narrows the lens; it does not perform the run (GC11).
     assert run.agent_id is None
     [step] = await TaskRunQuerySet().nodes_of(session, run_id=run.id)
-    assert (step.task_key, step.args["edge_label"], step.args["vertex_id"]) == ("expand_neighbours", "KNOWS", "v1")
+    assert (step.task_key, step.args["edge_label"], step.args["vertex_id"]) == (
+        "graph.read.get_neighbors",
+        "KNOWS",
+        "v1",
+    )
 
     # The step is queued under the reply, which is what the Tasks tab lists.
     reply = await session.get(SessionMessage, run.assistant_message_id)

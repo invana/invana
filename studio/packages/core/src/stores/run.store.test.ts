@@ -16,7 +16,7 @@ describe("run store", () => {
 	it("folds a run's stream into one view, in seq order", () => {
 		const { seed, apply } = useRunStore.getState();
 		seed({ id: "r1", sessionId: "s", messageId: "m" });
-		apply("r1", { seq: 1, kind: "run.started", payload: { workflow: "ql" } });
+		apply("r1", { seq: 1, kind: "run.started", payload: { flow: "ql" } });
 		apply("r1", { seq: 3, kind: "step.started", payload: step(2, "running") });
 		apply("r1", { seq: 2, kind: "step.started", payload: step(1, "running") });
 		apply("r1", {
@@ -39,7 +39,7 @@ describe("run store", () => {
 
 		const view = useRunStore.getState().views.r1;
 		expect(view.status).toBe("succeeded");
-		expect(view.workflow).toBe("ql");
+		expect(view.flow).toBe("ql");
 		// seq 2 arrived after seq 3, so it was dropped as stale.
 		expect(view.steps.map((s) => [s.id, s.status])).toEqual([
 			["s1", "succeeded"],

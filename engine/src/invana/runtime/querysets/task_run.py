@@ -15,7 +15,7 @@ from sqlalchemy import Text, exists, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
-from invana.apps.task_plans.models import TaskPlan
+from invana.apps.flows.models import Flow
 from invana.core.lists import ListParams, PageInfo
 from invana.core.lists.querysets import contains, page_of_select
 from invana.runtime.models import INTERACTIVE, RunRole, RunStatus, TaskRun
@@ -257,7 +257,7 @@ class TaskRunQuerySet:
                 TaskRun.graph_id == graph_id,
                 TaskRun.parent_run_id.is_(None),
                 TaskRun.role == RunRole.plan.value,
-                TaskRun.workflow_key == "skill-draft",
+                TaskRun.flow_key == "skill-draft",
             )
             .order_by(TaskRun.queued_at.desc())
             .limit(25)
@@ -283,7 +283,7 @@ class TaskRunQuerySet:
             TaskRun.graph_id == graph_id,
             TaskRun.parent_run_id.is_(None),
             TaskRun.role == RunRole.plan.value,
-            TaskRun.workflow_key == "skill-draft",
+            TaskRun.flow_key == "skill-draft",
             TaskRun.status.in_([RunStatus.queued.value, RunStatus.running.value]),
         )
         for run in (await session.execute(stmt)).scalars().all():
@@ -469,12 +469,12 @@ class TaskRunQuerySet:
         """The roots that executed one library plan since *since*, newest first.
 
         Two ways in, because a plan is run two ways: by name (``plan_origin``)
-        and inlined into a skill's plan (``task_plan_id`` of a plan that copied
+        and inlined into a skill's plan (``flow_id`` of a plan that copied
         its rows) — [LB36](docs/for-developers/modules/workflows/features/the-library.md).
         """
         by = TaskRun.plan_origin == origin
         if plan_ids:
-            by = or_(by, TaskRun.task_plan_id.in_(plan_ids))
+            by = or_(by, TaskRun.flow_id.in_(plan_ids))
         stmt = (
             select(TaskRun)
             .where(TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_(None), TaskRun.queued_at >= since, by)
@@ -523,7 +523,7 @@ class TaskRunQuerySet:
         one version — tokens summed over each root and its own steps.
 
         Exactly one way in: ``agent`` is ``(agent_id, agent_version)``; ``plan``
-        is ``(task_plan_id, "template:<key>@<v>")``, the two ways a library plan
+        is ``(flow_id, "template:<key>@<v>")``, the two ways a library plan
         is run (:meth:`roots_for_plan`); ``run_ids`` names the roots outright —
         a dataset version's bind loads, in any Graph, so ``graph_id`` is None;
         none of these is the Graph's roots queued in ``[since, until)``, the
@@ -539,7 +539,7 @@ class TaskRunQuerySet:
         elif agent is not None:
             where += [TaskRun.agent_id == agent[0], TaskRun.agent_version == agent[1]]
         elif plan is not None:
-            where.append(or_(TaskRun.task_plan_id == plan[0], TaskRun.plan_origin == plan[1]))
+            where.append(or_(TaskRun.flow_id == plan[0], TaskRun.plan_origin == plan[1]))
         if since is not None:
             where.append(TaskRun.queued_at >= since)
         if until is not None:
@@ -631,10 +631,10 @@ class TaskRunQuerySet:
             verify = aliased(TaskRun)
             served = exists().where(
                 verify.parent_run_id == TaskRun.id,
-                verify.task_key == "verify_result",
+                verify.task_key == "plan.verify",
                 verify.output["served"].as_string() == "yes",
             )
-            promoted = exists().where(TaskPlan.promoted_from_run_id == TaskRun.id)
+            promoted = exists().where(Flow.promoted_from_run_id == TaskRun.id)
             stmt = stmt.where(TaskRun.plan_origin == "generated", TaskRun.plan_snapshot.is_not(None), served, ~promoted)
         if params.q:
             stmt = stmt.where(contains(params.q, TaskRun.body))

@@ -266,7 +266,7 @@ was read off the rendered artboards, not off the source.
 |---|---|---|
 | `RunDash` (34k) | the root **TaskRun** | six tiles, the flow with status painted on, Performance + Reported, Input + `result.json`, Log |
 | `StepImport` · `StepQuery` · `StepLlm` (34l–n) | a **child TaskRun** — one Task's execution ([§0](../../orchestration.md), no separate step table) | **only the Output panel.** Tiles, Input, `result.json`, Artifacts, Where it sits and Log are identical |
-| `PlanDash` (34o) | a published **TaskPlan** version | the same flow, painted with per-task medians instead of status; Arguments + Runs of this plan replace Input + `result.json` |
+| `PlanDash` (34o) | a published **Flow** version | the same flow, painted with per-task medians instead of status; Arguments + Runs of this plan replace Input + `result.json` |
 | `PlanStepParams` (34p) | one **Task** inside a draft | the flow with one node selected, then Parameters + its contract + Validation |
 
 **The shell, top to bottom** — identical on all six: canvas tab strip → record strip → a scrolling

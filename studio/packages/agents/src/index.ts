@@ -27,7 +27,7 @@ export { useLLMProvidersQuery } from "./llms/queries";
 export type { LLMProvider } from "./llms/types";
 export { OverviewPage } from "./overview/OverviewPage";
 export { PerformancePage } from "./performance/PerformancePage";
-export { taskPlansApi } from "./plans/api";
+export { flowsApi } from "./plans/api";
 export { PlanBoardPage } from "./plans/boards/PlanBoardPage";
 export { PLAN_CHART_WIDGETS } from "./plans/boards/PlanChartWidgets";
 export {
@@ -38,8 +38,8 @@ export {
 export { LibraryViewPanel } from "./plans/LibraryViewPanel";
 export { PlanFlowCanvas } from "./plans/PlanFlowCanvas";
 export {
-	useTaskPlanQuery,
-	useTaskPlansQuery,
+	useFlowQuery,
+	useFlowsQuery,
 } from "./plans/queries";
 export { useLibraryViewPanel } from "./plans/useLibraryViewPanel";
 export { PluginPage } from "./plugins/PluginPage";

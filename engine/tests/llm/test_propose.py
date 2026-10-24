@@ -1,6 +1,6 @@
 """NL → model proposal tests (docs/for-developers/modules/ask/spec.md).
 
-``validate_proposal`` is pure (no external deps). ``propose_model`` runs against
+``model.validate_proposal`` is pure (no external deps). ``model.propose`` runs against
 a real local Ollama and skips when it is not reachable (repo rule 7 — real
 services, no mocks).
 """

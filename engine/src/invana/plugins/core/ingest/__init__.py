@@ -2,7 +2,7 @@
 (docs/for-developers/orchestration.md §0.6).
 
 **The keys are the ones already stored** on every load's nodes —
-`validate_records` is not renamed to `import_dataset` (§6.4).
+`data.records.validate` is not renamed to `import_dataset` (§6.4).
 
 Reading a folder is `ingest`, not `graph_read`: nothing here touches the bound
 database. What lands is `graph_write`, and it is a separate ceiling for exactly

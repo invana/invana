@@ -1,7 +1,7 @@
 """Bound: ``schema_write`` — the entries that touch a model draft
 (docs/for-developers/orchestration.md §0.6).
 
-``understand_ask`` binds the draft this run edits; ``validate_proposal`` checks
+``model.understand_ask`` binds the draft this run edits; ``model.validate_proposal`` checks
 referential integrity and reconciles the proposal into it. Both write to the
 **draft**, never to the bound graph database — that is a different bound and a
 different entry.

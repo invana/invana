@@ -28,8 +28,8 @@ describe("routeTemplate", () => {
 		);
 		expect(route).toBe("/api/v1/u/:username/:graph/runs/:id/stream");
 		expect(
-			routeTemplate("/api/v1/u/ravi/airways/task-plans/weekly-report/export"),
-		).toBe("/api/v1/u/:username/:graph/task-plans/:id/export");
+			routeTemplate("/api/v1/u/ravi/airways/flows/weekly-report/export"),
+		).toBe("/api/v1/u/:username/:graph/flows/:id/export");
 	});
 });
 

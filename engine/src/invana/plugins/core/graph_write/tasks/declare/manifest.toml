@@ -1,0 +1,16 @@
+key = "graph.stitch.declare"
+version = "1.0.0"
+summary = "Declare every stitch a bundle's stitches.json states, as staged."
+bound = "graph_write"
+side_effect = "write"
+requires = []
+resources = ["cpu"]
+
+[args]
+root = { type = "str" }
+
+[outputs]
+declared = "int"
+already = "int"
+skipped = "int"
+passed = "bool"

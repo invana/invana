@@ -19,7 +19,7 @@ the file, so a manifest that drifted from its code stops the process at start
 rather than a plan at run time. A core plugin's version is the engine's, and a
 task key's last dotted segment is its folder (``sim.genomic_prediction`` →
 ``tasks/genomic_prediction/``) — or, where two keys of one plugin end alike, the
-whole key with dots as underscores (``uniprot.get`` → ``tasks/uniprot_get/``).
+whole key with dots as underscores (``science.uniprot.get`` → ``tasks/uniprot_get/``).
 
 Three kinds load: the **core** plugins, always; the **simulator** plugins
 under ``simulators/`` (docs/for-developers/modules/work/features/simulation.md);
@@ -42,8 +42,8 @@ Usage::
     from invana.plugins import load_plugins
 
     registry = load_plugins()
-    registry.task("execute_graph_query")        # latest version of a key
-    registry.task("execute_graph_query@1.0.0")  # one exact version
+    registry.task("graph.read.query")        # latest version of a key
+    registry.task("graph.read.query@1.0.0")  # one exact version
     registry.flows["model-import"]
     registry.simulator("sim.genomic_prediction")
 """

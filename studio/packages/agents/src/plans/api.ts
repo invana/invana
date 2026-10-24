@@ -9,12 +9,12 @@ import type { Interaction } from "@invana-studio/core";
 import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
 import type {
 	CataloguePage,
+	FlowDetail,
+	FlowPage,
 	PlanPerformance,
 	PlanRunsPage,
 	PlanVersionDiff,
 	PlanWindow,
-	TaskPlanDetail,
-	TaskPlanPage,
 } from "./types";
 
 function base(username: string, graphSlug: string): string {
@@ -31,17 +31,17 @@ export const catalogueApi = {
 		),
 };
 
-/** The plan library — `task_plans` where `reusable`. */
-export const taskPlansApi = {
+/** The plan library — `flows` where `reusable`. */
+export const flowsApi = {
 	/** One page of the library — searched, filtered and sorted by the engine. */
 	list: (username: string, graphSlug: string, query: ListQuery = {}) =>
-		request<TaskPlanPage>(
-			`${base(username, graphSlug)}/task-plans${listQueryToApi(query)}`,
+		request<FlowPage>(
+			`${base(username, graphSlug)}/flows${listQueryToApi(query)}`,
 		),
 
 	get: (username: string, graphSlug: string, key: string, version?: number) =>
-		request<TaskPlanDetail>(
-			`${base(username, graphSlug)}/task-plans/${key}${version ? `?version=${version}` : ""}`,
+		request<FlowDetail>(
+			`${base(username, graphSlug)}/flows/${key}${version ? `?version=${version}` : ""}`,
 		),
 
 	/** How it has behaved over a window — Overview · Layers · Flow. */
@@ -52,13 +52,13 @@ export const taskPlansApi = {
 		q: { version: number; window: PlanWindow },
 	) =>
 		request<PlanPerformance>(
-			`${base(username, graphSlug)}/task-plans/${key}/performance?version=${q.version}&window=${q.window}`,
+			`${base(username, graphSlug)}/flows/${key}/performance?version=${q.version}&window=${q.window}`,
 		),
 
 	/** What changed against the version before it. */
 	diff: (username: string, graphSlug: string, key: string, version: number) =>
 		request<PlanVersionDiff>(
-			`${base(username, graphSlug)}/task-plans/${key}/diff?version=${version}`,
+			`${base(username, graphSlug)}/flows/${key}/diff?version=${version}`,
 		),
 
 	/** Every run of it, newest first — Activity. */
@@ -84,7 +84,7 @@ export const taskPlansApi = {
 		if (q.agentId) params.set("agent_id", q.agentId);
 		if (q.cursor) params.set("cursor", q.cursor);
 		return request<PlanRunsPage>(
-			`${base(username, graphSlug)}/task-plans/${key}/runs?${params}`,
+			`${base(username, graphSlug)}/flows/${key}/runs?${params}`,
 		);
 	},
 
@@ -96,11 +96,11 @@ export const taskPlansApi = {
 		version: number,
 	) =>
 		request<string>(
-			`${base(username, graphSlug)}/task-plans/${key}/export?version=${version}`,
+			`${base(username, graphSlug)}/flows/${key}/export?version=${version}`,
 		),
 
 	exportUrl: (username: string, graphSlug: string, key: string) =>
-		`${base(username, graphSlug)}/task-plans/${key}/export`,
+		`${base(username, graphSlug)}/flows/${key}/export`,
 
 	/** The one write in MVP — authoring a workflow stays post-1.0. */
 	promote: (
@@ -114,7 +114,7 @@ export const taskPlansApi = {
 		},
 		action?: Interaction,
 	) =>
-		request<TaskPlanDetail>(`${base(username, graphSlug)}/task-plans/promote`, {
+		request<FlowDetail>(`${base(username, graphSlug)}/flows/promote`, {
 			method: "POST",
 			...json(data),
 			action,

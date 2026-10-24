@@ -53,7 +53,7 @@ def _retry_for(wf, row: TaskRun, plan: dict | None = None) -> Retry:
     """**The plan declares, the runtime executes.**
 
     Three sources, most specific first: the plan node's own policy, the static
-    workflow's declaration for this task, then the per-task default. A planned
+    flow's declaration for this task, then the per-task default. A planned
     step used to have no way to state one, which is why the fallback existed.
     """
     from_plan = _retry_from_plan(plan, row)

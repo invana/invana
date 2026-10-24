@@ -15,7 +15,7 @@ here imports it; the runtime hands it to the library seeder.
 ``SEEDED_AGENTS``
     The agents every graph gets: *Explorer* (plans), *Query* (static QL tail),
     *Modeller* (plans a model proposal). A session that names no agent behaves
-    exactly as it does today, because these carry the workflows S9b shipped.
+    exactly as it does today, because these carry the packaged flows.
 """
 
 from __future__ import annotations
@@ -25,32 +25,36 @@ from typing import Any
 
 # ── Step labels ──────────────────────────────────────────────────────────────
 #
-# The words on the card. `translate_thought` was labelled *Understand* before
+# The words on the card. `nl.translate` was labelled *Understand* before
 # docs/for-developers/modules/agents/spec.md; calling translation "Understand" is what made "understand then
 # plan" sound like a duplicate. It is *Translate* now, and *Understand* is its
 # own step (docs/for-developers/modules/agents/spec.md "the current label lies").
 
 LABELS: dict[str, str] = {
-    "understand_intent": "Understand",
-    "plan_workflow": "Plan",
-    "translate_thought": "Translate",
-    "validate_query": "Validate",
-    "execute_graph_query": "Execute",
-    "shape_for_canvas": "Project",
-    "verify_result": "Verify",
-    "understand_ask": "Understand",
-    "propose_model": "Propose",
-    "validate_proposal": "Validate",
-    "spawn_agent": "Spawn",
-    "delegate": "Delegate",
-    "await_delegations": "Await",
-    "create_task": "Sub-task",
+    "nl.understand": "Understand",
+    "plan.compose": "Plan",
+    "nl.translate": "Translate",
+    "graph.read.validate": "Validate",
+    "graph.read.query": "Execute",
+    "answer.shape": "Project",
+    "plan.verify": "Verify",
+    "model.understand_ask": "Understand",
+    "model.propose": "Propose",
+    "model.validate_proposal": "Validate",
+    "work.spawn_agent": "Spawn",
+    "work.delegate": "Delegate",
+    "work.await": "Await",
+    "work.create_task": "Sub-task",
 }
 
 
 def step(task: str, *, id: str | None = None, label: str | None = None, **args: Any) -> dict:
-    """One plan step, in the shape :mod:`invana.apps.agents.envelope` parses."""
-    return {"id": id or task, "task": task, "label": label or LABELS.get(task, task), "args": args}
+    """One plan step, in the shape :mod:`invana.apps.agents.envelope` parses.
+
+    The id defaults to the function with dots as underscores (``graph.read.query``
+    → ``graph_read_query``): a step id is what ``${steps.<id>.<output>}`` binds, so it never carries a dot.
+    """
+    return {"id": id or task.replace(".", "_"), "task": task, "label": label or LABELS.get(task, task), "args": args}
 
 
 # ── The intent → template map (V6: data, tunable by INSERT) ──────────────────
@@ -72,7 +76,7 @@ INTENT_TEMPLATES: dict[tuple[str, str], str] = {
 def template_key_for(*, ask_kind: str, intent_kind: str) -> str | None:
     """The **key** of the plan that serves this intent, or None when the model must plan.
 
-    A key, not a step list. The rows in ``task_plans`` + ``tasks`` are what the
+    A key, not a step list. The rows in ``flows`` + ``tasks`` are what the
     runtime executes, and the packaged flows are the *seed source* those rows are
     exploded from — nothing else reads it
     (docs/for-developers/modules/workflows/features/the-library.md **LB12**).
@@ -109,13 +113,13 @@ class SeededAgent:
 
 
 _PLANNING_ALLOW = [
-    "understand_intent",
-    "plan_workflow",
-    "translate_thought",
-    "validate_query",
-    "execute_graph_query",
-    "shape_for_canvas",
-    "verify_result",
+    "nl.understand",
+    "plan.compose",
+    "nl.translate",
+    "graph.read.validate",
+    "graph.read.query",
+    "answer.shape",
+    "plan.verify",
 ]
 
 EXPLORER = SeededAgent(
@@ -132,7 +136,7 @@ EXPLORER = SeededAgent(
         "allow": _PLANNING_ALLOW,
         # The pin that makes every data canvas read-only from Studio. A plan
         # cannot unset it; the validator rejects a plan that tries.
-        "pins": {"execute_graph_query": {"read_only": True}},
+        "pins": {"graph.read.query": {"read_only": True}},
         "templates": ["nl-single", "nl-compare", "ql-direct"],
     },
     effort={"max_steps": 16, "max_replans": 1, "max_clarifications": 3},
@@ -144,14 +148,14 @@ QL_AGENT = SeededAgent(
     description="Runs the query you typed. No translation, no interpretation.",
     workflow_spec={
         # No planning entry: the envelope's own steps are the plan (M1).
-        "entry": "validate_query",
-        "allow": ["validate_query", "execute_graph_query", "shape_for_canvas", "verify_result"],
-        "pins": {"execute_graph_query": {"read_only": True}},
+        "entry": "graph_read_validate",
+        "allow": ["graph.read.validate", "graph.read.query", "answer.shape", "plan.verify"],
+        "pins": {"graph.read.query": {"read_only": True}},
         "steps": [
-            step("validate_query"),
-            step("execute_graph_query", read_only=True),
-            step("shape_for_canvas"),
-            step("verify_result"),
+            step("graph.read.validate"),
+            step("graph.read.query", read_only=True),
+            step("answer.shape"),
+            step("plan.verify"),
         ],
     },
     effort={"max_steps": 8},
@@ -167,9 +171,9 @@ MODELLER = SeededAgent(
         "Explain each change in one line."
     ),
     workflow_spec={
-        "entry": "understand_ask",
-        "allow": ["understand_ask", "propose_model", "validate_proposal"],
-        "steps": [step("understand_ask"), step("propose_model"), step("validate_proposal")],
+        "entry": "model_understand_ask",
+        "allow": ["model.understand_ask", "model.propose", "model.validate_proposal"],
+        "steps": [step("model.understand_ask"), step("model.propose"), step("model.validate_proposal")],
     },
     effort={"max_steps": 6},
 )
@@ -196,8 +200,8 @@ COORDINATOR = SeededAgent(
     ),
     workflow_spec={
         "entry": "understand",
-        "allow": [*_PLANNING_ALLOW, "spawn_agent", "delegate", "await_delegations"],
-        "pins": {"execute_graph_query": {"read_only": True}},
+        "allow": [*_PLANNING_ALLOW, "work.spawn_agent", "work.delegate", "work.await"],
+        "pins": {"graph.read.query": {"read_only": True}},
         "templates": ["nl-single", "nl-compare", "ql-direct"],
     },
     effort={"max_steps": 24, "max_replans": 1, "max_clarifications": 3},

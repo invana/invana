@@ -27,7 +27,7 @@ TEMPLATES = load_plugins().flows
 #: The core plugins' task types. An installed simulator adds its own beside them.
 CORE = {t.key for p in load_plugins().plugins.values() if p.manifest.kind == "core" for t in p.tasks}
 
-#: The core set's size. Growth belongs in reusable TaskPlans, not here — so
+#: The core set's size. Growth belongs in reusable Flows, not here — so
 #: changing this number is a decision, and the decision goes in
 #: `building-engine/task-model-migration.md` § 6.1 first.
 ENTRY_COUNT = 30
@@ -160,13 +160,13 @@ class TestBindings:
     def test_a_binding_to_an_undeclared_output_is_refused(self) -> None:
         from invana.apps.agents.envelope import Envelope, PlanRejected, validate_plan
 
-        envelope = Envelope.from_spec({"allow": ["translate_thought", "validate_query"]})
+        envelope = Envelope.from_spec({"allow": ["nl.translate", "graph.read.validate"]})
         with pytest.raises(PlanRejected) as caught:
             validate_plan(
                 [
-                    {"id": "t", "task": "translate_thought", "label": "T", "args": {}},
-                    # `translate_thought` declares `query`, never `sql`.
-                    {"id": "v", "task": "validate_query", "label": "V", "args": {"query": "${steps.t.sql}"}},
+                    {"id": "t", "task": "nl.translate", "label": "T", "args": {}},
+                    # `nl.translate` declares `query`, never `sql`.
+                    {"id": "v", "task": "graph.read.validate", "label": "V", "args": {"query": "${steps.t.sql}"}},
                 ],
                 envelope,
                 catalogue=CATALOGUE,

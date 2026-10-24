@@ -253,7 +253,7 @@ async def commit_staged_links(
         )
 
     nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
-    out = next((n.output or {} for n in nodes if n.task_key == "commit_stitches"), {})
+    out = next((n.output or {} for n in nodes if n.task_key == "graph.stitch.commit"), {})
     per_link = {row["link_id"]: row for row in out.get("links") or []}
     committed = [link for link in await link_service.list_links(session, graph.id) if link.id in per_link]
     responses = []
@@ -370,7 +370,7 @@ async def remove_model_link(
             )
         nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
         withdrawn = int(
-            next((n.output or {} for n in nodes if n.task_key == "withdraw_stitch"), {}).get("withdrawn") or 0
+            next((n.output or {} for n in nodes if n.task_key == "graph.stitch.withdraw"), {}).get("withdrawn") or 0
         )
     else:
         removed = await link_service.remove(session, graph.id, link_id)
@@ -421,7 +421,7 @@ async def preview_stitch(
             detail={"error": "preview_queued", "run_id": run_id, "message": "The preview is queued behind other runs."},
         )
     nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
-    out = next((n.output or {} for n in nodes if n.task_key == "preview_stitches"), {})
+    out = next((n.output or {} for n in nodes if n.task_key == "graph.stitch.preview"), {})
     row = next(iter(out.get("previews") or []), None)
     if run.status != RunStatus.succeeded.value or row is None:
         raise HTTPException(

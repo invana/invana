@@ -96,7 +96,7 @@ export function TraceDialog({
 					<DialogDescription>
 						{trace.data ? (
 							<>
-								{trace.data.workflow_key} ·{" "}
+								{trace.data.flow_key} ·{" "}
 								{OUTCOME_COPY[trace.data.outcome ?? ""] ?? trace.data.status}
 								{trace.data.duration_ms !== null
 									? ` · ${formatDuration(trace.data.duration_ms)}`

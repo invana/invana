@@ -2,7 +2,7 @@
 
 ``TaskRuntime`` owns the interpreter loop of docs/for-developers/modules/ask/features/streaming-and-the-workflow.md:
 for each step of
-the workflow, mark the row running, run the task, and settle the row as
+the flow, mark the row running, run the task, and settle the row as
 succeeded / failed / needs_input / stopped — retrying on the classes the step's
 policy allows (docs/for-developers/modules/ask/features/when-it-cannot-answer.md), emitting a ``diagnosis`` on a
 terminal failure and
@@ -557,13 +557,13 @@ class TaskRuntime:
             # run knows it is *resuming* — from this step.
             start_index = int((th.cursor or {}).get("step", 0))
             # **Lenient, because a library plan is the normal case now**
-            # (task-model-migration § 6.5). `workflow_key` on an import run is
+            # (task-model-migration § 6.5). `flow_key` on an import run is
             # `dataset-import@1`, which `WORKFLOWS` does not hold and is not
             # meant to: the three keys left in it are what a session opens
             # against, and they retire in M12. Subscripting here is what kept
             # ingestion running inline — the run raised `KeyError` before a
             # single node was dispatched.
-            wf = WORKFLOWS.get(th.workflow_key)
+            wf = WORKFLOWS.get(th.flow_key)
             v, assistant = await self.run_vars(db, th)
 
             th.status = RunStatus.running.value
@@ -580,7 +580,7 @@ class TaskRuntime:
                     {
                         "run_id": th.id,
                         "message_id": assistant.id if assistant else None,
-                        "workflow": th.workflow_key,
+                        "flow": th.flow_key,
                         "agent_id": th.agent_id,
                         "agent": v.agent.name if v.agent else None,
                         "task_id": th.todo_id,
@@ -679,8 +679,8 @@ class TaskRuntime:
             parameters=params.get("parameters"),
             provider=provider,
             history=history,
-            grounding=await load_grounding(db, graph.id) if th.workflow_key != "modeller-generate" else None,
-            global_model=await load_global_model(db, graph.id) if th.workflow_key != "modeller-generate" else None,
+            grounding=await load_grounding(db, graph.id) if th.flow_key != "modeller-generate" else None,
+            global_model=await load_global_model(db, graph.id) if th.flow_key != "modeller-generate" else None,
             skills=skills,
             rules=rules,
             # The Graph's, then the agent's own focus (AG13).
@@ -805,8 +805,8 @@ class TaskRuntime:
         held on its approval.
 
         The list of steps is read from ``run_nodes`` each pass rather than
-        from a static workflow, because a *Plan* step appends to it mid-run.
-        That is the whole difference between a planned workflow and a fixed
+        from a static flow, because a *Plan* step appends to it mid-run.
+        That is the whole difference between a planned flow and a fixed
         one — the loop cannot know its own length when it starts.
         """
         message_id = assistant.id if assistant else None
@@ -1094,8 +1094,8 @@ class TaskRuntime:
         payload = plan_payload(steps, source=v.plan_origin or "generated", version=th.plan_revision)
         th.plan_snapshot = payload
         th.plan_origin = v.plan_origin
-        if v.task_plan_id:
-            th.task_plan_id = v.task_plan_id
+        if v.flow_id:
+            th.flow_id = v.flow_id
         await queue_plan_steps(db, run=th, message_id=message_id, steps=steps, start_seq=after + 1)
         await db.commit()
         await emitter.emit("plan.proposed" if th.plan_revision == 1 else "plan.revised", payload)
@@ -1136,7 +1136,7 @@ class TaskRuntime:
         sess = v.sess
         m.status = SessionMessageStatus.ok
         m.timeout_s = v.timeout_s
-        if th.workflow_key == "modeller-generate":
+        if th.flow_key == "modeller-generate":
             assert v.proposal is not None and v.counts is not None
             m.via = v.via
             m.llm_time_ms = round(v.llm_ms) if v.llm_ms is not None else None
@@ -1244,7 +1244,7 @@ class TaskRuntime:
             await self._settle(db, emitter, th, v, None, RunStatus.failed)
             return
         m.status = SessionMessageStatus.error
-        m.source_query = v.query if v.query and th.workflow_key != "modeller-generate" else m.source_query
+        m.source_query = v.query if v.query and th.flow_key != "modeller-generate" else m.source_query
         m.via = v.via or m.via
         m.rationale = v.rationale or m.rationale
         m.llm_time_ms = round(v.llm_ms) if v.llm_ms is not None else m.llm_time_ms
@@ -1309,7 +1309,7 @@ class TaskRuntime:
             run_id=th.id,
             details={
                 "run_id": th.id,
-                "workflow": th.workflow_key,
+                "flow": th.flow_key,
                 "status": status.value,
                 "outcome": th.outcome,
                 "duration_ms": span_ms(th.started_at, th.finished_at),
@@ -1374,7 +1374,7 @@ class TaskRuntime:
         Only the root run of `model-import` or `bulk-load`, and only once it has
         succeeded. The snapshot never fails the run: the records already landed.
         """
-        if th.parent_run_id is not None or (th.workflow_key or "").split("@")[0] not in _IMPORT_PLAN_KEYS:
+        if th.parent_run_id is not None or (th.flow_key or "").split("@")[0] not in _IMPORT_PLAN_KEYS:
             return
         try:
             connector = await connector_for(db, th.graph_id)

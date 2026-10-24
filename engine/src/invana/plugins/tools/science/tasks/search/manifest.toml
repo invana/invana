@@ -1,0 +1,16 @@
+key = "science.pubmed.search"
+version = "0.1.0"
+summary = "Search PubMed and return each article's PMID, title, journal, year and link."
+bound = "network"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+timeout_s = 30
+retries = 2
+
+[args]
+query = { type = "str", required = true }
+limit = { type = "int", default = 20 }
+
+[outputs]
+articles = "list"

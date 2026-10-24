@@ -1,0 +1,15 @@
+key = "graph.write.edits"
+version = "1.0.0"
+summary = "Write a board's saved edits — nodes and relationships added, changed and deleted — checked against the model."
+bound = "graph_write"
+side_effect = "write"
+requires = []
+resources = ["cpu"]
+
+[args]
+edits = { type = "list", required = true }
+model_id = { type = "str", required = true }
+
+[outputs]
+applied = "int"
+ids = "obj"

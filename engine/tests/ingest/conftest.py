@@ -10,10 +10,10 @@ import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+import invana.apps.flows.models
 import invana.apps.graphs.models
 import invana.apps.sessions.models
-import invana.apps.task_plans.models
-import invana.apps.work.models  # todos, which task_plans points at
+import invana.apps.work.models  # todos, which flows points at
 import invana.runtime.models  # noqa: F401 — runs, runs and their steps
 from invana.apps.modeller.store import ModelStore
 from invana.core.models import Base

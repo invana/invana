@@ -22,6 +22,7 @@ from invana.apps.agents.envelope import PlanStep
 from invana.apps.agents.managers import AgentManager
 from invana.apps.agents.models import Agent
 from invana.apps.agents.querysets import AgentQuerySet
+from invana.apps.flows.models import Flow
 from invana.apps.govern.managers import LensManager, LLMEndpointManager, NoEndpointError
 from invana.apps.govern.managers.lens import to_effective
 from invana.apps.govern.rules import compose, from_snapshot
@@ -42,7 +43,6 @@ from invana.apps.sessions.querysets import SessionMessageQuerySet
 from invana.apps.sessions.schemas import SendMessage
 from invana.apps.sessions.transcript import _title_from_text
 from invana.apps.skills.models import SkillVersion
-from invana.apps.task_plans.models import TaskPlan
 from invana.apps.work.models import Task
 from invana.core.auth.querysets import UserQuerySet
 from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedError, ValidationError
@@ -71,7 +71,7 @@ def _queue_steps(db: AsyncSession, th: TaskRun, message_id: str, wf: Workflow, *
                 parent_run_id=th.id,
                 message_id=message_id,
                 seq=i,
-                step_key=step.task_key,
+                step_key=step.task_key.replace(".", "_"),
                 task_key=step.task_key,
                 label=step.label,
                 attempt=1,
@@ -83,7 +83,7 @@ def _queue_steps(db: AsyncSession, th: TaskRun, message_id: str, wf: Workflow, *
 def _queue_opening(db: AsyncSession, th: TaskRun, message_id: str | None, opening) -> None:
     """The rows a run opens with.
 
-    For a static agent that is the whole workflow, before any LLM call. For a
+    For a static agent that is the whole flow, before any LLM call. For a
     planning one it is *Understand* and *Plan* alone — the rest appear when the
     plan lands, which is the difference the user actually sees (docs/for-developers/modules/agents/spec.md).
     """
@@ -244,7 +244,7 @@ async def open_turn(
             # ([AS5](docs/for-developers/modules/ask/spec.md) · AG25).
             "max_tokens_run": tokens_per_run(sess, agent),
         },
-        workflow_key=wf.key,
+        flow_key=wf.key,
         assistant_message_id=assistant_msg.id,
         agent_id=agent.id if agent else None,
         agent_version=agent.version if agent else None,
@@ -409,7 +409,7 @@ async def pins_for_run(db: AsyncSession, *, th: TaskRun) -> tuple[str | None, ..
     agent's. A plan drawn from several versions takes the first that pins.
     """
     skill_pin = None
-    plan = await db.get(TaskPlan, th.task_plan_id) if th.task_plan_id else None
+    plan = await db.get(Flow, th.flow_id) if th.flow_id else None
     for version_id in (plan.source_skill_version_ids or []) if plan is not None else []:
         version = await db.get(SkillVersion, version_id)
         if version is not None and version.model_pin:
@@ -480,7 +480,7 @@ async def open_todo_run(
         ask_kind="nl",
         body=body if body is not None else task.body or task.title,
         params={"acceptance": task.acceptance or None},
-        workflow_key=NL_QUERY.key,
+        flow_key=NL_QUERY.key,
         agent_id=agent.id,
         agent_version=agent.version,
         triggered_by=triggered,
@@ -552,7 +552,7 @@ async def open_schedule_run(
         ask_kind="nl",
         body=instructions,
         params={"schedule_id": schedule_id},
-        workflow_key=NL_QUERY.key,
+        flow_key=NL_QUERY.key,
         agent_id=agent.id,
         agent_version=agent.version,
         triggered_by=TriggeredBy.schedule.value,
@@ -589,12 +589,12 @@ async def open_draft_run(
 ) -> TaskRun:
     """The run that draws a skill's playbook — the first ``role = plan`` run.
 
-    One node, ``draft_plan``, against the draft's id. It is an ordinary run for
+    One node, ``plan.draft``, against the draft's id. It is an ordinary run for
     every other purpose: it takes a slot, it records its exchange, it appears in
     Runs, and what it did is readable months later
     ([SK23](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
 
-    ``workflow_key`` names the act rather than a `WORKFLOWS` entry — the loop
+    ``flow_key`` names the act rather than a `WORKFLOWS` entry — the loop
     reads its steps from the queued rows, and the three keys left in that dict
     are what a *session* opens against (task-model-migration § 6.5).
     """
@@ -605,7 +605,7 @@ async def open_draft_run(
         ask_kind="nl",
         role=RunRole.plan.value,
         body=f"Draw “{skill_name}” as a plan",
-        workflow_key="skill-draft",
+        flow_key="skill-draft",
         # Which draft this run is drawing, on the **root** as well as on the
         # step's args: the authoring surface asks *is a draw in flight for this
         # draft* on every read, and a draw has to be recognisable after a
@@ -626,8 +626,8 @@ async def open_draft_run(
             graph_id=graph.id,
             parent_run_id=th.id,
             seq=0,
-            step_key="draft_plan",
-            task_key="draft_plan",
+            step_key="plan_draft",
+            task_key="plan.draft",
             label="Draw",
             args={"skill_version_id": version.id},
             attempt=1,
@@ -748,7 +748,7 @@ async def rerun_turn(
             if prev and prev.params
             else {"language": message.query_language, "timeout_s": message.timeout_s}
         ),
-        workflow_key=QL_QUERY.key,
+        flow_key=QL_QUERY.key,
         assistant_message_id=message.id,
         # A re-run is a new run, so it freezes anew rather than copying a
         # snapshot ([GV26]) — but it re-runs under the **world it was asked
@@ -807,7 +807,7 @@ async def rerun_run(
     if run.status in _LIVE:
         raise ConflictError({"error": "run_live", "message": "This run has not settled — re-run a settled run only."})
     agent = await _agents.require_available(db, agent_id=run.agent_id, graph_id=graph.id) if run.agent_id else None
-    if agent is None and run.workflow_key not in WORKFLOWS:
+    if agent is None and run.flow_key not in WORKFLOWS:
         raise ConflictError({"error": "not_an_ask", "message": "This run's flow cannot be opened again."})
 
     needs_model = run.ask_kind == "nl"
@@ -833,7 +833,7 @@ async def rerun_run(
         ask_kind=run.ask_kind,
         body=run.body,
         params={**(run.params or {}), "llm_model_id": provider.model_row_id if provider else None},
-        workflow_key=run.workflow_key,
+        flow_key=run.flow_key,
         agent_id=agent.id if agent else None,
         agent_version=agent.version if agent else None,
         model_version=provider.model_id if provider else None,
@@ -848,7 +848,7 @@ async def rerun_run(
     if opening is not None:
         _queue_opening(db, th, None, opening)
     else:
-        _queue_steps(db, th, None, WORKFLOWS[run.workflow_key])
+        _queue_steps(db, th, None, WORKFLOWS[run.flow_key])
     await emit_event(
         db,
         action=actions.THINKING_OPEN,
@@ -893,7 +893,7 @@ async def _recorded_endpoint(db: AsyncSession, *, run: TaskRun) -> LLMEndpoint:
 
 
 def _workflow(th: TaskRun) -> Workflow:
-    return WORKFLOWS[th.workflow_key]
+    return WORKFLOWS[th.flow_key]
 
 
 async def awaiting_run(db: AsyncSession, *, sess: Session) -> TaskRun | None:
@@ -1012,7 +1012,7 @@ async def list_runs(db: AsyncSession, *, graph_id: str, params: ListParams) -> t
     """One page of the Runs list — the plan and its verdict, without the steps.
 
     Three surfaces read it: an agent's *Recent plans* (``agent_id``), the
-    Workflows library's Promote picker (``candidates=true``) and the journal
+    flow library's Promote picker (``candidates=true``) and the journal
     (``kind``, ``status``, ``since``). All want the same few facts and none
     wants the steps, so the steps are not loaded — only rolled up onto the row.
 
@@ -1062,7 +1062,7 @@ async def list_runs(db: AsyncSession, *, graph_id: str, params: ListParams) -> t
         spend[1] += tokens_out or 0
         if step_cost is not None:
             cost[run_id] = cost.get(run_id, 0.0) + step_cost
-        if task_key == "verify_result":
+        if task_key == "plan.verify":
             served = (output or {}).get("served")
             if isinstance(served, str):
                 verdicts[run_id] = served
@@ -1091,7 +1091,7 @@ async def list_runs(db: AsyncSession, *, graph_id: str, params: ListParams) -> t
     promoted = {
         row
         for (row,) in (
-            await db.execute(select(TaskPlan.promoted_from_run_id).where(TaskPlan.promoted_from_run_id.in_(ids)))
+            await db.execute(select(Flow.promoted_from_run_id).where(Flow.promoted_from_run_id.in_(ids)))
         ).all()
         if row
     }
@@ -1104,7 +1104,7 @@ async def list_runs(db: AsyncSession, *, graph_id: str, params: ListParams) -> t
     items = [
         {
             "id": r.id,
-            "workflow_key": r.workflow_key,
+            "flow_key": r.flow_key,
             "status": r.status,
             # What kind of work, and what it was about. A journal row has to say
             # *what changed my graph* without a second request, and for a load
@@ -1289,8 +1289,8 @@ async def open_load_run(
         ask_kind="import",
         body=f"Import {name}",
         params=opened.as_params(root=str(path)),
-        workflow_key=selected.ref,
-        task_plan_id=selected.plan_id,
+        flow_key=selected.ref,
+        flow_id=selected.plan_id,
         plan_origin=f"template:{selected.ref}",
         triggered_by=TriggeredBy.user.value if actor_id else TriggeredBy.schedule.value,
         on_behalf_of_user_id=actor_id,
@@ -1328,13 +1328,13 @@ async def open_bulk_run(
 
     There is no prologue: a fast load resolves no model and pins no version,
     because it checks against neither. The Graph's connection is the only thing
-    it needs, and `bulk_write` asks for that itself.
+    it needs, and `graph.write.bulk` asks for that itself.
     """
     selected = await select_plan_by_key(db, graph_id=graph.id, key=BULK_PLAN_KEY)
     if selected is None:
         raise RuntimeError(f"The plan library has no populated {BULK_PLAN_KEY!r}; run a migration before loading.")
     root = Path(path).resolve()
-    # `bulk_write` reads its step's args, not the run's params — the params are
+    # `graph.write.bulk` reads its step's args, not the run's params — the params are
     # the journal's copy, the args are what the step is handed.
     args = {
         "root": str(root),
@@ -1354,8 +1354,8 @@ async def open_bulk_run(
         ask_kind="bulk",
         body=f"Bulk load {root.name}",
         params={**args, "source": f"file://{root}"},
-        workflow_key=selected.ref,
-        task_plan_id=selected.plan_id,
+        flow_key=selected.ref,
+        flow_id=selected.plan_id,
         plan_origin=f"template:{selected.ref}",
         triggered_by=TriggeredBy.user.value if actor_id else TriggeredBy.schedule.value,
         on_behalf_of_user_id=actor_id,
@@ -1410,8 +1410,8 @@ async def _open_stitch_run(
         ask_kind=ask_kind,
         body=body,
         params=dict(args or {}),
-        workflow_key=selected.ref,
-        task_plan_id=selected.plan_id,
+        flow_key=selected.ref,
+        flow_id=selected.plan_id,
         plan_origin=f"template:{selected.ref}",
         triggered_by=TriggeredBy.user.value,
         on_behalf_of_user_id=actor_id,
@@ -1435,7 +1435,7 @@ async def open_stitch_commit_run(
     """Open the run a stitch commit runs as — the drawer's and the CLI's alike.
 
     **Committing writes edges, so it is a run** (ST54): the
-    Graph's guardrails are frozen on it and `commit_stitches` asks them about
+    Graph's guardrails are frozen on it and `graph.stitch.commit` asks them about
     each stitch's two models before writing a single edge (ST53 · GV35). There
     is no other path to that write.
 
@@ -1464,7 +1464,7 @@ async def open_data_edit_run(
 
     **Writing data is a run**
     (docs/for-developers/modules/explore/features/edit-the-graphs-data.md):
-    ``apply_data_edits`` checks the edits against the model again and writes
+    ``graph.write.edits`` checks the edits against the model again and writes
     them under the Graph's guardrails. A connection it may not write to refuses
     before the run opens, as a load's does.
     """
@@ -1521,7 +1521,7 @@ async def open_stitch_preview_run(
 
     **Previewing reads the graph, so it is a run** under the Graph's
     guardrails, like committing (ST54): the drawer's count and `invana stitches
-    resolve` go through `preview_stitches` and its lens, never the connector.
+    resolve` go through `graph.stitch.preview` and its lens, never the connector.
     """
     if rule is not None:
         body = (
@@ -1565,8 +1565,8 @@ async def open_simulation_run(
         ask_kind="simulate",
         body=body,
         params=params,
-        workflow_key=selected.ref,
-        task_plan_id=selected.plan_id,
+        flow_key=selected.ref,
+        flow_id=selected.plan_id,
         plan_origin=f"template:{selected.ref}",
         triggered_by=TriggeredBy.user.value,
         on_behalf_of_user_id=actor_id,
@@ -1612,8 +1612,8 @@ async def open_model_migration_run(
         ask_kind="model_migration",
         body=f"{verb} the breaking change to {model_name}",
         params=dict(args),
-        workflow_key=selected.ref,
-        task_plan_id=selected.plan_id,
+        flow_key=selected.ref,
+        flow_id=selected.plan_id,
         plan_origin=f"template:{selected.ref}",
         triggered_by=TriggeredBy.user.value,
         on_behalf_of_user_id=actor_id,

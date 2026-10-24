@@ -13,12 +13,12 @@ import { BOARD_ICONS } from "@invana-studio/ui";
 import { type ReactNode, useMemo, useState } from "react";
 import { EVERY } from "../../lists";
 import {
+	useFlowsQuery,
 	usePlanDiffsQuery,
 	usePlanExportQuery,
 	usePlanVersionQuery,
-	useTaskPlansQuery,
 } from "../queries";
-import type { TaskPlanSummary } from "../types";
+import type { FlowSummary } from "../types";
 import {
 	planArgumentsSpec,
 	planExportSpec,
@@ -29,7 +29,7 @@ import {
 interface RecordPageProps {
 	username: string;
 	graphSlug: string;
-	/** The `task_plans.id` the board is keyed by — one version. */
+	/** The `flows.id` the board is keyed by — one version. */
 	planId: string;
 	/** The crumb naming the plan — back to its page. */
 	onOpenPlan: (planId: string) => void;
@@ -37,7 +37,7 @@ interface RecordPageProps {
 
 /** The version the board names, and every version of its key. */
 function usePlanRecord(username: string, graphSlug: string, planId: string) {
-	const library = useTaskPlansQuery(username, graphSlug, EVERY);
+	const library = useFlowsQuery(username, graphSlug, EVERY);
 	const plan = library.data?.items.find((p) => p.id === planId);
 	const versions = useMemo(
 		() => (library.data?.items ?? []).filter((p) => plan && p.key === plan.key),
@@ -80,7 +80,7 @@ function Frame({
 	);
 }
 
-const refOf = (p: TaskPlanSummary) => `${p.key}@${p.version}`;
+const refOf = (p: FlowSummary) => `${p.key}@${p.version}`;
 
 export function PlanVersionsPage({
 	username,

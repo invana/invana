@@ -136,7 +136,7 @@ export const CANVAS_KINDS: Record<CanvasKind, CanvasKindSpec> = {
 		// Authoring a workflow is out of MVP; a canvas is not a loophole in a
 		// threat model (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
 		writesFromGesture: false,
-		// The library is **Library › Plans**; a workflow is a reusable TaskPlan, not
+		// The library is **Library › Plans**; a workflow is a reusable Flow, not
 		// a panel of its own.
 		panel: "library",
 		hasLayers: false,
@@ -250,7 +250,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		icon: LayoutDashboard,
 		// A plan in Library › Plans — its flow with per-task medians and its runs.
 		panel: "library",
-		subject: "a task_plans.id",
+		subject: "a flows.id",
 	},
 	// `⋯` on the plan page — records, not readings over a window, so
 	// Studio-only like `runs`: none offers `Save report`.
@@ -260,7 +260,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		label: "Versions",
 		icon: History,
 		panel: "library",
-		subject: "a task_plans.id",
+		subject: "a flows.id",
 	},
 	plan_arguments: {
 		kind: "plan_arguments",
@@ -268,7 +268,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		label: "Arguments",
 		icon: SlidersHorizontal,
 		panel: "library",
-		subject: "a task_plans.id",
+		subject: "a flows.id",
 	},
 	plan_export: {
 		kind: "plan_export",
@@ -276,7 +276,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		label: "Export YAML",
 		icon: FileCode,
 		panel: "library",
-		subject: "a task_plans.id",
+		subject: "a flows.id",
 	},
 	task_run: {
 		kind: "task_run",
@@ -426,7 +426,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 	task_type: {
 		kind: "task_type",
 		renders: "declared",
-		label: "Task type",
+		label: "Function",
 		icon: Box,
 		// A task type on a plugin's page.
 		panel: "plugins",

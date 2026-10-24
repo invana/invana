@@ -625,7 +625,7 @@ function input(trace: TraceRead): PanelSpec<RunPanels> {
 				trace.body ? { label: "asked", value: `"${trace.body}"` } : null,
 				{
 					label: "plan",
-					value: trace.plan_origin ?? trace.workflow_key,
+					value: trace.plan_origin ?? trace.flow_key,
 					mono: true,
 				},
 				trace.plan_revision

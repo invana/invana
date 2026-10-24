@@ -6,44 +6,44 @@ intents = ["compound", "aggregate_and_chart"]
 
 [[steps]]
 id = "translate_a"
-task = "translate_thought"
+task = "nl.translate"
 label = "Translate A"
 
 [[steps]]
 id = "validate_a"
-task = "validate_query"
+task = "graph.read.validate"
 label = "Validate A"
 args = { query = "${steps.translate_a.query}" }
 
 [[steps]]
 id = "execute_a"
-task = "execute_graph_query"
+task = "graph.read.query"
 label = "Execute A"
 args = { query = "${steps.translate_a.query}", read_only = true }
 
 [[steps]]
 id = "translate_b"
-task = "translate_thought"
+task = "nl.translate"
 label = "Translate B"
 
 [[steps]]
 id = "validate_b"
-task = "validate_query"
+task = "graph.read.validate"
 label = "Validate B"
 args = { query = "${steps.translate_b.query}" }
 
 [[steps]]
 id = "execute_b"
-task = "execute_graph_query"
+task = "graph.read.query"
 label = "Execute B"
 args = { query = "${steps.translate_b.query}", read_only = true }
 
 [[steps]]
-id = "shape_for_canvas"
-task = "shape_for_canvas"
+id = "answer_shape"
+task = "answer.shape"
 label = "Project"
 
 [[steps]]
-id = "verify_result"
-task = "verify_result"
+id = "plan_verify"
+task = "plan.verify"
 label = "Verify"

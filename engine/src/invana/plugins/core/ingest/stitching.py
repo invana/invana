@@ -23,7 +23,7 @@ declared, active link that names this source model and this edge type. Endpoints
 resolve by id against the whole graph and one that resolves nowhere is rejected
 naming both (LD7), never written as a dangle.
 
-**This is a body, not an entry.** `apply_stitches` and `commit_stitches` are
+**This is a body, not an entry.** `graph.stitch.declare` and `graph.stitch.commit` are
 declared in `graph_write.py`, which spends the bound; what they do lives here
 (the-runtime-package.md § 4a).
 """
@@ -490,7 +490,7 @@ async def commit_stitches(
     ``admit`` is a run's lens on each stitch's two models (ST53). A stitch it
     refuses is still committed — the rule is the Graph's, not the run's — but
     this run writes none of its edges, and says so. It is **required**: only the
-    `commit_stitches` step calls this, so there is no path that writes a
+    `graph.stitch.commit` step calls this, so there is no path that writes a
     stitch's edges without asking the lens first.
     """
     committed = await link_service.commit_staged(session, graph_id)

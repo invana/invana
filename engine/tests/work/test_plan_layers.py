@@ -17,19 +17,19 @@ from __future__ import annotations
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.flows.managers import FlowManager
+from invana.apps.flows.models import Flow, PlanOrigin, Task, TaskForm
+from invana.apps.flows.schemas import FLOW_LIST
 from invana.apps.graphs.models import Graph
 from invana.apps.skills.models import Skill, SkillVersion
-from invana.apps.task_plans.managers import TaskPlanManager
-from invana.apps.task_plans.models import PlanOrigin, Task, TaskForm, TaskPlan
-from invana.apps.task_plans.schemas import TASK_PLAN_LIST
 from invana.core.errors import ValidationError
 from invana.core.lists.params import parse_list_params
 from invana.runtime.layers import declared_bands
-from invana.runtime.managers import TaskPlanRunsManager
+from invana.runtime.managers import FlowRunsManager
 
 
 def _task(key: str, *, step_key: str | None, form: str = TaskForm.callable.value) -> Task:
-    return Task(task_plan_id="p1", key=key, step_key=step_key, form=form)
+    return Task(flow_id="p1", key=key, step_key=step_key, form=form)
 
 
 class TestDeclaredBands:
@@ -38,8 +38,8 @@ class TestDeclaredBands:
             b["layer"]: b
             for b in declared_bands(
                 [
-                    _task("translate", step_key="translate_thought"),
-                    _task("execute", step_key="execute_graph_query"),
+                    _task("translate", step_key="nl.translate"),
+                    _task("execute", step_key="graph.read.query"),
                     _task("sign_off", step_key=None, form=TaskForm.human.value),
                 ]
             )
@@ -50,7 +50,7 @@ class TestDeclaredBands:
 
     def test_an_untouched_band_is_still_sent_and_reads_as_nothing(self):
         """The negative half: `—`, never `0 steps` and never an absent row."""
-        bands = {b["layer"]: b for b in declared_bands([_task("check", step_key="validate_query")])}
+        bands = {b["layer"]: b for b in declared_bands([_task("check", step_key="graph.read.validate")])}
         # Five governed bands, always — the spine is not one of them.
         assert set(bands) == {"graph data", "llm", "third party", "cache", "human"}
         assert bands["third party"] == {
@@ -59,7 +59,7 @@ class TestDeclaredBands:
             "steps": 0,
             "summary": "—",
         }
-        # `validate_query` spends nothing, so it lands on the spine and no
+        # `graph.read.validate` spends nothing, so it lands on the spine and no
         # governed band claims it.
         assert not any(b["declared"] for b in bands.values())
 
@@ -69,15 +69,15 @@ class TestCallers:
     async def test_a_skills_plan_that_inlines_one_is_a_caller_with_what_it_tuned(
         self, session: AsyncSession, graph: Graph
     ):
-        library = TaskPlanRunsManager()
-        plan = TaskPlan(graph_id=graph.id, key="escalate-core", version=2, reusable=True)
+        library = FlowRunsManager()
+        plan = Flow(graph_id=graph.id, key="escalate-core", version=2, reusable=True)
         session.add(plan)
         await session.flush()
-        session.add(Task(task_plan_id=plan.id, key="fetch", step_key="execute_graph_query"))
+        session.add(Task(flow_id=plan.id, key="fetch", step_key="graph.read.query"))
 
         # The caller: a skill version's plan, which is `reusable = False` and so
-        # is never in the library it calls into (LB16).
-        caller = TaskPlan(
+        # is never in the library it calls into.
+        caller = Flow(
             graph_id=graph.id,
             key=None,
             reusable=False,
@@ -89,7 +89,7 @@ class TestCallers:
         session.add(SkillVersion(skill_id=skill.id, version=1, plan_id=caller.id))
         await session.flush()
 
-        detail = await library.detail(session, workflow=plan)
+        detail = await library.detail(session, flow=plan)
         assert [(c.kind, c.name, c.args) for c in detail.callers] == [
             ("skill", "Escalate a late supplier", {"grace_days": 2})
         ]
@@ -97,14 +97,14 @@ class TestCallers:
 
     async def test_an_agent_permitted_to_run_it_is_not_a_caller(self, session: AsyncSession, graph: Graph, agent):
         """*May run* and *used by* are different facts, and only one is a use."""
-        library = TaskPlanRunsManager()
-        plan = TaskPlan(graph_id=graph.id, key="nl-single", version=1, reusable=True)
+        library = FlowRunsManager()
+        plan = Flow(graph_id=graph.id, key="nl-single", version=1, reusable=True)
         session.add(plan)
         await session.flush()
-        session.add(Task(task_plan_id=plan.id, key="translate", step_key="translate_thought"))
+        session.add(Task(flow_id=plan.id, key="translate", step_key="nl.translate"))
         await session.flush()
 
-        detail = await library.detail(session, workflow=plan)
+        detail = await library.detail(session, flow=plan)
         assert detail.used_by, "the seeded agents may run it"
         assert detail.callers == []
         assert detail.caller_count == 0
@@ -115,21 +115,21 @@ class TestTheLibraryList:
     async def test_it_filters_by_origin_and_family_and_counts_the_whole_library(
         self, session: AsyncSession, graph: Graph
     ):
-        library = TaskPlanRunsManager()
+        library = FlowRunsManager()
         session.add_all(
             [
-                TaskPlan(graph_id=graph.id, key="nl-custom", name="Custom", origin=PlanOrigin.promoted.value),
-                TaskPlan(graph_id=graph.id, key="nlx-other", name="Other", origin=PlanOrigin.promoted.value),
-                TaskPlan(graph_id=graph.id, key=None, reusable=False, origin=PlanOrigin.generated.value),
+                Flow(graph_id=graph.id, key="nl-custom", name="Custom", origin=PlanOrigin.promoted.value),
+                Flow(graph_id=graph.id, key="nlx-other", name="Other", origin=PlanOrigin.promoted.value),
+                Flow(graph_id=graph.id, key=None, reusable=False, origin=PlanOrigin.generated.value),
             ]
         )
         await session.flush()
 
-        params = parse_list_params(TASK_PLAN_LIST, {"origin": ["promoted"], "family": ["nl"]})
+        params = parse_list_params(FLOW_LIST, {"origin": ["promoted"], "family": ["nl"]})
         reads, info = await library.page_reads(session, graph_id=graph.id, params=params)
         assert [r.key for r in reads] == ["nl-custom"]
 
-        listed = await TaskPlanManager().list_for_graph(session, graph_id=graph.id)
+        listed = await FlowManager().list_for_graph(session, graph_id=graph.id)
         assert (info.total, info.unfiltered_total) == (1, len(listed))
         assert await library.count_packaged(session, graph_id=graph.id) == sum(
             1 for p in listed if p.origin == PlanOrigin.packaged.value
@@ -138,6 +138,6 @@ class TestTheLibraryList:
 
 def test_the_library_list_refuses_a_filter_it_does_not_take():
     with pytest.raises(ValidationError, match="it takes"):
-        parse_list_params(TASK_PLAN_LIST, {"bound": ["yes"]})
+        parse_list_params(FLOW_LIST, {"bound": ["yes"]})
     with pytest.raises(ValidationError, match="one of"):
-        parse_list_params(TASK_PLAN_LIST, {"origin": ["generated"]})
+        parse_list_params(FLOW_LIST, {"origin": ["generated"]})

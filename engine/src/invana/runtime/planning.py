@@ -25,19 +25,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.apps.agents.envelope import Envelope, PlanRejected, PlanStep, apply_pins, validate_plan
 from invana.apps.agents.models import Agent
 from invana.apps.agents.registry import LABELS, template_key_for
-from invana.apps.task_plans.args import resolve as resolve_args
-from invana.apps.task_plans.querysets import TaskPlanQuerySet
-from invana.apps.task_plans.yaml_export import steps_of
+from invana.apps.flows.args import resolve as resolve_args
+from invana.apps.flows.querysets import FlowQuerySet
+from invana.apps.flows.yaml_export import steps_of
 from invana.core.errors import NotFoundError
 from invana.runtime.catalogue import CATALOGUE
-from invana.runtime.managers.task_plan_runs import TaskPlanRunsManager
+from invana.runtime.managers.flow_runs import FlowRunsManager
 from invana.runtime.models import RunStatus, TaskRun
 
-# The two rows a planning agent always starts with. `understand_intent` is
+# The two rows a planning agent always starts with. `nl.understand` is
 # skipped for a QL ask — there is nothing to understand about a query the user
 # typed, and pretending otherwise costs an LLM call for a certain answer.
-UNDERSTAND_STEP = PlanStep(id="understand", task="understand_intent", label=LABELS["understand_intent"])
-PLAN_STEP = PlanStep(id="plan", task="plan_workflow", label=LABELS["plan_workflow"])
+UNDERSTAND_STEP = PlanStep(id="understand", task="nl.understand", label=LABELS["nl.understand"])
+PLAN_STEP = PlanStep(id="plan", task="plan.compose", label=LABELS["plan.compose"])
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,10 +85,10 @@ async def select_plan(
 ) -> SelectedPlan | None:
     """The plan a Plan step picks — **no LLM call in the common case**.
 
-    **The rows are the plan.** This reads ``task_plans`` + ``tasks`` for the
+    **The rows are the plan.** This reads ``flows`` + ``tasks`` for the
     Graph; it never reads a step list out of the registry
     (docs/for-developers/modules/workflows/features/the-library.md **LB12**).
-    Before this, ``plan_workflow`` resolved against a dict, so the library was
+    Before this, ``plan.compose`` resolved against a dict, so the library was
     something only Studio read, ``TaskRun.task_id`` could not be populated from
     the runtime, and ``plan_snapshot`` froze a copy of code rather than a copy
     of the plan a person can open.
@@ -120,10 +120,10 @@ async def select_plan_by_key(db: AsyncSession, *, graph_id: str, key: str) -> Se
     try:
         # Seeds the graph's library if it has never been listed, then takes the
         # newest version of the key.
-        plan = await TaskPlanRunsManager().get(db, graph_id=graph_id, key=key, version=None)
+        plan = await FlowRunsManager().get(db, graph_id=graph_id, key=key, version=None)
     except NotFoundError:
         return None
-    tasks = await TaskPlanQuerySet().tasks_for(db, plan_id=plan.id)
+    tasks = await FlowQuerySet().tasks_for(db, plan_id=plan.id)
     if not tasks:
         # LB11: present is not populated, and an empty plan is not a plan.
         return None

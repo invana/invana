@@ -19,17 +19,17 @@ interface Scope {
 // Every task the interpreter knows, split by whether this envelope permits it —
 // "what this agent may not do" is as much of the answer as what it may.
 const ALL_TASKS = [
-	"understand_intent",
-	"plan_workflow",
-	"translate_thought",
-	"validate_query",
-	"execute_graph_query",
-	"shape_for_canvas",
-	"verify_result",
-	"spawn_agent",
-	"delegate",
-	"await_delegations",
-	"create_task",
+	"nl.understand",
+	"plan.compose",
+	"nl.translate",
+	"graph.read.validate",
+	"graph.read.query",
+	"answer.shape",
+	"plan.verify",
+	"work.spawn_agent",
+	"work.delegate",
+	"work.await",
+	"work.create_task",
 ];
 
 export function EnvelopeCanvas({
@@ -65,7 +65,7 @@ export function EnvelopeCanvas({
 	}));
 
 	const edges: LayeredEdge[] = (
-		spec.require ?? [{ task: "execute_graph_query", after: "validate_query" }]
+		spec.require ?? [{ task: "graph.read.query", after: "graph.read.validate" }]
 	)
 		.filter((rule) => allow.has(rule.task) && allow.has(rule.after))
 		.map((rule) => ({

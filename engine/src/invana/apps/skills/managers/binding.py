@@ -11,7 +11,7 @@ for the event, which must still read after the agent is gone
 
 That is also why the bind-time checks arrive as a **callable**
 ([BN5](docs/for-developers/modules/skills/features/bindings.md)): the envelope
-half reads the plan a skill version draws, and `apps/task_plans` sits above this
+half reads the plan a skill version draws, and `apps/flows` sits above this
 package. So the check is composed one band up
 (`runtime/managers/skill_bind.py`) and handed in by whoever binds — the same
 shape `SkillDraftManager.apply_drawing` uses for `resolve_plan`.

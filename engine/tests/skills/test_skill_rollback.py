@@ -10,10 +10,10 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.flows.models import Flow, PlanOrigin
 from invana.apps.graphs.models import Graph
 from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.schemas import SkillCreate, SkillVersionPublish
-from invana.apps.task_plans.models import PlanOrigin, TaskPlan
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError
 from invana.core.events.models import Event
@@ -50,8 +50,8 @@ async def test_a_rollback_publishes_the_earlier_text_and_plan_as_the_next_versio
     assert skill.content == "first"
     # A copy of v1's plan, never v1's own row — v1 keeps its plan.
     assert restored.plan_id != v1.plan_id
-    plan = await session.get(TaskPlan, restored.plan_id)
-    source = await session.get(TaskPlan, v1.plan_id)
+    plan = await session.get(Flow, restored.plan_id)
+    source = await session.get(Flow, v1.plan_id)
     assert plan.origin == source.origin == PlanOrigin.generated.value
     assert plan.source_skill_version_ids == [restored.id]
     # Every earlier version still resolves, unchanged.

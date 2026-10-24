@@ -30,7 +30,7 @@ governs.
 | API | The engine HTTP surface Studio and external agents call. |
 | CLI | `invana …` — the entry point for anything a person runs at a terminal. Most features need none. |
 | Words | Pinned in [terminology.md](terminology.md). Nothing outside it is ours. |
-| **Orchestration** | [orchestration.md § 0](orchestration.md#0-the-records) — **Todo → TaskPlan → Task → TaskRun**, the model this product is moving to. A person writes a **Todo**; a **TaskPlan** (generated, packaged or promoted, and reused when it matches) is the flow of **Task**s that carries it out; a **TaskRun** is one execution. *Nothing a user authors is ever a Task.* A **Lens** bounds what a run may see. ⚠ **§ 0 is current; § 1–§ 3 of that file and every feature file below still describe the retired Todo · Run · Step · Workflow · Project split** |
+| **Orchestration** | [orchestration.md § 0](orchestration.md#0-the-records) — **Todo → Flow → Task → TaskRun**, the model this product is moving to. A person writes a **Todo**; a **Flow** (generated, packaged or promoted, and reused when it matches) is the flow of **Task**s that carries it out; a **TaskRun** is one execution. *Nothing a user authors is ever a Task.* A **Lens** bounds what a run may see. ⚠ **§ 0 is current; § 1–§ 3 of that file and every feature file below still describe the retired Todo · Run · Step · Workflow · Project split** |
 | **The migration** | [building-engine/task-model-migration.md](building-engine/task-model-migration.md) — eight tables → the records above, column by column, with the route changes, the slices M1–M8 and what Studio ships in lockstep. **Read this before touching anything task-shaped** |
 | **Module structure** | [module-structure.md](module-structure.md) — **decided, not started.** One name per module, shared by docs, Studio and the engine, in seven groups; feature numbers kept; the component suffix convention; the target file trees; phases R0–R6 |
 | **The runtime package** | [building-engine/the-runtime-package.md](building-engine/the-runtime-package.md) — one package walks every plan; apps reach it through protocols, never imports. The file-by-file plan, and the ~900 LOC of consolidation it pays for |
@@ -160,12 +160,12 @@ provider row and its models, and reopens four rows below. The shapes:
 
 | # | Feature | What it does | API | CLI | Studio | Slice |
 |---|---|---|---|---|---|---|
-| 7.1 | [Save a plan for reuse](modules/workflows/features/the-library.md) | Named, versioned plans — Invana's builtins among them; diff against the previous version | 🟡 | — | 🟡 | S12c |
+| 7.1 | [Save a plan for reuse](modules/workflows/features/the-library.md) | Named, versioned flows (the `Flow` record) — Invana's packaged flows among them; diff against the previous version | 🟡 | — | 🟡 | S12c · F02 |
 | 7.2 | [Pick a plan, or write one](modules/workflows/features/plan-selection.md) | A template by intent; generation only when none fits | 🟡 | — | 🟡 | S9d |
 | 7.3 | [Check a plan against the bound](modules/workflows/features/envelope-validation.md) | A plan is checked before dispatch, refused with the bound named | 🟡 | — | 🔵 | S9d |
 | 7.4 | [Promote a plan](modules/workflows/features/promote-a-plan.md) | A plan that served becomes a template | 🟡 | — | 🟡 | S12c |
 | 7.5 | [Run a workflow](modules/workflows/features/run-a-workflow.md) | Start a plan from the library with its arguments — the front door | 🔵 | 🔵 | 🔵 | S15 |
-| 7.6 | [Read the catalogue](modules/workflows/features/the-catalogue.md) | The closed set of callables a plan may name — bound · args · outputs · requires | 🟡 | — | 🟡 | S12c |
+| 7.6 | [Read the catalogue](modules/workflows/features/the-catalogue.md) | The closed set of functions (`namespace.verb`) a flow may name — bound · args · outputs · requires | 🟡 | — | 🟡 | S12c · F02 |
 
 ## 8 · [Memory](modules/memory/spec.md)
 
@@ -236,7 +236,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 13.6 | [Admin and health](modules/platform/features/admin-and-health.md) | A generated browser over app state, and a readiness probe | ✅ | — | — | S1 |
 | 13.7 | [Setup](modules/platform/features/setup.md) | Four required steps in four features — the onboarding wizard, created to answering | ✅ | — | 🟡 | S13 |
 | 13.8 | [The runtime](modules/platform/features/runtime.md) | The workhorse: plan graph · frontier · signals · pools · approvals · what it emits | 🟡 | — | — | S15 |
-| 13.9 | [Plugins](modules/platform/features/plugins.md) | Every task type in a plugin — `plugin.yaml`, a manifest beside each task's code, packaged flows; one frozen registry; each Task records its task version | — | — | — | B06a |
+| 13.9 | [Plugins](modules/platform/features/plugins.md) | Every task type in a plugin — `plugin.toml`, a manifest beside each task's code, packaged flows; keys named `namespace.verb`; one frozen registry; each Task records its task version | — | — | — | B06a · F02 |
 | 13.10 | [Search](modules/platform/features/search.md) | One name search over every Graph and dataset you may open, filtered by access, exact → prefix → contains | ✅ | ✅ | — | B11 |
 | 13.11 | [Distributed execution](modules/platform/features/distributed-execution.md) | Every step as a `TaskEnvelope`, called by one `run_envelope()` that rebuilds its context from ids; procrastinate chosen as the distributed executor by benchmark | — | — | — | B14 |
 | 13.12 | [Tool plugins](modules/platform/features/tool-plugins.md) | `tools/web` · `tools/mail` · `tools/science` as optional extras, Admin-enabled, run in workers; `send` waits for an approval; the plugin registry over API and CLI | ✅ | ✅ | ✅ | B06b |

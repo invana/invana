@@ -8,7 +8,7 @@ with the work that opens the run — a session, a Todo, a schedule, a parent run
 ([AG24](features/author-an-agent.md#decisions)). This spec owns the agent and its limits; **the
 composition happens at run open and is drawn in [Ask](../ask/spec.md)**.
 
-> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `TaskPlan` ·
+> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
 > [task-model-migration.md](../../building-engine/task-model-migration.md).
@@ -160,7 +160,7 @@ erDiagram
     }
     TASK {
         string id           PK
-        string task_plan_id FK
+        string flow_id FK
         string form            "callable composite human"
         string step_key        "callable only"
         string role            "llm callables - resolved by the cast"
@@ -203,7 +203,7 @@ erDiagram
         string id             PK
         string agent_id       FK
         int    agent_version
-        string task_plan_id   FK
+        string flow_id   FK
         string lens_id        FK
         string stance_id      FK
     }

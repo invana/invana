@@ -2,7 +2,7 @@
 
 Lives in ``runtime`` for the same reason
 :mod:`invana.runtime.managers.skill_usage` does: it reads and writes rows from
-**two** apps. ``apps/skills`` cannot import ``apps/task_plans`` — that package
+**two** apps. ``apps/skills`` cannot import ``apps/flows`` — that package
 imports ``apps/agents``, which imports ``apps/skills``, and the import-linter
 refuses the cycle — so the manager that needs both lives above both
 (migration-plan §3).
@@ -34,6 +34,12 @@ from datetime import UTC, datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.registry import LABELS
+from invana.apps.flows.args import ArgError, check_tuning
+from invana.apps.flows.args import resolve as resolve_args
+from invana.apps.flows.dag import dag_for
+from invana.apps.flows.managers.flow import FlowManager, explode
+from invana.apps.flows.models import Flow, PlanKind, PlanOrigin, Task, TaskForm
+from invana.apps.flows.querysets import FlowQuerySet
 from invana.apps.govern.managers import LLMEndpointManager
 from invana.apps.llm.draft import PLAN_PREFIX
 from invana.apps.skills.managers import SkillManager
@@ -53,12 +59,6 @@ from invana.apps.skills.schemas import (
     SkillVersionPublish,
     SkillVersionRead,
 )
-from invana.apps.task_plans.args import ArgError, check_tuning
-from invana.apps.task_plans.args import resolve as resolve_args
-from invana.apps.task_plans.dag import dag_for
-from invana.apps.task_plans.managers.task_plan import TaskPlanManager, explode
-from invana.apps.task_plans.models import PlanKind, PlanOrigin, Task, TaskForm, TaskPlan
-from invana.apps.task_plans.querysets import TaskPlanQuerySet
 from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.lists import ListParams, PageInfo
 from invana.plugins import load_plugins
@@ -153,7 +153,7 @@ def _copy_task(task: Task, *, plan_id: str) -> Task:
     """One node of another plan, re-homed under ``plan_id``; JSON fields copied."""
     fields = {name: getattr(task, name) for name in _COPIED_TASK_FIELDS}
     return Task(
-        task_plan_id=plan_id,
+        flow_id=plan_id,
         args=dict(task.args or {}),
         depends_on=list(task.depends_on or []),
         loop=dict(task.loop) if task.loop else None,
@@ -171,7 +171,7 @@ def _requires() -> dict[str, tuple[str, ...]]:
 class PlanView:
     """What the Flow tab draws, and what the Playbook tab reads its spans from."""
 
-    plan: TaskPlan
+    plan: Flow
     nodes: list[dict]
     edges: list[dict]
 
@@ -181,11 +181,11 @@ class SkillDraftManager:
 
     skills = SkillManager()
     endpoints = LLMEndpointManager()
-    plans_qs = TaskPlanQuerySet()
+    plans_qs = FlowQuerySet()
     clarifications_qs = SkillClarificationQuerySet()
     runs_qs = TaskRunQuerySet()
     seeder = BuiltinSkillSeeder()
-    library = TaskPlanManager()
+    library = FlowManager()
     evals = EvalManager()
 
     # ── reading a drawer ─────────────────────────────────────────────────────
@@ -270,7 +270,7 @@ class SkillDraftManager:
             uses=await self._uses_read(session, plan=view.plan),
         )
 
-    async def _uses_read(self, session: AsyncSession, *, plan: TaskPlan) -> list[PlanUseRead]:
+    async def _uses_read(self, session: AsyncSession, *, plan: Flow) -> list[PlanUseRead]:
         """What this plan composed, each saying whether the library has moved on.
 
         The row records the version it inlined; the newest is looked up beside
@@ -307,7 +307,7 @@ class SkillDraftManager:
         origin: str,
         description: str = "",
         key: str | None = None,
-    ) -> TaskPlan:
+    ) -> Flow:
         """A plan a skill version owns: never listed in the library, never
         selected by an intent — ``reusable = False``, which is what keeps the
         Library a place of plans a person can choose (LB6).
@@ -318,7 +318,7 @@ class SkillDraftManager:
         """
         return await self.plans_qs.add(
             session,
-            TaskPlan(
+            Flow(
                 graph_id=graph_id,
                 key=key,
                 version=1,
@@ -334,7 +334,7 @@ class SkillDraftManager:
             ),
         )
 
-    async def fallback_plan(self, session: AsyncSession, *, graph_id: str, name: str) -> TaskPlan:
+    async def fallback_plan(self, session: AsyncSession, *, graph_id: str, name: str) -> Flow:
         """One node, and it is a person's (SK15 · SK22).
 
         It is born ``generated``: nothing but the engine wrote this node, and
@@ -345,7 +345,7 @@ class SkillDraftManager:
             session,
             [
                 Task(
-                    task_plan_id=plan.id,
+                    flow_id=plan.id,
                     key=FALLBACK_KEY,
                     form=TaskForm.human.value,
                     step_key=None,
@@ -358,7 +358,7 @@ class SkillDraftManager:
         )
         return plan
 
-    async def copy_plan(self, session: AsyncSession, *, source_plan_id: str, graph_id: str, name: str) -> TaskPlan:
+    async def copy_plan(self, session: AsyncSession, *, source_plan_id: str, graph_id: str, name: str) -> Flow:
         """A new plan with the source plan's nodes, node for node, its origin
         and the library plans it composed.
 
@@ -380,8 +380,8 @@ class SkillDraftManager:
             await session.flush()
         return plan
 
-    async def rewrite(self, session: AsyncSession, *, version: SkillVersion, tasks: list[Task]) -> TaskPlan:
-        """Replace a draft's nodes — what ``draft_plan`` writes. The rows go and
+    async def rewrite(self, session: AsyncSession, *, version: SkillVersion, tasks: list[Task]) -> Flow:
+        """Replace a draft's nodes — what ``plan.draft`` writes. The rows go and
         come back rather than being patched:
         a redraw is a revision of the whole shape, not a merge (SK12)."""
         plan = await self.plans_qs.get(session, version.plan_id)
@@ -389,7 +389,7 @@ class SkillDraftManager:
             raise NotFoundError("This version has no plan.")
         await self.plans_qs.clear_tasks(session, plan_id=plan.id)
         for ordinal, task in enumerate(tasks):
-            task.task_plan_id = plan.id
+            task.flow_id = plan.id
             task.ordinal = ordinal
         await self.plans_qs.add_tasks(session, tasks)
         return plan
@@ -415,7 +415,7 @@ class SkillDraftManager:
         )
 
         plans = await self.plans_qs.list_for_graph(session, graph_id=graph_id)
-        newest: dict[str, TaskPlan] = {}
+        newest: dict[str, Flow] = {}
         for plan in plans:
             if not plan.reusable or not plan.key:
                 continue
@@ -457,7 +457,7 @@ class SkillDraftManager:
         validator sees one graph and the Flow tab can still group them.
 
         Keys are prefixed with the plan's key — ``nl_single_translate_thought``
-        — because two plans may both name ``validate_query`` and a plan whose
+        — because two plans may both name ``graph.read.validate`` and a plan whose
         sibling keys collide is one whose bindings mean two things. An
         underscore and not a dot: a step id is ``[A-Za-z0-9_]`` in the binding
         grammar, and a dotted one would parse as *step ``nl``, output
@@ -467,7 +467,7 @@ class SkillDraftManager:
 
         Returns the copied steps — ``{key, step_key, form, title, args,
         source_step_key}`` each, arguments resolved over ``tuned`` — and the
-        entry ``task_plans.uses`` records. Raises ``ValidationError`` with a
+        entry ``flows.uses`` records. Raises ``ValidationError`` with a
         sentence naming what is wrong: an unknown or one-off plan, an argument
         the plan does not declare, a plan with no steps.
         """
@@ -859,7 +859,8 @@ class SkillDraftManager:
                         }
                     )
                 continue
-            key = _unique(picked.task, seen)
+            # A step id is an identifier — `${steps.<id>.x}` cannot name a dot.
+            key = _unique(picked.task.replace(".", "_"), seen)
             raw_steps.append(
                 {
                     "id": key,
@@ -908,7 +909,7 @@ class SkillDraftManager:
             task = exploded.get(key)
             if task is None:
                 task = Task(
-                    task_plan_id="",
+                    flow_id="",
                     key=key,
                     form=TaskForm.human.value,
                     step_key=None,
@@ -1019,7 +1020,7 @@ class SkillDraftManager:
         if run is None:
             return None
         for node in await self.runs_qs.nodes_of(session, run_id=run.id):
-            reasons = (node.output or {}).get("refused") if node.step_key == "draft_plan" else None
+            reasons = (node.output or {}).get("refused") if node.step_key == "plan.draft" else None
             if reasons:
                 return SkillDrawRefusal(run_id=run.id, reasons=[str(r) for r in reasons])
         return None
@@ -1046,8 +1047,8 @@ class SkillDraftManager:
 def _rebind(args: dict, renamed: dict[str, str]) -> dict:
     """Point an inlined plan's own ``${steps.X.y}`` at its renamed copies.
 
-    Without this, a copied ``validate_query`` would still bind
-    ``${steps.translate_thought.query}`` — which now names either nothing or,
+    Without this, a copied ``graph.read.validate`` would still bind
+    ``${steps.nl_translate.query}`` — which now names either nothing or,
     worse, a *different* step the skill happens to have called that.
     """
     out = {}

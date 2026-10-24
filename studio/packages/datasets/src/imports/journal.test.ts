@@ -17,7 +17,7 @@ function run(
 ): TaskRunSummary {
 	return {
 		id,
-		workflow_key: "dataset-import",
+		flow_key: "dataset-import",
 		status: "succeeded",
 		kind,
 		body: `Import ${id}`,

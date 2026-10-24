@@ -2,7 +2,7 @@
 
 > **The picker, `GET …/skills/inlinable` and `PATCH …/skills/{id}/draft/tasks` are gone** ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3 · IS11).
 > Composition is drawn: a sentence names a library plan and `draft_plan` inlines it. Expansion, `args_schema`,
-> `${args.N}`, `source_plan_key` and `task_plans.uses` below still hold.
+> `${args.N}`, `source_plan_key` and `flows.uses` below still hold.
 
 **The third Skills pass.** [M8](skills-draw-as-plans.md) gave every skill version a plan of its own,
 drawn from its prose. This is the other way a version's plan gets its steps: **it inlines one the
@@ -14,19 +14,19 @@ Library already holds**, and tunes the arguments that make it fit ([SK18](../mod
 | Ships | [6.1 Authoring](../modules/skills/features/authoring-a-skill.md) — SK18's `uses` half · [7.6 The Library](../modules/workflows/features/the-library.md) — LB18 · LB19 |
 | Drawn in | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — page *Skills*, artboard `SkillUsesPlan` |
 | Worked example | **Ask about routes and airports** inlining `nl-single@1` instead of redrawing its five steps |
-| Needs | `task_plans` + `tasks` (M2 ✅) · a version owning a plan (M8 ✅) · the hand-edit route (M8 ✅) |
+| Needs | `flows` + `tasks` (M2 ✅) · a version owning a plan (M8 ✅) · the hand-edit route (M8 ✅) |
 
 ## 1. What the tree already has, and what it does not
 
 | Piece | State | Where |
 |---|---|---|
-| `task_plans.args_schema` | ❌ the column exists, is always `{}`, and **nothing reads it** | `apps/task_plans/models.py:111` |
+| `flows.args_schema` | ❌ the column exists, is always `{}`, and **nothing reads it** | `apps/flows/models.py:111` |
 | `uses` | ❌ named in [13.8 § 4](../modules/platform/features/runtime.md) and **deferred there** (§ 21). No code | — |
-| `TaskForm.composite` | ❌ the value exists; nothing writes one and the interpreter has never walked one | `apps/task_plans/models.py:72` |
+| `TaskForm.composite` | ❌ the value exists; nothing writes one and the interpreter has never walked one | `apps/flows/models.py:72` |
 | The binding grammar | 🟡 `${steps.X.y}` only | `apps/agents/envelope.py:36` |
 | Reusable plans to inline | ✅ eight, seeded `builtin` | `bulk-load` · `bundle-import` · `model-import` · `modeller-propose` · `nl-compare` · `nl-single` · `ql-direct` · `stitch-apply` |
 
-`task_plans.source_skill_version_ids` is **not** where a `uses` is recorded, despite being the obvious
+`flows.source_skill_version_ids` is **not** where a `uses` is recorded, despite being the obvious
 candidate. It points the other way — *which playbooks the planner read when `origin = generated`*
 ([orchestration § 0.8](../orchestration.md)) — and overloading it would make one column mean both
 *this plan was drafted from those skills* and *this plan inlines that plan*.
@@ -59,8 +59,8 @@ One migration — `000000000052_a_skill_uses_a_plan`.
 | Table | Change | Notes |
 |---|---|---|
 | `tasks` | **+ `source_plan_key`** `String(80)` nullable | `nl-single@1` — the plan version this row was copied from, `NULL` for a row somebody wrote. What the Flow tab groups by, and what a re-inline replaces |
-| `task_plans` | **+ `uses`** `JSON`, default `[]`, NOT NULL | what this plan composed, and with which arguments — § 5 |
-| `task_plans` | `args_schema` — **given a shape**, no DDL | `{"<name>": {"type": "str｜int｜bool", "default": …, "label": …}}`. Declared on the plan being inlined, read by the caller ([LB19](../modules/workflows/features/the-library.md#decisions)) |
+| `flows` | **+ `uses`** `JSON`, default `[]`, NOT NULL | what this plan composed, and with which arguments — § 5 |
+| `flows` | `args_schema` — **given a shape**, no DDL | `{"<name>": {"type": "str｜int｜bool", "default": …, "label": …}}`. Declared on the plan being inlined, read by the caller ([LB19](../modules/workflows/features/the-library.md#decisions)) |
 
 **`nl-single@2`** declares the one argument that tail genuinely has: `read_only`, default `true`, bound
 by its `execute_graph_query` row as `${args.read_only}` — so the mechanism ships with a real user
@@ -96,7 +96,7 @@ On the calling plan, because *what this plan will do for me* must be answerable 
 library ([LB19](../modules/workflows/features/the-library.md#decisions)):
 
 ```
-task_plans.uses = [{"key": "nl-single", "version": 1, "args": {"read_only": false}}]
+flows.uses = [{"key": "nl-single", "version": 1, "args": {"read_only": false}}]
 ```
 
 It is its own column, written by the same migration — not a corner of `args_schema`, which is what a
@@ -117,7 +117,7 @@ Expansion is not its own route: inlining is part of the draw, and it publishes w
 | # | Slice | Done when |
 |---|---|---|
 | **S4a** ✅ | The migration, `args_schema`'s shape, `${args.N}` in the grammar, and `nl-single@1` declaring `read_only` | **Done.** A reusable plan declares an argument, its row binds it, a plan selected directly resolves it to the declared default before anything validates, and an undeclared name is refused by name |
-| **S4b** ✅ — the hand-edit path is gone; expansion runs inside the draw ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS11) | Expansion — a `uses` row becomes the inlined steps, flat, each carrying `source_plan_key`, validated as one graph | **Done.** Hand-editing a draft to `uses: nl-single@1` writes five rows keyed `answer_*`, the tuned `read_only` lands on `execute_graph_query`, the copied plan's own bindings follow the copies, and `task_plans.uses` records the act |
+| **S4b** ✅ — the hand-edit path is gone; expansion runs inside the draw ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS11) | Expansion — a `uses` row becomes the inlined steps, flat, each carrying `source_plan_key`, validated as one graph | **Done.** Hand-editing a draft to `uses: nl-single@1` writes five rows keyed `answer_*`, the tuned `read_only` lands on `execute_graph_query`, the copied plan's own bindings follow the copies, and `flows.uses` records the act |
 | **S4c** ✅ — route and picker gone ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3 · IS11) | `GET …/skills/inlinable`, and Studio's picker + argument tuning in `SkillPlaybookEditor` | **Done.** The picker lists the eight reusable plans with their bands, step counts and what each offers; inlining `nl-single@2` and tuning `read_only` writes five rows and records the composition; re-opening the editor collapses those five back into the one row that wrote them |
 
 ## 8. Not in this pass

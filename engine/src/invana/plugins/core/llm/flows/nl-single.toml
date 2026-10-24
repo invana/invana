@@ -1,5 +1,5 @@
-# The query bindings are **declared**, not left to the sequence: `validate_query`
-# and `execute_graph_query` both bind `${steps.translate_thought.query}`, so
+# The query bindings are **declared**, not left to the sequence: `graph.read.validate`
+# and `graph.read.query` both bind `${steps.nl_translate.query}`, so
 # materialising the plan records the data-flow edge rather than a sequence guess.
 # `read_only` is declared, not hard-coded, because it is the one thing a caller
 # legitimately differs on: a skill that answers questions wants it true, one that
@@ -19,28 +19,28 @@ intents = ["single_query", "exploration"]
 read_only = { type = "bool", default = true, label = "Refuse anything that writes" }
 
 [[steps]]
-id = "translate_thought"
-task = "translate_thought"
+id = "nl_translate"
+task = "nl.translate"
 label = "Translate"
 
 [[steps]]
-id = "validate_query"
-task = "validate_query"
+id = "graph_read_validate"
+task = "graph.read.validate"
 label = "Validate"
-args = { query = "${steps.translate_thought.query}" }
+args = { query = "${steps.nl_translate.query}" }
 
 [[steps]]
-id = "execute_graph_query"
-task = "execute_graph_query"
+id = "graph_read_query"
+task = "graph.read.query"
 label = "Execute"
-args = { query = "${steps.translate_thought.query}", read_only = "${args.read_only}" }
+args = { query = "${steps.nl_translate.query}", read_only = "${args.read_only}" }
 
 [[steps]]
-id = "shape_for_canvas"
-task = "shape_for_canvas"
+id = "answer_shape"
+task = "answer.shape"
 label = "Project"
 
 [[steps]]
-id = "verify_result"
-task = "verify_result"
+id = "plan_verify"
+task = "plan.verify"
 label = "Verify"

@@ -33,7 +33,7 @@ apps/datasets ──┘        │ implements
 | Protocol in `core/contracts.py` | Implemented by | Called by | For |
 |---|---|---|---|
 | `RunOpener` | `runtime` | `work` · `sessions` · `datasets` | open a run for this Todo |
-| **`PlanDrafter`** *(new)* | `runtime` | `skills` | draw this playbook as a `TaskPlan` |
+| **`PlanDrafter`** *(new)* | `runtime` | `skills` | draw this playbook as a `Flow` |
 | `EnvelopeCheck` | `agents` | `runtime` | is this plan allowed |
 | **`LensResolver`** *(new)* | `lenses` | `runtime` | what may this run see |
 
@@ -50,7 +50,7 @@ The split is **definition (band 2) vs execution (band 3)**, and it is the whole 
 | Record | Package | Band | Why |
 |---|---|---|---|
 | `todos` · `todo_dependencies` · `projects` | `apps/work/` | 2 | what someone wants — a definition |
-| `task_plans` · `tasks` | `apps/workflows/` | 2 | the library owns the flow; the runtime only walks it |
+| `flows` · `tasks` | `apps/workflows/` | 2 | the library owns the flow; the runtime only walks it |
 | `lenses` | **`apps/lenses/`** *(new)* | 2 | spans model versions and stitches. Making it `modeller`'s would have agents, plans and todos all deep-import `modeller` — the *cross-app read gets its own app* rule ([§2.1](migration-plan.md)) |
 | `skills` · `skill_versions` · clarifications | `apps/skills/` | 2 | |
 | `agents` · envelope · budget | `apps/agents/` | 2 | |
@@ -68,7 +68,7 @@ twice, and the fastest-growing of them.
 ```
 runtime/                        ── band 3 · imports 0–2, imported only by band 5
 ├── planner/
-│   ├── select.py                   match a Todo's intent to a reusable TaskPlan
+│   ├── select.py                   match a Todo's intent to a reusable Flow
 │   ├── draft.py                    draft_plan · the role=plan run · clarifications
 │   └── validate.py                 the generated plan vs the envelope and the lens
 ├── interpreter/
@@ -95,7 +95,7 @@ runtime/                        ── band 3 · imports 0–2, imported only by
 │   ├── llm.py                      understand · plan_queries · translate
 │   │                               summarise · enrich_properties · judge
 │   ├── work_write.py               spawn_agent · delegate · create_task
-│   └── plan_write.py               draft_plan — the only entry that writes a TaskPlan
+│   └── plan_write.py               draft_plan — the only entry that writes a Flow
 ├── executor/                       one protocol, one implementation · pools · contention
 ├── state/                          task_runs · models.py · querysets/ · managers/
 ├── prompts/                        task_prompts — clarification · approval · verdict
@@ -195,7 +195,7 @@ in scope.**
 | `apps/work/managers/plan.py` | 78 | unchanged — it is the manager over `plan.py` |
 | `apps/work/models.py` | 194 | `Task` → `Todo`; `status` column deleted |
 | `apps/workflows/dag.py` | 145 | **~100 LOC deleted** — the inference has nothing left to infer. `_depth_of` inlines into the canvas projection; `pinned_by` stays — §6.3 |
-| `apps/workflows/models.py` | 59 | `TaskPlan` + the new `Task` node model; `WorkflowVersion` deleted |
+| `apps/workflows/models.py` | 59 | `Flow` + the new `Task` node model; `WorkflowVersion` deleted |
 | `apps/sessions/schemas.py` | 220 | drops its `invana.runtime` import — an upward import that should never have existed |
 | `apps/datasets/run.py` | — | drops its `invana.runtime.models` import; opens through `RunOpener` |
 | `apps/agents/envelope.py` | 210 | implements `EnvelopeCheck`; **grows** the lens intersection; **loses** `DEFAULT_REQUIRE` to the catalogue declaration |
@@ -207,7 +207,7 @@ in scope.**
 |---|---|---|
 | `server/runtime/thinkings.py` | 433 | `server/runtime/runs.py` — `…/thinkings` → `…/runs` |
 | `server/work/views.py` | 353 | `…/tasks` → `…/todos`; accept/reject become the only closers |
-| `server/workflows/views.py` | 117 | `…/workflows` → `…/task-plans`; `/{key}/plan` → `/{key}/tasks` |
+| `server/workflows/views.py` | 117 | `…/workflows` → `…/flows`; `/{key}/plan` → `/{key}/tasks` |
 | `server/runtime/templates.py` | 289 | unchanged — projections are not part of this migration |
 | *(new)* `server/lenses/` | — | routes · views · deps |
 

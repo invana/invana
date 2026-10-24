@@ -247,7 +247,7 @@ export function AgentSkillsTab({
 		() => [
 			{
 				id: "callable",
-				header: "Callable",
+				header: "Function",
 				enableSorting: false,
 				cell: ({ row }) => (
 					<span className="font-mono">{row.original.step_key}</span>
@@ -413,7 +413,7 @@ export function AgentSkillsTab({
 
 			<PanelSection
 				card
-				title="Callables"
+				title="Functions"
 				action={
 					<span className="flex items-center gap-1">
 						<span className="text-sm text-muted-foreground">

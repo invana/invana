@@ -22,7 +22,7 @@ Usage::
 
     env = TaskEnvelope(run_id=run.id, node_id=row.id, attempt=row.attempt,
                        plugin="invana.core.graph_read@1.4.0",
-                       task="execute_graph_query@1.0.0", args={"query": "..."})
+                       task="graph.read.query@1.0.0", args={"query": "..."})
     wire = env.to_json()                     # onto the queue
     TaskEnvelope.from_json(wire) == env      # on the worker
     env.idempotency_key                      # "run:node:attempt" — writes check it

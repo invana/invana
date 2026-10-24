@@ -191,7 +191,7 @@ export function AgentActivityTab({
 													{run.id.slice(0, 4)}
 												</TableCell>
 												<TableCell className="w-full max-w-0 truncate">
-													{run.body ?? run.task_title ?? run.workflow_key}
+													{run.body ?? run.task_title ?? run.flow_key}
 												</TableCell>
 												<TableCell
 													className={`whitespace-nowrap ${outcome.tone}`}

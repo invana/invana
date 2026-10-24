@@ -34,19 +34,19 @@ class TestAccepts:
         # validated against what it declares (LB20).
         steps = check([dict(s) for s in NL_SINGLE.steps], declares=NL_SINGLE.args_schema)
         assert [s.task for s in steps] == [
-            "translate_thought",
-            "validate_query",
-            "execute_graph_query",
-            "shape_for_canvas",
-            "verify_result",
+            "nl.translate",
+            "graph.read.validate",
+            "graph.read.query",
+            "answer.shape",
+            "plan.verify",
         ]
 
     def test_a_backward_binding_resolves(self):
         steps = check(
             [
-                step("translate_thought", id="t1"),
-                step("validate_query", id="v1", query="${steps.t1.query}"),
-                step("execute_graph_query", id="e1", query="${steps.t1.query}"),
+                step("nl.translate", id="t1"),
+                step("graph.read.validate", id="v1", query="${steps.t1.query}"),
+                step("graph.read.query", id="e1", query="${steps.t1.query}"),
             ],
         )
         assert steps[1].args["query"] == "${steps.t1.query}"
@@ -55,7 +55,7 @@ class TestAccepts:
         # `read_only: true` holds even for a plan that said nothing about it —
         # which is why a data canvas can never be written from Studio.
         steps = apply_pins(
-            check([step("validate_query", id="v"), step("execute_graph_query", id="e")]),
+            check([step("graph.read.validate", id="v"), step("graph.read.query", id="e")]),
             ENVELOPE,
         )
         assert steps[1].args["read_only"] is True
@@ -71,22 +71,22 @@ class TestRejects:
         # The one that matters: a plan cannot make execution writable.
         with pytest.raises(PlanRejected) as caught:
             check(
-                [step("validate_query", id="v"), step("execute_graph_query", id="e", read_only=False)],
+                [step("graph.read.validate", id="v"), step("graph.read.query", id="e", read_only=False)],
                 ENVELOPE,
             )
         assert "pinned" in str(caught.value)
 
     def test_executing_without_validating_first(self):
         with pytest.raises(PlanRejected) as caught:
-            check([step("translate_thought", id="t"), step("execute_graph_query", id="e")])
-        assert "requires 'validate_query'" in str(caught.value)
+            check([step("nl.translate", id="t"), step("graph.read.query", id="e")])
+        assert "requires 'graph.read.validate'" in str(caught.value)
 
     def test_a_forward_reference(self):
         with pytest.raises(PlanRejected) as caught:
             check(
                 [
-                    step("validate_query", id="v", query="${steps.later.query}"),
-                    step("translate_thought", id="later"),
+                    step("graph.read.validate", id="v", query="${steps.later.query}"),
+                    step("nl.translate", id="later"),
                 ],
                 ENVELOPE,
             )
@@ -95,38 +95,38 @@ class TestRejects:
     def test_an_envelope_cannot_waive_what_the_catalogue_requires(self):
         # `require` is the catalogue's, not the envelope's — one source, and it
         # is the same line the planner read while drafting.
-        loose = Envelope.from_spec({"allow": ["execute_graph_query"], "require": []})
+        loose = Envelope.from_spec({"allow": ["graph.read.query"], "require": []})
         with pytest.raises(PlanRejected) as caught:
-            check([step("execute_graph_query", id="e")], loose)
-        assert "requires 'validate_query'" in str(caught.value)
+            check([step("graph.read.query", id="e")], loose)
+        assert "requires 'graph.read.validate'" in str(caught.value)
 
     def test_binding_to_an_output_the_entry_never_declared(self):
         with pytest.raises(PlanRejected) as caught:
             check(
                 [
-                    step("translate_thought", id="t"),
-                    step("validate_query", id="v", query="${steps.t.sql}"),
+                    step("nl.translate", id="t"),
+                    step("graph.read.validate", id="v", query="${steps.t.sql}"),
                 ],
             )
         assert "does not declare as an output" in str(caught.value)
 
     def test_a_step_with_no_label_has_no_row_on_the_card(self):
         with pytest.raises(PlanRejected) as caught:
-            check([{"id": "v", "task": "validate_query", "args": {}}])
+            check([{"id": "v", "task": "graph.read.validate", "args": {}}])
         assert "label" in str(caught.value)
 
     def test_a_plan_longer_than_the_budget_is_rejected_not_truncated(self):
         # Half a plan answers a different question.
-        small = Envelope.from_spec({"allow": ["validate_query"], "max_steps": 2})
+        small = Envelope.from_spec({"allow": ["graph.read.validate"], "max_steps": 2})
         with pytest.raises(PlanRejected) as caught:
-            check([step("validate_query", id=f"v{i}") for i in range(3)], small)
+            check([step("graph.read.validate", id=f"v{i}") for i in range(3)], small)
         assert "the envelope allows 2" in str(caught.value)
 
     def test_every_error_comes_back_at_once_so_the_one_repair_can_fix_them_all(self):
         with pytest.raises(PlanRejected) as caught:
             check(
                 [step("nope", id="a"), step("also_nope", id="b")],
-                Envelope.from_spec({"allow": ["validate_query"]}),
+                Envelope.from_spec({"allow": ["graph.read.validate"]}),
             )
         assert len(caught.value.errors) == 2
 
@@ -136,9 +136,9 @@ class TestModes:
         assert ENVELOPE.plans is True
 
     def test_a_static_envelope_is_the_degenerate_case(self):
-        static = Envelope.from_spec({"entry": "validate_query", "steps": [step("validate_query", id="v")]})
+        static = Envelope.from_spec({"entry": "graph.read.validate", "steps": [step("graph.read.validate", id="v")]})
         assert static.plans is False
-        assert [s.task for s in static.steps] == ["validate_query"]
+        assert [s.task for s in static.steps] == ["graph.read.validate"]
 
 
 class TestTheCeilings:

@@ -54,7 +54,7 @@ export function productOfRun(run: TaskRunSummary): ProductId {
 const TARGET_PRODUCT: Record<string, ProductId> = {
 	agent: "agents",
 	skill: "agents",
-	workflow: "agents",
+	flow: "agents",
 	eval_set: "agents",
 	llm_provider: "agents",
 	llm_model: "agents",
@@ -140,5 +140,5 @@ export function inboxCount(items: readonly InboxItem[]): number {
 
 /** A run's name on a row: what the opener wrote, else its Todo, else its plan. */
 export function runTitle(run: TaskRunSummary): string {
-	return run.body ?? run.task_title ?? run.workflow_key;
+	return run.body ?? run.task_title ?? run.flow_key;
 }

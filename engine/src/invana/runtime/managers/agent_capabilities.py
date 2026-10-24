@@ -2,7 +2,7 @@
 each other ([C12](docs/for-developers/modules/agents/features/author-an-agent.md)).
 
 Band 3 for the reason the bind check is: it reads ``apps/skills``,
-``apps/task_plans``, the catalogue and ``task_runs``, and only the runtime may
+``apps/flows``, the catalogue and ``task_runs``, and only the runtime may
 read all four (migration-plan §3).
 
 **Needs are derived, never typed** (AG15). A skill's needs are the callables its
@@ -19,8 +19,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.apps.agents.envelope import Envelope
 from invana.apps.agents.models import Agent
 from invana.apps.agents.schemas import AgentCallableRow, AgentSkillRow, AgentSkillsAndCallables
-from invana.apps.task_plans.models import Task, TaskForm
-from invana.apps.task_plans.querysets import TaskPlanQuerySet
+from invana.apps.flows.models import Task, TaskForm
+from invana.apps.flows.querysets import FlowQuerySet
 from invana.plugins.sdk.manifest import Bound
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.managers.skill_usage import MIN_OFFERS_TO_READ
@@ -44,7 +44,7 @@ def _needs(tasks: list[Task]) -> list[str]:
 class AgentCapabilitiesManager:
     """Stateless. The session is the first argument of every method."""
 
-    plans_qs = TaskPlanQuerySet()
+    plans_qs = FlowQuerySet()
     runs_qs = TaskRunQuerySet()
 
     async def read(self, session: AsyncSession, *, agent: Agent) -> AgentSkillsAndCallables:

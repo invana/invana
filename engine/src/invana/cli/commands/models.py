@@ -451,7 +451,7 @@ async def _publish(
         async with session_factory() as session:
             root = await session.get(TaskRun, run_id)
             nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
-            out = next((n.output or {} for n in nodes if n.task_key == "migrate_model"), {})
+            out = next((n.output or {} for n in nodes if n.task_key == "model.migrate"), {})
             done.update(status=root.status, error=(root.error or {}).get("message"), preview=out.get("preview"))
             if not dry_run:
                 opened = await _reviews.advance_due(session, now=datetime.now(UTC))

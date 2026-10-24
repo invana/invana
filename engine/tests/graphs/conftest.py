@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 # plus the four apps `SetupManager.derive_setup_state` reads, since every Graph
 # read now derives its setup state.
 from invana.apps.agents.models import Agent  # noqa: F401
+from invana.apps.flows.models import Flow  # noqa: F401
 from invana.apps.graphs.models import Graph
 from invana.apps.graphs.querysets import GraphConnectionQuerySet
 from invana.apps.graphs.schemas import GraphConnectionCreate
@@ -17,8 +18,7 @@ from invana.apps.llm_providers.models import LLMProvider  # noqa: F401
 from invana.apps.modeller.models import GraphModel, GraphVersion, NodeTypeDefinition  # noqa: F401
 from invana.apps.sessions.models import Session  # noqa: F401 — task_runs points at it
 from invana.apps.skills.models import Skill  # noqa: F401
-from invana.apps.task_plans.models import TaskPlan  # noqa: F401
-from invana.apps.work.models import Task  # noqa: F401 — todos, which task_plans points at
+from invana.apps.work.models import Task  # noqa: F401 — todos, which flows points at
 from invana.core.auth.models import User
 from invana.core.events.models import Event  # noqa: F401
 from invana.core.models import Base

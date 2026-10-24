@@ -13,7 +13,7 @@ kind        versions                    effect after
 ==========  ==========================  =================================
 ``skill``   ``skill_versions``          steps offered the version
 ``rule``    ``rule_versions``           steps offered the version
-``plan``    ``task_plans`` by key       roots run on that plan version
+``plan``    ``flows`` by key       roots run on that plan version
 ``agent``   its update events           roots run on that agent version
 ``model``   ``graph_versions``          the Graph's roots while published
 ``dataset`` ``dataset_versions``        the loads that bound the version
@@ -53,16 +53,16 @@ from invana.activity.schemas import ChangeCompare, ChangeEffect, ChangeEntry, Ch
 from invana.apps.agents.managers import AgentManager
 from invana.apps.datasets.content import records_summary
 from invana.apps.datasets.querysets import DatasetQuerySet, DatasetRecordQuerySet, DatasetVersionQuerySet
+from invana.apps.flows.diff import diff_arguments, diff_steps, summarise
+from invana.apps.flows.models import Flow
+from invana.apps.flows.querysets.flow import FlowQuerySet
+from invana.apps.flows.schemas import PlanVersionDiff
 from invana.apps.modeller.models import GraphVersion
 from invana.apps.modeller.store import ModelStore
 from invana.apps.modeller.versioner import compute_diff
 from invana.apps.skills.managers import RuleManager, SkillManager
 from invana.apps.skills.querysets.rule import RuleVersionQuerySet
 from invana.apps.skills.querysets.skill_version import SkillVersionQuerySet
-from invana.apps.task_plans.diff import diff_arguments, diff_steps, summarise
-from invana.apps.task_plans.models import TaskPlan
-from invana.apps.task_plans.querysets.task_plan import TaskPlanQuerySet
-from invana.apps.task_plans.schemas import PlanVersionDiff
 from invana.core.auth.querysets.user import UserQuerySet
 from invana.core.errors import NotFoundError
 from invana.core.events import actions
@@ -75,7 +75,7 @@ from invana.runtime.querysets.task_run import TaskRunQuerySet
 TARGETS: dict[str, str] = {
     "skill": actions.TARGET_SKILL,
     "rule": actions.TARGET_RULE,
-    "plan": actions.TARGET_WORKFLOW,
+    "plan": actions.TARGET_FLOW,
     "agent": actions.TARGET_AGENT,
     "model": actions.TARGET_MODEL,
     "dataset": actions.TARGET_DATASET,
@@ -142,7 +142,7 @@ class ChangeLogManager:
     events_qs = EventQuerySet()
     users_qs = UserQuerySet()
     runs_qs = TaskRunQuerySet()
-    plans_qs = TaskPlanQuerySet()
+    plans_qs = FlowQuerySet()
     skill_versions_qs = SkillVersionQuerySet()
     rule_versions_qs = RuleVersionQuerySet()
     datasets_qs = DatasetQuerySet()
@@ -488,7 +488,7 @@ class ChangeLogManager:
             out.append(_field(name, before, after, a.label, b.label))
         return out
 
-    async def _plan_diff(self, session: AsyncSession, prior: TaskPlan, plan: TaskPlan, *, key: str) -> PlanVersionDiff:
+    async def _plan_diff(self, session: AsyncSession, prior: Flow, plan: Flow, *, key: str) -> PlanVersionDiff:
         added, removed, moved, changed, unchanged = diff_steps(
             await self.plans_qs.tasks_for(session, plan_id=prior.id),
             await self.plans_qs.tasks_for(session, plan_id=plan.id),

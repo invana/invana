@@ -14,8 +14,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from invana.activity.models import ApprovalStatus
+from invana.apps.flows.schemas import PlanVersionDiff
 from invana.apps.modeller.schemas import SchemaDiff
-from invana.apps.task_plans.schemas import PlanVersionDiff
 from invana.core.events.models import ActorKind
 from invana.core.lists import Filter, ListSpec, Page
 from invana.core.metrics import Change

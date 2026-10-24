@@ -7,12 +7,11 @@ import uuid
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from invana.apps.graphs.models import Graph
-from invana.apps.sessions.models import Session, SessionMessage  # noqa: F401
-
 # A run names the plan node it executes, so both plan tables have to be in the
 # metadata this fixture creates — otherwise the FK has nothing to point at.
-from invana.apps.task_plans.models import Task, TaskPlan  # noqa: F401
+from invana.apps.flows.models import Flow, Task  # noqa: F401
+from invana.apps.graphs.models import Graph
+from invana.apps.sessions.models import Session, SessionMessage  # noqa: F401
 
 # Import every model whose table the FKs touch so `create_all` builds them.
 from invana.core.auth.models import User

@@ -5,6 +5,6 @@ description = "Write a board's saved edits to the graph, checked against its mod
 intents = []
 
 [[steps]]
-id = "apply_data_edits"
-task = "apply_data_edits"
+id = "graph_write_edits"
+task = "graph.write.edits"
 label = "Write edits"

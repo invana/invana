@@ -1,0 +1,14 @@
+key = "graph.read.types_count"
+version = "1.0.0"
+summary = "Count every node and edge type the run's world holds, inside it."
+bound = "graph_read"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+
+[args]
+
+[outputs]
+node_types = "list"
+edge_types = "list"
+counted = "bool"

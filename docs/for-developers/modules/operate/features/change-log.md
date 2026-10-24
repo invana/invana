@@ -68,7 +68,7 @@ flowchart TD
 |---|---|---|---|---|---|---|
 | `skill` | `skill` | `skill_versions` (published) | number | `details.why` | prose fields, unified lines · the two versions' plans | `pinned` — steps whose `skills_offered` names the version |
 | `rule` | `rule` | `rule_versions` | number | `details.why` | statement, unified lines | `pinned` — steps whose `rules_offered` names the version |
-| `plan` | `workflow` | `task_plans` by key | number | `details.why` | plan diff (steps, arguments) | `pinned` — roots run as `template:<key>@<v>` or on that row |
+| `plan` | `workflow` | `flows` by key | number | `details.why` | plan diff (steps, arguments) | `pinned` — roots run as `template:<key>@<v>` or on that row |
 | `agent` | `agent` | `agent.create` / `agent.update` / `agent.soul_set` events | number | `details.why` | fields folded from the events' `diff` | `pinned` — roots with `agent_id` and `agent_version` |
 | `model` | `graph_model` | `graph_versions` (not draft) | SemVer | `change_summary` | schema diff | `window` — the Graph's roots while it was published |
 | `dataset` | `dataset` | `dataset_versions` | number | `why` on the version | licence, author chain, columns · a records summary | `bound` — the load runs that bound the version, in every Graph |
@@ -94,7 +94,7 @@ flowchart TD
 | `POST …/skills/{id}/versions` · `PATCH …/skills/{id}` | optional `why` → `skill.publish` `details.why` |
 | `PATCH …/rules/{id}` | optional `why` → `rule.publish` `details.why` |
 | `PATCH …/agents/{id}` | optional `why` → `details.why`; `details.diff` holds every changed field's before and after |
-| `POST …/task-plans/promote` | optional `why` → `workflow.promote` `details.why` |
+| `POST …/flows/promote` | optional `why` → `workflow.promote` `details.why` |
 
 ## Decisions
 

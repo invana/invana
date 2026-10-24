@@ -1,0 +1,13 @@
+key = "plan.verify"
+version = "1.0.0"
+summary = "Decide whether the plan served the intent — deterministic checks first."
+bound = "none"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+
+[args]
+
+[outputs]
+served = "str"
+evidence = "list"

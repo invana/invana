@@ -67,5 +67,5 @@ async def save_data_edits(
             },
         )
     nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
-    out = next((n.output or {} for n in nodes if n.task_key == "apply_data_edits"), {})
+    out = next((n.output or {} for n in nodes if n.task_key == "graph.write.edits"), {})
     return DataEditResult(run_id=run_id, ids=dict(out.get("ids") or {}), applied=int(out.get("applied") or 0))

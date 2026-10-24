@@ -3,7 +3,7 @@
 Every load leaves a run, a report and provenance. Studio reads all three, so "where did this number
 come from" ends at a record and not at a shrug.
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `TaskPlan` ·
+> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
 > [task-model-migration.md](../../../building-engine/task-model-migration.md).

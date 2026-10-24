@@ -15,10 +15,10 @@ import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
 import { EVERY } from "../../lists";
 import {
+	useFlowsQuery,
 	usePlanPerformanceQuery,
 	usePlanRunsQuery,
 	usePlanVersionQuery,
-	useTaskPlansQuery,
 } from "../queries";
 import { PLAN_CHART_WIDGETS } from "./PlanChartWidgets";
 import { PlanRevisionsWidget } from "./PlanRevisionsWidget";
@@ -48,13 +48,13 @@ export function PlanBoardPage({
 }: {
 	username: string;
 	graphSlug: string;
-	/** The `task_plans.id` the board is keyed by. */
+	/** The `flows.id` the board is keyed by. */
 	planId: string;
 	onOpenRun: (runId: string) => void;
 	/** `⋯` — a reading of the version the header names, as its own page. */
 	onOpenReading: (reading: PlanReading, planId: string) => void;
 }) {
-	const library = useTaskPlansQuery(username, graphSlug, EVERY);
+	const library = useFlowsQuery(username, graphSlug, EVERY);
 	const opened = library.data?.items.find((p) => p.id === planId);
 	const key = opened?.key ?? undefined;
 	const versions = useMemo(

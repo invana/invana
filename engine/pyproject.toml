@@ -279,7 +279,7 @@ name = "apps are acyclic"
 type = "layers"
 layers = [
     "invana.apps.work",
-    "invana.apps.task_plans",
+    "invana.apps.flows",
     "invana.apps.explorer",
     "invana.apps.boards",
     "invana.apps.annotations",

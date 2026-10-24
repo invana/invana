@@ -5,22 +5,22 @@ description = "A typed query, and every re-run: no translation."
 intents = ["typed_query"]
 
 [[steps]]
-id = "validate_query"
-task = "validate_query"
+id = "graph_read_validate"
+task = "graph.read.validate"
 label = "Validate"
 
 [[steps]]
-id = "execute_graph_query"
-task = "execute_graph_query"
+id = "graph_read_query"
+task = "graph.read.query"
 label = "Execute"
 args = { read_only = true }
 
 [[steps]]
-id = "shape_for_canvas"
-task = "shape_for_canvas"
+id = "answer_shape"
+task = "answer.shape"
 label = "Project"
 
 [[steps]]
-id = "verify_result"
-task = "verify_result"
+id = "plan_verify"
+task = "plan.verify"
 label = "Verify"

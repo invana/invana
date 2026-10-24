@@ -18,7 +18,7 @@ from invana.runtime.managers import SkillDraftManager
 from invana.runtime.planning import resolve_plan
 
 drafts = SkillDraftManager()
-ENVELOPE = Envelope.from_spec({"allow": ["translate_thought"]})
+ENVELOPE = Envelope.from_spec({"allow": ["nl.translate"]})
 
 
 async def draw(session: AsyncSession, *, skill: Skill) -> None:
@@ -27,7 +27,7 @@ async def draw(session: AsyncSession, *, skill: Skill) -> None:
     sentence = DraftedSentence(
         span=draft.content or "Understand the question.",
         kind="step",
-        candidates=(Candidate(task="translate_thought", label="Understand"),),
+        candidates=(Candidate(task="nl.translate", label="Understand"),),
     )
     out = await drafts.apply_drawing(
         session,

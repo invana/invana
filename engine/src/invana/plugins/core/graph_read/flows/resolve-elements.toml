@@ -5,6 +5,6 @@ description = "Check a reopened canvas against the graph, under its world (GC14)
 intents = []
 
 [[steps]]
-id = "resolve_elements"
-task = "resolve_elements"
+id = "graph_read_resolve"
+task = "graph.read.resolve"
 label = "Resolve"

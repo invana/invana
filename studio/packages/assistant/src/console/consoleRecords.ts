@@ -8,7 +8,7 @@
  * `PAGE_SIZE` records; the count is always the full one.
  *
  * Queries are the session's query steps, newest first: one per reply that ran
- * a query — the `execute_graph_query` step of its run, or the step that failed
+ * a query — the `graph.read.query` step of its run, or the step that failed
  * before it got there. Sessions live in the chat and runs in Activity; this is
  * only the queries.
  */
@@ -99,7 +99,7 @@ export interface QueryStep {
 	askedBy?: string;
 }
 
-const QUERY_TASK = "execute_graph_query";
+const QUERY_TASK = "graph.read.query";
 
 /** The step a query row opens: its latest query attempt, else the failed one. */
 function stepOf(steps: readonly RunNode[] | undefined): RunNode | undefined {
@@ -155,7 +155,7 @@ export interface ConsoleLogLine {
 	/** When, already worded — `10:42:07`; empty when the step never started. */
 	at: string;
 	level: "info" | "error";
-	/** The step that wrote it — `execute_graph_query`. */
+	/** The step that wrote it — `graph.read.query`. */
 	source: string;
 	message: string;
 }

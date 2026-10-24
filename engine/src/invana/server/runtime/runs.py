@@ -88,7 +88,7 @@ async def list_runs(
     """List runs as rows — the plan and its verdict, without the steps.
 
     One endpoint with filters rather than ``/agents/{id}/plans`` and
-    ``/workflows/candidates``: both questions are "which runs match this?", and
+    ``/flows/candidates``: both questions are "which runs match this?", and
     two endpoints would give *served* two definitions to drift apart. **The
     journal is the same endpoint**: a load is a run, so *what changed my
     graph* is ``?kind=import`` rather than a surface of its own.
@@ -456,7 +456,7 @@ async def get_trace(
     rules = await offered_rules(session, steps=steps)
     # The bound each attempt count is read against — resolved the way the
     # interpreter resolves it, so the page and the loop cannot disagree (SR67).
-    workflow = WORKFLOWS.get(run.workflow_key)
+    workflow = WORKFLOWS.get(run.flow_key)
     opened_by = await _username(session, run.on_behalf_of_user_id or run.author_id)
     # The run's spend as the settle stored it; still going, the same sum so far.
     if run.run_tokens is not None:
@@ -512,7 +512,7 @@ async def get_trace(
         # and not on the field, and every call to this route raised a
         # ValidationError until it was put back.
         run_id=run.id,
-        workflow_key=run.workflow_key,
+        flow_key=run.flow_key,
         status=run.status,
         ask_kind=run.ask_kind,
         body=run.body,

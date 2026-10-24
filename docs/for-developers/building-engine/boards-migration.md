@@ -240,13 +240,13 @@ six rows that exist today are unchanged.
 |---|---|---|---|---|
 | `data` | `canvas` | — | records · relationships | [Explore](../modules/explore/spec.md) |
 | `model` | `canvas` | — | node types · edge types | [Connect and model](../modules/connect-and-model/spec.md) |
-| `plan` | `canvas` | a `task_plans.id` | tasks · dependencies | [Work](../modules/work/spec.md) |
-| `workflow` | `canvas` | a `task_plans.id` | steps · order + bindings | [Workflows](../modules/workflows/spec.md) |
+| `plan` | `canvas` | a `flows.id` | tasks · dependencies | [Work](../modules/work/spec.md) |
+| `workflow` | `canvas` | a `flows.id` | steps · order + bindings | [Workflows](../modules/workflows/spec.md) |
 | `envelope` | `canvas` | an agent id | allowed / disallowed steps | [Agents](../modules/agents/spec.md) |
 | `lineage` | `canvas` | a root `task_runs.id` | agents · people · tasks | Agents |
 | `run` | `declared` | a root `task_runs.id` | panels, from the closed set | [Operate](../modules/operate/spec.md) |
 | `task_run` | `declared` | a child `task_runs.id` | panels | Operate |
-| `plan_runs` | `declared` | a `task_plans.id` | panels | Workflows |
+| `plan_runs` | `declared` | a `flows.id` | panels | Workflows |
 | `compare` | `declared` | two root `task_runs.id` joined by `:` | panels | [Govern](../modules/govern/spec.md) |
 | `skill` | `declared` | a `skills.id` | panels | [Skills](../modules/skills/spec.md) |
 | `skill_usage` | `declared` | a `skills.id` | panels | Skills |
@@ -591,7 +591,7 @@ B5 lands the live reading; B6 lands the kept one. What a board panel *is* stays 
 | B7 | **`canvas_states.kind` becomes `cause`.** Two `kind` columns in one module, meaning different things, is a bug waiting for a join. |
 | B8 | **`subject_id` is a string, not a foreign key.** It points at three tables by `kind`. A deleted subject leaves a board that reads *this run is gone* — an honest empty state, not a cascade that silently removes what someone pinned. |
 | B9 | **A live board has no row.** It is derived from its subject on every open, so creating one would be a row that duplicates `task_runs` and a write before every read. `(graph_id, kind, subject_id)` is still its identity — it is just an identity the page computes rather than one the table stores. The row is created lazily, by the first act that keeps something: a saved report ([§ 6.3](#63-saving-a-report--where-the-row-comes-from)). |
-| B10 | **`plan` and `plan_runs` are two kinds.** The same TaskPlan drawn as a task graph and reported on across its runs share a record, not a renderer, a legend or a tile set. Collapsing them into one kind with a mode flag is the two-column model wearing a different hat. |
+| B10 | **`plan` and `plan_runs` are two kinds.** The same Flow drawn as a task graph and reported on across its runs share a record, not a renderer, a legend or a tile set. Collapsing them into one kind with a mode flag is the two-column model wearing a different hat. |
 | B11 | **A report is a frozen version of a board, not a third rendering.** `renders` answers *which body*, `source` answers *live or frozen*, and they are orthogonal: a drawn board has both readings too — the canvas you are editing, and a version in History. Making `report` a third value of `renders` would mean two renderers drawing the same pixels from different fetches, and the day a third frozen thing appears the axis has to be split anyway. |
 | B12 | **A frozen reading is a page id, not a mode flag.** `kind:id` is live, `kind:id@version` is frozen, one parser, and the URL carries which you are looking at. A `?frozen=true` beside the id would be the same fact in two places, and the two would disagree the first time a link was shared. |
 | B13 | **The frozen document is the resolved one.** A report stores the spec **with the numbers in it**, not the spec plus a subject id to re-read — re-reading is what makes it live. That is also what lets a report outlive its run's pruned `result.json`, which is the reason to keep one. |

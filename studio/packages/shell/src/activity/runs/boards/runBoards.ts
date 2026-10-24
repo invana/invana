@@ -183,7 +183,7 @@ export function stepAddress(stepId: string): string {
 }
 
 export function runTitle(trace: TraceRead): string {
-	return trace.body?.trim() || trace.workflow_key || "Run";
+	return trace.body?.trim() || trace.flow_key || "Run";
 }
 
 /** What a step is called: the plan's own id for the node, else the entry it names. */

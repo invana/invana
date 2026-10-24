@@ -5,6 +5,6 @@ description = "Count the types the canvas's world holds (SP11)."
 intents = []
 
 [[steps]]
-id = "count_types"
-task = "count_types"
+id = "graph_read_types_count"
+task = "graph.read.types_count"
 label = "Count types"

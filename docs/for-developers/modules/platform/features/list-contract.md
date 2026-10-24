@@ -78,7 +78,7 @@ flowchart TD
 |---|---|---|---|---|
 | Agents | `GET …/agents` | name | `status` (none leaves out retired) · `kind` · `ephemeral=shown` (else spawned helpers are left out) | `name` · `-created_at` · `-updated_at` |
 | Skills | `GET …/skills` | name | `status` (published · draft) · `origin` | `name` · `-updated_at` · `-created_at` |
-| Task plans | `GET …/task-plans` | name · key | `origin` · `family` | `key` · `name` · `-created_at` |
+| Task plans | `GET …/flows` | name · key | `origin` · `family` | `key` · `name` · `-created_at` |
 | Runs | `GET …/runs` | the ask | `status` · `agent_id` (labelled with the agent's name) · `task_id` · `kind` · `origin` (who triggered it) · `started_by` (labelled with the username) · `since` (`24h` · `7d` · `30d` · `90d`) · `candidates=true` (served, never promoted) · `interactive=true` (canvas and system runs shown) | `-created_at` |
 | LLM providers | `GET …/llm` | name | `kind` | `created_at` · `name` · `-updated_at` |
 | LLM models | `GET …/llm/{provider_id}/models` | model id | `status` | `created_at` · `model_id` · `-updated_at` |

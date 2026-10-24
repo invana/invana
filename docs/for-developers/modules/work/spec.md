@@ -5,7 +5,7 @@ the same Todo can go to either, and the same acceptance closes it.
 
 > ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records).** The word **Task**
 > has flipped: what this module used to call a Task is now a **Todo**, and `Task` names a node inside
-> a TaskPlan — which this module does not own. Migration: [task-model-migration.md](../../building-engine/task-model-migration.md).
+> a Flow — which this module does not own. Migration: [task-model-migration.md](../../building-engine/task-model-migration.md).
 
 | | |
 |---|---|
@@ -29,7 +29,7 @@ Product-wide words are pinned in [terminology.md](../../terminology.md). What th
 | **Simulation** | one run of a simulator plugin on a branch, over pinned dataset versions; its result is `derived` | an observation · a finding — a finding may cite it |
 
 **A Todo is not a run, and a Task is not a Todo.** A Todo is work with a definition of done; a
-**TaskRun** is one execution; a **Task** is one node inside the TaskPlan that run is executing. A
+**TaskRun** is one execution; a **Task** is one node inside the Flow that run is executing. A
 plan's Tasks — an LLM call, a query, a decision box, a graph algorithm — are Tasks, never Todos.
 Nobody accepts a load, so no plan node has a definition of done. The only child run a run gets is a
 [delegation](../agents/features/delegation.md), and that child is a run too. All of them are listed
@@ -50,7 +50,7 @@ default project. And a Todo may have **no plan at all**: a person simply does it
 | `todos` | `graph_id` · `project_id?` · `parent_id?` · `title` · `body` (the prose a planner reads) · `assignee_kind/id?` · `created_by_kind/id` · `due_at?` · `lens_id?` · `closed_at?` · `outcome?`. **No `status` column** — see §3 |
 | `todo_dependencies` | `todo_id` · `depends_on_id` · `on (success\|failure\|any_outcome)` · cycles rejected with the loop named |
 | `rules` · `objectives` · `criteria` · `criterion_outcomes` | [objectives-and-criteria](features/objectives-and-criteria.md) |
-| `schedules` | [recurring-tasks-and-conditions](features/recurring-tasks-and-conditions.md). **There is one kind of schedule** — it names a TaskPlan and opens a run. Whether that creates work a person accepts is a property of what it names ([Operate](../operate/features/schedules.md)) |
+| `schedules` | [recurring-tasks-and-conditions](features/recurring-tasks-and-conditions.md). **There is one kind of schedule** — it names a Flow and opens a run. Whether that creates work a person accepts is a property of what it names ([Operate](../operate/features/schedules.md)) |
 
 Agents, skills, workflows and their bounds are the [Agents](../agents/spec.md) module. Work assigns to
 an agent; it does not define one.
@@ -149,9 +149,9 @@ everything else acts on a row and lives on the row.
 | W5 | Every Task records which skills were **offered** and which were **reported applied** |
 | W6 | **A Todo is work, a TaskRun is a run, a Task is a node in a plan.** A Task never becomes a Todo, and no surface calls any of them a *job*. |
 | W7 | The Todo panel's `Runs` tab is the Graph's journal ([10.5](../operate/features/see-what-ran.md)) filtered to one `todo_id` — not a list of its own. |
-| W8 | **A plan's Tasks are not Todos, at any altitude.** A multi-stage load, stitch or enrichment is a TaskPlan whose nodes are Tasks ([13.8 §3.2](../platform/features/runtime.md)). Nobody accepts a load, so no node has a definition of done. |
+| W8 | **A plan's Tasks are not Todos, at any altitude.** A multi-stage load, stitch or enrichment is a Flow whose nodes are Tasks ([13.8 §3.2](../platform/features/runtime.md)). Nobody accepts a load, so no node has a definition of done. |
 | W9 | **A plan produces Todos; it is never made of them.** Where a run needs a person to go and *do* something, a `human` Task raises real work here — that is the only direction the two concepts meet ([13.8 RP30a](../platform/features/runtime.md)). |
-| W10 | There is **one kind of schedule**: it names a TaskPlan and opens a run ([SC6](../operate/features/schedules.md)). Whether a firing creates work a person accepts is a property of the plan it names, not of the schedule — which is why a nightly load raises no Todo nobody owns. |
+| W10 | There is **one kind of schedule**: it names a Flow and opens a run ([SC6](../operate/features/schedules.md)). Whether a firing creates work a person accepts is a property of the plan it names, not of the schedule — which is why a nightly load raises no Todo nobody owns. |
 | W11 | **A Todo has no status column.** Its state derives from its latest run; `closed_at` and `outcome` are written by acceptance alone (§3). |
 | W12 | **A Project is a record, not a Task.** It never runs, carries no criteria, no plan, no timeout — and there are no sub-projects. Nesting belongs inside the work item, not in the filing cabinet ([orchestration § 0.1](../../orchestration.md#01-reading-the-dependencies)). |
 | W13 | **A Todo may have no plan.** A person assigned a Todo with criteria and no steps is the smallest legal case, and it uses no field it does not need. |

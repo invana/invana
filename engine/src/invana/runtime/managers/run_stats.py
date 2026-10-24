@@ -53,8 +53,8 @@ def run_title(run: TaskRun, task_title: str | None = None) -> str:
     if origin.startswith("template:"):
         return origin.removeprefix("template:")
     if origin == "generated":
-        return f"{run.workflow_key} · planned"
-    return run.workflow_key
+        return f"{run.flow_key} · planned"
+    return run.flow_key
 
 
 class RunStatsManager:

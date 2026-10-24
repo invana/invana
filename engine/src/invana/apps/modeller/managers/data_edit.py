@@ -2,7 +2,7 @@
 
 A batch is what a board's Changes panel saves: the edits since the last save,
 in order. :class:`DataEditManager` checks it against the graph's model, and the
-``apply_data_edits`` task writes it inside a ``data-edit`` run — never directly
+``graph.write.edits`` task writes it inside a ``data-edit`` run — never directly
 from a route, since nothing writes outside the runtime.
 
 **The model is the schema.** :meth:`DataEditManager.model_index` reads the

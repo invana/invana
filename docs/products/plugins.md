@@ -15,7 +15,7 @@ How the catalogue (today's built-in steps) and the new tools become one versione
 |---|---|
 | **Plugin** | A folder of task types, skills and flows, with a `plugin.toml` manifest. Versioned as a whole |
 | **Task type** | One callable the runtime can run — e.g. `web.fetch`. Declared by its **task manifest** (`manifest.toml`) beside its code (`run.py`). Versioned on its own |
-| **Task** | Unchanged (`terminology.md`): a node in a TaskPlan. A Task **uses** a task type; its TaskRun is one execution |
+| **Task** | Unchanged (`terminology.md`): a node in a Flow. A Task **uses** a task type; its TaskRun is one execution |
 | Retired | *pack* and *catalogue entry* — the catalogue is the registry of task types |
 
 ## 1. Should the built-ins be plugins?
@@ -70,7 +70,7 @@ plugins/tools/web/
 │   └── download_and_extract/    a composite task type — fixed steps in code, one task
 ├── skills/
 │   └── collect-dataset/     instructions.md · evals.yaml
-├── flows/                   packaged flows (fixed multi-step TaskPlans)
+├── flows/                   packaged flows (fixed multi-step Flows)
 └── tests/                   positive and negative — real services, no mocks
 ```
 
@@ -134,7 +134,7 @@ Manifests are TOML, read with the standard library's `tomllib` — no parser dep
 | **Task type** | one callable — `run(ctx, vars) -> Out` | one envelope on one worker | `web.fetch` |
 | **Composite task type** | a fixed, deterministic sequence in code, exposed as **one** task type | one envelope on one worker — no per-step dispatch | `web.download_and_extract` (download → unzip → parse) |
 | **Skill** | `instructions.md` + an eval set; its plan is **generated** | a flow: each step its own envelope | *Collect a dataset from the web* |
-| **Flow** | a fixed multi-step TaskPlan written in the plugin | a flow: each step its own envelope | `model-import@1` · `bundle-import@1` (today's built-ins) |
+| **Flow** | a fixed multi-step Flow written in the plugin | a flow: each step its own envelope | `model-import@1` · `bundle-import@1` (today's built-ins) |
 
 | Rule | Detail |
 |---|---|

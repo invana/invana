@@ -5,6 +5,6 @@ description = "Read one vertex's neighbours under the canvas session's lens (GC6
 intents = []
 
 [[steps]]
-id = "expand_neighbours"
-task = "expand_neighbours"
+id = "graph_read_get_neighbors"
+task = "graph.read.get_neighbors"
 label = "Expand"

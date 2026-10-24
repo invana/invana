@@ -109,7 +109,7 @@ class AgentLifecycleManager:
                 LifecycleItem(
                     kind="run",
                     id=run.id,
-                    title=run.label or run.workflow_key or "Run",
+                    title=run.label or run.flow_key or "Run",
                     effect=LifecycleEffect.finishes,
                     note="Finishes — never killed.",
                 )

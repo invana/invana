@@ -67,7 +67,7 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 | P-08 | Dataset record: origin, author chain, licence, versions, hash | all of Datasets | Revives the retired term *Dataset* |
 | P-09 | Change log over every versioned record | SH-14 · AG-06 · AG-09 · MO-09 · DS-04 | ✅ B01 · C04 (Studio: the Events tab's Changes filter, the compare page, a model's History, a record's change log naming who) — Who, when, why, diff, effect after |
 | P-10 | Project records: type, Branch, Finding (with stance), Verdict, Decision (supersede), Proposal, Report, merge | all of Projects | Projects stay flat; branches live inside |
-| P-11 | Generated or packaged TaskPlans | AG-08 · AG-11 · SH-13 | ✅ C03 (Studio: a skill's plan generated from its instructions, what a publish regenerated, revisions in runs) — Users never author plans: `generated` from instructions or `packaged` in a plugin pack; retire user-authored |
+| P-11 | Generated or packaged Flows | AG-08 · AG-11 · SH-13 | ✅ C03 (Studio: a skill's plan generated from its instructions, what a publish regenerated, revisions in runs) — Users never author plans: `generated` from instructions or `packaged` in a plugin pack; retire user-authored |
 | P-12 | Install-wide scope for rules and standards | MO-12 · DS-08 | No tenancy; the install is the scope |
 | P-13 | Notifications, channels and schedule delivery | SH-13 · SH-15 · SH-16 | ✅ B08 (engine) · ✅ C05 (Studio: Activity › Schedules, a schedule's page, the Inbox with approval review, Rules, Channels) — Rules, in-app/email/Slack/webhook channels, approvals inbox, approval deadlines, missed-firing policy |
 | P-14 | Per-project access | PJ-02 (private projects) | Membership is binary today; a project may be limited to its people |
@@ -110,7 +110,7 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 | Token budget | The tokens an agent, schedule or eval set may spend in a period. Budgets are never in currency | Changed (terminology.md says *cost ceiling*) |
 | Model version | A provider’s exact model name (`claude-opus-5-5`); pinned by agents, recorded on every run | New |
 | Change log | Every version of every versioned record, with its effect after | New |
-| TaskPlan origin `authored` | — | **Retired** for users: a plan is `generated` from instructions.md or `packaged` in a plugin pack |
+| Flow origin `authored` | — | **Retired** for users: a plan is `generated` from instructions.md or `packaged` in a plugin pack |
 
 ## Conflicts with for-developers
 
@@ -120,7 +120,7 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 | `graph-detail-page.md` G15: one graph page | Five products, one shell | Replace G15 |
 | `terminology.md`: *Dataset* retired for *Model* | Dataset revived, above Graphs | Add the term back with its new meaning |
 | `terminology.md`: Graph is the outermost container | Install-wide catalogue, standards, rules | Add *install* scope |
-| `terminology.md`: TaskPlan origins `authored · generated · promoted` | `generated` · `packaged` | Retire user-authored; add `packaged` (decide whether `promoted` stays) |
+| `terminology.md`: Flow origins `authored · generated · promoted` | `generated` · `packaged` | Retire user-authored; add `packaged` (decide whether `promoted` stays) |
 | `terminology.md`: Projects are flat, no sub-projects | Branches fork and merge inside a project | Projects stay flat; branches are not sub-projects |
 | `bring-data-in` lives with Modeller | Imports move to Datasets | Move the surface |
 | Library › Plans is an authoring surface | Plans are read-only, generated | Remove plan authoring |
@@ -144,7 +144,7 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 |---|---|
 | Datasets · Standards · Graph models | Yes |
 | Skills (instructions.md) | Decide in phase 3 — executable instructions carry risk |
-| TaskPlans | No — always generated |
+| Flows | No — always generated |
 | Projects | No — a published finding travels as a derived dataset |
 
 - Formats: Frictionless Data Package for datasets, RO-Crate for research bundles, DCAT for the catalogue.

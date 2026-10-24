@@ -42,19 +42,17 @@ import type { Agent, AgentUpdate } from "./types";
  * complete.
  */
 export const ALL_TASKS = [
-	"understand_intent",
-	"plan_workflow",
-	"translate_thought",
-	"validate_query",
-	"execute_graph_query",
-	"shape_for_canvas",
-	"compare_results",
-	"chart_result",
-	"verify_result",
-	"spawn_agent",
-	"delegate",
-	"await_delegations",
-	"create_task",
+	"nl.understand",
+	"plan.compose",
+	"nl.translate",
+	"graph.read.validate",
+	"graph.read.query",
+	"answer.shape",
+	"plan.verify",
+	"work.spawn_agent",
+	"work.delegate",
+	"work.await",
+	"work.create_task",
 ];
 
 export type AgentTab =
@@ -281,7 +279,7 @@ export function AgentDetail({
 					},
 					{
 						value: "skills",
-						label: "Skills & callables",
+						label: "Skills & functions",
 						content: (
 							<AgentSkillsTab
 								username={username}

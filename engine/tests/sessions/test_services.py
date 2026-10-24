@@ -201,9 +201,9 @@ class TestQueryLanguageAsksAnswer:
             actor_id=user.id,
         )
         steps = (await session.execute(select(TaskRun.task_key).where(TaskRun.parent_run_id == th.id))).scalars()
-        assert th.workflow_key == "ql-query"
+        assert th.flow_key == "ql-query"
         assert th.agent_id != modeller.id
-        assert not {"understand_ask", "propose_model", "validate_proposal"} & set(steps)
+        assert not {"model.understand_ask", "model.propose", "model.validate_proposal"} & set(steps)
 
     async def test_an_agent_that_cannot_answer_is_refused_not_run(self, session, graph, user):
         agents = AgentManager()

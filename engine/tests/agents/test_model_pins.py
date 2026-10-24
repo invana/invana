@@ -97,7 +97,7 @@ async def _settled_ask(session: AsyncSession, graph: Graph, user: User, model_ve
         author_id=user.id,
         ask_kind="nl",
         body="Which suppliers ship late?",
-        workflow_key=NL_QUERY.key,
+        flow_key=NL_QUERY.key,
         model_version=model_version,
         status=RunStatus.succeeded.value,
     )

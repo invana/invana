@@ -9,7 +9,7 @@ exactly what [BN7](docs/for-developers/modules/skills/features/bindings.md) said
 it was waiting on.
 
 Lives in ``runtime`` for the reason every composition here does: it reads rows
-from ``apps/skills``, ``apps/task_plans`` **and** ``apps/govern``, and skills
+from ``apps/skills``, ``apps/flows`` **and** ``apps/govern``, and skills
 sits above plans in the app order, so the package that needs all three is the
 one above them (migration-plan §3).
 
@@ -49,14 +49,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.envelope import Envelope
 from invana.apps.agents.querysets import AgentQuerySet
+from invana.apps.flows.models import Task, TaskForm
+from invana.apps.flows.querysets import FlowQuerySet
 from invana.apps.govern.addressing import GOVERNED_LAYERS, Layer
 from invana.apps.govern.catalogue import Catalogue, CatalogueResolver
 from invana.apps.govern.managers import LensManager
 from invana.apps.govern.rules import Effective
 from invana.apps.skills.managers import SkillBindingManager
 from invana.apps.skills.models import Skill
-from invana.apps.task_plans.models import Task, TaskForm
-from invana.apps.task_plans.querysets import TaskPlanQuerySet
 from invana.core.errors import ConflictError
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.layers import LAYER_LABEL, band_for
@@ -87,7 +87,7 @@ class SkillBindManager:
     """Stateless. The session is the first argument of every method."""
 
     agents_qs = AgentQuerySet()
-    plans_qs = TaskPlanQuerySet()
+    plans_qs = FlowQuerySet()
     lenses = LensManager()
     catalogue = CatalogueResolver()
     bindings = SkillBindingManager()
@@ -107,7 +107,7 @@ class SkillBindManager:
 
         The envelope runs first because it names a **step**, which is the
         narrower and more actionable fact: *this agent may not call
-        `write_graph`* tells the author what to change, where *the graph data
+        `graph.write.records`* tells the author what to change, where *the graph data
         band is shut* tells them who to ask. Both are refusals the person
         binding can act on; neither is worth hiding behind the other.
 

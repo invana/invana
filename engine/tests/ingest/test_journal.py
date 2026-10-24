@@ -96,7 +96,7 @@ class TestJournal:
         """
         graph, _ = journal
         root = await _run(session, graph, kind="ask", body="Which routes?", minutes_ago=1)
-        for seq, task_key in enumerate(("understand_intent", "translate_thought", "execute_graph_query")):
+        for seq, task_key in enumerate(("nl.understand", "nl.translate", "graph.read.query")):
             session.add(
                 TaskRun(
                     graph_id=graph.id,
@@ -206,16 +206,16 @@ class TestBulkLoad:
 
     Writing the CSV is `CSVLoader`, covered in `tests/graph/loaders`. What is
     under test here is the declaration the plan rests on — an edit that gave
-    `bulk_write` a `requires` would make a bulk load claim a validation it never
+    `graph.write.bulk` a `requires` would make a bulk load claim a validation it never
     ran, and nothing else would notice.
     """
 
     async def test_bulk_write_requires_nothing(self, session):
         from invana.runtime.catalogue import CATALOGUE
 
-        entry = CATALOGUE["bulk_write"]
+        entry = CATALOGUE["graph.write.bulk"]
         assert entry.bound.value == "graph_write"
-        # Borrowing `write_graph`'s `requires: validate_records` is the whole
+        # Borrowing `graph.write.records`'s `requires: validate_records` is the whole
         # thing this guards against (LD10 · § 6.1).
         assert entry.requires == ()
 
@@ -224,16 +224,16 @@ class TestBulkLoad:
 
         plan = load_plugins().flows["bulk-load"]
         assert plan.kind == "bulk"
-        assert [s["task"] for s in plan.steps] == ["bulk_write"]
+        assert [s["task"] for s in plan.steps] == ["graph.write.bulk"]
 
     async def test_the_step_is_handed_the_folder_it_loads(self, session, tmp_path):
-        """`bulk_write` reads its step's args; a folder only on the run's params is no folder."""
+        """`graph.write.bulk` reads its step's args; a folder only on the run's params is no folder."""
         from invana.runtime.querysets import TaskRunQuerySet
 
         graph = await _graph(session, "bulk")
         run = await services.open_bulk_run(session, graph=graph, path=str(tmp_path), batch_size=50)
 
         [step] = await TaskRunQuerySet().nodes_of(session, run_id=run.id)
-        assert step.task_key == "bulk_write"
+        assert step.task_key == "graph.write.bulk"
         assert step.args["root"] == str(tmp_path.resolve())
         assert step.args["batch_size"] == 50

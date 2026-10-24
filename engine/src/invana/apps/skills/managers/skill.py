@@ -23,7 +23,7 @@ question that suspends survives a reload. Publishing stamps it and moves the
 head — text, answers and plan as one act.
 
 **Every version needs a plan** ([SK13](docs/for-developers/modules/skills/features/authoring-a-skill.md)),
-and this package cannot make one: ``apps/task_plans`` imports ``apps/agents``,
+and this package cannot make one: ``apps/flows`` imports ``apps/agents``,
 which imports this package, so importing it here would close a cycle the
 import-linter refuses. Callers pass ``plan_id`` in, and the composition lives
 one band up in ``runtime/managers/skill_draft.py``.

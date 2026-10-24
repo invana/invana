@@ -5,7 +5,7 @@ may be offered, a **rule** is a statement that is always true. Both are authored
 everywhere, and reach a step as discrete items with ids — so a step can report which it applied and a
 trace can name them.
 
-> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `TaskPlan` ·
+> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
 > [task-model-migration.md](../../building-engine/task-model-migration.md).

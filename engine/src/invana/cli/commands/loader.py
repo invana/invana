@@ -280,12 +280,12 @@ async def _run_bulk(
     """Open the bulk run, hand it to the runtime, and report what it did.
 
     **Nothing here knows how a CSV folder is written.** `bulk-load@1` does, and
-    `bulk_write` is the one step in it — the same shape `invana records import`
+    `graph.write.bulk` is the one step in it — the same shape `invana records import`
     already uses, so both kinds of load are one journal and one trace (LD10).
     """
+    from invana.apps.flows.models import Task as PlanTask  # noqa: F401
     from invana.apps.graphs.pool import GraphConnectionManager
     from invana.apps.graphs.querysets import GraphQuerySet
-    from invana.apps.task_plans.models import Task as PlanTask  # noqa: F401
     from invana.core.auth.querysets import UserQuerySet
     from invana.core.db import create_db_engine, create_session_factory
     from invana.core.settings import settings
@@ -332,7 +332,7 @@ async def _run_bulk(
         async with session_factory() as session:
             root = await session.get(TaskRun, run_id)
             nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
-            out = next((n.output or {} for n in nodes if n.task_key == "bulk_write"), {})
+            out = next((n.output or {} for n in nodes if n.task_key == "graph.write.bulk"), {})
             status = root.status
             fatal = (root.error or {}).get("message")
 

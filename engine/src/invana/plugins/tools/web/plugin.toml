@@ -7,6 +7,6 @@ title = "Web"
 engine = "*"
 extra = "tools-web"
 secrets = ["web_search"]
-tasks = ["web.search", "web.fetch", "web.download_and_extract"]
+tasks = ["web.search", "web.read_url", "web.download_file"]
 flows = []
 skills = ["collect-dataset"]

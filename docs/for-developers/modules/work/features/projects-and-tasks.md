@@ -1,7 +1,7 @@
 # Projects and Todos
 
 > ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records).** What this file
-> used to call a *Task* is a **Todo**; `Task` now names a node inside a TaskPlan. A Todo has no
+> used to call a *Task* is a **Todo**; `Task` now names a node inside a Flow. A Todo has no
 > `status` column — state derives from its runs. Migration:
 > [task-model-migration.md](../../../building-engine/task-model-migration.md).
 
@@ -124,7 +124,7 @@ flowchart LR
 | PT4 | Order is derived from dependencies, never maintained by hand. |
 | PT5 | Cycles are refused, naming the loop. |
 | PT6 | Staffing is a default; Graph membership is the permission. On a private project staffing is also the access list ([PP1](private-projects.md)). |
-| PT7 | **Projects owns Todos; there is no Todos icon.** A Todo without its project is a to-do list, and the project is the thing it is for — so the list lives under Projects with a *No project* bucket, and the rail's **Tasks** icon is execution only ([G30](../../../building-studio/graph-detail-page.md)). The word *Tasks* in the rail therefore names `TaskRun`s, `TaskPlan`s and the catalogue, never Todos ([SR3](../../operate/features/see-what-ran.md)). |
+| PT7 | **Projects owns Todos; there is no Todos icon.** A Todo without its project is a to-do list, and the project is the thing it is for — so the list lives under Projects with a *No project* bucket, and the rail's **Tasks** icon is execution only ([G30](../../../building-studio/graph-detail-page.md)). The word *Tasks* in the rail therefore names `TaskRun`s, `Flow`s and the catalogue, never Todos ([SR3](../../operate/features/see-what-ran.md)). |
 | PT8 | **The detail leads with the project, not with the way back.** The name is a heading, the panel breadcrumb is the only *Projects* link, and the second `← Projects` row is gone — two back-links on one screen is one too many, and the row cost the title its place. |
 | PT9 | **The purpose is clamped to three lines with *Show more*.** A project's purpose is the thing every agent plans from, so it sits above the tabs where it is always read; three lines is what a panel can spare before the Todos disappear. |
 | PT10 | **Details is the only editing surface, and it edits in place.** Name and purpose are fields behind `Edit`; key, creator and timestamps are facts. A dialog over a 400px panel hides the thing being edited. |

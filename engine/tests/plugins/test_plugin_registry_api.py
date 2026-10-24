@@ -71,7 +71,7 @@ class TestPluginRegistry:
         assert items[WEB]["enabled"] is False
 
         detail = (await client.get(f"/api/v1/plugins/{WEB}")).json()
-        assert any(t["key"] == "web.fetch" for t in detail["task_types"])
+        assert any(t["key"] == "web.read_url" for t in detail["task_types"])
 
     async def test_an_admin_switches_a_tool_plugin_and_no_one_else_may(self, api):
         client, who, admin = api
@@ -92,11 +92,11 @@ class TestPluginRegistry:
 
     async def test_a_task_type_by_ref_carries_its_plugin_and_usage(self, api):
         client, _, _ = api
-        resp = await client.get("/api/v1/task-types/execute_graph_query@1.0.0")
+        resp = await client.get("/api/v1/task-types/graph.read.query@1.0.0")
 
         assert resp.status_code == 200
         body = resp.json()
-        assert body["key"] == "execute_graph_query"
+        assert body["key"] == "graph.read.query"
         assert body["plugin"].startswith("invana.core.graph_read@")
         assert body["runs_30d"] == 0
         assert (await client.get("/api/v1/task-types/no_such_task")).status_code == 404

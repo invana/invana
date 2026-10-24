@@ -43,7 +43,7 @@ test("the plan panel draws the four bands of a plan", async ({ page }) => {
 	await expect(page.getByText("Versions", { exact: true })).toBeVisible();
 	// Each version says what changed against the one before it (LB37): v2
 	// bound `read_only` to the plan's argument, and v1 compares against nothing.
-	await expect(page.getByText("execute_graph_query changed")).toBeVisible();
+	await expect(page.getByText("graph_read_query changed")).toBeVisible();
 	await expect(page.getByText("the first version")).toBeVisible();
 });
 

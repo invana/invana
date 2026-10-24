@@ -58,7 +58,7 @@ interface ApiTaskRun {
 	id: string;
 	run_id: string;
 	graph_id: string;
-	workflow_key: string;
+	flow_key: string;
 	/** The run this row is a step of; null on a root. */
 	parent_run_id?: string | null;
 	status: RunStatus;
@@ -86,7 +86,7 @@ interface ApiTaskRun {
 
 export interface TaskRun {
 	id: string;
-	workflowKey: string;
+	flowKey: string;
 	status: RunStatus;
 	assistantMessageId?: string;
 	streamSeq: number;
@@ -246,7 +246,7 @@ export const runsApi = {
 		const d = await request<ApiTaskRun>(`${base(username, graphSlug)}/${id}`);
 		return {
 			id: d.id,
-			workflowKey: d.workflow_key,
+			flowKey: d.flow_key,
 			status: d.status,
 			assistantMessageId: d.assistant_message_id ?? undefined,
 			streamSeq: d.stream_seq,
@@ -533,7 +533,7 @@ export const traceApi = {
 /** The trace, as the engine returns it. */
 export interface TraceRead {
 	run_id: string;
-	workflow_key: string;
+	flow_key: string;
 	status: string;
 	/** The ask this run carries — `nl` · `ql` · `import`. */
 	ask_kind: string | null;

@@ -275,7 +275,7 @@ const ROUTE_WORDS = new Set([
 	"start",
 	"starters",
 	"stream",
-	"task-plans",
+	"flows",
 	"tasks",
 	"telemetry",
 	"template",

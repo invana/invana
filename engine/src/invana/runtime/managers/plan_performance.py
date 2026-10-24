@@ -16,11 +16,9 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.querysets import AgentQuerySet
-from invana.apps.sessions.querysets import SessionQuerySet
-from invana.apps.skills.querysets import SkillVersionQuerySet
-from invana.apps.task_plans.models import Task, TaskPlan
-from invana.apps.task_plans.querysets import TaskPlanQuerySet
-from invana.apps.task_plans.schemas import (
+from invana.apps.flows.models import Flow, Task
+from invana.apps.flows.querysets import FlowQuerySet
+from invana.apps.flows.schemas import (
     AgentChip,
     BoundUse,
     CalledBy,
@@ -37,6 +35,8 @@ from invana.apps.task_plans.schemas import (
     SlowRun,
     StepPerformance,
 )
+from invana.apps.sessions.querysets import SessionQuerySet
+from invana.apps.skills.querysets import SkillVersionQuerySet
 from invana.apps.work.querysets import TaskQuerySet as TodoQuerySet
 from invana.core.auth.querysets import UserQuerySet
 from invana.core.utils import percentile
@@ -115,10 +115,11 @@ class _Root:
 
     @property
     def verdict(self) -> str | None:
-        for row in self.reaches.get("verify_result", []):
-            served = (row.output or {}).get("served")
-            if isinstance(served, str):
-                return served
+        for rows in self.reaches.values():
+            for row in rows:
+                served = (row.output or {}).get("served") if row.task_key == "plan.verify" else None
+                if isinstance(served, str):
+                    return served
         return None
 
     @property
@@ -167,10 +168,10 @@ class _Root:
 
 
 class PlanPerformanceManager:
-    plans_qs = TaskPlanQuerySet()
+    plans_qs = FlowQuerySet()
     runs_qs = TaskRunQuerySet()
 
-    async def _roots(self, session: AsyncSession, *, plan: TaskPlan, since: datetime) -> tuple[list[_Root], set[str]]:
+    async def _roots(self, session: AsyncSession, *, plan: Flow, since: datetime) -> tuple[list[_Root], set[str]]:
         inlining = await self.plans_qs.plans_inlining(session, graph_id=plan.graph_id, ref=plan.ref)
         roots = await self.runs_qs.roots_for_plan(
             session, graph_id=plan.graph_id, origin=f"template:{plan.ref}", plan_ids=inlining, since=since
@@ -184,7 +185,7 @@ class PlanPerformanceManager:
     # ── Overview · Layers · Flow ──────────────────────────────────────────────
 
     async def performance(
-        self, session: AsyncSession, *, plan: TaskPlan, window: int, now: datetime | None = None
+        self, session: AsyncSession, *, plan: Flow, window: int, now: datetime | None = None
     ) -> PlanPerformance:
         now = now or datetime.now(UTC)
         since = now - timedelta(days=window)
@@ -197,9 +198,9 @@ class PlanPerformanceManager:
         # copy that recorded none stays out (LB36).
         copies = await self.plans_qs.copied_steps(session, graph_id=plan.graph_id, ref=plan.ref)
         stepwise = [
-            r if r.root.task_plan_id not in inlining else r.through(copies[r.root.task_plan_id])
+            r if r.root.flow_id not in inlining else r.through(copies[r.root.flow_id])
             for r in current
-            if r.root.task_plan_id not in inlining or r.root.task_plan_id in copies
+            if r.root.flow_id not in inlining or r.root.flow_id in copies
         ]
 
         return PlanPerformance(
@@ -240,7 +241,7 @@ class PlanPerformanceManager:
         self,
         session: AsyncSession,
         *,
-        plan: TaskPlan,
+        plan: Flow,
         window: int,
         status: str | None = None,
         called_by: str | None = None,
@@ -307,7 +308,7 @@ class PlanPerformanceManager:
         return PlanRunsPage(items=items, next_cursor=str(start + limit) if more else None, live=live)
 
     async def _callers(
-        self, session: AsyncSession, *, plan: TaskPlan, roots: list[_Root], inlining: set[str]
+        self, session: AsyncSession, *, plan: Flow, roots: list[_Root], inlining: set[str]
     ) -> dict[str, CalledBy]:
         """Who called each root: the skill that inlined the plan, else the
         session it was asked in, else what opened it (LB34)."""
@@ -323,8 +324,8 @@ class PlanPerformanceManager:
         for r in roots:
             run = r.root
             person = people.get(run.author_id or run.on_behalf_of_user_id or "")
-            if run.task_plan_id in inlining and run.task_plan_id in owners:
-                out[run.id] = CalledBy(kind="skill", name=owners[run.task_plan_id][1], person=person)
+            if run.flow_id in inlining and run.flow_id in owners:
+                out[run.id] = CalledBy(kind="skill", name=owners[run.flow_id][1], person=person)
             elif run.session_id:
                 out[run.id] = CalledBy(kind="session", name=titles.get(run.session_id) or "a session", person=person)
             else:

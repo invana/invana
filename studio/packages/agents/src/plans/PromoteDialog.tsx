@@ -30,7 +30,7 @@ import { ApiError } from "@invana-studio/core";
 import { useRunsQuery } from "@invana-studio/shell";
 import { DetailStatus } from "@invana-studio/ui";
 import { useState } from "react";
-import { usePromoteTaskPlanMutation } from "./queries";
+import { usePromoteFlowMutation } from "./queries";
 
 /** `nl-compare` — a key is the contract, so it is constrained like one. */
 const KEY_PATTERN = /^[a-z][a-z0-9-]{1,62}$/;
@@ -59,7 +59,7 @@ export function PromoteDialog({
 		{ filters: { candidates: ["true"] }, limit: 25 },
 		open,
 	);
-	const promote = usePromoteTaskPlanMutation(username, graphSlug);
+	const promote = usePromoteFlowMutation(username, graphSlug);
 
 	const items = candidates.data?.items ?? [];
 	const keyValid = KEY_PATTERN.test(key);
@@ -119,7 +119,7 @@ export function PromoteDialog({
 								>
 									<span className="min-w-0 flex-1">
 										<span className="block truncate text-base text-foreground">
-											{item.task_title ?? item.workflow_key}
+											{item.task_title ?? item.flow_key}
 										</span>
 										<span className="block truncate text-base text-muted-foreground">
 											generated · {item.step_count} step

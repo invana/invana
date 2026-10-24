@@ -2,5 +2,5 @@ name = "invana.core.llm"
 kind = "core"
 engine = "*"
 secrets = []
-tasks = ["understand_intent", "plan_workflow", "translate_thought", "draft_plan", "propose_model"]
+tasks = ["nl.understand", "plan.compose", "nl.translate", "plan.draft", "model.propose"]
 flows = ["nl-single", "nl-compare"]

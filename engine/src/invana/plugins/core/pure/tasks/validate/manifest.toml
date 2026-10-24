@@ -1,0 +1,14 @@
+key = "graph.read.validate"
+version = "1.0.0"
+summary = "Check a query is read-only and name the labels it touches, before it runs."
+bound = "none"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+
+[args]
+query = { type = "str" }
+
+[outputs]
+verdict = "str"
+labels = "list"

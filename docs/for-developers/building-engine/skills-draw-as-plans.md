@@ -11,7 +11,7 @@ clarification it raises instead of guessing, and the **Playbook** and **Flow** t
 | Slice | **M8** of [task-model-migration.md](task-model-migration.md) § 7 |
 | Drawn in | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — page *Skills*, artboards `S1`–`S5` |
 | Worked example | **Answer in natural language** — the NL-query capability the product already runs, seeded into every Graph |
-| Needs | `task_plans` + `tasks` (M2 ✅) · `generate_plan` and `resolve_plan` (in the tree ✅) · `TaskPrompt` (M3 ✅) |
+| Needs | `flows` + `tasks` (M2 ✅) · `generate_plan` and `resolve_plan` (in the tree ✅) · `TaskPrompt` (M3 ✅) |
 
 ## 1. What the tree already has
 
@@ -19,7 +19,7 @@ Read before writing anything — four of the six pieces exist.
 
 | Piece | State | Where |
 |---|---|---|
-| `task_plans` · `tasks` | ✅ rows, with `source_span`, `form`, `step_key`, `depends_on` | `apps/task_plans/models.py` |
+| `flows` · `tasks` | ✅ rows, with `source_span`, `form`, `step_key`, `depends_on` | `apps/flows/models.py` |
 | Plan validation against the catalogue and the envelope | ✅ `validate_plan` · `resolve_plan` | `apps/agents/envelope.py` · `runtime/planning.py` |
 | An LLM that composes steps from prose | ✅ `generate_plan`, used by `plan_workflow` | `apps/llm/` · `runtime/catalogue/llm.py` |
 | `TaskPrompt kind=clarification`, suspend and resume | ✅ | `runtime/models.py` · `runtime/services.py:resume_turn` |
@@ -46,13 +46,13 @@ One migration — `000000000048_a_skill_draws_as_a_plan`.
 
 | Table | Change | Notes |
 |---|---|---|
-| `skill_versions` | **+ `plan_id`** `String(36)` FK → `task_plans.id` `ondelete=RESTRICT`, **NOT NULL**, **UNIQUE** | one version, exactly one plan ([SK13](../modules/skills/features/authoring-a-skill.md#decisions)). `RESTRICT`, because deleting a plan out from under a published version would break a trace |
+| `skill_versions` | **+ `plan_id`** `String(36)` FK → `flows.id` `ondelete=RESTRICT`, **NOT NULL**, **UNIQUE** | one version, exactly one plan ([SK13](../modules/skills/features/authoring-a-skill.md#decisions)). `RESTRICT`, because deleting a plan out from under a published version would break a trace |
 | `skill_versions` | **`published_at` → nullable** | null is the draft ([SK20](#2-the-shape-of-a-draft)). Every existing row is published, so the backfill is a no-op |
 | `skills` | **+ `origin`** `String(16)` default `authored` | `builtin` · `authored` ([SK25](#2-the-shape-of-a-draft)) |
 | `skill_version_clarifications` | **new** — `id · skill_version_id` (FK CASCADE) `· span · question · options` (JSON) `· answer · answered_by_id · answered_at · created_at` | recorded so a redraw never re-asks ([SK11](../modules/skills/features/authoring-a-skill.md#decisions)) |
 
 **The backfill is the interesting half.** `plan_id NOT NULL` over existing rows means every skill version
-in every Graph needs a plan before the constraint lands: for each, the migration writes a `task_plans`
+in every Graph needs a plan before the constraint lands: for each, the migration writes a `flows`
 row (`origin = authored`, `reusable = false`, `key = null`, `kind = ask`) with one `form: human` task
 titled by the skill's name — [SK22](#2-the-shape-of-a-draft) again, and the same honest fallback the
 product uses live. It is added nullable, backfilled, then altered to `NOT NULL` in one migration
@@ -157,7 +157,7 @@ and *a lens exists only on a run*. Both are gone, so both halves run.
 
 | Not building | Because |
 |---|---|
-| A bespoke flow **editor** | the plan canvas already draws a `TaskPlan`, and nobody edits a plan by hand ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3) |
+| A bespoke flow **editor** | the plan canvas already draws a `Flow`, and nobody edits a plan by hand ([6.5](../modules/skills/features/instructions-publish-rollback.md#decisions) IS3) |
 | Generating prose from a flow | two generators pointing at each other is a drift machine |
 | `uses:` composition (`S4`) | it needs a plan-level include; the column that records it is `source_skill_version_ids`, and the surface is the next pass |
 | Redrawing on every keystroke | half a sentence is not an instruction |

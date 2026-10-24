@@ -1464,6 +1464,42 @@
    "route": "/u/admin/airways/agents/settings",
    "state": ""
   },
+  "agents.functions": {
+   "story": "AF-02",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/plugins/tasks",
+   "state": ""
+  },
+  "agents.functions.detail": {
+   "story": "AF-02",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/plugins/tasks/graph.read.query",
+   "state": "graph.read.query stands for a function's dotted name: click any function in the catalogue"
+  },
+  "agents.functions.plans": {
+   "story": "AF-02",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/library",
+   "state": "Packaged plans: the plan library"
+  },
+  "agents.functions.closed": {
+   "story": "AF-02",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/plugins/tasks",
+   "state": "the catalogue with the assistant closed"
+  },
+  "agents.plans": {
+   "story": "AF-02",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/library",
+   "state": ""
+  },
+  "agents.plans.detail": {
+   "story": "AF-02",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/library/nl-single",
+   "state": "nl-single stands for a plan's key: click any plan in the library"
+  },
   "agents.runs.filtered": {
    "story": "AF-26",
    "product": "agent-fabric",

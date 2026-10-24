@@ -1,15 +1,15 @@
 """Draw a playbook as a plan — the model reads prose, sentence by sentence.
 
-This is not the workflow planner (:mod:`invana.apps.llm.planner`). That one
+This is not the flow planner (:mod:`invana.apps.llm.planner`). That one
 answers *what shape serves this question*; this one answers a narrower and more
 checkable question: **which catalogue entry does this sentence name?** The
 difference is what lets ambiguity be a declared condition rather than a feeling
-([SK10 · SK24](docs/for-developers/modules/skills/features/authoring-a-skill.md)):
+(docs/for-developers/modules/skills/features/authoring-a-skill.md):
 
 * exactly one candidate → a step, and the sentence is its ``source_span``;
 * two or more → a **clarification**, quoting the sentence and offering the
   readings, each naming the step it would write;
-* none → a ``form: human`` step, because a person can always do it (SK15);
+* none → a ``form: human`` step, because a person can always do it;
 * not an instruction at all → no step, and the sentence reads as *unmapped*.
 
 A candidate is a catalogue entry or a reusable library plan, named
@@ -18,7 +18,7 @@ manager copies its rows in when it is picked, with the arguments the sentence
 tunes.
 
 The model never writes args it invented: it may bind one earlier step's output,
-exactly as the workflow planner may, and everything else is validated against
+exactly as the flow planner may, and everything else is validated against
 the envelope before a row is written.
 """
 

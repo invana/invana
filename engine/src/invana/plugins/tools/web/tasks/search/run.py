@@ -8,7 +8,7 @@ from invana.plugins.sdk.context import Out, RunVars, TaskContext
 MAX_RESULTS = 50
 
 
-async def search(ctx: TaskContext, v: RunVars) -> Out:
+async def web_search(ctx: TaskContext, v: RunVars) -> Out:
     """Ask the install's SearXNG (the ``web_search`` secret is its base URL) for ``query``.
 
     Every result is ``{title, url, snippet}`` — the URL is the citation a later
@@ -34,4 +34,4 @@ async def search(ctx: TaskContext, v: RunVars) -> Out:
     )
 
 
-run = search
+run = web_search

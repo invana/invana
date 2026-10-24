@@ -1,9 +1,9 @@
-key = "validate_proposal"
+key = "model.validate_proposal"
 version = "1.0.0"
 summary = "Check a proposed model change for referential integrity, then stage it."
 bound = "schema_write"
 side_effect = "write"
-requires = ["propose_model"]
+requires = ["model.propose"]
 resources = ["cpu"]
 
 [args]

@@ -62,7 +62,7 @@ class ChildOutcome:
 def narrow(parent: Agent, *, requested: dict) -> dict:
     """Compute a child's bindings as the intersection with its parent's.
 
-    Inheritance **narrows**, always. This is checked at ``spawn_agent`` and
+    Inheritance **narrows**, always. This is checked at ``work.spawn_agent`` and
     again when the child's own plan is validated, so a child cannot widen its
     reach by planning something its parent could not have run.
     """

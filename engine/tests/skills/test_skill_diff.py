@@ -37,7 +37,7 @@ async def _step(session: AsyncSession, graph: Graph, root: TaskRun, *, offered: 
         TaskRun(
             graph_id=graph.id,
             parent_run_id=root.id,
-            task_key="translate_thought",
+            task_key="nl.translate",
             label="Translate",
             status="succeeded",
             finished_at=datetime.now(UTC),

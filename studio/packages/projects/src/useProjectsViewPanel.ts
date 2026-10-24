@@ -8,7 +8,7 @@ import { useCallback } from "react";
 // Todo in the Graph, which is the *No project* bucket: a Todo nobody filed is
 // still work somebody wrote.
 //
-// The rail's **Tasks** icon is execution only — `TaskRun`s, `TaskPlan`s and the
+// The rail's **Tasks** icon is execution only — `TaskRun`s, `Flow`s and the
 // catalogue, never Todos.
 export type ProjectsSectionKey = "projects" | "todos";
 

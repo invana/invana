@@ -7,7 +7,7 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | For | builders |
 | Scope | One Graph |
 | Rail | Overview · Agents · Skills │ Library · Plugins · LLMs · Performance │ Settings (bottom) |
-| Core rule | People write `instructions.md`; TaskPlans are generated from it, never drawn |
+| Core rule | People write `instructions.md`; Flows are generated from it, never drawn |
 | Moved out | Schedules → Shell · Projects → the Projects product |
 
 | Status | Means |

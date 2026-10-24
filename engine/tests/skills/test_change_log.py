@@ -40,7 +40,7 @@ async def _step_offered(session: AsyncSession, graph: Graph, version_id: str, *,
         TaskRun(
             graph_id=graph.id,
             parent_run_id=root.id,
-            task_key="translate_thought",
+            task_key="nl.translate",
             status=status,
             rules_offered=[version_id],
             tokens_in=tokens,
@@ -161,7 +161,7 @@ async def test_a_skill_history_carries_its_why_and_its_prose_diff(
 
     assert [(e.version, e.why, e.summary) for e in history.items] == [
         # The prose changed, so the plan was redrawn from it.
-        ("2", "Clearer.", "content changed · plan: +translate_thought · \u2212do-it"),
+        ("2", "Clearer.", "content changed · plan: +nl_translate · \u2212do-it"),
         ("1", None, "the first version"),
     ]
     assert history.items[0].effect.basis == "pinned"

@@ -200,6 +200,8 @@ yet.
 | PL8 | Success copy belongs to the engine. A mutation returns the sentence it wants shown, and Studio does not write one beside it. |
 | PL9 | The shell is built once and shared. A screen chooses its middle, never its chrome. |
 | PL10 | Studio's end-to-end tests run against a live engine and a real graph database. A Studio test that mocks the engine tests the mock. |
+| PL11 | **The migration chain starts at one baseline.** `000000000082_baseline.py` creates the whole schema an empty Postgres database needs — tables, enum types, indexes and the `events` notify trigger — as one DDL script; it carries the id of the last revision it replaces, so a database already at that revision is at the baseline and is never rebuilt. Every later change is a new revision after it. Postgres is the only migration target. |
+| PL12 | **A rename migration renames, and rewrites what it renames.** A table, column or key that changes name changes in one revision, which also rewrites the values recorded under the old name (a run's step keys, a plan's snapshot); nothing reads an old name afterwards and no alias is kept. A revision may instead drop what it cannot rewrite, saying so in its docstring. |
 
 ## 8. Deliberately absent
 

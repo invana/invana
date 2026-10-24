@@ -1,0 +1,14 @@
+key = "graph.write.records"
+version = "1.0.0"
+summary = "Merge validated records into the graph, each stamped with its origin."
+bound = "graph_write"
+side_effect = "write"
+requires = ["data.records.validate"]
+resources = ["cpu"]
+
+[args]
+
+[outputs]
+nodes = "int"
+edges = "int"
+written = "int"

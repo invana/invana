@@ -21,8 +21,8 @@ const event = (over: Partial<AuditEvent>): AuditEvent => ({
 describe("changeOf", () => {
 	it("reads a plan by its key, not its row id", () => {
 		const e = event({
-			action: "workflow.update",
-			target_kind: "workflow",
+			action: "flow.promote",
+			target_kind: "flow",
 			target_id: "row-7",
 			details: { key: "triage", version: 3 },
 		});
@@ -36,9 +36,7 @@ describe("changeOf", () => {
 
 	it("is null for an event that mints no version", () => {
 		expect(changeOf(event({ target_kind: "run" }))).toBeNull();
-		expect(
-			changeOf(event({ target_kind: "workflow", details: {} })),
-		).toBeNull();
+		expect(changeOf(event({ target_kind: "flow", details: {} }))).toBeNull();
 	});
 });
 

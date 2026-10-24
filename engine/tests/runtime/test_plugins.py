@@ -32,10 +32,10 @@ class TestCorePlugins:
     def test_every_core_task_type_is_loaded_with_its_version_and_plugin(self) -> None:
         registry = load_plugins()
         assert set(registry.tasks) == set(CATALOGUE)
-        task = registry.task("execute_graph_query")
+        task = registry.task("graph.read.query")
         assert task is not None and task.plugin == "invana.core.graph_read"
-        assert registry.task(f"execute_graph_query@{task.version}") is task
-        assert registry.task("execute_graph_query@99.0.0") is None
+        assert registry.task(f"graph.read.query@{task.version}") is task
+        assert registry.task("graph.read.query@99.0.0") is None
         # A core plugin is versioned with the engine; a simulator declares its own.
         core = [p for p in registry.plugins.values() if p.manifest.kind == "core"]
         assert {p.manifest.version for p in core} == {engine_version()}
@@ -48,7 +48,7 @@ class TestCorePlugins:
 
     def test_the_registry_is_read_only(self) -> None:
         with pytest.raises(TypeError):
-            load_plugins().tasks["anything"] = CATALOGUE["validate_query"]  # type: ignore[index]
+            load_plugins().tasks["anything"] = CATALOGUE["graph.read.validate"]  # type: ignore[index]
 
 
 class TestDrift:

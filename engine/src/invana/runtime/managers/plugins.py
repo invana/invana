@@ -20,7 +20,7 @@ extra is not installed and the MCP servers this process has not loaded, listed
     await plugins.list(session)                                 # [PluginSummary, …]
     await plugins.page(session, params=params)                  # one page of the list, and its counts
     await plugins.show(session, "invana.tools.web")             # PluginDetail
-    await plugins.task_type(session, "execute_graph_query@1.0.0")  # TaskTypeRead, with runs_30d
+    await plugins.task_type(session, "graph.read.query@1.0.0")  # TaskTypeRead, with runs_30d
     await plugins.is_enabled(session, "invana.tools.web")      # False until enabled
     await plugins.switch(session, name="invana.tools.web", enabled=True, actor=admin)
 """

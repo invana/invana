@@ -48,7 +48,7 @@ class SessionSurface(enum.StrEnum):
     """Which Studio surface a session lives on (docs/for-developers/modules/ask/spec.md).
 
     ``explorer`` sessions query the graph (NL → query); ``modeller`` sessions
-    author a model's draft (NL → ``propose_model``). Existing rows and the create
+    author a model's draft (NL → ``model.propose``). Existing rows and the create
     path default to ``explorer`` so Explorer behaviour is untouched.
     """
 

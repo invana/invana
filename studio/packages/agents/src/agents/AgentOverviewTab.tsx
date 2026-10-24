@@ -128,7 +128,7 @@ export function AgentOverviewTab({
 					card
 					title="Skills"
 					action={
-						<GoTo label="Skills & callables" onClick={() => onGoTo("skills")} />
+						<GoTo label="Skills & functions" onClick={() => onGoTo("skills")} />
 					}
 				>
 					<PropertyList>
@@ -147,7 +147,7 @@ export function AgentOverviewTab({
 							<PropertyRow label="needs attention">
 								<span className="text-warning">
 									{needAttention} skill{needAttention === 1 ? "" : "s"} need
-									{needAttention === 1 ? "s" : ""} a callable the envelope lacks
+									{needAttention === 1 ? "s" : ""} a function the envelope lacks
 								</span>
 							</PropertyRow>
 						) : null}
@@ -186,13 +186,13 @@ export function AgentOverviewTab({
 							label="may run"
 							to={
 								<GoTo
-									label="Skills & callables"
+									label="Skills & functions"
 									onClick={() => onGoTo("skills")}
 								/>
 							}
 						>
 							{can.data
-								? `${can.data.callables.length} callables · ${can.data.plans.length} plan${can.data.plans.length === 1 ? "" : "s"}`
+								? `${can.data.callables.length} functions · ${can.data.plans.length} plan${can.data.plans.length === 1 ? "" : "s"}`
 								: "…"}
 						</LimitRow>
 						<LimitRow

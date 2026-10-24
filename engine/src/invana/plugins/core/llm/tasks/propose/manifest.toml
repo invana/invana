@@ -1,0 +1,14 @@
+key = "model.propose"
+version = "1.0.0"
+summary = "Propose node and edge types for a described change, staged on the draft."
+bound = "llm"
+side_effect = "read"
+requires = ["model.understand_ask"]
+resources = ["llm"]
+
+[args]
+
+[outputs]
+node_types = "list"
+edge_types = "list"
+summary = "str"

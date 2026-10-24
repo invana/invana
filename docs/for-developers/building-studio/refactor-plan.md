@@ -229,7 +229,7 @@ Leaf-first, so a module never moves while something it owns is still elsewhere.
 | 1 | `shared/` | Everything imports it; moving it first means every later move fixes its imports once |
 | 2 | `app/` | Router, shell, providers. Small, and it fixes the entry point early |
 | 3 | `identity-and-access` · `operate` | Genuinely self-contained. They prove the module contract on something low-risk |
-| 4 | `agents` · `skills` · `task_plans` · `work` | The `work/` panels, one module each. Already near-separable |
+| 4 | `agents` · `skills` · `flows` · `work` | The `work/` panels, one module each. Already near-separable |
 | 5 | `bring-data-in` · `connect-and-model` | The model canvas is the risk here — move it with its components in one commit |
 | 6 | `ask` | The answer surface. Substituted in Phase 2, so it moves as kit compositions rather than as 1,700 lines |
 | 7 | `explore` | Last, and biggest. `GraphDetailPage.tsx` is decomposed *as* it moves — see below |

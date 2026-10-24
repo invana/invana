@@ -105,7 +105,7 @@ def stub_tasks(monkeypatch):
     monkeypatch.setitem(task_registry.TASKS, "stub_ask_open", ask_open)
     monkeypatch.setitem(task_registry.TASKS, "stub_slow", slow)
     monkeypatch.setitem(task_registry.TASKS, "stub_offline", offline)
-    project = Step("shape_for_canvas", "Project")
+    project = Step("answer.shape", "Project")
     for wf in (
         Workflow("stub-ok", (Step("stub_ok", "Understand"), project)),
         Workflow("stub-converse", (Step("stub_converse", "Understand"), project)),
@@ -131,14 +131,14 @@ def stub_tasks(monkeypatch):
     return calls
 
 
-async def _open(session, graph, user, workflow_key: str):
+async def _open(session, graph, user, flow_key: str):
     sess = await SessionManager().create_session(session, graph=graph, user_id=user.id, title="t")
     _, assistant, th = await run_services.open_turn(
         session, sess=sess, graph=graph, payload=SendMessage(content="hello", mode="ql"), actor_id=user.id
     )
     # Swap the ql workflow for the stub's, re-queuing its steps.
-    wf = workflows.WORKFLOWS[workflow_key]
-    th.workflow_key = wf.key
+    wf = workflows.WORKFLOWS[flow_key]
+    th.flow_key = wf.key
     for row in (await session.execute(select(TaskRun).where(TaskRun.parent_run_id == th.id))).scalars():
         await session.delete(row)
     await session.flush()  # deletes before the re-insert of the same (seq, attempt) keys
@@ -437,6 +437,6 @@ async def test_no_choices_when_nothing_can_be_read():
     """A world that names no types, or an agent that may not query, is offered nothing (NL14)."""
     offered = [Choice("What is the longest runway?", ("airport",))]
     assert await _askable(None, SimpleNamespace(governor=None, envelope=None), offered, frozenset()) == []
-    no_query = Envelope.from_spec({"allow": ["understand_intent"]})
+    no_query = Envelope.from_spec({"allow": ["nl.understand"]})
     v = SimpleNamespace(governor=None, envelope=no_query)
     assert await _askable(None, v, offered, frozenset({"airport"})) == []

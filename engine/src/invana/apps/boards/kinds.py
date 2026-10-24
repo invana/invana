@@ -45,13 +45,13 @@ BOARD_KINDS: dict[str, BoardKindSpec] = {
     for spec in (
         _drawn("data"),
         _drawn("model"),
-        _drawn("plan", "a task_plans.id", required=True),
-        _drawn("workflow", "a task_plans.id", required=True),
+        _drawn("plan", "a flows.id", required=True),
+        _drawn("workflow", "a flows.id", required=True),
         _drawn("envelope", "an agent id", required=True),
         _drawn("lineage", "a root task_runs.id", required=True),
         _declared("run", "a root task_runs.id"),
         _declared("task_run", "a child task_runs.id"),
-        _declared("plan_runs", "a task_plans.id"),
+        _declared("plan_runs", "a flows.id"),
         # Two runs, side by side, with what each touched diffed
         # (docs/for-developers/modules/govern/features/worlds.md WO4). Its
         # subject is a pair rather than a row, because **compare is two runs,

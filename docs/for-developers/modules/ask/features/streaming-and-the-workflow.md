@@ -4,7 +4,7 @@ The steps are the interface. You watch `understand · plan · translate · valid
 verify` happen, with their emissions appearing as they are produced — never a spinner followed by
 everything at once.
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `TaskPlan` ·
+> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
 > [task-model-migration.md](../../../building-engine/task-model-migration.md).

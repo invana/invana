@@ -4,7 +4,7 @@ Running the thing: what happened, what it cost, what is scheduled, and what may 
 outside. Every write in the product is an event here, and every actor is a principal — which is what
 makes "who recommended what, citing what, on behalf of whom" answerable.
 
-> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `TaskPlan` ·
+> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
 > [task-model-migration.md](../../building-engine/task-model-migration.md).

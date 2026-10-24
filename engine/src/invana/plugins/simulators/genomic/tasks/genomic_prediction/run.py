@@ -127,7 +127,7 @@ def _cross(
     }
 
 
-async def genomic_prediction(ctx: TaskContext, v: RunVars) -> Out:
+async def sim_genomic_prediction(ctx: TaskContext, v: RunVars) -> Out:
     """Rank every female-by-male cross by the share of its progeny that meets every target.
 
     **The model is deliberately simple and says so.** A progeny's trait is the
@@ -180,4 +180,4 @@ async def genomic_prediction(ctx: TaskContext, v: RunVars) -> Out:
     )
 
 
-run = genomic_prediction
+run = sim_genomic_prediction

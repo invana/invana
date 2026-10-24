@@ -9,7 +9,7 @@ probably* — the options come from the graph rather than from the model.
 ([CQ11](docs/for-developers/modules/ask/features/clarifying-questions.md)). The
 ``llm`` entry that asks back opens the run's ``graph_data`` crossing around it,
 hands the lens here, and records the touch — so a world that excludes a value
-never offers it. The model wrote the query and no ``validate_query`` stands in
+never offers it. The model wrote the query and no ``graph.read.validate`` stands in
 front of it, so the read-only check is made here; anything refused or failed
 falls back to the fixed options.
 """

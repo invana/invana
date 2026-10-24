@@ -1,5 +1,5 @@
 # One of the plans ingestion is assembled from. Its steps are task type
-# primitives — `validate_records`, `write_graph`, `stitch`, `snapshot_model` — and
+# primitives — `data.records.validate`, `graph.write.records`, `stitch`, `data.snapshot` — and
 # the plan is what orders them. `model-import`, not `dataset-import`: records are
 # imported **into a model**, and the model is what holds them.
 
@@ -10,21 +10,21 @@ description = "Load records into a model: check them, write them, resolve their 
 intents = []
 
 [[steps]]
-id = "validate_records"
-task = "validate_records"
+id = "data_records_validate"
+task = "data.records.validate"
 label = "Validate"
 
 [[steps]]
-id = "write_graph"
-task = "write_graph"
+id = "graph_write_records"
+task = "graph.write.records"
 label = "Write"
 
 [[steps]]
-id = "stitch"
-task = "stitch"
+id = "graph_stitch_run"
+task = "graph.stitch.run"
 label = "Stitch"
 
 [[steps]]
-id = "snapshot_model"
-task = "snapshot_model"
+id = "data_snapshot"
+task = "data.snapshot"
 label = "Snapshot"

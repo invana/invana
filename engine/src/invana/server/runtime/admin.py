@@ -19,7 +19,7 @@ class TaskRunView(ModelView):
         "graph_id",
         "parent_run_id",
         "todo_id",
-        "task_plan_id",
+        "flow_id",
         StringField("role", label="Role"),
         "ask_kind",
         "body",

@@ -5,6 +5,6 @@ description = "Withdraw the edges a removed stitch wrote, under the Graph's guar
 intents = []
 
 [[steps]]
-id = "withdraw_stitch"
-task = "withdraw_stitch"
+id = "graph_stitch_withdraw"
+task = "graph.stitch.withdraw"
 label = "Withdraw"

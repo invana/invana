@@ -1,4 +1,4 @@
-key = "spawn_agent"
+key = "work.spawn_agent"
 version = "1.0.0"
 summary = "Create a helper agent under this agent's ceiling."
 bound = "work_write"

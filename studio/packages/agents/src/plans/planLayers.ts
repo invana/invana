@@ -12,10 +12,10 @@
 
 import type { GanttOptions, GanttSpecRow } from "@invana/blocks";
 import { LAYER_SWATCHES, layerSlug } from "@invana-studio/ui";
-import type { TaskPlanDetail } from "./types";
+import type { FlowDetail } from "./types";
 
 export function planLayersGantt(
-	plan: TaskPlanDetail,
+	plan: FlowDetail,
 	/** Each step's p50 over the page's window, as the bar carries it. */
 	p50?: Map<string, string>,
 ): GanttOptions {

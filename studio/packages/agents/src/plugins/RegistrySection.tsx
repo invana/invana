@@ -141,7 +141,7 @@ function RegistryBody({
 							key={p.name}
 							onClick={() => onOpenPlugin?.(p.name)}
 							title={<span className="font-mono">{p.name}</span>}
-							subtitle={`${p.kind} · v${p.version} · ${p.task_types} task type${p.task_types === 1 ? "" : "s"}`}
+							subtitle={`${p.kind} · v${p.version} · ${p.task_types} function${p.task_types === 1 ? "" : "s"}`}
 							status={stateOf(p)}
 						/>
 					))

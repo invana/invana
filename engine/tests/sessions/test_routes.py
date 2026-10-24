@@ -158,13 +158,13 @@ class TestTaskRunRoutes:
             await task
 
         th = (await client.get(f"{BASE.replace('/sessions', '/runs')}/{run_id}")).json()
-        assert th["workflow_key"] == "ql-query"
+        assert th["flow_key"] == "ql-query"
         assert th["status"] == "failed"
         by_key = {s["task_key"]: s for s in th["steps"]}
-        assert by_key["validate_query"]["status"] == "succeeded"
-        assert by_key["validate_query"]["detail"].startswith("read-only")
-        assert by_key["execute_graph_query"]["status"] == "failed"
-        assert by_key["shape_for_canvas"]["status"] == "queued"
+        assert by_key["graph.read.validate"]["status"] == "succeeded"
+        assert by_key["graph.read.validate"]["detail"].startswith("read-only")
+        assert by_key["graph.read.query"]["status"] == "failed"
+        assert by_key["answer.shape"]["status"] == "queued"
 
         detail = (await client.get(f"{BASE}/{sid}")).json()
         reply = detail["messages"][1]
@@ -196,6 +196,6 @@ class TestTaskRunRoutes:
             await task
         th = (await client.get(f"{BASE.replace('/sessions', '/runs')}/{run_id}")).json()
         by_key = {s["task_key"]: s for s in th["steps"]}
-        assert by_key["validate_query"]["status"] == "failed"
-        assert by_key["validate_query"]["error"]["cause"] == "query_not_read_only"
-        assert by_key["execute_graph_query"]["status"] == "queued"
+        assert by_key["graph.read.validate"]["status"] == "failed"
+        assert by_key["graph.read.validate"]["error"]["cause"] == "query_not_read_only"
+        assert by_key["graph.read.query"]["status"] == "queued"

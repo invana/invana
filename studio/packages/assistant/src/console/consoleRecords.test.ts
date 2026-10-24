@@ -33,7 +33,7 @@ const step = (over: Partial<RunNode>): RunNode => ({
 	id: "s",
 	runId: "r1",
 	seq: 1,
-	taskKey: "execute_graph_query",
+	taskKey: "graph.read.query",
 	label: "Execute",
 	attempt: 1,
 	status: "succeeded",
@@ -131,7 +131,11 @@ describe("the session's queries", () => {
 					mode: "ql",
 					status: "error",
 					steps: [
-						step({ id: "v1", taskKey: "validate_query", status: "failed" }),
+						step({
+							id: "v1",
+							taskKey: "graph.read.validate",
+							status: "failed",
+						}),
 					],
 				}),
 				msg({ id: "a2", operation: "expand", sourceQuery: "MATCH (n)--(m)" }),

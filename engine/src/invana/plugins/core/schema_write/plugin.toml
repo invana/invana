@@ -2,5 +2,5 @@ name = "invana.core.schema_write"
 kind = "core"
 engine = "*"
 secrets = []
-tasks = ["understand_ask", "validate_proposal", "migrate_model"]
+tasks = ["model.understand_ask", "model.validate_proposal", "model.migrate"]
 flows = ["modeller-propose", "model-migration"]

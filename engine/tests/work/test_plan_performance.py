@@ -16,24 +16,24 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.flows.models import Flow, Task
 from invana.apps.graphs.models import Graph
 from invana.apps.skills.models import Skill, SkillVersion
-from invana.apps.task_plans.models import Task, TaskPlan
 from invana.runtime.managers import PlanPerformanceManager
 from invana.runtime.models import TaskRun
 
 NOW = datetime(2026, 9, 26, 12, tzinfo=UTC)
 
 
-async def _plan(session: AsyncSession, graph: Graph) -> TaskPlan:
-    plan = TaskPlan(graph_id=graph.id, key="nl-single", version=2, reusable=True)
+async def _plan(session: AsyncSession, graph: Graph) -> Flow:
+    plan = Flow(graph_id=graph.id, key="nl-single", version=2, reusable=True)
     session.add(plan)
     await session.flush()
     session.add_all(
         [
-            Task(task_plan_id=plan.id, key="translate", step_key="translate_thought", ordinal=0),
-            Task(task_plan_id=plan.id, key="execute", step_key="execute_graph_query", ordinal=1),
-            Task(task_plan_id=plan.id, key="verify_result", step_key="verify_result", ordinal=2),
+            Task(flow_id=plan.id, key="translate", step_key="nl.translate", ordinal=0),
+            Task(flow_id=plan.id, key="execute", step_key="graph.read.query", ordinal=1),
+            Task(flow_id=plan.id, key="plan_verify", step_key="plan.verify", ordinal=2),
         ]
     )
     await session.flush()
@@ -73,11 +73,17 @@ class TestPerformance:
                 # Retried and recovered: used the bound, did not fail.
                 _step(ok, "execute", ms=20, status="failed", error={"cause": "db_error"}),
                 _step(ok, "execute", ms=30, attempt=2),
-                _step(ok, "verify_result", ms=5, output={"served": "yes"}),
+                _step(ok, "plan_verify", ms=5, task_key="plan.verify", output={"served": "yes"}),
                 _step(bad, "translate", ms=300),
                 _step(bad, "execute", ms=10, status="failed", attempt=3, error={"cause": "query_invalid"}),
                 # Closed after the failure, never started: not reached.
-                TaskRun(graph_id=graph.id, parent_run_id=bad.id, step_key="verify_result", status="failed"),
+                TaskRun(
+                    graph_id=graph.id,
+                    parent_run_id=bad.id,
+                    step_key="plan_verify",
+                    task_key="plan.verify",
+                    status="failed",
+                ),
             ]
         )
         await session.flush()
@@ -87,10 +93,10 @@ class TestPerformance:
         assert perf.tiles.runs.value == 2 and perf.tiles.failed.value == 1
         assert perf.tiles.served.value == 1.0, "of verified runs, not of all runs"
         steps = {s.step_key: s for s in perf.steps}
-        assert [s.step_key for s in perf.steps] == ["translate", "execute", "verify_result"]
+        assert [s.step_key for s in perf.steps] == ["translate", "execute", "plan_verify"]
         assert steps["execute"].failed == 1 and steps["execute"].retried == 0.5
-        assert steps["verify_result"].ran_in == 0.5 and steps["verify_result"].failed == 0
-        assert not steps["translate"].wide and not steps["verify_result"].rare, "a 3x spread and half the runs"
+        assert steps["plan_verify"].ran_in == 0.5 and steps["plan_verify"].failed == 0
+        assert not steps["translate"].wide and not steps["plan_verify"].rare, "a 3x spread and half the runs"
         assert [(f.step_key, f.cause, f.count) for f in perf.failures] == [("execute", "query_invalid", 1)]
         assert [(b.step_key, b.limit, b.used, b.exhausted) for b in perf.bounds] == [("execute", 3, 1, 1)]
         assert perf.slowest["translate"][0].run_id == bad.id
@@ -104,22 +110,22 @@ class TestPerformance:
         session.add_all(roots)
         await session.flush()
         session.add_all([_step(r, "translate", ms=1000 if i == 4 else 100) for i, r in enumerate(roots)])
-        session.add(_step(roots[0], "verify_result", ms=5))
+        session.add(_step(roots[0], "plan_verify", ms=5, task_key="plan.verify"))
         await session.flush()
 
         perf = await PlanPerformanceManager().performance(session, plan=plan, window=7, now=NOW)
 
         steps = {s.step_key: s for s in perf.steps}
         assert steps["translate"].wide and not steps["translate"].rare
-        assert steps["verify_result"].rare and steps["verify_result"].ran_in == 0.2
+        assert steps["plan_verify"].rare and steps["plan_verify"].ran_in == 0.2
 
     async def test_a_skill_that_inlined_it_counts_through_the_steps_it_copied(
         self, session: AsyncSession, graph: Graph
     ):
         plan = await _plan(session, graph)
-        recorded = TaskPlan(graph_id=graph.id, key=None, reusable=False)
+        recorded = Flow(graph_id=graph.id, key=None, reusable=False)
         # Copied before a copy recorded its source: a caller, never a step.
-        legacy = TaskPlan(graph_id=graph.id, key=None, reusable=False)
+        legacy = Flow(graph_id=graph.id, key=None, reusable=False)
         skill = Skill(graph_id=graph.id, name="Escalate a late supplier")
         older = Skill(graph_id=graph.id, name="Brief the route desk")
         session.add_all([recorded, legacy, skill, older])
@@ -129,18 +135,18 @@ class TestPerformance:
                 SkillVersion(skill_id=skill.id, version=1, plan_id=recorded.id),
                 SkillVersion(skill_id=older.id, version=1, plan_id=legacy.id),
                 Task(
-                    task_plan_id=recorded.id,
+                    flow_id=recorded.id,
                     key="nl_single_translate",
                     source_plan_key="nl-single@2",
                     source_step_key="translate",
                 ),
                 # The skill's own step, not the plan's.
-                Task(task_plan_id=recorded.id, key="tell_desk"),
-                Task(task_plan_id=legacy.id, key="nl_single_translate", source_plan_key="nl-single@2"),
+                Task(flow_id=recorded.id, key="tell_desk"),
+                Task(flow_id=legacy.id, key="nl_single_translate", source_plan_key="nl-single@2"),
             ]
         )
-        run = _root(graph, status="succeeded", ago=timedelta(hours=3), task_plan_id=recorded.id)
-        old = _root(graph, status="succeeded", ago=timedelta(hours=4), task_plan_id=legacy.id)
+        run = _root(graph, status="succeeded", ago=timedelta(hours=3), flow_id=recorded.id)
+        old = _root(graph, status="succeeded", ago=timedelta(hours=4), flow_id=legacy.id)
         session.add_all([run, old])
         await session.flush()
         session.add_all(

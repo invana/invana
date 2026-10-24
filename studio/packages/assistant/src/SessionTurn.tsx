@@ -522,11 +522,10 @@ function SettledTurn({
 	);
 }
 
-/** The questions a conversed Understand step offered (NL14), or none. */
+/** The questions a conversed Understand step offered, or none. */
 function conversedChoices(steps: RunNode[]): string[] {
 	const out = steps.find(
-		(s) =>
-			s.taskKey === "understand_intent" && typeof s.output?.reply === "string",
+		(s) => s.taskKey === "nl.understand" && typeof s.output?.reply === "string",
 	)?.output;
 	const options = out?.options;
 	return Array.isArray(options)

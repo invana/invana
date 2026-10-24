@@ -47,7 +47,7 @@ export function TaskTypePage({
 		return (
 			<EmptyState
 				className="h-full"
-				title="No such task type"
+				title="No such function"
 				description={`No loaded plugin declares "${taskKey}". A plan naming it cannot run.`}
 			/>
 		);

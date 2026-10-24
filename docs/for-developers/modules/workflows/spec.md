@@ -1,14 +1,10 @@
 # Workflows — module spec
 
-The plan a run executes. A **workflow** is a **reusable TaskPlan** — a named flow of Tasks; the
-**plan** is the one chosen for this run. Plans are selected by intent, generated only when nothing
-fits, validated against the running agent's bounds before anything is dispatched, and promoted back
-into the library when they demonstrably served.
-
-> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records).** *Workflow* is now a
-> **role**, not a record: it is a `TaskPlan` with `reusable = true`. `workflow_versions` is gone — a
-> run freezes `plan_snapshot`, so a version table would record the same fact twice. Migration:
-> [task-model-migration.md](../../building-engine/task-model-migration.md).
+The flow a run executes. A **Flow** is the record — a flow of Tasks, each calling one **function**
+(`namespace.verb`); a **reusable** flow is one the library lists, and the **plan** is the flow chosen
+for this run. Flows are selected by intent, generated only when nothing fits, validated against the
+running agent's bounds before anything is dispatched, and promoted back into the library when they
+demonstrably served. A run freezes `plan_snapshot`, so there is no version table.
 
 | | |
 |---|---|
@@ -23,11 +19,12 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 
 | Noun | Is | Is not |
 |---|---|---|
-| **Workflow** | a `TaskPlan` with `reusable = true`, in the library | a record of its own · one run |
-| **Template** | a reusable TaskPlan, selected by intent | a default |
-| **Plan** | the `TaskPlan` this run executes — frozen onto it as `plan_snapshot` | a workflow |
-| **Candidate** | a `generated` plan a Verify Task judged as serving | a template |
-| **Catalogue** | the closed set of callables a plan may name by `step_key`, grouped by bound | a plugin registry |
+| **Flow** | the record: `flows` + its `tasks` rows; `reusable = true` puts it in the library | a second record per origin |
+| **Template** | a reusable flow, selected by intent | a default |
+| **Plan** | the flow this run executes — frozen onto it as `plan_snapshot` | a record of its own |
+| **Candidate** | a `generated` flow a `plan.verify` Task judged as serving | a template |
+| **Function** | one task type, `namespace.verb`, named by a Task's `step_key` | a step — a step is the Task that calls it |
+| **Catalogue** | the closed set of functions a flow may name, grouped by bound | a plugin registry |
 
 **The plan's grammar is [orchestration § 5](../../orchestration.md#5-the-plan-is-data)'s, and this
 module does not restate it.** A plan is a set of `Task` rows with declared `depends_on` edges, carrying
@@ -64,8 +61,8 @@ flowchart TD
 
 | Owns | Shape |
 |---|---|
-| `task_plans` | `graph_id` · `key?` · `name` · `intent` · `kind` · `origin (packaged\|generated\|promoted)` — `authored` is read on older rows, never written · `reusable` · `todo_id?` · `args_schema` · `source_skill_version_ids[]` |
-| `tasks` | the plan's nodes — `task_plan_id` **NOT NULL** · `parent_id?` · `key` · `form` · `step_key?` · `depends_on[]` and the rest of the grammar |
+| `flows` | `graph_id` · `key?` · `name` · `intent` · `kind` · `origin (packaged\|generated\|promoted)` — `authored` is read on older rows, never written · `reusable` · `todo_id?` · `args_schema` · `source_skill_version_ids[]` |
+| `tasks` | the flow's nodes — `flow_id` **NOT NULL** · `parent_id?` · `key` · `form` · `step_key?` (a function) · `depends_on[]` and the rest of the grammar |
 | Plan record | on the run: `plan_snapshot` (frozen) and `plan_origin` (`authored:<id>` · `generated` · `reused:<id>`) |
 | Validation result | which bound refused a plan, when one did |
 
@@ -129,12 +126,15 @@ is closed ([orchestration § 0.6](../../orchestration.md#06-the-catalogue--what-
 | F9 | **Every plan resolves from this library, including Invana's own** — `plan-a-todo` and `check-criteria` included. A builtin is a seeded, read-only plan, never a constant in a feature package. |
 | F10 | A builtin is listed and composable but not editable: no edit, no retire, reseeded on migrate. Its Tasks are bound to catalogue entries the engine owns. |
 | F11 | **A multi-stage load is an ordinary plan.** `bundle-import` inlines `dataset-import` per dataset with `ref`; ingestion gets no grammar of its own. [13.8 §3.2](../platform/features/runtime.md) |
-| F14 | **A `TaskPlan` is one record, whatever drew it.** A plan drawn from a skill, generated for a Todo, packaged or promoted is the same table with a different `origin`. There is no `SkillPlan`: provenance is a column, not a type ([orchestration § 0.8](../../orchestration.md#08-a-skill-drawn-as-a-flow)). |
+| F14 | **A `Flow` is one record, whatever drew it.** A plan drawn from a skill, generated for a Todo, packaged or promoted is the same table with a different `origin`. There is no `SkillPlan`: provenance is a column, not a type ([orchestration § 0.8](../../orchestration.md#08-a-skill-drawn-as-a-flow)). |
 | F15 | **A skill version is drawn as exactly one plan** — `skill_versions.plan_id` is `NOT NULL`. If a playbook cannot be drawn as a flow, it is a [rule](../skills/features/rules.md), not a skill. |
 | F16 | **A plan is a flow of Tasks, never of Todos.** Where one needs a person, that is a `form: human` Task — and if the person owns it beyond this run, the Task raises a Todo in [Work](../work/spec.md). |
 | F12 | **A plan in the library is startable.** A person picks a published version, supplies its arguments and runs it ([7.5](features/run-a-workflow.md)). Reaching a deterministic plan only by asking a question the planner might match was the gap. |
 | F13 | Starting by hand changes nothing downstream: the envelope check, the trace, the journal row and the pauses are the ones every other run gets. **A published version is not editable** — nobody edits a plan by hand ([6.5](../skills/features/instructions-publish-rollback.md#decisions) IS3). |
 | F17 | **A plan enters the library generated, packaged or promoted — never drafted.** Studio has no *New plan* and no plan editor ([6.5](../skills/features/instructions-publish-rollback.md#decisions) IS2 · IS3). A plan that served is promoted ([7.4](features/promote-a-plan.md)); a builtin or a plugin pack's plan is packaged. Composition happens at a skill's draw, where a sentence names a library plan ([IS11](../skills/features/instructions-publish-rollback.md#decisions)). |
+| F19 | **The record is `Flow`, in every layer.** Table `flows`, column `flow_id` on `tasks` and `task_runs`, routes `/flows`, schemas `FlowRead`/`FlowPage`, Studio's `Flow` type and `useFlowQuery`. *Workflow* names no record, column or route; a reusable flow is `reusable = true`. The screen calls a listed flow a **plan** (*Packaged plans*, *Generated plans*, *Promote a plan*) and its drawing **Flow** — the words of the [Functions boards](../../../products/agent-fabric.md#functions-skills-and-plans). `plan_snapshot`, `plan_revision`, `plan_origin` and `skill_versions.plan_id` keep *plan*: each names the plan of one run or one version, not the record. |
+| F20 | **A Task's `key` is a plain identifier; its `step_key` is a function.** `${steps.<key>.<output>}` binds against the key, so a key never carries a dot. A step's key defaults to its function with dots as underscores — `nl-single@2` is `nl_translate → graph_read_validate → graph_read_query → answer_shape → plan_verify` — and a flow that calls one function twice names each (`translate_a`, `translate_b`). One rule both ways, so renaming a function renames its default keys without two steps colliding. |
+| F21 | **Packaged flow keys keep their names** (`nl-single`, `model-import`, `stitch-apply`, …). They are versioned rows (`key@n`) runs and skills cite; the function rename does not reach them. |
 | F18 | **The canvas and `manifest.yml` are two readings of one document.** The plan is data ([orchestration § 5](../../orchestration.md#5-the-plan-is-data)); the canvas draws it and the YAML export prints it. Neither writes it back. |
 
 ## 7. Deliberately absent

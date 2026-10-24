@@ -85,7 +85,7 @@ flowchart TD
 
 | An eval run | Is |
 |---|---|
-| Its record | A root `TaskRun` `role=evaluate`, `workflow_key=eval`, `triggered_by` `user` (publish, manual) or `system` (drift, nightly), `params.trigger` naming why |
+| Its record | A root `TaskRun` `role=evaluate`, `flow_key=eval`, `triggered_by` `user` (publish, manual) or `system` (drift, nightly), `params.trigger` naming why |
 | Its children | One replayed ask per case and side, `parent_run_id` the eval run; their tokens count on the eval budget, never on production |
 | Its candidate | `params.candidate` — `draft`, a `version` (a rollback) or a `model_pin` (an agent's pin move) — and `params.candidate_digest`, the sha256 of the candidate's text and pin |
 | Its summary | `result.eval` — per side: hard passed / total, p95 ms, tokens, tokens per case, judged mean; changed answers; `versus_live` (the draft's `p95_ms` and `tokens_per_case` against live, each a `Change`, null on a one-side run); the gate's verdict (`clean` · `warn` · `blocked`) with its reasons |

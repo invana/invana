@@ -69,7 +69,7 @@ const ENGINE_ONLY = {
 		"served by @invana-studio/core and the Modeller's settings, outside the host",
 	agents: "served by the @invana-studio/agents package, outside the host",
 	skills: "served by the @invana-studio/agents package, outside the host",
-	task_plans: "served by the @invana-studio/agents package, outside the host",
+	flows: "served by the @invana-studio/agents package, outside the host",
 	runtime: "served by the @invana-studio/agents package, outside the host",
 	llm_providers:
 		"served by the @invana-studio/agents package, outside the host",

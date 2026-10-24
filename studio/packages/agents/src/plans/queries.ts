@@ -1,7 +1,7 @@
 /**
  * TanStack Query hooks for the library: the catalogue, the task plans and one
  * plan's versions, diffs, export, performance and runs over a window, and
- * promoting a plan. Keys are `["workflows", owner, graph, …]`, the engine's
+ * promoting a plan. Keys are `["flows", owner, graph, …]`, the engine's
  * route name, so promoting invalidates every plan reading at once.
  */
 
@@ -14,13 +14,13 @@ import {
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { catalogueApi, taskPlansApi } from "./api";
+import { catalogueApi, flowsApi } from "./api";
 import type { PlanWindow } from "./types";
 
 type Scope = { username: string; graphSlug: string };
 
-const taskPlansKey = (s: Scope, extra: unknown[] = []) =>
-	["workflows", s.username, s.graphSlug, ...extra] as const;
+const flowsKey = (s: Scope, extra: unknown[] = []) =>
+	["flows", s.username, s.graphSlug, ...extra] as const;
 
 // ── Workflows ────────────────────────────────────────────────────────────────
 
@@ -32,7 +32,7 @@ export function useCatalogueQuery(
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: taskPlansKey(scope, ["catalogue", listQueryKey(query)]),
+		queryKey: flowsKey(scope, ["catalogue", listQueryKey(query)]),
 		queryFn: () => catalogueApi.list(scope.username, scope.graphSlug, query),
 		enabled: !!username && !!graphSlug,
 		staleTime: 5 * 60_000,
@@ -41,30 +41,29 @@ export function useCatalogueQuery(
 }
 
 /** One page of the plan library for `query`; a caller that needs every plan asks `limit: 200`. */
-export function useTaskPlansQuery(
+export function useFlowsQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
 	query: ListQuery = {},
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: taskPlansKey(scope, ["list", listQueryKey(query)]),
-		queryFn: () => taskPlansApi.list(scope.username, scope.graphSlug, query),
+		queryKey: flowsKey(scope, ["list", listQueryKey(query)]),
+		queryFn: () => flowsApi.list(scope.username, scope.graphSlug, query),
 		enabled: !!username && !!graphSlug,
 		placeholderData: keepPreviousData,
 	});
 }
 
-export function useTaskPlanQuery(
+export function useFlowQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
 	key: string | undefined,
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: taskPlansKey(scope, [key]),
-		queryFn: () =>
-			taskPlansApi.get(scope.username, scope.graphSlug, key as string),
+		queryKey: flowsKey(scope, [key]),
+		queryFn: () => flowsApi.get(scope.username, scope.graphSlug, key as string),
 		enabled: !!username && !!graphSlug && !!key,
 	});
 }
@@ -78,9 +77,9 @@ export function usePlanVersionQuery(
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: taskPlansKey(scope, [key, version]),
+		queryKey: flowsKey(scope, [key, version]),
 		queryFn: () =>
-			taskPlansApi.get(scope.username, scope.graphSlug, key as string, version),
+			flowsApi.get(scope.username, scope.graphSlug, key as string, version),
 		enabled: !!username && !!graphSlug && !!key && !!version,
 	});
 }
@@ -94,9 +93,9 @@ export function usePlanDiffQuery(
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: taskPlansKey(scope, [key, "diff", version]),
+		queryKey: flowsKey(scope, [key, "diff", version]),
 		queryFn: () =>
-			taskPlansApi.diff(
+			flowsApi.diff(
 				scope.username,
 				scope.graphSlug,
 				key as string,
@@ -117,14 +116,9 @@ export function usePlanDiffsQuery(
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQueries({
 		queries: versions.map((version) => ({
-			queryKey: taskPlansKey(scope, [key, "diff", version]),
+			queryKey: flowsKey(scope, [key, "diff", version]),
 			queryFn: () =>
-				taskPlansApi.diff(
-					scope.username,
-					scope.graphSlug,
-					key as string,
-					version,
-				),
+				flowsApi.diff(scope.username, scope.graphSlug, key as string, version),
 			enabled: !!username && !!graphSlug && !!key,
 			staleTime: Number.POSITIVE_INFINITY,
 		})),
@@ -140,9 +134,9 @@ export function usePlanExportQuery(
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: taskPlansKey(scope, [key, "export", version]),
+		queryKey: flowsKey(scope, [key, "export", version]),
 		queryFn: () =>
-			taskPlansApi.exportText(
+			flowsApi.exportText(
 				scope.username,
 				scope.graphSlug,
 				key as string,
@@ -162,9 +156,9 @@ export function usePlanPerformanceQuery(
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: taskPlansKey(scope, [key, "performance", q]),
+		queryKey: flowsKey(scope, [key, "performance", q]),
 		queryFn: () =>
-			taskPlansApi.performance(
+			flowsApi.performance(
 				scope.username,
 				scope.graphSlug,
 				key as string,
@@ -194,9 +188,9 @@ export function usePlanRunsQuery(
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useInfiniteQuery({
-		queryKey: taskPlansKey(scope, [key, "runs", q]),
+		queryKey: flowsKey(scope, [key, "runs", q]),
 		queryFn: ({ pageParam }) =>
-			taskPlansApi.runs(scope.username, scope.graphSlug, key as string, {
+			flowsApi.runs(scope.username, scope.graphSlug, key as string, {
 				...(q as NonNullable<typeof q>),
 				cursor: pageParam ?? undefined,
 			}),
@@ -213,10 +207,7 @@ export function usePlanRunsQuery(
  * candidates list the moment a library entry claims it as its origin, and a
  * candidates list still offering it would invite a second, duplicate promotion.
  */
-export function usePromoteTaskPlanMutation(
-	username: string,
-	graphSlug: string,
-) {
+export function usePromoteFlowMutation(username: string, graphSlug: string) {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: (data: {
@@ -229,7 +220,7 @@ export function usePromoteTaskPlanMutation(
 				"invana.graph": `${username}/${graphSlug}`,
 				"invana.run_id": data.run_id,
 			});
-			return taskPlansApi.promote(username, graphSlug, data, action).then(
+			return flowsApi.promote(username, graphSlug, data, action).then(
 				(plan) => {
 					action.end("promoted");
 					return plan;
@@ -241,7 +232,7 @@ export function usePromoteTaskPlanMutation(
 			);
 		},
 		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: ["workflows", username, graphSlug] });
+			qc.invalidateQueries({ queryKey: ["flows", username, graphSlug] });
 			qc.invalidateQueries({ queryKey: ["runs", username, graphSlug] });
 		},
 	});

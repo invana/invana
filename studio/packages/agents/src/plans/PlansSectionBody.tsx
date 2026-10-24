@@ -45,17 +45,12 @@ import { chipsOf, FilteredEmpty, ListStrip, PAGE } from "../lists";
 import type { SkillLayer } from "../skills/types";
 import { PromoteDialog } from "./PromoteDialog";
 import {
+	useFlowQuery,
+	useFlowsQuery,
 	usePlanDiffQuery,
 	usePlanPerformanceQuery,
-	useTaskPlanQuery,
-	useTaskPlansQuery,
 } from "./queries";
-import type {
-	TaskPlanCaller,
-	TaskPlanDagNode,
-	TaskPlanDetail,
-	TaskPlanSummary,
-} from "./types";
+import type { FlowCaller, FlowDagNode, FlowDetail, FlowSummary } from "./types";
 
 /** The reader's spelling back to the address segment the kit's components take.
  *
@@ -106,7 +101,7 @@ export function usePlanList(
 	graphSlug: string,
 	list: ListUrl,
 ) {
-	return useTaskPlansQuery(username, graphSlug, { ...list.query, limit: PAGE });
+	return useFlowsQuery(username, graphSlug, { ...list.query, limit: PAGE });
 }
 
 interface Props {
@@ -141,13 +136,9 @@ export function PlansSectionBody({
 	onOpenAgent,
 }: Props) {
 	const plans = usePlanList(username, graphSlug, list);
-	const detail = useTaskPlanQuery(
-		username,
-		graphSlug,
-		selectedKey ?? undefined,
-	);
+	const detail = useFlowQuery(username, graphSlug, selectedKey ?? undefined);
 	// Every version of the drilled-in key, whatever the list is filtered by.
-	const sameKey = useTaskPlansQuery(username, graphSlug, {
+	const sameKey = useFlowsQuery(username, graphSlug, {
 		q: selectedKey ?? undefined,
 		limit: PAGE,
 	});
@@ -174,7 +165,7 @@ export function PlansSectionBody({
 				onOpenAgent={onOpenAgent}
 			/>
 		) : (
-			<TaskPlanDetailBlock
+			<FlowDetailBlock
 				username={username}
 				graphSlug={graphSlug}
 				workflow={detail.data}
@@ -250,7 +241,7 @@ export function PlansSectionBody({
 	);
 }
 
-function TaskPlanDetailBlock({
+function FlowDetailBlock({
 	username,
 	graphSlug,
 	workflow,
@@ -259,9 +250,9 @@ function TaskPlanDetailBlock({
 }: {
 	username: string;
 	graphSlug: string;
-	workflow: TaskPlanDetail;
+	workflow: FlowDetail;
 	/** Every version of this key the library lists. */
-	versions: TaskPlanSummary[];
+	versions: FlowSummary[];
 	onOpenAgent?: (id: string) => void;
 }) {
 	// A short *does this work?* over the page's default window; the page's
@@ -325,7 +316,7 @@ function TaskPlanDetailBlock({
 					</PropertyRow>
 					<PropertyRow label="tasks">
 						{workflow.nodes.length} ·{" "}
-						{`${callables} callable${callables === 1 ? "" : "s"}`}
+						{`${callables} function${callables === 1 ? "" : "s"}`}
 						{human ? `, ${human} human` : ""}
 					</PropertyRow>
 					{/* The bands it will engage, as chips. The spine is not one: the
@@ -428,7 +419,7 @@ function PlanVersions({
 }: {
 	username: string;
 	graphSlug: string;
-	versions: TaskPlanSummary[];
+	versions: FlowSummary[];
 	current: number;
 }) {
 	const ordered = [...versions].sort((a, b) => b.version - a.version);
@@ -458,7 +449,7 @@ function PlanVersionRow({
 }: {
 	username: string;
 	graphSlug: string;
-	version: TaskPlanSummary;
+	version: FlowSummary;
 	current: boolean;
 }) {
 	const diff = usePlanDiffQuery(
@@ -499,8 +490,8 @@ function PlanCallers({
 	callers,
 	args,
 }: {
-	callers: TaskPlanCaller[];
-	args: TaskPlanDetail["args_schema"];
+	callers: FlowCaller[];
+	args: FlowDetail["args_schema"];
 }) {
 	const declared = Object.keys(args ?? {});
 	return (
@@ -556,7 +547,7 @@ function PlanCallers({
  * cost me* is the question a person scans a library with — and a row that
  * answered it only after a click would make the list a set of names.
  */
-function PlanRowLines({ workflow }: { workflow: TaskPlanSummary }) {
+function PlanRowLines({ workflow }: { workflow: FlowSummary }) {
 	return (
 		<span className="flex min-w-0 flex-1 flex-col gap-1">
 			<span className="truncate">
@@ -600,8 +591,8 @@ function StepDetail({
 	workflow,
 	onOpenAgent,
 }: {
-	step: TaskPlanDagNode;
-	workflow: TaskPlanDetail;
+	step: FlowDagNode;
+	workflow: FlowDetail;
 	onOpenAgent?: (id: string) => void;
 }) {
 	const requiredBy = workflow.edges.filter(

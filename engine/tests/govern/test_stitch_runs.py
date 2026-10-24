@@ -60,10 +60,10 @@ async def test_a_commit_opens_the_stitch_commit_plan_with_the_guardrails_frozen(
     run = await open_stitch_commit_run(session, graph=graph, actor_id=None)
 
     assert run.status == RunStatus.queued.value
-    assert run.workflow_key == "stitch-commit@1"
+    assert run.flow_key == "stitch-commit@1"
     assert run.lens_snapshot is not None
     nodes = await TaskRunQuerySet().nodes_of(session, run_id=run.id)
-    assert [n.task_key for n in nodes] == ["commit_stitches"]
+    assert [n.task_key for n in nodes] == ["graph.stitch.commit"]
 
 
 async def test_nothing_staged_never_starts_a_run(session: AsyncSession, graph: Graph) -> None:
@@ -84,9 +84,9 @@ async def test_removing_an_active_stitch_opens_the_withdraw_plan(session: AsyncS
 
     run = await open_stitch_withdraw_run(session, graph=graph, link_id=link.id, actor_id=None)
 
-    assert run.workflow_key == "stitch-withdraw@1"
+    assert run.flow_key == "stitch-withdraw@1"
     nodes = await TaskRunQuerySet().nodes_of(session, run_id=run.id)
-    assert [(n.task_key, (n.args or {}).get("link_id")) for n in nodes] == [("withdraw_stitch", link.id)]
+    assert [(n.task_key, (n.args or {}).get("link_id")) for n in nodes] == [("graph.stitch.withdraw", link.id)]
 
 
 async def test_a_guardrail_denying_its_model_keeps_the_rule_and_its_edges(
@@ -115,9 +115,9 @@ async def test_a_preview_is_a_run_whether_one_rule_or_every_stitch(session: Asyn
     one = await open_stitch_preview_run(session, graph=graph, actor_id=None, rule=rule)
     every = await open_stitch_preview_run(session, graph=graph, actor_id=None)
 
-    assert one.workflow_key == every.workflow_key == "stitch-preview@1"
+    assert one.flow_key == every.flow_key == "stitch-preview@1"
     assert one.lens_snapshot is not None
     [step] = await TaskRunQuerySet().nodes_of(session, run_id=one.id)
-    assert (step.task_key, step.args["rules"]) == ("preview_stitches", [rule])
+    assert (step.task_key, step.args["rules"]) == ("graph.stitch.preview", [rule])
     [step] = await TaskRunQuerySet().nodes_of(session, run_id=every.id)
     assert step.args["all_links"] is True

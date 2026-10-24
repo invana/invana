@@ -1,6 +1,6 @@
 """The tool plugins: loaded from their folders, honouring robots.txt, and reading only declared secrets.
 
-``web.fetch`` runs against a real HTTP server on localhost — a page, a
+``web.read_url`` runs against a real HTTP server on localhost — a page, a
 disallowed path and the robots.txt that disallows it.
 """
 
@@ -20,9 +20,9 @@ from invana.plugins.sdk.manifest import Bound, SideEffect
 from invana.runtime.models import TaskRun
 
 KEYS = {
-    "invana.tools.web": {"web.search", "web.fetch", "web.download_and_extract"},
+    "invana.tools.web": {"web.search", "web.read_url", "web.download_file"},
     "invana.tools.mail": {"mail.read", "mail.send"},
-    "invana.tools.science": {"pubmed.search", "uniprot.get", "pubchem.get"},
+    "invana.tools.science": {"science.pubmed.search", "science.uniprot.get", "science.pubchem.get"},
 }
 
 PAGE = (
@@ -75,7 +75,7 @@ def test_the_three_tool_plugins_load_with_their_task_types_and_skill() -> None:
         assert all(t.bound is Bound.network for t in plugin.tasks)
     assert registry.task("mail.send").side_effect is SideEffect.send
     assert registry.task("mail.send").retries == 0
-    assert registry.task("web.download_and_extract").timeout_s == 120
+    assert registry.task("web.download_file").timeout_s == 120
     assert registry.plugins["invana.tools.web"].manifest.secrets == ("web_search",)
     (skill,) = registry.plugins["invana.tools.web"].skills
     assert skill.slug == "collect-dataset" and skill.name == "Collect a dataset from the web"
@@ -83,7 +83,7 @@ def test_the_three_tool_plugins_load_with_their_task_types_and_skill() -> None:
 
 
 async def test_web_fetch_reads_an_allowed_page_and_refuses_a_disallowed_one(site: str) -> None:
-    fetch = load_plugins().task("web.fetch").run
+    fetch = load_plugins().task("web.read_url").run
     ctx = _ctx({"url": f"{site}/page"})
 
     out = await fetch(ctx, None)

@@ -9,11 +9,7 @@
 
 import type { BoardSpec, PanelSpec } from "@invana/boards";
 import type { PlanArg } from "../../skills/types";
-import type {
-	PlanVersionDiff,
-	TaskPlanCaller,
-	TaskPlanSummary,
-} from "../types";
+import type { FlowCaller, FlowSummary, PlanVersionDiff } from "../types";
 
 export const RECORD_ACTIONS = {
 	/** The crumb naming the plan — back to its page. */
@@ -34,7 +30,7 @@ const shown = (v: unknown): string =>
 
 // ── Versions ──────────────────────────────────────────────────────────────────
 
-const fared = (v: TaskPlanSummary) =>
+const fared = (v: FlowSummary) =>
 	v.runs
 		? `${v.runs.toLocaleString()} run${v.runs === 1 ? "" : "s"}${
 				v.served_rate == null
@@ -93,7 +89,7 @@ function diffRows(diff: PlanVersionDiff) {
 
 export function planVersionsSpec(
 	ref: string,
-	versions: TaskPlanSummary[],
+	versions: FlowSummary[],
 	diffs: Map<number, PlanVersionDiff>,
 	picked: number,
 ): BoardSpec {
@@ -174,7 +170,7 @@ export function planVersionsSpec(
 export function planArgumentsSpec(
 	ref: string,
 	declared: Record<string, PlanArg>,
-	callers: TaskPlanCaller[],
+	callers: FlowCaller[],
 ): BoardSpec {
 	const names = Object.keys(declared);
 	const defaults = Object.fromEntries(

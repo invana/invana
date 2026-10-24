@@ -31,6 +31,8 @@ from invana.apps.datasets.models import (  # noqa: F401
     DatasetStandard,
     DatasetVersion,
 )
+from invana.apps.flows.models import Flow  # noqa: F401
+from invana.apps.flows.models import Task as PlanTask  # noqa: F401
 from invana.apps.graphs.models import (  # noqa: F401
     Graph,
     GraphConnection,
@@ -46,8 +48,6 @@ from invana.apps.skills.models import (
     SkillVersion,  # noqa: F401
 )
 from invana.apps.standards.models import Standard, StandardVersion  # noqa: F401
-from invana.apps.task_plans.models import Task as PlanTask  # noqa: F401
-from invana.apps.task_plans.models import TaskPlan  # noqa: F401
 from invana.apps.work.models import (  # noqa: F401
     Project,
     ProjectAssignment,

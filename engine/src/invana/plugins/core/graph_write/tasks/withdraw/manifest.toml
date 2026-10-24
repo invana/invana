@@ -1,0 +1,13 @@
+key = "graph.stitch.withdraw"
+version = "1.0.0"
+summary = "Delete the edges one active stitch wrote, then remove the rule."
+bound = "graph_write"
+side_effect = "write"
+requires = []
+resources = ["cpu"]
+
+[args]
+link_id = { type = "str", required = true }
+
+[outputs]
+withdrawn = "int"

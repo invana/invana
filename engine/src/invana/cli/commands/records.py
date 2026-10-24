@@ -141,8 +141,8 @@ async def _run_import(
     that takes minutes still moves on screen (LD17), and turn the outcome into
     an exit code a scheduler can branch on.
     """
+    from invana.apps.flows.models import Task as PlanTask  # noqa: F401
     from invana.apps.graphs.pool import GraphConnectionManager
-    from invana.apps.task_plans.models import Task as PlanTask  # noqa: F401
     from invana.core.settings import settings
     from invana.runtime import services as run_services
     from invana.runtime.interpreter import TaskRuntime
@@ -195,8 +195,8 @@ async def _run_import(
         async with session_factory() as session:
             root = await session.get(TaskRun, run_id)
             nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
-            outcome = next((n.output or {} for n in nodes if n.task_key == "snapshot_model"), {})
-            written = next((n.output or {} for n in nodes if n.task_key == "write_graph"), {})
+            outcome = next((n.output or {} for n in nodes if n.task_key == "data.snapshot"), {})
+            written = next((n.output or {} for n in nodes if n.task_key == "graph.write.records"), {})
             status = root.status
             errors = int(outcome.get("reported") or 0)
             groups = outcome.get("groups") or []

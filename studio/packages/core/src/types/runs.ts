@@ -83,7 +83,7 @@ export interface RunView {
 	id: string;
 	sessionId: string;
 	messageId: string;
-	workflow?: string;
+	flow?: string;
 	status: RunStatus;
 	steps: RunNode[];
 	/** The run's tokens so far, as the engine summed them on the last finished step. */
@@ -159,7 +159,7 @@ export interface OfferedRule {
  */
 export interface TaskRunSummary {
 	id: string;
-	workflow_key: string;
+	flow_key: string;
 	status: string;
 	/** What kind of work — `nl` · `ql` · `canvas` · `import` · `bulk` · `stitch`. Null on a child run. */
 	kind: string | null;

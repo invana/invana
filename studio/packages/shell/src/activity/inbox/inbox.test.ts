@@ -13,7 +13,7 @@ function run(
 ): TaskRunSummary {
 	return {
 		id,
-		workflow_key: "ask",
+		flow_key: "ask",
 		status,
 		kind: "ql",
 		body: id,

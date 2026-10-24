@@ -103,7 +103,7 @@ flowchart TD
 
 | Not building | Because |
 |---|---|
-| A schedule naming a skill or a TaskPlan | it carries instructions; the plan generated from them is [6.5](../../skills/features/instructions-publish-rollback.md)'s, and a schedule's instructions are stored here until 6.5 reads them |
+| A schedule naming a skill or a Flow | it carries instructions; the plan generated from them is [6.5](../../skills/features/instructions-publish-rollback.md)'s, and a schedule's instructions are stored here until 6.5 reads them |
 | Overlap `queue` | `skip` or `allow`; a queue of firings is a backlog nobody asked for |
 | `run_all` beyond 24 | a day of hourly firings is the most a recovery replays |
 | Calendar-aware scheduling | cron plus a zone and a missed-firing policy is enough |

@@ -1,4 +1,4 @@
-"""The ``spawn_agent`` task type; ``manifest.toml`` beside this file declares it."""
+"""The ``work.spawn_agent`` task type; ``manifest.toml`` beside this file declares it."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from invana.plugins.sdk.context import Out, RunVars, TaskContext
 from invana.plugins.sdk.errors import TaskFailure
 
 
-async def spawn_agent(ctx: TaskContext, v: RunVars) -> Out:
+async def work_spawn_agent(ctx: TaskContext, v: RunVars) -> Out:
     """Create a helper agent under this agent's ceiling.
 
     Nothing about this step trusts the model: the name and the brief come from
@@ -45,4 +45,4 @@ async def spawn_agent(ctx: TaskContext, v: RunVars) -> Out:
     )
 
 
-run = spawn_agent
+run = work_spawn_agent

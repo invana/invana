@@ -1,4 +1,4 @@
-key = "delegate"
+key = "work.delegate"
 version = "1.0.0"
 summary = "Open a run under a child agent and wait for it."
 bound = "work_write"

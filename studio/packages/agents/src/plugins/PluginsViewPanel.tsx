@@ -93,7 +93,7 @@ export function PluginsViewPanel({ username, graphSlug, onOpenPlugin }: Props) {
 						{entryKey ? <StatusCrumb active>{entryKey}</StatusCrumb> : null}
 					</>
 				}
-				right="a plugin brings the task types a plan is written in"
+				right="a plugin brings the functions a plan is written in"
 			/>
 		</div>
 	);

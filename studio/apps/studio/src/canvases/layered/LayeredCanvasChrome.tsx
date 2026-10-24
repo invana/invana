@@ -17,7 +17,7 @@ import {
 	EVERY_AGENT,
 	useAgentLineageQuery,
 	useAgentsQuery,
-	useTaskPlanQuery,
+	useFlowQuery,
 } from "@invana-studio/agents";
 import { useProjectPlanQuery } from "@invana-studio/projects";
 import { CANVAS_KINDS } from "@invana-studio/shell";
@@ -44,7 +44,7 @@ function useSubject({ username, graphSlug, target }: Scope): {
 	title: string;
 	metrics: string[];
 } {
-	const workflow = useTaskPlanQuery(
+	const workflow = useFlowQuery(
 		username,
 		graphSlug,
 		target.kind === "workflow" ? target.workflowKey : undefined,

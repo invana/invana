@@ -4,7 +4,7 @@ A question becomes a run, the run becomes steps, and the steps produce things a 
 Everything here is grounded: an answer states only what the graph holds, and says so when it holds
 nothing.
 
-> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `TaskPlan` ·
+> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
 > [task-model-migration.md](../../building-engine/task-model-migration.md).
@@ -170,8 +170,8 @@ Hi-fi, at 1440×900, on the **Hi-fi · finance** page of the *Agents at Work Wir
 
 | # | Decision |
 |---|---|
-| AS1 | **Nothing in a chat reaches a provider, a database or the graph except through a TaskPlan.** A message that asks for something opens a TaskRun; the session records the thread ([orchestration § 4.2](../../orchestration.md#42-a-session-is-not-a-task)). There is no chat-only execution path, which is what makes an answer auditable and an envelope enforceable ([§ 4.1a](../../orchestration.md#41a-nothing-executes-outside-the-runtime)). |
-| AS2 | **Selection order is: a matched reusable plan · a generated plan.** Both are `TaskPlan` rows; `plan_origin` says which served. A reusable plan is packaged or promoted, never drawn by hand ([7.2](../workflows/features/plan-selection.md) · [6.5](../skills/features/instructions-publish-rollback.md#decisions) IS3) — promoting the plan that answered a question well ([7.4](../workflows/features/promote-a-plan.md)) is how it is answered well, permanently. |
+| AS1 | **Nothing in a chat reaches a provider, a database or the graph except through a Flow.** A message that asks for something opens a TaskRun; the session records the thread ([orchestration § 4.2](../../orchestration.md#42-a-session-is-not-a-task)). There is no chat-only execution path, which is what makes an answer auditable and an envelope enforceable ([§ 4.1a](../../orchestration.md#41a-nothing-executes-outside-the-runtime)). |
+| AS2 | **Selection order is: a matched reusable plan · a generated plan.** Both are `Flow` rows; `plan_origin` says which served. A reusable plan is packaged or promoted, never drawn by hand ([7.2](../workflows/features/plan-selection.md) · [6.5](../skills/features/instructions-publish-rollback.md#decisions) IS3) — promoting the plan that answered a question well ([7.4](../workflows/features/promote-a-plan.md)) is how it is answered well, permanently. |
 | AS3 | **Understanding is a bounded loop** ([clarifying-questions](features/clarifying-questions.md) CQ8–CQ10): several rounds of clarification are iterations of one run, and the thread shows one exchange. |
 | AS4 | **The session is not the unit of governance; the run is.** Budget, lens, envelope and approval all attach to the run — so two asks in one thread can be grounded differently and billed separately, and neither inherits the other's spend. |
 | AS5 | **A session carries the default bounds for its asks; the run still freezes them.** `sessions.lens_id` is the world every ask in the thread starts in (null = *Everything*, inside the guardrails) and `sessions.max_tokens_run` its tokens per run, capped by the agent's own `max_tokens_run`. One ask may narrow either for itself. At open, `freeze_lens` composes the ask's world — else the session's — with the agent's standing limits and every guardrail, and the tasks read only that frozen copy, so AS4 holds: two asks in one thread can still be grounded differently ([AG24](../agents/features/author-an-agent.md#decisions) · [AG25](../agents/features/author-an-agent.md#decisions)). |

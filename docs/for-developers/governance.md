@@ -14,7 +14,7 @@ it is not kept. This file is then deleted.
 | | |
 |---|---|
 | Governs | [operate](modules/operate/spec.md) · [ask](modules/ask/spec.md) · [agents](modules/agents/spec.md) · [connect-and-model](modules/connect-and-model/spec.md) · [graph-connectors](modules/graph-connectors/spec.md) · [explore](modules/explore/spec.md) |
-| Depends on | [orchestration § 0](orchestration.md#0-the-records) — `Todo · TaskPlan · Task · TaskRun · Lens` |
+| Depends on | [orchestration § 0](orchestration.md#0-the-records) — `Todo · Flow · Task · TaskRun · Lens` |
 | Drawn in | the `Task Plan & Task Run` design canvas — `QueryPlan` · `QueryRun` artboards |
 | Slice | not assigned — this is design, not delivery |
 
@@ -926,7 +926,7 @@ The vertical axis inside a band is spent on participants, so a card's height car
 
 | Drawing | The llm band's rows are | The card badges |
 |---|---|---|
-| `task_plan` | **roles** — `extract` · `decide` · `judge`, which is what a plan names | nothing; the cast has not resolved yet |
+| `flow` | **roles** — `extract` · `decide` · `judge`, which is what a plan names | nothing; the cast has not resolved yet |
 | `task_run` | **models** — `haiku-4.5` · `opus-5`, which is what resolved | the **role**, which the row does not carry |
 
 This is [§11](#11-plan-and-run-are-two-drawings)'s *plan names roles, a run names what resolved them*,
@@ -986,7 +986,7 @@ what the next one may do.
 
 ## 11. Plan and run are two drawings
 
-| Aspect | `task_plan` | `task_run` |
+| Aspect | `flow` | `task_run` |
 |---|---|---|
 | Answers | what will happen, and under what rules | what did happen, and when |
 | Ground | cool grid paper — reads as a document | warm plain — reads as a live surface |

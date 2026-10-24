@@ -27,7 +27,7 @@ async def _run_with_one_step(session, graph, user) -> tuple[TaskRun, TaskRun]:
         author_id=user.id,
         ask_kind="ql",
         body=QUERY,
-        workflow_key="ql-query",
+        flow_key="ql-query",
         status="running",
     )
     session.add(run)
@@ -35,7 +35,7 @@ async def _run_with_one_step(session, graph, user) -> tuple[TaskRun, TaskRun]:
     step = TaskRun(
         graph_id=graph.id,
         parent_run_id=run.id,
-        task_key="execute_graph_query",
+        task_key="graph.read.query",
         label="Run",
         attempt=2,
         status="running",
@@ -48,7 +48,7 @@ async def _run_with_one_step(session, graph, user) -> tuple[TaskRun, TaskRun]:
 class TestEnvelope:
     async def test_an_envelope_crosses_the_wire_and_keeps_its_idempotency_key(self):
         env = TaskEnvelope(
-            run_id="r", node_id="n", attempt=1, plugin="invana.core.graph_read@0.0.0", task="execute_graph_query@1.0.0"
+            run_id="r", node_id="n", attempt=1, plugin="invana.core.graph_read@0.0.0", task="graph.read.query@1.0.0"
         )
 
         redelivered = TaskEnvelope.from_json(env.to_json())
@@ -72,7 +72,7 @@ class TestEnvelope:
             node_id=step.id,
             attempt=step.attempt,
             plugin="invana.core.graph_read@0.0.0",
-            task="execute_graph_query@1.0.0",
+            task="graph.read.query@1.0.0",
             args={"query": QUERY},
         ).to_json()
         runtime = TaskRuntime(session_factory=session_factory, manager=object(), encryption_key="x")
@@ -87,7 +87,7 @@ class TestEnvelope:
 
     async def test_a_task_version_the_worker_does_not_carry_is_refused(self, session_factory):
         runtime = TaskRuntime(session_factory=session_factory, manager=object(), encryption_key="x")
-        env = TaskEnvelope(run_id="missing", node_id="missing", attempt=1, plugin="", task="execute_graph_query@9.9.9")
+        env = TaskEnvelope(run_id="missing", node_id="missing", attempt=1, plugin="", task="graph.read.query@9.9.9")
 
         with pytest.raises(TaskFailure) as err:
             await run_envelope(env, contexts=RebuiltContexts(runtime))

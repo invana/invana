@@ -2,7 +2,7 @@
 
 Exercises the load-bearing by-name diff + ordering of ``reconcile_proposal``
 against a real draft version, and the referential-integrity pre-check
-(``validate_proposal``) that guards a mutation. The LLM round-trip is covered
+(``model.validate_proposal``) that guards a mutation. The LLM round-trip is covered
 separately (Ollama-gated) in ``tests/llm/test_propose.py``.
 """
 

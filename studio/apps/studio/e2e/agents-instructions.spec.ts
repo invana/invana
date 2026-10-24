@@ -110,7 +110,7 @@ test("AG-11 a plan with no replanned run says so", async ({ page }) => {
 	});
 });
 
-test("AG-13 Plugins lists the registry; a plugin and a task type open", async ({
+test("AG-13 Plugins lists the registry; a plugin and a function open", async ({
 	page,
 }) => {
 	const registry = await api<{ items: { name: string; task_types: number }[] }>(
@@ -120,14 +120,14 @@ test("AG-13 Plugins lists the registry; a plugin and a task type open", async ({
 	const core = registry?.items.find(
 		(p) => p.name.startsWith("invana.core.") && p.task_types > 0,
 	);
-	expect(core, "a core plugin with task types").toBeTruthy();
+	expect(core, "a core plugin with functions").toBeTruthy();
 	const name = (core as { name: string }).name;
 
 	await page.goto(`${AGENTS}/plugins`);
 	await page.getByRole("button", { name: new RegExp(`^${name}`) }).click({
 		timeout: 30_000,
 	});
-	await expect(page.getByText("Task types", { exact: true })).toBeVisible({
+	await expect(page.getByText("Functions", { exact: true })).toBeVisible({
 		timeout: 15_000,
 	});
 	await page.getByRole("row").nth(1).click();

@@ -27,7 +27,7 @@ _NOW = datetime(2026, 10, 19, 12, 0, tzinfo=UTC)
 def _run(graph: Graph, queued: datetime, **kwargs) -> TaskRun:
     return TaskRun(
         graph_id=graph.id,
-        workflow_key="nl-single",
+        flow_key="nl-single",
         ask_kind="nl",
         queued_at=queued,
         started_at=queued,

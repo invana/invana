@@ -30,7 +30,7 @@ export default defineConfig({
 				"packages/shell/src/activity/runs/rerun/rerunChoice.ts",
 				"packages/explorer/src/share/shareAnswer.ts",
 				"packages/agents/src/agents/agentDraft.ts",
-				"packages/agents/src/plans/taskFlowFromTaskPlan.ts",
+				"packages/agents/src/plans/flowFromRows.ts",
 				"packages/agents/src/skills/taskFlowFromPlan.ts",
 				"packages/projects/src/impact/reach.ts",
 			],

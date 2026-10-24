@@ -40,7 +40,7 @@ async def test_the_graph_is_seeded_with_the_playbook_the_product_runs(session: A
 
     skill = await skills.get(session, skill_id=builtin.id, graph_id=graph.id)
     plan = await drafts.plan_read(session, version=skill.current_version)
-    understand = next(n for n in plan.nodes if n.task == "translate_thought")
+    understand = next(n for n in plan.nodes if n.task == "nl.translate")
     assert understand.layer == "llm"
     assert "turn it into a query" in (understand.source_span or "")
     # Every node names the sentence it was drawn from (C11) — and "Be concise."
@@ -108,9 +108,9 @@ async def test_a_published_version_cannot_be_edited_and_a_builtin_cannot_be_dele
     assert v2.plan_id != v1.plan_id
     plan = await drafts.plan_read(session, version=v2)
     assert [n.task for n in plan.nodes] == [
-        "translate_thought",
-        "validate_query",
-        "execute_graph_query",
-        "shape_for_canvas",
-        "verify_result",
+        "nl.translate",
+        "graph.read.validate",
+        "graph.read.query",
+        "answer.shape",
+        "plan.verify",
     ]

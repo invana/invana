@@ -192,7 +192,7 @@ the engine shapes that have to exist before any of it can be built.
 > dispatch, which is also where `tasks.map_over` and `tasks.max_parallel` stop being columns
 > `steps_of` emits and `PlanStep` drops.
 >
-> **The provider split landed, as migration `53`.** Slot `52` was taken by Skills' `task_plans.uses`
+> **The provider split landed, as migration `53`.** Slot `52` was taken by Skills' `flows.uses`
 > while this waited on its § 8 sign-offs, which is what *everything additive lands first* is for: an
 > unrelated module shipped through the queue the split was holding. `llm_providers` now holds a
 > `name` that **is** the address segment and `llm_models` holds what each endpoint offers; the
@@ -261,7 +261,7 @@ This file is the design record the implementation is reviewed against —
 | Draws | [14.1 Worlds](../modules/govern/features/worlds.md) · [14.2 Guardrails](../modules/govern/features/guardrails.md) · [5.1–5.7 Agents](../modules/agents/spec.md) |
 | Slice | **S16** for Govern; it **reopens** 5.1 · 5.2 · 5.3 · 5.7 in [§5](../README.md#5--agents) |
 | Companion | [building-studio/govern-and-agents-panels.md](../building-studio/govern-and-agents-panels.md) — the same 16 artboards, read as components |
-| Migrations | `000000000049` · `50` · `51` · `53` **built**. `52` is Skills' `task_plans.uses`, landed while the split waited on its sign-offs |
+| Migrations | `000000000049` · `50` · `51` · `53` **built**. `52` is Skills' `flows.uses`, landed while the split waited on its sign-offs |
 
 ---
 
@@ -772,7 +772,7 @@ six months out needs.
 | `49` | `lenses` · `agents.lens_id` · `graph_members.can_edit_guardrails` (owner backfilled as first holder) | ✅ built. Purely additive |
 | `50` | `run_touches` | ✅ built |
 | `51` | `graph_versions.axes` · `graphs.pools` | ✅ built |
-| `52` | `task_plans.uses` · `tasks.source_plan_key` | ✅ built — Skills' work, not this pass's. The slot was taken while the split waited on its sign-offs |
+| `52` | `flows.uses` · `tasks.source_plan_key` | ✅ built — Skills' work, not this pass's. The slot was taken while the split waited on its sign-offs |
 | `53` | `llm_providers.name` · `llm_models` · backfill · seeded cast · **drop** `model_id` · `is_default` · `agents.llm_config_id` | ✅ built. Both directions are exercised against a scratch database by `tests/golden/test_provider_split.py` |
 | `77` | `sessions.max_tokens_run` — the token budget per run. `sessions.max_cost_usd_run` stays for one release and bounds nothing | ✅ built — [EB8](../modules/agents/features/envelope-and-budget.md#decisions) · EB14. Purely additive |
 | `54` | `agents.soul` · `soul_traits` · `effort` · `agents.lens_id` → an agent guardrail, then dropped · `sessions.lens_id` · `sessions.max_cost_usd_run` · rename `workflow_spec` → `envelope` · `templates` → `plans` · `policy` spawn keys → a pin | 🔵 — 5.8 · EB9 · EB10 · DG11. `effort` is backfilled from `workflow_spec` then `budget`; the down path copies every key back |
@@ -791,7 +791,7 @@ pre-split rows, migrates up, grows a second model, comes back down and reads wha
 no confirm to gate it on: `invana migrate` goes to head and there is no *down* verb, so the only way
 back is `alembic downgrade` run by hand against a database somebody already decided to move.
 
-**The slot number is not the order.** `52` is Skills' `task_plans.uses`, landed while the split
+**The slot number is not the order.** `52` is Skills' `flows.uses`, landed while the split
 was still gated on §8 — which is exactly what *everything additive lands first* buys: an
 unrelated module shipped through the queue the split was holding.
 

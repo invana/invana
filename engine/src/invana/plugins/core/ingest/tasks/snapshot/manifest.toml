@@ -1,0 +1,17 @@
+key = "data.snapshot"
+version = "1.0.0"
+summary = "Record the model version a load was checked against, and what landed."
+bound = "ingest"
+side_effect = "write"
+requires = ["graph.write.records"]
+resources = ["cpu"]
+
+[args]
+model = { type = "str" }
+
+[outputs]
+model_id = "str"
+version_id = "str"
+version = "int"
+reported = "int"
+groups = "list"

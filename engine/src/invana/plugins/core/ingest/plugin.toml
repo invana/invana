@@ -2,5 +2,5 @@ name = "invana.core.ingest"
 kind = "core"
 engine = "*"
 secrets = []
-tasks = ["check_bundle", "snapshot_model", "validate_records"]
+tasks = ["data.bundle.check", "data.snapshot", "data.records.validate"]
 flows = ["model-import", "bulk-load"]

@@ -1,8 +1,8 @@
-"""The envelope, and the validator that keeps a planned workflow inside it.
+"""The envelope, and the validator that keeps a planned flow inside it.
 
-docs/for-developers/modules/ask/spec.md **D2** rejected workflow-as-code because a spec drives dispatch. A plan
+docs/for-developers/modules/ask/spec.md rejected flow-as-code because a spec drives dispatch. A plan
 the *model* writes is authored too — by the model — so it stays safe the same
-way D2's ``plan`` task does: **the model proposes, the interpreter disposes**
+way the ``plan`` task does: **the model proposes, the interpreter disposes**
 (docs/for-developers/modules/agents/spec.md).
 
 Two documents, one grammar:
@@ -10,7 +10,7 @@ Two documents, one grammar:
 ``Envelope``
     ``agents.workflow_spec`` — set by the agent's author. Names the tasks any
     plan may contain (``allow``), the args no plan may rebind (``pins``) and the
-    library workflows a *Plan* step may select (``templates``). The effort
+    reusable flows a *Plan* step may select (``templates``). The effort
     ceilings are ``agents.effort``, handed in. **It does not name preconditions**: a step's ``requires`` is
     declared on its catalogue entry, so the planner reads it while drafting
     instead of being refused and redrafting
@@ -134,7 +134,7 @@ class Envelope:
 
     allow: frozenset[str]
     # Args the envelope fixes. A plan may not rebind these — ``read_only: true``
-    # on ``execute_graph_query`` is the one that matters, and it is why a data
+    # on ``graph.read.query`` is the one that matters, and it is why a data
     # canvas can never be written from Studio.
     pins: dict[str, dict[str, Any]]
     templates: frozenset[str]

@@ -17,7 +17,7 @@ this says how the engine is, and what still has to move. Neither says what the p
 > **Scope.** This file is about **where code lives** — bands, packages, the import rule.
 > The **records** are migrating too, and that is a separate plan:
 > [task-model-migration.md](task-model-migration.md) — eight tables into
-> [orchestration § 0](../orchestration.md#0-the-records)'s Todo · TaskPlan · Task · TaskRun · Lens.
+> [orchestration § 0](../orchestration.md#0-the-records)'s Todo · Flow · Task · TaskRun · Lens.
 > The two are orthogonal and can proceed independently; where both touch a package, the record
 > migration's slice order wins.
 
@@ -290,7 +290,7 @@ it is scheduled last (§7).
 | `core/events/actions.py` | `apps/<app>/events.py`, one per app | 122 verbs + 19 target kinds for 21 subjects, in one `core` file. A feature must ship without touching `core` |
 | — | `core/events/registry.py` | new · subject descriptors, populated by `server/` at startup. **Registration, not import** — core may not reach an app |
 | — | `activity/notifications` | new · the inbox and its delivery. Replaces the planned `core/alerting` |
-| `canvases` · `explorer` · `datasets` · `sessions` · `skills` · `agents` · `task_plans` | `apps/…` | already at the right band; they gain a path segment and lose nothing |
+| `canvases` · `explorer` · `datasets` · `sessions` · `skills` · `agents` · `flows` | `apps/…` | already at the right band; they gain a path segment and lose nothing |
 | `llm_providers/` | `apps/llm_providers`, then folded into `apps/llm` at §7 step 6 | one calls a model, the other stores the endpoint. One app — but `llm/providers/` is already the four provider *clients*, so which half keeps the name is the merge's decision, not the move's |
 | `projects/` | `apps/projects`, then folded into `apps/work` at §7 step 6 | they import each other and hold the same idea |
 | `run/` | `runtime/`, split into seven parts | [13.8 §2](../modules/platform/features/runtime.md) |
@@ -909,7 +909,7 @@ The target names — one per module, shared with Studio — are [module-structur
 | `apps/datasets` | [Bring data in §2](../README.md#2--bring-data-in) | 2 |
 | `apps/sessions` | [Ask §3](../README.md#3--ask) | 2 |
 | `apps/agents` · `apps/skills` | [Agents §5](../README.md#5--agents) · [Skills §6](../README.md#6--skills) | 2 |
-| `apps/task_plans` | [Workflows §7](../README.md#7--workflows) | 2 |
+| `apps/flows` | [Workflows §7](../README.md#7--workflows) | 2 |
 | `apps/work` | [Work §9](../README.md#9--work) | 2 |
 | `activity/` | [Audit and activity 10.2](../modules/operate/features/audit-and-activity.md) — the **reader**. `core/events` is the record | 4 |
 | `activity/notifications` | Notifications — the inbox, its rules and its delivery. **Blocked**: no index row, no feature file | 4 |
@@ -1188,7 +1188,7 @@ describes it as shipped behaviour. Either the feature file is ahead of the code,
 | `runtime` | 14 | 12 | → its managers |
 | `apps/work` | 13 | 11 | → its managers |
 | `core/auth` | 13 | 10 | → `core/auth/managers` |
-| `apps/agents` · `llm_providers` · `projects` · `canvases` · `sessions` · `skills` · `datasets` · `explorer` · `task_plans` | 1–6 each | — | → their managers |
+| `apps/agents` · `llm_providers` · `projects` · `canvases` · `sessions` · `skills` · `datasets` · `explorer` · `flows` | 1–6 each | — | → their managers |
 | `cli/commands` | 4 | 3 | → managers, called by the CLI |
 
 ### 13.4 Activity is above `runtime`, not beside it — and that is measured
@@ -1202,7 +1202,7 @@ is an upward import — illegal by [code-shape §4](#3-the-rule).** It is not al
 |---|---|
 | `apps/sessions` | 4 — `routes.py` ×3, `schemas.py` |
 | `apps/work` | 3 — `services.py`, `routes.py`, `activity.py` |
-| `apps/task_plans` | 2 — `services.py`, `routes.py` |
+| `apps/flows` | 2 — `services.py`, `routes.py` |
 | `apps/agents` | 2 — `services.py` |
 | `apps/skills` · `apps/datasets` | 1 each |
 
@@ -1232,7 +1232,7 @@ moves every route file to `server/` — band 4, which may import anything.
 |---|---|---|
 | `work` | 3 | `routes.py` → `server` · `activity.py` → the new band · `services.py` → `RunOpener` ([code-shape §4.1](#31-breaking-the-two-real-cycles)). **All three** |
 | `sessions` | 4 | 3 by `routes.py` → `server`; `schemas.py` composes a runtime schema and needs a decision |
-| `skills` · `task_plans` | 1 each in `routes.py` | `routes.py` → `server` |
+| `skills` · `flows` | 1 each in `routes.py` | `routes.py` → `server` |
 | `agents` | 2 | the retirement preview — a cross-app read, so the new band ([§9.2](#142-ranked) item 5) |
 | `datasets` | 1 | `run.py` genuinely writes runtime rows. Stays, or becomes a contract |
 
@@ -1407,7 +1407,7 @@ or a behaviour.
 | 4 | `runtime` | 8 models, **no store, ≈36 leaked sites**. Biggest single win | large |
 | 5 | `apps/modeller` | split `ModelStore` 45 → eleven | large |
 | 6 | `core/auth` · `core/events` | per §7.3 | medium |
-| 7 | the rest | `agents` · `sessions` · `graphs` · `datasets` · `llm` · `llm_providers` · `task_plans` · `explorer` | — |
+| 7 | the rest | `agents` · `sessions` · `graphs` · `datasets` · `llm` · `llm_providers` · `flows` · `explorer` | — |
 | 7b | the activity tree | carve out of `work` while converting it at step 3 (§9.1.1) — into `activity/`, band 4 | one file |
 | 7c | **`cli/commands`** | 4 files hold raw `select()` — `stitches.py` · `loader.py` · `datasets.py` · `models.py` — and emit events directly. Band 5, so it gets the view rule: parse, call one manager, print ([code-shape §5.1](#41-the-two-guarantees)) | medium — `stitches.py` reaches 10 packages |
 | 7d | `server/admin` | **not an exemption.** `views.py` holds no query — 39 `ModelView` declarations and 9 permission methods. Three fixes: `auth.py:54`'s `select(User)` → `core/auth/querysets/user.py`; the 39 declarations → `server/<module>/admin.py`, beside the code they describe; `server/admin/` keeps only the mount, the sections, the auth provider and the templates | small, and it resolves `views.py` meaning two things |

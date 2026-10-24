@@ -3,10 +3,10 @@ import { ErrorBoundary } from "@invana/ui";
 import {
 	AgentsSettingsViewPanel,
 	AgentsViewPanel,
+	flowsApi,
 	LibraryViewPanel,
 	PluginsViewPanel,
 	SkillsViewPanel,
-	taskPlansApi,
 } from "@invana-studio/agents";
 import type { useSessions } from "@invana-studio/assistant";
 import type { LensKind, QueryResultItem } from "@invana-studio/core";
@@ -144,7 +144,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 				openAgentPage(id);
 			}}
 			planExportUrl={(key) =>
-				taskPlansApi.exportUrl(username as string, graphSlug as string, key)
+				flowsApi.exportUrl(username as string, graphSlug as string, key)
 			}
 		/>
 	) : settingsPanel.section === "skills" ? (

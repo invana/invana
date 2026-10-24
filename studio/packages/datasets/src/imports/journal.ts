@@ -59,7 +59,7 @@ export function mergeImports(
 			seen.set(key, {
 				id: run.id,
 				kind: run.kind,
-				title: run.body?.trim() || run.workflow_key,
+				title: run.body?.trim() || run.flow_key,
 				status: run.status,
 				queuedAt: run.queued_at,
 				graph,

@@ -97,8 +97,8 @@ async def _open(
         ask_kind="canvas",
         body=body,
         params=args,
-        workflow_key=selected.ref,
-        task_plan_id=selected.plan_id,
+        flow_key=selected.ref,
+        flow_id=selected.plan_id,
         plan_origin=f"template:{selected.ref}",
         triggered_by=trigger.value,
         on_behalf_of_user_id=actor_id,
@@ -196,7 +196,7 @@ async def expand(
     """Expand one node as a run, and answer with what it read (GC6 · GC12 · GC13)."""
     sess = await _explore.owned_session(db, graph=graph, actor_id=actor_id, session_id=req.session_id)
     run = await open_expand_run(db, graph=graph, actor_id=actor_id, req=req, sess=sess)
-    out = await _settle(db, runtime, run, task_key="expand_neighbours", what="expand")
+    out = await _settle(db, runtime, run, task_key="graph.read.get_neighbors", what="expand")
     data = GraphResponse(
         nodes=[Vertex.model_validate(n) for n in out.get("nodes") or []],
         edges=[Edge.model_validate(e) for e in out.get("edges") or []],
@@ -232,7 +232,7 @@ async def count_types(
         trigger=TriggeredBy.canvas,
         lens_id=lens_id,
     )
-    out = await _settle(db, runtime, run, task_key="count_types", what="count")
+    out = await _settle(db, runtime, run, task_key="graph.read.types_count", what="count")
     nodes = [TypeCount.model_validate(t) for t in out.get("node_types") or []]
     edges = [TypeCount.model_validate(t) for t in out.get("edge_types") or []]
     counted = bool(out.get("counted", True))
@@ -273,7 +273,7 @@ async def resolve(
         trigger=TriggeredBy.system,
         lens_id=lens_id,
     )
-    out = await _settle(db, runtime, run, task_key="resolve_elements", what="resolve")
+    out = await _settle(db, runtime, run, task_key="graph.read.resolve", what="resolve")
     return ResolveElementsResponse(
         present=list(out.get("present") or []),
         missing=list(out.get("missing") or []),

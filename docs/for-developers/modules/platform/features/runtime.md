@@ -6,7 +6,7 @@ one run with one vocabulary, whether the plan came from a question, an import, a
 workflow.
 
 > ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records).** A plan is a
-> `TaskPlan`, its nodes are `Task` rows, and a run is a `TaskRun`. **The word *step* survives as a
+> `Flow`, its nodes are `Task` rows, and a run is a `TaskRun`. **The word *step* survives as a
 > role** — a Task in the position of a child, which is what the authoring format writes as `steps:`.
 > What used to be called a *Task* here is a **Todo**. Migration:
 > [task-model-migration.md](../../../building-engine/task-model-migration.md).
@@ -21,7 +21,7 @@ Two properties are not features of this module. They are what it is for:
 | | |
 |---|---|
 | Index | [13.8](../../../README.md#13--platform) · Slice **S15** |
-| Module | [Platform](../spec.md) — the workhorse layer, like [logging](logging.md) and [telemetry](telemetry.md). `todos` · `task_plans` · `tasks` · `task_runs` are owned elsewhere; the runtime is what walks them |
+| Module | [Platform](../spec.md) — the workhorse layer, like [logging](logging.md) and [telemetry](telemetry.md). `todos` · `flows` · `tasks` · `task_runs` are owned elsewhere; the runtime is what walks them |
 | API / CLI / Studio | 🟡 / — / — |
 | State | Built and shipped; this document is the shape it is being moved into. Its one user-facing half — deciding on an approval — is a row kind in [Review](../../work/features/review.md), and that Studio column is Review's |
 | Related | [runtime-and-adapters](../../ask/features/runtime-and-adapters.md) · [envelope-and-budget](../../agents/features/envelope-and-budget.md) · [plan-selection](../../workflows/features/plan-selection.md) · [clarifying-questions](../../ask/features/clarifying-questions.md) · [delegation](../../agents/features/delegation.md) · [review](../../work/features/review.md) · [projects-and-tasks](../../work/features/projects-and-tasks.md) · [schedules](../../operate/features/schedules.md) · [audit-and-activity](../../operate/features/audit-and-activity.md) · [observability](../../operate/features/observability.md) |
@@ -67,7 +67,7 @@ distributed one ([13.11](distributed-execution.md)); it is built the day a step 
 
 ```
 Todo                       what someone wants done · assignee · definition of done
-└── TaskPlan               the flow that carries it out · authored, generated or reused
+└── Flow               the flow that carries it out · authored, generated or reused
     └── TaskRun            one execution · plan_snapshot · lens_snapshot · agent · outcome
         ├── run of Task  translate    a callable from the catalogue
         ├── run of Task  execute      attempt 1 failed · attempt 2 succeeded — two rows, never one mutated
@@ -82,7 +82,7 @@ still writes `steps:`. What it never is, is a second record.
 | Rule | Detail |
 |---|---|
 | Assigning a Todo opens exactly one **root run** | `triggered_by = task`, `todo_id` set. A retry is a **new run**, never a mutated one |
-| A workflow is the **plan**, not a kind of run | A reusable `TaskPlan`, selected from the library by intent, recorded as `plan_origin = reused:<id>` |
+| A workflow is the **plan**, not a kind of run | A reusable `Flow`, selected from the library by intent, recorded as `plan_origin = reused:<id>` |
 | **A Task never becomes a Todo** | A Task that needs an owner is `form: human`, or raises a Todo in [Work](../../work/spec.md); that child is a Todo or a run of its own |
 | The plan that ran is frozen on the run | `plan_snapshot` — the trace replays even after the plan or the agent's envelope changes |
 | **So is the world it ran against** | `lens_snapshot` — the model versions and stitches it resolved ([orchestration § 0.9](../../../orchestration.md#09-grounding-a-run--the-lens)) |
@@ -155,7 +155,7 @@ steps:
 | Is a stage a Todo? | **No.** A Todo has a definition of done; a plan node has neither an owner beyond the run nor an acceptance, and nobody accepts a load. [Work W6](../../work/spec.md) already says this — this is the same rule at the ingestion altitude |
 | Where does the fan-out collection come from? | The bundle manifest. `stitches.json` names the datasets and the rules between them, so the declaration a person already writes is the collection the plan maps over |
 | How does it ask a person for something? | Two ways, and they are the two pauses of §10: `approval: required` on a node when it may not proceed alone, and a `form: human` Task when someone must go and *do* something. **A plan produces Todos; it is never made of them** |
-| How does it recur? | **One kind of schedule** — it names the TaskPlan and opens a run ([10.1 SC6](../../operate/features/schedules.md)). It raises no Todo nobody accepts, because the plan it names raises none |
+| How does it recur? | **One kind of schedule** — it names the Flow and opens a run ([10.1 SC6](../../operate/features/schedules.md)). It raises no Todo nobody accepts, because the plan it names raises none |
 | What holds the stages together as one thing? | The run. One run, one trace, one cost roll-up, one row in [Runs](../../operate/features/see-what-ran.md) with its lanes and its delegated children under it |
 
 **This is the flow the deferrals were waiting for.** §21 defers the frontier, lanes and `uses` until
@@ -729,7 +729,7 @@ files as artifacts, because unbounded content does not belong in a row and a TTL
 | `artifacts` | `id` (content hash) · `graph_id` · `run_id` · `kind` · `bytes` · `media_type` · `expires_at` |
 | `pools` | `graph_id` · `name` · `slots` |
 | `pool_waits` | which step waits on which pool, with its position — read, not stored twice |
-| `task_plans` gains | `max_concurrent_runs` |
+| `flows` gains | `max_concurrent_runs` |
 | Envelope gains | `requires_approval: [step_key]` · `max_concurrent_steps` · fan-out ceiling · run deadline · approval deadline · **verdict deadline and `max_iterations` ceiling** · threshold ceilings |
 | Catalogue entry gains | a declared input schema, and a default pool |
 | Signals | one returned enum, not seven exception types |
@@ -798,7 +798,7 @@ directions.
 | RP31 | **An interactive run is awaited, not queued.** `TaskRuntime.run_inline` runs a committed run inside the caller's request — same plan, lens, stream and trace as `submit`, and admission still happens inside, so a Graph at its ceiling queues it like any other. It is what a canvas expansion, a stitch commit and a stitch removal use, because a person is waiting on the answer. `TriggeredBy` carries `canvas` and `system` beside `user · schedule · task · delegation`, so the journal can keep interactive runs out of its default view ([GC7](../../explore/features/graph-canvas.md)). Under contention a `canvas` run waits with a `user` run's precedence — a person is waiting on both — and a `system` run with a schedule's. |
 | RP30a | **A plan produces Todos; it is never made of them.** A node that needs a person is either an `approval` on it or a `form: human` Task. Nobody accepts a load, so no node is a Todo. |
 | RP30b | The **bundle manifest is the fan-out collection.** `stitches.json` already names the datasets; `bundle-import@1` maps over them rather than asking for a second declaration. |
-| RP30c | A workflow recurs through **the one kind of schedule**, which names its TaskPlan. Whether a firing creates work a person accepts is a property of the plan, not of the schedule. |
+| RP30c | A workflow recurs through **the one kind of schedule**, which names its Flow. Whether a firing creates work a person accepts is a property of the plan, not of the schedule. |
 
 ## 21. How this lands
 

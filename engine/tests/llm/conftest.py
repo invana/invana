@@ -14,14 +14,14 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 # Every model whose table the FKs touch, so `create_all` builds them.
 from invana.apps.agents.models import Agent  # noqa: F401
 from invana.apps.boards.models import Board  # noqa: F401
+from invana.apps.flows.models import Flow  # noqa: F401
+from invana.apps.flows.models import Task as PlanTask  # noqa: F401
 from invana.apps.govern.models import Lens, RunTouch  # noqa: F401
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.llm_providers.models import LLMProvider  # noqa: F401
 from invana.apps.modeller.models import GraphModel  # noqa: F401
 from invana.apps.sessions.models import Session  # noqa: F401
 from invana.apps.skills.models import Skill  # noqa: F401
-from invana.apps.task_plans.models import Task as PlanTask  # noqa: F401
-from invana.apps.task_plans.models import TaskPlan  # noqa: F401
 from invana.apps.work.models import (
     Project,  # noqa: F401
     Task,  # noqa: F401

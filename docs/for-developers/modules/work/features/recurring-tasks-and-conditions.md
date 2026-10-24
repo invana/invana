@@ -4,7 +4,7 @@ A Todo template on a cron, and dependencies that fire on failure as well as succ
 happens every day opens itself, and the work that only matters when something breaks has a way to say
 so.
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `TaskPlan` ·
+> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
 > [task-model-migration.md](../../../building-engine/task-model-migration.md).

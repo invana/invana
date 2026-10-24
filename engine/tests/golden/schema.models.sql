@@ -486,6 +486,41 @@ CREATE INDEX ix_events_run_id_created_at ON events (run_id, created_at);
 
 CREATE INDEX ix_events_task_id_created_at ON events (task_id, created_at);
 
+CREATE TABLE flows (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	key VARCHAR(64), 
+	version INTEGER NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	origin VARCHAR(16) NOT NULL, 
+	intent JSON NOT NULL, 
+	todo_id VARCHAR(36), 
+	args_schema JSON NOT NULL, 
+	uses JSON NOT NULL, 
+	source_skill_version_ids JSON NOT NULL, 
+	reusable BOOLEAN NOT NULL, 
+	promoted_from_run_id VARCHAR(36), 
+	created_by_kind VARCHAR(16) NOT NULL, 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_flow_graph_key_version UNIQUE (graph_id, key, version), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(todo_id) REFERENCES todos (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_flows_graph_id ON flows (graph_id);
+
+CREATE INDEX ix_flows_kind ON flows (kind);
+
+CREATE INDEX ix_flows_origin ON flows (origin);
+
+CREATE INDEX ix_flows_reusable ON flows (reusable);
+
+CREATE INDEX ix_flows_todo_id ON flows (todo_id);
+
 CREATE TABLE graph_connections (
 	id VARCHAR(36) NOT NULL, 
 	graph_id VARCHAR(36), 
@@ -1412,7 +1447,7 @@ CREATE TABLE skill_versions (
 	CONSTRAINT uq_skill_version_number UNIQUE (skill_id, version), 
 	FOREIGN KEY(skill_id) REFERENCES skills (id) ON DELETE CASCADE, 
 	UNIQUE (plan_id), 
-	FOREIGN KEY(plan_id) REFERENCES task_plans (id) ON DELETE RESTRICT, 
+	FOREIGN KEY(plan_id) REFERENCES flows (id) ON DELETE RESTRICT, 
 	FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL
 );
 
@@ -1474,41 +1509,6 @@ CREATE INDEX ix_standards_origin ON standards (origin);
 
 CREATE INDEX ix_standards_publisher ON standards (publisher);
 
-CREATE TABLE task_plans (
-	id VARCHAR(36) NOT NULL, 
-	graph_id VARCHAR(36) NOT NULL, 
-	key VARCHAR(64), 
-	version INTEGER NOT NULL, 
-	name VARCHAR(255) NOT NULL, 
-	description TEXT NOT NULL, 
-	kind VARCHAR(16) NOT NULL, 
-	origin VARCHAR(16) NOT NULL, 
-	intent JSON NOT NULL, 
-	todo_id VARCHAR(36), 
-	args_schema JSON NOT NULL, 
-	uses JSON NOT NULL, 
-	source_skill_version_ids JSON NOT NULL, 
-	reusable BOOLEAN NOT NULL, 
-	promoted_from_run_id VARCHAR(36), 
-	created_by_kind VARCHAR(16) NOT NULL, 
-	created_by_id VARCHAR(36), 
-	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
-	PRIMARY KEY (id), 
-	CONSTRAINT uq_task_plan_graph_key_version UNIQUE (graph_id, key, version), 
-	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
-	FOREIGN KEY(todo_id) REFERENCES todos (id) ON DELETE CASCADE
-);
-
-CREATE INDEX ix_task_plans_graph_id ON task_plans (graph_id);
-
-CREATE INDEX ix_task_plans_kind ON task_plans (kind);
-
-CREATE INDEX ix_task_plans_origin ON task_plans (origin);
-
-CREATE INDEX ix_task_plans_reusable ON task_plans (reusable);
-
-CREATE INDEX ix_task_plans_todo_id ON task_plans (todo_id);
-
 CREATE TABLE task_prompts (
 	id VARCHAR(36) NOT NULL, 
 	run_id VARCHAR(36) NOT NULL, 
@@ -1532,7 +1532,7 @@ CREATE TABLE task_runs (
 	graph_id VARCHAR(36) NOT NULL, 
 	parent_run_id VARCHAR(36), 
 	todo_id VARCHAR(36), 
-	task_plan_id VARCHAR(36), 
+	flow_id VARCHAR(36), 
 	task_id VARCHAR(36), 
 	role VARCHAR(16) NOT NULL, 
 	task_key VARCHAR(64) NOT NULL, 
@@ -1542,7 +1542,7 @@ CREATE TABLE task_runs (
 	lane VARCHAR(64), 
 	iteration INTEGER NOT NULL, 
 	attempt INTEGER NOT NULL, 
-	workflow_key VARCHAR(64) NOT NULL, 
+	flow_key VARCHAR(64) NOT NULL, 
 	plan_snapshot JSON, 
 	plan_origin VARCHAR(64), 
 	plan_revision INTEGER NOT NULL, 
@@ -1600,7 +1600,7 @@ CREATE TABLE task_runs (
 	CONSTRAINT uq_task_run_attempt UNIQUE (parent_run_id, task_id, lane, iteration, attempt), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	FOREIGN KEY(parent_run_id) REFERENCES task_runs (id) ON DELETE CASCADE, 
-	FOREIGN KEY(task_plan_id) REFERENCES task_plans (id) ON DELETE SET NULL, 
+	FOREIGN KEY(flow_id) REFERENCES flows (id) ON DELETE SET NULL, 
 	FOREIGN KEY(task_id) REFERENCES tasks (id) ON DELETE SET NULL, 
 	FOREIGN KEY(session_id) REFERENCES sessions (id) ON DELETE CASCADE, 
 	FOREIGN KEY(message_id) REFERENCES session_messages (id) ON DELETE SET NULL, 
@@ -1615,6 +1615,8 @@ CREATE INDEX ix_task_runs_agent_started ON task_runs (agent_id, started_at);
 
 CREATE INDEX ix_task_runs_assistant_message_id ON task_runs (assistant_message_id);
 
+CREATE INDEX ix_task_runs_flow_id ON task_runs (flow_id);
+
 CREATE INDEX ix_task_runs_graph_id ON task_runs (graph_id);
 
 CREATE INDEX ix_task_runs_lens_id ON task_runs (lens_id);
@@ -1628,8 +1630,6 @@ CREATE INDEX ix_task_runs_session_id ON task_runs (session_id);
 CREATE INDEX ix_task_runs_status ON task_runs (status);
 
 CREATE INDEX ix_task_runs_task_id ON task_runs (task_id);
-
-CREATE INDEX ix_task_runs_task_plan_id ON task_runs (task_plan_id);
 
 CREATE INDEX ix_task_runs_todo_id ON task_runs (todo_id);
 
@@ -1650,7 +1650,7 @@ CREATE INDEX ix_task_stream_run_id ON task_stream (run_id);
 
 CREATE TABLE tasks (
 	id VARCHAR(36) NOT NULL, 
-	task_plan_id VARCHAR(36) NOT NULL, 
+	flow_id VARCHAR(36) NOT NULL, 
 	parent_id VARCHAR(36), 
 	ordinal INTEGER NOT NULL, 
 	key VARCHAR(64) NOT NULL, 
@@ -1677,16 +1677,16 @@ CREATE TABLE tasks (
 	source_step_key VARCHAR(64), 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
-	CONSTRAINT uq_task_plan_sibling_key UNIQUE (task_plan_id, parent_id, key), 
-	FOREIGN KEY(task_plan_id) REFERENCES task_plans (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_flow_sibling_key UNIQUE (flow_id, parent_id, key), 
+	FOREIGN KEY(flow_id) REFERENCES flows (id) ON DELETE CASCADE, 
 	FOREIGN KEY(parent_id) REFERENCES tasks (id) ON DELETE CASCADE
 );
+
+CREATE INDEX ix_tasks_flow_id ON tasks (flow_id);
 
 CREATE INDEX ix_tasks_parent_id ON tasks (parent_id);
 
 CREATE INDEX ix_tasks_step_key ON tasks (step_key);
-
-CREATE INDEX ix_tasks_task_plan_id ON tasks (task_plan_id);
 
 CREATE TABLE todo_dependencies (
 	id VARCHAR(36) NOT NULL, 

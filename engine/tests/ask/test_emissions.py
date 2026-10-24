@@ -43,7 +43,7 @@ async def scope(session):
     session.add(graph)
     await session.flush()
     # The ask is the run's own columns now — one row, not two.
-    run = TaskRun(graph_id=graph.id, ask_kind="nl", body="how many stocks?", workflow_key="nl-query")
+    run = TaskRun(graph_id=graph.id, ask_kind="nl", body="how many stocks?", flow_key="nl-query")
     session.add(run)
     await session.flush()
     await ensure_builtins(session)

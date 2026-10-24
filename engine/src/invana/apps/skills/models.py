@@ -135,7 +135,7 @@ class SkillVersion(Base):
     ``task_runs.skills_offered`` name a version and still resolve years later
     ([US3](docs/for-developers/modules/skills/features/usage.md)).
 
-    ``plan_id`` — one version, exactly one ``TaskPlan``
+    ``plan_id`` — one version, exactly one ``Flow``
     ([SK13](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
     It landed with M8 (building-engine/skills-draw-as-plans.md), added over a
     backfill and altered to ``NOT NULL`` in the same migration rather than left
@@ -179,11 +179,11 @@ class SkillVersion(Base):
     #: have a flow* ([SK22](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
     #:
     #: The column is a plain FK by table name: `apps/skills` imports nothing
-    #: from `apps/task_plans`, because `apps/task_plans` imports `apps/agents`
+    #: from `apps/flows`, because `apps/flows` imports `apps/agents`
     #: and `apps/agents` imports this package. The composition lives one band
     #: up, in `runtime/managers/skill_draft.py`.
     plan_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("task_plans.id", ondelete="RESTRICT"), nullable=False, unique=True
+        String(36), ForeignKey("flows.id", ondelete="RESTRICT"), nullable=False, unique=True
     )
 
     published_by_id: Mapped[str | None] = mapped_column(

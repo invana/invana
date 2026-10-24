@@ -7,6 +7,6 @@ title = "Science sources"
 engine = "*"
 extra = "tools-science"
 secrets = []
-tasks = ["pubmed.search", "uniprot.get", "pubchem.get"]
+tasks = ["science.pubmed.search", "science.uniprot.get", "science.pubchem.get"]
 flows = []
 skills = []

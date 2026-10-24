@@ -1,4 +1,4 @@
-"""The ``create_task`` task type; ``manifest.toml`` beside this file declares it."""
+"""The ``work.create_task`` task type; ``manifest.toml`` beside this file declares it."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from invana.plugins.sdk.context import Out, RunVars, TaskContext
 from invana.plugins.sdk.errors import TaskFailure
 
 
-async def create_task(ctx: TaskContext, v: RunVars) -> Out:
+async def work_create_task(ctx: TaskContext, v: RunVars) -> Out:
     """An agent writing down work for a child or for a human.
 
     Only inside a task-triggered run, and only as a **sub-task** of the
@@ -56,4 +56,4 @@ async def create_task(ctx: TaskContext, v: RunVars) -> Out:
     return Out(detail=f'sub-task "{child.title}"', output={"task_id": child.id})
 
 
-run = create_task
+run = work_create_task

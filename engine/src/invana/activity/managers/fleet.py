@@ -80,11 +80,11 @@ from invana.activity.schemas import (
 )
 from invana.apps.agents.models import Agent, AgentLifetime, AgentStatus
 from invana.apps.agents.querysets import AgentQuerySet
+from invana.apps.flows.models import Flow
+from invana.apps.flows.querysets import FlowQuerySet
 from invana.apps.skills.models import Skill, SkillVersion
 from invana.apps.skills.querysets.skill import SkillQuerySet
 from invana.apps.skills.querysets.skill_binding import SkillBindingQuerySet
-from invana.apps.task_plans.models import TaskPlan
-from invana.apps.task_plans.querysets import TaskPlanQuerySet
 from invana.core.errors import NotFoundError
 from invana.core.events import actions
 from invana.core.events.querysets import EventQuerySet
@@ -271,7 +271,7 @@ class _Fleet:
     agents: dict[str, Agent]
     skills: dict[str, Skill]
     versions: list[SkillVersion]
-    plans: dict[str, TaskPlan]
+    plans: dict[str, Flow]
     plan_of: dict[str, str]
     mints: list[_Mint]
 
@@ -327,7 +327,7 @@ class FleetManager:
     agents_qs = AgentQuerySet()
     skills_qs = SkillQuerySet()
     bindings_qs = SkillBindingQuerySet()
-    plans_qs = TaskPlanQuerySet()
+    plans_qs = FlowQuerySet()
     approvals_qs = ApprovalQuerySet()
     events_qs = EventQuerySet()
     evals_qs = EvalQuerySet()
@@ -733,20 +733,20 @@ class FleetManager:
 
     async def _plans(
         self, session: AsyncSession, graph_id: str, runs: list[TaskRun]
-    ) -> tuple[dict[str, TaskPlan], dict[str, str]]:
+    ) -> tuple[dict[str, Flow], dict[str, str]]:
         """``({ref: plan}, {run_id: ref})`` — a root's library plan, by the plan
         it ran, else by the ``template:<ref>`` it was run from. A generated
         one-off plan has no ref and is no plan here."""
-        plans: dict[str, TaskPlan] = {}
-        by_id: dict[str, TaskPlan | None] = {}
+        plans: dict[str, Flow] = {}
+        by_id: dict[str, Flow | None] = {}
         plan_of: dict[str, str] = {}
         for run in runs:
             plan = None
-            if run.task_plan_id:
-                if run.task_plan_id not in by_id:
-                    found = await self.plans_qs.get(session, run.task_plan_id)
-                    by_id[run.task_plan_id] = found if found is not None and found.key else None
-                plan = by_id[run.task_plan_id]
+            if run.flow_id:
+                if run.flow_id not in by_id:
+                    found = await self.plans_qs.get(session, run.flow_id)
+                    by_id[run.flow_id] = found if found is not None and found.key else None
+                plan = by_id[run.flow_id]
             if plan is None and (run.plan_origin or "").startswith("template:"):
                 ref = run.plan_origin.removeprefix("template:")
                 if ref not in plans:

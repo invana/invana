@@ -1,4 +1,4 @@
-key = "create_task"
+key = "work.create_task"
 version = "1.0.0"
 summary = "Write down work for a child agent or a person."
 bound = "work_write"

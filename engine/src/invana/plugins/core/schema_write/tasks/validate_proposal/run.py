@@ -1,4 +1,4 @@
-"""The ``validate_proposal`` task type; ``manifest.toml`` beside this file declares it."""
+"""The ``model.validate_proposal`` task type; ``manifest.toml`` beside this file declares it."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from invana.plugins.sdk.context import Out, RunVars, TaskContext
 from invana.plugins.sdk.errors import TaskFailure
 
 
-async def validate_proposal_task(ctx: TaskContext, v: RunVars) -> Out:
+async def model_validate_proposal(ctx: TaskContext, v: RunVars) -> Out:
     """Referential integrity before any draft mutation (docs/for-developers/modules/ask/spec.md), then reconcile into
     the draft."""
     assert v.proposal is not None and v.draft is not None and v.model is not None and v.provider is not None
@@ -55,4 +55,4 @@ async def validate_proposal_task(ctx: TaskContext, v: RunVars) -> Out:
     )
 
 
-run = validate_proposal_task
+run = model_validate_proposal

@@ -239,7 +239,7 @@ export const WHAT_NEXT: readonly {
 		label: "Build a plan",
 		description:
 			"Name the tasks a good answer takes, so the next one takes them too.",
-		// A workflow is a reusable TaskPlan, listed in Library › Plans.
+		// A workflow is a reusable Flow, listed in Library › Plans.
 		settingsSection: "library",
 	},
 	{

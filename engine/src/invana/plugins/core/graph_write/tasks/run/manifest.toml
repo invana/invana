@@ -1,0 +1,14 @@
+key = "graph.stitch.run"
+version = "1.0.0"
+summary = "Resolve what a load deferred, then run the graph's standing stitches."
+bound = "graph_write"
+side_effect = "write"
+requires = ["graph.write.records"]
+resources = ["cpu"]
+
+[args]
+
+[outputs]
+resolved = "int"
+unresolved = "int"
+stitched = "int"

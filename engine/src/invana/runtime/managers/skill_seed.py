@@ -29,12 +29,12 @@ from __future__ import annotations
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.registry import LABELS, step
+from invana.apps.flows.managers.flow import explode
+from invana.apps.flows.models import Flow, PlanKind, PlanOrigin, Task, TaskForm
+from invana.apps.flows.querysets import FlowQuerySet
 from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.models import Skill
 from invana.apps.skills.schemas import SkillCreate
-from invana.apps.task_plans.managers.task_plan import explode
-from invana.apps.task_plans.models import PlanKind, PlanOrigin, Task, TaskForm, TaskPlan
-from invana.apps.task_plans.querysets import TaskPlanQuerySet
 from invana.core.events.models import ActorKind
 from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
@@ -66,31 +66,31 @@ CONTENT = "\n".join(
 
 #: ``(step_key, args, the sentences it was drawn from)``. *Understand* carries
 #: two, because asking back is part of translating rather than a step of its
-#: own — `translate_thought` declares `question` and `options` beside `query`.
+#: own — `nl.translate` declares `question` and `options` beside `query`.
 STEPS: tuple[tuple[str, dict, str], ...] = (
     (
-        "translate_thought",
+        "nl.translate",
         {},
         "Read the question and turn it into a query against the models in view. "
         "If it could mean two things, ask which — do not guess.",
     ),
     (
-        "validate_query",
-        {"query": "${steps.translate_thought.query}"},
+        "graph.read.validate",
+        {"query": "${steps.nl_translate.query}"},
         "Check the query before it runs, and refuse anything outside the read subset.",
     ),
     (
-        "execute_graph_query",
-        {"query": "${steps.translate_thought.query}", "read_only": True},
+        "graph.read.query",
+        {"query": "${steps.nl_translate.query}", "read_only": True},
         "Run it against the graph, inside whatever world the run was opened in.",
     ),
     (
-        "shape_for_canvas",
+        "answer.shape",
         {},
         "Shape the rows for the canvas, and say what the answer rests on.",
     ),
     (
-        "verify_result",
+        "plan.verify",
         {},
         "Say whether the answer actually served the question.",
     ),
@@ -107,7 +107,7 @@ class BuiltinSkillSeeder:
     """Stateless. Idempotent by name, so a Graph converges on one copy."""
 
     skills = SkillManager()
-    plans_qs = TaskPlanQuerySet()
+    plans_qs = FlowQuerySet()
 
     async def ensure_seeded(self, session: AsyncSession, *, graph_id: str) -> Skill | None:
         """Write *Answer in natural language* into this Graph if it is absent.
@@ -123,7 +123,7 @@ class BuiltinSkillSeeder:
 
         plan = await self.plans_qs.add(
             session,
-            TaskPlan(
+            Flow(
                 graph_id=graph_id,
                 key=PLAN_KEY,
                 version=1,
@@ -181,7 +181,7 @@ class BuiltinSkillSeeder:
                     continue
                 plan = await self.plans_qs.add(
                     session,
-                    TaskPlan(
+                    Flow(
                         graph_id=graph_id,
                         key=f"skill:{manifest.slug}",
                         version=1,
@@ -200,7 +200,7 @@ class BuiltinSkillSeeder:
                     session,
                     [
                         Task(
-                            task_plan_id=plan.id,
+                            flow_id=plan.id,
                             key=PLUGIN_SKILL_NODE,
                             form=TaskForm.human.value,
                             step_key=None,

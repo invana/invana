@@ -1,7 +1,7 @@
 """Natural-language → proposed graph model (docs/for-developers/modules/ask/spec.md).
 
 The Modeller counterpart to ``translate.nl_to_query``: it grounds on a model's
-**draft** version and forces a ``propose_model`` structured result — node/edge
+**draft** version and forces a ``model.propose`` structured result — node/edge
 types + property keys — that the sessions service reconciles into that draft.
 Model-only: it never proposes data, queries, or connector writes.
 
@@ -217,7 +217,7 @@ async def propose_model(
         system=system,
         messages=messages,
         tool_schema=PROPOSE_MODEL_TOOL,
-        tool_name="propose_model",
+        tool_name="submit_model",
         encryption_key=encryption_key,
         timeout_s=timeout_s,
         operation="propose",

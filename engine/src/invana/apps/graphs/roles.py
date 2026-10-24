@@ -6,7 +6,7 @@ Graph reads everything in it; a **Graph role** is the right to change one
 
     viewer       ask — sessions, Explorer, boards, a run's answer · cancel · rerun
     contributor  work — projects and tasks
-    builder      build — agents, skills, evals, task plans, templates
+    builder      build — agents, skills, evals, flows, templates
     modeller     model — models, links, rules, guardrails, dataset bindings
     owner        settings — the Graph, its connection, providers, members
 
@@ -87,7 +87,7 @@ _POLICY: tuple[tuple[tuple[str, ...], Area], ...] = (
     (("agents",), BUILD),
     (("skills",), BUILD),
     (("evals",), BUILD),
-    (("task-plans",), BUILD),
+    (("flows",), BUILD),
     (("projection-templates",), BUILD),
     (("catalogue",), BUILD),
     (("models",), MODEL),

@@ -240,8 +240,8 @@ def _looks_read_only(query: str, language: str) -> bool:
     read-only subquery.
 
     A heuristic, and deliberately the outermost of four: the connection's
-    read-only flag, the envelope's pin on ``execute_graph_query`` and the
-    ``validate_query`` step all check again closer to the database.
+    read-only flag, the envelope's pin on ``graph.read.query`` and the
+    ``graph.read.validate`` step all check again closer to the database.
     """
     low = _STRING_LITERAL_RE.sub(" ", query).lower()
     if language != "cypher":

@@ -87,7 +87,7 @@ def _actor(actor_id: str | None) -> dict:
 def _solved_lines(rows: list[dict]) -> None:
     """What each stitch wrote, one line each — a zero is a verdict, not a silence.
 
-    Reads `commit_stitches`' own `links` output, which carries both shapes a
+    Reads `graph.stitch.commit`' own `links` output, which carries both shapes a
     commit produces: a rule that joined, and one that loaded the rows its dataset
     ships (ST51) — and a stitch the guardrails refused (ST53).
     """
@@ -177,7 +177,7 @@ async def _commit_as_run(graph_ref: str, user_ref: str | None) -> dict:
         open_run=lambda services, session, graph, actor_id: services.open_stitch_commit_run(
             session, graph=graph, actor_id=actor_id
         ),
-        task_key="commit_stitches",
+        task_key="graph.stitch.commit",
         after=recorded,
     )
 
@@ -342,7 +342,7 @@ def resolve_cmd(graph_ref: str) -> None:
             open_run=lambda services, session, graph, actor_id: services.open_stitch_preview_run(
                 session, graph=graph, actor_id=actor_id
             ),
-            task_key="preview_stitches",
+            task_key="graph.stitch.preview",
         )
     )
     if done["status"] != "succeeded":

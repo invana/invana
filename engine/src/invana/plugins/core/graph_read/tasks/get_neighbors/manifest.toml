@@ -1,0 +1,24 @@
+key = "graph.read.get_neighbors"
+version = "1.0.0"
+summary = "Read one vertex's neighbours — all, by edge type or by node type — under the run's lens."
+bound = "graph_read"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+
+[args]
+vertex_id = { type = "str", required = true }
+direction = { type = "str", default = "both" }
+edge_label = { type = "str" }
+neighbor_label = { type = "str" }
+filters = { type = "obj" }
+sort = { type = "list" }
+limit = { type = "int", default = 50 }
+offset = { type = "int", default = 0 }
+
+[outputs]
+nodes = "list"
+edges = "list"
+metadata = "obj"
+total = "int"
+has_more = "bool"

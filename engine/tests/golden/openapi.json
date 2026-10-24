@@ -9258,6 +9258,373 @@
         "title": "FleetTiles",
         "type": "object"
       },
+      "FlowDetail": {
+        "properties": {
+          "args_schema": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Args Schema",
+            "type": "object"
+          },
+          "caller_count": {
+            "default": 0,
+            "title": "Caller Count",
+            "type": "integer"
+          },
+          "callers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PlanCallerRead"
+            },
+            "title": "Callers",
+            "type": "array"
+          },
+          "declared_layers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PlanLayerRead"
+            },
+            "title": "Declared Layers",
+            "type": "array"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "edges": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DagEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "intent": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Intent",
+            "type": "array"
+          },
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_run_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At"
+          },
+          "layers": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Layers",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "nodes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DagNode"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "promoted_from_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoted From Run Id"
+          },
+          "reusable": {
+            "title": "Reusable",
+            "type": "boolean"
+          },
+          "runs": {
+            "default": 0,
+            "title": "Runs",
+            "type": "integer"
+          },
+          "served_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Served Rate"
+          },
+          "step_count": {
+            "default": 0,
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "todo_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Todo Id"
+          },
+          "used_by": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AgentChip"
+            },
+            "title": "Used By",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "version",
+          "name",
+          "description",
+          "kind",
+          "origin",
+          "intent",
+          "reusable",
+          "todo_id",
+          "promoted_from_run_id"
+        ],
+        "title": "FlowDetail",
+        "type": "object"
+      },
+      "FlowPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FlowRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "packaged": {
+            "default": 0,
+            "title": "Packaged",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "FlowPage",
+        "type": "object"
+      },
+      "FlowRead": {
+        "properties": {
+          "caller_count": {
+            "default": 0,
+            "title": "Caller Count",
+            "type": "integer"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "intent": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Intent",
+            "type": "array"
+          },
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_run_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At"
+          },
+          "layers": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Layers",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "promoted_from_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoted From Run Id"
+          },
+          "reusable": {
+            "title": "Reusable",
+            "type": "boolean"
+          },
+          "runs": {
+            "default": 0,
+            "title": "Runs",
+            "type": "integer"
+          },
+          "served_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Served Rate"
+          },
+          "step_count": {
+            "default": 0,
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "todo_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Todo Id"
+          },
+          "used_by": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AgentChip"
+            },
+            "title": "Used By",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "version",
+          "name",
+          "description",
+          "kind",
+          "origin",
+          "intent",
+          "reusable",
+          "todo_id",
+          "promoted_from_run_id"
+        ],
+        "title": "FlowRead",
+        "type": "object"
+      },
       "GlobalModel": {
         "description": "The union of a Graph's published models plus its declared links.",
         "properties": {
@@ -15584,7 +15951,7 @@
         "type": "object"
       },
       "PlanCallerRead": {
-        "description": "A caller that inlined this plan, and what it tuned\n([LB19](docs/for-developers/modules/workflows/features/the-library.md)).\n\nTuning is a property of the **call**, recorded on the calling plan \u2014 so\nthis is read off ``task_plans.uses`` and never off this plan, which is\nuntouched by any of them.",
+        "description": "A caller that inlined this plan, and what it tuned\n([LB19](docs/for-developers/modules/workflows/features/the-library.md)).\n\nTuning is a property of the **call**, recorded on the calling plan \u2014 so\nthis is read off ``flows.uses`` and never off this plan, which is\nuntouched by any of them.",
         "properties": {
           "args": {
             "additionalProperties": true,
@@ -24328,373 +24695,6 @@
         "title": "TaskManifestRead",
         "type": "object"
       },
-      "TaskPlanDetail": {
-        "properties": {
-          "args_schema": {
-            "additionalProperties": true,
-            "default": {},
-            "title": "Args Schema",
-            "type": "object"
-          },
-          "caller_count": {
-            "default": 0,
-            "title": "Caller Count",
-            "type": "integer"
-          },
-          "callers": {
-            "default": [],
-            "items": {
-              "$ref": "#/components/schemas/PlanCallerRead"
-            },
-            "title": "Callers",
-            "type": "array"
-          },
-          "declared_layers": {
-            "default": [],
-            "items": {
-              "$ref": "#/components/schemas/PlanLayerRead"
-            },
-            "title": "Declared Layers",
-            "type": "array"
-          },
-          "description": {
-            "title": "Description",
-            "type": "string"
-          },
-          "edges": {
-            "default": [],
-            "items": {
-              "$ref": "#/components/schemas/DagEdge"
-            },
-            "title": "Edges",
-            "type": "array"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "intent": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Intent",
-            "type": "array"
-          },
-          "key": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Key"
-          },
-          "kind": {
-            "title": "Kind",
-            "type": "string"
-          },
-          "last_run_at": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Last Run At"
-          },
-          "layers": {
-            "default": [],
-            "items": {
-              "type": "string"
-            },
-            "title": "Layers",
-            "type": "array"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "nodes": {
-            "default": [],
-            "items": {
-              "$ref": "#/components/schemas/DagNode"
-            },
-            "title": "Nodes",
-            "type": "array"
-          },
-          "origin": {
-            "title": "Origin",
-            "type": "string"
-          },
-          "promoted_from_run_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Promoted From Run Id"
-          },
-          "reusable": {
-            "title": "Reusable",
-            "type": "boolean"
-          },
-          "runs": {
-            "default": 0,
-            "title": "Runs",
-            "type": "integer"
-          },
-          "served_rate": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Served Rate"
-          },
-          "step_count": {
-            "default": 0,
-            "title": "Step Count",
-            "type": "integer"
-          },
-          "todo_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Todo Id"
-          },
-          "used_by": {
-            "default": [],
-            "items": {
-              "$ref": "#/components/schemas/AgentChip"
-            },
-            "title": "Used By",
-            "type": "array"
-          },
-          "version": {
-            "title": "Version",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "id",
-          "key",
-          "version",
-          "name",
-          "description",
-          "kind",
-          "origin",
-          "intent",
-          "reusable",
-          "todo_id",
-          "promoted_from_run_id"
-        ],
-        "title": "TaskPlanDetail",
-        "type": "object"
-      },
-      "TaskPlanPage": {
-        "properties": {
-          "applied": {
-            "items": {
-              "$ref": "#/components/schemas/AppliedFilter"
-            },
-            "title": "Applied",
-            "type": "array"
-          },
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/TaskPlanRead"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "next_cursor": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Next Cursor"
-          },
-          "packaged": {
-            "default": 0,
-            "title": "Packaged",
-            "type": "integer"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          },
-          "unfiltered_total": {
-            "title": "Unfiltered Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total",
-          "unfiltered_total"
-        ],
-        "title": "TaskPlanPage",
-        "type": "object"
-      },
-      "TaskPlanRead": {
-        "properties": {
-          "caller_count": {
-            "default": 0,
-            "title": "Caller Count",
-            "type": "integer"
-          },
-          "description": {
-            "title": "Description",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "intent": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Intent",
-            "type": "array"
-          },
-          "key": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Key"
-          },
-          "kind": {
-            "title": "Kind",
-            "type": "string"
-          },
-          "last_run_at": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Last Run At"
-          },
-          "layers": {
-            "default": [],
-            "items": {
-              "type": "string"
-            },
-            "title": "Layers",
-            "type": "array"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "origin": {
-            "title": "Origin",
-            "type": "string"
-          },
-          "promoted_from_run_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Promoted From Run Id"
-          },
-          "reusable": {
-            "title": "Reusable",
-            "type": "boolean"
-          },
-          "runs": {
-            "default": 0,
-            "title": "Runs",
-            "type": "integer"
-          },
-          "served_rate": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Served Rate"
-          },
-          "step_count": {
-            "default": 0,
-            "title": "Step Count",
-            "type": "integer"
-          },
-          "todo_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Todo Id"
-          },
-          "used_by": {
-            "default": [],
-            "items": {
-              "$ref": "#/components/schemas/AgentChip"
-            },
-            "title": "Used By",
-            "type": "array"
-          },
-          "version": {
-            "title": "Version",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "id",
-          "key",
-          "version",
-          "name",
-          "description",
-          "kind",
-          "origin",
-          "intent",
-          "reusable",
-          "todo_id",
-          "promoted_from_run_id"
-        ],
-        "title": "TaskPlanRead",
-        "type": "object"
-      },
       "TaskPromptRead": {
         "properties": {
           "answered_at": {
@@ -25106,6 +25106,10 @@
             ],
             "title": "Finished At"
           },
+          "flow_key": {
+            "title": "Flow Key",
+            "type": "string"
+          },
           "graph_id": {
             "title": "Graph Id",
             "type": "string"
@@ -25284,16 +25288,12 @@
               }
             ],
             "title": "Work Ms"
-          },
-          "workflow_key": {
-            "title": "Workflow Key",
-            "type": "string"
           }
         },
         "required": [
           "id",
           "graph_id",
-          "workflow_key",
+          "flow_key",
           "status",
           "stream_seq"
         ],
@@ -25301,7 +25301,7 @@
         "type": "object"
       },
       "TaskRunSummary": {
-        "description": "One run, as a **list** row \u2014 the plan and its verdict, without the steps.\n\nThree surfaces read this and they want the same few facts: an agent's\n*Recent plans* (what has this agent actually run?), the Workflows library's\n*candidates* (which generated plans served and were never promoted?) and the\n**journal** (what ran in this Graph, filtered by kind). Returning the step\nrows here would make any of them an order of magnitude larger for nothing \u2014\nthe trace is a per-run fetch.",
+        "description": "One run, as a **list** row \u2014 the plan and its verdict, without the steps.\n\nThree surfaces read this and they want the same few facts: an agent's\n*Recent plans* (what has this agent actually run?), the flow library's\n*candidates* (which generated plans served and were never promoted?) and the\n**journal** (what ran in this Graph, filtered by kind). Returning the step\nrows here would make any of them an order of magnitude larger for nothing \u2014\nthe trace is a per-run fetch.",
         "properties": {
           "agent_id": {
             "anyOf": [
@@ -25369,6 +25369,10 @@
               }
             ],
             "title": "Finished At"
+          },
+          "flow_key": {
+            "title": "Flow Key",
+            "type": "string"
           },
           "id": {
             "title": "Id",
@@ -25561,15 +25565,11 @@
               }
             ],
             "title": "Work Ms"
-          },
-          "workflow_key": {
-            "title": "Workflow Key",
-            "type": "string"
           }
         },
         "required": [
           "id",
-          "workflow_key",
+          "flow_key",
           "status"
         ],
         "title": "TaskRunSummary",
@@ -26475,6 +26475,10 @@
             ],
             "title": "Finished At"
           },
+          "flow_key": {
+            "title": "Flow Key",
+            "type": "string"
+          },
           "governed": {
             "default": false,
             "title": "Governed",
@@ -26660,15 +26664,11 @@
               }
             ],
             "title": "Work Ms"
-          },
-          "workflow_key": {
-            "title": "Workflow Key",
-            "type": "string"
           }
         },
         "required": [
           "run_id",
-          "workflow_key",
+          "flow_key",
           "status"
         ],
         "title": "TraceRead",
@@ -37898,6 +37898,746 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/flows": {
+      "get": {
+        "operationId": "list_flows_api_v1_u__username___graphSlug__flows_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Flows",
+        "tags": [
+          "flows"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/flows/promote": {
+      "post": {
+        "description": "Turn a plan that served into a library entry \u2014 the one write in MVP.\n\nThis is the *review* stage of docs/for-developers/modules/workflows/features/promote-a-plan.md, applied to plans: a\nhuman decides that a\ngenerated shape is worth keeping, and it gets a key and a version so the\nnext promotion is diffable against it.",
+        "operationId": "promote_api_v1_u__username___graphSlug__flows_promote_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Promote",
+        "tags": [
+          "flows"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/flows/{key}": {
+      "get": {
+        "operationId": "get_flow_api_v1_u__username___graphSlug__flows__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Flow",
+        "tags": [
+          "flows"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/flows/{key}/diff": {
+      "get": {
+        "description": "What changed against the version before it.",
+        "operationId": "plan_diff_api_v1_u__username___graphSlug__flows__key__diff_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanVersionDiff"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Plan Diff",
+        "tags": [
+          "flows"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/flows/{key}/export": {
+      "get": {
+        "description": "The surface form (docs/for-developers/modules/agents/spec.md, *one schema, two encodings*).",
+        "operationId": "export_flow_api_v1_u__username___graphSlug__flows__key__export_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Export Flow",
+        "tags": [
+          "flows"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/flows/{key}/performance": {
+      "get": {
+        "description": "How the plan has behaved \u2014 the Overview, Layers and Flow tabs.",
+        "operationId": "plan_performance_api_v1_u__username___graphSlug__flows__key__performance_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window",
+            "required": false,
+            "schema": {
+              "default": "30d",
+              "title": "Window",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanPerformance"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Plan Performance",
+        "tags": [
+          "flows"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/flows/{key}/runs": {
+      "get": {
+        "description": "Every run of the plan, newest first \u2014 the Activity tab.",
+        "operationId": "plan_runs_api_v1_u__username___graphSlug__flows__key__runs_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window",
+            "required": false,
+            "schema": {
+              "default": "30d",
+              "title": "Window",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "called_by",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Called By"
+            }
+          },
+          {
+            "in": "query",
+            "name": "agent_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Agent Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanRunsPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Plan Runs",
+        "tags": [
+          "flows"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/flows/{key}/tasks": {
+      "get": {
+        "description": "The plan's nodes and the order between them \u2014 nothing else about it.",
+        "operationId": "get_plan_tasks_api_v1_u__username___graphSlug__flows__key__tasks_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasksResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Plan Tasks",
+        "tags": [
+          "flows"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/global-model": {
       "get": {
         "description": "The union, computed on the way out. Nothing here is stored (ST3).",
@@ -47770,7 +48510,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/runs": {
       "get": {
-        "description": "List runs as rows \u2014 the plan and its verdict, without the steps.\n\nOne endpoint with filters rather than ``/agents/{id}/plans`` and\n``/workflows/candidates``: both questions are \"which runs match this?\", and\ntwo endpoints would give *served* two definitions to drift apart. **The\njournal is the same endpoint**: a load is a run, so *what changed my\ngraph* is ``?kind=import`` rather than a surface of its own.",
+        "description": "List runs as rows \u2014 the plan and its verdict, without the steps.\n\nOne endpoint with filters rather than ``/agents/{id}/plans`` and\n``/flows/candidates``: both questions are \"which runs match this?\", and\ntwo endpoints would give *served* two definitions to drift apart. **The\njournal is the same endpoint**: a load is a run, so *what changed my\ngraph* is ``?kind=import`` rather than a surface of its own.",
         "operationId": "list_runs_api_v1_u__username___graphSlug__runs_get",
         "parameters": [
           {
@@ -51703,746 +52443,6 @@
         "summary": "Skill Version Plan",
         "tags": [
           "skills"
-        ]
-      }
-    },
-    "/api/v1/u/{username}/{graphSlug}/task-plans": {
-      "get": {
-        "operationId": "list_workflows_api_v1_u__username___graphSlug__task_plans_get",
-        "parameters": [
-          {
-            "description": "Owner username from the URL prefix.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "schema": {
-              "description": "Owner username from the URL prefix.",
-              "title": "Username",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Graph slug, unique per owner.",
-            "in": "path",
-            "name": "graphSlug",
-            "required": true,
-            "schema": {
-              "description": "Graph slug, unique per owner.",
-              "title": "Graphslug",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskPlanPage"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "List Workflows",
-        "tags": [
-          "task-plans"
-        ]
-      }
-    },
-    "/api/v1/u/{username}/{graphSlug}/task-plans/promote": {
-      "post": {
-        "description": "Turn a plan that served into a library entry \u2014 the one write in MVP.\n\nThis is the *review* stage of docs/for-developers/modules/workflows/features/promote-a-plan.md, applied to plans: a\nhuman decides that a\ngenerated shape is worth keeping, and it gets a key and a version so the\nnext promotion is diffable against it.",
-        "operationId": "promote_api_v1_u__username___graphSlug__task_plans_promote_post",
-        "parameters": [
-          {
-            "description": "Owner username from the URL prefix.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "schema": {
-              "description": "Owner username from the URL prefix.",
-              "title": "Username",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Graph slug, unique per owner.",
-            "in": "path",
-            "name": "graphSlug",
-            "required": true,
-            "schema": {
-              "description": "Graph slug, unique per owner.",
-              "title": "Graphslug",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PromoteRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskPlanRead"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Promote",
-        "tags": [
-          "task-plans"
-        ]
-      }
-    },
-    "/api/v1/u/{username}/{graphSlug}/task-plans/{key}": {
-      "get": {
-        "operationId": "get_workflow_api_v1_u__username___graphSlug__task_plans__key__get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "title": "Key",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Owner username from the URL prefix.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "schema": {
-              "description": "Owner username from the URL prefix.",
-              "title": "Username",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Graph slug, unique per owner.",
-            "in": "path",
-            "name": "graphSlug",
-            "required": true,
-            "schema": {
-              "description": "Graph slug, unique per owner.",
-              "title": "Graphslug",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "version",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Version"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskPlanDetail"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Get Workflow",
-        "tags": [
-          "task-plans"
-        ]
-      }
-    },
-    "/api/v1/u/{username}/{graphSlug}/task-plans/{key}/diff": {
-      "get": {
-        "description": "What changed against the version before it (LB37).",
-        "operationId": "plan_diff_api_v1_u__username___graphSlug__task_plans__key__diff_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "title": "Key",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Owner username from the URL prefix.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "schema": {
-              "description": "Owner username from the URL prefix.",
-              "title": "Username",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Graph slug, unique per owner.",
-            "in": "path",
-            "name": "graphSlug",
-            "required": true,
-            "schema": {
-              "description": "Graph slug, unique per owner.",
-              "title": "Graphslug",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "version",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Version"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanVersionDiff"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Plan Diff",
-        "tags": [
-          "task-plans"
-        ]
-      }
-    },
-    "/api/v1/u/{username}/{graphSlug}/task-plans/{key}/export": {
-      "get": {
-        "description": "The surface form (docs/for-developers/modules/agents/spec.md, *one schema, two encodings*).",
-        "operationId": "export_workflow_api_v1_u__username___graphSlug__task_plans__key__export_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "title": "Key",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Owner username from the URL prefix.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "schema": {
-              "description": "Owner username from the URL prefix.",
-              "title": "Username",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Graph slug, unique per owner.",
-            "in": "path",
-            "name": "graphSlug",
-            "required": true,
-            "schema": {
-              "description": "Graph slug, unique per owner.",
-              "title": "Graphslug",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "version",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Version"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Export Workflow",
-        "tags": [
-          "task-plans"
-        ]
-      }
-    },
-    "/api/v1/u/{username}/{graphSlug}/task-plans/{key}/performance": {
-      "get": {
-        "description": "How the plan has behaved \u2014 the Overview, Layers and Flow tabs (LB33 \u00b7 LB36).",
-        "operationId": "plan_performance_api_v1_u__username___graphSlug__task_plans__key__performance_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "title": "Key",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Owner username from the URL prefix.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "schema": {
-              "description": "Owner username from the URL prefix.",
-              "title": "Username",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Graph slug, unique per owner.",
-            "in": "path",
-            "name": "graphSlug",
-            "required": true,
-            "schema": {
-              "description": "Graph slug, unique per owner.",
-              "title": "Graphslug",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "version",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Version"
-            }
-          },
-          {
-            "in": "query",
-            "name": "window",
-            "required": false,
-            "schema": {
-              "default": "30d",
-              "title": "Window",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanPerformance"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Plan Performance",
-        "tags": [
-          "task-plans"
-        ]
-      }
-    },
-    "/api/v1/u/{username}/{graphSlug}/task-plans/{key}/runs": {
-      "get": {
-        "description": "Every run of the plan, newest first \u2014 the Activity tab (LB34).",
-        "operationId": "plan_runs_api_v1_u__username___graphSlug__task_plans__key__runs_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "title": "Key",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Owner username from the URL prefix.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "schema": {
-              "description": "Owner username from the URL prefix.",
-              "title": "Username",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Graph slug, unique per owner.",
-            "in": "path",
-            "name": "graphSlug",
-            "required": true,
-            "schema": {
-              "description": "Graph slug, unique per owner.",
-              "title": "Graphslug",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "version",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Version"
-            }
-          },
-          {
-            "in": "query",
-            "name": "window",
-            "required": false,
-            "schema": {
-              "default": "30d",
-              "title": "Window",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "status",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Status"
-            }
-          },
-          {
-            "in": "query",
-            "name": "called_by",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Called By"
-            }
-          },
-          {
-            "in": "query",
-            "name": "agent_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Agent Id"
-            }
-          },
-          {
-            "in": "query",
-            "name": "cursor",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Cursor"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "default": 50,
-              "maximum": 200,
-              "minimum": 1,
-              "title": "Limit",
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanRunsPage"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Plan Runs",
-        "tags": [
-          "task-plans"
-        ]
-      }
-    },
-    "/api/v1/u/{username}/{graphSlug}/task-plans/{key}/tasks": {
-      "get": {
-        "description": "The plan's nodes and the order between them \u2014 nothing else about it.",
-        "operationId": "get_plan_tasks_api_v1_u__username___graphSlug__task_plans__key__tasks_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "title": "Key",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Owner username from the URL prefix.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "schema": {
-              "description": "Owner username from the URL prefix.",
-              "title": "Username",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Graph slug, unique per owner.",
-            "in": "path",
-            "name": "graphSlug",
-            "required": true,
-            "schema": {
-              "description": "Graph slug, unique per owner.",
-              "title": "Graphslug",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "version",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Version"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TasksResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Get Plan Tasks",
-        "tags": [
-          "task-plans"
         ]
       }
     },

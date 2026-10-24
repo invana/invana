@@ -2,5 +2,5 @@ name = "invana.core.work_write"
 kind = "core"
 engine = "*"
 secrets = []
-tasks = ["spawn_agent", "delegate", "create_task"]
+tasks = ["work.spawn_agent", "work.delegate", "work.create_task"]
 flows = []

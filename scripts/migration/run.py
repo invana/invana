@@ -21,6 +21,11 @@ agent:
 5. **Close** — the driver marks the log row ``done`` and commits on the
    session's branch. It never pushes and never opens a pull request.
 
+Commits are small enough to review: the lead commits each finished step as a
+``wip`` commit, the driver checkpoints whatever is left after every session and
+when a phase is blocked, and a phase's first session tags its starting point
+``<scope>/<ID>-start`` so ``git reset --hard`` to that tag undoes the phase.
+
 Resumable: the log is the only state. Run it again and it continues from the
 first unfinished session.
 
@@ -68,6 +73,7 @@ os.environ.setdefault("E2E_GRAPH_PATH", "/u/admin/airways")
 ALLOWED_TOOLS = [
     "Read", "Edit", "Write", "Glob", "Grep", "Agent",
     "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(git mv *)", "Bash(git show *)",
+    "Bash(git add -A)", "Bash(git commit --no-verify -m *)",
     "Bash(pnpm *)", "Bash(node *)", "Bash(npx playwright *)",
     "Bash(uv run *)", "Bash(python3 *)", "Bash(make *)", "Bash(docker compose *)",
     "Bash(ls *)", "Bash(mkdir *)", "Bash(rm -rf node_modules/.vite*)",
@@ -134,6 +140,20 @@ def sh(cmd: list[str], cwd: Path = ROOT, env: dict | None = None) -> subprocess.
 
 def git_clean() -> bool:
     return sh(["git", "status", "--porcelain"]).stdout.strip() == ""
+
+
+def checkpoint(sid: str, phase: str, what: str) -> None:
+    """Commit whatever a session left uncommitted as a `wip` commit, so no phase piles up into one diff.
+
+    Hooks are skipped: mid-phase the tree may not lint. The phase's closing commit runs them.
+    """
+    if git_clean():
+        return
+    sh(["git", "add", "-A"])
+    res = sh(["git", "commit", "--no-verify", "-m", f"wip({SCOPE}): {sid} · {phase} — {what}\n\n"
+              "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"])
+    if res.returncode != 0:
+        print(res.stdout[-2000:] + res.stderr[-2000:])
 
 
 def ensure_branch(branch: str) -> None:
@@ -247,16 +267,22 @@ def reclaim(sid: str) -> None:
 TAMPERED: set[str] = set()
 
 
-def build_until_handoffs_end(sid: str, first_prompt: str, label: str, max_handoffs: int = MAX_HANDOFFS) -> None:
-    """Run a session; while it ends `partial` (a hand-off), continue in a fresh session from the note."""
+def build_until_handoffs_end(sid: str, phase: str, first_prompt: str, label: str,
+                             max_handoffs: int = MAX_HANDOFFS) -> None:
+    """Run a session; while it ends `partial` (a hand-off), continue in a fresh session from the note.
+
+    Every session ends in a checkpoint commit, so each hand-off is its own reviewable diff.
+    """
     claude(first_prompt, sid, label)
     reclaim(sid)
+    checkpoint(sid, phase, f"{label} session")
     for n in range(1, max_handoffs + 1):
         if status_of(sid) != "partial":
             return
         print(f"  {sid} handed off — continuing in session {n + 1}")
         claude(prompt("continue", ID=sid), sid, f"{label}-cont{n}")
         reclaim(sid)
+        checkpoint(sid, phase, f"{label}-cont{n} session")
     if status_of(sid) == "partial":
         raise RuntimeError(f"{sid} still partial after {max_handoffs} hand-offs")
 
@@ -446,15 +472,18 @@ def run_session(row: dict, max_fix: int) -> bool:
         print("  working tree not clean — refusing to start over someone's uncommitted work")
         return False
     ensure_branch(row["branch"])
+    if not resuming:
+        sh(["git", "tag", "-f", f"{SCOPE}/{sid}-start"])
     set_status(sid, "in progress")
     if not resuming and sid.startswith(("A", "C")) and row["kind"].startswith("move"):
         sh(["node", "scripts/migration/shoot.mjs", "--live", "--smoke", "--out", f".migration-cache/{sid}/before"])
     try:
         # An interrupted run picks up where it stopped, from the work on disk and the hand-off notes.
         first, label = (prompt("continue", ID=sid), "resume") if resuming else (prompt("build", ID=sid), "build")
-        build_until_handoffs_end(sid, first, label)
+        build_until_handoffs_end(sid, row["phase"], first, label)
     except RuntimeError as exc:
         set_status(sid, "blocked", str(exc))
+        checkpoint(sid, row["phase"], "blocked")
         return False
 
     for attempt in range(max_fix + 1):
@@ -485,13 +514,15 @@ def run_session(row: dict, max_fix: int) -> bool:
         if attempt == max_fix:
             break
         try:
-            build_until_handoffs_end(sid, prompt("fix", ID=sid, ATTEMPT=str(attempt + 1), FINDINGS="\n\n".join(findings)),
-                                     f"fix-{attempt + 1}")
+            build_until_handoffs_end(sid, row["phase"], prompt("fix", ID=sid, ATTEMPT=str(attempt + 1),
+                                                               FINDINGS="\n\n".join(findings)), f"fix-{attempt + 1}")
         except RuntimeError as exc:
             set_status(sid, "blocked", str(exc))
+            checkpoint(sid, row["phase"], "blocked")
             return False
 
     set_status(sid, "blocked", f"failed after {max_fix} fix rounds — see .migration-cache/{sid}/")
+    checkpoint(sid, row["phase"], "blocked")
     return False
 
 

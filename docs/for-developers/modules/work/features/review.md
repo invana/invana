@@ -4,7 +4,7 @@ One queue for everything waiting on a person. Three of its kinds stop a run dead
 agent cannot answer, an **approval** it may not proceed without, a **verdict** on what it just
 produced. **Results** need accepting and **proposals** wait. Ordered by what is holding work up.
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `TaskPlan` ·
+> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
 > [task-model-migration.md](../../../building-engine/task-model-migration.md).

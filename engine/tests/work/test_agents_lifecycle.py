@@ -39,7 +39,9 @@ class TestSeeding:
         await session.flush()
 
         by_key = {a.key: a for a in created}
-        delegating = {key for key, agent in by_key.items() if "delegate" in (agent.workflow_spec.get("allow") or [])}
+        delegating = {
+            key for key, agent in by_key.items() if "work.delegate" in (agent.workflow_spec.get("allow") or [])
+        }
         assert delegating == {"coordinator"}
         # And its bounds come from the registry, enforced by the interpreter (DG2).
         assert by_key["coordinator"].budget == {"max_depth": 2, "max_children": 3}
@@ -153,9 +155,9 @@ class TestLifecycle:
 
 class TestDelegationBounds:
     async def test_a_child_cannot_widen_its_parents_allow_list(self, agent):
-        narrowed = narrow(agent, requested={"allow": ["execute_graph_query", "drop_everything"]})
+        narrowed = narrow(agent, requested={"allow": ["graph.read.query", "drop_everything"]})
         assert "drop_everything" not in narrowed["allow"]
-        assert "execute_graph_query" in narrowed["allow"]
+        assert "graph.read.query" in narrowed["allow"]
 
     async def test_a_childs_depth_allowance_shrinks_by_one(self, agent):
         narrowed = narrow(agent, requested={})

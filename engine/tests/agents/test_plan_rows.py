@@ -9,10 +9,10 @@ from __future__ import annotations
 
 import pytest
 
-from invana.apps.task_plans.dag import dag_for, materialise
-from invana.apps.task_plans.managers.task_plan import explode
-from invana.apps.task_plans.models import PlanKind, PlanOrigin, TaskPlan
-from invana.apps.task_plans.yaml_export import steps_of, to_yaml
+from invana.apps.flows.dag import dag_for, materialise
+from invana.apps.flows.managers.flow import explode
+from invana.apps.flows.models import Flow, PlanKind, PlanOrigin
+from invana.apps.flows.yaml_export import steps_of, to_yaml
 from invana.plugins import load_plugins
 from invana.runtime.catalogue import CATALOGUE
 
@@ -21,8 +21,8 @@ TEMPLATES = load_plugins().flows
 REQUIRES = {key: entry.requires for key, entry in CATALOGUE.items()}
 
 
-def _plan(template) -> TaskPlan:
-    return TaskPlan(
+def _plan(template) -> Flow:
+    return Flow(
         id="p1",
         graph_id="g1",
         key=template.key,
@@ -63,13 +63,20 @@ def test_no_unmeant_sequence_edge(template) -> None:
     it was joined to the open sinks. Two are meant: *Verify*, which summarises
     the work and therefore has to come after it, and `stitch-apply`'s *Commit*,
     which writes what *Apply* staged — a hand-off through rows, not through an
-    output, so there is no binding to declare (ST54). Anything else is a
+    output, so there is no binding to declare. The pairs are functions, not
+    step ids, because the review is about what runs after what. Anything else is a
     data-flow that should have been declared as a binding — which is exactly
     what `nl-single` was hiding before M2.
     """
-    meant = {("verify_result", "shape_for_canvas"), ("commit_stitches", "apply_stitches")}
+    meant = {("plan.verify", "answer.shape"), ("graph.stitch.commit", "graph.stitch.declare")}
     rows = materialise(template.steps, requires=REQUIRES)
-    found = {(row["key"], dep["key"]) for row in rows for dep in row["depends_on"] if dep["kind"] == "sequence"}
+    function = {row["key"]: row["step_key"] for row in rows}
+    found = {
+        (row["step_key"], function[dep["key"]])
+        for row in rows
+        for dep in row["depends_on"]
+        if dep["kind"] == "sequence"
+    }
     assert found <= meant, f"{template.key} carries an unreviewed sequence edge: {found - meant}"
 
 
@@ -86,7 +93,7 @@ def test_two_readings_of_the_graph_do_not_depend_on_each_other() -> None:
     assert ("execute_a", "translate_b") not in pairs
     assert {"translate_a", "translate_b"} == {t.key for t in tasks if not t.depends_on}
     # Both branches converge on the node that summarises them.
-    assert {"execute_a", "execute_b"} == {s for s, t in pairs if t == "shape_for_canvas"}
+    assert {"execute_a", "execute_b"} == {s for s, t in pairs if t == "answer_shape"}
 
 
 def test_the_export_declares_its_arguments_and_writes_an_empty_mapping_as_one() -> None:

@@ -1,0 +1,16 @@
+key = "science.uniprot.get"
+version = "0.1.0"
+summary = "Read one UniProtKB entry by accession — protein, genes, organism, sequence and function."
+bound = "network"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+timeout_s = 30
+retries = 2
+
+[args]
+accession = { type = "str", required = true }
+
+[outputs]
+entry = "obj"
+url = "str"

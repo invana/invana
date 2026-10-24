@@ -147,7 +147,7 @@ class Agent(Base):
 
     # ── bindings ─────────────────────────────────────────────────────────────
     # The envelope (docs/for-developers/modules/agents/spec.md): allow-list · pinned args · require ·
-    # budgets · which library workflows a Plan step may select. Not a table —
+    # budgets · which reusable flows a Plan step may select. Not a table —
     # it is versioned with its agent.
     workflow_spec: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     # There is no `llm_config_id`: an agent binds no provider
@@ -292,4 +292,4 @@ class Agent(Base):
         """
         spec = self.workflow_spec or {}
         allowed = set(spec.get("allow") or [s.get("task") for s in spec.get("steps") or [] if isinstance(s, dict)])
-        return "execute_graph_query" in allowed
+        return "graph.read.query" in allowed

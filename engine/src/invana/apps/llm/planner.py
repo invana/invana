@@ -1,16 +1,15 @@
-"""Plan — the workflow one run runs, when no template fits.
+"""Plan — the flow one run runs, when no template fits.
 
 The common case never reaches this module: *Plan* matches a template by intent
 and costs no LLM call (docs/for-developers/modules/agents/spec.md). This is the other case — a
 `compound` ask whose shape no library entry has — and it stays inside the envelope
-(docs/for-developers/modules/ask/spec.md)
-**D2** for the same reason the ``plan`` task does: the model proposes a
+(docs/for-developers/modules/ask/spec.md) for the same reason the ``plan`` task does: the model proposes a
 **document**, and the interpreter validates it against the envelope before
 anything is dispatched.
 
 The grammar has nowhere to put code. A step is a task key, a label, and args
 that are either literals or ``${steps.X.y}`` path lookups — so "the model wrote
-the workflow" never means "the model wrote an expression we then evaluate".
+the flow" never means "the model wrote an expression we then evaluate".
 """
 
 from __future__ import annotations

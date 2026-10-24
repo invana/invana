@@ -5,7 +5,7 @@
 // The journal of what actually ran is **Runs**, its own panel.
 //
 // The library lists **reusable plans only**, with origin as a badge
-// (the-library.md) — a workflow is a reusable TaskPlan, not a kind,
+// (the-library.md) — a workflow is a reusable Flow, not a kind,
 // so there is no Workflows icon any more.
 
 import {

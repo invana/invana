@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.task_plans.querysets import TaskPlanQuerySet
+from invana.apps.flows.querysets import FlowQuerySet
 from invana.core.lists import ListParams, PageInfo, page_of_rows
 from invana.plugins.sdk.manifest import Bound, Entry
 from invana.runtime.catalogue import CATALOGUE
@@ -47,7 +47,7 @@ def _entry_read(entry: Entry, used_by: int) -> CatalogueEntryRead:
 
 
 class CatalogueManager:
-    plans = TaskPlanQuerySet()
+    plans = FlowQuerySet()
 
     async def page(
         self, session: AsyncSession, *, graph_id: str, params: ListParams

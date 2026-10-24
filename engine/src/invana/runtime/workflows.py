@@ -48,7 +48,7 @@ _EXECUTE_RETRY = Retry(max_attempts=3, on=frozenset({"transient"}))
 
 #: The fallback for a planned step with no static definition, keyed by what the
 #: task is — the same policy expressed one level up.
-RETRY_BY_TASK: dict[str, Retry] = {"execute_graph_query": _EXECUTE_RETRY}
+RETRY_BY_TASK: dict[str, Retry] = {"graph.read.query": _EXECUTE_RETRY}
 
 
 def retry_limit(task_key: str, declared: dict | None) -> int:
@@ -65,10 +65,10 @@ def retry_limit(task_key: str, declared: dict | None) -> int:
 NL_QUERY = Workflow(
     key="nl-query",
     steps=(
-        Step("translate_thought", "Understand"),
-        Step("validate_query", "Validate"),
-        Step("execute_graph_query", "Execute", retry=_EXECUTE_RETRY),
-        Step("shape_for_canvas", "Project"),
+        Step("nl.translate", "Understand"),
+        Step("graph.read.validate", "Validate"),
+        Step("graph.read.query", "Execute", retry=_EXECUTE_RETRY),
+        Step("answer.shape", "Project"),
     ),
 )
 
@@ -76,9 +76,9 @@ NL_QUERY = Workflow(
 QL_QUERY = Workflow(
     key="ql-query",
     steps=(
-        Step("validate_query", "Validate"),
-        Step("execute_graph_query", "Execute", retry=_EXECUTE_RETRY),
-        Step("shape_for_canvas", "Project"),
+        Step("graph.read.validate", "Validate"),
+        Step("graph.read.query", "Execute", retry=_EXECUTE_RETRY),
+        Step("answer.shape", "Project"),
     ),
 )
 
@@ -86,9 +86,9 @@ QL_QUERY = Workflow(
 MODELLER_GENERATE = Workflow(
     key="modeller-generate",
     steps=(
-        Step("understand_ask", "Understand"),
-        Step("propose_model", "Propose"),
-        Step("validate_proposal", "Validate"),
+        Step("model.understand_ask", "Understand"),
+        Step("model.propose", "Propose"),
+        Step("model.validate_proposal", "Validate"),
     ),
 )
 

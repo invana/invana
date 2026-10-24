@@ -1,6 +1,6 @@
 # Orchestration — the whole model, in one read
 
-**Three records, one line.** A **Todo** is what a person wrote; a **TaskPlan** — generated, packaged
+**Three records, one line.** A **Todo** is what a person wrote; a **Flow** — generated, packaged
 or promoted, and reused when it matches — is the flow of **Task**s that carries it out; a **TaskRun** is one execution of it.
 **Nothing a user authors is ever a `Task`.**
 
@@ -20,8 +20,8 @@ or promoted, and reused when it matches — is the flow of **Task**s that carrie
 
 | § | | What it settles |
 |---|---|---|
-| **0** | **[The records](#0-the-records)** | **Todo · TaskPlan · Task · TaskRun · Artifact · Stream · Prompt — the ER diagram** |
-| 0.4 | [Where a TaskPlan comes from](#04-where-a-taskplan-comes-from) | matched · generated · none — and why the planner does not regress |
+| **0** | **[The records](#0-the-records)** | **Todo · Flow · Task · TaskRun · Artifact · Stream · Prompt — the ER diagram** |
+| 0.4 | [Where a Flow comes from](#04-where-a-taskplan-comes-from) | matched · generated · none — and why the planner does not regress |
 | 0.5 | [Swimlanes](#05-swimlanes--who-does-what-in-order) | the generated · matched · human paths, and who may write each field |
 | 0.6 | [The catalogue](#06-the-catalogue--what-a-plan-may-name) | the closed set of callables, grouped by bound — and where to cut granularity |
 | 0.7 | [Agents, skills and plans](#07-agents-skills-and-plans--three-things-composed-at-run-time) | why a skill is not a plan, the two links that are real, and where a DeepAgent fits |
@@ -87,7 +87,7 @@ Nine configs in [§8](#8-worked-examples), one per shape — **every `kind` a Ta
 
 ## 0. The records
 
-**Nothing a user authors is ever a `Task`.** A person writes a **Todo**; a **TaskPlan** — generated,
+**Nothing a user authors is ever a `Task`.** A person writes a **Todo**; a **Flow** — generated,
 packaged or promoted, and reused when it matches — is the flow of **Task**s that carries it out; a **TaskRun** is one execution.
 
 ```mermaid
@@ -144,7 +144,7 @@ erDiagram
         int         version
         text        content      "the playbook prose"
         text        when_to_use
-        uuid        plan_id      FK "NOT NULL - every version is drawn as exactly one TaskPlan"
+        uuid        plan_id      FK "NOT NULL - every version is drawn as exactly one Flow"
         timestamptz published_at "null while draft - immutable once set"
     }
 
@@ -163,7 +163,7 @@ erDiagram
 
     TASK {
         uuid  id           PK
-        uuid  task_plan_id FK
+        uuid  flow_id FK
         uuid  parent_id    FK "null at the root of the plan"
         int   ordinal
         text  key          UK "unique among siblings"
@@ -189,7 +189,7 @@ erDiagram
         uuid  graph_id       FK
         uuid  parent_run_id  FK "null at the root run"
         uuid  todo_id        FK "set on a root run"
-        uuid  task_plan_id   FK
+        uuid  flow_id   FK
         uuid  task_id        FK "set on a child run"
         uuid  agent_id       FK "null when a person ran it"
         uuid  lens_id        FK "null - then the whole global model"
@@ -260,8 +260,8 @@ erDiagram
 | Edge | Cardinality | Why |
 |---|---|---|
 | `Project → Todo` | 0..1 → many | A Todo needs no Project — the Graph's "No project" bucket ([work/spec.md](modules/work/spec.md)) |
-| `Todo → TaskPlan` | 1 → 0..1 | **Optional both ways.** A Todo assigned to a person never gets a plan ([§8.9](#89-a-human-task--no-steps-at-all)); a reusable TaskPlan belongs to no Todo |
-| `TaskPlan → Task` | 1 → many | The plan is the unit that is drawn, versioned-by-freezing and reused. A Task has no life outside one |
+| `Todo → Flow` | 1 → 0..1 | **Optional both ways.** A Todo assigned to a person never gets a plan ([§8.9](#89-a-human-task--no-steps-at-all)); a reusable Flow belongs to no Todo |
+| `Flow → Task` | 1 → many | The plan is the unit that is drawn, versioned-by-freezing and reused. A Task has no life outside one |
 | `Task → Task` | self | Nesting is inside the plan, never in the filing cabinet |
 | `Todo → TaskRun` | 1 → many | Set on **root** runs only. Many runs per Todo: one to plan it, one to execute, one to evaluate |
 | `Task → TaskRun` | 1 → many | Set on **child** runs. A `map_over` of 200 makes 200 runs of one Task |
@@ -272,17 +272,17 @@ erDiagram
 
 | Rule | In the diagram |
 |---|---|
-| **A user authors Todos, never Tasks** | `TASK.task_plan_id` is `NOT NULL` — a Task cannot exist outside a plan, and a user never writes a plan node by hand |
-| **Evaluation is a TaskPlan, not a property** | `TASKRUN.role = evaluate` — the evaluator is the same machinery, and `TASKPROMPT.kind = verdict` is what it produces. **It recommends; a person writes `TODO.closed_at`** |
-| **History is never rewritten** | `TASKPLAN` is mutable and editing it touches no run; a **replan** appends a revision to `TASKRUN.plan_snapshot` and may never alter a settled node ([§0.11](#011-replan--changing-the-plan-under-a-live-run)). This is why `TaskPlan` needs no version table |
+| **A user authors Todos, never Tasks** | `TASK.flow_id` is `NOT NULL` — a Task cannot exist outside a plan, and a user never writes a plan node by hand |
+| **Evaluation is a Flow, not a property** | `TASKRUN.role = evaluate` — the evaluator is the same machinery, and `TASKPROMPT.kind = verdict` is what it produces. **It recommends; a person writes `TODO.closed_at`** |
+| **History is never rewritten** | `TASKPLAN` is mutable and editing it touches no run; a **replan** appends a revision to `TASKRUN.plan_snapshot` and may never alter a settled node ([§0.11](#011-replan--changing-the-plan-under-a-live-run)). This is why `Flow` needs no version table |
 
 ### 0.3 The names this pins
 
 | Was | Is | Because |
 |---|---|---|
 | `TaskRun.plan` | `TaskRun.plan_snapshot` | `plan` otherwise names four things: the record, the frozen column, the planning **role**, and the `plan` callable in the ask flow ([§4.3](#43-every-flow-in-the-product-placed)) |
-| `step_key: plan` | `step_key: plan_queries` | same collision, other end — the ask flow's step plans **queries**, and never emits a `TaskPlan` row ([§0.4](#04-where-a-taskplan-comes-from)) |
-| `kind = work` | *(retired)* | Human-vs-machine is now Todo-vs-Task, a type. `kind` is subject only, on the TaskPlan |
+| `step_key: plan` | `step_key: plan_queries` | same collision, other end — the ask flow's step plans **queries**, and never emits a `Flow` row ([§0.4](#04-where-a-taskplan-comes-from)) |
+| `kind = work` | *(retired)* | Human-vs-machine is now Todo-vs-Task, a type. `kind` is subject only, on the Flow |
 | `thought_stream` | `TaskStream` | |
 | `prompt_answers` | `TaskPrompt` | |
 
@@ -291,16 +291,16 @@ the only one of [§11](#11-what-you-can-answer-afterwards)'s six outputs stored 
 fastest-growing. An **event** stays `core/events`: a fact about a write with its principal, not
 task-shaped. A **metric** is telemetry.
 
-### 0.4 Where a TaskPlan comes from
+### 0.4 Where a Flow comes from
 
-**A reusable TaskPlan is what this product has been calling a workflow** — `workflows` and
+**A reusable Flow is what this product has been calling a workflow** — `workflows` and
 `workflow_versions` collapse into it ([§13](#13-what-this-replaces)).
 
 A Todo reaches a flow three ways, and **only one of them runs a planner**:
 
-| Path | `TaskPlan.origin` | A `role=plan` run? |
+| Path | `Flow.origin` | A `role=plan` run? |
 |---|---|---|
-| **Matched** — a reusable TaskPlan's `intent` fits the Todo | `packaged` or `promoted` — reused as-is | no |
+| **Matched** — a reusable Flow's `intent` fits the Todo | `packaged` or `promoted` — reused as-is | no |
 | **Generated** — nothing fit, so one is drafted | `generated`, `todo_id` set | **yes, one** |
 | **None** — a person simply does it ([§8.9](#89-a-human-task--no-steps-at-all)) | — | no |
 
@@ -311,14 +311,14 @@ journal filter the subject is supposed to narrow.
 ```
 Todo  "Which suppliers are at risk?"
  |
- +-- TaskRun  role=plan      of TaskPlan "plan-a-todo"      <- system, origin=packaged
- |              writes a new TaskPlan  origin=generated  todo_id=<this Todo>
- +-- TaskRun  role=execute   of that generated TaskPlan
- +-- TaskRun  role=evaluate  of TaskPlan "check-criteria"   <- system, origin=packaged
+ +-- TaskRun  role=plan      of Flow "plan-a-todo"      <- system, origin=packaged
+ |              writes a new Flow  origin=generated  todo_id=<this Todo>
+ +-- TaskRun  role=execute   of that generated Flow
+ +-- TaskRun  role=evaluate  of Flow "check-criteria"   <- system, origin=packaged
 ```
 
-**The planner is an ordinary TaskPlan.** The only unusual thing about it is what its run writes: a
-`TaskPlan` row rather than graph records. There is no planner service, and no runtime of its own.
+**The planner is an ordinary Flow.** The only unusual thing about it is what its run writes: a
+`Flow` row rather than graph records. There is no planner service, and no runtime of its own.
 
 | Rule | |
 |---|---|
@@ -326,15 +326,15 @@ Todo  "Which suppliers are at risk?"
 | **So the chain is one level deep, always** | packaged → generated. Never generated → generated, which is what would regress |
 | **The evaluator recommends; a person accepts** | A `role=evaluate` run writes a `TaskPrompt` of `kind = verdict`. Only a person writes `Todo.closed_at` ([§7](#7-three-kinds-of-pause)) |
 | **Promotion closes the loop** | A generated plan that served is promoted — `origin: promoted`, `reusable: true`, `todo_id` cleared. The next matching Todo takes the *matched* path and never plans again |
-| **A builtin is seeded, never registered** | The four plans Invana ships enter the library the same way any other does — as `task_plans` + `tasks` rows, `origin: packaged`, published and read-only. **The runtime resolves every plan from rows**, so a builtin has no privileged path and the *matched* row above is the only one it ever takes ([the-library LB12–LB14](modules/workflows/features/the-library.md#decisions)) |
+| **A builtin is seeded, never registered** | The four plans Invana ships enter the library the same way any other does — as `flows` + `tasks` rows, `origin: packaged`, published and read-only. **The runtime resolves every plan from rows**, so a builtin has no privileged path and the *matched* row above is the only one it ever takes ([the-library LB12–LB14](modules/workflows/features/the-library.md#decisions)) |
 
 **Three things called plan, kept apart:**
 
 | Name | Is | Emits |
 |---|---|---|
-| `TaskPlan` | the record | — |
-| `TaskRun.role = plan` | a run whose job is drafting a flow | a `TaskPlan` row |
-| `step_key: plan_queries` | a callable inside the **ask** plan | a query strategy — never a `TaskPlan` |
+| `Flow` | the record | — |
+| `TaskRun.role = plan` | a run whose job is drafting a flow | a `Flow` row |
+| `step_key: plan_queries` | a callable inside the **ask** plan | a query strategy — never a `Flow` |
 
 ---
 
@@ -365,11 +365,11 @@ sequenceDiagram
 
     P->>S: write a Todo - title, body, criteria
     S->>R: POST /todos
-    R->>R: match intent against reusable TaskPlans
+    R->>R: match intent against reusable Flows
     Note over R: nothing fits
 
     R->>PL: open TaskRun role=plan of "plan-a-todo"
-    PL->>R: write TaskPlan origin=generated, todo_id set
+    PL->>R: write Flow origin=generated, todo_id set
     R->>R: validate the plan against the agent's envelope
 
     alt the plan exceeds a bound
@@ -395,7 +395,7 @@ sequenceDiagram
     S->>R: write Todo.closed_at and outcome
 ```
 
-#### B. The matched path — a reusable TaskPlan fit
+#### B. The matched path — a reusable Flow fit
 
 The planner lane never opens. This is the difference between *predefined* and *dynamic*
 ([§4.2](#42-a-session-is-not-a-task)), and it needs no new machinery.
@@ -410,7 +410,7 @@ sequenceDiagram
 
     P->>S: "run the nightly load"
     S->>R: POST /todos
-    R->>R: intent matches TaskPlan "nightly-load"
+    R->>R: intent matches Flow "nightly-load"
     Note over R: no planner run - the flow already exists
     R->>W: open TaskRun role=execute, plan_snapshot frozen from the reusable plan
     W->>R: outcome
@@ -452,11 +452,11 @@ flowchart TB
     end
 
     subgraph AUTHOR["Package seed"]
-        B1["TaskPlan origin=packaged<br/>and its Task rows"]
+        B1["Flow origin=packaged<br/>and its Task rows"]
     end
 
     subgraph PLANNER["Planner &mdash; role=plan"]
-        C1["TaskPlan origin=generated<br/>and its Task rows"]
+        C1["Flow origin=generated<br/>and its Task rows"]
     end
 
     subgraph RUNTIME["Runtime"]
@@ -493,7 +493,7 @@ exactly one writer. If that arrow ever becomes solid, an agent is accepting its 
 | Field | Written by | Never by |
 |---|---|---|
 | `Todo.title · body · criteria` | a person | anything else — this is the definition of a Todo |
-| `TaskPlan` rows | the Planner or a skill's draw *(generated)*, a package seed *(packaged)*, promotion *(promoted)* | a person by hand ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) · a worker mid-run |
+| `Flow` rows | the Planner or a skill's draw *(generated)*, a package seed *(packaged)*, promotion *(promoted)* | a person by hand ([6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS3) · a worker mid-run |
 | `TaskRun.plan_snapshot` | the Runtime, at open | anyone, afterwards |
 | `TaskPrompt.answer` where `kind = approval` | **a person** | an agent |
 | `TaskPrompt.answer` where `kind = verdict` | an agent **or** a person | — |
@@ -514,7 +514,7 @@ tiers and only the lower one is closed.**
 | Tier | Is | Closed? | Named by |
 |---|---|---|---|
 | **Callable** | one act, one bound, one failure mode | **yes** — ships with the engine | `step_key: run_query` |
-| **TaskPlan** | a composition of callables, already proven | **no** — grows by promotion ([§0.4](#04-where-a-taskplan-comes-from)) | `ref: task:nightly-load` |
+| **Flow** | a composition of callables, already proven | **no** — grows by promotion ([§0.4](#04-where-a-taskplan-comes-from)) | `ref: task:nightly-load` |
 
 **This is the answer to "how do plans get richer without the catalogue getting huge".** They don't
 compose bigger callables; they compose plans. Every generated plan that served is promoted, and the
@@ -572,7 +572,7 @@ Grouping is not cosmetic — **the group is the thing the envelope ceilings.**
 | `schema_write` | `diff_models` · `check_capabilities` · `publish_model_version` · `snapshot_model` · `project_model` |
 | `ingest` | `check_bundle` · `import_dataset` · `validate_records` · `import_report` · `read_stitches` · `resolve_stitch_rule` |
 | `llm` | `understand` · `plan_queries` · `translate` · `summarise` · `enrich_properties` · `judge` |
-| `plan_write` | `draft_plan` — the only entry that writes a `TaskPlan` row |
+| `plan_write` | `draft_plan` — the only entry that writes a `Flow` row |
 | `work_write` | `spawn_agent` · `delegate` · `create_task` — an agent making a child, or work for a person |
 
 Roughly twenty-five entries, and the count is meant to stay near it. Growth belongs in tier two.
@@ -608,7 +608,7 @@ time. Too coarse and the envelope has nothing to ceiling, because one entry spen
 #### And the planner itself
 
 `role = plan` is a property of the **run**, never a `kind` on the plan ([§0.4](#04-where-a-taskplan-comes-from)).
-The planner is an ordinary TaskPlan naming ordinary callables:
+The planner is an ordinary Flow naming ordinary callables:
 
 ```yaml
 key: plan-a-todo
@@ -629,9 +629,9 @@ own plan is the same hole as an agent accepting its own work.
 
 ### 0.7 Agents, skills and plans — three things, composed at run time
 
-**A skill must not become a TaskPlan.** The whole Skills module rests on one axis — *offered, not
+**A skill must not become a Flow.** The whole Skills module rests on one axis — *offered, not
 obeyed* ([skills/spec.md § 2](modules/skills/spec.md)) — and the gap between **offered** and
-**applied** is the signal a person acts on. A TaskPlan has no such gap: the Runtime dispatches its
+**applied** is the signal a person acts on. A Flow has no such gap: the Runtime dispatches its
 Tasks, and "the agent chose not to follow the plan" is not a state that exists. Merging them deletes
 the distinction the module was built for.
 
@@ -639,7 +639,7 @@ But the intuition behind the question is right: **a skill's README often *is* a 
 twice — once as prose for the model, once as a plan for the Runtime — is a second source of truth.
 The fix is a link, not a merge.
 
-| | **Agent** | **Skill** | **TaskPlan** |
+| | **Agent** | **Skill** | **Flow** |
 |---|---|---|---|
 | Is | the **principal** that runs work | a **playbook**, offered | a **flow**, executed |
 | Authored by | a person | a person | a person, or the planner |
@@ -652,13 +652,13 @@ The fix is a link, not a merge.
 | | Link | Shape |
 |---|---|---|
 | **B** | A skill is **cited as a source** by a Todo's plan | `draft_plan` reads the bound skill versions; the generated plan records which. **Many skills → one plan** |
-| **C** | A skill **is itself drawn as** a plan | **One version ↔ exactly one TaskPlan.** Binding the skill to an agent grants it |
+| **C** | A skill **is itself drawn as** a plan | **One version ↔ exactly one Flow.** Binding the skill to an agent grants it |
 
 ```mermaid
 flowchart LR
     SK["Skill version<br/>content · when_to_use"]
-    PL["TaskPlan<br/>origin=generated"]
-    GEN["TaskPlan<br/>origin=generated"]
+    PL["Flow<br/>origin=generated"]
+    GEN["Flow<br/>origin=generated"]
     AG["Agent<br/>envelope · budget"]
     RUN["TaskRun"]
 
@@ -680,7 +680,7 @@ running it.
 | Column | On | Means |
 |---|---|---|
 | `plan_id` | `skill_versions` | **NOT NULL, UNIQUE — exactly one plan per version.** On the version, not the skill: a skill is versioned because what was *offered* must be reconstructible, and the plan is part of what was offered |
-| `source_skill_version_ids[]` | `TaskPlan` | which playbooks the planner read when `origin = generated`. Provenance, not a dependency |
+| `source_skill_version_ids[]` | `Flow` | which playbooks the planner read when `origin = generated`. Provenance, not a dependency |
 | `agent_skills` | *(unchanged)* | binding a skill grants the plan its current version is drawn as |
 
 | Rule | |
@@ -704,7 +704,7 @@ self-report for you to see it.
 | The agent supplies | Bounds |
 |---|---|
 | provider + model | which endpoint an `llm` callable spends against |
-| **envelope** | which `step_key`s a plan may name, and which reusable TaskPlans it may `ref` |
+| **envelope** | which `step_key`s a plan may name, and which reusable Flows it may `ref` |
 | budget | what a run may spend, and what happens at the ceiling |
 | bindings + instructions | what enters the context |
 
@@ -718,7 +718,7 @@ not a second mechanism — every primitive of that pattern already has a home he
 
 | DeepAgent primitive | Here | What changes |
 |---|---|---|
-| a `write_todos` planning tool | `draft_plan` → a **TaskPlan** row | durable, queryable and envelope-checked — not an in-context list that dies with the window |
+| a `write_todos` planning tool | `draft_plan` → a **Flow** row | durable, queryable and envelope-checked — not an in-context list that dies with the window |
 | spawning sub-agents | **delegation** — a child TaskRun with bounds ⊆ its parent's | the child cannot widen what the parent was given |
 | a virtual filesystem / scratchpad | **TaskArtifact** | addressable by digest, and it survives the run |
 | the system prompt | **Skill** (offered) + `Agent.instructions` | versioned, so a trace can say what was offered |
@@ -777,7 +777,7 @@ immutable ([skills/spec.md](modules/skills/spec.md)).
 | **`form: human` is the universal fallback** | This is what makes *never zero* safe. Anything the catalogue cannot express, a person can — *email the supplier* becomes a `human` Task. A catalogue gap therefore never blocks publishing a playbook |
 | **A shipped plan is still offered** | Drawing a playbook does not make an agent run it ([§0.7](#07-agents-skills-and-plans--three-things-composed-at-run-time)) |
 
-#### Not `SkillPlan` — `TaskPlan`
+#### Not `SkillPlan` — `Flow`
 
 The temptation is to name it for where it came from. Don't:
 
@@ -787,13 +787,13 @@ The temptation is to name it for where it came from. Don't:
 | A second type would have to stay in sync forever | and the first time a `SkillPlan` needed `map_over`, it would grow one |
 | And the name runs out | what is a plan promoted from a chat ask, or drawn from a bundle manifest? |
 
-**Provenance is a column, not a type** — `TaskPlan.source_skill_version_ids[]` already says where it
+**Provenance is a column, not a type** — `Flow.source_skill_version_ids[]` already says where it
 came from. This is the same argument that keeps *Project* a record and *step* a role
 ([§0.2](#02-three-rules-the-diagram-encodes)).
 
 #### One version, one plan — and what that sharpens
 
-**A skill version is drawn as exactly one TaskPlan.** Not *may have*: `plan_id` is `NOT NULL`, so the
+**A skill version is drawn as exactly one Flow.** Not *may have*: `plan_id` is `NOT NULL`, so the
 Flow tab is always there and no surface branches on its absence. The draft plan exists from the first
 draw, beside the draft version, and the two publish together.
 
@@ -813,11 +813,11 @@ on the author's judgement into one the product can hold.
 | The two skill↔plan relationships, kept apart | |
 |---|---|
 | `skill_versions.plan_id` — **1:1, owned** | this playbook, as a flow |
-| `TaskPlan.source_skill_version_ids[]` — **N:M, cited** | the playbooks a *Todo's* generated plan was drafted against ([§0.7](#07-agents-skills-and-plans--three-things-composed-at-run-time)) |
+| `Flow.source_skill_version_ids[]` — **N:M, cited** | the playbooks a *Todo's* generated plan was drafted against ([§0.7](#07-agents-skills-and-plans--three-things-composed-at-run-time)) |
 
 #### It reuses the plan canvas
 
-The drawing is a `TaskPlan`, so it is drawn by the surface that already draws one — screen 34
+The drawing is a `Flow`, so it is drawn by the surface that already draws one — screen 34
 `WorkflowStepHiFi` ([the-screens.md](the-screens.md)), as a **Flow tab** on the skill panel. A bespoke
 editor for skills would be a second thing that draws plans, and it would drift.
 
@@ -994,11 +994,11 @@ it also recovers *which model decided it* and *what left the building*.
 
 | | Frozen on the run | Why |
 |---|---|---|
-| `plan_snapshot` | the flow that ran | editing a TaskPlan must not rewrite fifty past runs |
+| `plan_snapshot` | the flow that ran | editing a Flow must not rewrite fifty past runs |
 | **`lens_snapshot`** | **the world it ran against** | publishing a model version must not rewrite what an answer meant |
 
 Same rule, same reason, one sentence apart. A named `Lens` row is the definition; the snapshot on the
-run is what actually applied — exactly the `TaskPlan` / `plan_snapshot` split
+run is what actually applied — exactly the `Flow` / `plan_snapshot` split
 ([§0.2](#02-three-rules-the-diagram-encodes)).
 
 **Declared is half of it.** The lens says what *may* participate; the **touch record** says what did,
@@ -1025,7 +1025,7 @@ lens should be described as if it could.
 
 #### Bounds narrow, never widen
 
-A lens may be set on the Agent, the TaskPlan or the Todo. Two operations compose them, and both
+A lens may be set on the Agent, the Flow or the Todo. Two operations compose them, and both
 narrow:
 
 ```
@@ -1190,7 +1190,7 @@ about history, which is the one thing this record exists to be right about.
 
 | The two "frozen" claims, side by side | |
 |---|---|
-| Editing the **`TaskPlan`** never touches a run | a definition and an execution are different records ([§0.2](#02-three-rules-the-diagram-encodes)) |
+| Editing the **`Flow`** never touches a run | a definition and an execution are different records ([§0.2](#02-three-rules-the-diagram-encodes)) |
 | A **replan** never alters a settled node | a run may change its future, never its past |
 
 One principle, stated twice: **history is not rewritten.**
@@ -1409,7 +1409,7 @@ version records rather than a run. A model *import* passes all three.
 #### 4.1a Nothing executes outside the runtime
 
 **One dispatcher, one trace, one place a refusal can happen.** Every act that spends a bound is
-dispatched by the interpreter as a Task inside a TaskPlan — an import, an ask in a chat, a stitch
+dispatched by the interpreter as a Task inside a Flow — an import, an ask in a chat, a stitch
 commit, a model publish, a provider ping, a canvas expansion. No feature package opens its own
 execution path, writes its own progress rows, or calls a provider directly.
 
@@ -1447,7 +1447,7 @@ A **session** is a conversation. It never runs, has no outcome, and its children
 there is no `depends_on` graph over the messages in a thread. It **references** Tasks; it is not one.
 
 **But everything a session *does* is a Task.** A message that asks for something opens a TaskRun
-against a TaskPlan — matched or generated ([§0.4](#04-where-a-taskplan-comes-from)) — and
+against a Flow — matched or generated ([§0.4](#04-where-a-taskplan-comes-from)) — and
 nothing in a chat reaches a provider, a database or the graph except through it. The session is the
 thread; the plans are the work.
 
@@ -1469,7 +1469,7 @@ Session  "Q3 supply review"                    a conversation, not a Task
 
 | In a chat | What happens |
 |---|---|
-| **An expert plan fits** | The message resolves to a `reusable` TaskPlan matched by intent — packaged, or promoted from a generated plan that served. A new TaskRun against it; **no plan is created** |
+| **An expert plan fits** | The message resolves to a `reusable` Flow matched by intent — packaged, or promoted from a generated plan that served. A new TaskRun against it; **no plan is created** |
 | **Nothing fits** | A one-off plan is generated for the ask, `plan_origin = generated`, validated against the envelope before anything is dispatched |
 | **The generated plan served** | Promote it — the frozen plan becomes reusable with an `intent`, and the next matching question selects it instead |
 | **Either way** | The run is the same record, the same trace, the same budget. *Which plan served this answer* is a column, not an implementation detail |
@@ -2428,7 +2428,7 @@ terms, so nobody mistakes the design for the state.
 | Five separate concepts — Thought · Thinking · Step · Workflow · Project | ✅ shipped. §13 is what replaces them |
 | Import writing its own rows instead of being dispatched | ❌ the largest correctness item — **M11** |
 | Bulk load · stitch apply · model import leaving **no record they ran** | ❌ four flows currently invisible — bulk and stitch in **M11**, model in **M14** |
-| The runtime resolving a plan from a **dict**, not from the library | ❌ `plan_workflow → select_template → template_for` never touches `task_plans`. *A plan is its rows* is true for reading and false for running until **M11** |
+| The runtime resolving a plan from a **dict**, not from the library | ❌ `plan_workflow → select_template → template_for` never touches `flows`. *A plan is its rows* is true for reading and false for running until **M11** |
 | Frontier · lanes · `ref` composition · `loop` · verdict | 🔵 designed, triggers fired, not built |
 | Approvals · artifacts · run logs | 🔵 designed, additive |
 | Pools · automations · provider cache | 🔵 designed, **still waiting for a trigger** |

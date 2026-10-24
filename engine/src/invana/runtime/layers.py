@@ -16,8 +16,8 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
 
+from invana.apps.flows.models import Task, TaskForm
 from invana.apps.govern.addressing import Layer
-from invana.apps.task_plans.models import Task, TaskForm
 from invana.plugins.sdk.manifest import Bound
 from invana.runtime.catalogue import CATALOGUE
 

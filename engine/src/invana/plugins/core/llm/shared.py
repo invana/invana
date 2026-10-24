@@ -68,7 +68,7 @@ def _vocabulary(envelope) -> list[dict]:
 
 #: The step every data question ends in: an agent whose envelope lacks it can
 #: answer nothing, so it is offered nothing to ask (NL14).
-_READS_THE_GRAPH = "execute_graph_query"
+_READS_THE_GRAPH = "graph.read.query"
 _MAX_CHOICES = 3
 
 

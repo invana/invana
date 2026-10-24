@@ -5,8 +5,8 @@
  * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md) ·
  * [see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
  * breadcrumb · tiles · Input · `result.json` · Output · Artifacts · Log · where
- * it sits, identical for `import_dataset`, `execute_graph_query` and
- * `understand_intent`. The Output panel is picked from **the shape the step
+ * it sits, identical for `data.records.validate`, `graph.read.query` and
+ * `nl.understand`. The Output panel is picked from **the shape the step
  * recorded**, never from its `task_key` — rows are a table, a prompt and a
  * completion are an exchange, records written are properties — so a new
  * catalogue entry ships a surface by recording one of those shapes.
@@ -640,7 +640,7 @@ function whereItSits(trace: TraceRead, group: TaskGroup): PanelSpec {
 				{ label: "attempt", value: `${step.attempt} of ${group.attempts}` },
 				{
 					label: "parent",
-					value: trace.workflow_key || "root run",
+					value: trace.flow_key || "root run",
 					mono: true,
 				},
 			]),

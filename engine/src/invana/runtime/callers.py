@@ -46,7 +46,7 @@ async def caller_for(db: AsyncSession, run: TaskRun) -> QueryCaller | None:
 
 
 def classify(root: TaskRun) -> QueryCaller | None:
-    plan_key = (root.workflow_key or "").split("@")[0]
+    plan_key = (root.flow_key or "").split("@")[0]
     if root.triggered_by == TriggeredBy.system.value or plan_key in _UNLOGGED_PLANS:
         return None
     if root.triggered_by == TriggeredBy.canvas.value:

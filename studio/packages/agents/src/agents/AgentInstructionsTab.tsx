@@ -173,7 +173,7 @@ export function AgentInstructionsTab({
 							every plan this agent runs is generated with these
 						</PropertyRow>
 						<PropertyRow label="skills">
-							offered {agent.skill_ids.length} · listed under Skills & callables
+							offered {agent.skill_ids.length} · listed under Skills & functions
 						</PropertyRow>
 						<PropertyRow label="last change">
 							{last ? (

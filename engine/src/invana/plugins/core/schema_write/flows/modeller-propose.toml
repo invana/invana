@@ -5,16 +5,16 @@ description = "Read a described change and stage it on the model draft."
 intents = ["model_change"]
 
 [[steps]]
-id = "understand_ask"
-task = "understand_ask"
+id = "model_understand_ask"
+task = "model.understand_ask"
 label = "Understand"
 
 [[steps]]
-id = "propose_model"
-task = "propose_model"
+id = "model_propose"
+task = "model.propose"
 label = "Propose"
 
 [[steps]]
-id = "validate_proposal"
-task = "validate_proposal"
+id = "model_validate_proposal"
+task = "model.validate_proposal"
 label = "Validate"

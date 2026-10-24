@@ -203,7 +203,7 @@ export function tokensPerRun(e: ChangeEffect): number | null {
 const BY_TARGET: Record<string, RecordKind> = {
 	skill: "skill",
 	rule: "rule",
-	workflow: "plan",
+	flow: "plan",
 	agent: "agent",
 	graph_model: "model",
 };

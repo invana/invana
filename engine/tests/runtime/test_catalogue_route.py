@@ -14,8 +14,8 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from invana.apps.flows.models import Flow, Task
 from invana.apps.graphs.models import Graph, GraphMember
-from invana.apps.task_plans.models import Task, TaskPlan
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
@@ -29,13 +29,13 @@ pytestmark = pytest.mark.asyncio
 URL = "/api/v1/u/owner/atlas/catalogue"
 
 
-def _plan(graph_id: str, *, key: str | None, version: int = 1, reusable: bool = True) -> TaskPlan:
-    return TaskPlan(graph_id=graph_id, key=key, version=version, reusable=reusable, origin="authored")
+def _plan(graph_id: str, *, key: str | None, version: int = 1, reusable: bool = True) -> Flow:
+    return Flow(graph_id=graph_id, key=key, version=version, reusable=reusable, origin="authored")
 
 
 @pytest_asyncio.fixture
 async def client(db_engine):
-    """A Graph whose library names `execute_graph_query` from one plan key in two
+    """A Graph whose library names `graph.read.query` from one plan key in two
     versions, from a one-off plan, and from another Graph's plan."""
     factory = async_sessionmaker(db_engine, class_=AsyncSession, expire_on_commit=False)
 
@@ -62,9 +62,7 @@ async def client(db_engine):
         s.add(member)
         s.add_all(plans)
         await s.flush()
-        s.add_all(
-            Task(task_plan_id=p.id, key="execute", form="callable", step_key="execute_graph_query") for p in plans
-        )
+        s.add_all(Task(flow_id=p.id, key="execute", form="callable", step_key="graph.read.query") for p in plans)
         await s.commit()
         user_id, graph_id = user.id, graph.id
 
@@ -100,17 +98,17 @@ class TestCatalogueRoute:
         bounds = [item["bound"] for item in body["items"]]
         assert bounds == sorted(bounds, key=order.index)
 
-        query = next(i for i in body["items"] if i["step_key"] == "execute_graph_query")
+        query = next(i for i in body["items"] if i["step_key"] == "graph.read.query")
         assert query["summary"]
-        assert query["requires"] == ["validate_query"]
+        assert query["requires"] == ["graph.read.validate"]
         assert {"name": "rows", "type": "int", "rollup": "sum"} in query["outputs"]
 
     async def test_used_by_counts_this_graphs_reusable_plan_keys_only(self, client):
         """Two versions of one key count once; a one-off and another Graph's plan not at all."""
         items = {i["step_key"]: i for i in (await client.get(URL)).json()["items"]}
 
-        assert items["execute_graph_query"]["used_by"] == 1
-        assert items["bulk_write"]["used_by"] == 0
+        assert items["graph.read.query"]["used_by"] == 1
+        assert items["graph.write.bulk"]["used_by"] == 0
 
     async def test_the_list_is_filtered_labelled_and_paged_by_key(self, client):
         writes = sorted(e.key for e in CATALOGUE.values() if e.bound is Bound.graph_write)

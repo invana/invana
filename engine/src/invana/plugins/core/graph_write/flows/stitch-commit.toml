@@ -5,6 +5,6 @@ description = "Commit the staged stitches and write their edges, under the Graph
 intents = []
 
 [[steps]]
-id = "commit_stitches"
-task = "commit_stitches"
+id = "graph_stitch_commit"
+task = "graph.stitch.commit"
 label = "Commit"

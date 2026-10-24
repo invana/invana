@@ -2,5 +2,5 @@ name = "invana.core.graph_read"
 kind = "core"
 engine = "*"
 secrets = []
-tasks = ["execute_graph_query", "preview_stitches", "count_types", "resolve_elements", "expand_neighbours"]
+tasks = ["graph.read.query", "graph.stitch.preview", "graph.read.types_count", "graph.read.resolve", "graph.read.get_neighbors"]
 flows = ["ql-direct", "stitch-preview", "expand-neighbours", "count-types", "resolve-elements"]

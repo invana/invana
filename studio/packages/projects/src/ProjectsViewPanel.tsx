@@ -8,7 +8,7 @@
  * still work somebody wrote. Drill into a project and the section narrows to its
  * Todos, while the projects list keeps its place above.
  *
- * The rail's **Tasks** icon is execution only — `TaskRun`s, `TaskPlan`s and the
+ * The rail's **Tasks** icon is execution only — `TaskRun`s, `Flow`s and the
  * catalogue, never Todos.
  */
 

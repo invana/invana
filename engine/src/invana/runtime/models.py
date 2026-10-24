@@ -155,8 +155,8 @@ class TaskRun(Base):
     #: The Todo this run carries out, when it is carrying one out.
     todo_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
     #: The plan being run (root) — its rows are what the nodes execute.
-    task_plan_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("task_plans.id", ondelete="SET NULL"), nullable=True, index=True
+    flow_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("flows.id", ondelete="SET NULL"), nullable=True, index=True
     )
     #: The plan **node** this run executes. Null on a root, and on a node whose
     #: plan was generated rather than drawn from the library.
@@ -182,7 +182,7 @@ class TaskRun(Base):
     #: on. Distinct from `plan_origin`, which is provenance: a run off
     #: `nl-query` whose Plan step picks `nl-single@1` has both, and they answer
     #: different questions.
-    workflow_key: Mapped[str] = mapped_column(String(64), default="", nullable=False)
+    flow_key: Mapped[str] = mapped_column(String(64), default="", nullable=False)
     #: The flow as it ran. **Not `plan`** — that word names four things.
     plan_snapshot: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     #: `authored:<id>` · `generated` · `reused:<id>` · `template:<key>@<v>`.
@@ -451,7 +451,7 @@ class ProjectionTemplate(Base):
     # The surface's own definition — columns for a table, axes for a chart, the
     # option source for a choice.
     spec: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
-    # What it is for, so `project` selects it the way `plan` selects a workflow.
+    # What it is for, so `project` selects it the way `plan` selects a reusable flow.
     intent: Mapped[str] = mapped_column(String(255), default="", nullable=False)
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     status: Mapped[str] = mapped_column(String(16), default="published", nullable=False)

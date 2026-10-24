@@ -44,7 +44,7 @@ function fold(view: RunView, e: AskFrame): RunView {
 			return {
 				...v,
 				status: "run",
-				workflow: (p.workflow as string | undefined) ?? v.workflow,
+				flow: (p.flow as string | undefined) ?? v.flow,
 			};
 		case "step.started":
 		case "step.needs_input":

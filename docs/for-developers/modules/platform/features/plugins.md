@@ -26,7 +26,7 @@ builds itself from the manifests once at start-up and is then frozen.
 | C4 | Packaged flows | `flows/<key>.toml` — the fixed multi-step plans the plugin ships (`model-import@1`, `stitch-apply@1`, …) |
 | C5 | Checked at start-up | A manifest whose key's last dotted segment is not its folder, whose `run.py` has no `async def run(ctx, v)`, or whose key repeats stops the process with the file named |
 | C6 | Frozen per process | Built once; nothing registers while plans run |
-| C7 | Keys never move | `run_nodes.task_key` and Studio read them; moving a task type into a plugin renames nothing |
+| C7 | Keys are `namespace.verb` | `graph.read.query`, `nl.translate`, `web.read_url` — [agent-fabric › The function library](../../../../products/agent-fabric.md#the-function-library); moving a task type between plugins renames nothing |
 | C8 | Each Task records its task type's version | `tasks.task_version`, written when a plan's rows are exploded |
 | C9 | Simulator plugins | `plugins/simulators/<name>/`, `kind = "simulator"`: one simulator task type, its declared spec fields, and one packaged `simulate` flow — run by [9.8 Simulation](../../work/features/simulation.md) |
 
@@ -91,7 +91,7 @@ flowchart LR
 | # | Decision |
 |---|---|
 | PL1 | **`invana.plugins` shares band 3 with `invana.runtime`.** Task bodies use the runtime (stream, governing, models) and the runtime dispatches task types, so the two are non-independent siblings in the `bands` contract; `apps` still never imports either. |
-| PL2 | **Flows reach `apps` as an argument.** `TaskPlanManager.ensure_seeded` takes the flows (and their task versions) from the runtime caller, the same way it already takes `requires`, because an app may not import band 3. |
+| PL2 | **Flows reach `apps` as an argument.** `FlowManager.ensure_seeded` takes the flows (and their task versions) from the runtime caller, the same way it already takes `requires`, because an app may not import band 3. |
 | PL3 | **A core plugin's version is the engine's.** `plugin.toml` for `kind: core` carries no `version`; the loader reads the installed engine version. |
 | PL4 | **`run.py` keeps the task's own function name** and binds `run` to it, so stack traces, tests and re-exports keep the names they had. |
 | PL5 | **`TASKS` is a mutable dict derived from the frozen registry.** Tests substitute steps on it; the registry's own mappings are read-only. |
@@ -105,7 +105,8 @@ flowchart LR
 | PL12 | **The simulator contract is checked at load.** Its task type is `bound = "none"`, `side_effect = "read"`, takes `spec: obj` · `inputs: list` · `seed: int` (all required) and declares `ranked: list` · `summary: obj`; a plugin that breaks any of it stops the process with its manifest named. |
 | PL13 | **A simulator reads data only through `read_inputs(ctx)`.** It gets the records of the versions Invana pinned, after their content hash is checked and a retraction refused. It never queries the graph or another dataset. |
 | PL14 | **A simulator's task type is in the registry like any other** — the catalogue lists it, the interpreter dispatches it, and a plan may name it only where an envelope allows it. The closed **core** set stays the count the catalogue test holds; a simulator adds to the registry, not to it. |
-| PL15 | **A task type's key may carry its plugin's prefix** (`sim.genomic_prediction`); the folder is the last segment, so the module path stays importable — or the whole key with dots as underscores where two keys of one plugin end alike (`uniprot.get` → `uniprot_get/`). Core keys have no prefix. |
+| PL15 | **Every task type's key is `namespace.verb`, core included** (`graph.read.query`, `sim.genomic_prediction`). The folder is the last segment, so the module path stays importable — or the whole key with dots as underscores where two keys of one plugin end alike, or the last segment is a Python keyword (`science.uniprot.get` → `science_uniprot_get/`, `work.await` → `work_await/`). |
+| PL17 | **The namespace is not the plugin.** A plugin groups task types by what they need to run (`core.graph_read` holds `graph.read.*` and `graph.stitch.preview`; `core.pure` holds `graph.read.validate`); the namespace groups them by what they touch. |
 | PL16 | **A plugin lists its `skills` beside its `tasks` and `flows`.** `skills/<slug>/skill.toml` + `instructions.md`, loaded into `LoadedPlugin.skills`; a folder the list does not name is a load error, as for tasks (PL8). |
 ## Not building
 

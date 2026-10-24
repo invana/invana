@@ -8,7 +8,7 @@ node types (edge endpoints reference node-type names), then edge types.
 
 The caller passes the eager-loaded draft ``version`` (``ModelStore.get_version``)
 and a validated :class:`~invana.apps.llm.propose.ModelProposal` — referential
-integrity is already checked (``validate_proposal``) before we touch the draft.
+integrity is already checked (``model.validate_proposal``) before we touch the draft.
 All ``ModelStore`` writes are draft-guarded by ``_ensure_draft``.
 """
 

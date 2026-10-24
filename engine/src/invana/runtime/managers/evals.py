@@ -505,7 +505,7 @@ class EvalManager:
         root = TaskRun(
             graph_id=graph_id,
             role=RunRole.evaluate.value,
-            workflow_key="eval",
+            flow_key="eval",
             label=_subject(subject_kind, subject_id),
             author_id=actor_id,
             author_kind="user" if actor_id else "system",
@@ -580,7 +580,7 @@ class EvalManager:
             ask_kind="nl",
             body=case.question,
             params={"llm_model_id": provider.model_row_id, "eval": replay},
-            workflow_key=NL_QUERY.key,
+            flow_key=NL_QUERY.key,
             label=f"{side} · case {seq // 2 + 1}" if root.params.get("side") == "both" else f"{side} · case {seq + 1}",
             agent_id=agent.id if agent else None,
             agent_version=agent.version if agent else None,

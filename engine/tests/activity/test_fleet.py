@@ -21,9 +21,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.activity.managers import FleetManager
 from invana.activity.models import Approval
 from invana.apps.agents.models import Agent
+from invana.apps.flows.models import Flow
 from invana.apps.graphs.models import Graph
 from invana.apps.skills.models import Skill, SkillBinding, SkillVersion
-from invana.apps.task_plans.models import TaskPlan
 from invana.core.metrics import change_of, points_change_of
 from invana.runtime.models import EvalSet, TaskRun
 
@@ -55,12 +55,12 @@ async def _agent(session: AsyncSession, graph: Graph, name: str, **kw) -> Agent:
 
 async def test_overview_names_what_broke_and_what_waits(session: AsyncSession, graph: Graph, user) -> None:
     analyst = await _agent(session, graph, "Analyst")
-    plan = TaskPlan(graph_id=graph.id, key="nightly-load", version=2, name="nightly-load")
+    plan = Flow(graph_id=graph.id, key="nightly-load", version=2, name="nightly-load")
     session.add(plan)
     await session.flush()
-    ok = _root(graph, analyst, ago=timedelta(hours=5), secs=2, task_plan_id=plan.id, tokens_in=10, tokens_out=5)
-    bad1 = _root(graph, analyst, ago=timedelta(hours=3), secs=2, status="failed", task_plan_id=plan.id)
-    bad2 = _root(graph, analyst, ago=timedelta(hours=1), secs=2, status="failed", task_plan_id=plan.id)
+    ok = _root(graph, analyst, ago=timedelta(hours=5), secs=2, flow_id=plan.id, tokens_in=10, tokens_out=5)
+    bad1 = _root(graph, analyst, ago=timedelta(hours=3), secs=2, status="failed", flow_id=plan.id)
+    bad2 = _root(graph, analyst, ago=timedelta(hours=1), secs=2, status="failed", flow_id=plan.id)
     paused = _root(graph, analyst, ago=timedelta(minutes=30), secs=1, status="needs_input", body="Which quarter?")
     judged = _root(graph, analyst, ago=timedelta(minutes=20), secs=1, role="evaluate", tokens_in=999)
     session.add_all([ok, bad1, bad2, paused, judged])
@@ -110,7 +110,7 @@ async def test_overview_names_what_broke_and_what_waits(session: AsyncSession, g
 async def test_a_degradation_names_the_skill_version_before_it(session: AsyncSession, graph: Graph) -> None:
     analyst = await _agent(session, graph, "Analyst")
     skill = Skill(graph_id=graph.id, name="Route brief")
-    plans = [TaskPlan(graph_id=graph.id, key=None, reusable=False) for _ in range(2)]
+    plans = [Flow(graph_id=graph.id, key=None, reusable=False) for _ in range(2)]
     session.add_all([skill, *plans])
     await session.flush()
     v1 = SkillVersion(skill_id=skill.id, version=1, plan_id=plans[0].id, published_at=NOW - timedelta(days=30))
@@ -178,7 +178,7 @@ async def test_pins_group_by_address(session: AsyncSession, graph: Graph) -> Non
     address = "llm/anthropic/claude-x"
     analyst = await _agent(session, graph, "Analyst", model_pin=address)
     skill = Skill(graph_id=graph.id, name="Route brief")
-    plan = TaskPlan(graph_id=graph.id, key=None, reusable=False)
+    plan = Flow(graph_id=graph.id, key=None, reusable=False)
     session.add_all([skill, plan])
     await session.flush()
     version = SkillVersion(skill_id=skill.id, version=3, plan_id=plan.id, published_at=NOW, model_pin=address)

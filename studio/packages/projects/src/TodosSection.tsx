@@ -571,7 +571,7 @@ function TaskDetail({
 						runs.data.map((run) => (
 							<TodoRunsBlock
 								key={run.id}
-								workflowKey={run.workflowKey}
+								flowKey={run.flowKey}
 								steps={run.steps}
 								workMs={run.workMs}
 								done={run.stepsDone}
@@ -692,7 +692,7 @@ function TaskDetail({
  * steps`), so the two surfaces read as one record seen from two ends.
  */
 function TodoRunsBlock({
-	workflowKey,
+	flowKey,
 	steps,
 	workMs,
 	done,
@@ -700,7 +700,7 @@ function TodoRunsBlock({
 	tokensIn = 0,
 	tokensOut = 0,
 }: {
-	workflowKey: string;
+	flowKey: string;
 	steps: RunNode[];
 	workMs?: number;
 	/** Steps that succeeded, of the plan's length so far — the engine's count. */
@@ -737,7 +737,7 @@ function TodoRunsBlock({
 				<>
 					<StepList steps={steps} className="pl-3.5" />
 					<span className="pl-3.5 font-mono text-base text-muted-foreground">
-						{workflowKey}
+						{flowKey}
 					</span>
 				</>
 			) : null}

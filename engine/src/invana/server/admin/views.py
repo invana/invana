@@ -29,6 +29,8 @@ from invana.apps.datasets.models import (
     DatasetStandard,
     DatasetVersion,
 )
+from invana.apps.flows.models import Flow
+from invana.apps.flows.models import Task as PlanTask
 from invana.apps.govern.models import Lens, RunTouch
 from invana.apps.graphs.models import Graph, GraphConnection, GraphMember
 from invana.apps.llm_providers.models import LLMModel, LLMProvider
@@ -58,8 +60,6 @@ from invana.apps.skills.models import (
     SkillVersionClarification,
 )
 from invana.apps.standards.models import Standard, StandardVersion
-from invana.apps.task_plans.models import Task as PlanTask
-from invana.apps.task_plans.models import TaskPlan
 from invana.apps.work.models import (
     BranchFinding,
     Project,
@@ -110,6 +110,7 @@ from invana.server.datasets.admin import (
 )
 from invana.server.evals.admin import EvalBudgetView, EvalCaseView, EvalResultView, EvalSetView
 from invana.server.events.admin import EventView
+from invana.server.flows.admin import FlowView, PlanTaskView
 from invana.server.govern.admin import LensView, RunTouchView
 from invana.server.graphs.admin import (
     GraphConnectionView,
@@ -162,7 +163,6 @@ from invana.server.skills.admin import (
     SkillView,
 )
 from invana.server.standards.admin import StandardVersionView, StandardView
-from invana.server.task_plans.admin import PlanTaskView, TaskPlanView
 from invana.server.work.admin import (
     BranchFindingView,
     ProjectAssignmentView,
@@ -347,7 +347,7 @@ def mount_admin(app: FastAPI) -> None:
             icon="fa fa-robot",
             views=[
                 AgentView(Agent, label="Agents", icon="fa fa-robot"),
-                TaskPlanView(TaskPlan, label="Plan library", icon="fa fa-diagram-next"),
+                FlowView(Flow, label="Plan library", icon="fa fa-diagram-next"),
                 PlanTaskView(PlanTask, label="Plan tasks", icon="fa fa-diagram-project"),
                 ProjectView(Project, label="Projects", icon="fa fa-folder-open"),
                 ProjectAssignmentView(ProjectAssignment, label="Project staffing", icon="fa fa-user-plus"),

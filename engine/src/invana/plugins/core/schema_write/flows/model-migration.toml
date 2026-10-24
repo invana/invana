@@ -5,6 +5,6 @@ description = "Preview a breaking model change, or publish it once a review is a
 intents = []
 
 [[steps]]
-id = "migrate_model"
-task = "migrate_model"
+id = "model_migrate"
+task = "model.migrate"
 label = "Migrate"

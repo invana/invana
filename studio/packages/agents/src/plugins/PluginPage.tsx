@@ -98,11 +98,11 @@ export function PluginPage({
 					{!p.installed ? (
 						<p className="text-muted-foreground">
 							Not installed — the <span className="font-mono">{p.extra}</span>{" "}
-							extra brings its task types.
+							extra brings its functions.
 						</p>
 					) : null}
 
-					<PanelSection card title="Task types" hint={`${p.task_types.length}`}>
+					<PanelSection card title="Functions" hint={`${p.task_types.length}`}>
 						{p.task_types.length === 0 ? (
 							<p className="text-muted-foreground">It declares none.</p>
 						) : (

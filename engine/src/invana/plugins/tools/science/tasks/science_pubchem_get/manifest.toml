@@ -1,0 +1,17 @@
+key = "science.pubchem.get"
+version = "0.1.0"
+summary = "Read one PubChem compound, by name or CID, as its formula, weight, IUPAC name, SMILES and InChIKey."
+bound = "network"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+timeout_s = 30
+retries = 2
+
+[args]
+name = { type = "str" }
+cid = { type = "int" }
+
+[outputs]
+compound = "obj"
+url = "str"

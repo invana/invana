@@ -5,7 +5,7 @@
 [building-studio/code-shape.md](building-studio/code-shape.md) §4; the module map is in the [README](README.md#the-modules).
 Nothing beyond `RunsList` (§4) has moved.
 
-The product's words moved — Todo · TaskPlan · Task · TaskRun ([orchestration.md § 0](orchestration.md#0-the-records)),
+The product's words moved — Todo · Flow · Task · TaskRun ([orchestration.md § 0](orchestration.md#0-the-records)),
 **Runs**, **Library**, **Projects** — and the folders did not. One thing carries a different name in the
 docs module, the Studio folder and the engine package. This file sets one module structure, one name
 per module across all three layers, one component-naming convention, and the order the moves are made in.
@@ -132,7 +132,7 @@ folder called `<m>`: `apps/<m>/` when the module owns tables, and `server/<m>/` 
 | `lenses` | `lenses/` ← govern | `lenses/` ← govern | `lenses/` ← govern |
 | `llms` | `llms/` ← agents/Llms* | `llms/` ← llm_providers + llm (provider half) | `llms/` ← llm_providers |
 | `models` | `models/` ← connect-and-model | `models/` ← modeller | `models/` ← modeller + routes/{models,model_links,schemas} |
-| `plans` | `plans/` ← workflows | `plans/` ← task_plans | `plans/` ← task_plans + runtime/catalogue.py |
+| `plans` | `plans/` ← workflows | `plans/` ← flows | `plans/` ← flows + runtime/catalogue.py |
 | `projections` | `projections/` ← ask/projections | — (records in `runtime`) | `projections/` ← runtime/templates.py |
 | `projects` | `projects/` ← work | `projects/` ← work | `projects/` ← work |
 | `rules` | `rules/` ← skills/Rule* | `rules/` ← skills (rules, rule_versions) | `rules/` |
@@ -241,7 +241,7 @@ The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `Pane
 |---|---|---|
 | `XViewPanel` | what fills a region — `leftSection` · `rightSection` · `bottomSection` — named for the occupant | `AgentsStackPanel` → `AgentsViewPanel` · `GovernStackPanel` → `LensesViewPanel` · `LibraryStackPanel` → `LibraryViewPanel` · `ProjectsStackPanel` → `ProjectsViewPanel` · `RunsPanel` → `RunsViewPanel` · `SkillsPanel` → `SkillsViewPanel` · `ModelPanel` → `ModelViewPanel` · `SettingsPanel` → `SettingsViewPanel` · `ExplorerTypesPanel` → `ExplorerViewPanel` · `AssistantPanel` → `AssistantViewPanel` · `InspectorPanel` → `InspectorViewPanel` |
 | `XSection` + `xSection()` | one `PanelStackSection` of a view panel — collapsible, resizable, its own header | `AgentsDrawer` → `AgentsSection` · `LlmsDrawer` → `LlmsSection` · `WorldsDrawer` → `WorldsSection` · `GuardrailsDrawer` → `GuardrailsSection` · `PlansDrawer` → `PlansSection` · `CatalogueDrawer` → `CatalogueSection` · `TemplatesDrawer` → `TemplatesSection` · `RulesDrawer` → `RulesSection` · `ProjectsPanel` → `ProjectsSection` · `TasksPanel` → `TodosSection`; factories `agentsDrawerSection()` → `agentsSection()` |
-| `XSectionBody` | a section's `content`, when it is its own component | `TodosDrawerBody` → `TodosSectionBody` · `PlansDrawerBody` (`TaskPlansPanel`) → `PlansSectionBody` · `TemplatesPanel` → `TemplatesSectionBody` |
+| `XSectionBody` | a section's `content`, when it is its own component | `TodosDrawerBody` → `TodosSectionBody` · `PlansDrawerBody` (`FlowsPanel`) → `PlansSectionBody` · `TemplatesPanel` → `TemplatesSectionBody` |
 | `XList` | the rows of a list section | `RunsList` (done) |
 | `XDetail` | a drill-in that replaces a section's body | `RunDetailDrawer` → `RunDetail` |
 | `XBoardPage` | anything in `mainSection` | `PlanDashboardPage` · `RunDashboardPage` · `RuleDashboardPage` · `UsageDashboardPage` → `*BoardPage` · `RunsJournalPage` → `RunsBoardPage` · `ComparePage` → `CompareBoardPage` |
@@ -273,13 +273,13 @@ docstrings stay full — they are how a reader learns to use the code.
 
 ## 6. Retired words still in Studio
 
-**Status: file and component names done** — `TodoActivityTree`, `TodoRunsBlock`, `LayeredCanvas*`, `RecordRow`, `PlanTrendWidget`, `taskFlowFromTaskPlan`, `AgentEffortTab`, `useLeftSection` · `LeftNavKey`. The type, hook and API names are done too — `Todo*` · `todosApi` · `useTodosQuery` · `useTodoRunsQuery`, `TaskRun` · `RunStreamHandle` · `RunState` · `LIVE_RUN_STATUSES`, `useTaskPlansQuery` · `taskPlansApi`, `SkillPlaybook*`, `navItem`. **Journal:** the journal hook is `useRunListQuery` and its row `RunListRow`; `useRunsQuery` keeps its name, because it is a different read — the raw list with server-side filters, where the journal shapes and filters rows client-side — and both live in `runs/queries.ts`. Only a *Todo* retires *Task*: `TaskFlowCanvas`, `TaskGroup`, `TaskPlan*` and `TaskRun` name the runtime step and keep it. UI copy keeps its words (§11) — the Todos section still labels its runs *Thoughts*.
+**Status: file and component names done** — `TodoActivityTree`, `TodoRunsBlock`, `LayeredCanvas*`, `RecordRow`, `PlanTrendWidget`, `taskFlowFromFlow`, `AgentEffortTab`, `useLeftSection` · `LeftNavKey`. The type, hook and API names are done too — `Todo*` · `todosApi` · `useTodosQuery` · `useTodoRunsQuery`, `TaskRun` · `RunStreamHandle` · `RunState` · `LIVE_RUN_STATUSES`, `useFlowsQuery` · `taskPlansApi`, `SkillPlaybook*`, `navItem`. **Journal:** the journal hook is `useRunListQuery` and its row `RunListRow`; `useRunsQuery` keeps its name, because it is a different read — the raw list with server-side filters, where the journal shapes and filters rows client-side — and both live in `runs/queries.ts`. Only a *Todo* retires *Task*: `TaskFlowCanvas`, `TaskGroup`, `Flow*` and `TaskRun` name the runtime step and keep it. UI copy keeps its words (§11) — the Todos section still labels its runs *Thoughts*.
 
 | Word | Where | Becomes |
 |---|---|---|
 | Task, meaning Todo | `types/work.ts` (`Task`, `TaskStatus`, `TaskCreate`, `PlanTask`, `TaskActivity`) · `useTasksQuery` · `useTaskMutations` · `TaskActivityTree` · `tasksApi` | `Todo*` · `useTodosQuery` · `TodoActivityTree` · `todosApi` |
-| Work | `WorkCanvas*` · `WorkGraphCanvas` · `WorkNode` · `WorkTone` · `WorkRow` · `WorkTrendPanel` · `useWork.ts` · `types/work.ts` · `services/api/work.ts` | `LayeredCanvas*` · `RecordRow` · `PlanTrendWidget` · split by record: `useTodos` / `useProjects` / `useTaskPlans` / `useAgents` |
-| Workflow, meaning TaskPlan | `useWorkflowsQuery` · `usePromoteWorkflowMutation` · `taskFlowFromWorkflow` · `workflowsApi` | `useTaskPlansQuery` · `usePromoteTaskPlanMutation` · `taskFlowFromTaskPlan` · `taskPlansApi` |
+| Work | `WorkCanvas*` · `WorkGraphCanvas` · `WorkNode` · `WorkTone` · `WorkRow` · `WorkTrendPanel` · `useWork.ts` · `types/work.ts` · `services/api/work.ts` | `LayeredCanvas*` · `RecordRow` · `PlanTrendWidget` · split by record: `useTodos` / `useProjects` / `useFlows` / `useAgents` |
+| Workflow, meaning Flow | `useWorkflowsQuery` · `usePromoteWorkflowMutation` · `taskFlowFromWorkflow` · `workflowsApi` | `useFlowsQuery` · `usePromoteFlowMutation` · `taskFlowFromFlow` · `taskPlansApi` |
 | Thinking / Thought | `services/api/runs.ts` (`Thinking`, `ApiThinking`, `ThinkingStreamHandle`) · `ThinkingState` · `LIVE_THINKING_STATUSES` · `ThoughtBlock` · `useTaskThinkingsQuery` · `byThinking` | `TaskRun` · `RunStreamHandle` · `RunState` · `LIVE_RUN_STATUSES` · `TodoRunsBlock` · `useTodoRunsQuery` |
 | SkillPlan | `types/skills.ts` (`SkillPlanRead`, …) · `useSkillPlanQuery` · `SkillPlanEditor` | `SkillPlaybook*` |
 | Journal | `useRunsJournalQuery` · `JournalRow`; `useWork.useRunsQuery` is a second run-list hook | one file, `useRuns.ts`: `useRunsQuery`, `RunListRow`, `usePlanRunsQuery` |
@@ -298,7 +298,7 @@ except a stored name, which waits for its migration (§7 Stored renames).
 | Retired word | Say | Allowed where | docs | studio | engine |
 |---|---|---|---|---|---|
 | thinking · thought | TaskRun · run | — | 142 | 27 | 76 |
-| workflow | TaskPlan · plan | a **reusable** TaskPlan, and the `workflow` board kind | 513 | 199 | 191 |
+| workflow | Flow · plan | a **reusable** Flow, and the `workflow` board kind | 513 | 199 | 191 |
 | dataset | model · records | — | 356 | 37 | 179 |
 | ingest · ingestion | import | — | 52 | 5 | 19 |
 | job | TaskRun | — | 91 | 6 | 17 |
@@ -319,7 +319,7 @@ except a stored name, which waits for its migration (§7 Stored renames).
 
 ## 7. Engine
 
-The tables are already migrated (`todos`, `task_plans`, `tasks`, `task_runs`, `lenses`). What still
+The tables are already migrated (`todos`, `flows`, `tasks`, `task_runs`, `lenses`). What still
 carries the old words is package names, Python names and a few stored strings.
 
 ### Packages
@@ -328,7 +328,7 @@ carries the old words is package names, Python names and a few stored strings.
 |---|---|---|
 | `apps/work` | `apps/projects` | owns `projects`, `todos`, `todo_dependencies` |
 | `apps/modeller` + `server/routes/{models,model_links,schemas}.py` | `apps/models`, `server/models/` | the loose route files join a server package |
-| `apps/task_plans` | `apps/plans` | [task-model-migration.md](building-engine/task-model-migration.md) §2.2 · §5 and [the-runtime-package.md](building-engine/the-runtime-package.md) say `apps/workflows/`; fixed in the same commit |
+| `apps/flows` | `apps/plans` | [task-model-migration.md](building-engine/task-model-migration.md) §2.2 · §5 and [the-runtime-package.md](building-engine/the-runtime-package.md) say `apps/workflows/`; fixed in the same commit |
 | `apps/sessions` | `apps/assistant` | Studio and engine share the module name (§3); owns `sessions`, `session_messages` |
 | `apps/govern` | `apps/lenses` | owns `lenses`, `run_touches` |
 | `apps/llm_providers` + the provider half of `apps/llm` | `apps/llms` | **records only**: providers, models, the client, the provider adapters, pricing. The reasoning callers leave — see below |
@@ -348,7 +348,7 @@ carries the old words is package names, Python names and a few stored strings.
 | `managers/task.py` · `querysets/task.py` · `activity/managers/task_read.py` | `TaskManager` · `TaskQuerySet` · `TaskReadManager` | `todo.py`, `Todo*` |
 | `server/work/routes.py` · `views.py` | `tasks_router`, `create_task`, `accept_task` … | `todos_router`, `*_todo` |
 | `core/events/actions.py` | `THINKING_*`, `TARGET_THINKING` — the values are already `run.*` | `RUN_*`, `TARGET_RUN` |
-| `server/task_plans/views.py`, querysets | `list_workflows`, `workflows_qs` | `list_task_plans`, `task_plans_qs` |
+| `server/flows/views.py`, querysets | `list_workflows`, `workflows_qs` | `list_flows`, `flows_qs` |
 | `server/agents/routes.py` | `atlas_agent_router` | `default_agent_router` |
 | `runtime/catalogue/{ingest,bundle,stitching}.py`, `cli/commands/{records,loader}.py` | `ingest`, `DatasetResult`, `check_dataset`, `source_dataset` | `records_check`, `rows` — [task-model-migration.md](building-engine/task-model-migration.md) §6.7 |
 | `core/errors.py` | `dataset_not_found` | delete |
@@ -389,8 +389,8 @@ These need migrations and go into the task-model-migration slices.
 |---|---|---|---|
 | Route | `…/tasks` | `…/todos` | M4 — already planned |
 | Column | `todo_dependencies.task_id` · `events.task_id` | `todo_id` | M4 — to add |
-| Column | `agents.workflow_spec` · `task_runs.workflow_key` | envelope · retired | §2.5 · M12 |
-| Event strings | `task.*` (15) · `workflow.promote` · `dataset.import` | `todo.*` · `task_plan.promote` · removed | new slice; old rows are rewritten |
+| Column | `agents.workflow_spec` · `task_runs.flow_key` | envelope · retired | §2.5 · M12 |
+| Event strings | `task.*` (15) · `workflow.promote` · `dataset.import` | `todo.*` · `flow.promote` · removed | new slice; old rows are rewritten |
 | Step keys | `translate_thought` · `plan_workflow` · `create_task` | `translate_ask` · `draft_plan` · merged into delegation | §6.1 · §6.3 |
 | Catalogue bound · setup key | `Bound.ingest` · `"datasets"` | `records_write` · `records` | new — both break [terminology.md §8](terminology.md#8-words-we-do-not-use) today |
 | Column | `lenses.scope` | `pinned_on` | [govern/spec.md](modules/govern/spec.md) names it `scope`; terminology forbids the word |
@@ -449,7 +449,7 @@ republished to their pinned artifact URLs.
 | `ask/features/the-assistant.md` C1 | "Explorer, Model, Projects, Tasks, Agents, Workflows" | the 11 `leftNav` items |
 | `building-studio/graph-detail-page.md` | "ten feature modules / ten icons"; G2 contradicts "one icon per feature module" | the §2 table |
 | `building-engine/migration-plan.md` §2.2 | `apps/canvases`, `apps/datasets`, `apps/workflows`, `apps/projects` | the §7 target |
-| `building-studio/refactor-plan.md` step 4 | module `task_plans` | `plans` |
+| `building-studio/refactor-plan.md` step 4 | module `flows` | `plans` |
 | Decision prefixes | `PT` is used by both work and identity-and-access; `CC` by both agents and graph-connectors | unchanged — IDs are anchors and never move |
 
 ## 8c. The public docs site
@@ -475,7 +475,7 @@ A check in CI, so the structure cannot drift again, tightened as each phase land
 `studio/scripts/check-names.mjs`** (Node, reads identifiers with the TypeScript parser Studio already
 ships, in `pnpm lint`): the module map, the suffixes and the retired words in identifiers. Its module
 map spells each engine folder as it is today — `assistant` → `sessions`, `lenses` → `govern`, `llms` →
-`llm_providers`, `models` → `modeller`, `plans` → `task_plans`, `projects` → `work`, `runs` and
+`llm_providers`, `models` → `modeller`, `plans` → `flows`, `projects` → `work`, `runs` and
 `projections` → `runtime` — so R5 is a one-line change per module there. The docs and engine rows below
 are `scripts/check-names` (Python, no dependencies, runs on every OS), not yet written.
 
@@ -484,7 +484,7 @@ are `scripts/check-names` (Python, no dependencies, runs on every OS), not yet w
 | a Studio `features/<m>/` has no engine `server/<m>/`, or the reverse (bands, `auth` · `telemetry` · `admin`, and a module with no routes of its own — `setup` — excepted) | Studio · engine |
 | a docs module folder is not in the §2 table | docs |
 | a `.tsx` file under `features/` ends in a suffix outside §5 — `Drawer`, `StackPanel`, `Dashboard…`, or a bare `Panel` | Studio |
-| a retired word from [terminology.md](terminology.md) §8 appears outside its allowed contexts (§6b) — identifiers, UI copy, docstrings, docs prose. For `Task`: only its Todo sense is flagged (`TaskStatus`, `TaskCreate`, `TaskActivity`, `useTasksQuery`, `tasksApi`, `TaskManager` …); `Task` the TaskPlan node is correct | docs · Studio · engine |
+| a retired word from [terminology.md](terminology.md) §8 appears outside its allowed contexts (§6b) — identifiers, UI copy, docstrings, docs prose. For `Task`: only its Todo sense is flagged (`TaskStatus`, `TaskCreate`, `TaskActivity`, `useTasksQuery`, `tasksApi`, `TaskManager` …); `Task` the Flow node is correct | docs · Studio · engine |
 | a feature link's number differs from the README row it links to | docs |
 
 An allow-list in the script names each deliberate exception with the reason, so an exception is a
@@ -639,7 +639,7 @@ engine/src/invana/
 │   ├── llms/                      providers · models · client · pricing
 │   ├── skills/
 │   ├── rules/
-│   ├── plans/                     task_plans · tasks
+│   ├── plans/                     flows · tasks
 │   │  ── Governance
 │   ├── lenses/                    lenses · touches
 │   │  ── Platform
@@ -748,11 +748,11 @@ studio/src/
             │                                useStitchesSection.tsx — a PanelStackSection, so the name holds
             │                                components/ DeclareStitchCard ← DeclareStitchPanel · DeclareStitchDialog · RemoveStitchDialog
             ├── plans/                       ← workflows/
-            │   ├── index.ts  api.ts  queries.ts  types.ts   ← work.ts (taskPlansApi) · useWork (useTaskPlans*)
+            │   ├── index.ts  api.ts  queries.ts  types.ts   ← work.ts (taskPlansApi) · useWork (useFlows*)
             │   ├── LibraryViewPanel.tsx         ← LibraryStackPanel.tsx
-            │   ├── PlansSection.tsx          + PlansSectionBody ← TaskPlansPanel.tsx
+            │   ├── PlansSection.tsx          + PlansSectionBody ← FlowsPanel.tsx
             │   ├── CatalogueSection.tsx  PromoteDialog.tsx  PlanFlowCanvas.tsx  planLayers.ts   ← CatalogueDrawer
-            │   ├── taskFlowFromTaskPlan.ts  ← taskFlowFromWorkflow.ts
+            │   ├── taskFlowFromFlow.ts  ← taskFlowFromWorkflow.ts
             │   └── boards/                  ← boards/ — PlanBoardPage ← PlanDashboardPage
             │                                PlanChartWidgets ← PlanChartPanels (PlanTrendWidget ← WorkTrendPanel)
             │                                planBoardSpec ← planDashboardSpec · planRecordSpecs · PlanRecordPages
@@ -818,8 +818,8 @@ engine/src/invana/
 │   ├── llms/                        ← llm_providers/ + llm/{client,pricing,defaults,errors,schemas,providers/}
 │   │                                endpoint · ping · managers/provider · querysets/{llm_model,llm_provider}
 │   ├── models/                      ← modeller/ (every file keeps its name)
-│   ├── plans/                       ← task_plans/ — args · dag · diff · yaml_export
-│   │                                managers/task_plan · querysets/task_plan
+│   ├── plans/                       ← flows/ — args · dag · diff · yaml_export
+│   │                                managers/flow · querysets/flow
 │   ├── projects/                    ← work/ — plan.py (PlanTask → PlanTodo)
 │   │                                managers/{todo ← task, project, dependency, plan, staffing}
 │   │                                querysets/{todo ← task, project, dependency, assignment}
@@ -831,7 +831,7 @@ engine/src/invana/
 │   ├── planner/                     ← apps/llm/{planner,translate,intent,clarify,draft,grounding}.py
 │   ├── catalogue/                   records_check.py ← ingest.py · bundle · stitching (dataset → rows)
 │   │                                work_write.py → per task-model-migration §6.3
-│   ├── managers/                    task_plan_runs.py (workflows_qs → task_plans_qs)
+│   ├── managers/                    flow_runs.py (workflows_qs → flows_qs)
 │   └── workflows.py                 deleted — already planned (the-runtime-package)
 ├── activity/                        band 4 (unchanged) — managers/todo_read.py ← task_read.py · tree.py
 ├── server/                          band 5 — server/<module>/{routes,views,admin,deps}.py
@@ -846,7 +846,7 @@ engine/src/invana/
 │   ├── lenses/                      ← govern/
 │   ├── llms/                        ← llm_providers/
 │   ├── models/                      ← modeller/ + routes/{models,model_links,schemas}.py
-│   ├── plans/                       ← task_plans/ + runtime/catalogue.py (list_workflows → list_task_plans)
+│   ├── plans/                       ← flows/ + runtime/catalogue.py (list_workflows → list_flows)
 │   ├── projects/                    ← work/ (tasks_router → todos_router; the path stays /tasks until M4)
 │   ├── telemetry/                   ← routes/telemetry.py
 │   └── (routes/ deleted — every route file lives with its module)

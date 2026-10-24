@@ -65,7 +65,7 @@ def _read(srv: Server, folder: str, limit: int, unseen_only: bool) -> list[dict]
             conn.logout()
 
 
-async def read(ctx: TaskContext, v: RunVars) -> Out:
+async def mail_read(ctx: TaskContext, v: RunVars) -> Out:
     """The newest ``limit`` messages of ``folder``, newest first — unseen ones only by default.
 
     The folder is opened read-only and bodies are fetched with ``BODY.PEEK``,
@@ -94,4 +94,4 @@ async def read(ctx: TaskContext, v: RunVars) -> Out:
     )
 
 
-run = read
+run = mail_read

@@ -196,8 +196,8 @@ AGENT_DELETE = "agent.delete"
 AGENT_SPAWN = "agent.spawn"  # an agent created an agent; actor_kind = agent
 AGENT_SET_DEFAULT = "agent.set_default"  # the graph's default agent
 
-# ── Workflows library (docs/for-developers/modules/agents/spec.md) ────────────────────────────────────
-WORKFLOW_PROMOTE = "workflow.promote"  # a served plan became a library entry
+# ── Flow library (docs/for-developers/modules/agents/spec.md) ────────────────────────────────────────
+FLOW_PROMOTE = "flow.promote"  # a served plan became a library entry
 
 # ── Datasets / ingestion (docs/for-developers/modules/bring-data-in/features/load-data.md)
 # ────────────────────────────────────────────
@@ -319,7 +319,7 @@ TARGET_TASK = "task"
 TARGET_AGENT = "agent"
 TARGET_THINKING = "run"
 TARGET_EVAL_SET = "eval_set"
-TARGET_WORKFLOW = "workflow"
+TARGET_FLOW = "flow"
 TARGET_TOKEN = "personal_access_token"
 TARGET_SCHEDULE = "schedule"
 TARGET_NOTIFICATION_RULE = "notification_rule"
@@ -335,7 +335,7 @@ TARGET_APPROVAL = "approval"
 CHANGE_ACTIONS_BY_TARGET: dict[str, frozenset[str]] = {
     TARGET_SKILL: frozenset({SKILL_CREATE, SKILL_PUBLISH}),
     TARGET_RULE: frozenset({RULE_CREATE, RULE_PUBLISH}),
-    TARGET_WORKFLOW: frozenset({WORKFLOW_PROMOTE}),
+    TARGET_FLOW: frozenset({FLOW_PROMOTE}),
     TARGET_AGENT: frozenset({AGENT_CREATE, AGENT_UPDATE, AGENT_SOUL_SET}),
     # An import and an upgrade land as drafts; only publishing mints a version.
     TARGET_MODEL: frozenset({MODEL_ACTIVATE, MODEL_COMMIT}),

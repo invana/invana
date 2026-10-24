@@ -118,7 +118,7 @@ async def test_a_skill_needing_a_callable_the_envelope_lacks_is_marked_on_both_t
     agent = Agent(
         graph_id=graph.id,
         name="Narrow",
-        workflow_spec={"entry": "understand", "allow": ["understand_intent", "create_task"]},
+        workflow_spec={"entry": "understand", "allow": ["nl.understand", "work.create_task"]},
     )
     session.add(agent)
     await session.flush()
@@ -130,10 +130,10 @@ async def test_a_skill_needing_a_callable_the_envelope_lacks_is_marked_on_both_t
 
     [row] = read.skills
     assert row.needs and row.version == builtin.current_version.version
-    assert row.missing and row.missing == [k for k in row.needs if k not in {"understand_intent", "create_task"}]
+    assert row.missing and row.missing == [k for k in row.needs if k not in {"nl.understand", "work.create_task"}]
     by_key = {c.step_key: c for c in read.callables}
-    assert by_key["create_task"].needed_by == []
-    assert by_key["create_task"].bound == "work_write"
+    assert by_key["work.create_task"].needed_by == []
+    assert by_key["work.create_task"].bound == "work_write"
     head = builtin.current_version
     assert read.prompt_chars == len(head.content) + len(head.when_to_use) > 0
     assert (read.offered, read.applied) == (0, 0), "nothing ran"

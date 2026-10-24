@@ -1,4 +1,4 @@
-key = "understand_ask"
+key = "model.understand_ask"
 version = "1.0.0"
 summary = "Resolve the modeller draft and the turns to replay."
 bound = "schema_write"

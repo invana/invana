@@ -23,7 +23,7 @@ This adds a fifth: **a person**. Three questions have no other answer today.
 
 | Question | Where it is answered without this |
 |---|---|
-| *What does `validate_query` actually check, and what does it hand on?* | the engine source |
+| *What does `graph.read.validate` actually check, and what does it hand on?* | the engine source |
 | *Why was this plan refused with `graph_write not in envelope`?* | the error string alone |
 | *What can the system do — what is the whole vocabulary?* | nowhere |
 
@@ -34,7 +34,7 @@ This adds a fifth: **a person**. Three questions have no other answer today.
 | C1 | Every entry, **grouped by the bound it spends** | The group is the thing the envelope ceilings — grouping is not cosmetic |
 | C2 | An entry's contract: `bound` · `args` · `outputs` · `requires` | The declaration, rendered — never a second copy of it |
 | C3 | An output row states its **lane roll-up** | `sum` · `concat` · *not exposed on a fan-out* — the type *is* the rule ([§ 5.1b](../../../orchestration.md)) |
-| C4 | `requires` reads as an ordering statement | *"a plan naming this must already order `validate_query` before it"*, linking to that entry |
+| C4 | `requires` reads as an ordering statement | *"a plan naming this must already order `graph.read.validate` before it"*, linking to that entry |
 | C5 | **Used by** — which reusable plans name this entry | The reverse of a plan's step list; a plan row opens [7.1](the-library.md) |
 | C6 | Which agents may spend this bound | From the envelopes — the bound is what an envelope grants ([7.3](envelope-validation.md)) |
 | C7 | Read-only, and it says so | The set is closed and ships with the engine; nothing here adds, edits or disables an entry |
@@ -92,7 +92,7 @@ The declaration already exists — one `manifest.toml` per task type in the core
 | Thing | Shape |
 |---|---|
 | Source | `invana.plugins.load_plugins()` — the frozen registry, re-exported as `invana.runtime.catalogue.CATALOGUE`; derived nowhere else |
-| Entries this work adds | `test_connection` (`network`) · `expand_neighbours` (`graph_read`) · `import_dataset` · `check_bundle` · `validate_records` · `import_report` (`ingest`) · `apply_stitches` · `commit_stitches` · `bulk_write` (`graph_write`). Declared in the engine, not registered by the feature that needed them ([CA1](#decisions)) — folding a flow into the runtime means *declaring its callable*, never *opening the set* |
+| Entries | Declared in the engine, not registered by the feature that needed them ([CA1](#decisions)) — folding a flow into the runtime means *declaring its function*, never *opening the set* |
 | `GET …/catalogue` | Every entry: `step_key · bound · summary · args · outputs (with rollup) · requires · used_by`, ordered by bound then key. Graph-scoped only so *used by* and *granted to* can be answered. `used_by` counts this Graph's reusable plan **keys**, not versions |
 | `GET …/catalogue/{step_key}` | One entry, plus `used_by` (reusable plans naming it) and `granted_to` (agents whose envelope carries its bound) |
 | Cache | The entry list is engine-static: it is versioned with the engine build and served from memory |
@@ -107,6 +107,8 @@ The declaration already exists — one `manifest.toml` per task type in the core
 | CA4 | **A drawer of Tasks, not an icon.** A run is an execution of a plan; a plan is a composition of catalogue entries — the catalogue is the bottom of that same sentence, and it is where *this run → the plan it ran → the callable that failed* ends ([G33](../../../building-studio/graph-detail-page.md)). |
 | CA6 | **An entry gets a drawer detail, not a page.** Fourteen entries, five or six fields each, and nothing per-entry to chart: a board would be a contract with whitespace around it. The two places an entry is genuinely read are the **selected step whose arguments it declares** and the **refusal that names its bound**, and both show the contract in place. Browsing all of them is the drawer's job. |
 | CA7 | **An entry's summary is declared on the entry.** `summary` is one line in the task type's `manifest.toml`, and the route serves it — not a docstring parsed at read time, and not a string in Studio. A golden test refuses an entry without one. |
+| CA8 | **A function is named `namespace.verb`.** The namespace names what it touches (`graph.read`, `graph.stitch`, `graph.write`, `data`, `model`, `nl`, `plan`, `work`, `answer`, `web`, `mail`, `science`, `sim`, `mcp.<server>`); the bound stays a property of the function, since one namespace spans bounds (`graph.stitch.preview` reads, `graph.stitch.commit` writes). The map is [agent-fabric › The function library](../../../../products/agent-fabric.md#the-function-library). The route, a refusal and Studio show the dotted name; no old key is kept as an alias. |
+| CA9 | **Studio says *function*.** Every label, header, empty state and count that said *task type* or *callable* says *function* — *Functions* on a plugin, *No such function*, *Skills & functions* on an agent, *5 functions* on a plan. The read shapes that still carry the old word (`task_types` on a plugin, `…/skills-and-callables`, board kind `task_type`) are renamed with the surfaces that replace them, not before. |
 | CA5 | **Control flow is not in the catalogue.** `if` · `loop` · `map` · `retry` · `stop` are plan grammar ([§ 5](../../../orchestration.md)); they are documented with the plan, and a person looking for them here is told where they live rather than shown an entry that does not exist. |
 
 ## Not building

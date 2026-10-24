@@ -56,12 +56,12 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Graph** | The bounded domain and the reasoning boundary. An agent never crosses it. One Graph binds to exactly one graph database. |
 | **Graph settings** | The Graph's own configuration, in four tabs: **Basic** · **Graph** (the connection) · **LLMs** (the providers) · **Agents** (the ceiling). Nothing else is settings. |
 | **Rule** | One statement that is always true, scoped `install`, `graph` (an **invariant**) or `project` (a **working** rule). Offered to steps; a rule with a **check** is also enforced `block · warn · report` at the acts the check names. [6.4](modules/skills/features/rules.md) |
-| **Library** | The **definitions** a run is built from: reusable **plans**, the closed **catalogue** of callables, and projection **templates**. One `leftNav` item, three sections ([G41](building-studio/graph-detail-page.md)). It widens the older sense of *the library*, which named the plan list alone. Never the journal — that is **Runs**. |
+| **Library** | The **definitions** a run is built from: reusable **flows**, the closed **catalogue** of functions, and projection **templates**. One `leftNav` item, three sections ([G41](building-studio/graph-detail-page.md)). Never the journal — that is **Runs**. |
 | **Skill** | A playbook an agent may be offered — named, described, with a "when to use". Offered, never forced. |
 | **Versioned record** | A record whose published form is immutable, so a change mints a new **version**: a skill, a rule, a plan, an agent, a model, a dataset. A draft is not a version. [10.6](modules/operate/features/change-log.md) |
 | **Change log** | Every version of every versioned record — who, when, why, the diff, the effect after. It is the Events list narrowed to the events that mint a version, never a second record. A **change** is one such event. Never "audit log" for this narrower list, never "revision history". |
-| **Instructions** | A skill's or agent's `instructions.md` — the prose a person writes and owns. A plan is generated from it; nobody draws one. [6.5](modules/skills/features/instructions-publish-rollback.md) |
-| **Packaged plan** | A plan that ships with Invana or a plugin pack, `origin = packaged`: seeded, read-only. The other two origins are `generated` and `promoted`. [6.5](modules/skills/features/instructions-publish-rollback.md) |
+| **Instructions** | A skill's or agent's `instructions.md` — the prose a person writes and owns. A flow is generated from it; nobody draws one. [6.5](modules/skills/features/instructions-publish-rollback.md) |
+| **Packaged flow** | A flow that ships with Invana or a plugin, `origin = packaged`: seeded, read-only — `nl-single@2`, `model-import@1`. The other two origins are `generated` and `promoted`. On screen, *Packaged plans*. [6.5](modules/skills/features/instructions-publish-rollback.md) |
 | **Eval set** | A skill's or agent's fixed questions, each with **checks**: rule checks are hard and counted; a **judged** score comes from a pinned judge model and is labelled, never mixed with them. [6.6](modules/skills/features/evals.md) |
 | **Pin** | An exact model version name an agent, skill version or judge thinks with — `claude-opus-5-5`, never an alias. Moving one is a change. [5.9](modules/agents/features/pinned-model-versions.md) |
 | **Graph connector** | The package that speaks to one graph database — `invana-neo4j`, `invana-janusgraph`. Always qualified. |
@@ -103,9 +103,9 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Semantic import** | Reading a published vocabulary or ontology (JSON-LD, Turtle, RDF/XML) into Invana's own records: a **SKOS** concept scheme becomes a standard, an **RDFS/OWL** ontology becomes a draft model. Never a load of records — that is an **import run**. [2.8](modules/bring-data-in/features/skos-import.md) · [1.10](modules/connect-and-model/features/ontology-import.md) |
 | **Import report** | What a semantic import says back: what mapped, what was **skipped and why**, the notes (flattened inheritance, merged ranges) and, for an ontology, the stitch **suggestions** a person confirms. The preview and the real import return the same one. |
 | **Source IRI** | The IRI a standard's term or value, or a model's type or property, was imported from. Kept on the record; never its identity. |
-| **Import run** | One load of a dataset — a **TaskRun** of a TaskPlan with `kind = import`. It inherits the runtime, trace, retries and failure vocabulary. |
-| **Bulk run** | One `invana loader` load — a TaskRun of a `kind = bulk` plan with a single `bulk_write` Task. Validated per record and traceable to a source record is what an **import** is; a bulk run is neither, and the kind is what says so. |
-| **Bundle** | A folder of datasets that belong together, with `stitches.json` naming them and the rules between them. Loading one is a workflow, not a new kind. |
+| **Import run** | One load of a dataset — a **TaskRun** of a Flow with `kind = import`. It inherits the runtime, trace, retries and failure vocabulary. |
+| **Bulk run** | One `invana loader` load — a TaskRun of a `kind = bulk` flow with a single `graph.write.bulk` Task. Validated per record and traceable to a source record is what an **import** is; a bulk run is neither, and the kind is what says so. |
+| **Bundle** | A folder of datasets that belong together, with `stitches.json` naming them and the rules between them. Loading one is a flow, not a new kind. |
 | **Validation report** | Per-record accept/reject with reasons. Rejects are never silent. |
 
 ## 4. Asking and answering
@@ -113,12 +113,13 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | Term | Means |
 |---|---|
 | **Todo** | What a person wrote — the only thing a user authors. Prose, criteria, an optional assignee and due date. It has no status of its own: its state derives from its runs, and only acceptance is stored. [§6](#6-work) |
-| **TaskPlan** | A flow of Tasks — the thing that carries a Todo out. Three origins: `generated` · `packaged` · `promoted`; `authored` is read on older rows, never written. A **reusable** TaskPlan is what the product calls a **workflow**. |
-| **Task** | One node inside a TaskPlan: `callable` · `composite` · `human`. **Never a thing a user authors** — a Task cannot exist outside a plan. Users see *step*; the record is a `Task`. |
+| **Flow** | A flow of Tasks — the thing that carries a Todo out. The record is `Flow` (table `flows`, route `/flows`). Three origins: `generated` · `packaged` · `promoted`. A **reusable** flow (`reusable = true`) is one the library lists and a run may select; there is no separate *workflow*. On screen a listed flow is a **plan** (*Packaged plans*, *Plan · route-audit r9*) and its drawing is its **Flow** tab. |
+| **Task** | One node inside a Flow: `callable` · `composite` · `human`. **Never a thing a user authors** — a Task cannot exist outside a flow. Users see *step*; the record is a `Task`. Its `key` is a plain identifier — by default its function with dots as underscores (`nl_translate`) — and is what `${steps.<key>.<output>}` binds against. |
+| **Function** | One operation a Task may call, from a plugin, named **`namespace.verb`** — `graph.read.query`, `nl.translate`, `web.read_url`. A Task names it as `step_key`. One bound per function. [the function library](../products/agent-fabric.md#the-function-library) |
 | **Step** | A Task in the role of a child — the authoring format writes `steps:`. A role, not a second record. |
 | **TaskRun** | One execution. Its `role` says what the execution is for: `execute` · `plan` · `evaluate`. A delegated child is a TaskRun carrying `parent_run_id`. The word is now literal — a run is a TaskRun. |
-| **Kind** | What a TaskPlan is *about*: `ask · import · bulk · stitch · model · enrich`. The subject, and what the journal filters on. Never *how* it executes — that is `form` on a Task — and never *what the run is for* — that is `role`. |
-| **Catalogue** | The closed set of callables a plan may name by `step_key`, grouped by the bound each spends. Closed is the point: a planner that could invent a callable could escape any ceiling. [orchestration § 0.6](orchestration.md#06-the-catalogue--what-a-plan-may-name) |
+| **Kind** | What a Flow is *about*: `ask · import · bulk · stitch · model · enrich`. The subject, and what the journal filters on. Never *how* it executes — that is `form` on a Task — and never *what the run is for* — that is `role`. |
+| **Catalogue** | The closed set of **functions** a flow may name by `step_key`, grouped by the bound each spends. Closed is the point: a planner that could invent a callable could escape any ceiling. [orchestration § 0.6](orchestration.md#06-the-catalogue--what-a-plan-may-name) |
 | **Emission** | One thing a step produced — a subgraph, table, metric, chart or prose block. An answer is its emissions. |
 | **Run frame** | One frame of a TaskRun's stream: a Task transition, a reasoning line, an emission arriving. `TaskStream` is the log of them, and its `seq` is the resume cursor. |
 | **Session** | A named thread of asks, assigned to an agent. It references Todos; it is not one — a conversation never runs and has no outcome. |
@@ -135,7 +136,7 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 
 | Term | Means |
 |---|---|
-| **Board** | A named, saved, versioned working surface. One flat `kind` axis of nine: `data · model · plan · workflow · envelope · lineage · run · task_run · plan_runs`. Whether it is *drawn* (on a canvas) or *declared* (panels bound to one record) is **`renders`**, a property of the kind — never a second column. The **plan** and **workflow** kinds both draw a `TaskPlan` — one for a Project's Todos, one for a plan's Tasks. Never "artboard". |
+| **Board** | A named, saved, versioned working surface. One flat `kind` axis of nine: `data · model · plan · workflow · envelope · lineage · run · task_run · plan_runs`. Whether it is *drawn* (on a canvas) or *declared* (panels bound to one record) is **`renders`**, a property of the kind — never a second column. The **plan** and **workflow** kinds both draw a `Flow` — one for a Project's Todos, one for a flow's Tasks. Never "artboard". |
 | **Report** | A **frozen** declared board — the panels with the numbers as they were, stored merged so it outlives its subject. One version of a board, not a kind of its own. |
 | **View panel** | The content of one shell region — `ModelViewPanel`, `InspectorViewPanel`, `AssistantViewPanel` — canvas-ui's suffix. A panel is named for the **occupant**, not for its contents: the Assistant holds sessions, so it is `AssistantViewPanel`, not `SessionsViewPanel`. A panel is *what fills* a region, never a region itself, so "the panel" alone names nothing. |
 | **Section** | One collapsible, resizable part of a stacked view panel — the kit's `PanelStackSection`, with its own header, count, search and drill-in. The Agents view panel has two: **Agents** and **LLMs**. Never a *drawer*: nothing in Studio slides over anything. |
@@ -182,12 +183,12 @@ sub-slots, the URL params and the retired words are in
 | **Simulation** | One run of a **simulator** on a branch, over pinned dataset versions and a seed; its result is ranked and always `derived` — a prediction, never an observation. Numbered per project (`s1`). [9.8](modules/work/features/simulation.md) |
 | **Impact** | What a branch's option reaches over the graph, hop by hop from the records its findings cite; reach only, no what-if values. Not *blast radius* in UI copy. [9.9](modules/work/features/impact.md) |
 | **Simulator** | A plugin of kind `simulator` that does a domain's science (genomic prediction first); Invana runs it, never computes a figure itself. Not a *simulation* — the simulator is the model, a simulation is one use of it. |
-| **Tool plugin** | A plugin of kind `tool` that reaches outside Invana — the web, mail, a science source — as task types; installed by its extra, run only while an install Admin has **enabled** it, and in a worker when one runs. [13.12](modules/platform/features/tool-plugins.md) |
-| **MCP plugin** | A plugin of kind `mcp` made from one MCP server an install Admin added: each of its tools is a task type `mcp.<server>.<tool>`, frozen as it was when added until an Admin refreshes it, and switched like a tool plugin. [13.13](modules/platform/features/mcp-plugins.md) |
+| **Tool plugin** | A plugin of kind `tool` that reaches outside Invana — the web, mail, a science source — as functions; installed by its extra, run only while an install Admin has **enabled** it, and in a worker when one runs. [13.12](modules/platform/features/tool-plugins.md) |
+| **MCP plugin** | A plugin of kind `mcp` made from one MCP server an install Admin added: each of its tools is a function `mcp.<server>.<tool>`, frozen as it was when added until an Admin refreshes it, and switched like a tool plugin. [13.13](modules/platform/features/mcp-plugins.md) |
 | **Objective** | One statement of what a Project is for. |
 | **Criterion** | One checkable statement of "done", with how it is checked: `query · agent · human`. |
 | **Outcome** | A criterion's finding on one Todo, with its evidence: met · unmet · needs a human. Not a **verdict** — that is a person answering a paused Task. |
-| **Dependency** | An `depends_on` edge with a condition: `success · failure · any_outcome`. Between **Todos** in a Project, and between **Tasks** in a TaskPlan — the same concept at two altitudes. |
+| **Dependency** | An `depends_on` edge with a condition: `success · failure · any_outcome`. Between **Todos** in a Project, and between **Tasks** in a Flow — the same concept at two altitudes. |
 | **Wave** | Dependency depth. The Plan canvas groups by it. |
 | **Critical path** | The longest success chain. Failure edges never inflate it. |
 | **Review** | The one queue for everything waiting on a person: **clarifications, approvals and verdicts** each stop a run; results need accepting; proposals wait. |
@@ -201,7 +202,7 @@ sub-slots, the URL params and the retired words are in
 |---|---|
 | **Principal** | Who acted: `user · agent · system · external · anonymous`. |
 | **Agent** | A principal that can be assigned work, carrying provider, model, skills, envelope and budget. |
-| **Envelope** | The static bounds on an agent: allowed `step_key`s, which reusable TaskPlans it may `ref`, pinned arguments. What it may **do**. Validated before dispatch. |
+| **Envelope** | The static bounds on an agent: allowed `step_key`s, which reusable flows it may `ref`, pinned arguments. What it may **do**. Validated before dispatch. |
 | **Budget** | The cost ceiling a run may spend — the smallest of the agent's, the plan's and the Todo's. **At the ceiling the run pauses and asks**, as an `approval`; in-flight work finishes and nothing is discarded. Never a hard stop — that is a separate `hard_ceiling`. |
 | **Role** | What a TaskRun is *for*: `execute` · `plan` · `evaluate`. Planning and evaluating are roles of a run, never kinds of a plan. |
 | **Delegation** | An agent spawning an agent, bounded by depth, fan-out and a budget ⊆ its parent's. |
@@ -209,8 +210,7 @@ sub-slots, the URL params and the retired words are in
 | **Ephemeral** | A spawned agent that retires when its work closes. Its row stays so lineage resolves. |
 | **On behalf of** | The principal a run serves, distinct from the principal that ran it. |
 | **Personal access token** | A long-lived credential a person mints on their profile. It carries their identity — never a scope — and is revoked on its own. |
-| **Workflow** | A **reusable TaskPlan**, in a role — not a record of its own. **Promoting** a plan that served turns a generated one into a reusable one. A multi-stage load is one of these; ingestion has no grammar of its own ([§7 F11](modules/workflows/spec.md)). |
-| **Builtin workflow** | A plan Invana ships, seeded into the library as a published, read-only version. `model-import@1` (`kind: import`) and `stitch-apply@1` (`stitch`) today; `bundle-import@1` and `bulk-load@1` when `map_over` and `bulk_write` exist ([LB14](modules/workflows/features/the-library.md)). Seeded means **exploded into rows**, and the rows are what the runtime executes — so a builtin is read-only because editing it would edit a live plan, not because it is special. |
+| **Promote** | Turn a generated flow that served into a reusable one (`origin = promoted`). A multi-stage load is a reusable flow too; ingestion has no grammar of its own ([§6 F11](modules/workflows/spec.md)). |
 | **Agent orchestrator** | What Invana is. It decides which agent takes a task, what it may run, what it is offered, in what order, and who checks the result. |
 | **Job scheduler** | The role behind the runtime protocol: when a run is dispatched, retried and queued at the process level. Invana fills it itself, in process. An external one could implement the protocol; none has. |
 | **Orchestration** | The first of those. Invana's. |
@@ -232,8 +232,10 @@ sub-slots, the URL params and the retired words are in
 | Permission level · access tier · Graph admin | **Graph role** by name (`viewer` … `owner`) | five named roles; a Graph has no *admin* — that word is the install's |
 | Thought · Thinking | **Todo** · **TaskRun** | a load is not a thought, and the run is the thing that happens. Both words are retired |
 | Job · execution · job run | **TaskRun** | one vocabulary from UI to code. There is no *job* anywhere in the product |
-| Task (for a thing a user wrote) | **Todo** | **the flip.** `Task` now names a node inside a TaskPlan and nothing else. Nothing a user authors is ever a Task |
-| SkillPlan · WorkflowPlan · plan-as-a-type | **TaskPlan** | one record. Where a plan came from is `origin` and `source_skill_version_ids[]` — provenance is a column, not a type |
+| Task (for a thing a user wrote) | **Todo** | **the flip.** `Task` now names a node inside a Flow and nothing else. Nothing a user authors is ever a Task |
+| TaskPlan · SkillPlan · WorkflowPlan · plan-as-a-type | **Flow** | one record. Where a flow came from is `origin` and `source_skill_version_ids[]` — provenance is a column, not a type |
+| Workflow · builtin workflow (as a record or a role) | a **reusable flow** · a **packaged flow** | *reusable* is a column on the one record; a second noun for it read as a second concept |
+| Callable · task type key (for what a step calls) | **Function**, named `namespace.verb` | `execute_graph_query`, `translate_thought` named the implementation; the namespace names what it touches. No alias is kept |
 | `TaskRun.plan` | **`plan_snapshot`** | `plan` otherwise names the record, the frozen column, the planning **role** and a callable at once |
 | `kind = plan` · `kind = work` | **`role = plan`** · **a Todo** | `kind` is the *subject* a plan is about. Planning is a role of a run; human work is a Todo, which is a type |
 | Emission (for a stream frame) | **Run frame** | an emission is what a reader sees in an answer; a frame is how it travels |
@@ -249,11 +251,11 @@ sub-slots, the URL params and the retired words are in
 | Source connector · pipeline | **Import** | Invana is a destination; nothing pulls data in today |
 | Dataset, for *the records one load brought* | **Model** (the container) · **import run** (the load) | Records are imported *into a model*. *Dataset* now names only the install-wide, versioned record above Graphs ([2.4](modules/bring-data-in/features/datasets.md)); the records a load carried are the model's, and the load is a run |
 | Ingestion · ingest job · import job | **Import** for the surface, **import run** for one load | *ingest* claims a pull Invana does not do, and *job* is already retired above |
-| Pipeline · ingestion pipeline · DAG (for a multi-stage load) | **Workflow**, and its parts are **steps** | the retired sense below is a thing that *pulls* data in; this one is worse, because it implies a second orchestration concept beside the plan graph that already exists. A load of three datasets, stitched and enriched, is one workflow, one run, one trace |
+| Pipeline · ingestion pipeline · DAG (for a multi-stage load) | **Flow**, and its parts are **steps** | the retired sense below is a thing that *pulls* data in; this one is worse, because it implies a second orchestration concept beside the plan graph that already exists. A load of three datasets, stitched and enriched, is one flow, one run, one trace |
 | Stage (for a step of a load) | **Step** | same rule as *Task*: a step is a callable the runtime dispatches, whatever a load calls it |
 | Merge (for an anchor) | **Link** | anchors link; folding two nodes is lossy |
 | From · To (for a stitch's two sides) | **Source** · **Target** | the payload's own words (`source_version_id`, `target_type`); *from/to* reads as direction, which an anchor does not have |
-| Links (as a surface name) | **Stitches** | *link* is the record the engine stores; *stitch* is what a person does, and the product already has `TaskPlan(kind = stitch)`. The word *link* keeps its place in `model_links` |
+| Links (as a surface name) | **Stitches** | *link* is the record the engine stores; *stitch* is what a person does, and the product already has `Flow(kind = stitch)`. The word *link* keeps its place in `model_links` |
 | API key · PAT · service account | **Personal access token**, spelled out | it is a person's identity with a longer life, not a key and not an account of its own |
 | Wizard · onboarding · checklist · getting started | **Setup**, and **setup step** | nothing is walked modally, nothing is ticked and nothing is dismissed — the steps are derived, so the words for walking one are all false ([SU1](modules/platform/features/setup.md) · [SU7](modules/platform/features/setup.md)) |
 | Rail · left rail · activity bar | **`leftNav`** | the kit's prop name is the word; nothing else names a region |

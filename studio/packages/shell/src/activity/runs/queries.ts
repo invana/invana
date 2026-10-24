@@ -37,8 +37,8 @@ export interface RunListRow {
 function planOf(t: TaskRunSummary): string {
 	const source = t.plan_origin ?? "";
 	if (source.startsWith("template:")) return source.slice("template:".length);
-	if (source === "generated") return `${t.workflow_key} · planned`;
-	return t.workflow_key;
+	if (source === "generated") return `${t.flow_key} · planned`;
+	return t.flow_key;
 }
 
 /**
@@ -86,7 +86,7 @@ export function useRunListQuery(
 		// what every run was before a load became one.
 		kind: (t.kind ?? "ask") as RunKind,
 		title: titleOf(t),
-		isQuery: t.workflow_key.startsWith("ql-") && !!t.body?.trim(),
+		isQuery: t.flow_key.startsWith("ql-") && !!t.body?.trim(),
 		plan: planOf(t),
 		status: t.status,
 		startedAt: t.queued_at,

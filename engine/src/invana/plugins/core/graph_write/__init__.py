@@ -4,8 +4,8 @@
 **This is the bound that matters most to ceiling**: an agent allowed `graph_read`
 and not this one cannot change the graph, whatever plan it runs.
 
-`write_graph` and `stitch` are the keys already stored on every load's nodes and
-are not renamed (§6.4). `bulk_write` is the fast path, and it declares no
+`graph.write.records` and `stitch` are the keys already stored on every load's nodes and
+are not renamed (§6.4). `graph.write.bulk` is the fast path, and it declares no
 `requires` because nothing validated what it writes.
 
 **The bodies are here, not one import away.** Loading owns no records of its own,

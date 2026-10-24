@@ -10,18 +10,18 @@ from __future__ import annotations
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.flows.models import Flow, Task
 from invana.apps.graphs.models import Graph
-from invana.apps.task_plans.models import Task, TaskPlan
-from invana.runtime.managers import TaskPlanRunsManager
+from invana.runtime.managers import FlowRunsManager
 
 READ_ONLY = {"type": "bool", "default": True}
 
 
-async def _version(session: AsyncSession, graph: Graph, version: int, args_schema: dict, rows: list[dict]) -> TaskPlan:
-    plan = TaskPlan(graph_id=graph.id, key="escalate-core", version=version, reusable=True, args_schema=args_schema)
+async def _version(session: AsyncSession, graph: Graph, version: int, args_schema: dict, rows: list[dict]) -> Flow:
+    plan = Flow(graph_id=graph.id, key="escalate-core", version=version, reusable=True, args_schema=args_schema)
     session.add(plan)
     await session.flush()
-    session.add_all([Task(task_plan_id=plan.id, ordinal=i, **row) for i, row in enumerate(rows)])
+    session.add_all([Task(flow_id=plan.id, ordinal=i, **row) for i, row in enumerate(rows)])
     await session.flush()
     return plan
 
@@ -35,9 +35,9 @@ class TestPlanDiff:
             1,
             {"read_only": READ_ONLY},
             [
-                {"key": "fetch", "step_key": "execute_graph_query", "args": {"read_only": True}},
-                {"key": "rank", "step_key": "shape_for_canvas"},
-                {"key": "draft_note", "step_key": "translate_thought"},
+                {"key": "fetch", "step_key": "graph.read.query", "args": {"read_only": True}},
+                {"key": "rank", "step_key": "answer.shape"},
+                {"key": "draft_note", "step_key": "nl.translate"},
             ],
         )
         v2 = await _version(
@@ -46,13 +46,13 @@ class TestPlanDiff:
             2,
             {"read_only": READ_ONLY, "grace_days": {"type": "int", "default": 2}},
             [
-                {"key": "fetch", "step_key": "execute_graph_query", "args": {"read_only": "${args.read_only}"}},
+                {"key": "fetch", "step_key": "graph.read.query", "args": {"read_only": "${args.read_only}"}},
                 {"key": "await_reply", "step_key": None, "form": "human"},
-                {"key": "rank", "step_key": "shape_for_canvas"},
+                {"key": "rank", "step_key": "answer.shape"},
             ],
         )
 
-        diff = await TaskPlanRunsManager().diff(session, workflow=v2)
+        diff = await FlowRunsManager().diff(session, flow=v2)
 
         assert (diff.version, diff.against_version) == (2, 1)
         assert (diff.added, diff.removed, diff.moved, diff.unchanged) == (["await_reply"], ["draft_note"], [], ["rank"])
@@ -63,9 +63,9 @@ class TestPlanDiff:
         assert diff.summary == "+await_reply · \N{MINUS SIGN}draft_note · fetch changed · argument grace_days added"
 
     async def test_the_first_version_is_compared_against_nothing(self, session: AsyncSession, graph: Graph):
-        v1 = await _version(session, graph, 1, {}, [{"key": "fetch", "step_key": "execute_graph_query"}])
+        v1 = await _version(session, graph, 1, {}, [{"key": "fetch", "step_key": "graph.read.query"}])
 
-        diff = await TaskPlanRunsManager().diff(session, workflow=v1)
+        diff = await FlowRunsManager().diff(session, flow=v1)
 
         assert diff.against_version is None and diff.summary == "the first version"
         assert diff.added == [] and diff.unchanged == [], "not an empty diff: nothing was compared"

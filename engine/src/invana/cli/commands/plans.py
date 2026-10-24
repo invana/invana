@@ -14,10 +14,10 @@ import asyncio
 
 import click
 
-from invana.apps.task_plans.managers import TaskPlanManager
+from invana.apps.flows.managers import FlowManager
 from invana.cli.context import graph_options, on_graph
 
-_plans = TaskPlanManager()
+_plans = FlowManager()
 
 
 @click.group("plans")

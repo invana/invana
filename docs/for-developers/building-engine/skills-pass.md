@@ -64,7 +64,7 @@ Recorded in the feature files, which are the record ([CLAUDE.md](../../../CLAUDE
 |---|---|
 | Bind / unbind routes | **Do not exist.** `bindings.md` § Engine lists `POST DELETE …/agents/{id}/skills/{skill_id}`; binding today is a `PATCH …/agents/{id}` writing the whole array, with no `agent.skill_bound` event. K3 builds the write path from zero |
 | `agents.lens` | **Does not exist.** A lens is only `task_runs.lens_id` · `lens_snapshot`, and [lens-migration § 22](lens-migration.md) says both are never written and never read — hence fork 3 |
-| `task_plans.source_skill_version_ids` | **Already a column** (`apps/task_plans/models.py:113`, migration `38`), pointing at a table that does not exist. Always `[]`, nothing reads it. K1 makes it referenceable; it stays empty until M8 |
+| `flows.source_skill_version_ids` | **Already a column** (`apps/flows/models.py:113`, migration `38`), pointing at a table that does not exist. Always `[]`, nothing reads it. K1 makes it referenceable; it stays empty until M8 |
 | The next migration number | `43` was latest and [lens-migration](lens-migration.md) had reserved `44` without landing it. Skills leads the build order ([the-sequence § 1a](../the-sequence.md)), so **K1 takes `44`** and lens renumbers to `45` — a revision chain has no gaps to reserve into |
 
 ## 3. The slices

@@ -16,8 +16,8 @@ import {
 } from "@invana-studio/canvases";
 import { Workflow } from "lucide-react";
 import { useMemo } from "react";
-import { useTaskPlanQuery } from "./queries";
-import { taskFlowFromTaskPlan } from "./taskFlowFromTaskPlan";
+import { flowFromRows } from "./flowFromRows";
+import { useFlowQuery } from "./queries";
 
 export function PlanFlowCanvas({
 	username,
@@ -32,9 +32,9 @@ export function PlanFlowCanvas({
 	selectedStepId: string | null;
 	onSelectStep: (id: string | null) => void;
 }) {
-	const workflow = useTaskPlanQuery(username, graphSlug, workflowKey);
+	const workflow = useFlowQuery(username, graphSlug, workflowKey);
 	const data = useMemo(
-		() => (workflow.data ? taskFlowFromTaskPlan(workflow.data) : null),
+		() => (workflow.data ? flowFromRows(workflow.data) : null),
 		[workflow.data],
 	);
 

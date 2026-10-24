@@ -54,10 +54,10 @@ export interface RunSummary {
 function planOf(trace: TraceRead): string {
 	const origin = trace.plan_origin ?? "";
 	if (origin.startsWith("template:")) return origin.slice("template:".length);
-	if (origin === "generated") return `${trace.workflow_key} · planned`;
+	if (origin === "generated") return `${trace.flow_key} · planned`;
 	return trace.plan_revision
-		? `${trace.workflow_key}@${trace.plan_revision}`
-		: trace.workflow_key;
+		? `${trace.flow_key}@${trace.plan_revision}`
+		: trace.flow_key;
 }
 
 /**

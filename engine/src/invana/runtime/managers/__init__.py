@@ -5,6 +5,7 @@ from invana.runtime.managers.agent_lifecycle import AgentLifecycleManager
 from invana.runtime.managers.catalogue import CatalogueManager
 from invana.runtime.managers.dataset_bind import DatasetBindManager
 from invana.runtime.managers.evals import EvalManager
+from invana.runtime.managers.flow_runs import FlowRunsManager
 from invana.runtime.managers.mcp import McpManager
 from invana.runtime.managers.plan_performance import PlanPerformanceManager
 from invana.runtime.managers.plugins import PluginManager
@@ -16,7 +17,6 @@ from invana.runtime.managers.skill_bind import SkillBindManager
 from invana.runtime.managers.skill_draft import SkillDraftManager
 from invana.runtime.managers.skill_seed import BuiltinSkillSeeder
 from invana.runtime.managers.skill_usage import SkillUsageManager
-from invana.runtime.managers.task_plan_runs import TaskPlanRunsManager
 
 __all__ = [
     "AgentCapabilitiesManager",
@@ -25,6 +25,7 @@ __all__ = [
     "CatalogueManager",
     "DatasetBindManager",
     "EvalManager",
+    "FlowRunsManager",
     "McpManager",
     "PlanPerformanceManager",
     "PluginManager",
@@ -35,5 +36,4 @@ __all__ = [
     "SkillBindManager",
     "SkillDraftManager",
     "SkillUsageManager",
-    "TaskPlanRunsManager",
 ]

@@ -37,17 +37,20 @@ async def _agent(session: AsyncSession, graph: Graph, name: str = "Explorer", sp
 
 
 #: What the Modeller's envelope allows — nothing the NL playbook names.
-MODELLER_SPEC = {"entry": "understand_ask", "allow": ["understand_ask", "propose_model", "validate_proposal"]}
+MODELLER_SPEC = {
+    "entry": "model.understand_ask",
+    "allow": ["model.understand_ask", "model.propose", "model.validate_proposal"],
+}
 PLANNING_SPEC = {
     "entry": "understand",
     "allow": [
-        "understand_intent",
-        "plan_workflow",
-        "translate_thought",
-        "validate_query",
-        "execute_graph_query",
-        "shape_for_canvas",
-        "verify_result",
+        "nl.understand",
+        "plan.compose",
+        "nl.translate",
+        "graph.read.validate",
+        "graph.read.query",
+        "answer.shape",
+        "plan.verify",
     ],
 }
 
@@ -143,7 +146,7 @@ async def test_a_skill_the_envelope_could_never_run_is_refused_at_bind_time(
     detail = refused.value.detail
     assert detail["error"] == "skill_binding_refused"
     assert detail["check"] == "envelope"
-    assert detail["step_key"] == "translate_thought"
+    assert detail["step_key"] == "nl.translate"
     assert detail["bound"] == "llm"
     assert detail["skill_version_id"] == skill.current_version_id
     # BN7 — a bind is never refused on grounds it did not check. Both halves

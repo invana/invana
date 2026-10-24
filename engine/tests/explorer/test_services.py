@@ -73,7 +73,7 @@ async def test_type_counts_are_a_run(session, runtime, graph, user, seeded_graph
     assert {t.name: t.count for t in result.nodes} == {"Person": 3, "Company": 1}
     assert {t.name: t.count for t in result.edges} == {"KNOWS": 2, "WORKS_AT": 1}
     run = await session.get(TaskRun, result.run_id)
-    assert (run.workflow_key, run.triggered_by) == ("count-types@1", TriggeredBy.canvas.value)
+    assert (run.flow_key, run.triggered_by) == ("count-types@1", TriggeredBy.canvas.value)
 
 
 async def test_a_reopened_canvas_is_resolved_by_element_id(session, runtime, graph, user, connector, seeded_graph):

@@ -12,15 +12,15 @@ import type { BoardSpec, PanelSpec, TabSpec } from "@invana/boards";
 import { formatElapsed } from "@invana-studio/core";
 import type { FlowOptions } from "@invana-studio/shell";
 import { runAddress } from "@invana-studio/shell";
+import { flowFromRows } from "../flowFromRows";
 import { planLayersGantt } from "../planLayers";
-import { taskFlowFromTaskPlan } from "../taskFlowFromTaskPlan";
 import type {
+	FlowDetail,
 	Measure,
 	PlanPerformance,
 	PlanRunRow,
 	PlanRunsPage,
 	PlanWindow,
-	TaskPlanDetail,
 } from "../types";
 import type { PlanChartWidgets } from "./PlanChartWidgets";
 import type { PlanRevisionsOptions } from "./PlanRevisionsWidget";
@@ -91,7 +91,7 @@ export interface PlanView {
 }
 
 export interface PlanPageData {
-	plan: TaskPlanDetail;
+	plan: FlowDetail;
 	/** Every version of this key, oldest first — the header's switch. */
 	versions: number[];
 	performance: PlanPerformance | undefined;
@@ -435,7 +435,7 @@ function stepCard(
 
 // ── Layers ────────────────────────────────────────────────────────────────────
 
-function layersRows(plan: TaskPlanDetail, perf: PlanPerformance | undefined) {
+function layersRows(plan: FlowDetail, perf: PlanPerformance | undefined) {
 	const p50 = new Map(
 		(perf?.steps ?? [])
 			.filter((s) => s.p50_ms != null)
@@ -476,7 +476,7 @@ function layersRows(plan: TaskPlanDetail, perf: PlanPerformance | undefined) {
 const FLOW_HEIGHT = 420;
 
 function flowRows(
-	plan: TaskPlanDetail,
+	plan: FlowDetail,
 	perf: PlanPerformance | undefined,
 	view: PlanView,
 ) {
@@ -485,7 +485,7 @@ function flowRows(
 		kind: "flow",
 		grow: 1,
 		options: {
-			data: taskFlowFromTaskPlan(plan, perf?.steps),
+			data: flowFromRows(plan, perf?.steps),
 			selectedId: view.step,
 			openAction: PLAN_ACTIONS.selectStep,
 			height: FLOW_HEIGHT,

@@ -29,11 +29,11 @@ pytestmark = pytest.mark.asyncio
 
 @pytest.fixture
 def tool_steps(monkeypatch):
-    """``web.fetch`` and ``mail.send`` stood in for, each in a one-step workflow."""
+    """``web.read_url`` and ``mail.send`` stood in for, each in a one-step workflow."""
     calls: list[str] = []
 
     async def fetched(ctx, v):
-        calls.append("web.fetch")
+        calls.append("web.read_url")
         v.result = _tabular()
         return Out(detail="fetched")
 
@@ -42,9 +42,9 @@ def tool_steps(monkeypatch):
         v.result = _tabular()
         return Out(detail="sent", output={"message_id": "<m@invana>"})
 
-    monkeypatch.setitem(task_registry.TASKS, "web.fetch", fetched)
+    monkeypatch.setitem(task_registry.TASKS, "web.read_url", fetched)
     monkeypatch.setitem(task_registry.TASKS, "mail.send", sent)
-    monkeypatch.setitem(workflows.WORKFLOWS, "stub-fetch", Workflow("stub-fetch", (Step("web.fetch", "Fetch"),)))
+    monkeypatch.setitem(workflows.WORKFLOWS, "stub-fetch", Workflow("stub-fetch", (Step("web.read_url", "Fetch"),)))
     monkeypatch.setitem(workflows.WORKFLOWS, "stub-send", Workflow("stub-send", (Step("mail.send", "Send"),)))
     return calls
 
@@ -93,7 +93,7 @@ class TestEnabledGate:
         await _run(runtime, again.id)
 
         assert (await _fresh(session, TaskRun, again.id)).status == "succeeded"
-        assert tool_steps == ["web.fetch"]
+        assert tool_steps == ["web.read_url"]
 
 
 class TestSendApproval:
@@ -136,7 +136,7 @@ class TestQueue:
         await _enable(session, "invana.tools.web", user)
         _, _, th = await _open(session, graph, user, "stub-fetch")
         [step] = await _steps(session, th.id)
-        env = TaskEnvelope(run_id=th.id, node_id=step.id, attempt=1, plugin="invana.tools.web", task="web.fetch")
+        env = TaskEnvelope(run_id=th.id, node_id=step.id, attempt=1, plugin="invana.tools.web", task="web.read_url")
         runtime = TaskRuntime(session_factory=session_factory, manager=object(), encryption_key="x")
 
         await queue.defer(env)

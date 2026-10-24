@@ -171,7 +171,7 @@ class RunVars:
     plan_origin: str | None = None
     #: The library plan this run is executing, when one was selected. Written
     #: onto the root run when the plan lands (LB12).
-    task_plan_id: str | None = None
+    flow_id: str | None = None
     # verify →
     verdict: str | None = None
     # delegation → the children this run opened, and what they emitted (R2:

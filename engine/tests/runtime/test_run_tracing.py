@@ -59,7 +59,7 @@ def stub_tasks(monkeypatch):
 
     async def delegate(ctx, v):
         # What `delegate` does: a child run whose parent is this step, submitted from inside it.
-        child = TaskRun(graph_id=ctx.step.graph_id, parent_run_id=ctx.step.id, workflow_key="stub-ok", role="execute")
+        child = TaskRun(graph_id=ctx.step.graph_id, parent_run_id=ctx.step.id, flow_key="stub-ok", role="execute")
         ctx.db.add(child)
         await ctx.db.flush()
         ctx.db.add(
@@ -90,13 +90,13 @@ def stub_tasks(monkeypatch):
         monkeypatch.setitem(workflows.WORKFLOWS, wf.key, wf)
 
 
-async def _open(session, graph, user, workflow_key: str) -> TaskRun:
+async def _open(session, graph, user, flow_key: str) -> TaskRun:
     sess = await SessionManager().create_session(session, graph=graph, user_id=user.id, title="t")
     _, assistant, th = await run_services.open_turn(
         session, sess=sess, graph=graph, payload=SendMessage(content="hello", mode="ql"), actor_id=user.id
     )
-    wf = workflows.WORKFLOWS[workflow_key]
-    th.workflow_key = wf.key
+    wf = workflows.WORKFLOWS[flow_key]
+    th.flow_key = wf.key
     for row in (await session.execute(select(TaskRun).where(TaskRun.parent_run_id == th.id))).scalars():
         await session.delete(row)
     await session.flush()

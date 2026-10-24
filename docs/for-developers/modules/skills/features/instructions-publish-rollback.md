@@ -25,7 +25,7 @@ generated from instructions or packaged; nobody draws one.
 | C4 | Publish passes the eval gate | Hard checks block; warnings need a reason ([evals](evals.md)) |
 | C5 | Pick-up on the next run | Bound agents read the current version when a run opens; running ones finish on the old |
 | C6 | One-act rollback | A new version made from an earlier one — prose, pin and plan; nothing is rewritten |
-| C7 | Plans are generated or packaged | `task_plans.origin` is written `generated` · `packaged` · `promoted` |
+| C7 | Plans are generated or packaged | `flows.origin` is written `generated` · `packaged` · `promoted` |
 
 ## Journey
 
@@ -82,8 +82,8 @@ flowchart TD
 | `drawn_digest` | `skill_versions` | String64, nullable — sha256 of the text the plan was last drawn from |
 | `restored_from_version` | `skill_versions` | Integer, nullable — the version a rollback copied |
 | `instructions_draft` | `agents` | Text, nullable — the agent's unpublished instructions; null = no draft |
-| `origin` | `task_plans` | written `generated` · `packaged` · `promoted` |
-| `uses` | `task_plans` | the library plans a draw inlined, `{key, version, args}` each |
+| `origin` | `flows` | written `generated` · `packaged` · `promoted` |
+| `uses` | `flows` | the library plans a draw inlined, `{key, version, args}` each |
 
 | Route | Does |
 |---|---|
@@ -98,9 +98,9 @@ flowchart TD
 | # | Decision |
 |---|---|
 | IS1 | **`instructions.md` is the record's own prose field**, not a file store: a skill version's `content`, an agent's `instructions`. *.md* names the format a person writes; the CLI's `push --instructions <file>` reads a file into that field. A schedule carries instructions when [10.1](../../operate/features/schedules.md) builds the schedule record. |
-| IS2 | **Plans are generated or packaged; nobody draws one.** `task_plans.origin` is written `generated` (from instructions or for a Todo), `packaged` (ships with Invana or a plugin pack, seeded read-only) or `promoted` (a generated plan that served). Rows written `authored` before keep it and read as they are. |
+| IS2 | **Plans are generated or packaged; nobody draws one.** `flows.origin` is written `generated` (from instructions or for a Todo), `packaged` (ships with Invana or a plugin pack, seeded read-only) or `promoted` (a generated plan that served). Rows written `authored` before keep it and read as they are. |
 | IS3 | **Nobody edits a plan by hand.** A skill has no route that writes plan rows and no *Edit by hand*; the library has no *New plan* and no drafting of one. A plan that reads wrong means the instructions are ambiguous, and the fix is the prose or the clarification answer. |
-| IS11 | **Composition is drawn.** The planner reads the Graph's reusable library plans beside the catalogue — newest version of each, as `plan:<key>@<v>` with its description and declared arguments — and a sentence may name one as a candidate. It is counted like any candidate: one is a step, two or more ask. A picked plan is inlined at the draw: copied flat, keys prefixed with the plan key, each row naming the plan and step it came from ([SK32](authoring-a-skill.md#decisions) · [SK33](authoring-a-skill.md#decisions)), and validated in the drawing envelope with every other step. A candidate's `tune` sets arguments the plan declares; an undeclared one refuses the draw by name ([LB27](../../workflows/features/the-library.md#decisions)). `task_plans.uses` records the composition. A person composes by naming the plan in the prose. |
+| IS11 | **Composition is drawn.** The planner reads the Graph's reusable library plans beside the catalogue — newest version of each, as `plan:<key>@<v>` with its description and declared arguments — and a sentence may name one as a candidate. It is counted like any candidate: one is a step, two or more ask. A picked plan is inlined at the draw: copied flat, keys prefixed with the plan key, each row naming the plan and step it came from ([SK32](authoring-a-skill.md#decisions) · [SK33](authoring-a-skill.md#decisions)), and validated in the drawing envelope with every other step. A candidate's `tune` sets arguments the plan declares; an undeclared one refuses the draw by name ([LB27](../../workflows/features/the-library.md#decisions)). `flows.uses` records the composition. A person composes by naming the plan in the prose. |
 | IS4 | **Publish regenerates by requiring a fresh draw.** A draw stamps `drawn_digest` — the sha256 of the draft's description, content and when-to-use. Publish compares it with the draft's text now and refuses `409` when they differ, so a published plan is always the one drawn from the published words. Studio's *Publish* draws and then publishes; the engine never publishes an undrawn change. A draft opened over a published version, and a rollback, carry that version's digest: its plan is the plan of its text, so a pin-only or why-only publish needs no draw. `PATCH …/skills/{id}` with new prose writes the draft and publishes nothing. Seeds, fixtures and imports publish through `create(publish=True)`, a Python-only path no route reaches. The draft read says `drawn` — whether the digest matches the text now. |
 | IS5 | **An agent's draft is one column**, `agents.instructions_draft`. An agent has no version table — its versions are its events ([CL8](../../operate/features/change-log.md#decisions)) — so publish is an ordinary `agent.update` that moves the draft into `instructions`, with its diff and why, and clears the draft; a draft equal to `instructions` clears without a new version. Publish with no draft open is refused `409`. `PATCH …/agents/{id}` `{instructions}` stays a direct write — an `agent.update` — for a caller with no draft surface; Studio writes the draft. An agent's draw and eval gate arrive with [evals](evals.md); until then publish moves the text. |
 | IS10 | **An agent's rollback reads its events.** The instructions at version N are the `after` of the last change at or before N, else the `before` of the first change after N, else today's text. It is refused `409` while a draft is open, when that text is already current, and when the change that holds it predates recorded diffs; an unknown version is `404`. The `agent.update` it writes carries `restored_from`. |

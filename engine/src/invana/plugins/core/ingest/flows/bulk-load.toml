@@ -1,6 +1,6 @@
 # The fast path writes *without* validating — that is what makes it fast and what
-# makes it unauditable. `write_graph` declares `requires: validate_records`, so
-# this plan names `bulk_write`, which declares no `requires`, and states what
+# makes it unauditable. `graph.write.records` declares `requires: validate_records`, so
+# this plan names `graph.write.bulk`, which declares no `requires`, and states what
 # actually happens.
 #
 # `bundle-import@1` is not packaged yet: it needs `map_over` — a lane per model,
@@ -15,6 +15,6 @@ description = "Write a CSV folder straight through the connector — fast, and v
 intents = []
 
 [[steps]]
-id = "bulk_write"
-task = "bulk_write"
+id = "graph_write_bulk"
+task = "graph.write.bulk"
 label = "Load"

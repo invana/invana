@@ -4,7 +4,7 @@ import { planKeyOf, runSummary } from "./runSummary";
 
 const trace = (over: Partial<TraceRead> = {}) =>
 	({
-		workflow_key: "ql-direct",
+		flow_key: "ql-direct",
 		plan_origin: "template:nl-compare@3",
 		plan_revision: null,
 		triggered_by: null,
@@ -35,8 +35,8 @@ const trace = (over: Partial<TraceRead> = {}) =>
 				duration_ms: 1000,
 				attempt: 3,
 				max_attempts: 3,
-				task_key: "graph_read",
-				step_key: "read",
+				task_key: "graph.read.query",
+				step_key: "graph_read_query",
 			},
 		],
 		...over,
@@ -173,7 +173,7 @@ describe("runSummary", () => {
 						started_at: "2026-09-28T10:00:00Z",
 						attempt: 1,
 						max_attempts: 1,
-						task_key: "ask",
+						task_key: "nl.understand",
 					},
 					{
 						seq: 2,
@@ -182,7 +182,7 @@ describe("runSummary", () => {
 						duration_ms: 500,
 						attempt: 1,
 						max_attempts: 2,
-						task_key: "graph_read",
+						task_key: "graph.read.query",
 					},
 				],
 			} as unknown as Partial<TraceRead>),
@@ -228,7 +228,7 @@ describe("runSummary", () => {
 		expect(row("asked")).toBeUndefined();
 		expect(row("tokens")).toBe("8.2k in · 400 out");
 		expect(row("waiting")).toBe("4.5s — 2.0s asking");
-		expect(row("attempts")).toBe("1 of 2 · graph_read");
+		expect(row("attempts")).toBe("1 of 2 · graph.read.query");
 		expect(row("replans")).toBe("1 of 2");
 		expect(s.boundsAside).toBe("none exhausted");
 		expect(s.touched.find((t) => t.layer === "llm")?.note).toBe("1 call");

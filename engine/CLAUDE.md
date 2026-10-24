@@ -35,7 +35,7 @@ src/invana/
                │  logging/ · telemetry/ · auth/ · events/
   graph/       1  the graph engine — connectors/ (cypher · gremlin) · types/ · loaders/
   apps/        2  one product idea each — graphs · modeller · canvases · explorer · datasets
-               │  sessions · skills · agents · task_plans · work · projects · llm · llm_providers
+               │  sessions · skills · agents · flows · work · projects · llm · llm_providers
                │  (`datasets` is the Dataset row and nothing else; loading lives in plugins/core/ingest)
   runtime/     3  the workhorse — catalogue/ (a re-export) · interpreter/ + the planner and state files
   plugins/     3  every task type — sdk/ · registry · core/<plugin>/tasks/<key>/ (manifest.toml + run.py)
