@@ -50,6 +50,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -71,6 +72,7 @@ BASELINE = HERE / "baseline.json"
 SHOTS = CACHE / "baseline"
 SHOT_THRESHOLD = float(os.environ.get("INVANA_RUNNER_SHOT_THRESHOLD", "0.005"))
 # Reviews compare screenshots against the docs; Sonnet does that well at a fraction of Opus's usage.
+GATE_TIMEOUT = float(os.environ.get("INVANA_RUNNER_GATE_TIMEOUT", "1800"))
 REVIEW_MODEL = os.environ.get("INVANA_RUNNER_REVIEW_MODEL", "sonnet")
 # e2e specs default to a Graph this stack lacks; set here so headless sessions inherit it too.
 os.environ.setdefault("E2E_GRAPH_PATH", "/u/admin/airways")
@@ -141,9 +143,24 @@ def next_session(rows: list[dict], only: str | None) -> dict | None:
 
 
 # ── shell helpers ──────────────────────────────────────────────────────────
-def sh(cmd: list[str], cwd: Path = ROOT, env: dict | None = None) -> subprocess.CompletedProcess:
+def sh(cmd: list[str], cwd: Path = ROOT, env: dict | None = None,
+       timeout: float | None = None) -> subprocess.CompletedProcess:
+    """Run a command and capture its output; past ``timeout`` seconds its whole process group is killed.
+
+    A timed-out command returns code 124 with the output it had written, so a hung gate fails
+    like any other instead of stalling the driver.
+    """
     print("  $", " ".join(cmd), f"  (in {cwd.relative_to(ROOT) if cwd != ROOT else '.'})")
-    return subprocess.run(cmd, cwd=cwd, env={**os.environ, **(env or {})}, text=True, capture_output=True)
+    proc = subprocess.Popen(cmd, cwd=cwd, env={**os.environ, **(env or {})}, text=True,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+    try:
+        out, err = proc.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        os.killpg(proc.pid, signal.SIGKILL)
+        out, err = proc.communicate()
+        err += f"\n\nTimed out after {timeout / 60:.0f} min — the command hung, or a test never finished.\n"
+        return subprocess.CompletedProcess(cmd, 124, out, err)
+    return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
 
 
 def git_clean() -> bool:
@@ -442,7 +459,7 @@ def gate_failures(sid: str) -> tuple[list[str], set[str]]:
     failures, seen = [], set()
     baseline = set(json.loads(BASELINE.read_text())) if BASELINE.exists() else set()
     for cmd, cwd, env in gate_commands(sid):
-        res = sh(cmd, cwd, env)
+        res = sh(cmd, cwd, env, timeout=GATE_TIMEOUT)
         if res.returncode == 0:
             continue
         out = res.stdout + res.stderr
