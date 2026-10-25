@@ -61,6 +61,10 @@ def names_line(names: list[str], *, shown: int = 2) -> str:
     return f"{head} · {len(names) - shown} more" if len(names) > shown else head
 
 
+#: The Held by tab reads groups, then agents, people and tokens, each by name.
+_HOLDER_ORDER = {"group": 0, "agent": 1, "person": 2, "token": 3}
+
+
 @dataclass
 class GraphHolders:
     """One Graph's holders, read once, for every policy on a page."""
@@ -104,7 +108,7 @@ class GraphHolders:
         attached_people = {a.holder_id for a in rows if a.holder_kind == "person"}
         people = attached_people | {m.user_id for m in self.role_holders(policy)}
         groups = [a.holder_id for a in rows if a.holder_kind == "group"]
-        agents = sum(1 for a in rows if a.holder_kind == "agent")
+        agents = sum(1 for a in rows if a.holder_kind == "agent" and a.holder_id in self.agents)
         tokens = sum(1 for a in rows if a.holder_kind == "token")
         named = self._named(policy, rows, people, usernames)
         if named is not None:
@@ -184,7 +188,7 @@ class AttachmentManager:
             narrowed,
             params,
             unfiltered_total=len(rows),
-            sorts={"name": lambda r: r.name.lower()},
+            sorts={"name": lambda r: f"{_HOLDER_ORDER.get(r.kind, 9)}{r.name.lower()}"},
             id_of=lambda r: r.id or f"{r.kind}:{r.holder_id}",
         )
         return page, info, kinds

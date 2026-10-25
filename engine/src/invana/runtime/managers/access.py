@@ -177,14 +177,14 @@ class AccessReadManager:
     # ── the IAM home ─────────────────────────────────────────────────────────
 
     async def overview(self, session: AsyncSession, *, graph: Graph) -> OverviewRead:
-        """The IAM home's counts: people, service accounts, groups, agents, saved policies and tokens."""
+        """The IAM home's counts: people, service accounts, groups, agents, policies per kind and tokens."""
         people, service = await self.qs.member_counts(session, graph_id=graph.id)
         now = datetime.now(UTC)
         live, expiring = await self.qs.token_counts(
             session, graph_id=graph.id, now=now, week_end=now + timedelta(days=7)
         )
         policies = {kind.value: 0 for kind in PolicyKind}
-        policies.update(await self.qs.saved_policy_counts(session, graph_id=graph.id))
+        policies.update(await self.qs.policy_counts(session, graph_id=graph.id))
         return OverviewRead(
             people=people,
             service_accounts=service,
@@ -297,6 +297,7 @@ class AccessReadManager:
             rows=rows,
             delegates=await self._delegates(session, agent=agent, held=held, depth=depth),
             functions_allowed=self._functions_allowed(holder, held, boundaries),
+            allowed=sum(1 for r in rows if r.effective == "allowed"),
             refused=sum(1 for r in rows if r.effective == "refused"),
         )
 

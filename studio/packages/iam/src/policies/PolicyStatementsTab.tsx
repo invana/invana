@@ -5,9 +5,11 @@
  * many rows sit under it; a row is effect · actions · resources · conditions.
  *
  * A draft's statements sit in a dashed box: they decide nothing until saved.
+ * Under them, who the draft is meant for — the holders it is attached to.
  */
 
 import {
+	Eyebrow,
 	Table,
 	TableBody,
 	TableCell,
@@ -116,6 +118,16 @@ export function PolicyStatementsTab({ policy }: { policy: PolicyRead }) {
 					</TableBody>
 				</Table>
 			</div>
+			{draft ? (
+				<section className="flex flex-col gap-1 rounded-md border p-3">
+					<Eyebrow>Held by</Eyebrow>
+					<span>
+						{policy.held_by.line === "nobody"
+							? "Not attached to anyone yet — attach it on Held by."
+							: policy.held_by.line}
+					</span>
+				</section>
+			) : null}
 			<p className="text-muted-foreground">
 				A statement allows actions on resources. Resources are addressed by
 				layer — graph data, llm, third party, cache, human — then name. Anything

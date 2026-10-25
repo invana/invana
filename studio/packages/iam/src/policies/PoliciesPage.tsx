@@ -224,6 +224,7 @@ function policyColumns(): ColumnDef<PolicyRow>[] {
 	return [
 		{
 			id: "policy",
+			size: 200,
 			header: "Policy",
 			cell: ({ row }) => (
 				<span className="inline-flex items-center gap-1.5 font-semibold">
@@ -234,6 +235,7 @@ function policyColumns(): ColumnDef<PolicyRow>[] {
 		},
 		{
 			id: "kind",
+			size: 130,
 			header: "Kind",
 			cell: ({ row }) => (
 				<span className="inline-flex items-center gap-1">
@@ -244,6 +246,7 @@ function policyColumns(): ColumnDef<PolicyRow>[] {
 		},
 		{
 			id: "summary",
+			size: 520,
 			header: "What it allows",
 			cell: ({ row }) => (
 				<span className="text-sm text-muted-foreground">
@@ -253,6 +256,7 @@ function policyColumns(): ColumnDef<PolicyRow>[] {
 		},
 		{
 			id: "statements",
+			size: 100,
 			header: "Statements",
 			cell: ({ row }) => (
 				<span className="text-sm tabular-nums">
@@ -262,6 +266,7 @@ function policyColumns(): ColumnDef<PolicyRow>[] {
 		},
 		{
 			id: "held_by",
+			size: 280,
 			header: "Held by",
 			cell: ({ row }) => (
 				<span className="text-sm text-muted-foreground">
@@ -271,6 +276,7 @@ function policyColumns(): ColumnDef<PolicyRow>[] {
 		},
 		{
 			id: "changed",
+			size: 180,
 			header: "Changed",
 			cell: ({ row }) => (
 				<span className="text-sm text-muted-foreground">

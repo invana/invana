@@ -130,7 +130,7 @@ export function TestAccessDialog({
 
 	return (
 		<Dialog open onOpenChange={(o) => !o && onClose()}>
-			<DialogContent className="sm:max-w-2xl">
+			<DialogContent className="max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>Test access</DialogTitle>
 					<DialogDescription>

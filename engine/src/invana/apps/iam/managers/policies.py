@@ -82,9 +82,25 @@ def what_it_allows(policy: Policy) -> str:
     if managed is not None:
         return managed.summary
     try:
-        return summary(parse_statements(policy.statements)) or "nothing"
+        statements = parse_statements(policy.statements)
     except StatementError:
         return "—"
+    if policy.kind == PolicyKind.boundary.value:
+        return _bounds(statements)
+    return summary(statements) or "nothing"
+
+
+def _bounds(statements: list) -> str:
+    """What a boundary holds everyone to — the fields it keeps back, else the resources it leaves open."""
+    kept: list[str] = []
+    for statement in statements:
+        for name in (statement.conditions.get("fields") or {}).get("except", []):
+            if name not in kept:
+                kept.append(name)
+    if kept:
+        return f"nothing reads {' · '.join(kept)} or sends it out"
+    resources = list(dict.fromkeys(r for s in statements for r in s.resources))
+    return f"only {' · '.join(resources[:3])}" if resources else "nothing"
 
 
 class PolicyManager:

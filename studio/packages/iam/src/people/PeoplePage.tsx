@@ -62,7 +62,7 @@ export function PeoplePage({ username, graphSlug }: SectionPageProps) {
 		<SectionPage
 			section="people"
 			graph={graphSlug}
-			chips={<CountChip page={page} noun="people" />}
+			chips={<CountChip page={page} noun="in all" />}
 			actions={
 				<>
 					<ActButton

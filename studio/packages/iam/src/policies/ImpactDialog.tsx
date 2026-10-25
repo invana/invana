@@ -76,7 +76,7 @@ export function ImpactDialog({
 
 	return (
 		<Dialog open onOpenChange={(o) => !o && onCancel()}>
-			<DialogContent className="sm:max-w-2xl">
+			<DialogContent className="max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>
 						Save {policy.name}?{" "}

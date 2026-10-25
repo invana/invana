@@ -8681,6 +8681,10 @@
             "title": "Agent Id",
             "type": "string"
           },
+          "allowed": {
+            "title": "Allowed",
+            "type": "integer"
+          },
           "delegates": {
             "items": {
               "$ref": "#/components/schemas/Delegate"
@@ -8762,6 +8766,7 @@
           "rows",
           "delegates",
           "functions_allowed",
+          "allowed",
           "refused"
         ],
         "title": "EffectiveRead",

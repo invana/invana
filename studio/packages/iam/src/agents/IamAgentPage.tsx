@@ -265,7 +265,7 @@ function EffectiveTab({
 					As started by
 				</Label>
 				<Select value={startedBy} onValueChange={setStartedBy}>
-					<SelectTrigger id="iam-started-by" className="w-60">
+					<SelectTrigger id="iam-started-by" className="w-80">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
@@ -295,7 +295,7 @@ function EffectiveTab({
 				</Select>
 				<span className="ml-auto text-muted-foreground">
 					{data
-						? `${data.functions_allowed} functions allowed · ${data.refused} refused · `
+						? `${data.functions_allowed} its policies allow · ${data.allowed} allowed here · ${data.refused} refused · `
 						: ""}
 					Allowed only where every column allows
 				</span>
@@ -429,7 +429,9 @@ function effectiveColumns(): ColumnDef<EffectiveRow>[] {
 			header: "Resource",
 			size: 240,
 			cell: ({ row }) => (
-				<span className="font-mono">{row.original.resource}</span>
+				<span className="whitespace-nowrap font-mono">
+					{row.original.resource}
+				</span>
 			),
 		},
 		{

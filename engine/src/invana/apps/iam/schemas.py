@@ -343,6 +343,7 @@ class EffectiveRead(BaseModel):
     rows: list[EffectiveRow]
     delegates: list[Delegate]
     functions_allowed: int  # catalogue functions its policies and the boundary allow
+    allowed: int  # rows allowed once every layer has its say
     refused: int
 
 

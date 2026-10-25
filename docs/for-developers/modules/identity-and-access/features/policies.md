@@ -123,7 +123,7 @@ flowchart TD
 | PO13 | A boundary policy bounds every holder in the Graph without being attached. Several boundaries all apply. With none, the boundary layer allows. |
 | PO14 | Deleting a custom or boundary policy deletes its attachments; a managed policy is never deleted. |
 | PO15 | Without iam-admin every act is drawn disabled, never hidden (RO14). The policy list, a policy's tabs and Test access stay open to every member. |
-| PO16 | The *Policies* list's *Held by* line and counts are the engine's (`held_by` on each row); Studio prints them. |
+| PO16 | The *Policies* list's *Held by* line and counts are the engine's (`held_by` on each row); Studio prints them. Agents are counted as IAM › Agents lists them — spawned agents are not. A boundary's *What it allows* says what it keeps back (*nothing reads email or sends it out*), else the resources it leaves open. The Held by tab lists groups, then agents, people and tokens, each by name. IAM Home's policy counts are per kind with drafts, as the list's kind tabs count them. |
 | PO17 | The *Policies* list reads managed → custom → inline → boundary, then by name, when the Graph's policies fit one page; a longer list, or another sort, pages by name or by last change alone. A managed policy has no *Changed* — it is built in. |
 | PO18 | The Limits tab's rows are label · per: *Tokens* a month · *Tokens* a run (used reads `p95 <n>` over 30 days) · *Live agents* at once · *Agents a run* descendants (used reads `<n> in #<run>`, the largest live tree) · *Depth* spawn levels · *Worker-seconds* an hour · *Pools* it may use. |
 

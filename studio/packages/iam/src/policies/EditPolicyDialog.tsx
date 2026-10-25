@@ -88,7 +88,7 @@ export function EditPolicyDialog({
 
 	return (
 		<Dialog open onOpenChange={(o) => !o && onCancel()}>
-			<DialogContent className="sm:max-w-2xl">
+			<DialogContent className="max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>Edit {policy.name}</DialogTitle>
 					<DialogDescription>

@@ -21,7 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.apps.agents.models import Agent, AgentKind
 from invana.apps.govern.models import Lens, LensKind
 from invana.apps.graphs.models import GraphMember
-from invana.apps.iam.models import Group, Policy, PolicyStatus
+from invana.apps.iam.models import Group, Policy
 from invana.core.auth.models import PersonalAccessToken, User
 from invana.core.ledger.models import LedgerRow
 from invana.core.lists import ListParams, PageInfo
@@ -231,12 +231,9 @@ class AccessQuerySet:
         )
         return int((await session.execute(stmt)).scalar_one())
 
-    async def saved_policy_counts(self, session: AsyncSession, *, graph_id: str) -> dict[str, int]:
-        stmt = (
-            select(Policy.kind, func.count())
-            .where(Policy.graph_id == graph_id, Policy.status == PolicyStatus.saved.value)
-            .group_by(Policy.kind)
-        )
+    async def policy_counts(self, session: AsyncSession, *, graph_id: str) -> dict[str, int]:
+        """Policies per kind, drafts included — the counts the Policies list's kind tabs read."""
+        stmt = select(Policy.kind, func.count()).where(Policy.graph_id == graph_id).group_by(Policy.kind)
         return {kind: int(n) for kind, n in (await session.execute(stmt)).all()}
 
     async def token_counts(

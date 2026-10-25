@@ -320,6 +320,8 @@ export interface EffectiveRead {
 	delegates: Delegate[];
 	/** Catalogue functions its policies and the boundary allow — IAM › Agents' count. */
 	functions_allowed: number;
+	/** Rows allowed once every layer has its say. */
+	allowed: number;
 	refused: number;
 }
 
