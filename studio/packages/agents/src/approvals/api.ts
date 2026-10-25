@@ -16,9 +16,17 @@ export const alertRulesApi = {
 		request<AlertRule[]>(base(username, graphSlug)),
 
 	create: (username: string, graphSlug: string, data: AlertRuleCreate) =>
-		request<AlertRule>(base(username, graphSlug), { method: "POST", ...json(data) }),
+		request<AlertRule>(base(username, graphSlug), {
+			method: "POST",
+			...json(data),
+		}),
 
-	update: (username: string, graphSlug: string, id: string, data: AlertRuleUpdate) =>
+	update: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		data: AlertRuleUpdate,
+	) =>
 		request<AlertRule>(`${base(username, graphSlug)}/${id}`, {
 			method: "PATCH",
 			...json(data),

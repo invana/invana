@@ -1,0 +1,14 @@
+# An ask for a list, answered by opening it. Understand has already turned the
+# ask into words — which list, and each filter as the person said it — so the
+# one step left resolves those words and writes the link.
+
+key = "board-open"
+version = 1
+kind = "ask"
+description = "Open one of Studio's lists with the filters the ask names, and link to it."
+intents = ["open_list"]
+
+[[steps]]
+id = "board_open"
+task = "board.open"
+label = "Open"

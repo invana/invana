@@ -287,6 +287,8 @@ export function AgentDetail({
 						graphSlug={graphSlug}
 						agent={agent}
 						onOpenEnvelope={onOpenEnvelope}
+						draft={draft}
+						onPatch={patch}
 					/>
 				);
 			case "limits":

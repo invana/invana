@@ -3,7 +3,7 @@
  * Asks themselves are the shell's `Approval`.
  */
 
-export interface AlertMatch {
+interface AlertMatch {
 	act: string;
 	touched: string;
 	verdict: string[];

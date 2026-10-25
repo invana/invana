@@ -255,7 +255,7 @@ export interface TouchesResponse {
 	tallies: TouchTallies | null;
 }
 
-export interface ParticipantReading {
+interface ParticipantReading {
 	address: string;
 	layer: string;
 	verdict: "refused" | "touched" | "miss" | "never_touched";

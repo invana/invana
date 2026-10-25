@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.models import DEFAULT_EFFORT, Agent, AgentKind, AgentLifetime, AgentStatus
 from invana.apps.agents.querysets import AgentQuerySet
-from invana.apps.agents.registry import SEEDED_AGENTS, SURFACE_DEFAULT_AGENT
+from invana.apps.agents.registry import SEEDED_AGENTS, SURFACE_DEFAULT_AGENT, SeededAgent
 from invana.apps.agents.schemas import (
     AgentCreate,
     AgentRead,
@@ -145,6 +145,7 @@ class AgentManager:
         for seeded in SEEDED_AGENTS:
             existing = await self.agents_qs.get_by_key(session, graph_id=graph.id, key=seeded.key)
             if existing is not None:
+                self._add_shipped(existing, seeded)
                 continue
             agent = Agent(
                 graph_id=graph.id,
@@ -173,6 +174,33 @@ class AgentManager:
             if explorer is not None:
                 graph.default_agent_id = explorer.id
         return created
+
+    @staticmethod
+    def _add_shipped(agent: Agent, seeded: SeededAgent) -> None:
+        """Give a seeded agent the functions and packaged flows a release added.
+
+        ``shipped`` remembers what the agent was last given, so only what is new
+        since then is added: what an owner took away stays away. A Graph seeded
+        before ``board.open`` shipped gains it this way.
+        """
+        spec = copy.deepcopy(agent.workflow_spec or {})
+        given = spec.get("shipped")
+        changed = False
+        for key in ("allow", "templates"):
+            shipped = seeded.workflow_spec.get(key)
+            if not isinstance(shipped, list):
+                continue
+            have = list(spec.get(key) or [])
+            seen = set(given.get(key) or []) if isinstance(given, dict) else set(have)
+            new = [k for k in shipped if k not in seen and k not in have]
+            if new:
+                spec[key] = have + new
+            changed = changed or bool(new) or not isinstance(given, dict)
+        if changed:
+            spec["shipped"] = {
+                k: list(v) for k in ("allow", "templates") if isinstance(v := seeded.workflow_spec.get(k), list)
+            }
+            agent.workflow_spec = spec
 
     async def default_agent_for_surface(self, session: AsyncSession, *, graph: Graph, surface: str) -> Agent | None:
         """Which agent a new session on this surface binds (docs/for-developers/modules/agents/spec.md).

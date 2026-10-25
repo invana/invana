@@ -63,6 +63,9 @@ const ENGINE_ONLY = {
 	annotations:
 		"served by the @invana-studio/explorer package, outside the host",
 	data_edits: "served by the @invana-studio/explorer package, outside the host",
+	alerts:
+		"served by the @invana-studio/agents package (Approvals › Alert rules)",
+	ledger: "served by the @invana-studio/agents package (Ledger)",
 	modeller: "served by the @invana-studio/modeller package, outside the host",
 	govern: "served by the @invana-studio/modeller package, outside the host",
 	graphs:

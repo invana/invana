@@ -16,6 +16,14 @@ type AgentStatus = "draft" | "active" | "paused" | "retired";
 
 type AgentLifetime = "persistent" | "ephemeral";
 
+/** Whether an agent may hand work to another: always, after an ask, or never. */
+export type Delegate = "always" | "ask" | "never";
+
+/** An agent's policy: its flags, and who it may delegate to by agent id. */
+export type AgentPolicy = Record<string, boolean | Record<string, Delegate>> & {
+	may_delegate?: Record<string, Delegate>;
+};
+
 export interface Agent {
 	id: string;
 	graph_id: string;
@@ -53,7 +61,7 @@ export interface Agent {
 	effective_effort: Record<EffortKey, number>;
 	/** Whether an Explorer ask may run through it — decides *Make default*. */
 	answers_asks: boolean;
-	policy: Record<string, boolean>;
+	policy: AgentPolicy;
 	/** Markdown. Empty is Invana's default voice, never no voice. */
 	soul: string;
 	/** The voice dials; a missing key is its default. */
@@ -98,7 +106,7 @@ export interface AgentCreate {
 	skill_ids?: string[];
 	budget?: Record<string, number>;
 	effort?: Partial<Record<EffortKey, number>>;
-	policy?: Record<string, boolean>;
+	policy?: AgentPolicy;
 	/** `""` clears it back to the default voice. */
 	soul?: string;
 	soul_traits?: SoulTraits;

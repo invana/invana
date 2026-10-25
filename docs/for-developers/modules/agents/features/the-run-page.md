@@ -90,7 +90,7 @@ flowchart TD
 | `task_runs.exit_reason` | why a run ended, set when it settles: `served · cannot_answer · budget_declined · time_limit · step_limit · no_progress · loop · parent_ended · stopped · failed` |
 | `task_runs.escrow_tokens` · `escrow_returned` | on a child run: tokens moved from its parent's remaining budget, and what went back when it ended ([delegation](delegation.md)) |
 | `GET …/runs` | `Page[TaskRunSummary]`; items add `number` · `agent_name` · `origin` · `started_by_name` · `agents` · `exit_reason`. Filters add `state` (`live · waiting · ended`) and `exit_reason` (a reason, or `not_served` for every ended run that did not serve) |
-| `GET …/runs/stats` | adds `served` · `not_served` · `not_served_by_reason {reason: n}` · `waiting_approvals` over the window |
+| `GET …/runs/stats` | adds `served` · `not_served` · `not_served_by_reason {reason: n}` · `served_share` · `waiting_approvals` over the window, and `largest_live_run_id` · `largest_live_agents` standing now |
 | `GET …/runs/{id}/overview` | `RunOverview` — head, tiles, `agents_over_time[]`, `steps_per_minute[]`, `waiting[]`, and for a large run `finished_per_minute[]` · `live_over_time[]` · `live_limit` · `eta_s` · `by_role[]` |
 | `GET …/runs/{id}/agents` | `RunAgents` — `nodes[]` (run id, parent, agent, role, depth, status, exit reason, tokens, escrow, state words), `asks[]` (pending delegation), `roles[]` |
 | `GET …/runs/{id}/stages` | `RunStages` — `stages[]` in plan order: function, status, calls, lanes, duration, p95, tokens, `in_count`, `out_count`, `line`, `step_ids[]` |
@@ -107,7 +107,7 @@ flowchart TD
 | RP2 | **A root run has a number.** `#2291` is how people quote a run; the uuid stays its identity. The number is per Graph, given at creation, never reused; steps and children have none, so the numbers people see are the runs they started. |
 | RP3 | **A run's status is its exit reason once it ends.** `served`, `budget declined`, `no progress` — the reason an agent ended is the word a row shows, recorded when the run settles, never derived in Studio. A running run says `running`, a held one `waiting`. |
 | RP4 | **`state` groups statuses for the list's tabs.** `live` is queued or running, `waiting` is held on a person (`awaiting_input` · `needs_input` — a question, or a step held on an approval), `ended` is every terminal status. |
-| RP5 | **From is the run's origin in the reader's words.** Explorer (an ask from a session), Todo, Schedule, Project, API — mapped from `triggered_by` and the session; a delegation is never a root, so it is never a From. |
+| RP5 | **From is the run's origin in the reader's words.** Explorer (an ask from a session), Todo, Schedule, Project, API — mapped from `triggered_by` and the session; a delegation is never a root, so it is never a From. `f.origin` takes the same words, on Runs and on an agent's Runs tab. |
 | RP6 | **Size is how many agents the run used**, the root and every child run with an agent, counted by the engine. |
 | RP7 | **One page at any size.** The tabs never change with size; past 50 agents the Overview swaps to the large-run reading and Agents offers *By role*. |
 | RP8 | **Every number on the page is the engine's.** Tiles, bars, per-minute counts, ETA and per-role p50/p95 come from the run's read endpoints; Studio formats them. |

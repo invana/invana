@@ -38,8 +38,16 @@ INTENT_KINDS = (
     "exploration",
     "aggregate_and_chart",
     "model_change",
+    "open_list",
     "out_of_scope",
 )
+
+#: The lists an ``open_list`` ask can open. An ask for any other list is
+#: answered as an ordinary question.
+OPEN_LISTS = ("runs", "agents", "approvals", "ledger")
+
+#: The words an ``open_list`` ask carries in ``refs``, as ``"<key>: <words>"``.
+OPEN_LIST_KEYS = ("list", "agent", "status", "since", "started_by", "origin", "verdict")
 
 # The visuals an ask can name. A fixed enum, never a template list: the schema
 # stays a constant, so it never grows with a Graph's templates and stays in the
@@ -61,13 +69,18 @@ UNDERSTAND_TOOL = {
             "enum": list(INTENT_KINDS),
             "description": "single_query = one question, one query. compound = several readings to combine. "
             "exploration = open-ended browsing. aggregate_and_chart = a number or a trend to draw. "
-            "model_change = a change to the schema, not the data. out_of_scope = not answerable here.",
+            "model_change = a change to the schema, not the data. open_list = open one of Studio's lists "
+            "(runs, agents, approvals, ledger) with filters, not a question about the graph's data. "
+            "out_of_scope = not answerable here.",
         },
         "summary": {"type": "string", "description": "One line: what the user means, in your words."},
         "refs": {
             "type": "array",
             "items": {"type": "string"},
-            "description": "Node/edge type names from the model that this ask is about. [] if none apply.",
+            "description": "Node/edge type names from the model that this ask is about. [] if none apply. "
+            'For open_list: "<key>: <the person\'s words>" pairs instead — "list: runs", "agent: Route Auditor", '
+            '"status: failed", "since: this month"; keys are list, agent, status, since, started_by, origin, '
+            "verdict, and only the ones the ask names.",
         },
         "expects": {
             "type": "array",
@@ -231,6 +244,17 @@ class Conversed:
     duration_ms: float = 0.0
 
 
+def list_words(refs: list[str]) -> dict[str, str]:
+    """An ``open_list`` intent's refs as ``{key: words}``; a ref that names no known key is left out."""
+    out: dict[str, str] = {}
+    for ref in refs:
+        key, sep, words = ref.partition(":")
+        key = key.strip().lower().replace(" ", "_")
+        if sep and key in OPEN_LIST_KEYS and words.strip():
+            out[key] = words.strip()
+    return out
+
+
 def _system_prompt(model_context: str, instructions: str, skills: str, rules: str, voice: str = "") -> str:
     return (
         f"{voice}"
@@ -251,9 +275,15 @@ def _system_prompt(model_context: str, instructions: str, skills: str, rules: st
         'three "choices": each a short question the graph below can answer, with "refs" naming the types '
         "it reads. A thanks or a goodbye needs no choices, and when the model below lists no types offer "
         "none. Anything that asks about the data, however casually, is not converse.\n\n"
-        '"refs" must contain names that appear in the model below — never invented ones. "expects" is '
+        '"refs" must contain names that appear in the model below — never invented ones (open_list, below, '
+        'is the one exception). "expects" is '
         "what a good answer would look like: graph for things to see on a canvas, table for rows, "
         "metric for a single number, chart for a trend or comparison, text for an explanation.\n\n"
+        'An ask to SEE one of Studio\'s lists — "show me Route Auditor\'s failed runs this month", "open the '
+        'approvals waiting on me", "ledger rows refused today" — is kind="open_list", not a graph question, '
+        "and never cannot_answer because the graph does not hold runs or agents. "
+        'Its "refs" are "<key>: <words>" pairs naming the list (runs, agents, approvals or ledger) and each '
+        'filter in the person\'s own words; never resolve a name to an id. Its "expects" is [].\n\n'
         f"{instructions}{skills}{rules}"
         f"Graph model:\n{model_context}"
     )
@@ -352,13 +382,16 @@ async def understand(
     kind = str(data.get("kind") or "single_query")
     if kind not in INTENT_KINDS:
         kind = "single_query"
+    refs = [str(r).strip() for r in (data.get("refs") or []) if str(r).strip()]
+    if kind == "open_list" and list_words(refs).get("list", "").lower() not in OPEN_LISTS:
+        kind = "single_query"
     prefer = str(data.get("prefer") or "").strip().lower()
     if prefer not in PREFERS:
         prefer = ""
     return Intent(
         kind=kind,
         summary=str(data.get("summary") or "").strip(),
-        refs=[str(r).strip() for r in (data.get("refs") or []) if str(r).strip()],
+        refs=refs,
         expects=[str(e).strip() for e in (data.get("expects") or []) if str(e).strip()],
         prefer=prefer,
         confidence=float(data.get("confidence") or 1.0),

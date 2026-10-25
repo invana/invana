@@ -29,6 +29,33 @@ RUN_STATE_STATUSES: dict[str, tuple[str, ...]] = {
 }
 
 
+def origin_clause(origin: str):
+    """The roots whose *From* is *origin* — ``run_origin``'s order, as SQL.
+
+    A trigger that says it alone wins (a Todo's run, a firing, a system run);
+    then a session or a canvas act is Explorer, a Todo id is Todo, a project
+    in the params is Project, and anything else a person opened is API.
+    """
+    said = {"Todo": "task", "Schedule": "schedule"}
+    plain = TaskRun.triggered_by.not_in(("task", "schedule", "system", "delegation"))
+    explorer = or_(TaskRun.session_id.is_not(None), TaskRun.triggered_by == "canvas")
+    project = TaskRun.params["project_id"].as_string().is_not(None)
+    if origin == "Explorer":
+        return and_(plain, explorer)
+    if origin == "Todo":
+        return or_(TaskRun.triggered_by == said["Todo"], and_(plain, ~explorer, TaskRun.todo_id.is_not(None)))
+    if origin == "Schedule":
+        return TaskRun.triggered_by == said["Schedule"]
+    if origin == "Project":
+        return and_(plain, ~explorer, TaskRun.todo_id.is_(None), project)
+    if origin == "API":
+        return or_(
+            TaskRun.triggered_by == "system",
+            and_(plain, ~explorer, TaskRun.todo_id.is_(None), ~project),
+        )
+    return TaskRun.id.is_(None)
+
+
 class TaskRunQuerySet:
     async def get(self, session: AsyncSession, run_id: str) -> TaskRun | None:
         return await session.get(TaskRun, run_id)
@@ -701,8 +728,8 @@ class TaskRunQuerySet:
 
         The unfiltered list is the default view: every root a person reads the
         journal for, so canvas and system runs are outside it. ``interactive``
-        brings them in; naming an ``origin`` asks for exactly those triggers,
-        canvas and system included. ``candidates`` is a generated plan that has
+        brings them in; naming an ``origin`` — a *From* word — asks for exactly
+        those runs, canvas and system included. ``candidates`` is a generated plan that has
         a recorded plan, that Verify said served, and that no library entry
         names as its origin. ``state`` is a tab — the statuses
         :data:`RUN_STATE_STATUSES` groups under it. ``exit_reason`` is a recorded
@@ -715,7 +742,7 @@ class TaskRunQuerySet:
         origins = params.values("origin")
         stmt = roots if origins or params.one("interactive") else unfiltered
         if origins:
-            stmt = stmt.where(TaskRun.triggered_by.in_(origins))
+            stmt = stmt.where(or_(*(origin_clause(o) for o in origins)))
         if statuses := params.values("status"):
             stmt = stmt.where(TaskRun.status.in_(statuses))
         if agent_ids := params.values("agent_id"):

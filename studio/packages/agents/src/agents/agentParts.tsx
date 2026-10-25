@@ -60,6 +60,9 @@ export const runLabel = (id: string) => `#${id.slice(0, 4)}`;
  * What opened a run, as a person reads it — the run's `triggered_by`.
  * `canvas` and `system` runs are left out of a runs list unless asked for.
  */
+/** A run's *From* — the words `f.origin` filters on and a row's `origin` says. */
+export const RUN_FROM = ["Explorer", "Todo", "Schedule", "Project", "API"];
+
 export const RUN_ORIGIN: Record<string, string> = {
 	user: "Asked",
 	schedule: "Schedule",

@@ -276,7 +276,10 @@ class LedgerManager:
             out.append(LedgerCustody(kind="worker", name=row.where, line="where it ran"))
         if row.run_id:
             snapshot = await self.rows_qs.lens_snapshot(session, row.run_id) or {}
-            names = [str(c) for c in snapshot.get("contributors") or []]
+            names = [
+                str(c.get("name") or c.get("id")) if isinstance(c, dict) else str(c)
+                for c in snapshot.get("contributors") or []
+            ]
             rules = snapshot.get("rules") or []
             out.append(
                 LedgerCustody(

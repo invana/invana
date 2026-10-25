@@ -128,7 +128,11 @@ export const agents: ProductDefinition = {
 				level("llms", "LLMs", [level(":provider")]),
 				level("runs", "Runs"),
 				level("approvals", "Approvals", tabs("alerts")),
-				level("ledger", "Ledger", tabs("actor", "record", "refusals", "export")),
+				level(
+					"ledger",
+					"Ledger",
+					tabs("actor", "record", "refusals", "export"),
+				),
 				level("settings", "Settings"),
 			],
 		},

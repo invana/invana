@@ -22328,6 +22328,28 @@
             "title": "Failed",
             "type": "integer"
           },
+          "largest_live_agents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Largest Live Agents"
+          },
+          "largest_live_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Largest Live Run Id"
+          },
           "live": {
             "title": "Live",
             "type": "integer"
@@ -22363,6 +22385,17 @@
             "default": 0,
             "title": "Served",
             "type": "integer"
+          },
+          "served_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Served Share"
           },
           "since": {
             "format": "date-time",

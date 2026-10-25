@@ -7,6 +7,7 @@ import {
 	PlanExportPage,
 	PlanVersionsPage,
 	PluginPage,
+	RunPage,
 	SkillBoardPage,
 	TemplatePage,
 } from "@invana-studio/agents";
@@ -26,7 +27,6 @@ import {
 	BOARD_KINDS,
 	boardPageId,
 	type OpenBoard,
-	RunBoardPage,
 	RunsBoardPage,
 	runAddress,
 } from "@invana-studio/shell";
@@ -127,7 +127,7 @@ export function declaredBoardContent(
 			);
 		}
 		return (
-			<RunBoardPage
+			<RunPage
 				username={username as string}
 				graphSlug={graphSlug as string}
 				runId={runId}
@@ -145,10 +145,6 @@ export function declaredBoardContent(
 								})
 						: openStep
 				}
-				// `Retune` — the run stays in `mainSection` while Govern opens
-				// beside it, which is the whole reason the section is a stack
-				// (worlds.md Journey 2).
-				onRetune={() => settingsPanel.setSection("govern")}
 				// The pair is the subject, and the first half is this run —
 				// `compare:<a>:<b>`, which the id parser splits on the first colon.
 				onCompare={(other) =>

@@ -184,6 +184,15 @@ class TestRunsList:
         assert [r["exit_reason"] for r in not_served] == ["budget_declined"]
         assert not_served[0]["started_by_name"] == user.username and not_served[0]["origin"] == "API"
 
+        # *From* filters by the same words a row says.
+        api, _ = await services.list_runs(
+            session, graph_id=graph.id, params=ListParams(sort="-created_at", filters={"origin": ("API",)})
+        )
+        explorer, _ = await services.list_runs(
+            session, graph_id=graph.id, params=ListParams(sort="-created_at", filters={"origin": ("Explorer",)})
+        )
+        assert len(api) == 3 and explorer == []
+
     async def test_a_retune_of_a_run_still_going_is_refused(self, session, graph, user):
         run = TaskRun(graph_id=graph.id, flow_key="nl-query", ask_kind="nl", status="running")
         session.add(run)

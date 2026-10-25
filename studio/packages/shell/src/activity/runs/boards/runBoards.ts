@@ -12,7 +12,7 @@
  * `0 tokens` or `{}`.
  */
 
-import type { GanttSpecStatus, Tone as TileTone } from "@invana/blocks";
+import type { Tone as TileTone } from "@invana/blocks";
 import type { ChipSpec, Tone } from "@invana/boards";
 import type { Bound, StatusDotProps } from "@invana/ui";
 import type { TraceRead, TraceStepRead } from "@invana-studio/core";
@@ -71,11 +71,6 @@ export function tileToneOf(status: string): TileTone | undefined {
 	return TILE_TONES[toneOf(status) ?? ""];
 }
 
-/** The Gantt's own vocabulary is the engine's, so this is a narrow, not a map. */
-export function ganttStatusOf(status: string): GanttSpecStatus {
-	return status as GanttSpecStatus;
-}
-
 /** A catalogue bound, when the trace named one the kit can draw. */
 const BOUNDS: ReadonlySet<string> = new Set([
 	"none",
@@ -114,23 +109,6 @@ export {
 	VIEW_BOARD,
 	VIEW_SPEC,
 } from "../../../boards/boardSpec";
-
-/**
- * A tile's gauge — the value against its ceiling — or `undefined` when there is
- * no real ceiling.
- *
- * [see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md):
- * a spend without its ceiling is a number nobody can act on — so the meter is
- * drawn only when the trace carried a ceiling, and a run over its ceiling still
- * draws a full bar rather than one that overflows the tile.
- */
-export function gaugeOf(
-	value: number,
-	ceiling: number | null | undefined,
-): { value: number; max: number } | undefined {
-	if (!ceiling || ceiling <= 0) return undefined;
-	return { value: Math.min(1, value / ceiling), max: 1 };
-}
 
 /**
  * A stored duration, else a live clock while the thing is still running.

@@ -231,9 +231,7 @@ export function ImportsPage() {
 								return (
 									<TableRow
 										key={`${row.graph.username}/${row.graph.graphSlug}/${row.id}`}
-										onClick={() =>
-											navigate(runPagePath(row.graph, row.id))
-										}
+										onClick={() => navigate(runPagePath(row.graph, row.id))}
 										className="cursor-pointer"
 									>
 										<TableCell

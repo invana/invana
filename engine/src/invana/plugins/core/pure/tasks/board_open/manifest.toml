@@ -1,0 +1,19 @@
+key = "board.open"
+version = "1.0.0"
+summary = "Turn an ask for a list into that list's filters, count its rows, and link to it."
+bound = "none"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+
+[args]
+list = { type = "str" }
+filters = { type = "obj" }
+
+[outputs]
+path = "str"
+params = "obj"
+chips = "list"
+total = "int"
+unresolved = "list"
+emission_id = "str"

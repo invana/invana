@@ -8,7 +8,7 @@
  * change nobody made.
  */
 
-import type { Agent, AgentUpdate, SoulTraits } from "./types";
+import type { Agent, AgentPolicy, AgentUpdate, SoulTraits } from "./types";
 
 /** The envelope, as this page reads and writes it. */
 export interface Envelope {
@@ -23,7 +23,7 @@ export interface AgentDraft {
 	name: string;
 	budget: Record<string, number>;
 	effort: Record<string, number>;
-	policy: Record<string, boolean>;
+	policy: AgentPolicy;
 	spec: Envelope;
 	soul: string;
 	soul_traits: SoulTraits;

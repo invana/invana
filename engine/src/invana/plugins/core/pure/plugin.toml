@@ -2,5 +2,5 @@ name = "invana.core.pure"
 kind = "core"
 engine = "*"
 secrets = []
-tasks = ["graph.read.validate", "answer.shape", "plan.verify", "work.await"]
-flows = []
+tasks = ["graph.read.validate", "answer.shape", "plan.verify", "work.await", "board.open"]
+flows = ["board-open"]

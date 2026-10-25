@@ -31,7 +31,7 @@ const OLD_PANEL_LINKS: [string, string][] = [
 	["?panel=fleet&section=map", "/agents/fleet/map"],
 	["?panel=functions&section=templates", "/agents/functions/templates"],
 	["?panel=connections", "/agents/connections/mcp"],
-	["?panel=runs&run=r1", "/activity/runs/r1"],
+	["?panel=runs", "/agents/runs"],
 	["?panel=events", "/activity/events"],
 	["?panel=projects&project=p1", "/projects/p1"],
 	["?panel=projects&section=todos&todo=t1", "/projects/todos/t1"],

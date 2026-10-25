@@ -31,12 +31,8 @@ export type { ChangeEntry } from "./activity/changes/history";
 export { effectLine, useRecordHistories } from "./activity/changes/history";
 export type { EventListResponse } from "./activity/events/types";
 export { approvalsApi } from "./activity/notifications/api";
-export type {
-	Approval,
-	ApprovalPage,
-} from "./activity/notifications/types";
+export type { Approval } from "./activity/notifications/types";
 export { QueryStepBoard } from "./activity/runs/boards/QueryStepBoard";
-export { RunBoardPage } from "./activity/runs/boards/RunBoardPage";
 export { runAddress } from "./activity/runs/boards/runBoards";
 export { useRunStep } from "./activity/runs/boards/useRunStep";
 export { useRunsQuery } from "./activity/runs/queries";

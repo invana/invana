@@ -202,7 +202,7 @@ Grouped by the bound it spends, because **the group is what the envelope ceiling
 Roughly twenty-five entries, and the count is meant to stay near it — growth belongs in reusable
 TaskPlans, not in new callables.
 
-### 6.1 The catalogue as it actually is — thirty entries
+### 6.1 The catalogue as it actually is — thirty-one entries
 
 `runtime/catalogue/registry.py` is the declaration; one module per bound holds the callables. **The
 keys do not change in M1.** They are stored in `thinking_steps.task_key` and read by Studio, so
@@ -223,6 +223,7 @@ adds its one task type to the catalogue beside them and is not counted here.
 | `verify_result` | *none* | — | `served` str · `evidence` list | — |
 | `shape_for_canvas` | *none* | — | `nodes` int · `edges` int · `result_type` str · `emission_id` str · `emission_kind` str · `template_id` str · `single_value` bool | `execute_graph_query` |
 | `await_delegations` | *none* | `thinking_ids` list | `children` list | — |
+| `board.open` | *none* | `list` str · `filters` obj | `path` str · `params` obj · `chips` list · `total` int · `unresolved` list | — |
 | `execute_graph_query` | `graph_read` | `query` str · `read_only` bool | `rows` int · `execution_time_ms` int · `result_type` str | `validate_query` |
 | `preview_stitches` | `graph_read` | `rules` list · `all_links` bool | `previews` list | — |
 | `count_types` | `graph_read` | — | `node_types` list · `edge_types` list · `counted` bool | — |
@@ -350,7 +351,7 @@ resolving option values and its result is never returned to the model.
 `snapshot_model`**. [§ 6.2](#62-where-todays-set-and--06s-proposed-set-differ)
 lists § 0.6's *proposed* names — `import_dataset`, `import_report` — and taking
 those would rename a column whose values are stored on 179 live nodes and read
-by Studio, which [§ 6.1](#61-the-catalogue-as-it-actually-is--thirty-entries)
+by Studio, which [§ 6.1](#61-the-catalogue-as-it-actually-is--thirty-one-entries)
 already settles: **a stored key is renamed by a data migration, never by a
 declaration.** So M11 declares the keys that exist.
 

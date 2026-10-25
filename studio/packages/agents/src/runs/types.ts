@@ -73,14 +73,14 @@ export interface MinuteCount {
 	count: number;
 }
 
-export interface WaitingAsk {
+interface WaitingAsk {
 	approval_id: string;
 	kind: string;
 	line: string;
 	for_you: boolean;
 }
 
-export interface RoleRow {
+interface RoleRow {
 	role: string;
 	depth: number;
 	agents: number;
@@ -122,7 +122,7 @@ export interface RunAgentNode {
 	how: string;
 }
 
-export interface DelegationAsk {
+interface DelegationAsk {
 	approval_id: string;
 	from_run_id: string;
 	agent_id: string | null;
@@ -130,7 +130,7 @@ export interface DelegationAsk {
 	line: string;
 }
 
-export interface RoleGroup {
+interface RoleGroup {
 	role: string;
 	depth: number;
 	agents: number;
@@ -189,8 +189,18 @@ export interface RunTouched {
 		refused: number;
 		refused_line: string;
 	}[];
-	web: { domain: string; pages: number; refused: number; refused_line: string }[];
-	llm: { model: string; calls: number; tokens_in: number; tokens_out: number }[];
+	web: {
+		domain: string;
+		pages: number;
+		refused: number;
+		refused_line: string;
+	}[];
+	llm: {
+		model: string;
+		calls: number;
+		tokens_in: number;
+		tokens_out: number;
+	}[];
 	secrets: { name: string; used_by: string; where: string }[];
 	records_touched: number;
 }

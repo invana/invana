@@ -35,7 +35,8 @@ function usePart<T>(
 ) {
 	return useQuery({
 		queryKey: ["run-page", username, graphSlug, runId, part],
-		queryFn: () => fetcher(username as string, graphSlug as string, runId as string),
+		queryFn: () =>
+			fetcher(username as string, graphSlug as string, runId as string),
 		enabled: !!username && !!graphSlug && !!runId,
 		refetchInterval: running ? LIVE_MS : false,
 	});
@@ -50,7 +51,11 @@ export function useRunOverviewQuery(
 	return useQuery({
 		queryKey: ["run-page", username, graphSlug, runId, "overview"],
 		queryFn: () =>
-			runPageApi.overview(username as string, graphSlug as string, runId as string),
+			runPageApi.overview(
+				username as string,
+				graphSlug as string,
+				runId as string,
+			),
 		enabled: !!username && !!graphSlug && !!runId,
 		refetchInterval: (q) =>
 			q.state.data && !SETTLED.has(q.state.data.head.status) ? LIVE_MS : false,
@@ -107,7 +112,8 @@ export function useRunsTilesQuery(
 ) {
 	return useQuery({
 		queryKey: ["runs", username, graphSlug, "tiles"],
-		queryFn: () => runsApi.stats(username as string, graphSlug as string, { days: 1 }),
+		queryFn: () =>
+			runsApi.stats(username as string, graphSlug as string, { days: 1 }),
 		enabled: !!username && !!graphSlug,
 		refetchInterval: LIVE_MS * 2,
 	});

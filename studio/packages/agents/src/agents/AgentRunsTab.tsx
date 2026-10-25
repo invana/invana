@@ -47,7 +47,13 @@ import { useContext, useMemo, useState } from "react";
 import { FilteredEmpty } from "../lists";
 import { AgentsOpenContext } from "../open";
 import { ms, tokens } from "../overview/fleetParts";
-import { exitTone, RUN_ORIGIN, runLabel, TabReadState } from "./agentParts";
+import {
+	exitTone,
+	RUN_FROM,
+	RUN_ORIGIN,
+	runLabel,
+	TabReadState,
+} from "./agentParts";
 import { RUNS_PAGE, useAgentRunPagesQuery } from "./queries";
 import type { Agent } from "./types";
 
@@ -69,15 +75,16 @@ const SHOWING = [
 type Showing = (typeof SHOWING)[number]["value"];
 
 /** The origins a person filters an agent's runs by. */
-const ORIGIN_OPTIONS = ["task", "schedule", "user", "delegation"].map(
-	(value) => ({ value, label: RUN_ORIGIN[value] }),
-);
+const ORIGIN_OPTIONS = RUN_FROM.map((value) => ({ value, label: value }));
 
 /** Where a run came from, in the words the *From* filter uses. */
 function originOf(run: TaskRunSummary): string | null {
-	return run.triggered_by
-		? (RUN_ORIGIN[run.triggered_by] ?? run.triggered_by)
-		: null;
+	return (
+		run.origin ??
+		(run.triggered_by
+			? (RUN_ORIGIN[run.triggered_by] ?? run.triggered_by)
+			: null)
+	);
 }
 
 export function AgentRunsTab({

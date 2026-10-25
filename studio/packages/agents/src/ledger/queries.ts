@@ -13,7 +13,11 @@ const key = (u?: string, g?: string, ...rest: unknown[]) =>
 
 const on = (u?: string, g?: string) => !!u && !!g;
 
-export function useLedgerRowsQuery(u: string | undefined, g: string | undefined, query: ListQuery) {
+export function useLedgerRowsQuery(
+	u: string | undefined,
+	g: string | undefined,
+	query: ListQuery,
+) {
 	return useQuery({
 		queryKey: key(u, g, "rows", listQueryKey(query)),
 		queryFn: () => ledgerApi.rows(u as string, g as string, query),
@@ -23,7 +27,11 @@ export function useLedgerRowsQuery(u: string | undefined, g: string | undefined,
 	});
 }
 
-export function useLedgerStatsQuery(u: string | undefined, g: string | undefined, since = "today") {
+export function useLedgerStatsQuery(
+	u: string | undefined,
+	g: string | undefined,
+	since = "today",
+) {
 	return useQuery({
 		queryKey: key(u, g, "stats", since),
 		queryFn: () => ledgerApi.stats(u as string, g as string, since),
@@ -32,7 +40,11 @@ export function useLedgerStatsQuery(u: string | undefined, g: string | undefined
 	});
 }
 
-export function useLedgerRowQuery(u: string | undefined, g: string | undefined, id: string | null) {
+export function useLedgerRowQuery(
+	u: string | undefined,
+	g: string | undefined,
+	id: string | null,
+) {
 	return useQuery({
 		queryKey: key(u, g, "row", id),
 		queryFn: () => ledgerApi.row(u as string, g as string, id as string),
@@ -48,7 +60,8 @@ export function useLedgerActorQuery(
 ) {
 	return useQuery({
 		queryKey: key(u, g, "actor", actor, since),
-		queryFn: () => ledgerApi.actor(u as string, g as string, actor as string, since),
+		queryFn: () =>
+			ledgerApi.actor(u as string, g as string, actor as string, since),
 		enabled: on(u, g) && !!actor,
 	});
 }
@@ -61,12 +74,16 @@ export function useLedgerRecordQuery(
 ) {
 	return useQuery({
 		queryKey: key(u, g, "record", address, since),
-		queryFn: () => ledgerApi.record(u as string, g as string, address as string, since),
+		queryFn: () =>
+			ledgerApi.record(u as string, g as string, address as string, since),
 		enabled: on(u, g) && !!address,
 	});
 }
 
-export function useLedgerRefusalsQuery(u: string | undefined, g: string | undefined) {
+export function useLedgerRefusalsQuery(
+	u: string | undefined,
+	g: string | undefined,
+) {
 	return useQuery({
 		queryKey: key(u, g, "refusals"),
 		queryFn: () => ledgerApi.refusals(u as string, g as string),
@@ -74,7 +91,10 @@ export function useLedgerRefusalsQuery(u: string | undefined, g: string | undefi
 	});
 }
 
-export function useLedgerExportsQuery(u: string | undefined, g: string | undefined) {
+export function useLedgerExportsQuery(
+	u: string | undefined,
+	g: string | undefined,
+) {
 	return useQuery({
 		queryKey: key(u, g, "exports"),
 		queryFn: () => ledgerApi.exports(u as string, g as string),
@@ -82,7 +102,10 @@ export function useLedgerExportsQuery(u: string | undefined, g: string | undefin
 	});
 }
 
-export function useLedgerIntegrityQuery(u: string | undefined, g: string | undefined) {
+export function useLedgerIntegrityQuery(
+	u: string | undefined,
+	g: string | undefined,
+) {
 	return useQuery({
 		queryKey: key(u, g, "integrity"),
 		queryFn: () => ledgerApi.integrity(u as string, g as string),

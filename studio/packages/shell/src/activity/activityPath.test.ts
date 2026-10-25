@@ -33,8 +33,8 @@ describe("activityOf", () => {
 	});
 
 	it("opens a run on its Agents page", () => {
-		expect(runPagePath({ username: "admin", graphSlug: "airways" }, "r 1")).toBe(
-			"/u/admin/airways/agents/runs?page=run%3Ar%201",
-		);
+		expect(
+			runPagePath({ username: "admin", graphSlug: "airways" }, "r 1"),
+		).toBe("/u/admin/airways/agents/runs?page=run%3Ar%201");
 	});
 });

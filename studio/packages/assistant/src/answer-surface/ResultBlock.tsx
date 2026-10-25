@@ -1,11 +1,21 @@
 import type { Emission, QueryResponse } from "@invana-studio/core";
-import { emissionsApi } from "@invana-studio/core";
+import { emissionsApi, request, useRunStore } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useMatch, useNavigate, useParams } from "react-router-dom";
 import { EmissionList } from "./AnswerEmission";
-import { emissionsFromResult } from "./emissions";
+import {
+	emissionsFromResult,
+	type LinkEmission,
+	linkHref,
+	linksFromRows,
+	type RawEmissionRow,
+} from "./emissions";
+import { LinkCard } from "./LinkCard";
 import { TraceDialog } from "./TraceDialog";
+
+/** Links already opened by themselves, so a re-rendered thread never opens one twice. */
+const opened = new Set<string>();
 
 // An assistant reply's result, rendered as the emissions it is
 // (docs/for-developers/modules/ask/features/the-answer-surface.md). Every one
@@ -54,6 +64,39 @@ export function ResultBlock({ result, runId }: ResultBlockProps) {
 		staleTime: 60_000,
 	});
 
+	// The links this run wrote, read raw: a link is not one of the kinds the
+	// emission card draws. Keyed on the run's status so a reply rendered while
+	// the run streams reads them again once it settles.
+	const status = useRunStore((s) =>
+		runId ? s.views[runId]?.status : undefined,
+	);
+	const streamed = status !== undefined;
+	const links = useQuery({
+		queryKey: ["emission-links", username, graphSlug, runId, status] as const,
+		queryFn: async () =>
+			linksFromRows(
+				await request<RawEmissionRow[]>(
+					`/api/v1/u/${username}/${graphSlug}/runs/${runId}/emissions`,
+				),
+			),
+		enabled: scoped,
+		staleTime: 60_000,
+	});
+	const linkIds = new Set((links.data ?? []).map((l) => l.id));
+
+	const navigate = useNavigate();
+	const open = (link: LinkEmission) =>
+		navigate(linkHref(link, username as string, graphSlug as string));
+	// Asked from Agents, the list opens itself as the link arrives; the card
+	// stays in the thread as the way back. A thread read later never re-opens.
+	const onAgents = Boolean(useMatch("/u/:username/:graphSlug/agents/*"));
+	const arrived = links.data?.at(-1);
+	useEffect(() => {
+		if (!arrived || !onAgents || !streamed || opened.has(arrived.id)) return;
+		opened.add(arrived.id);
+		navigate(linkHref(arrived, username as string, graphSlug as string));
+	}, [arrived, onAgents, streamed, navigate, username, graphSlug]);
+
 	const qc = useQueryClient();
 	const switchTemplate = useMutation({
 		mutationFn: ({
@@ -78,11 +121,14 @@ export function ResultBlock({ result, runId }: ResultBlockProps) {
 
 	const emissions: Emission[] =
 		scoped && persisted.data?.length
-			? persisted.data
+			? persisted.data.filter((e) => !(e.id && linkIds.has(e.id)))
 			: emissionsFromResult(result);
 
 	return (
 		<>
+			{links.data?.map((link) => (
+				<LinkCard key={link.id} link={link} onOpen={() => open(link)} />
+			))}
 			<EmissionList
 				emissions={emissions.filter((e) => e.kind !== "subgraph")}
 				onSwitchTemplate={

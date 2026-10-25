@@ -12,7 +12,7 @@ export interface ChainLink {
 	name: string;
 }
 
-export interface LedgerRow {
+interface LedgerRow {
 	id: string;
 	seq: number;
 	at: string;
@@ -66,7 +66,7 @@ export interface LedgerRowDetail {
 }
 
 /** A generic counted row: `key` and up to three counts, plus a line. */
-export interface CountRow {
+interface CountRow {
 	key: string;
 	a: number;
 	b: number;
@@ -108,7 +108,12 @@ export interface LedgerRecord {
 	people: number;
 	agents: number;
 	rows: LedgerRow[];
-	can_see: { worlds: string[]; people: string; agents: string; can_write: string };
+	can_see: {
+		worlds: string[];
+		people: string;
+		agents: string;
+		can_write: string;
+	};
 }
 
 export interface LedgerRefusals {
@@ -149,6 +154,3 @@ export interface LedgerIntegrity {
 	retention_days: number;
 	rows: number;
 }
-
-/** A Ledger tab — the path's last segment. */
-export type LedgerTab = "rows" | "actor" | "record" | "refusals" | "export";

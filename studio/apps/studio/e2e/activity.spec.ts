@@ -3,8 +3,9 @@ import { askForRun } from "./api";
 import { GRAPH } from "./explorer";
 
 /**
- * Activity is the shell's page on a Graph: seven tabs, each a path, the bell
- * in the header as the way in, and a run's page inside the Runs tab.
+ * Activity is the shell's page on a Graph: six tabs, each a path, the bell in
+ * the header as the way in. A row of its Runs journal opens the run's page in
+ * Agents › Runs, where every run is read.
  */
 
 test("the bell opens the tray, the tray opens the Inbox, and each tab is a path", async ({
@@ -36,7 +37,7 @@ test("the bell opens the tray, the tray opens the Inbox, and each tab is a path"
 	).toBeVisible();
 });
 
-test("a run's page lives at its path and survives a reload", async ({
+test("a journal row opens its run's page in Agents, and it survives a reload", async ({
 	page,
 }) => {
 	// A query of its own, so its row is this test's and nobody else's.
@@ -48,27 +49,20 @@ test("a run's page lives at its path and survives a reload", async ({
 		.filter({ hasText: query })
 		.first()
 		.click({ timeout: 30_000 });
-	await expect(page).toHaveURL(new RegExp(`${GRAPH}/activity/runs/[^/?]+$`));
+	await expect(page).toHaveURL(
+		new RegExp(`${GRAPH}/agents/runs\\?page=run%3A[^&]+`),
+	);
 	const url = page.url();
 	await expect(page.getByRole("tab", { name: "Overview" })).toBeVisible({
 		timeout: 30_000,
 	});
-	// The run page owns the main area: its own tabs, no Activity strip above,
-	// and the crumb reads the run's short address.
-	await expect(page.getByRole("tab", { name: "Log" })).toBeVisible();
+	// The run page's own tabs; Activity's strip is not there.
+	await expect(page.getByRole("tab", { name: "Ledger" })).toBeVisible();
 	await expect(page.getByRole("tab", { name: "Inbox" })).toHaveCount(0);
-	await expect(
-		page.getByLabel("Breadcrumb").getByText(/^run:[0-9a-f]{8}$/),
-	).toBeVisible();
 
 	await page.reload();
 	await expect(page).toHaveURL(url);
 	await expect(page.getByRole("tab", { name: "Overview" })).toBeVisible({
 		timeout: 30_000,
 	});
-	await page
-		.getByLabel("Breadcrumb")
-		.getByRole("link", { name: "Runs" })
-		.click();
-	await expect(page).toHaveURL(`${GRAPH}/activity/runs`);
 });

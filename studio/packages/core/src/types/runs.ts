@@ -233,6 +233,11 @@ export interface RunStats {
 	served?: number;
 	not_served?: number;
 	not_served_by_reason?: Record<string, number>;
+	/** Served over every ended run with a reason, 0–1; null when none ended. */
+	served_share?: number | null;
+	/** The live root with the most agents under it, standing now. */
+	largest_live_run_id?: string | null;
+	largest_live_agents?: number | null;
 	/** Pending asks routed to the reader, standing now. */
 	waiting_approvals?: number;
 }

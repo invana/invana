@@ -31,7 +31,9 @@ export const runPageApi = {
 
 	/** Everything the run produced. */
 	assets: (username: string, graphSlug: string, id: string) =>
-		request<{ items: RunAsset[] }>(`${runBase(username, graphSlug, id)}/assets`),
+		request<{ items: RunAsset[] }>(
+			`${runBase(username, graphSlug, id)}/assets`,
+		),
 
 	/** Graph data, web, LLM and secrets the run touched. */
 	touched: (username: string, graphSlug: string, id: string) =>

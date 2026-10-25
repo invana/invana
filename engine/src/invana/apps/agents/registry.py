@@ -45,6 +45,7 @@ LABELS: dict[str, str] = {
     "work.delegate": "Delegate",
     "work.await": "Await",
     "work.create_task": "Sub-task",
+    "board.open": "Open",
 }
 
 
@@ -70,6 +71,7 @@ INTENT_TEMPLATES: dict[tuple[str, str], str] = {
     ("nl", "compound"): "nl-compare",
     ("nl", "aggregate_and_chart"): "nl-compare",
     ("nl", "model_change"): "modeller-propose",
+    ("nl", "open_list"): "board-open",
 }
 
 
@@ -120,6 +122,7 @@ _PLANNING_ALLOW = [
     "graph.read.query",
     "answer.shape",
     "plan.verify",
+    "board.open",
 ]
 
 EXPLORER = SeededAgent(
@@ -137,7 +140,7 @@ EXPLORER = SeededAgent(
         # The pin that makes every data canvas read-only from Studio. A plan
         # cannot unset it; the validator rejects a plan that tries.
         "pins": {"graph.read.query": {"read_only": True}},
-        "templates": ["nl-single", "nl-compare", "ql-direct"],
+        "templates": ["nl-single", "nl-compare", "ql-direct", "board-open"],
     },
     effort={"max_steps": 16, "max_replans": 1, "max_clarifications": 3},
 )
@@ -202,7 +205,7 @@ COORDINATOR = SeededAgent(
         "entry": "understand",
         "allow": [*_PLANNING_ALLOW, "work.spawn_agent", "work.delegate", "work.await"],
         "pins": {"graph.read.query": {"read_only": True}},
-        "templates": ["nl-single", "nl-compare", "ql-direct"],
+        "templates": ["nl-single", "nl-compare", "ql-direct", "board-open"],
     },
     effort={"max_steps": 24, "max_replans": 1, "max_clarifications": 3},
     budget={"max_depth": 2, "max_children": 3},

@@ -61,7 +61,7 @@ sequenceDiagram
 |---|---|
 | Intent | `open_list` joins `INTENT_KINDS`; `refs` carry `{list, agent, status, since, started_by, origin, verdict}` as words |
 | Flow | packaged `board.open` — `nl.understand → board.open`; `INTENT_TEMPLATES[("nl", "open_list")]` |
-| Function | `board.open` (`core.pure`, bound none): in `{list, filters}`, out `{path, params, chips[{field, value, label}], total, unresolved[]}`; emits a `link` emission |
+| Function | `board.open` (`core.pure`, bound none): in `{list, filters}`, out `{path, params, chips[{field, title, value, label}], total, unresolved[]}`; emits a `link` emission. The word table and name resolution live in `runtime/managers/board_open.py` |
 
 ## Decisions
 
@@ -72,6 +72,8 @@ sequenceDiagram
 | OB3 | **The count is the list's own `total`**, computed by the same query the list runs. |
 | OB4 | **Words map to the list's values in one table in the engine**: *failed* → `status=failed`; *didn't serve* / *not served* → `exit_reason=not_served`; *this month* · *30 days* → `since=30d`; *this week* → `7d`; *today* → `24h`. |
 | OB5 | **On Agents the page opens itself**; the card stays in the thread as the way back. |
+| OB6 | **A list joins `board.open` by registering itself** — its key, label, path, row noun, its `ListSpec` and a counter that runs the list's own query. The runtime registers Runs and Agents; Activity registers Approvals and the ledger, so the runtime never imports the band above it. A chip carries `{field, title, value, label}`, the list contract's applied filter. |
+| OB7 | **A seeded agent gains what a release ships.** On each seed, the Explorer and Coordinator agents receive the functions and packaged flows added since they were last given any (`workflow_spec.shipped`); what an owner removed is not given back. |
 
 ## Not building
 

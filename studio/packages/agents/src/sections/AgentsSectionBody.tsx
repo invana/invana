@@ -6,13 +6,13 @@
 
 import { AgentsListPage } from "../agents/AgentsListPage";
 import { ApprovalsPage } from "../approvals/ApprovalsPage";
-import { LedgerPage } from "../ledger/LedgerPage";
-import { RunsListPage } from "../runs/RunsListPage";
 import { ConnectionsSectionPage } from "../connections/ConnectionsSectionPage";
 import { FleetSectionPage } from "../fleet/FleetSectionPage";
 import { FunctionsSectionPage } from "../functions/FunctionsSectionPage";
+import { LedgerPage } from "../ledger/LedgerPage";
 import { LlmsPage } from "../llms/LlmsPage";
 import { PerformancePage } from "../performance/PerformancePage";
+import { RunsListPage } from "../runs/RunsListPage";
 import { SettingsSectionPage } from "../settings/SettingsSectionPage";
 import { SkillsListPage } from "../skills/SkillsListPage";
 import type { AgentsSectionKey, SectionPageProps } from "./spec";

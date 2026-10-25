@@ -93,9 +93,7 @@ export function Downstream({
 								<Button
 									variant="outline"
 									size="sm"
-									onClick={() =>
-										navigate(runPagePath(ref, b.run_id as string))
-									}
+									onClick={() => navigate(runPagePath(ref, b.run_id as string))}
 								>
 									Open
 								</Button>

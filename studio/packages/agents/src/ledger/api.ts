@@ -37,9 +37,16 @@ export const ledgerApi = {
 		request<LedgerRowDetail>(`${base(username, graphSlug)}/${id}`),
 
 	actor: (username: string, graphSlug: string, actor: string, since = "7d") =>
-		request<LedgerActor>(`${base(username, graphSlug)}/actor${qs({ actor, since })}`),
+		request<LedgerActor>(
+			`${base(username, graphSlug)}/actor${qs({ actor, since })}`,
+		),
 
-	record: (username: string, graphSlug: string, address: string, since = "30d") =>
+	record: (
+		username: string,
+		graphSlug: string,
+		address: string,
+		since = "30d",
+	) =>
 		request<LedgerRecord>(
 			`${base(username, graphSlug)}/record${qs({ address, since })}`,
 		),

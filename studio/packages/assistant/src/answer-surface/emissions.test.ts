@@ -1,6 +1,6 @@
 import type { QueryResponse } from "@invana-studio/core";
 import { describe, expect, it } from "vitest";
-import { emissionsFromResult } from "./emissions";
+import { emissionsFromResult, linkHref, linksFromRows } from "./emissions";
 
 const graph = (nodes: unknown[]) =>
 	({
@@ -41,5 +41,32 @@ describe("emissionsFromResult", () => {
 			} as unknown as QueryResponse)[0].kind,
 		).toBe("empty");
 		expect(emissionsFromResult(null)).toEqual([]);
+	});
+});
+
+describe("linksFromRows", () => {
+	it("reads a link row and opens it marked as the assistant's", () => {
+		const [link] = linksFromRows([
+			{ id: "t", seq: 0, kind: "table", payload: {} },
+			{
+				id: "l",
+				seq: 1,
+				kind: "link",
+				payload: {
+					list: "runs",
+					label: "Runs",
+					noun: ["run", "runs"],
+					path: "/agents/runs",
+					params: { "f.status": "failed", "f.since": "30d" },
+					chips: [],
+					total: 2,
+					unresolved: [],
+				},
+			},
+		]);
+		expect(link).toMatchObject({ id: "l", label: "Runs", total: 2 });
+		expect(linkHref(link, "admin", "airways")).toBe(
+			"/u/admin/airways/agents/runs?f.status=failed&f.since=30d&via=assistant",
+		);
 	});
 });

@@ -31,6 +31,7 @@ from invana.apps.work.models import Task as Todo
 from invana.core.errors import ValidationError
 from invana.runtime.models import INTERACTIVE, ExitReason, RunStatus, TaskRun, span_ms
 from invana.runtime.querysets import TaskRunQuerySet
+from invana.runtime.querysets.run_pages import RunPageQuerySet
 from invana.runtime.querysets.task_run import RUN_STATE_STATUSES
 from invana.runtime.schemas import RunDay, RunStats, SlowestRun
 
@@ -84,7 +85,9 @@ class RunStatsManager:
         waiting on a person is not timed at all. Tokens are a
         settled run's stored ``run_tokens``, or its own and its nodes' so far.
         *Served* and *not served* are counted over the window's ended runs by
-        their recorded exit reason; a run that recorded none is in neither.
+        their recorded exit reason; a run that recorded none is in neither,
+        and the served share is served over both. The largest live run is the
+        live root with the most agents under it.
         ``waiting_approvals`` is the reader's pending asks, counted by the caller
         — approvals belong to a band above this one.
         Raises ``ValidationError`` for an unknown zone or a window out of range.
@@ -120,6 +123,11 @@ class RunStatsManager:
             r.exit_reason for r in window if r.status in RUN_STATE_STATUSES["ended"] and r.exit_reason is not None
         )
         served = reasons.pop(ExitReason.served.value, 0)
+        ended = served + sum(reasons.values())
+        # Agents under each live root, the root's own agent counted too.
+        under = await RunPageQuerySet().agents_under(session, run_ids=[r.id for r in live])
+        sizes = {r.id: (1 if r.agent_id else 0) + under.get(r.id, 0) for r in live}
+        largest = max(sizes, key=sizes.__getitem__, default=None)
 
         by_day: dict[date, int] = {first_day + timedelta(days=i): 0 for i in range(days)}
         for run in window:
@@ -145,6 +153,9 @@ class RunStatsManager:
             served=served,
             not_served=sum(reasons.values()),
             not_served_by_reason=dict(reasons),
+            served_share=round(served / ended, 4) if ended else None,
+            largest_live_run_id=largest,
+            largest_live_agents=sizes[largest] if largest else None,
             waiting_approvals=waiting_approvals,
         )
 

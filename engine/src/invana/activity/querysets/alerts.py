@@ -13,7 +13,6 @@ from datetime import datetime
 
 from sqlalchemy import Text, cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import aliased
 
 from invana.activity.models import AlertRule, Approval, ApprovalStatus
 from invana.core.auth.models import User
@@ -84,16 +83,27 @@ class WaitingQuerySet:
         return dict(result.all())
 
     async def run_numbers(self, session: AsyncSession, run_ids: list[str]) -> dict[str, int]:
-        """Each run's number — a step's is its root run's."""
-        if not run_ids:
-            return {}
-        parent = aliased(TaskRun)
-        stmt = (
-            select(TaskRun.id, func.coalesce(TaskRun.number, parent.number))
-            .outerjoin(parent, parent.id == TaskRun.parent_run_id)
-            .where(TaskRun.id.in_(run_ids))
-        )
-        return {run_id: number for run_id, number in (await session.execute(stmt)).all() if number is not None}
+        """Each run's number — a step's, or a delegated run's, is its root run's.
+
+        Walked up a level at a time for every run at once, so a child under a
+        delegate step under the root costs three queries, not three per run.
+        """
+        out: dict[str, int] = {}
+        at = {run_id: run_id for run_id in run_ids}  # the run asked for → where its walk is
+        for _ in range(16):
+            if not at:
+                break
+            stmt = select(TaskRun.id, TaskRun.parent_run_id, TaskRun.number).where(TaskRun.id.in_(set(at.values())))
+            rows = {rid: (parent, number) for rid, parent, number in (await session.execute(stmt)).all()}
+            nxt: dict[str, str] = {}
+            for asked, here in at.items():
+                parent, number = rows.get(here, (None, None))
+                if number is not None:
+                    out[asked] = number
+                elif parent is not None:
+                    nxt[asked] = parent
+            at = nxt
+        return out
 
 
 class AlertRuleQuerySet:

@@ -4,9 +4,11 @@
  *
  * - **Budget** — `max_tokens_run` · `max_tokens_month`. A run budget above the
  *   month budget is flagged under the field.
- * - **Delegation** — `policy.can_spawn`, `max_depth` · `max_children` ·
- *   `max_concurrent_runs`. Depth and children bound the helpers it creates,
- *   so they are disabled while it may create none.
+ * - **Delegation** — `policy.can_spawn`, then the four ceilings of one run:
+ *   `max_depth` · `max_children` · `max_descendants` (*in all*) ·
+ *   `max_live` (*live at once*, past which a helper queues). They bound the
+ *   helpers it creates, so they are disabled while it may create none.
+ * - **Runs** — `max_concurrent_runs`, across every run it is working.
  * - **Effort** — `max_steps` · `max_replans` · `max_clarifications`.
  *
  * Empty is *the default applies*, never zero: the placeholder is what a run
@@ -59,7 +61,8 @@ export function AgentLimitsTab({
 	const effective = (key: string): number | null | undefined =>
 		key in agent.effective_effort
 			? agent.effective_effort[key as keyof typeof agent.effective_effort]
-			: (meters?.[key as keyof typeof meters] as number | null | undefined);
+			: ((meters?.[key as keyof typeof meters] as number | null | undefined) ??
+				agent.effective_budget?.[key]);
 
 	const limit = (
 		group: Group,
@@ -140,18 +143,29 @@ export function AgentLimitsTab({
 								May create helpers
 							</FieldLabel>
 						</Field>
-						<div className="grid gap-3 @[560px]:grid-cols-2">
+						<div className="grid gap-3 @[560px]:grid-cols-3">
 							{limit("budget", "max_depth", "Depth", "levels", {
 								off: !canSpawn,
 							})}
-							{limit("budget", "max_children", "Children", "a run", {
+							{limit("budget", "max_children", "Children", "an agent", {
 								off: !canSpawn,
 							})}
+							{limit("budget", "max_descendants", "In all", "helpers", {
+								off: !canSpawn,
+								hint: "the whole tree of one run",
+							})}
 						</div>
-						{limit("budget", "max_concurrent_runs", "Live at once", "runs", {
+						{limit("budget", "max_live", "Live at once", "agents", {
+							off: !canSpawn,
 							hint: "the rest queue; a large run goes as fast as this and the pools allow",
 						})}
 					</div>
+				</PanelSection>
+
+				<PanelSection card title="Runs">
+					{limit("budget", "max_concurrent_runs", "At once", "runs", {
+						hint: "across every run it is working; past it the next run is refused",
+					})}
 				</PanelSection>
 			</div>
 
@@ -171,10 +185,13 @@ export function AgentLimitsTab({
 						<PropertyRow label="Budget">
 							drawn against — a run is not stopped part way
 						</PropertyRow>
-						<PropertyRow label="Depth · children">
+						<PropertyRow label="Depth · children · in all">
 							the spawn is refused, naming the limit; the parent carries on
 						</PropertyRow>
 						<PropertyRow label="Live at once">
+							the helper waits, queued, until another ends
+						</PropertyRow>
+						<PropertyRow label="Runs at once">
 							the next run is refused at admission, naming the agent
 						</PropertyRow>
 						<PropertyRow label="Effort">

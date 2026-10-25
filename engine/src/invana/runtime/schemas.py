@@ -12,7 +12,7 @@ from invana.apps.skills.schemas import OfferedRule
 from invana.core.lists import Filter, ListSpec
 from invana.core.metrics import Change
 from invana.plugins.sdk.manifest import Bound
-from invana.runtime.models import ExitReason, RunStatus, TriggeredBy
+from invana.runtime.models import ExitReason, RunStatus
 
 
 class RunNodeRead(BaseModel):
@@ -211,6 +211,11 @@ class RunStats(BaseModel):
     #: Ended runs in the window that did not serve, and why.
     not_served: int = 0
     not_served_by_reason: dict[str, int] = Field(default_factory=dict)
+    #: Served over every ended run with a reason, 0 to 1; null when none ended.
+    served_share: float | None = None
+    #: The live root with the most agents under it, standing now.
+    largest_live_run_id: str | None = None
+    largest_live_agents: int | None = None
     #: Pending asks routed to the reader, standing now.
     waiting_approvals: int = 0
 
@@ -225,6 +230,9 @@ RUN_SINCE = {"24h": "last 24 hours", "7d": "last 7 days", "30d": "last 30 days",
 #: What the Runs list takes. Root runs only. With no ``interactive=true`` and no
 #: ``origin``, canvas and system runs are left out; ``candidates=true`` narrows
 #: to generated plans that served and were never promoted — the Promote picker.
+#: The Runs list's *From*: where a root run came from, in the reader's words.
+RUN_ORIGINS = ("Explorer", "Todo", "Schedule", "Project", "API")
+
 RUN_LIST = ListSpec(
     filters={
         "status": Filter(
@@ -234,7 +242,7 @@ RUN_LIST = ListSpec(
         "agent_id": Filter(title="agent"),
         "task_id": Filter(title="task"),
         "kind": Filter(),
-        "origin": Filter(values=tuple(t.value for t in TriggeredBy)),
+        "origin": Filter(values=RUN_ORIGINS),
         "started_by": Filter(title="started by"),
         "since": Filter(values=tuple(RUN_SINCE), labels=RUN_SINCE),
         "state": Filter(values=tuple(RUN_STATES), labels=RUN_STATES),

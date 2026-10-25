@@ -1,5 +1,9 @@
-"""Activity rules, as classes (migration-plan §5)."""
+"""Activity rules, as classes (migration-plan §5).
 
+Importing it also registers Approvals and the ledger with ``board.open``.
+"""
+
+import invana.activity.managers.boards  # noqa: F401
 from invana.activity.managers.agent_acts import AgentActsManager
 from invana.activity.managers.approvals import ApprovalManager, ApprovalSendGate
 from invana.activity.managers.ask_gate import ApprovalAskGate

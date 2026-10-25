@@ -38,9 +38,6 @@ export interface FlowOptions {
 	message?: string;
 }
 
-/** The registry type argument both composers are parametrised by. */
-export type WithFlow = { flow: FlowOptions };
-
 export function TaskFlowWidget({
 	options,
 	onAction,
