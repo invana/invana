@@ -1,0 +1,9 @@
+{
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		// The linked kit's forms resolve their own react-hook-form; read it as this one.
+		"paths": { "react-hook-form": ["./node_modules/react-hook-form"] },
+		"types": ["vite/client"]
+	},
+	"include": ["src"]
+}

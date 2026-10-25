@@ -6,7 +6,12 @@ features/roles.md. The rules every front-end shares:
 - a member is added by email or username, and must already have an account;
 - a role set is normalised (``apps/graphs/roles.normalise``) — unknown names are
   refused, an empty set is ``viewer``;
-- a Graph always has an owner, so removing or demoting the last one is refused;
+- a Graph always has an owner and an iam-admin, so removing or demoting the
+  last of either is refused;
+- a member's roles are their own and the managed policies their groups hold,
+  unioned — ``holders`` and ``access`` read both;
+- removing a member takes their group memberships and the policies attached to
+  them in this Graph with them;
 - every change is an event (``member.add · remove · roles``).
 
 Used by the routes and by ``invana members``::
@@ -16,16 +21,19 @@ Used by the routes and by ``invana members``::
     await members.set_roles(session, graph=graph, username="ada", roles=["builder"], actor=owner)
     access = await members.access(session, graph=graph, member=me)
 
-Who may call these is the route's guard (``members`` is the ``settings`` area,
-an owner's); the manager does not re-check the actor's role.
+Who may call these is the route's guard (``members`` is the ``iam`` area, an
+iam-admin's); the manager does not re-check the actor's role.
 """
 
 from __future__ import annotations
+
+from datetime import UTC, datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.graphs.querysets import GraphMemberQuerySet
+from invana.apps.graphs.querysets.group_roles import GroupRoleQuerySet
 from invana.apps.graphs.roles import AREAS, GraphRole, holds, normalise
 from invana.apps.graphs.schemas import AccessArea, AccessRead, MemberRead
 from invana.core.auth.managers import AuthManager
@@ -44,6 +52,7 @@ def _roles(raw: list[str]) -> list[str]:
 
 class GraphMemberManager:
     members_qs = GraphMemberQuerySet()
+    group_roles_qs = GroupRoleQuerySet()
     auth = AuthManager()
 
     async def members(self, session: AsyncSession, *, graph: Graph) -> list[MemberRead]:
@@ -99,6 +108,8 @@ class GraphMemberManager:
         row = await self.get(session, graph=graph, username=username)
         if row.holds(GraphRole.owner) and GraphRole.owner.value not in stored:
             await self._keep_an_owner(session, graph, row)
+        if GraphRole.iam_admin.value in (row.roles or []) and GraphRole.iam_admin.value not in stored:
+            await self._keep_an_iam_admin(session, graph, row, stays=True)
         if stored != list(row.roles or []):
             row.roles = stored
             await session.flush()
@@ -110,31 +121,55 @@ class GraphMemberManager:
         row = await self.get(session, graph=graph, username=username)
         if row.holds(GraphRole.owner):
             await self._keep_an_owner(session, graph, row)
+        if GraphRole.iam_admin.value in (row.roles or []):
+            await self._keep_an_iam_admin(session, graph, row, stays=False)
         await self._emit(session, actions.MEMBER_REMOVE, graph, row, actor_id)
+        await self.group_roles_qs.forget_person(session, graph_id=graph.id, user_id=row.user_id)
         await session.delete(row)
         await session.flush()
 
-    async def holders(self, session: AsyncSession, *, graph_id: str, role: GraphRole) -> list[str]:
-        """Usernames that may act as ``role`` — owners included."""
+    async def effective(self, session: AsyncSession, *, graph_id: str) -> list[tuple[GraphMember, list[str]]]:
+        """Every member with their roles — their own and their groups', as a stored role set."""
         rows = await self.members_qs.list_for_graph(session, graph_id=graph_id)
-        return [row.user.username for row in rows if row.holds(role)]
+        via_groups = await self.group_roles_qs.group_roles(session, graph_id=graph_id, now=datetime.now(UTC))
+        return [(row, normalise([*(row.roles or []), *via_groups.get(row.user_id, ())])) for row in rows]
+
+    async def holders(self, session: AsyncSession, *, graph_id: str, role: GraphRole) -> list[str]:
+        """Usernames that may act as ``role`` — owners and group holders included."""
+        return [
+            row.user.username for row, roles in await self.effective(session, graph_id=graph_id) if holds(roles, role)
+        ]
 
     async def access(self, session: AsyncSession, *, graph: Graph, member: GraphMember) -> AccessRead:
         """What ``member`` may change, area by area, and who to ask for the rest."""
-        rows = await self.members_qs.list_for_graph(session, graph_id=graph.id)
+        everyone = await self.effective(session, graph_id=graph.id)
+        mine = next((roles for row, roles in everyone if row.user_id == member.user_id), list(member.roles or []))
         return AccessRead(
-            roles=list(member.roles or [GraphRole.viewer.value]),
+            roles=mine or [GraphRole.viewer.value],
             areas=[
                 AccessArea(
                     area=area.name,
                     label=area.label,
                     role=area.role.value,
-                    allowed=member.holds(area.role),
-                    holders=[row.user.username for row in rows if holds(row.roles or [], area.role)],
+                    allowed=holds(mine, area.role),
+                    holders=[row.user.username for row, roles in everyone if holds(roles, area.role)],
                 )
                 for area in AREAS
             ],
         )
+
+    async def _keep_an_iam_admin(
+        self, session: AsyncSession, graph: Graph, leaving: GraphMember, *, stays: bool
+    ) -> None:
+        """Refuse unless someone else — or ``leaving`` through a group, when they stay — still holds iam-admin."""
+        if stays:
+            via_groups = await self.group_roles_qs.group_roles(session, graph_id=graph.id, now=datetime.now(UTC))
+            if GraphRole.iam_admin.value in via_groups.get(leaving.user_id, set()):
+                return
+        for row, roles in await self.effective(session, graph_id=graph.id):
+            if row.user_id != leaving.user_id and GraphRole.iam_admin.value in roles:
+                return
+        raise ConflictError("A Graph always has an iam-admin. Make someone else an iam-admin first.")
 
     async def _keep_an_owner(self, session: AsyncSession, graph: Graph, leaving: GraphMember) -> None:
         rows = await self.members_qs.list_for_graph(session, graph_id=graph.id)

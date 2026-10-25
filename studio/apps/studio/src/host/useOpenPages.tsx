@@ -13,6 +13,7 @@ import {
 	markSessionTutorialSeen,
 } from "@invana-studio/assistant";
 import { useLensesQuery } from "@invana-studio/core";
+import { type IamOpen, IamOpenContext } from "@invana-studio/iam";
 import type {
 	ModelSelection,
 	useLensesViewPanel,
@@ -47,14 +48,10 @@ import {
 } from "@/host/declaredBoardBody";
 import { GraphHomePage } from "@/host/GraphHomePage";
 import { canvasEmptyHint } from "@/host/layeredCanvasBody";
-import {
-	AGENTS_HOME_ID,
-	sectionOfPage,
-	type useAgentsSections,
-} from "@/host/useAgentsSections";
 import type { useDataBoards } from "@/host/useDataBoards";
 import type { useLayeredCanvas } from "@/host/useLayeredCanvas";
 import type { useOpenBoards } from "@/host/useOpenBoards";
+import type { SectionTabs } from "@/host/useSectionTabs";
 
 /** The page that is always open and can never be closed (graph-detail-page.md). */
 export const GRAPH_PAGE_ID = "graph";
@@ -64,6 +61,8 @@ export interface OpenPagesDeps {
 	username: string | undefined;
 	/** The Agents openers, so a record page opened as a declared page links like a section row. */
 	agentsOpeners?: AgentsOpen | null;
+	/** The IAM openers, for the same reason. */
+	iamOpeners?: IamOpen | null;
 	graphSlug: string | undefined;
 	/** The setup wizard is open, which puts the graph page in front. */
 	onboardingOpen: boolean;
@@ -78,8 +77,8 @@ export interface OpenPagesDeps {
 	workCanvas: ReactNode;
 	dataBoards: ReturnType<typeof useDataBoards>;
 	runStep: string | null;
-	/** The Agents sections as tabs; none outside Agents. */
-	agentsSections: ReturnType<typeof useAgentsSections>;
+	/** The open product's sections as tabs — Agents' or IAM's; none elsewhere. */
+	sections: SectionTabs;
 	openAgentPage: DeclaredBoardDeps["openAgentPage"];
 	showAgentCanvas: DeclaredBoardDeps["showAgentCanvas"];
 	modelSelection: ModelSelection | null;
@@ -122,7 +121,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		workCanvas,
 		dataBoards,
 		runStep,
-		agentsSections,
+		sections,
 		openAgentPage,
 		showAgentCanvas,
 		modelSelection,
@@ -219,7 +218,8 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	const boardPageRef = useRef<BoardPageHandle>(null);
 	const productId = useActiveProduct()?.id;
 	const explorerOpen = productId === "explorer";
-	const agentsOpen = productId === "agents";
+	// Agents and IAM: sections as tabs, and Home when nothing is open.
+	const sectionsOpen = productId === "agents" || productId === "iam";
 	const openPalette = useOpenPalette();
 	const [assistantShown] = useAssistantShown();
 
@@ -295,16 +295,16 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		? boardPageId("data", activeCanvasId)
 		: null;
 	const workPage = workCanvas && workPageId ? workPageId : null;
-	const { activeSectionId } = agentsSections;
-	// In Agents a record tab is in front first, then the section the path
-	// names — or Home — unless a canvas came forward since.
-	const activePageId = agentsOpen
+	const { activeSectionId } = sections;
+	// In Agents and IAM a record tab is in front first, then the section the
+	// path names — or Home — unless a canvas came forward since.
+	const activePageId = sectionsOpen
 		? (focusedBoard ??
-			agentsSections.frontId ??
+			sections.frontId ??
 			workPage ??
 			dataPageId ??
 			activeSectionId ??
-			AGENTS_HOME_ID)
+			sections.homeId)
 		: onboardingOpen
 			? GRAPH_PAGE_ID
 			: focusedBoard
@@ -344,9 +344,9 @@ export function useOpenPages(deps: OpenPagesDeps) {
 
 	// The Explorer has no graph page: with no canvas open it draws the centred
 	// start in place of the strip, so the strip only ever holds canvases. Agents
-	// has none either: with nothing open its workbook shows Home.
+	// and IAM have none either: with nothing open their workbook shows Home.
 	const graphPage: WorkbookPage[] =
-		explorerOpen || agentsOpen
+		explorerOpen || sectionsOpen
 			? []
 			: [
 					{
@@ -370,7 +370,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 					},
 				];
 	const pages: WorkbookPage[] = [
-		...agentsSections.pages,
+		...sections.pages,
 		...graphPage,
 		...openTabs.map((tab) => ({
 			id: boardPageId("data", tab.id),
@@ -405,7 +405,9 @@ export function useOpenPages(deps: OpenPagesDeps) {
 					onOpenVersion={(versionId) => openBoard({ ...board, versionId })}
 				>
 					<AgentsOpenContext.Provider value={deps.agentsOpeners ?? null}>
-						{declaredBoardContent(board, declaredDeps)}
+						<IamOpenContext.Provider value={deps.iamOpeners ?? null}>
+							{declaredBoardContent(board, declaredDeps)}
+						</IamOpenContext.Provider>
 					</AgentsOpenContext.Provider>
 				</DeclaredBoard>
 			),
@@ -436,11 +438,11 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	// putting the page state that produced it back, which is why this dispatches
 	// rather than setting one id.
 	const selectPage = (id: string) => {
-		if (sectionOfPage(id)) {
-			agentsSections.select(id);
+		if (sections.isSectionPage(id)) {
+			sections.select(id);
 			return;
 		}
-		agentsSections.stepBack();
+		sections.stepBack();
 		// A declared board is reached by its id alone — there is no panel state
 		// behind it to put back, which is what `subject_id` buys.
 		if (declaredPage(id)) {
@@ -467,8 +469,8 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	// Closing a page is closing whatever opened it. The graph page has no close —
 	// it is the resting state of the region, not a tab.
 	const closePage = (id: string) => {
-		if (sectionOfPage(id)) {
-			agentsSections.close(id);
+		if (sections.isSectionPage(id)) {
+			sections.close(id);
 			return;
 		}
 		const board = declaredPage(id);
@@ -520,10 +522,11 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		pages,
 		activeId: activePageId,
 		onSelect: selectPage,
-		// In Agents `+` opens a section or a record, through ⌘K; elsewhere it
-		// opens a canvas.
-		onAdd: agentsOpen && openPalette ? openPalette : () => void newCanvasTab(),
-		addLabel: agentsOpen ? "Open a section or a record" : "New canvas",
+		// In Agents and IAM `+` opens a section or a record, through ⌘K;
+		// elsewhere it opens a canvas.
+		onAdd:
+			sectionsOpen && openPalette ? openPalette : () => void newCanvasTab(),
+		addLabel: sectionsOpen ? "Open a section or a record" : "New canvas",
 		onClose: closePage,
 		pageMenuItems,
 	};

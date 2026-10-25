@@ -27,6 +27,10 @@ from invana.apps.agents.schemas import (
 from invana.apps.govern.managers import LensManager, LLMEndpointManager
 from invana.apps.govern.models import Lens, LensKind
 from invana.apps.graphs.models import Graph
+from invana.apps.iam.managers import HoldingsManager
+from invana.apps.iam.models import PolicyAttachment
+from invana.apps.iam.querysets import HoldingsQuerySet
+from invana.apps.iam.querysets.policies import PolicyQuerySet
 from invana.apps.llm.voice import check_traits
 from invana.apps.skills.managers import BindCheck, SkillBindingManager, SkillManager
 from invana.apps.work.models import Task, TaskStatus
@@ -60,6 +64,43 @@ _UPDATABLE = [
 #: rather than `agent.update`, because it changes how the agent speaks and
 #: nothing it may do (SO2 · AG16).
 _VOICE = ("soul", "soul_traits")
+
+#: An agent budget key → the policy limit that ceilings it, and how a refusal names it.
+_POLICY_CEILINGS = {
+    "max_tokens_run": ("tokens_run", "tokens a run"),
+    "max_tokens_month": ("tokens_month", "tokens a month"),
+    "max_descendants": ("descendants", "agents a run"),
+    "max_depth": ("depth", "depth"),
+    "max_live": ("live_agents", "live agents at once"),
+}
+#: Envelope functions that write work, and those that write the graph, its models or its data —
+#: what a seeded agent is born holding ``contributor`` and ``modeller`` for.
+_WORK_WRITES = ("work.",)
+_GRAPH_WRITES = (
+    "graph.write.",
+    "graph.stitch.commit",
+    "graph.stitch.declare",
+    "graph.stitch.run",
+    "graph.stitch.withdraw",
+    "model.migrate",
+    "model.understand_ask",
+    "model.validate_proposal",
+    "data.",
+)
+
+
+def managed_for_envelope(spec: dict | None) -> list[str]:
+    """The managed policies an agent is born holding: ``viewer``, and what its envelope writes.
+
+    An envelope that names nothing allows everything, so it holds all three.
+    """
+    allow = list((spec or {}).get("allow") or [])
+    names = ["viewer"]
+    if not allow or any(k.startswith(_WORK_WRITES) for k in allow):
+        names.append("contributor")
+    if not allow or any(k.startswith(_GRAPH_WRITES) for k in allow):
+        names.append("modeller")
+    return names
 
 
 def check_effort(effort: dict | None) -> dict[str, int]:
@@ -106,6 +147,11 @@ class AgentManager:
     # guardrails are Govern's rows.
     lenses = LensManager()
     endpoints = LLMEndpointManager()
+    # What an agent holds is IAM's: a new agent is attached its managed policies
+    # there, and its budget is checked against the ceilings they set.
+    holdings = HoldingsManager()
+    holdings_qs = HoldingsQuerySet()
+    policies_qs = PolicyQuerySet()
 
     async def reads(self, session: AsyncSession, items: list[Agent]) -> list[AgentRead]:
         """Agents as the API answers them, each with its own guardrail named.
@@ -166,6 +212,7 @@ class AgentManager:
                 created_by_kind="system",
             )
             await self.agents_qs.add(session, agent)
+            await self._hold(session, agent=agent, names=managed_for_envelope(agent.workflow_spec), actor_id=None)
             created.append(agent)
             if seeded.default and not graph.default_agent_id:
                 graph.default_agent_id = agent.id
@@ -313,6 +360,9 @@ class AgentManager:
             await self.agents_qs.add(session, agent)
         except IntegrityError as exc:
             raise ConflictError(f"An agent named '{payload.name}' already exists in this graph.") from exc
+        # A new agent holds `viewer`; anything more is attached in IAM.
+        await self._hold(session, agent=agent, names=["viewer"], actor_id=actor.id)
+        await self._check_ceilings(session, agent=agent, budget=payload.budget)
 
         # The skills this agent starts with, bound as part of creating it. Each
         # one goes through the binding manager carrying the same `bind_check`
@@ -368,6 +418,8 @@ class AgentManager:
             payload.soul_traits = check_traits(payload.soul_traits)
         if payload.effort is not None:
             payload.effort = check_effort(payload.effort)
+        if payload.budget is not None:
+            await self._check_ceilings(session, agent=agent, budget=payload.budget)
         # A pin is cleared by sending null, so it is read by set-ness; an empty
         # string reads as null too.
         repin = "model_pin" in payload.model_fields_set
@@ -662,6 +714,49 @@ class AgentManager:
             details={"name": agent.name},
         )
         return graph
+
+    # ── what it holds ─────────────────────────────────────────────────────────
+
+    async def _hold(self, session: AsyncSession, *, agent: Agent, names: list[str], actor_id: str | None) -> None:
+        """Attach the Graph's managed policies ``names`` to a new agent.
+
+        A Graph whose managed policies are not written yet attaches nothing.
+        """
+        for policy in await self.holdings_qs.managed_by_name(session, graph_id=agent.graph_id, names=names):
+            await self.policies_qs.add(
+                session,
+                PolicyAttachment(
+                    policy_id=policy.id,
+                    graph_id=agent.graph_id,
+                    holder_kind="agent",
+                    holder_id=agent.id,
+                    attached_by_id=actor_id,
+                    via="direct",
+                ),
+            )
+
+    async def _check_ceilings(self, session: AsyncSession, *, agent: Agent, budget: dict | None) -> None:
+        """Refuse a budget above a ceiling a policy the agent holds sets, naming the policy and the ceiling.
+
+        The tightest ceiling across its policies and the Graph's boundaries
+        binds; a key the budget does not set is not checked.
+        """
+        wanted = {k: v for k, v in (budget or {}).items() if k in _POLICY_CEILINGS and v is not None}
+        if not wanted:
+            return
+        held = [
+            *await self.holdings.policies_for(session, graph_id=agent.graph_id, principal=("agent", agent.id)),
+            *await self.holdings.boundaries(session, graph_id=agent.graph_id),
+        ]
+        for key, value in wanted.items():
+            limit, label = _POLICY_CEILINGS[key]
+            for h in held:
+                ceiling = (h.policy.limits or {}).get(limit)
+                if ceiling is not None and int(value) > int(ceiling):
+                    raise ValidationError(
+                        f"Policy {h.policy.name} caps {label} at {int(ceiling)}; "
+                        f"'{agent.name}' cannot be set to {int(value)}."
+                    )
 
     async def _open_tasks(self, session: AsyncSession, *, agent: Agent) -> list[Task]:
         return await self.tasks_qs.open_for_agent(session, graph_id=agent.graph_id, agent_id=agent.id)

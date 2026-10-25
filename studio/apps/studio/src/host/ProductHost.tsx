@@ -19,10 +19,12 @@ import {
 	hasOutstandingSetup,
 	isGateOpen,
 	reportBoundaryError,
+	useAuth,
 	useGraphConnectionQuery,
 	useGraphQuery,
 } from "@invana-studio/core";
 import { EmptyBoard, ExplorerLocked } from "@invana-studio/explorer";
+import { IamHomeTiles, IamOpenContext } from "@invana-studio/iam";
 import {
 	type ModelSelection,
 	useLensesViewPanel,
@@ -50,9 +52,10 @@ import { layeredCanvasBody } from "@/host/layeredCanvasBody";
 import { leftSection } from "@/host/leftSectionContent";
 import { rightSection } from "@/host/rightSections";
 import { setupSlots } from "@/host/setupSlots";
-import { AGENTS_HOME_ID, useAgentsSections } from "@/host/useAgentsSections";
+import { useAgentsSections } from "@/host/useAgentsSections";
 import { useBoardPageTrail } from "@/host/useBoardPageTrail";
 import { useDataBoards } from "@/host/useDataBoards";
+import { useIamSections } from "@/host/useIamSections";
 import { useLayeredCanvas } from "@/host/useLayeredCanvas";
 import { useModelsPage } from "@/host/useModelsPage";
 import { useOpenBoards } from "@/host/useOpenBoards";
@@ -98,8 +101,9 @@ function startSubtitle(
  * The product host — the one page every graph product's routes draw. It owns
  * the state the regions share (the open sessions, the canvas, the declared
  * boards, the layered canvases, the selection) and fills each region for the
- * open product: the Workbook in `mainSection` — in Agents, its sections as
- * tabs and Home when nothing is open — the product's panel in `leftSection`,
+ * open product: the Workbook in `mainSection` — in Agents and IAM, their
+ * sections as tabs and Home when nothing is open — the product's panel in
+ * `leftSection`,
  * the assistant on the right and the Console
  * underneath. The open product is the route's (`useActiveProduct`); the open
  * panel is the path's (`useLeftSection`).
@@ -355,6 +359,10 @@ export function ProductHost() {
 	const activeProductId = useActiveProduct()?.id;
 	const explorerOpen = activeProductId === "explorer";
 	const agentsOpen = activeProductId === "agents";
+	const iamOpen = activeProductId === "iam";
+	// The products on the Agents shell: sections as tabs, Home, no leftSection.
+	const sectionsOpen = agentsOpen || iamOpen;
+	const { user } = useAuth();
 	const agents = useAgentsQuery(username, graphSlug, { limit: 200 });
 	const defaultAgent = agents.data?.items.find(
 		(a) => a.id === agents.data?.default_agent_id,
@@ -370,14 +378,32 @@ export function ProductHost() {
 		activeCanvasId: dataBoards.activeCanvasId,
 		workPageId: workCanvas ? layered.workPageId : null,
 	});
+	// IAM's sections, the same way.
+	const iamSections = useIamSections({
+		username,
+		graphSlug,
+		enabled: iamOpen,
+		openBoard,
+		boardPage,
+		setActiveBoardId,
+		activeCanvasId: dataBoards.activeCanvasId,
+		workPageId: workCanvas ? layered.workPageId : null,
+	});
+	// The open product's sections; off both, Agents' — which then draw none.
+	const sections = iamOpen ? iamSections : agentsSections;
+	const graphName = graphContainer?.name ?? graphSlug ?? "";
 
-	// With the assistant docked there is one question box already: Agents'
-	// Home keeps its tiles and drops its own composer.
+	// With the assistant docked there is one question box already: Home keeps
+	// its tiles and drops its own composer.
 	const homeTiles =
-		agentsOpen && username && graphSlug ? (
+		!username || !graphSlug ? null : agentsOpen ? (
 			<AgentsOpenContext.Provider value={agentsSections.openers}>
 				<HomeTiles username={username} graphSlug={graphSlug} />
 			</AgentsOpenContext.Provider>
+		) : iamOpen ? (
+			<IamOpenContext.Provider value={iamSections.openers}>
+				<IamHomeTiles username={username} graphSlug={graphSlug} />
+			</IamOpenContext.Provider>
 		) : null;
 	const homeStart =
 		homeTiles && right.is("assistant") ? (
@@ -386,16 +412,17 @@ export function ProductHost() {
 			graphSlug &&
 			!connectionMissing &&
 			!right.is("assistant") &&
-			(explorerOpen || agentsOpen || !settingsPanel.isOpen) ? (
+			(explorerOpen || sectionsOpen || !settingsPanel.isOpen) ? (
 			<AssistantStart
 				asking={assistantShown}
 				username={username}
 				graphSlug={graphSlug}
-				graphName={graphContainer?.name ?? graphSlug}
-				// Agents' Home is about the agents, not the Graph's models, and
-				// its asks are not Explorer sessions: no subtitle, chips or views.
+				graphName={graphName}
+				// Agents' and IAM's Home are about the product, not the Graph's
+				// models, and their asks are not Explorer sessions: no subtitle,
+				// recent chips or views.
 				subtitle={
-					agentsOpen
+					sectionsOpen
 						? undefined
 						: startSubtitle(
 								graphContainer?.description,
@@ -416,7 +443,7 @@ export function ProductHost() {
 				}}
 				onStop={sessionState.stop}
 				isRunning={sessionState.isRunning}
-				views={(agentsOpen ? [] : (dataBoards.canvasList?.items ?? [])).map(
+				views={(sectionsOpen ? [] : (dataBoards.canvasList?.items ?? [])).map(
 					(c) => ({
 						id: c.id,
 						sessionId: c.sessionId,
@@ -431,11 +458,23 @@ export function ProductHost() {
 				}}
 				{...(agentsOpen && {
 					// The ask is about the product on this Graph, not a query of it.
-					context: ["Agents", graphContainer?.name ?? graphSlug],
+					context: ["Agents", graphName],
 					heading: "What should your agents do?",
 					placeholder:
 						"Ask about your agents, draft a skill, or open a section…",
 					recent: false,
+				})}
+				{...(iamOpen && {
+					context: ["IAM", graphName],
+					heading: `Who may do what in ${graphName}?`,
+					placeholder: "Ask who can reach something, or draft a policy…",
+					recent: false,
+					suggestions: [
+						"Which agents can write to the graph?",
+						"Who can push data?",
+						`What can ${user?.username ?? "a member"} do?`,
+						"What was refused today?",
+					],
 				})}
 			>
 				{homeTiles}
@@ -446,6 +485,7 @@ export function ProductHost() {
 	const strip = useOpenPages({
 		username,
 		agentsOpeners: agentsSections.openers,
+		iamOpeners: iamSections.openers,
 		graphSlug,
 		onboardingOpen,
 		setupOutstanding,
@@ -457,7 +497,7 @@ export function ProductHost() {
 		workCanvas,
 		dataBoards,
 		runStep,
-		agentsSections,
+		sections,
 		openAgentPage,
 		showAgentCanvas,
 		modelSelection,
@@ -476,9 +516,10 @@ export function ProductHost() {
 	// The pill that reopens a closed conversation floats over the data canvas
 	// it belongs to — never over a declared board or the home page.
 	const dataBoardInFront = parseBoardPageId(strip.activeId)?.kind === "data";
-	// On Agents, a page in front (a section or a record) is what the pill asks about.
+	// On Agents and IAM, a page in front (a section or a record) is what the
+	// pill asks about.
 	const agentsPageInFront =
-		agentsOpen && strip.activeId !== AGENTS_HOME_ID
+		sectionsOpen && strip.activeId !== sections.homeId
 			? strip.pages.find((p) => p.id === strip.activeId)
 			: undefined;
 	const pill =
@@ -493,7 +534,7 @@ export function ProductHost() {
 				onOpen={() => right.open("assistant")}
 			/>
 		) : null;
-	// Over a canvas the pill floats; an Agents page's tables and consoles run
+	// Over a canvas the pill floats; a section page's tables and consoles run
 	// to the bottom edge, so there it takes a row of its own under the page. A
 	// run's Agents and Stages tabs are canvases, so the pill floats over them.
 	const [search] = useSearchParams();
@@ -569,9 +610,9 @@ export function ProductHost() {
 			: null;
 	// With the chat docked and nothing drawn yet, the board is its empty
 	// ground: one question box on screen, never two.
-	// Agents with nothing open: Home under the strip, no tab lit.
+	// Agents or IAM with nothing open: Home under the strip, no tab lit.
 	const agentsHome =
-		agentsOpen && strip.activeId === AGENTS_HOME_ID ? (
+		sectionsOpen && strip.activeId === sections.homeId ? (
 			<div className="flex h-full flex-col">
 				<Workbook
 					{...strip}

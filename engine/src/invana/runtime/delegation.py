@@ -18,6 +18,7 @@ never by the prompt:
 | no loops | a delegation into an agent already in the run's chain is refused |
 | inheritance narrows | a child's allow-list, skills, budget and LLM are ⊆ its parent's |
 | the human at the root | ``on_behalf_of_user_id`` is copied down, never re-derived |
+| policies | a held policy's depth, descendants, live agents and tokens a run clamp the agent's own |
 
 **Escrow.** A parent's *remaining* is its run budget less its own tokens less
 every live child's escrow less what each ended child spent, so a parent never
@@ -51,7 +52,7 @@ from invana.apps.skills.querysets import SkillQuerySet
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
-from invana.runtime import ledger_acts
+from invana.runtime import access, ledger_acts
 from invana.runtime.models import ExitReason, RunStatus, TaskRun, TaskStream
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.results import run_tokens
@@ -107,6 +108,23 @@ def ceiling(agent: Agent, key: str) -> int:
         return int(agent.effective_budget.get(key, DEFAULT_BUDGET.get(key, 0)))
     except (TypeError, ValueError):
         return int(DEFAULT_BUDGET.get(key, 0))
+
+
+async def bound_of(db: AsyncSession, agent: Agent, key: str, *, run: TaskRun | None) -> tuple[int, str | None]:
+    """A ceiling as it binds at run time: the smaller of the agent's and its policies'.
+
+    Returns the value and the policy that set it, or ``None`` when the
+    agent's own setting is the tighter one.
+    """
+    own = ceiling(agent, key)
+    capped = (await access.AccessGate().limits(db, agent=agent, run=run)).get(key)
+    if capped is not None and capped[0] < own:
+        return capped
+    return own, None
+
+
+def _named(policy: str | None) -> str:
+    return f" by policy {policy}" if policy else ""
 
 
 @dataclass(slots=True)
@@ -292,10 +310,10 @@ async def _check_spawn(db: AsyncSession, *, parent: Agent, run: TaskRun, request
     if lifetime == AgentLifetime.persistent.value and not policy.get("can_spawn_persistent", False):
         raise BoundExceeded(f"'{parent.name}' may only spawn ephemeral agents.", refused_by="policy")
 
-    depth, max_depth = await depth_of(db, parent) + 1, ceiling(parent, "max_depth")
+    depth, (max_depth, by) = await depth_of(db, parent) + 1, await bound_of(db, parent, "max_depth", run=run)
     if depth > max_depth:
         raise BoundExceeded(
-            f"Delegation is capped at depth {max_depth}; this helper would be at depth {depth}.",
+            f"Delegation is capped at depth {max_depth}{_named(by)}; this helper would be at depth {depth}.",
             ceiling="max_depth",
             count=depth - 1,
         )
@@ -307,10 +325,10 @@ async def _check_spawn(db: AsyncSession, *, parent: Agent, run: TaskRun, request
             ceiling="max_children",
             count=children,
         )
-    tree, max_tree = await descendants_spawned(db, run), ceiling(parent, "max_descendants")
+    tree, (max_tree, by) = await descendants_spawned(db, run), await bound_of(db, parent, "max_descendants", run=run)
     if tree + 1 > max_tree:
         raise BoundExceeded(
-            f"This run may have at most {max_tree} helpers in all, and {tree} are spawned.",
+            f"This run may have at most {max_tree} helpers in all{_named(by)}, and {tree} are spawned.",
             ceiling="max_descendants",
             count=tree,
         )
@@ -343,6 +361,15 @@ def run_budget(run: TaskRun, agent: Agent | None) -> int | None:
     return None
 
 
+async def budget_of(db: AsyncSession, run: TaskRun, agent: Agent | None) -> int | None:
+    """:func:`run_budget` under the policies' tokens a run: the smaller of the two binds."""
+    budget = run_budget(run, agent)
+    capped = (await access.AccessGate().limits(db, agent=agent, run=run)).get("max_tokens_run")
+    if capped is None:
+        return budget
+    return capped[0] if budget is None else min(budget, capped[0])
+
+
 async def spent(db: AsyncSession, run: TaskRun) -> int:
     """The run's own tokens so far — itself and its direct steps, never its children."""
     tokens_in, tokens_out = run_tokens(run, await TaskRunQuerySet().nodes_of(db, run_id=run.id))
@@ -360,7 +387,7 @@ async def _children(db: AsyncSession, run: TaskRun) -> list[TaskRun]:
 async def remaining(db: AsyncSession, run: TaskRun) -> int | None:
     """What ``run`` may still promise: its budget less its own tokens, live escrows and what ended children spent."""
     agent = await db.get(Agent, run.agent_id) if run.agent_id else None
-    budget = run_budget(run, agent)
+    budget = await budget_of(db, run, agent)
     if budget is None:
         return None
     held = 0
@@ -423,7 +450,7 @@ async def wait_for_room(db: AsyncSession, *, parent_run: TaskRun, child_run: Tas
     parent = await db.get(Agent, parent_run.agent_id) if parent_run.agent_id else None
     if parent is None:
         return True
-    max_live = ceiling(parent, "max_live")
+    max_live, _ = await bound_of(db, parent, "max_live", run=parent_run)
     deadline = asyncio.get_running_loop().time() + timeout_s
     while True:
         ahead = [
@@ -446,10 +473,15 @@ def may_delegate(caller: Agent, target: Agent) -> str:
 
     A helper the caller spawned itself is always allowed: spawning it was the
     permission. An authored agent the caller's list does not name is ``ask``.
+    ``always`` holds only under the caller's policies: inside a step whose
+    access check found no policy allowing ``work.delegate`` on the target, it
+    asks the owner instead.
     """
     if target.parent_agent_id == caller.id:
         return ALWAYS
     listed = (caller.effective_policy.get("may_delegate") or {}).get(target.id)
+    if listed == ALWAYS and (access.delegate_allowed.get() or {}).get(target.id) is False:
+        return ASK
     return listed if listed in (ALWAYS, ASK, NEVER) else ASK
 
 

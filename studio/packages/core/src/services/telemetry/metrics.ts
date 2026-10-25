@@ -296,6 +296,20 @@ const ROUTE_WORDS = new Set([
 	"validate",
 	"version",
 	"versions",
+	// IAM's.
+	"drafts",
+	"effective",
+	"groups",
+	"holders",
+	"iam",
+	"limits",
+	"members",
+	"overview",
+	"people",
+	"policies",
+	"refusals",
+	"save",
+	"service-accounts",
 ]);
 
 /**
@@ -336,6 +350,7 @@ const PATH_MODULES: Record<string, string> = {
 	"agents/settings": "agents",
 	"activity/runs": "runs",
 	projects: "projects",
+	iam: "iam",
 };
 
 /**

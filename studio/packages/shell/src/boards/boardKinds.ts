@@ -47,10 +47,12 @@ import {
 	Play,
 	Plug,
 	Quote,
+	ScrollText,
 	ShieldCheck,
 	SlidersHorizontal,
 	SquareActivity,
 	SquareFunction,
+	UsersRound,
 	WandSparkles,
 } from "lucide-react";
 import type { ElementType } from "react";
@@ -182,7 +184,10 @@ export type DeclaredKind =
 	| "decisions"
 	| "plugin"
 	| "function"
-	| "template";
+	| "template"
+	| "policy"
+	| "iam_agent"
+	| "iam_group";
 
 export type BoardKind = CanvasKind | DeclaredKind;
 
@@ -403,6 +408,35 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		// A row in Functions › Templates.
 		panel: "functions",
 		subject: "a projection template id",
+	},
+	// IAM's record pages. Studio-only, and titled with the record's name: a
+	// policy and a group by their own, an agent by the agent's.
+	policy: {
+		kind: "policy",
+		renders: "declared",
+		label: "Policy",
+		icon: ScrollText,
+		// A row in IAM › Policies.
+		panel: "iam-policies",
+		subject: "a policy name",
+	},
+	iam_agent: {
+		kind: "iam_agent",
+		renders: "declared",
+		label: "Agent access",
+		icon: Bot,
+		// A row in IAM › Agents; its builder page is Agents' `agent`.
+		panel: "iam-agents",
+		subject: "an agents.id",
+	},
+	iam_group: {
+		kind: "iam_group",
+		renders: "declared",
+		label: "Group",
+		icon: UsersRound,
+		// A row in IAM › Groups.
+		panel: "iam-groups",
+		subject: "a group name",
 	},
 };
 

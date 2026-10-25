@@ -80,6 +80,7 @@ const ENGINE_ONLY = {
 	history:
 		"the change log, served by @invana-studio/shell and read by the agents and modeller packages, outside the host",
 	evals: "served by the @invana-studio/agents package, outside the host",
+	iam: "served by the @invana-studio/iam package, outside the host",
 	plugins: "served by the @invana-studio/agents package, outside the host",
 	datasets: "served by the @invana-studio/datasets package, outside the host",
 	standards: "served by the @invana-studio/datasets package, outside the host",

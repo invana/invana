@@ -104,6 +104,15 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	{ path: "agents/ledger/refusals", panel: "ledger", section: "refusals" },
 	{ path: "agents/ledger/export", panel: "ledger", section: "export" },
 	{ path: "agents/settings", panel: "concurrency" },
+	// The IAM rail. Every section is a page with no tabs; its panel key is
+	// prefixed so none collides with an Agents section of the same name.
+	{ path: "iam/home", panel: "iam-home" },
+	{ path: "iam/people", panel: "iam-people" },
+	{ path: "iam/groups", panel: "iam-groups" },
+	{ path: "iam/agents", panel: "iam-agents" },
+	{ path: "iam/policies", panel: "iam-policies" },
+	{ path: "iam/tokens", panel: "iam-tokens" },
+	{ path: "iam/settings", panel: "iam-settings" },
 	// Activity's tabs (the shell's page). Events keeps the panel key its rail
 	// icon writes; the other tabs share one key. `runs` is Agents › Runs.
 	{ path: "activity/inbox", panel: "activity", section: "inbox" },
@@ -144,6 +153,7 @@ const LEVEL_LANDINGS: Record<string, string> = {
 	modeller: "modeller/global-model",
 	agents: "agents/home",
 	"agents/connections": "agents/connections/mcp",
+	iam: "iam/home",
 	activity: "activity/runs",
 };
 

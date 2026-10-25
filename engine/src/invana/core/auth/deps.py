@@ -5,6 +5,15 @@ person: a short-lived access token (a JWT), or a personal access token
 (docs/for-developers/modules/identity-and-access/features/tokens.md).
 Neither carries membership — that is looked up per request (IA2).
 
+A personal access token may be **bound** to one Graph and **narrowed** by an
+inline policy. Both are kept on ``request.state`` when it authenticates —
+``auth_token_id``, ``auth_token_graph_id``, ``auth_token_policy`` and
+``auth_token_statements`` — and a narrowed token's request is checked against
+:mod:`invana.core.auth.narrowing` before any route runs: a request the policy
+does not allow is ``403 token_narrowed`` naming the token and its policy. The
+Graph binding is enforced where the Graph is resolved
+(:func:`invana.server.graphs.deps.get_graph_membership`).
+
 Graph-scoped deps (membership, role gates) live in :mod:`invana.server.graphs.deps`.
 """
 
@@ -16,11 +25,13 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.core.auth import narrowing
 from invana.core.auth.jwt import InvalidTokenError, decode_access_token
 from invana.core.auth.models import User
 from invana.core.auth.tokens import (
     PersonalAccessTokenRefusal,
     is_personal_access_token,
+    narrowing_of,
     resolve_personal_access_token,
     should_touch_last_used,
 )
@@ -28,6 +39,7 @@ from invana.core.db import get_session
 from invana.core.events import actions as event_actions
 from invana.core.events.models import ActorType
 from invana.core.events.services import emit_event
+from invana.core.policy import StatementError, parse_statements
 from invana.core.telemetry.spans import set_current
 
 _bearer_scheme = HTTPBearer(auto_error=False)
@@ -82,6 +94,7 @@ async def get_current_user(
         if credentials is None:
             raise _unauthorized("Personal access tokens are accepted in the Authorization header only.")
         user = await _user_from_personal_access_token(request, session, raw_token=raw_token)
+        _check_narrowing(request)
         request.state.current_user = user
         _record_caller(user, origin="api")
         return user
@@ -148,7 +161,39 @@ async def _user_from_personal_access_token(request: Request, session: AsyncSessi
         await session.commit()
 
     request.state.auth_credential = "personal_access_token"
+    request.state.auth_token_id = row.id
+    request.state.auth_token_name = row.name
+    request.state.auth_token_graph_id = row.graph_id
+    narrowed = await narrowing_of(session, row)
+    request.state.auth_token_policy = narrowed[0] if narrowed is not None else None
+    request.state.auth_token_statements = narrowed[1] if narrowed is not None else None
     return user
+
+
+def _check_narrowing(request: Request) -> None:
+    """Refuse a narrowed token's request its inline policy does not allow.
+
+    Dependencies resolve after routing, so the matched route's template is on the
+    scope; the check reads it, never the concrete URL. A policy whose statements
+    no longer parse narrows to nothing.
+    """
+    raw = getattr(request.state, "auth_token_statements", None)
+    if raw is None:
+        return
+    try:
+        statements = parse_statements(raw)
+    except StatementError:
+        statements = []
+    route = request.scope.get("route")
+    route_path = getattr(route, "path", request.url.path)
+    token = request.state.auth_token_name
+    policy = request.state.auth_token_policy
+    message = narrowing.check(statements, request.method, route_path, request.path_params, token=token, policy=policy)
+    if message is not None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"error": "token_narrowed", "token": token, "policy": policy, "message": message},
+        )
 
 
 async def require_session_auth(

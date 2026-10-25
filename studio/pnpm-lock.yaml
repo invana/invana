@@ -84,6 +84,9 @@ importers:
       '@invana-studio/explorer':
         specifier: workspace:*
         version: link:../../packages/explorer
+      '@invana-studio/iam':
+        specifier: workspace:*
+        version: link:../../packages/iam
       '@invana-studio/modeller':
         specifier: workspace:*
         version: link:../../packages/modeller
@@ -660,6 +663,79 @@ importers:
       elkjs:
         specifier: ^0.9.3
         version: 0.9.3
+    devDependencies:
+      '@biomejs/biome':
+        specifier: ^2.5.14
+        version: 2.5.14
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.98.0(react@19.2.5)
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.2.3(@types/react@19.2.14)
+      lucide-react:
+        specifier: ^0.475.0
+        version: 0.475.0(react@19.2.5)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.5
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.5(react@19.2.5)
+      react-hook-form:
+        specifier: 7.81.0
+        version: 7.81.0(react@19.2.5)
+      react-router-dom:
+        specifier: ^7.0.0
+        version: 7.14.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      typescript:
+        specifier: ^6.0.0
+        version: 6.0.2
+      vite:
+        specifier: ^7.0.0
+        version: 7.3.2(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.1)
+      vitest:
+        specifier: ^5.0.2
+        version: 5.0.2(@opentelemetry/api@1.9.1)(@types/node@25.6.0)(@vitest/coverage-v8@5.0.2)(vite@7.3.2(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.1))
+
+  packages/iam:
+    dependencies:
+      '@invana-studio/assistant':
+        specifier: workspace:*
+        version: link:../assistant
+      '@invana-studio/core':
+        specifier: workspace:*
+        version: link:../core
+      '@invana-studio/shell':
+        specifier: workspace:*
+        version: link:../shell
+      '@invana-studio/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@invana/blocks':
+        specifier: link:../../../../design-kit/packages/blocks
+        version: link:../../../../design-kit/packages/blocks
+      '@invana/charts':
+        specifier: link:../../../../design-kit/packages/charts
+        version: link:../../../../design-kit/packages/charts
+      '@invana/forms':
+        specifier: link:../../../../design-kit/packages/forms
+        version: link:../../../../design-kit/packages/forms
+      '@invana/styling':
+        specifier: link:../../../../design-kit/packages/styling
+        version: link:../../../../design-kit/packages/styling
+      '@invana/tables':
+        specifier: link:../../../../design-kit/packages/tables
+        version: link:../../../../design-kit/packages/tables
+      '@invana/ui':
+        specifier: link:../../../../design-kit/packages/ui
+        version: link:../../../../design-kit/packages/ui
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.5.14

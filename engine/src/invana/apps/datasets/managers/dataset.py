@@ -14,6 +14,10 @@ identical hash, and writes the version with its records in one act. Labels,
 visibility and the refresh schedule are metadata — ``dataset.update``, never a
 version.
 
+**A version may be pushed as a draft.** ``push_draft`` takes the same body and
+gates, numbers it and lists it with ``state = draft``; it is never current and
+never bound. ``publish_draft`` — the owner's act — makes it current.
+
 **Retraction marks, never deletes, and flags are read.** Only an install Admin
 retracts. ``used`` lists the bindings and derived versions that cite a version;
 a version read names its retracted inputs and a binding read says whether its
@@ -41,7 +45,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.datasets.content import columns_of, content_hash, normalise, property_changes
+from invana.apps.datasets.content import Row, columns_of, content_hash, normalise, property_changes
 from invana.apps.datasets.managers.conformance import ConformanceManager
 from invana.apps.datasets.models import (
     AuthorKind,
@@ -85,6 +89,8 @@ from invana.core.events.services import emit_event
 
 _REF = re.compile(r"^(?P<publisher>[a-z0-9][a-z0-9-]{0,62})/(?P<name>[a-z0-9][a-z0-9-]{0,62})(?:@(?P<version>\d+))?$")
 _CRON_FIELD = re.compile(r"^[\d*/,\-]+$")
+#: ``dataset_versions.state`` — a draft is never current and never bound.
+DRAFT, PUBLISHED = "draft", "published"
 
 
 def parse_ref(ref: str) -> tuple[str, str, int | None]:
@@ -226,6 +232,7 @@ class DatasetManager:
             dataset_id=dataset.id,
             address=f"{dataset.address}@{version.version}",
             version=version.version,
+            state=version.state,
             content_hash=version.content_hash,
             licence=version.licence,
             author_chain=list(version.author_chain or []),
@@ -472,6 +479,8 @@ class DatasetManager:
             row = await self.get_version(session, dataset=source, version=version)
             if row.retracted_at is not None:
                 raise ValidationError(f"Input {ref} is retracted and cannot be derived from.")
+            if row.state == DRAFT:
+                raise ValidationError(f"Input {ref} is a draft and cannot be derived from.")
             ids.append(row.id)
         return ids
 
@@ -489,7 +498,23 @@ class DatasetManager:
     ) -> DatasetVersion:
         """Mint the next version from its records — refused when nothing changed,
         or when a standard the dataset claims with ``block`` would break."""
-        self.require_owner(dataset, actor, "add a version")
+        return await self._mint(session, dataset=dataset, payload=payload, actor=actor, draft=False)
+
+    async def push_draft(
+        self, session: AsyncSession, *, dataset: Dataset, payload: DatasetVersionCreate, actor: User
+    ) -> DatasetVersion:
+        """Store the next version as a **draft** — numbered and listed, never current, never bound.
+
+        The same body and the same gates as :meth:`publish_version`: refused when
+        the records match the current version, or when a ``block`` claim breaks.
+        Only :meth:`publish_draft` makes it current.
+        """
+        return await self._mint(session, dataset=dataset, payload=payload, actor=actor, draft=True)
+
+    async def _mint(
+        self, session: AsyncSession, *, dataset: Dataset, payload: DatasetVersionCreate, actor: User, draft: bool
+    ) -> DatasetVersion:
+        self.require_owner(dataset, actor, "push a draft" if draft else "add a version")
         rows = normalise(payload.records, key_column=dataset.key_column)
         digest = content_hash(rows)
         chain = self._chain(dataset, payload, actor)
@@ -505,6 +530,7 @@ class DatasetManager:
         version = DatasetVersion(
             dataset_id=dataset.id,
             version=number,
+            state=DRAFT if draft else PUBLISHED,
             content_hash=digest,
             licence=payload.licence,
             author_chain=chain,
@@ -520,12 +546,13 @@ class DatasetManager:
             session,
             [DatasetRecord(version_id=version.id, key=r.key, values=r.values, provenance=r.provenance) for r in rows],
         )
-        dataset.current_version_id = version.id
+        if not draft:
+            dataset.current_version_id = version.id
         await session.flush()
         await self.claims.record(session, version=version, scored=scored)
         await emit_event(
             session,
-            action=actions.DATASET_VERSION,
+            action=actions.DATASET_DRAFT if draft else actions.DATASET_VERSION,
             target_kind=actions.TARGET_DATASET,
             target_id=dataset.id,
             actor_id=actor.id,
@@ -535,6 +562,50 @@ class DatasetManager:
                 "content_hash": digest,
                 "record_count": len(rows),
                 "why": payload.why,
+            },
+        )
+        return version
+
+    async def publish_draft(
+        self, session: AsyncSession, *, dataset: Dataset, version: DatasetVersion, actor: User
+    ) -> DatasetVersion:
+        """Make a draft the current version — the owner's act, through the gates a minted version passes.
+
+        Refused for a version that is not a draft, a draft whose records match the
+        current version, a draft older than the current version, and one a
+        ``block`` claim now breaks.
+        """
+        self.require_owner(dataset, actor, "publish a draft")
+        if version.state != DRAFT:
+            raise ConflictError(f"{dataset.address}@{version.version} is not a draft.")
+        current = await self.current(session, dataset)
+        if current is not None and current.content_hash == version.content_hash:
+            raise ConflictError(f"unchanged — the records match {dataset.address}@{current.version}.")
+        if current is not None and current.version > version.version:
+            raise ConflictError(
+                f"{dataset.address}@{current.version} is newer than the draft — push the draft again to publish it."
+            )
+        stored = await self.records_qs.all_for_version(session, version.id)
+        await self.claims.gate(
+            session, dataset=dataset, rows=[Row(key=r.key, values=r.values, provenance=r.provenance) for r in stored]
+        )
+        version.state = PUBLISHED
+        version.published_at = datetime.now(UTC)
+        version.published_by_id = actor.id
+        dataset.current_version_id = version.id
+        await session.flush()
+        await emit_event(
+            session,
+            action=actions.DATASET_PUBLISH,
+            target_kind=actions.TARGET_DATASET,
+            target_id=dataset.id,
+            actor_id=actor.id,
+            details={
+                "address": dataset.address,
+                "version": version.version,
+                "content_hash": version.content_hash,
+                "record_count": version.record_count,
+                "why": version.why,
             },
         )
         return version

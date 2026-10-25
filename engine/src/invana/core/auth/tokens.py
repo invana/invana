@@ -19,6 +19,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.core.auth.models import PersonalAccessToken, RefreshToken
+from invana.core.auth.querysets.token_policy import TokenPolicyQuerySet
 from invana.core.settings import settings
 
 
@@ -132,3 +133,15 @@ def should_touch_last_used(row: PersonalAccessToken, *, now: datetime | None = N
     if last.tzinfo is None:  # SQLite hands back naive datetimes
         last = last.replace(tzinfo=UTC)
     return (now - last).total_seconds() >= settings.auth_token_last_used_throttle_seconds
+
+
+async def narrowing_of(session: AsyncSession, row: PersonalAccessToken) -> tuple[str, list] | None:
+    """The inline policy narrowing a token, as ``(policy name, raw statements)``.
+
+    ``None`` for a token that is not narrowed. A narrowed token whose policy row
+    is gone narrows to nothing — ``(name, [])`` — so a dangling id never widens it.
+    """
+    if row.policy_id is None:
+        return None
+    found = await TokenPolicyQuerySet().get(session, row.policy_id)
+    return found if found is not None else (row.policy_id, [])

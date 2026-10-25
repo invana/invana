@@ -1,7 +1,7 @@
 /**
- * The page a graph product's routes draw — Explorer, Modeller, Projects and
- * Agents hand it in as their slot's `Page`, because the host composes all
- * four (the Workbook's boards, `leftSection`'s panels, the assistant on the
+ * The page a graph product's routes draw — Explorer, Modeller, Projects,
+ * Agents and IAM hand it in as their slot's `Page`, because the host composes
+ * all five (the Workbook's boards, `leftSection`'s panels, the assistant on the
  * right, the Console) and a product may not import another.
  *
  * An old link (`?panel=`, `?settings=`, `?drawer=`, a product's bare root) is

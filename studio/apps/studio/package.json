@@ -27,6 +27,7 @@
 		"@invana-studio/core": "workspace:*",
 		"@invana-studio/datasets": "workspace:*",
 		"@invana-studio/explorer": "workspace:*",
+		"@invana-studio/iam": "workspace:*",
 		"@invana-studio/modeller": "workspace:*",
 		"@invana-studio/projects": "workspace:*",
 		"@invana-studio/shell": "workspace:*",

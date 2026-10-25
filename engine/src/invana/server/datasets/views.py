@@ -156,6 +156,35 @@ async def publish_version(
     return read
 
 
+async def push_draft(
+    payload: DatasetVersionCreate,
+    publisher: str = Path(...),
+    name: str = Path(...),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> DatasetVersionRead:
+    """The next version as a draft — numbered and listed, never current until its owner publishes it."""
+    dataset = await datasets.get(session, publisher=publisher, name=name, reader=user)
+    version = await datasets.push_draft(session, dataset=dataset, payload=payload, actor=user)
+    read = await datasets.read_version(session, dataset=dataset, version=version)
+    read.warnings = await claims.warnings(session, dataset=dataset, version=version)
+    return read
+
+
+async def publish_draft(
+    publisher: str = Path(...),
+    name: str = Path(...),
+    version: int = Path(..., ge=1),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> DatasetVersionRead:
+    """Make a draft the current version."""
+    dataset = await datasets.get(session, publisher=publisher, name=name, reader=user)
+    row = await datasets.get_version(session, dataset=dataset, version=version)
+    row = await datasets.publish_draft(session, dataset=dataset, version=row, actor=user)
+    return await datasets.read_version(session, dataset=dataset, version=row)
+
+
 async def get_version(
     publisher: str = Path(...),
     name: str = Path(...),

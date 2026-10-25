@@ -85,7 +85,7 @@ flowchart TD
 | Surface | Shape |
 |---|---|
 | `iam.agents` | Page *Agents*: *An agent holds policies like a person does — it is built in Agents. Workers hold none — they only run steps*; kind tabs; table agent · kind · policies · functions allowed · refused · 7 d · owner; *Build an agent in Agents* |
-| `iam.agent.effective` | Agent page in IAM (`?page=iam-agent:<id>`), `RecordHeader variant="page"` crumb *Agents › name*, *Open in Agents*; tabs Effective access · Policies · Refusals; *As started by* and *in world* selects; matrix grouped by layer; *Who it may delegate to* |
+| `iam.agent.effective` | Agent page in IAM (`?page=iam_agent:<id>`), `RecordHeader variant="page"` crumb *Agents › name*, *Open in Agents*; tabs Effective access · Policies · Refusals; *As started by* and *in world* selects; matrix grouped by layer; *Who it may delegate to* |
 | `agents.agent.access` | The agent page's Access tab: *Policies it holds* (policy · kind · allows · owner, *Attach a policy*), the function matrix (function · its skills need · its policies · started by · world · effective · why not), *May delegate to* |
 | `GET …/iam/agents` | `Page[AgentAccessRow]`: `agent_id` · `name` · `kind` · `version` · `policies[]` · `functions_allowed` · `refused_7d` · `refused_line` · `owner` |
 | `GET …/iam/agents/{id}/effective` | `?started_by=<user>&run_id=&world_id=` → `{agent, started_by?, world?, policies[], rows[], delegates[], allowed, refused}` |

@@ -60,6 +60,8 @@ interface AssistantStartProps
 	/** Whether the chips repeat the person's recent Explorer questions. A
 	 *  product whose asks are not Explorer sessions turns them off. */
 	recent?: boolean;
+	/** Asks a product offers under the box, in place of the recent questions. */
+	suggestions?: readonly string[];
 	/** What a product draws under the start — Agents' section tiles. */
 	children?: ReactNode;
 }
@@ -79,7 +81,8 @@ interface AssistantStartProps
  * ask — the host docks the chat on the right as it sends. The chips under the
  * box are the person's own recent questions, asked again in one click; the
  * cards are their kept canvases. Neither is invented: a Graph never asked
- * anything shows the box alone.
+ * anything shows the box alone. A product whose asks are not Explorer
+ * sessions offers its own `suggestions` in the chips' place.
  */
 export function AssistantStart({
 	username,
@@ -94,6 +97,7 @@ export function AssistantStart({
 	heading,
 	placeholder = "Ask a question, or say what to draw…",
 	recent: showRecent = true,
+	suggestions,
 	children,
 	...composer
 }: AssistantStartProps) {
@@ -105,7 +109,7 @@ export function AssistantStart({
 				includeArchived: false,
 				surface: "explorer",
 			}),
-		enabled: asking && showRecent && !!username && !!graphSlug,
+		enabled: asking && showRecent && !suggestions && !!username && !!graphSlug,
 	});
 	// The distinct questions most recently asked — a session's title is its
 	// first question until someone renames it.
@@ -116,6 +120,7 @@ export function AssistantStart({
 				.filter((t): t is string => !!t && t !== "New session"),
 		),
 	].slice(0, SHOWN);
+	const chips = suggestions ?? (showRecent ? recent : []);
 	const shownViews = [...views]
 		.sort((a, b) => Number(b.pinned) - Number(a.pinned))
 		.slice(0, SHOWN);
@@ -155,9 +160,9 @@ export function AssistantStart({
 					/>
 				</div>
 			)}
-			{asking && showRecent && recent.length > 0 && (
+			{asking && chips.length > 0 && (
 				<div className="flex flex-wrap justify-center gap-2">
-					{recent.map((q) => (
+					{chips.map((q) => (
 						<Button
 							key={q}
 							variant="outline"

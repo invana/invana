@@ -49,9 +49,9 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Routes | `/u/:username/:graphSlug/iam/{home · people · groups · agents · policies · tokens · settings}`; a detail is `?page=policy:<name>` · `iam-agent:<id>` · `iam-group:<name>` |
+| Routes | `/u/:username/:graphSlug/iam/{home · people · groups · agents · policies · tokens · settings}`; a detail is `?page=policy:<name>` · `iam_agent:<id>` · `iam_group:<name>` |
 | `iam.home` | `AssistantStart` with heading *Who may do what in <Graph>?*, placeholder *Ask who can reach something, or draft a policy…*, suggestions *Which agents can write to the graph?* · *Who can push data?* · *What can <person> do?* · *What was refused today?*; tiles People · Groups · Agents · Policies · Tokens with the overview's lines |
-| `GET …/iam/overview` | `{people, service_accounts, groups, agents, policies: {managed, custom, inline, boundary}, tokens: {live, expiring_week}}` |
+| `GET …/iam/overview` | `{people, service_accounts, groups, agents, policies: {managed, custom, inline, boundary}, tokens_live, tokens_expiring_week}` |
 | Package | `@invana-studio/iam` — `product.tsx`, `sections/spec.ts`, one folder per section; the app's host renders it on the Agents host |
 
 ## Decisions

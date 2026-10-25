@@ -59,7 +59,7 @@ flowchart TD
 |---|---|
 | `iam.people` | Page *People* — *Members of airways, and service accounts — a person with no sign-in that owns tokens for scripts*; kind tabs, table name · email · groups · policies · tokens · signs in with; *Add person* · *New service account* |
 | `iam.groups` | Page *Groups* — *Attach a policy once, to a team*; table group · people · agents · policies; *New group* |
-| Group page | `?page=iam-group:<name>`: members (person or agent, *Add member*, remove) and the policies it holds (*Attach a policy*) |
+| Group page | `?page=iam_group:<name>`: members (person or agent, *Add member*, remove) and the policies it holds (*Attach a policy*) |
 | `GET …/iam/people` | `Page[PersonRow]` (`f.kind` person · service): `user_id` · `username` · `name` · `email?` · `kind` · `groups[]` · `policies[]` · `tokens` · `signs_in_with` |
 | `POST …/iam/service-accounts` | `{username, description?}` → `PersonRow` |
 | `GET·POST …/iam/groups` · `GET·PATCH·DELETE …/iam/groups/{name}` | `GroupRow` `{id, name, description, people[], agents[], policies[], people_count, agents_count}` |

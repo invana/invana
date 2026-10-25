@@ -56,6 +56,7 @@ from invana.plugins import load_plugins
 from invana.plugins.core.ingest.records import LoadRefused, connector_for
 from invana.plugins.sdk.manifest import SideEffect
 from invana.runtime import ledger_acts
+from invana.runtime.access import AccessGate
 from invana.runtime.callers import caller_for
 from invana.runtime.catalogue import (
     CannotAnswer,
@@ -71,10 +72,10 @@ from invana.runtime.catalogue import (
 )
 from invana.runtime.contention import AgentAtCeiling, AgentSlots, GraphSlots, PoolSlots, Refused
 from invana.runtime.delegation import (
+    budget_of,
     cost_rollup,
     descendants,
     end_waiting_children,
-    run_budget,
     settle_escrow,
     spent,
 )
@@ -140,6 +141,7 @@ _REFUSED_BY_CAUSE = {
     "loop": "policy",
     "delegation_declined": "policy",
     "secret_undeclared": "grant",
+    "policy_refused": "grant",
     "plugin_disabled": "policy",
 }
 
@@ -253,6 +255,8 @@ class TaskRuntime:
     #: The approvals inbox every other ask holds on — a delegation to an agent
     #: that asks each time. With none installed such a step is refused.
     ask_gate: ClassVar[AskGate | None] = None
+    #: The policy layers every step with a bound passes before it dispatches.
+    access_gate: ClassVar[AccessGate] = AccessGate()
 
     def __init__(
         self,
@@ -941,6 +945,13 @@ class TaskRuntime:
         """
         message_id = assistant.id if assistant else None
         i = start_index
+        if start_index == 0 and th.parent_run_id is None:
+            # A held policy's tokens a month, spent, keep a new run from starting.
+            month = await self.access_gate.month_refusal(db, run=th, agent=v.agent)
+            if month is not None:
+                await self._drop_pending(db, th, message_id)
+                await self._finish_failed(db, emitter, th, v, assistant, month, attempts=1)
+                return "error"
         # The settled calls so far, as (function, args, output) — what *no progress* reads.
         recent: list[tuple[str, str, str]] = []
         while True:
@@ -968,6 +979,8 @@ class TaskRuntime:
                 if v.governor is not None:
                     v.governor.begin_step(row.id, row.task_key)
                 try:
+                    # Refused before dispatch when a policy layer does not allow it.
+                    await self.access_gate.check(db, run=th, step_key=row.task_key, args=row.args, vars=v)
                     if await self._hold_for_send(db, emitter, th, row, v, i):
                         return "clarify"
                     with step_span(row, attempt):
@@ -1250,6 +1263,16 @@ class TaskRuntime:
         """
         touch, lens_rule = v.governor.end_step(row.id) if v.governor is not None else (None, None)
         if row.task_key == "work.spawn_agent":
+            if failure is not None and failure.cause == "policy_refused":
+                # Refused before it ran, so the spawn wrote no row of its own.
+                await ledger_acts.spawn_refused(
+                    db,
+                    run=th,
+                    name=str((row.args or {}).get("name") or "Helper").strip(),
+                    refused_by="grant",
+                    rule=failure.message,
+                    step_run_id=row.id,
+                )
             return
         touched, line = (touch[0], ledger_acts.volume_line(touch[1])) if touch else ("", "")
         tokens = (row.tokens_in or 0) + (row.tokens_out or 0)
@@ -1297,7 +1320,7 @@ class TaskRuntime:
         froze at open, else its agent's. The step it did not reach is
         ``skipped`` and says why.
         """
-        budget = run_budget(th, v.agent)
+        budget = await budget_of(db, th, v.agent)
         if budget is None:
             return False
         used = await spent(db, th)

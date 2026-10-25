@@ -88,6 +88,14 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"approvals",
 	"ledger",
 	"concurrency",
+	// The IAM sections — pages too.
+	"iam-home",
+	"iam-people",
+	"iam-groups",
+	"iam-agents",
+	"iam-policies",
+	"iam-tokens",
+	"iam-settings",
 	// The Projects product's own panel.
 	"decisions",
 ];
@@ -99,7 +107,7 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
  * - The shell's header slots: the breadcrumb's last crumb, the canvas toolbar
  *   in the centre and the Assistant toggle.
  * - `leftNav`: none for Explorer, whose `nav` is `null`; the open product's
- *   rail for the Modeller, Projects and Agents — the shell draws it from the
+ *   rail for the Modeller, Projects, Agents and IAM — the shell draws it from the
  *   product's `nav`.
  * - SettingsViewPanel takeover: docked replaces `leftSection`; expanded replaces
  *   `mainSection` and hides both `leftSection` and `rightSection`.

@@ -122,6 +122,13 @@ type SingleTabSection = Exclude<
 	| "llms"
 	| "performance"
 	| "concurrency"
+	| "iam-home"
+	| "iam-people"
+	| "iam-groups"
+	| "iam-agents"
+	| "iam-policies"
+	| "iam-tokens"
+	| "iam-settings"
 	| "decisions"
 	// Activity's tabs are the shell's page; they are never a tab here.
 	| "activity"

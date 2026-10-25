@@ -8,13 +8,17 @@
  * disabled, with who to ask, before anyone tries it.
  */
 
-/** The five Graph roles, lowest to highest. `owner` implies the other four. */
+/**
+ * The six Graph roles, lowest to highest. `owner` implies the four before it;
+ * `iam-admin` is a peer that nothing implies.
+ */
 export const GRAPH_ROLES = [
 	"viewer",
 	"contributor",
 	"builder",
 	"modeller",
 	"owner",
+	"iam-admin",
 ] as const;
 export type GraphRole = (typeof GRAPH_ROLES)[number];
 
@@ -24,11 +28,18 @@ export const ROLE_MAY: Record<GraphRole, string> = {
 	contributor: "projects, findings, observations, schedules",
 	builder: "agents, skills, evals, tools",
 	modeller: "models, publish, stitches, rules, guardrails",
-	owner: "members, settings, approving breaking changes",
+	owner: "settings, the connection, approving breaking changes",
+	"iam-admin": "members, people, groups, policies and others' tokens",
 };
 
 /** A part of a Graph one role changes. */
-export type AccessAreaName = "ask" | "work" | "build" | "model" | "settings";
+export type AccessAreaName =
+	| "ask"
+	| "work"
+	| "build"
+	| "model"
+	| "settings"
+	| "iam";
 
 interface AccessArea {
 	area: AccessAreaName;

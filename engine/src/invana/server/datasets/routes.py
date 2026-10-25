@@ -5,7 +5,9 @@ GET · POST ``""``                                  the catalogue · create (no 
 GET ``/claims``                                    every claim on every readable dataset
 GET ``/validation``                                the validation queue, with its totals
 GET · PATCH ``/{publisher}/{name}``                detail · metadata (never a version)
-GET · POST ``/{publisher}/{name}/versions``        versions · mint the next one
+GET · POST ``/{publisher}/{name}/versions``        versions, drafts too · mint the next one
+POST ``/{publisher}/{name}/versions/drafts``       push the next one as a draft — never current
+POST ``/{publisher}/{name}/versions/{v}/publish``  make a draft the current version (its owner)
 GET ``/{publisher}/{name}/versions/{v}``           one version
 GET ``/{publisher}/{name}/versions/{v}/records``   its records, by key
 POST ``/{publisher}/{name}/versions/{v}/retract``  mark it withdrawn (install Admin)
@@ -63,6 +65,10 @@ datasets_router.get(f"{_ONE}/versions", response_model=DatasetVersionListRespons
 datasets_router.post(f"{_ONE}/versions", response_model=DatasetVersionRead, status_code=status.HTTP_201_CREATED)(
     views.publish_version
 )
+datasets_router.post(f"{_ONE}/versions/drafts", response_model=DatasetVersionRead, status_code=status.HTTP_201_CREATED)(
+    views.push_draft
+)
+datasets_router.post(f"{_ONE}/versions/{{version}}/publish", response_model=DatasetVersionRead)(views.publish_draft)
 datasets_router.get(f"{_ONE}/versions/{{version}}", response_model=DatasetVersionRead)(views.get_version)
 datasets_router.get(f"{_ONE}/versions/{{version}}/records", response_model=DatasetRecordPage)(views.list_records)
 datasets_router.post(f"{_ONE}/versions/{{version}}/retract", response_model=DatasetVersionRead)(views.retract_version)

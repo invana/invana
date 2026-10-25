@@ -72,11 +72,19 @@ async def resolve_graph_by_username_slug(
 
 
 async def get_graph_membership(
+    request: Request,
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> GraphMember:
-    """Resolve the (graph, user) -> GraphMember row or 403."""
+    """Resolve the (graph, user) -> GraphMember row or 403.
+
+    A personal access token bound to one Graph reaches no other: on another
+    Graph's routes the Graph reads as absent (404), as any scoping refusal does.
+    """
+    bound_to = getattr(request.state, "auth_token_graph_id", None)
+    if bound_to is not None and bound_to != graph.id:
+        raise _not_found("Graph not found.")
     stmt = select(GraphMember).where(
         GraphMember.graph_id == graph.id,
         GraphMember.user_id == user.id,

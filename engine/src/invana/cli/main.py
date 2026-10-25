@@ -40,6 +40,7 @@ from invana.cli.commands.approvals import approvals_cmd
 from invana.cli.commands.datasets import datasets_cmd
 from invana.cli.commands.evals import evals_cmd
 from invana.cli.commands.govern import govern_cmd
+from invana.cli.commands.iam import iam_cmd
 from invana.cli.commands.llms import llms_cmd
 from invana.cli.commands.loader import loader_cmd
 from invana.cli.commands.members import members_cmd
@@ -224,6 +225,7 @@ app.add_command(datasets_cmd)
 app.add_command(standards_cmd)
 app.add_command(rules_cmd)
 app.add_command(members_cmd)
+app.add_command(iam_cmd)
 app.add_command(schedules_cmd)
 app.add_command(approvals_cmd)
 app.add_command(notifications_cmd)

@@ -68,6 +68,18 @@ describe("panelPaths", () => {
 		);
 	});
 
+	it("lands IAM on Home and keeps its panels apart from Agents'", () => {
+		expect(canonicalRedirect(`${G}/iam`, "")).toBe(`${G}/iam/home`);
+		expect(pageParamsOf("iam/agents", "").get("panel")).toBe("iam-agents");
+		expect(pageParamsOf("agents/agents", "").get("panel")).toBe("agents");
+		expect(
+			canonicalRedirect(`${G}/iam/policies`, "page=policy%3Aread-only"),
+		).toBeNull();
+		expect(canonicalRedirect(G, "?panel=iam-settings")).toBe(
+			`${G}/iam/settings`,
+		);
+	});
+
 	it("puts a project under the Projects root and Decisions beside My todos", () => {
 		const project = pageParamsOf("projects/p1", "");
 		expect(project.get("section")).toBe("projects");

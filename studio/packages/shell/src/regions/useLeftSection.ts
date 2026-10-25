@@ -39,6 +39,14 @@ export type LeftNavKey =
 	| "llms"
 	| "performance"
 	| "concurrency"
+	// The IAM rail's sections, each a page.
+	| "iam-home"
+	| "iam-people"
+	| "iam-groups"
+	| "iam-agents"
+	| "iam-policies"
+	| "iam-tokens"
+	| "iam-settings"
 	// The Projects rail's Decisions, a panel of its own.
 	| "decisions"
 	// Activity's tabs that no rail icon writes; `?section=` names the tab.
@@ -136,6 +144,13 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"llms",
 	"performance",
 	"concurrency",
+	"iam-home",
+	"iam-people",
+	"iam-groups",
+	"iam-agents",
+	"iam-policies",
+	"iam-tokens",
+	"iam-settings",
 	"decisions",
 	"activity",
 ];

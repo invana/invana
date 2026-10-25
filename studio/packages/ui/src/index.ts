@@ -18,6 +18,7 @@ export * from "./PrincipalChip";
 export * from "./RdfSourceField";
 export * from "./RecordRow";
 export * from "./RuleParts";
+export * from "./SectionFrame";
 export * from "./SectionTitle";
 export * from "./StackSection";
 export * from "./StepRules";

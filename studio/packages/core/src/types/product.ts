@@ -22,7 +22,8 @@ export type ProductId =
 	| "modeller"
 	| "explorer"
 	| "projects"
-	| "agents";
+	| "agents"
+	| "iam";
 
 /** An icon component — a lucide icon fits. */
 export type ProductIcon = ComponentType<{ className?: string }>;

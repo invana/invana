@@ -12,6 +12,7 @@ import {
 	TemplatePage,
 } from "@invana-studio/agents";
 import type { CanvasBackend } from "@invana-studio/canvases";
+import { GroupPage, IamAgentPage, PolicyPage } from "@invana-studio/iam";
 import type { useLensesViewPanel } from "@invana-studio/modeller";
 import {
 	CompareBoardPage,
@@ -307,6 +308,37 @@ export function declaredBoardContent(
 		);
 	}
 
+	// IAM's record pages. Each binds to a name or an id and reads no trace.
+	if (board.kind === "policy") {
+		return (
+			<PolicyPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				name={board.subjectId}
+			/>
+		);
+	}
+
+	if (board.kind === "iam_agent") {
+		return (
+			<IamAgentPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				agentId={board.subjectId}
+			/>
+		);
+	}
+
+	if (board.kind === "iam_group") {
+		return (
+			<GroupPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				name={board.subjectId}
+			/>
+		);
+	}
+
 	if (board.kind === "compare") {
 		const pair = parseComparePair(board.subjectId);
 		return pair ? (
@@ -377,8 +409,8 @@ export interface BoardTitleNames {
 
 /**
  * A declared tab's title. Most kinds are titled by their kind — one skill
- * board, and the crumb inside says which record. A lens, an agent and a project are titled
- * by name, and a run by its number, `Run #1002` — its address, `run:3c414b9f`,
+ * board, and the crumb inside says which record. A lens, an agent, a project, a policy
+ * and a group are titled by name, and a run by its number, `Run #1002` — its address, `run:3c414b9f`,
  * only until the number is read — so two open runs are two readable tabs.
  */
 export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
@@ -400,7 +432,7 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 				: "All models"
 			: board.kind === "world" || board.kind === "guardrail"
 				? (lensNameById.get(board.subjectId) ?? BOARD_KINDS[board.kind].label)
-				: board.kind === "agent"
+				: board.kind === "agent" || board.kind === "iam_agent"
 					? (agentNameById.get(board.subjectId) ??
 						BOARD_KINDS[board.kind].label)
 					: board.kind === "skill"
@@ -408,7 +440,10 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 							BOARD_KINDS[board.kind].label)
 						: board.kind === "project"
 							? (projectNameByKey.get(board.subjectId) ?? board.subjectId)
-							: board.kind === "plugin" || board.kind === "function"
+							: board.kind === "plugin" ||
+									board.kind === "function" ||
+									board.kind === "policy" ||
+									board.kind === "iam_group"
 								? board.subjectId
 								: board.kind === "run"
 									? runTitle(board.subjectId, runNumberById)

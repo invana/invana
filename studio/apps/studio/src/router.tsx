@@ -1,5 +1,6 @@
 import { AgentsSlotsContext, useAgentsQuery } from "@invana-studio/agents";
 import { ExplorerSlotsContext } from "@invana-studio/explorer";
+import { IamSlotsContext } from "@invana-studio/iam";
 import { ModellerSlotsContext } from "@invana-studio/modeller";
 import { ProjectsSlotsContext } from "@invana-studio/projects";
 import {
@@ -21,11 +22,12 @@ import { ProductHostRoute } from "@/host/ProductHostRoute";
 import { products } from "@/products";
 import { modellerSlots } from "@/products/modellerSlots";
 
-// The Explorer's, the Modeller's, the Projects and the Agents product's routes
-// draw the product host, which composes all four. Projects reads the agents a
+// The Explorer's, the Modeller's, the Projects, the Agents and the IAM
+// product's routes draw the product host, which composes all five. Projects reads the agents a
 // Todo can be handed to from the Agents product, through its slot.
 const explorerSlots = { Page: ProductHostRoute };
 const agentsSlots = { Page: ProductHostRoute };
+const iamSlots = { Page: ProductHostRoute };
 const projectsSlots = { Page: ProductHostRoute, useAgents: useAgentsQuery };
 
 export const router = createBrowserRouter([
@@ -43,13 +45,15 @@ export const router = createBrowserRouter([
 				<ExplorerSlotsContext.Provider value={explorerSlots}>
 					<ModellerSlotsContext.Provider value={modellerSlots}>
 						<AgentsSlotsContext.Provider value={agentsSlots}>
-							<ProjectsSlotsContext.Provider value={projectsSlots}>
-								{/* Activity is the shell's route, and a run's page in it
-								    names agents and govern records the shell may not import. */}
-								<ActivitySlotsContext.Provider value={activitySlots}>
-									<StudioShell products={products} />
-								</ActivitySlotsContext.Provider>
-							</ProjectsSlotsContext.Provider>
+							<IamSlotsContext.Provider value={iamSlots}>
+								<ProjectsSlotsContext.Provider value={projectsSlots}>
+									{/* Activity is the shell's route, and a run's page in it
+									    names agents and govern records the shell may not import. */}
+									<ActivitySlotsContext.Provider value={activitySlots}>
+										<StudioShell products={products} />
+									</ActivitySlotsContext.Provider>
+								</ProjectsSlotsContext.Provider>
+							</IamSlotsContext.Provider>
 						</AgentsSlotsContext.Provider>
 					</ModellerSlotsContext.Provider>
 				</ExplorerSlotsContext.Provider>
