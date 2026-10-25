@@ -285,6 +285,7 @@ layers = [
     "invana.apps.annotations",
     "invana.apps.sessions",
     "invana.apps.agents",
+    "invana.apps.iam",
     "invana.apps.skills",
     "invana.apps.govern",
     "invana.apps.llm",

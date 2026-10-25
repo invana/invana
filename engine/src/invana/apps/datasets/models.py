@@ -138,6 +138,8 @@ class DatasetVersion(Base):
         String(36), ForeignKey("datasets.id", ondelete="CASCADE"), nullable=False, index=True
     )
     version: Mapped[int] = mapped_column(Integer, nullable=False)
+    #: ``draft`` until its owner publishes it; a draft is never current and no binding cites it.
+    state: Mapped[str] = mapped_column(String(16), nullable=False, default="published", server_default="published")
     #: ``sha256:<hex>`` over the records in key order.
     content_hash: Mapped[str] = mapped_column(String(80), nullable=False, index=True)
     licence: Mapped[str] = mapped_column(String(255), nullable=False)

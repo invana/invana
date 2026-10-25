@@ -12,8 +12,9 @@ Resolution chain (per docs/for-developers/modules/identity-and-access/spec.md):
     └─> get_graph_membership(current_user, graph)
         └─> require_graph_member
 
-A ``GraphMember`` row is the right to read the Graph; its ``roles`` are the right
-to change it (docs/for-developers/modules/identity-and-access/features/roles.md).
+A ``GraphMember`` row is the right to read the Graph; its ``roles``, with the
+managed policies its groups hold, are the right to change it
+(docs/for-developers/modules/identity-and-access/features/roles.md).
 ``require_graph_member`` checks both, from one policy table, on every route.
 
 All graph-scoped URLs are namespaced as ``/api/v1/u/{username}/{graphSlug}/...``.
@@ -29,7 +30,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.managers import GraphMemberManager
 from invana.apps.graphs.models import Graph, GraphMember
-from invana.apps.graphs.roles import READ_METHODS, GraphRole, area_for
+from invana.apps.graphs.roles import READ_METHODS, GraphRole, area_for, holds
+from invana.apps.iam.managers import HoldingsManager
 from invana.apps.setup.managers import SetupManager
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
@@ -106,6 +108,9 @@ async def require_graph_member(
     area = area_for(request.method, path)
     role = area.role if area is not None else GraphRole.owner
     if member.holds(role):
+        return member
+    # A role a group holds counts as the member's own.
+    if holds(await HoldingsManager().roles_for(session, graph_id=graph.id, user_id=member.user_id), role):
         return member
     holders = await GraphMemberManager().holders(session, graph_id=graph.id, role=role)
     label = area.label if area is not None else "This change"

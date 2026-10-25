@@ -292,6 +292,22 @@ APPROVAL_REMIND = "approval.remind"
 ALERT_RULE_CREATE = "alert_rule.create"
 ALERT_RULE_UPDATE = "alert_rule.update"
 ALERT_RULE_DELETE = "alert_rule.delete"
+
+# ── IAM (docs/for-developers/modules/identity-and-access/features/policies.md)
+POLICY_CREATE = "policy.create"
+POLICY_UPDATE = "policy.update"
+POLICY_SAVE = "policy.save"
+POLICY_DELETE = "policy.delete"
+POLICY_ATTACH = "policy.attach"
+POLICY_DETACH = "policy.detach"
+GROUP_CREATE = "group.create"
+GROUP_UPDATE = "group.update"
+GROUP_DELETE = "group.delete"
+GROUP_MEMBER_ADD = "group.member.add"
+GROUP_MEMBER_REMOVE = "group.member.remove"
+SERVICE_ACCOUNT_CREATE = "service_account.create"
+DATASET_DRAFT = "dataset.draft"
+DATASET_PUBLISH = "dataset.publish"
 UNMATCHED_PREFIXES: tuple[str, ...] = ("delivery.", "notification.")
 UNMATCHED_ACTIONS: frozenset[str] = frozenset({APPROVAL_REMIND})
 
@@ -336,6 +352,9 @@ TARGET_CHANNEL = "channel"
 TARGET_DELIVERY = "delivery"
 TARGET_APPROVAL = "approval"
 TARGET_ALERT_RULE = "alert_rule"
+TARGET_POLICY = "policy"
+TARGET_GROUP = "group"
+TARGET_USER = "user"
 
 
 # ── The change log (docs/for-developers/modules/operate/features/change-log.md)
@@ -349,6 +368,7 @@ CHANGE_ACTIONS_BY_TARGET: dict[str, frozenset[str]] = {
     TARGET_AGENT: frozenset({AGENT_CREATE, AGENT_UPDATE, AGENT_SOUL_SET}),
     # An import and an upgrade land as drafts; only publishing mints a version.
     TARGET_MODEL: frozenset({MODEL_ACTIVATE, MODEL_COMMIT}),
-    TARGET_DATASET: frozenset({DATASET_VERSION}),
+    TARGET_DATASET: frozenset({DATASET_VERSION, DATASET_PUBLISH}),
+    TARGET_POLICY: frozenset({POLICY_SAVE}),
 }
 CHANGE_ACTIONS: frozenset[str] = frozenset().union(*CHANGE_ACTIONS_BY_TARGET.values())

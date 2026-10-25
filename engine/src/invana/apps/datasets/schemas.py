@@ -74,6 +74,8 @@ class DatasetVersionRead(BaseModel):
     dataset_id: str
     address: str
     version: int
+    #: ``draft`` until its owner publishes it; ``published`` otherwise.
+    state: str = "published"
     content_hash: str
     licence: str
     author_chain: list[dict[str, Any]]

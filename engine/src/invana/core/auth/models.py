@@ -61,6 +61,8 @@ class User(Base):
     # starlette-admin; no bearing on Graph roles.
     is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # A person with no sign-in that owns tokens for scripts; its password hash is unusable.
+    is_service_account: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
     # Stamp set on every username change; enforces auth_username_change_cooldown_days.
     username_last_changed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
@@ -70,7 +72,7 @@ class User(Base):
 
     refresh_tokens: Mapped[list[RefreshToken]] = relationship(back_populates="user", cascade="all, delete-orphan")
     personal_access_tokens: Mapped[list[PersonalAccessToken]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
+        back_populates="user", cascade="all, delete-orphan", foreign_keys="PersonalAccessToken.user_id"
     )
     memberships: Mapped[list[GraphMember]] = relationship(  # noqa: F821 — forward ref resolved via SQLAlchemy registry
         back_populates="user",
@@ -120,5 +122,15 @@ class PersonalAccessToken(Base):
     last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    # The Graph an IAM token is bound to; NULL for a profile token, which reaches every Graph.
+    graph_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("graphs.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    # Its inline policy (``policies.id``), when it is narrowed; deleted with the token's revocation.
+    policy_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    # Who minted it — the holder, or an iam-admin minting for a service account.
+    created_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
 
-    user: Mapped[User] = relationship(back_populates="personal_access_tokens")
+    user: Mapped[User] = relationship(back_populates="personal_access_tokens", foreign_keys=[user_id])

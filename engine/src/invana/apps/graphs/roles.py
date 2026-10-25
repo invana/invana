@@ -2,15 +2,18 @@
 
 docs/for-developers/modules/identity-and-access/features/roles.md. A member of a
 Graph reads everything in it; a **Graph role** is the right to change one
-**area** of it. Five roles, held as a set:
+**area** of it. Six roles, held as a set — each is also the managed policy of
+the same name (docs/for-developers/modules/identity-and-access/features/policies.md):
 
     viewer       ask — sessions, Explorer, boards, a run's answer · cancel · rerun
     contributor  work — projects and tasks
     builder      build — agents, skills, evals, flows, templates
     modeller     model — models, links, rules, guardrails, dataset bindings
-    owner        settings — the Graph, its connection, providers, members
+    owner        settings — the Graph, its connection, providers
+    iam-admin    iam — members, people, groups, policies and others' tokens
 
-``owner`` implies the other four, and every member holds ``viewer``.
+``owner`` implies contributor, builder and modeller; ``iam-admin`` is a peer that
+nothing implies. Every member holds ``viewer``.
 
 The area is read off the route a request matched — never named by the route
 itself — so one table here governs every graph-scoped write:
@@ -43,6 +46,7 @@ class GraphRole(enum.StrEnum):
     builder = "builder"
     modeller = "modeller"
     owner = "owner"
+    iam_admin = "iam-admin"
 
 
 # Canonical order — how a set of roles is stored and listed.
@@ -62,9 +66,10 @@ ASK = Area("ask", GraphRole.viewer, "Asking and exploring")
 WORK = Area("work", GraphRole.contributor, "Projects and tasks")
 BUILD = Area("build", GraphRole.builder, "Agents, skills and evals")
 MODEL = Area("model", GraphRole.modeller, "Models, rules and guardrails")
-SETTINGS = Area("settings", GraphRole.owner, "Members and settings")
+SETTINGS = Area("settings", GraphRole.owner, "Settings")
+IAM = Area("iam", GraphRole.iam_admin, "People, policies and tokens")
 
-AREAS: tuple[Area, ...] = (ASK, WORK, BUILD, MODEL, SETTINGS)
+AREAS: tuple[Area, ...] = (ASK, WORK, BUILD, MODEL, SETTINGS, IAM)
 
 # Path prefixes after the Graph, first match wins — so a narrower prefix sits
 # above the broader one it carves out of. ``*`` matches one path segment.
@@ -80,6 +85,10 @@ _POLICY: tuple[tuple[tuple[str, ...], Area], ...] = (
     (("notifications", "read"), ASK),
     (("approvals",), ASK),
     (("ledger",), ASK),
+    (("iam", "tokens"), ASK),
+    (("iam", "test"), ASK),
+    (("iam",), IAM),
+    (("members",), IAM),
     (("projects",), WORK),
     (("data-edits",), WORK),
     (("annotations",), WORK),
@@ -103,7 +112,6 @@ _POLICY: tuple[tuple[tuple[str, ...], Area], ...] = (
     (("setup",), SETTINGS),
     (("default-agent",), SETTINGS),
     (("llm",), SETTINGS),
-    (("members",), SETTINGS),
     (("notifications",), SETTINGS),
     ((), SETTINGS),  # the Graph itself: PATCH · DELETE
 )
@@ -130,10 +138,15 @@ def area_for(method: str, path: str) -> Area | None:
 
 
 def holds(roles: Iterable[str], role: GraphRole | str) -> bool:
-    """Whether a member holding ``roles`` may act as ``role``."""
+    """Whether a member holding ``roles`` may act as ``role``.
+
+    ``owner`` implies every role but ``iam-admin``, which only itself grants.
+    """
     wanted = GraphRole(role)
     held = set(roles)
-    return wanted is GraphRole.viewer or GraphRole.owner.value in held or wanted.value in held
+    if wanted is GraphRole.viewer or wanted.value in held:
+        return True
+    return wanted is not GraphRole.iam_admin and GraphRole.owner.value in held
 
 
 def normalise(roles: Iterable[str]) -> list[str]:
