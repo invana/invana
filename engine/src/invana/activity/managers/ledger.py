@@ -32,7 +32,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.managers.notifications import Members
 from invana.activity.querysets import LedgerReadQuerySet
-from invana.activity.querysets.ledger import PRESETS, chain_names, like_pattern
+from invana.activity.querysets.ledger import ACTOR_TILES, PRESETS, RECORD_TILES, chain_names, like_pattern
 from invana.apps.agents.models import AgentKind
 from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.govern.addressing import matches
@@ -44,7 +44,6 @@ from invana.core.errors import NotFoundError, ValidationError
 from invana.core.ledger.models import LedgerExport, LedgerRow
 from invana.core.ledger.querysets import LedgerQuerySet
 from invana.core.ledger.schemas import (
-    LEDGER_LIST,
     LEDGER_SINCE,
     CanSee,
     CountRow,
@@ -61,13 +60,16 @@ from invana.core.ledger.schemas import (
     LedgerStats,
     RefusalRule,
     RefusedDay,
+    preset_label,
 )
-from invana.core.lists import AppliedFilter, ListParams
+from invana.core.lists import AppliedFilter, ListParams, Page
 
 #: How often the clock re-verifies a Graph's chain.
 VERIFY_EVERY = timedelta(minutes=10)
 #: The 7-day daily mean of acts below which the Acts tile shows no change.
 CHANGE_FLOOR = 10
+#: The sign between a name and how many — *Hub Checker* times 4.
+TIMES = "\N{MULTIPLICATION SIGN}"
 #: How long rows are kept, stated in the head.
 RETENTION_DAYS = 365
 #: The most rows one export carries.
@@ -146,6 +148,77 @@ def _filters_line(filters: dict) -> str:
     return " · ".join(parts) or "all rows"
 
 
+def _reasons_line(reasons: Counter | None) -> str:
+    """Why a table row's acts were refused — ``lens``, or ``lens 2 · grant 1`` for several reasons."""
+    if not reasons:
+        return ""
+    if len(reasons) == 1:
+        return next(iter(reasons))
+    return " · ".join(f"{key} {n}" for key, n in reasons.most_common())
+
+
+def _role(name: str) -> str:
+    """A spawned helper's role: its name without the parent suffix and an instance code.
+
+    ``Hub Checker LHR · Route Auditor`` reads ``Hub Checker``. The last word is
+    an instance code when it is all capitals or a number (``LHR``, ``3``, ``#3``).
+    """
+    base = name.split(" · ", 1)[0].strip()
+    words = base.split()
+    last = words[-1].lstrip("#") if words else ""
+    if len(words) > 1 and (last.isupper() or last.isdigit()):
+        words = words[:-1]
+    return " ".join(words) or base
+
+
+def _acted_through(through: dict[str, list], kinds: dict[str, str]) -> list[CountRow]:
+    """The helpers an actor acted through, most acts first.
+
+    Spawned helpers of one role are one row — *Hub Checker* times 4, ``b`` the
+    helpers in it; an agent delegated to is a row of its own.
+    """
+    rows: dict[tuple[str, str], list] = {}
+    for agent_id, (label, count) in through.items():
+        spawned = kinds.get(agent_id) == AgentKind.spawned.value
+        key = ("spawned", _role(label)) if spawned else ("delegated", agent_id)
+        entry = rows.setdefault(key, [label, 0, 0])
+        entry[1] += count
+        entry[2] += 1
+    out = [
+        CountRow(
+            key=f"{role} {TIMES}{helpers}" if how == "spawned" and helpers > 1 else label, a=count, b=helpers, line=how
+        )
+        for (how, role), (label, count, helpers) in rows.items()
+    ]
+    return sorted(out, key=lambda c: -c.a)
+
+
+def bound_words(refused_by: str, rule: str, touched: str = "") -> str:
+    """The bound a refusal names, in words — what *The rule* reads on the Refusals tab.
+
+    A ceiling, policy or robots refusal stores the sentence that refused it, and
+    that sentence is the bound. A grant, lens or world refusal stores the
+    pattern that matched, so the words name the bound and then the pattern.
+    """
+    if refused_by in ("ceiling", "policy", "robots") and rule:
+        return rule
+    if refused_by == "robots":
+        _, _, rest = touched.partition("/")
+        domain, slash, path = rest.partition("/")
+        return f"robots.txt disallows {slash + path if slash else domain or 'the page'}"
+    if refused_by == "ceiling":
+        return "a ceiling on the run was reached"
+    if refused_by == "policy":
+        return "the agent's policy refuses it"
+    head = {
+        "grant": f"no grant for {touched or 'it'}",
+        "lens": "outside the lens",
+        "world": "outside the world",
+    }.get(refused_by, "refused")
+    pattern = rule.removeprefix(f"{refused_by} · ")
+    return f"{head} — {pattern}" if pattern and pattern != head else head
+
+
 class LedgerManager:
     """Stateless. The session is the first argument of every method."""
 
@@ -213,7 +286,7 @@ class LedgerManager:
             presets.append(
                 LedgerPreset(
                     key=key,
-                    label=LEDGER_LIST.filters["preset"].labels[key],
+                    label=preset_label(key, since),
                     count=await self.rows_qs.count(session, window.where(clause)),
                 )
             )
@@ -312,6 +385,9 @@ class LedgerManager:
             raise ValidationError("actor is person:<id> or agent:<id>.")
         start = since_start(since, now or datetime.now(UTC))
         stmt = self.rows_qs.scope(graph.id, self.viewer_id(member)).where(chain_names(actor_id), LedgerRow.at >= start)
+        tiles = await self.rows_qs.counts(session, stmt, ACTOR_TILES)
+        secret_names = await self.rows_qs.distinct_touched(session, stmt.where(LedgerRow.layer == "secret"))
+        # The tables are read from the newest rows; every tile above is counted in full.
         rows = await self.rows_qs.rows(session, stmt)
 
         name = ""
@@ -328,28 +404,31 @@ class LedgerManager:
         if not name and not rows:
             raise NotFoundError("Actor not found.")
 
-        writes = [r for r in rows if r.act.startswith("graph.write.")]
-        secrets = [r for r in rows if r.layer == "secret"]
-        refused = [r for r in rows if r.verdict == "refused"]
         graph_rows: dict[str, CountRow] = {}
         web_rows: dict[str, CountRow] = {}
         llm_rows: dict[str, CountRow] = {}
+        reasons: dict[tuple[str, str], Counter] = defaultdict(Counter)
         through: dict[str, list] = {}
         llm_steps = [r.step_run_id for r in rows if r.layer == "llm" and r.step_run_id]
         step_tokens = await self.rows_qs.step_tokens(session, step_run_ids=llm_steps)
         for row in rows:
             target = _name_after_layer(row.touched)
+            refused = row.verdict == "refused"
             if row.layer == "graph":
                 key = target.split(":")[0].split("@")[0] or "graph"
                 entry = graph_rows.setdefault(key, CountRow(key=key))
                 entry.a += row.act.startswith("graph.read.")
                 entry.b += row.act.startswith("graph.write.")
-                entry.c += row.verdict == "refused"
+                entry.c += refused
+                if refused:
+                    reasons[("graph", key)][row.refused_by or "other"] += 1
             elif row.layer == "web" and row.touched.startswith("web/"):
                 key = target.split("/")[0] or "web"
                 entry = web_rows.setdefault(key, CountRow(key=key))
                 entry.a += 1
-                entry.b += row.verdict == "refused"
+                entry.b += refused
+                if refused:
+                    reasons[("web", key)][row.refused_by or "other"] += 1
             elif row.layer == "llm" and row.touched.startswith("llm/"):
                 # Keyed by the model's address; the tokens are the step's, as it recorded them.
                 entry = llm_rows.setdefault(target, CountRow(key=target))
@@ -361,32 +440,26 @@ class LedgerManager:
                 for link in chain[at + 1 :]:
                     if link["kind"] == "agent" and link["id"]:
                         through.setdefault(link["id"], [link["name"], 0])[1] += 1
+        for layer, table in (("graph", graph_rows), ("web", web_rows)):
+            for key, entry in table.items():
+                entry.line = _reasons_line(reasons.get((layer, key)))
         kinds = {a.id: a.kind for a in await self.agents_qs.by_ids(session, graph_id=graph.id, ids=list(through))}
-        acted_through = [
-            CountRow(
-                key=label,
-                a=count,
-                line="spawned" if kinds.get(agent_id) == AgentKind.spawned.value else "delegated",
-            )
-            for agent_id, (label, count) in sorted(through.items(), key=lambda kv: -kv[1][1])
-        ]
-        by = Counter(r.refused_by or "other" for r in refused)
         return LedgerActorRead(
             actor=actor,
             name=name,
             since=since,
-            acts=len(rows),
-            writes=len(writes),
-            writes_refused=sum(1 for r in writes if r.verdict == "refused"),
-            third_party=sum(1 for r in rows if r.layer == "web"),
-            secrets=len(secrets),
-            secret_names=sorted({_name_after_layer(r.touched) for r in secrets if r.touched}),
-            refused=len(refused),
-            refused_by=dict(by),
+            acts=tiles["acts"],
+            writes=tiles["writes"],
+            writes_refused=tiles["writes_refused"],
+            third_party=tiles["third_party"],
+            secrets=tiles["secrets"],
+            secret_names=sorted({_name_after_layer(t) for t in secret_names}),
+            refused=tiles["refused"],
+            refused_by=await self.rows_qs.refused_by(session, stmt),
             graph=sorted(graph_rows.values(), key=lambda c: -(c.a + c.b + c.c)),
             web=sorted(web_rows.values(), key=lambda c: -c.a),
             llm=sorted(llm_rows.values(), key=lambda c: -c.a),
-            acted_through=acted_through,
+            acted_through=_acted_through(through, kinds),
         )
 
     # ── By record ────────────────────────────────────────────────────────────
@@ -409,22 +482,22 @@ class LedgerManager:
         stmt = self.rows_qs.scope(graph.id, self.viewer_id(member)).where(
             LedgerRow.touched.like(like_pattern(address) + "%", escape="\\"), LedgerRow.at >= start
         )
+        tiles = await self.rows_qs.counts(session, stmt, RECORD_TILES)
+        by = await self.rows_qs.refused_by(session, stmt)
+        # The table, the writers and who acted are read from the newest rows.
         rows = await self.rows_qs.rows(session, stmt)
-        writes = [r for r in rows if r.act.startswith("graph.write.")]
-        refused = [r for r in rows if r.verdict == "refused"]
         people = {link["id"] for r in rows for link in _chain(r) if link["kind"] == "person" and link["id"]}
         agents = {link["id"] for r in rows for link in _chain(r) if link["kind"] == "agent" and link["id"]}
-        writers = Counter(_who(r) for r in writes if r.verdict == "allowed")
-        by = Counter(r.refused_by or "other" for r in refused)
+        writers = Counter(_who(r) for r in rows if r.act.startswith("graph.write.") and r.verdict == "allowed")
         return LedgerRecordRead(
             address=address,
             since=since,
-            acts=len(rows),
-            reads=sum(1 for r in rows if r.act.startswith("graph.read.")),
-            writes=len(writes),
-            writes_line=", ".join(f"{who} x{n}" for who, n in writers.most_common(3)),
-            refused=len(refused),
-            refused_line=" · ".join(f"{key} {n}" for key, n in by.most_common()),
+            acts=tiles["acts"],
+            reads=tiles["reads"],
+            writes=tiles["writes"],
+            writes_line=", ".join(f"{who} {TIMES}{n}" for who, n in writers.most_common(3)),
+            refused=tiles["refused"],
+            refused_line=" · ".join(f"{key} {n}" for key, n in sorted(by.items(), key=lambda kv: -kv[1])),
             people=len(people),
             agents=len(agents),
             rows=[_read(r) for r in rows[:50]],
@@ -466,41 +539,46 @@ class LedgerManager:
         first = today - timedelta(days=29)
         scope = self.rows_qs.scope(graph.id, self.viewer_id(member))
         acts_today = await self.rows_qs.count(session, scope.where(LedgerRow.at >= today))
-        rows = await self.rows_qs.rows(session, scope.where(LedgerRow.verdict == "refused", LedgerRow.at >= first))
-        todays = [r for r in rows if r.at >= today]
-        by_today = Counter(r.refused_by or "other" for r in todays)
-        per_day = Counter(r.at.astimezone(UTC).date() for r in rows)
-        days = [(first + timedelta(days=i)).date() for i in range(30)]
-        by_day = [RefusedDay(day=day, refused=per_day.get(day, 0)) for day in days]
-        functions: dict[str, list] = {}
+        refused = scope.where(LedgerRow.verdict == "refused", LedgerRow.at >= first)
+        by_today = await self.rows_qs.refused_by(session, refused.where(LedgerRow.at >= today))
+        refused_today = sum(by_today.values())
+        days = [first + timedelta(days=i) for i in range(30)]
+        per_day = await self.rows_qs.per_day(session, refused, days)
+        by_day = [RefusedDay(day=day.date(), refused=n) for day, n in zip(days, per_day, strict=True)]
+        # Every count is the engine's over all refusals; the lines are read from the newest.
+        rows = await self.rows_qs.rows(session, refused)
+        rule_of: dict[str, Counter] = defaultdict(Counter)
         groups: dict[tuple[str, str], list[LedgerRow]] = defaultdict(list)
         for row in rows:
-            entry = functions.setdefault(row.act, [0, Counter()])
-            entry[0] += 1
-            entry[1][row.rule or row.refused_by or ""] += 1
+            rule_of[row.act][row.rule or row.refused_by or ""] += 1
             groups[(row.refused_by or "other", row.rule)].append(row)
         top_functions = [
-            CountRow(key=act, a=n, line=rules.most_common(1)[0][0] if rules else "")
-            for act, (n, rules) in sorted(functions.items(), key=lambda kv: -kv[1][0])[:10]
+            CountRow(key=act, a=n, line=rule_of[act].most_common(1)[0][0] if rule_of[act] else "")
+            for act, n, _ in (await self.rows_qs.grouped(session, refused, LedgerRow.act))[:10]
         ]
         by_rule = []
-        for (refused_by, rule), members in sorted(groups.items(), key=lambda kv: -len(kv[1])):
-            what, n = Counter(r.touched or r.act for r in members).most_common(1)[0]
+        for refused_by, rule, n, n_today in await self.rows_qs.grouped(
+            session, refused, LedgerRow.refused_by, LedgerRow.rule, since=today
+        ):
+            reason = refused_by or "other"
+            members = groups.get((reason, rule), [])
+            what, seen = Counter(r.touched or r.act for r in members).most_common(1)[0] if members else ("", 0)
             who = list(dict.fromkeys(_who(r) for r in members))[:3]
             by_rule.append(
                 RefusalRule(
-                    rule=rule or f"refused by {refused_by}",
-                    refused_by=refused_by,
-                    today=sum(1 for r in members if r.at >= today),
-                    what=f"{what} x{n}",
+                    rule=rule or f"refused by {reason}",
+                    refused_by=reason,
+                    refused=n,
+                    today=n_today,
+                    what=f"{what} {TIMES}{seen}" if what else "",
                     who=", ".join(who),
-                    the_rule=rule,
+                    the_rule=bound_words(reason, rule, what),
                 )
             )
         return LedgerRefusalsRead(
-            refused_today=len(todays),
+            refused_today=refused_today,
             acts_today=acts_today,
-            share_pct=round(len(todays) / acts_today * 100, 1) if acts_today else None,
+            share_pct=round(refused_today / acts_today * 100, 1) if acts_today else None,
             by_grant=by_today.get("grant", 0),
             by_lens=by_today.get("lens", 0),
             by_ceiling=by_today.get("ceiling", 0),
@@ -587,11 +665,13 @@ class LedgerManager:
             values["refused_by"] = row.refused_by
             yield json.dumps(values, ensure_ascii=False) + "\n"
 
-    async def exports(self, session: AsyncSession, *, graph: Graph) -> list[LedgerExportRead]:
-        """The Graph's exports, newest first."""
-        rows = await self.rows_qs.exports(session, graph_id=graph.id)
+    async def exports(
+        self, session: AsyncSession, *, graph: Graph, params: ListParams, applied: list[AppliedFilter]
+    ) -> Page[LedgerExportRead]:
+        """One page of the Graph's exports, newest first."""
+        rows, info = await self.rows_qs.exports(session, graph_id=graph.id, params=params)
         names = await self.rows_qs.usernames(session, sorted({r.requested_by_id for r in rows if r.requested_by_id}))
-        return [
+        items = [
             LedgerExportRead(
                 id=r.id,
                 requested_by_name=names.get(r.requested_by_id) if r.requested_by_id else None,
@@ -602,6 +682,7 @@ class LedgerManager:
             )
             for r in rows
         ]
+        return Page[LedgerExportRead].of(items, info, applied)
 
     # ── Integrity ────────────────────────────────────────────────────────────
 

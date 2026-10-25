@@ -57,7 +57,8 @@ flowchart TD
 | Nothing waiting | *Nothing waits on you* in Approvals › Waiting |
 | No alert rules | *No alert rules yet* with *New alert* |
 | A member who is not an approver | The approval reads, with its approvers; *Approve* is disabled naming them |
-| Decided twice | 409 — the second click names who decided first |
+| A member without `settings` on Alert rules | The rules read; a notice names the role and who holds it; *New alert* and each `Switch` are disabled with that reason, and a row does not open |
+| Decided twice | 409 — the second click names who decided first and when: *Already approved by ravi at 10:02 UTC on Oct 25* |
 | The deadline passes during review | The decision is refused (409, `expired`); the row reads *expired, not sent* |
 | An approver leaves the Graph | Still listed; the others may decide. With none left it expires at its deadline |
 | The engine was down at the deadline | Expired on recovery, with the deadline as the time it lapsed — never approved late |
@@ -78,7 +79,8 @@ flowchart TD
 | `approvals` | `graph_id` · `subject_kind (delivery · step · model_publish · access · budget · delegation · question)` · `subject_id` · `run_id` · `schedule_id` · `title` · `payload` · `approver_ids[]` · `requested_by_id` · `deadline_at` · `reminded_at` · `status (pending · approved · declined · expired)` · `decided_by_id` · `decided_at` · `note` |
 | `approvals` (added) | `kind` · `asked_by` (the actor chain, `[{kind, id, name}]`) · `wants` (one line) · `routed_reason` (`world owner` · `agent owner` · `started the run` · `wrote the Todo` · `install admin`) · `step_run_id` |
 | `alert_rules` | `graph_id` · `name` · `enabled` · `match {act, touched, verdict[], refused_by[], threshold {count, window_s}}` · `notify_user_ids[]` · `notify_line` · `last_fired_at` · `created_by_id` |
-| Routes | `GET …/approvals` (`?f.view=for_you·all·answered` · `?f.kind=` · `?status=`) · `GET …/approvals/{id}` · `POST …/approvals/{id}/approve` (`{note, scope: run·always}`) · `POST …/approvals/{id}/decline` (tag `approvals`) · `GET · POST …/alert-rules` · `PATCH · DELETE …/alert-rules/{id}` |
+| Routes | `GET …/approvals` (`?f.view=for_you·all·answered` · `?f.kind=` · `?status=`) · `GET …/approvals/{id}` · `POST …/approvals/{id}/approve` (`{note, scope: run·always}`) · `POST …/approvals/{id}/decline` (tag `approvals`) · `GET …/alert-rules` (`Page[AlertRuleRead]` on the list contract, by name; `?q=` · `?enabled=`) · `POST …/alert-rules` · `PATCH · DELETE …/alert-rules/{id}` |
+| Decided twice | `409` with `detail {error: already_decided, message, status, decided_by, decided_at}` — `decided_by` a username, `message` the sentence shown |
 | Events | `approval.request · approve · decline · expire · remind` |
 | CLI | `invana approvals list · approve · decline` |
 
@@ -100,6 +102,8 @@ flowchart TD
 | AP12 | **Alert rules match ledger rows** — an act pattern (`graph.write.*`), a touched pattern (`graph/Fare`), verdicts and refusal reasons, optionally a threshold (`count` in `window_s`). The clock evaluates them over new ledger rows; a match notifies each named member in the inbox and records `last_fired_at`. A rule change is itself a ledger row. |
 | AP13 | **`For you` is what the reader may decide**; `All` is every pending ask in the Graph the reader can see; `Answered` is the decided and expired ones, newest first. The counts on the tabs are the engine's. |
 | AP14 | **An ask ends with its run.** When a run ends — served, failed, stopped or any exit — every read leaves its pending asks out at once, and the clock closes them `expired` on its next tick; what they held is not sent. A delivery or a publish review — asked after its run ended on purpose — keeps its own deadline |
+| AP15 | **A rule sees only what happens after it exists.** A new rule starts at the Graph's ledger head, so a matching row written before it never fires it, and *Last fired* reads `never` until a new row matches |
+| AP16 | **Writing an alert rule is the `settings` area.** A member without it reads the rules, and every write control is disabled naming the role and who holds it — never a control that answers 403 |
 
 ## Not building
 

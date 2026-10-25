@@ -198,13 +198,15 @@ function AgentsOverTime({
 }) {
 	if (!bars.length)
 		return <p className="text-muted-foreground">No agent has started yet.</p>;
+	// A live clock: an agent still going ends its bar at now, open-ended.
+	const now = new Date().toISOString();
 	const rows: GanttRow[] = bars.map((bar) => ({
 		key: bar.run_id,
 		// An agent's name is a name, not an identifier: the UI face, not the
 		// chart's mono.
 		label: <span className="font-sans">{bar.agent_name}</span>,
 		startedAt: bar.started_at ?? undefined,
-		finishedAt: bar.finished_at ?? undefined,
+		finishedAt: bar.finished_at ?? (live && bar.started_at ? now : undefined),
 		status: barStatus(bar),
 		duration: bar.state_line,
 	}));

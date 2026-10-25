@@ -11,22 +11,24 @@ from fastapi import Depends, Path, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.managers.alerts import AlertRuleManager
-from invana.activity.schemas import AlertRuleCreate, AlertRuleRead, AlertRuleUpdate
+from invana.activity.schemas import ALERT_RULE_LIST, AlertRuleCreate, AlertRuleRead, AlertRuleUpdate
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.lists import ListParams, Page, applied_filters, list_params
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 _rules = AlertRuleManager()
 
 
 async def list_rules(
+    params: ListParams = Depends(list_params(ALERT_RULE_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> list[AlertRuleRead]:
-    return await _rules.list(session, graph=graph)
+) -> Page[AlertRuleRead]:
+    return await _rules.page(session, graph=graph, params=params, applied=applied_filters(params, ALERT_RULE_LIST))
 
 
 async def create_rule(

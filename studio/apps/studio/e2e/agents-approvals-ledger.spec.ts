@@ -22,10 +22,11 @@ interface Rule {
 }
 
 async function dropRules(page: Page, prefix: string) {
-	const rules = await graphApi<Rule[]>(page, "/alert-rules").catch(
-		() => [] as Rule[],
-	);
-	for (const r of rules.filter((x) => x.name.startsWith(prefix)))
+	const rules = await graphApi<{ items: Rule[] }>(
+		page,
+		"/alert-rules?limit=200",
+	).catch(() => ({ items: [] as Rule[] }));
+	for (const r of rules.items.filter((x) => x.name.startsWith(prefix)))
 		await graphApi(page, `/alert-rules/${r.id}`, { method: "DELETE" }).catch(
 			() => {},
 		);

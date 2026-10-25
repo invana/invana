@@ -4,7 +4,8 @@
  * keeps and how it proves it was not edited.
  *
  * The rows are the URL's `f.*` filters — the same ones the Rows tab writes —
- * and the count on the button is the engine's total for them. Zero rows turns
+ * and the count on the button is the engine's total for them. Like Rows, the
+ * window is today until one is chosen; *any time* drops it. Zero rows turns
  * *Export* off. The file is fetched signed in and saved by the browser; the
  * engine records the export, and the list reads it again.
  */
@@ -76,7 +77,13 @@ export function LedgerExportTab({
 	const list = useListParams();
 	const qc = useQueryClient();
 	const [format, setFormat] = useState<Format>("csv");
-	const filters = { q: list.query.q, filters: list.query.filters };
+	// Today until a window is chosen, as on Rows; *any time* drops the window.
+	const since = filterValue(list, "since") || "today";
+	const { since: _chosen, ...rest } = list.query.filters ?? {};
+	const filters = {
+		q: list.query.q,
+		filters: since === "all" ? rest : { ...rest, since: [since] },
+	};
 	// One row is enough: the page's total is the count the export will hold.
 	const matching = useLedgerRowsQuery(username, graphSlug, {
 		...filters,
@@ -105,9 +112,12 @@ export function LedgerExportTab({
 							<FilterBar seamless>
 								<FilterSelect
 									label="When:"
-									any="any time"
+									any="today"
 									value={filterValue(list, "since")}
-									options={SINCE_OPTIONS}
+									options={[
+										...SINCE_OPTIONS,
+										{ value: "all", label: "any time" },
+									]}
 									onChange={(v) => setOne(list, "since", v)}
 								/>
 								<FilterSelect
@@ -147,7 +157,7 @@ export function LedgerExportTab({
 					</div>
 				</PanelSection>
 				<PanelSection card title="Exports">
-					{!exports.data?.length ? (
+					{!exports.data?.items.length ? (
 						<p className="py-2 text-muted-foreground">No export yet</p>
 					) : (
 						<Table density="compact">
@@ -160,7 +170,7 @@ export function LedgerExportTab({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{exports.data.map((e) => (
+								{exports.data.items.map((e) => (
 									<TableRow key={e.id}>
 										<TableCell className="whitespace-nowrap">
 											{formatShortDateTime(new Date(e.created_at))}

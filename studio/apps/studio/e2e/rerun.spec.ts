@@ -40,11 +40,9 @@ test("a settled run reruns on the same versions and links back", async ({
 	await rerun.click();
 
 	const dialog = page.getByRole("dialog");
-	await dialog
-		.getByRole("radio", { name: "The same versions — reproduce it" })
-		.click();
+	await dialog.getByRole("radio", { name: /^The same versions/ }).click();
 	await expect(
-		dialog.getByRole("radio", { name: "Current versions — compare" }),
+		dialog.getByRole("radio", { name: /^Current versions/ }),
 	).toBeVisible();
 	await dialog.getByRole("button", { name: "Rerun", exact: true }).click();
 

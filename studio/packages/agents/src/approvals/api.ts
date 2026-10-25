@@ -3,7 +3,7 @@
  * shell's `approvalsApi`, shared with the bell's tray.
  */
 
-import { request } from "@invana-studio/core";
+import { type Page, request } from "@invana-studio/core";
 import type { AlertRule, AlertRuleCreate, AlertRuleUpdate } from "./types";
 
 const base = (username: string, graphSlug: string) =>
@@ -12,8 +12,9 @@ const base = (username: string, graphSlug: string) =>
 const json = (body: unknown) => ({ body: JSON.stringify(body) });
 
 export const alertRulesApi = {
+	/** The Graph's rules on the list contract, by name. */
 	list: (username: string, graphSlug: string) =>
-		request<AlertRule[]>(base(username, graphSlug)),
+		request<Page<AlertRule>>(`${base(username, graphSlug)}?limit=200`),
 
 	create: (username: string, graphSlug: string, data: AlertRuleCreate) =>
 		request<AlertRule>(base(username, graphSlug), {

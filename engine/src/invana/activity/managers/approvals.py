@@ -212,7 +212,7 @@ class ApprovalManager:
             names = (await Members.of(session, graph_id=graph.id)).usernames(row.approver_ids)
             raise PermissionDeniedError(f"Only its approvers may decide: {', '.join(names) or 'none left'}.")
         if row.status != ApprovalStatus.pending.value:
-            raise ConflictError(f"Already {row.status}.")
+            raise ConflictError(await self._already_decided(session, row))
         if now >= row.deadline_at:
             raise ConflictError("The deadline has passed; it expires, not sent.")
         row.status = (ApprovalStatus.approved if approve else ApprovalStatus.declined).value
@@ -235,6 +235,29 @@ class ApprovalManager:
             scope=row.scope,
         )
         return row
+
+    async def _already_decided(self, session: AsyncSession, row: Approval) -> dict:
+        """The 409 body for a second decision: who decided first, and when.
+
+        ``message`` is the sentence a person reads; ``decided_by`` is a
+        username (``None`` for an expired ask nobody decided).
+        """
+        names = await self.waiting_qs.usernames(session, [row.decided_by_id] if row.decided_by_id else [])
+        by = names.get(row.decided_by_id or "")
+        at = row.decided_at
+        message = f"Already {row.status}"
+        if by:
+            message += f" by {by}"
+        if at is not None:
+            utc = at.astimezone(UTC)
+            message += f" at {utc:%H:%M} UTC on {utc:%b} {utc.day}"
+        return {
+            "error": "already_decided",
+            "message": message + ".",
+            "status": row.status,
+            "decided_by": by,
+            "decided_at": at.isoformat() if at is not None else None,
+        }
 
     async def _allow_always(self, session: AsyncSession, *, graph: Graph, row: Approval) -> None:
         """Write ``always`` for the target into the asking agent's ``policy.may_delegate``."""

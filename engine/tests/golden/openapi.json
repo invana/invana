@@ -16677,6 +16677,50 @@
         "title": "OverviewTiles",
         "type": "object"
       },
+      "Page_AlertRuleRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AlertRuleRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[AlertRuleRead]",
+        "type": "object"
+      },
       "Page_CatalogueEntryRead_": {
         "properties": {
           "applied": {
@@ -16851,6 +16895,50 @@
           "unfiltered_total"
         ],
         "title": "Page[LLMProviderRead]",
+        "type": "object"
+      },
+      "Page_LedgerExportRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerExportRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[LedgerExportRead]",
         "type": "object"
       },
       "Page_MemberRead_": {
@@ -20202,7 +20290,13 @@
         "type": "object"
       },
       "RefusalRule": {
+        "description": "Refusals over 30 days that one rule held, grouped by reason and stored rule.",
         "properties": {
+          "refused": {
+            "default": 0,
+            "title": "Refused",
+            "type": "integer"
+          },
           "refused_by": {
             "title": "Refused By",
             "type": "string"
@@ -21688,6 +21782,17 @@
             ],
             "title": "Agent Name"
           },
+          "agent_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Version"
+          },
           "body": {
             "anyOf": [
               {
@@ -21757,6 +21862,17 @@
               }
             ],
             "title": "Max Tokens Run"
+          },
+          "model_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Version"
           },
           "number": {
             "anyOf": [
@@ -37244,11 +37360,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/AlertRuleRead"
-                  },
-                  "title": "Response List Rules Api V1 U  Username   Graphslug  Alert Rules Get",
-                  "type": "array"
+                  "$ref": "#/components/schemas/Page_AlertRuleRead_"
                 }
               }
             },
@@ -44098,11 +44210,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/LedgerExportRead"
-                  },
-                  "title": "Response List Exports Api V1 U  Username   Graphslug  Ledger Exports Get",
-                  "type": "array"
+                  "$ref": "#/components/schemas/Page_LedgerExportRead_"
                 }
               }
             },

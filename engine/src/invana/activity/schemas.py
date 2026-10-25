@@ -446,6 +446,14 @@ class AlertRuleRead(BaseModel):
     created_at: datetime
 
 
+#: What the alert rules list takes. ``q`` matches the name; ``enabled=false`` is a paused rule.
+ALERT_RULE_LIST = ListSpec(
+    filters={"enabled": Filter(values=("true", "false"), labels={"true": "on", "false": "off"})},
+    sorts=("name",),
+    search_title="name",
+)
+
+
 class AlertRuleCreate(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     enabled: bool = True

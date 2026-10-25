@@ -9,8 +9,8 @@
  *
  * - **The head**: `Runs › Run #N · <root agent>`, its status (the exit reason
  *   once it ended), what started it, `N of M tokens` with a meter, and
- *   Compare · Rerun · Stop run. Rerun is offered once the run has ended; Stop
- *   run is absent once it has.
+ *   Compare (on a rerun) · Rerun · Stop run — one row. Rerun is offered once
+ *   the run has ended; Stop run is absent once it has.
  * - **The tabs** (`&tab=`): Overview · Agents · Stages · Assets · Data touched
  *   · Ledger. They never change with size; past 50 agents the Overview reads
  *   the large run and Agents offers *By role* (`&view=role`).
@@ -214,9 +214,34 @@ export function RunPage({
 						`Run ${name}${head.agent_name ? ` · ${head.agent_name}` : ""}`,
 					]}
 					chips={
-						<DetailStatus tone={statusTone(head.status, head.exit_reason)}>
-							{statusWord(head.status, head.exit_reason)}
-						</DetailStatus>
+						<>
+							<DetailStatus tone={statusTone(head.status, head.exit_reason)}>
+								{statusWord(head.status, head.exit_reason)}
+							</DetailStatus>
+							{started ? (
+								// The origin rides the head's one row; a long ask truncates.
+								<span
+									className="max-w-96 truncate text-sm text-muted-foreground"
+									title={started}
+								>
+									{started}
+								</span>
+							) : null}
+							{head.session_id ? (
+								<Button
+									size="sm"
+									variant="link"
+									className="shrink-0"
+									onClick={() =>
+										navigate(
+											`/u/${username}/${graphSlug}/explorer/${encodeURIComponent(head.session_id as string)}`,
+										)
+									}
+								>
+									Open the session
+								</Button>
+							) : null}
+						</>
 					}
 					actions={
 						<>
@@ -273,27 +298,6 @@ export function RunPage({
 						</>
 					}
 				/>
-				{started || head.session_id ? (
-					<p className="flex min-w-0 items-center gap-2 px-4 py-1 text-sm text-muted-foreground">
-						<span className="min-w-0 truncate" title={started}>
-							{started}
-						</span>
-						{head.session_id ? (
-							<Button
-								size="sm"
-								variant="link"
-								className="shrink-0"
-								onClick={() =>
-									navigate(
-										`/u/${username}/${graphSlug}/explorer/${encodeURIComponent(head.session_id as string)}`,
-									)
-								}
-							>
-								Open the session
-							</Button>
-						) : null}
-					</p>
-				) : null}
 			</div>
 			<TabbedPanel
 				className="min-h-0 flex-1 border-0 bg-transparent shadow-none"

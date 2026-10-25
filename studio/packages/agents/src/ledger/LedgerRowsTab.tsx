@@ -4,14 +4,15 @@
  * the engine's counts, and {@link LedgerRowsTable} under them.
  *
  * The tiles read `/ledger/stats` for the Rows window (`f.since`, else today);
- * a preset chip writes `?f.preset=` and the engine narrows the rows.
+ * a preset is a toggle — one on at a time — that writes `?f.preset=`, and the
+ * engine narrows the rows.
  *
  * The tiles and chips count rows across the whole Graph, so only an owner —
  * the one reader the engine shows every row — sees them. A member's tab is the
  * banner, the filters and the table.
  */
 
-import { Button, FilterChip, MetricGrid, MetricTile } from "@invana/ui";
+import { Button, MetricGrid, MetricTile, Toggle } from "@invana/ui";
 import { useListParams } from "@invana-studio/core";
 import { useAccess } from "@invana-studio/shell";
 import { filterValue, setOne } from "../lists";
@@ -90,16 +91,17 @@ export function LedgerRowsTab({
 					{stats.presets.length > 0 && (
 						<div className="flex flex-wrap gap-1.5">
 							{stats.presets.map((p) => (
-								<FilterChip
+								<Toggle
 									key={p.key}
-									label={p.label}
-									value={n(p.count)}
-									active={preset === p.key}
-									aria-pressed={preset === p.key}
-									onClick={() =>
-										setOne(list, "preset", preset === p.key ? "" : p.key)
+									variant="outline"
+									size="sm"
+									pressed={preset === p.key}
+									onPressedChange={(on) =>
+										setOne(list, "preset", on ? p.key : "")
 									}
-								/>
+								>
+									{p.label} · {n(p.count)}
+								</Toggle>
 							))}
 						</div>
 					)}

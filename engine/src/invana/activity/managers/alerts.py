@@ -39,6 +39,7 @@ from invana.core.events.actions import (
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
 from invana.core.ledger.models import LedgerRow
+from invana.core.lists import AppliedFilter, ListParams, Page
 
 
 def _pattern_matches(pattern: str, value: str) -> bool:
@@ -81,9 +82,12 @@ class AlertRuleManager:
     rules_qs = AlertRuleQuerySet()
     inbox = InboxManager()
 
-    async def list(self, session: AsyncSession, *, graph: Graph) -> list[AlertRuleRead]:
-        rows = await self.rules_qs.list_for_graph(session, graph_id=graph.id)
-        return await self.reads(session, graph_id=graph.id, rows=rows)
+    async def page(
+        self, session: AsyncSession, *, graph: Graph, params: ListParams, applied: list[AppliedFilter]
+    ) -> Page[AlertRuleRead]:
+        """One page of the Graph's rules, by name, each read in words."""
+        rows, info = await self.rules_qs.page(session, graph_id=graph.id, params=params)
+        return Page[AlertRuleRead].of(await self.reads(session, graph_id=graph.id, rows=list(rows)), info, applied)
 
     async def get(self, session: AsyncSession, *, graph: Graph, rule_id: str) -> AlertRule:
         row = await self.rules_qs.get(session, graph_id=graph.id, rule_id=rule_id)

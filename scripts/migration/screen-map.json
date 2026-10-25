@@ -1689,8 +1689,8 @@
   "agents.run.step": {
    "story": "AF-08",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=stages&right=assistant",
-   "state": "the uuid stands for the seeded run tree of eight agents (scripts/agents-build/seed_f05.py prints it); Stages tab, click the first stage"
+   "route": "/u/admin/airways/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=stages&step=0cc8ca93-2465-4d5e-ae29-d718b1e4c649&right=assistant",
+   "state": "the uuid stands for the seeded run tree of eight agents (scripts/agents-build/seed_f05.py prints it); Stages tab, the first stage's step open (the step uuid is its graph read)"
   },
   "agents.run.assets": {
    "story": "AF-08",
@@ -1779,8 +1779,8 @@
   "agents.run.ask": {
    "story": "AF-16",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/runs?page=run%3A11970a9e-3208-435f-abe6-20d0d1f11c5d&tab=stages&right=assistant",
-   "state": "the uuid stands for an Explorer answer's run (a served run with a session); Stages tab, click a stage"
+   "route": "/u/admin/airways/agents/runs?page=run%3A11970a9e-3208-435f-abe6-20d0d1f11c5d&tab=stages&step=91f6507f-28d8-478b-9b4d-16996d7d6d93&right=assistant",
+   "state": "the uuid stands for an Explorer answer's run (a served run with a session); Stages tab, its graph read's step open"
   },
   "agents.connections.mcp": {
    "story": "AF-17",
@@ -1881,8 +1881,8 @@
   "agents.runs.filtered": {
    "story": "AF-26",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/runs?f.agent_id=757e8fc1-53a5-46a4-9a9b-36f6f24065ae&f.status=failed&f.since=30d&via=assistant&right=assistant",
-   "state": "Route Auditor's failed runs this month, as the assistant links them \u2014 the uuid stands for Route Auditor (seed_f05.py)"
+   "route": "/u/admin/airways/agents/runs?f.agent_id=757e8fc1-53a5-46a4-9a9b-36f6f24065ae&f.exit_reason=not_served&f.since=30d&via=assistant&right=assistant",
+   "state": "Route Auditor's runs this month that were not served, as the assistant links them \u2014 the uuid stands for Route Auditor (seed_f05.py)"
   },
   "agents.agents.filtered": {
    "story": "AF-26",

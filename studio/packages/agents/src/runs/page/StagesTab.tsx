@@ -61,7 +61,8 @@ function stageSub(s: RunStage): string {
 		.join(" · ");
 }
 
-const STAGE_CARDS = { view: "Stages" } as const;
+/** One row, left to right in plan order. */
+const STAGE_CARDS = { view: "Stages", direction: "RIGHT" } as const;
 
 export function StagesTab({
 	username,

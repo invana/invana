@@ -129,11 +129,16 @@ export interface LedgerRefusals {
 	/** function · refused; `line` is the rule. */
 	top_functions: CountRow[];
 	by_rule: {
+		/** The rule as the row stored it. */
 		rule: string;
+		/** The reason — the badge: `grant` · `lens` · `world` · `ceiling` · `robots` · `policy`. */
 		refused_by: string;
+		/** Over the 30 days. */
+		refused: number;
 		today: number;
 		what: string;
 		who: string;
+		/** The bound in words — `robots.txt disallows /fares`. */
 		the_rule: string;
 	}[];
 }

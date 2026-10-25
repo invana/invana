@@ -309,6 +309,10 @@ class RunHead(BaseModel):
     tokens: int | None = None
     #: The run's token ceiling; ``None`` when it has none.
     max_tokens_run: int | None = None
+    #: The agent version the run pinned; ``None`` when it was not recorded.
+    agent_version: int | None = None
+    #: The model version the run pinned; ``None`` when it was not recorded.
+    model_version: str | None = None
     started_at: datetime | None = None
     finished_at: datetime | None = None
     duration_ms: int | None = None

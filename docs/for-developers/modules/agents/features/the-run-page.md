@@ -21,7 +21,7 @@ be rerun as it was, on today's versions, or retuned.
 |---|---|---|
 | C1 | One runs list | Agents › Runs: every root run, newest first. Tiles Live · Waiting on you · Served 24 h · Not served 24 h · Tokens 24 h. `All · Live · Waiting · Ended`, Agent · Started by · From selects; the applied-filters strip |
 | C2 | A run row | `#number` · root agent · asked · From (Explorer · Todo · Schedule · Project · API) · started by · size (agents) · tokens · time · status (the exit reason once ended) |
-| C3 | The run page head | `Runs › Run #N · <root agent>`, status, *what started it* (`Todo by ravi · "…"`, `asked in Explorer by meera · session "…" · Open the session`), `N of M tokens` with a meter, Compare · Rerun · Stop run |
+| C3 | The run page head | `Runs › Run #N · <root agent>`, status, *what started it* (`Todo by ravi · "…"`, `asked in Explorer by meera · session "…" · Open the session`), `N of M tokens` with a meter, Compare (on a rerun) · Rerun · Stop run — all on one row |
 | C4 | Overview | Tiles Elapsed · Tokens · Agents · Steps · Assets · Records touched; *Agents over time* — a bar per agent with its state in words; *Steps a minute*; *Waiting on you* |
 | C5 | Overview of a large run | More than 50 agents: tiles Agents · Live · Queued · Finishing a minute · Tokens · ETA; *Agents finished a minute*; *Agents live* against the live limit; *By role* |
 | C6 | Agents | Who spawned whom on a canvas: the Todo or session, the root agent, every helper with its state and `tokens/escrow`; a pending delegation ask drawn dashed. Views: **Tree** · **By role** (one card per role with a status bar, and one cell per agent) |
@@ -112,14 +112,14 @@ flowchart TD
 | RP7 | **One page at any size.** The tabs never change with size; past 50 agents the Overview swaps to the large-run reading and Agents offers *By role*. |
 | RP8 | **Every number on the page is the engine's.** Tiles, bars, per-minute counts, ETA and per-role p50/p95 come from the run's read endpoints; Studio formats them. |
 | RP9 | **The ETA is a rate, not a forecast model.** Agents still to finish divided by the last ten minutes' finishing rate; absent when nothing finished in that window. |
-| RP10 | **Stages are the plan's functions in order, each stage the steps of one step key.** Counts on an edge are the stage's `out_count`, the rows or items its steps returned. |
+| RP10 | **Stages are the plan's functions in order, each stage the steps of one step key.** Counts on an edge are the stage's `out_count`, the rows or items its steps returned. The stages read as one row left to right; a long plan pans rather than wrapping. |
 | RP11 | **A step opens under the stage canvas, inside the run** — Overview (tiles · Input · Output) · Touched · Log, the components [see-what-ran](../../operate/features/see-what-ran.md) already draws. A fanned-out stage opens on its first lane with *All lanes* beside it. |
-| RP12 | **Rerun is one dialog wherever a run is read.** Same versions reproduces it; current versions compares; retune changes agent version, model version, run budget or world. A rerun opens its own page; the comparison is the Compare act. |
+| RP12 | **Rerun is one dialog wherever a run is read.** Same versions reproduces it and shows the agent and model versions the run pinned (*not recorded* when it pinned none); current versions compares; retune changes agent version, model version, run budget or world. A rerun opens its own page; the comparison is the Compare act. |
 | RP13 | **Stop run is the one write on the run page.** It cancels the root; children end `parent ended`, the root `stopped`, and both are ledger rows. |
 | RP14 | **Waiting on you lists the run's pending asks** routed to the reader; each opens Approvals › Waiting. |
 | RP15 | **A run's workbook tab is titled `Run #N`**, with the run icon; the uuid stands in only until the number is read. The assistant's pill reads the same title |
 | RP16 | **The Agents Tree and the Stages canvas draw cards**, not circles: an agent card carries its state line and its tokens against its escrow; a stage card carries its function, calls, lanes and time. Both canvases carry the board's view chip and its zoom · fit · lock controls. An agent card prints its tokens against its escrow as text — a canvas card has no meter element — and neither canvas draws a minimap |
-| RP17 | **A number the engine has not recorded is absent, never 0** — a run with no token count shows `—` in its head; an LLM row with no model version reads *not recorded* as muted text |
+| RP17 | **A number the engine has not recorded is absent, never 0** — a run with no token count shows `—` in its head, and a role whose agents recorded no tokens shows `—` for its p50 and p95, unrecorded spend left out of the percentile; an LLM row with no model version reads *not recorded* as muted text |
 | RP18 | **An ended run holds no asks.** When a run ends, each of its pending asks is closed `expired` and leaves Waiting on you and Approvals › Waiting |
 | RP19 | **A link to a step opens its run on Stages with that step under the canvas**; a link that names a tab keeps it |
 

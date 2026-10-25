@@ -21,7 +21,7 @@ from invana.core import ledger
 from invana.core.auth.models import User
 from invana.core.errors import NotFoundError
 from invana.core.ledger.models import LedgerRow
-from invana.core.ledger.schemas import LEDGER_LIST
+from invana.core.ledger.schemas import LEDGER_EXPORT_LIST, LEDGER_LIST
 from invana.core.lists.params import parse_list_params
 from invana.runtime.models import TaskRun
 
@@ -142,6 +142,7 @@ async def test_rows_filter_and_a_member_sees_only_their_own(session, graph, owne
 
     stats = await reader.stats(session, graph=graph, member=owner, since="today")
     assert stats.acts == 5 and stats.refused == 1 and stats.refused_by == {"grant": 1}
+    assert {p.label: p.count for p in stats.presets}["Refused today"] == 1
 
 
 async def test_by_actor_keys_models_by_address_and_refusals_count_the_world(session, graph, owner, user, rows):
@@ -170,10 +171,15 @@ async def test_by_actor_keys_models_by_address_and_refusals_count_the_world(sess
 
     read = await reader.actor(session, graph=graph, member=owner, actor="agent:a-1")
     assert [(r.key, r.a, r.b) for r in read.llm] == [("anthropic/claude-x", 1, 120)]
-    assert {r.key for r in read.web} == {"ba.com", "fares.example.com"}
+    assert {r.key: r.line for r in read.web} == {"ba.com": "", "fares.example.com": "world"}
+    assert read.refused == 2 and read.refused_by == {"grant": 1, "world": 1}
 
     refusals = await reader.refusals(session, graph=graph, member=owner)
     assert (refusals.by_world, refusals.by_lens, refusals.by_grant) == (1, 0, 1)
+    held = {r.refused_by: r for r in refusals.by_rule}
+    assert held["world"].the_rule == "outside the world — web domains"
+    assert held["grant"].the_rule == "no grant for graph/Fare — no writes to Fare"
+    assert held["grant"].refused == 1 and held["grant"].rule == "no writes to Fare"
 
     earlier = datetime.now(UTC) - timedelta(days=2)
     for _ in range(7):
@@ -190,8 +196,10 @@ async def test_export_carries_hashes_and_a_tampered_row_breaks_the_chain(session
     assert name.endswith(".csv") and media == "text/csv"
     assert text.splitlines()[0].startswith("seq,at,actor_chain,act")
     assert rows["refused"].hash in text and "owner ▸ Route Auditor" in text
-    [export] = await reader.exports(session, graph=graph)
-    assert export.rows == 5 and export.format == "csv"
+    await reader.export(session, graph=graph, member=owner, params=_params(preset="refused"), fmt="jsonl")
+    page = await reader.exports(session, graph=graph, params=parse_list_params(LEDGER_EXPORT_LIST, {}), applied=[])
+    assert page.total == 2 and [e.format for e in page.items] == ["jsonl", "csv"]
+    assert page.items[1].rows == 5
 
     assert (await reader.integrity(session, graph=graph, full=True)).ok
     await session.execute(update(LedgerRow).where(LedgerRow.id == rows["shared"].id).values(touched="web/evil.com"))

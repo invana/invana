@@ -111,9 +111,19 @@ class WaitingQuerySet:
 class AlertRuleQuerySet:
     """Alert rules, and the ledger rows the clock matches them against."""
 
-    async def list_for_graph(self, session: AsyncSession, *, graph_id: str) -> list[AlertRule]:
-        stmt = select(AlertRule).where(AlertRule.graph_id == graph_id).order_by(AlertRule.name)
-        return list((await session.execute(stmt)).scalars().all())
+    async def page(
+        self, session: AsyncSession, *, graph_id: str, params: ListParams
+    ) -> tuple[Sequence[AlertRule], PageInfo]:
+        """One page of the Graph's rules, by name; ``q`` matches the name."""
+        unfiltered = select(AlertRule).where(AlertRule.graph_id == graph_id)
+        stmt = unfiltered
+        if enabled := params.one("enabled"):
+            stmt = stmt.where(AlertRule.enabled.is_(enabled == "true"))
+        if params.q:
+            stmt = stmt.where(contains(params.q, AlertRule.name))
+        return await page_of_select(
+            session, stmt, params, unfiltered=unfiltered, sorts={"name": AlertRule.name}, id_column=AlertRule.id
+        )
 
     async def get(self, session: AsyncSession, *, graph_id: str, rule_id: str) -> AlertRule | None:
         row = await session.get(AlertRule, rule_id)

@@ -16,7 +16,24 @@ from invana.core.lists import Filter, ListSpec, Page
 LEDGER_SINCE = {"today": "today", "24h": "last 24 hours", "7d": "last 7 days", "30d": "last 30 days"}
 LEDGER_VERDICTS = {"allowed": "allowed", "refused": "refused", "approval": "approval", "held": "held"}
 LEDGER_LAYERS = ("graph", "web", "llm", "secret", "agent", "run", "lens", "access", "rule")
-LEDGER_REFUSED_BY = ("grant", "lens", "ceiling", "robots", "policy")
+LEDGER_REFUSED_BY = ("grant", "lens", "world", "ceiling", "robots", "policy")
+
+#: The preset chips over the Rows table, by key; the window is added to each (``Refused today``).
+LEDGER_PRESET_CHIPS = {
+    "refused": "Refused",
+    "writes": "Writes",
+    "third_party": "Third-party reads",
+    "secrets": "Secrets used",
+    "granted": "Granted access",
+    "people": "People only",
+}
+
+
+def preset_label(key: str, since: str) -> str:
+    """A chip's words over a window — ``Refused today``, ``Writes in the last 7 days``."""
+    window = "today" if since == "today" else f"in the {LEDGER_SINCE.get(since, since)}"
+    return f"{LEDGER_PRESET_CHIPS[key]} {window}"
+
 
 #: The Rows tab. ``actor`` is ``person:<id>`` or ``agent:<id>`` and matches every
 #: row whose chain names it; ``act`` takes a ``*`` pattern; ``preset`` is one of
@@ -155,7 +172,7 @@ class LedgerActorRead(BaseModel):
     web: list[CountRow] = Field(default_factory=list)
     #: model · calls · tokens.
     llm: list[CountRow] = Field(default_factory=list)
-    #: agent · how (spawned · delegated) · acts.
+    #: agent (one row per role of spawned helpers, with how many) · acts · helpers · spawned or delegated.
     acted_through: list[CountRow] = Field(default_factory=list)
 
 
@@ -187,11 +204,18 @@ class RefusedDay(BaseModel):
 
 
 class RefusalRule(BaseModel):
+    """Refusals over 30 days that one rule held, grouped by reason and stored rule."""
+
+    #: The rule as the row stored it — a pattern or the sentence that refused.
     rule: str
+    #: The reason — ``grant`` · ``lens`` · ``world`` · ``ceiling`` · ``robots`` · ``policy``; the badge.
     refused_by: str
+    #: Over the 30 days.
+    refused: int = 0
     today: int
     what: str
     who: str
+    #: The bound in words — ``robots.txt disallows /fares``, ``no grant for graph/Fare``.
     the_rule: str
 
 
@@ -208,6 +232,13 @@ class LedgerRefusalsRead(BaseModel):
     #: function · refused · rule.
     top_functions: list[CountRow] = Field(default_factory=list)
     by_rule: list[RefusalRule] = Field(default_factory=list)
+
+
+#: The Export tab's list of past exports, newest first.
+LEDGER_EXPORT_LIST = ListSpec(
+    filters={"format": Filter(values=("csv", "jsonl"), labels={"csv": "CSV", "jsonl": "JSON Lines"})},
+    sorts=("-created_at",),
+)
 
 
 class LedgerExportRead(BaseModel):

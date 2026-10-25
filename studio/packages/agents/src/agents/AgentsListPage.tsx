@@ -186,7 +186,7 @@ export function AgentsListPage({ username, graphSlug }: SectionPageProps) {
 							}
 						/>
 					</FilterBar>
-					{page && page.ephemeral > 0 ? (
+					{page && page.ephemeral > 0 && !showEphemeral ? (
 						<span className="ml-auto text-muted-foreground">
 							{page.ephemeral} spawned helper{page.ephemeral === 1 ? "" : "s"} ·
 							see them in their runs

@@ -52,15 +52,16 @@ class AgentQuerySet:
 
         With no ``status`` filter a retired agent is left out, and with no
         ``ephemeral=shown`` a spawned helper is (docs/for-developers/modules/work/spec.md)
-        — both are still fully present in lineage and the trace.
+        — both are still fully present in lineage and the trace. With helpers
+        shown, ``unfiltered_total`` counts them too, so *N of M* is over the
+        rows the list could show.
         """
         scoped = select(Agent).where(Agent.graph_id == graph_id)
-        unfiltered = scoped.where(
-            Agent.lifetime == AgentLifetime.persistent.value, Agent.status != AgentStatus.retired.value
-        )
+        unfiltered = scoped.where(Agent.status != AgentStatus.retired.value)
         stmt = scoped
         if "shown" not in params.values("ephemeral"):
             stmt = stmt.where(Agent.lifetime == AgentLifetime.persistent.value)
+            unfiltered = unfiltered.where(Agent.lifetime == AgentLifetime.persistent.value)
         if statuses := params.values("status"):
             stmt = stmt.where(Agent.status.in_(statuses))
         else:

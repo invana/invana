@@ -20,7 +20,7 @@ by actor, by record and by refusal, and exported with its hashes.
 |---|---|---|
 | C1 | A row per act | when · actor with its chain (*ravi ▸ Route Auditor ▸ Hub Checker LHR*) · act (a function, or a person's act such as `run.stop`) · touched (`layer/name` and a volume line) · verdict (`allowed` · `refused` · `approval` · `held`) with the refusal's reason (`grant` · `lens` · `world` · `ceiling` · `robots` · `policy`) · run · where it ran |
 | C2 | Rows | Tiles Acts today (against the 7-day daily mean; no change is shown while that mean is under 10 acts a day) · People · Agents · Refused (by reason) · Waiting (approvals); preset chips (Refused today · Writes · Third-party reads · Secrets used · Granted access · People only); filters since · actor · act · touched layer · run · `All · Allowed · Refused · Approval`; the applied-filters strip; newest first, paged |
-| C3 | A row's detail | A drawer: chain of custody (who started it, each agent with how it got there, the function and plugin version, where it ran, the lens), the act (function · arguments · touched · the rule that allowed or refused it), integrity (row hash, previous hash, chain verified), the rows around it, *Open step in run #N*, *Copy link* |
+| C3 | A row's detail | A drawer inside the page: chain of custody (who started it, each agent with how it got there, the function and plugin version, where it ran, the lens), the act (function · arguments · touched · the rule that allowed or refused it), integrity (row hash, previous hash, chain verified), the rows around it, *Open step in run #N*, *Copy link* |
 | C4 | By actor | A person or agent and a window: tiles Acts · Writes · Third-party · Secrets · Refused; Graph data · Web · LLM · Acted through (the helpers it spawned or delegated to) |
 | C5 | By record | An address (`graph/Airport:LHR`, `graph/Fare`) and a window: tiles Acts · Reads · Writes · Refused · People · Agents; every act on it; who can see it now (worlds · people · agents · who can write) |
 | C6 | Refusals | Tiles Refused today (share of acts) · By grant · By lens · By world · By ceiling; refused a day over 30 days; top refused functions; by the rule that held |
@@ -60,7 +60,7 @@ flowchart TD
 | Surface | Shape |
 |---|---|
 | `agents.ledger` | `/agents/ledger` — `SectionPage` *Ledger* with `append-only` · `hash chain verified HH:MM · 365 days kept` in the head and *Export*; tabs Rows · By actor · By record · Refusals · Export; filters in the URL (`?f.since=` · `?f.actor=` · `?f.act=` · `?f.layer=` · `?f.run_id=` · `?f.verdict=`) |
-| `agents.ledger.entry` | `?row=<id>` — the row drawer over the Rows tab |
+| `agents.ledger.entry` | `?row=<id>` — the row drawer: a kit `FloatingPanel` over the right of the open workbook page (Rows, or a run's Ledger tab), inside `mainSection`; *Open step in run #N* opens the run's page on Stages with `&step=<step_run_id>` |
 | `agents.ledger.actor` | `/agents/ledger/actor?actor=agent:<id>&since=7d` |
 | `agents.ledger.record` | `/agents/ledger/record?address=graph/Airport:LHR&since=30d` |
 | `agents.ledger.refusals` | `/agents/ledger/refusals` |
@@ -82,9 +82,9 @@ flowchart TD
 | `GET …/ledger/{id}` | `LedgerRowDetail` — the row, its chain of custody, the rule, `around[]` (two before, two after in its run), `verified` |
 | `GET …/ledger/actor` | `?actor=agent:<id>|person:<id>&since=` → `LedgerActorRead` |
 | `GET …/ledger/record` | `?address=&since=` → `LedgerRecordRead` with `can_see` |
-| `GET …/ledger/refusals` | `LedgerRefusalsRead` — tiles, `by_day[30]`, `top_functions[]`, `by_rule[]` |
+| `GET …/ledger/refusals` | `LedgerRefusalsRead` — tiles, `by_day[30]`, `top_functions[]`, `by_rule[]` (`refused_by` the badge · `rule` as stored · `the_rule` the bound in words · `refused` over 30 days · `today` · `what` · `who`) |
 | `GET …/ledger/export` | `?format=csv|jsonl` + the Rows filters → the file; records a `ledger_exports` row |
-| `GET …/ledger/exports` | the Graph's exports, newest first |
+| `GET …/ledger/exports` | `Page[LedgerExportRead]` on the list contract, newest first; `?format=csv·jsonl` |
 | `GET …/ledger/integrity` | `{verified_at, ok, last_seq, broken_seq, retention_days}` |
 
 ## Decisions
@@ -106,6 +106,12 @@ flowchart TD
 | LG13 | **A `world` refusal is its own reason** — the world did not name the layer or domain — with its own Refusals tile, never folded into `lens` |
 | LG14 | **The Acts change is absent while the 7-day daily mean is under 10 acts**; a percentage over a near-empty week misleads |
 | LG15 | **Rows read today until a window is chosen.** The window filter offers Today · Last 24 hours · 7 days · 30 days · *Any time*; the tiles count today when *Any time* is chosen |
+| LG16 | **A row opens in a drawer inside the page, never as a tab or over the window.** The drawer is `?row=<id>` on the page that lists the row, a `FloatingPanel` over the right of the workbook page — the app header, the leftSection and the assistant stay uncovered. The table behind it still takes clicks, so *Around it* and another row move the drawer without closing it |
+| LG17 | **Every tile is counted in SQL over the whole window.** By actor, By record and Refusals count their tiles, per-day series and grouped counts in the database; only table rows, the lines beside them and the distinct people and agents are read from the newest 20,000 rows |
+| LG18 | **A preset chip names its window** — *Refused today*, *Writes in the last 7 days* — with the engine's count beside it; the applied-filters strip keeps the filter's own word (`showing refused`) |
+| LG19 | **A refusal names its reason and its bound apart.** The badge is `refused_by` (`robots.txt` · `grant` · `lens` · `world` · `ceiling` · `policy`); *The rule* is the bound in words — the stored sentence for a ceiling, policy or robots refusal; `no grant for graph/Fare — <pattern>`, `outside the lens — <pattern>`, `outside the world — <pattern>` for the rest |
+| LG20 | **By actor names why and groups helpers.** A Graph data or Web row's *Refused* carries its reason (`1 · lens`, or `lens 2 · grant 1`); spawned helpers of one role — the name without its parent suffix and a trailing instance code — are one *Acted through* row, `Hub Checker ×4`; a delegated agent is its own row. Counts join a name with `×` |
+| LG21 | **Export reads today until a window is chosen**, as Rows does (LG15); *any time* drops the window, so the count on *Export* is the rows the reader was looking at |
 
 ## Not building
 

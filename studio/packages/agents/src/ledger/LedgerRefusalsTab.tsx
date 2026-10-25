@@ -29,7 +29,11 @@ const REASON_TONE: Record<string, "destructive" | "warning"> = {
 	lens: "destructive",
 	world: "warning",
 	ceiling: "warning",
+	robots: "warning",
 };
+
+/** The bound's name as a reader knows it — `robots` is the site's robots.txt. */
+const BOUND_WORD: Record<string, string> = { robots: "robots.txt" };
 
 /** A round top for the day chart's scale, so its ticks read as whole numbers. */
 function scaleTop(largest: number): number {
@@ -129,14 +133,14 @@ export function LedgerRefusalsTab({
 											variant={REASON_TONE[r.refused_by] ? "soft" : "outline"}
 											tone={REASON_TONE[r.refused_by] ?? "muted"}
 										>
-											{r.rule}
+											{BOUND_WORD[r.refused_by] ?? r.refused_by}
 										</Badge>
 									</TableCell>
 									<TableCell className="font-mono">{n(r.today)}</TableCell>
 									<TableCell>{r.what}</TableCell>
 									<TableCell>{r.who}</TableCell>
 									<TableCell className="text-muted-foreground">
-										{r.the_rule}
+										{r.the_rule || r.rule}
 									</TableCell>
 								</TableRow>
 							))}

@@ -24,8 +24,11 @@ export interface AgentsOpen {
 	plan: (id: string) => void;
 	/** An answer template's page, by its id. */
 	template: (id: string) => void;
-	/** A run's page, by its root `task_runs.id`. */
-	run: (id: string) => void;
+	/**
+	 * A run's page, by its root `task_runs.id`. With a step's `task_runs.id`
+	 * the page opens on Stages with that step under the canvas.
+	 */
+	run: (id: string, stepId?: string) => void;
 	/** Another Agents section, on one of its tabs. */
 	section: (key: AgentsSectionKey, tab?: string) => void;
 }

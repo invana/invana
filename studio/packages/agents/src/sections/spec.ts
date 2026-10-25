@@ -133,7 +133,7 @@ export const SECTIONS: Record<AgentsSectionKey, SectionSpec> = {
 		label: "Approvals",
 		icon: Inbox,
 		description:
-			"Every ask waiting on a person — access, budget, delegation, sends, questions — routed to whoever owns the thing asked for",
+			"Every ask waiting on a person — access, budget, delegation, sends, questions — routed to whoever owns the thing asked for. Access granted shows in IAM",
 		tabs: [
 			{ key: "waiting", label: "Waiting" },
 			{ key: "alerts", label: "Alert rules" },

@@ -14,10 +14,11 @@ started — the rule the run routes apply.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import Select, Text, and_, cast, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.sql.elements import ColumnElement
 
 from invana.activity.models import Approval
@@ -65,6 +66,23 @@ PRESETS: dict[str, ColumnElement[bool]] = {
     "secrets": LedgerRow.layer == "secret",
     "granted": or_(act_like("access.grant*"), and_(LedgerRow.act == "approval.approve", LedgerRow.layer == "access")),
     "people": LedgerRow.actor_kind == "person",
+}
+
+
+#: The By actor tiles, counted over every row in the window.
+ACTOR_TILES: dict[str, ColumnElement[bool]] = {
+    "writes": act_like("graph.write.*"),
+    "writes_refused": and_(act_like("graph.write.*"), LedgerRow.verdict == "refused"),
+    "third_party": LedgerRow.layer == "web",
+    "secrets": LedgerRow.layer == "secret",
+    "refused": LedgerRow.verdict == "refused",
+}
+
+#: The By record tiles, counted over every row in the window.
+RECORD_TILES: dict[str, ColumnElement[bool]] = {
+    "reads": act_like("graph.read.*"),
+    "writes": act_like("graph.write.*"),
+    "refused": LedgerRow.verdict == "refused",
 }
 
 
@@ -189,6 +207,46 @@ class LedgerReadQuerySet:
         keys = ("acts", "people", "people_acts", "agents", "agent_acts", "refused", "spawned")
         return dict(zip(keys, (int(v or 0) for v in row), strict=True))
 
+    async def counts(
+        self, session: AsyncSession, stmt: Select, clauses: dict[str, ColumnElement[bool]]
+    ) -> dict[str, int]:
+        """One count per named clause over ``stmt``, in one statement; ``acts`` is every row."""
+        cols = [func.count().filter(clause) for clause in clauses.values()]
+        query = stmt.order_by(None).limit(None).with_only_columns(func.count(), *cols, maintain_column_froms=True)
+        row = (await session.execute(query)).one()
+        return dict(zip(("acts", *clauses), (int(v or 0) for v in row), strict=True))
+
+    async def grouped(
+        self, session: AsyncSession, stmt: Select, *keys: InstrumentedAttribute, since: datetime | None = None
+    ) -> list[tuple]:
+        """``(key…, count, count since)`` per distinct ``keys`` over ``stmt``, most first."""
+        n = func.count()
+        cols = [*keys, n, func.count().filter(LedgerRow.at >= since) if since is not None else n]
+        query = (
+            stmt.order_by(None)
+            .limit(None)
+            .with_only_columns(*cols, maintain_column_froms=True)
+            .group_by(*keys)
+            .order_by(n.desc(), *keys)
+        )
+        return [tuple(r) for r in (await session.execute(query)).all()]
+
+    async def per_day(self, session: AsyncSession, stmt: Select, days: list[datetime]) -> list[int]:
+        """Rows of ``stmt`` on each day starting at ``days`` (UTC midnights), in one statement."""
+        cols = [func.count().filter(LedgerRow.at >= day, LedgerRow.at < day + timedelta(days=1)) for day in days]
+        query = stmt.order_by(None).limit(None).with_only_columns(*cols, maintain_column_froms=True)
+        return [int(v or 0) for v in (await session.execute(query)).one()]
+
+    async def distinct_touched(self, session: AsyncSession, stmt: Select) -> list[str]:
+        query = (
+            stmt.order_by(None)
+            .limit(None)
+            .with_only_columns(LedgerRow.touched, maintain_column_froms=True)
+            .where(LedgerRow.touched != "")
+            .distinct()
+        )
+        return list((await session.execute(query)).scalars().all())
+
     async def refused_by(self, session: AsyncSession, stmt: Select) -> dict[str, int]:
         sub = stmt.where(LedgerRow.verdict == "refused").order_by(None).limit(None).subquery()
         result = await session.execute(
@@ -210,14 +268,22 @@ class LedgerReadQuerySet:
         await session.flush()
         return row
 
-    async def exports(self, session: AsyncSession, *, graph_id: str, limit: int = 100) -> list[LedgerExport]:
-        stmt = (
-            select(LedgerExport)
-            .where(LedgerExport.graph_id == graph_id)
-            .order_by(LedgerExport.created_at.desc(), LedgerExport.id.desc())
-            .limit(limit)
+    async def exports(
+        self, session: AsyncSession, *, graph_id: str, params: ListParams
+    ) -> tuple[Sequence[LedgerExport], PageInfo]:
+        """One page of the Graph's exports, newest first; ``format`` narrows to one file type."""
+        unfiltered = select(LedgerExport).where(LedgerExport.graph_id == graph_id)
+        stmt = unfiltered
+        if formats := params.values("format"):
+            stmt = stmt.where(LedgerExport.format.in_(formats))
+        return await page_of_select(
+            session,
+            stmt,
+            params,
+            unfiltered=unfiltered,
+            sorts={"created_at": LedgerExport.created_at},
+            id_column=LedgerExport.id,
         )
-        return list((await session.execute(stmt)).scalars().all())
 
     # ── names ────────────────────────────────────────────────────────────────
 

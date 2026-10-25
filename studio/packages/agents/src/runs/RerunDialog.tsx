@@ -5,7 +5,8 @@
  * versions, or with one thing changed — so that a different outcome has a
  * reason I can point at.*
  *
- * - *The same versions — reproduce it*: the versions the run recorded.
+ * - *The same versions — reproduce it*: the versions the run recorded, shown
+ *   as the engine pinned them (*not recorded* when it pinned none).
  * - *Current versions — compare*: today's versions, resolved when it opens.
  * - *Retune*: agent version · model version · run budget · world; anything
  *   left as it ran stays as the run recorded it.
@@ -33,6 +34,8 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
+	PropertyList,
+	PropertyRow,
 	SegmentedControl,
 } from "@invana/ui";
 import {
@@ -52,9 +55,9 @@ import type { RunHead } from "./types";
 const AS_RAN = "as-ran";
 
 const CHOICES = [
-	{ value: "same", label: "The same versions — reproduce it" },
-	{ value: "current", label: "Current versions — compare" },
-	{ value: "retune", label: "Retune" },
+	{ value: "same", label: "The same versions", sub: "reproduce it" },
+	{ value: "current", label: "Current versions", sub: "compare" },
+	{ value: "retune", label: "Retune", sub: "change one thing" },
 ];
 
 export function RerunDialog({
@@ -125,21 +128,37 @@ export function RerunDialog({
 				onOpenChange(next);
 			}}
 		>
-			<DialogContent className="sm:max-w-xl">
+			<DialogContent className="max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
 					<DialogDescription>
 						A rerun is a new run with its own number; it opens on its own page.
 					</DialogDescription>
 				</DialogHeader>
-				<div className="flex flex-col gap-3">
+				<div className="flex min-w-0 flex-col gap-3">
 					<SegmentedControl
-						size="sm"
+						stretch
 						aria-label="Versions"
 						value={versions}
 						onValueChange={(v) => setVersions(v as RerunVersions)}
 						options={CHOICES}
 					/>
+					{versions === "same" ? (
+						<PropertyList labelWidth="auto" variant="summary">
+							<PropertyRow label="Agent version">
+								{head.agent_version != null ? (
+									`${head.agent_name ?? "Agent"} v${head.agent_version}`
+								) : (
+									<span className="text-muted-foreground">not recorded</span>
+								)}
+							</PropertyRow>
+							<PropertyRow label="Model version" mono={!!head.model_version}>
+								{head.model_version ?? (
+									<span className="text-muted-foreground">not recorded</span>
+								)}
+							</PropertyRow>
+						</PropertyList>
+					) : null}
 					{versions === "retune" ? (
 						<div className="grid gap-3 sm:grid-cols-2">
 							<div className="flex flex-col gap-1.5">

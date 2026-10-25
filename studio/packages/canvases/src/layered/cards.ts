@@ -127,16 +127,8 @@ export function cardsConfig(direction: CardDirection): CanvasConfig {
 				// edge's label between two cards.
 				nodeSpacing: direction === "DOWN" ? 32 : 40,
 				layerSpacing: direction === "DOWN" ? 56 : 72,
-				// A long chain read left to right wraps onto the next line rather
-				// than shrinking every card to fit one.
-				...(direction === "RIGHT"
-					? {
-							layoutOptions: {
-								"elk.layered.wrapping.strategy": "MULTI_EDGE",
-								"elk.aspectRatio": "2.4",
-							},
-						}
-					: {}),
+				// A chain read left to right stays one row in its order; a long one
+				// pans rather than snaking back across the canvas.
 			},
 		},
 	} as unknown as CanvasConfig;

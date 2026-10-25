@@ -3,7 +3,8 @@
 
 What is worth testing: an alert rule fires on a matching ledger row and not on
 another, *For you* is what the reader may decide while *All* is every pending
-ask, and *Allow always* is refused on anything but a delegation.
+ask, *Allow always* is refused on anything but a delegation, and a second
+decision names who decided first.
 """
 
 from __future__ import annotations
@@ -17,11 +18,11 @@ from sqlalchemy import select
 from invana.activity.managers.alerts import AlertRuleManager
 from invana.activity.managers.approvals import ApprovalManager
 from invana.activity.models import Notification
-from invana.activity.schemas import APPROVAL_LIST, AlertMatch, AlertRuleCreate
+from invana.activity.schemas import ALERT_RULE_LIST, APPROVAL_LIST, AlertMatch, AlertRuleCreate
 from invana.apps.graphs.models import GraphMember
 from invana.core import ledger
 from invana.core.auth.models import User
-from invana.core.errors import ValidationError
+from invana.core.errors import ConflictError, ValidationError
 from invana.core.ledger.models import LedgerRow  # noqa: F401  (registers the ledger tables)
 from invana.core.lists.params import parse_list_params
 
@@ -56,8 +57,9 @@ async def test_an_alert_rule_fires_on_a_match_and_not_otherwise(session, graph, 
         ),
         actor_id=user.id,
     )
-    [read] = await alerts.list(session, graph=graph)
-    assert read.match_line == "graph.write.* on Fare · allowed" and read.notify_line == "bo"
+    page = await alerts.page(session, graph=graph, params=parse_list_params(ALERT_RULE_LIST, {}), applied=[])
+    [read] = page.items
+    assert page.total == 1 and read.match_line == "graph.write.* on Fare · allowed" and read.notify_line == "bo"
 
     read_row = await ledger.record(
         session,
@@ -108,5 +110,9 @@ async def test_for_you_is_what_the_reader_decides_and_always_is_for_delegation(s
     with pytest.raises(ValidationError, match="delegation only"):
         await approvals.decide(session, graph=graph, approval_id=mine.id, user=user, approve=True, scope="always")
     await approvals.decide(session, graph=graph, approval_id=mine.id, user=user, approve=True)
+    with pytest.raises(ConflictError) as twice:
+        await approvals.decide(session, graph=graph, approval_id=mine.id, user=user, approve=False)
+    assert twice.value.detail["decided_by"] == "owner" and twice.value.detail["decided_at"]
+    assert twice.value.detail["message"].startswith("Already approved by owner at ")
     answered = await approvals.page(session, graph=graph, params=view("answered"), reader=user, applied=[])
     assert [a.decided_by_name for a in answered.items] == ["owner"]

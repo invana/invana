@@ -22,6 +22,10 @@ export interface RunHead {
 	/** Absent until the engine has recorded a count. */
 	tokens: number | null;
 	max_tokens_run: number | null;
+	/** The pinned agent version; absent when it was not recorded. */
+	agent_version: number | null;
+	/** The pinned model version; absent when it was not recorded. */
+	model_version: string | null;
 	started_at: string | null;
 	finished_at: string | null;
 	duration_ms: number | null;

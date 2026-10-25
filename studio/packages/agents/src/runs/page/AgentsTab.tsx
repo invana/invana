@@ -167,8 +167,7 @@ function Tree({ data }: { data: RunAgents }) {
 			nodes.push({
 				id,
 				label: ask.agent_name,
-				sub: "asks to delegate",
-				line: ask.line,
+				sub: "asking to delegate · waiting on you",
 				column: (depthOf.get(ask.from_run_id) ?? 0) + 2,
 				tone: "warning",
 			});

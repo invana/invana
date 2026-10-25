@@ -7,8 +7,10 @@
  * a list is asked for one row, and only its counts are read. A section with no
  * such number names itself in words. A tile opens its section as a tab.
  *
- * Runs, Workers, Approvals and Ledger have no tile: they join with their
- * phases.
+ * Runs, Approvals and Ledger read the queries their rail badges and pages
+ * read — the runs live now, the asks waiting for the reader, the acts today —
+ * so a tile and its page share one cache entry. A count the reader may not
+ * read (a member's ledger tiles) falls back to the section's words.
  */
 
 import {
@@ -21,20 +23,24 @@ import {
 import { type ListQuery, useGraphQuery } from "@invana-studio/core";
 import type { ReactNode } from "react";
 import { useAgentsQuery } from "../agents/queries";
+import { useAsksQuery } from "../approvals/queries";
 import { useFleetPerformanceQuery } from "../fleet/queries";
+import { useLedgerStatsQuery } from "../ledger/queries";
 import { useLLMProvidersQuery } from "../llms/queries";
 import { useAgentsOpen } from "../open";
 import { useCatalogueQuery } from "../plans/queries";
 import { usePluginsQuery } from "../plugins/queries";
+import { useRunsTilesQuery } from "../runs/queries";
 import { type AgentsSectionKey, SECTIONS } from "../sections/spec";
 import { useSkillsQuery } from "../skills/queries";
 
 /** A list asked only for its counts. */
 const COUNT: ListQuery = { limit: 1 };
 const MCP: ListQuery = { filters: { kind: ["mcp"] }, limit: 1 };
+const FOR_YOU: ListQuery = { filters: { view: ["for_you"] }, limit: 1 };
 
 const plural = (n: number, one: string, many = `${one}s`) =>
-	`${n} ${n === 1 ? one : many}`;
+	`${n.toLocaleString()} ${n === 1 ? one : many}`;
 
 /** The tiles, in the rail's order. */
 const ORDER: Exclude<AgentsSectionKey, "home">[] = [
@@ -45,6 +51,9 @@ const ORDER: Exclude<AgentsSectionKey, "home">[] = [
 	"functions",
 	"connections",
 	"llms",
+	"runs",
+	"approvals",
+	"ledger",
 	"concurrency",
 ];
 
@@ -108,13 +117,28 @@ function useTileLines(
 	const llms = useLLMProvidersQuery(username, graphSlug, COUNT).data;
 	const perf = useFleetPerformanceQuery(username, graphSlug, "7d").data;
 	const graph = useGraphQuery(username, graphSlug).data;
+	const runs = useRunsTilesQuery(username, graphSlug);
+	const asks = useAsksQuery(username, graphSlug, FOR_YOU);
+	const ledger = useLedgerStatsQuery(username, graphSlug);
 	const reading = "…";
 
 	return {
 		fleet: "agents, skills, functions",
-		runs: "every run, any size",
-		approvals: "asks waiting on a person",
-		ledger: "every act, allowed or refused",
+		runs: runs.data
+			? `${plural(runs.data.live, "run")} live`
+			: runs.error
+				? "every run, any size"
+				: reading,
+		approvals: asks.data
+			? `${plural(asks.data.for_you, "ask")} waiting for you`
+			: asks.error
+				? "asks waiting on a person"
+				: reading,
+		ledger: ledger.data
+			? `${plural(ledger.data.acts, "act")} today`
+			: ledger.error
+				? "every act, allowed or refused"
+				: reading,
 		performance: perf
 			? `${perf.tiles.degraded} degraded against its baseline`
 			: reading,

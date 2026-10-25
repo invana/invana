@@ -126,7 +126,8 @@ async def test_the_list_counts_spawned_helpers_apart(session: AsyncSession, grap
         session, graph=graph, params=parse_list_params(AGENT_LIST, {"ephemeral": ["shown"], "q": ["HELPER"]})
     )
     assert [a.name for a in shown] == ["helper-1"]
-    assert (info.total, info.unfiltered_total) == (1, len(seeded))
+    # With helpers shown, the unfiltered list counts them too.
+    assert (info.total, info.unfiltered_total) == (1, len(seeded) + 1)
 
 
 async def test_the_list_pages_by_cursor_and_refuses_what_it_does_not_take(session: AsyncSession, graph: Graph):

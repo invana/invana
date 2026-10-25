@@ -4,7 +4,12 @@
  * integrity. `exportUrl` is a link the browser downloads.
  */
 
-import { type ListQuery, listQueryToApi, request } from "@invana-studio/core";
+import {
+	type ListQuery,
+	listQueryToApi,
+	type Page,
+	request,
+} from "@invana-studio/core";
 import type {
 	LedgerActor,
 	LedgerExport,
@@ -54,8 +59,9 @@ export const ledgerApi = {
 	refusals: (username: string, graphSlug: string) =>
 		request<LedgerRefusals>(`${base(username, graphSlug)}/refusals`),
 
+	/** Past exports on the list contract, newest first. */
 	exports: (username: string, graphSlug: string) =>
-		request<LedgerExport[]>(`${base(username, graphSlug)}/exports`),
+		request<Page<LedgerExport>>(`${base(username, graphSlug)}/exports`),
 
 	integrity: (username: string, graphSlug: string) =>
 		request<LedgerIntegrity>(`${base(username, graphSlug)}/integrity`),

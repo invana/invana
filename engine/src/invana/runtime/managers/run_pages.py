@@ -227,6 +227,11 @@ class _Tree:
         """An agent run's own spend and its direct steps' — its children apart."""
         return (run.tokens or 0) + sum(s.tokens or 0 for s in self.steps_of.get(run.id, []))
 
+    def recorded_tokens(self, run: TaskRun) -> int | None:
+        """:meth:`tokens`, or ``None`` when neither the run nor its steps recorded a count."""
+        spent = [r.tokens for r in (run, *self.steps_of.get(run.id, [])) if r.tokens is not None]
+        return sum(spent) if spent else None
+
     def counted_agents(self) -> list[TaskRun]:
         """The agents a run's size counts: the root when it has one, and every child."""
         return [r for r in self.agent_runs if r.agent_id]
@@ -438,6 +443,9 @@ class RunPageManager:
             task_title=todos.get(run.todo_id or ""),
             tokens=self._recorded_tokens(tree),
             max_tokens_run=int(ceiling) if ceiling is not None else None,
+            agent_version=run.agent_version,
+            model_version=run.model_version
+            or next((s.model_version for s in tree.steps_of.get(run.id, []) if s.model_version), None),
             started_at=run.started_at,
             finished_at=run.finished_at,
             duration_ms=run.duration_ms,
@@ -489,6 +497,8 @@ class RunPageManager:
             groups.setdefault(tree.name(r), []).append(r)
         rows = []
         for role, members in groups.items():
+            # Unrecorded spend stays out of the percentile; none recorded is None.
+            spent = [t for r in members if (t := tree.recorded_tokens(r)) is not None]
             rows.append(
                 RoleRow(
                     role=role,
@@ -498,8 +508,8 @@ class RunPageManager:
                     not_served=sum(1 for r in members if r.exit_reason is not None and r.exit_reason != "served"),
                     running=sum(1 for r in members if r.status in RUN_STATE_STATUSES["live"]),
                     waiting=sum(1 for r in members if r.status in _WAITING),
-                    tokens_p50=_percentile([tree.tokens(r) for r in members], 50),
-                    tokens_p95=_percentile([tree.tokens(r) for r in members], 95),
+                    tokens_p50=_percentile(spent, 50),
+                    tokens_p95=_percentile(spent, 95),
                     time_p95_ms=_percentile([r.duration_ms for r in members if r.duration_ms is not None], 95),
                 )
             )
@@ -575,17 +585,22 @@ class RunPageManager:
                 )
             )
 
-        delegation = [
-            DelegationAsk(
-                approval_id=a.id,
-                from_run_id=self._asking_run(tree, a),
-                agent_id=a.payload.get("agent_id"),
-                agent_name=str(a.payload.get("agent_name") or a.line or "an agent"),
-                line=a.line,
+        asked = [a for a in mine if a.kind == "delegation"]
+        targets = await self.pages_qs.agent_names(
+            session, ids=[str(a.payload.get("to_agent_id") or a.payload.get("agent_id") or "") for a in asked]
+        )
+        delegation = []
+        for a in asked:
+            target = a.payload.get("to_agent_id") or a.payload.get("agent_id")
+            delegation.append(
+                DelegationAsk(
+                    approval_id=a.id,
+                    from_run_id=self._asking_run(tree, a),
+                    agent_id=target,
+                    agent_name=targets.get(target or "") or str(a.payload.get("agent_name") or "an agent"),
+                    line=a.line,
+                )
             )
-            for a in mine
-            if a.kind == "delegation"
-        ]
         return RunAgents(origin_label=label, origin_line=line, nodes=nodes, asks=delegation, roles=self._roles(tree))
 
     @staticmethod

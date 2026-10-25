@@ -19,6 +19,7 @@ from invana.activity.managers.ledger import LedgerManager
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.core.db import get_session
 from invana.core.ledger.schemas import (
+    LEDGER_EXPORT_LIST,
     LEDGER_LIST,
     LedgerActorRead,
     LedgerExportRead,
@@ -29,7 +30,7 @@ from invana.core.ledger.schemas import (
     LedgerRowDetail,
     LedgerStats,
 )
-from invana.core.lists import ListParams, applied_filters, list_params
+from invana.core.lists import ListParams, Page, applied_filters, list_params
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 _ledger = LedgerManager()
@@ -109,11 +110,14 @@ async def export_rows(
 
 
 async def list_exports(
+    params: ListParams = Depends(list_params(LEDGER_EXPORT_LIST)),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> list[LedgerExportRead]:
-    return await _ledger.exports(session, graph=graph)
+) -> Page[LedgerExportRead]:
+    return await _ledger.exports(
+        session, graph=graph, params=params, applied=applied_filters(params, LEDGER_EXPORT_LIST)
+    )
 
 
 async def get_integrity(

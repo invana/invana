@@ -82,7 +82,7 @@ def _chain(owner, *agents):
     ]
 
 
-MODEL = "anthropic/claude-opus-5-5"
+MODEL = "claude-opus-5-5"
 
 
 def _touched(task_key: str, chain) -> str:
@@ -96,9 +96,36 @@ def _touched(task_key: str, chain) -> str:
     return f"agent/{chain[-1]['name']}"
 
 
+WEB_PAGE = "fares.example.com/search"
+
+
+def _web_touch(run, step, seq: int) -> RunTouch:
+    """The run touch a `web.fetch` step leaves: one page read on a third-party host."""
+    return RunTouch(
+        run_id=run.id, graph_id=run.graph_id, seq=seq, step_key=step.step_key,
+        address=f"third_party/api/{WEB_PAGE}", layer="third_party", sublayer="api",
+        participant=WEB_PAGE, direction="in", volume={"pages": 1},
+    )
+
+
 class Seeder:
+    """Writes the seeded runs; their ledger rows wait in `acts` until `write_ledger`.
+
+    The ledger numbers rows as they are written, so rows are held and written
+    in time order — a back-dated run's acts never follow today's in `seq`.
+    """
+
     def __init__(self, db, graph, owner):
         self.db, self.graph, self.owner = db, graph, owner
+        self.acts: list[dict] = []
+
+    def act(self, **kw) -> None:
+        self.acts.append(kw)
+
+    async def write_ledger(self) -> None:
+        for kw in sorted(self.acts, key=lambda a: a["at"]):
+            await ledger.record(self.db, graph_id=self.graph.id, **kw)
+        self.acts.clear()
 
     async def root(self, agent, *, body, status, started, finished=None, exit_reason=None, budget=80_000, queued=None, **kw):
         run = TaskRun(
@@ -136,18 +163,20 @@ class Seeder:
             queued_at=start,
             started_at=start,
             finished_at=None if status == "running" else start + timedelta(seconds=secs),
-            tokens_in=tokens // 2 or None,
-            tokens_out=(tokens - tokens // 2) or None,
+            # Only a model call splits its tokens in and out; that split is what
+            # the run's Data touched counts as an LLM call.
+            tokens_in=(tokens // 2 or None) if task_key.startswith("llm.") else None,
+            tokens_out=((tokens - tokens // 2) or None) if task_key.startswith("llm.") else None,
             tokens=tokens or None,
             output={"row_count": rows} if rows is not None else None,
             model_version=MODEL if task_key.startswith("llm.") else None,
         )
         self.db.add(step)
         await self.db.flush()
+        if task_key.startswith("web."):
+            self.db.add(_web_touch(run, step, seq))
         layer = {"graph": "graph", "llm.": "llm", "work.": "agent", "web.": "web"}
-        await ledger.record(
-            self.db,
-            graph_id=self.graph.id,
+        self.act(
             actor_kind="agent",
             actor_chain=chain,
             actor_agent_id=chain[-1]["id"],
@@ -232,7 +261,7 @@ async def seed(db) -> None:
 
     # ── the tree: eight agents, escrow, no progress, two asks ────────────────
     t0 = NOW - timedelta(minutes=14)
-    root = await s.root(auditor, body="Audit the routes out of LHR, JFK and DXB for delays and fare gaps", status="running", started=t0)
+    root = await s.root(auditor, body="Audit the routes out of LHR, JFK and DXB for delays and fare gaps", status="running", started=t0, model_version=MODEL)
     n = root.number
     c_root = _chain(owner, auditor)
     await s.step(root, c_root, seq=0, key="graph_read_query", task_key="graph.read.query", start=t0, secs=2, rows=214, number=n)
@@ -252,7 +281,7 @@ async def seed(db) -> None:
         h = await s.child(spawn, helper, status="succeeded", exit_reason="served", start=spawn.started_at, finished=spawn.started_at + timedelta(minutes=3 + i), escrow=4_000, returned=900 + 300 * i)
         await s.step(h, _chain(owner, auditor, hub, helper), seq=0, key="graph_read_query", task_key="graph.read.query", start=h.started_at, secs=2, rows=30 + 10 * i, number=n)
         await s.step(h, _chain(owner, auditor, hub, helper), seq=1, key="llm_summarize", task_key="llm.summarize", start=h.started_at + timedelta(seconds=3), secs=8, tokens=2_400 + 200 * i, number=n)
-    await ledger.record(db, graph_id=graph.id, actor_kind="agent", actor_chain=c_hub, actor_agent_id=hub.id, act="escrow.return", layer="agent", touched=f"agent/{hub.name}", touched_line="6.1k returned · 17.9k spent", verdict="allowed", run_id=hub_run.id, run_number=n, where="control plane", at=t0 + timedelta(minutes=7))
+    s.act(actor_kind="agent", actor_chain=c_hub, actor_agent_id=hub.id, act="escrow.return", layer="agent", touched=f"agent/{hub.name}", touched_line="6.1k returned · 17.9k spent", verdict="allowed", run_id=hub_run.id, run_number=n, where="control plane", at=t0 + timedelta(minutes=7))
 
     fares_run = await s.child(d_fares, fares, status="failed", exit_reason="no_progress", start=t0 + timedelta(seconds=13), finished=t0 + timedelta(minutes=3, seconds=20), escrow=16_000, returned=9_800)
     c_fares = _chain(owner, auditor, fares)
@@ -279,12 +308,12 @@ async def seed(db) -> None:
             graph_id=graph.id, subject_kind="delegation", subject_id=delays_run.id, run_id=delays_run.id,
             step_run_id=ask_step.id, title="Delay Analyst wants to delegate to Weather Reader", kind="delegation",
             asked_by=c_delays, wants="delegate to Weather Reader — METARs for 3 airports",
-            routed_reason="agent owner", payload={"target_agent_id": weather.id, "escrow": 6_000},
+            routed_reason="agent owner", payload={"to_agent_id": weather.id, "escrow": 6_000},
             approver_ids=[owner.id], requested_by_id=owner.id, deadline_at=NOW + timedelta(hours=4),
         )
     )
-    await ledger.record(db, graph_id=graph.id, actor_kind="agent", actor_chain=c_delays, actor_agent_id=delays.id, act="work.delegate", layer="agent", touched=f"agent/{weather.name}", touched_line="asks — may delegate: ask", verdict="approval", run_id=delays_run.id, step_run_id=ask_step.id, run_number=n, where="control plane", at=t0 + timedelta(minutes=9))
-    await ledger.record(db, graph_id=graph.id, actor_kind="agent", actor_chain=c_fares, actor_agent_id=fares.id, act="web.fetch", layer="web", touched="web/fares.example.com", touched_line="refused — domain not in its world", verdict="refused", refused_by="world", rule="world · web domains", run_id=fares_run.id, run_number=n, where="in-process", at=t0 + timedelta(minutes=2))
+    s.act(actor_kind="agent", actor_chain=c_delays, actor_agent_id=delays.id, act="work.delegate", layer="agent", touched=f"agent/{weather.name}", touched_line="asks — may delegate: ask", verdict="approval", run_id=delays_run.id, step_run_id=ask_step.id, run_number=n, where="control plane", at=t0 + timedelta(minutes=9))
+    s.act(actor_kind="agent", actor_chain=c_fares, actor_agent_id=fares.id, act="web.fetch", layer="web", touched="web/fares.example.com", touched_line="refused — domain not in its world", verdict="refused", refused_by="world", rule="world · web domains", run_id=fares_run.id, run_number=n, where="in-process", at=t0 + timedelta(minutes=2))
 
     db.add(RunTouch(run_id=root.id, graph_id=graph.id, seq=0, step_key="graph_read_query", address="graph_data/model/Airport", layer="graph_data", sublayer="model", participant="Airport", direction="in", volume={"rows": 214}))
     db.add(Emission(run_id=root.id, seq=0, kind="table", payload={"title": "Delayed routes by hub", "rows": [{"route": f"LHR-{i}"} for i in range(42)]}))
@@ -295,7 +324,7 @@ async def seed(db) -> None:
     # ── a run of 700 agents ──────────────────────────────────────────────────
     t2 = NOW - timedelta(minutes=38)
     sweep = await _agent(db, graph, owner, "Network Sweep", budget={"max_tokens_run": 2_000_000, "max_live": 120, "max_descendants": 800})
-    many = await s.root(sweep, body="Check every route in the network for schedule conflicts", status="running", started=t2, budget=2_000_000)
+    many = await s.root(sweep, body="Check every route in the network for schedule conflicts", status="running", started=t2, budget=2_000_000, model_version=MODEL)
     c_sweep = _chain(owner, sweep)
     fan = await s.step(many, c_sweep, seq=0, key="work_spawn", task_key="work.spawn", start=t2 + timedelta(seconds=5), secs=0, status="running", number=many.number)
     roles = [("Route checker", 420), ("Hub summarizer", 140), ("Fare checker", 90), ("Conflict reporter", 50)]
@@ -321,6 +350,7 @@ async def seed(db) -> None:
             )
             db.add(child)
     await db.flush()
+    await s.write_ledger()
 
     # ── five alert rules, from the ledger head ───────────────────────────────
     head = (await db.execute(select(LedgerRow.seq).where(LedgerRow.graph_id == graph.id).order_by(LedgerRow.seq.desc()))).scalars().first() or 0
@@ -379,6 +409,11 @@ async def revive(db) -> None:
         .all()
     )
     reopened = 0
+    for ask in (await db.execute(select(Approval).where(Approval.kind == "delegation"))).scalars().all():
+        if ask.payload and "target_agent_id" in ask.payload:
+            payload = dict(ask.payload)
+            payload["to_agent_id"] = payload.pop("target_agent_id")
+            ask.payload = payload
     for ask in asks:
         if ask.title in {"More tokens for Delay Analyst", "Delay Analyst wants to delegate to Weather Reader"}:
             ask.status = "pending"
@@ -404,10 +439,54 @@ async def revive(db) -> None:
             )
         )
     ).first()
+    await _backfill(db, graph)
     if not ended:
-        closed, failed = await ended_runs(Seeder(db, graph, owner), auditor, _chain(owner, auditor))
+        s = Seeder(db, graph, owner)
+        closed, failed = await ended_runs(s, auditor, _chain(owner, auditor))
+        await s.write_ledger()
         print("closed run     ", closed.id, f"#{closed.number}")
         print("failed runs    ", ", ".join(r.id for r in failed))
+
+
+async def _backfill(db, graph) -> None:
+    """Give a database seeded by an older seeder what the boards now read.
+
+    Web touches for the `web.fetch` steps (whose tokens are no model call), the
+    model on seeded LLM steps and on the seeded roots, and token spend on the
+    large run's children.
+    """
+    seeded = (
+        (await db.execute(select(TaskRun).where(TaskRun.graph_id == graph.id, TaskRun.parent_run_id.is_(None))))
+        .scalars()
+        .all()
+    )
+    seeded = [r for r in seeded if (r.params or {}).get("seed") == "f05"]
+    frontier, touches, models, spend = list(seeded), 0, 0, 0
+    sweep = next((r for r in seeded if r.body.startswith("Check every route")), None)
+    for root in seeded:
+        root.model_version = MODEL
+    while frontier:
+        run = frontier.pop()
+        rows = (await db.execute(select(TaskRun).where(TaskRun.parent_run_id == run.id))).scalars().all()
+        for row in rows:
+            key = row.task_key or ""
+            if key.startswith("llm.") and row.model_version != MODEL:
+                row.model_version, models = MODEL, models + 1
+            if key.startswith("web."):
+                has = (
+                    await db.execute(
+                        select(RunTouch.id).where(RunTouch.run_id == run.id, RunTouch.step_key == row.step_key)
+                    )
+                ).first()
+                if not has:
+                    db.add(_web_touch(run, row, row.seq or 0))
+                    touches += 1
+                row.tokens_in = row.tokens_out = None
+            in_sweep = sweep is not None and run.parent_run_id == sweep.id
+            if in_sweep and row.started_at is not None and row.tokens is None:
+                row.tokens, spend = rng.randint(600, 2_200), spend + 1
+        frontier.extend(rows)
+    print(f"backfilled {touches} web touches, {models} LLM models, {spend} spends")
 
 
 async def main() -> None:
