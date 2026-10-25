@@ -1977,8 +1977,8 @@
   "iam.policy.test": {
    "story": "IAM-11",
    "product": "iam",
-   "route": "/u/admin/airways/iam/policies?page=policy%3Afare-team-quota&dialog=test&right=assistant",
-   "state": "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py; Test access on the head"
+   "route": "/u/admin/airways/iam/policies?page=policy%3Afare-team-quota&dialog=test&who=agent%3A24e2b9d6-384b-49de-b339-51f31dbc85d1&by=b09502e1-964b-4fe4-ab3a-4902b8ee12e5&does=graph.write.records&to=graph%2FFare%2FLHR-JFK%20%C2%B7%20price&right=assistant",
+   "state": "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py; Test access on the head \u2014 the link carries the proto's check: Fare Scout, started by priya, graph.write.records on graph/Fare/LHR-JFK \u00b7 price"
   }
  }
 }

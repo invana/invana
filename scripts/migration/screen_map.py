@@ -39,7 +39,9 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("iam.policy.statements", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=statements"),
     ("iam.policy.limits", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=limits"),
     ("iam.policy.held_by", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=held_by"),
-    ("iam.policy.test", f"{G}/iam/policies?page=policy%3Afare-team-quota&dialog=test"),
+    ("iam.policy.test", f"{G}/iam/policies?page=policy%3Afare-team-quota&dialog=test"
+     "&who=agent%3A24e2b9d6-384b-49de-b339-51f31dbc85d1&by=b09502e1-964b-4fe4-ab3a-4902b8ee12e5"
+     "&does=graph.write.records&to=graph%2FFare%2FLHR-JFK%20%C2%B7%20price"),
     ("iam.policy.draft", f"{G}/iam/policies?page=policy%3Aagent-readers"),
     ("iam.policy.impact", f"{G}/iam/policies?page=policy%3Aagent-readers&dialog=impact"),
     ("iam.tokens.new", f"{G}/iam/tokens?new=1"), ("iam.tokens", f"{G}/iam/tokens"),
@@ -151,7 +153,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "iam.agent.effective": "the uuid stands for Coordinator, which holds fare-team-quota through fare-team and has the skill Hey bound: IAM › Agents, click Coordinator",
     "iam.policies.denied": "signed in as e2e-viewer (INVANA_MIGRATION_USER=e2e-viewer INVANA_MIGRATION_PASSWORD=e2e-member-password-1)",
     "iam.policy.statements": POLICIES, "iam.policy.limits": POLICIES, "iam.policy.held_by": POLICIES,
-    "iam.policy.test": f"{POLICIES}; Test access on the head",
+    "iam.policy.test": f"{POLICIES}; Test access on the head — the link carries the proto's check: Fare Scout, started by priya, graph.write.records on graph/Fare/LHR-JFK · price",
     "iam.policy.draft": f"{POLICIES}; the assistant's draft",
     "iam.policy.impact": f"{POLICIES}; Review impact on the draft",
     "shell.onboarding": "a Graph whose set-up is not finished: the set-up checklist open",

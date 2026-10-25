@@ -17,7 +17,8 @@
  *   *Review impact*. Saving is *Save anyway* in the impact modal, so the
  *   impact is always read before anything is saved.
  * - **Modals** — `?dialog=test` · `impact` · `edit` · `attach` · `discard`, so
- *   a link or a reload opens the same one.
+ *   a link or a reload opens the same one. A test link may carry its check
+ *   (`who` · `by` · `does` · `to` · `world`); closing the modal drops it.
  *
  * Without iam-admin every write is drawn disabled with the reason; reads and
  * Test access stay open.
@@ -58,7 +59,7 @@ import {
 	statementIn,
 	usePageParam,
 } from "./policyParts";
-import { TestAccessDialog } from "./TestAccessDialog";
+import { TestAccessDialog, type TestAccessPrefill } from "./TestAccessDialog";
 
 export interface PolicyPageProps {
 	username: string;
@@ -77,6 +78,8 @@ type PolicyTab = (typeof TABS)[number]["value"];
 const TAB_KEYS = TABS.map((t) => t.value);
 
 const DIALOGS = ["test", "impact", "edit", "attach", "discard"] as const;
+/** The check a Test access link carries. */
+const TEST_KEYS = ["who", "by", "does", "to", "world"];
 
 /**
  * `v4 · held by group fare-team · 4 agents · owner sam` — the engine's lines,
@@ -98,7 +101,7 @@ function metaLine(policy: PolicyRead): string {
 
 export function PolicyPage({ username, graphSlug, name }: PolicyPageProps) {
 	const open = useIamOpen();
-	const [params] = useSearchParams();
+	const [params, setParams] = useSearchParams();
 	const inFront = params.get("page") === `policy:${name}`;
 	const [tab, setTab] = usePageParam<PolicyTab>(
 		"tab",
@@ -135,6 +138,22 @@ export function PolicyPage({ username, graphSlug, name }: PolicyPageProps) {
 		setDialog(null);
 		setEdit(null);
 	};
+	const prefill: TestAccessPrefill = {
+		who: params.get("who") ?? undefined,
+		startedBy: params.get("by") ?? undefined,
+		action: params.get("does") ?? undefined,
+		resource: params.get("to") ?? undefined,
+		world: params.get("world") ?? undefined,
+	};
+	const closeTest = () =>
+		setParams(
+			(prev) => {
+				const out = new URLSearchParams(prev);
+				for (const key of ["dialog", ...TEST_KEYS]) out.delete(key);
+				return out;
+			},
+			{ replace: true },
+		);
 
 	const onEdited = (next: PolicyEdit) => {
 		if (draft) {
@@ -309,7 +328,8 @@ export function PolicyPage({ username, graphSlug, name }: PolicyPageProps) {
 				<TestAccessDialog
 					username={username}
 					graphSlug={graphSlug}
-					onClose={close}
+					prefill={prefill}
+					onClose={inFront ? closeTest : close}
 				/>
 			) : null}
 			{dialog === "edit" && changeable ? (

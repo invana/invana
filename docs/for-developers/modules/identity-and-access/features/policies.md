@@ -82,7 +82,7 @@ flowchart TD
 | History | Versions table: version · saved by · when · why · statements · limits |
 | `iam.policy.draft` | The policy page of a draft: banner *Draft by the assistant — nothing changes until you save*, statements in a dashed table, Held by, *Discard* · *Review impact* |
 | `iam.policy.impact` | Modal *Save name?* — holders with gains/loses, the resource and its 30-day use, a destructive line per skill that would break; *Cancel* · *Save anyway* |
-| `iam.policy.test` | Modal *Test access*: Who · Started by · Does · To; the verdict line; table checked · by · says |
+| `iam.policy.test` | Modal *Test access*: Who · Started by · Does · To; the verdict line; table checked · by · says. Shot from a link carrying the check (PO19) |
 | `iam.policies.denied` | A *New policy* tab for a member without iam-admin: lock, *You can read policies, not change them*, who holds iam-admin, *Open policies read-only* |
 | CLI | `invana iam list · show <name> · apply <file.yaml> [--why]` |
 
@@ -126,6 +126,8 @@ flowchart TD
 | PO16 | The *Policies* list's *Held by* line and counts are the engine's (`held_by` on each row); Studio prints them. Agents are counted as IAM › Agents lists them — spawned agents are not. A boundary's *What it allows* says what it keeps back (*nothing reads email or sends it out*), else the resources it leaves open. The Held by tab lists groups, then agents, people and tokens, each by name. IAM Home's policy counts are per kind with drafts, as the list's kind tabs count them. |
 | PO17 | The *Policies* list reads managed → custom → inline → boundary, then by name, when the Graph's policies fit one page; a longer list, or another sort, pages by name or by last change alone. A managed policy has no *Changed* — it is built in. |
 | PO18 | The Limits tab's rows are label · per: *Tokens* a month · *Tokens* a run (used reads `p95 <n>` over 30 days) · *Live agents* at once · *Agents a run* descendants (used reads `<n> in #<run>`, the largest live tree) · *Depth* spawn levels · *Worker-seconds* an hour · *Pools* it may use. |
+| PO19 | A *Test access* link may carry its check — `?dialog=test&who=<kind>:<id>&by=<user id>&does=<action>&to=<resource>&world=<id>`. The modal opens filled and runs once when who, does and to are given; closing it drops the check from the URL. A link never writes, so a carried check is safe to open. *New token*'s minted secret has no such link — minting writes. |
+| PO20 | A *Held by* person row's second line names the groups the person is in (`analysts`), else their full name; a service account reads *service account*. |
 
 ## Not building
 

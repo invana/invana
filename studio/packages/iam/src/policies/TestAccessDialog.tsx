@@ -5,6 +5,9 @@
  * same check dispatch runs, without running anything, and answers with every
  * layer's verdict — policies it holds · started by · world · boundary · token —
  * and the first that refuses. It writes nothing, so every member may use it.
+ *
+ * A link may carry the check (`?who=agent:<id>&by=<user id>&does=…&to=…&world=…`):
+ * the form opens filled, and runs once when who, does and to are all given.
  */
 
 import {
@@ -38,7 +41,7 @@ import {
 } from "@invana/ui";
 import { FormError } from "@invana-studio/ui";
 import { Check, ScrollText, ShieldCheck, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useIamOpen } from "../open";
 import {
 	useIamAgentsQuery,
@@ -94,28 +97,48 @@ const NOBODY = "none";
 
 type PrincipalKind = AccessCheckRequest["principal_kind"];
 
+/** A check a link carries; every field optional. */
+export type TestAccessPrefill = {
+	/** `agent:<id>` · `person:<id>` · `token:<id>`. */
+	who?: string;
+	/** The starter's user id. */
+	startedBy?: string;
+	action?: string;
+	resource?: string;
+	world?: string;
+};
+
 /** Mounted only while it is open. */
 export function TestAccessDialog({
 	username,
 	graphSlug,
+	prefill = {},
 	onClose,
 }: {
 	username: string;
 	graphSlug: string;
+	prefill?: TestAccessPrefill;
 	onClose: () => void;
 }) {
 	const test = useTestAccessMutation({ username, graphSlug });
 	const people = usePeopleQuery(username, graphSlug, EVERY);
 	const agents = useIamAgentsQuery(username, graphSlug, EVERY);
 	const tokens = useIamTokensQuery(username, graphSlug, EVERY);
-	const [who, setWho] = useState("");
-	const [startedBy, setStartedBy] = useState(NOBODY);
-	const [action, setAction] = useState("");
-	const [resource, setResource] = useState("");
-	const [world, setWorld] = useState("");
+	const [who, setWho] = useState(prefill.who ?? "");
+	const [startedBy, setStartedBy] = useState(prefill.startedBy ?? NOBODY);
+	const [action, setAction] = useState(prefill.action ?? "");
+	const [resource, setResource] = useState(prefill.resource ?? "");
+	const [world, setWorld] = useState(prefill.world ?? "");
 	const read = test.data;
 
 	const ready = !!who && !!action.trim() && !!resource.trim();
+	const ranPrefill = useRef(false);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: a carried check runs once, on open
+	useEffect(() => {
+		if (ranPrefill.current || !ready) return;
+		ranPrefill.current = true;
+		run();
+	}, []);
 	const run = () => {
 		const [kind, ...rest] = who.split(":");
 		test.mutate({

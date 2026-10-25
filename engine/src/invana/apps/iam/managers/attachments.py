@@ -94,6 +94,17 @@ class GraphHolders:
         ]
         return names_line([n for n in names if n])
 
+    def person_line(self, user) -> str:
+        """The groups a person is in (``analysts · fare-team``), else their name."""
+        if user is None:
+            return ""
+        groups = sorted(
+            self.groups.get(m.group_id, m.group_id)
+            for m in self.group_members
+            if m.member_kind == "person" and m.member_id == user.id
+        )
+        return " · ".join(groups) or _full_name(user)
+
     def held_by(self, policy: Policy, usernames: dict[str, str] | None = None) -> HeldBy:
         """The counts and the line the Policies list prints.
 
@@ -221,7 +232,7 @@ class AttachmentManager:
                 if m.member_kind == "person" and m.member_id not in seen:
                     seen.add(m.member_id)
                     user = users.get(m.member_id)
-                    name, line = (user.username if user else m.member_id), _full_name(user)
+                    name, line = (user.username if user else m.member_id), ctx.person_line(user)
                 elif m.member_kind == "agent" and m.member_id not in seen_agents:
                     seen_agents.add(m.member_id)
                     name, line = ctx.agents.get(m.member_id, m.member_id), "built in Agents"
@@ -248,7 +259,7 @@ class AttachmentManager:
                     kind="person",
                     holder_id=m.user_id,
                     name=user.username if user else m.user_id,
-                    line=_full_name(user),
+                    line=ctx.person_line(user),
                     how="role",
                     attached_at=m.created_at,
                 )
@@ -258,7 +269,7 @@ class AttachmentManager:
     def _row(self, a, ctx: GraphHolders, users, usernames, tokens, runs, now: datetime) -> HolderRow:
         if a.holder_kind == "person":
             user = users.get(a.holder_id)
-            name, line = (user.username if user else a.holder_id), _full_name(user)
+            name, line = (user.username if user else a.holder_id), ctx.person_line(user)
         elif a.holder_kind == "group":
             name, line = ctx.groups.get(a.holder_id, a.holder_id), ctx.group_line(a.holder_id, usernames)
         elif a.holder_kind == "agent":
