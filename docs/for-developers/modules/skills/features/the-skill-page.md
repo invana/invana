@@ -145,13 +145,14 @@ appears in the text is drawn without a line.
 | Editing a plan by hand | Nobody draws a plan ([IS3](instructions-publish-rollback.md#decisions)) |
 | A Playbook tab apart from Instructions | The document is the playbook |
 | A skill granting functions | A skill declares needs; a policy in IAM allows them (I01) |
-| Assistant proposals marked in the editor | The assistant's proposals arrive with F05's assistant work |
+| Assistant proposals marked in the editor | A proposal marked in the editor needs a proposal record the engine does not keep |
 | *Allow / Need <function>* on an unmapped line | There is no allow act, and an unmapped line names no function; *Leave it to a person* and *Rewrite the line* are its choices |
 | Agents' *Version* and *Last applied* columns, *Applied · 7 days* | The skill's agents read carries no per-agent applied window or last applied (engine) |
 | Usage's *The gap — offered, not applied* table | The engine records no reason a run passed a skill over; the gap is shown as a number only |
 | Skills list *Agents*, *Functions* and *Evals* columns | The skills list carries no bound-agent count, function count or eval pass rate (engine); *Plan* shows its steps |
-| A Flow step's *Runs*, *Allowed by* and *In its test runs* cards | Per-step run counts and policies arrive with F05's runs and I01's policies |
-| Previewing writes and sends on a test run | A test runs the ask as an eval case does; holding its writes and sends for preview arrives with F05's runs work |
+| A Flow step's *Runs*, *Allowed by* and *In its test runs* cards | The engine stores no per-step run count of a skill's plan; policies arrive with IAM (I01) |
+| Previewing writes and sends on a test run | A test runs the ask as an eval case does; a send already waits on an approval, and a held write has no preview store |
+| Records of which handler fired on a run, and *Adopt* from them | Runs record replans, not the handler that guided each one; Exceptions shows the stored replan numbers and says *No exceptions recorded yet* |
 | *Ask an owner* on a locked skill | Asking for access is an access request, and access requests arrive with IAM (I01); the notice names who to ask |
 | *Publishing a skill that writes needs a Graph owner* | The engine gates every skill write by the `build` area alone; an owner-only gate on skills that write arrives with IAM's policies (I01) |
 | An × on a *Functions it needs* row | A need is a line in the prose and is removed by editing that line; a skill has no allowed-but-unneeded function to remove, since a policy in IAM allows functions (I01) |

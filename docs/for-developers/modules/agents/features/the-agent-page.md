@@ -158,14 +158,12 @@ default is refused with `409` naming the state, as for `paused`.
 | Callable over MCP on Deploy | This Graph's MCP server (I02) |
 | Remote agents in Flow and Access | 5.11, later |
 | Deleting an agent that has run | Lineage must resolve ([lifecycle](lifecycle.md)); a draft is discarded (AP22) |
-| Assistant proposals marked on the builder | F05's assistant work |
-| Escrow, *in all*, exit rules, refused-at-a-ceiling counts, *May delegate to* | Delegation with escrow, ceilings and exit reasons (F05) |
+| Assistant proposals marked on the builder | The assistant opens boards and drafts; a proposal marked on the builder needs a proposal record the engine does not keep |
 | An event trigger and pool labels on Deploy | Workers (F06) |
-| *Run now* in the head | Starting a run of an agent is the Runs phase's (F05); there is no run-an-agent endpoint yet |
+| *Run now* in the head | A run starts from an ask, a Todo or a schedule; there is no run-an-agent endpoint, and a run with no ask has nothing to answer |
 | *Estimate* on the builder and Limits | The engine stores no per-run estimate; a client-side guess would break CLAUDE.md rule 13 |
 | Soul's *How it speaks* · *Caution* · *When unsure* | The agent stores four dials; these are not stored, so they are not drawn |
 | Effort as low · medium · high | Effort is stored as max steps · replans · questions, and Limits shows those |
-| *Started by* and *Size* columns on Runs | Runs carry neither; F05's run list adds them |
 | Deploy's resource → pool mapping | Skill resources (`cpu` · `llm` · `gpu`) and pools (`llm` · `graphdb` · `heavy`) share only `llm`; pools are F06's |
-| *Test on a sample* on the builder | Test runs are a skill's (the skill page's Tests); an agent's arrive with F05's runs |
+| *Test on a sample* on the builder | Test runs are a skill's (the skill page's Tests) |
 | Deploy's *At 02:00* forecast and capacity warning (*Add workers*) | Needs each pool's free capacity over time, which the engine does not store; workers and pools are F06's |

@@ -102,7 +102,7 @@ from invana.runtime.models import ExitReason, RunStatus, TaskRun, span_ms
 from invana.runtime.planning import plan_payload, queue_plan_steps
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.results import roll_up_run, run_result, run_tokens, step_result
-from invana.runtime.services import BULK_PLAN_KEY, LOAD_PLAN_KEY, endpoint_for_run
+from invana.runtime.services import BULK_PLAN_KEY, LOAD_PLAN_KEY, endpoint_for_run, record_stop
 from invana.runtime.stream import Emitter, broadcaster
 from invana.runtime.workflows import WORKFLOWS, Step
 
@@ -1706,7 +1706,7 @@ class TaskRuntime:
                 details={"run_id": th.id, "exit_reason": reason},
             )
             if reason == ExitReason.stopped.value:
-                await ledger_acts.run_stopped(db, run=th, stopped_by=stopped_by)
+                await record_stop(db, run=th, stopped_by=stopped_by)
             else:
                 await ledger_acts.run_ended(db, run=th, reason=reason)
             await db.commit()

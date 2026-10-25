@@ -106,7 +106,7 @@ flowchart TD
 | RP1 | **Agents › Runs is the one runs list.** Activity › Runs stays the shell's journal for every product and its rows open this page; an agent's Runs tab is this list with `f.agent_id`. |
 | RP2 | **A root run has a number.** `#2291` is how people quote a run; the uuid stays its identity. The number is per Graph, given at creation, never reused; steps and children have none, so the numbers people see are the runs they started. |
 | RP3 | **A run's status is its exit reason once it ends.** `served`, `budget declined`, `no progress` — the reason an agent ended is the word a row shows, recorded when the run settles, never derived in Studio. A running run says `running`, a held one `waiting`. |
-| RP4 | **`state` groups statuses for the list's tabs.** `live` is queued or running, `waiting` is held on a person (`awaiting_input` · `awaiting_approval`), `ended` is every terminal status. |
+| RP4 | **`state` groups statuses for the list's tabs.** `live` is queued or running, `waiting` is held on a person (`awaiting_input` · `needs_input` — a question, or a step held on an approval), `ended` is every terminal status. |
 | RP5 | **From is the run's origin in the reader's words.** Explorer (an ask from a session), Todo, Schedule, Project, API — mapped from `triggered_by` and the session; a delegation is never a root, so it is never a From. |
 | RP6 | **Size is how many agents the run used**, the root and every child run with an agent, counted by the engine. |
 | RP7 | **One page at any size.** The tabs never change with size; past 50 agents the Overview swaps to the large-run reading and Agents offers *By role*. |

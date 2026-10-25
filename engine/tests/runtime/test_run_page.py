@@ -12,6 +12,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from sqlalchemy import select
 
 from invana.activity.models import Approval
 from invana.activity.querysets.asks import pending_for
@@ -19,6 +20,7 @@ from invana.apps.agents.models import Agent
 from invana.apps.govern.models import Lens, RunTouch  # noqa: F401 — tables for create_all
 from invana.apps.work.models import Task as Todo  # noqa: F401
 from invana.core.errors import ConflictError
+from invana.core.ledger.models import LedgerRow
 from invana.core.lists import ListParams
 from invana.runtime import services
 from invana.runtime.managers.run_pages import PendingAsk, RunPageManager
@@ -195,3 +197,12 @@ class TestRunsList:
                 actor_id=user.id,
                 retune=services.Retune(max_tokens_run=10_000),
             )
+
+    async def test_stopping_a_waiting_run_ends_it_stopped_and_names_who(self, session, graph, user):
+        run = TaskRun(graph_id=graph.id, flow_key="nl-query", ask_kind="nl", status="awaiting_input", number=1)
+        session.add(run)
+        await session.flush()
+        await services.cancel_waiting(session, run=run, stopped_by=user.id)
+        assert (run.status, run.exit_reason) == ("cancelled", "stopped") and run.finished_at is not None
+        rows = (await session.execute(select(LedgerRow).where(LedgerRow.run_id == run.id))).scalars().all()
+        assert [(r.act, r.actor_user_id) for r in rows] == [("run.stop", user.id)]
