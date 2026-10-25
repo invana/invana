@@ -55,6 +55,7 @@ from invana.plugins.core.ingest.records import LoadRefused
 from invana.runtime.models import INTERACTIVE, RunRole, RunStatus, TaskRun, TriggeredBy
 from invana.runtime.planning import opening_for, plan_payload, queue_plan_steps, select_plan_by_key
 from invana.runtime.querysets import TaskRunQuerySet
+from invana.runtime.querysets.run_pages import RunPageQuerySet
 from invana.runtime.workflows import MODELLER_GENERATE, NL_QUERY, QL_QUERY, WORKFLOWS, Workflow
 
 
@@ -779,8 +780,18 @@ async def rerun_turn(
     return th
 
 
-#: A root in one of these is still live, so it is not re-run.
-_LIVE = (RunStatus.queued.value, RunStatus.running.value, RunStatus.awaiting_input.value)
+#: A root in one of these has ended, so it may be re-run.
+_ENDED = (RunStatus.succeeded.value, RunStatus.failed.value, RunStatus.cancelled.value, RunStatus.stopped.value)
+
+
+@dataclass(frozen=True, slots=True)
+class Retune:
+    """What a retuned re-run changes; ``None`` keeps what the run recorded."""
+
+    agent_version: int | None = None
+    model_version: str | None = None
+    max_tokens_run: int | None = None
+    lens_id: str | None = None
 
 
 async def rerun_run(
@@ -790,25 +801,53 @@ async def rerun_run(
     run: TaskRun,
     versions: str,
     actor_id: str,
+    retune: Retune | None = None,
 ) -> TaskRun:
-    """Re-run a settled ask as a new root run, linked to the one it re-ran.
+    """Re-run an ended ask as a new root run, linked to the one it re-ran.
 
     ``same`` calls the model version the run recorded and runs under its frozen
     lens; a version the Graph no longer offers refuses, naming it, rather than
     calling another model. ``current`` resolves today's pins and cast and
-    freezes the lens anew, in the world the run was asked in.
+    freezes the lens anew, in the world the run was asked in. ``retune`` is
+    ``current`` with what ``retune`` names overridden — the agent version, the
+    model version, the run budget or the world — and refuses with a
+    ``ValidationError`` a version, budget or world it cannot run on.
 
-    The new run belongs to no session, so the reply the original wrote is
-    never rewritten; it reads in Runs like any other root. The original is
+    A run that has not ended is refused (``ConflictError``). The new run
+    belongs to no session, so the reply the original wrote is never rewritten;
+    it reads in Runs like any other root, with its own number. The original is
     never touched.
     """
     if run.parent_run_id is not None or run.ask_kind not in ("nl", "ql"):
         raise ConflictError({"error": "not_an_ask", "message": "Only an ask re-runs — a question or a query."})
-    if run.status in _LIVE:
-        raise ConflictError({"error": "run_live", "message": "This run has not settled — re-run a settled run only."})
+    if run.status not in _ENDED:
+        raise ConflictError({"error": "run_live", "message": "This run has not ended — re-run an ended run only."})
     agent = await _agents.require_available(db, agent_id=run.agent_id, graph_id=graph.id) if run.agent_id else None
     if agent is None and run.flow_key not in WORKFLOWS:
         raise ConflictError({"error": "not_an_ask", "message": "This run's flow cannot be opened again."})
+    tune = retune if versions == "retune" and retune is not None else Retune()
+    if tune.agent_version is not None and (agent is None or tune.agent_version != agent.version):
+        # Only the agent as it stands can run: its earlier versions are numbers
+        # on past runs, not configurations kept to run again.
+        raise ValidationError(
+            {
+                "error": "agent_version_unavailable",
+                "message": f"Version {tune.agent_version} of this agent cannot run — only its current version can.",
+                "agent_version": tune.agent_version,
+            }
+        )
+    params = dict(run.params or {})
+    if tune.max_tokens_run is not None:
+        ceiling = agent.effective_budget.get("max_tokens_run") if agent is not None else None
+        if ceiling is not None and tune.max_tokens_run > ceiling:
+            raise ValidationError(
+                {
+                    "error": "over_agent_budget",
+                    "message": f"A run budget of {tune.max_tokens_run} tokens is over the agent's {ceiling}.",
+                    "max_tokens_run": ceiling,
+                }
+            )
+        params["max_tokens_run"] = tune.max_tokens_run
 
     needs_model = run.ask_kind == "nl"
     provider: LLMEndpoint | None = None
@@ -817,12 +856,19 @@ async def rerun_run(
         if needs_model:
             provider = await _recorded_endpoint(db, run=run)
     else:
-        frozen = await freeze_lens(db, graph_id=graph.id, agent_id=agent.id if agent else None, lens_id=run.lens_id)
-        if needs_model:
+        lens_id = run.lens_id
+        if tune.lens_id is not None:
+            world = await _lenses.lenses_qs.get(db, tune.lens_id)
+            if world is None or world.graph_id != graph.id:
+                raise ValidationError({"error": "world_not_found", "message": "That world is not in this graph."})
+            lens_id = world.id
+        frozen = await freeze_lens(db, graph_id=graph.id, agent_id=agent.id if agent else None, lens_id=lens_id)
+        if needs_model or tune.model_version is not None:
             provider = await resolve_endpoint(
                 db,
                 graph_id=graph.id,
                 snapshot=frozen["lens_snapshot"],
+                prefer_model_row_id=await _offered_model_row(db, graph_id=graph.id, version=tune.model_version),
                 pins=(agent.model_pin if agent else None,),
             )
 
@@ -832,7 +878,7 @@ async def rerun_run(
         author_kind="user",
         ask_kind=run.ask_kind,
         body=run.body,
-        params={**(run.params or {}), "llm_model_id": provider.model_row_id if provider else None},
+        params={**params, "llm_model_id": provider.model_row_id if provider else None},
         flow_key=run.flow_key,
         agent_id=agent.id if agent else None,
         agent_version=agent.version if agent else None,
@@ -862,6 +908,26 @@ async def rerun_run(
     await _prune(db, graph.id)
     await db.flush()
     return th
+
+
+async def _offered_model_row(db: AsyncSession, *, graph_id: str, version: str | None) -> str | None:
+    """The ``llm_models`` row offering ``version`` in this Graph, or the refusal naming it.
+
+    ``None`` asks for nothing in particular, and the cast picks as it would.
+    """
+    if version is None:
+        return None
+    offered = await _endpoints.models_qs.endpoints_for_graph(db, graph_id)
+    found = next((e for e in offered if e.model.model_id == version), None)
+    if found is None:
+        raise ValidationError(
+            {
+                "error": "version_not_offered",
+                "message": f"{version} is not offered by this graph.",
+                "model_version": version,
+            }
+        )
+    return found.model.id
 
 
 async def _recorded_endpoint(db: AsyncSession, *, run: TaskRun) -> LLMEndpoint:
@@ -1008,6 +1074,35 @@ _SINCE_WINDOWS = {
 }
 
 
+#: The run's origin in the reader's words, by trigger, when the trigger alone says it.
+_ORIGIN_BY_TRIGGER = {
+    TriggeredBy.task.value: "Todo",
+    TriggeredBy.schedule.value: "Schedule",
+    TriggeredBy.system.value: "API",
+}
+
+
+def run_origin(run: TaskRun) -> str | None:
+    """Where a root run came from, as the Runs list's *From* says it.
+
+    ``Explorer`` is an ask from a session (or a person acting on a canvas),
+    ``Todo`` a Todo's run, ``Schedule`` a firing, ``Project`` a run opened for a
+    project, and ``API`` anything a person opened with no session behind it.
+    A delegation is never a root, so it has no origin.
+    """
+    if run.triggered_by == TriggeredBy.delegation.value:
+        return None
+    if run.triggered_by in _ORIGIN_BY_TRIGGER:
+        return _ORIGIN_BY_TRIGGER[run.triggered_by]
+    if run.session_id or run.triggered_by == TriggeredBy.canvas.value:
+        return "Explorer"
+    if run.todo_id:
+        return "Todo"
+    if (run.params or {}).get("project_id"):
+        return "Project"
+    return "API"
+
+
 async def list_runs(db: AsyncSession, *, graph_id: str, params: ListParams) -> tuple[list[dict], PageInfo]:
     """One page of the Runs list — the plan and its verdict, without the steps.
 
@@ -1021,6 +1116,11 @@ async def list_runs(db: AsyncSession, *, graph_id: str, params: ListParams) -> t
     unless ``interactive=true`` or an ``origin`` names them. What each filter
     means is :meth:`TaskRunQuerySet.page_roots`'s; ``since`` is resolved here
     against now.
+
+    Each row also carries the run's number, its root agent's current name, its
+    origin in words (:func:`run_origin`), who it ran for, how many agents it
+    used — the root and every run under it with an agent, counted for the
+    whole page in one walk — and its recorded exit reason.
     """
     window = params.one("since")
     created_after = datetime.now(UTC) - _SINCE_WINDOWS[window] if window else None
@@ -1101,6 +1201,14 @@ async def list_runs(db: AsyncSession, *, graph_id: str, params: ListParams) -> t
     if task_ids:
         titles = dict((await db.execute(select(Task.id, Task.title).where(Task.id.in_(task_ids)))).all())
 
+    # Who, from where, and how big — each one batched over the page.
+    pages_qs = RunPageQuerySet()
+    agent_names = await pages_qs.agent_names(db, ids=[r.agent_id for r in rows if r.agent_id])
+    starters = await UserQuerySet().usernames_by_ids(
+        db, list({uid for r in rows if (uid := r.on_behalf_of_user_id or r.author_id)})
+    )
+    helpers = await pages_qs.agents_under(db, run_ids=ids)
+
     items = [
         {
             "id": r.id,
@@ -1149,6 +1257,13 @@ async def list_runs(db: AsyncSession, *, graph_id: str, params: ListParams) -> t
             "cost_usd": (
                 None if r.cost_usd is None and r.id not in cost else (r.cost_usd or 0.0) + cost.get(r.id, 0.0)
             ),
+            "number": r.number,
+            "agent_name": agent_names.get(r.agent_id or ""),
+            "origin": run_origin(r),
+            "started_by_name": starters.get(r.on_behalf_of_user_id or r.author_id or ""),
+            # The root, when it has an agent, and every run under it that has one.
+            "agents": (1 if r.agent_id else 0) + helpers.get(r.id, 0),
+            "exit_reason": r.exit_reason,
         }
         for r in rows
     ]

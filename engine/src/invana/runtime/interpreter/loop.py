@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import json
 import logging
 import random
 import time
@@ -48,11 +49,13 @@ from invana.core.events import actions
 from invana.core.events.models import ActorKind, ActorType
 from invana.core.events.services import emit_event
 from invana.core.querylog import calling_as
+from invana.core.settings import settings
 from invana.core.telemetry.recorders import add_run_active, record_run, record_run_admitted
 from invana.core.telemetry.spans import add_event, current_ids, current_span_context, set_current
 from invana.plugins import load_plugins
 from invana.plugins.core.ingest.records import LoadRefused, connector_for
 from invana.plugins.sdk.manifest import SideEffect
+from invana.runtime import ledger_acts
 from invana.runtime.callers import caller_for
 from invana.runtime.catalogue import (
     CannotAnswer,
@@ -67,7 +70,14 @@ from invana.runtime.catalogue import (
     load_grounding,
 )
 from invana.runtime.contention import AgentAtCeiling, AgentSlots, GraphSlots, PoolSlots, Refused
-from invana.runtime.delegation import cost_rollup, descendants
+from invana.runtime.delegation import (
+    cost_rollup,
+    descendants,
+    end_waiting_children,
+    run_budget,
+    settle_escrow,
+    spent,
+)
 from invana.runtime.diagnosis import diagnose, internal_failure
 from invana.runtime.executor import _dispatch, refuse_disabled, tool_manifest
 from invana.runtime.governing import Governor
@@ -88,7 +98,7 @@ from invana.runtime.interpreter.tracing import (
     run_span,
     step_span,
 )
-from invana.runtime.models import RunStatus, TaskRun, span_ms
+from invana.runtime.models import ExitReason, RunStatus, TaskRun, span_ms
 from invana.runtime.planning import plan_payload, queue_plan_steps
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.results import roll_up_run, run_result, run_tokens, step_result
@@ -103,6 +113,35 @@ log = logging.getLogger(__name__)
 
 #: How long a ``send`` step's approval waits for its approver.
 SEND_APPROVAL_DEADLINE_S = 86400
+#: How long any other ask — a delegation, a budget — waits for its approver.
+ASK_DEADLINE_S = 86400
+
+#: How many identical calls in a row, with nothing new from any, end a run as making no progress.
+NO_PROGRESS_REPEATS = 3
+
+#: A step failure's cause → the reason its run ended, where the cause names one.
+_EXIT_BY_CAUSE = {
+    "budget_declined": ExitReason.budget_declined,
+    "time_limit": ExitReason.time_limit,
+    "step_limit": ExitReason.step_limit,
+    "max_steps": ExitReason.step_limit,
+    "no_progress": ExitReason.no_progress,
+    "loop": ExitReason.loop,
+}
+
+#: A step failure's cause → the ledger's refusal reason, for a step refused on a bound.
+_REFUSED_BY_CAUSE = {
+    "bound_exceeded": "ceiling",
+    "budget_declined": "ceiling",
+    "step_limit": "ceiling",
+    "max_steps": "ceiling",
+    "robots_disallowed": "robots",
+    "policy": "policy",
+    "loop": "policy",
+    "delegation_declined": "policy",
+    "secret_undeclared": "grant",
+    "plugin_disabled": "policy",
+}
 
 
 class SendGate(Protocol):
@@ -130,6 +169,71 @@ class SendGate(Protocol):
     async def decision(self, db: AsyncSession, *, approval_id: str) -> tuple[str, str]: ...
 
 
+class AskGate(Protocol):
+    """Where a step asks a person for something — a delegation, more budget — and reads it back.
+
+    The same seam as :class:`SendGate`, for every ask that is not a send: the
+    edge that owns the approvals inbox installs one on
+    :attr:`TaskRuntime.ask_gate`. ``ask`` creates the approval — ``kind`` is the
+    reader's word (``delegation`` · ``budget``), ``asked_by`` the chain from the
+    person to the asking agent, ``routed_reason`` why it went to
+    ``approver_ids`` — and returns its id. ``verdict`` returns the status
+    (``pending · approved · declined · expired``), who decided it by name, and
+    the scope it was approved with (``run`` · ``always``).
+
+    The step that asked holds — polling ``verdict`` — and the rest of its run
+    carries on; with no gate installed the step is refused, never waved through.
+    """
+
+    async def ask(
+        self,
+        db: AsyncSession,
+        *,
+        kind: str,
+        graph_id: str,
+        run_id: str | None,
+        step_run_id: str | None,
+        asked_by: list[dict],
+        wants: str,
+        routed_reason: str,
+        approver_ids: list[str],
+        payload: dict,
+        title: str | None = None,
+        deadline_s: int = ASK_DEADLINE_S,
+    ) -> str: ...
+
+    async def verdict(self, db: AsyncSession, *, approval_id: str) -> tuple[str, str, str | None]: ...
+
+
+def exit_reason_for(status: str, *, outcome: str | None = None, cause: str | None = None) -> str:
+    """The one reason a run ended, from how it settled.
+
+    Succeeded is *served*, or *cannot answer* when that was its outcome; failed
+    is the specific reason its cause names, else *failed*. Cancellation is
+    decided by whoever cancelled — :meth:`TaskRuntime.cancel` — not here.
+    """
+    if status == RunStatus.succeeded.value:
+        return (ExitReason.cannot_answer if outcome == "cannot_answer" else ExitReason.served).value
+    if status == RunStatus.cancelled.value:
+        return ExitReason.stopped.value
+    return _EXIT_BY_CAUSE.get(cause or "", ExitReason.failed).value
+
+
+def _no_progress(recent: list[tuple[str, str, str]], row: TaskRun) -> bool:
+    """Remember a settled call; True once the last few were one call with nothing new from any.
+
+    The same function, with the same bound arguments, returning the same output
+    :data:`NO_PROGRESS_REPEATS` times in a row is a run going round in place.
+    """
+    recent.append((row.task_key, _canonical(row.args), _canonical(row.output)))
+    del recent[:-NO_PROGRESS_REPEATS]
+    return len(recent) == NO_PROGRESS_REPEATS and len(set(recent)) == 1
+
+
+def _canonical(value: Any) -> str:
+    return json.dumps(value or {}, sort_keys=True, default=str)
+
+
 def _seconds_since(then: datetime | None) -> float:
     """Seconds from *then* to now, never negative; a naive time is read as UTC."""
     if then is None:
@@ -146,6 +250,9 @@ class TaskRuntime:
     #: the edge that owns it. With none installed a ``send`` step is refused,
     #: never sent unapproved.
     send_gate: ClassVar[SendGate | None] = None
+    #: The approvals inbox every other ask holds on — a delegation to an agent
+    #: that asks each time. With none installed such a step is refused.
+    ask_gate: ClassVar[AskGate | None] = None
 
     def __init__(
         self,
@@ -172,6 +279,9 @@ class TaskRuntime:
         self._pools = PoolSlots()
         # Rules are Skills' rule, read here rather than reimplemented.
         self._rules = RuleManager()
+        # Why each run being cancelled ends, and who stopped it, keyed by run id:
+        # the run a person stopped ends `stopped`, every run under it `parent_ended`.
+        self._cancelled: dict[str, tuple[str, str | None]] = {}
 
     # ── lifecycle ─────────────────────────────────────────────────────────────
 
@@ -310,6 +420,7 @@ class TaskRuntime:
                 if root is not None:
                     root.status = RunStatus.failed.value
                     root.outcome = "failed"
+                    root.exit_reason = ExitReason.failed.value
                     root.finished_at = _now()
                     root.error = {"cls": "defect", "cause": "internal", "message": "The eval run could not be scored."}
                     await self._roll_up_run(db, root)
@@ -358,7 +469,9 @@ class TaskRuntime:
             )
             th.status = RunStatus.failed.value
             th.outcome = "failed"
+            th.exit_reason = ExitReason.failed.value
             th.finished_at = _now()
+            await settle_escrow(db, th)
             th.error = {
                 "cls": "bound",
                 "cause": "agent_ceiling",
@@ -402,7 +515,9 @@ class TaskRuntime:
             )
             th.status = RunStatus.failed.value
             th.outcome = "failed"
+            th.exit_reason = ExitReason.failed.value
             th.finished_at = _now()
+            await settle_escrow(db, th)
             th.error = {
                 "cls": "bound",
                 "cause": "graph_ceiling",
@@ -427,12 +542,15 @@ class TaskRuntime:
                 add_event("run.admitted", {"waited": True})
                 return True
 
-    async def cancel(self, run_id: str) -> bool:
+    async def cancel(self, run_id: str, *, stopped_by: str | None = None) -> bool:
         """Stop a running run, and everything it delegated to.
 
         The cascade walks ``parent_run_id`` **down** (docs/for-developers/modules/work/spec.md):
         cancelling a parent while its children keep spending budget would make
-        the stop button a lie.
+        the stop button a lie. The run named here ends ``stopped`` — a
+        ``run.stop`` event by ``stopped_by`` (else the person it ran for) — and
+        every run under it ends ``parent_ended``; a child still waiting for room
+        and never started is ended in place.
         """
         children: list[str] = []
         async with self._factory() as db:
@@ -443,14 +561,26 @@ class TaskRuntime:
             th = await TaskRunQuerySet().get(db, run_id)
             if th is not None:
                 self._slots.withdraw(graph_id=th.graph_id, run_id=run_id)
+            waiting = [c for c in children if c not in self._tasks or self._tasks[c].done()]
+            with contextlib.suppress(Exception):
+                for child in await end_waiting_children(db, waiting):
+                    self._slots.withdraw(graph_id=child.graph_id, run_id=child.id)
+                await db.commit()
+        self._cancelled[run_id] = (ExitReason.stopped.value, stopped_by)
+        for child in children:
+            self._cancelled[child] = (ExitReason.parent_ended.value, stopped_by)
         stopped = False
-        for target in [*children, run_id]:
+        # The stopped run first: a parent that saw its child cancelled before its
+        # own stop arrived would end `failed` on a delegation, not `stopped`.
+        for target in [run_id, *children]:
             task = self._tasks.get(target)
             if task is None or task.done():
+                self._cancelled.pop(target, None)
                 continue
             task.cancel()
             with contextlib.suppress(BaseException):
                 await task
+            self._cancelled.pop(target, None)
             stopped = True
         return stopped
 
@@ -811,6 +941,8 @@ class TaskRuntime:
         """
         message_id = assistant.id if assistant else None
         i = start_index
+        # The settled calls so far, as (function, args, output) — what *no progress* reads.
+        recent: list[tuple[str, str, str]] = []
         while True:
             queued = await self._pending_rows(db, th, message_id)
             if i >= len(queued):
@@ -823,12 +955,18 @@ class TaskRuntime:
             # actually ran; the authored binding survives in `plan_snapshot`,
             # which is what a replay reads.
             row.args = resolve_bindings(row.args, {r.step_key: r.output or {} for r in queued[:i] if r.step_key})
+            # A run stops on its token budget between steps — a child's budget is
+            # its escrow — and the step it did not reach says why.
+            if await self._out_of_budget(db, emitter, th, row, v, assistant):
+                return "error"
             while True:
                 row.status = RunStatus.running.value
                 row.started_at = _now()
                 await db.commit()
                 await emitter.emit("step.started", _step_payload(row))
                 ctx = TaskContext(db=db, manager=self._manager, emitter=emitter, step=row, runtime=self)
+                if v.governor is not None:
+                    v.governor.begin_step(row.id, row.task_key)
                 try:
                     if await self._hold_for_send(db, emitter, th, row, v, i):
                         return "clarify"
@@ -843,6 +981,7 @@ class TaskRuntime:
                     row.detail = "cannot answer · outside this graph"
                     row.output = {"cannot_answer": cannot.reason, **cannot.exchange}
                     self._record(row, ctx, v)
+                    await self._ledger_step(db, th, row, v)
                     await self._drop_pending(db, th, message_id)
                     await db.commit()
                     await self._step_finished(db, emitter, th, row)
@@ -856,6 +995,7 @@ class TaskRuntime:
                     row.detail = "small talk"
                     row.output = {"reply": conv.reply, "options": conv.options, **conv.exchange}
                     self._record(row, ctx, v)
+                    await self._ledger_step(db, th, row, v)
                     await self._drop_pending(db, th, message_id)
                     await db.commit()
                     await self._step_finished(db, emitter, th, row)
@@ -889,6 +1029,7 @@ class TaskRuntime:
                             row.output["bound"] = "max_clarifications"
                             row.output["clarifications"] = {"round": th.clarifications, "limit": limit}
                         self._record(row, ctx, v)
+                        await self._ledger_step(db, th, row, v)
                         await self._drop_pending(db, th, message_id)
                         await db.commit()
                         await self._step_finished(db, emitter, th, row)
@@ -905,6 +1046,9 @@ class TaskRuntime:
                         "clarifications": {"round": th.clarifications, "limit": limit},
                     }
                     self._record(row, ctx, v)
+                    if v.governor is not None:
+                        # Held on a person, not settled: the resumed attempt is the row.
+                        v.governor.end_step(row.id)
                     th.status = RunStatus.awaiting_input.value
                     # The cursor carries the question, not just where to resume:
                     # the attempt that continues the run records what it was
@@ -934,6 +1078,7 @@ class TaskRuntime:
                     if failure.raw:
                         row.error["raw"] = failure.raw[:2000]
                     self._record(row, ctx, v)
+                    await self._ledger_step(db, th, row, v, failure=failure)
                     will_retry = failure.cls in step.retry.on and attempt < step.retry.max_attempts
                     await db.commit()
                     await self._step_finished(db, emitter, th, row)
@@ -972,8 +1117,21 @@ class TaskRuntime:
                 row.tokens_in = out.tokens_in if out.tokens_in is not None else row.tokens_in
                 row.tokens_out = out.tokens_out if out.tokens_out is not None else row.tokens_out
                 self._record(row, ctx, v)
+                await self._ledger_step(db, th, row, v)
                 await db.commit()
                 await self._step_finished(db, emitter, th, row)
+                if _no_progress(recent, row):
+                    failure = TaskFailure(
+                        cls="bound",
+                        cause="no_progress",
+                        message=(
+                            f"{row.task_key} ran {NO_PROGRESS_REPEATS} times in a row with the same arguments "
+                            "and nothing new came back, so the run stopped."
+                        ),
+                        short="no progress",
+                    )
+                    await self._finish_failed(db, emitter, th, v, assistant, failure, attempts=attempt)
+                    return "error"
                 # A Plan step appends the rest of the run. The rows are written
                 # and emitted **before** any of them starts, which is the
                 # "this is what I'm about to do" moment plan-first buys.
@@ -1076,6 +1234,87 @@ class TaskRuntime:
         """
         row.cost_usd = cost_usd(v.provider, row.tokens_in, row.tokens_out)
         row.result = step_result(row, artifacts=ctx.artifacts)
+
+    async def _ledger_step(
+        self, db: AsyncSession, th: TaskRun, row: TaskRun, v: RunVars, *, failure: TaskFailure | None = None
+    ) -> None:
+        """Write the settled step's ledger row, in the step's own transaction.
+
+        ``touched`` is the first participant the step engaged — else, for a
+        model call, the model; for a delegation, the agent handed the work.
+        The verdict is ``refused`` when the frozen lens refused the step
+        something, or when it failed on a bound — naming which — and
+        ``allowed`` otherwise, a plain failure included: the act happened.
+
+        A spawn writes its own rows as it decides, so its step writes none here.
+        """
+        touch, lens_rule = v.governor.end_step(row.id) if v.governor is not None else (None, None)
+        if row.task_key == "work.spawn_agent":
+            return
+        touched, line = (touch[0], ledger_acts.volume_line(touch[1])) if touch else ("", "")
+        tokens = (row.tokens_in or 0) + (row.tokens_out or 0)
+        if not touched and ledger_acts.layer_for(row.task_key) == "llm" and v.model_address:
+            touched = v.model_address
+        if row.task_key == "work.delegate":
+            target = await db.get(Agent, str((row.args or {}).get("agent_id") or "")) if row.args else None
+            touched = f"agent/{target.name}" if target else touched
+            escrow = (row.input or {}).get("escrow")
+            line = f"escrow {ledger_acts.tokens_line(escrow)}" if escrow else line
+        if not line and tokens:
+            line = f"{ledger_acts.tokens_line(tokens)} tokens"
+        verdict, refused_by, rule = "allowed", None, ""
+        if lens_rule is not None:
+            verdict, refused_by, rule = "refused", "lens", lens_rule
+        elif failure is not None:
+            refused_by = (
+                failure.evidence.get("refused_by")
+                or _REFUSED_BY_CAUSE.get(failure.cause)
+                or ("ceiling" if failure.cls == "bound" else None)
+            )
+            if refused_by:
+                verdict, rule = "refused", failure.message
+        manifest = tool_manifest(row.task_key)
+        where = "tools queue" if manifest is not None and settings.executor == "procrastinate" else None
+        await ledger_acts.step_settled(
+            db,
+            run=th,
+            step=row,
+            touched=touched,
+            touched_line=line,
+            verdict=verdict,
+            refused_by=refused_by,
+            rule=rule,
+            where=where or ledger_acts.IN_PROCESS,
+        )
+
+    async def _out_of_budget(
+        self, db: AsyncSession, emitter: Emitter, th: TaskRun, row: TaskRun, v: RunVars, m: SessionMessage | None
+    ) -> bool:
+        """End the run ``budget_declined`` when it has spent its token budget; True when it ended.
+
+        Checked before each step, so a step is never started on tokens the run
+        does not have. A child's budget is its escrow; a root's is what it
+        froze at open, else its agent's. The step it did not reach is
+        ``skipped`` and says why.
+        """
+        budget = run_budget(th, v.agent)
+        if budget is None:
+            return False
+        used = await spent(db, th)
+        if used < budget:
+            return False
+        row.status = RunStatus.skipped.value
+        row.detail = "not started · token budget spent"
+        await db.commit()
+        failure = TaskFailure(
+            cls="bound",
+            cause="budget_declined",
+            message=f"This run spent {used} of its {budget} tokens, so it stopped before {row.label or row.task_key}.",
+            short="budget spent",
+            evidence={"budget": budget, "spent": used},
+        )
+        await self._finish_failed(db, emitter, th, v, m, failure, attempts=row.attempt)
+        return True
 
     # ── the plan ──────────────────────────────────────────────────────────────
 
@@ -1279,6 +1518,8 @@ class TaskRuntime:
         # from ``status``: a run that finished cleanly having found nothing is
         # *succeeded* and *cannot_answer*, and those are not the same claim.
         th.outcome = outcome or _OUTCOME_BY_STATUS.get(status.value)
+        # The one reason it ended, recorded once, as it settles — never derived later.
+        th.exit_reason = exit_reason_for(status.value, outcome=th.outcome, cause=(th.error or {}).get("cause"))
         th.finished_at = _now()
         # The run's own `result.json` — a roll-up of its tasks, written once the
         # outcome is known and never before (SR39). Its cost is the sum of the
@@ -1289,6 +1530,7 @@ class TaskRuntime:
         th.cost_usd = round(sum(priced), 6) if priced else None
         roll_up_run(th, nodes)
         th.result = run_result(th, nodes)
+        await settle_escrow(db, th)
         rollup = await cost_rollup(db, run_id=th.id)
         agent_kwargs: dict = {"actor_type": ActorType.system, "actor_id": None}
         if th.agent_id and th.on_behalf_of_user_id:
@@ -1440,10 +1682,13 @@ class TaskRuntime:
                     row.status = RunStatus.stopped.value
                     row.finished_at = _now()
                     row.detail = "stopped"
+            reason, stopped_by = self._cancelled.get(run_id, (ExitReason.stopped.value, None))
             th.status = RunStatus.cancelled.value
             th.outcome = "cancelled"
+            th.exit_reason = reason
             th.finished_at = _now()
             await self._roll_up_run(db, th)
+            await settle_escrow(db, th)
             if m is not None:
                 m.status = SessionMessageStatus.stopped
                 m.content = "Stopped by you."
@@ -1458,13 +1703,47 @@ class TaskRuntime:
                 graph_id=th.graph_id,
                 actor_id=None,
                 actor_type=ActorType.system,
-                details={"run_id": th.id},
+                details={"run_id": th.id, "exit_reason": reason},
             )
+            if reason == ExitReason.stopped.value:
+                await self._emit_stop(db, th, stopped_by)
+            else:
+                await ledger_acts.run_ended(db, run=th, reason=reason)
             await db.commit()
             await emitter.emit(
                 "run.cancelled",
                 {"run_id": th.id, "status": th.status, "message": message_payload(m, th) if m else None},
             )
+
+    async def _emit_stop(self, db: AsyncSession, th: TaskRun, stopped_by: str | None) -> None:
+        """Record a person stopping a run — ``run.stop``, which is also its ledger row.
+
+        The person is who pressed Stop when the caller says so, else the person
+        the run was working for. A run nobody can be named for records no stop.
+        """
+        user_id = stopped_by or th.on_behalf_of_user_id or th.author_id
+        if not user_id:
+            return
+        from invana.core.auth.models import User
+
+        user = await db.get(User, user_id)
+        root = await ledger_acts.root_of(db, th)
+        await emit_event(
+            db,
+            action=actions.RUN_STOP,
+            target_kind=actions.TARGET_THINKING,
+            target_id=th.id,
+            graph_id=th.graph_id,
+            task_id=th.todo_id,
+            run_id=th.id,
+            actor_kind=ActorKind.user,
+            actor_id=user_id,
+            details={
+                "actor_name": user.username if user else None,
+                "run_number": root.number,
+                "exit_reason": ExitReason.stopped.value,
+            },
+        )
 
     async def _on_crash(self, run_id: str, exc: BaseException) -> None:
         emitter = Emitter(self._factory, run_id)
@@ -1480,9 +1759,11 @@ class TaskRuntime:
                 row.error = {"cls": "defect", "cause": "internal", "message": failure.message}
             th.status = RunStatus.failed.value
             th.outcome = "failed"
+            th.exit_reason = ExitReason.failed.value
             th.finished_at = _now()
             th.error = {"cls": "defect", "cause": "internal", "message": failure.message, "raw": repr(exc)[:2000]}
             await self._roll_up_run(db, th)
+            await settle_escrow(db, th)
             m = await db.get(SessionMessage, th.assistant_message_id) if th.assistant_message_id else None
             if m is not None:
                 m.status = SessionMessageStatus.error
@@ -1506,9 +1787,11 @@ class TaskRuntime:
             row.error = {"cls": "defect", "cause": "internal", "message": "engine restarted"}
         th.status = RunStatus.failed.value
         th.outcome = "failed"
+        th.exit_reason = ExitReason.failed.value
         th.finished_at = _now()
         th.error = {"cls": "defect", "cause": "internal", "message": "The engine restarted while this was running."}
         await self._roll_up_run(db, th)
+        await settle_escrow(db, th)
         if th.assistant_message_id:
             m = await db.get(SessionMessage, th.assistant_message_id)
             if m is not None and m.status == SessionMessageStatus.running:

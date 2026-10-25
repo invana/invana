@@ -138,6 +138,10 @@ THINKING_FINISH = "run.finish"  # succeeded | failed, with duration
 THINKING_CANCEL = "run.cancel"  # stopped by the user; cascades to children
 THINKING_DELEGATE = "run.delegate"  # a step opened a child run (docs/for-developers/modules/work/spec.md)
 THINKING_RESUME = "run.resume"  # a clarification was answered
+# A person stopped a run (the-run-page.md); the run ends `stopped`, its children `parent_ended`.
+RUN_STOP = "run.stop"
+# A child run's unspent escrow went back to its parent (delegation.md).
+ESCROW_RETURN = "escrow.return"
 
 # ── Evals (docs/for-developers/modules/skills/features/evals.md) ─────────────────
 EVAL_SET_UPDATE = "eval_set.update"  # judge pin, rubric
@@ -284,6 +288,10 @@ APPROVAL_APPROVE = "approval.approve"
 APPROVAL_DECLINE = "approval.decline"
 APPROVAL_EXPIRE = "approval.expire"
 APPROVAL_REMIND = "approval.remind"
+# Rules over the ledger (approvals.md, Alert rules) — each change is itself a ledger row.
+ALERT_RULE_CREATE = "alert_rule.create"
+ALERT_RULE_UPDATE = "alert_rule.update"
+ALERT_RULE_DELETE = "alert_rule.delete"
 UNMATCHED_PREFIXES: tuple[str, ...] = ("delivery.", "notification.")
 UNMATCHED_ACTIONS: frozenset[str] = frozenset({APPROVAL_REMIND})
 

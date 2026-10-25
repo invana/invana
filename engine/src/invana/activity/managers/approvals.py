@@ -11,25 +11,34 @@ the deadline it is ``expired`` and what it held is *expired, not sent*::
 
 The clock calls ``remind_due`` and ``expire_due`` each tick; both lock what they
 touch, so two engine processes never remind or expire one approval twice.
+
+**Approvals is the one queue.** Every ask an agent or a run makes of a person —
+access, budget, delegation, send, question, publish — is a row with a ``kind``.
+:meth:`ApprovalManager.page` cuts it into the Waiting tabs (*For you* · *All* ·
+*Answered*) with the engine's counts, and :meth:`ApprovalManager.reads` fills
+each row with the names a person reads. Approving a ``delegation`` with
+``scope="always"`` also writes ``always`` for the target agent into the asking
+agent's ``policy.may_delegate``; every other kind refuses that scope.
 """
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.managers.notifications import InboxManager, Members
 from invana.activity.models import Approval, ApprovalStatus, DeliveryStatus, NotificationKind
-from invana.activity.querysets import ApprovalQuerySet, DeliveryQuerySet
+from invana.activity.querysets import ApprovalQuerySet, DeliveryQuerySet, WaitingQuerySet
+from invana.activity.schemas import ApprovalPage, ApprovalRead
+from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.graphs.models import Graph
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
-from invana.core.lists import ListParams, PageInfo
+from invana.core.lists import AppliedFilter, ListParams
 
 
 class ApprovalManager:
@@ -37,6 +46,8 @@ class ApprovalManager:
 
     approvals_qs = ApprovalQuerySet()
     deliveries_qs = DeliveryQuerySet()
+    waiting_qs = WaitingQuerySet()
+    agents_qs = AgentQuerySet()
     inbox = InboxManager()
 
     async def request(
@@ -54,8 +65,19 @@ class ApprovalManager:
         run_id: str | None = None,
         schedule_id: str | None = None,
         now: datetime | None = None,
+        kind: str | None = None,
+        asked_by: list[dict] | None = None,
+        wants: str = "",
+        routed_reason: str = "",
+        step_run_id: str | None = None,
     ) -> Approval:
-        """Hold ``payload`` until one of ``approver_ids`` decides, or ``deadline_s`` passes."""
+        """Hold ``payload`` until one of ``approver_ids`` decides, or ``deadline_s`` passes.
+
+        ``kind`` is the reader's word for the ask; left out, a model publish is
+        ``publish`` and anything else a ``send``. ``asked_by`` is the actor chain,
+        ``wants`` one line of what is asked, ``routed_reason`` why it went to
+        these approvers.
+        """
         if not approver_ids:
             raise ValidationError("An approval needs at least one approver.")
         now = now or datetime.now(UTC)
@@ -73,6 +95,11 @@ class ApprovalManager:
                 requested_by_id=requested_by_id,
                 deadline_at=now + timedelta(seconds=deadline_s),
                 created_at=now,
+                kind=kind or ("publish" if subject_kind == "model_publish" else "send"),
+                asked_by=list(asked_by or []),
+                wants=wants[:512],
+                routed_reason=routed_reason[:64],
+                step_run_id=step_run_id,
             ),
         )
         await self.inbox.tell(
@@ -101,12 +128,51 @@ class ApprovalManager:
         return sorted(rows, key=lambda r: (r.status != ApprovalStatus.pending.value, r.deadline_at))
 
     async def page(
-        self, session: AsyncSession, *, graph: Graph, params: ListParams, mine: User | None = None
-    ) -> tuple[Sequence[Approval], PageInfo]:
-        """One page of the Approvals list, newest first; with ``mine``, only what names that member."""
-        return await self.approvals_qs.page_for_graph(
-            session, graph_id=graph.id, params=params, approver_id=mine.id if mine is not None else None
+        self,
+        session: AsyncSession,
+        *,
+        graph: Graph,
+        params: ListParams,
+        reader: User,
+        applied: list[AppliedFilter],
+    ) -> ApprovalPage:
+        """One page of the Approvals list for ``reader``, with the Waiting tabs' counts.
+
+        ``view=for_you`` is what the reader may decide, ``all`` every pending ask
+        in the Graph, ``answered`` the decided and expired ones, newest decided
+        first. ``mine=true`` keeps the bell tray's reading.
+        """
+        rows, info = await self.waiting_qs.page(session, graph_id=graph.id, params=params, reader_id=reader.id)
+        for_you, pending = await self.waiting_qs.counts(session, graph_id=graph.id, reader_id=reader.id)
+        return ApprovalPage(
+            items=await self.reads(session, list(rows), reader=reader),
+            total=info.total,
+            unfiltered_total=info.unfiltered_total,
+            next_cursor=info.next_cursor,
+            applied=applied,
+            for_you=for_you,
+            pending=pending,
         )
+
+    async def reads(self, session: AsyncSession, rows: list[Approval], *, reader: User | None) -> list[ApprovalRead]:
+        """Each approval as the reader reads it: names, the run's number, whether they may decide."""
+        user_ids = {uid for r in rows for uid in r.approver_ids} | {r.decided_by_id for r in rows if r.decided_by_id}
+        names = await self.waiting_qs.usernames(session, sorted(user_ids))
+        numbers = await self.waiting_qs.run_numbers(session, sorted({r.run_id for r in rows if r.run_id}))
+        out = []
+        for row in rows:
+            read = ApprovalRead.model_validate(row)
+            read.approver_names = [names[i] for i in row.approver_ids if i in names]
+            read.run_number = numbers.get(row.run_id) if row.run_id else None
+            read.can_decide = (
+                reader is not None and row.status == ApprovalStatus.pending.value and reader.id in row.approver_ids
+            )
+            read.decided_by_name = names.get(row.decided_by_id) if row.decided_by_id else None
+            out.append(read)
+        return out
+
+    async def read(self, session: AsyncSession, row: Approval, *, reader: User | None) -> ApprovalRead:
+        return (await self.reads(session, [row], reader=reader))[0]
 
     async def get(self, session: AsyncSession, *, graph: Graph, approval_id: str) -> Approval:
         row = await self.approvals_qs.get(session, graph_id=graph.id, approval_id=approval_id)
@@ -123,12 +189,21 @@ class ApprovalManager:
         user: User,
         approve: bool,
         note: str = "",
+        scope: str = "run",
         now: datetime | None = None,
     ) -> Approval:
-        """Approve or decline. 403 for anyone not named; 409 once decided or past the deadline."""
+        """Approve or decline. 403 for anyone not named; 409 once decided or past the deadline.
+
+        ``scope="always"`` is for a ``delegation`` only (422 otherwise): approving
+        writes ``always`` for the target agent into the asking agent's *May
+        delegate to*. Any other ask's decision is recorded and read back by
+        whatever waits on it.
+        """
         now = now or datetime.now(UTC)
         await self.get(session, graph=graph, approval_id=approval_id)
         row = await self.approvals_qs.locked(session, approval_id=approval_id)
+        if scope == "always" and row.kind != "delegation":
+            raise ValidationError("Allow always is for a delegation only; this ask is for this run.")
         if user.id not in row.approver_ids:
             names = (await Members.of(session, graph_id=graph.id)).usernames(row.approver_ids)
             raise PermissionDeniedError(f"Only its approvers may decide: {', '.join(names) or 'none left'}.")
@@ -138,6 +213,10 @@ class ApprovalManager:
             raise ConflictError("The deadline has passed; it expires, not sent.")
         row.status = (ApprovalStatus.approved if approve else ApprovalStatus.declined).value
         row.decided_by_id, row.decided_at, row.note = user.id, now, note
+        if approve and row.kind == "delegation":
+            row.scope = scope
+            if scope == "always":
+                await self._allow_always(session, graph=graph, row=row)
         released = DeliveryStatus.pending if approve else DeliveryStatus.declined
         for delivery in await self.deliveries_qs.for_approval(session, approval_id=row.id):
             if delivery.status == DeliveryStatus.held.value:
@@ -149,8 +228,23 @@ class ApprovalManager:
             actions.APPROVAL_APPROVE if approve else actions.APPROVAL_DECLINE,
             actor=user.id,
             note=note,
+            scope=row.scope,
         )
         return row
+
+    async def _allow_always(self, session: AsyncSession, *, graph: Graph, row: Approval) -> None:
+        """Write ``always`` for the target into the asking agent's ``policy.may_delegate``."""
+        from_id = (row.payload or {}).get("from_agent_id")
+        to_id = (row.payload or {}).get("to_agent_id")
+        if not from_id or not to_id:
+            raise ValidationError("This delegation names no agents, so it cannot be allowed always.")
+        caller = await self.agents_qs.get(session, from_id)
+        if caller is None or caller.graph_id != graph.id:
+            raise NotFoundError("The agent that asked is gone.")
+        policy = dict(caller.policy or {})
+        policy["may_delegate"] = {**dict(policy.get("may_delegate") or {}), to_id: "always"}
+        caller.policy = policy
+        await session.flush()
 
     async def remind_due(self, session: AsyncSession, *, now: datetime) -> int:
         """Remind the approvers of every approval past half-time, once."""

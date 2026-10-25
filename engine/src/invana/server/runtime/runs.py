@@ -15,6 +15,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.activity.querysets.asks import AskQuerySet, pending_for
 from invana.apps.agents.models import Agent
 from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.graphs.models import Graph, GraphMember
@@ -29,6 +30,7 @@ from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.interpreter import TaskRuntime
 from invana.runtime.interpreter.payloads import _retry_for
 from invana.runtime.managers.rule_citations import offered_rules
+from invana.runtime.managers.run_pages import PendingAsk, RunPageManager
 from invana.runtime.managers.run_stats import MAX_DAYS, RunStatsManager
 from invana.runtime.models import RunStatus, TaskPrompt, TaskRun, span_ms
 from invana.runtime.projections import (
@@ -45,10 +47,15 @@ from invana.runtime.schemas import (
     CancelResponse,
     EmissionRead,
     ResumeTaskRun,
+    RunAgents,
+    RunAssets,
     RunNodeRead,
+    RunOverview,
     RunRerun,
     RunRerunResponse,
+    RunStages,
     RunStats,
+    RunTouched,
     SwitchTemplate,
     TaskPromptRead,
     TaskRunRead,
@@ -107,11 +114,16 @@ async def run_stats(
     kind: list[str] | None = Query(default=None, description="Only these kinds of work — `ask`, `import`, `bulk`."),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> RunStats:
     """The journal's tiles for this Graph — *In flight*, *Today*, *Tokens today*,
-    *Slowest* — counted over every root run in the window."""
-    return await RunStatsManager().stats(session, graph_ids=[graph.id], kinds=kind, days=days, tz=tz)
+    *Slowest*, *Served* and *Not served* — counted over every root run in the
+    window, and *Waiting on you*: the pending asks naming the reader."""
+    waiting = await AskQuerySet().count_for_approver(session, graph_ids=[graph.id], user_id=user.id)
+    return await RunStatsManager().stats(
+        session, graph_ids=[graph.id], kinds=kind, days=days, tz=tz, waiting_approvals=waiting
+    )
 
 
 @install_runs_router.get("/stats", response_model=RunStats)
@@ -125,7 +137,10 @@ async def install_run_stats(
     """The same tiles over every Graph the reader is a member of — the Imports
     page's counts, median time and imports a day."""
     graph_ids = await GraphMemberQuerySet().graph_ids_for_user(session, user_id=user.id)
-    return await RunStatsManager().stats(session, graph_ids=graph_ids, kinds=kind, days=days, tz=tz)
+    waiting = await AskQuerySet().count_for_approver(session, graph_ids=graph_ids, user_id=user.id)
+    return await RunStatsManager().stats(
+        session, graph_ids=graph_ids, kinds=kind, days=days, tz=tz, waiting_approvals=waiting
+    )
 
 
 @runs_router.get("/{run_id}", response_model=TaskRunRead)
@@ -148,6 +163,84 @@ async def get_run(
         read.run_tokens_in, read.run_tokens_out = run_tokens(th, steps)
         read.run_tokens = read.run_tokens_in + read.run_tokens_out
     return read
+
+
+# ---------------------------------------------------------------------------
+# The run page (docs/for-developers/modules/agents/features/the-run-page.md)
+# ---------------------------------------------------------------------------
+
+
+async def _pending_asks(session: AsyncSession, graph: Graph) -> list[PendingAsk]:
+    """The Graph's pending asks, for the run page to keep the ones raised in its tree."""
+    return [PendingAsk.of(a) for a in await pending_for(session, graph_id=graph.id)]
+
+
+@runs_router.get("/{run_id}/overview", response_model=RunOverview)
+async def run_overview(
+    run_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RunOverview:
+    """The run page's Overview — head, tiles, agents over time, steps a minute,
+    what waits on the reader, and past fifty agents the large-run reading."""
+    run = await services.get_run_or_404(session, run_id=run_id, graph_id=graph.id, user_id=user.id)
+    asks = await _pending_asks(session, graph)
+    return await RunPageManager().overview(session, run=run, reader_id=user.id, asks=asks)
+
+
+@runs_router.get("/{run_id}/agents", response_model=RunAgents)
+async def run_agents(
+    run_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RunAgents:
+    """Who spawned whom in this run, its pending delegation asks, and its roles."""
+    run = await services.get_run_or_404(session, run_id=run_id, graph_id=graph.id, user_id=user.id)
+    asks = await _pending_asks(session, graph)
+    return await RunPageManager().agents(session, run=run, asks=asks)
+
+
+@runs_router.get("/{run_id}/stages", response_model=RunStages)
+async def run_stages(
+    run_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RunStages:
+    """The run's stages — one per step key, in plan order, with counts in and out."""
+    run = await services.get_run_or_404(session, run_id=run_id, graph_id=graph.id, user_id=user.id)
+    return await RunPageManager().stages(session, run=run)
+
+
+@runs_router.get("/{run_id}/assets", response_model=RunAssets)
+async def run_assets(
+    run_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RunAssets:
+    """Every emission, file, branch and Todo the run produced."""
+    run = await services.get_run_or_404(session, run_id=run_id, graph_id=graph.id, user_id=user.id)
+    return await RunPageManager().assets(session, run=run)
+
+
+@runs_router.get("/{run_id}/touched", response_model=RunTouched)
+async def run_touched(
+    run_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RunTouched:
+    """What the run engaged — graph types, web domains, models and secrets."""
+    run = await services.get_run_or_404(session, run_id=run_id, graph_id=graph.id, user_id=user.id)
+    return await RunPageManager().touched(session, run=run)
 
 
 @runs_router.get("/{run_id}/stream")
@@ -218,9 +311,18 @@ async def rerun_run(
     session: AsyncSession = Depends(get_session),
     runtime: TaskRuntime = Depends(get_runtime),
 ) -> RunRerunResponse:
-    """Re-run a settled ask on the versions it recorded (``same``) or on today's (``current``)."""
+    """Re-run an ended ask on the versions it recorded (``same``), on today's
+    (``current``), or retuned — agent version, model version, run budget, world."""
     th = await services.get_run_or_404(session, run_id=run_id, graph_id=graph.id, user_id=user.id)
-    rerun = await services.rerun_run(session, graph=graph, run=th, versions=payload.versions, actor_id=user.id)
+    retune = services.Retune(
+        agent_version=payload.agent_version,
+        model_version=payload.model_version,
+        max_tokens_run=payload.max_tokens_run,
+        lens_id=payload.lens_id,
+    )
+    rerun = await services.rerun_run(
+        session, graph=graph, run=th, versions=payload.versions, actor_id=user.id, retune=retune
+    )
     await session.commit()
     runtime.submit(rerun.id)
     return RunRerunResponse(

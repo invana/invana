@@ -9,6 +9,7 @@ from starlette_admin import DropDown
 from starlette_admin.contrib.sqla import Admin
 
 from invana.activity.models import (
+    AlertRule,
     Approval,
     Notification,
     NotificationChannel,
@@ -76,6 +77,7 @@ from invana.apps.work.models import (
 )
 from invana.core.auth.models import PersonalAccessToken, RefreshToken, User
 from invana.core.events.models import Event
+from invana.core.ledger.models import LedgerCheck, LedgerExport, LedgerRow
 from invana.runtime.models import (
     Emission,
     EnvelopeOutcome,
@@ -92,6 +94,7 @@ from invana.runtime.models import (
 )
 from invana.server.admin.auth import SuperuserAuthProvider
 from invana.server.agents.admin import AgentView
+from invana.server.alerts.admin import AlertRuleView
 from invana.server.annotations.admin import AnnotationAnchorView, AnnotationView
 from invana.server.approvals.admin import ApprovalView
 from invana.server.auth.admin import (
@@ -117,6 +120,7 @@ from invana.server.graphs.admin import (
     GraphContainerView,
     GraphMemberView,
 )
+from invana.server.ledger.admin import LedgerCheckView, LedgerExportView, LedgerRowView
 from invana.server.llm_providers.admin import LLMModelView, LLMProviderView
 from invana.server.modeller.admin import (
     ConstraintDefinitionView,
@@ -414,6 +418,21 @@ def mount_admin(app: FastAPI) -> None:
                 NotificationDeliveryView(NotificationDelivery, label="Deliveries", icon="fa fa-paper-plane"),
                 NotificationCursorView(NotificationCursor, label="Cursors", icon="fa fa-bookmark"),
                 ApprovalView(Approval, label="Approvals", icon="fa fa-stamp"),
+                AlertRuleView(AlertRule, label="Alert rules", icon="fa fa-triangle-exclamation"),
+            ],
+        ),
+    )
+
+    # ── The ledger (docs/for-developers/modules/operate/features/the-ledger.md)
+    # ──────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Ledger",
+            icon="fa fa-book",
+            views=[
+                LedgerRowView(LedgerRow, label="Ledger rows", icon="fa fa-list"),
+                LedgerCheckView(LedgerCheck, label="Chain checks", icon="fa fa-link"),
+                LedgerExportView(LedgerExport, label="Exports", icon="fa fa-file-export"),
             ],
         ),
     )

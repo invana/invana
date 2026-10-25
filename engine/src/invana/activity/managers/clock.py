@@ -4,8 +4,9 @@ docs/for-developers/modules/operate/spec.md · features/notifications.md.
 One ``tick(now)`` does, in order: fire due and queued schedules, deliver the
 scheduled runs that settled, match new events against the rules, remind and
 expire approvals, move publish reviews along (a settled preview asks for its
-approval, a decided approval opens or ends the migration), and send what is
-pending. Each step is idempotent on a unique
+approval, a decided approval opens or ends the migration), send what is
+pending, match the alert rules against new ledger rows, and re-verify each
+Graph's ledger chain whose last check is ten minutes old. Each step is idempotent on a unique
 key or a row lock, so a restart or a second engine process repeats nothing::
 
     run_ids = await Clock().tick(session, now=datetime.now(UTC))
@@ -21,8 +22,10 @@ from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.activity.managers.alerts import AlertRuleManager
 from invana.activity.managers.approvals import ApprovalManager
 from invana.activity.managers.delivery import DeliveryManager
+from invana.activity.managers.ledger import LedgerManager
 from invana.activity.managers.notifications import EventMatcher
 from invana.activity.managers.publish_reviews import PublishReviewManager
 from invana.activity.managers.schedules import ScheduleManager
@@ -39,6 +42,10 @@ class Tick:
     expired: int = 0
     sent: int = 0
     failed: int = 0
+    #: Alert rules that fired.
+    alerts: int = 0
+    #: Graphs whose ledger chain was re-verified.
+    verified: int = 0
 
 
 class Clock:
@@ -47,6 +54,8 @@ class Clock:
     approvals = ApprovalManager()
     deliveries = DeliveryManager()
     reviews = PublishReviewManager()
+    alert_rules = AlertRuleManager()
+    ledger = LedgerManager()
 
     async def tick(self, session: AsyncSession, *, now: datetime) -> Tick:
         done = Tick()
@@ -57,4 +66,6 @@ class Clock:
         done.expired = await self.approvals.expire_due(session, now=now)
         done.run_ids += await self.reviews.advance_due(session, now=now)
         done.sent, done.failed = await self.deliveries.send_pending(session, now=now)
+        done.alerts = await self.alert_rules.evaluate(session, now=now)
+        done.verified = await self.ledger.verify_due(session, now=now)
         return done

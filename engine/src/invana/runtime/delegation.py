@@ -10,9 +10,22 @@ never by the prompt:
 | Bound | Where |
 |---|---|
 | depth | ``budget.max_depth`` (default 2), against the ``parent_agent_id`` chain |
-| fan-out | ``budget.max_children`` (default 3) per run |
+| fan-out | ``budget.max_children`` (default 3) per agent per run |
+| the whole tree | ``budget.max_descendants`` (default 12) helpers under the root run |
+| at once | ``budget.max_live`` (default 4) child runs live; past it a child waits ``queued`` |
+| budget | a child run's budget is its **escrow**, moved out of the parent's remaining |
+| may delegate to | ``policy.may_delegate`` — ``always`` runs, ``never`` is refused, ``ask`` asks the owner |
+| no loops | a delegation into an agent already in the run's chain is refused |
 | inheritance narrows | a child's allow-list, skills, budget and LLM are ⊆ its parent's |
 | the human at the root | ``on_behalf_of_user_id`` is copied down, never re-derived |
+
+**Escrow.** A parent's *remaining* is its run budget less its own tokens less
+every live child's escrow less what each ended child spent, so a parent never
+promises the same tokens twice. When a child ends, :func:`settle_escrow` writes
+``escrow_returned`` and a ledger row says so.
+
+Every spawn, refused spawn and escrow return is a ledger row
+(:mod:`invana.runtime.ledger_acts`).
 
 A child is a **full run** — its own plan, its own stream, its own trace
 (R3) — and the parent's ``delegate`` step tails its emissions (R2). That is
@@ -26,18 +39,22 @@ from __future__ import annotations
 import asyncio
 import copy
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.agents.models import Agent, AgentKind, AgentLifetime, AgentStatus
+from invana.apps.agents.models import DEFAULT_BUDGET, Agent, AgentKind, AgentLifetime, AgentStatus
+from invana.apps.graphs.models import Graph
 from invana.apps.skills.managers import SkillBindingManager
 from invana.apps.skills.querysets import SkillQuerySet
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
-from invana.runtime.models import RunStatus, TaskRun, TaskStream
+from invana.runtime import ledger_acts
+from invana.runtime.models import ExitReason, RunStatus, TaskRun, TaskStream
 from invana.runtime.querysets import TaskRunQuerySet
+from invana.runtime.results import run_tokens
 
 _skills_qs = SkillQuerySet()
 _bindings = SkillBindingManager()
@@ -48,8 +65,48 @@ DEFAULT_CHILD_TIMEOUT_S = 300.0
 _POLL_S = 0.5
 
 
+#: The statuses a child run holds escrow in.
+_LIVE = (RunStatus.queued.value, RunStatus.running.value, RunStatus.awaiting_input.value)
+
+#: ``may_delegate`` values.
+ALWAYS, ASK, NEVER = "always", "ask", "never"
+
+
 class BoundExceeded(Exception):
-    """A spawn or delegate step asked for more than the envelope allows."""
+    """A spawn or delegate step asked for more than the envelope allows.
+
+    ``refused_by`` is the ledger's reason (``ceiling`` · ``policy``), ``cause``
+    the step's failure code, and ``ceiling`` / ``count`` name the bound and
+    how far the run already is against it.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        refused_by: str = "ceiling",
+        cause: str = "bound_exceeded",
+        ceiling: str | None = None,
+        count: int | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.refused_by = refused_by
+        self.cause = cause
+        self.ceiling = ceiling
+        self.count = count
+
+    @property
+    def evidence(self) -> dict:
+        """What a step failure carries about the refusal."""
+        return {"refused_by": self.refused_by, "ceiling": self.ceiling, "count": self.count}
+
+
+def ceiling(agent: Agent, key: str) -> int:
+    """One of the agent's delegation ceilings, its default where unset."""
+    try:
+        return int(agent.effective_budget.get(key, DEFAULT_BUDGET.get(key, 0)))
+    except (TypeError, ValueError):
+        return int(DEFAULT_BUDGET.get(key, 0))
 
 
 @dataclass(slots=True)
@@ -118,9 +175,20 @@ async def depth_of(db: AsyncSession, agent: Agent) -> int:
     return depth
 
 
-async def children_spawned_in(db: AsyncSession, run_id: str) -> int:
-    rows = (await db.execute(select(Agent.id).where(Agent.spawned_in_run_id == run_id))).scalars().all()
-    return len(rows)
+async def children_spawned_in(db: AsyncSession, run_id: str, *, parent_agent_id: str | None = None) -> int:
+    """Helpers spawned in one run — by one agent, when ``parent_agent_id`` is named."""
+    stmt = select(Agent.id).where(Agent.spawned_in_run_id == run_id)
+    if parent_agent_id is not None:
+        stmt = stmt.where(Agent.parent_agent_id == parent_agent_id)
+    return len((await db.execute(stmt)).scalars().all())
+
+
+async def descendants_spawned(db: AsyncSession, run: TaskRun) -> int:
+    """Helpers spawned anywhere in the tree under ``run``'s root."""
+    root = await ledger_acts.root_of(db, run)
+    tree = [root.id, *await descendants(db, root.id)]
+    stmt = select(Agent.id).where(Agent.spawned_in_run_id.in_(tree))
+    return len((await db.execute(stmt)).scalars().all())
 
 
 async def spawn(
@@ -132,19 +200,27 @@ async def spawn(
     instructions: str,
     requested: dict,
     lifetime: str = AgentLifetime.ephemeral.value,
+    step_id: str | None = None,
 ) -> Agent:
-    """Create a child agent under its parent's ceiling."""
-    policy = parent.effective_policy
-    if not policy.get("can_spawn", False):
-        raise BoundExceeded(f"'{parent.name}' is not allowed to spawn agents.")
-    if lifetime == AgentLifetime.persistent.value and not policy.get("can_spawn_persistent", False):
-        raise BoundExceeded(f"'{parent.name}' may only spawn ephemeral agents.")
+    """Create a child agent under its parent's ceilings, and write its ledger row.
 
-    budget = parent.effective_budget
-    if await depth_of(db, parent) + 1 > int(budget.get("max_depth", 2)):
-        raise BoundExceeded(f"Delegation is capped at depth {budget.get('max_depth', 2)}.")
-    if await children_spawned_in(db, run.id) + 1 > int(budget.get("max_children", 3)):
-        raise BoundExceeded(f"This run may spawn at most {budget.get('max_children', 3)} agents.")
+    Refused before anything is created when a ceiling is reached — depth,
+    children per agent in this run, helpers in the whole tree — or when the
+    budget it asks for is more than the run has left. A refusal names the bound
+    and the count, is a ``refused`` ledger row, and raises :class:`BoundExceeded`.
+    """
+    try:
+        await _check_spawn(db, parent=parent, run=run, requested=requested, lifetime=lifetime)
+    except BoundExceeded as refused:
+        await ledger_acts.spawn_refused(
+            db,
+            run=run,
+            name=(name or "Helper").strip(),
+            refused_by=refused.refused_by,
+            rule=str(refused),
+            step_run_id=step_id,
+        )
+        raise
 
     narrowed = narrow(parent, requested=requested)
 
@@ -197,7 +273,256 @@ async def spawn(
         on_behalf_of_user_id=run.on_behalf_of_user_id,
         details={"actor_name": parent.name, "child_name": child.name, "lifetime": lifetime},
     )
+    await ledger_acts.spawned(
+        db,
+        run=run,
+        child=child,
+        depth=await depth_of(db, child),
+        escrow=int(narrowed["budget"].get("max_tokens_run") or 0) or None,
+        step_run_id=step_id,
+    )
     return child
+
+
+async def _check_spawn(db: AsyncSession, *, parent: Agent, run: TaskRun, requested: dict, lifetime: str) -> None:
+    """Raise :class:`BoundExceeded` naming the first bound this spawn would cross."""
+    policy = parent.effective_policy
+    if not policy.get("can_spawn", False):
+        raise BoundExceeded(f"'{parent.name}' is not allowed to spawn agents.", refused_by="policy")
+    if lifetime == AgentLifetime.persistent.value and not policy.get("can_spawn_persistent", False):
+        raise BoundExceeded(f"'{parent.name}' may only spawn ephemeral agents.", refused_by="policy")
+
+    depth, max_depth = await depth_of(db, parent) + 1, ceiling(parent, "max_depth")
+    if depth > max_depth:
+        raise BoundExceeded(
+            f"Delegation is capped at depth {max_depth}; this helper would be at depth {depth}.",
+            ceiling="max_depth",
+            count=depth - 1,
+        )
+    children = await children_spawned_in(db, run.id, parent_agent_id=parent.id)
+    max_children = ceiling(parent, "max_children")
+    if children + 1 > max_children:
+        raise BoundExceeded(
+            f"{parent.name} may spawn at most {max_children} agents in this run, and has spawned {children}.",
+            ceiling="max_children",
+            count=children,
+        )
+    tree, max_tree = await descendants_spawned(db, run), ceiling(parent, "max_descendants")
+    if tree + 1 > max_tree:
+        raise BoundExceeded(
+            f"This run may have at most {max_tree} helpers in all, and {tree} are spawned.",
+            ceiling="max_descendants",
+            count=tree,
+        )
+    wanted = (requested.get("budget") or {}).get("max_tokens_run")
+    if wanted is not None:
+        left = await remaining(db, run)
+        if left is not None and int(wanted) > left:
+            raise BoundExceeded(
+                f"Asked for {int(wanted)} tokens, and this run has {left} left.",
+                ceiling="max_tokens_run",
+                count=left,
+            )
+
+
+# ── escrow ────────────────────────────────────────────────────────────────────
+
+
+def run_budget(run: TaskRun, agent: Agent | None) -> int | None:
+    """The tokens one run may spend: its escrow, else what it froze at open, else its agent's.
+
+    ``None`` is a run nothing bounds — no escrow, no frozen budget and no agent.
+    """
+    if run.escrow_tokens is not None:
+        return int(run.escrow_tokens)
+    frozen = (run.params or {}).get("max_tokens_run")
+    if frozen:
+        return int(frozen)
+    if agent is not None:
+        return int(agent.effective_budget.get("max_tokens_run") or 0) or None
+    return None
+
+
+async def spent(db: AsyncSession, run: TaskRun) -> int:
+    """The run's own tokens so far — itself and its direct steps, never its children."""
+    tokens_in, tokens_out = run_tokens(run, await TaskRunQuerySet().nodes_of(db, run_id=run.id))
+    return tokens_in + tokens_out
+
+
+async def _children(db: AsyncSession, run: TaskRun) -> list[TaskRun]:
+    """The runs delegated from ``run``'s steps, re-read: they settle in their own sessions."""
+    children = await TaskRunQuerySet().children_of_nodes(db, run_id=run.id)
+    for child in children:
+        await db.refresh(child, ["status", "escrow_tokens", "escrow_returned", "queued_at"])
+    return children
+
+
+async def remaining(db: AsyncSession, run: TaskRun) -> int | None:
+    """What ``run`` may still promise: its budget less its own tokens, live escrows and what ended children spent."""
+    agent = await db.get(Agent, run.agent_id) if run.agent_id else None
+    budget = run_budget(run, agent)
+    if budget is None:
+        return None
+    held = 0
+    for child in await _children(db, run):
+        if child.escrow_tokens is None:
+            continue
+        if child.status in _LIVE or child.escrow_returned is None:
+            held += child.escrow_tokens
+        else:
+            held += max(0, child.escrow_tokens - child.escrow_returned)
+    return max(0, budget - await spent(db, run) - held)
+
+
+async def take_escrow(db: AsyncSession, *, parent_run: TaskRun, child_agent: Agent, wanted: int | None) -> int | None:
+    """How many tokens the child run is escrowed, or a refusal naming the remainder.
+
+    ``wanted`` is what the step asked for; with none, the child takes its own
+    run budget or an even share of the remainder across the children its
+    agent may still open, whichever is smaller. ``None`` is a parent nothing
+    bounds, whose child is bounded by its own agent alone.
+    """
+    left = await remaining(db, parent_run)
+    if left is None:
+        return int(wanted) if wanted else None
+    if wanted is not None and int(wanted) > left:
+        raise BoundExceeded(
+            f"Asked to escrow {int(wanted)} tokens, and this run has {left} left.",
+            ceiling="max_tokens_run",
+            count=left,
+        )
+    if left <= 0:
+        raise BoundExceeded("This run has no tokens left to hand a helper.", ceiling="max_tokens_run", count=0)
+    if wanted is not None:
+        return int(wanted)
+    parent = await db.get(Agent, parent_run.agent_id) if parent_run.agent_id else None
+    open_slots = max(1, ceiling(parent, "max_children") - len(await _children(db, parent_run))) if parent else 1
+    own = int(child_agent.effective_budget.get("max_tokens_run") or 0) or left
+    return max(1, min(own, left // open_slots or left))
+
+
+async def settle_escrow(db: AsyncSession, run: TaskRun) -> None:
+    """Return a child run's unspent escrow once it has ended, and write the ledger row.
+
+    Idempotent: a run whose return is written is left alone. A run with no
+    escrow is not a child and has nothing to return.
+    """
+    if run.escrow_tokens is None or run.escrow_returned is not None:
+        return
+    used = await spent(db, run)
+    run.escrow_returned = max(0, int(run.escrow_tokens) - used)
+    await ledger_acts.escrow_returned(db, run=run, returned=run.escrow_returned, spent=used)
+
+
+async def wait_for_room(db: AsyncSession, *, parent_run: TaskRun, child_run: TaskRun, timeout_s: float) -> bool:
+    """Hold a child ``queued`` while its parent already has ``max_live`` children live.
+
+    Only the siblings queued before it count, so children start in the order
+    they were opened. Returns False when the wait ran out.
+    """
+    parent = await db.get(Agent, parent_run.agent_id) if parent_run.agent_id else None
+    if parent is None:
+        return True
+    max_live = ceiling(parent, "max_live")
+    deadline = asyncio.get_running_loop().time() + timeout_s
+    while True:
+        ahead = [
+            c
+            for c in await _children(db, parent_run)
+            if c.id != child_run.id and c.status in _LIVE and c.queued_at <= child_run.queued_at
+        ]
+        if len(ahead) < max_live:
+            return True
+        if asyncio.get_running_loop().time() >= deadline:
+            return False
+        await asyncio.sleep(_POLL_S)
+
+
+# ── may delegate to ───────────────────────────────────────────────────────────
+
+
+def may_delegate(caller: Agent, target: Agent) -> str:
+    """``always`` · ``ask`` · ``never`` — how ``caller`` may hand work to ``target``.
+
+    A helper the caller spawned itself is always allowed: spawning it was the
+    permission. An authored agent the caller's list does not name is ``ask``.
+    """
+    if target.parent_agent_id == caller.id:
+        return ALWAYS
+    listed = (caller.effective_policy.get("may_delegate") or {}).get(target.id)
+    return listed if listed in (ALWAYS, ASK, NEVER) else ASK
+
+
+def allow_always(caller: Agent, target: Agent) -> None:
+    """Write ``always`` for ``target`` into ``caller``'s *May delegate to*."""
+    policy = dict(caller.policy or {})
+    listed = dict(policy.get("may_delegate") or {})
+    if listed.get(target.id) == ALWAYS:
+        return
+    listed[target.id] = ALWAYS
+    policy["may_delegate"] = listed
+    caller.policy = policy
+
+
+async def refuse_loop(db: AsyncSession, *, run: TaskRun, target: Agent) -> None:
+    """Refuse a delegation into an agent already in the run's chain."""
+    if target.id in await ledger_acts.agents_in_chain(db, run):
+        raise BoundExceeded(
+            f"{target.name} is already working in this run; handing it the work again would loop.",
+            refused_by="policy",
+            cause="loop",
+        )
+
+
+async def owner_of(db: AsyncSession, agent: Agent) -> list[str]:
+    """Who an ask about ``agent`` goes to: the person who made it, else the Graph's owner.
+
+    A spawned helper's owner is its nearest ancestor a person made.
+    """
+    node: Agent | None = agent
+    depth = 0
+    while node is not None and depth < 16:
+        if node.created_by_kind == "user" and node.created_by_id:
+            return [node.created_by_id]
+        node = await db.get(Agent, node.parent_agent_id) if node.parent_agent_id else None
+        depth += 1
+    graph = await db.get(Graph, agent.graph_id)
+    return [graph.created_by_id] if graph is not None and graph.created_by_id else []
+
+
+# ── cancellation ──────────────────────────────────────────────────────────────
+
+
+async def end_waiting_children(db: AsyncSession, run_ids: list[str]) -> list[TaskRun]:
+    """End the delegated runs under a cancelled parent that never started working.
+
+    A child waiting for room is a row with no task behind it, so nothing would
+    otherwise move it: it ends ``cancelled · parent_ended`` here, and its escrow
+    goes back.
+    """
+    if not run_ids:
+        return []
+    rows = (
+        (
+            await db.execute(
+                select(TaskRun).where(
+                    TaskRun.id.in_(run_ids),
+                    TaskRun.task_key == "",
+                    TaskRun.status.in_([RunStatus.queued.value, RunStatus.awaiting_input.value]),
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    for row in rows:
+        row.status = RunStatus.cancelled.value
+        row.outcome = "cancelled"
+        row.finished_at = datetime.now(UTC)
+        row.exit_reason = ExitReason.parent_ended.value
+        await settle_escrow(db, row)
+        await ledger_acts.run_ended(db, run=row, reason=row.exit_reason)
+    return list(rows)
 
 
 def _unique_name(name: str, parent: Agent) -> str:

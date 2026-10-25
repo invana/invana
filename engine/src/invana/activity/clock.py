@@ -62,7 +62,7 @@ class ClockLoop:
                     return
         for run_id in done.run_ids:
             self._submit(run_id)
-        if any((done.run_ids, done.delivered, done.reminded, done.expired, done.sent, done.failed)):
+        if any((done.run_ids, done.delivered, done.reminded, done.expired, done.sent, done.failed, done.alerts)):
             log.info(
                 "clock tick",
                 extra={
@@ -73,6 +73,8 @@ class ClockLoop:
                     "expired": done.expired,
                     "sent": done.sent,
                     "failed": done.failed,
+                    "alerts_fired": done.alerts,
+                    "ledgers_verified": done.verified,
                 },
             )
 

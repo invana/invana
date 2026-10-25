@@ -11,14 +11,22 @@ from __future__ import annotations
 from collections.abc import Sequence
 from datetime import datetime
 
-from sqlalchemy import Text, exists, func, or_, select, update
+from sqlalchemy import Text, and_, exists, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
 from invana.apps.flows.models import Flow
 from invana.core.lists import ListParams, PageInfo
 from invana.core.lists.querysets import contains, page_of_select
-from invana.runtime.models import INTERACTIVE, RunRole, RunStatus, TaskRun
+from invana.runtime.models import INTERACTIVE, ExitReason, RunRole, RunStatus, TaskRun
+
+#: The statuses behind each of the Runs list's tabs: ``live`` is the engine
+#: working, ``waiting`` is held on a person, ``ended`` is every terminal status.
+RUN_STATE_STATUSES: dict[str, tuple[str, ...]] = {
+    "live": (RunStatus.queued.value, RunStatus.running.value),
+    "waiting": (RunStatus.awaiting_input.value, RunStatus.needs_input.value),
+    "ended": (RunStatus.succeeded.value, RunStatus.failed.value, RunStatus.cancelled.value, RunStatus.stopped.value),
+}
 
 
 class TaskRunQuerySet:
@@ -696,8 +704,11 @@ class TaskRunQuerySet:
         brings them in; naming an ``origin`` asks for exactly those triggers,
         canvas and system included. ``candidates`` is a generated plan that has
         a recorded plan, that Verify said served, and that no library entry
-        names as its origin. ``created_after`` is the ``since`` window, resolved
-        by the caller.
+        names as its origin. ``state`` is a tab — the statuses
+        :data:`RUN_STATE_STATUSES` groups under it. ``exit_reason`` is a recorded
+        reason, or ``not_served``: every ended run whose recorded reason is not
+        ``served``. ``created_after`` is the ``since`` window, resolved by the
+        caller.
         """
         roots = select(TaskRun).where(TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_(None))
         unfiltered = roots.where(TaskRun.triggered_by.not_in(INTERACTIVE))
@@ -715,6 +726,20 @@ class TaskRunQuerySet:
             stmt = stmt.where(TaskRun.ask_kind.in_(kinds))
         if starters := params.values("started_by"):
             stmt = stmt.where(TaskRun.author_id.in_(starters))
+        if states := params.values("state"):
+            stmt = stmt.where(TaskRun.status.in_([s for state in states for s in RUN_STATE_STATUSES.get(state, ())]))
+        if reasons := params.values("exit_reason"):
+            named = [r for r in reasons if r != "not_served"]
+            matches = [TaskRun.exit_reason.in_(named)] if named else []
+            if "not_served" in reasons:
+                matches.append(
+                    and_(
+                        TaskRun.status.in_(RUN_STATE_STATUSES["ended"]),
+                        TaskRun.exit_reason.is_not(None),
+                        TaskRun.exit_reason != ExitReason.served.value,
+                    )
+                )
+            stmt = stmt.where(or_(*matches))
         if created_after is not None:
             stmt = stmt.where(TaskRun.created_at >= created_after)
         if params.one("candidates"):
@@ -752,3 +777,9 @@ class TaskRunQuerySet:
         session.add(run)
         await session.flush()
         return run
+
+
+def last_run_number(connection, graph_id: str) -> int:
+    """The highest root-run number in a Graph, on a sync connection (the insert hook's)."""
+    stmt = select(func.coalesce(func.max(TaskRun.number), 0)).where(TaskRun.graph_id == graph_id)
+    return int(connection.execute(stmt).scalar() or 0)

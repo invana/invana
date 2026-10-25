@@ -9,6 +9,7 @@ resources = ["cpu"]
 [args]
 agent_id = { type = "str" }
 body = { type = "str" }
+escrow = { type = "int" }
 
 [outputs]
 child_run_id = "str"

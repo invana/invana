@@ -11,6 +11,10 @@ it — a publish review's migration run — moves without waiting for a tick.
 builds its runtime. A decision on an approval whose subject is a step resumes
 its run once the request has committed, through the runtime the app holds —
 approved sends, declined fails the step as *not sent*.
+
+The list is the Waiting queue: ``?view=for_you · all · answered`` with the
+tabs' counts on the page, and ``?mine=true&status=pending`` for the bell tray.
+``scope=always`` on approve is for a delegation only.
 """
 
 from __future__ import annotations
@@ -20,12 +24,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.managers import ApprovalManager
 from invana.activity.models import Approval
-from invana.activity.schemas import APPROVAL_LIST, ApprovalDecide, ApprovalRead
+from invana.activity.schemas import APPROVAL_LIST, ApprovalDecide, ApprovalPage, ApprovalRead
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
-from invana.core.lists import ListParams, Page, applied_filters, list_params
+from invana.core.lists import ListParams, applied_filters, list_params
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 _approvals = ApprovalManager()
@@ -50,11 +54,9 @@ async def list_approvals(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-) -> Page[ApprovalRead]:
-    mine = user if params.one("mine") else None
-    rows, info = await _approvals.page(session, graph=graph, params=params, mine=mine)
-    return Page[ApprovalRead].of(
-        [ApprovalRead.model_validate(r) for r in rows], info, applied_filters(params, APPROVAL_LIST)
+) -> ApprovalPage:
+    return await _approvals.page(
+        session, graph=graph, params=params, reader=user, applied=applied_filters(params, APPROVAL_LIST)
     )
 
 
@@ -62,9 +64,11 @@ async def get_approval(
     approval_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> ApprovalRead:
-    return ApprovalRead.model_validate(await _approvals.get(session, graph=graph, approval_id=approval_id))
+    row = await _approvals.get(session, graph=graph, approval_id=approval_id)
+    return await _approvals.read(session, row, reader=user)
 
 
 async def approve(
@@ -78,11 +82,17 @@ async def approve(
     session: AsyncSession = Depends(get_session),
 ) -> ApprovalRead:
     row = await _approvals.decide(
-        session, graph=graph, approval_id=approval_id, user=user, approve=True, note=payload.note
+        session,
+        graph=graph,
+        approval_id=approval_id,
+        user=user,
+        approve=True,
+        note=payload.note,
+        scope=payload.scope,
     )
     _wake_clock(request, background)
     _resume_run(request, background, row)
-    return ApprovalRead.model_validate(row)
+    return await _approvals.read(session, row, reader=user)
 
 
 async def decline(
@@ -100,4 +110,4 @@ async def decline(
     )
     _wake_clock(request, background)
     _resume_run(request, background, row)
-    return ApprovalRead.model_validate(row)
+    return await _approvals.read(session, row, reader=user)

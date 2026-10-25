@@ -23,7 +23,7 @@ and *nothing was governed* are different runs.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -79,6 +79,12 @@ class Governor:
     run_id: str
     graph_id: str
     touches: TouchManager
+    #: The step being dispatched, ``(step run id, function)``, set by the interpreter.
+    step: tuple[str, str] | None = None
+    #: The first touch of each step run, ``{step run id: (address, volume)}``.
+    first_touch: dict[str, tuple[str, dict]] = field(default_factory=dict)
+    #: The step runs the lens refused something in, with the rule that did.
+    refused: dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def for_run(cls, run: TaskRun) -> Governor:
@@ -119,6 +125,20 @@ class Governor:
             classes=tuple(c for c in carrying if c in permitted),
             cut=tuple(c for c in carrying if c not in permitted),
         )
+
+    # ── the step being dispatched ────────────────────────────────────────────
+
+    def begin_step(self, step_id: str, task_key: str) -> None:
+        """Name the step whose touches follow, so its ledger row can carry them."""
+        self.step = (step_id, task_key)
+        self.first_touch.pop(step_id, None)
+        self.refused.pop(step_id, None)
+
+    def end_step(self, step_id: str) -> tuple[tuple[str, dict] | None, str | None]:
+        """What the step touched first, and the rule that refused it if one did."""
+        if self.step and self.step[0] == step_id:
+            self.step = None
+        return self.first_touch.pop(step_id, None), self.refused.pop(step_id, None)
 
     # ── recording ────────────────────────────────────────────────────────────
 
@@ -175,6 +195,32 @@ class Governor:
             cost_usd=cost_usd,
             duration_ms=duration_ms,
         )
+        refused = TouchDirection(direction) is TouchDirection.refused
+        if self.step is not None:
+            step_id = self.step[0]
+            self.first_touch.setdefault(step_id, (address, volume or {}))
+            if refused:
+                self.refused.setdefault(step_id, _rule_of(verdict))
+        if refused:
+            # A refusal is an act of its own on the ledger, beside the step that met it.
+            from invana.runtime import ledger_acts  # noqa: PLC0415 — ledger_acts reaches back through the plugin SDK
+
+            await ledger_acts.touch_refused(
+                db,
+                run_id=self.run_id,
+                address=address,
+                act=self.step[1] if self.step else (step_key or ""),
+                rule=_rule_of(verdict),
+                step_run_id=self.step[0] if self.step else None,
+            )
+
+
+def _rule_of(verdict: Verdict | None) -> str:
+    """The rule a refusal names, in words: the pattern, else the world that narrowed it."""
+    if verdict is None:
+        return ""
+    narrowed = f"not in {verdict.narrowed_by}" if verdict.narrowed_by else ""
+    return verdict.rule_matched or narrowed or (verdict.why or "")
 
 
 def is_fatal(address: str) -> bool:

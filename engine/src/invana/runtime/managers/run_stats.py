@@ -21,6 +21,7 @@ Usage::
 from __future__ import annotations
 
 import statistics
+from collections import Counter
 from datetime import UTC, date, datetime, time, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -28,8 +29,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.work.models import Task as Todo
 from invana.core.errors import ValidationError
-from invana.runtime.models import INTERACTIVE, RunStatus, TaskRun, span_ms
+from invana.runtime.models import INTERACTIVE, ExitReason, RunStatus, TaskRun, span_ms
 from invana.runtime.querysets import TaskRunQuerySet
+from invana.runtime.querysets.task_run import RUN_STATE_STATUSES
 from invana.runtime.schemas import RunDay, RunStats, SlowestRun
 
 #: Standing statuses — counted now, whatever the window.
@@ -72,6 +74,7 @@ class RunStatsManager:
         days: int,
         tz: str,
         now: datetime | None = None,
+        waiting_approvals: int = 0,
     ) -> RunStats:
         """The tiles for the root runs in *graph_ids*, over the last *days* of *tz*.
 
@@ -80,6 +83,10 @@ class RunStatsManager:
         timed to *now*, so a long run in flight can be the slowest — but a run
         waiting on a person is not timed at all. Tokens are a
         settled run's stored ``run_tokens``, or its own and its nodes' so far.
+        *Served* and *not served* are counted over the window's ended runs by
+        their recorded exit reason; a run that recorded none is in neither.
+        ``waiting_approvals`` is the reader's pending asks, counted by the caller
+        — approvals belong to a band above this one.
         Raises ``ValidationError`` for an unknown zone or a window out of range.
         """
         if not 1 <= days <= MAX_DAYS:
@@ -109,6 +116,11 @@ class RunStatsManager:
         slowest_run = max((r for r in window if timed[r.id] is not None), key=lambda r: timed[r.id], default=None)
         finished = sorted(r.duration_ms for r in window if r.status not in LIVE and r.duration_ms is not None)
 
+        reasons = Counter(
+            r.exit_reason for r in window if r.status in RUN_STATE_STATUSES["ended"] and r.exit_reason is not None
+        )
+        served = reasons.pop(ExitReason.served.value, 0)
+
         by_day: dict[date, int] = {first_day + timedelta(days=i): 0 for i in range(days)}
         for run in window:
             queued = run.queued_at if run.queued_at.tzinfo else run.queued_at.replace(tzinfo=UTC)
@@ -130,6 +142,10 @@ class RunStatsManager:
             median_ms=round(statistics.median(finished)) if finished else None,
             slowest=await self._slowest(session, slowest_run, timed),
             by_day=[RunDay(day=day, runs=n) for day, n in by_day.items()],
+            served=served,
+            not_served=sum(reasons.values()),
+            not_served_by_reason=dict(reasons),
+            waiting_approvals=waiting_approvals,
         )
 
     @staticmethod

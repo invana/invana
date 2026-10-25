@@ -72,8 +72,13 @@ class AgentLifetime(enum.StrEnum):
 DEFAULT_BUDGET: dict[str, int | float] = {
     # No steps, replans or clarifications: those are effort, not spend
     # (``DEFAULT_EFFORT`` · EB9).
+    # Delegation's four ceilings, per run: children per agent, depth below the
+    # root, helpers in the whole tree, and child runs live at once (past it a
+    # child waits queued rather than being refused).
     "max_children": 3,
     "max_depth": 2,
+    "max_descendants": 12,
+    "max_live": 4,
     # Tokens, in two windows, each named by it — never currency: what a token
     # costs depends on the customer's subscription.
     "max_tokens_month": 5_000_000,
@@ -277,7 +282,12 @@ class Agent(Base):
 
     @property
     def effective_policy(self) -> dict:
-        return {**DEFAULT_POLICY, **(self.policy or {})}
+        """The policy a run reads, defaults filled in.
+
+        ``may_delegate`` is ``{agent_id: always · ask · never}``; an agent it
+        does not list is asked about each time, so an empty map is the default.
+        """
+        return {**DEFAULT_POLICY, "may_delegate": {}, **(self.policy or {})}
 
     @property
     def is_available(self) -> bool:

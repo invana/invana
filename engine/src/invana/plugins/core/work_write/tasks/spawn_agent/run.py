@@ -32,9 +32,12 @@ async def work_spawn_agent(ctx: TaskContext, v: RunVars) -> Out:
                 "budget": args.get("budget"),
             },
             lifetime=str(args.get("lifetime") or "ephemeral"),
+            step_id=ctx.step.id,
         )
     except BoundExceeded as exc:
-        raise TaskFailure(cls="blocked", cause="bound_exceeded", message=str(exc), short="not allowed") from exc
+        raise TaskFailure(
+            cls="blocked", cause=exc.cause, message=str(exc), short="not allowed", evidence=exc.evidence
+        ) from exc
     v.spawned.append(child.id)
     depth = await _depth(ctx.db, child)
     await ctx.emit("agent.spawned", {"agent_id": child.id, "name": child.name, "lifetime": child.lifetime})

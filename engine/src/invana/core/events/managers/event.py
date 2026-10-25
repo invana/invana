@@ -9,11 +9,60 @@ from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.core import ledger
+from invana.core.auth.models import User
+from invana.core.events import actions
 from invana.core.events.models import ActorKind, Event
 from invana.core.events.querysets import EventQuerySet
 from invana.core.redaction import redact
 from invana.core.telemetry.recorders import record_event
 from invana.core.telemetry.spans import current_ids
+
+#: Events that write no ledger row: high-volume reads and pings, and the acts the
+#: runtime records as rows of its own (a spawn, a delegation, a run settling).
+UNLEDGERED: frozenset[str] = frozenset(
+    {
+        actions.QUERY_EXECUTE,
+        actions.GRAPH_EXPAND,
+        actions.CONNECTION_PING,
+        actions.CONNECTION_TEST,
+        actions.LLM_PING,
+        actions.LLM_TRANSLATE,
+        actions.SKILL_APPLY,
+        actions.APPROVAL_REMIND,
+        actions.AGENT_SPAWN,
+        actions.THINKING_DELEGATE,
+        actions.THINKING_FINISH,
+        actions.THINKING_CANCEL,
+        actions.ESCROW_RETURN,
+    }
+)
+
+#: An event's target kind → the ledger's layer; anything unlisted is ``run``.
+LAYER_BY_TARGET: dict[str, str] = {
+    actions.TARGET_THINKING: "run",
+    actions.TARGET_SESSION: "run",
+    actions.TARGET_AGENT: "agent",
+    actions.TARGET_SKILL: "agent",
+    actions.TARGET_RULE: "rule",
+    "alert_rule": "rule",
+    actions.TARGET_LENS: "lens",
+    actions.TARGET_MEMBER: "access",
+    actions.TARGET_USER: "access",
+    actions.TARGET_TOKEN: "access",
+    "guardrail_permission": "access",
+    actions.TARGET_GRAPH: "graph",
+    actions.TARGET_CONNECTION: "graph",
+    actions.TARGET_MODEL: "graph",
+    actions.TARGET_MODEL_LINK: "graph",
+    actions.TARGET_DATASET: "graph",
+    actions.TARGET_STANDARD: "graph",
+    actions.TARGET_BOARD: "graph",
+    actions.TARGET_ANNOTATION: "graph",
+    actions.TARGET_PROJECTION_TEMPLATE: "graph",
+    actions.TARGET_LLM: "llm",
+    actions.TARGET_LLM_MODEL: "llm",
+}
 
 # ── emit_event ───────────────────────────────────────────────────────────────
 
@@ -71,6 +120,10 @@ class EventManager:
         added to the session — the count is of rows written, and a row the
         caller later rolls back has still been counted.
 
+        **A person's or an agent's act in a Graph is also a ledger row**, written
+        in the same transaction through :func:`invana.core.ledger.record` (see
+        :meth:`_ledger` for what is left out).
+
         Sensitive fields in ``details`` (keys matching ``*_hash``, ``*_encrypted``,
         ``password``, ``api_key``, ``secret``, ``token``) are stripped before
         storage. Callers don't need to pre-filter, but they should avoid
@@ -107,4 +160,49 @@ class EventManager:
         )
         added = await self.events_qs.add(session, event)
         record_event(action=action)
+        await self._ledger(session, event, details or {})
         return added
+
+    async def _ledger(self, session: AsyncSession, event: Event, details: dict) -> None:
+        """Write the event's ledger row when a person or an agent caused it in a Graph.
+
+        Same transaction as the event, so the two commit or roll back together.
+        The engine's own work (``system``), a token or an anonymous caller, an
+        event outside any Graph, and the high-volume reads in :data:`UNLEDGERED`
+        write none — nor do the acts the runtime writes rows for itself. The
+        chain is the person, then the acting agent, by the names the event
+        carries (``details.actor_name``) or the person's username now.
+        """
+        if not event.graph_id or event.action in UNLEDGERED:
+            return
+        kind = event.actor_kind
+        if kind not in (ActorKind.user, ActorKind.agent):
+            return
+        person_id = event.actor_id if kind == ActorKind.user else event.on_behalf_of_user_id
+        chain: list[dict] = []
+        if person_id:
+            name = details.get("actor_name") if kind == ActorKind.user else None
+            if not name:
+                user = await session.get(User, person_id)
+                name = user.username if user else ""
+            chain.append({"kind": "person", "id": person_id, "name": name or ""})
+        if kind == ActorKind.agent:
+            chain.append({"kind": "agent", "id": event.actor_id, "name": details.get("actor_name") or ""})
+        target = event.target_kind or ""
+        named = details.get("name") or details.get("title") or details.get("username") or event.target_id or ""
+        await ledger.record(
+            session,
+            graph_id=event.graph_id,
+            actor_kind="agent" if kind == ActorKind.agent else "person",
+            actor_chain=chain,
+            actor_user_id=person_id,
+            actor_agent_id=event.actor_id if kind == ActorKind.agent else None,
+            act=event.action,
+            layer=LAYER_BY_TARGET.get(target, "run"),
+            touched=f"{target}/{named}" if target else str(named),
+            verdict="allowed",
+            run_id=event.run_id,
+            step_run_id=event.node_run_id,
+            run_number=details.get("run_number") if isinstance(details.get("run_number"), int) else None,
+            where=str(details.get("where") or ""),
+        )

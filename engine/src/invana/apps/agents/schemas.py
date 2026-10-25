@@ -6,10 +6,37 @@ import enum
 from datetime import date, datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from invana.apps.agents.models import AgentKind, AgentStatus
 from invana.core.lists import Filter, ListSpec, Page
+
+#: ``policy.may_delegate`` values: runs · asks the target's owner each time · refused.
+MAY_DELEGATE = ("always", "ask", "never")
+#: The budget keys that are delegation ceilings — whole numbers, never negative.
+CEILING_KEYS = ("max_depth", "max_children", "max_descendants", "max_live")
+
+
+def check_policy(policy: dict[str, Any] | None) -> dict[str, Any] | None:
+    """``policy`` as given, or a refusal naming the ``may_delegate`` entry that is wrong."""
+    if policy is None or "may_delegate" not in policy:
+        return policy
+    listed = policy["may_delegate"]
+    if not isinstance(listed, dict):
+        raise ValueError("policy.may_delegate is a map of agent id to always · ask · never.")
+    for agent_id, mode in listed.items():
+        if mode not in MAY_DELEGATE:
+            raise ValueError(f"policy.may_delegate[{agent_id}] is '{mode}'; it is one of always · ask · never.")
+    return policy
+
+
+def check_ceilings(budget: dict[str, Any] | None) -> dict[str, Any] | None:
+    """``budget`` as given, or a refusal naming the delegation ceiling that is not a whole number ≥ 0."""
+    for key in CEILING_KEYS:
+        value = (budget or {}).get(key)
+        if value is not None and (isinstance(value, bool) or not isinstance(value, int) or value < 0):
+            raise ValueError(f"budget.{key} is a whole number of 0 or more.")
+    return budget
 
 
 class AgentCreate(BaseModel):
@@ -34,6 +61,16 @@ class AgentCreate(BaseModel):
     soul_traits: dict[str, str] = Field(default_factory=dict)
     #: ``llm/<provider>/<model id>``; null lets the cast decide.
     model_pin: str | None = Field(default=None, max_length=255)
+
+    @field_validator("policy")
+    @classmethod
+    def _may_delegate(cls, value: dict[str, Any]) -> dict[str, Any]:
+        return check_policy(value) or {}
+
+    @field_validator("budget")
+    @classmethod
+    def _ceilings(cls, value: dict[str, Any]) -> dict[str, Any]:
+        return check_ceilings(value) or {}
 
 
 class AgentMakeLive(BaseModel):
@@ -60,6 +97,16 @@ class AgentUpdate(BaseModel):
     model_pin: str | None = Field(default=None, max_length=255)
     #: Why — carried on the event that mints the version, never inferred.
     why: str | None = Field(default=None, max_length=500)
+
+    @field_validator("policy")
+    @classmethod
+    def _may_delegate(cls, value: dict[str, Any] | None) -> dict[str, Any] | None:
+        return check_policy(value)
+
+    @field_validator("budget")
+    @classmethod
+    def _ceilings(cls, value: dict[str, Any] | None) -> dict[str, Any] | None:
+        return check_ceilings(value)
 
 
 class AgentDraftWrite(BaseModel):
