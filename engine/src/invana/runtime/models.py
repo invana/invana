@@ -377,7 +377,11 @@ def _number_root_run(_mapper, connection, row: TaskRun) -> None:
     last = connection.execute(
         text("SELECT COALESCE(MAX(number), 0) FROM task_runs WHERE graph_id = :g"), {"g": row.graph_id}
     ).scalar()
-    row.number = int(last or 0) + 1
+    # Rows inserted in one flush are numbered before any is written, so the
+    # numbers handed out on this connection count too.
+    given = connection.info.setdefault("run_numbers", {})
+    row.number = max(int(last or 0), given.get(row.graph_id, 0)) + 1
+    given[row.graph_id] = row.number
 
 
 @event.listens_for(TaskRun, "before_insert")

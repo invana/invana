@@ -1,4 +1,6 @@
-"""The ledger — every act by a person or an agent in a Graph (docs/for-developers/modules/operate/features/the-ledger.md).
+"""The ledger — every act by a person or an agent in a Graph.
+
+docs/for-developers/modules/operate/features/the-ledger.md.
 
 One table, append-only, written by :func:`invana.core.ledger.writer.record` and
 nothing else. Each row's ``hash`` covers its content and the previous row's
