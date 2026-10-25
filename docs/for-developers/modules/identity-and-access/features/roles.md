@@ -22,12 +22,14 @@ Admin**.
 
 | # | Capability | Notes |
 |---|---|---|
-| R1 | Five Graph roles | `viewer` · `contributor` · `builder` · `modeller` · `owner` |
+| R1 | Six Graph roles | `viewer` · `contributor` · `builder` · `modeller` · `owner` · `iam-admin` |
 | R2 | Several at once | A member holds a set; `owner` implies the other four; every member reads |
 | R3 | Enforced on every graph-scoped route | One policy table, applied by the one membership dependency |
 | R4 | A refusal names the role and who holds it | 403 `role_required` with `role`, `area` and `holders` |
 | R5 | Studio can draw acts disabled before trying | `GET …/access` returns my roles and every area's role, holders and whether I may |
 | R6 | My roles ride on `/auth/me` | Each Graph in `graphs[]` carries `roles` |
+| R8 | Roles are managed policies | Each role is a managed [policy](policies.md) of the same name; a group can hold one ([people and groups](people-and-groups.md)) |
+| R9 | iam-admin | A sixth role: people, groups, policies and others' tokens — the `iam` area |
 | R7 | Install Admin | `users.is_superuser`: install rules, standards, any dataset, retraction. Never a way into a Graph |
 
 ## What each role may change
@@ -41,7 +43,8 @@ Reading is never gated: every `GET` on a Graph is open to every member. A role g
 | `work` | contributor | `projects…` · `tasks…` · `schedules…` |
 | `build` | builder | `agents…` · `skills…` · `evals…` · `flows…` · `projection-templates…` · `runs/{id}/emissions/{id}/template` |
 | `model` | modeller | `models…` · `model-links…` · `rules…` · `projects/{key}/rules` · `govern…` · `dataset-bindings` · `connection/introspect` |
-| `settings` | owner | the Graph itself (`PATCH` · `DELETE`) · `connection…` · `setup…` · `default-agent` · `llm…` · `members…` · `notifications…` (rules and channels) |
+| `settings` | owner | the Graph itself (`PATCH` · `DELETE`) · `connection…` · `setup…` · `default-agent` · `llm…` · `notifications…` (rules and channels) · `alert-rules…` |
+| `iam` | iam-admin | `members…` · `iam…` except `iam/tokens`, which is `ask` |
 
 ## Journey
 
@@ -126,6 +129,9 @@ flowchart TD
 | RO15 | What is gated is the **entry act** of an area — the button that opens an authoring dialog or writes straight away (*New agent*, *Edit instructions*, *Publish*, *New project*, *Save*). A dialog's own submit is not gated again: its entry already was. Area by product follows the engine table: Agents' agents, skills, evals, plans, templates and plugins → `build`; LLM providers → `settings`; Modeller's models, stitches, rules and guardrails → `model`, its Graph settings and Members → `settings`; Projects' projects, findings, decisions, todos → `work`; Activity's schedules → `work`, rules and channels → `settings`. Asking is every member's. Datasets are install-scoped and keep B03's checks; a plugin's enable and disable are install-wide (`/api/v1/plugins…`) and gated by no Graph role. *Save as dataset* on a simulation is gated as `work`, the act that starts it, though the dataset route itself is install-wide. |
 | RO16 | A detail surface whose main act is gated opens with one line, `ReadOnlyNotice`: *You can read this `<noun>`. Editing needs the `<role>` role — ask `<names>`.* Shown only where the board draws it — a skill, an agent, a model, a project — not on every list. |
 | RO17 | Graph settings gains a **Members** tab: one row per member — name, roles as badges, *since* — and for an owner *Edit* (the five roles as a checkbox set; `viewer` always held) and *Remove* (confirmed). *Add member* takes an email or a username and roles. Below it a **Roles** key: role · what it may change. The last owner's refusal (409) and an unknown account (404) show in the dialog, in the engine's words. Without `owner` the tab reads, its acts disabled per RO14. |
+| RO19 | **The roles are the managed policies** `viewer · contributor · builder · modeller · owner · iam-admin` ([policies](policies.md) PO2). A member's directly held ones are `graph_members.roles`; a group's are attachments; the guard checks their union. |
+| RO20 | `iam-admin` is a peer role: `owner` does not imply it. The Graph's creator holds `owner` and `iam-admin`. A Graph always has an iam-admin — removing or demoting the last one is refused (409), as for the last owner. |
+| RO21 | Members moves to the `iam` area: adding, re-roling and removing a member needs iam-admin, from IAM › People or Graph settings › Members. |
 | RO18 | Graph settings' connection tab is labelled **Database** (its `?tab=graph` key unchanged), so the strip reads Basic · Database · Members as the product names them. |
 
 ## Not building
@@ -134,7 +140,7 @@ flowchart TD
 |---|---|
 | Per-record permissions | an area is the unit; a finer grain is unproven |
 | Private projects | Per-project access sits on top of these roles — [9.7](../../work/features/private-projects.md) |
-| Custom roles | five named roles are the product's words |
+| Custom roles | a custom [policy](policies.md) carries what a role cannot; the six roles stay the product's words |
 | Role-aware agents | agents are principals bounded by an envelope ([MB5](membership.md)) |
 | Hiding a product a role cannot read | every role reads every product today |
 | Invitations | as in [membership](membership.md) |

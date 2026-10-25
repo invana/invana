@@ -202,7 +202,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 10.1 | [Schedules](modules/operate/features/schedules.md) | An agent and instructions on a cron in a zone; every firing recorded; a missed-firing and an overlap policy; the result delivered to the inbox and channels | ✅ | ✅ | ✅ | B08 |
 | 10.2 | [Audit and activity](modules/operate/features/audit-and-activity.md) | Every write is an event; every actor is a principal; retention lives here | 🟡 | — | 🟡 | S5.5 · S12a |
 | 10.3 | [Observability](modules/operate/features/observability.md) | Query and LLM metrics, cost and latency | 🔵 | — | 🔵 | S11 |
-| 10.4 | [External-agent API](modules/operate/features/external-agent-api.md) | Scoped tokens; retrieval with provenance | 🔵 | — | 🔵 | S10 |
+| 10.4 | [External-agent API](modules/operate/features/external-agent-api.md) | Retrieval with provenance for outside callers; their credential is a narrowed [token](modules/identity-and-access/features/tokens.md) | 🔵 | — | 🔵 | S10 |
 | 10.5 | [See what ran](modules/operate/features/see-what-ran.md) | **Runs** — every run in the Graph, children nested; Imports is a filter of it | 🟡 | — | 🟡 | S14 |
 | 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | ✅ | B01 |
 | 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | 🟡 | B08 |
@@ -218,8 +218,12 @@ provider row and its models, and reopens four rows below. The shapes:
 | 11.2 | [Usernames](modules/identity-and-access/features/usernames.md) | The URL identity — mutable, rate-limited, never aliased | ✅ | — | ✅ | S1 |
 | 11.3 | [Sessions](modules/identity-and-access/features/sessions.md) | Short access token, revocable rotating refresh | ✅ | — | 🟡 | S1 |
 | 11.4 | [Membership](modules/identity-and-access/features/membership.md) | Who may open a Graph; add, re-role and remove members | ✅ | ✅ | ✅ | S1 |
-| 11.5 | [Personal access tokens](modules/identity-and-access/features/personal-access-tokens.md) | A long-lived credential that carries your identity; revocable, shown once | ✅ | — | ✅ | S1 |
-| 11.6 | [Roles](modules/identity-and-access/features/roles.md) | Graph roles viewer · contributor · builder · modeller · owner, enforced on every graph route; install Admin; a refusal names who can | ✅ | ✅ | ✅ | B11 |
+| 11.5 | [Tokens](modules/identity-and-access/features/tokens.md) | A long-lived credential that acts as its holder; shown once, expiring, revocable; in IAM narrowed by an inline policy and bound to the Graph | ✅ | — | ✅ | S1 · I01 |
+| 11.6 | [Roles](modules/identity-and-access/features/roles.md) | Graph roles viewer · contributor · builder · modeller · owner · iam-admin — the managed policies — enforced on every graph route; install Admin; a refusal names who can | ✅ | ✅ | ✅ | B11 · I01 |
+| 11.7 | [Policies](modules/identity-and-access/features/policies.md) | Statements by layer with conditions, limits, drafts, impact before saving, Test access, held by, history; `invana iam` | ✅ | ✅ | ✅ | I01 |
+| 11.8 | [Effective access](modules/identity-and-access/features/effective-access.md) | Skill needs ∩ its policies ∩ started by ∩ world ∩ boundary, refused before dispatch naming the policy; an agent's access in IAM and on its Access tab | ✅ | — | ✅ | I01 |
+| 11.9 | [People and groups](modules/identity-and-access/features/people-and-groups.md) | Members, service accounts and groups with the policies each holds | ✅ | — | ✅ | I01 |
+| 11.10 | [The IAM product](modules/identity-and-access/features/the-iam-product.md) | A sixth product on the Agents shell: Home · People, Groups, Agents · Policies, Tokens | ✅ | — | ✅ | I01 |
 
 ## 12 · [Graph connectors](modules/graph-connectors/spec.md)
 
@@ -421,7 +425,7 @@ replacement lands.
 | F03 | 5.1 · 5.7 · 5.10 · 6.x · 13.9 · 13.13 | Every surface the Agents product had is reachable from the new rail with no leftSection, and the code it replaced is deleted |
 | F04 | 5.2 · 5.3 · 5.5 · 5.8 · 5.9 · 6.x | An agent is built on its page from a drafted skill, its Flow matches its instructions, and publishing passes the eval gate |
 | F05 | 5.14 · 10.9 · 10.8 · 5.4 · 3.15 | The assistant opens Runs with filters it set, and every act in a run has a ledger row |
-| I01 | 11.4–11.6 · the IAM features | A skill need no policy covers is refused naming the policy; a narrowed token can push a draft dataset and nothing else |
+| I01 | 11.4–11.10 | A skill need no policy covers is refused naming the policy; a narrowed token can push a draft dataset and nothing else |
 | I02 | 10.4 · 13.13 | Claude Code, with a narrowed token, pushes a draft dataset version over this Graph's MCP server and a person publishes it |
 | F06 | 13.11 | A worker on a second machine joins with a service-account token and runs a tool step |
 

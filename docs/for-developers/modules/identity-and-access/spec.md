@@ -1,13 +1,14 @@
 # Identity and access — module spec
 
 Who you are, how you stay signed in, which Graphs you can reach and what you may change there.
-Deliberately small: an account, a username that is also a URL, a session that can be revoked,
-membership, and five Graph roles.
+An account, a username that is also a URL, a session that can be revoked, membership, six Graph
+roles — and **IAM**: policies people, groups, agents and tokens hold, what they add up to, and the
+product that shows it.
 
 | | |
 |---|---|
 | Index | [§11 · Identity and access](../../README.md#11--identity-and-access) |
-| Features | [accounts](features/accounts.md) · [usernames](features/usernames.md) · [sessions](features/sessions.md) · [membership](features/membership.md) · [personal access tokens](features/personal-access-tokens.md) · [roles](features/roles.md) |
+| Features | [accounts](features/accounts.md) · [usernames](features/usernames.md) · [sessions](features/sessions.md) · [membership](features/membership.md) · [tokens](features/tokens.md) · [roles](features/roles.md) · [policies](features/policies.md) · [effective access](features/effective-access.md) · [people and groups](features/people-and-groups.md) · [the IAM product](features/the-iam-product.md) |
 | Depends on | — |
 | Depended on by | everything: every request resolves to a principal |
 
@@ -22,7 +23,12 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 | **Session** | an access token plus a revocable refresh token | a login row |
 | **Personal access token** | a long-lived credential a person mints for a script, carrying their identity | a scope, or a second permission system |
 | **Member** | someone with access to a Graph | a role |
-| **Graph role** | what a member may change: `viewer` · `contributor` · `builder` · `modeller` · `owner` | a run's `role` |
+| **Graph role** | what a member may change: `viewer` · `contributor` · `builder` · `modeller` · `owner` · `iam-admin` — each a managed policy | a run's `role` |
+| **Policy** | statements (actions × resources, conditions) and limits a principal holds; managed · custom · inline · boundary | a role, a lens |
+| **Principal** | a person, a service account, a group, an agent — what holds a policy; a token acts as its holder | a worker |
+| **Service account** | a person with no sign-in that owns tokens for scripts | a bot user with a password |
+| **Group** | people and agents in one Graph that hold policies together | a team page |
+| **Effective access** | skill needs ∩ its policies ∩ started by ∩ world ∩ boundary | a permission list typed by hand |
 | **Install Admin** | `is_superuser` — install rules, standards, datasets, retraction, outside any Graph | a Graph owner |
 
 ## 2. Membership, then roles
@@ -43,8 +49,10 @@ question — roles bound people, not agents.
 |---|---|
 | `users` | `email` (login, case-folded) · `username` · `password_hash` · `first_name` · `last_name?` · `is_superuser` · `is_active` · `username_last_changed_at` |
 | `refresh_tokens` | opaque, server-side, revocable, rotated on use |
-| `personal_access_tokens` | hashed, server-side, revocable, never rotated — [11.5](features/personal-access-tokens.md) |
-| `graph_members` | `graph_id` · `user_id` · `roles` — the whole access model |
+| `personal_access_tokens` | hashed, server-side, revocable, never rotated — [11.5](features/tokens.md) |
+| `graph_members` | `graph_id` · `user_id` · `roles` — the managed policies a member holds directly |
+| `policies` · `policy_versions` · `policy_attachments` | [policies](features/policies.md) |
+| `groups` · `group_members` | [people and groups](features/people-and-groups.md) |
 | Auth routes | `/api/v1/auth/*`; everything else is graph-scoped under `/api/v1/u/{username}/{graphSlug}/…` |
 | The superuser flag | what the admin application checks — the application itself is [13.6](../platform/features/admin-and-health.md) |
 
@@ -64,7 +72,7 @@ flowchart LR
 
 | Rule | Detail |
 |---|---|
-| The token carries identity only | Not membership, and not the username — both can change while a token lives. A [personal access token](features/personal-access-tokens.md) carries the same thing, for longer |
+| The token carries identity only | Not membership, and not the username — both can change while a token lives. A [personal access token](features/tokens.md) carries the same thing, for longer |
 | Membership is checked per request | So revoking access takes effect immediately |
 | The refresh token is not a JWT | It is a server-side row, so revocation is a database update rather than a denylist |
 | Rotation on every refresh | A reused old refresh token is a signal, not a convenience |
@@ -80,14 +88,16 @@ flowchart LR
 | IA5 | Deletes are hard; there is no soft-delete tier for accounts. |
 | IA6 | Superuser is the install Admin: install rules, standards, datasets and retraction. It grants no access to a Graph's contents. |
 | IA7 | The admin application browses app state for operators. It is not a product surface, and it is never how a member reaches their own Graph. |
-| IA8 | Every credential this module issues carries identity and nothing else. A long-lived one is a personal access token, revocable on its own; a scoped one belongs to a Graph, and is [10.4](../operate/features/external-agent-api.md). |
+| IA8 | Every credential this module issues carries its holder's identity. A long-lived one is a [token](features/tokens.md), revocable on its own; one minted in a Graph's IAM is bound to that Graph and may be narrowed by an inline policy. |
+| IA10 | **Allowed only where every layer allows.** A request is its holder's roles plus a narrowed token's inline policy; a run's step is [effective access](features/effective-access.md). A refusal names the layer and the policy. |
+| IA11 | IAM's records belong to one Graph: policies, groups, service accounts' memberships and IAM tokens. Nothing is install-wide but the install Admin. |
 | IA9 | Credential management needs a session. A request authenticated by a personal access token cannot mint or revoke one, change a password, delete an account or provision a user. |
 
 ## 6. Deliberately absent
 
 | Not built | Because |
 |---|---|
-| Per-record permissions, custom roles | five Graph roles over five areas carry the product; anything finer is unproven |
+| Per-record permissions | an area and a policy's resources are the units; a finer grain is unproven |
 | Invitations | a member is added directly; an invitation flow is a product of its own |
 | Old-username aliases and redirects | a username is an address, and addresses that silently forward hide mistakes |
 | SSO and OAuth providers | email and password first; a provider is a later decision |

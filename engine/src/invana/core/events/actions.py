@@ -236,7 +236,7 @@ AUTH_REFRESH = "auth.refresh"
 AUTH_PASSWORD_CHANGE = "auth.password_change"
 AUTH_USERNAME_CHANGE = "auth.username_change"
 # Personal access tokens
-# (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
+# (docs/for-developers/modules/identity-and-access/features/tokens.md).
 # Use is not an event — `last_used_at` on the row carries it; a refusal is,
 # because a refusal is a signal (PT8).
 TOKEN_CREATE = "token.create"

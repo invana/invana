@@ -6,7 +6,7 @@ persisted. Lookups compare hashes; raw tokens never round-trip the DB.
 Personal access tokens carry the fixed ``invana_pat_`` prefix (PT3) so the
 engine can route the credential without attempting a JWT decode, and a secret
 scanner can recognise one in a repository
-(docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
+(docs/for-developers/modules/identity-and-access/features/tokens.md).
 """
 
 from __future__ import annotations

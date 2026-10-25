@@ -51,7 +51,7 @@ export interface UsernameAvailabilityResponse {
 }
 
 /** A personal access token as the list shows it
- *  (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
+ *  (docs/for-developers/modules/identity-and-access/features/tokens.md).
  *  The secret is not here — it exists once, in the create response. */
 export interface PersonalAccessToken {
 	id: string;

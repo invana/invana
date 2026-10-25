@@ -8,7 +8,7 @@ database write.
 | Index | [11.3](../../../README.md#11--identity-and-access) · Slice **S1** |
 | Module | [Identity and access](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [accounts](accounts.md) · [personal access tokens](personal-access-tokens.md) · [external-agent-api](../../operate/features/external-agent-api.md) |
+| Related | [accounts](accounts.md) · [personal access tokens](tokens.md) · [external-agent-api](../../operate/features/external-agent-api.md) |
 
 > **As** someone signed in on two machines, **I want** to be able to sign one of them out, **so that**
 > losing a laptop is not a password change and a prayer.
@@ -94,5 +94,5 @@ sequenceDiagram
 | Not building | Because |
 |---|---|
 | A JWT denylist | rotation plus a server-side row is simpler and exact |
-| Long-lived tokens for convenience | a session stays short. A person who needs one mints a [personal access token](personal-access-tokens.md); a third party gets a scoped one from a Graph ([10.4](../../operate/features/external-agent-api.md)) |
+| Long-lived tokens for convenience | a session stays short. A person who needs one mints a [personal access token](tokens.md); a third party gets a scoped one from a Graph ([10.4](../../operate/features/external-agent-api.md)) |
 | Device fingerprinting | a session list is enough to act on |

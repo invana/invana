@@ -27,7 +27,7 @@ builder — until *Create agent* makes it live; a live agent's Overview is its d
 | C6 | Soul | Voice dials, the soul editor and a sample ask previewed before saving ([soul](soul.md)) |
 | C7 | Model | The pinned model version (offered versions only) and its effort; the versions it has run on; a move runs the evals first |
 | C8 | Flow | Triggers → the agent → its skills → the agents it spawned, with *From the instructions* and *Who it can talk to*. Delegation targets join with F05, outside callers with I02 |
-| C9 | Access | The functions its skills need against what its envelope allows, with why a function is refused. *May delegate to* joins with delegation (F05); policies with IAM (I01) |
+| C9 | Access | The policies it holds (*Attach a policy*), every function its skills need or its policies allow against its policies · started by · world, with why a function is refused, and *May delegate to* ([effective access](../../identity-and-access/features/effective-access.md)) |
 | C10 | Limits | Budget (a run, a month), delegation (may create helpers, depth, children a run, runs at once), effort (steps, replans, questions) and what happens at each limit. Escrow, *in all* and the exit rules join with F05 |
 | C11 | Deploy | Where its steps run (resource → pool, free slots), triggers (schedule · can be assigned · unattended · an event) |
 | C12 | Evals | The agent's eval set, runs and gate ([evals](../../skills/features/evals.md)) |
@@ -73,7 +73,7 @@ flowchart TD
 | Soul | `soul` | `AgentSoulTab` | `PATCH …/agents/{id}` · `POST …/soul/preview` |
 | Model | `model` | `AgentModelTab` | `GET …/llm/providers` · `…/agents/{id}/overview` (versions run on) · `PATCH` `model_pin` · effort |
 | Flow | `flow` | `AgentFlowTab` — `LayeredCanvas` + side cards | `…/skills-and-callables` · `…/lineage` · schedules |
-| Access | `access` | `AgentAccessTab` | `…/skills-and-callables` · `workflow_spec.delegate_to` |
+| Access | `access` | `AgentAccessTab` | `GET …/iam/agents/{id}/effective` · `POST …/iam/policies/{name}/holders` · `policy.may_delegate` |
 | Limits | `limits` | `AgentLimitsTab` | `PATCH` `budget` · `workflow_spec` ceilings · `effort` |
 | Deploy | `deploy` | `AgentDeployTab` | `GET …/agents/concurrency` (pools) · schedules · `PATCH` `policy` |
 | Evals | `evals` | `EvalSetPanel` (subject `agent`) | `…/evals/agent/{id}` |
@@ -130,7 +130,7 @@ default is refused with `409` naming the state, as for `paused`.
 | AP7 | **The head is `RecordHeader variant="page"`**: crumb `Agents`, the name, a state chip (`draft` · `authored · vN` · `paused` · `retired`), a meta line (model · runtime), and the acts — a draft: *Discard draft* · *Create agent*; live: *Make default* · *Pause* (or *Resume*) · *Retire*. *Run now* is not here — starting a run of an agent is the Runs phase's (agent-fabric › Runs) |
 | AP8 | **Pause and Retire name every piece of open work and what happens to it** ([lifecycle](lifecycle.md) LC8–LC10); Retire takes a *Why* (`RetireRequest.why`, at most 500 characters), written on the `agent.retire` event, so History shows it |
 | AP9 | **Flow is drawn from records, never from a model call**: triggers are the agent's schedules (`?f.agent_id=`) and its `policy.can_be_assigned`; skills are its bindings with their steps; spawned agents are the lineage's `spawned` edges. *From the instructions* lists each instruction line that names a bound skill or a spawn. The canvas foot says *Drawn from <agent>'s instructions and skills. A run may replan within them — who it may spawn never widens.* |
-| AP10 | **Access shows what is enforced today**: every function its skills need and every function its envelope allows, as one table — *Its skills need* · *Bound* (the function's bound) · *Its envelope* · *Effective* (allowed · refused) · *Why not* (*not in its envelope* · *no skill needs it*). Policies, *started by* and *world* join with IAM (I01); *May delegate to* with F05 |
+| AP10 | **Access is the agent's effective access** ([11.8](../../identity-and-access/features/effective-access.md)): *Policies it holds* (policy · kind · allows · owner, *Attach a policy* — the IAM act, gated by iam-admin), then one table — function · *Its skills need* · *Its policies* · *Started by* (as the reader) · *World* · *Effective* · *Why not* — and *May delegate to*. |
 | AP11 | **Limits is a form of the stored limits** — `budget.max_tokens_run` · `max_tokens_month` · `max_depth` · `max_children` · `max_concurrent_runs`, `policy.can_spawn`, `effort.max_steps` · `max_replans` · `max_clarifications` — each beside the unit it bounds, and *When it reaches a limit* says what each does. A run budget above the month budget is flagged under the field |
 | AP13 | **Deploy reads the Graph's pools** (`GET …/contention`): *Where its steps run* lists each resource its functions declare (`resources` on the manifest) with the pool that serves it and its free slots; triggers are its schedules (each opens Activity › Schedules), *Can be assigned* and *Unattended* (`policy.can_be_assigned` · `policy.unattended`). An event trigger joins with workers (F06) |
 | AP14 | **Model's *Versions it has run on* is `overview.models`**, this agent's runs grouped by the recorded `model_version`; a move is `PATCH model_pin` with a reason, gated by the agent's evals |
@@ -154,7 +154,6 @@ default is refused with `409` naming the state, as for `paused`.
 
 | Item | Why |
 |---|---|
-| Policies it holds, started-by and world columns on Access | IAM (I01) |
 | Callable over MCP on Deploy | This Graph's MCP server (I02) |
 | Remote agents in Flow and Access | 5.11, later |
 | Deleting an agent that has run | Lineage must resolve ([lifecycle](lifecycle.md)); a draft is discarded (AP22) |

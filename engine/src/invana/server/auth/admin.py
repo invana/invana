@@ -60,7 +60,7 @@ class PersonalAccessTokenView(ModelView):
     icon = "fa fa-key"
     # `token_hash` is excluded — a hash is still a credential lookup key, and the
     # secret itself was never stored
-    # (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md PT2).
+    # (docs/for-developers/modules/identity-and-access/features/tokens.md PT2).
     fields = [
         "id",
         "user_id",

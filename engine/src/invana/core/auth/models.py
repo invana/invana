@@ -11,7 +11,7 @@ GraphConnection per docs/for-developers/modules/identity-and-access/spec.md.
 - ``refresh_tokens``  — opaque, hashed refresh-token store.
 - ``personal_access_tokens``
                       — long-lived, hashed credentials a person mints for a script
-                        (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
+                        (docs/for-developers/modules/identity-and-access/features/tokens.md).
                         Carries identity, never a scope (PT1).
 """
 

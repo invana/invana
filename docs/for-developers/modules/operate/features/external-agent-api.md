@@ -1,7 +1,7 @@
 # External-agent API
 
 Something outside Invana — an orchestrator, a bot, someone else's agent — reading from the Graph with
-a scoped token, and getting provenance with every answer.
+a narrowed token, and getting provenance with every answer.
 
 | | |
 |---|---|
@@ -18,7 +18,7 @@ a scoped token, and getting provenance with every answer.
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | Scoped tokens | Each names exactly what it may read |
+| C1 | Narrowed tokens | The caller's credential is an IAM [token](../../identity-and-access/features/tokens.md) narrowed by an inline policy |
 | C2 | Read-only | There is no general write path |
 | C3 | Provenance on every response | Records, and where they came from |
 | C4 | Recorded as a principal | External calls appear in activity like any other actor |
@@ -88,5 +88,5 @@ flowchart TD
 | Not building | Because |
 |---|---|
 | A general write API | writes have contracts — import has one, tasks have one |
-| OAuth apps and third-party installs | scoped tokens cover the need at this stage |
+| OAuth apps and third-party installs | narrowed tokens cover the need at this stage |
 | Webhooks | polling with provenance is simpler to reason about and to audit |

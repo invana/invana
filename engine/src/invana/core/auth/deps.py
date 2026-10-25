@@ -2,7 +2,7 @@
 
 A request arrives with one of two credentials, and both resolve to the same
 person: a short-lived access token (a JWT), or a personal access token
-(docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
+(docs/for-developers/modules/identity-and-access/features/tokens.md).
 Neither carries membership — that is looked up per request (IA2).
 
 Graph-scoped deps (membership, role gates) live in :mod:`invana.server.graphs.deps`.

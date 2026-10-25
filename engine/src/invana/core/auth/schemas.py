@@ -156,7 +156,7 @@ class DeleteMeRequest(BaseModel):
 
 # ---------------------------------------------------------------------------
 # Personal access tokens
-# (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md)
+# (docs/for-developers/modules/identity-and-access/features/tokens.md)
 # ---------------------------------------------------------------------------
 
 # The expiries offered at creation come from settings (PT7), so a deployment

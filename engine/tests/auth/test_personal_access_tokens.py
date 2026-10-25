@@ -1,5 +1,5 @@
 """Personal access tokens against a real Postgres
-(docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
+(docs/for-developers/modules/identity-and-access/features/tokens.md).
 
 The route tests deliberately do NOT override ``get_current_user`` — the point is
 the credential path itself: a secret in the ``Authorization`` header resolving to

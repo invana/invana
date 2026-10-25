@@ -75,7 +75,7 @@ flowchart TD
 | AC3 | A password change revokes existing sessions. |
 | AC4 | Errors never confirm whether an account exists. |
 | AC5 | Superuser is platform administration, never Graph access. |
-| AC6 | The profile's sections are a **left nav**, not a tab strip, and the page is as wide as a reading column allows rather than the width of one form. Five labels do not fit a tab bar, and [Access tokens](personal-access-tokens.md) is a table that needs the width the strip was taking. |
+| AC6 | The profile's sections are a **left nav**, not a tab strip, and the page is as wide as a reading column allows rather than the width of one form. Five labels do not fit a tab bar, and [Access tokens](tokens.md) is a table that needs the width the strip was taking. |
 
 ## Not building
 

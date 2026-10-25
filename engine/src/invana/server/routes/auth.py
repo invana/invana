@@ -124,7 +124,7 @@ async def delete_me(
 
 # ---------------------------------------------------------------------------
 # Personal access tokens
-# (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md)
+# (docs/for-developers/modules/identity-and-access/features/tokens.md)
 #
 # Every route here is session-only: a token cannot mint or revoke a token (PT4).
 # ---------------------------------------------------------------------------

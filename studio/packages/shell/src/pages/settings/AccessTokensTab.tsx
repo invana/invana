@@ -1,6 +1,6 @@
 /**
  * Profile › Access tokens
- * (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
+ * (docs/for-developers/modules/identity-and-access/features/tokens.md).
  *
  * A token carries the person's identity, not a scope — so this surface has
  * no permission picker, and never suggests one. The two things it must get right
