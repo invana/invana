@@ -51,6 +51,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -172,7 +173,28 @@ HANDOFF = ("Context budget reached: this session has used more than {limit:,} to
            "(files done, files left, the next step number), and stop. A fresh session will continue from your note.")
 
 
+LIMIT_RETRY = ("A previous attempt at this was cut off by a usage limit. Check `git log` and `git status` for what it "
+               "already did, do not redo it, and carry on from there.\n\n")
+
+
 def claude(text: str, sid: str, label: str) -> str:
+    """Run a session; when a usage limit refuses it, wait for the reset and run it again.
+
+    A refusal is not a fix round and not a failure: the same prompt is retried, told
+    that an earlier attempt may have left work on disk.
+    """
+    for n in range(1, 10):
+        result, resets_at = _session(text, sid, label)
+        if resets_at is None:
+            return result
+        wait = max(0, resets_at - dt.datetime.now().timestamp()) + 60
+        print(f"  {label}: usage limit — waiting {wait / 60:.0f} min for the reset, then retrying")
+        time.sleep(wait)
+        text, label = LIMIT_RETRY + text.removeprefix(LIMIT_RETRY), f"{label.split('-limit')[0]}-limit{n}"
+    raise RuntimeError(f"{label}: refused by the usage limit nine times")
+
+
+def _session(text: str, sid: str, label: str) -> tuple[str, float | None]:
     """One headless session in a fresh context, watched for context size.
 
     Runs ``claude -p`` with streaming input and output. Every assistant message
@@ -199,7 +221,7 @@ def claude(text: str, sid: str, label: str) -> str:
     send(text)
     # Sub-agents run in the background: a lead's turn ends while it waits for them, and their
     # completion starts its next turn. The session is over only at a result with none still running.
-    warned, result, peak, session_id, running = False, "", 0, "", set()
+    warned, result, peak, session_id, running, resets_at = False, "", 0, "", set(), None
     with open(CACHE / sid / f"{label}.jsonl", "w") as log:
         for line in proc.stdout:
             log.write(line)
@@ -218,6 +240,10 @@ def claude(text: str, sid: str, label: str) -> str:
                     print(f"  context {ctx:,} > {CONTEXT_LIMIT:,} — asking {label} to hand off")
                     send(HANDOFF.format(limit=CONTEXT_LIMIT, sid=sid))
                     warned = True
+            elif event.get("type") == "rate_limit_event":
+                info = event.get("rate_limit_info") or {}
+                if info.get("status") == "rejected" and info.get("resetsAt"):
+                    resets_at = float(info["resetsAt"])
             elif event.get("type") == "system" and event.get("subtype") == "background_tasks_changed":
                 running = {t.get("task_id") for t in event.get("tasks") or []}
             elif event.get("type") == "system" and event.get("subtype") == "task_started":
@@ -247,7 +273,7 @@ def claude(text: str, sid: str, label: str) -> str:
     with open(index, "a") as f:
         f.write(f"| {sid} | {label} | `claude -r {session_id}` | {peak:,} | {'yes' if warned else ''} | "
                 f"{dt.datetime.now().strftime('%Y-%m-%d %H:%M')} |\n")
-    return result
+    return result, resets_at
 
 
 def status_of(sid: str) -> str:
