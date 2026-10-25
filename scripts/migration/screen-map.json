@@ -57,13 +57,13 @@
   "shell.run.failed": {
    "story": "SH-10",
    "product": "shell",
-   "route": "/u/admin/airways/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909",
+   "route": "/u/admin/airways/agents/runs?page=run%3A1aca082a-d13d-4972-b3cf-9d2b28d6671c",
    "state": "15 stands for a failed run's id: Activity \u203a Runs, status failed, open the newest"
   },
   "shell.run.compare": {
    "story": "SH-11",
    "product": "shell",
-   "route": "/u/admin/airways/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909",
+   "route": "/u/admin/airways/agents/runs?page=run%3A1aca082a-d13d-4972-b3cf-9d2b28d6671c",
    "state": "two runs of one question in two worlds: select both in Activity \u203a Runs, Compare"
   },
   "shell.activity.approvals": {
@@ -75,7 +75,7 @@
   "shell.run.approval": {
    "story": "SH-12",
    "product": "shell",
-   "route": "/u/admin/airways/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909",
+   "route": "/u/admin/airways/agents/runs?page=run%3A1aca082a-d13d-4972-b3cf-9d2b28d6671c",
    "state": "15 stands for a run waiting on approval: open it from Approvals (needs B08)"
   },
   "shell.schedules": {
@@ -189,7 +189,7 @@
   "shell.run.rerun": {
    "story": "SH-18",
    "product": "shell",
-   "route": "/u/admin/airways/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909",
+   "route": "/u/admin/airways/agents/runs?page=run%3A1aca082a-d13d-4972-b3cf-9d2b28d6671c",
    "state": "the uuid stands for a served run (seed_f05.py prints it): Agents \u203a Runs, open the newest served run that answered a question or a query; Re-run\u2026 on its header"
   },
   "shell.first_run": {
@@ -1875,7 +1875,7 @@
   "agents.run.rerun": {
    "story": "AF-24",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909&rerun=1&right=assistant",
+   "route": "/u/admin/airways/agents/runs?page=run%3A1aca082a-d13d-4972-b3cf-9d2b28d6671c&rerun=1&right=assistant",
    "state": "the uuid stands for a served run of Route Auditor; Rerun"
   },
   "agents.runs.filtered": {

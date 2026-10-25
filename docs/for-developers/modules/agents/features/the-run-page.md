@@ -121,6 +121,7 @@ flowchart TD
 | RP16 | **The Agents Tree and the Stages canvas draw cards**, not circles: an agent card carries its state line and its tokens against its escrow; a stage card carries its function, calls, lanes and time. Both canvases carry the board's view chip and its zoom · fit · lock controls. An agent card prints its tokens against its escrow as text — a canvas card has no meter element — and neither canvas draws a minimap |
 | RP17 | **A number the engine has not recorded is absent, never 0** — a run with no token count shows `—` in its head; an LLM row with no model version reads *not recorded* as muted text |
 | RP18 | **An ended run holds no asks.** When a run ends, each of its pending asks is closed `expired` and leaves Waiting on you and Approvals › Waiting |
+| RP19 | **A link to a step opens its run on Stages with that step under the canvas**; a link that names a tab keeps it |
 
 ## Not building
 

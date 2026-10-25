@@ -125,7 +125,12 @@ export function RunPage({
 	const [tabParam, setTab] = useRunParam(runId, "tab");
 	const [rerunParam, setRerun] = useRunParam(runId, "rerun");
 	const [stopping, setStopping] = useState(false);
-	const tab: RunTab = isRunTab(tabParam) ? tabParam : "overview";
+	// A link to a step opens on Stages, with that step under the canvas.
+	const tab: RunTab = isRunTab(tabParam)
+		? tabParam
+		: stepId
+			? "stages"
+			: "overview";
 	const crumb = { label: "Runs", onClick: () => open.section("runs") };
 
 	const data = overview.data;

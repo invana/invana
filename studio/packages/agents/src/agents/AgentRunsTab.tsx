@@ -149,12 +149,14 @@ export function AgentRunsTab({
 				<FilterBar>
 					<FilterSelect
 						label="started by"
+						any="anyone"
 						value={startedBy}
 						options={memberOptions}
 						onChange={setStartedBy}
 					/>
 					<FilterSelect
 						label="from"
+						any="anywhere"
 						value={origin}
 						options={ORIGIN_OPTIONS}
 						onChange={setOrigin}

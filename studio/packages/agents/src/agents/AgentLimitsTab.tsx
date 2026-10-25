@@ -181,7 +181,7 @@ export function AgentLimitsTab({
 				</PanelSection>
 
 				<PanelSection card title="When it reaches a limit">
-					<PropertyList labelWidth={110}>
+					<PropertyList labelWidth={150}>
 						<PropertyRow label="Budget">
 							drawn against — a run is not stopped part way
 						</PropertyRow>

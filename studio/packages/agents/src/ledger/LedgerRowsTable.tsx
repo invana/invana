@@ -120,7 +120,12 @@ export function LedgerRowsTable({
 		cursor: cursors.at(-1) ?? null,
 	});
 	const page = query.data;
-	const chips = runId ? [] : chipsOf(page, list);
+	// The default window is not a filter the reader set, so it draws no chip.
+	const chips = runId
+		? []
+		: chipsOf(page, list).filter(
+				(c) => c.field !== "since" || filterValue(list, "since") !== "",
+			);
 
 	const rowId = search.get("row");
 	const setRow = (id: string | null) =>
@@ -153,7 +158,9 @@ export function LedgerRowsTable({
 			{!runId && (
 				<RowFilters username={username} graphSlug={graphSlug} list={list} />
 			)}
-			{!runId && <ListStrip page={page} list={list} />}
+			{!runId && (
+				<ListStrip page={page && { ...page, applied: chips }} list={list} />
+			)}
 
 			{query.isLoading ? (
 				<FleetReadState loading error={null} what="the ledger" />

@@ -100,7 +100,7 @@ class Seeder:
     def __init__(self, db, graph, owner):
         self.db, self.graph, self.owner = db, graph, owner
 
-    async def root(self, agent, *, body, status, started, finished=None, exit_reason=None, budget=80_000, **kw):
+    async def root(self, agent, *, body, status, started, finished=None, exit_reason=None, budget=80_000, queued=None, **kw):
         run = TaskRun(
             graph_id=self.graph.id,
             ask_kind="nl",
@@ -113,7 +113,7 @@ class Seeder:
             status=status,
             exit_reason=exit_reason,
             outcome="answered" if exit_reason == "served" else None,
-            queued_at=started,
+            queued_at=queued or started,
             started_at=started,
             finished_at=finished,
             params={**MARK, "max_tokens_run": budget},
@@ -185,15 +185,20 @@ class Seeder:
 
 
 async def ended_runs(s, auditor, c_root):
-    """Route Auditor's closed run and its three failed runs this month."""
+    """Route Auditor's closed run and its three failed runs this month.
+
+    Each is queued now though it started days ago: the engine keeps the newest
+    runs per Graph by when they were queued, so a back-dated queue time would
+    be pruned by the next run anyone starts.
+    """
     t1 = NOW - timedelta(days=2, hours=3)
-    closed = await s.root(auditor, body="Which LHR routes lost the most seats last quarter?", status="succeeded", started=t1, finished=t1 + timedelta(minutes=2), exit_reason="served")
+    closed = await s.root(auditor, body="Which LHR routes lost the most seats last quarter?", status="succeeded", started=t1, queued=NOW, finished=t1 + timedelta(minutes=2), exit_reason="served")
     await s.step(closed, c_root, seq=0, key="graph_read_query", task_key="graph.read.query", start=t1, secs=2, rows=58, number=closed.number)
     await s.step(closed, c_root, seq=1, key="llm_answer", task_key="llm.answer", start=t1 + timedelta(seconds=3), secs=9, tokens=3_100, number=closed.number)
     failed = []
     for i, (reason, ago) in enumerate((("failed", 4), ("budget_declined", 9), ("time_limit", 17))):
         t = NOW - timedelta(days=ago)
-        r = await s.root(auditor, body=f"Audit {('JFK', 'DXB', 'SIN')[i]} routes for fare gaps", status="failed", started=t, finished=t + timedelta(minutes=5), exit_reason=reason)
+        r = await s.root(auditor, body=f"Audit {('JFK', 'DXB', 'SIN')[i]} routes for fare gaps", status="failed", started=t, queued=NOW, finished=t + timedelta(minutes=5), exit_reason=reason)
         await s.step(r, c_root, seq=0, key="graph_read_query", task_key="graph.read.query", start=t, secs=2, rows=120, number=r.number)
         failed.append(r)
     return closed, failed

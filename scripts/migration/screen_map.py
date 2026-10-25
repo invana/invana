@@ -26,7 +26,7 @@ G = "/u/admin/airways"
 AR = "/u/admin/arabidopsis"
 ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.login", "/login"), ("shell.graphs", "/graphs"), ("shell.first_run", "/graphs?first-run"),
-    ("shell.profile", "/settings/profile"), ("shell.runs", f"{G}/activity/runs"), ("shell.run", f"{G}/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909"),
+    ("shell.profile", "/settings/profile"), ("shell.runs", f"{G}/activity/runs"), ("shell.run", f"{G}/agents/runs?page=run%3A1aca082a-d13d-4972-b3cf-9d2b28d6671c"),
     ("shell.schedule", f"{G}/activity/schedules"), ("shell.activity.events", f"{G}/activity/events"),
     ("shell.events", f"{G}/activity/events?filter=changes"), ("shell.change", f"{G}/activity/changes/agent/a1"),
     ("shell.notifications.rule", f"{G}/activity/rules"), ("shell.notifications.channels", f"{G}/activity/channels"),
@@ -53,7 +53,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("agents.run.step", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=stages"),
     ("agents.run.assets", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=assets"),
     ("agents.run.touched", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=touched"),
-    ("agents.run.rerun", f"{G}/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909&rerun=1"),
+    ("agents.run.rerun", f"{G}/agents/runs?page=run%3A1aca082a-d13d-4972-b3cf-9d2b28d6671c&rerun=1"),
     ("agents.run.approval", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=agents"),
     ("agents.run.ask", f"{G}/agents/runs?page=run%3A11970a9e-3208-435f-abe6-20d0d1f11c5d&tab=stages"),
     ("agents.run", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=agents"),

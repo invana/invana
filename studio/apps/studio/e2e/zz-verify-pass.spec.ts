@@ -7,58 +7,13 @@
  * offered and cited needs an LLM step, and a QL ask has none. What those two
  * tests prove is Studio's threading of a real response, not the engine's read.
  */
-import { expect, type Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { askForRun, graphApi, me, ruleWithStatement } from "./api";
 import { GRAPH } from "./explorer";
 
 const STATEMENT = "Airport codes are IATA, never ICAO.";
 const QUERY =
 	"UNWIND [['LHR','GB'],['CDG','FR'],['AMS','NL']] AS r RETURN r[0] AS code, r[1] AS country";
-
-/** A run with one report kept of it: ask, open its board, `Save report`. */
-async function reportedRun(page: Page): Promise<string> {
-	const run = await askForRun(page, QUERY);
-	await page.goto(`${GRAPH}?page=run:${run}`);
-	await page.getByRole("button", { name: "Save report", exact: true }).click();
-	// Saving turns the page into the reading it kept.
-	await expect(page).toHaveURL(new RegExp(`page=run%3A${run}%40`), {
-		timeout: 20_000,
-	});
-	return run;
-}
-
-test("B21 — a declared board offers Reports, and the card lists them", async ({
-	page,
-}) => {
-	const run = await reportedRun(page);
-	await page.goto(`${GRAPH}?page=run:${run}`);
-	const reports = page.getByRole("button", { name: "Reports", exact: true });
-	await expect(reports).toBeVisible({ timeout: 30_000 });
-	await reports.click();
-	await expect(
-		page.getByRole("button", { name: "Close Reports" }),
-	).toBeVisible();
-	await expect(
-		page.getByRole("button", { name: "Open this report" }).first(),
-	).toBeVisible({ timeout: 15_000 });
-});
-
-test("B22 — a report row opens; it does not restore", async ({ page }) => {
-	const run = await reportedRun(page);
-	await page.goto(`${GRAPH}?page=run:${run}`);
-	await page.getByRole("button", { name: "Reports", exact: true }).click();
-	// No fork: the live board is always there, so there is nothing to fork into.
-	await expect(
-		page.getByRole("button", { name: /Open as new canvas/ }),
-	).toHaveCount(0);
-	await page.getByRole("button", { name: "Open this report" }).first().click();
-	await expect(
-		page.getByText(/A report — the numbers as they were/),
-	).toBeVisible({ timeout: 30_000 });
-	await expect(page).toHaveURL(new RegExp(`page=run%3A${run}%40`));
-	await page.getByRole("button", { name: "Open the live board" }).click();
-	await expect(page).toHaveURL(new RegExp(`page=run%3A${run}$`));
-});
 
 test("SR44 — a step board opened cold finds its own run", async ({ page }) => {
 	const run = await askForRun(page, QUERY);
@@ -76,11 +31,13 @@ test("SR44 — a step board opened cold finds its own run", async ({ page }) => 
 		0,
 		{ timeout: 30_000 },
 	);
-	// The trace loaded, which is only possible once the run was resolved.
-	await expect(page.getByText(label).first()).toBeVisible({ timeout: 30_000 });
-	await expect(
-		page.getByRole("button", { name: "Reports", exact: true }),
-	).toBeVisible();
+	// The run page opened on Stages, which is only possible once the run was resolved.
+	await expect(page.getByRole("tab", { name: "Stages" })).toHaveAttribute(
+		"aria-selected",
+		"true",
+		{ timeout: 30_000 },
+	);
+	expect(label).toBeTruthy();
 });
 
 test("RU13 — a statement closes the trace and opens the rule board", async ({

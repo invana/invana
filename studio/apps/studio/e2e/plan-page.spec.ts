@@ -54,8 +54,8 @@ test("a plan that has run reads across its four tabs and opens a run", async ({
 	await page.getByRole("option", { name: ranBy, exact: true }).click();
 	await expect(run).toBeVisible();
 
-	const label = (await run.getByText(/^run:[0-9a-f]{8}$/).textContent()) ?? "";
 	await run.click();
+	const label = /^Run #\d+$/;
 
 	// The run opens as its own page beside the plan's, and comes to the front.
 	await expect(page.getByRole("tab", { name: label })).toHaveAttribute(
