@@ -14,11 +14,11 @@ from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.graphs.roles import GraphRole, holds
 from invana.apps.iam.managers.holdings import HoldingsManager
 from invana.apps.iam.managers.tokens import IamTokenManager
-from invana.apps.iam.schemas import IAM_TOKEN_LIST, IamTokenCreate, IamTokenCreated, IamTokenRow
+from invana.apps.iam.schemas import IAM_TOKEN_LIST, IamTokenCreate, IamTokenCreated, IamTokenPage
 from invana.core.auth.deps import require_session_auth
 from invana.core.auth.models import User
 from invana.core.db import get_session
-from invana.core.lists import ListParams, Page, list_params
+from invana.core.lists import ListParams, list_params
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 tokens = IamTokenManager()
@@ -34,7 +34,7 @@ async def list_tokens(
     member: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> Page[IamTokenRow]:
+) -> IamTokenPage:
     return await tokens.page(session, graph=graph, params=params)
 
 

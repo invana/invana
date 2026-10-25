@@ -35,7 +35,12 @@ _CREATE = Workflow("access-create-task", (Step("work.create_task", "Create a tas
 async def _setup(session, graph, user, *, roles: list[str], holds: list[str]) -> tuple[Agent, TaskRun]:
     """The Graph's managed policies, ``user`` a member with ``roles``, and an agent holding ``holds``."""
     managed = {p.name: p for p in await PolicyManager().ensure_managed(session, graph_id=graph.id)}
-    session.add(GraphMember(graph_id=graph.id, user_id=user.id, roles=roles))
+    member = (
+        await session.execute(
+            select(GraphMember).where(GraphMember.graph_id == graph.id, GraphMember.user_id == user.id)
+        )
+    ).scalar_one()
+    member.roles = roles
     agent = Agent(graph_id=graph.id, name="Fare Scout", created_by_kind="user", created_by_id=user.id)
     session.add(agent)
     await session.flush()

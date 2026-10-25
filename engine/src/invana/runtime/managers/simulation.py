@@ -151,6 +151,10 @@ class SimulationManager:
                 raise ValidationError(f"Input {ref!r} does not resolve: {exc}") from exc
             if version.retracted_at is not None:
                 raise ConflictError(f"retracted — {dataset.address}@{number} was withdrawn and cannot be simulated on.")
+            if version.state == "draft":
+                raise ConflictError(
+                    f"draft — {dataset.address}@{number} is not published yet and cannot be simulated on."
+                )
             pin = {
                 "ref": f"{dataset.address}@{version.version}",
                 "dataset_id": dataset.id,

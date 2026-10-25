@@ -38,6 +38,159 @@
         "title": "AccessArea",
         "type": "object"
       },
+      "AccessCheckLayer": {
+        "properties": {
+          "by": {
+            "items": {
+              "$ref": "#/components/schemas/PrincipalRef"
+            },
+            "title": "By",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "layer": {
+            "enum": [
+              "policies",
+              "started_by",
+              "world",
+              "boundary",
+              "token"
+            ],
+            "title": "Layer",
+            "type": "string"
+          },
+          "reason": {
+            "default": "",
+            "title": "Reason",
+            "type": "string"
+          },
+          "says": {
+            "enum": [
+              "allows",
+              "refuses",
+              "n/a"
+            ],
+            "title": "Says",
+            "type": "string"
+          }
+        },
+        "required": [
+          "layer",
+          "label",
+          "by",
+          "says"
+        ],
+        "title": "AccessCheckLayer",
+        "type": "object"
+      },
+      "AccessCheckRead": {
+        "properties": {
+          "allowed": {
+            "title": "Allowed",
+            "type": "boolean"
+          },
+          "decided_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By"
+          },
+          "layers": {
+            "items": {
+              "$ref": "#/components/schemas/AccessCheckLayer"
+            },
+            "title": "Layers",
+            "type": "array"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "allowed",
+          "message",
+          "layers"
+        ],
+        "title": "AccessCheckRead",
+        "type": "object"
+      },
+      "AccessCheckRequest": {
+        "properties": {
+          "action": {
+            "minLength": 1,
+            "title": "Action",
+            "type": "string"
+          },
+          "principal_id": {
+            "title": "Principal Id",
+            "type": "string"
+          },
+          "principal_kind": {
+            "enum": [
+              "person",
+              "agent",
+              "token"
+            ],
+            "title": "Principal Kind",
+            "type": "string"
+          },
+          "resource": {
+            "minLength": 1,
+            "title": "Resource",
+            "type": "string"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "started_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started By"
+          },
+          "world_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "World Id"
+          }
+        },
+        "required": [
+          "principal_kind",
+          "principal_id",
+          "action",
+          "resource"
+        ],
+        "title": "AccessCheckRequest",
+        "type": "object"
+      },
       "AccessRead": {
         "description": "What the caller may change in this Graph. Reading is never gated.",
         "properties": {
@@ -817,6 +970,119 @@
           "calls"
         ],
         "title": "Advice",
+        "type": "object"
+      },
+      "AgentAccessPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AgentAccessRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "kinds": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Kinds",
+            "type": "object"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "AgentAccessPage",
+        "type": "object"
+      },
+      "AgentAccessRow": {
+        "properties": {
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "functions_allowed": {
+            "title": "Functions Allowed",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner"
+          },
+          "policies": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Policies",
+            "type": "array"
+          },
+          "refused_7d": {
+            "title": "Refused 7D",
+            "type": "integer"
+          },
+          "refused_line": {
+            "title": "Refused Line",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "agent_id",
+          "name",
+          "kind",
+          "version",
+          "policies",
+          "functions_allowed",
+          "refused_7d",
+          "refused_line"
+        ],
+        "title": "AgentAccessRow",
         "type": "object"
       },
       "AgentBar": {
@@ -3413,6 +3679,63 @@
           "assigned_at"
         ],
         "title": "AssignmentRead",
+        "type": "object"
+      },
+      "AttachRequest": {
+        "properties": {
+          "days": {
+            "anyOf": [
+              {
+                "maximum": 365.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days"
+          },
+          "ends": {
+            "default": "always",
+            "enum": [
+              "run",
+              "days",
+              "always"
+            ],
+            "title": "Ends",
+            "type": "string"
+          },
+          "holder_id": {
+            "title": "Holder Id",
+            "type": "string"
+          },
+          "holder_kind": {
+            "enum": [
+              "person",
+              "group",
+              "agent"
+            ],
+            "title": "Holder Kind",
+            "type": "string"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          }
+        },
+        "required": [
+          "holder_kind",
+          "holder_id"
+        ],
+        "title": "AttachRequest",
         "type": "object"
       },
       "Attention": {
@@ -7252,6 +7575,11 @@
             ],
             "title": "Source"
           },
+          "state": {
+            "default": "published",
+            "title": "State",
+            "type": "string"
+          },
           "version": {
             "title": "Version",
             "type": "integer"
@@ -7808,6 +8136,50 @@
         "title": "Degradation",
         "type": "object"
       },
+      "Delegate": {
+        "properties": {
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "by_policy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By Policy"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "may": {
+            "enum": [
+              "always",
+              "ask",
+              "never"
+            ],
+            "title": "May",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_id",
+          "name",
+          "kind",
+          "may"
+        ],
+        "title": "Delegate",
+        "type": "object"
+      },
       "DelegationAsk": {
         "description": "A delegation waiting on a person, drawn dashed from the asking agent.",
         "properties": {
@@ -8297,6 +8669,195 @@
           }
         },
         "title": "EdgeTypeUpdate",
+        "type": "object"
+      },
+      "EffectiveRead": {
+        "properties": {
+          "agent": {
+            "title": "Agent",
+            "type": "string"
+          },
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "allowed": {
+            "title": "Allowed",
+            "type": "integer"
+          },
+          "delegates": {
+            "items": {
+              "$ref": "#/components/schemas/Delegate"
+            },
+            "title": "Delegates",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "layers": {
+            "items": {
+              "$ref": "#/components/schemas/LayerRead"
+            },
+            "title": "Layers",
+            "type": "array"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner"
+          },
+          "policies": {
+            "items": {
+              "$ref": "#/components/schemas/HeldPolicy"
+            },
+            "title": "Policies",
+            "type": "array"
+          },
+          "refused": {
+            "title": "Refused",
+            "type": "integer"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/EffectiveRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "started_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PrincipalRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "world": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PrincipalRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "agent_id",
+          "agent",
+          "kind",
+          "policies",
+          "layers",
+          "rows",
+          "delegates",
+          "allowed",
+          "refused"
+        ],
+        "title": "EffectiveRead",
+        "type": "object"
+      },
+      "EffectiveRow": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "bound": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bound"
+          },
+          "boundary": {
+            "enum": [
+              "allows",
+              "refuses",
+              "n/a"
+            ],
+            "title": "Boundary",
+            "type": "string"
+          },
+          "effective": {
+            "enum": [
+              "allowed",
+              "refused"
+            ],
+            "title": "Effective",
+            "type": "string"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "needs": {
+            "title": "Needs",
+            "type": "boolean"
+          },
+          "policies": {
+            "enum": [
+              "allows",
+              "refuses",
+              "n/a"
+            ],
+            "title": "Policies",
+            "type": "string"
+          },
+          "resource": {
+            "title": "Resource",
+            "type": "string"
+          },
+          "started_by": {
+            "enum": [
+              "allows",
+              "refuses",
+              "n/a"
+            ],
+            "title": "Started By",
+            "type": "string"
+          },
+          "why": {
+            "default": "",
+            "title": "Why",
+            "type": "string"
+          },
+          "world": {
+            "enum": [
+              "allows",
+              "refuses",
+              "n/a"
+            ],
+            "title": "World",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "resource",
+          "layer",
+          "needs",
+          "policies",
+          "started_by",
+          "world",
+          "boundary",
+          "effective"
+        ],
+        "title": "EffectiveRow",
         "type": "object"
       },
       "EmissionRead": {
@@ -11746,6 +12307,262 @@
         "title": "GraphUpdate",
         "type": "object"
       },
+      "GroupCreate": {
+        "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "GroupCreate",
+        "type": "object"
+      },
+      "GroupMemberAdd": {
+        "properties": {
+          "member_id": {
+            "title": "Member Id",
+            "type": "string"
+          },
+          "member_kind": {
+            "enum": [
+              "person",
+              "agent"
+            ],
+            "title": "Member Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "member_kind",
+          "member_id"
+        ],
+        "title": "GroupMemberAdd",
+        "type": "object"
+      },
+      "GroupMemberRef": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "member_id": {
+            "title": "Member Id",
+            "type": "string"
+          },
+          "member_kind": {
+            "enum": [
+              "person",
+              "agent"
+            ],
+            "title": "Member Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "member_kind",
+          "member_id",
+          "name"
+        ],
+        "title": "GroupMemberRef",
+        "type": "object"
+      },
+      "GroupPolicyRef": {
+        "description": "A policy a group holds, with the attachment that detaches it.",
+        "properties": {
+          "attachment_id": {
+            "title": "Attachment Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "managed",
+              "custom",
+              "inline",
+              "boundary"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attachment_id",
+          "name",
+          "kind",
+          "summary"
+        ],
+        "title": "GroupPolicyRef",
+        "type": "object"
+      },
+      "GroupRead": {
+        "properties": {
+          "agents": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Agents",
+            "type": "array"
+          },
+          "agents_count": {
+            "title": "Agents Count",
+            "type": "integer"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "held": {
+            "items": {
+              "$ref": "#/components/schemas/GroupPolicyRef"
+            },
+            "title": "Held",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/GroupMemberRef"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "people": {
+            "items": {
+              "type": "string"
+            },
+            "title": "People",
+            "type": "array"
+          },
+          "people_count": {
+            "title": "People Count",
+            "type": "integer"
+          },
+          "policies": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Policies",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "people",
+          "agents",
+          "policies",
+          "people_count",
+          "agents_count",
+          "members"
+        ],
+        "title": "GroupRead",
+        "type": "object"
+      },
+      "GroupRow": {
+        "properties": {
+          "agents": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Agents",
+            "type": "array"
+          },
+          "agents_count": {
+            "title": "Agents Count",
+            "type": "integer"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "people": {
+            "items": {
+              "type": "string"
+            },
+            "title": "People",
+            "type": "array"
+          },
+          "people_count": {
+            "title": "People Count",
+            "type": "integer"
+          },
+          "policies": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Policies",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "people",
+          "agents",
+          "policies",
+          "people_count",
+          "agents_count"
+        ],
+        "title": "GroupRow",
+        "type": "object"
+      },
+      "GroupUpdate": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "title": "GroupUpdate",
+        "type": "object"
+      },
       "Growth": {
         "properties": {
           "change": {
@@ -12055,51 +12872,650 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
-      "ImpactRead": {
-        "description": "*Saving this would change 2 of 4 worlds*, and what each one loses.",
+      "HeldBy": {
+        "description": "Who holds a policy, counted by the engine.",
         "properties": {
-          "headline": {
-            "title": "Headline",
+          "agents": {
+            "default": 0,
+            "title": "Agents",
+            "type": "integer"
+          },
+          "groups": {
+            "default": 0,
+            "title": "Groups",
+            "type": "integer"
+          },
+          "line": {
+            "title": "Line",
             "type": "string"
           },
-          "worlds": {
+          "people": {
+            "default": 0,
+            "title": "People",
+            "type": "integer"
+          },
+          "tokens": {
+            "default": 0,
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "line"
+        ],
+        "title": "HeldBy",
+        "type": "object"
+      },
+      "HeldPolicy": {
+        "properties": {
+          "how": {
+            "title": "How",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "managed",
+              "custom",
+              "inline",
+              "boundary"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "summary",
+          "how"
+        ],
+        "title": "HeldPolicy",
+        "type": "object"
+      },
+      "HolderPage": {
+        "properties": {
+          "applied": {
             "items": {
-              "$ref": "#/components/schemas/WorldImpactRead"
+              "$ref": "#/components/schemas/AppliedFilter"
             },
-            "title": "Worlds",
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/HolderRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "kinds": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Kinds",
+            "type": "object"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "HolderPage",
+        "type": "object"
+      },
+      "HolderRow": {
+        "properties": {
+          "attached_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attached At"
+          },
+          "attached_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attached By"
+          },
+          "ends_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends At"
+          },
+          "ends_line": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends Line"
+          },
+          "holder_id": {
+            "title": "Holder Id",
+            "type": "string"
+          },
+          "how": {
+            "title": "How",
+            "type": "string"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "kind": {
+            "enum": [
+              "person",
+              "group",
+              "agent",
+              "token"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "line": {
+            "title": "Line",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "holder_id",
+          "name",
+          "line",
+          "how"
+        ],
+        "title": "HolderRow",
+        "type": "object"
+      },
+      "IamTokenCreate": {
+        "properties": {
+          "expires_in_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires In Days"
+          },
+          "holder_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Holder Id"
+          },
+          "name": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/StatementIn"
+            },
+            "title": "Statements",
             "type": "array"
           }
         },
         "required": [
-          "headline",
-          "worlds"
+          "name"
         ],
-        "title": "ImpactRead",
+        "title": "IamTokenCreate",
         "type": "object"
       },
-      "ImpactRequest": {
+      "IamTokenCreated": {
         "properties": {
-          "closed_layers": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "expired": {
+            "title": "Expired",
+            "type": "boolean"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "graph_bound": {
+            "title": "Graph Bound",
+            "type": "boolean"
+          },
+          "holder": {
+            "$ref": "#/components/schemas/TokenHolder"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_four": {
+            "title": "Last Four",
+            "type": "string"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "narrowed_to": {
+            "title": "Narrowed To",
+            "type": "string"
+          },
+          "policy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Policy"
+          },
+          "secret": {
+            "title": "Secret",
+            "type": "string"
+          },
+          "statements": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/StatementRead"
             },
-            "title": "Closed Layers",
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "last_four",
+          "holder",
+          "graph_bound",
+          "narrowed_to",
+          "created_at",
+          "expired",
+          "secret"
+        ],
+        "title": "IamTokenCreated",
+        "type": "object"
+      },
+      "IamTokenPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
             "type": "array"
           },
-          "rules": {
+          "expiry_day_choices": {
             "items": {
-              "$ref": "#/components/schemas/RuleIn"
+              "type": "integer"
             },
-            "title": "Rules",
+            "title": "Expiry Day Choices",
             "type": "array"
           },
-          "scope": {
-            "default": "graph",
-            "title": "Scope",
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IamTokenRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "max_tokens": {
+            "title": "Max Tokens",
+            "type": "integer"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total",
+          "expiry_day_choices",
+          "max_tokens"
+        ],
+        "title": "IamTokenPage",
+        "type": "object"
+      },
+      "IamTokenRow": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "expired": {
+            "title": "Expired",
+            "type": "boolean"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "graph_bound": {
+            "title": "Graph Bound",
+            "type": "boolean"
+          },
+          "holder": {
+            "$ref": "#/components/schemas/TokenHolder"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_four": {
+            "title": "Last Four",
+            "type": "string"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "narrowed_to": {
+            "title": "Narrowed To",
+            "type": "string"
+          },
+          "policy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Policy"
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/StatementRead"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "last_four",
+          "holder",
+          "graph_bound",
+          "narrowed_to",
+          "created_at",
+          "expired"
+        ],
+        "title": "IamTokenRow",
+        "type": "object"
+      },
+      "ImpactBreak": {
+        "properties": {
+          "agent": {
+            "title": "Agent",
+            "type": "string"
+          },
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "line": {
+            "title": "Line",
+            "type": "string"
+          },
+          "needs": {
+            "title": "Needs",
+            "type": "string"
+          },
+          "skill": {
+            "title": "Skill",
+            "type": "string"
+          },
+          "skill_id": {
+            "title": "Skill Id",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": [
+          "agent_id",
+          "agent",
+          "skill_id",
+          "skill",
+          "needs",
+          "line"
+        ],
+        "title": "ImpactBreak",
+        "type": "object"
+      },
+      "ImpactRow": {
+        "properties": {
+          "change": {
+            "enum": [
+              "gains",
+              "loses",
+              "same"
+            ],
+            "title": "Change",
+            "type": "string"
+          },
+          "holder_id": {
+            "title": "Holder Id",
+            "type": "string"
+          },
+          "holder_kind": {
+            "enum": [
+              "person",
+              "agent"
+            ],
+            "title": "Holder Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "used_30d": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Used 30D"
+          },
+          "used_line": {
+            "default": "",
+            "title": "Used Line",
+            "type": "string"
+          },
+          "what": {
+            "title": "What",
             "type": "string"
           }
         },
-        "title": "ImpactRequest",
+        "required": [
+          "holder_kind",
+          "holder_id",
+          "name",
+          "change",
+          "what"
+        ],
+        "title": "ImpactRow",
         "type": "object"
       },
       "ImportNote": {
@@ -12758,6 +14174,30 @@
         ],
         "title": "Layer",
         "type": "string"
+      },
+      "LayerRead": {
+        "description": "A layer row of the Statements table.",
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "line": {
+            "title": "Line",
+            "type": "string"
+          }
+        },
+        "required": [
+          "layer",
+          "label",
+          "line"
+        ],
+        "title": "LayerRead",
+        "type": "object"
       },
       "LayerTally": {
         "description": "One layer of a run's ledger, counted.",
@@ -13996,6 +15436,195 @@
           "items"
         ],
         "title": "LifecyclePreview",
+        "type": "object"
+      },
+      "LimitRow": {
+        "properties": {
+          "ceiling": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ceiling"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "per": {
+            "title": "Per",
+            "type": "string"
+          },
+          "share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share"
+          },
+          "used": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Used"
+          },
+          "used_line": {
+            "default": "\u2014",
+            "title": "Used Line",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "per"
+        ],
+        "title": "LimitRow",
+        "type": "object"
+      },
+      "Limits": {
+        "properties": {
+          "depth": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Depth"
+          },
+          "descendants": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descendants"
+          },
+          "live_agents": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Agents"
+          },
+          "may_ask_more": {
+            "default": false,
+            "title": "May Ask More",
+            "type": "boolean"
+          },
+          "pools": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Pools",
+            "type": "array"
+          },
+          "tokens_month": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens Month"
+          },
+          "tokens_run": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens Run"
+          },
+          "worker_seconds_hour": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worker Seconds Hour"
+          }
+        },
+        "title": "Limits",
+        "type": "object"
+      },
+      "LimitsRead": {
+        "properties": {
+          "asks_go_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asks Go To"
+          },
+          "may_ask_more": {
+            "title": "May Ask More",
+            "type": "boolean"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/LimitRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rows",
+          "may_ask_more"
+        ],
+        "title": "LimitsRead",
         "type": "object"
       },
       "LinkDeclare": {
@@ -16552,6 +18181,52 @@
         "title": "Overview",
         "type": "object"
       },
+      "OverviewRead": {
+        "properties": {
+          "agents": {
+            "title": "Agents",
+            "type": "integer"
+          },
+          "groups": {
+            "title": "Groups",
+            "type": "integer"
+          },
+          "people": {
+            "title": "People",
+            "type": "integer"
+          },
+          "policies": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Policies",
+            "type": "object"
+          },
+          "service_accounts": {
+            "title": "Service Accounts",
+            "type": "integer"
+          },
+          "tokens_expiring_week": {
+            "title": "Tokens Expiring Week",
+            "type": "integer"
+          },
+          "tokens_live": {
+            "title": "Tokens Live",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "people",
+          "service_accounts",
+          "groups",
+          "agents",
+          "policies",
+          "tokens_live",
+          "tokens_expiring_week"
+        ],
+        "title": "OverviewRead",
+        "type": "object"
+      },
       "OverviewRow": {
         "properties": {
           "key": {
@@ -16809,6 +18484,50 @@
         "title": "Page[FunctionCallRead]",
         "type": "object"
       },
+      "Page_GroupRow_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GroupRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[GroupRow]",
+        "type": "object"
+      },
       "Page_LLMModelRead_": {
         "properties": {
           "applied": {
@@ -16939,6 +18658,50 @@
           "unfiltered_total"
         ],
         "title": "Page[LedgerExportRead]",
+        "type": "object"
+      },
+      "Page_LedgerRowRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerRowRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[LedgerRowRead]",
         "type": "object"
       },
       "Page_MemberRead_": {
@@ -17306,6 +19069,57 @@
         "title": "ParticipantReading",
         "type": "object"
       },
+      "PeoplePage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PersonRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "kinds": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Kinds",
+            "type": "object"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "PeoplePage",
+        "type": "object"
+      },
       "Performance": {
         "properties": {
           "error_rate": {
@@ -17623,6 +19437,86 @@
           "marks"
         ],
         "title": "PerformanceTrend",
+        "type": "object"
+      },
+      "PersonRow": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "groups": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Groups",
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "person",
+              "service"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "policies": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Policies",
+            "type": "array"
+          },
+          "signs_in_with": {
+            "title": "Signs In With",
+            "type": "string"
+          },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "username",
+          "name",
+          "kind",
+          "groups",
+          "policies",
+          "tokens",
+          "signs_in_with"
+        ],
+        "title": "PersonRow",
         "type": "object"
       },
       "PersonalAccessTokenCreateRequest": {
@@ -18797,6 +20691,451 @@
         "title": "PluginSummary",
         "type": "object"
       },
+      "PolicyCreate": {
+        "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "kind": {
+            "default": "custom",
+            "enum": [
+              "custom",
+              "boundary"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/Limits"
+          },
+          "name": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
+            "title": "Name",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/StatementIn"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "PolicyCreate",
+        "type": "object"
+      },
+      "PolicyDraftRequest": {
+        "description": "*Draft with the assistant*: one sentence.",
+        "properties": {
+          "prompt": {
+            "maxLength": 2000,
+            "minLength": 3,
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "title": "PolicyDraftRequest",
+        "type": "object"
+      },
+      "PolicyPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PolicyRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "kinds": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Kinds",
+            "type": "object"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "PolicyPage",
+        "type": "object"
+      },
+      "PolicyRead": {
+        "properties": {
+          "area": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
+          },
+          "changed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changed At"
+          },
+          "changed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changed By"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "drafted_by": {
+            "default": "person",
+            "enum": [
+              "person",
+              "assistant"
+            ],
+            "title": "Drafted By",
+            "type": "string"
+          },
+          "editable": {
+            "title": "Editable",
+            "type": "boolean"
+          },
+          "held_by": {
+            "$ref": "#/components/schemas/HeldBy"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "managed",
+              "custom",
+              "inline",
+              "boundary"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "layers": {
+            "items": {
+              "$ref": "#/components/schemas/LayerRead"
+            },
+            "title": "Layers",
+            "type": "array"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/Limits"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner"
+          },
+          "statement_count": {
+            "title": "Statement Count",
+            "type": "integer"
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/StatementRead"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "saved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "status",
+          "summary",
+          "statement_count",
+          "held_by",
+          "description",
+          "version",
+          "statements",
+          "layers",
+          "limits",
+          "editable"
+        ],
+        "title": "PolicyRead",
+        "type": "object"
+      },
+      "PolicyRow": {
+        "properties": {
+          "changed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changed At"
+          },
+          "changed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changed By"
+          },
+          "held_by": {
+            "$ref": "#/components/schemas/HeldBy"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "managed",
+              "custom",
+              "inline",
+              "boundary"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "statement_count": {
+            "title": "Statement Count",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "saved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "status",
+          "summary",
+          "statement_count",
+          "held_by"
+        ],
+        "title": "PolicyRow",
+        "type": "object"
+      },
+      "PolicySave": {
+        "properties": {
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "title": "PolicySave",
+        "type": "object"
+      },
+      "PolicyUpdate": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "limits": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Limits"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "statements": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/StatementIn"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statements"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "title": "PolicyUpdate",
+        "type": "object"
+      },
+      "PolicyVersionRead": {
+        "properties": {
+          "limit_count": {
+            "title": "Limit Count",
+            "type": "integer"
+          },
+          "saved_at": {
+            "format": "date-time",
+            "title": "Saved At",
+            "type": "string"
+          },
+          "saved_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saved By"
+          },
+          "statement_count": {
+            "title": "Statement Count",
+            "type": "integer"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "version",
+          "saved_at",
+          "statement_count",
+          "limit_count"
+        ],
+        "title": "PolicyVersionRead",
+        "type": "object"
+      },
       "PreviewRequest": {
         "description": "One join rule, counted before anything is declared.\n\nThe same shape for both kinds: an anchor asks *are these the same entity*\nand a relationship asks *where does the edge attach*, and both are answered\nby the one question \u2014 which value on this side equals which on that one.",
         "properties": {
@@ -18833,6 +21172,35 @@
           "target_property"
         ],
         "title": "PreviewRequest",
+        "type": "object"
+      },
+      "PrincipalRef": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "name"
+        ],
+        "title": "PrincipalRef",
         "type": "object"
       },
       "ProjectCreate": {
@@ -23791,6 +26159,27 @@
         "title": "Sensitivity",
         "type": "string"
       },
+      "ServiceAccountCreate": {
+        "properties": {
+          "description": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Description",
+            "type": "string"
+          },
+          "username": {
+            "maxLength": 64,
+            "minLength": 2,
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username"
+        ],
+        "title": "ServiceAccountCreate",
+        "type": "object"
+      },
       "SessionContextTurn": {
         "description": "One prior turn in the conversation context sent to the model (docs/for-developers/modules/ask/spec.md \u00b7\ndocs/for-developers/modules/ask/features/reasoning-trace.md).\n\nStructured so the UI can render with hierarchy rather than one blob. A turn is\neither a query turn (``query`` set) or a clarification turn (``question`` set,\ndocs/for-developers/modules/ask/features/clarifying-questions.md). Same turns ``_assemble_history`` replays to the\nmodel.",
         "properties": {
@@ -27704,6 +30093,86 @@
         "title": "StarterSummary",
         "type": "object"
       },
+      "StatementIn": {
+        "description": "One statement as stored and sent \u2014 see ``core/policy.py``.",
+        "properties": {
+          "actions": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Actions",
+            "type": "array"
+          },
+          "conditions": {
+            "additionalProperties": true,
+            "title": "Conditions",
+            "type": "object"
+          },
+          "effect": {
+            "const": "allow",
+            "default": "allow",
+            "title": "Effect",
+            "type": "string"
+          },
+          "resources": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Resources",
+            "type": "array"
+          }
+        },
+        "required": [
+          "actions",
+          "resources"
+        ],
+        "title": "StatementIn",
+        "type": "object"
+      },
+      "StatementRead": {
+        "properties": {
+          "actions": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Actions",
+            "type": "array"
+          },
+          "conditions": {
+            "additionalProperties": true,
+            "title": "Conditions",
+            "type": "object"
+          },
+          "effect": {
+            "const": "allow",
+            "default": "allow",
+            "title": "Effect",
+            "type": "string"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "resources": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Resources",
+            "type": "array"
+          }
+        },
+        "required": [
+          "actions",
+          "resources",
+          "layer"
+        ],
+        "title": "StatementRead",
+        "type": "object"
+      },
       "StepChange": {
         "properties": {
           "fields": {
@@ -29620,6 +32089,33 @@
           "mode"
         ],
         "title": "ThemePreference",
+        "type": "object"
+      },
+      "TokenHolder": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "person",
+              "service"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "username",
+          "kind"
+        ],
+        "title": "TokenHolder",
         "type": "object"
       },
       "TouchRead": {
@@ -31841,6 +34337,118 @@
         ],
         "title": "WrittenBy",
         "type": "object"
+      },
+      "invana__apps__govern__schemas__ImpactRead": {
+        "description": "*Saving this would change 2 of 4 worlds*, and what each one loses.",
+        "properties": {
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "worlds": {
+            "items": {
+              "$ref": "#/components/schemas/WorldImpactRead"
+            },
+            "title": "Worlds",
+            "type": "array"
+          }
+        },
+        "required": [
+          "headline",
+          "worlds"
+        ],
+        "title": "ImpactRead",
+        "type": "object"
+      },
+      "invana__apps__govern__schemas__ImpactRequest": {
+        "properties": {
+          "closed_layers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Closed Layers",
+            "type": "array"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/RuleIn"
+            },
+            "title": "Rules",
+            "type": "array"
+          },
+          "scope": {
+            "default": "graph",
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "title": "ImpactRequest",
+        "type": "object"
+      },
+      "invana__apps__iam__schemas__ImpactRead": {
+        "properties": {
+          "breaks": {
+            "items": {
+              "$ref": "#/components/schemas/ImpactBreak"
+            },
+            "title": "Breaks",
+            "type": "array"
+          },
+          "holders_line": {
+            "title": "Holders Line",
+            "type": "string"
+          },
+          "policy": {
+            "title": "Policy",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ImpactRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "policy",
+          "version",
+          "holders_line",
+          "rows",
+          "breaks"
+        ],
+        "title": "ImpactRead",
+        "type": "object"
+      },
+      "invana__apps__iam__schemas__ImpactRequest": {
+        "properties": {
+          "limits": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Limits"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/StatementIn"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "statements"
+        ],
+        "title": "ImpactRequest",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -33303,6 +35911,73 @@
         ]
       }
     },
+    "/api/v1/datasets/{publisher}/{name}/versions/drafts": {
+      "post": {
+        "description": "The next version as a draft \u2014 numbered and listed, never current until its owner publishes it.",
+        "operationId": "push_draft_api_v1_datasets__publisher___name__versions_drafts_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetVersionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Push Draft",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
     "/api/v1/datasets/{publisher}/{name}/versions/{version}": {
       "get": {
         "operationId": "get_version_api_v1_datasets__publisher___name__versions__version__get",
@@ -33431,6 +36106,73 @@
           }
         ],
         "summary": "Version Conformance",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/{publisher}/{name}/versions/{version}/publish": {
+      "post": {
+        "description": "Make a draft the current version.",
+        "operationId": "publish_draft_api_v1_datasets__publisher___name__versions__version__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "title": "Publisher",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Publish Draft",
         "tags": [
           "datasets"
         ]
@@ -43151,7 +45893,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ImpactRequest"
+                "$ref": "#/components/schemas/invana__apps__govern__schemas__ImpactRequest"
               }
             }
           },
@@ -43162,7 +45904,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ImpactRead"
+                  "$ref": "#/components/schemas/invana__apps__govern__schemas__ImpactRead"
                 }
               }
             },
@@ -43969,6 +46711,2147 @@
         "summary": "Compare Versions",
         "tags": [
           "change-log"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/agents": {
+      "get": {
+        "operationId": "list_agents_api_v1_u__username___graphSlug__iam_agents_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAccessPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Agents",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/agents/{agent_id}/effective": {
+      "get": {
+        "operationId": "get_effective_api_v1_u__username___graphSlug__iam_agents__agent_id__effective_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "description": "A user id or username",
+            "in": "query",
+            "name": "started_by",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A user id or username",
+              "title": "Started By"
+            }
+          },
+          {
+            "in": "query",
+            "name": "run_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Run Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "World Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EffectiveRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Effective",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/agents/{agent_id}/refusals": {
+      "get": {
+        "operationId": "list_refusals_api_v1_u__username___graphSlug__iam_agents__agent_id__refusals_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_LedgerRowRead_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Refusals",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/groups": {
+      "get": {
+        "operationId": "list_groups_api_v1_u__username___graphSlug__iam_groups_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_GroupRow_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Groups",
+        "tags": [
+          "iam"
+        ]
+      },
+      "post": {
+        "operationId": "create_group_api_v1_u__username___graphSlug__iam_groups_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Group",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/groups/{name}": {
+      "delete": {
+        "operationId": "delete_group_api_v1_u__username___graphSlug__iam_groups__name__delete",
+        "parameters": [
+          {
+            "description": "The group's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The group's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Group",
+        "tags": [
+          "iam"
+        ]
+      },
+      "get": {
+        "operationId": "get_group_api_v1_u__username___graphSlug__iam_groups__name__get",
+        "parameters": [
+          {
+            "description": "The group's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The group's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Group",
+        "tags": [
+          "iam"
+        ]
+      },
+      "patch": {
+        "operationId": "update_group_api_v1_u__username___graphSlug__iam_groups__name__patch",
+        "parameters": [
+          {
+            "description": "The group's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The group's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Group",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/groups/{name}/members": {
+      "post": {
+        "operationId": "add_group_member_api_v1_u__username___graphSlug__iam_groups__name__members_post",
+        "parameters": [
+          {
+            "description": "The group's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The group's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupMemberAdd"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Add Group Member",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/groups/{name}/members/{member_id}": {
+      "delete": {
+        "operationId": "remove_group_member_api_v1_u__username___graphSlug__iam_groups__name__members__member_id__delete",
+        "parameters": [
+          {
+            "description": "The group's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The group's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The group membership's id.",
+            "in": "path",
+            "name": "member_id",
+            "required": true,
+            "schema": {
+              "description": "The group membership's id.",
+              "title": "Member Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Remove Group Member",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/overview": {
+      "get": {
+        "operationId": "get_overview_api_v1_u__username___graphSlug__iam_overview_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Overview",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/people": {
+      "get": {
+        "operationId": "list_people_api_v1_u__username___graphSlug__iam_people_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeoplePage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List People",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/policies": {
+      "get": {
+        "operationId": "list_policies_api_v1_u__username___graphSlug__iam_policies_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Policies",
+        "tags": [
+          "iam"
+        ]
+      },
+      "post": {
+        "operationId": "create_policy_api_v1_u__username___graphSlug__iam_policies_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Policy",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/policies/drafts": {
+      "post": {
+        "operationId": "draft_policy_api_v1_u__username___graphSlug__iam_policies_drafts_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyDraftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Draft Policy",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/policies/{name}": {
+      "delete": {
+        "operationId": "delete_policy_api_v1_u__username___graphSlug__iam_policies__name__delete",
+        "parameters": [
+          {
+            "description": "The policy's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The policy's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Policy",
+        "tags": [
+          "iam"
+        ]
+      },
+      "get": {
+        "operationId": "get_policy_api_v1_u__username___graphSlug__iam_policies__name__get",
+        "parameters": [
+          {
+            "description": "The policy's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The policy's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Policy",
+        "tags": [
+          "iam"
+        ]
+      },
+      "patch": {
+        "operationId": "update_policy_api_v1_u__username___graphSlug__iam_policies__name__patch",
+        "parameters": [
+          {
+            "description": "The policy's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The policy's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Policy",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/policies/{name}/holders": {
+      "get": {
+        "operationId": "list_holders_api_v1_u__username___graphSlug__iam_policies__name__holders_get",
+        "parameters": [
+          {
+            "description": "The policy's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The policy's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HolderPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Holders",
+        "tags": [
+          "iam"
+        ]
+      },
+      "post": {
+        "operationId": "attach_holder_api_v1_u__username___graphSlug__iam_policies__name__holders_post",
+        "parameters": [
+          {
+            "description": "The policy's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The policy's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HolderRow"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Attach Holder",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/policies/{name}/holders/{attachment_id}": {
+      "delete": {
+        "operationId": "detach_holder_api_v1_u__username___graphSlug__iam_policies__name__holders__attachment_id__delete",
+        "parameters": [
+          {
+            "description": "The policy's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The policy's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The attachment's id.",
+            "in": "path",
+            "name": "attachment_id",
+            "required": true,
+            "schema": {
+              "description": "The attachment's id.",
+              "title": "Attachment Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Detach Holder",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/policies/{name}/impact": {
+      "post": {
+        "operationId": "policy_impact_api_v1_u__username___graphSlug__iam_policies__name__impact_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/invana__apps__iam__schemas__ImpactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/invana__apps__iam__schemas__ImpactRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Policy Impact",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/policies/{name}/limits": {
+      "get": {
+        "operationId": "policy_limits_api_v1_u__username___graphSlug__iam_policies__name__limits_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LimitsRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Policy Limits",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/policies/{name}/save": {
+      "post": {
+        "operationId": "save_policy_api_v1_u__username___graphSlug__iam_policies__name__save_post",
+        "parameters": [
+          {
+            "description": "The policy's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The policy's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicySave"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Save Policy",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/policies/{name}/versions": {
+      "get": {
+        "operationId": "list_versions_api_v1_u__username___graphSlug__iam_policies__name__versions_get",
+        "parameters": [
+          {
+            "description": "The policy's name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The policy's name.",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PolicyVersionRead"
+                  },
+                  "title": "Response List Versions Api V1 U  Username   Graphslug  Iam Policies  Name  Versions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Versions",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/service-accounts": {
+      "post": {
+        "operationId": "create_service_account_api_v1_u__username___graphSlug__iam_service_accounts_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceAccountCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonRow"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Service Account",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/test": {
+      "post": {
+        "operationId": "test_access_api_v1_u__username___graphSlug__iam_test_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessCheckRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Test Access",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/tokens": {
+      "get": {
+        "operationId": "list_tokens_api_v1_u__username___graphSlug__iam_tokens_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IamTokenPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Tokens",
+        "tags": [
+          "iam"
+        ]
+      },
+      "post": {
+        "description": "Mint a token bound to this Graph; the response carries the secret, once.",
+        "operationId": "create_token_api_v1_u__username___graphSlug__iam_tokens_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IamTokenCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IamTokenCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Token",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/iam/tokens/{token_id}": {
+      "delete": {
+        "operationId": "revoke_token_api_v1_u__username___graphSlug__iam_tokens__token_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token_id",
+            "required": true,
+            "schema": {
+              "title": "Token Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Revoke Token",
+        "tags": [
+          "iam"
         ]
       }
     },

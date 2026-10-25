@@ -16,7 +16,8 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
-from invana.apps.graphs.models import Graph
+from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.iam.managers.policies import PolicyManager
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
@@ -48,6 +49,8 @@ async def client(session_factory):
         graph = Graph(slug=f"g-{uuid.uuid4().hex[:6]}", name="G", created_by_id=user.id)
         s.add(graph)
         await s.flush()
+        s.add(GraphMember(graph_id=graph.id, user_id=user.id, roles=["owner", "iam-admin"]))
+        await PolicyManager().ensure_managed(s, graph_id=graph.id)
         await s.commit()
         user_id, graph_id = user.id, graph.id
 

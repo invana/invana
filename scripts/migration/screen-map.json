@@ -1889,6 +1889,96 @@
    "product": "agent-fabric",
    "route": "/u/admin/airways/agents/agents?q=fare&f.ephemeral=shown&right=assistant",
    "state": "Agents searched for fare with spawned helpers shown"
+  },
+  "iam.home": {
+   "story": "IAM-01",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/home",
+   "state": ""
+  },
+  "iam.policies": {
+   "story": "IAM-01",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/policies?right=assistant",
+   "state": ""
+  },
+  "iam.policy.statements": {
+   "story": "IAM-02",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/policies?page=policy%3Afare-team-quota&tab=statements&right=assistant",
+   "state": "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py"
+  },
+  "iam.policy.limits": {
+   "story": "IAM-03",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/policies?page=policy%3Afare-team-quota&tab=limits&right=assistant",
+   "state": "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py"
+  },
+  "iam.policy.draft": {
+   "story": "IAM-05",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/policies?page=policy%3Aagent-readers&right=assistant",
+   "state": "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py; the assistant's draft"
+  },
+  "iam.policy.impact": {
+   "story": "IAM-05",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/policies?page=policy%3Aagent-readers&dialog=impact&right=assistant",
+   "state": "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py; Review impact on the draft"
+  },
+  "iam.policies.denied": {
+   "story": "IAM-06",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/policies?right=assistant",
+   "state": "signed in as e2e-viewer (INVANA_MIGRATION_USER=e2e-viewer INVANA_MIGRATION_PASSWORD=e2e-member-password-1)"
+  },
+  "iam.agents": {
+   "story": "IAM-07",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/agents?right=assistant",
+   "state": ""
+  },
+  "iam.agent.effective": {
+   "story": "IAM-07",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/agents?page=iam_agent%3A24e2b9d6-384b-49de-b339-51f31dbc85d1&right=assistant",
+   "state": "the uuid stands for Fare Scout, which holds fare-team-quota through fare-team (seed_i01.py prints it): IAM \u203a Agents, click Explorer"
+  },
+  "iam.people": {
+   "story": "IAM-08",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/people?right=assistant",
+   "state": ""
+  },
+  "iam.groups": {
+   "story": "IAM-08",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/groups?right=assistant",
+   "state": ""
+  },
+  "iam.tokens": {
+   "story": "IAM-09",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/tokens?right=assistant",
+   "state": ""
+  },
+  "iam.tokens.new": {
+   "story": "IAM-09",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/tokens?new=1&right=assistant",
+   "state": ""
+  },
+  "iam.policy.held_by": {
+   "story": "IAM-10",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/policies?page=policy%3Afare-team-quota&tab=held_by&right=assistant",
+   "state": "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py"
+  },
+  "iam.policy.test": {
+   "story": "IAM-11",
+   "product": "iam",
+   "route": "/u/admin/airways/iam/policies?page=policy%3Afare-team-quota&dialog=test&right=assistant",
+   "state": "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py; Test access on the head"
   }
  }
 }

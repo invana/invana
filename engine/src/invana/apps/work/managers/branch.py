@@ -179,6 +179,8 @@ class BranchManager:
                 version = await self.datasets.get_version(session, dataset=dataset, version=number)
             except NotFoundError as exc:
                 raise ValidationError(f"Cite {cite.ref!r} does not resolve: {exc}") from exc
+            if version.state == "draft":
+                raise ValidationError(f"Cite {cite.ref!r} is a draft version — cite a published one.")
             out.append({"kind": "dataset", "ref": f"{dataset.address}@{version.version}", "version_id": version.id})
         return out
 

@@ -62,7 +62,7 @@ flowchart TD
 | Group page | `?page=iam_group:<name>`: members (person or agent, *Add member*, remove) and the policies it holds (*Attach a policy*) |
 | `GET …/iam/people` | `Page[PersonRow]` (`f.kind` person · service): `user_id` · `username` · `name` · `email?` · `kind` · `groups[]` · `policies[]` · `tokens` · `signs_in_with` |
 | `POST …/iam/service-accounts` | `{username, description?}` → `PersonRow` |
-| `GET·POST …/iam/groups` · `GET·PATCH·DELETE …/iam/groups/{name}` | `GroupRow` `{id, name, description, people[], agents[], policies[], people_count, agents_count}` |
+| `GET·POST …/iam/groups` · `GET·PATCH·DELETE …/iam/groups/{name}` | `GroupRow` `{id, name, description, people[], agents[], policies[], people_count, agents_count}`; a group's read adds `members[]` and `held[]` `{attachment_id, name, kind, summary}` — the attachment is what *Detach* removes |
 | `POST …/iam/groups/{name}/members` · `DELETE …/iam/groups/{name}/members/{id}` | `{member_kind: person·agent, member_id}` |
 
 ## Engine
@@ -85,6 +85,7 @@ flowchart TD
 | PG4 | A person's Graph roles stay on their membership (`graph_members.roles`): holding a managed policy directly is that set. A group's managed policies are attachments. A person's effective roles are both, unioned. |
 | PG5 | *Add person* is the membership act ([membership](membership.md)) and needs iam-admin; Graph settings › Members keeps its table and reaches the same routes. |
 | PG6 | The People list's tokens column is the count of the person's live tokens that reach this Graph, computed by the engine. |
+| PG7 | A service account's description is `users.preferences.description`; a person has none. |
 
 ## Not building
 

@@ -34,6 +34,7 @@ from invana.apps.flows.models import Flow
 from invana.apps.flows.models import Task as PlanTask
 from invana.apps.govern.models import Lens, RunTouch
 from invana.apps.graphs.models import Graph, GraphConnection, GraphMember
+from invana.apps.iam.models import Group, GroupMember, Policy, PolicyAttachment, PolicyVersion
 from invana.apps.llm_providers.models import LLMModel, LLMProvider
 from invana.apps.modeller.models import (
     ConstraintDefinition,
@@ -119,6 +120,13 @@ from invana.server.graphs.admin import (
     GraphConnectionView,
     GraphContainerView,
     GraphMemberView,
+)
+from invana.server.iam.admin import (
+    GroupMemberView,
+    GroupView,
+    PolicyAttachmentView,
+    PolicyVersionView,
+    PolicyView,
 )
 from invana.server.ledger.admin import LedgerCheckView, LedgerExportView, LedgerRowView
 from invana.server.llm_providers.admin import LLMModelView, LLMProviderView
@@ -238,6 +246,21 @@ def mount_admin(app: FastAPI) -> None:
                 GraphContainerView(Graph, label="Graphs", icon="fa fa-circle-nodes"),
                 GraphConnectionView(GraphConnection, label="Graph connections", icon="fa fa-plug"),
                 GraphMemberView(GraphMember, label="Graph members", icon="fa fa-users"),
+            ],
+        ),
+    )
+
+    # ── IAM (docs/for-developers/modules/identity-and-access/features/policies.md) ─────────────────────
+    admin.add_view(
+        DropDown(
+            label="IAM",
+            icon="fa fa-user-shield",
+            views=[
+                PolicyView(Policy, label="Policies", icon="fa fa-scroll"),
+                PolicyVersionView(PolicyVersion, label="Policy versions", icon="fa fa-clock-rotate-left"),
+                PolicyAttachmentView(PolicyAttachment, label="Policy attachments", icon="fa fa-link"),
+                GroupView(Group, label="Groups", icon="fa fa-users-rectangle"),
+                GroupMemberView(GroupMember, label="Group members", icon="fa fa-user-group"),
             ],
         ),
     )

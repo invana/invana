@@ -15,8 +15,9 @@ import uuid
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from invana.apps.graphs.models import Graph, GraphConnection
+from invana.apps.graphs.models import Graph, GraphConnection, GraphMember
 from invana.apps.graphs.pool import GraphConnectionManager
+from invana.apps.iam.managers.policies import PolicyManager
 from invana.core.auth.models import User
 from invana.core.events.models import Event  # noqa: F401 — table needed for emit_event
 from invana.core.models import Base
@@ -86,6 +87,9 @@ async def graph(session: AsyncSession, user: User, connector) -> Graph:
     g = Graph(slug=f"g-{uuid.uuid4().hex[:6]}", name="Test Graph", created_by_id=user.id)
     session.add(g)
     await session.flush()
+    # Its creator owns it and its managed policies exist, as a Graph created through the API has.
+    session.add(GraphMember(graph_id=g.id, user_id=user.id, roles=["owner", "iam-admin"]))
+    await PolicyManager().ensure_managed(session, graph_id=g.id)
     conn_row = GraphConnection(
         graph_id=g.id,
         uri=NEO4J_URI,

@@ -119,6 +119,7 @@ async def test_a_viewer_reads_but_a_write_names_the_role_and_who_holds_it(client
         "build": False,
         "model": False,
         "settings": False,
+        "iam": False,
     }
 
     client.as_(ada)

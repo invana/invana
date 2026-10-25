@@ -28,6 +28,7 @@ from invana.apps.govern.managers import LensManager, LLMEndpointManager
 from invana.apps.govern.models import Lens, LensKind
 from invana.apps.graphs.models import Graph
 from invana.apps.iam.managers import HoldingsManager
+from invana.apps.iam.managers.policies import PolicyManager
 from invana.apps.iam.models import PolicyAttachment
 from invana.apps.iam.querysets import HoldingsQuerySet
 from invana.apps.iam.querysets.policies import PolicyQuerySet
@@ -212,6 +213,9 @@ class AgentManager:
                 created_by_kind="system",
             )
             await self.agents_qs.add(session, agent)
+            if not created:
+                # A Graph being created has no managed policies yet; write them before the first is held.
+                await PolicyManager().ensure_managed(session, graph_id=graph.id)
             await self._hold(session, agent=agent, names=managed_for_envelope(agent.workflow_spec), actor_id=None)
             created.append(agent)
             if seeded.default and not graph.default_agent_id:

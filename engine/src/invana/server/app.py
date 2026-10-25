@@ -111,6 +111,14 @@ async def lifespan(app: FastAPI):
             if created:
                 await db.commit()
 
+        # docs/for-developers/modules/identity-and-access/features/policies.md — every
+        # Graph's managed policies, rewritten from the code where they drifted.
+        from invana.apps.iam.managers.policies import PolicyManager
+
+        async with session_factory() as db:
+            await PolicyManager().ensure_managed_everywhere(db)
+            await db.commit()
+
         # docs/for-developers/modules/ask/features/streaming-and-the-workflow.md — the inline run runtime: one asyncio
         # task per session ask.
         # Startup fails whatever a previous process left mid-flight.
@@ -206,6 +214,9 @@ def create_app() -> FastAPI:
     from invana.server.graphs.routes import graph_router, graphs_collection_router
     from invana.server.health import health_router
     from invana.server.history.routes import history_router
+    from invana.server.iam.access_routes import access_router
+    from invana.server.iam.routes import iam_router
+    from invana.server.iam.token_routes import tokens_router
     from invana.server.ledger.routes import ledger_router
     from invana.server.llm_providers.routes import llm_providers_router
     from invana.server.members.routes import members_router
@@ -332,6 +343,9 @@ def create_app() -> FastAPI:
     app.include_router(approvals_router)
     app.include_router(alerts_router)
     app.include_router(ledger_router)
+    app.include_router(iam_router)
+    app.include_router(access_router)
+    app.include_router(tokens_router)
 
     # Proxy the studio's browser OTLP/HTTP span export to the collector.
     # Always mounted: the studio exports on its own gate, so a route that

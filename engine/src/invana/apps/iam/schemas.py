@@ -391,8 +391,18 @@ class GroupRow(BaseModel):
     agents_count: int
 
 
+class GroupPolicyRef(BaseModel):
+    """A policy a group holds, with the attachment that detaches it."""
+
+    attachment_id: str
+    name: str
+    kind: PolicyKindName
+    summary: str
+
+
 class GroupRead(GroupRow):
     members: list[GroupMemberRef]
+    held: list[GroupPolicyRef] = Field(default_factory=list)
 
 
 GROUP_LIST = ListSpec(filters={}, sorts=("name",))
@@ -435,10 +445,19 @@ class IamTokenRow(BaseModel):
     expires_at: datetime | None = None
     last_used_at: datetime | None = None
     created_at: datetime
+    #: Who minted it — the holder, or an iam-admin minting for a service account.
+    created_by: str | None = None
     expired: bool
 
 
 IAM_TOKEN_LIST = ListSpec(filters={}, sorts=("-created_at", "name"))
+
+
+class IamTokenPage(Page[IamTokenRow]):
+    #: The expiries *New token* offers, in days; never is always offered too.
+    expiry_day_choices: list[int]
+    #: How many live tokens one holder may hold.
+    max_tokens: int
 
 
 class IamTokenCreate(BaseModel):

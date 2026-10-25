@@ -487,7 +487,7 @@ class AuthManager:
         if len(existing) >= ceiling:
             # Name the ceiling and the count — a silent failure here is a person
             # debugging their script instead of their token list (C9).
-            ConflictError(
+            raise ConflictError(
                 f"You already hold {len(existing)} access tokens, the maximum is {ceiling}. Revoke one first."
             )
         if any(row.name == name for row in existing):

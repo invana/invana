@@ -96,6 +96,8 @@ class DatasetBindManager:
         version = await self.datasets.get_version(session, dataset=dataset, version=number)
         if version.retracted_at is not None:
             raise ConflictError(f"retracted — {dataset.address}@{number} was withdrawn and cannot be bound.")
+        if version.state == "draft":
+            raise ConflictError(f"draft — {dataset.address}@{number} is not published yet and cannot be bound.")
         model = await self.models_qs.get_graph_model(session, model_id)
         if model is None or model.graph_id != graph.id:
             raise NotFoundError("Model not found.")

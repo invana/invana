@@ -37,6 +37,7 @@ from invana.apps.iam.schemas import (
     IAM_TOKEN_LIST,
     IamTokenCreate,
     IamTokenCreated,
+    IamTokenPage,
     IamTokenRow,
     StatementRead,
     TokenHolder,
@@ -68,16 +69,31 @@ class IamTokenManager:
 
     # ── reading ──────────────────────────────────────────────────────────────
 
-    async def page(self, session: AsyncSession, *, graph: Graph, params: ListParams) -> Page[IamTokenRow]:
-        """One page of the live tokens this Graph lists, each with what it is narrowed to."""
+    async def page(self, session: AsyncSession, *, graph: Graph, params: ListParams) -> IamTokenPage:
+        """One page of the live tokens this Graph lists, each with what it is narrowed to.
+
+        The page also carries the deployment's expiry choices and the ceiling
+        on live tokens, which *New token* offers and checks against.
+        """
         rows, info = await self.qs.page_for_graph(session, graph_id=graph.id, params=params)
-        users = await self.qs.users_by_ids(session, [r.user_id for r in rows])
+        ids = [r.user_id for r in rows] + [r.created_by_id for r in rows if r.created_by_id]
+        users = await self.qs.users_by_ids(session, ids)
         policies = await self.qs.policies_by_ids(session, [r.policy_id for r in rows if r.policy_id])
-        items = [self._row(r, users.get(r.user_id), policies.get(r.policy_id or "")) for r in rows]
-        return Page[IamTokenRow].of(items, info, applied_filters(params, IAM_TOKEN_LIST))
+        items = [
+            self._row(r, users.get(r.user_id), policies.get(r.policy_id or ""), users.get(r.created_by_id or ""))
+            for r in rows
+        ]
+        page = Page[IamTokenRow].of(items, info, applied_filters(params, IAM_TOKEN_LIST))
+        return IamTokenPage(
+            **page.model_dump(),
+            expiry_day_choices=list(settings.auth_token_expiry_day_choices),
+            max_tokens=settings.auth_max_personal_access_tokens,
+        )
 
     @staticmethod
-    def _row(token: PersonalAccessToken, holder: User | None, policy: Policy | None) -> IamTokenRow:
+    def _row(
+        token: PersonalAccessToken, holder: User | None, policy: Policy | None, creator: User | None = None
+    ) -> IamTokenRow:
         username = holder.username if holder is not None else "unknown"
         statements = parse_statements(policy.statements) if policy is not None else []
         expires_at = _aware(token.expires_at)
@@ -97,6 +113,7 @@ class IamTokenManager:
             expires_at=expires_at,
             last_used_at=token.last_used_at,
             created_at=token.created_at,
+            created_by=creator.username if creator is not None else None,
             expired=expires_at is not None and expires_at <= datetime.now(UTC),
         )
 
@@ -221,7 +238,7 @@ class IamTokenManager:
                 "expires_at": expires_at.isoformat() if expires_at else None,
             },
         )
-        row = self._row(token, holder, policy)
+        row = self._row(token, holder, policy, actor)
         return IamTokenCreated(**row.model_dump(), secret=secret)
 
     # ── revoking ─────────────────────────────────────────────────────────────

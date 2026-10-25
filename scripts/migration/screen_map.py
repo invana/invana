@@ -33,6 +33,16 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.notifications", f"{G}/activity/inbox"), ("shell.activity.approvals", f"{G}/agents/approvals"),
     ("shell.activity", f"{G}/activity/runs"),
     ("shell", f"{G}/explorer"),
+    ("iam.home", f"{G}/iam/home"), ("iam.people", f"{G}/iam/people"), ("iam.groups", f"{G}/iam/groups"),
+    ("iam.agents", f"{G}/iam/agents"), ("iam.agent.effective", f"{G}/iam/agents?page=iam_agent%3A24e2b9d6-384b-49de-b339-51f31dbc85d1"),
+    ("iam.policies", f"{G}/iam/policies"),
+    ("iam.policy.statements", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=statements"),
+    ("iam.policy.limits", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=limits"),
+    ("iam.policy.held_by", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=held_by"),
+    ("iam.policy.test", f"{G}/iam/policies?page=policy%3Afare-team-quota&dialog=test"),
+    ("iam.policy.draft", f"{G}/iam/policies?page=policy%3Aagent-readers"),
+    ("iam.policy.impact", f"{G}/iam/policies?page=policy%3Aagent-readers&dialog=impact"),
+    ("iam.tokens.new", f"{G}/iam/tokens?new=1"), ("iam.tokens", f"{G}/iam/tokens"),
     ("datasets.catalogue", "/datasets/catalogue"), ("datasets.validation", "/datasets/validation"),
     ("datasets.standard", "/datasets/standards"), ("datasets.imports", "/datasets/imports"),
     ("datasets", "/datasets/catalogue/admin/accession-phenotypes"),
@@ -133,10 +143,17 @@ UNMAPPED_SKILL = "the uuid stands for a draft whose last draw left a line unmapp
 DRAFT_SKILL = "the uuid stands for a draft skill (Weekly route check): open it from Skills"
 DRAFT_AGENT = "the uuid stands for a draft agent with two bound skills (Route desk briefer): Agents › Drafts"
 #: A product doc whose stories enter the map phase by phase, as agents-build-sessions.md builds them.
+POLICIES = "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py"
 BUILT = {"agent-fabric": {"AF-26", "AF-02", "AF-01", "AF-17", "AF-19", "AF-20", "AF-23", "AF-25",
                          "AF-03", "AF-04", "AF-05", "AF-06", "AF-21", "AF-22",
                          "AF-07", "AF-08", "AF-09", "AF-13", "AF-14", "AF-16", "AF-24"}}
 STATE = {  # board → how to reach it from its route; a board absent here is its route's landing view
+    "iam.agent.effective": "the uuid stands for Fare Scout, which holds fare-team-quota through fare-team (seed_i01.py prints it): IAM › Agents, click Explorer",
+    "iam.policies.denied": "signed in as e2e-viewer (INVANA_MIGRATION_USER=e2e-viewer INVANA_MIGRATION_PASSWORD=e2e-member-password-1)",
+    "iam.policy.statements": POLICIES, "iam.policy.limits": POLICIES, "iam.policy.held_by": POLICIES,
+    "iam.policy.test": f"{POLICIES}; Test access on the head",
+    "iam.policy.draft": f"{POLICIES}; the assistant's draft",
+    "iam.policy.impact": f"{POLICIES}; Review impact on the draft",
     "shell.onboarding": "a Graph whose set-up is not finished: the set-up checklist open",
     "shell.launcher.open": "click the product launcher in the header",
     "shell.breadcrumbs.overflow": f"open a finding {BRANCH}: /u/admin/arabidopsis/projects/early-flowering-under-drought › H1.1 › a finding",
@@ -335,8 +352,8 @@ def route_for(board: str) -> str | None:
 
 def main() -> None:
     boards, missing = {}, []
-    for doc in ["shell", "datasets", "modeller", "explorer", "projects", "agents", "agent-fabric"]:
-        for m in re.finditer(r"^\| ([A-Z]{2}-\d{2}) \|(.*)$", (DOCS / f"{doc}.md").read_text(), re.M):
+    for doc in ["shell", "datasets", "modeller", "explorer", "projects", "agents", "agent-fabric", "iam"]:
+        for m in re.finditer(r"^\| ([A-Z]{2,3}-\d{2}) \|(.*)$", (DOCS / f"{doc}.md").read_text(), re.M):
             if doc in BUILT and m.group(1) not in BUILT[doc]:
                 continue
             for b in re.findall(r"`([a-z_.]+)`", m.group(2)):
@@ -344,8 +361,8 @@ def main() -> None:
                 route = route_for(b)
                 if route is None or (variant and b not in STATE):
                     missing.append(b)
-                if (route and b.startswith("agents.") and not b.endswith(".closed")
-                        and b not in {"agents.home", "agents.open"}):
+                if (route and b.startswith(("agents.", "iam.")) and not b.endswith(".closed")
+                        and b not in {"agents.home", "agents.open", "iam.home"}):
                     # The Agents boards draw the assistant docked; `.closed` boards draw it closed,
                     # and Home's composer is the assistant before a thread exists.
                     route += ("&" if "?" in route else "?") + "right=assistant"

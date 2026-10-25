@@ -276,6 +276,13 @@ class PolicyManager:
         await session.flush()
         return out
 
+    async def ensure_managed_everywhere(self, session: AsyncSession) -> int:
+        """:meth:`ensure_managed` for every Graph — run at startup, so a change to the code reaches each one."""
+        ids = await self.qs.graph_ids(session)
+        for graph_id in ids:
+            await self.ensure_managed(session, graph_id=graph_id)
+        return len(ids)
+
     async def apply_file(
         self, session: AsyncSession, *, graph_id: str, doc: dict[str, Any], why: str | None, actor_id: str | None
     ) -> Policy:

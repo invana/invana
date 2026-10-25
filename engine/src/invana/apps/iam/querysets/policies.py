@@ -24,6 +24,7 @@ from invana.core.lists.querysets import contains, page_of_select
 _foreign = sa.MetaData()
 _agents = sa.Table("agents", _foreign, sa.Column("id"), sa.Column("graph_id"), sa.Column("name"), sa.Column("kind"))
 _runs = sa.Table("task_runs", _foreign, sa.Column("id"), sa.Column("number"))
+_graphs = sa.Table("graphs", _foreign, sa.Column("id"))
 _tokens = sa.Table("personal_access_tokens", _foreign, sa.Column("id"), sa.Column("name"), sa.Column("user_id"))
 
 
@@ -156,6 +157,10 @@ class PolicyQuerySet:
             return {}
         stmt = select(_tokens.c.id, _tokens.c.name).where(_tokens.c.id.in_(list(ids)))
         return dict((await session.execute(stmt)).all())
+
+    async def graph_ids(self, session: AsyncSession) -> list[str]:
+        """Every Graph's id."""
+        return list((await session.execute(select(_graphs.c.id))).scalars().all())
 
     async def run_numbers(self, session: AsyncSession, *, ids: Sequence[str]) -> dict[str, int | None]:
         if not ids:

@@ -336,6 +336,7 @@ CREATE TABLE dataset_versions (
 	retracted_at TIMESTAMP WITH TIME ZONE, 
 	retracted_by_id VARCHAR(36), 
 	retraction_reason VARCHAR(500), 
+	state VARCHAR(16) DEFAULT 'published'::character varying NOT NULL, 
 	CONSTRAINT dataset_versions_pkey PRIMARY KEY (id), 
 	CONSTRAINT dataset_versions_dataset_id_fkey FOREIGN KEY(dataset_id) REFERENCES datasets (id) ON DELETE CASCADE, 
 	CONSTRAINT dataset_versions_published_by_id_fkey FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL, 
@@ -674,6 +675,38 @@ CREATE TABLE graphs (
 );
 
 CREATE INDEX ix_graphs_created_by_id ON graphs (created_by_id);
+
+CREATE TABLE group_members (
+	id VARCHAR(36) NOT NULL, 
+	group_id VARCHAR(36) NOT NULL, 
+	member_kind VARCHAR(16) NOT NULL, 
+	member_id VARCHAR(36) NOT NULL, 
+	added_by_id VARCHAR(36), 
+	added_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT group_members_pkey PRIMARY KEY (id), 
+	CONSTRAINT group_members_added_by_id_fkey FOREIGN KEY(added_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT group_members_group_id_fkey FOREIGN KEY(group_id) REFERENCES groups (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_group_members_member UNIQUE NULLS DISTINCT (group_id, member_kind, member_id)
+);
+
+CREATE INDEX ix_group_members_group_id ON group_members (group_id);
+
+CREATE INDEX ix_group_members_member_id ON group_members (member_id);
+
+CREATE TABLE groups (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(64) NOT NULL, 
+	description TEXT DEFAULT ''::text NOT NULL, 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT groups_pkey PRIMARY KEY (id), 
+	CONSTRAINT groups_created_by_id_fkey FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT groups_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_groups_graph_name UNIQUE NULLS DISTINCT (graph_id, name)
+);
+
+CREATE INDEX ix_groups_graph_id ON groups (graph_id);
 
 CREATE TABLE index_definitions (
 	id VARCHAR(36) NOT NULL, 
@@ -1018,10 +1051,17 @@ CREATE TABLE personal_access_tokens (
 	last_used_at TIMESTAMP WITH TIME ZONE, 
 	revoked_at TIMESTAMP WITH TIME ZONE, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	graph_id VARCHAR(36), 
+	policy_id VARCHAR(36), 
+	created_by_id VARCHAR(36), 
 	CONSTRAINT personal_access_tokens_pkey PRIMARY KEY (id), 
+	CONSTRAINT fk_pat_created_by FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT fk_pat_graph FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	CONSTRAINT personal_access_tokens_user_id_fkey FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, 
 	CONSTRAINT uq_pat_user_name UNIQUE NULLS DISTINCT (user_id, name)
 );
+
+CREATE INDEX ix_personal_access_tokens_graph_id ON personal_access_tokens (graph_id);
 
 CREATE UNIQUE INDEX ix_personal_access_tokens_token_hash ON personal_access_tokens (token_hash);
 
@@ -1034,6 +1074,77 @@ CREATE TABLE plugin_states (
 	changed_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	CONSTRAINT plugin_states_pkey PRIMARY KEY (name)
 );
+
+CREATE TABLE policies (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(64) NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	status VARCHAR(16) NOT NULL, 
+	description TEXT DEFAULT ''::text NOT NULL, 
+	statements JSON NOT NULL, 
+	limits JSON NOT NULL, 
+	version INTEGER DEFAULT 0 NOT NULL, 
+	owner_id VARCHAR(36), 
+	drafted_by VARCHAR(16) DEFAULT 'person'::character varying NOT NULL, 
+	created_by_id VARCHAR(36), 
+	updated_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT policies_pkey PRIMARY KEY (id), 
+	CONSTRAINT policies_created_by_id_fkey FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT policies_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT policies_owner_id_fkey FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT policies_updated_by_id_fkey FOREIGN KEY(updated_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT uq_policies_graph_name UNIQUE NULLS DISTINCT (graph_id, name)
+);
+
+CREATE INDEX ix_policies_graph_id ON policies (graph_id);
+
+CREATE INDEX ix_policies_kind ON policies (kind);
+
+CREATE TABLE policy_attachments (
+	id VARCHAR(36) NOT NULL, 
+	policy_id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	holder_kind VARCHAR(16) NOT NULL, 
+	holder_id VARCHAR(36) NOT NULL, 
+	attached_by_id VARCHAR(36), 
+	attached_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	ends_at TIMESTAMP WITH TIME ZONE, 
+	run_id VARCHAR(36), 
+	via VARCHAR(16) DEFAULT 'direct'::character varying NOT NULL, 
+	approval_id VARCHAR(36), 
+	CONSTRAINT policy_attachments_pkey PRIMARY KEY (id), 
+	CONSTRAINT policy_attachments_attached_by_id_fkey FOREIGN KEY(attached_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT policy_attachments_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT policy_attachments_policy_id_fkey FOREIGN KEY(policy_id) REFERENCES policies (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_policy_attachments_holder UNIQUE NULLS DISTINCT (policy_id, holder_kind, holder_id)
+);
+
+CREATE INDEX ix_policy_attachments_graph_id ON policy_attachments (graph_id);
+
+CREATE INDEX ix_policy_attachments_holder_id ON policy_attachments (holder_id);
+
+CREATE INDEX ix_policy_attachments_policy_id ON policy_attachments (policy_id);
+
+CREATE TABLE policy_versions (
+	id VARCHAR(36) NOT NULL, 
+	policy_id VARCHAR(36) NOT NULL, 
+	version INTEGER NOT NULL, 
+	statements JSON NOT NULL, 
+	limits JSON NOT NULL, 
+	description TEXT DEFAULT ''::text NOT NULL, 
+	saved_by_id VARCHAR(36), 
+	saved_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	why VARCHAR(500), 
+	CONSTRAINT policy_versions_pkey PRIMARY KEY (id), 
+	CONSTRAINT policy_versions_policy_id_fkey FOREIGN KEY(policy_id) REFERENCES policies (id) ON DELETE CASCADE, 
+	CONSTRAINT policy_versions_saved_by_id_fkey FOREIGN KEY(saved_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT uq_policy_versions_number UNIQUE NULLS DISTINCT (policy_id, version)
+);
+
+CREATE INDEX ix_policy_versions_policy_id ON policy_versions (policy_id);
 
 CREATE TABLE project_assignments (
 	id VARCHAR(36) NOT NULL, 
@@ -1896,6 +2007,7 @@ CREATE TABLE users (
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	preferences JSON NOT NULL, 
+	is_service_account BOOLEAN DEFAULT false NOT NULL, 
 	CONSTRAINT users_pkey PRIMARY KEY (id), 
 	CONSTRAINT uq_users_email UNIQUE NULLS DISTINCT (email), 
 	CONSTRAINT uq_users_username UNIQUE NULLS DISTINCT (username)

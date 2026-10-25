@@ -122,7 +122,7 @@ sequenceDiagram
 | Narrowing | Shape |
 |---|---|
 | `personal_access_tokens.graph_id?` · `.policy_id?` · `.created_by_id?` | the Graph an IAM token is bound to · its inline policy · who minted it (a holder's iam-admin) |
-| `GET·POST …/iam/tokens` · `DELETE …/iam/tokens/{id}` | `Page[IamTokenRow]` `{id, name, last_four, holder{user_id, username, kind}, graph_bound, narrowed_to, policy?, expires_at?, last_used_at?, created_at, expired}` · `{name, holder_id?, statements?, expires_in_days?}` → row + `secret` once |
+| `GET·POST …/iam/tokens` · `DELETE …/iam/tokens/{id}` | `IamTokenPage` — `Page[IamTokenRow]` `{id, name, last_four, holder{user_id, username, kind}, graph_bound, narrowed_to, policy?, expires_at?, last_used_at?, created_at, created_by?, expired}` plus the deployment's `expiry_day_choices` and `max_tokens` · `{name, holder_id?, statements?, expires_in_days?}` → row + `secret` once |
 | `core/auth/narrowing.py` | `ROUTE_ACTIONS`, `action_for(method, path, params)`, `check(statements, …)` |
 
 

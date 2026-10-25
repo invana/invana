@@ -14,6 +14,8 @@ import pytest
 import invana.activity.models  # noqa: F401 — the approvals tables, for create_all
 from invana.activity.managers import ApprovalManager
 from invana.activity.models import Approval
+from invana.apps.iam.managers.policies import PolicyManager
+from invana.apps.iam.models import PolicyAttachment
 from invana.plugins.envelope import TaskEnvelope, outcome_from_json, outcome_to_json
 from invana.runtime import catalogue as task_registry
 from invana.runtime import workflows
@@ -106,6 +108,11 @@ class TestSendApproval:
         await _enable(session, "invana.tools.mail", user)
         runtime = TaskRuntime(session_factory=session_factory, manager=object(), encryption_key="x")
         _, _, th = await _open(session, graph, user, "stub-send")
+        # The default agent holds viewer; sending mail needs a policy that allows it.
+        managed = {p.name: p for p in await PolicyManager().ensure_managed(session, graph_id=graph.id)}
+        owner = managed["owner"]
+        session.add(PolicyAttachment(policy_id=owner.id, graph_id=graph.id, holder_kind="agent", holder_id=th.agent_id))
+        await session.commit()
         await _run(runtime, th.id)
 
         run = await _fresh(session, TaskRun, th.id)

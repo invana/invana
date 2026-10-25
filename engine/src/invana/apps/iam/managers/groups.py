@@ -20,11 +20,20 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.iam.managers.policies import what_it_allows
 from invana.apps.iam.models import Group, GroupMember
 from invana.apps.iam.querysets.groups import GroupQuerySet
 from invana.apps.iam.querysets.people import PeopleQuerySet
 from invana.apps.iam.querysets.policies import PolicyQuerySet
-from invana.apps.iam.schemas import GroupCreate, GroupMemberAdd, GroupMemberRef, GroupRead, GroupRow, GroupUpdate
+from invana.apps.iam.schemas import (
+    GroupCreate,
+    GroupMemberAdd,
+    GroupMemberRef,
+    GroupPolicyRef,
+    GroupRead,
+    GroupRow,
+    GroupUpdate,
+)
 from invana.core.errors import ConflictError, NotFoundError
 from invana.core.events import actions
 from invana.core.events.services import emit_event
@@ -87,6 +96,19 @@ class GroupManager:
                     people_count=len(people),
                     agents_count=len(agent_names),
                     members=refs,
+                    held=sorted(
+                        (
+                            GroupPolicyRef(
+                                attachment_id=a.id,
+                                name=policies[a.policy_id].name,
+                                kind=policies[a.policy_id].kind,
+                                summary=what_it_allows(policies[a.policy_id]),
+                            )
+                            for a in held
+                            if a.holder_id == g.id
+                        ),
+                        key=lambda r: r.name,
+                    ),
                 )
             )
         return out

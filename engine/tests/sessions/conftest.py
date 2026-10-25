@@ -10,7 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 # A run names the plan node it executes, so both plan tables have to be in the
 # metadata this fixture creates — otherwise the FK has nothing to point at.
 from invana.apps.flows.models import Flow, Task  # noqa: F401
-from invana.apps.graphs.models import Graph
+from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.iam.managers.policies import PolicyManager
 from invana.apps.sessions.models import Session, SessionMessage  # noqa: F401
 
 # Import every model whose table the FKs touch so `create_all` builds them.
@@ -85,4 +86,7 @@ async def graph(session: AsyncSession, user: User) -> Graph:
     g = Graph(slug=f"g-{uuid.uuid4().hex[:6]}", name="Test Graph", created_by_id=user.id)
     session.add(g)
     await session.flush()
+    # Its creator owns it and its managed policies exist, as a Graph created through the API has.
+    session.add(GraphMember(graph_id=g.id, user_id=user.id, roles=["owner", "iam-admin"]))
+    await PolicyManager().ensure_managed(session, graph_id=g.id)
     return g

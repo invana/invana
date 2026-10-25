@@ -318,6 +318,7 @@ CREATE TABLE dataset_versions (
 	id VARCHAR(36) NOT NULL, 
 	dataset_id VARCHAR(36) NOT NULL, 
 	version INTEGER NOT NULL, 
+	state VARCHAR(16) DEFAULT 'published' NOT NULL, 
 	content_hash VARCHAR(80) NOT NULL, 
 	licence VARCHAR(255) NOT NULL, 
 	author_chain JSON NOT NULL, 
@@ -668,6 +669,38 @@ CREATE TABLE graphs (
 
 CREATE INDEX ix_graphs_created_by_id ON graphs (created_by_id);
 
+CREATE TABLE group_members (
+	id VARCHAR(36) NOT NULL, 
+	group_id VARCHAR(36) NOT NULL, 
+	member_kind VARCHAR(16) NOT NULL, 
+	member_id VARCHAR(36) NOT NULL, 
+	added_by_id VARCHAR(36), 
+	added_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_group_members_member UNIQUE (group_id, member_kind, member_id), 
+	FOREIGN KEY(group_id) REFERENCES groups (id) ON DELETE CASCADE, 
+	FOREIGN KEY(added_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_group_members_group_id ON group_members (group_id);
+
+CREATE INDEX ix_group_members_member_id ON group_members (member_id);
+
+CREATE TABLE groups (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(64) NOT NULL, 
+	description TEXT NOT NULL, 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_groups_graph_name UNIQUE (graph_id, name), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_groups_graph_id ON groups (graph_id);
+
 CREATE TABLE index_definitions (
 	id VARCHAR(36) NOT NULL, 
 	version_id VARCHAR(36) NOT NULL, 
@@ -1011,10 +1044,17 @@ CREATE TABLE personal_access_tokens (
 	last_used_at TIMESTAMP WITH TIME ZONE, 
 	revoked_at TIMESTAMP WITH TIME ZONE, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	graph_id VARCHAR(36), 
+	policy_id VARCHAR(36), 
+	created_by_id VARCHAR(36), 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_pat_user_name UNIQUE (user_id, name), 
-	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL
 );
+
+CREATE INDEX ix_personal_access_tokens_graph_id ON personal_access_tokens (graph_id);
 
 CREATE UNIQUE INDEX ix_personal_access_tokens_token_hash ON personal_access_tokens (token_hash);
 
@@ -1027,6 +1067,77 @@ CREATE TABLE plugin_states (
 	changed_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (name)
 );
+
+CREATE TABLE policies (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(64) NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	status VARCHAR(16) NOT NULL, 
+	description TEXT NOT NULL, 
+	statements JSON NOT NULL, 
+	limits JSON NOT NULL, 
+	version INTEGER NOT NULL, 
+	owner_id VARCHAR(36), 
+	drafted_by VARCHAR(16) NOT NULL, 
+	created_by_id VARCHAR(36), 
+	updated_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_policies_graph_name UNIQUE (graph_id, name), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(updated_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_policies_graph_id ON policies (graph_id);
+
+CREATE INDEX ix_policies_kind ON policies (kind);
+
+CREATE TABLE policy_attachments (
+	id VARCHAR(36) NOT NULL, 
+	policy_id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	holder_kind VARCHAR(16) NOT NULL, 
+	holder_id VARCHAR(36) NOT NULL, 
+	attached_by_id VARCHAR(36), 
+	attached_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	ends_at TIMESTAMP WITH TIME ZONE, 
+	run_id VARCHAR(36), 
+	via VARCHAR(16) NOT NULL, 
+	approval_id VARCHAR(36), 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_policy_attachments_holder UNIQUE (policy_id, holder_kind, holder_id), 
+	FOREIGN KEY(policy_id) REFERENCES policies (id) ON DELETE CASCADE, 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(attached_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_policy_attachments_graph_id ON policy_attachments (graph_id);
+
+CREATE INDEX ix_policy_attachments_holder_id ON policy_attachments (holder_id);
+
+CREATE INDEX ix_policy_attachments_policy_id ON policy_attachments (policy_id);
+
+CREATE TABLE policy_versions (
+	id VARCHAR(36) NOT NULL, 
+	policy_id VARCHAR(36) NOT NULL, 
+	version INTEGER NOT NULL, 
+	statements JSON NOT NULL, 
+	limits JSON NOT NULL, 
+	description TEXT NOT NULL, 
+	saved_by_id VARCHAR(36), 
+	saved_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	why VARCHAR(500), 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_policy_versions_number UNIQUE (policy_id, version), 
+	FOREIGN KEY(policy_id) REFERENCES policies (id) ON DELETE CASCADE, 
+	FOREIGN KEY(saved_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_policy_versions_policy_id ON policy_versions (policy_id);
 
 CREATE TABLE project_assignments (
 	id VARCHAR(36) NOT NULL, 
@@ -1882,6 +1993,7 @@ CREATE TABLE users (
 	preferences JSON NOT NULL, 
 	is_superuser BOOLEAN NOT NULL, 
 	is_active BOOLEAN NOT NULL, 
+	is_service_account BOOLEAN DEFAULT 'false' NOT NULL, 
 	username_last_changed_at TIMESTAMP WITH TIME ZONE, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
