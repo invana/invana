@@ -52,6 +52,18 @@ import type { IamTokenCreated, StatementIn } from "../types";
 
 const SELF = "self";
 const NEVER = "never";
+/** The expiry the form starts on, when the deployment offers it. */
+const PREFERRED_DAYS = 90;
+
+/** `in 90 days` · `never` — what the Expires select shows for a value. */
+const expiryLabel = (value: string) =>
+	value === NEVER ? "never" : `in ${value} days`;
+
+/** 90 days when offered, else the first choice, else never. */
+function defaultExpiry(choices: number[]): string {
+	if (choices.includes(PREFERRED_DAYS)) return String(PREFERRED_DAYS);
+	return choices.length ? String(choices[0]) : NEVER;
+}
 
 /** Service accounts a holder may be — every one this Graph has. */
 const SERVICE_ACCOUNTS = { filters: { kind: ["service"] }, limit: 200 };
@@ -111,7 +123,9 @@ export function NewTokenDialog({
 	const [minted, setMinted] = useState<IamTokenCreated | null>(null);
 	const [copied, setCopied] = useState(false);
 
-	const expiresIn = expiry ?? (choices.length ? String(choices[0]) : NEVER);
+	// Derived until the person picks, so the default follows the choices
+	// whenever they arrive.
+	const expiresIn = expiry ?? defaultExpiry(choices);
 	const parsed = parseNarrowing(narrow);
 
 	function close() {
@@ -247,12 +261,12 @@ export function NewTokenDialog({
 							<FieldLabel htmlFor="iam-token-expiry">Expires</FieldLabel>
 							<Select value={expiresIn} onValueChange={setExpiry}>
 								<SelectTrigger id="iam-token-expiry" className="w-full">
-									<SelectValue />
+									<SelectValue>{expiryLabel(expiresIn)}</SelectValue>
 								</SelectTrigger>
 								<SelectContent>
 									{choices.map((days) => (
 										<SelectItem key={days} value={String(days)}>
-											in {days} days
+											{expiryLabel(String(days))}
 										</SelectItem>
 									))}
 									<SelectItem value={NEVER}>never</SelectItem>

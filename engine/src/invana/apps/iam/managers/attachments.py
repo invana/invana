@@ -5,8 +5,11 @@ features/people-and-groups.md. A holder is a person, a group, an agent or a
 token of the same Graph. A managed policy is also held by every member whose
 Graph roles include it; those rows read *role* and have no attachment to remove.
 
-Attaching is refused for a draft (a draft is held by nobody), for an inline
-policy (it belongs to its token), and for a holder that is not this Graph's —
+A custom draft may be attached to the holders it is meant for; the holding
+takes effect only once the draft is saved (every access read skips drafts), so
+its impact is drawn against them. Attaching is refused for a boundary (it bounds
+everyone), for an inline policy (it belongs to its token), and for a holder that
+is not this Graph's —
 a person who is not a member, a group or an agent of another Graph reads as
 absent. A holding may end with a run, after some days, or never::
 
@@ -87,20 +90,25 @@ class GraphHolders:
         ]
         return names_line([n for n in names if n])
 
-    def held_by(self, policy: Policy) -> HeldBy:
-        """The counts and the line the Policies list prints."""
+    def held_by(self, policy: Policy, usernames: dict[str, str] | None = None) -> HeldBy:
+        """The counts and the line the Policies list prints.
+
+        Up to two holders are named (``sam · ravi``) when ``usernames`` is
+        given; more than that are counted per kind.
+        """
         if policy.kind == PolicyKind.boundary.value:
             return (
                 HeldBy(line="the whole Graph") if policy.status == PolicyStatus.saved.value else HeldBy(line="nobody")
             )
-        if policy.status != PolicyStatus.saved.value:
-            return HeldBy(line="nobody")
         rows = self.by_policy.get(policy.id, [])
         attached_people = {a.holder_id for a in rows if a.holder_kind == "person"}
         people = attached_people | {m.user_id for m in self.role_holders(policy)}
         groups = [a.holder_id for a in rows if a.holder_kind == "group"]
         agents = sum(1 for a in rows if a.holder_kind == "agent")
         tokens = sum(1 for a in rows if a.holder_kind == "token")
+        named = self._named(policy, rows, people, usernames)
+        if named is not None:
+            return HeldBy(people=len(people), groups=len(groups), agents=agents, tokens=tokens, line=named)
         parts: list[str] = []
         if len(groups) == 1:
             parts.append(f"group {self.groups.get(groups[0], '?')}")
@@ -122,6 +130,25 @@ class GraphHolders:
             tokens=tokens,
             line=" · ".join(parts) or "nobody",
         )
+
+
+    def _named(
+        self, policy: Policy, rows: list[PolicyAttachment], people: set[str], usernames: dict[str, str] | None
+    ) -> str | None:
+        """``sam · ravi`` for one or two holders, or ``None`` to count them."""
+        if usernames is None or (policy.name == "viewer" and len(people) == len(self.members)):
+            return None
+        names: list[str] = [usernames.get(p, "") for p in sorted(people)]
+        for a in rows:
+            if a.holder_kind == "group":
+                names.append(self.groups.get(a.holder_id, ""))
+            elif a.holder_kind == "agent":
+                names.append(self.agents.get(a.holder_id, ""))
+            elif a.holder_kind == "token":
+                return None
+        if not names or len(names) > 2 or not all(names):
+            return None
+        return " · ".join(names)
 
 
 class AttachmentManager:
@@ -169,7 +196,9 @@ class AttachmentManager:
         attached = ctx.by_policy.get(policy.id, [])
         users = await self.people_qs.users(
             session,
-            ids=[m.user_id for m in ctx.members] + [a.attached_by_id for a in attached if a.attached_by_id],
+            ids=[m.user_id for m in ctx.members]
+            + [a.attached_by_id for a in attached if a.attached_by_id]
+            + [m.member_id for m in ctx.group_members if m.member_kind == "person"],
         )
         usernames = {i: u.username for i, u in users.items()}
         tokens = await self.qs.token_names(session, ids=[a.holder_id for a in attached if a.holder_kind == "token"])
@@ -178,6 +207,35 @@ class AttachmentManager:
         for a in attached:
             out.append(self._row(a, ctx, users, usernames, tokens, runs, now))
         seen = {a.holder_id for a in attached if a.holder_kind == "person"}
+        seen_agents = {a.holder_id for a in attached if a.holder_kind == "agent"}
+        for a in attached:
+            if a.holder_kind != "group":
+                continue
+            group = ctx.groups.get(a.holder_id, a.holder_id)
+            for m in ctx.group_members:
+                if m.group_id != a.holder_id:
+                    continue
+                if m.member_kind == "person" and m.member_id not in seen:
+                    seen.add(m.member_id)
+                    user = users.get(m.member_id)
+                    name, line = (user.username if user else m.member_id), _full_name(user)
+                elif m.member_kind == "agent" and m.member_id not in seen_agents:
+                    seen_agents.add(m.member_id)
+                    name, line = ctx.agents.get(m.member_id, m.member_id), "built in Agents"
+                else:
+                    continue
+                out.append(
+                    HolderRow(
+                        kind=m.member_kind,
+                        holder_id=m.member_id,
+                        name=name,
+                        line=line,
+                        how=f"via {group}",
+                        attached_by=usernames.get(a.attached_by_id) if a.attached_by_id else None,
+                        attached_at=a.attached_at,
+                        ends_at=aware(a.ends_at),
+                    )
+                )
         for m in ctx.role_holders(policy):
             if m.user_id in seen:
                 continue
@@ -243,8 +301,6 @@ class AttachmentManager:
             raise ConflictError(f"{policy.name} is an inline policy; it belongs to its token.")
         if policy.kind == PolicyKind.boundary.value:
             raise ConflictError(f"{policy.name} is a boundary; it bounds the whole Graph without being attached.")
-        if policy.status != PolicyStatus.saved.value:
-            raise ConflictError(f"{policy.name} is a draft, held by nobody. Save it before attaching it.")
         await self._check_holder(session, graph_id=graph_id, kind=request.holder_kind, ident=request.holder_id)
         if await self.qs.attachment_for(
             session, policy_id=policy.id, holder_kind=request.holder_kind, holder_id=request.holder_id

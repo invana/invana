@@ -5,17 +5,19 @@
  * total for *All*); the filter is the page's own, so it never touches the
  * Policies list's `?f.kind=` behind it.
  *
- * *Attach to…* is a modal; *Detach* removes one attachment. A managed policy
- * held as a member's role has no attachment to detach — the member's role is
- * changed in Settings › Members. A boundary is never attached: it bounds the
- * whole Graph.
+ * *Attach to…* is a modal — a draft may be attached too, to the holders it
+ * is meant for, and decides nothing until saved. *Detach* is a row action on
+ * a row that is an attachment of its own; a member or agent held via a group,
+ * or a managed policy held as a member's role, has none — the group or the
+ * member's role is changed instead. A boundary is never attached: it bounds
+ * the whole Graph.
  */
 
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Badge, EmptyState, SegmentedControl } from "@invana/ui";
 import { ActButton } from "@invana-studio/shell";
 import { FormError } from "@invana-studio/ui";
-import { Plus } from "lucide-react";
+import { Plus, Unlink } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useHoldersQuery, usePolicyMutations } from "../queries";
 import type { HolderRow, PolicyRead } from "../types";
@@ -93,13 +95,11 @@ export function PolicyHeldByTab({
 						area="iam"
 						size="sm"
 						variant="outline"
-						disabled={boundary || draft}
+						disabled={boundary}
 						title={
 							boundary
 								? "A boundary bounds the whole Graph without being attached."
-								: draft
-									? "A draft is held by nobody — save it first."
-									: undefined
+								: undefined
 						}
 						onClick={() => onAttaching(true)}
 					>
@@ -129,7 +129,7 @@ export function PolicyHeldByTab({
 						boundary
 							? "A boundary applies to every holder without being attached."
 							: draft
-								? "Save it, then attach it to a person, a group or an agent."
+								? "Attach it to whoever it is meant for — it decides nothing until saved."
 								: "Attach it to a person, a group or an agent."
 					}
 				/>
@@ -178,10 +178,14 @@ function holderColumns(
 			id: "holder",
 			header: "Holder",
 			cell: ({ row }) => (
-				<span className="flex items-baseline gap-3">
-					<span className="font-medium">{row.original.name}</span>
-					<span className="text-muted-foreground">{row.original.line}</span>
-				</span>
+				<span className="font-medium">{row.original.name}</span>
+			),
+		},
+		{
+			id: "line",
+			header: "",
+			cell: ({ row }) => (
+				<span className="text-muted-foreground">{row.original.line}</span>
 			),
 		},
 		{
@@ -205,19 +209,23 @@ function holderColumns(
 		},
 		{
 			id: "detach",
-			header: "",
+			header: () => <span className="sr-only">Detach</span>,
 			cell: ({ row }) => {
 				const id = row.original.id;
 				return id ? (
 					<ActButton
 						area="iam"
-						size="sm"
+						size="icon-xs"
 						variant="ghost"
 						disabled={pending}
-						onClick={() => onDetach(id)}
+						onClick={(e) => {
+							e.stopPropagation();
+							onDetach(id);
+						}}
 						aria-label={`Detach ${row.original.name}`}
+						title={`Detach ${row.original.name}`}
 					>
-						Detach
+						<Unlink />
 					</ActButton>
 				) : null;
 			},

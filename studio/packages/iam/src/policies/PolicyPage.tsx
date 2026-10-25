@@ -13,8 +13,9 @@
  *   its token.
  * - **Tabs** — Statements · Limits · Held by · History, as `?tab=` while the
  *   page is in front.
- * - **A draft** — the banner, *Discard* · *Edit* · *Review impact* · *Save*.
- *   Saving shows the impact first; *Save anyway* saves.
+ * - **A draft** — the banner, one `draft` badge, *Discard* · *Edit* ·
+ *   *Review impact*. Saving is *Save anyway* in the impact modal, so the
+ *   impact is always read before anything is saved.
  * - **Modals** — `?dialog=test` · `impact` · `edit` · `attach` · `discard`, so
  *   a link or a reload opens the same one.
  *
@@ -82,12 +83,7 @@ function metaLine(policy: PolicyRead): string {
 	const held = `held by ${policy.held_by.line}`;
 	const owner = policy.owner ? `owner ${policy.owner}` : null;
 	if (policy.status === "draft")
-		return [
-			policy.kind,
-			held === "held by nobody" ? "not held by anyone yet" : held,
-		]
-			.filter(Boolean)
-			.join(" · ");
+		return held === "held by nobody" ? "not held by anyone yet" : held;
 	const parts = [
 		policy.kind === "managed" ? "managed — built in" : `v${policy.version}`,
 		held,
@@ -203,12 +199,9 @@ export function PolicyPage({ username, graphSlug, name }: PolicyPageProps) {
 					<Pencil />
 					Edit
 				</ActButton>
-				<ActButton area="iam" size="sm" variant="outline" onClick={openImpact}>
-					Review impact
-				</ActButton>
 				<ActButton area="iam" size="sm" onClick={openImpact}>
 					<Check />
-					Save
+					Review impact
 				</ActButton>
 			</>
 		);
@@ -285,8 +278,7 @@ export function PolicyPage({ username, graphSlug, name }: PolicyPageProps) {
 				crumbs={crumbs}
 				chips={
 					<>
-						<KindBadge kind={policy.kind} />
-						{draft ? <DraftBadge /> : null}
+						{draft ? <DraftBadge /> : <KindBadge kind={policy.kind} />}
 						<span className="truncate text-muted-foreground">
 							{metaLine(policy)}
 						</span>
