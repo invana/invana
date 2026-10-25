@@ -26,7 +26,7 @@ python3 scripts/migration/run.py
 | Nothing Studio has is lost | Each row of [agent-fabric › Studio today, mapped](agent-fabric.md#studio-today-mapped) keeps its job; its **Deletes** column is deleted in the phase that moves it |
 | Studio UI | Composed from `@invana/*` and tokens only; a missing component is built in `~/Projects/invana/design-kit` with a story (CLAUDE.md › Design rules). Detail heads use `RecordHeader variant="page"` |
 | The backend owns every number | CLAUDE.md rule 13 — Studio formats, never derives |
-| Validate against the boards | Before a phase is done, every board its stories name is shot live and from the prototype (`node scripts/migration/shoot.mjs --live|--proto --boards …`) and compared; **every board of every phase already done is shot live again**, so nothing regresses. Routes live in `scripts/migration/screen-map.json` — regenerate with `screen_map.py` when a route changes |
+| Validate against the boards | Before a phase is done, every board its stories name is shot live and from the prototype (`node scripts/migration/shoot.mjs --live|--proto --boards …`) and compared, each image viewed once. **Every board of every phase already done is shot live again by the driver** and pixel-diffed against the accepted shots (`.migration-cache/baseline/`, `shoot.mjs --diff`); only boards past 0.5% changed reach the reviewer, so nothing regresses and nothing is re-viewed for free. A passed phase's shots become the accepted ones. The review runs on Sonnet; builds and fixes on Opus. Routes live in `scripts/migration/screen-map.json` — regenerate with `screen_map.py` when a route changes |
 | Tests | Few positive and negative tests, against the graph database, never mocked (CLAUDE.md rules 5–7). Graph-database tests only against the isolated database the driver sets |
 | Commits | A phase is a run of small commits, never one big diff. The lead commits each finished step as `wip(agents): <ID> · step N — <what>` (`--no-verify`; sub-agents never commit); the driver checkpoints whatever is left after every session, fix round and `blocked`, and makes the phase's closing `feat(agents): <ID> · <phase>` commit with hooks on. A phase's first session tags `agents/<ID>-start`; `git reset --hard agents/<ID>-start` undoes the phase, `git revert <sha>` one step. Never amend, rebase, push or open a PR from a session |
 | Hand-off | Past 400k tokens of context, stop at a clean point, set the row `partial`, write a hand-off note with exactly where to resume |
@@ -121,7 +121,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | F03 | Agents shell | studio | F02 | `feat/agents-fabric` | done | 2026-10-24 | gates green · design review passed |
 | F04 | Detail pages | engine+studio | F03 | `feat/agents-fabric` | done | 2026-10-24 | gates green · design review passed |
 | F05 | Runs · approvals · ledger · assistant | engine+studio | F04 | `feat/agents-fabric` | done | 2026-10-25 | gates green · design review passed |
-| I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | partial | 2026-10-25 | session 3 — fix rounds 1–2 built; review round 2's leftovers and the regression verdict remain |
+| I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | in progress | 2026-10-25 | session 4 — step 5c: gates, re-shoot, review-2 leftovers |
 | I02 | Connections in | engine+studio | I01 | `feat/agents-fabric` | pending |  |  |
 | F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | pending |  |  |
 

@@ -3,11 +3,15 @@
 //   node scripts/migration/shoot.mjs --proto --boards a,b --out <dir>   prototype boards (.design/canvas-products/project)
 //   node scripts/migration/shoot.mjs --live  --boards a,b --out <dir>   the same boards' routes in the running Studio
 //   node scripts/migration/shoot.mjs --live  --smoke      --out <dir>   a fixed route set, for move sessions (before/after)
+//   node scripts/migration/shoot.mjs --diff <baseline>    --out <dir>   pixel-diff every shot in <dir> against <baseline>
+//
+// --diff writes <dir>/diff.json: board → share of pixels changed (0–1), or "new" with no baseline shot.
+// Only boards past a small threshold need a reviewer's eyes; the rest are unchanged.
 //
 // Routes come from screen-map.json. Live shots sign in once with INVANA_MIGRATION_USER / _PASSWORD
 // (default admin / change_me_please) against INVANA_MIGRATION_STUDIO_URL (default http://localhost:8300).
 import { createRequire } from 'node:module';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,7 +35,36 @@ const boards = (val('--boards') ?? '').split(',').filter(Boolean);
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 
-if (flag('--proto')) {
+if (val('--diff')) {
+  const baseline = path.resolve(root, val('--diff'));
+  const result = {};
+  for (const file of readdirSync(out).filter((f) => f.endsWith('.png')).sort()) {
+    const name = file.slice(0, -4);
+    const before = path.join(baseline, file);
+    if (!existsSync(before)) { result[name] = 'new'; continue; }
+    const [a, b] = [readFileSync(path.join(out, file)), readFileSync(before)].map((x) => x.toString('base64'));
+    // A channel off by more than 24 counts the pixel as changed, so anti-aliasing is not a change.
+    result[name] = await page.evaluate(async ([a, b]) => {
+      const load = async (s) => createImageBitmap(await (await fetch(`data:image/png;base64,${s}`)).blob());
+      const [x, y] = await Promise.all([load(a), load(b)]);
+      if (x.width !== y.width || x.height !== y.height) return 1;
+      const px = (img) => {
+        const c = new OffscreenCanvas(img.width, img.height);
+        const g = c.getContext('2d');
+        g.drawImage(img, 0, 0);
+        return g.getImageData(0, 0, img.width, img.height).data;
+      };
+      const [p, q] = [px(x), px(y)];
+      let changed = 0;
+      for (let i = 0; i < p.length; i += 4) {
+        if (Math.abs(p[i] - q[i]) > 24 || Math.abs(p[i + 1] - q[i + 1]) > 24 || Math.abs(p[i + 2] - q[i + 2]) > 24) changed++;
+      }
+      return changed / (p.length / 4);
+    }, [a, b]);
+  }
+  writeFileSync(path.join(out, 'diff.json'), `${JSON.stringify(result, null, 2)}\n`);
+  console.log(JSON.stringify(result));
+} else if (flag('--proto')) {
   for (const b of boards) {
     const file = path.join(root, '.design/canvas-products/project', `${b}.dc.html`);
     if (!existsSync(file)) { console.log(`missing prototype board ${b}`); continue; }

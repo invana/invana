@@ -41,4 +41,4 @@ Never give these to a part — they are where parallel edits collide:
 | Stage | How to split |
 |---|---|
 | Fix | Group the findings by the file they touch. Groups with no shared file go to parallel parts (up to 2); findings in lead-only files, or spanning groups, stay with the lead. Then the lead re-runs every failing check. |
-| Review | The lead shoots every board once (`shoot.mjs --live` and `--proto`, so Studio is driven by one process). Then up to 2 reviewer parts each compare a disjoint list of boards and return findings rows. The lead merges them into the one report; the verdict is the lead's. |
+| Review | The lead shoots every board once (`shoot.mjs --live` and `--proto`, so Studio is driven by one process). Then reviewer parts of at most 15 boards each compare a disjoint list and return findings rows; each image is viewed once, never re-read. The lead merges them into the one report; the verdict is the lead's. |

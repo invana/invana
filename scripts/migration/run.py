@@ -49,6 +49,7 @@ import datetime as dt
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -66,6 +67,11 @@ CACHE = ROOT / ".migration-cache"
 STUDIO_URL = os.environ.get("INVANA_MIGRATION_STUDIO_URL", "http://localhost:8300")
 ENGINE_URL = os.environ.get("INVANA_MIGRATION_ENGINE_URL", "http://localhost:8200")
 BASELINE = HERE / "baseline.json"
+# Accepted live shots of every finished phase's boards; regressions are pixel-diffed against them.
+SHOTS = CACHE / "baseline"
+SHOT_THRESHOLD = float(os.environ.get("INVANA_RUNNER_SHOT_THRESHOLD", "0.005"))
+# Reviews compare screenshots against the docs; Sonnet does that well at a fraction of Opus's usage.
+REVIEW_MODEL = os.environ.get("INVANA_RUNNER_REVIEW_MODEL", "sonnet")
 # e2e specs default to a Graph this stack lacks; set here so headless sessions inherit it too.
 os.environ.setdefault("E2E_GRAPH_PATH", "/u/admin/airways")
 
@@ -181,18 +187,21 @@ HANDOFF = ("Context budget reached: this session has used more than {limit:,} to
            "(files done, files left, the next step number), and stop. A fresh session will continue from your note.")
 
 
+SUBAGENT_OVER = ("A sub-agent (its Agent call is {part}) has passed {limit:,} tokens of context, and every turn it takes "
+                 "re-reads all of it. Stop it now (TaskStop), keep what it reported, and hand what is left to a fresh "
+                 "sub-agent with a smaller share of the work.")
 LIMIT_RETRY = ("A previous attempt at this was cut off by a usage limit. Check `git log` and `git status` for what it "
                "already did, do not redo it, and carry on from there.\n\n")
 
 
-def claude(text: str, sid: str, label: str) -> str:
+def claude(text: str, sid: str, label: str, model: str | None = None) -> str:
     """Run a session; when a usage limit refuses it, wait for the reset and run it again.
 
     A refusal is not a fix round and not a failure: the same prompt is retried, told
     that an earlier attempt may have left work on disk.
     """
     for n in range(1, 10):
-        result, resets_at = _session(text, sid, label)
+        result, resets_at = _session(text, sid, label, model)
         if resets_at is None:
             return result
         wait = max(0, resets_at - dt.datetime.now().timestamp()) + 60
@@ -202,7 +211,7 @@ def claude(text: str, sid: str, label: str) -> str:
     raise RuntimeError(f"{label}: refused by the usage limit nine times")
 
 
-def _session(text: str, sid: str, label: str) -> tuple[str, float | None]:
+def _session(text: str, sid: str, label: str, model: str | None) -> tuple[str, float | None]:
     """One headless session in a fresh context, watched for context size.
 
     Runs ``claude -p`` with streaming input and output. Every assistant message
@@ -217,7 +226,7 @@ def _session(text: str, sid: str, label: str) -> tuple[str, float | None]:
     """
     (CACHE / sid).mkdir(parents=True, exist_ok=True)
     cmd = ["claude", "-p", "--input-format", "stream-json", "--output-format", "stream-json", "--verbose",
-           "--max-turns", "500"]
+           "--max-turns", "500"] + (["--model", model] if model else [])
     model = CHEAP_MODEL if label.startswith(("review", "fix")) else LEAD_MODEL
     if model:
         cmd += ["--model", model]
@@ -237,6 +246,7 @@ def _session(text: str, sid: str, label: str) -> tuple[str, float | None]:
     # Sub-agents run in the background: a lead's turn ends while it waits for them, and their
     # completion starts its next turn. The session is over only at a result with none still running.
     warned, result, peak, session_id, running, resets_at = False, "", 0, "", set(), None
+    big_parts: set[str] = set()
     parts: dict[str, str] = {}  # tool use id → part description
     part_peak: dict[str, int] = {}
     stopped: set[str] = set()
@@ -264,7 +274,12 @@ def _session(text: str, sid: str, label: str) -> tuple[str, float | None]:
                 u = event["message"].get("usage") or {}
                 ctx = u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + u.get("cache_creation_input_tokens", 0)
                 peak = max(peak, ctx)
-                if ctx > CONTEXT_LIMIT and not warned:
+                part = event.get("parent_tool_use_id")
+                if part and ctx > CONTEXT_LIMIT and part not in big_parts:
+                    print(f"  {label}: sub-agent {part} at {ctx:,} tokens of context — asking the lead to stop it")
+                    send(SUBAGENT_OVER.format(limit=CONTEXT_LIMIT, part=part))
+                    big_parts.add(part)
+                elif not part and ctx > CONTEXT_LIMIT and not warned:
                     print(f"  context {ctx:,} > {CONTEXT_LIMIT:,} — asking {label} to hand off")
                     send(HANDOFF.format(limit=CONTEXT_LIMIT, sid=sid))
                     warned = True
@@ -515,12 +530,66 @@ def ensure_demo_data() -> bool:
 
 
 # ── design review ──────────────────────────────────────────────────────────
+def phase_boards(sid: str) -> list[str]:
+    """The screen-map boards a phase's entry names under "Boards"; `x*` is a prefix, `(not ...)` excludes."""
+    text = SESSIONS.read_text()
+    head = re.search(rf"^### {re.escape(sid)} ·.*$", text, re.M)
+    line = re.search(r"^\| Boards \|(.*)$", text[head.end():], re.M) if head else None
+    if not line:
+        return []
+    names = list(json.loads((HERE / "screen-map.json").read_text())["boards"])
+    drop = " ".join(re.findall(r"\(not ([^)]*)\)", line.group(1)))
+    keep = re.sub(r"\(not [^)]*\)", "", line.group(1))
+    # An exclusion may be a partial name (`run.remote*` inside `agents.run.*`), so it matches anywhere.
+    kept = {n for pat in re.findall(r"`([^`]+)`", keep) for n in names
+            if (n.startswith(pat[:-1]) if pat.endswith("*") else n == pat)}
+    dropped = {n for pat in re.findall(r"`([^`]+)`", drop) for n in names if pat.rstrip("*") in n}
+    return sorted(kept - dropped)
+
+
+def regression(sid: str) -> str:
+    """Shoot every finished phase's boards live and pixel-diff them against the accepted shots.
+
+    Only boards past ``SHOT_THRESHOLD`` reach the reviewer, so a phase is not paid for by
+    re-viewing every earlier board. Returns the reviewer's instructions for them.
+    """
+    boards = sorted({b for r in read_log() if r["status"] == "done" and r["id"] != sid for b in phase_boards(r["id"])}
+                    - set(phase_boards(sid)))
+    if not boards:
+        return "No earlier phase is done; there is no regression set."
+    out = CACHE / sid / "regression"
+    shutil.rmtree(out, ignore_errors=True)
+    sh(["node", "scripts/migration/shoot.mjs", "--live", "--boards", ",".join(boards), "--out", str(out)])
+    sh(["node", "scripts/migration/shoot.mjs", "--diff", str(SHOTS), "--out", str(out)])
+    diff = json.loads((out / "diff.json").read_text()) if (out / "diff.json").exists() else {}
+    changed = [b for b, v in diff.items() if v == "new" or v > SHOT_THRESHOLD]
+    rel = lambda d: d.relative_to(ROOT)
+    if not changed:
+        return f"The driver shot {len(diff)} boards of finished phases; none changed against the accepted shots."
+    rows = "\n".join(f"- `{b}`: {'no accepted shot yet — compare it with the prototype' if diff[b] == 'new' else f'{diff[b]:.1%} of pixels changed'}"
+                      for b in changed)
+    return (f"The driver shot {len(diff)} boards of finished phases into `{rel(out)}` and pixel-diffed them against "
+            f"the accepted shots in `{rel(SHOTS)}`. {len(diff) - len(changed)} are unchanged — do not view them. "
+            f"These changed; view each live shot once beside its accepted shot (and the prototype only if unsure):\n{rows}")
+
+
+def accept_shots(sid: str) -> None:
+    """A passed phase's live shots, and the regression set it was judged on, become the accepted shots."""
+    SHOTS.mkdir(parents=True, exist_ok=True)
+    reg = CACHE / sid / "regression"
+    for png in reg.glob("*.png") if reg.exists() else []:
+        shutil.copy2(png, SHOTS / png.name)
+    if boards := phase_boards(sid):
+        sh(["node", "scripts/migration/shoot.mjs", "--live", "--boards", ",".join(boards), "--out", str(SHOTS)])
+
+
 def review(row: dict) -> tuple[bool, str]:
     REVIEWS.mkdir(parents=True, exist_ok=True)
     report = REVIEWS / f"{row['id']}.md"
     claude(prompt("review", ID=row["id"], KIND=row["kind"], STUDIO_URL=STUDIO_URL,
-                  REPORT=str(report.relative_to(ROOT)), CACHE=str((CACHE / row["id"]).relative_to(ROOT))),
-           row["id"], "review")
+                  REPORT=str(report.relative_to(ROOT)), CACHE=str((CACHE / row["id"]).relative_to(ROOT)),
+                  BOARDS=", ".join(phase_boards(row["id"])) or "(none named)", REGRESSION=regression(row["id"])),
+           row["id"], "review", model=REVIEW_MODEL)
     text = report.read_text() if report.exists() else "VERDICT: FAIL\n\nThe reviewer wrote no report."
     return text.lstrip().upper().startswith("VERDICT: PASS"), text
 
@@ -566,6 +635,7 @@ def run_session(row: dict, max_fix: int) -> bool:
             ok, report = review(row)
             if ok:
                 set_status(sid, "done", "gates green · design review passed")
+                accept_shots(sid)
                 kind = {"A": "refactor", "R": "chore"}.get(sid[0], "feat")
                 sh(["git", "add", "-A"])
                 res = sh(["git", "commit", "-m", f"{kind}({SCOPE}): {sid} · {row['phase']}\n\nGates green; design review in "
