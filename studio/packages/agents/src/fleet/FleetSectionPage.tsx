@@ -321,7 +321,7 @@ function NeedsAttention({
 						const act = attentionAct(item, graph, open);
 						return (
 							<Item
-								key={`${item.kind}:${item.run_id ?? item.approval_id ?? item.agent_id ?? item.title}`}
+								key={`${item.kind}:${item.approval_id ?? item.run_id ?? item.agent_id ?? item.title}`}
 								size="sm"
 							>
 								<ItemContent>

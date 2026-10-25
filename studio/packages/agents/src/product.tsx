@@ -30,6 +30,7 @@ import type { ProductDefinition } from "@invana-studio/core";
 import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";
 import type { Params, RouteObject } from "react-router-dom";
 import { useAgentsSlots } from "./AgentsSlots";
+import { useAgentsNavBadges } from "./navBadges";
 import { searchAgents } from "./search";
 import { SECTIONS } from "./sections/spec";
 
@@ -83,6 +84,7 @@ export const agents: ProductDefinition = {
 		],
 		bottom: [rail("concurrency")],
 	},
+	useNavBadges: useAgentsNavBadges,
 	search: searchAgents,
 	commands: [
 		{

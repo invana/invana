@@ -114,6 +114,12 @@ export interface ProductDefinition {
 	routes: RouteObject[];
 	/** The product's `leftNav` icons; `null` draws none. */
 	nav: { groups: NavItem[][]; bottom: NavItem[] } | null;
+	/**
+	 * The counts pinned to `nav` icons, by item id — a hook the shell calls
+	 * while the product is open. An item with no count, or a count of 0, has
+	 * no badge. The engine owns each number; the hook only reads it.
+	 */
+	useNavBadges?: () => Partial<Record<string, number>>;
 	/** Where the launcher and the Graph name go, relative to the product's base. */
 	landing: string;
 	actions?: Record<string, ActionDef>;

@@ -28,7 +28,7 @@ import type {
 	ProductIcon,
 } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
-import { type ComponentProps, useEffect } from "react";
+import { type ComponentProps, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ActionDialogHost } from "./actions";
 import {
@@ -82,9 +82,32 @@ function regionSearch(search: string): string {
 	return query ? `?${query}` : "";
 }
 
+type NavBadges = Partial<Record<string, number>>;
+
+/**
+ * Calls a product's `useNavBadges` and hands the counts up. Keyed by the
+ * product, so the hook is called in the same order for the life of one
+ * instance even as the open product changes; it renders nothing.
+ */
+function NavBadgesProbe({
+	use,
+	onChange,
+}: {
+	use: () => NavBadges;
+	onChange: (badges: NavBadges) => void;
+}) {
+	const badges = use();
+	const signature = JSON.stringify(badges);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: the signature stands for `badges`
+	useEffect(() => onChange(badges), [signature, onChange]);
+	useEffect(() => () => onChange({}), [onChange]);
+	return null;
+}
+
 /** The open product's `nav` as the theme's `leftNav`, or none. */
 function useProductLeftNav(
 	product: ProductDefinition | undefined,
+	badges: NavBadges,
 ): NavVerticalProps | undefined {
 	const graph = useOpenGraph();
 	const { pathname, search } = useLocation();
@@ -111,7 +134,9 @@ function useProductLeftNav(
 	const toItem = (item: NavItem, showSeperator = false) => {
 		const target = joinPath(base, item.to);
 		const active = item === lit;
+		const count = badges[item.id];
 		return {
+			badge: count ? count : undefined,
 			name: item.label,
 			icon: item.icon as ProductIcon,
 			iconClassName: "w-5 h-5",
@@ -146,13 +171,20 @@ export function StudioShellLayout({
 	...regions
 }: StudioShellLayoutProps) {
 	const product = useActiveProduct();
-	const productNav = useProductLeftNav(product);
+	const [badges, setBadges] = useState<NavBadges>({});
+	const productNav = useProductLeftNav(product, badges);
+	const useBadges = !leftNav ? product?.useNavBadges : undefined;
 	return (
-		<AppLayoutV2
-			{...regions}
-			header={useAppHeader(header)}
-			leftNav={leftNav ?? productNav}
-		/>
+		<>
+			{useBadges && product && (
+				<NavBadgesProbe key={product.id} use={useBadges} onChange={setBadges} />
+			)}
+			<AppLayoutV2
+				{...regions}
+				header={useAppHeader(header)}
+				leftNav={leftNav ?? productNav}
+			/>
+		</>
 	);
 }
 
