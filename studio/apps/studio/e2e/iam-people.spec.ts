@@ -15,6 +15,9 @@ test("People lists admin, with the kind tabs", async ({ page }) => {
 		page.getByRole("row").filter({ hasText: "admin" }).first(),
 	).toBeVisible({ timeout: 30_000 });
 	await expect(page.getByText(/^Service accounts \d+$/).first()).toBeVisible();
+	// The kind is the tabs'; a row carries its email in a column of its own.
+	await expect(page.getByRole("columnheader", { name: "Email" })).toBeVisible();
+	await expect(page.getByRole("columnheader", { name: "Kind" })).toHaveCount(0);
 });
 
 test("IAM Agents lists Explorer and opens its effective access", async ({

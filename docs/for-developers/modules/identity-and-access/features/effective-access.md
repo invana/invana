@@ -115,8 +115,8 @@ flowchart TD
 | EA8 | The envelope's allow-list stays the planner's list of functions an agent may plan with; the matrix's *Why not* says *not in its envelope* when the envelope is what refuses. |
 | EA9 | Existing agents keep what they could do: the migration attaches `viewer` to every agent, `contributor` to one whose envelope allows a `work_write` function, and `modeller` to one whose envelope allows a graph-write, schema-write or ingest function. A new agent is created holding `viewer`. |
 | EA10 | *May delegate to* keeps the agent's own setting (always · ask · never) under its policies: `always` runs only when a policy allows `work.delegate` on `agent/<name>`; without one it asks the owner; `never` refuses. |
-| EA11 | IAM › Agents lists every non-spawned agent; spawned agents are counted on their parent. *Functions allowed* is the number of catalogue functions with a bound its policies and the boundary allow. |
-| EA12 | The effective matrix's rows are the union of its skills' needs and the functions its policies allow, grouped by layer; a row's resource is the narrowest one a statement names for it. |
+| EA11 | IAM › Agents lists every non-spawned agent; spawned agents are counted on their parent. *Functions allowed* is the number of catalogue functions with a bound its policies and the boundary allow, each checked at its matrix row's resource — whether or not a skill needs it. The agent's own page prints the same number (`functions_allowed`) beside its count of refused rows. |
+| EA12 | The effective matrix's rows are the union of its skills' needs and the functions its policies allow, grouped by layer; a row's resource is the narrowest one a statement allowing it names in that layer — most path segments without a wildcard, then longest (`graph/Fare/*` over `graph/*`). |
 | EA13 | The agent's Access tab and IAM's agent page read the same endpoint; attaching from either is `POST …/iam/policies/{name}/holders` and needs iam-admin. |
 
 ## Not building

@@ -12,7 +12,7 @@
 import type { Page } from "@invana-studio/core";
 
 export type PolicyKindName = "managed" | "custom" | "inline" | "boundary";
-export type HolderKindName = "person" | "group" | "agent" | "token";
+type HolderKindName = "person" | "group" | "agent" | "token";
 export type Says = "allows" | "refuses" | "n/a";
 
 // ── statements and limits ───────────────────────────────────────────────────
@@ -55,7 +55,7 @@ export interface Limits {
 // ── policies ────────────────────────────────────────────────────────────────
 
 /** Who holds a policy, counted by the engine. */
-export interface HeldBy {
+interface HeldBy {
 	people: number;
 	groups: number;
 	agents: number;
@@ -137,7 +137,7 @@ export interface ImpactRequest {
 	limits?: Partial<Limits> | null;
 }
 
-export interface ImpactRow {
+interface ImpactRow {
 	holder_kind: "person" | "agent";
 	holder_id: string;
 	name: string;
@@ -149,7 +149,7 @@ export interface ImpactRow {
 	used_line: string;
 }
 
-export interface ImpactBreak {
+interface ImpactBreak {
 	agent_id: string;
 	agent: string;
 	skill_id: string;
@@ -162,6 +162,8 @@ export interface ImpactBreak {
 export interface ImpactRead {
 	policy: string;
 	version: number;
+	/** The version saving this writes — a draft's first save writes v1. */
+	writes_version: number;
 	holders_line: string;
 	rows: ImpactRow[];
 	breaks: ImpactBreak[];
@@ -201,7 +203,7 @@ export interface AttachRequest {
 
 // ── limits ──────────────────────────────────────────────────────────────────
 
-export interface LimitRow {
+interface LimitRow {
 	key: string;
 	label: string;
 	per: string;
@@ -239,7 +241,7 @@ export interface PrincipalRef {
 	name: string;
 }
 
-export interface AccessCheckLayer {
+interface AccessCheckLayer {
 	layer: "policies" | "started_by" | "world" | "boundary" | "token";
 	label: string;
 	by: PrincipalRef[];
@@ -316,7 +318,8 @@ export interface EffectiveRead {
 	layers: LayerRead[];
 	rows: EffectiveRow[];
 	delegates: Delegate[];
-	allowed: number;
+	/** Catalogue functions its policies and the boundary allow — IAM › Agents' count. */
+	functions_allowed: number;
 	refused: number;
 }
 
@@ -429,7 +432,7 @@ export interface GroupMemberAdd {
 
 // ── tokens ──────────────────────────────────────────────────────────────────
 
-export interface TokenHolder {
+interface TokenHolder {
 	user_id: string;
 	username: string;
 	kind: "person" | "service";

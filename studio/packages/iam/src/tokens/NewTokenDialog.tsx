@@ -1,6 +1,7 @@
 /**
  * IAM › Tokens › **New token** (board `iam.tokens.new`): one modal in two
- * states — the form, then the secret it produced.
+ * states — the form, then the same form, held, with the secret it produced
+ * under it.
  *
  * *As a person or an iam-admin, I want a token narrowed to what one job
  * needs, expiring, shown once — for me or for a service account — so that
@@ -72,7 +73,7 @@ const SERVICE_ACCOUNTS = { filters: { kind: ["service"] }, limit: 200 };
  * `graph.read.* on graph/Route/*` → one statement. A line without ` on `
  * is refused here rather than guessed at.
  */
-export function parseNarrowing(text: string): {
+function parseNarrowing(text: string): {
 	statements: StatementIn[];
 	error: string | null;
 } {
@@ -172,38 +173,8 @@ export function NewTokenDialog({
 						A key that acts as its holder, narrowed
 					</DialogDescription>
 				</DialogHeader>
-				{minted ? (
-					<>
-						<Alert tone="success">
-							<KeyRound className="size-4" />
-							<AlertDescription className="flex items-center gap-2">
-								<span className="flex-1">
-									<code className="break-all font-mono">{minted.secret}</code> —
-									copy it now. It is shown once and never stored readable.
-								</span>
-								<Button variant="outline" size="sm" onClick={() => void copy()}>
-									{copied ? (
-										<Check className="size-4" />
-									) : (
-										<Copy className="size-4" />
-									)}
-									{copied ? "Copied" : "Copy"}
-								</Button>
-							</AlertDescription>
-						</Alert>
-						<p className="text-muted-foreground">
-							{minted.name} acts as {minted.holder.username} · narrowed to{" "}
-							{minted.narrowed_to}
-						</p>
-						<DialogFooter>
-							<Button onClick={close}>
-								<Check className="size-4" />
-								Done
-							</Button>
-						</DialogFooter>
-					</>
-				) : (
-					<form className="flex flex-col gap-4" onSubmit={submit}>
+				<form className="flex flex-col gap-4" onSubmit={submit}>
+					<fieldset disabled={minted !== null} className="contents">
 						<Field>
 							<FieldLabel htmlFor="iam-token-name">Name</FieldLabel>
 							<Input
@@ -241,7 +212,7 @@ export function NewTokenDialog({
 							<FieldLabel htmlFor="iam-token-narrow">Narrow to</FieldLabel>
 							<Textarea
 								id="iam-token-narrow"
-								rows={3}
+								rows={1}
 								className="font-mono"
 								placeholder="graph.read.* on graph/Route/*"
 								aria-invalid={parsed.error ? true : undefined}
@@ -273,22 +244,57 @@ export function NewTokenDialog({
 								</SelectContent>
 							</Select>
 						</Field>
-						<FormError error={create.error} />
-						<DialogFooter>
-							<Button type="button" variant="ghost" onClick={close}>
-								Cancel
-							</Button>
-							<Button
-								type="submit"
-								disabled={
-									!name.trim() || Boolean(parsed.error) || create.isPending
-								}
-							>
-								{create.isPending ? "Creating…" : "Create token"}
-							</Button>
-						</DialogFooter>
-					</form>
-				)}
+					</fieldset>
+					{minted ? (
+						<>
+							<Alert tone="success">
+								<KeyRound className="size-4" />
+								<AlertDescription className="flex items-center gap-2">
+									<span className="flex-1">
+										<code className="break-all font-mono">{minted.secret}</code>{" "}
+										— copy it now. It is shown once and never stored readable.
+									</span>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={() => void copy()}
+									>
+										{copied ? (
+											<Check className="size-4" />
+										) : (
+											<Copy className="size-4" />
+										)}
+										{copied ? "Copied" : "Copy"}
+									</Button>
+								</AlertDescription>
+							</Alert>
+							<DialogFooter>
+								<Button type="button" onClick={close}>
+									<Check className="size-4" />
+									Done
+								</Button>
+							</DialogFooter>
+						</>
+					) : (
+						<>
+							<FormError error={create.error} />
+							<DialogFooter>
+								<Button type="button" variant="ghost" onClick={close}>
+									Cancel
+								</Button>
+								<Button
+									type="submit"
+									disabled={
+										!name.trim() || Boolean(parsed.error) || create.isPending
+									}
+								>
+									{create.isPending ? "Creating…" : "Create token"}
+								</Button>
+							</DialogFooter>
+						</>
+					)}
+				</form>
 			</DialogContent>
 		</Dialog>
 	);

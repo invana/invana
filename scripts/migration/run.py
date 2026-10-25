@@ -81,7 +81,7 @@ ALLOWED_TOOLS = [
     "Bash(ls *)", "Bash(mkdir *)", "Bash(rm -rf node_modules/.vite*)",
     "Bash(cat *)", "Bash(head *)", "Bash(tail *)", "Bash(wc *)", "Bash(grep *)", "Bash(rg *)", "Bash(find *)",
     "Bash(sed -n *)", "Bash(jq *)", "Bash(curl *)", "Bash(sort *)", "Bash(uniq *)", "Bash(diff *)",
-    "TodoWrite", "TaskCreate", "TaskUpdate", "TaskList", "TaskGet",
+    "TodoWrite", "TaskCreate", "TaskUpdate", "TaskList", "TaskGet", "TaskStop",
 ]
 
 
@@ -166,7 +166,15 @@ def ensure_branch(branch: str) -> None:
     sh(["git", "checkout", branch] if exists else ["git", "checkout", "-b", branch])
 
 
-CONTEXT_LIMIT = int(os.environ.get("INVANA_MIGRATION_CONTEXT_LIMIT", "300000"))
+CONTEXT_LIMIT = int(os.environ.get("INVANA_MIGRATION_CONTEXT_LIMIT", "200000"))
+PART_LIMIT = int(os.environ.get("INVANA_RUNNER_PART_LIMIT", "150000"))
+# Every turn re-reads the whole context, so spend grows with context size × turns. The lead builds on
+# Opus; reviews, fix rounds and every sub-agent run on the cheaper model.
+LEAD_MODEL = os.environ.get("INVANA_RUNNER_LEAD_MODEL", "")
+CHEAP_MODEL = os.environ.get("INVANA_RUNNER_CHEAP_MODEL", "sonnet")
+PART_STOP = ("Sub-agent '{name}' (tool use {tid}) has passed {limit:,} tokens of context. Stop it now with TaskStop. "
+             "Its edits stay on disk: check `git diff` on the files it owns, then finish what is left yourself or in "
+             "one fresh, smaller part. Launch no part with more than one surface.")
 HANDOFF = ("Context budget reached: this session has used more than {limit:,} tokens of context. Stop at the next clean "
            "point — finish or revert the file you are editing so the tree compiles; do not start anything new. Then set "
            "{sid}'s row in the log to `partial`, write a hand-off note that says exactly where the next session resumes "
@@ -199,20 +207,27 @@ def _session(text: str, sid: str, label: str) -> tuple[str, float | None]:
 
     Runs ``claude -p`` with streaming input and output. Every assistant message
     reports its usage; the context in use is input + cache-read + cache-written
-    tokens. Past ``CONTEXT_LIMIT`` the driver injects one message asking the
-    agent to stop cleanly and write a hand-off — the run then continues in a new
-    session that starts from that note. The full event stream is kept under
-    ``.migration-cache/<ID>/<label>.jsonl``.
+    tokens. A message with a ``parent_tool_use_id`` belongs to a sub-agent and is
+    counted against that part, not the lead. Past ``CONTEXT_LIMIT`` the driver
+    injects one message asking the lead to stop cleanly and write a hand-off — the
+    run then continues in a new session that starts from that note. A part past
+    ``PART_LIMIT`` gets the lead told to stop it. Reviews and fix rounds run on
+    ``CHEAP_MODEL``, and so does every sub-agent. The full event stream is kept
+    under ``.migration-cache/<ID>/<label>.jsonl``.
     """
     (CACHE / sid).mkdir(parents=True, exist_ok=True)
     cmd = ["claude", "-p", "--input-format", "stream-json", "--output-format", "stream-json", "--verbose",
            "--max-turns", "500"]
+    model = CHEAP_MODEL if label.startswith(("review", "fix")) else LEAD_MODEL
+    if model:
+        cmd += ["--model", model]
     if os.environ.get("INVANA_MIGRATION_SANDBOX") == "1":
         cmd.append("--dangerously-skip-permissions")
     else:
         cmd += ["--permission-mode", "acceptEdits", "--allowedTools", *ALLOWED_TOOLS]
+    env = {**os.environ, "CLAUDE_CODE_SUBAGENT_MODEL": CHEAP_MODEL} if CHEAP_MODEL else None
     proc = subprocess.Popen(cmd, cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT, text=True)
+                            stderr=subprocess.STDOUT, text=True, env=env)
 
     def send(msg: str) -> None:
         proc.stdin.write(json.dumps({"type": "user", "message": {"role": "user", "content": msg}}) + "\n")
@@ -222,6 +237,9 @@ def _session(text: str, sid: str, label: str) -> tuple[str, float | None]:
     # Sub-agents run in the background: a lead's turn ends while it waits for them, and their
     # completion starts its next turn. The session is over only at a result with none still running.
     warned, result, peak, session_id, running, resets_at = False, "", 0, "", set(), None
+    parts: dict[str, str] = {}  # tool use id → part description
+    part_peak: dict[str, int] = {}
+    stopped: set[str] = set()
     with open(CACHE / sid / f"{label}.jsonl", "w") as log:
         for line in proc.stdout:
             log.write(line)
@@ -232,7 +250,17 @@ def _session(text: str, sid: str, label: str) -> tuple[str, float | None]:
             if not session_id and event.get("session_id"):
                 session_id = event["session_id"]
                 print(f"  {label}: session {session_id}  (open with: claude -r {session_id})")
-            if event.get("type") == "assistant":
+            if event.get("type") == "assistant" and event.get("parent_tool_use_id"):
+                tid = event["parent_tool_use_id"]
+                u = event["message"].get("usage") or {}
+                ctx = u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + u.get("cache_creation_input_tokens", 0)
+                part_peak[tid] = max(part_peak.get(tid, 0), ctx)
+                if ctx > PART_LIMIT and tid not in stopped:
+                    name = parts.get(tid, "unnamed part")
+                    print(f"  {label}: part '{name}' at {ctx:,} > {PART_LIMIT:,} — asking the lead to stop it")
+                    send(PART_STOP.format(name=name, tid=tid, limit=PART_LIMIT))
+                    stopped.add(tid)
+            elif event.get("type") == "assistant":
                 u = event["message"].get("usage") or {}
                 ctx = u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + u.get("cache_creation_input_tokens", 0)
                 peak = max(peak, ctx)
@@ -248,6 +276,8 @@ def _session(text: str, sid: str, label: str) -> tuple[str, float | None]:
                 running = {t.get("task_id") for t in event.get("tasks") or []}
             elif event.get("type") == "system" and event.get("subtype") == "task_started":
                 running.add(event.get("task_id"))
+                if event.get("tool_use_id"):
+                    parts[event["tool_use_id"]] = event.get("description", "")
             elif event.get("type") == "system" and event.get("subtype") in ("task_notification", "task_completed", "task_finished") \
                     or (event.get("type") == "system" and event.get("status") in ("completed", "failed", "killed", "stopped")):
                 running.discard(event.get("task_id"))
@@ -266,6 +296,8 @@ def _session(text: str, sid: str, label: str) -> tuple[str, float | None]:
         proc.terminate()
         proc.wait()
     print(f"  {label}: peak context {peak:,} tokens{' · handed off' if warned else ''}")
+    for tid, top in part_peak.items():
+        print(f"    part '{parts.get(tid, tid)}': peak {top:,}{' · stopped' if tid in stopped else ''}")
     index = CACHE / "sessions.md"
     if not index.exists():
         index.write_text("| Migration session | Step | Claude session | Peak context | Handed off | Finished |\n"

@@ -1941,8 +1941,8 @@
   "iam.agent.effective": {
    "story": "IAM-07",
    "product": "iam",
-   "route": "/u/admin/airways/iam/agents?page=iam_agent%3A24e2b9d6-384b-49de-b339-51f31dbc85d1&right=assistant",
-   "state": "the uuid stands for Fare Scout, which holds fare-team-quota through fare-team (seed_i01.py prints it): IAM \u203a Agents, click Explorer"
+   "route": "/u/admin/airways/iam/agents?page=iam_agent%3A850f6a82-de3a-432c-a663-a5dcba4dc32a&right=assistant",
+   "state": "the uuid stands for Coordinator, which holds fare-team-quota through fare-team and has the skill Hey bound: IAM \u203a Agents, click Coordinator"
   },
   "iam.people": {
    "story": "IAM-08",

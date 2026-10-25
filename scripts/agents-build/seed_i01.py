@@ -223,7 +223,7 @@ async def seed(db) -> None:
     quota = await s.policy(FARE_TEAM_QUOTA)
     reader = await s.policy(ROUTE_READER)
     await s.policy(NO_PII_OUT)
-    await s.policy(AGENT_READERS, save=False, by="assistant")
+    readers_draft = await s.policy(AGENT_READERS, save=False, by="assistant")
 
     sam = await s.person("sam", ["builder", "iam-admin"])
     priya = await s.person("priya", ["viewer"])
@@ -250,6 +250,8 @@ async def seed(db) -> None:
     for name in ("Route Auditor", "Hub Checker"):
         if name in agents:
             await s.attach(reader, "agent", agents[name].id)
+            # The draft is meant for them: its impact is drawn against them before it is saved.
+            await s.attach(readers_draft, "agent", agents[name].id)
 
     # A token is never wider than its holder, so loader-bot holds the drafts it pushes.
     drafts = await s.policy(DATASET_DRAFTS)
@@ -263,7 +265,7 @@ async def seed(db) -> None:
     )
     await db.commit()
     print(f"seeded IAM for admin/{graph.slug}")
-    print("Fare Scout id (iam.agent.effective):", agents["Fare Scout"].id if "Fare Scout" in agents else "—")
+    print("Coordinator id (iam.agent.effective):", agents["Coordinator"].id if "Coordinator" in agents else "—")
 
 
 async def main() -> None:

@@ -119,7 +119,7 @@ function MayDelegateTo({
 					onRetry={() => void agents.refetch()}
 				/>
 			) : others.length ? (
-				<Table bordered={false} density="compact">
+				<Table bordered={false}>
 					<TableHeader>
 						<TableRow>
 							<TableHead>Agent</TableHead>

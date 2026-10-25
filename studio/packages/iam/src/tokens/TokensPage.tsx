@@ -85,7 +85,10 @@ export function TokensPage({ username, graphSlug }: SectionPageProps) {
 				id: "token",
 				header: "Token",
 				cell: ({ row }) => (
-					<span className="inline-flex items-center gap-2">
+					<span
+						className="inline-flex items-center gap-2"
+						title={`Created ${date(row.original.created_at)}${row.original.created_by ? ` by ${row.original.created_by}` : ""}`}
+					>
 						<span className="font-mono">{row.original.name}</span>
 						<span className="font-mono text-muted-foreground">
 							…{row.original.last_four}
@@ -119,18 +122,6 @@ export function TokensPage({ username, graphSlug }: SectionPageProps) {
 				),
 			},
 			{
-				id: "graph",
-				header: "Graph",
-				cell: ({ row }) =>
-					row.original.graph_bound ? (
-						"this Graph"
-					) : (
-						<span className="text-muted-foreground">
-							every Graph of {row.original.holder.username}'s
-						</span>
-					),
-			},
-			{
 				id: "expires",
 				header: "Expires",
 				cell: ({ row }) =>
@@ -144,19 +135,6 @@ export function TokensPage({ username, graphSlug }: SectionPageProps) {
 				cell: ({ row }) =>
 					date(row.original.last_used_at) ?? (
 						<span className="text-muted-foreground">never used</span>
-					),
-			},
-			{
-				id: "created",
-				header: "Created",
-				cell: ({ row }) => date(row.original.created_at),
-			},
-			{
-				id: "created_by",
-				header: "Created by",
-				cell: ({ row }) =>
-					row.original.created_by ?? (
-						<span className="text-muted-foreground">—</span>
 					),
 			},
 			{

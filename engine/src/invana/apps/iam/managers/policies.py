@@ -59,6 +59,9 @@ from invana.core.policy import LAYERS, StatementError, parse_statements, summary
 
 EDITABLE_KINDS = frozenset({PolicyKind.custom.value, PolicyKind.boundary.value})
 
+#: The Policies list's order by name: managed, custom, inline, then boundary.
+_KIND_ORDER = {kind: i for i, kind in enumerate(("managed", "custom", "inline", "boundary"))}
+
 
 def checked_statements(raw: list[StatementIn] | list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Statements in their stored shape, or ``ValidationError`` naming what is outside the grammar."""
@@ -102,10 +105,13 @@ class PolicyManager:
         names = await self.people_qs.usernames(session, ids=[r.updated_by_id or r.created_by_id for r in rows])
         kinds = await self.qs.kind_counts(session, graph_id=graph_id)
         kinds["all"] = sum(kinds.values())
+        if params.sort_key == "name" and not params.descending and info.next_cursor is None and params.after() is None:
+            rows = sorted(rows, key=lambda p: (_KIND_ORDER.get(p.kind, len(_KIND_ORDER)), p.name))
         return [self._row(p, ctx, names) for p in rows], info, kinds
 
     def _row(self, policy: Policy, ctx: GraphHolders, names: dict[str, str]) -> PolicyRow:
         changer = policy.updated_by_id or policy.created_by_id
+        managed = policy.kind == PolicyKind.managed.value
         return PolicyRow(
             id=policy.id,
             name=policy.name,
@@ -114,8 +120,8 @@ class PolicyManager:
             summary=what_it_allows(policy),
             statement_count=len(policy.statements or []),
             held_by=ctx.held_by(policy),
-            changed_by=names.get(changer) if changer else None,
-            changed_at=policy.updated_at,
+            changed_by=None if managed else (names.get(changer) if changer else None),
+            changed_at=None if managed else policy.updated_at,
         )
 
     async def get_row(self, session: AsyncSession, *, graph_id: str, name: str) -> Policy:

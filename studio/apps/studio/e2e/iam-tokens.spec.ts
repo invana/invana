@@ -32,6 +32,7 @@ test("?new=1 opens New token as a modal, and Cancel drops the param", async ({
 	});
 	await expect(dialog.getByLabel("Name")).toBeVisible();
 	await expect(dialog.getByLabel("Narrow to")).toBeVisible();
+	await expect(dialog.getByLabel("Expires")).toHaveText(/in \d+ days|never/);
 
 	await dialog.getByRole("button", { name: "Cancel" }).click();
 	await expect(page.getByRole("dialog")).toHaveCount(0);

@@ -4,13 +4,13 @@
  * page draws. The Agents product renders it through its `AccessPanel` slot,
  * beside *May delegate to*, which is the agent's own setting.
  *
- * - **Policies it holds** — policy · kind · allows · owner. *Attach a policy*
- *   is the IAM act itself (`POST …/iam/policies/{name}/holders`), so it needs
+ * - **Policies it holds** — policy · kind · allows · owner, and *Attach a
+ *   policy* in the card's foot. It is the IAM act itself (`POST …/iam/policies/{name}/holders`), so it needs
  *   iam-admin; without it the button is disabled and says who holds it.
  * - **Functions** — one row per function its skills need or its policies
- *   allow: *Its skills need* · *Its policies* · *Started by* (the reader, by
- *   default) · *World* · *Effective* · *Why not*. Every verdict is the
- *   engine's; the panel only draws it.
+ *   allow: *Its skills need* · *Its policies* · *Started by* (the signed-in
+ *   reader) · *World* · *Effective* · *Why not*, allowed rows
+ *   first. Every verdict is the engine's; the panel only draws it.
  */
 
 import {
@@ -22,7 +22,6 @@ import {
 } from "@invana/forms";
 import {
 	Badge,
-	BoundChip,
 	Button,
 	Dialog,
 	DialogContent,
@@ -37,6 +36,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import { useAuth } from "@invana-studio/core";
 import { ActButton } from "@invana-studio/shell";
 import { FormError, PanelSection } from "@invana-studio/ui";
 import { Check, Minus, Plus, X } from "lucide-react";
@@ -48,7 +48,7 @@ import {
 	usePoliciesQuery,
 	usePolicyMutations,
 } from "../queries";
-import type { EffectiveRead, Says } from "../types";
+import type { EffectiveRead, EffectiveRow, Says } from "../types";
 
 /** The agent the panel is about — its id and the name its copy says. */
 interface AgentRef {
@@ -83,7 +83,10 @@ export function AgentAccessPanel({
 	agent,
 	onOpenEnvelope,
 }: AgentAccessPanelProps) {
-	const effective = useEffectiveQuery(username, graphSlug, agent.id);
+	const reader = useAuth().user?.id;
+	const effective = useEffectiveQuery(username, graphSlug, agent.id, {
+		started_by: reader,
+	});
 	const read = effective.data;
 	if (!read)
 		return (
@@ -121,23 +124,9 @@ function PoliciesItHolds({
 }) {
 	const [attaching, setAttaching] = useState(false);
 	return (
-		<PanelSection
-			card
-			title="Policies it holds"
-			action={
-				<ActButton
-					area="iam"
-					size="sm"
-					variant="outline"
-					onClick={() => setAttaching(true)}
-				>
-					<Plus className="size-4" />
-					Attach a policy
-				</ActButton>
-			}
-		>
+		<PanelSection card title="Policies it holds">
 			{read.policies.length ? (
-				<Table bordered={false} density="compact">
+				<Table bordered={false}>
 					<TableHeader>
 						<TableRow>
 							<TableHead>Policy</TableHead>
@@ -171,9 +160,20 @@ function PoliciesItHolds({
 					policy to let it act.
 				</p>
 			)}
-			<p className="text-muted-foreground">
-				Policies are made in IAM; attaching one here is the same act as in IAM
-			</p>
+			<div className="flex flex-wrap items-center justify-between gap-2 pt-2">
+				<ActButton
+					area="iam"
+					size="sm"
+					variant="outline"
+					onClick={() => setAttaching(true)}
+				>
+					<Plus className="size-4" />
+					Attach a policy
+				</ActButton>
+				<span className="text-sm text-muted-foreground">
+					Policies are made in IAM; attaching one here is the same act as in IAM
+				</span>
+			</div>
 			<AttachPolicyDialog
 				username={username}
 				graphSlug={graphSlug}
@@ -283,6 +283,14 @@ function AttachPolicyDialog({
 	);
 }
 
+/** Allowed first, then what its skills need — the engine's order within each. */
+const ordered = (rows: EffectiveRow[]) =>
+	[...rows].sort(
+		(a, b) =>
+			Number(b.effective === "allowed") - Number(a.effective === "allowed") ||
+			Number(b.needs) - Number(a.needs),
+	);
+
 /** Every function, layer by layer, as the engine decided it. */
 function Functions({
 	read,
@@ -302,11 +310,10 @@ function Functions({
 			}
 		>
 			{read.rows.length ? (
-				<Table bordered={false} density="compact">
+				<Table bordered={false}>
 					<TableHeader>
 						<TableRow>
 							<TableHead>Function</TableHead>
-							<TableHead>Bound</TableHead>
 							<TableHead>Its skills need</TableHead>
 							<TableHead>Its policies</TableHead>
 							<TableHead>
@@ -321,7 +328,7 @@ function Functions({
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{read.rows.map((r) => {
+						{ordered(read.rows).map((r) => {
 							const ok = r.effective === "allowed";
 							return (
 								<TableRow key={`${r.action} ${r.resource}`}>
@@ -335,9 +342,6 @@ function Functions({
 										>
 											{r.action}
 										</Badge>
-									</TableCell>
-									<TableCell>
-										{r.bound ? <BoundChip bound={r.bound} /> : <Dash />}
 									</TableCell>
 									<TableCell>{r.needs ? <Yes /> : <No />}</TableCell>
 									<TableCell>

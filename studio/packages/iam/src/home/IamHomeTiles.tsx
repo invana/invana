@@ -50,9 +50,9 @@ const LINES: Record<TileKey, (o: OverviewRead) => string> = {
 export function IamHomeTiles({ username, graphSlug }: IamHomeTilesProps) {
 	const overview = useIamOverviewQuery(username, graphSlug).data;
 	return (
-		<div className="flex w-full max-w-5xl flex-col gap-3">
+		<div className="mt-4 flex w-full max-w-7xl flex-col gap-3">
 			<Eyebrow className="justify-center">Or open</Eyebrow>
-			<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+			<div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
 				{ORDER.map((key) => (
 					<Tile
 						key={key}
@@ -70,10 +70,16 @@ function Tile({ section, line }: { section: TileKey; line: string }) {
 	const spec = SECTIONS[section];
 	const Icon = spec.icon;
 	return (
-		<Item variant="outline" size="sm" className="items-start" asChild>
+		// A card on the board's ground: the row of five fills the width under the
+		// composer, and a two-line description starts its title level with the rest.
+		<Item
+			variant="outline"
+			className="min-h-20 items-start bg-card text-left hover:bg-accent"
+			asChild
+		>
 			<button type="button" onClick={() => open.section(section)}>
 				<ItemContent>
-					<ItemTitle>
+					<ItemTitle className="font-semibold">
 						<Icon className="size-4" />
 						{spec.label}
 					</ItemTitle>

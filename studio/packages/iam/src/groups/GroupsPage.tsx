@@ -58,6 +58,7 @@ export function GroupsPage({ username, graphSlug }: SectionPageProps) {
 	return (
 		<SectionPage
 			section="groups"
+			graph={graphSlug}
 			chips={<CountChip page={page} noun="groups" />}
 			actions={
 				<ActButton
@@ -142,25 +143,29 @@ function groupColumns(): ColumnDef<GroupRow>[] {
 		{
 			id: "group",
 			header: "Group",
+			size: 160,
 			cell: ({ row }) => (
-				<span className="font-medium">{row.original.name}</span>
+				<span className="font-semibold">{row.original.name}</span>
 			),
 		},
 		{
 			id: "people",
 			header: "People",
+			size: 220,
 			cell: ({ row }) =>
 				members(row.original.people, row.original.people_count),
 		},
 		{
 			id: "agents",
 			header: "Agents",
+			size: 260,
 			cell: ({ row }) =>
 				members(row.original.agents, row.original.agents_count),
 		},
 		{
 			id: "policies",
 			header: "Policies",
+			size: 640,
 			cell: ({ row }) => joined(row.original.policies),
 		},
 	];

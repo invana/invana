@@ -54,6 +54,7 @@ export function IamAgentsPage({ username, graphSlug }: SectionPageProps) {
 	return (
 		<SectionPage
 			section="agents"
+			graph={graphSlug}
 			chips={<CountChip page={page} noun="agents" />}
 			actions={
 				// Agents is where an agent is built, and its list is where *New
@@ -125,46 +126,40 @@ function agentColumns(): ColumnDef<AgentAccessRow>[] {
 		{
 			id: "agent",
 			header: "Agent",
+			size: 180,
 			cell: ({ row }) => (
-				<span className="font-medium">{row.original.name}</span>
+				<span className="font-semibold">{row.original.name}</span>
 			),
 		},
 		{
 			id: "kind",
 			header: "Kind",
-			cell: ({ row }) => (
-				<span className="text-muted-foreground">
-					{row.original.kind} · v{row.original.version}
-				</span>
-			),
+			size: 180,
+			cell: ({ row }) => `${row.original.kind} · v${row.original.version}`,
 		},
 		{
 			id: "policies",
 			header: "Policies",
+			size: 560,
 			cell: ({ row }) => joined(row.original.policies),
 		},
 		{
 			id: "functions_allowed",
 			header: "Functions allowed",
-			cell: ({ row }) => (
-				<span className="font-mono">{row.original.functions_allowed}</span>
-			),
+			size: 160,
+			cell: ({ row }) => row.original.functions_allowed.toLocaleString(),
 		},
 		{
 			id: "refused",
 			header: "Refused · 7 d",
-			cell: ({ row }) => (
-				<span className="font-mono">{row.original.refused_line}</span>
-			),
+			size: 120,
+			cell: ({ row }) => row.original.refused_line,
 		},
 		{
 			id: "owner",
 			header: "Owner",
-			cell: ({ row }) => (
-				<span className="text-muted-foreground">
-					{row.original.owner ?? "—"}
-				</span>
-			),
+			size: 100,
+			cell: ({ row }) => row.original.owner ?? "—",
 		},
 	];
 }

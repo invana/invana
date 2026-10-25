@@ -37,18 +37,59 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { FormError } from "@invana-studio/ui";
-import { Check, ShieldCheck, X } from "lucide-react";
+import { Check, ScrollText, ShieldCheck, X } from "lucide-react";
 import { useState } from "react";
+import { useIamOpen } from "../open";
 import {
 	useIamAgentsQuery,
 	useIamTokensQuery,
 	usePeopleQuery,
 	useTestAccessMutation,
 } from "../queries";
-import type { AccessCheckRequest } from "../types";
+import type { AccessCheckRequest, PrincipalRef } from "../types";
 import { SaysBadge } from "./policyParts";
 
 const EVERY = { limit: 200 };
+
+/** A layer's *By*: a policy opens its page; a person or a world is named. */
+function ByLine({
+	by,
+	onOpen,
+}: {
+	by: PrincipalRef[];
+	/** Called before a policy opens, so the dialog does not stay over it. */
+	onOpen: () => void;
+}) {
+	const open = useIamOpen();
+	if (by.length === 0) return <span className="text-muted-foreground">—</span>;
+	return (
+		<span className="flex flex-wrap items-center gap-1">
+			{by.map((b) =>
+				b.kind === "policy" ? (
+					<Button
+						key={`${b.kind}:${b.id ?? b.name}`}
+						size="xs"
+						variant="ghost"
+						onClick={() => {
+							onOpen();
+							open.policy(b.name);
+						}}
+					>
+						<ScrollText className="size-3.5" />
+						{b.name}
+					</Button>
+				) : (
+					<span
+						key={`${b.kind}:${b.id ?? b.name}`}
+						className="text-muted-foreground"
+					>
+						{b.name}
+					</span>
+				),
+			)}
+		</span>
+	);
+}
 const NOBODY = "none";
 
 type PrincipalKind = AccessCheckRequest["principal_kind"];
@@ -89,7 +130,7 @@ export function TestAccessDialog({
 
 	return (
 		<Dialog open onOpenChange={(o) => !o && onClose()}>
-			<DialogContent className="max-w-2xl">
+			<DialogContent className="sm:max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>Test access</DialogTitle>
 					<DialogDescription>
@@ -180,7 +221,7 @@ export function TestAccessDialog({
 								className="font-mono"
 								value={world}
 								onChange={(e) => setWorld(e.target.value)}
-								placeholder="the world's id — none for the whole Graph"
+								placeholder="no world"
 							/>
 						</Field>
 					</div>
@@ -210,10 +251,8 @@ export function TestAccessDialog({
 												{layer.label}
 											</TableCell>
 											<TableCell>
-												<span className="flex flex-col">
-													<span>
-														{layer.by.map((b) => b.name).join(" · ") || "—"}
-													</span>
+												<span className="flex flex-col items-start">
+													<ByLine by={layer.by} onOpen={onClose} />
 													{layer.reason ? (
 														<span className="text-muted-foreground">
 															{layer.reason}

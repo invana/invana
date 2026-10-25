@@ -16,12 +16,12 @@
 import type { ProductIcon } from "@invana-studio/core";
 import {
 	Bot,
+	FileCheck,
 	House,
-	KeyRound,
-	ScrollText,
+	Key,
 	Settings,
+	User,
 	Users,
-	UsersRound,
 } from "lucide-react";
 
 export type IamSectionKey =
@@ -48,13 +48,13 @@ export const SECTIONS: Record<IamSectionKey, IamSectionSpec> = {
 	},
 	people: {
 		label: "People",
-		icon: Users,
+		icon: User,
 		description:
 			"Members of this Graph, and service accounts — a person with no sign-in that owns tokens for scripts",
 	},
 	groups: {
 		label: "Groups",
-		icon: UsersRound,
+		icon: Users,
 		description: "Attach a policy once, to a team",
 	},
 	agents: {
@@ -65,13 +65,13 @@ export const SECTIONS: Record<IamSectionKey, IamSectionSpec> = {
 	},
 	policies: {
 		label: "Policies",
-		icon: ScrollText,
+		icon: FileCheck,
 		description:
 			"A policy says what may be done, to which resources, within which limits. People, groups, agents and tokens hold them",
 	},
 	tokens: {
 		label: "Tokens",
-		icon: KeyRound,
+		icon: Key,
 		description:
 			"A key that acts as its holder when software calls Invana — a script, CI, Claude Code. It can only narrow what its holder may do",
 	},

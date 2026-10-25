@@ -3,7 +3,7 @@
 The build of the Agents design ([agent-fabric.md](agent-fabric.md)) and then IAM ([iam.md](iam.md)),
 run as phases by `scripts/migration/run.py` with this file as its runbook. One phase is one row in the
 log and **a run of small commits**, one per step and session; a phase may span several sessions, handing off when a session's context
-passes 400k tokens. Every phase is on **one branch**, `feat/agents-fabric`.
+passes 200k tokens. Every phase is on **one branch**, `feat/agents-fabric`.
 
 Run it:
 
@@ -11,7 +11,7 @@ Run it:
 INVANA_RUNBOOK=docs/products/agents-build-sessions.md \
 INVANA_RUNNER_PROMPTS=scripts/agents-build/prompts \
 INVANA_RUNNER_SCOPE=agents INVANA_RUNNER_GATES=full \
-INVANA_MIGRATION_CONTEXT_LIMIT=400000 \
+INVANA_MIGRATION_CONTEXT_LIMIT=200000 \
 INVANA_MIGRATION_GRAPH_DB=bolt://localhost:27687 \
 python3 scripts/migration/run.py
 ```
@@ -121,7 +121,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | F03 | Agents shell | studio | F02 | `feat/agents-fabric` | done | 2026-10-24 | gates green · design review passed |
 | F04 | Detail pages | engine+studio | F03 | `feat/agents-fabric` | done | 2026-10-24 | gates green · design review passed |
 | F05 | Runs · approvals · ledger · assistant | engine+studio | F04 | `feat/agents-fabric` | done | 2026-10-25 | gates green · design review passed |
-| I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | in progress | 2026-10-25 | fix rounds refused by the usage limit — resuming from session 2's hand-off |
+| I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | in progress | 2026-10-25 | session 3 — step 5's fix round, from session 2's hand-off |
 | I02 | Connections in | engine+studio | I01 | `feat/agents-fabric` | pending |  |  |
 | F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | pending |  |  |
 

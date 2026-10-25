@@ -178,26 +178,32 @@ function holderColumns(
 			id: "holder",
 			header: "Holder",
 			cell: ({ row }) => (
-				<span className="font-medium">{row.original.name}</span>
+				<span className="font-semibold">{row.original.name}</span>
 			),
 		},
 		{
 			id: "line",
 			header: "",
 			cell: ({ row }) => (
-				<span className="text-muted-foreground">{row.original.line}</span>
+				<span className="text-sm text-muted-foreground">
+					{row.original.line}
+				</span>
 			),
 		},
 		{
 			id: "how",
 			header: "How",
-			cell: ({ row }) => row.original.how,
+			cell: ({ row }) => (
+				<span className="text-sm text-muted-foreground">
+					{row.original.how}
+				</span>
+			),
 		},
 		{
 			id: "attached_by",
 			header: "Attached by",
 			cell: ({ row }) => (
-				<span className="text-muted-foreground">
+				<span className="text-sm text-muted-foreground">
 					{byLine(row.original.attached_by, row.original.attached_at)}
 				</span>
 			),
@@ -205,7 +211,11 @@ function holderColumns(
 		{
 			id: "ends",
 			header: "Ends",
-			cell: ({ row }) => row.original.ends_line ?? "—",
+			cell: ({ row }) => (
+				<span className="text-sm text-muted-foreground">
+					{row.original.ends_line ?? "—"}
+				</span>
+			),
 		},
 		{
 			id: "detach",

@@ -111,13 +111,13 @@ _LABELS = {
 
 #: The Limits tab's rows, in order: key · label · per.
 _LIMIT_ROWS = (
-    ("tokens_month", "Tokens a month", "month"),
-    ("tokens_run", "Tokens a run", "run · p95 over 30 days"),
-    ("live_agents", "Live agents at once", "at once"),
-    ("descendants", "Agents a run", "run"),
-    ("depth", "Depth", "run"),
-    ("worker_seconds_hour", "Worker-seconds an hour", "hour"),
-    ("pools", "Pools it may use", "—"),
+    ("tokens_month", "Tokens", "a month"),
+    ("tokens_run", "Tokens", "a run"),
+    ("live_agents", "Live agents", "at once"),
+    ("descendants", "Agents a run", "descendants"),
+    ("depth", "Depth", "spawn levels"),
+    ("worker_seconds_hour", "Worker-seconds", "an hour"),
+    ("pools", "Pools", "it may use"),
 )
 
 _LAYER_ORDER = {name: i for i, (name, _, _) in enumerate(LAYERS)}
@@ -209,13 +209,7 @@ class AccessReadManager:
         for agent in rows:
             held = await self.holdings.policies_for(session, graph_id=graph.id, principal=("agent", agent.id))
             holder = Holder(kind="agent", id=agent.id, name=agent.name, held=tuple(held))
-            allowed = sum(
-                1
-                for key, bound in bound_functions()
-                if decide(
-                    action=key, resource=layer_resource(key, bound), bound=bound, agent=holder, boundaries=boundaries
-                ).allowed
-            )
+            allowed = self._functions_allowed(holder, held, boundaries)
             acts = refused.get(agent.id, [])
             count = sum(n for _, n in acts)
             items.append(
@@ -227,7 +221,7 @@ class AccessReadManager:
                     policies=holder.names,
                     functions_allowed=allowed,
                     refused_7d=count,
-                    refused_line=f"{count} · {_side_effect(acts[0][0])}" if acts else "none",
+                    refused_line=f"{count} · {_side_effect(acts[0][0])}" if acts else "0",
                     owner=owners.get(self._owner_id(agent) or ""),
                 )
             )
@@ -302,7 +296,7 @@ class AccessReadManager:
             layers=[LayerRead(layer=n, label=label, line=line) for n, label, line in LAYERS if n in present],
             rows=rows,
             delegates=await self._delegates(session, agent=agent, held=held, depth=depth),
-            allowed=sum(1 for r in rows if r.effective == "allowed"),
+            functions_allowed=self._functions_allowed(holder, held, boundaries),
             refused=sum(1 for r in rows if r.effective == "refused"),
         )
 
@@ -456,6 +450,7 @@ class AccessReadManager:
         return ImpactRead(
             policy=policy.name,
             version=policy.version,
+            writes_version=policy.version + 1,
             holders_line=f"Held by {and_list(parts)}" if parts else "Held by nobody",
             rows=rows,
             breaks=breaks,
@@ -476,7 +471,8 @@ class AccessReadManager:
         month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         live = await self.qs.live_runs(session, agent_ids=agent_ids)
         roots = [r for r in live if r.parent_run_id is None]
-        tree = max([await descendants_spawned(session, r) for r in roots], default=0)
+        trees = [(await descendants_spawned(session, r), r.number) for r in roots]
+        tree, tree_run = max(trees, key=lambda t: t[0], default=(0, None))
         used: dict[str, int | None] = {
             "tokens_month": await self.qs.tokens_since(session, agent_ids=agent_ids, since=month),
             "tokens_run": _p95(await self.qs.run_tokens_since(session, agent_ids=agent_ids, since=now - _USE_WINDOW)),
@@ -489,8 +485,12 @@ class AccessReadManager:
             value = used.get(key)
             if value is None:
                 line = "—"
+            elif key == "tokens_run":
+                line = f"p95 {ledger_acts.tokens_line(value)}"
             elif key.startswith("tokens"):
                 line = ledger_acts.tokens_line(value)
+            elif key == "descendants" and value and tree_run is not None:
+                line = f"{value} in #{tree_run}"
             else:
                 line = str(value)
             share = None
@@ -614,19 +614,44 @@ class AccessReadManager:
             out.append((skill.id, skill.name, version.version, needs))
         return out
 
+    @classmethod
+    def _functions_allowed(cls, holder: Holder, held: Sequence[Held], boundaries: Sequence[Held]) -> int:
+        """Catalogue functions with a bound its policies and the boundary allow.
+
+        One count for the IAM Agents list and the agent's own page, whether or not a
+        skill needs the function; each is checked at its matrix row's resource.
+        """
+        return sum(
+            1
+            for key, bound in bound_functions()
+            if decide(
+                action=key,
+                resource=cls._narrowest(held, key=key, bound=bound),
+                bound=bound,
+                depth=0,
+                agent=holder,
+                boundaries=boundaries,
+            ).allowed
+        )
+
     @staticmethod
     def _narrowest(held: Sequence[Held], *, key: str, bound: str) -> str:
-        """The resource a matrix row reads: the first one a held statement allowing it names in its layer."""
+        """The resource a matrix row reads: the narrowest one a held statement allowing it names in its layer.
+
+        Narrowest is the most path segments without a wildcard, then the
+        longest — ``graph/Fare/*`` over ``graph/*``.
+        """
         fallback = default_resource(key, bound)
         layer = layer_of(fallback)
+        named: list[str] = []
         for h in held:
             for statement in h.statements:
                 if allows([statement], action=key, resource=layer, bound=bound, depth=0) is None:
                     continue
-                for resource in statement.resources:
-                    if resource != "*" and layer_of(resource) == layer:
-                        return resource
-        return fallback
+                named.extend(r for r in statement.resources if r != "*" and layer_of(r) == layer)
+        if not named:
+            return fallback
+        return max(named, key=lambda r: (sum(1 for part in r.split("/") if "*" not in part), len(r)))
 
     @staticmethod
     def _row(key: str, bound: str, resource: str, decision: Decision, *, needed: bool, outside: bool) -> EffectiveRow:

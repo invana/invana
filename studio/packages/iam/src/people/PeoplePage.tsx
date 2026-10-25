@@ -8,7 +8,8 @@
  * The list is on the list contract: the kind tabs `All · People · Service
  * accounts` write `?f.kind=`, the search writes `?q=`, and the engine filters
  * and counts — the tabs' counts are its `kinds`, the tokens column its count
- * of live tokens that reach this Graph.
+ * of live tokens that reach this Graph. The kind is the tabs', not a column:
+ * a row is its name, email, groups, policies, tokens and sign-in.
  *
  * *Add person* is the membership act (the Graph's `…/members`); *New service
  * account* makes a person with no sign-in that owns tokens. Both are the `iam`
@@ -60,6 +61,7 @@ export function PeoplePage({ username, graphSlug }: SectionPageProps) {
 	return (
 		<SectionPage
 			section="people"
+			graph={graphSlug}
 			chips={<CountChip page={page} noun="people" />}
 			actions={
 				<>
@@ -155,51 +157,42 @@ export function PeoplePage({ username, graphSlug }: SectionPageProps) {
 function personColumns(): ColumnDef<PersonRow>[] {
 	return [
 		{
-			id: "person",
-			header: "Person",
+			id: "name",
+			header: "Name",
+			size: 140,
 			cell: ({ row }) => (
-				<span className="flex flex-col">
-					<span className="font-medium">{row.original.username}</span>
-					{row.original.email ? (
-						<span className="text-muted-foreground">{row.original.email}</span>
-					) : null}
-				</span>
+				<span className="font-semibold">{row.original.username}</span>
 			),
 		},
 		{
-			id: "kind",
-			header: "Kind",
-			cell: ({ row }) => (
-				<span className="text-muted-foreground">
-					{row.original.kind === "service" ? "service account" : "person"}
-				</span>
-			),
+			id: "email",
+			header: "Email",
+			size: 240,
+			cell: ({ row }) => row.original.email ?? "—",
 		},
 		{
 			id: "groups",
 			header: "Groups",
+			size: 150,
 			cell: ({ row }) => joined(row.original.groups),
 		},
 		{
 			id: "policies",
 			header: "Policies",
+			size: 640,
 			cell: ({ row }) => joined(row.original.policies),
 		},
 		{
 			id: "tokens",
 			header: "Tokens",
-			cell: ({ row }) => (
-				<span className="font-mono">{row.original.tokens}</span>
-			),
+			size: 90,
+			cell: ({ row }) => row.original.tokens.toLocaleString(),
 		},
 		{
 			id: "signs_in_with",
 			header: "Signs in with",
-			cell: ({ row }) => (
-				<span className="text-muted-foreground">
-					{row.original.signs_in_with}
-				</span>
-			),
+			size: 180,
+			cell: ({ row }) => row.original.signs_in_with,
 		},
 	];
 }

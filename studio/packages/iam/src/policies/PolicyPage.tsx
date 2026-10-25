@@ -78,12 +78,15 @@ const TAB_KEYS = TABS.map((t) => t.value);
 
 const DIALOGS = ["test", "impact", "edit", "attach", "discard"] as const;
 
-/** `v4 · held by group fare-team · 4 agents · owner sam` — the engine's lines, joined. */
+/**
+ * `v4 · held by group fare-team · 4 agents · owner sam` — the engine's lines,
+ * joined. A draft has no version yet: `custom · not held by anyone yet`.
+ */
 function metaLine(policy: PolicyRead): string {
 	const held = `held by ${policy.held_by.line}`;
 	const owner = policy.owner ? `owner ${policy.owner}` : null;
 	if (policy.status === "draft")
-		return held === "held by nobody" ? "not held by anyone yet" : held;
+		return `${policy.kind} · ${held === "held by nobody" ? "not held by anyone yet" : held}`;
 	const parts = [
 		policy.kind === "managed" ? "managed — built in" : `v${policy.version}`,
 		held,
@@ -347,7 +350,7 @@ export function PolicyPage({ username, graphSlug, name }: PolicyPageProps) {
 						<AlertDialogDescription>
 							{remove.error instanceof Error
 								? remove.error.message
-								: "A draft is held by nobody and decides nothing, so it is deleted."}
+								: "A draft decides nothing, so it is deleted, with whatever holds it."}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>

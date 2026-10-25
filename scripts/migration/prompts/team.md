@@ -1,12 +1,12 @@
 # Working as a team inside one session
 
-You are the **lead**. You may hand parts of this session to up to **3 sub-agents** (the `Agent` tool), run in parallel in this same checkout and branch. There are no worktrees and no merges: every agent writes straight into the working tree, so the split must keep each file to one writer.
+You are the **lead**. You may hand parts of this session to up to **2 sub-agents** (the `Agent` tool), run in parallel in this same checkout and branch. There are no worktrees and no merges: every agent writes straight into the working tree, so the split must keep each file to one writer.
 
 ## When to split
 
 | Situation | Do |
 |---|---|
-| The remaining work touches fewer than ~8 files, or is one surface | Do it yourself; don't split |
+| The remaining work touches fewer than ~12 files, or is one surface | Do it yourself; don't split |
 | Two or more surfaces (pages, dialogs, tabs) that each live in their own files | Split, one part per surface group |
 | Engine work (B) | Split only along modules that import nothing from each other (e.g. `apps/<x>/` vs `server/<y>/`); the lead owns migrations, `schemas.py` shared by both, routes registration and golden files |
 
@@ -40,5 +40,5 @@ Never give these to a part — they are where parallel edits collide:
 
 | Stage | How to split |
 |---|---|
-| Fix | Group the findings by the file they touch. Groups with no shared file go to parallel parts (up to 3); findings in lead-only files, or spanning groups, stay with the lead. Then the lead re-runs every failing check. |
-| Review | The lead shoots every board once (`shoot.mjs --live` and `--proto`, so Studio is driven by one process). Then up to 3 reviewer parts each compare a disjoint list of boards and return findings rows. The lead merges them into the one report; the verdict is the lead's. |
+| Fix | Group the findings by the file they touch. Groups with no shared file go to parallel parts (up to 2); findings in lead-only files, or spanning groups, stay with the lead. Then the lead re-runs every failing check. |
+| Review | The lead shoots every board once (`shoot.mjs --live` and `--proto`, so Studio is driven by one process). Then up to 2 reviewer parts each compare a disjoint list of boards and return findings rows. The lead merges them into the one report; the verdict is the lead's. |

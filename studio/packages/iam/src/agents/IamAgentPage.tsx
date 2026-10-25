@@ -265,7 +265,7 @@ function EffectiveTab({
 					As started by
 				</Label>
 				<Select value={startedBy} onValueChange={setStartedBy}>
-					<SelectTrigger id="iam-started-by" className="w-48">
+					<SelectTrigger id="iam-started-by" className="w-60">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
@@ -294,7 +294,9 @@ function EffectiveTab({
 					</SelectContent>
 				</Select>
 				<span className="ml-auto text-muted-foreground">
-					{data ? `${data.allowed} allowed · ${data.refused} refused · ` : ""}
+					{data
+						? `${data.functions_allowed} functions allowed · ${data.refused} refused · `
+						: ""}
 					Allowed only where every column allows
 				</span>
 			</div>
@@ -346,7 +348,7 @@ function EffectiveTab({
 								<TableBody>
 									{data.delegates.map((d) => (
 										<TableRow key={d.agent_id}>
-											<TableCell className="font-medium">{d.name}</TableCell>
+											<TableCell className="font-semibold">{d.name}</TableCell>
 											<TableCell>
 												{d.by_policy ? (
 													<Button
@@ -404,16 +406,17 @@ function effectiveColumns(): ColumnDef<EffectiveRow>[] {
 	): ColumnDef<EffectiveRow> => ({
 		id,
 		header,
+		size: 90,
 		cell: ({ row }) => <SaysMark says={row.original[id]} />,
 	});
 	return [
 		{
 			id: "action",
 			header: "Action",
+			size: 200,
 			cell: ({ row }) => (
 				<Badge
-					variant="outline"
-					tone="muted"
+					variant="secondary"
 					size="xs"
 					className={`font-mono font-normal${row.original.effective === "allowed" ? "" : " line-through"}`}
 				>
@@ -424,6 +427,7 @@ function effectiveColumns(): ColumnDef<EffectiveRow>[] {
 		{
 			id: "resource",
 			header: "Resource",
+			size: 240,
 			cell: ({ row }) => (
 				<span className="font-mono">{row.original.resource}</span>
 			),
@@ -431,6 +435,7 @@ function effectiveColumns(): ColumnDef<EffectiveRow>[] {
 		{
 			id: "needs",
 			header: "Skill needs",
+			size: 90,
 			cell: ({ row }) => (
 				<SaysMark says={row.original.needs ? "allows" : "refuses"} />
 			),
@@ -442,6 +447,7 @@ function effectiveColumns(): ColumnDef<EffectiveRow>[] {
 		{
 			id: "effective",
 			header: "Effective",
+			size: 110,
 			cell: ({ row }) => (
 				<Badge
 					size="xs"
@@ -457,9 +463,8 @@ function effectiveColumns(): ColumnDef<EffectiveRow>[] {
 		{
 			id: "why",
 			header: "Why not",
-			cell: ({ row }) => (
-				<span className="text-muted-foreground">{row.original.why}</span>
-			),
+			size: 480,
+			cell: ({ row }) => row.original.why,
 		},
 	];
 }

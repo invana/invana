@@ -84,6 +84,7 @@ export function PoliciesPage({ username, graphSlug }: SectionPageProps) {
 	return (
 		<SectionPage
 			section="policies"
+			graph={graphSlug}
 			chips={
 				page ? (
 					<Badge variant="outline" tone="muted">
@@ -225,7 +226,7 @@ function policyColumns(): ColumnDef<PolicyRow>[] {
 			id: "policy",
 			header: "Policy",
 			cell: ({ row }) => (
-				<span className="inline-flex items-center gap-1.5 font-medium">
+				<span className="inline-flex items-center gap-1.5 font-semibold">
 					<ScrollText className="size-3.5 text-primary" />
 					{row.original.name}
 				</span>
@@ -244,25 +245,35 @@ function policyColumns(): ColumnDef<PolicyRow>[] {
 		{
 			id: "summary",
 			header: "What it allows",
-			cell: ({ row }) => row.original.summary || "—",
+			cell: ({ row }) => (
+				<span className="text-sm text-muted-foreground">
+					{row.original.summary || "—"}
+				</span>
+			),
 		},
 		{
 			id: "statements",
 			header: "Statements",
 			cell: ({ row }) => (
-				<span className="font-mono">{row.original.statement_count}</span>
+				<span className="text-sm tabular-nums">
+					{row.original.statement_count}
+				</span>
 			),
 		},
 		{
 			id: "held_by",
 			header: "Held by",
-			cell: ({ row }) => row.original.held_by.line,
+			cell: ({ row }) => (
+				<span className="text-sm text-muted-foreground">
+					{row.original.held_by.line}
+				</span>
+			),
 		},
 		{
 			id: "changed",
 			header: "Changed",
 			cell: ({ row }) => (
-				<span className="text-muted-foreground">
+				<span className="text-sm text-muted-foreground">
 					{byLine(row.original.changed_by, row.original.changed_at)}
 				</span>
 			),

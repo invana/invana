@@ -41,7 +41,7 @@ export function joined(names: string[], show = names.length): string {
 }
 
 /** The first value of `?f.kind=`, or empty. */
-export function kindOf(list: ListUrl): string {
+function kindOf(list: ListUrl): string {
 	return list.query.filters?.kind?.[0] ?? "";
 }
 

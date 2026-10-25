@@ -131,7 +131,6 @@ class GraphHolders:
             line=" · ".join(parts) or "nobody",
         )
 
-
     def _named(
         self, policy: Policy, rows: list[PolicyAttachment], people: set[str], usernames: dict[str, str] | None
     ) -> str | None:

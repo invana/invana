@@ -60,12 +60,12 @@ export function PolicyLimitsTab({
 				<TableBody>
 					{limits.rows.map((row) => (
 						<TableRow key={row.key}>
-							<TableCell className="font-medium">{row.label}</TableCell>
-							<TableCell className="text-muted-foreground">{row.per}</TableCell>
-							<TableCell className="font-mono">
-								{ceilingLine(row.key, row.ceiling)}
+							<TableCell className="font-semibold">{row.label}</TableCell>
+							<TableCell className="text-sm text-muted-foreground">
+								{row.per}
 							</TableCell>
-							<TableCell className="font-mono">{row.used_line}</TableCell>
+							<TableCell>{ceilingLine(row.key, row.ceiling)}</TableCell>
+							<TableCell className="text-sm">{row.used_line}</TableCell>
 							<TableCell>
 								{row.share === null ? (
 									<span className="text-muted-foreground">—</span>
@@ -77,8 +77,8 @@ export function PolicyLimitsTab({
 											value={row.share}
 											aria-label={`${row.label} ${row.per} used`}
 										/>
-										<span className="font-mono text-muted-foreground">
-											{row.share}%
+										<span className="text-sm text-muted-foreground tabular-nums">
+											{Math.round(row.share)}%
 										</span>
 									</span>
 								)}
@@ -89,7 +89,7 @@ export function PolicyLimitsTab({
 			</Table>
 			<div className="flex flex-col gap-3">
 				<PanelBox title="When a limit is reached">
-					<PropertyList>
+					<PropertyList labelWidth="auto">
 						<PropertyRow label="Live agents">
 							new agents wait for a slot; the run carries on
 						</PropertyRow>

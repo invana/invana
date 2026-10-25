@@ -8681,16 +8681,16 @@
             "title": "Agent Id",
             "type": "string"
           },
-          "allowed": {
-            "title": "Allowed",
-            "type": "integer"
-          },
           "delegates": {
             "items": {
               "$ref": "#/components/schemas/Delegate"
             },
             "title": "Delegates",
             "type": "array"
+          },
+          "functions_allowed": {
+            "title": "Functions Allowed",
+            "type": "integer"
           },
           "kind": {
             "title": "Kind",
@@ -8761,7 +8761,7 @@
           "layers",
           "rows",
           "delegates",
-          "allowed",
+          "functions_allowed",
           "refused"
         ],
         "title": "EffectiveRead",
@@ -34412,11 +34412,16 @@
           "version": {
             "title": "Version",
             "type": "integer"
+          },
+          "writes_version": {
+            "title": "Writes Version",
+            "type": "integer"
           }
         },
         "required": [
           "policy",
           "version",
+          "writes_version",
           "holders_line",
           "rows",
           "breaks"

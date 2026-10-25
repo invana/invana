@@ -179,6 +179,7 @@ class ImpactBreak(BaseModel):
 class ImpactRead(BaseModel):
     policy: str
     version: int
+    writes_version: int  # the version saving this writes
     holders_line: str
     rows: list[ImpactRow]
     breaks: list[ImpactBreak]
@@ -341,7 +342,7 @@ class EffectiveRead(BaseModel):
     layers: list[LayerRead]
     rows: list[EffectiveRow]
     delegates: list[Delegate]
-    allowed: int
+    functions_allowed: int  # catalogue functions its policies and the boundary allow
     refused: int
 
 

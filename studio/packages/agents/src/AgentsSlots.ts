@@ -14,7 +14,7 @@
 
 import { type ComponentType, createContext, useContext } from "react";
 
-export interface AccessPanelProps {
+interface AccessPanelProps {
 	username: string;
 	graphSlug: string;
 	agent: { id: string; name: string };

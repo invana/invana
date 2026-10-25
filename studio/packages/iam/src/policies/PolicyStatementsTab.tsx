@@ -14,6 +14,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	TypographyInlineCode,
 } from "@invana/ui";
 import { Layers } from "lucide-react";
 import { Fragment } from "react";
@@ -97,8 +98,10 @@ export function PolicyStatementsTab({ policy }: { policy: PolicyRead }) {
 										<TableCell>
 											<EffectBadge />
 										</TableCell>
-										<TableCell className="font-mono">
-											{s.actions.join(" · ")}
+										<TableCell>
+											<TypographyInlineCode className="font-normal">
+												{s.actions.join(" · ")}
+											</TypographyInlineCode>
 										</TableCell>
 										<TableCell className="font-mono">
 											{s.resources.join(" · ")}

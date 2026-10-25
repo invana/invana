@@ -1,5 +1,6 @@
 /**
- * *Save name?* — what saving these statements and limits would change, before
+ * *Save name? policy · vN* — the version the engine says the save writes
+ * (a draft's first save writes v1) — and what saving these statements and limits would change, before
  * anything does. The engine compares each holder (the agents, the people, and
  * the members of holding groups) with what it may do today: who gains, who
  * loses which action on which resource and how often it used it in the last
@@ -75,12 +76,12 @@ export function ImpactDialog({
 
 	return (
 		<Dialog open onOpenChange={(o) => !o && onCancel()}>
-			<DialogContent className="max-w-2xl">
+			<DialogContent className="sm:max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>
 						Save {policy.name}?{" "}
 						<span className="font-normal text-muted-foreground">
-							policy · v{read?.version ?? policy.version}
+							{read ? `policy · v${read.writes_version}` : "policy"}
 						</span>
 					</DialogTitle>
 					<DialogDescription>
@@ -120,7 +121,7 @@ export function ImpactDialog({
 												</Badge>
 											</TableCell>
 											<TableCell className="font-mono">{r.what}</TableCell>
-											<TableCell className="text-muted-foreground">
+											<TableCell className="text-sm text-muted-foreground">
 												{r.used_line}
 											</TableCell>
 										</TableRow>

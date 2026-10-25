@@ -34,7 +34,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.activity", f"{G}/activity/runs"),
     ("shell", f"{G}/explorer"),
     ("iam.home", f"{G}/iam/home"), ("iam.people", f"{G}/iam/people"), ("iam.groups", f"{G}/iam/groups"),
-    ("iam.agents", f"{G}/iam/agents"), ("iam.agent.effective", f"{G}/iam/agents?page=iam_agent%3A24e2b9d6-384b-49de-b339-51f31dbc85d1"),
+    ("iam.agents", f"{G}/iam/agents"), ("iam.agent.effective", f"{G}/iam/agents?page=iam_agent%3A850f6a82-de3a-432c-a663-a5dcba4dc32a"),
     ("iam.policies", f"{G}/iam/policies"),
     ("iam.policy.statements", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=statements"),
     ("iam.policy.limits", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=limits"),
@@ -148,7 +148,7 @@ BUILT = {"agent-fabric": {"AF-26", "AF-02", "AF-01", "AF-17", "AF-19", "AF-20", 
                          "AF-03", "AF-04", "AF-05", "AF-06", "AF-21", "AF-22",
                          "AF-07", "AF-08", "AF-09", "AF-13", "AF-14", "AF-16", "AF-24"}}
 STATE = {  # board → how to reach it from its route; a board absent here is its route's landing view
-    "iam.agent.effective": "the uuid stands for Fare Scout, which holds fare-team-quota through fare-team (seed_i01.py prints it): IAM › Agents, click Explorer",
+    "iam.agent.effective": "the uuid stands for Coordinator, which holds fare-team-quota through fare-team and has the skill Hey bound: IAM › Agents, click Coordinator",
     "iam.policies.denied": "signed in as e2e-viewer (INVANA_MIGRATION_USER=e2e-viewer INVANA_MIGRATION_PASSWORD=e2e-member-password-1)",
     "iam.policy.statements": POLICIES, "iam.policy.limits": POLICIES, "iam.policy.held_by": POLICIES,
     "iam.policy.test": f"{POLICIES}; Test access on the head",

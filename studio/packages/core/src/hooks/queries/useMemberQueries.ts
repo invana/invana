@@ -20,7 +20,7 @@ import type { GraphRef } from "../../types/product";
  * |---|---|---|
  * | `useMembersQuery` | `GET …/members` | `["members", owner, graph, query]` |
  * | `useGraphAccessQuery` | `GET …/access` | `["access", owner, graph]` |
- * | `useMemberMutations` | add · set roles · remove | invalidates both |
+ * | `useMemberMutations` | add · set roles · remove | invalidates both, and IAM's `["iam", owner, graph]` |
  *
  * The members key is the one the shell's rules and schedules name member ids
  * with, so a role change shows everywhere at once. A change to the signed-in
@@ -67,6 +67,10 @@ export function useMemberMutations(graph: GraphRef) {
 		await Promise.all([
 			qc.invalidateQueries({ queryKey: memberKeys.members(graph) }),
 			qc.invalidateQueries({ queryKey: memberKeys.access(graph) }),
+			// A role is a managed policy: IAM's people, tiles and effective access read it.
+			qc.invalidateQueries({
+				queryKey: ["iam", graph.username, graph.graphSlug],
+			}),
 		]);
 		const store = useAuthStore.getState();
 		if (username && store.user?.username === username) {

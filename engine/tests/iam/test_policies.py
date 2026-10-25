@@ -66,6 +66,7 @@ async def test_a_group_holding_builder_lets_a_viewer_build(client, people, graph
     holders = (await client.get(f"{graph_url}/iam/policies/builder/holders")).json()
     assert {(h["kind"], h["name"], h["how"]) for h in holders["items"]} == {
         ("group", "fare-team", "direct"),
+        ("person", bo.username, "via fare-team"),
         ("person", ada.username, "role"),
     }
     robot = await client.post(f"{graph_url}/iam/service-accounts", json={"username": f"robot-{uuid.uuid4().hex[:6]}"})
