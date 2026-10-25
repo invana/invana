@@ -398,8 +398,17 @@ export interface GroupRow {
 	agents_count: number;
 }
 
+/** A policy a group holds, with the attachment that detaches it. */
+export interface GroupPolicyRef {
+	attachment_id: string;
+	name: string;
+	kind: PolicyKindName;
+	summary: string;
+}
+
 export interface GroupRead extends GroupRow {
 	members: GroupMemberRef[];
+	held: GroupPolicyRef[];
 }
 
 export type GroupList = Page<GroupRow>;
@@ -440,10 +449,17 @@ export interface IamTokenRow {
 	expires_at: string | null;
 	last_used_at: string | null;
 	created_at: string;
+	/** Who minted it — the holder, or an iam-admin minting for a service account. */
+	created_by: string | null;
 	expired: boolean;
 }
 
-export type IamTokenList = Page<IamTokenRow>;
+export interface IamTokenList extends Page<IamTokenRow> {
+	/** The expiries *New token* offers, in days; never is always offered too. */
+	expiry_day_choices: number[];
+	/** How many live tokens one holder may hold. */
+	max_tokens: number;
+}
 
 export interface IamTokenCreate {
 	name: string;

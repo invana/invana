@@ -68,6 +68,8 @@ export function useIamSections({
 				navigate(
 					`/u/${username}/${graphSlug}/agents/agents?page=${encodeURIComponent(boardPageId("agent", id))}`,
 				),
+			agentsInAgents: () =>
+				navigate(`/u/${username}/${graphSlug}/agents/agents`),
 		}),
 		[openBoard, goTo, navigate, username, graphSlug],
 	);

@@ -10,6 +10,7 @@
  * record comes through `IamOpenContext`.
  */
 
+export { AgentAccessPanel } from "./agents/AgentAccessPanel";
 export { IamAgentPage } from "./agents/IamAgentPage";
 export { iamApi } from "./api";
 export { GroupPage } from "./groups/GroupPage";

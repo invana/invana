@@ -23,6 +23,8 @@ export interface IamOpen {
 	section: (key: IamSectionKey) => void;
 	/** The agent's own page in the Agents product, where it is built. */
 	agentInAgents: (id: string) => void;
+	/** The Agents product's list, where a new agent is built. */
+	agentsInAgents: () => void;
 }
 
 export const IamOpenContext = createContext<IamOpen | null>(null);

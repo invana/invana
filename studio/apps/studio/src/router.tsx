@@ -1,6 +1,6 @@
 import { AgentsSlotsContext, useAgentsQuery } from "@invana-studio/agents";
 import { ExplorerSlotsContext } from "@invana-studio/explorer";
-import { IamSlotsContext } from "@invana-studio/iam";
+import { AgentAccessPanel, IamSlotsContext } from "@invana-studio/iam";
 import { ModellerSlotsContext } from "@invana-studio/modeller";
 import { ProjectsSlotsContext } from "@invana-studio/projects";
 import {
@@ -26,7 +26,8 @@ import { modellerSlots } from "@/products/modellerSlots";
 // product's routes draw the product host, which composes all five. Projects reads the agents a
 // Todo can be handed to from the Agents product, through its slot.
 const explorerSlots = { Page: ProductHostRoute };
-const agentsSlots = { Page: ProductHostRoute };
+// An agent's Access tab draws IAM's reading of it, handed in through the slot.
+const agentsSlots = { Page: ProductHostRoute, AccessPanel: AgentAccessPanel };
 const iamSlots = { Page: ProductHostRoute };
 const projectsSlots = { Page: ProductHostRoute, useAgents: useAgentsQuery };
 
