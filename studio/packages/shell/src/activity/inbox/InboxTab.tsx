@@ -20,7 +20,7 @@ import { Inbox } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProducts } from "../../products";
-import { activityPath } from "../activityPath";
+import { activityPath, runPagePath } from "../activityPath";
 import { useMarkRead } from "../notifications/queries";
 import type { Approval } from "../notifications/types";
 import { ApprovalDialog } from "./ApprovalDialog";
@@ -109,7 +109,7 @@ export function InboxTab({ graph }: { graph: GraphRef }) {
 	);
 	const acts: InboxActs = {
 		review: setReviewing,
-		openRun: (id) => navigate(activityPath(graph, "runs", id)),
+		openRun: (id) => navigate(runPagePath(graph, id)),
 		openSchedule: (id) => navigate(activityPath(graph, "schedules", id)),
 		markRead: (ids) => markRead.mutate(ids),
 	};

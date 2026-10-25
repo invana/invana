@@ -26,11 +26,12 @@ G = "/u/admin/airways"
 AR = "/u/admin/arabidopsis"
 ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.login", "/login"), ("shell.graphs", "/graphs"), ("shell.first_run", "/graphs?first-run"),
-    ("shell.profile", "/settings/profile"), ("shell.runs", f"{G}/activity/runs"), ("shell.run", f"{G}/activity/runs/15"),
+    ("shell.profile", "/settings/profile"), ("shell.runs", f"{G}/activity/runs"), ("shell.run", f"{G}/agents/runs?page=run%3Ab0144efb-6073-4204-8e50-a70308621dd8"),
     ("shell.schedule", f"{G}/activity/schedules"), ("shell.activity.events", f"{G}/activity/events"),
     ("shell.events", f"{G}/activity/events?filter=changes"), ("shell.change", f"{G}/activity/changes/agent/a1"),
     ("shell.notifications.rule", f"{G}/activity/rules"), ("shell.notifications.channels", f"{G}/activity/channels"),
-    ("shell.notifications", f"{G}/activity/inbox"), ("shell.activity", f"{G}/activity/runs"),
+    ("shell.notifications", f"{G}/activity/inbox"), ("shell.activity.approvals", f"{G}/agents/approvals"),
+    ("shell.activity", f"{G}/activity/runs"),
     ("shell", f"{G}/explorer"),
     ("datasets.catalogue", "/datasets/catalogue"), ("datasets.validation", "/datasets/validation"),
     ("datasets.standard", "/datasets/standards"), ("datasets.imports", "/datasets/imports"),
@@ -44,7 +45,26 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("explorer.sessions", f"{G}/explorer?history"), ("explorer.home", f"{G}/explorer"), ("explorer", f"{G}/explorer/routes-out-of-lhr"),
     ("projects.list", f"{AR}/projects"), ("projects.new", f"{AR}/projects"), ("projects.todo", f"{AR}/projects/todos"), ("projects.decisions", f"{AR}/projects/decisions"),
     ("projects.impact", f"{AR}/projects/gene-edited-field-trials"), ("projects", f"{AR}/projects/early-flowering-under-drought"),
-    ("agents.runs.filtered", f"{G}/activity/runs?f.status=failed&f.since=30d&via=assistant"),
+    ("agents.runs.filtered", f"{G}/agents/runs?f.agent_id=757e8fc1-53a5-46a4-9a9b-36f6f24065ae&f.status=failed&f.since=30d&via=assistant"),
+    ("agents.runs", f"{G}/agents/runs"),
+    ("agents.run.overview", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=overview"),
+    ("agents.run.many.overview", f"{G}/agents/runs?page=run%3A4b5f8f99-5572-4a16-b329-8474a789cee1&tab=overview"),
+    ("agents.run.many", f"{G}/agents/runs?page=run%3A4b5f8f99-5572-4a16-b329-8474a789cee1&tab=agents&view=role"),
+    ("agents.run.step", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=stages"),
+    ("agents.run.assets", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=assets"),
+    ("agents.run.touched", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=touched"),
+    ("agents.run.rerun", f"{G}/agents/runs?page=run%3Ab0144efb-6073-4204-8e50-a70308621dd8&rerun=1"),
+    ("agents.run.approval", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=overview"),
+    ("agents.run.ask", f"{G}/agents/runs?page=run%3A11970a9e-3208-435f-abe6-20d0d1f11c5d&tab=stages"),
+    ("agents.run", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=agents"),
+    ("agents.approvals.alerts", f"{G}/agents/approvals/alerts"),
+    ("agents.approvals", f"{G}/agents/approvals"),
+    ("agents.ledger.entry", f"{G}/agents/ledger"),
+    ("agents.ledger.actor", f"{G}/agents/ledger/actor?actor=agent%3A757e8fc1-53a5-46a4-9a9b-36f6f24065ae&since=7d"),
+    ("agents.ledger.record", f"{G}/agents/ledger/record?address=graph%2FAirport&since=30d"),
+    ("agents.ledger.refusals", f"{G}/agents/ledger/refusals"),
+    ("agents.ledger.export", f"{G}/agents/ledger/export"),
+    ("agents.ledger", f"{G}/agents/ledger"),
     ("agents.agents.filtered", f"{G}/agents/agents?q=fare&f.ephemeral=shown"),
     ("agents.home", f"{G}/agents/home"), ("agents.open", f"{G}/agents/home"),
     ("agents.fleet.map.table", f"{G}/agents/fleet/map?console=table"),
@@ -98,7 +118,9 @@ ROUTES = [  # first match wins: (board prefix, route template)
 ]
 
 
-RUN = "15 stands for a run id: Activity › Runs, open the newest succeeded run"
+RUN = "the uuid stands for a served run (seed_f05.py prints it): Agents › Runs, open the newest served run"
+TREE = "the uuid stands for the seeded run tree of eight agents (scripts/agents-build/seed_f05.py prints it)"
+MANY = "the uuid stands for the seeded run of 700 agents (scripts/agents-build/seed_f05.py prints it)"
 SESSION = "routes-out-of-lhr stands for a session id: ask “Which routes out of LHR grew last quarter?”"
 DARK = "theme dark: user menu › Appearance › Dark"
 DATASET = "dataset admin/accession-phenotypes (demos/arabidopsis/load.py publishes it)"
@@ -112,7 +134,8 @@ DRAFT_SKILL = "the uuid stands for a draft skill (Weekly route check): open it f
 DRAFT_AGENT = "the uuid stands for a draft agent with two bound skills (Route desk briefer): Agents › Drafts"
 #: A product doc whose stories enter the map phase by phase, as agents-build-sessions.md builds them.
 BUILT = {"agent-fabric": {"AF-26", "AF-02", "AF-01", "AF-17", "AF-19", "AF-20", "AF-23", "AF-25",
-                         "AF-03", "AF-04", "AF-05", "AF-06", "AF-21", "AF-22"}}
+                         "AF-03", "AF-04", "AF-05", "AF-06", "AF-21", "AF-22",
+                         "AF-07", "AF-08", "AF-09", "AF-13", "AF-14", "AF-16", "AF-24"}}
 STATE = {  # board → how to reach it from its route; a board absent here is its route's landing view
     "shell.onboarding": "a Graph whose set-up is not finished: the set-up checklist open",
     "shell.launcher.open": "click the product launcher in the header",
@@ -126,7 +149,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "shell.run.step": f"{RUN}; click a step on its timeline",
     "shell.run.failed": "15 stands for a failed run's id: Activity › Runs, status failed, open the newest",
     "shell.run.compare": "two runs of one question in two worlds: select both in Activity › Runs, Compare",
-    "shell.activity.approvals": "Approvals tab",
+    "shell.activity.approvals": "every ask waiting on a person is Agents › Approvals",
     "shell.run.approval": "15 stands for a run waiting on approval: open it from Approvals (needs B08)",
     "shell.schedule.new": "New schedule",
     "shell.schedule.detail": "click a schedule: /activity/schedules/<id>",
@@ -221,7 +244,23 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "projects.report": "Report tab (needs B05)",
     "agents.overview.dark": DARK,
     "agents.agents.lineage": "Lineage tab",
-    "agents.runs.filtered": "Runs filtered by status and since, as the assistant links them; add &f.agent_id=<an agent's id> for the agent chip",
+    "agents.run.overview": f"{TREE}; Overview tab",
+    "agents.run.many.overview": f"{MANY}; Overview tab — the large-run reading",
+    "agents.run.many.icicle": f"{MANY}; Agents › By role — the icicle is not built (the-run-page.md Not building)",
+    "agents.run.many": f"{MANY}; Agents tab, By role",
+    "agents.run.step": f"{TREE}; Stages tab, click the first stage",
+    "agents.run.assets": f"{TREE}; Assets tab",
+    "agents.run.touched": f"{TREE}; Data touched tab",
+    "agents.run.rerun": "the uuid stands for a served run of Route Auditor; Rerun",
+    "agents.run.closed": f"{TREE}; Agents tab, the assistant closed",
+    "agents.run.approval": f"{TREE}; Overview — Waiting on you lists its budget and delegation asks",
+    "agents.run.ask": "the uuid stands for an Explorer answer's run (a served run with a session); Stages tab, click a stage",
+    "agents.run": f"{TREE}; Agents tab, Tree",
+    "agents.approvals.alerts": "Alert rules tab — five seeded rules",
+    "agents.ledger.entry": "Rows tab, click the first row (opens ?row=)",
+    "agents.ledger.actor": "the uuid stands for Route Auditor",
+    "agents.ledger.member": "signed in as e2e-viewer (INVANA_MIGRATION_USER=e2e-viewer INVANA_MIGRATION_PASSWORD=e2e-member-password-1)",
+    "agents.runs.filtered": "Route Auditor's failed runs this month, as the assistant links them — the uuid stands for Route Auditor (seed_f05.py)",
     "agents.agents.filtered": "Agents searched for fare with spawned helpers shown",
     "agents.functions.detail": "graph.read.query stands for a function's dotted name: click any function in Functions",
     "agents.functions.plans": "Packaged plans tab",

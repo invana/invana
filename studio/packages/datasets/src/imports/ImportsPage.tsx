@@ -32,7 +32,7 @@ import {
 	TerminalLine,
 } from "@invana/ui";
 import { formatElapsed, type RunStats, useTicker } from "@invana-studio/core";
-import { activityPath } from "@invana-studio/shell";
+import { runPagePath } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { RefreshCw, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -232,7 +232,7 @@ export function ImportsPage() {
 									<TableRow
 										key={`${row.graph.username}/${row.graph.graphSlug}/${row.id}`}
 										onClick={() =>
-											navigate(activityPath(row.graph, "runs", row.id))
+											navigate(runPagePath(row.graph, row.id))
 										}
 										className="cursor-pointer"
 									>

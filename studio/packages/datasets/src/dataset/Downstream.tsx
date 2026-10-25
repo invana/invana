@@ -21,7 +21,7 @@ import {
 	Spinner,
 } from "@invana/ui";
 import { useGraphsQuery } from "@invana-studio/core";
-import { activityPath } from "@invana-studio/shell";
+import { runPagePath } from "@invana-studio/shell";
 import { useNavigate } from "react-router-dom";
 import { parseAddress } from "../api";
 import { useUsageQuery } from "../queries";
@@ -94,7 +94,7 @@ export function Downstream({
 									variant="outline"
 									size="sm"
 									onClick={() =>
-										navigate(activityPath(ref, "runs", b.run_id as string))
+										navigate(runPagePath(ref, b.run_id as string))
 									}
 								>
 									Open

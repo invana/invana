@@ -32,6 +32,8 @@ export type LeftNavKey =
 	// The Agents rail's sections, each a page.
 	| "home"
 	| "fleet"
+	| "approvals"
+	| "ledger"
 	| "functions"
 	| "connections"
 	| "llms"
@@ -127,6 +129,8 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"rules",
 	"home",
 	"fleet",
+	"approvals",
+	"ledger",
 	"functions",
 	"connections",
 	"llms",

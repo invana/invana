@@ -36,7 +36,7 @@ import {
 	MetricTile,
 } from "@invana/ui";
 import {
-	activityPath,
+	approvalsPath,
 	comparePath,
 	useRightSection,
 } from "@invana-studio/shell";
@@ -287,7 +287,7 @@ function attentionAct(
 			return runId ? { label: "Open run", act: () => open.run(runId) } : null;
 		}
 		case "waiting":
-			return { label: "Review", to: activityPath(graph, "approvals") };
+			return { label: "Review", to: approvalsPath(graph) };
 		case "degraded":
 			return {
 				label: "Investigate",

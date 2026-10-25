@@ -12,8 +12,8 @@ describe("panelPaths", () => {
 	});
 
 	it("sends every old ?panel= link to its path, keeping the rest", () => {
-		expect(canonicalRedirect(G, "?panel=runs&run=r1&right=assistant")).toBe(
-			`${G}/activity/runs/r1?right=assistant`,
+		expect(canonicalRedirect(G, "?panel=runs&right=assistant")).toBe(
+			`${G}/agents/runs?right=assistant`,
 		);
 		expect(canonicalRedirect(G, "?settings=functions&drawer=templates")).toBe(
 			`${G}/agents/functions/templates`,

@@ -39,7 +39,7 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { ApiError } from "@invana-studio/core";
-import { activityPath } from "@invana-studio/shell";
+import { approvalsPath, runPagePath } from "@invana-studio/shell";
 import { Check } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -446,7 +446,7 @@ function ReviewState({
 	const review = usePublishReviewQuery(username, graphSlug, modelId, reviewId);
 	const r = review.data;
 	const runsPath = (runId: string) =>
-		activityPath({ username, graphSlug }, "runs", runId);
+		runPagePath({ username, graphSlug }, runId);
 	return (
 		<>
 			<DialogHeader>
@@ -509,7 +509,7 @@ function ReviewState({
 						{r.approval_id ? (
 							<Link
 								className="text-primary"
-								to={activityPath({ username, graphSlug }, "approvals")}
+								to={approvalsPath({ username, graphSlug })}
 							>
 								Open Approvals
 							</Link>

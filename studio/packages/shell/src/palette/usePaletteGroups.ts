@@ -11,7 +11,7 @@ import {
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { FolderGit2, History, Star } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { activityPath } from "../activity/activityPath";
+import { runPagePath } from "../activity/activityPath";
 import { runTitle } from "../activity/inbox/inbox";
 import { recentRunsQuery } from "../activity/inbox/useInbox";
 import { useAssistantShown } from "../preferences";
@@ -155,7 +155,7 @@ export function usePaletteGroups(query: string, open: boolean) {
 					.filter(Boolean)
 					.join(" · "),
 				icon: History,
-				run: () => navigate(activityPath(graph, "runs", r.id)),
+				run: () => navigate(runPagePath(graph, r.id)),
 			};
 		});
 		const ranked = q

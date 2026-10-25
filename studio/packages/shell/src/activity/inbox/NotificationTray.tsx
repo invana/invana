@@ -9,7 +9,7 @@ import {
 import type { GraphRef } from "@invana-studio/core";
 import { ArrowLeft, Inbox } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { activityPath } from "../activityPath";
+import { activityPath, runPagePath } from "../activityPath";
 import { useMarkRead } from "../notifications/queries";
 import type { Approval } from "../notifications/types";
 import { ApprovalReview } from "./ApprovalReview";
@@ -53,7 +53,7 @@ export function NotificationTray({
 		onClose();
 		navigate(to);
 	};
-	const openRun = (id: string) => go(activityPath(graph, "runs", id));
+	const openRun = (id: string) => go(runPagePath(graph, id));
 
 	if (view.kind === "review") {
 		return (

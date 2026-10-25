@@ -95,12 +95,19 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	{ path: "agents/functions/plugins", panel: "functions", section: "plugins" },
 	{ path: "agents/connections/mcp", panel: "connections", section: "mcp" },
 	{ path: "agents/llms", panel: "llms", detail: "provider" },
+	{ path: "agents/runs", panel: "runs" },
+	{ path: "agents/approvals", panel: "approvals", section: "waiting" },
+	{ path: "agents/approvals/alerts", panel: "approvals", section: "alerts" },
+	{ path: "agents/ledger", panel: "ledger", section: "rows" },
+	{ path: "agents/ledger/actor", panel: "ledger", section: "actor" },
+	{ path: "agents/ledger/record", panel: "ledger", section: "record" },
+	{ path: "agents/ledger/refusals", panel: "ledger", section: "refusals" },
+	{ path: "agents/ledger/export", panel: "ledger", section: "export" },
 	{ path: "agents/settings", panel: "concurrency" },
-	// Activity's tabs (the shell's page). Runs and Events keep the panel keys
-	// their rail icons write; the tabs with no panel share one key.
+	// Activity's tabs (the shell's page). Events keeps the panel key its rail
+	// icon writes; the other tabs share one key. `runs` is Agents › Runs.
 	{ path: "activity/inbox", panel: "activity", section: "inbox" },
-	{ path: "activity/approvals", panel: "activity", section: "approvals" },
-	{ path: "activity/runs", panel: "runs", detail: "run" },
+	{ path: "activity/runs", panel: "activity", section: "runs" },
 	{
 		path: "activity/schedules",
 		panel: "activity",

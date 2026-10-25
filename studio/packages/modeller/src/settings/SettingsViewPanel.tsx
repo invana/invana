@@ -115,6 +115,8 @@ type SingleTabSection = Exclude<
 	| "rules"
 	| "home"
 	| "fleet"
+	| "approvals"
+	| "ledger"
 	| "functions"
 	| "connections"
 	| "llms"

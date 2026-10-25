@@ -10,7 +10,7 @@ import { Bell } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { activityPath } from "../../activity/activityPath";
+import { runPagePath } from "../../activity/activityPath";
 import { type InboxItem, runTitle } from "../../activity/inbox/inbox";
 import {
 	NotificationTray,
@@ -42,7 +42,7 @@ export function ActivityBell() {
 			setView({ kind: "review", approval: item.approval });
 			setOpen(true);
 		} else if (item.kind === "waiting" && graph) {
-			navigate(activityPath(graph, "runs", item.run.id));
+			navigate(runPagePath(graph, item.run.id));
 		}
 	});
 	if (!graph) return null;

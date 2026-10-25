@@ -1,15 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { activityOf, activityPath, comparePath } from "./activityPath";
+import { activityOf, comparePath, runPagePath } from "./activityPath";
 
 describe("activityOf", () => {
-	it("reads a tab, and a run inside Runs", () => {
+	it("reads a tab, and a schedule inside Schedules", () => {
 		expect(activityOf("/u/admin/airways/activity/events")).toEqual({
 			tab: "events",
-			runId: null,
 		});
-		expect(activityOf("/u/admin/airways/activity/runs/r%201")).toEqual({
-			tab: "runs",
-			runId: "r 1",
+		expect(activityOf("/u/admin/airways/activity/schedules/s%201")).toEqual({
+			tab: "schedules",
+			scheduleId: "s 1",
 		});
 	});
 
@@ -17,6 +16,7 @@ describe("activityOf", () => {
 		expect(activityOf("/u/admin/airways")).toBeNull();
 		expect(activityOf("/u/admin/airways/activity/nope")).toBeNull();
 		expect(activityOf("/u/admin/airways/activity/events/x")).toBeNull();
+		expect(activityOf("/u/admin/airways/activity/runs/r1")).toBeNull();
 	});
 
 	it("reads a change's compare as Events, and refuses a kind that is not versioned", () => {
@@ -27,18 +27,14 @@ describe("activityOf", () => {
 		);
 		expect(activityOf(path.split("?")[0] as string)).toEqual({
 			tab: "events",
-			runId: null,
 			change: { kind: "plan", id: "answer nl" },
 		});
 		expect(activityOf("/u/admin/airways/activity/changes/board/x")).toBeNull();
 	});
 
-	it("round-trips a run's path", () => {
-		const path = activityPath(
-			{ username: "admin", graphSlug: "airways" },
-			"runs",
-			"r 1",
+	it("opens a run on its Agents page", () => {
+		expect(runPagePath({ username: "admin", graphSlug: "airways" }, "r 1")).toBe(
+			"/u/admin/airways/agents/runs?page=run%3Ar%201",
 		);
-		expect(activityOf(path)).toEqual({ tab: "runs", runId: "r 1" });
 	});
 });
