@@ -335,6 +335,7 @@ TARGET_NOTIFICATION_RULE = "notification_rule"
 TARGET_CHANNEL = "channel"
 TARGET_DELIVERY = "delivery"
 TARGET_APPROVAL = "approval"
+TARGET_ALERT_RULE = "alert_rule"
 
 
 # ── The change log (docs/for-developers/modules/operate/features/change-log.md)

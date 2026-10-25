@@ -2,6 +2,7 @@
 
 from invana.activity.managers.agent_acts import AgentActsManager
 from invana.activity.managers.approvals import ApprovalManager, ApprovalSendGate
+from invana.activity.managers.ask_gate import ApprovalAskGate
 from invana.activity.managers.changes import ChangeLogManager
 from invana.activity.managers.channels import ChannelManager
 from invana.activity.managers.clock import Clock, Tick
@@ -16,6 +17,7 @@ from invana.activity.managers.tree import TreeManager
 
 __all__ = [
     "AgentActsManager",
+    "ApprovalAskGate",
     "ApprovalManager",
     "ApprovalSendGate",
     "ChangeLogManager",

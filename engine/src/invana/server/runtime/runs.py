@@ -345,11 +345,12 @@ async def cancel_run(
     """Stop run (UC9). A run in flight is cancelled; one parked on a question is closed."""
     th = await services.get_run_or_404(session, run_id=run_id, graph_id=graph.id, user_id=user.id)
     if th.status == RunStatus.awaiting_input.value:
-        await services.cancel_waiting(session, run=th)
+        await services.cancel_waiting(session, run=th, stopped_by=user.id)
         await session.commit()
+        await runtime.cancel(th.id, stopped_by=user.id)
         return CancelResponse(id=th.id, status=th.status)
     if th.status in {RunStatus.queued.value, RunStatus.running.value}:
-        await runtime.cancel(th.id)
+        await runtime.cancel(th.id, stopped_by=user.id)
         await session.refresh(th)
     return CancelResponse(id=th.id, status=th.status)
 

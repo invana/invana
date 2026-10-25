@@ -777,9 +777,3 @@ class TaskRunQuerySet:
         session.add(run)
         await session.flush()
         return run
-
-
-def last_run_number(connection, graph_id: str) -> int:
-    """The highest root-run number in a Graph, on a sync connection (the insert hook's)."""
-    stmt = select(func.coalesce(func.max(TaskRun.number), 0)).where(TaskRun.graph_id == graph_id)
-    return int(connection.execute(stmt).scalar() or 0)

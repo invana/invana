@@ -20,6 +20,7 @@ A later rename never rewrites a row: names are snapshotted into
 | :func:`step_settled` | a step the interpreter settled — ``act`` is its function |
 | :func:`touch_refused` | a participant the frozen lens refused |
 | :func:`spawned` · :func:`spawn_refused` | a helper agent created, or refused at a ceiling |
+| :func:`run_stopped` | a person stopping a run — the ``run.stop`` event, which writes the row |
 | :func:`escrow_returned` | a child's unspent escrow going back to its parent |
 """
 
@@ -35,8 +36,10 @@ from invana.apps.agents.models import Agent
 from invana.core import ledger
 from invana.core.auth.models import User
 from invana.core.events import actions
+from invana.core.events.models import ActorKind
+from invana.core.events.services import emit_event
 from invana.core.redaction import redact
-from invana.runtime.models import TaskRun
+from invana.runtime.models import ExitReason, TaskRun
 
 #: The function's bound → the ledger's layer.
 _LAYER_BY_BOUND = {
@@ -305,6 +308,35 @@ async def run_ended(db: AsyncSession, *, run: TaskRun, reason: str) -> None:
         touched_line=reason.replace("_", " "),
         verdict="allowed",
         where=CONTROL_PLANE,
+    )
+
+
+async def run_stopped(db: AsyncSession, *, run: TaskRun, stopped_by: str | None) -> None:
+    """Record a person stopping a run — ``run.stop``, which is also its ledger row.
+
+    The person is who pressed Stop when the caller says so, else the person
+    the run was working for. A run nobody can be named for records no stop.
+    """
+    user_id = stopped_by or run.on_behalf_of_user_id or run.author_id
+    if not user_id:
+        return
+    user = await db.get(User, user_id)
+    root = await root_of(db, run)
+    await emit_event(
+        db,
+        action=actions.RUN_STOP,
+        target_kind=actions.TARGET_THINKING,
+        target_id=run.id,
+        graph_id=run.graph_id,
+        task_id=run.todo_id,
+        run_id=run.id,
+        actor_kind=ActorKind.user,
+        actor_id=user_id,
+        details={
+            "actor_name": user.username if user else None,
+            "run_number": root.number,
+            "exit_reason": ExitReason.stopped.value,
+        },
     )
 
 

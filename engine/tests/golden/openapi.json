@@ -819,6 +819,91 @@
         "title": "Advice",
         "type": "object"
       },
+      "AgentBar": {
+        "description": "One agent's span on the run's clock.",
+        "properties": {
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "agent_name": {
+            "title": "Agent Name",
+            "type": "string"
+          },
+          "depth": {
+            "default": 0,
+            "title": "Depth",
+            "type": "integer"
+          },
+          "exit_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exit Reason"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "state_line": {
+            "title": "State Line",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tokens": {
+            "default": 0,
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "run_id",
+          "agent_name",
+          "status",
+          "state_line"
+        ],
+        "title": "AgentBar",
+        "type": "object"
+      },
       "AgentCallableRow": {
         "description": "One callable the envelope allows (C12).",
         "properties": {
@@ -2159,6 +2244,218 @@
         "title": "AgentUpdate",
         "type": "object"
       },
+      "AlertMatch": {
+        "description": "What a ledger row must be to match. Patterns take ``*``; empty matches any.",
+        "properties": {
+          "act": {
+            "default": "",
+            "title": "Act",
+            "type": "string"
+          },
+          "refused_by": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Refused By",
+            "type": "array"
+          },
+          "threshold": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AlertThreshold"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "touched": {
+            "default": "",
+            "title": "Touched",
+            "type": "string"
+          },
+          "verdict": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Verdict",
+            "type": "array"
+          }
+        },
+        "title": "AlertMatch",
+        "type": "object"
+      },
+      "AlertRuleCreate": {
+        "properties": {
+          "enabled": {
+            "default": true,
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "match": {
+            "$ref": "#/components/schemas/AlertMatch"
+          },
+          "name": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "notify_user_ids": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Notify User Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "match",
+          "notify_user_ids"
+        ],
+        "title": "AlertRuleCreate",
+        "type": "object"
+      },
+      "AlertRuleRead": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_fired_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Fired At"
+          },
+          "match": {
+            "$ref": "#/components/schemas/AlertMatch"
+          },
+          "match_line": {
+            "default": "",
+            "title": "Match Line",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "notify_line": {
+            "default": "",
+            "title": "Notify Line",
+            "type": "string"
+          },
+          "notify_user_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notify User Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "enabled",
+          "match",
+          "notify_user_ids",
+          "last_fired_at",
+          "created_at"
+        ],
+        "title": "AlertRuleRead",
+        "type": "object"
+      },
+      "AlertRuleUpdate": {
+        "properties": {
+          "enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          },
+          "match": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AlertMatch"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "notify_user_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notify User Ids"
+          }
+        },
+        "title": "AlertRuleUpdate",
+        "type": "object"
+      },
+      "AlertThreshold": {
+        "properties": {
+          "count": {
+            "minimum": 1.0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "window_s": {
+            "minimum": 60.0,
+            "title": "Window S",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count",
+          "window_s"
+        ],
+        "title": "AlertThreshold",
+        "type": "object"
+      },
       "AnnotationAuthor": {
         "properties": {
           "id": {
@@ -2640,9 +2937,73 @@
             "maxLength": 2000,
             "title": "Note",
             "type": "string"
+          },
+          "scope": {
+            "default": "run",
+            "enum": [
+              "run",
+              "always"
+            ],
+            "title": "Scope",
+            "type": "string"
           }
         },
         "title": "ApprovalDecide",
+        "type": "object"
+      },
+      "ApprovalPage": {
+        "description": "A page of asks, with the engine's counts for the Waiting tabs.",
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "for_you": {
+            "default": 0,
+            "title": "For You",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ApprovalRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "pending": {
+            "default": 0,
+            "title": "Pending",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "ApprovalPage",
         "type": "object"
       },
       "ApprovalRead": {
@@ -2653,6 +3014,26 @@
             },
             "title": "Approver Ids",
             "type": "array"
+          },
+          "approver_names": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Approver Names",
+            "type": "array"
+          },
+          "asked_by": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Asked By",
+            "type": "array"
+          },
+          "can_decide": {
+            "default": false,
+            "title": "Can Decide",
+            "type": "boolean"
           },
           "created_at": {
             "format": "date-time",
@@ -2687,8 +3068,24 @@
             ],
             "title": "Decided By Id"
           },
+          "decided_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Name"
+          },
           "id": {
             "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "default": "send",
+            "title": "Kind",
             "type": "string"
           },
           "note": {
@@ -2723,6 +3120,11 @@
             ],
             "title": "Requested By Id"
           },
+          "routed_reason": {
+            "default": "",
+            "title": "Routed Reason",
+            "type": "string"
+          },
           "run_id": {
             "anyOf": [
               {
@@ -2733,6 +3135,17 @@
               }
             ],
             "title": "Run Id"
+          },
+          "run_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Number"
           },
           "schedule_id": {
             "anyOf": [
@@ -2745,9 +3158,31 @@
             ],
             "title": "Schedule Id"
           },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope"
+          },
           "status": {
             "title": "Status",
             "type": "string"
+          },
+          "step_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step Run Id"
           },
           "subject_id": {
             "title": "Subject Id",
@@ -2759,6 +3194,11 @@
           },
           "title": {
             "title": "Title",
+            "type": "string"
+          },
+          "wants": {
+            "default": "",
+            "title": "Wants",
             "type": "string"
           }
         },
@@ -4335,6 +4775,34 @@
         "title": "CallerDay",
         "type": "object"
       },
+      "CanSee": {
+        "properties": {
+          "agents": {
+            "default": "",
+            "title": "Agents",
+            "type": "string"
+          },
+          "can_write": {
+            "default": "",
+            "title": "Can Write",
+            "type": "string"
+          },
+          "people": {
+            "default": "",
+            "title": "People",
+            "type": "string"
+          },
+          "worlds": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Worlds",
+            "type": "array"
+          }
+        },
+        "title": "CanSee",
+        "type": "object"
+      },
       "CancelResponse": {
         "properties": {
           "id": {
@@ -4610,6 +5078,35 @@
           "layers_present"
         ],
         "title": "CatalogueRead",
+        "type": "object"
+      },
+      "ChainLink": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "name"
+        ],
+        "title": "ChainLink",
         "type": "object"
       },
       "Change": {
@@ -5553,6 +6050,39 @@
           "policy"
         ],
         "title": "ContentionRead",
+        "type": "object"
+      },
+      "CountRow": {
+        "properties": {
+          "a": {
+            "default": 0,
+            "title": "A",
+            "type": "integer"
+          },
+          "b": {
+            "default": 0,
+            "title": "B",
+            "type": "integer"
+          },
+          "c": {
+            "default": 0,
+            "title": "C",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "line": {
+            "default": "",
+            "title": "Line",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "title": "CountRow",
         "type": "object"
       },
       "DagEdge": {
@@ -7276,6 +7806,46 @@
           "change"
         ],
         "title": "Degradation",
+        "type": "object"
+      },
+      "DelegationAsk": {
+        "description": "A delegation waiting on a person, drawn dashed from the asking agent.",
+        "properties": {
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "agent_name": {
+            "title": "Agent Name",
+            "type": "string"
+          },
+          "approval_id": {
+            "title": "Approval Id",
+            "type": "string"
+          },
+          "from_run_id": {
+            "title": "From Run Id",
+            "type": "string"
+          },
+          "line": {
+            "title": "Line",
+            "type": "string"
+          }
+        },
+        "required": [
+          "approval_id",
+          "from_run_id",
+          "agent_name",
+          "line"
+        ],
+        "title": "DelegationAsk",
         "type": "object"
       },
       "DeleteEdge": {
@@ -12233,6 +12803,697 @@
         "title": "LayerTally",
         "type": "object"
       },
+      "LedgerActorRead": {
+        "properties": {
+          "acted_through": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "title": "Acted Through",
+            "type": "array"
+          },
+          "actor": {
+            "title": "Actor",
+            "type": "string"
+          },
+          "acts": {
+            "title": "Acts",
+            "type": "integer"
+          },
+          "graph": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "title": "Graph",
+            "type": "array"
+          },
+          "llm": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "title": "Llm",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "refused": {
+            "title": "Refused",
+            "type": "integer"
+          },
+          "refused_by": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Refused By",
+            "type": "object"
+          },
+          "secret_names": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Secret Names",
+            "type": "array"
+          },
+          "secrets": {
+            "title": "Secrets",
+            "type": "integer"
+          },
+          "since": {
+            "title": "Since",
+            "type": "string"
+          },
+          "third_party": {
+            "title": "Third Party",
+            "type": "integer"
+          },
+          "web": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "title": "Web",
+            "type": "array"
+          },
+          "writes": {
+            "title": "Writes",
+            "type": "integer"
+          },
+          "writes_refused": {
+            "title": "Writes Refused",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "actor",
+          "name",
+          "since",
+          "acts",
+          "writes",
+          "writes_refused",
+          "third_party",
+          "secrets",
+          "refused"
+        ],
+        "title": "LedgerActorRead",
+        "type": "object"
+      },
+      "LedgerCustody": {
+        "description": "One line of a row's chain of custody.",
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "line": {
+            "title": "Line",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "name",
+          "line"
+        ],
+        "title": "LedgerCustody",
+        "type": "object"
+      },
+      "LedgerExportRead": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "filters_line": {
+            "default": "",
+            "title": "Filters Line",
+            "type": "string"
+          },
+          "format": {
+            "title": "Format",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "requested_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requested By Name"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "format",
+          "rows",
+          "created_at"
+        ],
+        "title": "LedgerExportRead",
+        "type": "object"
+      },
+      "LedgerIntegrity": {
+        "properties": {
+          "broken_seq": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Broken Seq"
+          },
+          "last_seq": {
+            "default": 0,
+            "title": "Last Seq",
+            "type": "integer"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "retention_days": {
+            "default": 365,
+            "title": "Retention Days",
+            "type": "integer"
+          },
+          "rows": {
+            "default": 0,
+            "title": "Rows",
+            "type": "integer"
+          },
+          "verified_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified At"
+          }
+        },
+        "title": "LedgerIntegrity",
+        "type": "object"
+      },
+      "LedgerPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "hidden": {
+            "default": 0,
+            "title": "Hidden",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerRowRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "LedgerPage",
+        "type": "object"
+      },
+      "LedgerPreset": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "count"
+        ],
+        "title": "LedgerPreset",
+        "type": "object"
+      },
+      "LedgerRecordRead": {
+        "properties": {
+          "acts": {
+            "title": "Acts",
+            "type": "integer"
+          },
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "agents": {
+            "title": "Agents",
+            "type": "integer"
+          },
+          "can_see": {
+            "$ref": "#/components/schemas/CanSee"
+          },
+          "people": {
+            "title": "People",
+            "type": "integer"
+          },
+          "reads": {
+            "title": "Reads",
+            "type": "integer"
+          },
+          "refused": {
+            "title": "Refused",
+            "type": "integer"
+          },
+          "refused_line": {
+            "default": "",
+            "title": "Refused Line",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerRowRead"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "since": {
+            "title": "Since",
+            "type": "string"
+          },
+          "writes": {
+            "title": "Writes",
+            "type": "integer"
+          },
+          "writes_line": {
+            "default": "",
+            "title": "Writes Line",
+            "type": "string"
+          }
+        },
+        "required": [
+          "address",
+          "since",
+          "acts",
+          "reads",
+          "writes",
+          "refused",
+          "people",
+          "agents"
+        ],
+        "title": "LedgerRecordRead",
+        "type": "object"
+      },
+      "LedgerRefusalsRead": {
+        "properties": {
+          "acts_today": {
+            "title": "Acts Today",
+            "type": "integer"
+          },
+          "by_ceiling": {
+            "title": "By Ceiling",
+            "type": "integer"
+          },
+          "by_day": {
+            "items": {
+              "$ref": "#/components/schemas/RefusedDay"
+            },
+            "title": "By Day",
+            "type": "array"
+          },
+          "by_grant": {
+            "title": "By Grant",
+            "type": "integer"
+          },
+          "by_lens": {
+            "title": "By Lens",
+            "type": "integer"
+          },
+          "by_robots": {
+            "default": 0,
+            "title": "By Robots",
+            "type": "integer"
+          },
+          "by_rule": {
+            "items": {
+              "$ref": "#/components/schemas/RefusalRule"
+            },
+            "title": "By Rule",
+            "type": "array"
+          },
+          "refused_today": {
+            "title": "Refused Today",
+            "type": "integer"
+          },
+          "share_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Pct"
+          },
+          "top_functions": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "title": "Top Functions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "refused_today",
+          "acts_today",
+          "by_grant",
+          "by_lens",
+          "by_ceiling"
+        ],
+        "title": "LedgerRefusalsRead",
+        "type": "object"
+      },
+      "LedgerRowDetail": {
+        "properties": {
+          "args": {
+            "additionalProperties": true,
+            "title": "Args",
+            "type": "object"
+          },
+          "around": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerRowRead"
+            },
+            "title": "Around",
+            "type": "array"
+          },
+          "custody": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerCustody"
+            },
+            "title": "Custody",
+            "type": "array"
+          },
+          "hash": {
+            "title": "Hash",
+            "type": "string"
+          },
+          "prev_hash": {
+            "title": "Prev Hash",
+            "type": "string"
+          },
+          "row": {
+            "$ref": "#/components/schemas/LedgerRowRead"
+          },
+          "verified": {
+            "title": "Verified",
+            "type": "boolean"
+          },
+          "verified_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified At"
+          }
+        },
+        "required": [
+          "row",
+          "hash",
+          "prev_hash",
+          "verified"
+        ],
+        "title": "LedgerRowDetail",
+        "type": "object"
+      },
+      "LedgerRowRead": {
+        "properties": {
+          "act": {
+            "title": "Act",
+            "type": "string"
+          },
+          "actor_chain": {
+            "items": {
+              "$ref": "#/components/schemas/ChainLink"
+            },
+            "title": "Actor Chain",
+            "type": "array"
+          },
+          "actor_kind": {
+            "title": "Actor Kind",
+            "type": "string"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "refused_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refused By"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "run_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Number"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          },
+          "step_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step Run Id"
+          },
+          "touched": {
+            "title": "Touched",
+            "type": "string"
+          },
+          "touched_line": {
+            "title": "Touched Line",
+            "type": "string"
+          },
+          "verdict": {
+            "title": "Verdict",
+            "type": "string"
+          },
+          "where": {
+            "title": "Where",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "seq",
+          "at",
+          "actor_kind",
+          "act",
+          "layer",
+          "touched",
+          "touched_line",
+          "verdict",
+          "rule",
+          "where"
+        ],
+        "title": "LedgerRowRead",
+        "type": "object"
+      },
+      "LedgerStats": {
+        "description": "The Rows tab's tiles and chips over ``since``.",
+        "properties": {
+          "acts": {
+            "title": "Acts",
+            "type": "integer"
+          },
+          "acts_7d_mean": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acts 7D Mean"
+          },
+          "acts_change_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acts Change Pct"
+          },
+          "agent_acts": {
+            "title": "Agent Acts",
+            "type": "integer"
+          },
+          "agents": {
+            "title": "Agents",
+            "type": "integer"
+          },
+          "hidden": {
+            "default": 0,
+            "title": "Hidden",
+            "type": "integer"
+          },
+          "people": {
+            "title": "People",
+            "type": "integer"
+          },
+          "people_acts": {
+            "title": "People Acts",
+            "type": "integer"
+          },
+          "presets": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerPreset"
+            },
+            "title": "Presets",
+            "type": "array"
+          },
+          "refused": {
+            "title": "Refused",
+            "type": "integer"
+          },
+          "refused_by": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Refused By",
+            "type": "object"
+          },
+          "since": {
+            "title": "Since",
+            "type": "string"
+          },
+          "spawned": {
+            "title": "Spawned",
+            "type": "integer"
+          },
+          "waiting_approvals": {
+            "title": "Waiting Approvals",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "since",
+          "acts",
+          "people",
+          "people_acts",
+          "agents",
+          "agent_acts",
+          "spawned",
+          "refused",
+          "waiting_approvals"
+        ],
+        "title": "LedgerStats",
+        "type": "object"
+      },
       "LensCreate": {
         "description": "A new lens. **Unnamed by default** \u2014 naming is a separate act, because\nnaming is what shares it ([WO1]).",
         "properties": {
@@ -13431,6 +14692,25 @@
           "roles"
         ],
         "title": "MemberUpdate",
+        "type": "object"
+      },
+      "MinuteCount": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "minute": {
+            "format": "date-time",
+            "title": "Minute",
+            "type": "string"
+          }
+        },
+        "required": [
+          "minute",
+          "count"
+        ],
+        "title": "MinuteCount",
         "type": "object"
       },
       "ModelArtefact-Input": {
@@ -15390,50 +16670,6 @@
           "success"
         ],
         "title": "OverviewTiles",
-        "type": "object"
-      },
-      "Page_ApprovalRead_": {
-        "properties": {
-          "applied": {
-            "items": {
-              "$ref": "#/components/schemas/AppliedFilter"
-            },
-            "title": "Applied",
-            "type": "array"
-          },
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/ApprovalRead"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "next_cursor": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Next Cursor"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          },
-          "unfiltered_total": {
-            "title": "Unfiltered Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total",
-          "unfiltered_total"
-        ],
-        "title": "Page[ApprovalRead]",
         "type": "object"
       },
       "Page_CatalogueEntryRead_": {
@@ -18960,6 +20196,63 @@
         "title": "RefusalRead",
         "type": "object"
       },
+      "RefusalRule": {
+        "properties": {
+          "refused_by": {
+            "title": "Refused By",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "the_rule": {
+            "title": "The Rule",
+            "type": "string"
+          },
+          "today": {
+            "title": "Today",
+            "type": "integer"
+          },
+          "what": {
+            "title": "What",
+            "type": "string"
+          },
+          "who": {
+            "title": "Who",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule",
+          "refused_by",
+          "today",
+          "what",
+          "who",
+          "the_rule"
+        ],
+        "title": "RefusalRule",
+        "type": "object"
+      },
+      "RefusedDay": {
+        "properties": {
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "refused": {
+            "title": "Refused",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "refused"
+        ],
+        "title": "RefusedDay",
+        "type": "object"
+      },
       "RegisterRequest": {
         "properties": {
           "email": {
@@ -19407,6 +20700,154 @@
           "reason"
         ],
         "title": "Retraction",
+        "type": "object"
+      },
+      "RoleCell": {
+        "properties": {
+          "exit_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exit Reason"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "status"
+        ],
+        "title": "RoleCell",
+        "type": "object"
+      },
+      "RoleGroup": {
+        "properties": {
+          "agents": {
+            "title": "Agents",
+            "type": "integer"
+          },
+          "by_state": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By State",
+            "type": "object"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/RoleCell"
+            },
+            "title": "Cells",
+            "type": "array"
+          },
+          "depth": {
+            "default": 0,
+            "title": "Depth",
+            "type": "integer"
+          },
+          "line": {
+            "default": "",
+            "title": "Line",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "agents"
+        ],
+        "title": "RoleGroup",
+        "type": "object"
+      },
+      "RoleRow": {
+        "description": "One role of a large run \u2014 every agent of one name.",
+        "properties": {
+          "agents": {
+            "title": "Agents",
+            "type": "integer"
+          },
+          "depth": {
+            "default": 0,
+            "title": "Depth",
+            "type": "integer"
+          },
+          "not_served": {
+            "title": "Not Served",
+            "type": "integer"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "running": {
+            "default": 0,
+            "title": "Running",
+            "type": "integer"
+          },
+          "served": {
+            "title": "Served",
+            "type": "integer"
+          },
+          "time_p95_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time P95 Ms"
+          },
+          "tokens_p50": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens P50"
+          },
+          "tokens_p95": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens P95"
+          },
+          "waiting": {
+            "default": 0,
+            "title": "Waiting",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "role",
+          "agents",
+          "served",
+          "not_served"
+        ],
+        "title": "RoleRow",
         "type": "object"
       },
       "RuleCheck": {
@@ -19986,6 +21427,217 @@
         "title": "RuleVersionRead",
         "type": "object"
       },
+      "RunAgentNode": {
+        "description": "One agent in a run's tree.",
+        "properties": {
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "agent_name": {
+            "title": "Agent Name",
+            "type": "string"
+          },
+          "budget": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget"
+          },
+          "depth": {
+            "default": 0,
+            "title": "Depth",
+            "type": "integer"
+          },
+          "exit_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exit Reason"
+          },
+          "how": {
+            "default": "root",
+            "title": "How",
+            "type": "string"
+          },
+          "parent_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Run Id"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "state_line": {
+            "title": "State Line",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tokens": {
+            "default": 0,
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "run_id",
+          "agent_name",
+          "role",
+          "status",
+          "state_line"
+        ],
+        "title": "RunAgentNode",
+        "type": "object"
+      },
+      "RunAgents": {
+        "properties": {
+          "asks": {
+            "items": {
+              "$ref": "#/components/schemas/DelegationAsk"
+            },
+            "title": "Asks",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/RunAgentNode"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "origin_label": {
+            "title": "Origin Label",
+            "type": "string"
+          },
+          "origin_line": {
+            "title": "Origin Line",
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/RoleGroup"
+            },
+            "title": "Roles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "origin_label",
+          "origin_line"
+        ],
+        "title": "RunAgents",
+        "type": "object"
+      },
+      "RunAsset": {
+        "properties": {
+          "emission_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Emission Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "produced_by": {
+            "title": "Produced By",
+            "type": "string"
+          },
+          "size_line": {
+            "default": "\u2014",
+            "title": "Size Line",
+            "type": "string"
+          },
+          "step_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step Run Id"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          },
+          "where": {
+            "default": "",
+            "title": "Where",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "produced_by"
+        ],
+        "title": "RunAsset",
+        "type": "object"
+      },
+      "RunAssets": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RunAsset"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "RunAssets",
+        "type": "object"
+      },
       "RunDay": {
         "description": "One calendar day of the window, in the reader's zone.",
         "properties": {
@@ -20004,6 +21656,207 @@
           "runs"
         ],
         "title": "RunDay",
+        "type": "object"
+      },
+      "RunHead": {
+        "description": "What the run page's head says.",
+        "properties": {
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "agent_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Name"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "can_rerun": {
+            "default": false,
+            "title": "Can Rerun",
+            "type": "boolean"
+          },
+          "can_stop": {
+            "default": false,
+            "title": "Can Stop",
+            "type": "boolean"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "exit_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exit Reason"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "max_tokens_run": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens Run"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "session_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Title"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "started_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started By Name"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          },
+          "task_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Title"
+          },
+          "tokens": {
+            "default": 0,
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "RunHead",
         "type": "object"
       },
       "RunNodeRead": {
@@ -20176,14 +22029,123 @@
         "title": "RunNodeRead",
         "type": "object"
       },
-      "RunRerun": {
-        "description": "Re-run a settled ask on the versions it recorded, or on today's.",
+      "RunOverview": {
         "properties": {
+          "agents_over_time": {
+            "items": {
+              "$ref": "#/components/schemas/AgentBar"
+            },
+            "title": "Agents Over Time",
+            "type": "array"
+          },
+          "by_role": {
+            "items": {
+              "$ref": "#/components/schemas/RoleRow"
+            },
+            "title": "By Role",
+            "type": "array"
+          },
+          "finished_per_minute": {
+            "items": {
+              "$ref": "#/components/schemas/MinuteCount"
+            },
+            "title": "Finished Per Minute",
+            "type": "array"
+          },
+          "head": {
+            "$ref": "#/components/schemas/RunHead"
+          },
+          "large": {
+            "default": false,
+            "title": "Large",
+            "type": "boolean"
+          },
+          "live_over_time": {
+            "items": {
+              "$ref": "#/components/schemas/MinuteCount"
+            },
+            "title": "Live Over Time",
+            "type": "array"
+          },
+          "steps_per_minute": {
+            "items": {
+              "$ref": "#/components/schemas/MinuteCount"
+            },
+            "title": "Steps Per Minute",
+            "type": "array"
+          },
+          "tiles": {
+            "$ref": "#/components/schemas/RunTiles"
+          },
+          "waiting": {
+            "items": {
+              "$ref": "#/components/schemas/WaitingAsk"
+            },
+            "title": "Waiting",
+            "type": "array"
+          }
+        },
+        "required": [
+          "head",
+          "tiles"
+        ],
+        "title": "RunOverview",
+        "type": "object"
+      },
+      "RunRerun": {
+        "description": "Re-run a settled run on the versions it recorded, on today's, or retuned.\n\nA retune names what changes; anything left out stays as the run recorded it.",
+        "properties": {
+          "agent_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Version"
+          },
+          "lens_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
+          "max_tokens_run": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens Run"
+          },
+          "model_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Version"
+          },
           "versions": {
             "default": "same",
             "enum": [
               "same",
-              "current"
+              "current",
+              "retune"
             ],
             "title": "Versions",
             "type": "string"
@@ -20226,6 +22188,124 @@
         "title": "RunRerunResponse",
         "type": "object"
       },
+      "RunStage": {
+        "description": "Every step of one step key, in plan order.",
+        "properties": {
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "function": {
+            "title": "Function",
+            "type": "string"
+          },
+          "in_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "In Count"
+          },
+          "lanes": {
+            "default": 1,
+            "title": "Lanes",
+            "type": "integer"
+          },
+          "line": {
+            "default": "",
+            "title": "Line",
+            "type": "string"
+          },
+          "out_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Out Count"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "step_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Step Ids",
+            "type": "array"
+          },
+          "step_key": {
+            "title": "Step Key",
+            "type": "string"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "tokens": {
+            "default": 0,
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "step_key",
+          "function",
+          "status",
+          "calls"
+        ],
+        "title": "RunStage",
+        "type": "object"
+      },
+      "RunStages": {
+        "properties": {
+          "pruned": {
+            "default": false,
+            "title": "Pruned",
+            "type": "boolean"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/RunStage"
+            },
+            "title": "Stages",
+            "type": "array"
+          }
+        },
+        "title": "RunStages",
+        "type": "object"
+      },
       "RunStats": {
         "description": "The journal's tiles over a window, counted over every root run in it.",
         "properties": {
@@ -20263,8 +22343,25 @@
             ],
             "title": "Median Ms"
           },
+          "not_served": {
+            "default": 0,
+            "title": "Not Served",
+            "type": "integer"
+          },
+          "not_served_by_reason": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Not Served By Reason",
+            "type": "object"
+          },
           "runs": {
             "title": "Runs",
+            "type": "integer"
+          },
+          "served": {
+            "default": 0,
+            "title": "Served",
             "type": "integer"
           },
           "since": {
@@ -20297,6 +22394,11 @@
           "waiting": {
             "title": "Waiting",
             "type": "integer"
+          },
+          "waiting_approvals": {
+            "default": 0,
+            "title": "Waiting Approvals",
+            "type": "integer"
           }
         },
         "required": [
@@ -20315,6 +22417,203 @@
           "by_day"
         ],
         "title": "RunStats",
+        "type": "object"
+      },
+      "RunTiles": {
+        "properties": {
+          "agents": {
+            "default": 0,
+            "title": "Agents",
+            "type": "integer"
+          },
+          "assets": {
+            "default": 0,
+            "title": "Assets",
+            "type": "integer"
+          },
+          "branches": {
+            "default": 0,
+            "title": "Branches",
+            "type": "integer"
+          },
+          "depth": {
+            "default": 0,
+            "title": "Depth",
+            "type": "integer"
+          },
+          "elapsed_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Elapsed Ms"
+          },
+          "eta_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta S"
+          },
+          "files": {
+            "default": 0,
+            "title": "Files",
+            "type": "integer"
+          },
+          "finishing_per_minute": {
+            "default": 0,
+            "title": "Finishing Per Minute",
+            "type": "integer"
+          },
+          "live": {
+            "default": 0,
+            "title": "Live",
+            "type": "integer"
+          },
+          "live_limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Limit"
+          },
+          "max_tokens_run": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens Run"
+          },
+          "not_served": {
+            "default": 0,
+            "title": "Not Served",
+            "type": "integer"
+          },
+          "peak_finishing": {
+            "default": 0,
+            "title": "Peak Finishing",
+            "type": "integer"
+          },
+          "peak_finishing_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Finishing At"
+          },
+          "queued": {
+            "default": 0,
+            "title": "Queued",
+            "type": "integer"
+          },
+          "records_touched": {
+            "default": 0,
+            "title": "Records Touched",
+            "type": "integer"
+          },
+          "redelivered": {
+            "default": 0,
+            "title": "Redelivered",
+            "type": "integer"
+          },
+          "served": {
+            "default": 0,
+            "title": "Served",
+            "type": "integer"
+          },
+          "steps": {
+            "default": 0,
+            "title": "Steps",
+            "type": "integer"
+          },
+          "time_limit_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Limit Ms"
+          },
+          "tokens": {
+            "default": 0,
+            "title": "Tokens",
+            "type": "integer"
+          },
+          "tokens_per_minute": {
+            "default": 0,
+            "title": "Tokens Per Minute",
+            "type": "integer"
+          },
+          "writes_refused": {
+            "default": 0,
+            "title": "Writes Refused",
+            "type": "integer"
+          }
+        },
+        "title": "RunTiles",
+        "type": "object"
+      },
+      "RunTouched": {
+        "properties": {
+          "graph": {
+            "items": {
+              "$ref": "#/components/schemas/TouchedGraphRow"
+            },
+            "title": "Graph",
+            "type": "array"
+          },
+          "llm": {
+            "items": {
+              "$ref": "#/components/schemas/TouchedLlmRow"
+            },
+            "title": "Llm",
+            "type": "array"
+          },
+          "records_touched": {
+            "default": 0,
+            "title": "Records Touched",
+            "type": "integer"
+          },
+          "secrets": {
+            "items": {
+              "$ref": "#/components/schemas/TouchedSecretRow"
+            },
+            "title": "Secrets",
+            "type": "array"
+          },
+          "web": {
+            "items": {
+              "$ref": "#/components/schemas/TouchedWebRow"
+            },
+            "title": "Web",
+            "type": "array"
+          }
+        },
+        "title": "RunTouched",
         "type": "object"
       },
       "ScheduleCreate": {
@@ -26382,6 +28681,22 @@
             ],
             "title": "Agent Id"
           },
+          "agent_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Name"
+          },
+          "agents": {
+            "default": 0,
+            "title": "Agents",
+            "type": "integer"
+          },
           "ask_ms": {
             "anyOf": [
               {
@@ -26426,6 +28741,17 @@
             ],
             "title": "Duration Ms"
           },
+          "exit_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exit Reason"
+          },
           "finished_at": {
             "anyOf": [
               {
@@ -26456,6 +28782,28 @@
               }
             ],
             "title": "Kind"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
           },
           "outcome": {
             "anyOf": [
@@ -26544,6 +28892,17 @@
               }
             ],
             "title": "Started At"
+          },
+          "started_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started By Name"
           },
           "status": {
             "title": "Status",
@@ -27238,6 +29597,118 @@
           "refused"
         ],
         "title": "TouchTallies",
+        "type": "object"
+      },
+      "TouchedGraphRow": {
+        "properties": {
+          "read": {
+            "default": 0,
+            "title": "Read",
+            "type": "integer"
+          },
+          "refused": {
+            "default": 0,
+            "title": "Refused",
+            "type": "integer"
+          },
+          "refused_line": {
+            "default": "",
+            "title": "Refused Line",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "written": {
+            "default": 0,
+            "title": "Written",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "TouchedGraphRow",
+        "type": "object"
+      },
+      "TouchedLlmRow": {
+        "properties": {
+          "calls": {
+            "default": 0,
+            "title": "Calls",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "tokens_in": {
+            "default": 0,
+            "title": "Tokens In",
+            "type": "integer"
+          },
+          "tokens_out": {
+            "default": 0,
+            "title": "Tokens Out",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "title": "TouchedLlmRow",
+        "type": "object"
+      },
+      "TouchedSecretRow": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "used_by": {
+            "default": "\u2014",
+            "title": "Used By",
+            "type": "string"
+          },
+          "where": {
+            "default": "",
+            "title": "Where",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "TouchedSecretRow",
+        "type": "object"
+      },
+      "TouchedWebRow": {
+        "properties": {
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "pages": {
+            "default": 0,
+            "title": "Pages",
+            "type": "integer"
+          },
+          "refused": {
+            "default": 0,
+            "title": "Refused",
+            "type": "integer"
+          },
+          "refused_line": {
+            "default": "",
+            "title": "Refused Line",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "title": "TouchedWebRow",
         "type": "object"
       },
       "TouchesRead": {
@@ -29062,6 +31533,34 @@
         ],
         "title": "Visibility",
         "type": "string"
+      },
+      "WaitingAsk": {
+        "properties": {
+          "approval_id": {
+            "title": "Approval Id",
+            "type": "string"
+          },
+          "for_you": {
+            "default": false,
+            "title": "For You",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "line": {
+            "title": "Line",
+            "type": "string"
+          }
+        },
+        "required": [
+          "approval_id",
+          "kind",
+          "line"
+        ],
+        "title": "WaitingAsk",
+        "type": "object"
       },
       "WarningRead": {
         "properties": {
@@ -34652,6 +37151,277 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/alert-rules": {
+      "get": {
+        "operationId": "list_rules_api_v1_u__username___graphSlug__alert_rules_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AlertRuleRead"
+                  },
+                  "title": "Response List Rules Api V1 U  Username   Graphslug  Alert Rules Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Rules",
+        "tags": [
+          "approvals"
+        ]
+      },
+      "post": {
+        "operationId": "create_rule_api_v1_u__username___graphSlug__alert_rules_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertRuleCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertRuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Rule",
+        "tags": [
+          "approvals"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/alert-rules/{rule_id}": {
+      "delete": {
+        "operationId": "delete_rule_api_v1_u__username___graphSlug__alert_rules__rule_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Rule",
+        "tags": [
+          "approvals"
+        ]
+      },
+      "patch": {
+        "operationId": "update_rule_api_v1_u__username___graphSlug__alert_rules__rule_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertRuleUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertRuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Rule",
+        "tags": [
+          "approvals"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/annotations": {
       "get": {
         "operationId": "list_annotations_api_v1_u__username___graphSlug__annotations_get",
@@ -35025,7 +37795,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Page_ApprovalRead_"
+                  "$ref": "#/components/schemas/ApprovalPage"
                 }
               }
             },
@@ -41026,6 +43796,628 @@
         "summary": "Compare Versions",
         "tags": [
           "change-log"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/ledger": {
+      "get": {
+        "operationId": "list_rows_api_v1_u__username___graphSlug__ledger_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Rows",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/ledger/actor": {
+      "get": {
+        "operationId": "get_actor_api_v1_u__username___graphSlug__ledger_actor_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "description": "person:<id> or agent:<id>",
+            "in": "query",
+            "name": "actor",
+            "required": true,
+            "schema": {
+              "description": "person:<id> or agent:<id>",
+              "title": "Actor",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "default": "7d",
+              "title": "Since",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerActorRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Actor",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/ledger/export": {
+      "get": {
+        "operationId": "export_rows_api_v1_u__username___graphSlug__ledger_export_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "description": "csv or jsonl",
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "csv",
+              "description": "csv or jsonl",
+              "title": "Format",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Export Rows",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/ledger/exports": {
+      "get": {
+        "operationId": "list_exports_api_v1_u__username___graphSlug__ledger_exports_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LedgerExportRead"
+                  },
+                  "title": "Response List Exports Api V1 U  Username   Graphslug  Ledger Exports Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Exports",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/ledger/integrity": {
+      "get": {
+        "operationId": "get_integrity_api_v1_u__username___graphSlug__ledger_integrity_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Re-verify the whole chain now.",
+            "in": "query",
+            "name": "full",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Re-verify the whole chain now.",
+              "title": "Full",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerIntegrity"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Integrity",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/ledger/record": {
+      "get": {
+        "operationId": "get_record_api_v1_u__username___graphSlug__ledger_record_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "description": "graph/Airport:LHR, graph/Fare",
+            "in": "query",
+            "name": "address",
+            "required": true,
+            "schema": {
+              "description": "graph/Airport:LHR, graph/Fare",
+              "title": "Address",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "default": "30d",
+              "title": "Since",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerRecordRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Record",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/ledger/refusals": {
+      "get": {
+        "operationId": "get_refusals_api_v1_u__username___graphSlug__ledger_refusals_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerRefusalsRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Refusals",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/ledger/stats": {
+      "get": {
+        "operationId": "get_stats_api_v1_u__username___graphSlug__ledger_stats_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "default": "today",
+              "title": "Since",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerStats"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Stats",
+        "tags": [
+          "ledger"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/ledger/{row_id}": {
+      "get": {
+        "operationId": "get_row_api_v1_u__username___graphSlug__ledger__row_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "row_id",
+            "required": true,
+            "schema": {
+              "title": "Row Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerRowDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Row",
+        "tags": [
+          "ledger"
         ]
       }
     },
@@ -49875,7 +53267,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/runs/stats": {
       "get": {
-        "description": "The journal's tiles for this Graph \u2014 *In flight*, *Today*, *Tokens today*,\n*Slowest* \u2014 counted over every root run in the window.",
+        "description": "The journal's tiles for this Graph \u2014 *In flight*, *Today*, *Tokens today*,\n*Slowest*, *Served* and *Not served* \u2014 counted over every root run in the\nwindow, and *Waiting on you*: the pending asks naming the reader.",
         "operationId": "run_stats_api_v1_u__username___graphSlug__runs_stats_get",
         "parameters": [
           {
@@ -50050,6 +53442,76 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/runs/{run_id}/agents": {
+      "get": {
+        "description": "Who spawned whom in this run, its pending delegation asks, and its roles.",
+        "operationId": "run_agents_api_v1_u__username___graphSlug__runs__run_id__agents_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunAgents"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Run Agents",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/runs/{run_id}/answer": {
       "post": {
         "description": "Record what a person chose, as a value and an option id \u2014 never as prose (P3).\n\nOnly a person answers a clarification (CQ5), which is why this route takes\nthe current user as the answerer and offers no way to say otherwise. Resuming\nthe run is a separate act: `POST \u2026/resume` carries the answer into the same\nrun (CQ4).",
@@ -50198,6 +53660,76 @@
           }
         ],
         "summary": "List Prompt Answers",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/runs/{run_id}/assets": {
+      "get": {
+        "description": "Every emission, file, branch and Todo the run produced.",
+        "operationId": "run_assets_api_v1_u__username___graphSlug__runs__run_id__assets_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunAssets"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Run Assets",
         "tags": [
           "runs"
         ]
@@ -50436,9 +53968,79 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/runs/{run_id}/overview": {
+      "get": {
+        "description": "The run page's Overview \u2014 head, tiles, agents over time, steps a minute,\nwhat waits on the reader, and past fifty agents the large-run reading.",
+        "operationId": "run_overview_api_v1_u__username___graphSlug__runs__run_id__overview_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Run Overview",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/runs/{run_id}/rerun": {
       "post": {
-        "description": "Re-run a settled ask on the versions it recorded (``same``) or on today's (``current``).",
+        "description": "Re-run an ended ask on the versions it recorded (``same``), on today's\n(``current``), or retuned \u2014 agent version, model version, run budget, world.",
         "operationId": "rerun_run_api_v1_u__username___graphSlug__runs__run_id__rerun_post",
         "parameters": [
           {
@@ -50596,6 +54198,76 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/runs/{run_id}/stages": {
+      "get": {
+        "description": "The run's stages \u2014 one per step key, in plan order, with counts in and out.",
+        "operationId": "run_stages_api_v1_u__username___graphSlug__runs__run_id__stages_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunStages"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Run Stages",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/runs/{run_id}/stream": {
       "get": {
         "description": "SSE tail of a run's stream: replay after the cursor, then live.\n\n``Last-Event-ID`` (set by the browser on reconnect) wins over ``after``.\nThe request-scoped DB session is released before the generator starts \u2014\nthe tail opens its own for the replay.",
@@ -50686,6 +54358,76 @@
           }
         ],
         "summary": "Stream Run",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/runs/{run_id}/touched": {
+      "get": {
+        "description": "What the run engaged \u2014 graph types, web domains, models and secrets.",
+        "operationId": "run_touched_api_v1_u__username___graphSlug__runs__run_id__touched_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunTouched"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Run Touched",
         "tags": [
           "runs"
         ]

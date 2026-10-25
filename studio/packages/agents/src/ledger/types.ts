@@ -4,6 +4,8 @@
  * the engine's.
  */
 
+import type { Page } from "@invana-studio/core";
+
 export interface ChainLink {
 	kind: string;
 	id?: string | null;
@@ -30,11 +32,7 @@ export interface LedgerRow {
 	where: string;
 }
 
-export interface LedgerPage {
-	items: LedgerRow[];
-	total: number;
-	next_cursor?: string | null;
-	applied?: unknown;
+export interface LedgerPage extends Page<LedgerRow> {
 	/** Rows in these filters the reader may not see — counted, not shown. */
 	hidden: number;
 }

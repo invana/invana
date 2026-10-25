@@ -108,13 +108,14 @@ async def with_runtime():
     at start-up. A ``send`` step held here waits on the same approvals inbox the
     API uses.
     """
-    from invana.activity.managers import ApprovalSendGate
+    from invana.activity.managers import ApprovalAskGate, ApprovalSendGate
     from invana.apps.graphs.pool import GraphConnectionManager
     from invana.core.settings import settings
     from invana.runtime.interpreter import TaskRuntime
     from invana.runtime.managers import McpManager
 
     TaskRuntime.send_gate = ApprovalSendGate()
+    TaskRuntime.ask_gate = ApprovalAskGate()
 
     engine = await create_db_engine()
     factory = create_session_factory(engine)

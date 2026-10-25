@@ -30,14 +30,15 @@ from invana.activity.querysets import AlertRuleQuerySet
 from invana.activity.schemas import AlertMatch, AlertRuleCreate, AlertRuleRead, AlertRuleUpdate
 from invana.apps.graphs.models import Graph
 from invana.core.errors import ConflictError, NotFoundError
+from invana.core.events.actions import (
+    ALERT_RULE_CREATE,
+    ALERT_RULE_DELETE,
+    ALERT_RULE_UPDATE,
+    TARGET_ALERT_RULE,
+)
 from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
 from invana.core.ledger.models import LedgerRow
-
-ALERT_RULE_CREATE = "alert_rule.create"
-ALERT_RULE_UPDATE = "alert_rule.update"
-ALERT_RULE_DELETE = "alert_rule.delete"
-TARGET_ALERT_RULE = "alert_rule"
 
 
 def _pattern_matches(pattern: str, value: str) -> bool:

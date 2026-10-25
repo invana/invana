@@ -114,7 +114,7 @@ async def lifespan(app: FastAPI):
         # docs/for-developers/modules/ask/features/streaming-and-the-workflow.md — the inline run runtime: one asyncio
         # task per session ask.
         # Startup fails whatever a previous process left mid-flight.
-        from invana.activity.managers import ApprovalSendGate
+        from invana.activity.managers import ApprovalAskGate, ApprovalSendGate
         from invana.runtime.interpreter import TaskRuntime
         from invana.runtime.managers import McpManager
 
@@ -125,6 +125,8 @@ async def lifespan(app: FastAPI):
 
         # A `send` step (mail.send) waits on an approval in the inbox.
         TaskRuntime.send_gate = ApprovalSendGate()
+        # An agent's ask of a person (a delegation, a budget) is a row in Approvals.
+        TaskRuntime.ask_gate = ApprovalAskGate()
         task_runtime = TaskRuntime(
             session_factory=session_factory, manager=manager, encryption_key=settings.encryption_key
         )
@@ -191,6 +193,7 @@ def create_app() -> FastAPI:
     """Build and return the Invana FastAPI application."""
     from invana.server.admin.views import mount_admin
     from invana.server.agents.routes import agents_router, atlas_agent_router
+    from invana.server.alerts.routes import alerts_router
     from invana.server.annotations.routes import annotations_router
     from invana.server.approvals.routes import approvals_router
     from invana.server.boards.routes import boards_router
@@ -203,6 +206,7 @@ def create_app() -> FastAPI:
     from invana.server.graphs.routes import graph_router, graphs_collection_router
     from invana.server.health import health_router
     from invana.server.history.routes import history_router
+    from invana.server.ledger.routes import ledger_router
     from invana.server.llm_providers.routes import llm_providers_router
     from invana.server.members.routes import members_router
     from invana.server.notifications.routes import notifications_router
@@ -326,6 +330,8 @@ def create_app() -> FastAPI:
     app.include_router(schedules_router)
     app.include_router(notifications_router)
     app.include_router(approvals_router)
+    app.include_router(alerts_router)
+    app.include_router(ledger_router)
 
     # Proxy the studio's browser OTLP/HTTP span export to the collector.
     # Always mounted: the studio exports on its own gate, so a route that

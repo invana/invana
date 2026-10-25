@@ -376,7 +376,7 @@ def _number_root_run(_mapper, connection, row: TaskRun) -> None:
         connection.execute(text("SELECT pg_advisory_xact_lock(hashtext(:k))"), {"k": "run-number:" + row.graph_id})
     # Through the ORM, so a schema translate map (the isolated test schema) applies.
     # The queryset imports this module, so it is read here, when the hook runs.
-    from invana.runtime.querysets.task_run import last_run_number  # noqa: PLC0415
+    from invana.runtime.querysets.run_numbers import last_run_number  # noqa: PLC0415
 
     last = last_run_number(connection, row.graph_id)
     # Rows inserted in one flush are numbered before any is written, so the

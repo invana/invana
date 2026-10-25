@@ -1706,7 +1706,7 @@ class TaskRuntime:
                 details={"run_id": th.id, "exit_reason": reason},
             )
             if reason == ExitReason.stopped.value:
-                await self._emit_stop(db, th, stopped_by)
+                await ledger_acts.run_stopped(db, run=th, stopped_by=stopped_by)
             else:
                 await ledger_acts.run_ended(db, run=th, reason=reason)
             await db.commit()
@@ -1714,36 +1714,6 @@ class TaskRuntime:
                 "run.cancelled",
                 {"run_id": th.id, "status": th.status, "message": message_payload(m, th) if m else None},
             )
-
-    async def _emit_stop(self, db: AsyncSession, th: TaskRun, stopped_by: str | None) -> None:
-        """Record a person stopping a run — ``run.stop``, which is also its ledger row.
-
-        The person is who pressed Stop when the caller says so, else the person
-        the run was working for. A run nobody can be named for records no stop.
-        """
-        user_id = stopped_by or th.on_behalf_of_user_id or th.author_id
-        if not user_id:
-            return
-        from invana.core.auth.models import User
-
-        user = await db.get(User, user_id)
-        root = await ledger_acts.root_of(db, th)
-        await emit_event(
-            db,
-            action=actions.RUN_STOP,
-            target_kind=actions.TARGET_THINKING,
-            target_id=th.id,
-            graph_id=th.graph_id,
-            task_id=th.todo_id,
-            run_id=th.id,
-            actor_kind=ActorKind.user,
-            actor_id=user_id,
-            details={
-                "actor_name": user.username if user else None,
-                "run_number": root.number,
-                "exit_reason": ExitReason.stopped.value,
-            },
-        )
 
     async def _on_crash(self, run_id: str, exc: BaseException) -> None:
         emitter = Emitter(self._factory, run_id)

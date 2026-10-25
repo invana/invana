@@ -52,7 +52,9 @@ from invana.core.events.services import emit_event
 from invana.core.lists import ListParams, PageInfo
 from invana.core.settings import settings
 from invana.plugins.core.ingest.records import LoadRefused
-from invana.runtime.models import INTERACTIVE, RunRole, RunStatus, TaskRun, TriggeredBy
+from invana.runtime import ledger_acts
+from invana.runtime.delegation import settle_escrow
+from invana.runtime.models import INTERACTIVE, ExitReason, RunRole, RunStatus, TaskRun, TriggeredBy
 from invana.runtime.planning import opening_for, plan_payload, queue_plan_steps, select_plan_by_key
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.querysets.run_pages import RunPageQuerySet
@@ -1056,12 +1058,22 @@ async def worlds_for_messages(db: AsyncSession, messages: list[SessionMessage]) 
     return out
 
 
-async def cancel_waiting(db: AsyncSession, *, run: TaskRun) -> None:
-    """Cancel a run that is parked on a clarification (nothing is running)."""
+async def cancel_waiting(db: AsyncSession, *, run: TaskRun, stopped_by: str | None) -> None:
+    """Stop a run that is parked on a clarification (nothing is running).
+
+    It ends ``stopped``, its escrow goes back and ``run.stop`` names who pressed
+    Stop. The caller then hands the run to ``TaskRuntime.cancel`` so the runs
+    it delegated to end ``parent_ended``.
+    """
     run.status = RunStatus.cancelled.value
+    run.outcome = "cancelled"
+    run.exit_reason = ExitReason.stopped.value
+    run.finished_at = datetime.now(UTC)
     for row in await list_steps(db, run_id=run.id):
         if row.status in {RunStatus.queued.value, RunStatus.needs_input.value}:
             row.status = RunStatus.stopped.value
+    await settle_escrow(db, run)
+    await ledger_acts.run_stopped(db, run=run, stopped_by=stopped_by)
     await db.flush()
 
 

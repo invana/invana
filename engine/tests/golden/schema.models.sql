@@ -37,6 +37,25 @@ CREATE INDEX ix_agents_parent_agent_id ON agents (parent_agent_id);
 
 CREATE INDEX ix_agents_status ON agents (status);
 
+CREATE TABLE alert_rules (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(128) NOT NULL, 
+	enabled BOOLEAN NOT NULL, 
+	match JSON NOT NULL, 
+	notify_user_ids JSON NOT NULL, 
+	last_fired_at TIMESTAMP WITH TIME ZONE, 
+	last_seq INTEGER NOT NULL, 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_alert_rule_name UNIQUE (graph_id, name), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_alert_rules_graph_id ON alert_rules (graph_id);
+
 CREATE TABLE annotation_anchors (
 	id VARCHAR(36) NOT NULL, 
 	annotation_id VARCHAR(36) NOT NULL, 
@@ -100,12 +119,20 @@ CREATE TABLE approvals (
 	decided_by_id VARCHAR(36), 
 	decided_at TIMESTAMP WITH TIME ZONE, 
 	note TEXT NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	asked_by JSON NOT NULL, 
+	wants VARCHAR(512) NOT NULL, 
+	routed_reason VARCHAR(64) NOT NULL, 
+	step_run_id VARCHAR(36), 
+	scope VARCHAR(8), 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
 );
 
 CREATE INDEX ix_approvals_graph_id ON approvals (graph_id);
+
+CREATE INDEX ix_approvals_kind ON approvals (kind);
 
 CREATE INDEX ix_approvals_pending ON approvals (status, deadline_at);
 
@@ -654,6 +681,68 @@ CREATE TABLE index_definitions (
 	CONSTRAINT uq_version_index UNIQUE (version_id, name), 
 	FOREIGN KEY(version_id) REFERENCES graph_versions (id) ON DELETE CASCADE
 );
+
+CREATE TABLE ledger_checks (
+	graph_id VARCHAR(36) NOT NULL, 
+	verified_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	ok BOOLEAN NOT NULL, 
+	last_seq BIGINT NOT NULL, 
+	broken_seq BIGINT, 
+	PRIMARY KEY (graph_id), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
+CREATE TABLE ledger_exports (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	requested_by_id VARCHAR(36), 
+	filters JSON NOT NULL, 
+	format VARCHAR(8) NOT NULL, 
+	rows INTEGER NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_ledger_exports_graph_id ON ledger_exports (graph_id);
+
+CREATE TABLE ledger_rows (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	seq BIGINT NOT NULL, 
+	at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	actor_kind VARCHAR(16) NOT NULL, 
+	actor_user_id VARCHAR(36), 
+	actor_agent_id VARCHAR(36), 
+	actor_chain JSON NOT NULL, 
+	act VARCHAR(128) NOT NULL, 
+	layer VARCHAR(16) NOT NULL, 
+	touched VARCHAR(512) NOT NULL, 
+	touched_line VARCHAR(255) NOT NULL, 
+	verdict VARCHAR(16) NOT NULL, 
+	refused_by VARCHAR(16), 
+	rule VARCHAR(512) NOT NULL, 
+	run_id VARCHAR(36), 
+	step_run_id VARCHAR(36), 
+	run_number INTEGER, 
+	"where" VARCHAR(128) NOT NULL, 
+	args JSON NOT NULL, 
+	hash VARCHAR(64) NOT NULL, 
+	prev_hash VARCHAR(64) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_ledger_rows_graph_seq UNIQUE (graph_id, seq), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_ledger_rows_actor_agent_id ON ledger_rows (actor_agent_id);
+
+CREATE INDEX ix_ledger_rows_actor_user_id ON ledger_rows (actor_user_id);
+
+CREATE INDEX ix_ledger_rows_graph_at ON ledger_rows (graph_id, at);
+
+CREATE INDEX ix_ledger_rows_run ON ledger_rows (run_id);
+
+CREATE INDEX ix_ledger_rows_touched ON ledger_rows (graph_id, touched);
 
 CREATE TABLE lenses (
 	id VARCHAR(36) NOT NULL, 
@@ -1578,6 +1667,10 @@ CREATE TABLE task_runs (
 	stream_seq INTEGER NOT NULL, 
 	clarifications INTEGER NOT NULL, 
 	replans INTEGER NOT NULL, 
+	number INTEGER, 
+	exit_reason VARCHAR(24), 
+	escrow_tokens INTEGER, 
+	escrow_returned INTEGER, 
 	detail VARCHAR(255) NOT NULL, 
 	args JSON, 
 	input JSON, 
@@ -1598,6 +1691,7 @@ CREATE TABLE task_runs (
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_task_run_attempt UNIQUE (parent_run_id, task_id, lane, iteration, attempt), 
+	CONSTRAINT uq_task_runs_graph_number UNIQUE (graph_id, number), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	FOREIGN KEY(parent_run_id) REFERENCES task_runs (id) ON DELETE CASCADE, 
 	FOREIGN KEY(flow_id) REFERENCES flows (id) ON DELETE SET NULL, 
@@ -1614,6 +1708,8 @@ CREATE INDEX ix_task_runs_agent_id ON task_runs (agent_id);
 CREATE INDEX ix_task_runs_agent_started ON task_runs (agent_id, started_at);
 
 CREATE INDEX ix_task_runs_assistant_message_id ON task_runs (assistant_message_id);
+
+CREATE INDEX ix_task_runs_exit_reason ON task_runs (exit_reason);
 
 CREATE INDEX ix_task_runs_flow_id ON task_runs (flow_id);
 
