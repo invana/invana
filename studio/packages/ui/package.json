@@ -11,18 +11,18 @@
 		"check-types": "tsc --noEmit -p tsconfig.json"
 	},
 	"peerDependencies": {
-		"@invana/forms": "^0.0.34",
-		"@invana/ui": "^0.0.34",
-		"lucide-react": "^0.475.0",
-		"react": "^19.2.0"
+		"@invana/forms": "^0.0.35",
+		"@invana/ui": "^0.0.35",
+		"lucide-react": "^1.61.0",
+		"react": "^19.3.1"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.5.14",
-		"@invana/forms": "^0.0.34",
-		"@invana/ui": "^0.0.34",
-		"@types/react": "^19.0.0",
-		"lucide-react": "^0.475.0",
-		"react": "^19.2.0",
-		"typescript": "^6.0.0"
+		"@biomejs/biome": "^2.6.2",
+		"@invana/forms": "^0.0.35",
+		"@invana/ui": "^0.0.35",
+		"@types/react": "^19.3.0",
+		"lucide-react": "^1.61.0",
+		"react": "^19.3.1",
+		"typescript": "^7.0.2"
 	}
 }
