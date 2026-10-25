@@ -38,7 +38,7 @@ import { useAlertRuleMutations } from "./queries";
 import type { AlertRule, AlertRuleCreate } from "./types";
 
 const VERDICTS = ["allowed", "refused", "approval", "held"];
-const REFUSED_BY = ["grant", "lens", "ceiling", "robots", "policy"];
+const REFUSED_BY = ["grant", "lens", "world", "ceiling", "robots", "policy"];
 
 /** Toggles one value in a list, keeping the list's order. */
 const toggled = (list: string[], value: string) =>

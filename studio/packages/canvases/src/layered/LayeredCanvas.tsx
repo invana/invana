@@ -24,13 +24,22 @@
  * | `provenance` | author → dataset · run → finding → decision | a cite · authorship | no |
  * | `impact` | a hop from the cited records | a relationship type joining two groups | no |
  *
+ * **Cards** are opt-in (`cards`): each node a card with its name, a status dot,
+ * what it did and one more fact, laid out by ELK left to right or top down,
+ * under the board's chrome — the view chip top-left, zoom · fit · lock
+ * bottom-left. Without it a node is the board's dot, as before.
+ *
  * **The canvas law still holds** (docs/for-developers/modules/agents/features/lineage.md): it selects and draws. Exactly
  * one kind writes, `plan`, and only where the geometry *is* the datum —
  * drawing the edge is creating the dependency — and it hands off to the same
  * endpoint the panel uses.
  */
 
+import { ControlPanel } from "@invana/canvas-react";
 import {
+	BOARD_DOCK,
+	BOARD_DOCK_ITEMS,
+	BOARD_EDGE,
 	type DagBoardSelection,
 	type DagLegendSpec,
 	LayeredDagBoard,
@@ -38,6 +47,7 @@ import {
 import type { GraphData } from "@invana/graph";
 import type { Tone } from "@invana-studio/ui";
 import { useMemo } from "react";
+import { CARD_TYPE, type CardDirection, cardsConfig } from "./cards";
 
 /**
  * The same status vocabulary the panels use, so a task drawn on the plan and the
@@ -69,6 +79,16 @@ export interface LayeredNode {
 	disabled?: boolean;
 	/** `lineage` only: which of agent / user / task this node is. */
 	nodeKind?: string;
+	/** Cards only: a third line under `sub` — `1 → 191 rows`, `14k / 30k tokens`. */
+	line?: string;
+}
+
+/** The canvas drawn as cards, under the board's chrome. */
+interface LayeredCards {
+	/** The view chip's word — `Tree`, `Stages`. */
+	view: string;
+	/** `RIGHT` (default) reads a chain; `DOWN` reads a tree. */
+	direction?: CardDirection;
 }
 
 export interface LayeredEdge {
@@ -104,6 +124,8 @@ interface Props {
 	/** Shown in place of the legend copy — e.g. a 422 that named the loop. */
 	error?: string | null;
 	emptyHint?: string;
+	/** Draw cards instead of dots. Left out, the canvas draws as it always has. */
+	cards?: LayeredCards;
 }
 
 /**
@@ -144,22 +166,43 @@ export function LayeredCanvas({
 	layout = "layered",
 	error,
 	emptyHint,
+	cards,
 }: Props) {
+	const direction = cards?.direction ?? "RIGHT";
+	const asCards = !!cards;
+	const config = useMemo(
+		() => (asCards ? cardsConfig(direction) : undefined),
+		[asCards, direction],
+	);
 	const data = useMemo(
 		(): GraphData =>
 			({
-				nodes: nodes.map((node) => ({
-					id: node.id,
-					type: node.nodeKind ?? kind,
-					data: {
-						text: node.sub
-							? `${clampLine(node.label)}\n${clampLine(node.sub)}`
-							: clampLine(node.label),
-						tone: node.tone ?? "muted",
-						disabled: !!node.disabled,
-						column: node.column,
-					},
-				})),
+				nodes: nodes.map((node) =>
+					asCards
+						? {
+								id: node.id,
+								type: CARD_TYPE,
+								data: {
+									title: node.label,
+									sub: node.sub,
+									line: node.line,
+									tone: node.tone ?? "muted",
+									column: node.column,
+								},
+							}
+						: {
+								id: node.id,
+								type: node.nodeKind ?? kind,
+								data: {
+									text: node.sub
+										? `${clampLine(node.label)}\n${clampLine(node.sub)}`
+										: clampLine(node.label),
+									tone: node.tone ?? "muted",
+									disabled: !!node.disabled,
+									column: node.column,
+								},
+							},
+				),
 				edges: edges.map((edge) => ({
 					id: edge.id,
 					source: edge.source,
@@ -172,9 +215,19 @@ export function LayeredCanvas({
 						dashed: !!edge.dashed,
 						highlight: !!edge.highlight,
 					},
+					// A card board draws by its config, so an edge carries its own
+					// label and dash.
+					...(asCards
+						? {
+								style: {
+									labelText: edge.label ?? "",
+									strokeDashArray: edge.dashed ? [4, 3] : [0, 0],
+								},
+							}
+						: {}),
 				})),
 			}) as unknown as GraphData,
-		[nodes, edges, kind],
+		[nodes, edges, kind, asCards],
 	);
 
 	const selected: DagBoardSelection = selectedNodeId
@@ -196,7 +249,9 @@ export function LayeredCanvas({
 		<LayeredDagBoard
 			data={data}
 			chrome="panel"
-			layout={layout}
+			{...(config ? { config } : {})}
+			// A card board is always laid out: the seeded columns are spaced for dots.
+			layout={asCards ? "layered" : layout}
 			theme="tokens"
 			legend={legend.keys.length || legend.note ? legend : undefined}
 			error={error ?? null}
@@ -216,7 +271,32 @@ export function LayeredCanvas({
 						},
 					}
 				: {})}
-		/>
+		>
+			{cards ? <CardChrome view={cards.view} /> : null}
+		</LayeredDagBoard>
+	);
+}
+
+/** The board's chrome over a card canvas: its view chip, and zoom · fit · lock. */
+function CardChrome({ view }: { view: string }) {
+	return (
+		<>
+			<ControlPanel
+				id="layered-view"
+				position="top-left"
+				offset={BOARD_EDGE}
+				surface="hairline"
+				items={[{ type: "text", key: "view", text: view }]}
+			/>
+			<ControlPanel
+				id="layered-dock"
+				position="bottom-left"
+				offset={BOARD_EDGE}
+				width={BOARD_DOCK.width}
+				surface="hairline"
+				items={[...BOARD_DOCK_ITEMS]}
+			/>
+		</>
 	);
 }
 

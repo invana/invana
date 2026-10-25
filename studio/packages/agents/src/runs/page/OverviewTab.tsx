@@ -126,7 +126,7 @@ function SmallTiles({ t, live }: { t: RunTiles; live: boolean }) {
 				}
 				captionTone="muted"
 				meter={
-					t.max_tokens_run
+					t.max_tokens_run && t.tokens != null
 						? Math.min(1, t.tokens / t.max_tokens_run)
 						: undefined
 				}
@@ -200,7 +200,9 @@ function AgentsOverTime({
 		return <p className="text-muted-foreground">No agent has started yet.</p>;
 	const rows: GanttRow[] = bars.map((bar) => ({
 		key: bar.run_id,
-		label: bar.agent_name,
+		// An agent's name is a name, not an identifier: the UI face, not the
+		// chart's mono.
+		label: <span className="font-sans">{bar.agent_name}</span>,
 		startedAt: bar.started_at ?? undefined,
 		finishedAt: bar.finished_at ?? undefined,
 		status: barStatus(bar),
@@ -331,7 +333,7 @@ function LargeOverview({ overview }: { overview: RunOverview }) {
 						.join(" · ")}
 					captionTone="muted"
 					meter={
-						t.max_tokens_run
+						t.max_tokens_run && t.tokens != null
 							? Math.min(1, t.tokens / t.max_tokens_run)
 							: undefined
 					}
@@ -373,29 +375,37 @@ function LargeOverview({ overview }: { overview: RunOverview }) {
 				<Table bordered={false} density="compact">
 					<TableHeader>
 						<TableRow>
-							<TableHead>Role</TableHead>
-							<TableHead>Agents</TableHead>
-							<TableHead>Served</TableHead>
-							<TableHead>Not served</TableHead>
-							<TableHead>Tokens p50</TableHead>
-							<TableHead>p95</TableHead>
-							<TableHead>Time p95</TableHead>
+							<TableHead className="whitespace-nowrap">Role</TableHead>
+							<TableHead className="whitespace-nowrap">Agents</TableHead>
+							<TableHead className="whitespace-nowrap">Served</TableHead>
+							<TableHead className="whitespace-nowrap">Not served</TableHead>
+							<TableHead className="whitespace-nowrap">Tokens p50</TableHead>
+							<TableHead className="whitespace-nowrap">p95</TableHead>
+							<TableHead className="whitespace-nowrap">Time p95</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{overview.by_role.map((r) => (
 							<TableRow key={`${r.depth}:${r.role}`}>
 								<TableCell className="w-full">{r.role}</TableCell>
-								<TableCell className="font-mono">{r.agents}</TableCell>
-								<TableCell className="font-mono">{r.served}</TableCell>
-								<TableCell className="font-mono">{r.not_served}</TableCell>
-								<TableCell className="font-mono">
+								<TableCell className="whitespace-nowrap font-mono">
+									{r.agents}
+								</TableCell>
+								<TableCell className="whitespace-nowrap font-mono">
+									{r.served}
+								</TableCell>
+								<TableCell className="whitespace-nowrap font-mono">
+									{r.not_served}
+								</TableCell>
+								<TableCell className="whitespace-nowrap font-mono">
 									{tokens(r.tokens_p50)}
 								</TableCell>
-								<TableCell className="font-mono">
+								<TableCell className="whitespace-nowrap font-mono">
 									{tokens(r.tokens_p95)}
 								</TableCell>
-								<TableCell className="font-mono">{ms(r.time_p95_ms)}</TableCell>
+								<TableCell className="whitespace-nowrap font-mono">
+									{ms(r.time_p95_ms)}
+								</TableCell>
 							</TableRow>
 						))}
 					</TableBody>

@@ -74,8 +74,8 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| `agents.runs` | `/agents/runs` — `SectionPage` *Runs* with the five tiles (`MetricTile`), `SegmentedControl` `All · Live · Waiting · Ended` (`?f.state=`), three `Select`s (`?f.agent_id=` · `?f.started_by=` · `?f.origin=`), the strip, a kit `Table`. A row opens `?page=run:<id>` as a workbook tab titled `Run #N` |
-| `agents.runs.filtered` | the same list with chips the assistant set, marked *set by the assistant* (`&via=assistant`) |
+| `agents.runs` | `/agents/runs` — `SectionPage` *Runs* with the five tiles (`MetricTile`), `SegmentedControl` `All · Live · Waiting · Ended` (`?f.state=`), three `FilterSelect` chips (`?f.agent_id=` · `?f.started_by=` · `?f.origin=`), each showing its value or *any*, the strip, a kit `Table`. A row opens `?page=run:<id>` as a workbook tab titled `Run #N` |
+| `agents.runs.filtered` | the list the assistant opened (`&via=assistant`): the head reads *N of M runs match*, then the strip with its chips marked *set by the assistant*, then the table — no tiles, no filter row. Removing a chip drops `via` and the full list returns |
 | `agents.run.*` | `?page=run:<id>&tab=overview|agents|stages|assets|touched|ledger` — `RecordHeader variant="page"` with the crumb `Runs`, then `Tabs` |
 | `agents.run.step` | `&tab=stages&step=<step run id>` — the step panel under the stage canvas; `&lane=all` for every lane |
 | `agents.run.rerun` | the Rerun `Dialog` over the run page (`&rerun=1`) |
@@ -117,6 +117,10 @@ flowchart TD
 | RP12 | **Rerun is one dialog wherever a run is read.** Same versions reproduces it; current versions compares; retune changes agent version, model version, run budget or world. A rerun opens its own page; the comparison is the Compare act. |
 | RP13 | **Stop run is the one write on the run page.** It cancels the root; children end `parent ended`, the root `stopped`, and both are ledger rows. |
 | RP14 | **Waiting on you lists the run's pending asks** routed to the reader; each opens Approvals › Waiting. |
+| RP15 | **A run's workbook tab is titled `Run #N`**, with the run icon; the uuid stands in only until the number is read. The assistant's pill reads the same title |
+| RP16 | **The Agents Tree and the Stages canvas draw cards**, not circles: an agent card carries its state line and its tokens against its escrow; a stage card carries its function, calls, lanes and time. Both canvases carry the board's view chip and its zoom · fit · lock controls. An agent card prints its tokens against its escrow as text — a canvas card has no meter element — and neither canvas draws a minimap |
+| RP17 | **A number the engine has not recorded is absent, never 0** — a run with no token count shows `—` in its head; an LLM row with no model version reads *not recorded* as muted text |
+| RP18 | **An ended run holds no asks.** When a run ends, each of its pending asks is closed `expired` and leaves Waiting on you and Approvals › Waiting |
 
 ## Not building
 

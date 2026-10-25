@@ -23,16 +23,23 @@ export function FilterSelect({
 	value,
 	options,
 	onChange,
+	any,
 }: {
 	label: string;
 	value: string;
 	options: FilterSelectOption[];
 	onChange: (value: string) => void;
+	/** The value shown while nothing is chosen — `any`, `anyone`, `anywhere`. */
+	any?: string;
 }) {
 	const current = options.find((o) => o.value === value);
 	return (
 		<span className="relative inline-flex">
-			<FilterChip label={label} value={current?.label} active={value !== ""} />
+			<FilterChip
+				label={label}
+				value={current?.label ?? any}
+				active={value !== ""}
+			/>
 			<select
 				value={value}
 				onChange={(e) => onChange(e.target.value)}

@@ -11,6 +11,8 @@ the deadline it is ``expired`` and what it held is *expired, not sent*::
 
 The clock calls ``remind_due`` and ``expire_due`` each tick; both lock what they
 touch, so two engine processes never remind or expire one approval twice.
+``expire_due`` also closes every ask whose run has ended, and until it does the
+Waiting reads already leave such an ask out.
 
 **Approvals is the one queue.** Every ask an agent or a run makes of a person —
 access, budget, delegation, send, question, publish — is a row with a ``kind``.
@@ -30,6 +32,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.activity.managers.notifications import InboxManager, Members
 from invana.activity.models import Approval, ApprovalStatus, DeliveryStatus, NotificationKind
 from invana.activity.querysets import ApprovalQuerySet, DeliveryQuerySet, WaitingQuerySet
+from invana.activity.querysets.asks import AskQuerySet
 from invana.activity.schemas import ApprovalPage, ApprovalRead
 from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.graphs.models import Graph
@@ -45,6 +48,7 @@ class ApprovalManager:
     """Stateless. The session is the first argument of every method."""
 
     approvals_qs = ApprovalQuerySet()
+    asks_qs = AskQuerySet()
     deliveries_qs = DeliveryQuerySet()
     waiting_qs = WaitingQuerySet()
     agents_qs = AgentQuerySet()
@@ -268,14 +272,16 @@ class ApprovalManager:
         return len(rows)
 
     async def expire_due(self, session: AsyncSession, *, now: datetime) -> int:
-        """End every approval past its deadline as ``expired``; what it held is not sent."""
+        """End every approval past its deadline, and every ask whose run has ended, as ``expired``.
+
+        What either held is not sent. An ask a run holds on ends with its run —
+        served, failed, stopped or any other exit — so the clock closes those
+        first (:meth:`expire_ended`), then the ones whose deadline passed.
+        """
+        ended = await self.expire_ended(session, now=now)
         rows = await self.approvals_qs.overdue(session, now=now)
         for row in rows:
-            row.status = ApprovalStatus.expired.value
-            row.decided_at = row.deadline_at
-            for delivery in await self.deliveries_qs.for_approval(session, approval_id=row.id):
-                if delivery.status == DeliveryStatus.held.value:
-                    delivery.status = DeliveryStatus.expired.value
+            await self._expire(session, row, at=row.deadline_at)
             told = [*row.approver_ids, *([row.requested_by_id] if row.requested_by_id else [])]
             await self.inbox.tell(
                 session,
@@ -292,7 +298,28 @@ class ApprovalManager:
             )
             await self._emit(session, row, actions.APPROVAL_EXPIRE)
         await session.flush()
+        return ended + len(rows)
+
+    async def expire_ended(self, session: AsyncSession, *, now: datetime) -> int:
+        """Close every pending ask whose run, or asking step, has ended — ``expired``, not sent.
+
+        The run that asked is gone, so nobody is told to decide; the event
+        records why it closed. A schedule's held delivery and a publish review
+        are raised after their run and keep their own deadline.
+        """
+        rows = await self.asks_qs.held_by_ended(session)
+        for row in rows:
+            await self._expire(session, row, at=now)
+            await self._emit(session, row, actions.APPROVAL_EXPIRE, reason="run_ended")
+        await session.flush()
         return len(rows)
+
+    async def _expire(self, session: AsyncSession, row: Approval, *, at: datetime) -> None:
+        row.status = ApprovalStatus.expired.value
+        row.decided_at = at
+        for delivery in await self.deliveries_qs.for_approval(session, approval_id=row.id):
+            if delivery.status == DeliveryStatus.held.value:
+                delivery.status = DeliveryStatus.expired.value
 
     async def _emit(self, session: AsyncSession, row: Approval, action: str, actor: str | None = None, **extra) -> None:
         await emit_event(

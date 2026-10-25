@@ -36,9 +36,7 @@ import {
 	EmptyState,
 	Progress,
 	RecordHeader,
-	Tabs,
-	TabsList,
-	TabsTrigger,
+	TabbedPanel,
 } from "@invana/ui";
 import { ApiError, runsApi } from "@invana-studio/core";
 import { DetailStatus } from "@invana-studio/ui";
@@ -201,7 +199,7 @@ export function RunPage({
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
-			<div className="shrink-0 border-b">
+			<div className="shrink-0">
 				<RecordHeader
 					size="lg"
 					variant="page"
@@ -211,37 +209,19 @@ export function RunPage({
 						`Run ${name}${head.agent_name ? ` · ${head.agent_name}` : ""}`,
 					]}
 					chips={
-						<>
-							<DetailStatus tone={statusTone(head.status, head.exit_reason)}>
-								{statusWord(head.status, head.exit_reason)}
-							</DetailStatus>
-							<span className="truncate text-sm text-muted-foreground">
-								{started}
-							</span>
-							{head.session_id ? (
-								<Button
-									size="sm"
-									variant="link"
-									onClick={() =>
-										navigate(
-											`/u/${username}/${graphSlug}/explorer/${encodeURIComponent(head.session_id as string)}`,
-										)
-									}
-								>
-									Open the session
-								</Button>
-							) : null}
-						</>
+						<DetailStatus tone={statusTone(head.status, head.exit_reason)}>
+							{statusWord(head.status, head.exit_reason)}
+						</DetailStatus>
 					}
 					actions={
 						<>
-							<span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-								{tokens(head.tokens)}
+							<span className="inline-flex items-center gap-2 whitespace-nowrap text-sm text-muted-foreground">
+								{head.tokens == null ? "—" : tokens(head.tokens)}
 								{head.max_tokens_run != null
 									? ` of ${tokens(head.max_tokens_run)}`
 									: ""}{" "}
 								tokens
-								{head.max_tokens_run ? (
+								{head.max_tokens_run && head.tokens != null ? (
 									<Progress
 										size="sm"
 										className="w-28"
@@ -288,21 +268,38 @@ export function RunPage({
 						</>
 					}
 				/>
-				<Tabs
-					size="sm"
-					value={tab}
-					onValueChange={(v) => setTab(v === "overview" ? null : v)}
-				>
-					<TabsList className="w-full justify-start gap-1 px-3 pb-1">
-						{TABS.map((t) => (
-							<TabsTrigger key={t.value} value={t.value}>
-								{t.label}
-							</TabsTrigger>
-						))}
-					</TabsList>
-				</Tabs>
+				{started || head.session_id ? (
+					<p className="flex min-w-0 items-center gap-2 px-4 py-1 text-sm text-muted-foreground">
+						<span className="min-w-0 truncate" title={started}>
+							{started}
+						</span>
+						{head.session_id ? (
+							<Button
+								size="sm"
+								variant="link"
+								className="shrink-0"
+								onClick={() =>
+									navigate(
+										`/u/${username}/${graphSlug}/explorer/${encodeURIComponent(head.session_id as string)}`,
+									)
+								}
+							>
+								Open the session
+							</Button>
+						) : null}
+					</p>
+				) : null}
 			</div>
-			<div className="min-h-0 flex-1 overflow-y-auto">{body()}</div>
+			<TabbedPanel
+				className="min-h-0 flex-1 border-0 bg-transparent shadow-none"
+				activeTab={tab}
+				onTabChange={(v) => setTab(v === "overview" ? null : v)}
+				tabs={TABS.map((t) => ({
+					value: t.value,
+					label: t.label,
+					content: t.value === tab ? body() : null,
+				}))}
+			/>
 
 			{head.can_rerun ? (
 				<RerunDialog

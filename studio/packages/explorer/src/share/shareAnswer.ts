@@ -142,6 +142,11 @@ export interface SnapshotInput {
 	takenAt: Date;
 }
 
+/** A link, as the line a reader of the share sees — the list it opened. */
+function linkLine(e: Extract<Emission, { kind: "link" }>): string {
+	return `Opened ${e.label} — ${e.total} ${e.total === 1 ? e.noun[0] : e.noun[1]}`;
+}
+
 /** One emission as the panel that draws it. */
 function emissionPanel(e: Emission): PanelSpec {
 	const count = e.citation.recordCount;
@@ -209,6 +214,8 @@ function emissionPanel(e: Emission): PanelSpec {
 			return { kind: "narrative", options: { text: e.text } };
 		case "empty":
 			return { kind: "text", options: { text: e.statement, tone: "muted" } };
+		case "link":
+			return { kind: "text", options: { text: linkLine(e) } };
 	}
 }
 
@@ -353,6 +360,8 @@ function mdEmission(e: Emission): string {
 			return e.text;
 		case "empty":
 			return `_${e.statement}_`;
+		case "link":
+			return linkLine(e);
 	}
 }
 

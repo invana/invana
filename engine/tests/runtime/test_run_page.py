@@ -14,6 +14,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from sqlalchemy import select
 
+from invana.activity.managers.approvals import ApprovalManager
 from invana.activity.models import Approval
 from invana.activity.querysets.asks import pending_for
 from invana.apps.agents.models import Agent
@@ -24,7 +25,7 @@ from invana.core.ledger.models import LedgerRow
 from invana.core.lists import ListParams
 from invana.runtime import services
 from invana.runtime.managers.run_pages import PendingAsk, RunPageManager
-from invana.runtime.models import Emission, TaskRun  # noqa: F401
+from invana.runtime.models import Emission, TaskRun
 
 pytestmark = pytest.mark.asyncio
 
@@ -143,6 +144,40 @@ class TestRunPage:
         assert [s.step_key for s in stages] == ["q", "d"]
         assert (stages[0].calls, stages[0].out_count, stages[0].line) == (2, 217, "→ 217 rows")
         assert stages[1].status == "running"
+        # A step in the delegated child opens against the child's run.
+        assert sorted(stages[0].run_of.values()) == sorted([root.id, child.id])
+
+    async def test_an_ended_run_holds_no_ask(self, session, graph, user):
+        root, child = await _tree(session, graph, user)
+        root.status, child.status = "cancelled", "cancelled"
+        await session.flush()
+        assert await pending_for(session, graph_id=graph.id) == []
+        assert await ApprovalManager().expire_due(session, now=T0) == 1
+        [ask] = (await session.execute(select(Approval).where(Approval.run_id == child.id))).scalars().all()
+        assert ask.status == "expired"
+
+    async def test_assets_and_touched_read_what_was_recorded_and_no_more(self, session, graph, user):
+        """A table that records only its row count and a Todo step still list as assets;
+        a tree that recorded no tokens has none, and a model with no version is absent."""
+        root, _ = await _tree(session, graph, user)
+        session.add(Emission(run_id=root.id, seq=0, kind="table", payload={"title": "Delays", "rows": 42}))
+        session.add(_step(root, seq=2, key="t", task_key="work.create_task", output=["not", "a", "document"]))
+        session.add(_step(root, seq=3, key="m", task_key="nl.translate", tokens_in=7, tokens_out=3))
+        await session.flush()
+        pages = RunPageManager()
+
+        assets = await pages.assets(session, run=root)
+        assert [(a.name, a.size_line) for a in assets.items] == [("Delays", "42 rows")]
+        touched = await pages.touched(session, run=root)
+        assert {r.model for r in touched.llm} == {None}
+
+        quiet = TaskRun(graph_id=graph.id, flow_key="ql-query", status="succeeded", started_at=T0)
+        session.add(quiet)
+        await session.flush()
+        session.add(_step(quiet, seq=0, key="q", task_key="graph.read.query"))
+        await session.flush()
+        overview = await pages.overview(session, run=quiet, reader_id=user.id, asks=[])
+        assert overview.head.tokens is None and overview.tiles.tokens is None
 
     async def test_a_reader_who_is_not_an_approver_is_not_asked(self, session, graph, user, other_user):
         root, _ = await _tree(session, graph, user)

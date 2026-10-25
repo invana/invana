@@ -87,6 +87,8 @@ export function RunsListPage({ username, graphSlug }: SectionPageProps) {
 	const chips = chipsOf(page, list);
 	const state = filterValue(list, "state");
 	const rows = page?.items ?? [];
+	// The list the assistant opened reads as its answer: the strip and the rows.
+	const byAssistant = list.viaAssistant && chips.length > 0;
 
 	const agentOptions = useMemo(
 		() =>
@@ -108,45 +110,52 @@ export function RunsListPage({ username, graphSlug }: SectionPageProps) {
 			chips={
 				page ? (
 					<Badge variant="outline" tone="muted" size="xs">
-						{matchCount(page, "runs")}
+						{byAssistant
+							? `${page.total} of ${page.unfiltered_total} runs match`
+							: matchCount(page, "runs")}
 					</Badge>
 				) : null
 			}
 		>
 			<SectionBody>
-				{stats.data ? <Tiles stats={stats.data} /> : null}
-				<div className="flex flex-wrap items-center gap-2">
-					<SegmentedControl
-						size="sm"
-						aria-label="Showing"
-						value={state || "all"}
-						onValueChange={(v) => setOne(list, "state", v === "all" ? "" : v)}
-						options={SHOWING}
-					/>
-					<FilterBar>
-						<FilterSelect
-							label="agent"
-							value={filterValue(list, "agent_id")}
-							options={agentOptions}
-							onChange={(v) => setOne(list, "agent_id", v)}
+				{!byAssistant && stats.data ? <Tiles stats={stats.data} /> : null}
+				{byAssistant ? null : (
+					<div className="flex flex-wrap items-center gap-2">
+						<SegmentedControl
+							size="sm"
+							aria-label="Showing"
+							value={state || "all"}
+							onValueChange={(v) => setOne(list, "state", v === "all" ? "" : v)}
+							options={SHOWING}
 						/>
-						<FilterSelect
-							label="started by"
-							value={filterValue(list, "started_by")}
-							options={memberOptions}
-							onChange={(v) => setOne(list, "started_by", v)}
-						/>
-						<FilterSelect
-							label="from"
-							value={filterValue(list, "origin")}
-							options={ORIGIN_OPTIONS}
-							onChange={(v) => setOne(list, "origin", v)}
-						/>
-					</FilterBar>
-					<span className="ml-auto text-sm text-muted-foreground">
-						Explorer · Todo · Schedule · Project · API
-					</span>
-				</div>
+						<FilterBar>
+							<FilterSelect
+								label="agent"
+								any="any"
+								value={filterValue(list, "agent_id")}
+								options={agentOptions}
+								onChange={(v) => setOne(list, "agent_id", v)}
+							/>
+							<FilterSelect
+								label="started by"
+								any="anyone"
+								value={filterValue(list, "started_by")}
+								options={memberOptions}
+								onChange={(v) => setOne(list, "started_by", v)}
+							/>
+							<FilterSelect
+								label="from"
+								any="anywhere"
+								value={filterValue(list, "origin")}
+								options={ORIGIN_OPTIONS}
+								onChange={(v) => setOne(list, "origin", v)}
+							/>
+						</FilterBar>
+						<span className="ml-auto text-sm text-muted-foreground">
+							Explorer · Todo · Schedule · Project · API
+						</span>
+					</div>
+				)}
 				<ListStrip page={page} list={list} />
 				{query.isLoading ? (
 					<Spinner />

@@ -18,12 +18,12 @@ by actor, by record and by refusal, and exported with its hashes.
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | A row per act | when · actor with its chain (*ravi ▸ Route Auditor ▸ Hub Checker LHR*) · act (a function, or a person's act such as `run.stop`) · touched (`layer/name` and a volume line) · verdict (`allowed` · `refused` · `approval` · `held`) with the refusal's reason (`grant` · `lens` · `ceiling` · `robots` · `policy`) · run · where it ran |
-| C2 | Rows | Tiles Acts today (against the 7-day daily mean) · People · Agents · Refused (by reason) · Waiting (approvals); preset chips (Refused today · Writes · Third-party reads · Secrets used · Granted access · People only); filters since · actor · act · touched layer · run · `All · Allowed · Refused · Approval`; the applied-filters strip; newest first, paged |
+| C1 | A row per act | when · actor with its chain (*ravi ▸ Route Auditor ▸ Hub Checker LHR*) · act (a function, or a person's act such as `run.stop`) · touched (`layer/name` and a volume line) · verdict (`allowed` · `refused` · `approval` · `held`) with the refusal's reason (`grant` · `lens` · `world` · `ceiling` · `robots` · `policy`) · run · where it ran |
+| C2 | Rows | Tiles Acts today (against the 7-day daily mean; no change is shown while that mean is under 10 acts a day) · People · Agents · Refused (by reason) · Waiting (approvals); preset chips (Refused today · Writes · Third-party reads · Secrets used · Granted access · People only); filters since · actor · act · touched layer · run · `All · Allowed · Refused · Approval`; the applied-filters strip; newest first, paged |
 | C3 | A row's detail | A drawer: chain of custody (who started it, each agent with how it got there, the function and plugin version, where it ran, the lens), the act (function · arguments · touched · the rule that allowed or refused it), integrity (row hash, previous hash, chain verified), the rows around it, *Open step in run #N*, *Copy link* |
 | C4 | By actor | A person or agent and a window: tiles Acts · Writes · Third-party · Secrets · Refused; Graph data · Web · LLM · Acted through (the helpers it spawned or delegated to) |
 | C5 | By record | An address (`graph/Airport:LHR`, `graph/Fare`) and a window: tiles Acts · Reads · Writes · Refused · People · Agents; every act on it; who can see it now (worlds · people · agents · who can write) |
-| C6 | Refusals | Tiles Refused today (share of acts) · By grant · By lens · By ceiling; refused a day over 30 days; top refused functions; by the rule that held |
+| C6 | Refusals | Tiles Refused today (share of acts) · By grant · By lens · By world · By ceiling; refused a day over 30 days; top refused functions; by the rule that held |
 | C7 | Export | Rows (the current filters) as CSV or JSON Lines, with each row's hash and the previous; past exports listed; retention and integrity stated |
 | C8 | Members | A member sees their own acts and the rows of runs they can open; the rest is counted, not shown — a banner says how many |
 | C9 | Integrity | Append-only; each row's hash covers its content and the previous row's hash; the chain is re-verified every 10 minutes and the head says when it last held |
@@ -102,6 +102,10 @@ flowchart TD
 | LG9 | **Retention is 365 days**, stated in the head; rows are kept for the period and never edited. |
 | LG10 | **By actor includes the helpers an agent spawned or delegated to** — every row whose chain names it. |
 | LG11 | **Who can see a record now** is the worlds that name its type, the Graph's members, the agents whose skills reach it in those worlds, and who may write it — read from govern, never from the ledger. |
+| LG12 | **A member's Rows tab is the banner, the filters and the table.** The tiles and preset chips count rows across the Graph, so only an admin sees them |
+| LG13 | **A `world` refusal is its own reason** — the world did not name the layer or domain — with its own Refusals tile, never folded into `lens` |
+| LG14 | **The Acts change is absent while the 7-day daily mean is under 10 acts**; a percentage over a near-empty week misleads |
+| LG15 | **Rows read today until a window is chosen.** The window filter offers Today · Last 24 hours · 7 days · 30 days · *Any time*; the tiles count today when *Any time* is chosen |
 
 ## Not building
 

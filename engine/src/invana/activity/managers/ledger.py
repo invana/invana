@@ -66,6 +66,8 @@ from invana.core.lists import AppliedFilter, ListParams
 
 #: How often the clock re-verifies a Graph's chain.
 VERIFY_EVERY = timedelta(minutes=10)
+#: The 7-day daily mean of acts below which the Acts tile shows no change.
+CHANGE_FLOOR = 10
 #: How long rows are kept, stated in the head.
 RETENTION_DAYS = 365
 #: The most rows one export carries.
@@ -203,7 +205,9 @@ class LedgerManager:
             session, scope.where(LedgerRow.at >= start - timedelta(days=7), LedgerRow.at < start)
         )
         mean = before / 7 if before else None
-        change = round((tallies["acts"] - mean) / mean * 100, 1) if mean else None
+        # A percentage over a near-empty week misleads, so none is given under the floor.
+        steady = mean is not None and mean >= CHANGE_FLOOR
+        change = round((tallies["acts"] - mean) / mean * 100, 1) if steady else None
         presets = []
         for key, clause in PRESETS.items():
             presets.append(
@@ -331,25 +335,26 @@ class LedgerManager:
         web_rows: dict[str, CountRow] = {}
         llm_rows: dict[str, CountRow] = {}
         through: dict[str, list] = {}
+        llm_steps = [r.step_run_id for r in rows if r.layer == "llm" and r.step_run_id]
+        step_tokens = await self.rows_qs.step_tokens(session, step_run_ids=llm_steps)
         for row in rows:
             target = _name_after_layer(row.touched)
             if row.layer == "graph":
-                key = target.split(":")[0] or "graph"
+                key = target.split(":")[0].split("@")[0] or "graph"
                 entry = graph_rows.setdefault(key, CountRow(key=key))
                 entry.a += row.act.startswith("graph.read.")
                 entry.b += row.act.startswith("graph.write.")
                 entry.c += row.verdict == "refused"
-            elif row.layer == "web":
+            elif row.layer == "web" and row.touched.startswith("web/"):
                 key = target.split("/")[0] or "web"
                 entry = web_rows.setdefault(key, CountRow(key=key))
                 entry.a += 1
                 entry.b += row.verdict == "refused"
-            elif row.layer == "llm":
-                key = target or "llm"
-                entry = llm_rows.setdefault(key, CountRow(key=key))
+            elif row.layer == "llm" and row.touched.startswith("llm/"):
+                # Keyed by the model's address; the tokens are the step's, as it recorded them.
+                entry = llm_rows.setdefault(target, CountRow(key=target))
                 entry.a += 1
-                tokens = (row.args or {}).get("tokens")
-                entry.b += int(tokens) if isinstance(tokens, int | float) else 0
+                entry.b += step_tokens.get(row.step_run_id or "", 0)
             chain = _chain(row)
             at = next((i for i, link in enumerate(chain) if link["id"] == actor_id), None)
             if at is not None:
@@ -500,6 +505,7 @@ class LedgerManager:
             by_lens=by_today.get("lens", 0),
             by_ceiling=by_today.get("ceiling", 0),
             by_robots=by_today.get("robots", 0),
+            by_world=by_today.get("world", 0),
             by_day=by_day,
             top_functions=top_functions,
             by_rule=by_rule,

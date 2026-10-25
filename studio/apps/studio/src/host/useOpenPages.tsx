@@ -4,6 +4,7 @@ import {
 	AgentsOpenContext,
 	EVERY_AGENT,
 	useAgentsQuery,
+	useRunNumbers,
 	useSkillsQuery,
 } from "@invana-studio/agents";
 import type { useSessions } from "@invana-studio/assistant";
@@ -198,6 +199,13 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		[skillsList.data],
 	);
 
+	// And a run's page for its number.
+	const runNumberById = useRunNumbers(
+		username,
+		graphSlug,
+		boards.filter((b) => b.kind === "run").map((b) => b.subjectId),
+	);
+
 	// And a project's page for the project.
 	const projectsList = useProjectsQuery(username, graphSlug);
 	const projectNameByKey = useMemo(
@@ -329,6 +337,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 		lensNameById,
 		agentNameById,
 		skillNameById,
+		runNumberById,
 		planRefById,
 		projectNameByKey,
 	};

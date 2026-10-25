@@ -15,6 +15,7 @@ from sqlalchemy import Text, cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.activity.models import AlertRule, Approval, ApprovalStatus
+from invana.activity.querysets.asks import still_waiting
 from invana.core.auth.models import User
 from invana.core.ledger.models import LedgerRow
 from invana.core.lists import ListParams, PageInfo
@@ -40,15 +41,16 @@ class WaitingQuerySet:
         ``view=for_you`` is pending and names the reader; ``all`` is pending;
         ``answered`` is decided or expired, newest decided first. ``mine`` keeps
         the bell tray's reading — approvals that name the reader, any status.
+        Pending leaves out an ask whose run has ended: it is no longer waiting.
         """
         unfiltered = select(Approval).where(Approval.graph_id == graph_id)
         stmt = unfiltered
         sort_column = Approval.created_at
         view = params.one("view")
         if view == "for_you":
-            stmt = stmt.where(Approval.status == ApprovalStatus.pending.value, _names(reader_id))
+            stmt = stmt.where(still_waiting(), _names(reader_id))
         elif view == "all":
-            stmt = stmt.where(Approval.status == ApprovalStatus.pending.value)
+            stmt = stmt.where(still_waiting())
         elif view == "answered":
             stmt = stmt.where(Approval.status.in_(_ANSWERED), Approval.decided_at.is_not(None))
             sort_column = Approval.decided_at
@@ -68,7 +70,7 @@ class WaitingQuerySet:
 
     async def counts(self, session: AsyncSession, *, graph_id: str, reader_id: str) -> tuple[int, int]:
         """(pending that name the reader, pending in the Graph)."""
-        pending = Approval.status == ApprovalStatus.pending.value
+        pending = still_waiting()
         stmt = select(func.count().filter(_names(reader_id)), func.count()).where(
             Approval.graph_id == graph_id, pending
         )

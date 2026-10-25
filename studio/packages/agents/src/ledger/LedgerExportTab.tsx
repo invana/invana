@@ -9,6 +9,7 @@
  * engine records the export, and the list reads it again.
  */
 
+import { Field, FieldLabel } from "@invana/forms";
 import {
 	Button,
 	FilterBar,
@@ -99,28 +100,36 @@ export function LedgerExportTab({
 			<div className="flex min-w-0 flex-col gap-3">
 				<PanelSection card title="Export rows">
 					<div className="flex flex-col gap-3 py-1">
-						<FilterBar>
-							<FilterSelect
-								label="since"
-								value={filterValue(list, "since")}
-								options={SINCE_OPTIONS}
-								onChange={(v) => setOne(list, "since", v)}
+						<Field>
+							<FieldLabel>Rows</FieldLabel>
+							<FilterBar seamless>
+								<FilterSelect
+									label="When:"
+									any="any time"
+									value={filterValue(list, "since")}
+									options={SINCE_OPTIONS}
+									onChange={(v) => setOne(list, "since", v)}
+								/>
+								<FilterSelect
+									label="Verdict:"
+									any="any"
+									value={filterValue(list, "verdict")}
+									options={VERDICT_OPTIONS}
+									onChange={(v) => setOne(list, "verdict", v)}
+								/>
+							</FilterBar>
+							<ListStrip page={matching} list={list} />
+						</Field>
+						<Field>
+							<FieldLabel>Format</FieldLabel>
+							<SegmentedControl
+								size="sm"
+								aria-label="Format"
+								value={format}
+								onValueChange={(v) => setFormat(v as Format)}
+								options={FORMATS}
 							/>
-							<FilterSelect
-								label="verdict"
-								value={filterValue(list, "verdict")}
-								options={VERDICT_OPTIONS}
-								onChange={(v) => setOne(list, "verdict", v)}
-							/>
-						</FilterBar>
-						<ListStrip page={matching} list={list} />
-						<SegmentedControl
-							size="sm"
-							aria-label="Format"
-							value={format}
-							onValueChange={(v) => setFormat(v as Format)}
-							options={FORMATS}
-						/>
+						</Field>
 						<div className="flex items-center justify-end gap-2">
 							{none && (
 								<span className="text-muted-foreground">no rows match</span>

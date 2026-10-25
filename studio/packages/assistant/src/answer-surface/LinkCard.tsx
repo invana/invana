@@ -9,8 +9,8 @@
  */
 
 import { AppliedFilters, Button, EmissionCard } from "@invana/ui";
+import type { LinkEmission } from "@invana-studio/core";
 import { ListFilter } from "lucide-react";
-import type { LinkEmission } from "./emissions";
 
 export function LinkCard({
 	link,

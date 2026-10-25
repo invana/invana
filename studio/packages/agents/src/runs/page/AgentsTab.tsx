@@ -1,18 +1,19 @@
 /**
  * A run › **Agents** — who spawned whom.
  *
- * - **Tree** (the default): on the layered canvas, a column per depth — what
+ * - **Tree** (the default): cards on the layered canvas, read top down — what
  *   started the run (the Todo or the session), the root agent, and every
- *   helper under the agent that made it, each with its state in words and
- *   `tokens/escrow`. A pending delegation ask hangs off the agent asking,
- *   dashed; selecting it opens Approvals › Waiting.
+ *   helper under the agent that made it, each card with its state in words and
+ *   its tokens against its escrow. A pending delegation ask hangs off the agent
+ *   asking, dashed; selecting it opens Approvals › Waiting.
  * - **By role** (`&view=role`, offered past 50 agents): one card per role with
- *   a bar of its agents by state, and one cell per agent.
+ *   a bar of its agents by state and its depth, and one strip of cells per
+ *   role under a single legend.
  *
  * Every count is the engine's; the page formats them.
  */
 
-import { HeatStrip, SegmentedBar, SegmentedBarLegend } from "@invana/charts";
+import { HeatStrip, SegmentedBar } from "@invana/charts";
 import { SegmentedControl } from "@invana/ui";
 import {
 	LayeredCanvas,
@@ -114,14 +115,19 @@ export function AgentsTab({
 	);
 }
 
-/** `no progress · 14k/30k` — its state, then its spend against its escrow. */
-function subLine(node: RunAgentNode): string {
-	const spend =
-		node.budget != null
-			? `${tokens(node.tokens)}/${tokens(node.budget)}`
-			: tokens(node.tokens);
-	return [node.state_line, spend].filter(Boolean).join(" · ");
+/** `14k / 30k tokens` — its spend against its escrow, or the run's budget. */
+function spendLine(node: RunAgentNode): string {
+	return node.budget != null
+		? `${tokens(node.tokens)} / ${tokens(node.budget)} tokens`
+		: `${tokens(node.tokens)} tokens`;
 }
+
+/** `root` · `depth 2` — where a role sits under the root, as the engine counts it. */
+function depthWord(depth: number): string {
+	return depth === 0 ? "root" : `depth ${depth}`;
+}
+
+const TREE_CARDS = { view: "Tree", direction: "DOWN" } as const;
 
 function Tree({ data }: { data: RunAgents }) {
 	const open = useAgentsOpen();
@@ -141,7 +147,8 @@ function Tree({ data }: { data: RunAgents }) {
 			nodes.push({
 				id: n.run_id,
 				label: n.agent_name,
-				sub: subLine(n),
+				sub: n.state_line,
+				line: spendLine(n),
 				column: n.depth + 1,
 				tone: TONE[stateOf(n.status, n.exit_reason)],
 			});
@@ -153,7 +160,6 @@ function Tree({ data }: { data: RunAgents }) {
 				id: `${parent}->${n.run_id}`,
 				source: parent,
 				target: n.run_id,
-				label: n.how === "root" ? undefined : n.how,
 			});
 		}
 		for (const ask of data.asks) {
@@ -161,7 +167,8 @@ function Tree({ data }: { data: RunAgents }) {
 			nodes.push({
 				id,
 				label: ask.agent_name,
-				sub: ask.line,
+				sub: "asks to delegate",
+				line: ask.line,
 				column: (depthOf.get(ask.from_run_id) ?? 0) + 2,
 				tone: "warning",
 			});
@@ -169,7 +176,6 @@ function Tree({ data }: { data: RunAgents }) {
 				id: `${ask.from_run_id}->${id}`,
 				source: ask.from_run_id,
 				target: id,
-				label: "asks to delegate",
 				dashed: true,
 			});
 		}
@@ -180,6 +186,7 @@ function Tree({ data }: { data: RunAgents }) {
 		<div className="relative min-h-96 flex-1">
 			<LayeredCanvas
 				kind="data"
+				cards={TREE_CARDS}
 				nodes={nodes}
 				edges={edges}
 				onSelectNode={(id) => {
@@ -193,36 +200,44 @@ function Tree({ data }: { data: RunAgents }) {
 
 function ByRole({ data }: { data: RunAgents }) {
 	return (
-		<div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
-			<SegmentedBarLegend series={STATES} />
-			{data.roles.map((role) => (
-				<PanelSection
-					key={`${role.depth}:${role.role}`}
-					card
-					title={role.role}
-					action={
-						<span className="font-mono text-sm text-muted-foreground">
-							×{role.agents}
-						</span>
-					}
-				>
-					<div className="flex flex-col gap-2">
-						<SegmentedBar values={role.by_state} series={STATES} />
-						<span className="text-sm text-muted-foreground">{role.line}</span>
-						<HeatStrip
-							states={STATES.map(({ key, label, color }) => ({
-								key,
-								label,
-								color,
-							}))}
-							cells={role.cells.map((cell) => ({
-								at: cell.run_id.slice(0, 8),
-								state: stateOf(cell.status, cell.exit_reason),
-							}))}
-						/>
-					</div>
-				</PanelSection>
-			))}
+		<div className="grid min-h-0 flex-1 items-start gap-3 overflow-y-auto p-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+			<div className="flex flex-col gap-3">
+				{data.roles.map((role) => (
+					<PanelSection
+						key={`${role.depth}:${role.role}`}
+						card
+						title={role.role}
+						action={
+							<span className="font-mono text-sm text-muted-foreground">
+								×{role.agents}
+							</span>
+						}
+					>
+						<div className="flex flex-col gap-2">
+							<SegmentedBar values={role.by_state} series={STATES} />
+							<span className="text-sm text-muted-foreground">
+								{[depthWord(role.depth), role.line].filter(Boolean).join(" · ")}
+							</span>
+						</div>
+					</PanelSection>
+				))}
+			</div>
+			{/* One legend for every role: the strip's own, under all of their cells. */}
+			<PanelSection card title="One cell per agent">
+				<HeatStrip
+					states={STATES.map(({ key, label, color }) => ({
+						key,
+						label,
+						color,
+					}))}
+					cells={data.roles.flatMap((role) =>
+						role.cells.map((cell) => ({
+							at: `${role.role} · ${cell.run_id.slice(0, 8)}`,
+							state: stateOf(cell.status, cell.exit_reason),
+						})),
+					)}
+				/>
+			</PanelSection>
 		</div>
 	);
 }

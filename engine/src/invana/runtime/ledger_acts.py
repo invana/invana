@@ -21,6 +21,10 @@ A later rename never rewrites a row: names are snapshotted into
 | :func:`touch_refused` | a participant the frozen lens refused |
 | :func:`spawned` · :func:`spawn_refused` | a helper agent created, or refused at a ceiling |
 | :func:`escrow_returned` | a child's unspent escrow going back to its parent |
+
+A governed address is written in the ledger's words (:func:`ledger_touched`):
+``graph/Airport``, ``web/<host>/…``, ``llm/<provider>/<model>``. A model call's
+tokens are the step's stored count; the readers take them from there.
 """
 
 from __future__ import annotations
@@ -166,6 +170,22 @@ async def actor_of(db: AsyncSession, run: TaskRun) -> Actor:
     )
 
 
+def ledger_touched(address: str) -> str:
+    """A governed address as a row's ``touched`` reads — ``layer/name``.
+
+    ``graph_data/model/Airport`` is ``graph/Airport``; a third party's
+    ``third_party/api/fares.example.com/v1`` is ``web/fares.example.com/v1``, so
+    the host follows the layer; ``llm/<provider>/<model>`` and anything already
+    in the ledger's words are kept as they are.
+    """
+    head, _, rest = (address or "").partition("/")
+    if head == "graph_data" and rest:
+        return f"graph/{rest.partition('/')[2] or rest}"
+    if head == "third_party" and rest:
+        return f"web/{rest.partition('/')[2] or rest}"
+    return address or ""
+
+
 async def _record(db: AsyncSession, *, run: TaskRun, actor: Actor | None = None, **row: Any) -> None:
     actor = actor or await actor_of(db, run)
     await ledger.record(
@@ -199,7 +219,7 @@ async def step_settled(
         run=run,
         act=step.task_key or "run",
         layer=layer_for(step.task_key),
-        touched=touched,
+        touched=ledger_touched(touched),
         touched_line=touched_line,
         verdict=verdict,
         refused_by=refused_by,
@@ -229,7 +249,7 @@ async def touch_refused(
         run=run,
         act=act or "touch",
         layer=_layer_of_address(address),
-        touched=address,
+        touched=ledger_touched(address),
         verdict="refused",
         refused_by=refused_by,
         rule=rule,
@@ -242,7 +262,7 @@ def _layer_of_address(address: str) -> str:
     head = address.split("/", 1)[0]
     if head.startswith("graph"):
         return "graph"
-    return {"llm": "llm", "web": "web", "secret": "secret", "secrets": "secret"}.get(head, "run")
+    return {"llm": "llm", "web": "web", "third_party": "web", "secret": "secret", "secrets": "secret"}.get(head, "run")
 
 
 async def spawned(

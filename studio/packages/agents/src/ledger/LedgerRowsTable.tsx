@@ -100,9 +100,15 @@ export function LedgerRowsTable({
 	const [search, setSearch] = useSearchParams();
 	const [cursors, setCursors] = useState<string[]>([]);
 
+	// Rows read today until a window is chosen; *Any time* drops the window.
+	const since = filterValue(list, "since") || "today";
+	const { since: _chosen, ...rest } = list.query.filters ?? {};
 	const base: ListQuery = runId
 		? { filters: { run_id: [runId] } }
-		: { q: list.query.q, filters: list.query.filters };
+		: {
+				q: list.query.q,
+				filters: since === "all" ? rest : { ...rest, since: [since] },
+			};
 	const baseKey = listQueryKey(base);
 	// A new filter starts again from the newest row.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: reset on the query's key
@@ -135,8 +141,12 @@ export function LedgerRowsTable({
 					<ShieldCheck className="size-4" />
 					<AlertDescription>
 						You see the rows of runs you can open, and your own acts.{" "}
-						{n(page.hidden)} row{page.hidden === 1 ? "" : "s"} here belong to
-						runs you cannot open — counted, not shown.
+						{n(page.hidden)} row{page.hidden === 1 ? "" : "s"}{" "}
+						{!runId && (filterValue(list, "since") || "today") === "today"
+							? "today"
+							: "here"}{" "}
+						{page.hidden === 1 ? "belongs" : "belong"} to runs you cannot open —
+						counted, not shown.
 					</AlertDescription>
 				</Alert>
 			)}
@@ -286,31 +296,36 @@ function RowFilters({
 		<div className="flex flex-wrap items-center gap-2">
 			<FilterBar>
 				<FilterSelect
-					label="since"
+					label="When:"
+					any="today"
 					value={filterValue(list, "since")}
-					options={SINCE_OPTIONS}
+					options={[...SINCE_OPTIONS, { value: "all", label: "any time" }]}
 					onChange={(v) => setOne(list, "since", v)}
 				/>
 				<FilterSelect
-					label="actor"
+					label="Actor:"
+					any="anyone"
 					value={filterValue(list, "actor")}
 					options={actorOptions}
 					onChange={(v) => setOne(list, "actor", v)}
 				/>
 				<FilterSelect
-					label="act"
+					label="Act:"
+					any="any function"
 					value={filterValue(list, "act")}
 					options={ACT_OPTIONS}
 					onChange={(v) => setOne(list, "act", v)}
 				/>
 				<FilterSelect
-					label="touched"
+					label="Touched:"
+					any="any layer"
 					value={filterValue(list, "layer")}
 					options={LAYER_OPTIONS}
 					onChange={(v) => setOne(list, "layer", v)}
 				/>
 				<FilterSelect
-					label="run"
+					label="Run:"
+					any="any"
 					value={filterValue(list, "run_id")}
 					options={runOptions}
 					onChange={(v) => setOne(list, "run_id", v)}

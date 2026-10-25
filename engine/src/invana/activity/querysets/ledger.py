@@ -20,7 +20,8 @@ from sqlalchemy import Select, Text, and_, cast, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.elements import ColumnElement
 
-from invana.activity.models import Approval, ApprovalStatus
+from invana.activity.models import Approval
+from invana.activity.querysets.asks import still_waiting
 from invana.apps.sessions.models import Session
 from invana.core.auth.models import User
 from invana.core.ledger.models import LedgerCheck, LedgerExport, LedgerRow
@@ -230,6 +231,13 @@ class LedgerReadQuerySet:
         result = await session.execute(select(TaskRun.lens_snapshot).where(TaskRun.id == run_id))
         return result.scalars().first()
 
+    async def step_tokens(self, session: AsyncSession, *, step_run_ids: list[str]) -> dict[str, int]:
+        """Each step's recorded tokens, by step run id; a step with none is left out."""
+        if not step_run_ids:
+            return {}
+        stmt = select(TaskRun.id, TaskRun.tokens).where(TaskRun.id.in_(step_run_ids), TaskRun.tokens.is_not(None))
+        return {step_id: int(n) for step_id, n in (await session.execute(stmt)).all()}
+
     async def approvals_waiting(self, session: AsyncSession, *, graph_id: str, user_id: str) -> int:
         """Pending approvals that name ``user_id`` as an approver."""
         stmt = (
@@ -237,7 +245,7 @@ class LedgerReadQuerySet:
             .select_from(Approval)
             .where(
                 Approval.graph_id == graph_id,
-                Approval.status == ApprovalStatus.pending.value,
+                still_waiting(),
                 cast(Approval.approver_ids, Text).like(f'%"{user_id}"%'),
             )
         )

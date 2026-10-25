@@ -125,11 +125,11 @@ export function WaitingTab({
 									<TableCell>
 										<KindBadge kind={ask.kind ?? ask.subject_kind} />
 									</TableCell>
-									<TableCell>
+									<TableCell className="whitespace-nowrap">
 										<ActorChain chain={ask.asked_by ?? []} />
 									</TableCell>
 									<TableCell>{ask.wants || ask.title}</TableCell>
-									<TableCell className="text-muted-foreground">
+									<TableCell className="whitespace-nowrap text-muted-foreground">
 										{routedTo(ask, user?.username) || "—"}
 									</TableCell>
 									<TableCell className="whitespace-nowrap text-muted-foreground">

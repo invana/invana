@@ -357,6 +357,12 @@ export function declaredBoardContent(
 	);
 }
 
+/** `Run #1002`, or the run's address until its number is read. */
+function runTitle(runId: string, numbers: Map<string, number>): string {
+	const n = numbers.get(runId);
+	return n == null ? runAddress(runId) : `Run #${n}`;
+}
+
 /** The names a declared tab is titled by, each read off a list the page already holds. */
 export interface BoardTitleNames {
 	modelsView: ReturnType<typeof useModelsView>["view"];
@@ -364,6 +370,7 @@ export interface BoardTitleNames {
 	lensNameById: Map<string, string>;
 	agentNameById: Map<string, string>;
 	skillNameById: Map<string, string>;
+	runNumberById: Map<string, number>;
 	planRefById: Map<string, string>;
 	projectNameByKey: Map<string, string>;
 }
@@ -371,8 +378,8 @@ export interface BoardTitleNames {
 /**
  * A declared tab's title. Most kinds are titled by their kind — one skill
  * board, and the crumb inside says which record. A lens, an agent and a project are titled
- * by name, and a run by its address, `run:3c414b9f`, so two open runs are two
- * readable tabs.
+ * by name, and a run by its number, `Run #1002` — its address, `run:3c414b9f`,
+ * only until the number is read — so two open runs are two readable tabs.
  */
 export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 	const {
@@ -381,6 +388,7 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 		lensNameById,
 		agentNameById,
 		skillNameById,
+		runNumberById,
 		planRefById,
 		projectNameByKey,
 	} = names;
@@ -403,7 +411,7 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 							: board.kind === "plugin" || board.kind === "function"
 								? board.subjectId
 								: board.kind === "run"
-									? runAddress(board.subjectId)
+									? runTitle(board.subjectId, runNumberById)
 									: board.kind === "plan_runs"
 										? (planRefById.get(board.subjectId) ??
 											BOARD_KINDS[board.kind].label)

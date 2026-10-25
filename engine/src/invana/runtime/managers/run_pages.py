@@ -164,10 +164,27 @@ def _count_of(doc: Any) -> int | None:
     return None
 
 
+def _size(value: Any) -> int:
+    """A recorded size — a count as written, or the length of a list; else 0."""
+    if isinstance(value, bool):
+        return 0
+    if isinstance(value, int):
+        return value
+    return len(value) if isinstance(value, list) else 0
+
+
+def _made_todo(step: TaskRun) -> str | None:
+    """The Todo a ``work.create_task`` step made, by id, when it records one."""
+    if step.task_key != "work.create_task" or not isinstance(step.output, dict):
+        return None
+    todo_id = step.output.get("task_id")
+    return str(todo_id) if todo_id else None
+
+
 def _out_count(step: TaskRun) -> int | None:
     found = _count_of(step.output)
     if found is None:
-        found = _count_of((step.result or {}).get("outputs"))
+        found = _count_of(step.result.get("outputs") if isinstance(step.result, dict) else None)
     return found
 
 
@@ -325,7 +342,7 @@ class RunPageManager:
         children = tree.agent_runs[1:]
         emissions = await self.pages_qs.emissions(session, run_ids=tree.ids)
         files, branches = self._files_and_branches(tree)
-        todos = [s for s in tree.steps if s.task_key == "work.create_task" and (s.output or {}).get("task_id")]
+        todos = [s for s in tree.steps if _made_todo(s)]
         records, writes_refused = self._records(tree, await self.pages_qs.touches(session, run_ids=tree.ids))
         root_agent = tree.agents.get(run.agent_id or "")
         timeout_s = (run.params or {}).get("timeout_s")
@@ -390,7 +407,7 @@ class RunPageManager:
         tiles.finishing_per_minute = sum(1 for at in finished if at is not None and at > now - timedelta(minutes=1))
         tiles.peak_finishing = peak.count if peak else 0
         tiles.peak_finishing_at = peak.minute if peak else None
-        tiles.tokens_per_minute = round(tokens / max(1.0, (elapsed or 0) / 60_000))
+        tiles.tokens_per_minute = round((tokens or 0) / max(1.0, (elapsed or 0) / 60_000))
         tiles.served = sum(1 for r in children if r.exit_reason == "served")
         tiles.not_served = sum(1 for r in children if r.exit_reason is not None and r.exit_reason != "served")
         tiles.eta_s = round(remaining / (last_ten / 10) * 60) if remaining and last_ten else None
@@ -419,7 +436,7 @@ class RunPageManager:
             session_title=titles.get(run.session_id or ""),
             task_id=run.todo_id,
             task_title=todos.get(run.todo_id or ""),
-            tokens=(run.tokens or 0) + sum(r.tokens or 0 for r in tree.rows),
+            tokens=self._recorded_tokens(tree),
             max_tokens_run=int(ceiling) if ceiling is not None else None,
             started_at=run.started_at,
             finished_at=run.finished_at,
@@ -427,6 +444,12 @@ class RunPageManager:
             can_stop=run.status not in _ENDED,
             can_rerun=run.status in _ENDED,
         )
+
+    @staticmethod
+    def _recorded_tokens(tree: _Tree) -> int | None:
+        """The tree's spend, or ``None`` when no row in it recorded a token count."""
+        spent = [r.tokens for r in (tree.root, *tree.rows) if r.tokens is not None]
+        return sum(spent) if spent else None
 
     @staticmethod
     def _per_minute(times: list[datetime | None]) -> list[MinuteCount]:
@@ -487,7 +510,7 @@ class RunPageManager:
         """The files the tree's steps wrote and the branches they recorded."""
         files, branches = [], []
         for step in tree.steps:
-            result = step.result or {}
+            result = step.result if isinstance(step.result, dict) else {}
             for artifact in result.get("artifacts") or []:
                 if isinstance(artifact, dict) and artifact.get("direction") != "read":
                     files.append((step, artifact))
@@ -647,6 +670,7 @@ class RunPageManager:
             line=line,
             summary=" · ".join(f"{n} {w}" for w, n in words.most_common()),
             step_ids=[s.id for s in steps],
+            run_of={s.id: s.parent_run_id for s in steps if s.parent_run_id},
         )
 
     # ── Assets ───────────────────────────────────────────────────────────────
@@ -664,11 +688,11 @@ class RunPageManager:
             step = tree.by_id.get(e.step_run_id or "")
             payload = e.payload or {}
             if e.kind == "subgraph":
-                data = payload.get("data") or {}
-                size = f"{len(data.get('nodes') or [])} nodes · {len(data.get('edges') or [])} edges"
+                data = payload.get("data") if isinstance(payload.get("data"), dict) else {}
+                size = f"{_size(data.get('nodes'))} nodes · {_size(data.get('edges'))} edges"
             else:
-                rows = (e.citation or {}).get("record_count")
-                rows = rows if isinstance(rows, int) else len(payload.get("rows") or [])
+                rows = (e.citation or {}).get("record_count") if isinstance(e.citation, dict) else None
+                rows = rows if isinstance(rows, int) else _size(payload.get("rows"))
                 size = f"{rows} rows"
             items.append(
                 RunAsset(
@@ -705,10 +729,9 @@ class RunPageManager:
                     step_run_id=step.id,
                 )
             )
-        made = [s for s in tree.steps if s.task_key == "work.create_task" and (s.output or {}).get("task_id")]
-        titles = await self.pages_qs.todo_titles(session, ids=[s.output["task_id"] for s in made])
-        for step in made:
-            todo_id = step.output["task_id"]
+        made = [(s, todo_id) for s in tree.steps if (todo_id := _made_todo(s))]
+        titles = await self.pages_qs.todo_titles(session, ids=[todo_id for _, todo_id in made])
+        for step, todo_id in made:
             items.append(
                 RunAsset(
                     name=titles.get(todo_id, "a Todo"),
@@ -759,8 +782,8 @@ class RunPageManager:
             if step.tokens_in is None and step.tokens_out is None:
                 continue
             owner = tree.owner(step)
-            model = step.model_version or (owner.model_version if owner is not None else None) or "not recorded"
-            row = llm.setdefault(model, TouchedLlmRow(model=model))
+            model = step.model_version or (owner.model_version if owner is not None else None)
+            row = llm.setdefault(model or "", TouchedLlmRow(model=model))
             row.calls += 1
             row.tokens_in += step.tokens_in or 0
             row.tokens_out += step.tokens_out or 0
@@ -768,7 +791,7 @@ class RunPageManager:
         return RunTouched(
             graph=sorted(graph.values(), key=lambda r: r.type),
             web=sorted(web.values(), key=lambda r: r.domain),
-            llm=sorted(llm.values(), key=lambda r: r.model),
+            llm=sorted(llm.values(), key=lambda r: (r.model is None, r.model or "")),
             secrets=[],
             records_touched=sum(r.read + r.written for r in graph.values()),
         )

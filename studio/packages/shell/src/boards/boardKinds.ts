@@ -44,6 +44,7 @@ import {
 	LayoutDashboard,
 	ListTree,
 	Pencil,
+	Play,
 	Plug,
 	Quote,
 	ShieldCheck,
@@ -212,7 +213,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		kind: "run",
 		renders: "declared",
 		label: "Run",
-		icon: LayoutDashboard,
+		icon: Play,
 		// `More` on a run in the Runs panel.
 		panel: "runs",
 		subject: "a root task_runs.id",

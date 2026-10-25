@@ -84,6 +84,9 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"functions",
 	"connections",
 	"llms",
+	"runs",
+	"approvals",
+	"ledger",
 	"concurrency",
 	// The Projects product's own panel.
 	"decisions",

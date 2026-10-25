@@ -40,7 +40,7 @@ import {
 } from "@invana-studio/shell";
 import { BoardGround } from "@invana-studio/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { assistantSlots } from "@/host/assistantSlots";
 import { OpenBoardContext } from "@/host/boards";
 import { consoleSection } from "@/host/consoleSection";
@@ -104,6 +104,10 @@ function startSubtitle(
  * underneath. The open product is the route's (`useActiveProduct`); the open
  * panel is the path's (`useLeftSection`).
  */
+
+/** The run page tabs that are a canvas. */
+const RUN_CANVAS_TABS = new Set(["agents", "stages"]);
+
 export function ProductHost() {
 	const { username, graphSlug } = useParams<{
 		username: string;
@@ -490,13 +494,19 @@ export function ProductHost() {
 			/>
 		) : null;
 	// Over a canvas the pill floats; an Agents page's tables and consoles run
-	// to the bottom edge, so there it takes a row of its own under the page.
+	// to the bottom edge, so there it takes a row of its own under the page. A
+	// run's Agents and Stages tabs are canvases, so the pill floats over them.
+	const [search] = useSearchParams();
+	const runCanvasInFront =
+		agentsPageInFront?.id.startsWith("run:") &&
+		RUN_CANVAS_TABS.has(search.get("tab") ?? "");
+	const pillInRow = Boolean(agentsPageInFront) && !runCanvasInFront;
 	const reopenPill =
-		pill && !agentsPageInFront ? (
+		pill && !pillInRow ? (
 			<div className="absolute right-16 bottom-4 z-10">{pill}</div>
 		) : null;
 	const reopenRow =
-		pill && agentsPageInFront ? (
+		pill && pillInRow ? (
 			<div className="flex shrink-0 justify-end py-2 pr-16">{pill}</div>
 		) : null;
 

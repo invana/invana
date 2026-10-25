@@ -122,6 +122,7 @@ export interface LedgerRefusals {
 	share_pct: number | null;
 	by_grant: number;
 	by_lens: number;
+	by_world: number;
 	by_ceiling: number;
 	by_robots: number;
 	by_day: { day: string; refused: number }[];

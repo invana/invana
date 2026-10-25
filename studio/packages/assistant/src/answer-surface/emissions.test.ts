@@ -1,6 +1,6 @@
 import type { QueryResponse } from "@invana-studio/core";
 import { describe, expect, it } from "vitest";
-import { emissionsFromResult, linkHref, linksFromRows } from "./emissions";
+import { emissionsFromResult, linkHref } from "./emissions";
 
 const graph = (nodes: unknown[]) =>
 	({
@@ -44,28 +44,18 @@ describe("emissionsFromResult", () => {
 	});
 });
 
-describe("linksFromRows", () => {
-	it("reads a link row and opens it marked as the assistant's", () => {
-		const [link] = linksFromRows([
-			{ id: "t", seq: 0, kind: "table", payload: {} },
-			{
-				id: "l",
-				seq: 1,
-				kind: "link",
-				payload: {
-					list: "runs",
-					label: "Runs",
-					noun: ["run", "runs"],
+describe("linkHref", () => {
+	it("opens the list with its filters, marked as the assistant's", () => {
+		expect(
+			linkHref(
+				{
 					path: "/agents/runs",
 					params: { "f.status": "failed", "f.since": "30d" },
-					chips: [],
-					total: 2,
-					unresolved: [],
 				},
-			},
-		]);
-		expect(link).toMatchObject({ id: "l", label: "Runs", total: 2 });
-		expect(linkHref(link, "admin", "airways")).toBe(
+				"admin",
+				"airways",
+			),
+		).toBe(
 			"/u/admin/airways/agents/runs?f.status=failed&f.since=30d&via=assistant",
 		);
 	});

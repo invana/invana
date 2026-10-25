@@ -17,7 +17,8 @@ export type EmissionKind =
 	| "metric"
 	| "chart"
 	| "prose"
-	| "empty";
+	| "empty"
+	| "link";
 
 /** The projection template that chose the rendering, when one did. */
 interface EmissionTemplate {
@@ -91,13 +92,52 @@ export interface EmptyEmission {
 	statement: string;
 }
 
+/** One filter a link sets, as the list's strip reads it. */
+interface LinkChip {
+	field: string;
+	title: string;
+	value: string;
+	label: string;
+}
+
+/** A filter the engine could not resolve, in the words that failed. */
+interface LinkUnresolved {
+	field: string;
+	word: string;
+	reason: string;
+}
+
+/**
+ * An ask for a list, answered by opening it
+ * (docs/for-developers/modules/ask/features/the-assistant-opens-boards.md):
+ * the list, its filters as the list contract's own params, one chip per
+ * filter and the row count the list's own query returned.
+ */
+export interface LinkEmission {
+	kind: "link";
+	/** `runs` · `agents` · `approvals` · `ledger`. */
+	list: string;
+	/** The list's name — `Runs`. */
+	label: string;
+	/** What one row is called, singular then plural. */
+	noun: [string, string];
+	/** Where the list lives under the Graph — `/agents/runs`. */
+	path: string;
+	/** `f.<field>` → value, exactly what a person would set. */
+	params: Record<string, string>;
+	chips: LinkChip[];
+	total: number;
+	unresolved: LinkUnresolved[];
+}
+
 type EmissionBody =
 	| TableEmission
 	| SubgraphEmission
 	| MetricEmission
 	| ChartEmission
 	| ProseEmission
-	| EmptyEmission;
+	| EmptyEmission
+	| LinkEmission;
 
 export type Emission = EmissionBody & {
 	/** The row's id, once the engine has written it. Absent for a derived one. */

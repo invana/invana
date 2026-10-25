@@ -5,10 +5,15 @@
  *
  * The tiles read `/ledger/stats` for the Rows window (`f.since`, else today);
  * a preset chip writes `?f.preset=` and the engine narrows the rows.
+ *
+ * The tiles and chips count rows across the whole Graph, so only an owner —
+ * the one reader the engine shows every row — sees them. A member's tab is the
+ * banner, the filters and the table.
  */
 
 import { Button, FilterChip, MetricGrid, MetricTile } from "@invana/ui";
 import { useListParams } from "@invana-studio/core";
+import { useAccess } from "@invana-studio/shell";
 import { filterValue, setOne } from "../lists";
 import { useAgentsOpen } from "../open";
 import { LedgerRowsTable } from "./LedgerRowsTable";
@@ -24,14 +29,18 @@ export function LedgerRowsTab({
 }) {
 	const list = useListParams();
 	const open = useAgentsOpen();
-	const since = filterValue(list, "since") || "today";
+	const access = useAccess();
+	const seesAll = !access.loading && access.gate("settings").allowed;
+	// The tiles count a window; with *Any time* chosen they stay on today.
+	const chosen = filterValue(list, "since") || "today";
+	const since = chosen === "all" ? "today" : chosen;
 	const stats = useLedgerStatsQuery(username, graphSlug, since).data;
 	const preset = filterValue(list, "preset");
 	const window = since === "today" ? "today" : sinceLabel(since).toLowerCase();
 
 	return (
 		<div className="flex flex-col gap-3">
-			{stats && (
+			{seesAll && stats && (
 				<>
 					<MetricGrid minTileWidth={160}>
 						<MetricTile

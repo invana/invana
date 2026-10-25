@@ -26,7 +26,7 @@ G = "/u/admin/airways"
 AR = "/u/admin/arabidopsis"
 ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.login", "/login"), ("shell.graphs", "/graphs"), ("shell.first_run", "/graphs?first-run"),
-    ("shell.profile", "/settings/profile"), ("shell.runs", f"{G}/activity/runs"), ("shell.run", f"{G}/agents/runs?page=run%3Ab0144efb-6073-4204-8e50-a70308621dd8"),
+    ("shell.profile", "/settings/profile"), ("shell.runs", f"{G}/activity/runs"), ("shell.run", f"{G}/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909"),
     ("shell.schedule", f"{G}/activity/schedules"), ("shell.activity.events", f"{G}/activity/events"),
     ("shell.events", f"{G}/activity/events?filter=changes"), ("shell.change", f"{G}/activity/changes/agent/a1"),
     ("shell.notifications.rule", f"{G}/activity/rules"), ("shell.notifications.channels", f"{G}/activity/channels"),
@@ -53,8 +53,8 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("agents.run.step", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=stages"),
     ("agents.run.assets", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=assets"),
     ("agents.run.touched", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=touched"),
-    ("agents.run.rerun", f"{G}/agents/runs?page=run%3Ab0144efb-6073-4204-8e50-a70308621dd8&rerun=1"),
-    ("agents.run.approval", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=overview"),
+    ("agents.run.rerun", f"{G}/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909&rerun=1"),
+    ("agents.run.approval", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=agents"),
     ("agents.run.ask", f"{G}/agents/runs?page=run%3A11970a9e-3208-435f-abe6-20d0d1f11c5d&tab=stages"),
     ("agents.run", f"{G}/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=agents"),
     ("agents.approvals.alerts", f"{G}/agents/approvals/alerts"),
@@ -253,7 +253,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "agents.run.touched": f"{TREE}; Data touched tab",
     "agents.run.rerun": "the uuid stands for a served run of Route Auditor; Rerun",
     "agents.run.closed": f"{TREE}; Agents tab, the assistant closed",
-    "agents.run.approval": f"{TREE}; Overview — Waiting on you lists its budget and delegation asks",
+    "agents.run.approval": f"{TREE}; Agents — the delegation ask drawn on the tree (the assistant's proposal card needs a live session)",
     "agents.run.ask": "the uuid stands for an Explorer answer's run (a served run with a session); Stages tab, click a stage",
     "agents.run": f"{TREE}; Agents tab, Tree",
     "agents.approvals.alerts": "Alert rules tab — five seeded rules",

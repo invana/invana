@@ -40,7 +40,9 @@ function Section({
 					<TableHeader>
 						<TableRow>
 							{head.map((h) => (
-								<TableHead key={h}>{h}</TableHead>
+								<TableHead key={h} className="whitespace-nowrap">
+									{h}
+								</TableHead>
 							))}
 						</TableRow>
 					</TableHeader>
@@ -125,14 +127,22 @@ export function TouchedTab({
 					head={["Model", "Calls", "Tokens in", "Tokens out"]}
 					rows={t.llm.length}
 				>
-					{t.llm.map((m) => (
-						<TableRow key={m.model}>
+					{t.llm.map((m, i) => (
+						<TableRow key={m.model ?? `unrecorded-${i}`}>
 							<TableCell className="w-full">
-								<TypographyInlineCode>{m.model}</TypographyInlineCode>
+								{m.model ? (
+									<TypographyInlineCode>{m.model}</TypographyInlineCode>
+								) : (
+									<span className="text-muted-foreground">not recorded</span>
+								)}
 							</TableCell>
-							<TableCell className="font-mono">{m.calls}</TableCell>
-							<TableCell className="font-mono">{tokens(m.tokens_in)}</TableCell>
-							<TableCell className="font-mono">
+							<TableCell className="whitespace-nowrap font-mono">
+								{m.calls}
+							</TableCell>
+							<TableCell className="whitespace-nowrap font-mono">
+								{tokens(m.tokens_in)}
+							</TableCell>
+							<TableCell className="whitespace-nowrap font-mono">
 								{tokens(m.tokens_out)}
 							</TableCell>
 						</TableRow>

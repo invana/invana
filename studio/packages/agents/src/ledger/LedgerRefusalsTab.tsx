@@ -1,7 +1,7 @@
 /**
  * Ledger › Refusals: what the bounds held today — tiles Refused today (its
- * share of acts) · By grant · By lens · By ceiling, refused a day over 30
- * days, the most refused functions, and each rule that held with what it
+ * share of acts) · By grant · By lens · By world · By ceiling, refused a day
+ * over 30 days, the most refused functions, and each rule that held with what it
  * stopped and whom. Every figure is the engine's `/ledger/refusals`.
  */
 
@@ -23,11 +23,21 @@ import { CountTable } from "./CountTable";
 import { Act, n } from "./ledgerParts";
 import { useLedgerRefusalsQuery } from "./queries";
 
-const REASON_TONE: Record<string, "destructive" | "warning" | "muted"> = {
+/** A bound the reader must look at is red; a limit that held is amber. */
+const REASON_TONE: Record<string, "destructive" | "warning"> = {
 	grant: "destructive",
 	lens: "destructive",
+	world: "warning",
 	ceiling: "warning",
 };
+
+/** A round top for the day chart's scale, so its ticks read as whole numbers. */
+function scaleTop(largest: number): number {
+	if (largest <= 0) return 0;
+	const step = 10 ** Math.floor(Math.log10(largest));
+	const top = Math.ceil(largest / step) * step;
+	return top % 2 === 0 ? top : top + step;
+}
 
 export function LedgerRefusalsTab({
 	username,
@@ -47,6 +57,7 @@ export function LedgerRefusalsTab({
 			/>
 		);
 	const last = d.by_day.length - 1;
+	const top = scaleTop(Math.max(0, ...d.by_day.map((b) => b.refused)));
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -59,6 +70,7 @@ export function LedgerRefusalsTab({
 				/>
 				<MetricTile label="By grant" value={n(d.by_grant)} />
 				<MetricTile label="By lens" value={n(d.by_lens)} />
+				<MetricTile label="By world" value={n(d.by_world)} />
 				<MetricTile
 					label="By ceiling"
 					value={n(d.by_ceiling)}
@@ -70,6 +82,9 @@ export function LedgerRefusalsTab({
 				<PanelSection card title="Refused a day · 30 days">
 					<BarChartV
 						height={120}
+						color="var(--color-success)"
+						max={top || undefined}
+						gridlines={top ? [0, top / 2, top] : []}
 						highlightIndex={last >= 0 ? last : null}
 						labelMode="none"
 						data={d.by_day.map((b, i) => ({
@@ -111,7 +126,7 @@ export function LedgerRefusalsTab({
 								<TableRow key={`${r.refused_by}:${r.rule}`}>
 									<TableCell>
 										<Badge
-											variant="soft"
+											variant={REASON_TONE[r.refused_by] ? "soft" : "outline"}
 											tone={REASON_TONE[r.refused_by] ?? "muted"}
 										>
 											{r.rule}

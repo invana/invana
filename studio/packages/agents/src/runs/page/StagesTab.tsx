@@ -26,7 +26,7 @@ import { QueryStepBoard } from "@invana-studio/shell";
 import type { Tone } from "@invana-studio/ui";
 import { useMemo } from "react";
 import { TabReadState } from "../../agents/agentParts";
-import { ms } from "../../overview/fleetParts";
+import { ms, tokens } from "../../overview/fleetParts";
 import { useRunStagesQuery } from "../queries";
 import type { RunStage } from "../types";
 import { useRunParam } from "./useRunParam";
@@ -49,22 +49,19 @@ function stageTone(status: string): Tone {
 	}
 }
 
-/** `0.6 s · 1 call · 4 lanes` — the card's second line. */
+/** `0.6 s · 1 call · 4 lanes · 2.8k tokens` — the card's second line. */
 function stageSub(s: RunStage): string {
 	return [
-		s.summary ||
-			[
-				s.duration_ms != null ? ms(s.duration_ms) : null,
-				`${s.calls} call${s.calls === 1 ? "" : "s"}`,
-			]
-				.filter(Boolean)
-				.join(" · "),
+		s.duration_ms != null ? ms(s.duration_ms) : null,
+		`${s.calls} call${s.calls === 1 ? "" : "s"}`,
 		s.lanes > 1 ? `${s.lanes} lanes` : null,
-		s.line,
+		s.tokens > 0 ? `${tokens(s.tokens)} tokens` : null,
 	]
 		.filter(Boolean)
 		.join(" · ");
 }
+
+const STAGE_CARDS = { view: "Stages" } as const;
 
 export function StagesTab({
 	username,
@@ -92,6 +89,7 @@ export function StagesTab({
 			id: s.step_key,
 			label: s.function,
 			sub: stageSub(s),
+			line: s.line || s.summary || undefined,
 			column: i,
 			tone: stageTone(s.status),
 		}));
@@ -134,7 +132,7 @@ export function StagesTab({
 			<div className="relative min-h-72 flex-1">
 				<LayeredCanvas
 					kind="data"
-					layout="fixed"
+					cards={STAGE_CARDS}
 					nodes={nodes}
 					edges={edges}
 					selectedNodeId={stage?.step_key ?? null}

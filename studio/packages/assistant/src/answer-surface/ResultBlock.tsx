@@ -1,16 +1,14 @@
-import type { Emission, QueryResponse } from "@invana-studio/core";
-import { emissionsApi, request, useRunStore } from "@invana-studio/core";
+import type {
+	Emission,
+	LinkEmission,
+	QueryResponse,
+} from "@invana-studio/core";
+import { emissionsApi, useRunStore } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useMatch, useNavigate, useParams } from "react-router-dom";
 import { EmissionList } from "./AnswerEmission";
-import {
-	emissionsFromResult,
-	type LinkEmission,
-	linkHref,
-	linksFromRows,
-	type RawEmissionRow,
-} from "./emissions";
+import { emissionsFromResult, linkHref } from "./emissions";
 import { LinkCard } from "./LinkCard";
 import { TraceDialog } from "./TraceDialog";
 
@@ -50,8 +48,14 @@ export function ResultBlock({ result, runId }: ResultBlockProps) {
 	// carry the pair only to hand it down.
 	const { username, graphSlug } = useParams();
 	const scoped = Boolean(runId && username && graphSlug);
+	// Keyed on the run's status, so a reply rendered while the run streams
+	// reads its emissions again once it settles — a link arrives that way.
+	const status = useRunStore((s) =>
+		runId ? s.views[runId]?.status : undefined,
+	);
+	const streamed = status !== undefined;
 	const persisted = useQuery({
-		queryKey: ["emissions", username, graphSlug, runId] as const,
+		queryKey: ["emissions", username, graphSlug, runId, status] as const,
 		queryFn: () =>
 			emissionsApi.list(
 				username as string,
@@ -63,26 +67,9 @@ export function ResultBlock({ result, runId }: ResultBlockProps) {
 		// focus would flicker a table for nothing.
 		staleTime: 60_000,
 	});
-
-	// The links this run wrote, read raw: a link is not one of the kinds the
-	// emission card draws. Keyed on the run's status so a reply rendered while
-	// the run streams reads them again once it settles.
-	const status = useRunStore((s) =>
-		runId ? s.views[runId]?.status : undefined,
+	const links = (persisted.data ?? []).filter(
+		(e): e is Emission & LinkEmission => e.kind === "link",
 	);
-	const streamed = status !== undefined;
-	const links = useQuery({
-		queryKey: ["emission-links", username, graphSlug, runId, status] as const,
-		queryFn: async () =>
-			linksFromRows(
-				await request<RawEmissionRow[]>(
-					`/api/v1/u/${username}/${graphSlug}/runs/${runId}/emissions`,
-				),
-			),
-		enabled: scoped,
-		staleTime: 60_000,
-	});
-	const linkIds = new Set((links.data ?? []).map((l) => l.id));
 
 	const navigate = useNavigate();
 	const open = (link: LinkEmission) =>
@@ -90,9 +77,10 @@ export function ResultBlock({ result, runId }: ResultBlockProps) {
 	// Asked from Agents, the list opens itself as the link arrives; the card
 	// stays in the thread as the way back. A thread read later never re-opens.
 	const onAgents = Boolean(useMatch("/u/:username/:graphSlug/agents/*"));
-	const arrived = links.data?.at(-1);
+	const arrived = links.at(-1);
 	useEffect(() => {
-		if (!arrived || !onAgents || !streamed || opened.has(arrived.id)) return;
+		if (!arrived?.id || !onAgents || !streamed || opened.has(arrived.id))
+			return;
 		opened.add(arrived.id);
 		navigate(linkHref(arrived, username as string, graphSlug as string));
 	}, [arrived, onAgents, streamed, navigate, username, graphSlug]);
@@ -121,13 +109,13 @@ export function ResultBlock({ result, runId }: ResultBlockProps) {
 
 	const emissions: Emission[] =
 		scoped && persisted.data?.length
-			? persisted.data.filter((e) => !(e.id && linkIds.has(e.id)))
+			? persisted.data.filter((e) => e.kind !== "link")
 			: emissionsFromResult(result);
 
 	return (
 		<>
-			{links.data?.map((link) => (
-				<LinkCard key={link.id} link={link} onOpen={() => open(link)} />
+			{links.map((link) => (
+				<LinkCard key={link.seq} link={link} onOpen={() => open(link)} />
 			))}
 			<EmissionList
 				emissions={emissions.filter((e) => e.kind !== "subgraph")}

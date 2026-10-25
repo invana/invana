@@ -13193,6 +13193,11 @@
             "title": "By Rule",
             "type": "array"
           },
+          "by_world": {
+            "default": 0,
+            "title": "By World",
+            "type": "integer"
+          },
           "refused_today": {
             "title": "Refused Today",
             "type": "integer"
@@ -21847,9 +21852,15 @@
             "title": "Task Title"
           },
           "tokens": {
-            "default": 0,
-            "title": "Tokens",
-            "type": "integer"
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens"
           }
         },
         "required": [
@@ -22253,6 +22264,13 @@
             ],
             "title": "P95 Ms"
           },
+          "run_of": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Run Of",
+            "type": "object"
+          },
           "status": {
             "title": "Status",
             "type": "string"
@@ -22592,9 +22610,15 @@
             "title": "Time Limit Ms"
           },
           "tokens": {
-            "default": 0,
-            "title": "Tokens",
-            "type": "integer"
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens"
           },
           "tokens_per_minute": {
             "default": 0,
@@ -29673,8 +29697,15 @@
             "type": "integer"
           },
           "model": {
-            "title": "Model",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
           },
           "tokens_in": {
             "default": 0,
@@ -29687,9 +29718,6 @@
             "type": "integer"
           }
         },
-        "required": [
-          "model"
-        ],
         "title": "TouchedLlmRow",
         "type": "object"
       },

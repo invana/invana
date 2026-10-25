@@ -94,6 +94,7 @@ class LedgerStats(BaseModel):
     acts: int
     #: The daily mean over the 7 days before, and the change against it.
     acts_7d_mean: float | None = None
+    #: Against the 7-day daily mean; ``None`` while that mean is under 10 acts.
     acts_change_pct: float | None = None
     people: int
     people_acts: int
@@ -200,6 +201,7 @@ class LedgerRefusalsRead(BaseModel):
     share_pct: float | None = None
     by_grant: int
     by_lens: int
+    by_world: int = 0
     by_ceiling: int
     by_robots: int = 0
     by_day: list[RefusedDay] = Field(default_factory=list)

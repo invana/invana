@@ -57,13 +57,13 @@
   "shell.run.failed": {
    "story": "SH-10",
    "product": "shell",
-   "route": "/u/admin/airways/agents/runs?page=run%3Ab0144efb-6073-4204-8e50-a70308621dd8",
+   "route": "/u/admin/airways/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909",
    "state": "15 stands for a failed run's id: Activity \u203a Runs, status failed, open the newest"
   },
   "shell.run.compare": {
    "story": "SH-11",
    "product": "shell",
-   "route": "/u/admin/airways/agents/runs?page=run%3Ab0144efb-6073-4204-8e50-a70308621dd8",
+   "route": "/u/admin/airways/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909",
    "state": "two runs of one question in two worlds: select both in Activity \u203a Runs, Compare"
   },
   "shell.activity.approvals": {
@@ -75,7 +75,7 @@
   "shell.run.approval": {
    "story": "SH-12",
    "product": "shell",
-   "route": "/u/admin/airways/agents/runs?page=run%3Ab0144efb-6073-4204-8e50-a70308621dd8",
+   "route": "/u/admin/airways/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909",
    "state": "15 stands for a run waiting on approval: open it from Approvals (needs B08)"
   },
   "shell.schedules": {
@@ -189,7 +189,7 @@
   "shell.run.rerun": {
    "story": "SH-18",
    "product": "shell",
-   "route": "/u/admin/airways/agents/runs?page=run%3Ab0144efb-6073-4204-8e50-a70308621dd8",
+   "route": "/u/admin/airways/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909",
    "state": "the uuid stands for a served run (seed_f05.py prints it): Agents \u203a Runs, open the newest served run that answered a question or a query; Re-run\u2026 on its header"
   },
   "shell.first_run": {
@@ -1683,8 +1683,8 @@
   "agents.run.approval": {
    "story": "AF-08",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=overview&right=assistant",
-   "state": "the uuid stands for the seeded run tree of eight agents (scripts/agents-build/seed_f05.py prints it); Overview \u2014 Waiting on you lists its budget and delegation asks"
+   "route": "/u/admin/airways/agents/runs?page=run%3A40b49f33-1ae2-46c8-9ea1-efe63474979a&tab=agents&right=assistant",
+   "state": "the uuid stands for the seeded run tree of eight agents (scripts/agents-build/seed_f05.py prints it); Agents \u2014 the delegation ask drawn on the tree (the assistant's proposal card needs a live session)"
   },
   "agents.run.step": {
    "story": "AF-08",
@@ -1875,7 +1875,7 @@
   "agents.run.rerun": {
    "story": "AF-24",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/runs?page=run%3Ab0144efb-6073-4204-8e50-a70308621dd8&rerun=1&right=assistant",
+   "route": "/u/admin/airways/agents/runs?page=run%3A390810ca-a34f-4d4f-8d3a-2c2df9422909&rerun=1&right=assistant",
    "state": "the uuid stands for a served run of Route Auditor; Rerun"
   },
   "agents.runs.filtered": {

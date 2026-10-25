@@ -8,6 +8,8 @@ carries each row's hash, and that an edited row breaks the chain.
 
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 import pytest
 import pytest_asyncio
 from sqlalchemy import update
@@ -140,6 +142,46 @@ async def test_rows_filter_and_a_member_sees_only_their_own(session, graph, owne
 
     stats = await reader.stats(session, graph=graph, member=owner, since="today")
     assert stats.acts == 5 and stats.refused == 1 and stats.refused_by == {"grant": 1}
+
+
+async def test_by_actor_keys_models_by_address_and_refusals_count_the_world(session, graph, owner, user, rows):
+    """A model row is keyed by its address and carries the step's tokens; a row
+    naming no model is not a model. A ``world`` refusal has its own count, and a
+    near-empty week gives the Acts tile no change."""
+    agent = {"kind": "agent", "id": "a-1", "name": "Route Auditor"}
+    chain = [{"kind": "person", "id": user.id, "name": "owner"}, agent]
+    run = await session.get(TaskRun, rows["read"].run_id)
+    step = TaskRun(graph_id=graph.id, parent_run_id=run.id, task_key="nl.translate", tokens_in=100, tokens_out=20)
+    session.add(step)
+    await session.flush()
+    common = {"actor_kind": "agent", "actor_agent_id": "a-1", "actor_chain": chain, "run_id": run.id, "run_number": 1}
+    await ledger.record(
+        session, graph_id=graph.id, act="nl.translate", layer="llm", touched="llm/anthropic/claude-x",
+        verdict="allowed", step_run_id=step.id, **common,
+    )  # fmt: skip
+    await ledger.record(
+        session, graph_id=graph.id, act="nl.translate", layer="llm", touched="agent/Route Auditor",
+        verdict="allowed", **common,
+    )  # fmt: skip
+    await ledger.record(
+        session, graph_id=graph.id, act="web.fetch", layer="web", touched="web/fares.example.com",
+        verdict="refused", refused_by="world", rule="world · web domains", **common,
+    )  # fmt: skip
+
+    read = await reader.actor(session, graph=graph, member=owner, actor="agent:a-1")
+    assert [(r.key, r.a, r.b) for r in read.llm] == [("anthropic/claude-x", 1, 120)]
+    assert {r.key for r in read.web} == {"ba.com", "fares.example.com"}
+
+    refusals = await reader.refusals(session, graph=graph, member=owner)
+    assert (refusals.by_world, refusals.by_lens, refusals.by_grant) == (1, 0, 1)
+
+    earlier = datetime.now(UTC) - timedelta(days=2)
+    for _ in range(7):
+        await ledger.record(
+            session, graph_id=graph.id, actor_kind="system", act="run.stop", layer="run", verdict="allowed", at=earlier
+        )
+    stats = await reader.stats(session, graph=graph, member=owner, since="today")
+    assert stats.acts_7d_mean == 1.0 and stats.acts_change_pct is None
 
 
 async def test_export_carries_hashes_and_a_tampered_row_breaks_the_chain(session, graph, owner, rows):

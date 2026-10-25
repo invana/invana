@@ -305,7 +305,8 @@ class RunHead(BaseModel):
     session_title: str | None = None
     task_id: str | None = None
     task_title: str | None = None
-    tokens: int = 0
+    #: The tree's spend; ``None`` when no row in it recorded a token count.
+    tokens: int | None = None
     #: The run's token ceiling; ``None`` when it has none.
     max_tokens_run: int | None = None
     started_at: datetime | None = None
@@ -321,7 +322,8 @@ class RunTiles(BaseModel):
     elapsed_ms: int | None = None
     #: The run's time limit; ``None`` when it has none.
     time_limit_ms: int | None = None
-    tokens: int = 0
+    #: As the head's: ``None`` when nothing in the tree recorded tokens.
+    tokens: int | None = None
     max_tokens_run: int | None = None
     agents: int = 0
     #: Deepest child below the root.
@@ -478,6 +480,8 @@ class RunStage(BaseModel):
     #: One line of what happened — ``9 pages ok · 2 refused · 3 failed``.
     summary: str = ""
     step_ids: list[str] = Field(default_factory=list)
+    #: Step id → the run it belongs to — a delegated child's step opens against that child.
+    run_of: dict[str, str] = Field(default_factory=dict)
 
 
 class RunStages(BaseModel):
@@ -517,7 +521,8 @@ class TouchedWebRow(BaseModel):
 
 
 class TouchedLlmRow(BaseModel):
-    model: str
+    #: The model version the calls ran on; ``None`` when none was recorded.
+    model: str | None = None
     calls: int = 0
     tokens_in: int = 0
     tokens_out: int = 0

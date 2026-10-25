@@ -19,7 +19,8 @@ export interface RunHead {
 	session_title: string | null;
 	task_id: string | null;
 	task_title: string | null;
-	tokens: number;
+	/** Absent until the engine has recorded a count. */
+	tokens: number | null;
 	max_tokens_run: number | null;
 	started_at: string | null;
 	finished_at: string | null;
@@ -31,7 +32,8 @@ export interface RunHead {
 export interface RunTiles {
 	elapsed_ms: number | null;
 	time_limit_ms: number | null;
-	tokens: number;
+	/** Absent, as the head's, until something in the run recorded tokens. */
+	tokens: number | null;
 	max_tokens_run: number | null;
 	agents: number;
 	depth: number;
@@ -196,7 +198,8 @@ export interface RunTouched {
 		refused_line: string;
 	}[];
 	llm: {
-		model: string;
+		/** The pinned model version; absent when it was not recorded. */
+		model: string | null;
 		calls: number;
 		tokens_in: number;
 		tokens_out: number;

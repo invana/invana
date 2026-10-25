@@ -99,6 +99,7 @@ flowchart TD
 | AP11 | **A waiting step holds; the rest of its run carries on.** |
 | AP12 | **Alert rules match ledger rows** — an act pattern (`graph.write.*`), a touched pattern (`graph/Fare`), verdicts and refusal reasons, optionally a threshold (`count` in `window_s`). The clock evaluates them over new ledger rows; a match notifies each named member in the inbox and records `last_fired_at`. A rule change is itself a ledger row. |
 | AP13 | **`For you` is what the reader may decide**; `All` is every pending ask in the Graph the reader can see; `Answered` is the decided and expired ones, newest first. The counts on the tabs are the engine's. |
+| AP14 | **An ask ends with its run.** When a run ends — served, failed, stopped or any exit — every read leaves its pending asks out at once, and the clock closes them `expired` on its next tick; what they held is not sent. A delivery or a publish review — asked after its run ended on purpose — keeps its own deadline |
 
 ## Not building
 

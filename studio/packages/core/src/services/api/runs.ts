@@ -495,6 +495,23 @@ function toEmission(row: ApiEmission): Emission {
 				text: String(p.text ?? ""),
 				citations: (p.citations ?? []) as never,
 			};
+		case "link": {
+			const noun = Array.isArray(p.noun)
+				? (p.noun as unknown[]).map(String)
+				: [];
+			return {
+				...base,
+				kind: "link",
+				list: String(p.list ?? ""),
+				label: String(p.label ?? p.list ?? ""),
+				noun: [noun[0] ?? "row", noun[1] ?? "rows"],
+				path: String(p.path ?? ""),
+				params: (p.params ?? {}) as never,
+				chips: (Array.isArray(p.chips) ? p.chips : []) as never,
+				total: Number(p.total ?? 0),
+				unresolved: (Array.isArray(p.unresolved) ? p.unresolved : []) as never,
+			};
+		}
 		default:
 			return {
 				...base,

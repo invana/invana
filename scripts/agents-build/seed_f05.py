@@ -11,12 +11,18 @@ ledger rows are append-only and cannot be seeded twice. Run from the repo root:
     uv run --directory engine python ../scripts/agents-build/seed_f05.py
 
 It prints the ids ``scripts/migration/screen_map.py`` routes the boards to.
+
+The engine fails every running run when it starts, so after a restart, and
+before shooting the boards, put the seeded live runs back::
+
+    uv run --directory engine python ../scripts/agents-build/seed_f05.py --revive
 """
 
 from __future__ import annotations
 
 import asyncio
 import random
+import sys
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
@@ -76,6 +82,20 @@ def _chain(owner, *agents):
     ]
 
 
+MODEL = "anthropic/claude-opus-5-5"
+
+
+def _touched(task_key: str, chain) -> str:
+    """The ledger's `layer/name` for what a seeded step touched."""
+    if task_key.startswith("graph"):
+        return "graph/Airport"
+    if task_key.startswith("llm."):
+        return f"llm/{MODEL}"
+    if task_key.startswith("web."):
+        return "web/fares.example.com/search"
+    return f"agent/{chain[-1]['name']}"
+
+
 class Seeder:
     def __init__(self, db, graph, owner):
         self.db, self.graph, self.owner = db, graph, owner
@@ -120,6 +140,7 @@ class Seeder:
             tokens_out=(tokens - tokens // 2) or None,
             tokens=tokens or None,
             output={"row_count": rows} if rows is not None else None,
+            model_version=MODEL if task_key.startswith("llm.") else None,
         )
         self.db.add(step)
         await self.db.flush()
@@ -132,7 +153,7 @@ class Seeder:
             actor_agent_id=chain[-1]["id"],
             act=task_key,
             layer=next((v for k, v in layer.items() if task_key.startswith(k)), "agent"),
-            touched="graph/Airport" if task_key.startswith("graph") else f"agent/{chain[-1]['name']}",
+            touched=_touched(task_key, chain),
             touched_line=f"{rows} rows" if rows is not None else (f"{tokens:,} tokens" if tokens else ""),
             verdict="allowed",
             run_id=run.id,
@@ -161,6 +182,21 @@ class Seeder:
         self.db.add(run)
         await self.db.flush()
         return run
+
+
+async def ended_runs(s, auditor, c_root):
+    """Route Auditor's closed run and its three failed runs this month."""
+    t1 = NOW - timedelta(days=2, hours=3)
+    closed = await s.root(auditor, body="Which LHR routes lost the most seats last quarter?", status="succeeded", started=t1, finished=t1 + timedelta(minutes=2), exit_reason="served")
+    await s.step(closed, c_root, seq=0, key="graph_read_query", task_key="graph.read.query", start=t1, secs=2, rows=58, number=closed.number)
+    await s.step(closed, c_root, seq=1, key="llm_answer", task_key="llm.answer", start=t1 + timedelta(seconds=3), secs=9, tokens=3_100, number=closed.number)
+    failed = []
+    for i, (reason, ago) in enumerate((("failed", 4), ("budget_declined", 9), ("time_limit", 17))):
+        t = NOW - timedelta(days=ago)
+        r = await s.root(auditor, body=f"Audit {('JFK', 'DXB', 'SIN')[i]} routes for fare gaps", status="failed", started=t, finished=t + timedelta(minutes=5), exit_reason=reason)
+        await s.step(r, c_root, seq=0, key="graph_read_query", task_key="graph.read.query", start=t, secs=2, rows=120, number=r.number)
+        failed.append(r)
+    return closed, failed
 
 
 async def seed(db) -> None:
@@ -246,19 +282,10 @@ async def seed(db) -> None:
     await ledger.record(db, graph_id=graph.id, actor_kind="agent", actor_chain=c_fares, actor_agent_id=fares.id, act="web.fetch", layer="web", touched="web/fares.example.com", touched_line="refused — domain not in its world", verdict="refused", refused_by="world", rule="world · web domains", run_id=fares_run.id, run_number=n, where="in-process", at=t0 + timedelta(minutes=2))
 
     db.add(RunTouch(run_id=root.id, graph_id=graph.id, seq=0, step_key="graph_read_query", address="graph_data/model/Airport", layer="graph_data", sublayer="model", participant="Airport", direction="in", volume={"rows": 214}))
-    db.add(Emission(run_id=root.id, seq=0, kind="table", payload={"title": "Delayed routes by hub", "rows": 42}))
+    db.add(Emission(run_id=root.id, seq=0, kind="table", payload={"title": "Delayed routes by hub", "rows": [{"route": f"LHR-{i}"} for i in range(42)]}))
 
     # ── a closed run, and Route Auditor's failed runs this month ─────────────
-    t1 = NOW - timedelta(days=2, hours=3)
-    closed = await s.root(auditor, body="Which LHR routes lost the most seats last quarter?", status="succeeded", started=t1, finished=t1 + timedelta(minutes=2), exit_reason="served")
-    await s.step(closed, c_root, seq=0, key="graph_read_query", task_key="graph.read.query", start=t1, secs=2, rows=58, number=closed.number)
-    await s.step(closed, c_root, seq=1, key="llm_answer", task_key="llm.answer", start=t1 + timedelta(seconds=3), secs=9, tokens=3_100, number=closed.number)
-    failed = []
-    for i, (reason, ago) in enumerate((("failed", 4), ("budget_declined", 9), ("time_limit", 17))):
-        t = NOW - timedelta(days=ago)
-        r = await s.root(auditor, body=f"Audit {('JFK', 'DXB', 'SIN')[i]} routes for fare gaps", status="failed", started=t, finished=t + timedelta(minutes=5), exit_reason=reason)
-        await s.step(r, c_root, seq=0, key="graph_read_query", task_key="graph.read.query", start=t, secs=2, rows=120, number=r.number)
-        failed.append(r)
+    closed, failed = await ended_runs(s, auditor, c_root)
 
     # ── a run of 700 agents ──────────────────────────────────────────────────
     t2 = NOW - timedelta(minutes=38)
@@ -313,11 +340,76 @@ async def seed(db) -> None:
     print("Delay Analyst  ", delays_run.id, "(child, waiting)")
 
 
+RESTARTED = "engine restarted"
+
+
+async def revive(db) -> None:
+    """Put the seeded live runs back to live after an engine restart.
+
+    The engine fails every queued or running run it finds on startup, and an
+    ended run closes its pending asks. The boards need the tree and the
+    700-agent run still going, so every run under a seeded root that the
+    restart failed is set back to running (queued if it never started), its
+    escrow left unsettled, and the asks it held are pending again.
+    """
+    roots = (
+        (await db.execute(select(TaskRun).where(TaskRun.parent_run_id.is_(None), TaskRun.status == "failed")))
+        .scalars()
+        .all()
+    )
+    frontier = [r for r in roots if (r.params or {}).get("seed") == "f05" and RESTARTED in str(r.error or "")]
+    revived: list[str] = []
+    while frontier:
+        run = frontier.pop()
+        if RESTARTED in str(run.error or "") or RESTARTED in str(run.detail or ""):
+            run.status = "running" if run.started_at else "queued"
+            run.exit_reason = run.outcome = run.error = run.finished_at = None
+            run.detail = ""
+            run.escrow_returned = None
+            revived.append(run.id)
+        frontier.extend((await db.execute(select(TaskRun).where(TaskRun.parent_run_id == run.id))).scalars().all())
+    asks = (
+        (await db.execute(select(Approval).where(Approval.status == "expired", Approval.payload.is_not(None))))
+        .scalars()
+        .all()
+    )
+    reopened = 0
+    for ask in asks:
+        if ask.title in {"More tokens for Delay Analyst", "Delay Analyst wants to delegate to Weather Reader"}:
+            ask.status = "pending"
+            ask.deadline_at = NOW + timedelta(hours=4)
+            ask.decided_at = None
+            reopened += 1
+    print(f"revived {len(revived)} runs, reopened {reopened} asks")
+
+    # A test that cleans up after itself may have taken Route Auditor's ended runs.
+    owner = (await db.execute(select(User).where(User.username == "admin"))).scalar_one()
+    graph = (
+        await db.execute(select(Graph).where(Graph.created_by_id == owner.id, Graph.slug == "airways"))
+    ).scalar_one()
+    auditor = (
+        await db.execute(select(Agent).where(Agent.graph_id == graph.id, Agent.name == "Route Auditor"))
+    ).scalar_one_or_none()
+    if auditor is None:
+        return
+    ended = (
+        await db.execute(
+            select(TaskRun.id).where(
+                TaskRun.agent_id == auditor.id, TaskRun.parent_run_id.is_(None), TaskRun.status == "succeeded"
+            )
+        )
+    ).first()
+    if not ended:
+        closed, failed = await ended_runs(Seeder(db, graph, owner), auditor, _chain(owner, auditor))
+        print("closed run     ", closed.id, f"#{closed.number}")
+        print("failed runs    ", ", ".join(r.id for r in failed))
+
+
 async def main() -> None:
     engine = await create_db_engine()
     factory = create_session_factory(engine)
     async with factory() as db:
-        await seed(db)
+        await (revive(db) if "--revive" in sys.argv else seed(db))
         await db.commit()
     await engine.dispose()
 
