@@ -9,7 +9,7 @@ the engine says where steps wait and how many workers would clear them.
 |---|---|
 | Index | [5.15](../../../README.md#5--agents) · Slice **F06** |
 | Module | [Agents](../spec.md) |
-| API / CLI / Studio | 🔵 / 🔵 / 🔵 |
+| API / CLI / Studio | ✅ / ✅ / 🔵 |
 | Related | [distributed-execution](../../platform/features/distributed-execution.md) 13.11 (the envelope, the executor) · [tool-plugins](../../platform/features/tool-plugins.md) 13.12 (`invana worker` today) · [concurrency-and-contention](concurrency-and-contention.md) 5.7 (a Graph's slot pools — a different thing) · [tokens](../../identity-and-access/features/tokens.md) · options: [workers-and-orchestration](../../../building-engine/workers-and-orchestration.md) · products: [agent-fabric.md](../../../../products/agent-fabric.md) › Workers, AF-10 · AF-11 · [scale-out.md](../../../../products/scale-out.md) |
 
 > **As** an install admin or operator, **I want** every worker in every pool, what each is running,
@@ -145,6 +145,10 @@ DE9 · DE10; the options are compared in [workers-and-orchestration](../../../bu
 | WK15 | **A remote step's context is its args, its step id, its idempotency key, the secrets its plugin declares (from the worker's environment) and the artifacts it records** — no database session, no graph connection. Tool steps need nothing more; the artifacts ride back with the outcome |
 | WK16 | **A lease long-polls for up to 20 s** and answers `204` when nothing is ready; heartbeats carry the worker's busy slots and CPU, which C3 · C4 show |
 | WK17 | **Workers is an Agents rail section** (`/agents/workers`, tabs Pools · Workers · Capacity · Join tokens). A pool and a worker open as workbook tabs (`worker_pool:<name>` · `worker:<name>`), each with the breadcrumb *Workers › pool › worker*; pool names and worker names are unique install-wide, and the routes take an id or a name. Add workers is a modal whose step is `?add=` |
+| WK18 | **A worker's outcome row carries who ran it.** The gateway stores the outcome in `envelope_outcomes` with `_worker` (id, pool, duration) and `_artifacts` beside the tagged JSON; a worker's steps an hour, failures and p95 and a pool's envelopes are read from those keys, and `outcome_from_json` ignores keys that start with `_` |
+| WK19 | **A worker's log lines and CPU series live in the engine process's memory** — the last ~200 lines and 30 minutes, fed by heartbeats. They are lost on restart and empty on a detail read served by another engine process; storing them is scale-out work |
+| WK20 | **A refused join makes no worker row,** so *Joined* shows its checks *waiting* until a worker joins; the refusal reaches the worker as the reason (labels outside the pool, plugins missing, token expired or used up) |
+| WK21 | **A lost worker that heartbeats again is revived** with a new queue worker id; a draining worker that reports no busy slots is `stopped` and its credential is refused from then on |
 
 ## Not building
 
