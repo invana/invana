@@ -88,7 +88,8 @@ test("MO-09 · a model's History lists its versions", async ({ page }) => {
 	await page.goto(
 		`${GRAPH}/modeller/models?model=${model.id}&models_tab=history`,
 	);
-	await expect(page.getByText("Versions", { exact: true })).toBeVisible({
+	const history = page.getByRole("tabpanel", { name: "History" });
+	await expect(history.getByText("Versions", { exact: true })).toBeVisible({
 		timeout: 30_000,
 	});
 	await expect(page.getByText("v1.0.1").first()).toBeVisible();

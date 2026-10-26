@@ -505,7 +505,7 @@ export function readOnly(
 	});
 }
 
-export function menu(items: ModelsMenuItem[]): ActionSpec {
+function menu(items: ModelsMenuItem[]): ActionSpec {
 	return {
 		id: MODELS_ACTIONS.more,
 		// Not `More` — that is the description's own fold.

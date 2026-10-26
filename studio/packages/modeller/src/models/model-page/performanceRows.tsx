@@ -48,7 +48,7 @@ export interface PerformanceRowsOptions {
 }
 
 /** The p95 line, with the Graph's p95 across it and each write marked. */
-export function P95Line({
+function P95Line({
 	days,
 	graphP95,
 	marks,

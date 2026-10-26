@@ -87,7 +87,7 @@ test("archiving a model an active stitch binds is refused, naming the stitches",
 test("the Database tab marks each label against the models, unmodelled first", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=model&models_tab=database`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=database`);
 	await expect(page.getByRole("tab", { name: "All models" })).toBeVisible({
 		timeout: 30_000,
 	});
@@ -110,12 +110,15 @@ test("the Database tab marks each label against the models, unmodelled first", a
 test("one model's Database tab leaves out what no model declares", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=model&models_tab=database`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=database`);
 	await expect(page.getByText("Labels", { exact: true })).toBeVisible({
 		timeout: 30_000,
 	});
+	// Model rows are *Each model* on Overview; the tab is kept once one is read.
+	await page.getByRole("tab", { name: "Overview" }).click();
 	await row(page, "AirRoutes").click();
 	await expect(page.getByRole("tab", { name: "AirRoutes" })).toBeVisible();
+	await page.getByRole("tab", { name: "Database" }).click();
 	// The scoped physical read walks the live database; it can take several seconds.
 	await expect(page.getByText(/\d+ modelled · 0 not/).first()).toBeVisible({
 		timeout: 30_000,
@@ -128,7 +131,7 @@ test("one model's Database tab leaves out what no model declares", async ({
 test("Growth stacks records by model, each write marked and named", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=model&models_tab=growth`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=growth`);
 	await expect(page.getByText("Records over time, by model")).toBeVisible({
 		timeout: 30_000,
 	});
@@ -146,7 +149,7 @@ test("a model nothing was counted for draws no chart of zeros", async ({
 	page,
 }) => {
 	const name = `E2E Growth ${Date.now()}`;
-	await page.goto(`${GRAPH}?panel=model&models_tab=growth`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=growth`);
 	await expect(page.getByText("Records over time, by model")).toBeVisible({
 		timeout: 30_000,
 	});
@@ -154,7 +157,9 @@ test("a model nothing was counted for draws no chart of zeros", async ({
 	await page.getByRole("textbox", { name: "Name" }).fill(name);
 	await page.getByRole("button", { name: "Create model" }).click();
 
+	await page.getByRole("tab", { name: "Overview" }).click();
 	await row(page, name).click();
+	await page.getByRole("tab", { name: "Growth" }).click();
 	await expect(page.getByText(`${name} has no records yet`)).toBeVisible({
 		timeout: 20_000,
 	});
@@ -175,7 +180,7 @@ test("Performance groups queries by shape, and a picked shape shows its plan", a
 	// Opening the Graph counts its types — an Explorer read, and so a logged one.
 	await page.goto(GRAPH);
 	await page.waitForTimeout(3_000);
-	await page.goto(`${GRAPH}?panel=model&models_tab=performance`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=performance`);
 	await expect(page.getByText("Query shapes")).toBeVisible({ timeout: 30_000 });
 	await expect(page.getByText("p95 a day")).toBeVisible();
 
@@ -202,7 +207,7 @@ test("Performance groups queries by shape, and a picked shape shows its plan", a
 });
 
 test("Usage calls nothing unused below 50 queries", async ({ page }) => {
-	await page.goto(`${GRAPH}?panel=model&models_tab=usage`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=usage`);
 	await expect(page.getByText("Each model")).toBeVisible({ timeout: 30_000 });
 	const tooFew = page.getByText(/too few to call anything unused/);
 	const unused = page.getByText("Unused types").locator("..");
@@ -229,7 +234,7 @@ async function adviceFor(page: Page, query: string, shape: RegExp) {
 	// The log is written off the query's path (MP36), so the shape may land a
 	// beat after the reply.
 	await expect(async () => {
-		await page.goto(`${GRAPH}?panel=model&models_tab=performance`);
+		await page.goto(`${GRAPH}/modeller/models?models_tab=performance`);
 		await expect(page.getByText(shape).first()).toBeVisible({
 			timeout: 5_000,
 		});

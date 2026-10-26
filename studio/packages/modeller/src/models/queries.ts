@@ -17,7 +17,6 @@ import type {
 	NodeTypeUpdate,
 	OntologyImportRequest,
 	PropertyKeyCreate,
-	PropertyKeyUpdate,
 } from "./types";
 
 const root = (u: string, g: string) => ["models", u, g] as const;
@@ -284,19 +283,6 @@ export const useCreatePropertyKeyMutation = (u: string, g: string) =>
 		g,
 		({ modelId, versionId, data }: TypeCtx & { data: PropertyKeyCreate }) =>
 			modelsApi.createPropertyKey(u, g, modelId, versionId, data),
-	);
-
-export const useUpdatePropertyKeyMutation = (u: string, g: string) =>
-	useModelMutation(
-		u,
-		g,
-		({
-			modelId,
-			versionId,
-			keyId,
-			data,
-		}: TypeCtx & { keyId: string; data: PropertyKeyUpdate }) =>
-			modelsApi.updatePropertyKey(u, g, modelId, versionId, keyId, data),
 	);
 
 export const useCreateIndexMutation = (u: string, g: string) =>

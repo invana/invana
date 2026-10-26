@@ -28,10 +28,7 @@ export { type ModellerSlots, ModellerSlotsContext } from "./ModellerSlots";
 export { ModelViewPanel } from "./models/model-editor/ModelViewPanel";
 export type { ModelSelection } from "./models/model-editor/types";
 export { ModelsPage } from "./models/model-page/ModelsPage";
-export {
-	modelPagePath,
-	useModelsView,
-} from "./models/model-page/useModelsView";
+export { useModelsView } from "./models/model-page/useModelsView";
 export { useActiveVersionQuery, useModelsQuery } from "./models/queries";
 export { GlobalModelPage } from "./models/stitch/GlobalModelPage";
 export { ModellerStatusBar } from "./models/stitch/ModellerStatusBar";
