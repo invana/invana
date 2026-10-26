@@ -32,7 +32,7 @@ export interface ServedRead {
 }
 
 /** One call over the server — a run. */
-export interface McpCallRead {
+interface McpCallRead {
 	run_id: string;
 	number: number | null;
 	at: string;
