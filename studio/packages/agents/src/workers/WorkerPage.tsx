@@ -142,8 +142,8 @@ export function WorkerPage({
 						/>
 						<MetricTile
 							label="Steps · 1 h"
-							value={w.steps_1h}
-							caption={`${w.failed_1h} failed`}
+							value={w.steps_1h > 0 ? w.steps_1h : "—"}
+							caption={w.steps_1h > 0 ? `${w.failed_1h} failed` : undefined}
 							captionTone={w.failed_1h > 0 ? "warning" : "muted"}
 						/>
 						<MetricTile label="p95 a step" value={millis(w.p95_ms)} />

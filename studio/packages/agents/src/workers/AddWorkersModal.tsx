@@ -434,7 +434,7 @@ export function AddWorkersModal({
 									<Input
 										id="wk-cap"
 										inputMode="numeric"
-										placeholder="no cap"
+										placeholder="e.g. 8 · blank is no cap"
 										value={cap}
 										disabled={created != null}
 										onChange={(e) => setCap(e.target.value)}

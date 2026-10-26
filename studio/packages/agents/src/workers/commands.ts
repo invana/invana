@@ -58,7 +58,7 @@ const manifestFile = (pool: string) => `${deploymentName(pool)}.yaml`;
 export function kubernetesCommands(i: RunInputs): string {
 	return [
 		`kubectl create secret generic invana-join --from-literal=token=${i.token}`,
-		`kubectl apply -f ${manifestFile(i.pool)}   # a Deployment of invana/worker — Download as a file`,
+		`kubectl apply -f ${manifestFile(i.pool)}   # a Deployment of invana/worker`,
 		`kubectl scale deployment ${deploymentName(i.pool)} --replicas=${i.replicas ?? 2}`,
 	].join("\n");
 }
@@ -125,12 +125,19 @@ export function downloadOf(
 	};
 }
 
+/** The line beside the buttons, per platform. */
+export const RUN_FOOTER: Record<RunsOn, string> = {
+	docker: "Run it on each machine; each becomes one worker",
+	python: "Run it on each machine; each becomes one worker",
+	kubernetes: "Apply it once; each replica becomes one worker",
+};
+
 /** The line under the command, per platform. */
 export const RUN_NOTE: Record<RunsOn, string> = {
 	docker:
 		"Needs Docker and outbound HTTPS (443) to the engine. One container is one worker.",
 	python:
-		"Python 3.14 and outbound HTTPS (443) to the engine. The worker logs to stdout.",
+		"Python 3.11 or newer and outbound HTTPS (443) to the engine. The worker logs to stdout.",
 	kubernetes:
 		"The same image as Docker, as a Deployment. You set the replicas; each pod joins with the token and gets its own credential.",
 };

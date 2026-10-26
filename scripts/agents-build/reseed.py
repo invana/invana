@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SEEDS = ["seed_f06.py"]
+SEEDS = ["seed_f06.py", "seed_f04.py"]
 DEV_DB = "postgresql+asyncpg://invana_user:change_this_password@localhost:5432/invana_db"
 
 

@@ -125,8 +125,7 @@ export function WorkerPoolPage({
 					<>
 						<DetailStatus>{RUNS_ON_LABEL[p.runs_on]}</DetailStatus>
 						<span className="text-sm text-muted-foreground">
-							{p.workers} {p.workers === 1 ? "worker" : "workers"} ·{" "}
-							{p.starting > 0 && `${p.starting} starting · `}
+							{p.workers} live · {p.starting > 0 && `${p.starting} starting · `}
 							{p.lost > 0 && `${p.lost} lost · `}
 							{labelsText(p.labels)} ·{" "}
 							{p.set_by === "replicas"

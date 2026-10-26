@@ -21,7 +21,7 @@ import {
 import { PanelSection } from "@invana-studio/ui";
 import { Check, Circle, CircleCheck, X } from "lucide-react";
 import { useState } from "react";
-import { downloadOf, RUN_NOTE, runText } from "./commands";
+import { downloadOf, RUN_FOOTER, RUN_NOTE, runText } from "./commands";
 import { WorkersTable } from "./parts";
 import {
 	useJoinStatusQuery,
@@ -122,7 +122,7 @@ export function RunStep({
 					Download as a file
 				</Button>
 				<span className="ml-auto text-sm text-muted-foreground">
-					Run it on each machine; each becomes one worker
+					{RUN_FOOTER[runsOn]}
 				</span>
 			</div>
 		</div>
