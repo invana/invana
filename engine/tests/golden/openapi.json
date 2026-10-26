@@ -19286,6 +19286,11 @@
             "title": "Attention",
             "type": "array"
           },
+          "attention_total": {
+            "default": 0,
+            "title": "Attention Total",
+            "type": "integer"
+          },
           "by_caller_by_day": {
             "items": {
               "$ref": "#/components/schemas/CallerDay"
@@ -19442,6 +19447,11 @@
             },
             "title": "Signals",
             "type": "array"
+          },
+          "signals_total": {
+            "default": 0,
+            "title": "Signals Total",
+            "type": "integer"
           }
         },
         "required": [
@@ -20316,6 +20326,11 @@
           },
           "errors": {
             "title": "Errors",
+            "type": "integer"
+          },
+          "missing_indexes": {
+            "default": 0,
+            "title": "Missing Indexes",
             "type": "integer"
           },
           "p50": {
@@ -35852,6 +35867,14 @@
           "share": {
             "title": "Share",
             "type": "number"
+          },
+          "signal_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "default": {},
+            "title": "Signal Counts",
+            "type": "object"
           },
           "signals": {
             "default": [],

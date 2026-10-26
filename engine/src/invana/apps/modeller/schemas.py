@@ -680,7 +680,9 @@ class OverviewRow(BaseModel):
     key: str
     share: float
     p95: float | None
+    #: The first three signals; ``signals_total`` says how many fired.
     signals: list[Signal] = []
+    signals_total: int = 0
 
 
 class Attention(BaseModel):
@@ -703,7 +705,9 @@ class Overview(BaseModel):
     by_caller_by_day: list[CallerDay]
     p95_by_day: list[DayValue]
     rows: list[OverviewRow]
+    #: The first six flagged signals; ``attention_total`` counts them all.
     attention: list[Attention]
+    attention_total: int = 0
 
 
 class UsageRow(BaseModel):
@@ -715,6 +719,8 @@ class UsageRow(BaseModel):
     by_caller: dict[str, int]
     last_touched: datetime | None
     signals: list[Signal] = []
+    #: How many types each signal fired on — ``{"unused": 5}``.
+    signal_counts: dict[str, int] = {}
 
 
 class StitchUse(BaseModel):
@@ -782,6 +788,8 @@ class Performance(BaseModel):
     #: ``errors`` over ``total``; 0 with no queries.
     error_rate: float = 0.0
     slow_shapes: int
+    #: Distinct ``label.property`` filtered after a label scan with no index on it.
+    missing_indexes: int = 0
     p95_by_day: list[DayValue]
     shapes: list[ShapeRow]
 
