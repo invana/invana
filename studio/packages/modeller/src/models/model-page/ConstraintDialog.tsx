@@ -232,42 +232,48 @@ export function ConstraintDialog({
 							<FieldLabel htmlFor="constraint-standard">
 								Or use a standard
 							</FieldLabel>
-							<Select
-								value={choice}
-								onValueChange={pickStandard}
-								disabled={standards.isSuccess && choices.length === 0}
-							>
-								<SelectTrigger id="constraint-standard">
-									<SelectValue
-										placeholder={
-											standards.isSuccess && choices.length === 0
+							<div className="flex items-center gap-2">
+								<Select
+									value={choice}
+									onValueChange={pickStandard}
+									disabled={standards.isSuccess && choices.length === 0}
+								>
+									<SelectTrigger id="constraint-standard" className="w-auto">
+										<SelectValue
+											placeholder={
+												standards.isSuccess && choices.length === 0
+													? "No standard has a term with values"
+													: "none"
+											}
+										/>
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value={NONE}>
+											{standards.isSuccess && choices.length === 0
 												? "No standard has a term with values"
-												: "none"
-										}
-									/>
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value={NONE}>
-										{standards.isSuccess && choices.length === 0
-											? "No standard has a term with values"
-											: "none"}
-									</SelectItem>
-									{choices.map((c) => (
-										<SelectItem
-											key={choiceKey(c.standard, c.term)}
-											value={choiceKey(c.standard, c.term)}
-										>
-											{c.title} · {c.term} ({nf.format(c.values)} values)
+												: "none"}
 										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+										{choices.map((c) => (
+											<SelectItem
+												key={choiceKey(c.standard, c.term)}
+												value={choiceKey(c.standard, c.term)}
+											>
+												{c.title} · {c.term} ({nf.format(c.values)} values)
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<span className="text-muted-foreground">
+									a range many datasets share belongs in a standard
+								</span>
+							</div>
 						</Field>
 						<Field>
 							<FieldLabel>When a record breaks it</FieldLabel>
 							<ToggleGroup
 								type="single"
 								variant="outline"
+								className="justify-start"
 								value={onBreak}
 								onValueChange={(v) => v && setOnBreak(v as "reject" | "flag")}
 							>
@@ -347,7 +353,7 @@ function Today({
 function todayLine(check: ConstraintCheck | undefined, pending: boolean) {
 	if (pending || !check) return "Counting the records that break it…";
 	if (!check.counted || check.breaking == null)
-		return "This database cannot count them here.";
+		return check.reason ?? "This database cannot count them here.";
 	if (check.breaking === 0) return "No record breaks it today.";
 	const named = check.samples
 		.map((s) => `${s.record} (${String(s.value)})`)

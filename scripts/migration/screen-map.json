@@ -515,10 +515,14 @@
   "modeller.model.type.constraint": {
    "story": "MO-08",
    "product": "modeller",
-   "route": "/u/admin/arabidopsis/modeller/models?model=807b30c5-7b5a-4eab-b954-684441467763&model_open=1&model_type=Accession&type_tab=constraints",
-   "state": "click days_to_flowering",
+   "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&model_type=airport&type_tab=constraints",
+   "state": "AirRoutes \u203a airport: a row's Edit constraint, a range typed in",
    "click": [
-    "text:days_to_flowering"
+    "Edit constraint on runways",
+    "fill:Lowest value=1",
+    "fill:Highest value=3",
+    "fill:Unit=runways",
+    "text:Flag for review"
    ]
   },
   "modeller.model.history": {

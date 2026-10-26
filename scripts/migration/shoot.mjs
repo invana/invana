@@ -137,6 +137,10 @@ if (val('--diff')) {
           .check({ timeout: 15000 }).catch(() => {});
       } else if (button.startsWith('upload:')) {
         await page.locator('input[type=file]').first().setInputFiles(path.resolve(root, button.slice(7))).catch(() => {});
+      } else if (button.startsWith('fill:')) {
+        // `fill:<label>=<value>` types into the field with that accessible name.
+        const [label, value] = button.slice(5).split('=');
+        await page.getByLabel(label, { exact: true }).first().fill(value ?? '', { timeout: 15000 }).catch(() => {});
       } else if (button.startsWith('label:')) {
         await page.getByLabel(button.slice(6)).first().click({ timeout: 15000 }).catch(() => {});
       } else await page.getByRole('button', { name: button, exact: true }).click({ timeout: 15000 }).catch(() => {});
@@ -145,6 +149,7 @@ if (val('--diff')) {
     }
     // A board that opens on a running check is shot once it has settled.
     await page.getByText('Testing…').waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
+    await page.getByText('Counting the records that break it…').waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
     await page.screenshot({ path: path.join(out, `${name}.png`) });
     if (priorMode) await setMode(page, priorMode);
     console.log(`${route} → ${path.join(out, `${name}.png`)}`);
