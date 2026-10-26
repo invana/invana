@@ -139,7 +139,7 @@ export function StitchesPage({ username, graphSlug }: StitchesPageProps) {
 			/>
 
 			<div className="min-h-0 flex-1 overflow-y-auto">
-				<div className="mx-auto flex w-full max-w-4xl flex-col gap-3 p-3">
+				<div className="mx-auto flex w-full max-w-7xl flex-col gap-3 p-3">
 					<SearchInput
 						inputSize="sm"
 						placeholder="Type to search stitches…"

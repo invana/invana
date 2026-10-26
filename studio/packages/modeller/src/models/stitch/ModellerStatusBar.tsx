@@ -54,7 +54,7 @@ export function ModellerStatusBar({
 		if (!union.data) return null;
 		const types = union.data.node_types.length + union.data.edge_types.length;
 		return (
-			<span>
+			<span className="px-2">
 				{types} {types === 1 ? "type" : "types"} across {union.data.model_count}{" "}
 				{union.data.model_count === 1 ? "model" : "models"}
 			</span>
@@ -64,7 +64,7 @@ export function ModellerStatusBar({
 	if (!drafted) {
 		if (!models.data) return null;
 		return (
-			<span>
+			<span className="px-2">
 				{authored.length} {authored.length === 1 ? "model" : "models"}
 			</span>
 		);
@@ -83,7 +83,7 @@ export function ModellerStatusBar({
 	].filter(Boolean);
 
 	return (
-		<span className="flex items-center gap-3">
+		<span className="flex items-center gap-3 px-2">
 			<span>{parts.join(" · ")}</span>
 			{staged.data ? (
 				<StatusCount tone={staged.data.can_commit ? "success" : "warning"}>

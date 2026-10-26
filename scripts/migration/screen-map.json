@@ -379,19 +379,16 @@
   "modeller.model.type": {
    "story": "MO-02",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_tab=model",
-   "state": "click node type airport",
-   "click": [
-    "text:airport"
-   ]
+   "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&model_type=airport",
+   "state": ""
   },
   "modeller.global_model.stitch": {
    "story": "MO-03",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/global-model",
-   "state": "click a dashed stitch on the board",
+   "state": "click the anchored stitch Country \u2261 country in the union list",
    "click": [
-    "text:anchored"
+    "text:Country \u2261 country"
    ]
   },
   "modeller.stitches": {
@@ -409,7 +406,7 @@
   "modeller.draft": {
    "story": "MO-04",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_tab=model",
+   "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_view=schema",
    "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, with an unpublished draft: change any property, do not publish"
   },
   "modeller.global_model.diff": {
@@ -421,7 +418,7 @@
   "modeller.draft.publish": {
    "story": "MO-05",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_tab=model",
+   "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_view=schema",
    "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, on the draft: Publish",
    "click": [
     "Publish"
@@ -430,7 +427,7 @@
   "modeller.draft.migration": {
    "story": "MO-05",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_tab=model",
+   "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_view=schema",
    "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, a breaking draft (remove a property): Publish",
    "click": [
     "Publish"
@@ -515,11 +512,10 @@
   "modeller.model.type.constraint": {
    "story": "MO-08",
    "product": "modeller",
-   "route": "/u/admin/arabidopsis/modeller/models?model=807b30c5-7b5a-4eab-b954-684441467763&model_open=1&models_tab=model",
-   "state": "Constraints tab; click days_to_flowering",
+   "route": "/u/admin/arabidopsis/modeller/models?model=807b30c5-7b5a-4eab-b954-684441467763&model_open=1&model_type=Accession&type_tab=constraints",
+   "state": "click days_to_flowering",
    "click": [
-    "text:Accession",
-    "scroll:Constraints on this type"
+    "text:days_to_flowering"
    ]
   },
   "modeller.model.history": {

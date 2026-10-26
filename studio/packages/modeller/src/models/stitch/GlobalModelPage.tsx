@@ -24,13 +24,11 @@ import { ActButton } from "@invana-studio/shell";
 import { AlertTriangle, Boxes, Check } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { DraftCompareBar } from "../model-page/DraftCompareBar";
 import { modelPagePath } from "../model-page/useModelsView";
 import {
 	useCommitStitchesMutation,
 	useDiscardStitchesMutation,
 	useGlobalModelQuery,
-	useModelsQuery,
 } from "../queries";
 import { buildAllModelsData, parseMemberId } from "./allModels";
 import { StitchInspector } from "./StitchInspector";
@@ -61,7 +59,6 @@ export function GlobalModelPage({
 		graphSlug,
 	);
 	const union = useGlobalModelQuery(username, graphSlug);
-	const models = useModelsQuery(username, graphSlug);
 	const worlds = useLensesQuery(username, graphSlug, { kind: "world" });
 	const commit = useCommitStitchesMutation(username, graphSlug);
 	const discard = useDiscardStitchesMutation(username, graphSlug);
@@ -191,10 +188,6 @@ export function GlobalModelPage({
 	const summary = union.data
 		? `${union.data.node_types.length} node · ${union.data.edge_types.length} edge types · ${union.data.link_count} stitches`
 		: undefined;
-	const authored = (models.data ?? []).filter(
-		(m) => m.origin !== "introspected",
-	);
-
 	return (
 		<div className="flex h-full min-h-0 w-full">
 			<div className="relative min-h-0 min-w-0 flex-1">
@@ -251,19 +244,9 @@ export function GlobalModelPage({
 							</span>
 						</Card>
 					) : null}
-					<DraftCompareBar
-						username={username}
-						graphSlug={graphSlug}
-						models={authored}
-						onReview={(modelId) =>
-							navigate(
-								modelPagePath(username, graphSlug, modelId, { schema: true }),
-							)
-						}
-					/>
 				</GlobalModelBoard>
 			</div>
-			<aside className="flex min-h-0 w-72 shrink-0 flex-col border-l bg-card">
+			<aside className="flex min-h-0 w-104 shrink-0 flex-col border-l bg-card">
 				{stitchId ? (
 					<StitchInspector
 						key={stitchId}

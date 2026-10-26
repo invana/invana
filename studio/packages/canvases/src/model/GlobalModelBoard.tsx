@@ -235,70 +235,75 @@ export function GlobalModelBoard({
 					/>
 				</GraphCanvasAppSurface>
 
-				<div className="pointer-events-none absolute inset-0 flex flex-col justify-between gap-2 p-2.5">
-					<div className="flex flex-col items-start gap-2">
-						<Card className="pointer-events-auto w-fit p-1 shadow-md">
-							<GraphControlsToolbar
-								layerId={SCHEMA_LAYER}
-								sections={{
-									history: false,
-									layout: false,
-									style: false,
-									edit: false,
-									view: false,
-								}}
-							/>
-						</Card>
-						<Card className="pointer-events-auto flex w-fit items-center gap-2 px-3 py-1 shadow-md">
-							<span className="font-semibold">{title}</span>
-							{summary ? (
-								<span className="text-sm text-muted-foreground">{summary}</span>
-							) : null}
-							<ToolbarItems
-								orientation="horizontal"
-								items={[
-									...selects.map((s) => ({
-										type: "select" as const,
-										key: s.key,
-										label: s.label,
-										value: s.value,
-										options: s.options,
-										onChange: s.onChange,
-									})),
-									{
-										type: "select" as const,
-										key: "detail",
-										label: "Detail",
-										value: level,
-										options: detail.options,
-										onChange: (v: string) => setLevel(v),
-									},
-								]}
-							/>
-						</Card>
-					</div>
+				{/* The toolbars resolve the engine from context, so they mount once it is ready. */}
+				{canvas ? (
+					<div className="pointer-events-none absolute inset-0 flex flex-col justify-between gap-2 p-2.5">
+						<div className="flex flex-col items-start gap-2">
+							<Card className="pointer-events-auto w-fit p-1 shadow-md">
+								<GraphControlsToolbar
+									layerId={SCHEMA_LAYER}
+									sections={{
+										history: false,
+										layout: false,
+										style: false,
+										edit: false,
+										view: false,
+									}}
+								/>
+							</Card>
+							<Card className="pointer-events-auto flex w-fit items-center gap-2 px-3 py-1 shadow-md">
+								<span className="whitespace-nowrap font-semibold">{title}</span>
+								{summary ? (
+									<span className="whitespace-nowrap text-sm text-muted-foreground">
+										{summary}
+									</span>
+								) : null}
+								<ToolbarItems
+									orientation="horizontal"
+									items={[
+										...selects.map((s) => ({
+											type: "select" as const,
+											key: s.key,
+											label: s.label,
+											value: s.value,
+											options: s.options,
+											onChange: s.onChange,
+										})),
+										{
+											type: "select" as const,
+											key: "detail",
+											label: "Detail",
+											value: level,
+											options: detail.options,
+											onChange: (v: string) => setLevel(v),
+										},
+									]}
+								/>
+							</Card>
+						</div>
 
-					<div className="flex items-end gap-2">
-						{/* The canvas draws the minimap under this spacer. */}
-						<div aria-hidden className="w-[200px] shrink-0" />
-						<Card className="pointer-events-auto w-fit p-1 shadow-md">
-							<GraphControlsToolbar
-								layerId={SCHEMA_LAYER}
-								sections={{
-									history: false,
-									layout: false,
-									selectMode: false,
-									style: false,
-									edit: false,
-									grid: false,
-								}}
-							/>
-						</Card>
-						<div className="pointer-events-auto mx-auto flex flex-col items-center gap-2">
-							{children}
+						<div className="flex items-end gap-2">
+							{/* The canvas draws the minimap under this spacer. */}
+							<div aria-hidden className="w-[200px] shrink-0" />
+							<Card className="pointer-events-auto w-fit p-1 shadow-md">
+								<GraphControlsToolbar
+									layerId={SCHEMA_LAYER}
+									sections={{
+										history: false,
+										layout: false,
+										selectMode: false,
+										style: false,
+										edit: false,
+										grid: false,
+									}}
+								/>
+							</Card>
+							<div className="pointer-events-auto mx-auto flex flex-col items-center gap-2">
+								{children}
+							</div>
 						</div>
 					</div>
-				</div>
+				) : null}
 			</GraphCanvasAppRoot>
 		</div>
 	);
