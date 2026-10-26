@@ -3,7 +3,7 @@
 The build of the Agents design ([agent-fabric.md](agent-fabric.md)) and then IAM ([iam.md](iam.md)),
 run as phases by `scripts/migration/run.py` with this file as its runbook. One phase is one row in the
 log and **a run of small commits**, one per step and session; a phase may span several sessions, handing off when a session's context
-passes 200k tokens. Every phase is on **one branch**, `feat/agents-fabric`.
+passes 300k tokens (a sub-agent too; past 350k the driver ends the session). Every phase is on **one branch**, `feat/agents-fabric`.
 
 Run it:
 
@@ -11,7 +11,7 @@ Run it:
 INVANA_RUNBOOK=docs/products/agents-build-sessions.md \
 INVANA_RUNNER_PROMPTS=scripts/agents-build/prompts \
 INVANA_RUNNER_SCOPE=agents INVANA_RUNNER_GATES=full \
-INVANA_MIGRATION_CONTEXT_LIMIT=200000 \
+INVANA_MIGRATION_CONTEXT_LIMIT=300000 \
 INVANA_MIGRATION_GRAPH_DB=bolt://localhost:27687 \
 python3 scripts/migration/run.py
 ```

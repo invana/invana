@@ -334,7 +334,9 @@ def _session(text: str, sid: str, label: str, model: str | None) -> tuple[str, f
     if killed:
         print(f"  {label}: {killed} passed {HARD_STOP:,} tokens of context — ending the session")
         proc.terminate()
-        set_status(sid, "partial", HARD_STOPPED.format(who=killed, limit=HARD_STOP))
+        # A review cut short writes no report, and a missing report already fails the review.
+        if not label.startswith("review"):
+            set_status(sid, "partial", HARD_STOPPED.format(who=killed, limit=HARD_STOP))
         warned = True
     # A slow exit hook can hold the process open after the result.
     try:
