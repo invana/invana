@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,6 +29,20 @@ class ProjectDecisionQuerySet:
             stmt = stmt.where(Project.id.not_in(exclude_project_ids))
         if project_id is not None:
             stmt = stmt.where(Project.id == project_id)
+        return list((await session.execute(stmt)).scalars().all())
+
+    async def decided_since(
+        self, session: AsyncSession, *, since: datetime, graph_id: str | None
+    ) -> list[ProjectDecision]:
+        """Decisions recorded since *since*, newest first — in one Graph, or every Graph when ``None``."""
+        stmt = (
+            select(ProjectDecision)
+            .join(Project, Project.id == ProjectDecision.project_id)
+            .where(ProjectDecision.created_at >= since)
+            .order_by(ProjectDecision.created_at.desc())
+        )
+        if graph_id is not None:
+            stmt = stmt.where(Project.graph_id == graph_id)
         return list((await session.execute(stmt)).scalars().all())
 
     async def count_for_project(self, session: AsyncSession, *, project_id: str) -> int:

@@ -1467,6 +1467,7 @@ CREATE TABLE rule_versions (
 	published_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	"check" JSON, 
 	mode VARCHAR(8), 
+	because VARCHAR(500), 
 	CONSTRAINT rule_versions_pkey PRIMARY KEY (id), 
 	CONSTRAINT rule_versions_published_by_id_fkey FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL, 
 	CONSTRAINT rule_versions_rule_id_fkey FOREIGN KEY(rule_id) REFERENCES rules (id) ON DELETE CASCADE, 

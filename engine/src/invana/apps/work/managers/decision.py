@@ -28,11 +28,13 @@ Usage::
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.datasets.managers import DatasetManager
 from invana.apps.skills.checks import ACT_PROJECT_DECIDE, NOT_RETRACTED, REVIEWED, kinds_at
-from invana.apps.skills.managers import RuleManager
+from invana.apps.skills.managers import RuleManager, refusal_line
 from invana.apps.skills.models import Rule
 from invana.apps.standards.models import Enforcement
 from invana.apps.work.managers.branch import BranchManager
@@ -141,6 +143,21 @@ class DecisionManager:
 
     # ── the rules ────────────────────────────────────────────────────────────
 
+    async def decided_since(
+        self, session: AsyncSession, *, since: datetime, graph_id: str | None
+    ) -> list[tuple[ProjectDecision, Project | None, list[ProjectFinding]]]:
+        """Each decision since *since* — in one Graph, or every Graph — with its project and cited findings."""
+        rows = await self.decisions_qs.decided_since(session, since=since, graph_id=graph_id)
+        findings = {f.id: f for f in await self.findings_qs.by_ids(session, sorted({i for d in rows for i in d.cites}))}
+        projects: dict[str, Project | None] = {}
+        out = []
+        for decision in rows:
+            if decision.project_id not in projects:
+                projects[decision.project_id] = await self.projects_qs.get(session, decision.project_id)
+            cited = [findings[i] for i in decision.cites if i in findings]
+            out.append((decision, projects[decision.project_id], cited))
+        return out
+
     async def applicable(self, session: AsyncSession, *, project: Project) -> list[Rule]:
         """The active rules whose check reads ``project.decide``, in assembly order."""
         candidates = await self.rules.install(session, active_only=True)
@@ -151,9 +168,23 @@ class DecisionManager:
 
     async def _failure(self, session: AsyncSession, *, rule: Rule, cited: list[ProjectFinding]) -> str | None:
         """Which cited evidence breaks *rule* — ``None`` when it passes."""
-        kind = (rule.check or {}).get("kind")
+        return await self.failure(session, check=rule.check or {}, cited=cited)
+
+    async def failure(
+        self, session: AsyncSession, *, check: dict, cited: list[ProjectFinding], at: datetime | None = None
+    ) -> str | None:
+        """Which cited evidence breaks *check* — ``None`` when it passes.
+
+        ``at`` reads the evidence as it stood then: a finding reviewed, or a
+        version retracted, after that moment counts as not yet. Omitted, it is now.
+        """
+        kind = check.get("kind")
         if kind == REVIEWED:
-            unreviewed = [f for f in cited if f.reviewed_by_id is None]
+            unreviewed = [
+                f
+                for f in cited
+                if f.reviewed_by_id is None or (at is not None and f.reviewed_at is not None and f.reviewed_at > at)
+            ]
             if unreviewed:
                 return f"{_names(unreviewed)} not reviewed by a person — review them, or remove them from the cites"
             return None
@@ -164,7 +195,7 @@ class DecisionManager:
                     if cite.get("kind") == "dataset" and cite.get("version_id"):
                         by_version.setdefault(cite["version_id"], []).append(finding)
             versions = await self.datasets.versions_qs.by_ids(session, list(by_version))
-            retracted = [v for v in versions if v.retracted_at is not None]
+            retracted = [v for v in versions if v.retracted_at is not None and (at is None or v.retracted_at <= at)]
             if not retracted:
                 return None
             refs = await self.datasets.addresses(session, [v.id for v in retracted])
@@ -184,7 +215,7 @@ class DecisionManager:
             for rule in await self.applicable(session, project=project)
         ]
         blocks = [
-            f'"{rule.statement}": {reason}'
+            refusal_line(rule, reason)
             for rule, reason in results
             if reason is not None and rule.mode == Enforcement.block
         ]
@@ -266,7 +297,7 @@ class DecisionManager:
         results = await self._check(session, project=project, cited=cited)
 
         warnings = [
-            f'Rule "{rule.statement}": {reason}.'
+            f"Rule {refusal_line(rule, reason)}."
             for rule, reason in results
             if reason is not None and rule.mode == Enforcement.warn
         ]

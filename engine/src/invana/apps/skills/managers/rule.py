@@ -14,8 +14,8 @@ A Graph route never reads an install rule by id — it reads as absent there.
 **Deactivating is not a version.** ``active`` is on the rule, so turning one off
 stops it being offered and checked and leaves every version — and every step
 that cited one — exactly where it was. That is also why there is no delete.
-The statement, the check and the mode are the wording: changing any of them
-publishes the next version.
+The statement, the check, the mode and the reason (``because``) are the
+wording: changing any of them publishes the next version.
 
 Usage::
 
@@ -39,6 +39,16 @@ from invana.core.auth.models import User
 from invana.core.errors import NotFoundError, PermissionDeniedError, ValidationError
 from invana.core.events import actions
 from invana.core.events.services import emit_event
+
+
+def _because(text: str | None) -> str | None:
+    return (text or "").strip() or None
+
+
+def refusal_line(rule: Rule, reason: str) -> str:
+    """How a refusal or a warning names a rule: its statement, its reason, what broke."""
+    because = f" (because {rule.because})" if rule.because else ""
+    return f'"{rule.statement}"{because}: {reason}'
 
 
 def _scope(graph_id: str | None, project_id: str | None) -> str:
@@ -131,7 +141,13 @@ class RuleManager:
         await self.rules_qs.add(session, rule)
 
         version = RuleVersion(
-            rule_id=rule.id, version=1, statement=payload.statement, check=check, mode=mode, published_by_id=actor_id
+            rule_id=rule.id,
+            version=1,
+            statement=payload.statement,
+            check=check,
+            mode=mode,
+            because=_because(payload.because),
+            published_by_id=actor_id,
         )
         await self.versions_qs.add(session, version)
         rule.current_version = version
@@ -151,6 +167,7 @@ class RuleManager:
                 "project_id": project_id,
                 "check": check,
                 "mode": mode,
+                "because": version.because,
             },
         )
         return rule
@@ -170,11 +187,18 @@ class RuleManager:
         why: str | None = None,
         check: dict[str, Any] | None = None,
         mode: str | None = None,
+        because: str | None = None,
     ) -> RuleVersion:
         """Mint the next version and point the rule at it."""
         number = await self.versions_qs.highest_version(session, rule.id) + 1
         version = RuleVersion(
-            rule_id=rule.id, version=number, statement=statement, check=check, mode=mode, published_by_id=actor_id
+            rule_id=rule.id,
+            version=number,
+            statement=statement,
+            check=check,
+            mode=mode,
+            because=because,
+            published_by_id=actor_id,
         )
         await self.versions_qs.add(session, version)
         rule.current_version = version
@@ -187,7 +211,14 @@ class RuleManager:
             target_id=rule.id,
             graph_id=rule.graph_id,
             actor_id=actor_id,
-            details={"statement": statement, "version": number, "why": why, "check": check, "mode": mode},
+            details={
+                "statement": statement,
+                "version": number,
+                "why": why,
+                "check": check,
+                "mode": mode,
+                "because": because,
+            },
         )
         return version
 
@@ -205,12 +236,20 @@ class RuleManager:
             check, mode = await self._check_and_mode(session, check=check_in, mode=mode_in, scope=rule.scope)
         else:
             check, mode = rule.check, rule.mode
+        because = _because(payload.because) if "because" in sent else rule.because
 
         # Resending the same wording is not a publish: an identical version
         # would restart the citation count for no reason.
-        if (statement, check, mode) != (rule.statement, rule.check, rule.mode):
+        if (statement, check, mode, because) != (rule.statement, rule.check, rule.mode, rule.because):
             await self.publish(
-                session, rule=rule, statement=statement, actor_id=actor_id, why=payload.why, check=check, mode=mode
+                session,
+                rule=rule,
+                statement=statement,
+                actor_id=actor_id,
+                why=payload.why,
+                check=check,
+                mode=mode,
+                because=because,
             )
         return rule
 

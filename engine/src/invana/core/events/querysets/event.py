@@ -108,6 +108,15 @@ class EventQuerySet:
         order = (Event.created_at.desc(), Event.id.desc()) if newest_first else (Event.created_at, Event.id)
         return [(event, user) for event, user in (await session.execute(stmt.order_by(*order))).all()]
 
+    async def since(
+        self, session: AsyncSession, *, actions: frozenset[str], since: datetime, graph_id: str | None = None
+    ) -> list[Event]:
+        """Events of the given actions since *since*, newest first — in one Graph, or anywhere when ``None``."""
+        stmt = select(Event).where(Event.action.in_(sorted(actions)), Event.created_at >= since)
+        if graph_id is not None:
+            stmt = stmt.where(Event.graph_id == graph_id)
+        return list((await session.execute(stmt.order_by(Event.created_at.desc(), Event.id.desc()))).scalars().all())
+
     async def list_page(
         self,
         session: AsyncSession,

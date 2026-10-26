@@ -396,6 +396,10 @@ class Rule(Base):
     def mode(self) -> str | None:
         return self.current_version.mode if self.current_version is not None else None
 
+    @property
+    def because(self) -> str | None:
+        return self.current_version.because if self.current_version is not None else None
+
 
 class RuleVersion(Base):
     """One published wording of a rule. **Immutable** once written.
@@ -422,6 +426,8 @@ class RuleVersion(Base):
     check: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     #: ``block · warn · report``; set exactly when ``check`` is.
     mode: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    #: Why the rule holds — named to whoever it stops.
+    because: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     published_by_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True

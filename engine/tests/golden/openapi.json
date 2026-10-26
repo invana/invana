@@ -20784,6 +20784,50 @@
         "title": "Page[PluginSummary]",
         "type": "object"
       },
+      "Page_RuleRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RuleRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[RuleRead]",
+        "type": "object"
+      },
       "Page_SkillRead_": {
         "properties": {
           "applied": {
@@ -26565,6 +26609,18 @@
       },
       "RuleCreate": {
         "properties": {
+          "because": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Because"
+          },
           "check": {
             "anyOf": [
               {
@@ -26606,6 +26662,101 @@
           "statement"
         ],
         "title": "RuleCreate",
+        "type": "object"
+      },
+      "RuleImpact": {
+        "description": "What a check would have broken over the window, read back act by act.",
+        "properties": {
+          "broken": {
+            "title": "Broken",
+            "type": "integer"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RuleImpactItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "read": {
+            "title": "Read",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "days",
+          "read",
+          "broken"
+        ],
+        "title": "RuleImpact",
+        "type": "object"
+      },
+      "RuleImpactItem": {
+        "description": "One act of the window the check breaks.",
+        "properties": {
+          "act": {
+            "title": "Act",
+            "type": "string"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          }
+        },
+        "required": [
+          "act",
+          "subject",
+          "at",
+          "reason"
+        ],
+        "title": "RuleImpactItem",
+        "type": "object"
+      },
+      "RuleImpactRequest": {
+        "description": "A check as the dialog holds it, and where it would sit.",
+        "properties": {
+          "check": {
+            "$ref": "#/components/schemas/RuleCheck"
+          },
+          "project_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Key"
+          },
+          "scope": {
+            "enum": [
+              "install",
+              "graph",
+              "project"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope",
+          "check"
+        ],
+        "title": "RuleImpactRequest",
         "type": "object"
       },
       "RuleIn": {
@@ -26684,6 +26835,35 @@
             "title": "Active",
             "type": "boolean"
           },
+          "acts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Acts",
+            "type": "array"
+          },
+          "because": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Because"
+          },
+          "broken_30d": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Broken 30D"
+          },
           "check": {
             "anyOf": [
               {
@@ -26726,6 +26906,17 @@
             ],
             "title": "Graph Id"
           },
+          "graph_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graph Name"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -26758,6 +26949,28 @@
               }
             ],
             "title": "Project Id"
+          },
+          "project_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Key"
+          },
+          "project_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Name"
           },
           "scope": {
             "title": "Scope",
@@ -26797,6 +27010,18 @@
       "RuleUpdate": {
         "description": "A rewording, a reorder, or both.\n\nChanging the statement publishes the next version; ``order`` and ``active``\nare properties of the rule and are edited in place\n([RU4](docs/for-developers/modules/skills/features/rules.md)).",
         "properties": {
+          "because": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Because"
+          },
           "check": {
             "anyOf": [
               {
@@ -26914,6 +27139,17 @@
       },
       "RuleVersionRead": {
         "properties": {
+          "because": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Because"
+          },
           "check": {
             "anyOf": [
               {
@@ -41511,6 +41747,53 @@
           }
         ],
         "summary": "Create Install Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rules/impact": {
+      "post": {
+        "description": "What an install check would have broken in the last 30 days, in every Graph.",
+        "operationId": "install_rule_impact_api_v1_rules_impact_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleImpactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleImpact"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Install Rule Impact",
         "tags": [
           "rules"
         ]
@@ -63766,8 +64049,8 @@
     },
     "/api/v1/u/{username}/{graphSlug}/rules": {
       "get": {
-        "description": "Every invariant on this Graph, active and inactive, in offer order, and the install rules above them.",
-        "operationId": "list_invariants_api_v1_u__username___graphSlug__rules_get",
+        "description": "Every rule in force here \u2014 the install's, the Graph's, each visible project's \u2014 in assembly order.",
+        "operationId": "list_rules_api_v1_u__username___graphSlug__rules_get",
         "parameters": [
           {
             "description": "Owner username from the URL prefix.",
@@ -63797,7 +64080,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RuleListResponse"
+                  "$ref": "#/components/schemas/Page_RuleRead_"
                 }
               }
             },
@@ -63819,7 +64102,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "List Invariants",
+        "summary": "List Rules",
         "tags": [
           "rules"
         ]
@@ -63888,6 +64171,77 @@
           }
         ],
         "summary": "Create Invariant",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/rules/impact": {
+      "post": {
+        "description": "What this check would have broken in the last 30 days, read in this Graph.",
+        "operationId": "rule_impact_api_v1_u__username___graphSlug__rules_impact_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleImpactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleImpact"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Rule Impact",
         "tags": [
           "rules"
         ]

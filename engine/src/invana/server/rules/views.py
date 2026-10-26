@@ -18,8 +18,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.skills.managers import RuleManager
 from invana.apps.skills.schemas import (
+    RULE_LIST,
     RuleCitationsResponse,
     RuleCreate,
+    RuleImpact,
+    RuleImpactRequest,
     RuleListResponse,
     RuleRead,
     RuleUpdate,
@@ -30,12 +33,15 @@ from invana.apps.work.managers import ProjectManager
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
-from invana.runtime.managers import RuleCitationManager
+from invana.core.lists import ListParams, Page, applied_filters, list_params
+from invana.runtime.managers import RuleCitationManager, RuleImpactManager, RulePageManager
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 rules = RuleManager()
 projects = ProjectManager()
 citations = RuleCitationManager()
+impact = RuleImpactManager()
+pages = RulePageManager()
 
 
 async def _with_citations(session: AsyncSession, *, graph_id: str, items: list) -> list[RuleRead]:
@@ -56,16 +62,35 @@ async def _with_citations(session: AsyncSession, *, graph_id: str, items: list) 
 # ── a Graph's invariants ──────────────────────────────────────────────────────
 
 
-async def list_invariants(
-    _: GraphMember = Depends(require_graph_member),
+async def list_rules(
+    params: ListParams = Depends(list_params(RULE_LIST)),
+    member: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> RuleListResponse:
-    """Every invariant on this Graph, active and inactive, in offer order, and the install rules above them."""
-    items = await rules.invariants(session, graph_id=graph.id)
-    reads = await _with_citations(session, graph_id=graph.id, items=items)
-    inherited = await _with_citations(session, graph_id=graph.id, items=await rules.install(session))
-    return RuleListResponse(items=reads, total=len(reads), inherited=inherited)
+) -> Page[RuleRead]:
+    """Every rule in force here — the install's, the Graph's, each visible project's — in assembly order."""
+    items, info = await pages.in_force(session, graph=graph, reader_id=member.user_id, params=params)
+    return Page[RuleRead].of(items, info, applied_filters(params, RULE_LIST))
+
+
+async def rule_impact(
+    payload: RuleImpactRequest,
+    member: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> RuleImpact:
+    """What this check would have broken in the last 30 days, read in this Graph."""
+    project_id = None
+    if payload.scope == "project":
+        key = payload.project_key or ""
+        project_id = (await projects.get_by_key(session, key=key, graph_id=graph.id, reader_id=member.user_id)).id
+    return await impact.of_check(
+        session,
+        check=payload.check.model_dump(exclude_none=True),
+        scope=payload.scope,
+        graph_id=graph.id,
+        project_id=project_id,
+    )
 
 
 async def create_invariant(
@@ -215,6 +240,18 @@ async def create_install_rule(
 ) -> RuleRead:
     """An install rule — offered in every Graph, and checked where its check says."""
     return RuleRead.model_validate(await rules.create_install(session, payload=payload, actor=user))
+
+
+async def install_rule_impact(
+    payload: RuleImpactRequest,
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RuleImpact:
+    """What an install check would have broken in the last 30 days, in every Graph."""
+    rules.require_install_admin(user)
+    return await impact.of_check(
+        session, check=payload.check.model_dump(exclude_none=True), scope="install", graph_id=None
+    )
 
 
 async def get_install_rule(

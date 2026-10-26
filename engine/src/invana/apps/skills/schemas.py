@@ -5,8 +5,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from invana.apps.skills.checks import ACT_DATASET_BIND, ACT_DATASET_SHARE, ACT_PROJECT_DECIDE, acts_of
 from invana.apps.standards.models import Enforcement
 from invana.core.lists import Filter, ListSpec
 
@@ -450,6 +451,8 @@ class RuleCreate(BaseModel):
     check: RuleCheck | None = None
     #: What a failed check does; ``warn`` when a check is given without one.
     mode: Enforcement | None = None
+    #: Why it holds — named to whoever it stops.
+    because: str | None = Field(default=None, max_length=500)
 
 
 class RuleUpdate(BaseModel):
@@ -465,6 +468,8 @@ class RuleUpdate(BaseModel):
     #: Sent as null, it removes the check (and the mode) in the next version.
     check: RuleCheck | None = None
     mode: Enforcement | None = None
+    #: Sent as null, it removes the reason in the next version.
+    because: str | None = Field(default=None, max_length=500)
     #: Why — carried on the event that mints the version, never inferred.
     why: str | None = Field(default=None, max_length=500)
 
@@ -478,6 +483,7 @@ class RuleVersionRead(BaseModel):
     statement: str
     check: RuleCheck | None = None
     mode: Enforcement | None = None
+    because: str | None = None
     published_by_id: str | None
     published_at: datetime
 
@@ -511,11 +517,27 @@ class RuleRead(BaseModel):
     statement: str
     check: RuleCheck | None = None
     mode: Enforcement | None = None
+    because: str | None = None
+    #: The acts its check is read at; empty on a rule that is only offered.
+    acts: list[str] = Field(default_factory=list)
     #: Steps that cited any version of this rule — the number under the
     #: statement on the drawer row. `0` on a rule nothing has used yet.
     citations: int = 0
+    #: On a Graph's list: the Graph's name on a Graph or project rule.
+    graph_name: str | None = None
+    #: On a Graph's list: the project a working rule belongs to.
+    project_key: str | None = None
+    project_name: str | None = None
+    #: On a Graph's list: acts of the last 30 days its check breaks; null with no check.
+    broken_30d: int | None = None
     created_at: datetime
     updated_at: datetime
+
+    @model_validator(mode="after")
+    def _acts(self) -> RuleRead:
+        if self.check is not None and not self.acts:
+            self.acts = acts_of(self.check.kind)
+        return self
 
 
 class RuleCitation(BaseModel):
@@ -566,6 +588,53 @@ class RuleCitationsResponse(BaseModel):
     #: Every published wording with its own count, newest first.
     versions: list[RuleVersionCitations] = Field(default_factory=list)
     items: list[RuleCitation]
+
+
+RULE_LIST = ListSpec(
+    filters={
+        "scope": Filter(values=("install", "graph", "project"), title="Scope"),
+        "act": Filter(
+            values=(ACT_DATASET_SHARE, ACT_DATASET_BIND, ACT_PROJECT_DECIDE),
+            labels={
+                ACT_DATASET_SHARE: "Dataset share",
+                ACT_DATASET_BIND: "Dataset bind",
+                ACT_PROJECT_DECIDE: "Project decision",
+            },
+            title="Checked on",
+        ),
+    },
+    sorts=("order",),
+)
+
+
+class RuleImpactRequest(BaseModel):
+    """A check as the dialog holds it, and where it would sit."""
+
+    scope: Literal["install", "graph", "project"]
+    #: The project a working rule would sit on.
+    project_key: str | None = None
+    check: RuleCheck
+
+
+class RuleImpactItem(BaseModel):
+    """One act of the window the check breaks."""
+
+    act: str
+    #: What the act was on — ``publisher/name@v`` or ``PROJ/b2/d3``.
+    subject: str
+    at: datetime
+    reason: str
+
+
+class RuleImpact(BaseModel):
+    """What a check would have broken over the window, read back act by act."""
+
+    days: int
+    #: Acts of the window the check is read at.
+    read: int
+    broken: int
+    #: The newest broken acts, at most five.
+    items: list[RuleImpactItem] = Field(default_factory=list)
 
 
 class RuleListResponse(BaseModel):

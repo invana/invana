@@ -42,6 +42,9 @@ REVIEWED = "evidence.reviewed"
 #: No finding a decision cites cites a retracted dataset version.
 NOT_RETRACTED = "evidence.not_retracted"
 
+#: Every checked act, in the order a surface lists them.
+ACTS = (ACT_DATASET_SHARE, ACT_DATASET_BIND, ACT_PROJECT_DECIDE)
+
 
 @dataclass(frozen=True)
 class CheckKind:
@@ -77,6 +80,12 @@ CHECK_KINDS: dict[str, CheckKind] = {
 def kinds_at(act: str) -> set[str]:
     """The check kinds an act reads."""
     return {kind for kind, spec in CHECK_KINDS.items() if act in spec.acts}
+
+
+def acts_of(kind: str) -> list[str]:
+    """The acts a check kind is read at, in the order a surface lists them."""
+    spec = CHECK_KINDS.get(kind)
+    return [a for a in ACTS if spec is not None and a in spec.acts]
 
 
 def normalise_check(check: dict[str, Any], *, scope: str) -> dict[str, Any]:

@@ -1457,6 +1457,7 @@ CREATE TABLE rule_versions (
 	statement TEXT NOT NULL, 
 	"check" JSON, 
 	mode VARCHAR(8), 
+	because VARCHAR(500), 
 	published_by_id VARCHAR(36), 
 	published_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
