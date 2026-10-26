@@ -6,7 +6,6 @@ import type {
 	GraphConnectionRead,
 	GraphConnectRead,
 	GraphContention,
-	GraphCreate,
 	GraphListResponse,
 	GraphUpdate,
 	SetupSection,
@@ -39,12 +38,6 @@ export const graphsApi = {
 
 	get: (username: string, graphSlug: string) =>
 		request<Graph>(`/api/v1/u/${username}/${graphSlug}`),
-
-	create: (data: GraphCreate) =>
-		request<Graph>("/api/v1/graphs", {
-			method: "POST",
-			body: JSON.stringify(data),
-		}),
 
 	update: (username: string, graphSlug: string, data: GraphUpdate) =>
 		request<Graph>(`/api/v1/u/${username}/${graphSlug}`, {

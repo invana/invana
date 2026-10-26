@@ -23,14 +23,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { modelsApi } from "../../api";
-import { useCreateModelMutation, useUpdateModelMutation } from "../../queries";
+import { useUpdateModelMutation } from "../../queries";
 import type { GraphModelSummary } from "../../types";
 
 interface Props {
 	open: boolean;
 	username: string;
 	graphSlug: string;
-	/** null → create a new model; set → edit this model. */
+	/** The model to edit; null keeps the dialog closed. */
 	model: GraphModelSummary | null;
 	onClose: () => void;
 }
@@ -42,8 +42,6 @@ export function ModelFormDialog({
 	model,
 	onClose,
 }: Props) {
-	const isEdit = model !== null;
-	const create = useCreateModelMutation(username, graphSlug);
 	const update = useUpdateModelMutation(username, graphSlug);
 
 	const [name, setName] = useState("");
@@ -57,45 +55,30 @@ export function ModelFormDialog({
 	const { data: full } = useQuery({
 		queryKey: ["models", username, graphSlug, model?.id, "detail"],
 		queryFn: () => modelsApi.get(username, graphSlug, model?.id as string),
-		enabled: open && isEdit,
+		enabled: open && model !== null,
 	});
 
 	useEffect(() => {
 		if (!open) return;
-		if (isEdit && full) {
+		if (full) {
 			setName(full.name);
 			setDescription(full.description);
 			setValidationMode(full.validation_mode as "strict" | "permissive");
-		} else if (!isEdit) {
-			setName("");
-			setDescription("");
-			setValidationMode("strict");
 		}
 		setError(null);
-	}, [open, isEdit, full]);
+	}, [open, full]);
 
-	const submitting = create.isPending || update.isPending;
+	const submitting = update.isPending;
 
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		setError(null);
 		try {
-			if (isEdit && model) {
-				await update.mutateAsync({
-					id: model.id,
-					data: {
-						name,
-						description,
-						validation_mode: validationMode,
-					},
-				});
-			} else {
-				await create.mutateAsync({
-					name,
-					description,
-					validation_mode: validationMode,
-				});
-			}
+			if (!model) return;
+			await update.mutateAsync({
+				id: model.id,
+				data: { name, description, validation_mode: validationMode },
+			});
 			onClose();
 		} catch (err) {
 			const message =
@@ -106,16 +89,12 @@ export function ModelFormDialog({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+		<Dialog open={open && model !== null} onOpenChange={(o) => !o && onClose()}>
 			<DialogContent>
 				<form onSubmit={onSubmit}>
 					<DialogHeader>
-						<DialogTitle>{isEdit ? "Edit model" : "New model"}</DialogTitle>
-						<DialogDescription>
-							{isEdit
-								? "Update this model's metadata."
-								: "A graph model groups the node and edge types that data is validated against. It starts as a draft you can author, then publish."}
-						</DialogDescription>
+						<DialogTitle>Edit model</DialogTitle>
+						<DialogDescription>Update this model's metadata.</DialogDescription>
 					</DialogHeader>
 					<div className="space-y-4 pt-4">
 						<div className="space-y-2">
@@ -159,11 +138,7 @@ export function ModelFormDialog({
 							Cancel
 						</Button>
 						<Button type="submit" disabled={submitting}>
-							{submitting
-								? "Saving…"
-								: isEdit
-									? "Save changes"
-									: "Create model"}
+							{submitting ? "Saving…" : "Save changes"}
 						</Button>
 					</DialogFooter>
 				</form>

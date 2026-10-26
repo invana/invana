@@ -5,8 +5,9 @@
  * same `GraphModelCanvas` as the global model, with no frame: the page's
  * breadcrumb already names the model. It only reads — a type clicked on it is
  * handed to the page, which opens that type's own page, where a draft's
- * properties, indexes and constraints are edited. Nothing here commits:
- * Publish is on the page header.
+ * properties, indexes and constraints are edited. On a draft it also marks
+ * each changed type against the active version and floats the staged bar;
+ * Publish and Discard are handed to the page, which owns their confirms.
  */
 
 import { EmptyState } from "@invana/ui";
@@ -21,12 +22,15 @@ import {
 	useModelsQuery,
 	useModelVersionQuery,
 	useModelVersionsQuery,
+	useStagedSetQuery,
+	useVersionDiffQuery,
 } from "../queries";
 import {
 	buildAllModelsData,
 	memberIdOf,
 	parseMemberId,
 } from "../stitch/allModels";
+import { StagedBar } from "./StagedBar";
 import type { ModelSelection } from "./types";
 
 interface Props {
@@ -39,6 +43,10 @@ interface Props {
 	selection: ModelSelection | null;
 	/** A type clicked on the canvas; the page opens its type page. */
 	onSelect: (selection: ModelSelection | null) => void;
+	/** *Publish vN* on the staged bar — the page opens its confirm. */
+	onPublish: () => void;
+	/** *Discard* on the staged bar. */
+	onDiscard: () => void;
 }
 
 export function ModelCanvas({
@@ -48,6 +56,8 @@ export function ModelCanvas({
 	backend,
 	selection,
 	onSelect,
+	onPublish,
+	onDiscard,
 }: Props) {
 	const models = useModelsQuery(username, graphSlug);
 	const model = (models.data ?? []).find((m) => m.id === modelId) ?? null;
@@ -64,8 +74,52 @@ export function ModelCanvas({
 		openVersionId,
 	);
 	const tree = version.data;
-	const nodeTypes = tree?.node_types ?? [];
-	const edgeTypes = tree?.edge_types ?? [];
+
+	// A draft is marked against the active version: with `against` left out
+	// the engine would compare it to nothing and mark every type added.
+	const marked = !!draft && !!active;
+	const diff = useVersionDiffQuery(
+		username,
+		graphSlug,
+		modelId,
+		marked ? draft.id : undefined,
+		active?.id,
+	);
+	const staged = useStagedSetQuery(username, graphSlug, modelId, !!draft);
+	const activeTree = useModelVersionQuery(
+		username,
+		graphSlug,
+		modelId,
+		marked ? active.id : undefined,
+	);
+	const marks = marked ? diff.data?.marks : undefined;
+
+	// A type the draft removes stays drawn, from the active version, with its chip.
+	const removed = useMemo(
+		() =>
+			new Set(
+				(marks ?? []).filter((m) => m.mark === "removed").map((m) => m.type),
+			),
+		[marks],
+	);
+	const nodeTypes = useMemo(
+		() => [
+			...(tree?.node_types ?? []),
+			...(marked
+				? (activeTree.data?.node_types ?? []).filter((t) => removed.has(t.name))
+				: []),
+		],
+		[tree, marked, activeTree.data, removed],
+	);
+	const edgeTypes = useMemo(
+		() => [
+			...(tree?.edge_types ?? []),
+			...(marked
+				? (activeTree.data?.edge_types ?? []).filter((t) => removed.has(t.name))
+				: []),
+		],
+		[tree, marked, activeTree.data, removed],
+	);
 
 	const selectedNode =
 		selection?.kind === "node_type"
@@ -156,13 +210,26 @@ export function ModelCanvas({
 		);
 
 	return (
-		<GraphModelCanvas
-			data={build.data}
-			message="Hover a type for its properties, an edge for what it connects"
-			selected={canvasSelection}
-			onSelect={onCanvasSelect}
-			backend={backend}
-			initialDetail="medium"
-		/>
+		<div className="relative h-full w-full">
+			<GraphModelCanvas
+				data={build.data}
+				{...(marks ? { marks } : {})}
+				message="Hover a type for its properties, an edge for what it connects"
+				selected={canvasSelection}
+				onSelect={onCanvasSelect}
+				backend={backend}
+				initialDetail="medium"
+			/>
+			{draft ? (
+				<div className="absolute top-3 right-3 z-10">
+					<StagedBar
+						staged={staged.data?.count ?? 0}
+						version={draft.version}
+						onPublish={onPublish}
+						onDiscard={onDiscard}
+					/>
+				</div>
+			) : null}
+		</div>
 	);
 }

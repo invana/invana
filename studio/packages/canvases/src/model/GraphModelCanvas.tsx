@@ -16,10 +16,17 @@ import { SIDE_SECTION } from "@invana-studio/core";
 import { type ReactNode, useMemo } from "react";
 import { renderModelEdge } from "./preview";
 import { decorate, useSuccessColor } from "./style";
-import type { Detail, ModelCanvasSelection, ModelGraphData } from "./types";
+import type {
+	Detail,
+	ModelCanvasSelection,
+	ModelGraphData,
+	ModelTypeMark,
+} from "./types";
 
 export interface GraphModelCanvasProps {
 	data: ModelGraphData;
+	/** What a version pair changed: marked types wear a chip, an added one is dashed. */
+	marks?: ModelTypeMark[];
 	/** Left out, the header carries no title — a page that names the model already. */
 	title?: string;
 	/** Shown once in the message bar when the canvas is ready. */
@@ -67,6 +74,7 @@ const schemaCard = (d: SchemaTypeData) => ({
 
 export function GraphModelCanvas({
 	data,
+	marks,
 	title,
 	message = "Hover an edge for its stitch rule — only stitches cross a model frame",
 	initialDetail = "high",
@@ -77,7 +85,10 @@ export function GraphModelCanvas({
 	backend,
 }: GraphModelCanvasProps) {
 	const success = useSuccessColor();
-	const drawn = useMemo(() => decorate(data, success), [data, success]);
+	const drawn = useMemo(
+		() => decorate(marks ? { ...data, marks } : data, success),
+		[data, marks, success],
+	);
 	const connect: SchemaBoardConnect | undefined = stitching
 		? {
 				onConnect: stitching.onStitch,

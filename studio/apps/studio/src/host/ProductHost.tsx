@@ -29,6 +29,7 @@ import {
 	type ModelSelection,
 	useLensesViewPanel,
 	useModelsQuery,
+	useStitchCrumb,
 } from "@invana-studio/modeller";
 import {
 	parseBoardPageId,
@@ -42,7 +43,12 @@ import {
 } from "@invana-studio/shell";
 import { BoardGround } from "@invana-studio/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+	useLocation,
+	useNavigate,
+	useParams,
+	useSearchParams,
+} from "react-router-dom";
 import { assistantSlots } from "@/host/assistantSlots";
 import { OpenBoardContext } from "@/host/boards";
 import { consoleSection } from "@/host/consoleSection";
@@ -361,6 +367,12 @@ export function ProductHost() {
 	const explorerOpen = activeProductId === "explorer";
 	const agentsOpen = activeProductId === "agents";
 	const iamOpen = activeProductId === "iam";
+	const { pathname } = useLocation();
+	const stitchCrumb = useStitchCrumb(
+		username,
+		graphSlug,
+		activeProductId === "modeller" && pathname.endsWith("/global-model"),
+	);
 	// The products on the Agents shell: sections as tabs, Home, no leftSection.
 	const sectionsOpen = agentsOpen || iamOpen;
 	const { user } = useAuth();
@@ -663,9 +675,11 @@ export function ProductHost() {
 								agentsSections.endpointId
 									? llmProviders.find((p) => p.id === agentsSections.endpointId)
 											?.name
-									: activeSessionId
-										? sessionTitleById.get(activeSessionId)
-										: undefined
+									: stitchCrumb
+										? stitchCrumb
+										: activeSessionId
+											? sessionTitleById.get(activeSessionId)
+											: undefined
 							}
 							// A project's page names its own levels: Projects › the project
 							// › its branch › the finding.

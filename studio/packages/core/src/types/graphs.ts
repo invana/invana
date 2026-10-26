@@ -85,12 +85,6 @@ export interface GraphContention {
 	pools: { pool: string; size: number; in_use: number }[];
 }
 
-export interface GraphCreate {
-	name: string;
-	slug: string;
-	instructions?: string | null;
-}
-
 export interface GraphUpdate {
 	name?: string;
 	description?: string | null;

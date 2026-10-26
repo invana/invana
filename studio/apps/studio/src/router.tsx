@@ -6,7 +6,7 @@ import { ProjectsSlotsContext } from "@invana-studio/projects";
 import {
 	ActivitySlotsContext,
 	ErrorPage,
-	GraphCreatePage,
+	GraphConnectPage,
 	GraphsListPage,
 	graphRoutes,
 	LoginPage,
@@ -64,7 +64,7 @@ export const router = createBrowserRouter([
 		children: [
 			{ index: true, element: <Navigate to="/graphs" replace /> },
 			{ path: "graphs", element: <GraphsListPage /> },
-			{ path: "graphs/new", element: <GraphCreatePage /> },
+			{ path: "graphs/new", element: <GraphConnectPage /> },
 			{ path: "settings/profile", element: <ProfileSettingsPage /> },
 			// Platform-admin surfaces (superuser-only — gated inside the page
 			// component via a direct user.is_superuser check). Lives under

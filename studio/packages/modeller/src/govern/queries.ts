@@ -22,6 +22,9 @@ const root = (u: string, g: string) => ["govern", u, g] as const;
 const lensesKey = (u: string, g: string) => [...root(u, g), "lenses"] as const;
 const catalogueKey = (u: string, g: string) =>
 	[...root(u, g), "participants"] as const;
+/** One world or guardrail read whole — also what its breadcrumb names it from. */
+export const lensDetailKey = (u: string, g: string, lensId: string) =>
+	[...lensesKey(u, g), lensId, "detail"] as const;
 
 // ── Queries ────────────────────────────────────────────────────────────────
 // The lens list is core's `useLensesQuery`, keyed under `lensesKey`, so the
@@ -33,11 +36,7 @@ export function useLensQuery(
 	lensId?: string,
 ) {
 	return useQuery({
-		queryKey: [
-			...lensesKey(username ?? "", graphSlug ?? ""),
-			lensId,
-			"detail",
-		] as const,
+		queryKey: lensDetailKey(username ?? "", graphSlug ?? "", lensId ?? ""),
 		queryFn: () =>
 			governApi.getLens(
 				username as string,

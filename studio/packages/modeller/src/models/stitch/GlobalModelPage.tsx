@@ -12,7 +12,7 @@
  * It does not write a model. Authoring is the model canvas, on a draft.
  */
 
-import { Badge, Card, EmptyState, Spinner } from "@invana/ui";
+import { Badge, Button, Card, EmptyState, Spinner } from "@invana/ui";
 import {
 	type CanvasBackend,
 	GlobalModelBoard,
@@ -29,8 +29,14 @@ import {
 	useCommitStitchesMutation,
 	useDiscardStitchesMutation,
 	useGlobalModelQuery,
+	useModelsQuery,
+	useModelVersionQuery,
+	useModelVersionsQuery,
+	useVersionDiffQuery,
 } from "../queries";
+import type { VersionSummary } from "../types";
 import { buildAllModelsData, parseMemberId } from "./allModels";
+import { CompareBar } from "./CompareBar";
 import { StitchInspector } from "./StitchInspector";
 import { UnionList } from "./UnionList";
 import { useAllModels } from "./useAllModels";
@@ -45,6 +51,23 @@ const STITCH = "stitch";
 const ALL = "all";
 const NO_LENS = "none";
 const STITCH_PREFIX = "stitch:";
+
+/** The pair a compare opens on: active to draft, else the two newest published. */
+function defaultPair(versions: VersionSummary[]) {
+	const draft = versions.find((v) => v.status === "draft");
+	const active = versions.find((v) => v.status === "active");
+	if (draft && active) return { from: active.id, to: draft.id };
+	const published = versions
+		.filter((v) => v.status !== "draft")
+		.sort((a, b) => b.created_at.localeCompare(a.created_at));
+	return { from: published[1]?.id, to: published[0]?.id };
+}
+
+interface Compare {
+	modelId: string;
+	from?: string;
+	to?: string;
+}
 
 export function GlobalModelPage({
 	username,
@@ -63,11 +86,90 @@ export function GlobalModelPage({
 	const commit = useCommitStitchesMutation(username, graphSlug);
 	const discard = useDiscardStitchesMutation(username, graphSlug);
 	const [show, setShow] = useState(ALL);
+	const [compare, setCompare] = useState<Compare | null>(null);
+	const models = useModelsQuery(username, graphSlug);
+	const compareVersions = useModelVersionsQuery(
+		username,
+		graphSlug,
+		compare?.modelId,
+	);
+	const versionList = useMemo(
+		() => compareVersions.data ?? [],
+		[compareVersions.data],
+	);
+	const pair = useMemo(() => {
+		const d = defaultPair(versionList);
+		return { from: compare?.from ?? d.from, to: compare?.to ?? d.to };
+	}, [versionList, compare]);
+	// One read for the bar's counts and the map's marks.
+	const diff = useVersionDiffQuery(
+		username,
+		graphSlug,
+		compare?.modelId,
+		pair.to,
+		pair.from,
+	);
+	const toTree = useModelVersionQuery(
+		username,
+		graphSlug,
+		compare?.modelId,
+		pair.to,
+	);
+	const fromTree = useModelVersionQuery(
+		username,
+		graphSlug,
+		compare?.modelId,
+		pair.from,
+	);
+	const openCompare = () => {
+		const id =
+			(models.data ?? []).find((m) => m.draft_version)?.id ??
+			frames.find((f) => f.versionId)?.modelId;
+		if (id) setCompare({ modelId: id });
+	};
 
 	const everything = useMemo(
 		() => buildAllModelsData(frames, links),
 		[frames, links],
 	);
+	// A compare draws the one model's `to` version, with the types it removed
+	// kept from `from` so their chips have something to sit beside.
+	const compared = useMemo(() => {
+		if (!compare || !toTree.data || !diff.data) return null;
+		const frame = frames.find((f) => f.modelId === compare.modelId);
+		const model = (models.data ?? []).find((m) => m.id === compare.modelId);
+		const removed = new Set(
+			diff.data.marks.filter((m) => m.mark === "removed").map((m) => m.type),
+		);
+		const keep = <T extends { name: string }>(
+			now: T[],
+			before: T[] | undefined,
+		) => [...now, ...(before ?? []).filter((t) => removed.has(t.name))];
+		const built = buildAllModelsData(
+			[
+				{
+					modelId: compare.modelId,
+					name: frame?.name ?? model?.name ?? "Model",
+					description: frame?.description ?? model?.description ?? "",
+					versionId: pair.to ?? null,
+					versionLabel: null,
+					hue: frame?.hue ?? 1,
+					nodeTypes: keep(toTree.data.node_types, fromTree.data?.node_types),
+					edgeTypes: keep(toTree.data.edge_types, fromTree.data?.edge_types),
+				},
+			],
+			[],
+		);
+		return { ...built.data, marks: diff.data.marks };
+	}, [
+		compare,
+		toTree.data,
+		fromTree.data,
+		diff.data,
+		frames,
+		models.data,
+		pair.to,
+	]);
 	const drawn = useMemo(
 		() =>
 			show === ALL
@@ -192,7 +294,7 @@ export function GlobalModelPage({
 		<div className="flex h-full min-h-0 w-full">
 			<div className="relative min-h-0 min-w-0 flex-1">
 				<GlobalModelBoard
-					data={drawn.data}
+					data={compared ?? drawn.data}
 					title="Global model"
 					summary={summary}
 					selects={selects}
@@ -200,6 +302,33 @@ export function GlobalModelPage({
 					onSelect={onSelect}
 					backend={backend}
 				>
+					{compare ? (
+						<CompareBar
+							models={(models.data ?? [])
+								.filter((m) => m.origin !== "introspected")
+								.map((m) => ({ id: m.id, name: m.name }))}
+							modelId={compare.modelId}
+							onModel={(modelId) => setCompare({ modelId })}
+							versions={versionList}
+							from={pair.from}
+							to={pair.to}
+							onFrom={(from) => setCompare({ ...compare, from, to: pair.to })}
+							onTo={(to) => setCompare({ ...compare, to, from: pair.from })}
+							diff={diff.data}
+							onReview={() =>
+								navigate(
+									modelPagePath(username, graphSlug, compare.modelId, {
+										schema: true,
+									}),
+								)
+							}
+							onClose={() => setCompare(null)}
+						/>
+					) : (
+						<Button size="xs" variant="outline" onClick={openCompare}>
+							Compare
+						</Button>
+					)}
 					{everything.stagedCount > 0 ? (
 						<Card className="flex w-fit items-center gap-2.5 py-1.5 pr-2 pl-3 shadow-md">
 							<span className="size-1.5 rounded-full bg-warning" />

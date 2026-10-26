@@ -39,8 +39,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { modelsApi } from "../api";
 import { DeleteModelDialog } from "../model-editor/components/DeleteModelDialog";
-import { ImportModelDialog } from "../model-editor/components/ImportModelDialog";
 import { ModelFormDialog } from "../model-editor/components/ModelFormDialog";
+import { NewModelDialog } from "../model-editor/components/NewModelDialog";
 import { OntologyImportDialog } from "../model-editor/components/OntologyImportDialog";
 import { ModelCanvas } from "../model-editor/ModelCanvas";
 import type { ModelSelection } from "../model-editor/types";
@@ -219,10 +219,8 @@ export function ModelsPage({
 			),
 	});
 
-	const [editing, setEditing] = useState<GraphModelSummary | "new" | null>(
-		null,
-	);
-	const [importing, setImporting] = useState(false);
+	const [editing, setEditing] = useState<GraphModelSummary | null>(null);
+	const [creating, setCreating] = useState(false);
 	const [fromOntology, setFromOntology] = useState(false);
 	const [deleting, setDeleting] = useState<GraphModelSummary | null>(null);
 	const [publishing, setPublishing] = useState(false);
@@ -331,21 +329,21 @@ export function ModelsPage({
 									Open the draft
 								</Button>
 							) : (
-								<ActButton area="model" onClick={() => setEditing("new")}>
+								<ActButton area="model" onClick={() => setCreating(true)}>
 									<Plus /> New model
 								</ActButton>
 							)}
 							<ActButton
 								area="model"
 								variant="outline"
-								onClick={() => setImporting(true)}
+								onClick={() => setCreating(true)}
 							>
 								<Upload /> Import
 							</ActButton>
 							<ActButton
 								area="model"
 								variant="ghost"
-								onClick={() => setImporting(true)}
+								onClick={() => setCreating(true)}
 							>
 								<BookOpen /> Starter models
 							</ActButton>
@@ -393,7 +391,7 @@ export function ModelsPage({
 	const onMenu = (item: ModelsMenuItem) => {
 		switch (item) {
 			case "starters":
-				return setImporting(true);
+				return setCreating(true);
 			case "ontology":
 				return setFromOntology(true);
 			case "introspect":
@@ -449,9 +447,9 @@ export function ModelsPage({
 			case MODELS_ACTIONS.versions:
 				return set({ tab: "history", schema: false, type: null });
 			case MODELS_ACTIONS.newModel:
-				return setEditing("new");
+				return setCreating(true);
 			case MODELS_ACTIONS.importModel:
-				return setImporting(true);
+				return setCreating(true);
 			case MODELS_ACTIONS.more:
 				return ctx?.option && onMenu(ctx.option as ModelsMenuItem);
 			case MODELS_ACTIONS.edit:
@@ -509,6 +507,8 @@ export function ModelsPage({
 							// A type clicked on the canvas opens as a page of its model.
 							if (next) set({ type: next.name, schema: false });
 						}}
+						onPublish={() => setPublishing(true)}
+						onDiscard={() => discardAll.mutate(scope.model.id)}
 					/>,
 				)}
 				icons={ICONS}
@@ -554,18 +554,22 @@ export function ModelsPage({
 				open={editing !== null}
 				username={username}
 				graphSlug={graphSlug}
-				model={editing === "new" ? null : editing}
+				model={editing}
 				onClose={() => setEditing(null)}
 			/>
-			<ImportModelDialog
-				open={importing}
+			<NewModelDialog
+				open={creating}
 				username={username}
 				graphSlug={graphSlug}
-				onClose={() => setImporting(false)}
-				onImported={(modelId) => {
-					setImporting(false);
-					// The panel opens beside the page, in the same URL write.
-					set({ scope: modelId, open: true, schema: true }, { panel: "model" });
+				onClose={() => setCreating(false)}
+				onCreated={(modelId, { assistant }) => {
+					setCreating(false);
+					// A new model lands on its draft's canvas; one the assistant is
+					// drafting opens with the assistant docked beside it.
+					set(
+						{ scope: modelId, open: true, schema: true, type: null },
+						assistant ? { right: "assistant" } : undefined,
+					);
 				}}
 			/>
 			{fromOntology ? (

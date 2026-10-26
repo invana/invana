@@ -7,8 +7,9 @@
  * versions together, with a Model column. A row's *Compare* opens the shell's
  * compare page against the version before it.
  *
- * A model is not pinned on runs, so its effect after is the Graph's runs
- * while that version was the published one — said so in the column, so
+ * Effect after is what the publish did to the datasets bound to the types
+ * it changed, stored at publish. A version that touched none keeps the
+ * Graph's runs while it was the published one — said so in the column, so
  * nobody reads it as attribution.
  */
 
@@ -46,10 +47,21 @@ const day = (iso: string | null) =>
 			})
 		: "—";
 
-const effect = (e: ChangeEntry) =>
-	e.effect.runs === 0
+const plural = (n: number, one: string, many: string) =>
+	`${n} ${n === 1 ? one : many}`;
+
+/** What the publish did to bound datasets, as the engine stored it. */
+const effect = (e: ChangeEntry) => {
+	const { datasets = [], datasets_failing = 0, rows_failing = 0 } = e.effect;
+	if (datasets.length > 0) {
+		return datasets_failing > 0
+			? `${plural(datasets_failing, "dataset now warns", "datasets now warn")} · ${plural(rows_failing, "row", "rows")}`
+			: `${plural(datasets.length, "dataset holds", "datasets hold")}`;
+	}
+	return e.effect.runs === 0
 		? effectLine(e.effect)
 		: `${effectLine(e.effect)} while published`;
+};
 
 export function ModelHistory({
 	username,

@@ -21,7 +21,7 @@
  * product host, which composes every graph product's regions, so the route's
  * element is whatever the app puts in `ModellerSlotsContext`.
  */
-import type { ProductDefinition } from "@invana-studio/core";
+import type { Lens, ProductDefinition } from "@invana-studio/core";
 import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";
 import {
 	Boxes,
@@ -35,6 +35,7 @@ import {
 	Shield,
 } from "lucide-react";
 import type { Params, RouteObject } from "react-router-dom";
+import { lensDetailKey } from "./govern/queries";
 import { useModellerSlots } from "./ModellerSlots";
 import { searchModeller } from "./search";
 
@@ -55,9 +56,26 @@ function level(
 		: { path, handle };
 }
 
-/** A section whose records drill in one level down: `worlds` › `<world>`. */
+/**
+ * A section whose records drill in one level down: `worlds` › `<world>`. The
+ * record's crumb is its name once its page has read it; its id until then.
+ */
 const drillable = (path: string, label: string, param: string) =>
-	level(path, label, [level(`:${param}`, (p) => p[param])]);
+	level(path, label, [
+		{
+			path: `:${param}`,
+			handle: {
+				crumb: (p) => p[param],
+				crumbFrom: (p) =>
+					p.username && p.graphSlug && p[param]
+						? {
+								queryKey: lensDetailKey(p.username, p.graphSlug, p[param]),
+								label: (data) => (data as Lens).display_name ?? undefined,
+							}
+						: undefined,
+			} satisfies ShellRouteHandle,
+		},
+	]);
 
 export const modeller: ProductDefinition = {
 	id: "modeller",

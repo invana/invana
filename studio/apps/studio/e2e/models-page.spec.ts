@@ -6,6 +6,7 @@
  * refusal changes nothing — an archive refused leaves the model where it was.
  */
 import { expect, type Page, test } from "@playwright/test";
+import { graphApi } from "./api";
 import { ask } from "./explorer";
 
 const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
@@ -149,27 +150,23 @@ test("a model nothing was counted for draws no chart of zeros", async ({
 	page,
 }) => {
 	const name = `E2E Growth ${Date.now()}`;
-	await page.goto(`${GRAPH}/modeller/models?models_tab=growth`);
-	await expect(page.getByText("Records over time, by model")).toBeVisible({
-		timeout: 30_000,
+	const model = await graphApi<{ id: string }>(page, "/models", {
+		method: "POST",
+		data: { name },
 	});
-	await page.getByRole("button", { name: "New model", exact: true }).click();
-	await page.getByRole("textbox", { name: "Name" }).fill(name);
-	await page.getByRole("button", { name: "Create model" }).click();
-
-	await page.getByRole("tab", { name: "Overview" }).click();
-	await row(page, name).click();
-	await page.getByRole("tab", { name: "Growth" }).click();
-	await expect(page.getByText(`${name} has no records yet`)).toBeVisible({
-		timeout: 20_000,
-	});
-	await expect(page.getByText("Records over time")).toHaveCount(0);
-
-	// Never published, so it is deleted rather than archived (MP7).
-	await page.getByRole("button", { name: "More actions" }).click();
-	await page.getByRole("menuitem", { name: "Delete" }).click();
-	await page.getByRole("button", { name: "Delete", exact: true }).click();
-	await expect(row(page, name)).toHaveCount(0);
+	try {
+		await page.goto(`${GRAPH}/modeller/models`);
+		await row(page, name).click();
+		await page.getByRole("tab", { name: "Growth" }).click();
+		await expect(page.getByText(`${name} has no records yet`)).toBeVisible({
+			timeout: 20_000,
+		});
+		await expect(page.getByText("Records over time")).toHaveCount(0);
+	} finally {
+		// Never published, so it is deleted rather than archived — even when a
+		// step above failed, so no stray model is left in the Graph.
+		await graphApi(page, `/models/${model.id}`, { method: "DELETE" });
+	}
 });
 
 // ── D · Usage and Performance ────────────────────────────────────────────────

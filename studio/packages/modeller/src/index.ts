@@ -33,6 +33,7 @@ export { useActiveVersionQuery, useModelsQuery } from "./models/queries";
 export { GlobalModelPage } from "./models/stitch/GlobalModelPage";
 export { ModellerStatusBar } from "./models/stitch/ModellerStatusBar";
 export { StitchesPage } from "./models/stitch/StitchesPage";
+export { useStitchCrumb } from "./models/stitch/useStitchCrumb";
 export { modeller } from "./product";
 export { RequestsViewPanel } from "./requests/RequestsViewPanel";
 export { RulesViewPanel } from "./rules/RulesViewPanel";

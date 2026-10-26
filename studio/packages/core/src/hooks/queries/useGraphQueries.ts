@@ -5,7 +5,6 @@ import { useAuthStore } from "../../stores/auth.store";
 import type {
 	GraphConnect,
 	GraphConnectionCreate,
-	GraphCreate,
 	GraphUpdate,
 	SetupSection,
 } from "../../types/graphs";
@@ -53,20 +52,6 @@ export function useGraphQuery(
 		queryKey: graphKey(username ?? "", graphSlug ?? ""),
 		queryFn: () => graphsApi.get(username as string, graphSlug as string),
 		enabled: !!username && !!graphSlug,
-	});
-}
-
-export function useCreateGraphMutation() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: (data: GraphCreate) => graphsApi.create(data),
-		onSuccess: async () => {
-			qc.invalidateQueries({ queryKey: GRAPHS_KEY });
-			// Refresh user.graphs so the new membership shows up immediately
-			// in the rail — otherwise the just-created graph looks like a
-			// non-member visit until logout/login.
-			await refreshAuthMe();
-		},
 	});
 }
 
