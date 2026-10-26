@@ -8,6 +8,8 @@ there is no row behind it (ST3).
 Routes
 ------
 GET    /model-links                list the Graph's declared links (?status= narrows)
+GET    /model-links/removed        removed stitches, from their removal events
+GET    /model-links/{link_id}      one stitch read whole — ends, counts, history
 POST   /model-links                declare one — it lands **staged** (ST21)
 POST   /model-links/commit         flip every staged stitch to active, in one action
 POST   /model-links/discard        delete the staged set, or one of it
@@ -91,6 +93,44 @@ class LinkResponse(BaseModel):
     # What solving this stitch wrote, when the commit that ran it is what is being
     # answered (ST44). Absent on a list: the number belongs to a run, not to the row.
     edges_written: int | None = None
+    # Edges the stitch holds in the graph now; null before it first solves.
+    edges: int | None = None
+
+
+class StitchEvent(BaseModel):
+    """One event in a stitch's history — its declare and its commit."""
+
+    action: str
+    at: str
+    actor: str | None = None
+
+
+class StitchDetail(LinkResponse):
+    """One stitch read whole: who declared it, each end's records, its history."""
+
+    declared_by: str | None = None
+    declared_at: str | None = None
+    # Each end type's latest counted records; null when never counted.
+    source_records: int | None = None
+    target_records: int | None = None
+    history: list[StitchEvent] = []
+
+
+class RemovedStitch(BaseModel):
+    """A removed stitch, read from its removal event — the row itself is gone."""
+
+    id: str
+    kind: str
+    source_model: str | None = None
+    source_type: str
+    target_model: str | None = None
+    target_type: str
+    source_property: str | None = None
+    target_property: str | None = None
+    edge_type: str | None = None
+    edges_withdrawn: int = 0
+    removed_by: str | None = None
+    removed_at: str
 
 
 class DiscardRequest(BaseModel):
@@ -155,6 +195,27 @@ async def list_model_links(
     version's links are history (ST58)."""
     links = await link_service.list_links(session, graph.id, status=status_filter, current=True)
     return [await _decorate(session, link) for link in links]
+
+
+@model_links_router.get("/model-links/removed", response_model=list[RemovedStitch])
+async def list_removed_links(
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> list[RemovedStitch]:
+    """Removed stitches, newest first, read from their removal events."""
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED)
+
+
+@model_links_router.get("/model-links/{link_id}", response_model=StitchDetail)
+async def get_model_link(
+    link_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> StitchDetail:
+    """One stitch read whole — the inspector's read."""
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED)
 
 
 @model_links_router.post(

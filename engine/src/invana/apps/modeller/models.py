@@ -467,6 +467,9 @@ class ModelLink(Base):
     edge_type: Mapped[str | None] = mapped_column(String(255), nullable=True)
     source_model_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
 
+    # Edges the stitch holds in the graph, re-counted after every solve that writes; null before the first.
+    edges: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
     description: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
