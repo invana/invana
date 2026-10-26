@@ -12,8 +12,7 @@ import {
 } from "@invana-studio/core";
 import { ActButton, ConfirmDialog } from "@invana-studio/shell";
 import { FormError } from "@invana-studio/ui";
-import { UserPlus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AddMemberDialog, EditRolesDialog } from "./MemberDialogs";
 
 /** `Sep 2026` — when the person joined, to the month. */
@@ -41,7 +40,9 @@ const ranked = (roles: GraphRole[]) =>
  * | Members | member · roles · since, with *Edit* and *Remove* per row |
  * | Roles | role · what it may change — the key to the badges above |
  *
- * Every member reads this tab. *Add member*, *Edit* and *Remove* are the
+ * The two cards sit side by side from `lg`. *Add member* is the page head's
+ * act, so whether its dialog is open is handed in. Every member reads this tab.
+ * *Add member*, *Edit* and *Remove* are the
  * `settings` area's: without `owner` they show disabled, with who to ask.
  * The signed-in member's row says *you*. Agents are not members, so they
  * never list here.
@@ -50,11 +51,18 @@ const ranked = (roles: GraphRole[]) =>
  * asked, in the engine's words. Removing has no dialog of its own after the
  * confirm, so its refusal shows above the table.
  */
-export function MembersTab({ graph }: { graph: GraphRef }) {
+export function MembersTab({
+	graph,
+	adding,
+	onAddingChange,
+}: {
+	graph: GraphRef;
+	adding: boolean;
+	onAddingChange: (open: boolean) => void;
+}) {
 	const { data, isLoading } = useMembersQuery(graph);
 	const { add, setRoles, remove } = useMemberMutations(graph);
 	const { user } = useAuth();
-	const [adding, setAdding] = useState(false);
 	const [editing, setEditing] = useState<GraphMember | null>(null);
 	const [removing, setRemoving] = useState<GraphMember | null>(null);
 
@@ -133,6 +141,11 @@ export function MembersTab({ graph }: { graph: GraphRef }) {
 		[user?.username, setRoles.reset, remove.reset],
 	);
 
+	// A fresh dialog never shows the last attempt's refusal.
+	useEffect(() => {
+		if (adding) add.reset();
+	}, [adding, add.reset]);
+
 	const roleRows = useMemo(
 		() => GRAPH_ROLES.map((role) => ({ role, may: ROLE_MAY[role] })),
 		[],
@@ -160,26 +173,9 @@ export function MembersTab({ graph }: { graph: GraphRef }) {
 	);
 
 	return (
-		<div className="space-y-4">
+		<div className="grid items-start gap-3 lg:grid-cols-[3fr_2fr]">
 			<Card>
-				<SectionHeader
-					bare
-					title="Members"
-					count={data?.total}
-					actions={
-						<ActButton
-							area="settings"
-							size="xs"
-							onClick={() => {
-								add.reset();
-								setAdding(true);
-							}}
-						>
-							<UserPlus className="size-3.5" />
-							Add member
-						</ActButton>
-					}
-				/>
+				<SectionHeader bare title="Members" count={data?.total} />
 				<FormError error={remove.error} className="mx-3 mb-3" />
 				{isLoading ? (
 					<div className="space-y-2 p-3">
@@ -208,9 +204,12 @@ export function MembersTab({ graph }: { graph: GraphRef }) {
 				open={adding}
 				pending={add.isPending}
 				error={add.error}
-				onOpenChange={setAdding}
+				onOpenChange={onAddingChange}
 				onAdd={(u, roles) =>
-					add.mutate({ user: u, roles }, { onSuccess: () => setAdding(false) })
+					add.mutate(
+						{ user: u, roles },
+						{ onSuccess: () => onAddingChange(false) },
+					)
 				}
 			/>
 			<EditRolesDialog

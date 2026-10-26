@@ -94,7 +94,6 @@ export { CanonicalRoute, graphRoutes } from "./graphRoutes";
 export * from "./pages/auth/LoginPage";
 export * from "./pages/ErrorPage";
 export { GraphConnectPage } from "./pages/graphs/GraphConnectPage";
-export { GraphForm } from "./pages/graphs/GraphForm";
 export { GraphsListPage } from "./pages/graphs/GraphsListPage";
 export { PlatformEventsPage } from "./pages/platform/PlatformEventsPage";
 export * from "./pages/settings/ProfileSettingsPage";

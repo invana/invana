@@ -19,6 +19,7 @@ import type { useLensesViewPanel } from "@invana-studio/modeller";
 import {
 	CompareBoardPage,
 	GlobalModelPage,
+	GraphSettingsPage,
 	GuardrailsPage,
 	LensBoardPage,
 	type ModelSelection,
@@ -237,6 +238,15 @@ export function declaredBoardContent(
 				username={username as string}
 				graphSlug={graphSlug as string}
 				onOpenRuleBoard={(id) => openBoard({ kind: "rule", subjectId: id })}
+			/>
+		);
+	}
+
+	if (board.kind === "settings") {
+		return (
+			<GraphSettingsPage
+				username={username as string}
+				graphSlug={graphSlug as string}
 			/>
 		);
 	}

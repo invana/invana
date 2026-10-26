@@ -37,4 +37,4 @@ export { useModellerCrumb } from "./models/stitch/useModellerCrumb";
 export { modeller } from "./product";
 export { RequestsPage } from "./requests/RequestsPage";
 export { RulesPage } from "./rules/RulesPage";
-export { SettingsViewPanel } from "./settings/SettingsViewPanel";
+export { GraphSettingsPage } from "./settings/GraphSettingsPage";

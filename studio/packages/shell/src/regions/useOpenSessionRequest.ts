@@ -1,12 +1,11 @@
 /**
  * "Open this session" — asked from a panel, answered by the page.
  *
- * A session row in the graph info panel has to do exactly what the same row in
+ * A session row outside the assistant has to do exactly what the same row in
  * the assistant's own list does: make that session active and give the right
- * side to the assistant (graph-detail-page.md). The panel cannot call
- * `handleOpenSession` — `SettingsViewPanel` is rendered by the *shell*, which knows
- * nothing of the page's session state — so the request travels instead of the
- * callback.
+ * side to the assistant (graph-detail-page.md). A panel cannot call
+ * `handleOpenSession` — it is rendered apart from the page's session state —
+ * so the request travels instead of the callback.
  *
  * It is a request, not state: nothing reads "which session was last asked for",
  * and a second ask for the same id is a second open. That is why this is a

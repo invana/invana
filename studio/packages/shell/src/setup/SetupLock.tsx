@@ -66,7 +66,7 @@ export function SetupLock({ graph, gate, surface }: Props) {
 						<Button
 							size="sm"
 							variant="outline"
-							onClick={() => setSection("info")}
+							onClick={() => setSection("settings", "basic")}
 						>
 							Open setup
 							<ArrowRight className="size-3.5" />

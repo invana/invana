@@ -53,6 +53,7 @@ import {
 	ScrollText,
 	Server,
 	ServerCog,
+	Settings,
 	ShieldCheck,
 	SlidersHorizontal,
 	SquareActivity,
@@ -186,6 +187,7 @@ export type DeclaredKind =
 	| "guardrails"
 	| "requests"
 	| "rules"
+	| "settings"
 	| "agent"
 	| "models"
 	| "global_model"
@@ -367,6 +369,16 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		icon: ScrollText,
 		// Rules on the Modeller's leftNav.
 		panel: "rules",
+		subject: "the graph's slug",
+	},
+	// The Graph's own settings — Basic · Database · Members (graph-settings.md).
+	settings: {
+		kind: "settings",
+		renders: "declared",
+		label: "Graph settings",
+		icon: Settings,
+		// Graph settings at the foot of the Modeller's leftNav.
+		panel: "settings",
 		subject: "the graph's slug",
 	},
 	// The agent's one page — five tabs, the one declared page that edits.

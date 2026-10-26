@@ -14,7 +14,7 @@
  * | Worlds | `/modeller/worlds[/:world]` | the Govern panel and the lens canvas with the world inspector |
  * | Guardrails | `/modeller/guardrails[/:guardrail]` | the Govern panel and the lens canvas with the guardrail inspector |
  * | Rules | `/modeller/rules[/:rule]` | every rule in force — install, Graph and project — and the rule dialog |
- * | Graph settings | `/modeller/settings` | Basic · Graph · Agents (`?tab=`; `?tab=info` is the Graph's info) |
+ * | Graph settings | `/modeller/settings` | a page with Basic · Database · Members (`?tab=`) |
  *
  * The levels under the product's route have no element of their own, so
  * moving along the rail never remounts the page. The page itself is the app's
@@ -159,10 +159,10 @@ export const modeller: ProductDefinition = {
 	useNavBadges: useModellerNavBadges,
 	commands: [
 		{
-			id: "graph-info",
-			label: "Graph info",
-			keywords: ["connection", "database", "about"],
-			to: "settings?tab=info",
+			id: "graph-settings",
+			label: "Graph settings",
+			keywords: ["connection", "database", "members", "info", "about"],
+			to: "settings",
 		},
 	],
 	routes: [

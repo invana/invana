@@ -19,7 +19,6 @@ import { createContext, useContext } from "react";
  * section setter has to accept every one of them.
  */
 export type SetupTarget =
-	| "info"
 	| "settings"
 	| "model"
 	| "runs"

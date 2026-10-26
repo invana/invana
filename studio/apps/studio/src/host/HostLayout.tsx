@@ -4,7 +4,6 @@ import {
 	SIDE_SECTION,
 	useGraphConnectionQuery,
 } from "@invana-studio/core";
-import { SettingsViewPanel } from "@invana-studio/modeller";
 import {
 	AppVersion,
 	type LeftNavKey,
@@ -32,18 +31,15 @@ interface HostLayoutProps {
 	/** The focused page's own levels — `Projects › a project › H2 › f1` —
 	 *  in place of the route's crumbs. */
 	pageTrail?: { label: string; to?: string; title?: string }[];
-	/** Page-side left panel. Shown only while a page-owned `?settings` key is
-	 *  open; a settings section docks the SettingsViewPanel here instead, and
-	 *  nothing open means no left column. */
+	/** Page-side left panel. Shown only while a page-owned `panel` key is
+	 *  open; nothing open means no left column. */
 	leftSection?: SectionSlot;
-	/** Main content. Replaced by SettingsViewPanel when settings is expanded. */
+	/** Main content — the Workbook. */
 	mainSection: SectionSlot;
-	/** Right panel — the docked assistant. Hidden when
-	 *  settings is expanded so the panel owns the full content width. */
+	/** Right panel — the docked assistant. */
 	rightSection?: SectionSlot;
 	/** The console, under the canvas only (`bottomSpan: "main"`) — the left
-	 *  and right sections stay full height beside it. Hidden with the rest
-	 *  when settings is expanded. */
+	 *  and right sections stay full height beside it. */
 	bottomSection?: SectionSlot;
 	/** Slot inside ConnectionStatusBar (left of footer) for page-specific
 	 *  counters — "0 nodes · 0 relationships · 0 queries", etc. */
@@ -63,18 +59,19 @@ interface HostLayoutProps {
 	footer?: { left: ReactNode; right: ReactNode };
 }
 
-// The keys the host itself owns, keyed into the shared `panel` param. Every
-// other key the path can name — Info and Graph settings — docks the
-// SettingsViewPanel instead. A product panel draws in `leftSection`; an Agents
-// section is a page in the Workbook and draws no left column at all.
+// The keys the host itself owns, keyed into the shared `panel` param. A
+// product panel draws in `leftSection`; a section that is a page in the
+// Workbook — Graph settings, Rules, the Agents and IAM sections — passes none,
+// so the column stays closed. A key not listed draws no left column.
 const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"explorer",
 	"model",
 	"projects",
 	"govern",
-	// The Modeller's requests and rules.
+	// The Modeller's requests, rules and Graph settings.
 	"requests",
 	"rules",
+	"settings",
 	// The Agents sections — pages, so the column stays closed.
 	"home",
 	"fleet",
@@ -110,8 +107,6 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
  * - `leftNav`: none for Explorer, whose `nav` is `null`; the open product's
  *   rail for the Modeller, Projects, Agents and IAM — the shell draws it from the
  *   product's `nav`.
- * - SettingsViewPanel takeover: docked replaces `leftSection`; expanded replaces
- *   `mainSection` and hides both `leftSection` and `rightSection`.
  * - Explorer: no `leftSection` — the board and the assistant fill it, the
  *   canvas tools float over the board, and the page hands its own `footer`.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
@@ -139,7 +134,7 @@ export function HostLayout({
 	}>();
 
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
-	const settingsPanel = useLeftSection();
+	const panel = useLeftSection();
 	const explorer = useActiveProduct()?.id === "explorer";
 
 	// The header is a breadcrumb naming the graph and the open panel; the levels
@@ -154,27 +149,12 @@ export function HostLayout({
 		center: explorer ? undefined : headerCenter,
 	};
 
-	// The whole left column shares one `panel` param. A product's own panel
-	// renders the host's `leftSection`; Info and Graph settings render the
-	// SettingsViewPanel.
-	const showNative =
-		settingsPanel.isOpen && PAGE_OWNED_SECTIONS.includes(settingsPanel.section);
-	const settingsOpen =
-		settingsPanel.isOpen && !showNative && !!username && !!graphSlug;
-	const settingsExpanded = settingsOpen && settingsPanel.expanded;
-	const settingsDocked = settingsOpen && !settingsPanel.expanded;
-
-	// Native panel open → the page's own leftSection. Settings docked → the
-	// SettingsViewPanel. Settings expanded → it takes main and both sides close.
-	// Nothing open → no left column.
-	const leftContent = showNative ? (
-		leftSection?.content
-	) : settingsDocked ? (
-		<SettingsViewPanel
-			username={username as string}
-			graphSlug={graphSlug as string}
-		/>
-	) : undefined;
+	// The whole left column shares one `panel` param: a product's own panel
+	// renders the host's `leftSection`, and nothing open means no left column.
+	const leftContent =
+		panel.isOpen && PAGE_OWNED_SECTIONS.includes(panel.section)
+			? leftSection?.content
+			: undefined;
 	const effectiveLeftSection =
 		leftContent && !explorer
 			? { ...SIDE_SECTION, content: leftContent }
@@ -182,25 +162,16 @@ export function HostLayout({
 
 	const effectiveMainSection = {
 		...MAIN_SECTION,
-		content: settingsExpanded ? (
-			<SettingsViewPanel
-				username={username as string}
-				graphSlug={graphSlug as string}
-			/>
-		) : (
-			mainSection.content
-		),
+		content: mainSection.content,
 	};
 
-	const effectiveRightSection =
-		rightSection && !settingsExpanded
-			? { ...SIDE_SECTION, ...rightSection.size, content: rightSection.content }
-			: undefined;
+	const effectiveRightSection = rightSection
+		? { ...SIDE_SECTION, ...rightSection.size, content: rightSection.content }
+		: undefined;
 
-	const effectiveBottomSection =
-		bottomSection && !settingsExpanded
-			? { ...BOTTOM_SECTION, content: bottomSection.content }
-			: undefined;
+	const effectiveBottomSection = bottomSection
+		? { ...BOTTOM_SECTION, content: bottomSection.content }
+		: undefined;
 
 	// The shell owns the layout. It keeps `mainSection` mounted at a
 	// stable position with each side region as a conditional sibling, so opening

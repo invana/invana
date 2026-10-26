@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback } from "react";
 import { usePageParams } from "./usePageParams";
 import { LEGACY_SECTION_PARAM, SECTION_PARAM } from "./useStackSections";
 
@@ -8,14 +8,14 @@ import { LEGACY_SECTION_PARAM, SECTION_PARAM } from "./useStackSections";
 // key below is the name a path stands for, never something a link carries:
 // an old `?panel=` link, its retired keys included, is redirected to its path
 // before any page reads it (`<CanonicalRoute>`). **No value means no left
-// column.** The product host draws its own panel for a product's key and the
-// SettingsViewPanel for Info and Graph settings.
+// column.** The product host draws its own panel for a product's key, and a
+// key whose section is a page (Graph settings, Rules, the Agents sections)
+// draws none.
 //
 // A write names a key, and the path it lands on may belong to another place:
 // `runs` and `events` are Activity's tabs, and `sessions` is Explorer with the
 // assistant on the right.
 export type LeftNavKey =
-	| "info"
 	| "explorer"
 	| "skills"
 	| "settings"
@@ -53,7 +53,7 @@ export type LeftNavKey =
 	// Activity's tabs that no rail icon writes; `?section=` names the tab.
 	| "activity";
 
-const DEFAULT_SECTION: LeftNavKey = "info";
+const DEFAULT_SECTION: LeftNavKey = "settings";
 
 // One param per axis of the page (graph-detail-page.md):
 //
@@ -112,7 +112,7 @@ const STACK_KEYS_OF: Partial<Record<LeftNavKey, readonly string[]>> = {
 };
 
 // A panel whose content is itself tabbed says which tab through `?tab=`. Only
-// Settings uses it today (Basic · Graph · LLMs · Agents), and it exists so a
+// Graph settings uses it today (Basic · Database · Members), and it exists so a
 // step in the setup timeline can send someone to the tab that holds the field
 // it is asking for rather than to the panel and a second click. It is dropped
 // whenever the section changes without naming one, so a stale tab never leaks
@@ -123,7 +123,6 @@ export const TAB_PARAM = "tab";
 // key, and anything else falls back to DEFAULT_SECTION rather than crashing the
 // render on an undefined section lookup.
 const KNOWN_SECTIONS: readonly LeftNavKey[] = [
-	"info",
 	"explorer",
 	"skills",
 	"settings",
@@ -157,28 +156,15 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"activity",
 ];
 
-// Expanded (full-width) state is non-URL local store — shared across the
-// hook's consumers via a tiny subscribable. Survives section changes but
-// not full reloads (intentional: deep-links should land in the docked view).
-let expandedState = false;
-const expandedListeners = new Set<() => void>();
-const setExpandedState = (v: boolean) => {
-	if (expandedState === v) return;
-	expandedState = v;
-	for (const l of expandedListeners) l();
-};
-
 /**
- * URL-backed state for the docked Settings panel.
+ * URL-backed state for the left column's open section.
  *
  * - `isOpen`    — true when the `panel` search param is present.
- * - `section`   — the selected section (defaults to "info").
+ * - `section`   — the selected section (defaults to "settings").
  * - `tab`       — the open tab inside a tabbed section, or null.
- * - `expanded`  — true when the panel is shown at full width (in-memory).
  * - `open(section?)`     — sets `?panel=<section>`.
  * - `setSection(s, tab?)` — switches section (and tab) without closing.
- * - `toggleExpanded()`   — flips the in-memory expanded flag.
- * - `close()`            — removes `?panel` from URL and resets expanded.
+ * - `close()`            — removes `?panel` from the URL.
  *
  * Every write drops the legacy `?settings` key alongside setting `?panel`. A
  * link that arrives with the old name is honoured once and then normalised, so
@@ -193,15 +179,6 @@ export function useLeftSection() {
 		raw && KNOWN_SECTIONS.includes(raw as LeftNavKey)
 			? (raw as LeftNavKey)
 			: DEFAULT_SECTION;
-
-	const expanded = useSyncExternalStore(
-		(cb) => {
-			expandedListeners.add(cb);
-			return () => expandedListeners.delete(cb);
-		},
-		() => expandedState,
-		() => false,
-	);
 
 	const write = useCallback(
 		(s: LeftNavKey, t?: string) => {
@@ -237,12 +214,7 @@ export function useLeftSection() {
 		[write],
 	);
 
-	const toggleExpanded = useCallback(() => {
-		setExpandedState(!expandedState);
-	}, []);
-
 	const close = useCallback(() => {
-		setExpandedState(false);
 		const next = new URLSearchParams(params);
 		next.delete(PANEL_PARAM);
 		next.delete(LEGACY_PANEL_PARAM);
@@ -255,10 +227,8 @@ export function useLeftSection() {
 		isOpen,
 		section,
 		tab,
-		expanded,
 		open,
 		setSection,
-		toggleExpanded,
 		close,
 	};
 }

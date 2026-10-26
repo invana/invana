@@ -25,8 +25,6 @@ const EMPTY_HINTS: Partial<Record<LeftNavKey, string>> = {
 		"Open a rule to read it here — how often steps were offered it, cited it and never cited it.",
 	requests:
 		"A request has no canvas of its own — each one names the type or property it asks the model for.",
-	settings:
-		"Graph settings have no canvas — the form beside is the whole of it.",
 };
 
 export function canvasEmptyHint(settingsSection: LeftNavKey): string {
