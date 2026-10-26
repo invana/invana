@@ -5,16 +5,12 @@
  * Without a draft, the left is the models count alone.
  *
  * The shell's `footer` takes its two sides separately, so one component draws
- * either. Which models have a draft is read the way the compare bar reads it —
- * a draft review per model, where no draft answers 404 — so both share a cache.
+ * either. Which model has a draft is on the models list itself.
  */
 
 import { StatusCount } from "@invana-studio/ui";
-import { useQueries } from "@tanstack/react-query";
-import { modelsApi } from "../api";
 import {
 	useGlobalModelQuery,
-	useModelQuery,
 	useModelsQuery,
 	useStagedSetQuery,
 } from "../queries";
@@ -39,15 +35,7 @@ export function ModellerStatusBar({
 		(m) => m.origin !== "introspected",
 	);
 
-	const reviews = useQueries({
-		queries: authored.map((m) => ({
-			queryKey: ["models", username, graphSlug, m.id, "draft-review"],
-			queryFn: () => modelsApi.draftReview(username, graphSlug, m.id),
-			retry: false,
-		})),
-	});
-	const drafted = authored.find((_, i) => reviews[i]?.data);
-	const detail = useModelQuery(username, graphSlug, drafted?.id);
+	const drafted = authored.find((m) => m.draft_version);
 	const staged = useStagedSetQuery(username, graphSlug, drafted?.id, !!drafted);
 
 	if (side === "right") {
@@ -70,9 +58,7 @@ export function ModellerStatusBar({
 		);
 	}
 
-	const draftLabel = version(
-		detail.data?.versions.find((v) => v.status === "draft")?.version,
-	);
+	const draftLabel = version(drafted.draft_version?.version);
 	const parts = [
 		drafted.name,
 		version(drafted.active_version?.version)

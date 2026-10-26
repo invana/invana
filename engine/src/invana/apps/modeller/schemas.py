@@ -313,6 +313,8 @@ class GraphModelSummary(BaseModel):
     origin: str
     updated_at: datetime
     active_version: VersionSummary | None = None
+    # The open draft, if any — so a list can say which models have one.
+    draft_version: VersionSummary | None = None
 
     model_config = {"from_attributes": True}
 

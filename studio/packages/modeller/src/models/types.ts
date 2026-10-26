@@ -124,6 +124,8 @@ export interface GraphModelSummary {
 	origin: ModelOrigin;
 	updated_at: string;
 	active_version: VersionSummary | null;
+	/** The open draft, if any. */
+	draft_version: VersionSummary | null;
 }
 
 export interface GraphModelResponse {

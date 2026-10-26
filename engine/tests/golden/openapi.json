@@ -12137,6 +12137,16 @@
             "title": "Description",
             "type": "string"
           },
+          "draft_version": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VersionSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "graph_id": {
             "anyOf": [
               {

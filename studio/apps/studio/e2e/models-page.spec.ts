@@ -10,8 +10,7 @@ import { ask } from "./explorer";
 
 const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 
-// The Modeller's Models rail item: the models board on Overview. A bare
-// `?panel=model` lands on Global model, which reads the Model tab.
+// The Modeller's Models rail item: the models board on Overview.
 async function openModels(page: Page) {
 	await page.goto(`${GRAPH}/modeller/models`);
 	await expect(page.getByRole("tab", { name: "All models" })).toBeVisible({
@@ -19,10 +18,11 @@ async function openModels(page: Page) {
 	});
 }
 
+// A model is a row of *Each model*; there is no models list in the leftSection.
 const row = (page: Page, name: string) =>
-	page.getByRole("button", { name: new RegExp(`^${name}`) }).first();
+	page.getByRole("row", { name: new RegExp(`^${name}\\b`) }).first();
 
-test("a click scopes the page, Open drills in, and a reload lands on the same reading", async ({
+test("a click opens the model, a type opens its page, and a reload lands on the same reading", async ({
 	page,
 }) => {
 	await openModels(page);
@@ -33,24 +33,31 @@ test("a click scopes the page, Open drills in, and a reload lands on the same re
 	await expect(page.getByRole("tab", { name: "AirRoutes" })).toBeVisible();
 	await expect(page.getByText("Each type")).toBeVisible();
 
-	// `Open` drills the panel in and turns the page to the Model tab.
-	await page.getByRole("button", { name: "Open", exact: true }).click();
+	// The row opens the model: its outline in the leftSection, its own head.
 	await expect(page.getByText("Node types").first()).toBeVisible();
 	await expect(
+		page.getByRole("button", { name: "Open in Schema" }),
+	).toBeVisible();
+	await expect(
 		page.getByRole("tab", { name: "Model", exact: true }),
-	).toHaveAttribute("aria-selected", "true");
-	await expect(page.getByText(/\d+ nodes and \d+ edges rendered/)).toBeVisible({
+	).toHaveCount(0);
+
+	// A type in the outline opens its page.
+	await page
+		.getByRole("button", { name: /^airport/ })
+		.first()
+		.click();
+	await expect(page.getByRole("tab", { name: /^Properties/ })).toBeVisible({
 		timeout: 20_000,
 	});
+	await expect(page.getByRole("tab", { name: "Mappings" })).toBeVisible();
 
-	// Scope, tab and panel are the URL's.
+	// Scope, type and outline are the URL's.
 	await page.reload();
 	await expect(page.getByRole("tab", { name: "AirRoutes" })).toBeVisible({
 		timeout: 30_000,
 	});
-	await expect(
-		page.getByRole("tab", { name: "Model", exact: true }),
-	).toHaveAttribute("aria-selected", "true");
+	await expect(page.getByRole("tab", { name: /^Properties/ })).toBeVisible();
 	await expect(page.getByText("Node types").first()).toBeVisible();
 });
 
@@ -70,8 +77,9 @@ test("archiving a model an active stitch binds is refused, naming the stitches",
 	await expect(card.getByText(/NewsArticles\.\w+/).first()).toBeVisible();
 	await card.getByRole("button", { name: "Close" }).first().click();
 
-	// Nothing moved: the model is still listed.
-	await expect(row(page, "NewsArticles")).toBeVisible();
+	// Nothing moved: the model's page is still open on it.
+	await expect(page.getByRole("tab", { name: "NewsArticles" })).toBeVisible();
+	await expect(page.getByText("Each type")).toBeVisible();
 });
 
 // ── B · Database ─────────────────────────────────────────────────────────────

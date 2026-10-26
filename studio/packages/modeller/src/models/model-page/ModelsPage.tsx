@@ -430,8 +430,9 @@ export function ModelsPage({
 				onSelect(null);
 				return set({ schema: false, type: null });
 			case MODELS_ACTIONS.selectModel:
-				// A click selects and keeps the tab.
-				return ctx?.itemId && set({ scope: ctx.itemId });
+				// A click reads that model, its outline in the leftSection, and
+				// keeps the tab.
+				return ctx?.itemId && set({ scope: ctx.itemId, open: true });
 			case MODELS_ACTIONS.selectType:
 				if (!ctx?.itemId) return;
 				onSelect({

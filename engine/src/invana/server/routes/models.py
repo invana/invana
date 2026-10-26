@@ -209,6 +209,8 @@ def _active_summary(model: GraphModel) -> VersionSummary | None:
 def _to_summary(model: GraphModel) -> GraphModelSummary:
     summary = GraphModelSummary.model_validate(model)
     summary.active_version = _active_summary(model)
+    draft = next((v for v in model.versions if v.status == "draft"), None)
+    summary.draft_version = VersionSummary.model_validate(draft) if draft else None
     return summary
 
 
