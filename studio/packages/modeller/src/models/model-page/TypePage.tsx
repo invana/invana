@@ -36,7 +36,7 @@ import {
 import { ApiError, suppressActionToast } from "@invana-studio/core";
 import { ActButton, ConfirmDialog } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
-import { Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { toast } from "sonner";
 import { EdgeTypeFormDialog } from "../model-editor/components/EdgeTypeFormDialog";
@@ -63,7 +63,9 @@ import type {
 	IndexResponse,
 	NodeTypeResponse,
 	TypePropertyMappingResponse,
+	ValidationRuleResponse,
 } from "../types";
+import { ConstraintDialog } from "./ConstraintDialog";
 import {
 	MODELS_ACTIONS,
 	type ModelsScope,
@@ -157,6 +159,10 @@ export function TypePage({
 		"property" | "index" | "constraint" | "edit" | null
 	>(null);
 	const [deletingType, setDeletingType] = useState(false);
+	/** The property whose constraint dialog is open. */
+	const [editing, setEditing] = useState<TypePropertyMappingResponse | null>(
+		null,
+	);
 
 	const constraints = (tree?.constraints ?? []).filter(
 		(c) => c.target_label === typeName,
@@ -280,9 +286,13 @@ export function TypePage({
 						const idx = indexes
 							.filter((i) => i.properties.includes(name))
 							.map((i) => i.index_type);
-						const con = constraints
-							.filter((c) => c.properties.includes(name))
-							.map((c) => c.constraint_type);
+						const rule = valueRule(m);
+						const con = [
+							...constraints
+								.filter((c) => c.properties.includes(name))
+								.map((c) => c.constraint_type),
+							...(rule ? [constraintLabel(rule)] : []),
+						];
 						return {
 							id: m.id,
 							cells: [
@@ -354,9 +364,49 @@ export function TypePage({
 		if (id === "constraints")
 			return [
 				panelRow({
-					title: "Constraints",
+					title: "Properties and their constraints",
+					aside: String(mappings.length),
+					empty: "No properties defined.",
+					heads: ["property", "type", "constraint", "from"],
+					rows: mappings.map((m) => {
+						const name = m.property_key.name;
+						const rule = valueRule(m);
+						const keyed = constraints
+							.filter((c) => c.properties.includes(name))
+							.map(
+								(c) => CONSTRAINT_WORD[c.constraint_type] ?? c.constraint_type,
+							);
+						return {
+							id: m.id,
+							cells: [
+								<Mono key="n">
+									{name}
+									{isStaged(name) ? <Staged /> : null}
+								</Mono>,
+								m.property_key.type,
+								[...keyed, ...(rule ? [ruleValues(rule)] : [])].join(" · ") ||
+									"—",
+								<span key="f" className="text-muted-foreground">
+									{rule?.rule_type === "standard"
+										? constraintLabel(rule)
+										: rule
+											? "model · constraint"
+											: "model"}
+								</span>,
+							],
+							edit: removable
+								? {
+										label: `Edit constraint on ${name}`,
+										run: () => setEditing(m),
+									}
+								: undefined,
+						};
+					}),
+				}),
+				panelRow({
+					title: "Database constraints",
 					aside: String(constraints.length),
-					empty: "No constraints defined.",
+					empty: "No database constraints defined.",
 					heads: ["name", "type", "properties"],
 					actions: removable
 						? [
@@ -423,7 +473,7 @@ export function TypePage({
 			: id === "indexes"
 				? `Indexes · ${indexes.length}`
 				: id === "constraints"
-					? `Constraints · ${constraints.length}`
+					? `Constraints · ${constraints.length + mappings.filter((m) => valueRule(m)).length}`
 					: TAB_LABEL[id];
 
 	const missing = !!tree && !type;
@@ -533,6 +583,17 @@ export function TypePage({
 						properties={mappings.map((m) => m.property_key.name)}
 						onClose={() => setForm(null)}
 					/>
+					<ConstraintDialog
+						open={!!editing}
+						ctx={ctx}
+						typeName={typeName}
+						property={editing?.property_key.name ?? ""}
+						// An inherited rule is its parent's: the dialog writes the type's own.
+						rule={
+							editing && !editing.inherited ? valueRule(editing) : undefined
+						}
+						onClose={() => setEditing(null)}
+					/>
 					{node ? (
 						<NodeTypeFormDialog
 							open={form === "edit"}
@@ -599,6 +660,61 @@ function inheritedFrom(
 	);
 }
 
+/** A database constraint as the Constraints tab names it. */
+const CONSTRAINT_WORD: Record<string, string> = {
+	node_key: "key",
+	relationship_unique: "unique",
+	relationship_exists: "exists",
+};
+const VALUE_RULES = ["range", "enum", "standard"];
+const SHOWN_VALUES = 3;
+
+/** The property's range, enum or standard rule — the type's own first, then the key's. */
+function valueRule(
+	m: TypePropertyMappingResponse,
+): ValidationRuleResponse | undefined {
+	const own = (r: ValidationRuleResponse) => VALUE_RULES.includes(r.rule_type);
+	return (
+		m.validation_rules.find(own) ?? m.property_key.validation_rules.find(own)
+	);
+}
+
+const num = (v: unknown) => nf.format(Number(v));
+
+/** The constraint as a refusal names it: `80 – 180 days`, `≥ 10 g`, `CO_338 · Seed type`. */
+function constraintLabel(rule: ValidationRuleResponse): string {
+	const { min, max, values } = rule.params as {
+		min?: number | null;
+		max?: number | null;
+		values?: unknown[];
+	};
+	if (rule.rule_type === "range") {
+		const text =
+			min != null && max != null
+				? `${num(min)} – ${num(max)}`
+				: min != null
+					? `≥ ${num(min)}`
+					: `≤ ${num(max)}`;
+		return rule.unit ? `${text} ${rule.unit}` : text;
+	}
+	if (rule.rule_type === "standard") {
+		const ref = (rule.standard_ref ?? "").split("@")[0];
+		return `${ref.split("/").pop() || "standard"} · ${rule.term ?? ""}`.trim();
+	}
+	return (values ?? []).map(String).join(" · ");
+}
+
+/** What the property may hold: the range, or its first values and how many more. */
+function ruleValues(rule: ValidationRuleResponse): string {
+	if (rule.rule_type === "range") return constraintLabel(rule);
+	const values = ((rule.params.values as unknown[]) ?? []).map(String);
+	const more = values.length - SHOWN_VALUES;
+	return (
+		values.slice(0, SHOWN_VALUES).join(" · ") +
+		(more > 0 ? ` · +${nf.format(more)}` : "")
+	);
+}
+
 // ── Pieces ───────────────────────────────────────────────────────────────────
 
 function Mono({ children }: { children: ReactNode }) {
@@ -613,6 +729,8 @@ function Staged() {
 interface TableRowSpec {
 	id: string;
 	cells: ReactNode[];
+	/** The row's edit, while a draft is open. */
+	edit?: { label: string; run: () => void };
 	/** The row's delete, while a draft is open. */
 	remove?: { label: string; run: () => void };
 }
@@ -626,7 +744,7 @@ function panelRow(opts: {
 	rows: TableRowSpec[];
 	actions?: ActionSpec[];
 }): RowSpec {
-	const deletes = opts.rows.some((r) => r.remove);
+	const deletes = opts.rows.some((r) => r.remove || r.edit);
 	const panel: PanelSpec = {
 		kind: "text",
 		title: opts.title,
@@ -658,6 +776,18 @@ function panelRow(opts: {
 								))}
 								{deletes ? (
 									<TableCell className="text-right">
+										{r.edit ? (
+											<ActButton
+												area="model"
+												variant="ghost"
+												size="icon"
+												aria-label={r.edit.label}
+												title={r.edit.label}
+												onClick={r.edit.run}
+											>
+												<Pencil />
+											</ActButton>
+										) : null}
 										{r.remove ? (
 											<ActButton
 												area="model"
