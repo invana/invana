@@ -24,6 +24,9 @@ ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "docs" / "products"
 G = "/u/admin/airways"
 AR = "/u/admin/arabidopsis"
+AIRROUTES = "d5b061e6-e75b-4545-8cbc-23f316331004"  # airways' AirRoutes model, which holds a draft
+ARABIDOPSIS = "807b30c5-7b5a-4eab-b954-684441467763"  # arabidopsis' only model
+EU_WORLD = "51356733-0529-43d7-b862-701efbcf6c62"  # airways' world "EU · H1 2026"
 ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.login", "/login"), ("shell.graphs", "/graphs"), ("shell.first_run", "/graphs?first-run"),
     ("shell.profile", "/settings/profile"), ("shell.runs", f"{G}/activity/runs"), ("shell.run", f"{G}/agents/runs?page=run%3Aeaec1323-ac75-466b-a616-86b031fbeacb"),
@@ -48,12 +51,22 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("datasets.catalogue", "/datasets/catalogue"), ("datasets.validation", "/datasets/validation"),
     ("datasets.standard", "/datasets/standards"), ("datasets.imports", "/datasets/imports"),
     ("datasets", "/datasets/catalogue/admin/accession-phenotypes"),
-    ("modeller.global_model", f"{G}/modeller/global-model"), ("modeller.models", f"{G}/modeller/models"),
-    ("modeller.model.type.constraint", f"{AR}/modeller/models/arabidopsis/accession"), ("modeller.model.history", f"{G}/modeller/models?model=m1&models_tab=history"),
-    ("modeller.model", f"{G}/modeller/models/airroutes"), ("modeller.stitches", f"{G}/modeller/stitches"),
-    ("modeller.worlds", f"{G}/modeller/worlds"), ("modeller.guardrails", f"{G}/modeller/guardrails"),
+    ("modeller.global_model", f"{G}/modeller/global-model"),
+    *[(f"modeller.models.{t}", f"{G}/modeller/models?models_tab={t}")
+      for t in ("overview", "database", "usage", "performance", "growth")],
+    ("modeller.models", f"{G}/modeller/models"),
+    ("modeller.model.type.constraint", f"{AR}/modeller/models?model={ARABIDOPSIS}&model_open=1&models_tab=model"),
+    ("modeller.model.history", f"{G}/modeller/models?model={AIRROUTES}&model_open=1&models_tab=history"),
+    ("modeller.model.type", f"{G}/modeller/models?model={AIRROUTES}&model_open=1&models_tab=model"),
+    ("modeller.model", f"{G}/modeller/models?model={AIRROUTES}&model_open=1"),
+    ("modeller.stitches", f"{G}/modeller/stitches"),
+    ("modeller.worlds.board", f"{G}/modeller/worlds/{EU_WORLD}"), ("modeller.worlds", f"{G}/modeller/worlds"),
+    ("modeller.guardrails", f"{G}/modeller/guardrails"),
     ("modeller.rules", f"{G}/modeller/rules"), ("modeller.requests", f"{G}/modeller/requests"),
-    ("modeller.settings", f"{G}/modeller/settings"), ("modeller.connect", "/graphs/new"), ("modeller.draft", f"{G}/modeller/models?model=m1"),
+    ("modeller.settings.database", f"{G}/modeller/settings?tab=graph"),
+    ("modeller.settings.members", f"{G}/modeller/settings?tab=members"),
+    ("modeller.settings", f"{G}/modeller/settings?tab=basic"), ("modeller.connect", "/graphs/new"),
+    ("modeller.draft", f"{G}/modeller/models?model={AIRROUTES}&model_open=1&models_tab=model"),
     ("explorer.sessions", f"{G}/explorer?history"), ("explorer.home", f"{G}/explorer"), ("explorer", f"{G}/explorer/routes-out-of-lhr"),
     ("projects.list", f"{AR}/projects"), ("projects.new", f"{AR}/projects"), ("projects.todo", f"{AR}/projects/todos"), ("projects.decisions", f"{AR}/projects/decisions"),
     ("projects.impact", f"{AR}/projects/gene-edited-field-trials"), ("projects", f"{AR}/projects/early-flowering-under-drought"),
@@ -380,6 +393,7 @@ AS = {  # board → the account shoot.mjs signs in as; a board absent here is sh
 CLICK = {  # board → buttons shoot.mjs presses after the route loads, for a state a URL may not hold
     "agents.workers.add.token": ["Make token"],
     **{f"agents.workers.add.run.{w}": ["Make token", "Next"] for w in ("docker", "python", "k8s")},
+    "modeller.models.new": ["New model"],
 }
 
 
