@@ -19,10 +19,10 @@ one model — **the model is a filter, not a second page**.
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | One page, six tabs | Overview · Model · Database · Usage · Performance · Growth (MP1) |
+| C1 | One page, five tabs | Overview · Database · Usage · Performance · Growth; History through *Versions* (MP1) |
 | C2 | The scope is a filter | `All models` or one model; the tab holds when the scope changes (MP2) |
 | C3 | One window | `7 days ¦ 30 days ¦ 90 days`; every number on the page is read over it (MP3) |
-| C4 | The panel lists, the page acts | The Models list, then a model's three drawers; every write on a model sits on the page header (MP4 · MP5) |
+| C4 | The page acts | No models list; one model's outline in the leftSection; every write on a model sits on the page header (MP4 · MP5) |
 | C5 | Database drift | Labels, relationship types, indexes and constraints, each marked against the model (MP9) |
 | C6 | Usage signals | Unused · empty · cold property · hot · hot and slow · supernode, with who called (MP10) |
 | C7 | Query shapes | Queries grouped by shape, with p50 · p95 · rows · callers (MP12) |
@@ -30,6 +30,7 @@ one model — **the model is a filter, not a second page**.
 | C9 | Growth over time | Records per model or type, from count snapshots, with each import and stitch commit marked (MP14) |
 | C10 | Archive, not delete | A published model is archived; only a never-published one is deleted (MP7) |
 | C11 | Publish shows what it will write | The confirm card lists the staged changes and the DDL the projection will push (MP8) |
+| C12 | A type is a page | Properties · Indexes · Constraints · Mappings, on its model (MP46) |
 
 ## Vocabulary
 
@@ -46,38 +47,26 @@ Product words are [terminology.md](../../../terminology.md). This page adds:
 
 ```mermaid
 flowchart TD
-    A[leftNav › Models] --> B[Panel: the models list<br/>Page: All models · Overview]
+    A[leftNav › Models] --> B[Page: All models · Overview<br/>no leftSection]
     B --> E{Any published model?}
     E -->|no| E1[Overview empty state: Author a model · Import · Starter<br/>Usage · Performance · Growth locked, naming why]
     E -->|yes| C[Tiles, a row per model, Needs attention]
     C -->|pick a tab| T[Same tab, all models]
-    C -->|click a row in the panel| S[Scope = that model<br/>same tab, filtered]
-    T -->|click a row in the panel| S
-    S -->|Open on the row| D[Panel: Node types · Edge types · Stitches<br/>Page: Model tab]
-    D -->|Edit| F[A draft opens · staged bar under the header]
+    C -->|click a model's row| S[One model: its outline in the leftSection<br/>same tab, filtered]
+    S -->|Open in Schema| D[The model's canvas, full-bleed]
+    S -->|a type in the outline| TY[The type page<br/>Properties · Indexes · Constraints · Mappings]
+    D -->|click a type| TY
+    S -->|Versions| H[History]
+    D -->|staged change| F[A draft · staged bar]
     F -->|Publish vN| G{Confirm card:<br/>changes + the DDL it projects}
-    G -->|publish| H[Next version active · its DDL projected (CM10)]
+    G -->|publish| H2[Next version active · its DDL projected]
     G -->|cancel| F
-    F -->|Discard draft| D
     S -->|breadcrumb Models ›| T
-    D -->|‹ in the panel| B
     C -->|Needs attention: hot and slow| P[Performance · the shape selected]
     P -->|a missing index| Q[Add index to draft] --> F
-    D -->|Archive| R{Active stitches on it?}
+    S -->|Archive| R{Active stitches on it?}
     R -->|yes| R1[Refused, naming each stitch]
-    R -->|no| R2[Archived · out of the list and the union]
-```
-
-Scope and panel are one state:
-
-```mermaid
-flowchart LR
-    L[Panel: list<br/>scope All] -->|click row| LS[Panel: list, row selected<br/>scope = model]
-    LS -->|click another row| LS
-    LS -->|Open| DT[Panel: that model's drawers<br/>scope = model · Model tab]
-    DT -->|‹| LS
-    LS -->|Models › crumb| L
-    DT -->|Models › crumb| L
+    R -->|no| R2[Archived · out of the board and the union]
 ```
 
 ## Seams
@@ -105,8 +94,8 @@ flowchart LR
 
 | View | Shape |
 |---|---|
-| **List** | One row per model: name · version readout (`v2 · draft` / `v1 · active`) · type count · a dot when it carries a Needs-attention item. Header: `New model` · `Import` · `Starter models` · `Search`. Footer toggle: `Show archived`. A click **selects** (scope); `Open` drills in |
-| **Detail** | `Models › <name>` crumb with `‹`, then a `PanelStack` of three drawers: **Node types · Edge types · Stitches**. `add` on the two type drawers while drafting, `Declare a stitch` on Stitches. No actions on the model itself, and no Staged drawer |
+| **None at All models** | The models board's rows pick a model; there is no list beside them (MP4) |
+| **One model's outline** | `<model> · vN · active` over a `PanelStack` of three drawers: **Node types · Edge types · Stitches**. A type row opens its type page; `add` on the two type drawers while drafting, `Declare a stitch` on Stitches. No actions on the model itself, and no Staged drawer |
 
 ### The page (`mainSection`)
 
@@ -115,22 +104,20 @@ The **Models** board (`board.kind = models`) — one board, whatever the scope. 
 
 | Region | Shape |
 |---|---|
-| Header | Breadcrumb `Models › <name>` (the name only when scoped), the version readout when scoped, the actions below, then the tab strip with the window on its right |
+| Header | Breadcrumb `Models › <name>` (the name only when scoped), the description and version readout when scoped, the actions on the same row, then the tab strip with the window on its right (MP45) |
 | Staged bar | Under the header while a draft is open: count · the list · discard-one · discard-all. `⌘↵` opens the Publish confirm |
-| Stitch bars | At All models only, on the Model tab: staged stitches with `Commit` · `Discard`, and stitches bound to a version no longer active (ST37) |
 
 | Scope | Primary | Secondary | `⋯` |
 |---|---|---|---|
 | All models | `New model` | `Import` | `Starter models` · `Introspect` |
-| One model, no draft | `Edit` (opens the next draft) | `Export` | `Rename` · `Archive` (or `Delete`, never published) |
-| One model, drafting | `Publish vN` | `Discard draft` | `Rename` · `Export` · `Archive` |
+| One model | `Open in Schema` | `Versions` · `Export` | `Rename` · `Archive` (or `Delete`, never published) |
+| One model, drafting | `Open in Schema` | `Publish vN` · `Discard draft` · `Versions` · `Export` | `Rename` · `Archive` |
 
 ### The tabs
 
 | Tab | All models | One model |
 |---|---|---|
-| **Overview** (default) | Tiles: models (published · draft) · types · records · queries a day · p95 · drift. A row per model: version · types · records · share of queries · p95 · signal · drift. **Needs attention**: every flagged signal, each linking to its tab | Tiles: types · records · queries a day · p95 · drift · staged. A row per type: kind · records · change over the window · share of queries · p95 · signal. The same Needs attention, filtered |
-| **Model** | [`GraphModelCanvas`](../../../building-studio/graph-model-canvas.md), on circles and ELK (MP19), every model as a frame with its stitches (ST14 · ST57). The union list beside it: every type with the models contributing it (ST6). The declare card docks on the right (ST34) | The same canvas and Detail, opening on cards, the model's types unframed (ME26 · MP19). The selected type's form beneath it (ME6 · ME19) |
+| **Overview** (default) | Tiles: models (published · draft) · types · records · queries a day · p95 · drift. A row per model: version · types · records · share of queries · p95 · signal · drift. **Needs attention**: every flagged signal, each linking to its tab | Tiles: types · records · queries a day · p95. A row per type: kind · records · change over the window · share of queries · p95 · signal. **Records over time** for this model's types (MP45) |
 | **Database** | Four sections: Labels · Relationship types · Indexes · Constraints. Each row carries its drift mark and count; **unmodelled** labels sort first. Captured-at time and `Introspect` on the tab's own header | The same four, only this model's types. No unmodelled section |
 | **Usage** | Tiles: queries · callers · unused types · hot types. A row per model: queries touching it · share · by agent · plan · Explorer · API · last touched · signal. **Stitches crossed**: each active stitch and the queries that traversed it | Tiles, filtered. A row per type, the same columns. **Properties**: filtered · returned · ordered on, per property, with cold ones marked |
 | **Performance** | Tiles: queries · p50 · p95 · errors · slow shapes. **p95 a day**. A row per shape: shape · callers · calls · p50 · p95 · rows · types touched · advice. Picking a row opens a card: the full shape, its slowest calls (each linking to its run), the plan's summary, and the advice | The same, only shapes touching this model's types. `Add index to draft` on an advice row when the index belongs to this model |
@@ -187,11 +174,11 @@ the file, the frame title and a row in [the-screens.md](../../../the-screens.md#
 
 | # | Decision |
 |---|---|
-| MP1 | **Models is one page with six tabs: Overview · Model · Database · Usage · Performance · Growth.** Every surface a model has is a tab of it. The global-model page, the *All models* canvas and a model's canvas are no longer separate destinations. |
-| MP2 | **The scope is a filter over the same tabs.** `All models` or one model; the tabs, their order and their columns do not change, and changing scope keeps the current tab. What exists at only one scope is a section inside a tab, not a tab: stitches (declare, staged, crossed) and unmodelled labels only at All models; editing, the type form and per-property usage only at one model. A page that reshapes itself per scope would be two pages to learn. |
+| MP1 | **Models is one page with five tabs: Overview · Database · Usage · Performance · Growth.** One model's History is a reading of the same page (`models_tab=history`), opened by *Versions*, with no tab in the strip. The canvas of every model is the Modeller's global model page ([stitch-models ST24](stitch-models.md#decisions)); one model's canvas opens from *Open in Schema* (MP42) |
+| MP2 | **The scope is a filter over the same tabs.** `All models` or one model; the tabs, their order and their columns do not change, and changing scope keeps the current tab. What exists at only one scope is a section inside a tab, not a tab: unmodelled labels and Needs attention only at All models; per-property usage and Records over time on Overview only at one model. A page that reshapes itself per scope would be two pages to learn. |
 | MP3 | **One window, `7 days ¦ 30 days ¦ 90 days`, on the tab strip's right**, read by every number on the page — the plan page's pattern ([LB24](../../workflows/features/the-library.md#decisions)). The Model and Database tabs ignore it and say so by greying the control, because a declaration and a mirror have no window. |
-| MP4 | **The panel lists; the page acts.** The list view is only the models. A model's detail is three drawers — Node types · Edge types · Stitches — and nothing on the model itself: `Edit`, `Publish`, `Discard draft`, `Rename`, `Export`, `Archive` and `Introspect` sit on the page header, because they act on what the page shows. The list view's Stitches and Global-model drawers are gone: the Model tab at All models draws both, and a read-only drawer that repeats the main area is a second place to look. |
-| MP5 | **A click selects, `Open` drills in.** Clicking a row sets the scope and keeps the tab, so stepping down the list compares models on one reading. `Open` drills the panel into that model's drawers and turns the page to the Model tab, because drilling in is for authoring. The breadcrumb `Models ›` on the page and `‹` in the panel return to All models; scope, tab and window are in the URL. |
+| MP4 | **There is no models list in the leftSection; the page acts.** At All models the board has no leftSection — its rows pick a model. One model's leftSection is its outline: three drawers, Node types · Edge types · Stitches, and nothing on the model itself: `Open in Schema`, `Publish`, `Discard draft`, `Versions`, `Rename`, `Export` and `Archive` sit on the page header, because they act on what the page shows. |
+| MP5 | **A row opens a model.** Clicking a model's row on the board sets the scope (`model=<id>&model_open=1`) and keeps the tab. The breadcrumb `Models ›` returns to All models; scope, tab and window are in the URL. |
 | MP6 | **The staged set is a bar under the page header, not a drawer.** Count, list, discard-one, discard-all, and `⌘↵` opening the Publish confirm. It appears only while a draft is open, and the staged rows still sort first with their chip in the type drawers (ME5). |
 | MP7 | **A never-published model is deleted; a published one is archived.** Imports, answers and stitches resolve against published versions (CM5), so deleting one would break what already cited it. An archived model leaves the list and the global model, and its versions still resolve. Archiving is **refused while an active stitch binds it**, naming each one, because a stitch into an archived model is a link the union no longer draws. `Show archived` lists them with `Restore`. |
 | MP8 | **Publishing asks, and says what it will write.** The confirm card lists the staged changes by kind and the DDL the projection will push — each `CREATE`/`DROP` of an index or constraint — because publish is the one act on this page that writes to the database (CM10). |
@@ -205,11 +192,11 @@ the file, the frame title and a row in [the-screens.md](../../../the-screens.md#
 | MP16 | **Percentiles are computed in the engine over the window's rows**, not in SQL — SQLite has no `percentile_cont` ([LB36](../../workflows/features/the-library.md#decisions)). One helper, `core.utils.percentile`, serves this page and the plan page. |
 | MP17 | **A type belongs to a model through the model's active version.** A label two models both declare counts toward both and is marked shared; a label no model declares is `database only` and reads only at All models. |
 | MP18 | **One board, `kind = models`, whatever the scope.** Its tab reads the scope's name — `All models` or `AirRoutes`. Scope is a filter, so a second model is the same board re-read, not a second tab. |
-| MP19 | **`All models` opens on circles and one model on cards, both laid out by ELK.** Both readings draw on the same `GraphModelCanvas` with the one layout ([GM3 · GM4](../../../building-studio/graph-model-canvas.md#decisions)); only the opening Detail differs, because one model has room for cards. The header carries Detail and no Layout switch. |
+| MP19 | **The global model opens on circles and one model's canvas on cards, both laid out by ELK.** Both draw on `GraphModelCanvas` with the one layout ([GM3 · GM4](../../../building-studio/graph-model-canvas.md#decisions)); only the opening Detail differs, because one model has room for cards. |
 | MP20 | **The Publish confirm reads a projection plan and writes nothing.** `…/draft/projection` diffs the draft's indexes and constraints against what the database reports, or against the active version when the connector cannot list them, and says which (`against: live \| active_version`). Each operation is stated in a neutral form — `CREATE RANGE INDEX airport_city ON airport(city)` — because the vendor's statement is its schema writer's, and an operation the connector lacks the capability for is listed and marked unsupported rather than hidden. Projecting is CM10's run, not this page's. |
 | MP21 | **Archive and restore are acts, not a status field.** `PATCH …/models/{id}` with `status: archived` archives (refused while an active stitch binds it) and emits `model.archived`; any other status on an archived model restores it — to `active` when it was ever published — and emits `model.restored`. A model counts as published once any version was activated. |
 | MP22 | **A tab whose reading the engine does not serve yet stays in the strip and says so.** The six tabs never change (MP2); when the engine answers a slice with `null` (MP33), its tab draws *Not measured yet* naming what it reads from, and the Overview leaves that tile out rather than drawing a zero. Every chart on the page is `@invana/charts`' — `StackedBarChartV`, `LineChart`, `StackedAreaChart`, and `InlineMeter` · `SegmentedBar` in a row — never one drawn in Studio. |
-| MP23 | **The reading is four URL keys, written with the page in one update.** `model` is the scope and the row the panel has selected, `model_open` the panel drilled into it, `models_tab` and `models_window` the tab and the window; absent is the default — All models, Overview, 30 days. A key the panel or the page writes goes in the same update as `page` or `panel`, because two writes in one tick do not compose. |
+| MP23 | **The reading is URL keys, written with the page in one update.** `model` is the scope, `model_open` its outline open in the leftSection, `models_tab` and `models_window` the tab and the window, `models_view=schema` one model's canvas, `model_type` a type's page and `type_tab` its tab; absent is the default — All models, Overview, 30 days. A key the outline or the page writes goes in the same update as `page` or `panel`, because two writes in one tick do not compose. |
 | MP24 | **Every member writes until membership says otherwise.** Membership is binary ([membership](../../identity-and-access/features/membership.md)), so the read-only reading — every tab reads, `Edit` · `Publish` · `Archive` absent — is the page drawn without a write grant, and it is reached when identity-and-access grants one. |
 | MP25 | **Records on the Overview are the database's own counts until count snapshots exist.** A type's records are the `count-types` read of its name; a model's are the sum over its active version's types, so a label two models declare counts toward both (MP17). A connector that cannot count shows `—`, never a zero. |
 | MP26 | **A connector says whether it lists its indexes and constraints; nothing infers it from an empty answer.** The schema reader carries `lists_schema`, true for Neo4j and Memgraph. The Database tab, the introspector and the Publish confirm's `against` (MP20) all read that one flag, so an empty list from a connector that lists means *none*, and from one that does not, *not reported*. |
@@ -228,6 +215,8 @@ the file, the frame title and a row in [the-screens.md](../../../the-screens.md#
 | MP39 | **Advice is read at the shape card, against the indexes the database reports now.** `missing_index` is a property filtered after a label scan with no index on that label and property; it names the model whose active version declares the label, and *Add index to draft* appears only then. A connector that cannot explain says `advice_unsupported_by_connector`. |
 | MP40 | **Signals are computed at read time over the window.** Records come from each type's latest count snapshot, and a supernode from the latest one that carried degree. Nothing is stored as a flag, so a changed rule re-reads every window. |
 | MP41 | **A query crossed a stitch when it touched the stitch's edge type and both its end types.** An anchor's `SAME_AS` is shared by every anchor, so the end types are what tell two anchors apart. |
-| MP42 | **One model's canvas is the whole Model tab.** The tab is `flush`: the canvas meets the tab strip and the page's edges, and its header carries no title, because the crumbs already name the model. `All models` keeps the tab's padding, because the union card sits beside its canvas. The canvas header is 30px, the height of the tab strip above it (GM11). |
+| MP42 | **One model's canvas is a full-bleed view of its page.** *Open in Schema* sets `models_view=schema`: the breadcrumb and the head stay, the tab strip goes, and the canvas fills the rest with the staged bar over it. A type clicked on it opens the type page. The canvas header carries no title, because the crumbs already name the model. |
 | MP43 | **The engine counts every number the tabs show; Studio formats.** `GET …/models/insights` returns, beside the values: Overview `total` and `slow` (the scope's p95 at or above the Graph's); Usage `per_day`, `caller_share` (each caller's fraction), `unused_types`, `hot_types` (hot and hot-and-slow), `cold_properties` and `stitches_crossed`; Performance `error_rate` and `slow`, and `slow` on each shape; the shape card's `caller_share`; Growth `start`, `now`, `change`, `change_rate`, `fastest` (a row key — from nothing ranks first, then by rate), `unchanged` and `writes.total`, and on each row `change_rate` and `unchanged`. `change_rate` is the shared change reading (`by` as a ratio, `direction`, `tone`), `null` from nothing. `GET …/schemas/physical` returns `labels_tally` and `relationship_types_tally` (modelled · not), `indexes_present`, `constraints_present` and `drift` (`total`, `types`, `rules`, `unmodelled_types`, `model_only_rules`, `by_model`), `null` until a mirror is captured. Studio sums, divides and filters none of them. |
 | MP44 | **The page's records and model counts are the engine's, and records are the counted ones.** The *Records* tile, a model's records column and a type's records column read Growth's stored counts — `growth.now`, a model row's `now`, a type row's `now` — so a tile and the *↑ 6.2% in 30 days* beneath it are one series, never a live count beside a stored one. A count is as of the last act that wrote data (MP14); a database that has never been counted reads *—*. Insights also return `catalog` — `models`, `published`, `drafts`, `node_types`, `edge_types` and each published model's `types` — counted over the models the page reads. Studio sums and counts none of it. |
+| MP45 | **One model's head is one row of acts, and its Overview ends on growth.** `Models › <model>`, the description, the active readout and a draft chip, then *Open in Schema* · *Versions* · *Export* — and *Publish vN* · *Discard draft* while a draft is open. Four tiles: Types · Records · Queries a day · p95; drift and staged are read on Database and on the staged bar. Below *Each type*, **Records over time** draws Growth's series for this model's types over the window; Needs attention stays on the All-models Overview. |
+| MP46 | **A type is a page of its model.** `model_type=<name>` replaces the tabs with the type's: Properties · N (property · type · cardinality · index · constraint) · Indexes · N · Constraints · N · Mappings (property · default · inherited from · validation). The head is `Models › <model> › <type>`, its records (Growth's latest count) and key (the unique constraint's property), a `node type` / `edge type` chip and the draft chip. While a draft is open each row deletes from the draft and *Add property* · *Add index* · *Add constraint* open their forms; without one the page reads, with *Open a draft*. |

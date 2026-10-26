@@ -72,9 +72,9 @@ this map.** Feature numbers do not change.
 | 1.3 | [Author a model](modules/connect-and-model/features/domain-models.md) | One model per domain, authored on its own | ✅ | — | ✅ | S3 |
 | 1.4 | [Model editor](modules/connect-and-model/features/model-editor.md) | Draw the model on a canvas; staged commit | ✅ | — | ✅ | S3 |
 | 1.5 | [Share a model](modules/connect-and-model/features/share-a-model.md) | Export, import, upgrade; files and git are the registry | ✅ | ✅ | ✅ | S7 |
-| 1.6 | [Stitch models](modules/connect-and-model/features/stitch-models.md) | Anchors and relationships; the global model is derived | ✅ | ✅ | ✅ | S7 |
+| 1.6 | [Stitch models](modules/connect-and-model/features/stitch-models.md) | Anchors and relationships; the global model is derived and drawn on its own page; the Stitches page lists active and removed stitches, each inspected on the canvas | ✅ | ✅ | 🟡 | S7 |
 | 1.7 | [Starter models](modules/connect-and-model/features/starter-models.md) | Importable models to begin from — memory, provenance — renamed on arrival | ✅ | ✅ | ✅ | S7 |
-| 1.8 | [The model page](modules/connect-and-model/features/the-model-page.md) | One page, six tabs — Overview · Model · Database · Usage · Performance · Growth — with the model as a filter; is it used, is it slow, how has it grown | ✅ | — | ✅ | S-TBD |
+| 1.8 | [The model page](modules/connect-and-model/features/the-model-page.md) | One page, five tabs — Overview · Database · Usage · Performance · Growth — with the model as a filter; one model's schema canvas and type pages; is it used, is it slow, how has it grown | ✅ | — | 🟡 | S-TBD |
 | 1.9 | [Publish review](modules/connect-and-model/features/publish-review.md) | Additive publishes now; breaking is previewed as a migration run and published after another owner approves | ✅ | ✅ | ✅ | B10 |
 | 1.10 | [Import an ontology](modules/connect-and-model/features/ontology-import.md) | RDFS / OWL subset, schema.org included — JSON-LD, Turtle, RDF/XML — into a draft model; flattened, source IRIs kept, an import report of what was skipped | ✅ | ✅ | ✅ | B12 · C08 |
 
