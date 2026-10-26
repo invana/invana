@@ -253,6 +253,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 13.13 | [MCP plugins](modules/platform/features/mcp-plugins.md) | An MCP server's tools as task types in an `mcp` plugin, frozen when an Admin adds the server; refreshed by hand, loaded at start-up, switched like a tool plugin | ✅ | ✅ | 🔵 | B07 |
 | 13.14 | [Metrics are stored](modules/platform/features/metrics-are-stored.md) | Every number Studio shows is computed and stored by the engine; Studio formats it — durations, totals, rates and shares | 🟡 | — | 🟡 | — |
 | 13.15 | [One list contract](modules/platform/features/list-contract.md) | Every list searched, filtered, sorted and keyset-paged by one engine helper, answering `{items, total, unfiltered_total, next_cursor, applied}`; filters in the URL and shown as chips | ✅ | — | 🟡 | F01 |
+| 13.16 | [This Graph's MCP server](modules/platform/features/this-graphs-mcp-server.md) | One MCP endpoint per Graph serving the agents and functions a builder marks served; callers connect with IAM tokens, each call a run in the ledger; Claude Code pushes draft dataset versions a person publishes | ✅ | — | ✅ | I02 |
 
 ---
 
@@ -426,7 +427,7 @@ replacement lands.
 | F04 | 5.2 · 5.3 · 5.5 · 5.8 · 5.9 · 6.x | An agent is built on its page from a drafted skill, its Flow matches its instructions, and publishing passes the eval gate |
 | F05 | 5.14 · 10.9 · 10.8 · 5.4 · 3.15 | The assistant opens Runs with filters it set, and every act in a run has a ledger row |
 | I01 | 11.4–11.10 | A skill need no policy covers is refused naming the policy; a narrowed token can push a draft dataset and nothing else |
-| I02 | 10.4 · 13.13 | Claude Code, with a narrowed token, pushes a draft dataset version over this Graph's MCP server and a person publishes it |
+| I02 | 13.16 · 10.4 · 11.5 | Claude Code, with a narrowed token, pushes a draft dataset version over this Graph's MCP server and a person publishes it |
 | F06 | 13.11 | A worker on a second machine joins with a service-account token and runs a tool step |
 
 F01–F06 and I01–I02 build the Agents design ([agent-fabric](../products/agent-fabric.md)) and then IAM ([iam](../products/iam.md)) on one branch, one commit a phase, run by [agents-build-sessions](../products/agents-build-sessions.md).

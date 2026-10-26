@@ -67,7 +67,7 @@ flowchart TD
 | Agents | `/agents/agents` | — | `AgentsListPage` | `GET …/agents` (list contract), `…/agents/performance?window=7d` |
 | Skills | `/agents/skills` | — | `SkillsListPage` | `GET …/skills` (list contract) |
 | Functions | `/agents/functions` | Functions · `plans` · `promoted` · `templates` · `plugins` | `FunctionsPage` | `GET …/catalogue` · `…/flows` · `…/templates` · `/api/v1/plugins` |
-| Connections | `/agents/connections/mcp` (`/agents/connections` lands here) | MCP servers | `ConnectionsPage` | `GET /api/v1/plugins?kind=mcp` · `GET /api/v1/plugins/:name` · `POST /api/v1/plugins/mcp` · `…/mcp/:name/refresh` · `…/:name/enable·disable` |
+| Connections | `/agents/connections/server` (`/agents/connections` lands here) · `/agents/connections/mcp` | This Graph's server · MCP servers | `ConnectionsPage` | `GET /api/v1/plugins?kind=mcp` · `GET /api/v1/plugins/:name` · `POST /api/v1/plugins/mcp` · `…/mcp/:name/refresh` · `…/:name/enable·disable` |
 | LLMs | `/agents/llms[/:provider]` | — | `LlmsPage` + `EndpointDialog` · `AddEndpointDialog` | `GET …/llm/providers` · `…/llm/pins` |
 | Settings | `/agents/settings` | — | `AgentsSettingsPage` | `GET/PUT …/agents/concurrency` · pools |
 
@@ -104,7 +104,7 @@ flowchart TD
 | AS6 | **Fleet › Map is agents → skills → function namespaces**, drawn from the agents' bound skills and each skill's offered plan. Pools join the map when Workers holds them |
 | AS7 | **Fleet › Table is Performance's agent rows over 7 days** — runs, success, p95 against the window before, tokens a run, the signal |
 | AS8 | **LLMs: an endpoint's details and adding one are modals.** The endpoint modal is in the path (`/agents/llms/:provider`), so a link opens it; adding one is not |
-| AS9 | **Connections shows only MCP servers.** *This Graph's server* arrives with I02 and *Remote agents* with 5.11; neither tab is drawn before it works |
+| AS9 | **Connections has two tabs: *This Graph's server* (the landing tab, [13.16](../../platform/features/this-graphs-mcp-server.md)) and *MCP servers*.** *Remote agents* arrives with 5.11 and is not drawn before it works |
 | AS10 | **A tile's count is a list's `total` or an engine field**, never a count Studio makes; a tile with no such number names the section in words |
 | AS11 | **Settings keeps the pools** until Workers holds them; the ceiling is the page's first card |
 | AS12 | **The rail holds only built sections.** Runs, Approvals and Ledger sit between LLMs and Settings with a divider before them; Workers joins with its phase. Runs and Approvals carry a badge — live runs (the Runs tiles' `live`), asks for you (the asks page's `for_you`) — counted by the engine. A product hands the shell its counts through `useNavBadges`, keyed by rail item; a count of 0 draws no badge |
@@ -146,6 +146,6 @@ flowchart TD
 | Card nodes, minimap and zoom on Fleet › Map | `LayeredCanvas` in panel mode has none; they arrive with a fleet kind in canvas |
 | A leftSection in Agents | The rail and its pages replace it |
 | Invented suggestions on Home | A suggestion the assistant cannot serve is a promise nobody keeps |
-| Tabs for Connections › This Graph's server and Remote agents | They arrive with the features that serve them |
+| The *Remote agents* tab of Connections | It arrives with 5.11, the feature that serves it |
 | A Swarms or Schedules section | A large run is a run; schedules live in the shell's Activity |
 | Restoring every open tab after a reload | The path and `?page=` restore what is in front; the rest is the session's |

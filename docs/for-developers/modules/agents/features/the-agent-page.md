@@ -149,12 +149,12 @@ default is refused with `409` naming the state, as for `paused`.
 | AP26 | **Exits keep the run's own word — `answered` is not relabelled `served`.** An exit is the run's `outcome` (AP17's *An exit*); Served counts every settled run that succeeded, small talk included, so the two numbers differ whenever a run converses |
 | AP27 | **Fleet's *Tokens this month* tile reads the same ceiling as the rows**: Σ the live agents' `effective_budget.max_tokens_month` (the agent's own, else the Graph's default; drafts and retired agents left out), and Fleet's table and console print *N of M* from `effective_budget` as the Agents list does (AP19) |
 | AP28 | **Token magnitudes print `k` · `M` · `B`** (`formatCompact`): a lowercase `m` reads as minutes, and a value that rounds up to the next rung is printed on it (`1M`, never `1000k`) |
+| AP29 | **Deploy's *Callable over MCP* is the agent's row in this Graph's MCP server** — one `mcp_served` record, switched here or on *Connections › This Graph's server*, naming its tool `ask_<name>`; a draft agent is not a candidate, so the switch is drawn disabled until *Create agent* ([13.16](../../platform/features/this-graphs-mcp-server.md) MS5). |
 
 ## Not building
 
 | Item | Why |
 |---|---|
-| Callable over MCP on Deploy | This Graph's MCP server (I02) |
 | Remote agents in Flow and Access | 5.11, later |
 | Deleting an agent that has run | Lineage must resolve ([lifecycle](lifecycle.md)); a draft is discarded (AP22) |
 | Assistant proposals marked on the builder | The assistant opens boards and drafts; a proposal marked on the builder needs a proposal record the engine does not keep |
