@@ -31,7 +31,7 @@ from invana.apps.graphs.pool import GraphConnectionManager, GraphUnavailableErro
 from invana.apps.graphs.schemas import QueryResponse
 from invana.core.events import actions as event_actions
 from invana.core.events.services import emit_event
-from invana.graph.connectors.base.exceptions import QueryErrorCategory
+from invana.graph.connectors.base.exceptions import LensViolationError, QueryErrorCategory
 from invana.graph.types.constants import Capability, QueryLanguage
 from invana.graph.types.data_elements import GraphResponse
 from invana.graph.types.lens import QueryLens
@@ -93,6 +93,8 @@ async def execute_query(
 
     try:
         graph_response = await connector.execute(query, parameters=parameters, timeout_s=timeout_s, lens=lens)
+    except LensViolationError:
+        raise
     except Exception as exc:
         # Carry the connector's classification through (it's lost once we re-wrap
         # into the service-level error). The raw message + vendor code land in the

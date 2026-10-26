@@ -68,6 +68,7 @@ const ENGINE_ONLY = {
 	ledger: "served by the @invana-studio/agents package (Ledger)",
 	modeller: "served by the @invana-studio/modeller package, outside the host",
 	govern: "served by the @invana-studio/modeller package, outside the host",
+	requests: "served by the @invana-studio/modeller package, outside the host",
 	graphs:
 		"served by @invana-studio/core and the Modeller's settings, outside the host",
 	agents: "served by the @invana-studio/agents package, outside the host",

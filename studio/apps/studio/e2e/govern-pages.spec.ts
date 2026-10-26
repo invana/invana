@@ -68,7 +68,9 @@ test("a rule that narrows nothing is refused in the dialog", async ({
 	await dialog.getByRole("radio", { name: "May leave" }).click();
 	await expect(dialog.getByText(/Impact before saving/)).toBeVisible();
 	await dialog.getByRole("button", { name: "Save rule" }).click();
-	await expect(dialog.getByRole("alert")).toBeVisible({ timeout: 15_000 });
+	await expect(
+		dialog.getByRole("alert").filter({ hasText: /^This rule narrows nothing/ }),
+	).toBeVisible({ timeout: 15_000 });
 	await expect(dialog).toBeVisible();
 });
 

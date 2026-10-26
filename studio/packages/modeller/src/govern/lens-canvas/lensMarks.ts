@@ -8,7 +8,7 @@
  * |---|---|
  * | `hidden` | a `− hidden` chip, in the destructive tone |
  * | `sliced` | a `~ sliced` chip |
- * | a guarded property | a `~ <property> · <what it may do>` chip, and the property's hover tag names the guardrail |
+ * | a guarded property | a `~ <property> · <what it may do>` chip (none for `*.*`, which the strip names), and the property's hover tag names the guardrail |
  * | an excluded property | the property's hover tag says the world leaves it out |
  *
  * Nothing here re-reads a rule: *hidden*, *sliced* and *guarded* are the
@@ -34,8 +34,11 @@ function linesOf(t: LensViewType): MarkLine[] {
 	const lines: MarkLine[] = [];
 	if (t.hidden) lines.push({ sign: "-", text: "hidden" });
 	else if (t.sliced) lines.push({ sign: "~", text: "sliced" });
+	// A `*.*` rule holds every type alike; the strip names it once rather than
+	// every type wearing the same chip.
 	for (const g of t.guarded)
-		lines.push({ sign: "~", text: `${g.property} · ${guardWord(g)}` });
+		if (g.property !== "*")
+			lines.push({ sign: "~", text: `${g.property} · ${guardWord(g)}` });
 	return lines;
 }
 

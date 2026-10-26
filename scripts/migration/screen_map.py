@@ -28,6 +28,8 @@ AIRROUTES = "d5b061e6-e75b-4545-8cbc-23f316331004"  # airways' AirRoutes model, 
 ARABIDOPSIS = "807b30c5-7b5a-4eab-b954-684441467763"  # arabidopsis' only model
 DEALS = "c83c82d2-2eba-40d0-9e95-c3ff62c588e8"  # airways' Deals model, whose draft drops a property
 EU_WORLD = "51356733-0529-43d7-b862-701efbcf6c62"  # airways' world "EU · H1 2026"
+CONTRACT_GUARDRAIL = "b175ce2c-6769-44a2-bba1-1591e33694b8"  # airways' guardrail "Deal.contract_value in counts only"
+CONTRACT_REQUEST = "8a378e17-2f94-4ad5-a87a-3d6557625168"  # an open request that guardrail refused, from Explorer
 MODELS_REPORT = "dce818ce-45ca-4f04-998f-89e6129a10a1"  # airways' saved report "Models overview, 30 days"
 ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.login", "/login"), ("shell.graphs", "/graphs"), ("shell.first_run", "/graphs?first-run"),
@@ -65,6 +67,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("modeller.stitches", f"{G}/modeller/stitches"),
     ("modeller.worlds.board", f"{G}/modeller/worlds/{EU_WORLD}?page=world:{EU_WORLD}"),
     ("modeller.worlds", f"{G}/modeller/worlds/{EU_WORLD}"),
+    ("modeller.guardrails.request", f"{G}/modeller/guardrails/{CONTRACT_GUARDRAIL}?request={CONTRACT_REQUEST}"),
     ("modeller.guardrails", f"{G}/modeller/guardrails"),
     ("modeller.rules", f"{G}/modeller/rules"), ("modeller.requests", f"{G}/modeller/requests"),
     ("modeller.settings.database", f"{G}/modeller/settings?tab=graph"),

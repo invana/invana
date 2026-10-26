@@ -534,19 +534,19 @@
   "modeller.worlds": {
    "story": "MO-10",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/worlds",
+   "route": "/u/admin/airways/modeller/worlds/51356733-0529-43d7-b862-701efbcf6c62",
    "state": ""
   },
   "modeller.worlds.board": {
    "story": "MO-10",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/worlds/51356733-0529-43d7-b862-701efbcf6c62",
+   "route": "/u/admin/airways/modeller/worlds/51356733-0529-43d7-b862-701efbcf6c62?page=world:51356733-0529-43d7-b862-701efbcf6c62",
    "state": "click a world"
   },
   "modeller.guardrails.request": {
    "story": "MO-11",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/guardrails",
+   "route": "/u/admin/airways/modeller/guardrails/b175ce2c-6769-44a2-bba1-1591e33694b8?request=8a378e17-2f94-4ad5-a87a-3d6557625168",
    "state": "a request from Explorer that meets a guardrail: open it"
   },
   "modeller.guardrails.edit": {
@@ -555,7 +555,9 @@
    "route": "/u/admin/airways/modeller/guardrails",
    "state": "click a guardrail rule",
    "click": [
-    "text:Airways guardrails"
+    "New rule",
+    "text:Read in counts only",
+    "text:Stays in the Graph"
    ]
   },
   "modeller.rules": {

@@ -120,7 +120,8 @@ _requests = RequestManager()
 _lenses = LensQuerySet()
 
 #: The refusals a Graph guardrail makes — the property is kept out, or counted only.
-_GUARDED = frozenset({"lens_property_excluded", "lens_property_counts_only"})
+#: The refusal each one makes, and the guardrail access that makes it.
+_GUARDED = {"lens_property_excluded": "never", "lens_property_counts_only": "counts"}
 
 #: How long a ``send`` step's approval waits for its approver.
 SEND_APPROVAL_DEADLINE_S = 86400
@@ -1481,14 +1482,20 @@ class TaskRuntime:
         if refusal.get("code") not in _GUARDED or not prop or v.governor is None:
             return cannot.reason, None
         type_name = refusal.get("type_name") or ""
-        for contributor in v.governor.effective.contributors:
-            if contributor.get("scope") != "graph" or not contributor.get("target"):
-                continue
-            if parse_target(contributor["target"]).covers(type_name, prop):
-                needs = f"{type_name}.{prop}" if type_name else prop
-                name = contributor.get("name")
-                return f'Cannot answer — this needs {needs}, kept out by the guardrail "{name}".', contributor["id"]
-        return cannot.reason, None
+        access = _GUARDED[refusal["code"]]
+        holding = [
+            (parse_target(c["target"]), c)
+            for c in v.governor.effective.contributors
+            if c.get("scope") == "graph" and c.get("target") and c.get("access") == access
+        ]
+        # ``Deal.price`` names the property more closely than ``*.price``.
+        holding = sorted(((t, c) for t, c in holding if t.covers(type_name, prop)), key=lambda pair: pair[0].any_type)
+        if not holding:
+            return cannot.reason, None
+        contributor = holding[0][1]
+        needs = f"{type_name}.{prop}" if type_name else prop
+        name = contributor.get("name")
+        return f'Cannot answer — this needs {needs}, kept out by the guardrail "{name}".', contributor["id"]
 
     async def _file_request(
         self, db: AsyncSession, th: TaskRun, v: RunVars, reason: str, *, guardrail_id: str | None
