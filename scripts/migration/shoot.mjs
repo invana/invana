@@ -80,7 +80,8 @@ if (val('--diff')) {
     await page.getByLabel(/username/i).fill(process.env.INVANA_MIGRATION_USER ?? 'admin');
     await page.getByLabel(/password/i).fill(process.env.INVANA_MIGRATION_PASSWORD ?? 'change_me_please');
     await page.getByRole('button', { name: /sign in/i }).click();
-    await page.waitForLoadState('networkidle');
+    // A click before the form hydrates is lost; wait until sign-in has left /login.
+    await page.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 60000 });
   }
   const targets = flag('--smoke')
     ? SMOKE.map((r, i) => [`smoke-${i}`, r])
@@ -88,6 +89,8 @@ if (val('--diff')) {
   for (const [name, route] of targets) {
     await page.goto(base + route, { waitUntil: 'networkidle' }).catch(() => {});
     await page.waitForTimeout(800);
+    // A board that opens on a running check is shot once it has settled.
+    await page.getByText('Testing…').waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
     await page.screenshot({ path: path.join(out, `${name}.png`) });
     console.log(`${route} → ${path.join(out, `${name}.png`)}`);
   }

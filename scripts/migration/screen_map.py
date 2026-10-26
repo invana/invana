@@ -40,7 +40,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("iam.policy.limits", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=limits"),
     ("iam.policy.held_by", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=held_by"),
     ("iam.policy.test", f"{G}/iam/policies?page=policy%3Afare-team-quota&dialog=test"
-     "&who=agent%3A24e2b9d6-384b-49de-b339-51f31dbc85d1&by=b09502e1-964b-4fe4-ab3a-4902b8ee12e5"
+     "&who=agent%3A24e2b9d6-384b-49de-b339-51f31dbc85d1&by=7332bf02-9180-42e0-8462-32b1e6f1d2a7"
      "&does=graph.write.records&to=graph%2FFare%2FLHR-JFK%20%C2%B7%20price"),
     ("iam.policy.draft", f"{G}/iam/policies?page=policy%3Aagent-readers"),
     ("iam.policy.impact", f"{G}/iam/policies?page=policy%3Aagent-readers&dialog=impact"),

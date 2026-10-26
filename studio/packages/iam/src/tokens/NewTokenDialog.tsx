@@ -230,7 +230,12 @@ export function NewTokenDialog({
 						</Field>
 						<Field>
 							<FieldLabel htmlFor="iam-token-expiry">Expires</FieldLabel>
-							<Select value={expiresIn} onValueChange={setExpiry}>
+							{/* Radix's hidden native select reports "" while the
+								    choices load; that is not a pick. */}
+							<Select
+								value={expiresIn}
+								onValueChange={(v) => v && setExpiry(v)}
+							>
 								<SelectTrigger id="iam-token-expiry" className="w-full">
 									<SelectValue>{expiryLabel(expiresIn)}</SelectValue>
 								</SelectTrigger>

@@ -21,6 +21,7 @@ so one fact never shows as two numbers.
 |---|---|---|
 | MS1 | Every run row stores its own timing when it settles | `duration_ms` · `queue_ms` on every `task_runs` row |
 | MS2 | A root run stores how its time was spent | `work_ms` · `ask_ms` · `wait_ms` |
+| MS5 | A run's times are 64-bit | The five `*_ms` columns are `BIGINT`: a run held open past 24.8 days (an unanswered ask) still settles, and the restart sweep never fails on it |
 | MS3 | The API serves the stored values | step rows, the trace, run lists, the reply, a simulation |
 | MS4 | Studio formats, never derives | A live clock on a running item is the one place Studio does time arithmetic |
 

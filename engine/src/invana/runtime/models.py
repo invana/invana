@@ -23,6 +23,7 @@ from datetime import UTC, datetime
 
 from sqlalchemy import (
     JSON,
+    BigInteger,
     Boolean,
     DateTime,
     Float,
@@ -269,15 +270,15 @@ class TaskRun(Base):
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     #: `started_at → finished_at`, written by the timing hook below.
-    duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    duration_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     #: `queued_at → started_at`, written by the timing hook below.
-    queue_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    queue_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     #: A root's nodes' time, a paused node excluded; written when the run settles.
-    work_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    work_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     #: A root's time waiting on a person's answer; written when the run settles.
-    ask_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    ask_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     #: A root's open time with no node working; written when the run settles.
-    wait_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    wait_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     #: Where to re-enter on resume: {"step": <index>}.
     cursor: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     stream_seq: Mapped[int] = mapped_column(Integer, default=0, nullable=False)

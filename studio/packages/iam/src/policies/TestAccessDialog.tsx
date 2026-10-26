@@ -136,8 +136,13 @@ export function TestAccessDialog({
 	// biome-ignore lint/correctness/useExhaustiveDependencies: a carried check runs once, on open
 	useEffect(() => {
 		if (ranPrefill.current || !ready) return;
-		ranPrefill.current = true;
-		run();
+		// Run after a StrictMode remount settles: a mutation started before it
+		// loses its observer and reads as pending for good.
+		const timer = setTimeout(() => {
+			ranPrefill.current = true;
+			run();
+		});
+		return () => clearTimeout(timer);
 	}, []);
 	const run = () => {
 		const [kind, ...rest] = who.split(":");
@@ -270,7 +275,7 @@ export function TestAccessDialog({
 								<TableBody>
 									{read.layers.map((layer) => (
 										<TableRow key={layer.layer}>
-											<TableCell className="font-medium">
+											<TableCell className="whitespace-nowrap font-medium">
 												{layer.label}
 											</TableCell>
 											<TableCell>
