@@ -1553,6 +1553,10 @@ class TaskRuntime:
         th.cost_usd = round(sum(priced), 6) if priced else None
         roll_up_run(th, nodes)
         th.result = run_result(th, nodes)
+        if m is None and v.summary:
+            # No session message carries the answer, so the run keeps it — what
+            # a caller over this Graph's MCP server reads back.
+            th.result["summary"] = v.summary
         await settle_escrow(db, th)
         rollup = await cost_rollup(db, run_id=th.id)
         agent_kwargs: dict = {"actor_type": ActorType.system, "actor_id": None}

@@ -1783,3 +1783,101 @@ async def open_model_migration_run(
     run.plan_snapshot = plan_payload(steps, source=run.plan_origin or "", version=1)
     await queue_plan_steps(db, run=run, message_id=None, steps=steps, start_seq=0)
     return run
+
+
+async def open_mcp_function_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    function: str,
+    label: str,
+    args: dict,
+    caller_id: str,
+    mcp: dict,
+) -> TaskRun:
+    """Open the run one function call over this Graph's MCP server is.
+
+    One queued step, the function with the caller's arguments; the run is the
+    token holder's, with no agent, under the Graph's guardrails
+    (docs/for-developers/modules/platform/features/this-graphs-mcp-server.md).
+    ``params.mcp`` names the tool, the token and the client.
+    """
+    step = PlanStep.parse({"id": function.replace(".", "_"), "task": function, "label": label, "args": args}, index=0)
+    run = TaskRun(
+        graph_id=graph.id,
+        author_id=caller_id,
+        author_kind="user",
+        ask_kind="mcp",
+        body=f"{mcp['tool']} over MCP",
+        params={"mcp": mcp},
+        flow_key="mcp-call",
+        triggered_by=TriggeredBy.mcp.value,
+        on_behalf_of_user_id=caller_id,
+        status=RunStatus.queued.value,
+        **await freeze_lens(db, graph_id=graph.id, agent_id=None, lens_id=None),
+    )
+    db.add(run)
+    await db.flush()
+    run.plan_revision = 1
+    run.plan_snapshot = plan_payload([step], source="mcp", version=1)
+    await queue_plan_steps(db, run=run, message_id=None, steps=[step], start_seq=0)
+    await emit_event(
+        db,
+        action=actions.THINKING_OPEN,
+        target_kind=actions.TARGET_THINKING,
+        target_id=run.id,
+        graph_id=graph.id,
+        run_id=run.id,
+        actor_id=caller_id,
+        details={"mcp": mcp["tool"], "token": mcp.get("token")},
+    )
+    await db.flush()
+    return run
+
+
+async def open_mcp_agent_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    agent: Agent,
+    question: str,
+    caller_id: str,
+    mcp: dict,
+) -> TaskRun:
+    """Open the run an ``ask_<agent>`` call over this Graph's MCP server is.
+
+    The agent's own run with the question as its body, on behalf of the token's
+    holder — a schedule's run with a caller instead of a schedule. The token in
+    ``params.mcp`` is a layer of the access gate for every step it takes.
+    """
+    th = TaskRun(
+        graph_id=graph.id,
+        author_id=caller_id,
+        author_kind="user",
+        ask_kind="nl",
+        body=question,
+        params={"mcp": mcp},
+        flow_key=NL_QUERY.key,
+        agent_id=agent.id,
+        agent_version=agent.version,
+        triggered_by=TriggeredBy.mcp.value,
+        on_behalf_of_user_id=caller_id,
+        **await freeze_lens(db, graph_id=graph.id, agent_id=agent.id, lens_id=None),
+    )
+    db.add(th)
+    await db.flush()
+    _queue_opening(db, th, None, opening_for(agent, ask_kind="nl"))
+    await emit_event(
+        db,
+        action=actions.THINKING_OPEN,
+        target_kind=actions.TARGET_THINKING,
+        target_id=th.id,
+        graph_id=graph.id,
+        run_id=th.id,
+        actor_kind=ActorKind.agent,
+        actor_id=agent.id,
+        on_behalf_of_user_id=caller_id,
+        details={"actor_name": agent.name, "mcp": mcp["tool"], "token": mcp.get("token")},
+    )
+    await db.flush()
+    return th

@@ -8,6 +8,7 @@ bound it; this module runs the **policy layers** of that intersection:
 |---|---|---|
 | its policies | the run's agent's holdings — a spawned agent reads its lead's | the run has an agent |
 | started by | the person at the root run: their Graph roles and attachments | a person started it |
+| token | the inline policy of the token a call over this Graph's MCP server came with | the root run records one |
 | boundary | every saved boundary policy, each on its own | always (none allows) |
 
 The world is the run's frozen lens and keeps enforcing as each step touches a
@@ -53,7 +54,7 @@ from invana.apps.agents.models import Agent, AgentKind
 from invana.apps.iam.managers import Held, HoldingsManager
 from invana.apps.iam.managers.attachments import AttachmentManager, GraphHolders
 from invana.apps.iam.models import Policy, PolicyKind
-from invana.core.policy import allows, layer_of
+from invana.core.policy import StatementError, allows, layer_of, parse_statements
 from invana.runtime import ledger_acts
 from invana.runtime.catalogue import CATALOGUE, RunVars, TaskFailure
 from invana.runtime.models import TaskRun
@@ -379,6 +380,8 @@ class RunAccess:
     agent: Holder | None
     starter: Holder | None
     run_number: int | None
+    #: The narrowed token the run was opened with over MCP; ``None`` otherwise.
+    token: Holder | None
     depth: int
     boundaries: tuple[Held, ...]
 
@@ -428,7 +431,31 @@ class AccessGate:
             held = await self.holdings.policies_for(db, graph_id=run.graph_id, principal=("person", person))
             starter = Holder(kind="person", id=person, name=user.username if user else person, held=tuple(held))
         boundaries = tuple(await self.holdings.boundaries(db, graph_id=run.graph_id))
-        return RunAccess(agent=holder, starter=starter, run_number=root.number, depth=depth, boundaries=boundaries)
+        token = await self._token(db, root)
+        return RunAccess(
+            agent=holder, starter=starter, run_number=root.number, depth=depth, boundaries=boundaries, token=token
+        )
+
+    async def _token(self, db: AsyncSession, root: TaskRun) -> Holder | None:
+        """The narrowing of the token a run came in with over MCP, as a holder of its inline policy.
+
+        A token with no inline policy narrows nothing and is no layer; one whose
+        policy is gone or no longer parses narrows to nothing.
+        """
+        token_id = ((root.params or {}).get("mcp") or {}).get("token_id")
+        tok = await self.qs.token(db, token_id=token_id) if token_id else None
+        if tok is None or tok.policy_id is None:
+            return None
+        inline = await self.qs.policy(db, policy_id=tok.policy_id)
+        if inline is None:
+            return Holder(kind="token", id=tok.id, name=tok.name)
+        try:
+            statements = tuple(parse_statements(inline.statements))
+        except StatementError:
+            statements = ()
+        return Holder(
+            kind="token", id=tok.id, name=tok.name, held=(Held(policy=inline, how="inline", statements=statements),)
+        )
 
     async def check(self, db: AsyncSession, *, run: TaskRun, step_key: str, args: dict | None, vars: RunVars) -> None:
         """Raise the step's :class:`TaskFailure` when a policy layer refuses it.
@@ -452,6 +479,7 @@ class AccessGate:
                 agent=access.agent,
                 starter=access.starter,
                 run_number=access.run_number,
+                token=access.token,
                 boundaries=access.boundaries,
             )
             if step_key == "work.delegate" and isinstance(target, Agent):
