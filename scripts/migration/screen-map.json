@@ -365,7 +365,10 @@
    "story": "MO-01",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/global-model",
-   "state": "theme dark: user menu \u203a Appearance \u203a Dark"
+   "state": "theme dark: user menu \u203a Appearance \u203a Dark",
+   "click": [
+    "dark"
+   ]
   },
   "modeller.model.airroutes": {
    "story": "MO-02",
@@ -377,13 +380,19 @@
    "story": "MO-02",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_tab=model",
-   "state": "click node type airport"
+   "state": "click node type airport",
+   "click": [
+    "text:airport"
+   ]
   },
   "modeller.global_model.stitch": {
    "story": "MO-03",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/global-model",
-   "state": "click a dashed stitch on the board"
+   "state": "click a dashed stitch on the board",
+   "click": [
+    "text:anchored"
+   ]
   },
   "modeller.stitches": {
    "story": "MO-03",
@@ -413,13 +422,19 @@
    "story": "MO-05",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_tab=model",
-   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, on the draft: Publish"
+   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, on the draft: Publish",
+   "click": [
+    "Publish"
+   ]
   },
   "modeller.draft.migration": {
    "story": "MO-05",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_tab=model",
-   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, a breaking draft (remove a property): Publish"
+   "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, a breaking draft (remove a property): Publish",
+   "click": [
+    "Publish"
+   ]
   },
   "modeller.models.new": {
    "story": "MO-06",
@@ -434,13 +449,32 @@
    "story": "MO-15",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": "More actions \u203a From an ontology \u203a File: demos/arabidopsis/semantic/schema-org-subset.ttl; tick Person, Organization, Product"
+   "state": "More actions \u203a From an ontology \u203a File: demos/arabidopsis/semantic/schema-org-subset.ttl; tick Person, Organization, Product",
+   "click": [
+    "More actions",
+    "text:From an ontology",
+    "text:File",
+    "upload:demos/arabidopsis/semantic/schema-org-subset.ttl",
+    "tick:Person",
+    "tick:Organization",
+    "tick:Product"
+   ]
   },
   "modeller.models.new.ontology.preview": {
    "story": "MO-15",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/models",
-   "state": "the same, then Preview"
+   "state": "the same, then Preview",
+   "click": [
+    "More actions",
+    "text:From an ontology",
+    "text:File",
+    "upload:demos/arabidopsis/semantic/schema-org-subset.ttl",
+    "tick:Person",
+    "tick:Organization",
+    "tick:Product",
+    "Preview"
+   ]
   },
   "modeller.models.overview": {
    "story": "MO-07",
@@ -482,7 +516,11 @@
    "story": "MO-08",
    "product": "modeller",
    "route": "/u/admin/arabidopsis/modeller/models?model=807b30c5-7b5a-4eab-b954-684441467763&model_open=1&models_tab=model",
-   "state": "Constraints tab; click days_to_flowering"
+   "state": "Constraints tab; click days_to_flowering",
+   "click": [
+    "text:Accession",
+    "scroll:Constraints on this type"
+   ]
   },
   "modeller.model.history": {
    "story": "MO-09",
@@ -512,7 +550,10 @@
    "story": "MO-11",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/guardrails",
-   "state": "click a guardrail rule"
+   "state": "click a guardrail rule",
+   "click": [
+    "text:Airways guardrails"
+   ]
   },
   "modeller.rules": {
    "story": "MO-12",
@@ -524,7 +565,10 @@
    "story": "MO-12",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/rules",
-   "state": "click a rule"
+   "state": "click a rule",
+   "click": [
+    "text:Airport codes are IATA"
+   ]
   },
   "modeller.requests": {
    "story": "MO-13",

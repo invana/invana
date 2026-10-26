@@ -394,6 +394,18 @@ CLICK = {  # board → buttons shoot.mjs presses after the route loads, for a st
     "agents.workers.add.token": ["Make token"],
     **{f"agents.workers.add.run.{w}": ["Make token", "Next"] for w in ("docker", "python", "k8s")},
     "modeller.models.new": ["New model"],
+    "modeller.global_model.dark": ["dark"],
+    "modeller.draft.publish": ["Publish"],
+    "modeller.draft.migration": ["Publish"],
+    "modeller.model.type": ["text:airport"],
+    "modeller.model.type.constraint": ["text:Accession", "scroll:Constraints on this type"],
+    "modeller.global_model.stitch": ["text:anchored"],
+    "modeller.rules.edit": ["text:Airport codes are IATA"],
+    "modeller.guardrails.edit": ["text:Airways guardrails"],
+    **{f"modeller.models.new.ontology{s}": ["More actions", "text:From an ontology",
+                                            "text:File", "upload:demos/arabidopsis/semantic/schema-org-subset.ttl",
+                                            "tick:Person", "tick:Organization", "tick:Product", *x]
+       for s, x in (("", []), (".preview", ["Preview"]))},
 }
 
 

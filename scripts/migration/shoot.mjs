@@ -12,6 +12,7 @@
 // (default admin / change_me_please) against INVANA_MIGRATION_STUDIO_URL (default http://localhost:8300);
 // a board whose map entry has `as` is shot signed in as that account instead, and one with `click`
 // has those buttons pressed in order after it loads — for a state no URL may hold, like a secret shown once.
+// A `click` entry may also be `text:<visible text>` (click that text), `label:<label>`, `scroll:<text>`, `tick:<row text>` (that row's checkbox), `upload:<repo path>` (the page's file input) or `dark` (dark theme).
 import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -108,7 +109,24 @@ if (val('--diff')) {
     await page.goto(base + route, { waitUntil: 'networkidle' }).catch(() => {});
     await page.waitForTimeout(800);
     for (const button of clicks) {
-      await page.getByRole('button', { name: button, exact: true }).click({ timeout: 15000 }).catch(() => {});
+      if (button === 'dark') {
+        await page.evaluate(() => localStorage.setItem('invana-theme', JSON.stringify({ theme: 'default', mode: 'dark' })));
+        await page.reload({ waitUntil: 'networkidle' }).catch(() => {});
+      } else if (button.startsWith('text:')) {
+        // With a dialog open the text is looked for inside it.
+        const inDialog = (await page.locator('[role=dialog]').count()) > 0;
+        const scope = inDialog ? page.locator('[role=dialog]') : page;
+        await scope.getByText(button.slice(5), { exact: inDialog }).first().click({ timeout: 15000 }).catch(() => {});
+      } else if (button.startsWith('scroll:')) {
+        await page.getByText(button.slice(7)).first().scrollIntoViewIfNeeded({ timeout: 15000 }).catch(() => {});
+      } else if (button.startsWith('tick:')) {
+        await page.locator('tr, [role=row]').filter({ hasText: button.slice(5) }).getByRole('checkbox').first()
+          .check({ timeout: 15000 }).catch(() => {});
+      } else if (button.startsWith('upload:')) {
+        await page.locator('input[type=file]').first().setInputFiles(path.resolve(root, button.slice(7))).catch(() => {});
+      } else if (button.startsWith('label:')) {
+        await page.getByLabel(button.slice(6)).first().click({ timeout: 15000 }).catch(() => {});
+      } else await page.getByRole('button', { name: button, exact: true }).click({ timeout: 15000 }).catch(() => {});
       await page.waitForLoadState('networkidle').catch(() => {});
       await page.waitForTimeout(800);
     }
