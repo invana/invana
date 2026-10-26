@@ -206,7 +206,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | I02 | Connections in | engine+studio | I01 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
-| M00 | Modeller audit | docs | F06 | `feat/modeller-redesign` | in progress | 2026-10-26 | session 2: steps 3–5 done, screen map fixed; uncommitted (the session could not run `git commit`) |
+| M00 | Modeller audit | docs | F06 | `feat/modeller-redesign` | blocked | 2026-10-26 | failed after 3 fix rounds — see .migration-cache/M00/ |
 | M01 | Shell and global model | engine+studio | M00 | `feat/modeller-redesign` | pending | | |
 | M02 | Models | engine+studio | M01 | `feat/modeller-redesign` | pending | | |
 | M03 | Model dashboards | engine+studio | M02 | `feat/modeller-redesign` | pending | | |
