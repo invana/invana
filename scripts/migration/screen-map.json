@@ -590,8 +590,8 @@
   "modeller.settings.database": {
    "story": "MO-14",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/settings?tab=graph",
-   "state": "Database tab (?tab=graph)"
+   "route": "/u/admin/airways/modeller/settings?tab=database",
+   "state": "Database tab (?tab=database)"
   },
   "modeller.settings.members": {
    "story": "MO-14",

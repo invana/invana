@@ -148,7 +148,8 @@ test("a reload on a path lands on the same screen", async ({ page }) => {
 	await expect(members).toBeVisible();
 
 	await page.reload();
-	await expect(page).toHaveURL(`${GRAPH}/modeller/settings?tab=members`);
+	// The open page rides along as `&page=`; the path and the tab are the screen.
+	await expect(page).toHaveURL(/\/modeller\/settings\?tab=members(&|$)/);
 	await expect(members).toBeVisible({ timeout: 30_000 });
 });
 
