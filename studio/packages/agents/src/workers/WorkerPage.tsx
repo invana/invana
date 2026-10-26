@@ -162,7 +162,12 @@ export function WorkerPage({
 								data={w.running}
 								enableSorting={false}
 								getRowId={(row) => `${row.run_id}:${row.function}`}
-								emptyState={w.note ?? "Nothing — it is idle"}
+								emptyState={
+									w.note ??
+									(w.slots_busy > 0
+										? "No step reported to this engine"
+										: "Nothing — it is idle")
+								}
 							/>
 						</PanelSection>
 

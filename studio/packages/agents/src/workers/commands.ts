@@ -67,7 +67,7 @@ export function kubernetesCommands(i: RunInputs): string {
 }
 
 /** The Deployment `kubectl apply` reads; the token comes from the `invana-join` Secret. */
-export function kubernetesManifest(i: RunInputs): string {
+function kubernetesManifest(i: RunInputs): string {
 	const name = deploymentName(i.pool);
 	return [
 		"apiVersion: apps/v1",

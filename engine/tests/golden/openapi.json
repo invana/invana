@@ -5164,6 +5164,24 @@
             },
             "title": "Rows",
             "type": "array"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/QueuePoint"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "series_pool_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series Pool Id"
           }
         },
         "required": [
@@ -14165,6 +14183,11 @@
             },
             "title": "Checks",
             "type": "array"
+          },
+          "joins": {
+            "default": 0,
+            "title": "Joins",
+            "type": "integer"
           },
           "token_id": {
             "title": "Token Id",
@@ -23719,6 +23742,30 @@
           "row_count"
         ],
         "title": "QueryResponse",
+        "type": "object"
+      },
+      "QueuePoint": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "ready": {
+            "title": "Ready",
+            "type": "integer"
+          },
+          "workers": {
+            "title": "Workers",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "at",
+          "ready",
+          "workers"
+        ],
+        "title": "QueuePoint",
         "type": "object"
       },
       "RdfFormat": {

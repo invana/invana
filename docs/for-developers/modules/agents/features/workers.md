@@ -82,7 +82,7 @@ sequenceDiagram
 | A token shown once | Join token step and the Run it command carry the secret; after the modal closes the Join tokens tab shows its prefix only |
 | A lost worker | Row *lost*, *N steps redelivered*; a Worker event *no heartbeat 30 s · N steps redelivered* |
 | A member who is not an install admin | Workers is readable; Add workers, Drain and Revoke are disabled with *Install admins add and scale workers* |
-| Reload | The tab and an open pool or worker are in the URL; the Add workers modal reopens at step 1 (a minted token is not shown again) |
+| Reload | The tab and an open pool or worker are in the URL; the Add workers modal reopens at its `?add=` step, drawn whole on a cold load (a minted token is not shown again) |
 
 ## Surfaces
 
@@ -149,6 +149,12 @@ DE9 · DE10; the options are compared in [workers-and-orchestration](../../../bu
 | WK19 | **A worker's log lines and CPU series live in the engine process's memory** — the last ~200 lines and 30 minutes, fed by heartbeats. They are lost on restart and empty on a detail read served by another engine process; storing them is scale-out work |
 | WK20 | **A refused join makes no worker row,** so *Joined* shows its checks *waiting* until a worker joins; the refusal reaches the worker as the reason (labels outside the pool, plugins missing, token expired or used up) |
 | WK21 | **A lost worker that heartbeats again is revived** with a new queue worker id; a draining worker that reports no busy slots is `stopped` and its credential is refused from then on |
+| WK22 | **Add workers opens on Docker** for *Where*; `?pool=<name>` preselects the pool, so Capacity's per-pool *Add workers* and a pool page's Join tokens open the modal on that pool. Closing drops `add` · `where` · `pool` from the URL |
+| WK23 | **Kubernetes' Run it is three `kubectl` lines** (secret · apply · rollout); *Download as a file* saves the Deployment manifest. Docker's command runs with `--restart unless-stopped` and carries the labels and slots |
+| WK24 | **Joined watches the token minted in the modal;** opened without one, it watches the pool's newest unrevoked join token, and lists that token's newest workers |
+| WK25 | **Capacity's chart is one pool's last 10 minutes** — the first pool short of workers, else the first pool — as stored `worker_stats` points (ready · workers); replica changes and joins are marked with the event's *why* |
+| WK26 | **A pool's *Runs on* line is the engine's:** Kubernetes reads *invana/worker deployment* (*Set by* carries the replicas), Docker counts distinct live hosts, Python names the machines. Studio derives no slot or host number — the pool's totals are served |
+| WK27 | **A pool page has tabs Workers · Capacity · Join tokens,** each the Workers page's surface filtered to that pool |
 
 ## Not building
 
