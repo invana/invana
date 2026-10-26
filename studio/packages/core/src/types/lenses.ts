@@ -202,21 +202,6 @@ export interface ValidationResponse {
 	warnings: Warning[];
 }
 
-/** What one world would lose if a guardrail were saved as proposed. */
-interface WorldImpact {
-	lens_id: string;
-	name: string;
-	loses: string[];
-	cast_denied: string[];
-	changes: boolean;
-	summary: string;
-}
-
-export interface ImpactResponse {
-	headline: string;
-	worlds: WorldImpact[];
-}
-
 type TouchDirection = "out" | "in" | "refused" | "skipped";
 
 /** One engagement, projected from the ledger and carrying its `seq`. */

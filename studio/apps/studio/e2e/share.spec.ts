@@ -16,7 +16,7 @@ test("EX-15 an answer is shared as a frozen snapshot and exported", async ({
 	await context.grantPermissions(["clipboard-read", "clipboard-write"]);
 
 	const composer = await openExplorer(page);
-	await composer.fill("MATCH (n) RETURN n LIMIT 1");
+	await composer.fill("MATCH (n:airport) RETURN n LIMIT 1");
 	await page.getByRole("button", { name: "Send" }).click();
 	await page
 		.getByRole("button", { name: "Share", exact: true })

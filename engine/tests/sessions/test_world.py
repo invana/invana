@@ -18,12 +18,16 @@ pytestmark = pytest.mark.asyncio
 
 
 async def _lens(session, graph, *, kind: str = LensKind.world.value, name: str = "EU") -> Lens:
+    guardrail = kind == LensKind.guardrail.value
     lens = Lens(
         graph_id=graph.id,
         kind=kind,
         key=name.lower(),
         name=name,
-        scope="graph" if kind == LensKind.guardrail.value else None,
+        scope="graph" if guardrail else None,
+        target="*.*" if guardrail else None,
+        access="read" if guardrail else None,
+        leaves=True if guardrail else None,
     )
     session.add(lens)
     await session.flush()

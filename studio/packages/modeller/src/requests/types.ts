@@ -10,11 +10,9 @@ export type RequestKind = "guardrail" | "unanswered" | "change";
 
 export type RequestSource = "explorer" | "agent" | "schedule" | "api";
 
-export type RequestStatus = "open" | "done";
+type RequestStatus = "open" | "done";
 
-export type RequestResolution = "declined" | "allowed" | "modelled";
-
-export type RequestAction = "decline" | "allow" | "model";
+type RequestAction = "decline" | "allow" | "model";
 
 export interface ModelRequest {
 	id: string;

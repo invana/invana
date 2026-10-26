@@ -346,7 +346,7 @@ test("EX-12 an answer is kept as a finding on a project's branch", async ({
 	const p = await makeProject(page, "answer");
 	try {
 		const composer = await openExplorer(page);
-		await composer.fill("MATCH (n) RETURN n LIMIT 1");
+		await composer.fill("MATCH (n:airport) RETURN n LIMIT 1");
 		await page.getByRole("button", { name: "Send" }).click();
 		const add = page.getByRole("button", { name: "Add to a project" }).last();
 		await add.click({ timeout: 60_000 });

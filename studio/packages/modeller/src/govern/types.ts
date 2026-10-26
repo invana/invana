@@ -15,7 +15,7 @@
 export type GuardrailAccess = "read" | "counts" | "never";
 
 /** A world named by id and name — enough for a chip. */
-export interface WorldRef {
+interface WorldRef {
 	id: string;
 	name: string;
 }
@@ -56,7 +56,7 @@ export interface GuardrailRefusal {
 	at: string;
 }
 
-export interface GuardrailHistoryEntry {
+interface GuardrailHistoryEntry {
 	action: string;
 	actor: string | null;
 	at: string;
@@ -99,9 +99,9 @@ export interface GuardrailUpdate {
 }
 
 /** How much of a model a world sees. */
-export type ModelSeen = "all" | "sliced" | "hidden";
+type ModelSeen = "all" | "sliced" | "hidden";
 
-export interface LensViewGuard {
+interface LensViewGuard {
 	property: string;
 	guardrail_id: string;
 	guardrail: string;
@@ -136,10 +136,3 @@ export interface LensView {
 	used_by: { kind: string; id: string; name: string; runs: number }[];
 }
 
-/** An agent whose runs asked under a world — the world board's cast. */
-export interface WorldCastRow {
-	agent_id: string;
-	name: string | null;
-	runs: number;
-	last_at: string | null;
-}

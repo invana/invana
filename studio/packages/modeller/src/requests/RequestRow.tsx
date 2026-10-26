@@ -33,7 +33,7 @@ const FROM: Record<RequestSource, string | null> = {
 };
 
 /** The guardrail page, opened with this request's bar. */
-export const guardrailRequestPath = (
+const guardrailRequestPath = (
 	username: string,
 	graphSlug: string,
 	guardrailId: string,

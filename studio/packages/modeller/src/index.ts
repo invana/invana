@@ -35,7 +35,6 @@ export { ModellerStatusBar } from "./models/stitch/ModellerStatusBar";
 export { StitchesPage } from "./models/stitch/StitchesPage";
 export { useModellerCrumb } from "./models/stitch/useModellerCrumb";
 export { modeller } from "./product";
-export { useOpenRequestsCount } from "./requests/queries";
 export { RequestsPage } from "./requests/RequestsPage";
 export { RulesViewPanel } from "./rules/RulesViewPanel";
 export { SettingsViewPanel } from "./settings/SettingsViewPanel";
