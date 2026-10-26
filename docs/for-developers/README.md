@@ -267,8 +267,9 @@ touch record that makes the declaration checkable. Decisions: [governance.md](go
 
 | # | Feature | What it does | API | CLI | Studio | Slice |
 |---|---|---|---|---|---|---|
-| 14.1 | [Worlds](modules/govern/features/worlds.md) | Named narrowings picked per question; name it to share it, compare two, promote one | ✅ | 🟡 | ✅ | S16 |
-| 14.2 | [Guardrails](modules/govern/features/guardrails.md) | The bounds every run carries whatever world it is in; one object, one owner | ✅ | 🟡 | ✅ | S16 |
+| 14.1 | [Worlds](modules/govern/features/worlds.md) | Named narrowings picked per question, read on the lens canvas; name it to share it, compare two | ✅ | 🟡 | 🟡 | S16 · M05 |
+| 14.2 | [Guardrails](modules/govern/features/guardrails.md) | One property rule each — read · counts only · never, may leave or stays — in force on every run, impact counted before saving | 🟡 | 🟡 | 🟡 | S16 · M05 |
+| 14.3 | [Requests](modules/govern/features/requests.md) | One inbox of guardrail refusals, unanswered asks and asks for a change; Decline · Allow in a world · Model it | 🟡 | 🟡 | 🟡 | M05 |
 
 **A lens is authored, enforced, and recorded — and the record is checkable.**
 `lenses` and `run_touches` exist, the rule grammar and its three laws are enforced, the ladder and

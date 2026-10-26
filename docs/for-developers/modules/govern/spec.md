@@ -7,7 +7,7 @@ answers *what was allowed to happen*, and it is the surface a person edits when 
 | | |
 |---|---|
 | Index | [§14 · Govern](../../README.md#14--govern) |
-| Features | [worlds](features/worlds.md) · [guardrails](features/guardrails.md) |
+| Features | [worlds](features/worlds.md) · [guardrails](features/guardrails.md) · [requests](features/requests.md) |
 | Depends on | [orchestration § 0.9](../../orchestration.md#09-grounding-a-run--the-lens) (the Lens record) · [connect-and-model](../connect-and-model/spec.md) (declared axes) · [graph-connectors](../graph-connectors/spec.md) (predicate composition) |
 | Depended on by | [Ask](../ask/spec.md) · [Agents](../agents/spec.md) · [Operate](../operate/spec.md) (the run reads its lens back) |
 | Decisions | D1–D19, settled in [governance.md](../../governance.md) and restated here in present tense |
@@ -27,7 +27,8 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 | **Address** | `graph_data/model/Observations@v2` · `llm/anthropic-prod/claude-opus-5` · `third_party/api/clearbit.com/v2/companies` | a URL to fetch |
 | **Pattern** | an address a rule matches on: `*` is one segment, `**` is the rest, and a `*` **inside** a segment globs it — `graph_data/model/Deals@*` is every published version of `Deals` | a regular expression |
 | **World** | a **named** Lens — a reusable narrowing people pick per question and compare | a *subgraph*, which is an [emission](../../terminology.md) |
-| **Guardrail** | a Lens pinned on the Graph or an agent, always in force, on its own surface | a permission on a person |
+| **Guardrail** | on the Graph, one property rule always in force ([GR1](features/guardrails.md#decisions)), stored as a Lens whose rules it compiles to; on an agent, that agent's own layered Lens | a permission on a person |
+| **Request** | an ask the Graph refused or could not answer, kept until a modeller declines, allows or models it ([requests](features/requests.md)) | a notification |
 | **Cast** | the binding of a plan's **role** (`extract` · `decide` · `judge` · `embed`) to a model address | a bound — it is a resolution, checked against the rules |
 | **Selector** | a narrowing *within* a model, along an axis the model declared — `time` · `geo` · `dims` | a query |
 | **Touch** | one recorded engagement with a participant: address, direction, volume, and what was sent | a log line |
