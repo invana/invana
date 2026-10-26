@@ -735,7 +735,14 @@ class TaskRuntime:
                 set_current(**{"invana.outcome": outcome})
                 # A crash is logged once, by the run span, with its traceback.
                 if not crashed:
-                    log_run_ended(th, outcome, duration_s)
+                    # A stop that lands mid-flush leaves the session rolled back, and the
+                    # log line's read of `th` would raise in its place: the run would then
+                    # end `failed` instead of `stopped`. The ledger write is `_on_cancelled`'s.
+                    try:
+                        log_run_ended(th, outcome, duration_s)
+                    except Exception:
+                        if outcome != "cancelled":
+                            raise
 
     async def run_vars(self, db: AsyncSession, th: TaskRun) -> tuple[RunVars, SessionMessage | None]:
         """Everything a step reads about its run, rebuilt from the run row's ids.

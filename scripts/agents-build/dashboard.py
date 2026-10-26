@@ -298,12 +298,12 @@ pre{margin:0;padding:12px;white-space:pre-wrap;overflow:auto;max-height:320px}.d
 </style></head><body>
 <header><h1>Agents build</h1><span id="runner"></span><span class="mut mono" id="branch"></span><span style="flex:1"></span><span class="mut" id="at"></span></header>
 <main>
+<section class="card"><h2 id="ftitle">Live feed</h2><div class="pad mut" id="fhint">Click a session or a sub-agent to follow it.</div><div class="feed" id="feed"></div></section>
 <section class="card"><h2>Phases</h2><div class="phases" id="phases"></div></section>
 <div class="grid">
 <section class="card"><h2 id="ptitle">Phase</h2><div class="pad" id="pdetail"></div></section>
 <section class="card"><h2>Sessions on this phase</h2><div id="sessions"></div></section>
 </div>
-<section class="card"><h2 id="ftitle">Live feed</h2><div class="pad mut" id="fhint">Click a session or a sub-agent to follow it.</div><div class="feed" id="feed"></div></section>
 <div class="grid">
 <section class="card"><h2>Runner log</h2><pre class="mono" id="log"></pre></section>
 <section class="card"><h2>Branch</h2><div class="pad" id="git"></div></section>
