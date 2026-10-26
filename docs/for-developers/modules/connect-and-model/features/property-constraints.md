@@ -9,7 +9,7 @@ records in the graph break it today before the constraint is saved.
 |---|---|
 | Index | [1.11](../../../README.md#1--connect-and-model) · Slice **M04** |
 | Module | [Connect and model](../spec.md) |
-| API / CLI / Studio | ✅ / — / ✅ |
+| API / CLI / Studio | ✅ / — / 🟡 |
 | Related | [the-model-page](the-model-page.md) (the type page) · [publish-review](publish-review.md) · [standards](../../bring-data-in/features/standards.md) · [load-data](../../bring-data-in/features/load-data.md) · products: [modeller.md](../../../../products/modeller.md) MO-08 · MO-F7 · [datasets.md](../../../../products/datasets.md) › Standards and checks |
 
 > **As** a modeller, **I want** ranges on a property, and values named by a standard, **so that**
