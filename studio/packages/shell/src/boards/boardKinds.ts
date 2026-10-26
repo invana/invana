@@ -54,6 +54,8 @@ import {
 	SquareFunction,
 	UsersRound,
 	WandSparkles,
+	Server,
+	ServerCog,
 } from "lucide-react";
 import type { ElementType } from "react";
 
@@ -187,7 +189,9 @@ export type DeclaredKind =
 	| "template"
 	| "policy"
 	| "iam_agent"
-	| "iam_group";
+	| "iam_group"
+	| "worker_pool"
+	| "worker";
 
 export type BoardKind = CanvasKind | DeclaredKind;
 
@@ -397,6 +401,25 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		// A row in Functions › Functions, or a function on a plugin's page.
 		panel: "functions",
 		subject: "a function key",
+	},
+	// A worker pool and one worker — install-wide, titled with the name.
+	worker_pool: {
+		kind: "worker_pool",
+		renders: "declared",
+		label: "Pool",
+		icon: ServerCog,
+		// A row in Workers › Pools.
+		panel: "workers",
+		subject: "a worker pool name",
+	},
+	worker: {
+		kind: "worker",
+		renders: "declared",
+		label: "Worker",
+		icon: Server,
+		// A row in a pool, or in Workers › Workers.
+		panel: "workers",
+		subject: "a worker name",
 	},
 	// An answer template — the surface it draws, the intents it accepts, and
 	// which answers cite it. Studio-only; titled with its key.

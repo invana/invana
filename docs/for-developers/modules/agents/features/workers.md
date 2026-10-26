@@ -82,15 +82,15 @@ sequenceDiagram
 | A token shown once | Join token step and the Run it command carry the secret; after the modal closes the Join tokens tab shows its prefix only |
 | A lost worker | Row *lost*, *N steps redelivered*; a Worker event *no heartbeat 30 s · N steps redelivered* |
 | A member who is not an install admin | Workers is readable; Add workers, Drain and Revoke are disabled with *Install admins add and scale workers* |
-| Reload | Tab and pool/worker are in the URL; the Add workers modal reopens at step 1 (a minted token is not shown again) |
+| Reload | The tab and an open pool or worker are in the URL; the Add workers modal reopens at step 1 (a minted token is not shown again) |
 
 ## Surfaces
 
 | Board | Route | Draws |
 |---|---|---|
 | `agents.pools` | `/agents/workers` (tab `pools`) | C1 · C2 |
-| `agents.pool.detail` | `/agents/workers/pools/<pool>` | C3 |
-| `agents.pool.worker` | `/agents/workers/pools/<pool>/workers/<worker>` | C4 |
+| `agents.pool.detail` | `/agents/workers?page=worker_pool:<pool name>` | C3 |
+| `agents.pool.worker` | `/agents/workers?page=worker:<worker name>` | C4 |
 | `agents.pool.capacity` | `/agents/workers` (tab `capacity`) | C5 |
 | `agents.workers.tokens` | `/agents/workers` (tab `tokens`) | C6 |
 | `agents.workers.add` · `.pool` · `.token` · `.run.docker` · `.run.python` · `.run.k8s` · `.waiting` · `.joined` | `/agents/workers?add=<step>` | C7 · C8 |
@@ -144,7 +144,7 @@ DE9 · DE10; the options are compared in [workers-and-orchestration](../../../bu
 | WK14 | **The gateway sweep runs in the engine** under `INVANA_EXECUTOR=procrastinate` on Postgres: every 5 s it marks workers silent 30 s `lost`, redelivers their jobs and writes the event; every 30 s it writes one `worker_stats` row a pool |
 | WK15 | **A remote step's context is its args, its step id, its idempotency key, the secrets its plugin declares (from the worker's environment) and the artifacts it records** — no database session, no graph connection. Tool steps need nothing more; the artifacts ride back with the outcome |
 | WK16 | **A lease long-polls for up to 20 s** and answers `204` when nothing is ready; heartbeats carry the worker's busy slots and CPU, which C3 · C4 show |
-| WK17 | **Workers is an Agents rail section** (`/agents/workers`, tabs Pools · Workers · Capacity · Join tokens); a pool and a worker open in the path under it, and Add workers is a modal whose step is `?add=` |
+| WK17 | **Workers is an Agents rail section** (`/agents/workers`, tabs Pools · Workers · Capacity · Join tokens). A pool and a worker open as workbook tabs (`worker_pool:<name>` · `worker:<name>`), each with the breadcrumb *Workers › pool › worker*; pool names and worker names are unique install-wide, and the routes take an id or a name. Add workers is a modal whose step is `?add=` |
 
 ## Not building
 

@@ -20,6 +20,7 @@ import {
 	Pencil,
 	Play,
 	Plug,
+	ServerCog,
 	Settings,
 	SquareFunction,
 } from "lucide-react";
@@ -34,6 +35,7 @@ export type AgentsSectionKey =
 	| "connections"
 	| "llms"
 	| "runs"
+	| "workers"
 	| "approvals"
 	| "ledger"
 	| "concurrency";
@@ -131,6 +133,18 @@ export const SECTIONS: Record<AgentsSectionKey, SectionSpec> = {
 		description:
 			"Every run in this Graph — the numbers are the engine's, stored when each run settles",
 		tabs: [],
+	},
+	workers: {
+		label: "Workers",
+		icon: ServerCog,
+		description:
+			"Pools of workers run every agent’s steps — on Docker, Python or Kubernetes; you add them, and you scale them",
+		tabs: [
+			{ key: "pools", label: "Pools" },
+			{ key: "workers", label: "Workers" },
+			{ key: "capacity", label: "Capacity" },
+			{ key: "tokens", label: "Join tokens" },
+		],
 	},
 	approvals: {
 		label: "Approvals",

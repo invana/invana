@@ -1,35 +1,37 @@
-"""The ``tools`` queue — tool steps run by ``invana worker``, outcomes read back by the API.
+"""The tool queue — tool steps wait on ``tools.<labels>``, outcomes are read back from a row.
 
 docs/for-developers/modules/platform/features/tool-plugins.md ·
-docs/for-developers/modules/platform/features/distributed-execution.md.
+docs/for-developers/modules/platform/features/distributed-execution.md ·
+docs/for-developers/modules/agents/features/workers.md.
 
-Under ``INVANA_EXECUTOR=procrastinate`` a tool step leaves the interpreter as
-a :class:`~invana.plugins.envelope.TaskEnvelope` on procrastinate's queue, which
-lives in the app's own Postgres — no broker to run. Both halves are here:
+Under ``INVANA_EXECUTOR=procrastinate`` a tool step leaves the interpreter as a
+:class:`~invana.plugins.envelope.TaskEnvelope` on procrastinate's queue, which
+lives in the app's own Postgres — no broker to run. The queue is named for the
+step's resources (``tools.cpu``, ``tools.cpu+gpu``, see
+:mod:`invana.apps.workers.queues`).
 
 | Side | Calls | Does |
 |---|---|---|
 | API process | :func:`defer` · :func:`await_outcome` | queues the envelope, polls ``envelope_outcomes`` for its key |
-| ``invana worker`` | :func:`run_worker` → :func:`run_tool_envelope` | runs it rebuilt, records the outcome |
+| Worker gateway | :func:`job_manager` | hands jobs to workers that dialled in (:mod:`invana.plugins.gateway`) |
 | ``invana migrate`` | :func:`apply_schema` | procrastinate's own tables, once |
 
+A worker never reaches this database: it joins a pool over HTTPS and the
+gateway fetches, heartbeats and finishes jobs for it.
+
 **Outcomes come back through a row, not through procrastinate.** procrastinate
-keeps no job result, so the worker writes the outcome — ``Out``, a failure or a
-signal, in the tagged form of :func:`~invana.plugins.envelope.outcome_to_json`
-— to ``envelope_outcomes``, keyed by the envelope's idempotency key. The API
-process polls for it (250 ms, backing off to 1 s) and raises a failure or a
-signal again exactly as the inline executor would have. The same row makes a
-redelivery safe: a worker that finds the key already recorded returns without
-running the task type a second time.
+keeps no job result, so the gateway writes the outcome a worker posted — ``Out``,
+a failure or a signal, in the tagged form of
+:func:`~invana.plugins.envelope.outcome_to_json` — to ``envelope_outcomes``,
+keyed by the envelope's idempotency key. The API process polls for it (250 ms,
+backing off to 1 s) and raises a failure or a signal again exactly as the inline
+executor would have. A key already recorded is a redelivery, and the first
+outcome stands.
 
-**A dead worker's jobs are retried by the other workers.** Each worker
-heartbeats every 2 s; the reaper inside every ``invana worker`` looks once a
-minute for jobs whose worker has been silent 10 s and retries them. A
-redelivered envelope keeps its idempotency key.
-
-**No worker running** is a timeout, not a hang: :func:`await_outcome` gives up
-after the step's own limit plus the queue-wait allowance the caller passes and
-raises ``transient · worker_unavailable`` naming ``invana worker``.
+**No worker carrying the label** is a timeout, not a hang: :func:`await_outcome`
+gives up after the step's own limit plus the queue-wait allowance the caller
+passes and raises ``transient · worker_unavailable`` naming the label and the
+command that adds a worker.
 
 procrastinate and psycopg are the ``workers`` extra, so they are imported only
 when the queue is used; a SQLite dev install never loads this module's
@@ -37,52 +39,42 @@ dependencies. Usage::
 
     from invana.plugins import queue
 
-    await queue.defer(envelope)                                   # API
-    out = await queue.await_outcome(envelope, session_factory=f, timeout_s=360)
+    await queue.defer(envelope, queue_name="tools.cpu")           # API
+    out = await queue.await_outcome(envelope, queue_name="tools.cpu", session_factory=f, timeout_s=360)
 
-    await queue.run_worker(runtime, concurrency=4)                # invana worker
     await queue.apply_schema()                                    # invana migrate
 """
 
 from __future__ import annotations
 
 import asyncio
-import contextlib
 import logging
 import time
 from typing import TYPE_CHECKING, Any
 
 from sqlalchemy.engine import make_url
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from invana.apps.workers.queues import labels_of
 from invana.core.settings import settings
-from invana.plugins.envelope import TaskEnvelope, outcome_from_json, outcome_to_json
+from invana.plugins.envelope import TaskEnvelope, outcome_from_json
 from invana.plugins.sdk.context import Out
 from invana.plugins.sdk.errors import TaskFailure
-from invana.plugins.worker import run_envelope
 from invana.runtime.querysets.plugins import EnvelopeOutcomeQuerySet
 
 if TYPE_CHECKING:
     from procrastinate import App
-
-    from invana.runtime.interpreter.loop import TaskRuntime
+    from procrastinate.manager import JobManager
 
 log = logging.getLogger(__name__)
 
-QUEUE = "tools"
 JOB = "run_tool_envelope"
-HEARTBEAT_S = 2  # a worker's heartbeat
-STALLED_AFTER_S = 10  # a job whose worker is silent this long is retried
-REAP_EVERY_S = 60  # how often a worker's reaper looks
 POLL_FIRST_S = 0.25  # the first outcome poll; doubles up to POLL_MAX_S
 POLL_MAX_S = 1.0
 
 _outcomes = EnvelopeOutcomeQuerySet()
 _app: App | None = None
 _opened = False
-#: The runtime a worker rebuilds contexts from; set by :func:`run_worker`.
-_worker_runtime: TaskRuntime | None = None
 
 
 def conninfo(database_url: str | None = None) -> str:
@@ -102,11 +94,9 @@ def app() -> App:
 
         built = App(connector=PsycopgConnector(conninfo=conninfo()))
 
-        @built.task(name=JOB, queue=QUEUE)
+        @built.task(name=JOB, queue="tools.cpu")
         async def _run_tool_envelope(envelope: str) -> None:
-            if _worker_runtime is None:
-                raise RuntimeError("run_tool_envelope runs inside `invana worker` only")
-            await run_tool_envelope(envelope, _worker_runtime)
+            raise RuntimeError("tool envelopes run in workers that joined over the gateway, never in procrastinate")
 
         _app = built
     return _app
@@ -122,20 +112,45 @@ async def _open() -> App:
     return built
 
 
-async def defer(envelope: TaskEnvelope) -> None:
-    """Queue one envelope on ``tools``; the caller must have committed what the worker will read."""
+async def job_manager() -> JobManager:
+    """procrastinate's job manager, for the gateway: register workers, fetch, retry and finish jobs."""
+    return (await _open()).job_manager
+
+
+async def defer(envelope: TaskEnvelope, *, queue_name: str) -> None:
+    """Queue one envelope on ``queue_name``; the caller must have committed what the worker will read."""
     built = await _open()
-    await built.configure_task(JOB, queue=QUEUE).defer_async(envelope=envelope.to_json())
+    await built.configure_task(JOB, queue=queue_name).defer_async(envelope=envelope.to_json())
+
+
+def _unavailable(envelope: TaskEnvelope, queue_name: str, timeout_s: float) -> TaskFailure:
+    label = "+".join(sorted(labels_of(queue_name))) or queue_name
+    return TaskFailure(
+        cls="transient",
+        cause="worker_unavailable",
+        message=(
+            f"No worker carrying '{label}' ran this step within {round(timeout_s)} s. "
+            "Add one: invana worker --engine <engine url> --token <join token> --pool <pool>"
+        ),
+        short="no worker",
+        evidence={"queue": queue_name, "label": label, "idempotency_key": envelope.idempotency_key},
+    )
 
 
 async def await_outcome(
-    envelope: TaskEnvelope, *, session_factory: async_sessionmaker[AsyncSession], timeout_s: float
+    envelope: TaskEnvelope,
+    *,
+    queue_name: str,
+    session_factory: async_sessionmaker[AsyncSession],
+    timeout_s: float,
+    artifacts: list[dict[str, Any]] | None = None,
 ) -> Out:
     """Poll ``envelope_outcomes`` until a worker records this envelope's outcome.
 
-    Returns the ``Out``, or raises what the worker raised. Past ``timeout_s``
-    raises ``transient · worker_unavailable``: the envelope stays queued, but
-    this step stops waiting for it.
+    Returns the ``Out``, or raises what the worker raised. The files the step
+    read or wrote ride back with the outcome and are appended to ``artifacts``.
+    Past ``timeout_s`` raises ``transient · worker_unavailable``: the envelope
+    stays queued, but this step stops waiting for it.
     """
     deadline = time.monotonic() + timeout_s
     delay = POLL_FIRST_S
@@ -143,85 +158,14 @@ async def await_outcome(
         async with session_factory() as db:
             row = await _outcomes.get(db, envelope.idempotency_key)
             if row is not None:
+                if artifacts is not None:
+                    artifacts.extend(row.outcome.get("_artifacts") or [])
                 return outcome_from_json(row.outcome)
         left = deadline - time.monotonic()
         if left <= 0:
-            raise TaskFailure(
-                cls="transient",
-                cause="worker_unavailable",
-                message=(
-                    f"No worker ran this step within {round(timeout_s)} s. "
-                    "Start one on this install with: invana worker"
-                ),
-                short="no worker",
-                evidence={"queue": QUEUE, "idempotency_key": envelope.idempotency_key},
-            )
+            raise _unavailable(envelope, queue_name, timeout_s)
         await asyncio.sleep(min(delay, left))
         delay = min(delay * 2, POLL_MAX_S)
-
-
-async def run_tool_envelope(wire: str, runtime: TaskRuntime) -> None:
-    """The job a worker runs: one envelope, its outcome recorded once.
-
-    A key already recorded is a redelivery and returns without running.
-    Anything the task type raises is recorded in its wire form; only
-    cancellation (the worker shutting down) escapes, so the job is retried.
-    """
-    from invana.runtime.executor import RebuiltContexts
-
-    envelope = TaskEnvelope.from_json(wire)
-    async with runtime._factory() as db:
-        if await _outcomes.get(db, envelope.idempotency_key) is not None:
-            return
-    result: Out | BaseException
-    try:
-        result = await run_envelope(envelope, contexts=RebuiltContexts(runtime))
-    except Exception as exc:
-        result = exc
-    async with runtime._factory() as db:
-        try:
-            await _outcomes.add(
-                db, idempotency_key=envelope.idempotency_key, run_id=envelope.run_id, outcome=outcome_to_json(result)
-            )
-            await db.commit()
-        except IntegrityError:
-            # A redelivery raced this one and recorded first; its outcome stands.
-            await db.rollback()
-
-
-async def _reap(built: App) -> None:
-    """Retry, once a minute, every job whose worker has been silent ``STALLED_AFTER_S``."""
-    while True:
-        await asyncio.sleep(REAP_EVERY_S)
-        try:
-            stalled = await built.job_manager.get_stalled_jobs(seconds_since_heartbeat=STALLED_AFTER_S)
-            for job in stalled:
-                await built.job_manager.retry_job(job)
-            if stalled:
-                log.warning("worker: retried %d stalled job(s) on %s", len(stalled), QUEUE)
-        except Exception:
-            log.exception("worker: the reaper failed; it tries again in %d s", REAP_EVERY_S)
-
-
-async def run_worker(runtime: TaskRuntime, *, concurrency: int, wait: bool = True) -> None:
-    """Run ``tools`` jobs with ``runtime`` until stopped — or, with ``wait=False``, until the queue is empty."""
-    global _worker_runtime  # noqa: PLW0603 — the job reads the worker's runtime
-    _worker_runtime = runtime
-    built = await _open()
-    reaper = asyncio.create_task(_reap(built), name="invana.worker.reaper")
-    try:
-        await built.run_worker_async(
-            queues=[QUEUE],
-            concurrency=concurrency,
-            wait=wait,
-            update_heartbeat_interval=HEARTBEAT_S,
-            stalled_worker_timeout=STALLED_AFTER_S,
-            delete_jobs="successful",
-        )
-    finally:
-        reaper.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await reaper
 
 
 async def apply_schema(database_url: str | None = None) -> bool:

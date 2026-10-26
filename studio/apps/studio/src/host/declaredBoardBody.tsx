@@ -7,6 +7,8 @@ import {
 	PlanExportPage,
 	PlanVersionsPage,
 	PluginPage,
+	WorkerPage,
+	WorkerPoolPage,
 	RunPage,
 	SkillBoardPage,
 	TemplatePage,
@@ -273,6 +275,25 @@ export function declaredBoardContent(
 	// The plugin registry's pages are install-level; a function's page also
 	// reads the Graph's catalogue for who uses it and how it fans out. A
 	// function on a plugin opens beside it, and back.
+	// Worker pools and workers are install-wide; a pool opens its workers beside it.
+	if (board.kind === "worker_pool") {
+		return (
+			<WorkerPoolPage
+				pool={board.subjectId}
+				onOpenWorker={(name) => openBoard({ kind: "worker", subjectId: name })}
+			/>
+		);
+	}
+
+	if (board.kind === "worker") {
+		return (
+			<WorkerPage
+				worker={board.subjectId}
+				onOpenPool={(name) => openBoard({ kind: "worker_pool", subjectId: name })}
+			/>
+		);
+	}
+
 	if (board.kind === "plugin") {
 		return (
 			<PluginPage
@@ -441,6 +462,8 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 						: board.kind === "project"
 							? (projectNameByKey.get(board.subjectId) ?? board.subjectId)
 							: board.kind === "plugin" ||
+									board.kind === "worker_pool" ||
+									board.kind === "worker" ||
 									board.kind === "function" ||
 									board.kind === "policy" ||
 									board.kind === "iam_group"

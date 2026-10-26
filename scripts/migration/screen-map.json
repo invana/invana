@@ -1723,6 +1723,84 @@
    "route": "/u/admin/airways/agents/runs?page=run%3A4b5f8f99-5572-4a16-b329-8474a789cee1&tab=agents&view=role&right=assistant",
    "state": "the uuid stands for the seeded run of 700 agents (scripts/agents-build/seed_f05.py prints it); Agents \u203a By role \u2014 the icicle is not built (the-run-page.md Not building)"
   },
+  "agents.pools": {
+   "story": "AF-10",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?right=assistant",
+   "state": ""
+  },
+  "agents.pool.detail": {
+   "story": "AF-10",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?page=worker_pool%3Ak8s-prod&right=assistant",
+   "state": "k8s-prod stands for a pool name (scripts/agents-build/seed_f06.py seeds the four pools): Workers \u203a Pools, click a pool"
+  },
+  "agents.pool.capacity": {
+   "story": "AF-10",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers/capacity?right=assistant",
+   "state": "Capacity tab"
+  },
+  "agents.pool.worker": {
+   "story": "AF-10",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?page=worker%3Aw-k8s-prod-01&right=assistant",
+   "state": "w-k8s-prod-01 stands for a worker name: open a pool, click a worker"
+  },
+  "agents.workers.tokens": {
+   "story": "AF-10",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers/tokens?right=assistant",
+   "state": "Join tokens tab"
+  },
+  "agents.workers.add": {
+   "story": "AF-11",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?add=where&right=assistant",
+   "state": "Add workers: step Where"
+  },
+  "agents.workers.add.pool": {
+   "story": "AF-11",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?add=pool&right=assistant",
+   "state": "Add workers \u203a Python \u203a Next: step Pool, egress chosen"
+  },
+  "agents.workers.add.token": {
+   "story": "AF-11",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?add=token&right=assistant",
+   "state": "Add workers \u203a Pool \u203a Next: step Join token, before Make token"
+  },
+  "agents.workers.add.run.docker": {
+   "story": "AF-11",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?add=run&where=docker&right=assistant",
+   "state": "Add workers \u203a Docker \u203a \u2026 \u203a Make token: step Run it"
+  },
+  "agents.workers.add.run.python": {
+   "story": "AF-11",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?add=run&where=python&right=assistant",
+   "state": "Add workers \u203a Python \u203a \u2026 \u203a Make token: step Run it"
+  },
+  "agents.workers.add.run.k8s": {
+   "story": "AF-11",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?add=run&where=kubernetes&right=assistant",
+   "state": "Add workers \u203a Kubernetes \u203a \u2026 \u203a Make token: step Run it"
+  },
+  "agents.workers.add.waiting": {
+   "story": "AF-11",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?add=joined&right=assistant",
+   "state": "Add workers \u203a \u2026 \u203a Run it \u203a Next: step Joined, before the first heartbeat"
+  },
+  "agents.workers.add.joined": {
+   "story": "AF-11",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/workers?add=joined&right=assistant",
+   "state": "Add workers \u203a \u2026 \u203a Joined, after a worker started with the command joined"
+  },
   "agents.approvals": {
    "story": "AF-13",
    "product": "agent-fabric",

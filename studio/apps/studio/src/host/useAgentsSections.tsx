@@ -70,6 +70,8 @@ export function useAgentsSections({
 			plugin: (name) => openBoard({ kind: "plugin", subjectId: name }),
 			plan: (id) => openBoard({ kind: "plan_runs", subjectId: id }),
 			template: (id) => openBoard({ kind: "template", subjectId: id }),
+			pool: (name) => openBoard({ kind: "worker_pool", subjectId: name }),
+			worker: (name) => openBoard({ kind: "worker", subjectId: name }),
 			run: (id, stepId) =>
 				openBoard({ kind: "run", subjectId: id, runId: id, stepId }),
 			section: (key, tab) => goTo(key, tab),

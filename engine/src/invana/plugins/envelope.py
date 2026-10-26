@@ -132,7 +132,9 @@ def outcome_to_json(result: Out | BaseException) -> dict[str, Any]:
 
 def outcome_from_json(outcome: dict[str, Any]) -> Out:
     """The inverse of :func:`outcome_to_json`: return the ``Out``, or raise what the worker raised."""
-    body = {k: v for k, v in outcome.items() if k != "kind"}
+    # Keys starting with an underscore (``_worker``, ``_artifacts``) are the gateway's
+    # bookkeeping beside the tagged outcome; they never reach an ``Out`` or a failure.
+    body = {k: v for k, v in outcome.items() if k != "kind" and not k.startswith("_")}
     match outcome.get("kind"):
         case "out":
             return Out(**body)

@@ -124,6 +124,7 @@ function useTileLines(
 
 	return {
 		fleet: "agents, skills, functions",
+		workers: "pools, workers, capacity",
 		runs: runs.data
 			? `${plural(runs.data.live, "run")} live`
 			: runs.error

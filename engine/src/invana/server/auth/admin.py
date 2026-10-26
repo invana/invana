@@ -70,6 +70,9 @@ class PersonalAccessTokenView(ModelView):
         "last_used_at",
         "revoked_at",
         "created_at",
+        "worker_pool_id",
+        "join_cap",
+        "joins",
     ]
     search_fields = ["name"]
     sortable_fields = ["created_at", "last_used_at", "expires_at", "revoked_at"]

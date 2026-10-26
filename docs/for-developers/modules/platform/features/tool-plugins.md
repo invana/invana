@@ -29,7 +29,7 @@ and a terminal read the same thing.
 | C6 | Enable · disable | An install Admin enables or disables a tool plugin; disabled is the default. Core and simulator plugins are always on |
 | C7 | The registry API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` — a function's read is Graph-scoped, `GET …/catalogue/{step_key}` ([the-catalogue](../../workflows/features/the-catalogue.md)) |
 | C8 | The CLI | `invana plugins list · show · enable · disable` · `invana worker` |
-| C9 | Tools run in workers | Under `executor = "procrastinate"`, every tool step is deferred as a `TaskEnvelope` to the `tools` queue and run by `invana worker`; the API process waits for its outcome |
+| C9 | Tools run in workers | Under `executor = "procrastinate"`, every tool step is deferred as a `TaskEnvelope` to the `tools.<labels>` queue its resources name and leased by an `invana worker` through the engine's worker gateway ([workers](../../agents/features/workers.md)); the API process waits for its outcome |
 | C10 | `send` waits for an approval | A step whose task type is `side_effect = "send"` (`mail.send`) holds the run on an approval in the inbox; approve resumes it, decline fails the step as *not sent* |
 | C11 | Secrets stay in the worker | A task type reads only the secrets its plugin declares, from the worker's environment (`INVANA_SECRET_<NAME>`); nothing rides an envelope |
 | C12 | Wire forms | `Out`, `TaskFailure`, `NeedsInput`, `CannotAnswer` and `Converse` cross the queue as JSON and are raised again in the API process |
@@ -52,8 +52,8 @@ flowchart TD
     G1 -->|declined| G2[Step fails · blocked · send_declined · not sent]
     G -->|no| H{executor}
     H -->|inline| I[run_envelope in this process]
-    H -->|procrastinate| J[defer envelope to the tools queue]
-    J --> K[invana worker · run_envelope · outcome row]
+    H -->|procrastinate| J[defer envelope to the tools.<labels> queue]
+    J --> K[invana worker leases it over HTTPS · run_envelope · outcome]
     K --> L[API process reads the outcome · settles the step]
     I --> L
 ```
@@ -62,13 +62,16 @@ flowchart TD
 sequenceDiagram
     participant O as Interpreter (API)
     participant Q as procrastinate (app Postgres)
-    participant W as invana worker
+    participant G as Worker gateway (engine)
+    participant W as invana worker (any machine)
     participant DB as envelope_outcomes
-    O->>Q: defer run_tool_envelope(envelope JSON)
-    Q->>W: job
-    W->>DB: outcome already recorded for this idempotency key? → return it
-    W->>W: run_envelope (RebuiltContexts)
-    W->>DB: outcome JSON (Out | failure | signal)
+    O->>Q: defer run_tool_envelope(envelope JSON) on tools.<labels>
+    W->>G: lease (pool credential)
+    G->>Q: fetch a job from a queue the pool's labels cover
+    G-->>W: envelope
+    W->>W: run_envelope (args, secrets, no database)
+    W->>G: outcome JSON (Out | failure | signal)
+    G->>DB: outcome, unless this idempotency key is recorded
     O->>DB: poll by idempotency key
     O->>O: Out → settle · failure/signal → raised as if inline
 ```
@@ -82,7 +85,7 @@ sequenceDiagram
 | Enable while runs are in flight | Takes effect for the next step dispatched — no restart; enablement is a gate, not a load |
 | No worker running | The envelope waits in the queue; the step stays `running` until its `timeout_s` (300 s when the manifest declares none) plus 120 s of queue wait — one reaper cycle and the stall window — then fails `transient · worker_unavailable` |
 | Approved from the CLI | `invana approvals approve` records the decision but does not resume the run; the API's approve does. The run resumes on its next `submit` |
-| A worker dies mid-step | Its heartbeat stops; the reaper inside `invana worker` retries jobs silent 10 s; the redelivered envelope keeps its idempotency key, and a recorded outcome is returned rather than re-run |
+| A worker dies mid-step | Its heartbeat stops; the engine's gateway sweep marks it lost after 30 s and retries its jobs; the redelivered envelope keeps its idempotency key, and a recorded outcome is returned rather than re-run |
 | Redelivered `mail.send` | Its `Message-ID` is derived from the idempotency key, so a resend after a crash between send and record is the same message to the receiving server |
 | Approval expires | The run stays awaiting input; the expiry is in the inbox, and the run is cancelled by hand |
 | An unattended run reaches `mail.send` | The approval is requested from the run's actor (the agent's or schedule's owner) like any other — an approval is not a clarification, so it does not end the run as *cannot answer* |
@@ -99,7 +102,8 @@ sequenceDiagram
 | `plugins/sdk/context.py` | `TaskContext.secret(name)` — refuses a name the plugin does not declare |
 | `plugins/sdk/web.py` | the shared HTTP client, robots check and HTML → text, used by `web.*` and the science tools |
 | `plugins/envelope.py` | `outcome_to_json(out | exc)` · `outcome_from_json(raw)` — the wire forms |
-| `plugins/queue.py` | the procrastinate app, the `run_tool_envelope` job (contexts rebuilt by `RebuiltContexts`), `defer` · `await_outcome` · `run_worker` · the reaper · `apply_schema` |
+| `plugins/queue.py` | the procrastinate app, the `run_tool_envelope` job name, `defer` onto `tools.<labels>` · `await_outcome` · `apply_schema` |
+| `plugins/gateway.py` · `plugins/remote.py` | the engine's worker gateway and its sweep · the dial-out worker ({W}) |
 | `runtime/interpreter/loop.py` | the `send` gate before dispatch; `resume_after_decision(run_id)` |
 | `activity/managers/approvals.py` | `ApprovalSendGate` — the gate over the inbox |
 | `runtime/executor.py` | `_dispatch` routes: enabled check → `send` approval gate → tool + procrastinate → queue, else inline |
@@ -142,7 +146,7 @@ sequenceDiagram
 | Setting | Default | Notes |
 |---|---|---|
 | `INVANA_EXECUTOR` | `inline` | `inline` · `procrastinate` |
-| `INVANA_WORKER_CONCURRENCY` | `4` | jobs one `invana worker` runs at once |
+| `INVANA_SLOTS` | the pool's slots a worker | envelopes one `invana worker` runs at once |
 | `INVANA_SECRET_<NAME>` | — | read in the worker only, for declared secrets |
 
 ## Decisions
@@ -156,7 +160,7 @@ sequenceDiagram
 | TP5 | **procrastinate is the `workers` extra**, not a core dependency: `psycopg` and procrastinate are Postgres-only and a SQLite dev install never needs them. `all` includes it, so every image has it. |
 | TP6 | **Outcomes come back through `envelope_outcomes`**, keyed by idempotency key, polled by the API process. procrastinate stores no result; a row also makes a redelivery return the recorded outcome instead of running twice. |
 | TP7 | **procrastinate's schema is applied by `invana migrate`** on Postgres, through its own schema manager, after Alembic — its tables are not ours to diff in the golden schema. |
-| TP8 | **The reaper runs in every worker.** Each `invana worker` heartbeats every 2 s and, once a minute, retries jobs whose worker has been silent 10 s (13.11 DE6). |
+| TP8 | **The engine runs the reaper.** Each `invana worker` heartbeats the gateway every 2 s; the engine's sweep retries the jobs of a worker silent 30 s ([workers](../../agents/features/workers.md)). |
 | TP9 | **`send` is gated by the interpreter, through the approvals inbox.** Before a `send` step dispatches, the run holds on an `Approval` (`subject_kind = "step"`, the args frozen as its payload, approver = the run's actor, else the Graph's owner, 24 h deadline). Approving or declining resumes the run; the task type itself never asks. |
 | TP10 | **Secrets live in the worker's environment** as `INVANA_SECRET_<NAME>`, read through `ctx.secret(name)`, which refuses a name the plugin's `plugin.toml` does not declare. No secrets table this slice. |
 | TP11 | **`web.search` speaks SearXNG.** The `web_search` secret is a SearXNG base URL; an open, self-hostable search keeps a vendor key out of the product. |

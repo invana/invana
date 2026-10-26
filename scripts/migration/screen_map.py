@@ -93,6 +93,19 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("agents.plans.detail", f"{G}/agents/functions/plans?page=plan_runs%3A0938814c-7522-42ec-acd2-2d52d3636a5a"),
     ("agents.plans", f"{G}/agents/functions/promoted"), ("agents.library", f"{G}/agents/functions/plans"),
     ("agents.plugins", f"{G}/agents/functions/plugins"),
+    ("agents.pools", f"{G}/agents/workers"),
+    ("agents.pool.detail", f"{G}/agents/workers?page=worker_pool%3Ak8s-prod"),
+    ("agents.pool.worker", f"{G}/agents/workers?page=worker%3Aw-k8s-prod-01"),
+    ("agents.pool.capacity", f"{G}/agents/workers/capacity"),
+    ("agents.workers.tokens", f"{G}/agents/workers/tokens"),
+    ("agents.workers.add.pool", f"{G}/agents/workers?add=pool"),
+    ("agents.workers.add.token", f"{G}/agents/workers?add=token"),
+    ("agents.workers.add.run.docker", f"{G}/agents/workers?add=run&where=docker"),
+    ("agents.workers.add.run.python", f"{G}/agents/workers?add=run&where=python"),
+    ("agents.workers.add.run.k8s", f"{G}/agents/workers?add=run&where=kubernetes"),
+    ("agents.workers.add.waiting", f"{G}/agents/workers?add=joined"),
+    ("agents.workers.add.joined", f"{G}/agents/workers?add=joined"),
+    ("agents.workers.add", f"{G}/agents/workers?add=where"),
     ("agents.connections.mcp", f"{G}/agents/connections/mcp"),
     ("agents.connections", f"{G}/agents/connections/server"),
     ("agents.llms.endpoint", f"{G}/agents/llms/85a79982-172c-4649-a7eb-2d14c9406182"), ("agents.llms", f"{G}/agents/llms"),
@@ -149,7 +162,7 @@ DRAFT_AGENT = "the uuid stands for a draft agent with two bound skills (Route de
 POLICIES = "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py"
 BUILT = {"agent-fabric": {"AF-26", "AF-02", "AF-01", "AF-17", "AF-19", "AF-20", "AF-23", "AF-25",
                          "AF-03", "AF-04", "AF-05", "AF-06", "AF-21", "AF-22",
-                         "AF-07", "AF-08", "AF-09", "AF-13", "AF-14", "AF-16", "AF-24", "AF-18"}}
+                         "AF-07", "AF-08", "AF-09", "AF-10", "AF-11", "AF-13", "AF-14", "AF-16", "AF-24", "AF-18"}}
 STATE = {  # board → how to reach it from its route; a board absent here is its route's landing view
     "iam.agent.effective": "the uuid stands for Coordinator, which holds fare-team-quota through fare-team and has the skill Hey bound: IAM › Agents, click Coordinator",
     "iam.policies.denied": "New policy, signed in as e2e-viewer (its `as`)",
@@ -344,6 +357,18 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "agents.library.plan.overview": "Plans tab, click a plan; Overview tab",
     "agents.library.plan.revisions": "a run that replanned: its Revisions",
     "agents.library.templates": "Templates tab",
+    "agents.pool.detail": "k8s-prod stands for a pool name (scripts/agents-build/seed_f06.py seeds the four pools): Workers › Pools, click a pool",
+    "agents.pool.worker": "w-k8s-prod-01 stands for a worker name: open a pool, click a worker",
+    "agents.pool.capacity": "Capacity tab",
+    "agents.workers.tokens": "Join tokens tab",
+    "agents.workers.add": "Add workers: step Where",
+    "agents.workers.add.pool": "Add workers › Python › Next: step Pool, egress chosen",
+    "agents.workers.add.token": "Add workers › Pool › Next: step Join token, before Make token",
+    "agents.workers.add.run.docker": "Add workers › Docker › … › Make token: step Run it",
+    "agents.workers.add.run.python": "Add workers › Python › … › Make token: step Run it",
+    "agents.workers.add.run.k8s": "Add workers › Kubernetes › … › Make token: step Run it",
+    "agents.workers.add.waiting": "Add workers › … › Run it › Next: step Joined, before the first heartbeat",
+    "agents.workers.add.joined": "Add workers › … › Joined, after a worker started with the command joined",
     "agents.plugins": "needs B06a for its rows",
     "agents.plugins.plugin": "click a plugin (needs B06a)",
     "agents.plugins.task": "click a plugin, then a task type (needs B06a)",
@@ -363,7 +388,7 @@ def main() -> None:
         for m in re.finditer(r"^\| ([A-Z]{2,3}-\d{2}) \|(.*)$", (DOCS / f"{doc}.md").read_text(), re.M):
             if doc in BUILT and m.group(1) not in BUILT[doc]:
                 continue
-            for b in re.findall(r"`([a-z_.]+)`", m.group(2)):
+            for b in re.findall(r"`([a-z][a-z0-9_.]*)`", m.group(2)):
                 variant = b.split(".")[-1] in {"dark", "readonly", "error", "closed"} or b.count(".") > 2
                 route = route_for(b)
                 if route is None or (variant and b not in STATE):

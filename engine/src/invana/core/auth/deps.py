@@ -44,6 +44,9 @@ from invana.core.telemetry.spans import set_current
 
 _bearer_scheme = HTTPBearer(auto_error=False)
 
+#: The prefix of a worker join token (``invana.apps.workers.credentials.JOIN_PREFIX``).
+JOIN_TOKEN_PREFIX = "invana_join_"
+
 
 def _unauthorized(detail: str) -> HTTPException:
     return HTTPException(
@@ -87,6 +90,10 @@ async def get_current_user(
 
     if not raw_token:
         raise _unauthorized("Missing bearer token.")
+
+    if raw_token.startswith(JOIN_TOKEN_PREFIX):
+        # Only POST /api/v1/workers/join takes a join token, and it reads it itself.
+        raise _unauthorized("A join token only joins a worker to its pool.")
 
     if is_personal_access_token(raw_token):
         # A long-lived secret is never read from the query string (PT5) — the

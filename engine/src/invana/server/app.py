@@ -176,6 +176,14 @@ async def lifespan(app: FastAPI):
         clock = ClockLoop(session_factory, submit=task_runtime.submit, interval_s=settings.clock_interval_s)
         app.state.clock = clock
         clock.start()
+
+        # docs/for-developers/modules/agents/features/workers.md — the worker
+        # gateway's sweep: lost workers, their jobs redelivered, pool numbers.
+        from invana.plugins.gateway import GatewaySweep
+
+        gateway_sweep = GatewaySweep(session_factory)
+        app.state.gateway_sweep = gateway_sweep
+        gateway_sweep.start()
         log.info(
             "startup finished",
             extra={
@@ -189,6 +197,7 @@ async def lifespan(app: FastAPI):
 
     set_query_observer(None)
     await clock.stop()
+    await gateway_sweep.stop()
     query_log_task.cancel()
     await task_runtime.shutdown()
     await event_broadcaster.stop()
@@ -244,6 +253,7 @@ def create_app() -> FastAPI:
         simulators_router,
         tasks_router,
     )
+    from invana.server.workers.routes import workers_router
 
     app = FastAPI(
         title=settings.app_name,
@@ -348,6 +358,7 @@ def create_app() -> FastAPI:
     app.include_router(access_router)
     app.include_router(tokens_router)
     app.include_router(mcp_router)
+    app.include_router(workers_router)
 
     # Proxy the studio's browser OTLP/HTTP span export to the collector.
     # Always mounted: the studio exports on its own gate, so a route that

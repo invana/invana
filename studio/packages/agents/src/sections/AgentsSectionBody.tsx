@@ -15,6 +15,7 @@ import { PerformancePage } from "../performance/PerformancePage";
 import { RunsListPage } from "../runs/RunsListPage";
 import { SettingsSectionPage } from "../settings/SettingsSectionPage";
 import { SkillsListPage } from "../skills/SkillsListPage";
+import { WorkersSectionPage } from "../workers/WorkersSectionPage";
 import type { AgentsSectionKey, SectionPageProps } from "./spec";
 
 const PAGES = {
@@ -26,6 +27,7 @@ const PAGES = {
 	connections: ConnectionsSectionPage,
 	llms: LlmsPage,
 	runs: RunsListPage,
+	workers: WorkersSectionPage,
 	approvals: ApprovalsPage,
 	ledger: LedgerPage,
 	concurrency: SettingsSectionPage,

@@ -9,7 +9,7 @@ executor carries it. Two context sources feed that one call:
 | Source | Used by | The live world comes from |
 |---|---|---|
 | :class:`InlineContexts` | every step run in the API process | the running pass, handed over as is |
-| :class:`RebuiltContexts` | ``invana worker``, a queued tool step | the envelope's ids → :meth:`TaskRuntime.run_vars` |
+| :class:`RebuiltContexts` | a process holding the database | the envelope's ids → :meth:`TaskRuntime.run_vars` |
 
 :func:`_dispatch` decides where one step runs, in this order
 (docs/for-developers/modules/platform/features/tool-plugins.md):
@@ -17,7 +17,7 @@ executor carries it. Two context sources feed that one call:
 | Step | Runs |
 |---|---|
 | A **tool** or **MCP** plugin's, not enabled | ``blocked · plugin_disabled``, naming ``invana plugins enable`` |
-| A tool or MCP plugin's, under ``procrastinate`` | on the ``tools`` queue; the pass polls the outcome row |
+| A tool or MCP plugin's, under ``procrastinate`` | on the ``tools.<labels>`` queue; the pass polls the outcome |
 | Any other — every core step, every step under ``inline`` | ``run_envelope`` in this process |
 
 Only tool steps go to the queue: core steps hand state to each other on
@@ -37,6 +37,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.workers.queues import queue_for
 from invana.core.settings import settings
 from invana.plugins import load_plugins, queue
 from invana.plugins.envelope import TaskEnvelope
@@ -125,8 +126,8 @@ class RebuiltContexts:
 #: A tool step's own limit when its manifest declares none.
 TOOL_TIMEOUT_S = 300
 #: How long a queued tool step may wait for a worker on top of its own limit:
-#: one reaper cycle (60 s) plus the stall window (10 s), with room to spare,
-#: so a job retried off a dead worker still lands inside it.
+#: the 30 s a worker may be silent before it is lost, a sweep, and a lease
+#: long-poll, with room to spare, so a job redelivered off a lost worker still lands inside it.
 QUEUE_WAIT_S = 120
 
 
@@ -175,12 +176,15 @@ async def _dispatch(task_key: str, ctx: TaskContext, v: RunVars):
         await refuse_disabled(ctx.db, manifest)
     envelope = envelope_for(ctx.step, v)
     if manifest is not None and settings.executor == "procrastinate":
+        queue_name = queue_for(r.value for r in manifest.resources)
         await ctx.db.commit()
-        await queue.defer(envelope)
+        await queue.defer(envelope, queue_name=queue_name)
         return await queue.await_outcome(
             envelope,
+            queue_name=queue_name,
             session_factory=ctx.runtime._factory,
             timeout_s=(manifest.timeout_s or TOOL_TIMEOUT_S) + QUEUE_WAIT_S,
+            artifacts=ctx.artifacts,
         )
     return await run_envelope(envelope, contexts=InlineContexts(ctx, v), resolve=lambda _env: TASKS.get(task_key))
 

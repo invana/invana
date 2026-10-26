@@ -77,6 +77,7 @@ from invana.apps.work.models import (
     Task,
     TaskDependency,
 )
+from invana.apps.workers.models import Worker, WorkerEvent, WorkerPool, WorkerStat
 from invana.core.auth.models import PersonalAccessToken, RefreshToken, User
 from invana.core.events.models import Event
 from invana.core.ledger.models import LedgerCheck, LedgerExport, LedgerRow
@@ -191,6 +192,7 @@ from invana.server.work.admin import (
     TaskDependencyView,
     TaskView,
 )
+from invana.server.workers.admin import WorkerEventView, WorkerPoolView, WorkerStatView, WorkerView
 
 # Custom templates (currently: base.html with theme switcher) live alongside
 # this module. starlette-admin's Jinja loader checks templates_dir first and
@@ -263,6 +265,20 @@ def mount_admin(app: FastAPI) -> None:
                 PolicyAttachmentView(PolicyAttachment, label="Policy attachments", icon="fa fa-link"),
                 GroupView(Group, label="Groups", icon="fa fa-users-rectangle"),
                 GroupMemberView(GroupMember, label="Group members", icon="fa fa-user-group"),
+            ],
+        ),
+    )
+
+    # ── Workers (docs/for-developers/modules/agents/features/workers.md) ─────
+    admin.add_view(
+        DropDown(
+            label="Workers",
+            icon="fa fa-server",
+            views=[
+                WorkerPoolView(WorkerPool, label="Worker pools", icon="fa fa-layer-group"),
+                WorkerView(Worker, label="Workers", icon="fa fa-server"),
+                WorkerEventView(WorkerEvent, label="Worker events", icon="fa fa-clock-rotate-left"),
+                WorkerStatView(WorkerStat, label="Worker stats", icon="fa fa-chart-line"),
             ],
         ),
     )

@@ -29,6 +29,10 @@ export interface AgentsOpen {
 	 * the page opens on Stages with that step under the canvas.
 	 */
 	run: (id: string, stepId?: string) => void;
+	/** A worker pool's page, by its name. */
+	pool: (name: string) => void;
+	/** A worker's page, by its name. */
+	worker: (name: string) => void;
 	/** Another Agents section, on one of its tabs. */
 	section: (key: AgentsSectionKey, tab?: string) => void;
 }

@@ -5144,6 +5144,121 @@
         "title": "CancelResponse",
         "type": "object"
       },
+      "Capacity": {
+        "properties": {
+          "computed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Computed At"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/CapacityRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rows"
+        ],
+        "title": "Capacity",
+        "type": "object"
+      },
+      "CapacityRow": {
+        "properties": {
+          "callout": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Callout"
+          },
+          "oldest_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest S"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "string"
+          },
+          "pool_id": {
+            "title": "Pool Id",
+            "type": "string"
+          },
+          "ready": {
+            "title": "Ready",
+            "type": "integer"
+          },
+          "runs_on": {
+            "enum": [
+              "docker",
+              "python",
+              "kubernetes"
+            ],
+            "title": "Runs On",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "keeping_up",
+              "short",
+              "no_workers",
+              "healthy"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "suggested": {
+            "title": "Suggested",
+            "type": "integer"
+          },
+          "unroutable_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unroutable Label"
+          },
+          "workers": {
+            "title": "Workers",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pool_id",
+          "pool",
+          "runs_on",
+          "ready",
+          "workers",
+          "suggested",
+          "state"
+        ],
+        "title": "CapacityRow",
+        "type": "object"
+      },
       "CastResolutionRead": {
         "properties": {
           "address": {
@@ -6406,6 +6521,31 @@
           "key"
         ],
         "title": "CountRow",
+        "type": "object"
+      },
+      "CpuPoint": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "cpu": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpu"
+          }
+        },
+        "required": [
+          "at"
+        ],
+        "title": "CpuPoint",
         "type": "object"
       },
       "DagEdge": {
@@ -12877,6 +13017,74 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "HeartbeatIn": {
+        "properties": {
+          "cpu": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpu"
+          },
+          "log": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Log",
+            "type": "array"
+          },
+          "slots_busy": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Slots Busy",
+            "type": "integer"
+          }
+        },
+        "title": "HeartbeatIn",
+        "type": "object"
+      },
+      "HeartbeatOut": {
+        "properties": {
+          "credential": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential"
+          },
+          "drain": {
+            "title": "Drain",
+            "type": "boolean"
+          },
+          "state": {
+            "enum": [
+              "starting",
+              "busy",
+              "idle",
+              "draining",
+              "lost",
+              "stopped"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "drain"
+        ],
+        "title": "HeartbeatOut",
+        "type": "object"
+      },
       "HeldBy": {
         "description": "Who holds a policy, counted by the engine.",
         "properties": {
@@ -13784,6 +13992,504 @@
         "title": "Insights",
         "type": "object"
       },
+      "JoinCheck": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "fix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fix"
+          },
+          "key": {
+            "enum": [
+              "token",
+              "engine",
+              "plugins",
+              "labels",
+              "heartbeat"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "waiting",
+              "ok",
+              "failed"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "state"
+        ],
+        "title": "JoinCheck",
+        "type": "object"
+      },
+      "JoinIn": {
+        "properties": {
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "node": {
+            "default": "",
+            "title": "Node",
+            "type": "string"
+          },
+          "plugins": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Plugins",
+            "type": "array"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "string"
+          },
+          "slots": {
+            "anyOf": [
+              {
+                "maximum": 256.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slots"
+          },
+          "version": {
+            "default": "",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pool"
+        ],
+        "title": "JoinIn",
+        "type": "object"
+      },
+      "JoinOut": {
+        "properties": {
+          "credential": {
+            "title": "Credential",
+            "type": "string"
+          },
+          "heartbeat_s": {
+            "title": "Heartbeat S",
+            "type": "integer"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "lease_wait_s": {
+            "title": "Lease Wait S",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "string"
+          },
+          "slots": {
+            "title": "Slots",
+            "type": "integer"
+          },
+          "worker_id": {
+            "title": "Worker Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "worker_id",
+          "name",
+          "pool",
+          "labels",
+          "slots",
+          "credential",
+          "heartbeat_s",
+          "lease_wait_s"
+        ],
+        "title": "JoinOut",
+        "type": "object"
+      },
+      "JoinStatus": {
+        "description": "``GET /workers/join-tokens/{id}/status`` \u2014 the *Joined* step's live checks.",
+        "properties": {
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/JoinCheck"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "token_id": {
+            "title": "Token Id",
+            "type": "string"
+          },
+          "waiting_s": {
+            "title": "Waiting S",
+            "type": "integer"
+          },
+          "worker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worker"
+          },
+          "worker_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worker Id"
+          }
+        },
+        "required": [
+          "token_id",
+          "checks",
+          "waiting_s"
+        ],
+        "title": "JoinStatus",
+        "type": "object"
+      },
+      "JoinTokenCreated": {
+        "properties": {
+          "cap": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cap"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "engine_url": {
+            "title": "Engine Url",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "joins": {
+            "title": "Joins",
+            "type": "integer"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "made_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made By"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "string"
+          },
+          "pool_id": {
+            "title": "Pool Id",
+            "type": "string"
+          },
+          "revoked": {
+            "default": false,
+            "title": "Revoked",
+            "type": "boolean"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "display",
+          "pool_id",
+          "pool",
+          "joins",
+          "created_at",
+          "token",
+          "engine_url"
+        ],
+        "title": "JoinTokenCreated",
+        "type": "object"
+      },
+      "JoinTokenIn": {
+        "properties": {
+          "cap": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cap"
+          },
+          "expires_in_days": {
+            "anyOf": [
+              {
+                "maximum": 365.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 7,
+            "title": "Expires In Days"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "pool_id": {
+            "title": "Pool Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pool_id"
+        ],
+        "title": "JoinTokenIn",
+        "type": "object"
+      },
+      "JoinTokenPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/JoinTokenRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "JoinTokenPage",
+        "type": "object"
+      },
+      "JoinTokenRow": {
+        "properties": {
+          "cap": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cap"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "joins": {
+            "title": "Joins",
+            "type": "integer"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "made_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made By"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "string"
+          },
+          "pool_id": {
+            "title": "Pool Id",
+            "type": "string"
+          },
+          "revoked": {
+            "default": false,
+            "title": "Revoked",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "display",
+          "pool_id",
+          "pool",
+          "joins",
+          "created_at"
+        ],
+        "title": "JoinTokenRow",
+        "type": "object"
+      },
       "LLMCredentialKind": {
         "description": "Disambiguates what ``api_key_encrypted`` holds for ``claude_agent_sdk`` rows\n(docs/for-developers/modules/agents/features/providers-and-models.md).\n\nMeaningless for every other provider kind, where the column is always an API key.",
         "enum": [
@@ -14246,6 +14952,53 @@
           "rows"
         ],
         "title": "LayerTally",
+        "type": "object"
+      },
+      "Lease": {
+        "properties": {
+          "envelope": {
+            "title": "Envelope",
+            "type": "string"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "job_id",
+          "envelope"
+        ],
+        "title": "Lease",
+        "type": "object"
+      },
+      "LeaseIn": {
+        "properties": {
+          "free": {
+            "default": 1,
+            "maximum": 256.0,
+            "minimum": 1.0,
+            "title": "Free",
+            "type": "integer"
+          }
+        },
+        "title": "LeaseIn",
+        "type": "object"
+      },
+      "LeaseOut": {
+        "properties": {
+          "leases": {
+            "items": {
+              "$ref": "#/components/schemas/Lease"
+            },
+            "title": "Leases",
+            "type": "array"
+          }
+        },
+        "required": [
+          "leases"
+        ],
+        "title": "LeaseOut",
         "type": "object"
       },
       "LedgerActorRead": {
@@ -18259,6 +19012,50 @@
         "title": "Origin",
         "type": "string"
       },
+      "OutcomeIn": {
+        "properties": {
+          "artifacts": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "idempotency_key": {
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "integer"
+          },
+          "outcome": {
+            "additionalProperties": true,
+            "title": "Outcome",
+            "type": "object"
+          }
+        },
+        "required": [
+          "job_id",
+          "idempotency_key",
+          "outcome"
+        ],
+        "title": "OutcomeIn",
+        "type": "object"
+      },
       "Overview": {
         "properties": {
           "attention": {
@@ -21303,6 +22100,477 @@
           "limit_count"
         ],
         "title": "PolicyVersionRead",
+        "type": "object"
+      },
+      "PoolIn": {
+        "properties": {
+          "egress": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Egress",
+            "type": "array"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "name": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "title": "Name",
+            "type": "string"
+          },
+          "plugins": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Plugins",
+            "type": "array"
+          },
+          "runs_on": {
+            "default": "python",
+            "enum": [
+              "docker",
+              "python",
+              "kubernetes"
+            ],
+            "title": "Runs On",
+            "type": "string"
+          },
+          "secrets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Secrets",
+            "type": "array"
+          },
+          "slots_per_worker": {
+            "default": 4,
+            "maximum": 256.0,
+            "minimum": 1.0,
+            "title": "Slots Per Worker",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "PoolIn",
+        "type": "object"
+      },
+      "PoolPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PoolRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "PoolPage",
+        "type": "object"
+      },
+      "PoolPatch": {
+        "properties": {
+          "egress": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Egress"
+          },
+          "labels": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Labels"
+          },
+          "plugins": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plugins"
+          },
+          "replicas": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replicas"
+          },
+          "secrets": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secrets"
+          },
+          "slots_per_worker": {
+            "anyOf": [
+              {
+                "maximum": 256.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slots Per Worker"
+          }
+        },
+        "title": "PoolPatch",
+        "type": "object"
+      },
+      "PoolRow": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "egress": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Egress",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "lost": {
+            "title": "Lost",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "oldest_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest S"
+          },
+          "plugins": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Plugins",
+            "type": "array"
+          },
+          "queued": {
+            "title": "Queued",
+            "type": "integer"
+          },
+          "replicas": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replicas"
+          },
+          "runs_on": {
+            "enum": [
+              "docker",
+              "python",
+              "kubernetes"
+            ],
+            "title": "Runs On",
+            "type": "string"
+          },
+          "runs_on_detail": {
+            "title": "Runs On Detail",
+            "type": "string"
+          },
+          "secrets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Secrets",
+            "type": "array"
+          },
+          "set_by": {
+            "enum": [
+              "hand",
+              "replicas"
+            ],
+            "title": "Set By",
+            "type": "string"
+          },
+          "slots": {
+            "title": "Slots",
+            "type": "integer"
+          },
+          "slots_busy": {
+            "title": "Slots Busy",
+            "type": "integer"
+          },
+          "slots_per_worker": {
+            "title": "Slots Per Worker",
+            "type": "integer"
+          },
+          "starting": {
+            "title": "Starting",
+            "type": "integer"
+          },
+          "state": {
+            "enum": [
+              "keeping_up",
+              "short",
+              "no_workers",
+              "healthy"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "workers": {
+            "title": "Workers",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "runs_on",
+          "runs_on_detail",
+          "labels",
+          "slots_per_worker",
+          "plugins",
+          "secrets",
+          "egress",
+          "set_by",
+          "workers",
+          "starting",
+          "lost",
+          "slots",
+          "slots_busy",
+          "queued",
+          "state",
+          "created_at"
+        ],
+        "title": "PoolRow",
+        "type": "object"
+      },
+      "PoolTotals": {
+        "description": "The Pools page tiles \u2014 every number from the latest ``worker_stats`` rows.",
+        "properties": {
+          "busy_pct": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Busy Pct"
+          },
+          "envelopes_a_minute": {
+            "title": "Envelopes A Minute",
+            "type": "integer"
+          },
+          "envelopes_vs_7d_pct": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Envelopes Vs 7D Pct"
+          },
+          "lost": {
+            "title": "Lost",
+            "type": "integer"
+          },
+          "lost_24h": {
+            "title": "Lost 24H",
+            "type": "integer"
+          },
+          "lost_24h_last": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lost 24H Last"
+          },
+          "oldest_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest S"
+          },
+          "queued": {
+            "title": "Queued",
+            "type": "integer"
+          },
+          "slots": {
+            "title": "Slots",
+            "type": "integer"
+          },
+          "slots_busy": {
+            "title": "Slots Busy",
+            "type": "integer"
+          },
+          "starting": {
+            "title": "Starting",
+            "type": "integer"
+          },
+          "workers": {
+            "title": "Workers",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "workers",
+          "starting",
+          "lost",
+          "slots",
+          "slots_busy",
+          "queued",
+          "envelopes_a_minute",
+          "lost_24h"
+        ],
+        "title": "PoolTotals",
+        "type": "object"
+      },
+      "PoolsOverview": {
+        "description": "``GET /workers/overview`` \u2014 the Pools tab's tiles and its *Workers \u00b7 last 30 min* chart.",
+        "properties": {
+          "executor": {
+            "enum": [
+              "inline",
+              "procrastinate"
+            ],
+            "title": "Executor",
+            "type": "string"
+          },
+          "marks": {
+            "items": {
+              "$ref": "#/components/schemas/SeriesMark"
+            },
+            "title": "Marks",
+            "type": "array"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/SeriesPoint"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/PoolTotals"
+          }
+        },
+        "required": [
+          "executor",
+          "totals",
+          "series",
+          "marks"
+        ],
+        "title": "PoolsOverview",
         "type": "object"
       },
       "PreviewRequest": {
@@ -25326,6 +26594,57 @@
         "title": "RunTouched",
         "type": "object"
       },
+      "RunningStep": {
+        "properties": {
+          "agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent"
+          },
+          "for_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "For S"
+          },
+          "function": {
+            "title": "Function",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "run_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Number"
+          }
+        },
+        "required": [
+          "function",
+          "run_id"
+        ],
+        "title": "RunningStep",
+        "type": "object"
+      },
       "ScheduleCreate": {
         "properties": {
           "agent": {
@@ -26327,6 +27646,44 @@
         ],
         "title": "Sensitivity",
         "type": "string"
+      },
+      "SeriesMark": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "at",
+          "label"
+        ],
+        "title": "SeriesMark",
+        "type": "object"
+      },
+      "SeriesPoint": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "workers": {
+            "title": "Workers",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "at",
+          "workers"
+        ],
+        "title": "SeriesPoint",
+        "type": "object"
       },
       "ServedPage": {
         "properties": {
@@ -34544,6 +35901,537 @@
           "message"
         ],
         "title": "WarningRead",
+        "type": "object"
+      },
+      "WorkerDetail": {
+        "description": "``GET /workers/{id}`` \u2014 C4.",
+        "properties": {
+          "cpu": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpu"
+          },
+          "cpu_series": {
+            "items": {
+              "$ref": "#/components/schemas/CpuPoint"
+            },
+            "title": "Cpu Series",
+            "type": "array"
+          },
+          "failed_1h": {
+            "title": "Failed 1H",
+            "type": "integer"
+          },
+          "from_ip": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Ip"
+          },
+          "heartbeat_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heartbeat S"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "joined_at": {
+            "format": "date-time",
+            "title": "Joined At",
+            "type": "string"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "log": {
+            "items": {
+              "$ref": "#/components/schemas/WorkerLogLine"
+            },
+            "title": "Log",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "node": {
+            "title": "Node",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "string"
+          },
+          "pool_id": {
+            "title": "Pool Id",
+            "type": "string"
+          },
+          "running": {
+            "items": {
+              "$ref": "#/components/schemas/RunningStep"
+            },
+            "title": "Running",
+            "type": "array"
+          },
+          "slots": {
+            "title": "Slots",
+            "type": "integer"
+          },
+          "slots_busy": {
+            "title": "Slots Busy",
+            "type": "integer"
+          },
+          "state": {
+            "enum": [
+              "starting",
+              "busy",
+              "idle",
+              "draining",
+              "lost",
+              "stopped"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "steps_1h": {
+            "title": "Steps 1H",
+            "type": "integer"
+          },
+          "up_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Up S"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "pool_id",
+          "pool",
+          "name",
+          "node",
+          "version",
+          "labels",
+          "state",
+          "running",
+          "slots",
+          "slots_busy",
+          "joined_at",
+          "steps_1h",
+          "failed_1h",
+          "cpu_series",
+          "log"
+        ],
+        "title": "WorkerDetail",
+        "type": "object"
+      },
+      "WorkerEventPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WorkerEventRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "WorkerEventPage",
+        "type": "object"
+      },
+      "WorkerEventRow": {
+        "properties": {
+          "actor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "change": {
+            "enum": [
+              "joined",
+              "lost",
+              "drained",
+              "stopped",
+              "replicas"
+            ],
+            "title": "Change",
+            "type": "string"
+          },
+          "change_text": {
+            "title": "Change Text",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "string"
+          },
+          "pool_id": {
+            "title": "Pool Id",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          },
+          "worker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worker"
+          }
+        },
+        "required": [
+          "id",
+          "at",
+          "pool_id",
+          "pool",
+          "change",
+          "change_text",
+          "why"
+        ],
+        "title": "WorkerEventRow",
+        "type": "object"
+      },
+      "WorkerLogLine": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "line": {
+            "title": "Line",
+            "type": "string"
+          }
+        },
+        "required": [
+          "at",
+          "line"
+        ],
+        "title": "WorkerLogLine",
+        "type": "object"
+      },
+      "WorkerPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/WorkerStateCounts"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WorkerRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total",
+          "counts"
+        ],
+        "title": "WorkerPage",
+        "type": "object"
+      },
+      "WorkerRow": {
+        "properties": {
+          "cpu": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpu"
+          },
+          "from_ip": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Ip"
+          },
+          "heartbeat_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heartbeat S"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "joined_at": {
+            "format": "date-time",
+            "title": "Joined At",
+            "type": "string"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "node": {
+            "title": "Node",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "string"
+          },
+          "pool_id": {
+            "title": "Pool Id",
+            "type": "string"
+          },
+          "running": {
+            "items": {
+              "$ref": "#/components/schemas/RunningStep"
+            },
+            "title": "Running",
+            "type": "array"
+          },
+          "slots": {
+            "title": "Slots",
+            "type": "integer"
+          },
+          "slots_busy": {
+            "title": "Slots Busy",
+            "type": "integer"
+          },
+          "state": {
+            "enum": [
+              "starting",
+              "busy",
+              "idle",
+              "draining",
+              "lost",
+              "stopped"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "up_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Up S"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "pool_id",
+          "pool",
+          "name",
+          "node",
+          "version",
+          "labels",
+          "state",
+          "running",
+          "slots",
+          "slots_busy",
+          "joined_at"
+        ],
+        "title": "WorkerRow",
+        "type": "object"
+      },
+      "WorkerStateCounts": {
+        "properties": {
+          "all": {
+            "title": "All",
+            "type": "integer"
+          },
+          "busy": {
+            "title": "Busy",
+            "type": "integer"
+          },
+          "idle": {
+            "title": "Idle",
+            "type": "integer"
+          },
+          "lost": {
+            "title": "Lost",
+            "type": "integer"
+          },
+          "starting": {
+            "title": "Starting",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "all",
+          "busy",
+          "idle",
+          "starting",
+          "lost"
+        ],
+        "title": "WorkerStateCounts",
         "type": "object"
       },
       "WorldImpactRead": {
@@ -64400,6 +66288,749 @@
         "summary": "Start Task",
         "tags": [
           "tasks"
+        ]
+      }
+    },
+    "/api/v1/workers/capacity": {
+      "get": {
+        "operationId": "capacity_api_v1_workers_capacity_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capacity"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Capacity",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/events": {
+      "get": {
+        "operationId": "list_events_api_v1_workers_events_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerEventPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Events",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/heartbeat": {
+      "post": {
+        "operationId": "heartbeat_api_v1_workers_heartbeat_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HeartbeatIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HeartbeatOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Heartbeat",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/join": {
+      "post": {
+        "description": "A join token becomes a worker credential.",
+        "operationId": "join_api_v1_workers_join_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JoinOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Join",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/join-tokens": {
+      "get": {
+        "operationId": "list_join_tokens_api_v1_workers_join_tokens_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JoinTokenPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Join Tokens",
+        "tags": [
+          "workers"
+        ]
+      },
+      "post": {
+        "description": "Mint a join token; the response carries the secret, once.",
+        "operationId": "create_join_token_api_v1_workers_join_tokens_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinTokenIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JoinTokenCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Join Token",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/join-tokens/{token_id}": {
+      "delete": {
+        "operationId": "revoke_join_token_api_v1_workers_join_tokens__token_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token_id",
+            "required": true,
+            "schema": {
+              "title": "Token Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Revoke Join Token",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/join-tokens/{token_id}/status": {
+      "get": {
+        "operationId": "join_status_api_v1_workers_join_tokens__token_id__status_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token_id",
+            "required": true,
+            "schema": {
+              "title": "Token Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JoinStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Join Status",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/lease": {
+      "post": {
+        "description": "Long-polls; ``204`` when nothing was ready.",
+        "operationId": "lease_api_v1_workers_lease_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeaseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaseOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "204": {
+            "description": "nothing ready"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Lease",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/outcome": {
+      "post": {
+        "operationId": "outcome_api_v1_workers_outcome_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OutcomeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Outcome",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/overview": {
+      "get": {
+        "operationId": "overview_api_v1_workers_overview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoolsOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Overview",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/pools": {
+      "get": {
+        "operationId": "list_pools_api_v1_workers_pools_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoolPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Pools",
+        "tags": [
+          "workers"
+        ]
+      },
+      "post": {
+        "operationId": "create_pool_api_v1_workers_pools_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PoolIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoolRow"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Pool",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/pools/{pool_id}": {
+      "get": {
+        "operationId": "get_pool_api_v1_workers_pools__pool_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pool_id",
+            "required": true,
+            "schema": {
+              "title": "Pool Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoolRow"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Pool",
+        "tags": [
+          "workers"
+        ]
+      },
+      "patch": {
+        "operationId": "update_pool_api_v1_workers_pools__pool_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pool_id",
+            "required": true,
+            "schema": {
+              "title": "Pool Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PoolPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoolRow"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Pool",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/pools/{pool_id}/drain": {
+      "post": {
+        "operationId": "drain_pool_api_v1_workers_pools__pool_id__drain_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pool_id",
+            "required": true,
+            "schema": {
+              "title": "Pool Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Drain Pool",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/workers": {
+      "get": {
+        "operationId": "list_workers_api_v1_workers_workers_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Workers",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/workers/{worker_id}": {
+      "get": {
+        "operationId": "get_worker_api_v1_workers_workers__worker_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "worker_id",
+            "required": true,
+            "schema": {
+              "title": "Worker Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Worker",
+        "tags": [
+          "workers"
+        ]
+      }
+    },
+    "/api/v1/workers/workers/{worker_id}/drain": {
+      "post": {
+        "operationId": "drain_worker_api_v1_workers_workers__worker_id__drain_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "worker_id",
+            "required": true,
+            "schema": {
+              "title": "Worker Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Drain Worker",
+        "tags": [
+          "workers"
         ]
       }
     },

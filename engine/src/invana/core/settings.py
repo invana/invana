@@ -118,9 +118,9 @@ class Settings(BaseSettings):
     run_history_limit: int = 500  # INVANA_RUN_HISTORY_LIMIT
 
     # Where a tool step runs: `inline` in this process, or `procrastinate` — deferred to the
-    # `tools` queue and run by `invana worker` (docs/for-developers/modules/platform/features/tool-plugins.md).
+    # `tools.<labels>` queues and leased by `invana worker` through the worker gateway
+    # (docs/for-developers/modules/agents/features/workers.md).
     executor: Literal["inline", "procrastinate"] = "inline"  # INVANA_EXECUTOR
-    worker_concurrency: int = Field(default=4, ge=1)  # INVANA_WORKER_CONCURRENCY — jobs one worker runs at once
 
     # CORS — comma-separated allowed origins; use * for development only
     cors_origins: list[str] = ["http://localhost:8300", "http://127.0.0.1:8300"]

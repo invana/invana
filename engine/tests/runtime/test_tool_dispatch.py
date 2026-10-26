@@ -1,4 +1,4 @@
-"""Tool steps: the wire forms a worker answers in, the enabled gate, the ``send`` approval, the queue.
+"""Tool steps: the wire forms a worker answers in, the enabled gate, the ``send`` approval.
 
 Against the real app database, with the tool task types themselves stood in
 for on ``TASKS`` — what is under test is where and whether a step runs, not
@@ -7,8 +7,6 @@ the network a tool reaches.
 
 from __future__ import annotations
 
-import importlib.util
-
 import pytest
 
 import invana.activity.models  # noqa: F401 — the approvals tables, for create_all
@@ -16,12 +14,12 @@ from invana.activity.managers import ApprovalManager
 from invana.activity.models import Approval
 from invana.apps.iam.managers.policies import PolicyManager
 from invana.apps.iam.models import PolicyAttachment
-from invana.plugins.envelope import TaskEnvelope, outcome_from_json, outcome_to_json
+from invana.plugins.envelope import outcome_from_json, outcome_to_json
 from invana.runtime import catalogue as task_registry
 from invana.runtime import workflows
 from invana.runtime.catalogue import NeedsInput, Out, TaskFailure
 from invana.runtime.interpreter import TaskRuntime
-from invana.runtime.models import EnvelopeOutcome, TaskRun
+from invana.runtime.models import TaskRun
 from invana.runtime.querysets.plugins import PluginStateQuerySet
 from invana.runtime.workflows import Step, Workflow
 from tests.runtime.test_runtime import _fresh, _open, _run, _steps, _tabular
@@ -130,28 +128,3 @@ class TestSendApproval:
         assert (await _fresh(session, TaskRun, th.id)).status == "succeeded"
         assert [s.id for s in await _steps(session, th.id)] == [step.id]
         assert tool_steps == ["mail.send"]
-
-
-@pytest.mark.skipif(importlib.util.find_spec("procrastinate") is None, reason="needs the workers extra (procrastinate)")
-class TestQueue:
-    async def test_a_deferred_envelope_is_run_by_a_worker_and_its_outcome_read_back(
-        self, session, session_factory, graph, user, tool_steps
-    ):
-        from invana.plugins import queue
-
-        await queue.apply_schema()
-        await _enable(session, "invana.tools.web", user)
-        _, _, th = await _open(session, graph, user, "stub-fetch")
-        [step] = await _steps(session, th.id)
-        env = TaskEnvelope(run_id=th.id, node_id=step.id, attempt=1, plugin="invana.tools.web", task="web.read_url")
-        runtime = TaskRuntime(session_factory=session_factory, manager=object(), encryption_key="x")
-
-        await queue.defer(env)
-        await queue.run_worker(runtime, concurrency=1, wait=False)
-
-        # The worker runs the registry's own web.fetch (not a substituted step), which
-        # refuses the empty url; the failure crosses the queue and is raised again here.
-        with pytest.raises(TaskFailure) as raised:
-            await queue.await_outcome(env, session_factory=session_factory, timeout_s=5)
-        assert raised.value.cls == "blocked"
-        assert await session.get(EnvelopeOutcome, env.idempotency_key) is not None

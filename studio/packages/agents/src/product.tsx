@@ -17,6 +17,7 @@
  * | Connections | `/agents/connections/server` | This Graph's server · `mcp` |
  * | LLMs | `/agents/llms[/:provider]` | — an endpoint opens in a modal |
  * | Runs | `/agents/runs` | — a run opens as a tab (`?page=run:<id>`) |
+ * | Workers | `/agents/workers` | Pools · `workers` · `capacity` · `tokens` — a pool or worker opens as a tab |
  * | Approvals | `/agents/approvals` | Waiting · `alerts` |
  * | Ledger | `/agents/ledger` | Rows · `actor` · `record` · `refusals` · `export` |
  * | Settings | `/agents/settings` | — |
@@ -79,7 +80,7 @@ export const agents: ProductDefinition = {
 				rail("connections"),
 				rail("llms"),
 			],
-			[rail("runs")],
+			[rail("runs"), rail("workers")],
 			[rail("approvals"), rail("ledger")],
 		],
 		bottom: [rail("concurrency")],
@@ -129,6 +130,7 @@ export const agents: ProductDefinition = {
 				// The endpoint's crumb is its name, which the host reads; the id is no label.
 				level("llms", "LLMs", [level(":provider")]),
 				level("runs", "Runs"),
+				level("workers", "Workers", tabs("workers", "capacity", "tokens")),
 				level("approvals", "Approvals", tabs("alerts")),
 				level(
 					"ledger",

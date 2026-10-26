@@ -1065,6 +1065,9 @@ CREATE TABLE personal_access_tokens (
 	graph_id VARCHAR(36), 
 	policy_id VARCHAR(36), 
 	created_by_id VARCHAR(36), 
+	worker_pool_id VARCHAR(36), 
+	join_cap INTEGER, 
+	joins INTEGER DEFAULT 0 NOT NULL, 
 	CONSTRAINT personal_access_tokens_pkey PRIMARY KEY (id), 
 	CONSTRAINT fk_pat_created_by FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
 	CONSTRAINT fk_pat_graph FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
@@ -1077,6 +1080,8 @@ CREATE INDEX ix_personal_access_tokens_graph_id ON personal_access_tokens (graph
 CREATE UNIQUE INDEX ix_personal_access_tokens_token_hash ON personal_access_tokens (token_hash);
 
 CREATE INDEX ix_personal_access_tokens_user_id ON personal_access_tokens (user_id);
+
+CREATE INDEX ix_personal_access_tokens_worker_pool_id ON personal_access_tokens (worker_pool_id);
 
 CREATE TABLE plugin_states (
 	name VARCHAR(128) NOT NULL, 
@@ -2038,3 +2043,90 @@ CREATE TABLE validation_rules (
 	CONSTRAINT validation_rules_property_key_id_fkey FOREIGN KEY(property_key_id) REFERENCES property_key_definitions (id) ON DELETE CASCADE, 
 	CONSTRAINT validation_rules_type_property_mapping_id_fkey FOREIGN KEY(type_property_mapping_id) REFERENCES type_property_mappings (id) ON DELETE CASCADE
 );
+
+CREATE TABLE worker_events (
+	id VARCHAR(36) NOT NULL, 
+	pool_id VARCHAR(36) NOT NULL, 
+	worker_id VARCHAR(36), 
+	change VARCHAR(16) NOT NULL, 
+	detail JSON NOT NULL, 
+	why TEXT DEFAULT ''::text NOT NULL, 
+	actor_id VARCHAR(36), 
+	at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+	CONSTRAINT worker_events_pkey PRIMARY KEY (id), 
+	CONSTRAINT worker_events_actor_id_fkey FOREIGN KEY(actor_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT worker_events_pool_id_fkey FOREIGN KEY(pool_id) REFERENCES worker_pools (id) ON DELETE CASCADE, 
+	CONSTRAINT worker_events_worker_id_fkey FOREIGN KEY(worker_id) REFERENCES workers (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_worker_events_at ON worker_events (at);
+
+CREATE INDEX ix_worker_events_pool_id ON worker_events (pool_id);
+
+CREATE TABLE worker_pools (
+	id VARCHAR(36) NOT NULL, 
+	name VARCHAR(64) NOT NULL, 
+	runs_on VARCHAR(16) DEFAULT 'python'::character varying NOT NULL, 
+	labels JSON NOT NULL, 
+	slots_per_worker INTEGER DEFAULT 4 NOT NULL, 
+	plugins JSON NOT NULL, 
+	secrets JSON NOT NULL, 
+	egress JSON NOT NULL, 
+	set_by VARCHAR(16) DEFAULT 'hand'::character varying NOT NULL, 
+	replicas INTEGER, 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+	CONSTRAINT worker_pools_pkey PRIMARY KEY (id), 
+	CONSTRAINT worker_pools_created_by_id_fkey FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT worker_pools_name_key UNIQUE NULLS DISTINCT (name)
+);
+
+CREATE TABLE worker_stats (
+	pool_id VARCHAR(36) NOT NULL, 
+	at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	workers INTEGER DEFAULT 0 NOT NULL, 
+	starting INTEGER DEFAULT 0 NOT NULL, 
+	lost INTEGER DEFAULT 0 NOT NULL, 
+	slots INTEGER DEFAULT 0 NOT NULL, 
+	slots_busy INTEGER DEFAULT 0 NOT NULL, 
+	ready INTEGER DEFAULT 0 NOT NULL, 
+	oldest_s INTEGER, 
+	envelopes INTEGER DEFAULT 0 NOT NULL, 
+	suggested INTEGER DEFAULT 0 NOT NULL, 
+	CONSTRAINT worker_stats_pkey PRIMARY KEY (pool_id, at), 
+	CONSTRAINT worker_stats_pool_id_fkey FOREIGN KEY(pool_id) REFERENCES worker_pools (id) ON DELETE CASCADE
+);
+
+CREATE TABLE workers (
+	id VARCHAR(36) NOT NULL, 
+	pool_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(64) NOT NULL, 
+	node VARCHAR(255) DEFAULT ''::character varying NOT NULL, 
+	version VARCHAR(32) DEFAULT ''::character varying NOT NULL, 
+	labels JSON NOT NULL, 
+	plugins JSON NOT NULL, 
+	slots INTEGER DEFAULT 4 NOT NULL, 
+	state VARCHAR(16) DEFAULT 'starting'::character varying NOT NULL, 
+	slots_busy INTEGER DEFAULT 0 NOT NULL, 
+	cpu DOUBLE PRECISION, 
+	credential_hash VARCHAR(64) NOT NULL, 
+	previous_credential_hash VARCHAR(64), 
+	credential_rotated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+	queue_worker_id BIGINT, 
+	joined_via VARCHAR(36), 
+	joined_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+	last_heartbeat_at TIMESTAMP WITH TIME ZONE, 
+	from_ip VARCHAR(64), 
+	redelivered INTEGER DEFAULT 0 NOT NULL, 
+	CONSTRAINT workers_pkey PRIMARY KEY (id), 
+	CONSTRAINT workers_joined_via_fkey FOREIGN KEY(joined_via) REFERENCES personal_access_tokens (id) ON DELETE SET NULL, 
+	CONSTRAINT workers_pool_id_fkey FOREIGN KEY(pool_id) REFERENCES worker_pools (id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX ix_workers_credential_hash ON workers (credential_hash);
+
+CREATE INDEX ix_workers_pool_id ON workers (pool_id);
+
+CREATE INDEX ix_workers_previous_credential_hash ON workers (previous_credential_hash);
+
+CREATE INDEX ix_workers_state ON workers (state);

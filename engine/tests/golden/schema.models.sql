@@ -1058,6 +1058,9 @@ CREATE TABLE personal_access_tokens (
 	graph_id VARCHAR(36), 
 	policy_id VARCHAR(36), 
 	created_by_id VARCHAR(36), 
+	worker_pool_id VARCHAR(36), 
+	join_cap INTEGER, 
+	joins INTEGER DEFAULT '0' NOT NULL, 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_pat_user_name UNIQUE (user_id, name), 
 	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, 
@@ -1070,6 +1073,8 @@ CREATE INDEX ix_personal_access_tokens_graph_id ON personal_access_tokens (graph
 CREATE UNIQUE INDEX ix_personal_access_tokens_token_hash ON personal_access_tokens (token_hash);
 
 CREATE INDEX ix_personal_access_tokens_user_id ON personal_access_tokens (user_id);
+
+CREATE INDEX ix_personal_access_tokens_worker_pool_id ON personal_access_tokens (worker_pool_id);
 
 CREATE TABLE plugin_states (
 	name VARCHAR(128) NOT NULL, 
@@ -2025,3 +2030,90 @@ CREATE TABLE validation_rules (
 	FOREIGN KEY(property_key_id) REFERENCES property_key_definitions (id) ON DELETE CASCADE, 
 	FOREIGN KEY(type_property_mapping_id) REFERENCES type_property_mappings (id) ON DELETE CASCADE
 );
+
+CREATE TABLE worker_events (
+	id VARCHAR(36) NOT NULL, 
+	pool_id VARCHAR(36) NOT NULL, 
+	worker_id VARCHAR(36), 
+	change VARCHAR(16) NOT NULL, 
+	detail JSON NOT NULL, 
+	why TEXT NOT NULL, 
+	actor_id VARCHAR(36), 
+	at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(pool_id) REFERENCES worker_pools (id) ON DELETE CASCADE, 
+	FOREIGN KEY(worker_id) REFERENCES workers (id) ON DELETE SET NULL, 
+	FOREIGN KEY(actor_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_worker_events_at ON worker_events (at);
+
+CREATE INDEX ix_worker_events_pool_id ON worker_events (pool_id);
+
+CREATE TABLE worker_pools (
+	id VARCHAR(36) NOT NULL, 
+	name VARCHAR(64) NOT NULL, 
+	runs_on VARCHAR(16) NOT NULL, 
+	labels JSON NOT NULL, 
+	slots_per_worker INTEGER NOT NULL, 
+	plugins JSON NOT NULL, 
+	secrets JSON NOT NULL, 
+	egress JSON NOT NULL, 
+	set_by VARCHAR(16) NOT NULL, 
+	replicas INTEGER, 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (name), 
+	FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE TABLE worker_stats (
+	pool_id VARCHAR(36) NOT NULL, 
+	at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	workers INTEGER NOT NULL, 
+	starting INTEGER NOT NULL, 
+	lost INTEGER NOT NULL, 
+	slots INTEGER NOT NULL, 
+	slots_busy INTEGER NOT NULL, 
+	ready INTEGER NOT NULL, 
+	oldest_s INTEGER, 
+	envelopes INTEGER NOT NULL, 
+	suggested INTEGER NOT NULL, 
+	PRIMARY KEY (pool_id, at), 
+	FOREIGN KEY(pool_id) REFERENCES worker_pools (id) ON DELETE CASCADE
+);
+
+CREATE TABLE workers (
+	id VARCHAR(36) NOT NULL, 
+	pool_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(64) NOT NULL, 
+	node VARCHAR(255) NOT NULL, 
+	version VARCHAR(32) NOT NULL, 
+	labels JSON NOT NULL, 
+	plugins JSON NOT NULL, 
+	slots INTEGER NOT NULL, 
+	state VARCHAR(16) NOT NULL, 
+	slots_busy INTEGER NOT NULL, 
+	cpu FLOAT, 
+	credential_hash VARCHAR(64) NOT NULL, 
+	previous_credential_hash VARCHAR(64), 
+	credential_rotated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	queue_worker_id BIGINT, 
+	joined_via VARCHAR(36), 
+	joined_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	last_heartbeat_at TIMESTAMP WITH TIME ZONE, 
+	from_ip VARCHAR(64), 
+	redelivered INTEGER NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(pool_id) REFERENCES worker_pools (id) ON DELETE CASCADE, 
+	FOREIGN KEY(joined_via) REFERENCES personal_access_tokens (id) ON DELETE SET NULL
+);
+
+CREATE UNIQUE INDEX ix_workers_credential_hash ON workers (credential_hash);
+
+CREATE INDEX ix_workers_pool_id ON workers (pool_id);
+
+CREATE INDEX ix_workers_previous_credential_hash ON workers (previous_credential_hash);
+
+CREATE INDEX ix_workers_state ON workers (state);
