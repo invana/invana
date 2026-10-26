@@ -3,6 +3,7 @@ import { authApi } from "../../services/api/auth";
 import { graphsApi } from "../../services/api/graphs";
 import { useAuthStore } from "../../stores/auth.store";
 import type {
+	GraphConnect,
 	GraphConnectionCreate,
 	GraphCreate,
 	GraphUpdate,
@@ -64,6 +65,25 @@ export function useCreateGraphMutation() {
 			// Refresh user.graphs so the new membership shows up immediately
 			// in the rail — otherwise the just-created graph looks like a
 			// non-member visit until logout/login.
+			await refreshAuthMe();
+		},
+	});
+}
+
+/** Credentials proved before any Graph exists. */
+export function useConnectTestMutation() {
+	return useMutation({
+		mutationFn: (data: GraphConnectionCreate) => graphsApi.connectTest(data),
+	});
+}
+
+/** A new Graph from a database, its model drafted from what the database holds. */
+export function useConnectGraphMutation() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: (data: GraphConnect) => graphsApi.connect(data),
+		onSuccess: async () => {
+			qc.invalidateQueries({ queryKey: GRAPHS_KEY });
 			await refreshAuthMe();
 		},
 	});

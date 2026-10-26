@@ -162,10 +162,6 @@ export interface VersionCreate {
 	based_on?: string | null;
 }
 
-export interface VersionActivate {
-	version?: string | null;
-}
-
 interface ValidationRuleCreate {
 	rule_type:
 		| "range"
@@ -472,10 +468,26 @@ export interface SchemaDiff {
 	added_indexes: string[];
 	removed_indexes: string[];
 	classification: "major" | "minor" | "patch";
+	/** One per type the pair changes — the chips the map draws. */
+	marks: TypeMark[];
+	/** The marks' lines by sign — what the Comparing bar counts. */
+	added: number;
+	changed: number;
+	removed: number;
 }
 
-export interface ModelUpgradeResult extends ModelImportResult {
-	diff: SchemaDiff;
+/** One line of a type's mark: `+` added, `~` changed, `-` removed. */
+export interface MarkLine {
+	sign: "+" | "~" | "-";
+	text: string;
+}
+
+/** What a version pair did to one type. `added`/`removed` are the whole type. */
+export interface TypeMark {
+	type: string;
+	target_kind: "node_type" | "edge_type";
+	mark: "added" | "changed" | "removed";
+	lines: MarkLine[];
 }
 
 export interface StarterSummary {

@@ -21,7 +21,6 @@ import type {
 	ModelImportResult,
 	ModelLink,
 	ModelLinkDeclare,
-	ModelUpgradeResult,
 	NodeTypeCreate,
 	NodeTypeResponse,
 	NodeTypeUpdate,
@@ -43,7 +42,6 @@ import type {
 	StarterSummary,
 	StitchDetail,
 	StitchPreview,
-	VersionActivate,
 	VersionCreate,
 	VersionSummary,
 } from "./types";
@@ -116,17 +114,6 @@ export const modelsApi = {
 		request<GraphVersionResponse>(`${base(u, g)}/${id}/active-version`),
 	createDraft: (u: string, g: string, id: string, data: VersionCreate = {}) =>
 		post(`${base(u, g)}/${id}/versions`, data) as Promise<GraphVersionResponse>,
-	activate: (
-		u: string,
-		g: string,
-		id: string,
-		vid: string,
-		data: VersionActivate = {},
-	) =>
-		post(
-			`${base(u, g)}/${id}/versions/${vid}/activate`,
-			data,
-		) as Promise<GraphVersionResponse>,
 
 	// ── Type authoring (draft versions only) ──────────────────────────────────
 	createNodeType: (
@@ -250,7 +237,7 @@ export const modelsApi = {
 		indexId: string,
 	) => del(`${ver(u, g, id, vid)}/indexes/${indexId}`),
 
-	/** What changed between two published versions (domain-models.md · Surfaces). */
+	/** What `against` → `versionId` changed, each type marked; `versionId` may be the draft. */
 	versionDiff: (
 		u: string,
 		g: string,
@@ -314,12 +301,6 @@ export const modelsApi = {
 			`${base(u, g)}/import/ontology`,
 			body,
 		) as Promise<OntologyImportResult>,
-	upgradeModel: (
-		u: string,
-		g: string,
-		id: string,
-		body: { artefact?: ModelArtefact; starter?: string },
-	) => post(`${base(u, g)}/${id}/upgrade`, body) as Promise<ModelUpgradeResult>,
 
 	// ── Links and the global model (stitch-models.md) ────────────────────────
 	links: (u: string, g: string) =>

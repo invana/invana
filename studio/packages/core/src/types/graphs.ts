@@ -281,6 +281,28 @@ export interface GraphConnectionRead {
 // How the detected/declared DB version relates to the connector's tested window.
 type CompatibilityStatus = "supported" | "untested" | "unsupported" | "unknown";
 
+/** A new Graph from a database (connect-a-database.md); `name` left out reads the database, else the host. */
+export interface GraphConnect extends GraphConnectionCreate {
+	name?: string | null;
+}
+
+/** What connecting made: the Graph, and the draft model read from its database. */
+export interface GraphConnectRead {
+	graph: Graph;
+	model_id: string;
+	/** `node_labels` · `edge_labels` · `indexes` · `constraints`. */
+	discovered: Record<string, number>;
+}
+
+/** A connection test's answer — nothing is recorded. */
+export interface ConnectionTestResult {
+	ok: boolean;
+	latency_ms?: number;
+	error?: string;
+	server_version?: string | null;
+	compatibility_status?: string;
+}
+
 export interface GraphConnectionCreate {
 	uri: string;
 	connector_class: string;

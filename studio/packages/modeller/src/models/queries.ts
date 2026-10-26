@@ -381,6 +381,40 @@ export const useCommitDraftMutation = (u: string, g: string) =>
 // ── Publish review (publish-review.md) ─────────────────────────────────────
 
 /** Additive or breaking — read when the Publish confirm opens, and by the compare bar. */
+/**
+ * What `against` → `to` did, with each changed type's mark — the map's chips
+ * and the Comparing bar's counts. `to` may be the draft's id; `against` left
+ * out reads the version before `to`.
+ */
+export function useVersionDiffQuery(
+	username?: string,
+	graphSlug?: string,
+	modelId?: string,
+	to?: string,
+	against?: string,
+) {
+	return useQuery({
+		queryKey: [
+			"models",
+			username,
+			graphSlug,
+			modelId,
+			"diff",
+			to,
+			against ?? null,
+		] as const,
+		queryFn: () =>
+			modelsApi.versionDiff(
+				username as string,
+				graphSlug as string,
+				modelId as string,
+				to as string,
+				against,
+			),
+		enabled: !!username && !!graphSlug && !!modelId && !!to,
+	});
+}
+
 export function useDraftReviewQuery(
 	username: string,
 	graphSlug: string,

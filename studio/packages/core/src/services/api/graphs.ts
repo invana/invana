@@ -1,7 +1,10 @@
 import type {
+	ConnectionTestResult,
 	Graph,
+	GraphConnect,
 	GraphConnectionCreate,
 	GraphConnectionRead,
+	GraphConnectRead,
 	GraphContention,
 	GraphCreate,
 	GraphListResponse,
@@ -19,6 +22,20 @@ export const graphsApi = {
 		request<GraphListResponse>(
 			`/api/v1/graphs${includeArchived ? "?include_archived=true" : ""}`,
 		),
+
+	/** Prove credentials before any Graph exists — recorded nowhere. */
+	connectTest: (data: GraphConnectionCreate) =>
+		request<ConnectionTestResult>("/api/v1/graphs/connect/test", {
+			method: "POST",
+			body: JSON.stringify(data),
+		}),
+
+	/** Test, make the Graph, save its connection and draft a model from the database. */
+	connect: (data: GraphConnect) =>
+		request<GraphConnectRead>("/api/v1/graphs/connect", {
+			method: "POST",
+			body: JSON.stringify(data),
+		}),
 
 	get: (username: string, graphSlug: string) =>
 		request<Graph>(`/api/v1/u/${username}/${graphSlug}`),
@@ -115,17 +132,13 @@ export const graphsApi = {
 		graphSlug: string,
 		data: GraphConnectionCreate,
 	) =>
-		request<{
-			ok: boolean;
-			latency_ms?: number;
-			error?: string;
-			// Auto-detected from the database at test time (docs/for-developers/modules/graph-connectors/features/capabilities.md).
-			server_version?: string | null;
-			compatibility_status?: string;
-		}>(`/api/v1/u/${username}/${graphSlug}/connection/test`, {
-			method: "POST",
-			body: JSON.stringify(data),
-		}),
+		request<ConnectionTestResult>(
+			`/api/v1/u/${username}/${graphSlug}/connection/test`,
+			{
+				method: "POST",
+				body: JSON.stringify(data),
+			},
+		),
 
 	/** The Graph's ceiling, and what it is holding back right now. */
 	contention: (username: string, graphSlug: string) =>
