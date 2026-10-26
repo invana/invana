@@ -123,7 +123,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | F05 | Runs · approvals · ledger · assistant | engine+studio | F04 | `feat/agents-fabric` | done | 2026-10-25 | gates green · design review passed |
 | I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | I02 | Connections in | engine+studio | I01 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
-| F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | in progress | 2026-10-26 | Session 4 — step 5d done: decisions WK22–WK27, goldens, live6 compared, e2e and gates green (Studio check-types bar the peer's canvas-ui `.d.ts`); ready for the driver's gates and review |
+| F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | blocked | 2026-10-26 | failed after 3 fix rounds — see .migration-cache/F06/ |
 
 ## Hand-off notes
 
