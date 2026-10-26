@@ -59,14 +59,21 @@ async def test_a_range_refuses_a_record_naming_it_and_a_flagging_standard_lets_i
     await manager.set(
         session,
         version=version,
-        body=PropertyConstraintSet(type="Variety", property="maturity_days", kind="range", min=80, max=180, unit="days"),
+        body=PropertyConstraintSet(
+            type="Variety", property="maturity_days", kind="range", min=80, max=180, unit="days"
+        ),
     )
     version = await _reload(session, store, version_id)
     rule = await manager.set(
         session,
         version=version,
         body=PropertyConstraintSet(
-            type="Variety", property="seed_type", kind="standard", standard="icrisat/CO_338", term="Seed type", on_break="flag"
+            type="Variety",
+            property="seed_type",
+            kind="standard",
+            standard="icrisat/CO_338",
+            term="Seed type",
+            on_break="flag",
         ),
     )
     await session.commit()
@@ -93,5 +100,7 @@ async def test_a_range_refuses_a_record_naming_it_and_a_flagging_standard_lets_i
 async def test_a_constraint_the_property_cannot_hold_is_refused(session, store, body: dict, code: str) -> None:
     version = await _reload(session, store, await _draft(session, store))
     with pytest.raises(ValidationError) as caught:
-        await PropertyConstraintManager().set(session, version=version, body=PropertyConstraintSet(type="Variety", **body))
+        await PropertyConstraintManager().set(
+            session, version=version, body=PropertyConstraintSet(type="Variety", **body)
+        )
     assert caught.value.detail["error"] == code
