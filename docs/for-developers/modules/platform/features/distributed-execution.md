@@ -117,6 +117,8 @@ procrastinate — and losing a dead worker's envelopes does not depend on the da
 | DE6 | **The engine runs the reaper.** procrastinate does not requeue a dead worker's jobs by itself; the orchestrator retries jobs whose worker has been silent 10 s, with workers heartbeating every 2 s. |
 | DE7 | **Signals and failures cross unchanged.** `NeedsInput`, `CannotAnswer`, `Converse` and `TaskFailure` propagate out of `run_envelope`; the orchestrator decides what they mean. Their wire form is B06b's, with the first step that runs remotely. |
 | DE8 | **Only steps that hand over through outputs run remotely.** A step that reads state an earlier step left on `RunVars` stays inline until that state is an output. |
+| DE9 | **Workers reach procrastinate only through the engine's worker gateway.** A worker on any machine — Python, Docker or a Kubernetes Deployment — long-polls `POST /api/v1/workers/lease` over HTTPS with its pool credential; the engine takes the next job for that pool's queues from procrastinate, takes heartbeats and outcomes back, and runs the reaper. No worker holds a database credential, so scaling out is starting more workers against one engine URL. Hatchet, Temporal and DBOS are compared in [workers-and-orchestration](../../../building-engine/workers-and-orchestration.md). |
+| DE10 | **B2–B5 of the executor benchmark are the gateway's acceptance tests.** Dial-out with no database route, the 700-agent run, a killed worker and a killed orchestrator are measured as part of F06; a failure that the gateway cannot close reopens the executor choice. Orchestrator take-over after a crash is scale-out work (a leased orchestrator), not F06's. |
 
 ## Engine
 

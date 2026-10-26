@@ -8,7 +8,7 @@ other machines that **dial out over HTTPS with no database access**, pools route
 lost after 30 s of silence, and — from [scale-out](../../products/scale-out.md) — durable runs and
 orchestrators that can die. This page sets six candidates against that, and the benchmark that decides.
 
-**Status: options, for decision.** The choice lands in 13.11 as a decision; F06 builds it.
+**Status: decided — procrastinate + an engine-run worker gateway** (13.11 DE9 · DE10); F06 builds it.
 
 ## What the choice must carry
 
@@ -74,9 +74,9 @@ gateway**, **Hatchet**, **Temporal**, **DBOS + gateway**. Restate and Argo are o
 Machine and settings as 13.11 (one laptop, Postgres 18 in Docker; Hatchet and Temporal on their
 documented Docker Compose with Postgres). No graph database is touched and no model is called.
 
-## The decision to make
+## The decision
 
-| Question | Options | Recommendation |
+| Question | Options | Chosen |
 |---|---|---|
 | Which executor carries workers and, later, scale-out? | procrastinate + gateway · Hatchet · Temporal · DBOS + gateway | **procrastinate + gateway**, unless B5 or B3 shows a gap the gateway cannot close |
 | Run the benchmark before building, or build on the recommendation and benchmark B2–B5 as the first F06 step? | benchmark first · build and measure | **Build and measure** — procrastinate is already in the engine and measured on B1; B2–B5 are its acceptance tests, and a failure there reopens this page |

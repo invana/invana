@@ -99,8 +99,8 @@ The *Workers* tab of the Workers page lists every worker across pools (C3's tabl
 
 ## Engine
 
-The shapes below are the contract whichever executor carries the queue; the executor itself is the
-open decision in [workers-and-orchestration](../../../building-engine/workers-and-orchestration.md).
+The queue is procrastinate behind the engine's worker gateway — [13.11](../../platform/features/distributed-execution.md)
+DE9 · DE10; the options are compared in [workers-and-orchestration](../../../building-engine/workers-and-orchestration.md).
 
 | Record | Columns |
 |---|---|

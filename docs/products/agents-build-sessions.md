@@ -123,7 +123,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | F05 | Runs · approvals · ledger · assistant | engine+studio | F04 | `feat/agents-fabric` | done | 2026-10-25 | gates green · design review passed |
 | I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | I02 | Connections in | engine+studio | I01 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
-| F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | blocked | 2026-10-26 | failed after 3 fix rounds — see .migration-cache/F06/ |
+| F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | partial | 2026-10-26 | **Executor decided (Ravi, 2026-10-26):** procrastinate + the engine-run HTTPS worker gateway, build and measure — B2–B5 are acceptance tests (13.11 DE9 · DE10). Resume at the build: records + migration, join/heartbeat/lease/outcome routes, `invana worker --engine --token --pool`, Studio Workers page, seed, boards |
 
 ## Hand-off notes
 
