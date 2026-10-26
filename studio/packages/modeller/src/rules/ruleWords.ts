@@ -79,7 +79,7 @@ export function scopeWords(rule: Rule): string {
 }
 
 /** `on dataset share and dataset bind` · `offered only`. */
-export function actsWords(acts: RuleAct[] | undefined): string {
+function actsWords(acts: RuleAct[] | undefined): string {
 	if (!acts?.length) return "offered only";
 	const words = acts.map((a) => ACT_WORD[a]);
 	return `on ${words.length > 1 ? `${words.slice(0, -1).join(", ")} and ${words.at(-1)}` : words[0]}`;

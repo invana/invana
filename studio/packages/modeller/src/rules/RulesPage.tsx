@@ -48,9 +48,9 @@ const PURPOSE =
 	"Organisation and certification policy. A guardrail bounds a run; a rule bounds what people and agents may record or decide.";
 
 /** The rule open in the dialog: `/modeller/rules/<rule>`. */
-export const RULE_PARAM = "rule";
+const RULE_PARAM = "rule";
 /** *New rule*: `?new=1`. */
-export const NEW_PARAM = "new";
+const NEW_PARAM = "new";
 
 const SCOPES = Object.keys(SCOPE_LABEL) as (keyof typeof SCOPE_LABEL)[];
 const ACTS = Object.keys(ACT_LABEL) as (keyof typeof ACT_LABEL)[];
