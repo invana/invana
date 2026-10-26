@@ -164,8 +164,12 @@ export function TypePage({
 	const indexes = (tree?.indexes ?? []).filter(
 		(i) => i.target_label === typeName,
 	);
+	// The effective list carries inherited properties; a type that inherits
+	// nothing may come back with it empty, so its own list stands in.
 	const mappings = node
-		? node.effective_property_mappings
+		? node.effective_property_mappings?.length
+			? node.effective_property_mappings
+			: node.property_mappings
 		: (edge?.property_mappings ?? []);
 	const key = constraints.find((c) =>
 		KEY_CONSTRAINTS.includes(c.constraint_type),

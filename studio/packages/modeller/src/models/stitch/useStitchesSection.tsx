@@ -1,8 +1,9 @@
 import type { PanelStackSection } from "@invana/ui";
 import { ActButton, gateItem, useAccess } from "@invana-studio/shell";
-import { RecordRow, SectionTitle } from "@invana-studio/ui";
+import { SectionTitle } from "@invana-studio/ui";
 import { Check, Link2, Plus, Trash2, Undo2 } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
+import { OutlineRow } from "../model-editor/components/OutlineRow";
 import type { ModelSelection } from "../model-editor/types";
 import {
 	useCommitStitchesMutation,
@@ -12,9 +13,27 @@ import {
 	useRemoveLinkMutation,
 } from "../queries";
 import type { LinkKind, ModelLink } from "../types";
-import { stitchPair, stitchRule } from "./allModels";
 import { DeclareStitchDialog } from "./components/DeclareStitchDialog";
 import { RemoveStitchDialog } from "./components/RemoveStitchDialog";
+
+/**
+ * A stitch read from one model's side: its own type bare, the other model's
+ * qualified — `country ≡ NewsArticles.Country`, `NewsArticles.City → airport`.
+ */
+const localPair = (link: ModelLink, versionId: string | null): string => {
+	const ownSource = link.source_version_id === versionId;
+	const ownTarget = link.target_version_id === versionId;
+	const left = ownSource
+		? link.source_type
+		: `${link.source_model ?? "?"}.${link.source_type}`;
+	const right = ownTarget
+		? link.target_type
+		: `${link.target_model ?? "?"}.${link.target_type}`;
+	// An anchor has no direction, so this model's end reads first.
+	if (link.kind === "anchor" && ownTarget && !ownSource)
+		return `${right} ≡ ${left}`;
+	return `${left} ${link.kind === "anchor" ? "≡" : "→"} ${right}`;
+};
 
 /**
  * Scrolls its row into view the moment it becomes the marked one.
@@ -165,9 +184,9 @@ export function useStitchesSection({
 				: []),
 		],
 		content: (
-			<div className="px-3 pb-2.5">
+			<div className="pb-2.5">
 				{mine.length === 0 ? (
-					<div className="flex flex-col items-start gap-2">
+					<div className="flex flex-col items-start gap-2 px-3">
 						<p className="text-base text-muted-foreground">
 							{!versionId
 								? "A stitch binds published versions. Publish this model first (ST8)."
@@ -190,7 +209,7 @@ export function useStitchesSection({
 				) : (
 					mine.map((link: ModelLink) => (
 						<HighlightOnMount key={link.id} on={link.id === highlighted}>
-							<RecordRow
+							<OutlineRow
 								active={link.id === highlighted}
 								tone={
 									link.status === "staged"
@@ -199,21 +218,17 @@ export function useStitchesSection({
 											? "info"
 											: "muted"
 								}
-								title={stitchPair(link)}
-								// The rule, then the state — `Company.ticker =
-								// Stock.nse_symbol · exact · active`. The row says what the
-								// stitch resolves on, because that is the thing anyone
-								// reviewing it has to judge.
-								// The rule, the state, and — when something other than
-								// this section declared it — where it came from, so a
-								// stitch applied from a bundle on the command line is
-								// not an anonymous row nobody remembers making.
-								subtitle={`${stitchRule(link, sourceModelName(link))} · ${
+								// The pair from this model's side — its own type bare, the
+								// other model's qualified — and what kind of stitch it is.
+								// The rule it resolves on is the inspector's to state.
+								name={localPair(link, versionId)}
+								meta={
 									link.status === "staged"
-										? "staged · not in the union yet"
-										: "active"
-								}${link.description ? ` · ${link.description}` : ""}`}
-								status={link.status === "staged" ? "staged" : link.kind}
+										? "staged"
+										: link.kind === "anchor"
+											? "anchor"
+											: (link.edge_type ?? "relationship")
+								}
 								actions={
 									<ActButton
 										area="model"
@@ -233,7 +248,7 @@ export function useStitchesSection({
 					<button
 						type="button"
 						onClick={onOpenGlobalModel}
-						className="mt-1 text-sm text-primary hover:underline"
+						className="mx-3 mt-1 text-sm text-primary hover:underline"
 					>
 						Open the global model
 					</button>

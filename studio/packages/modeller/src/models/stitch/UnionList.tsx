@@ -10,7 +10,7 @@
  */
 
 import { Badge, SectionHeader, Spinner } from "@invana/ui";
-import { RecordRow } from "@invana-studio/ui";
+import { OutlineRow } from "../model-editor/components/OutlineRow";
 import { useGlobalModelQuery, useModelLinksQuery } from "../queries";
 import type { GlobalType } from "../types";
 import { stitchPair } from "./allModels";
@@ -23,7 +23,7 @@ function Rows({ types }: { types: GlobalType[] }) {
 					key={t.name}
 					className="flex items-baseline gap-2 border-t border-border/60 px-3 py-1"
 				>
-					<span className="truncate font-mono text-sm">{t.name}</span>
+					<span className="min-w-0 shrink-0 font-mono text-sm">{t.name}</span>
 					{/* Anchored means one entity across models rather than a coincidence
 					    of naming — the difference between a union and a collision. */}
 					{t.anchored ? (
@@ -31,7 +31,7 @@ function Rows({ types }: { types: GlobalType[] }) {
 							anchored
 						</Badge>
 					) : null}
-					<span className="ml-auto shrink-0 truncate text-sm text-muted-foreground">
+					<span className="ml-auto min-w-0 truncate text-sm text-muted-foreground">
 						{t.models.join(" · ")}
 					</span>
 				</div>
@@ -79,17 +79,12 @@ export function UnionList({
 				<>
 					<SectionHeader bare title="Anchored" count={anchors.length} />
 					{anchors.map((l) => (
-						<RecordRow
+						<OutlineRow
 							key={l.id}
 							onClick={() => onOpenStitch(l.id)}
-							title={
-								<span className="font-mono text-sm">
-									{stitchPair(l, false)}
-								</span>
-							}
-							subtitle={`${l.source_model ?? "?"} · ${l.target_model ?? "?"}`}
-							status="anchor"
-							statusTone="info"
+							tone="info"
+							name={stitchPair(l, false)}
+							meta={`${l.source_model ?? "?"} · ${l.target_model ?? "?"}`}
 						/>
 					))}
 				</>

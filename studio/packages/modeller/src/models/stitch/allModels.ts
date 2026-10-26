@@ -238,9 +238,9 @@ export function buildAllModelsData(
 					label: n.name,
 					model: t.name,
 					...(framed ? { frame: t.name } : {}),
-					// The type's own colour, the one the Explorer paints it;
-					// the frame around it carries the model's.
-					hue: colorSlotByString(n.name),
+					// Framed, a type wears its model's colour, so the frames read
+					// as models at a glance; on one model's canvas, its own.
+					hue: framed ? t.hue : colorSlotByString(n.name),
 					description: n.description ?? "",
 					icon: TYPE_ICON,
 					propertyCount: properties.length,

@@ -691,6 +691,8 @@ function overviewOne(data: ModelsPageData, scope: ModelsScope): RowSpec[] {
 	const tiles: Panel = {
 		kind: "grid",
 		options: {
+			// One row across, as the board draws it — not two by two.
+			minTileWidth: 140,
 			tiles: [
 				{
 					label: "Types",

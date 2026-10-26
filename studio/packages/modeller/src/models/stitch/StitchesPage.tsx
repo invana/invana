@@ -51,13 +51,16 @@ const matches = (needle: string, ...haystack: (string | null)[]) =>
 function Group({
 	title,
 	count,
+	defaultOpen = true,
 	children,
 }: {
 	title: string;
 	count: number;
+	/** Removed starts folded: what is gone is looked up, not read. */
+	defaultOpen?: boolean;
 	children: ReactNode;
 }) {
-	const [open, setOpen] = useState(true);
+	const [open, setOpen] = useState(defaultOpen);
 	return (
 		<section className="flex flex-col">
 			<SectionHeader
@@ -217,7 +220,7 @@ export function StitchesPage({ username, graphSlug }: StitchesPageProps) {
 								)}
 							</Group>
 
-							<Group title="Removed" count={gone.length}>
+							<Group title="Removed" count={gone.length} defaultOpen={false}>
 								{gone.length === 0 ? (
 									<p className="px-3 text-sm text-muted-foreground">
 										{needle

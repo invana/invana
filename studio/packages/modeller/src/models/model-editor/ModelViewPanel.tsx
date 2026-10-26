@@ -3,30 +3,33 @@
  *
  * There is no models list here: a model is picked from the models board's rows,
  * the global canvas or a breadcrumb, and this panel exists only while one is
- * open (`?model=`). It is a `PanelStack` of **Node types · Edge types ·
- * Stitches** and nothing acts on the model itself: `Open in Schema`, `Publish`,
- * `Rename`, `Export` and `Archive` are on the page header, because they act on
- * what the page shows. Picking a type opens that type's page.
+ * open (`?model=`). It is one head — the model and the version read — over
+ * **Node types · Edge types · Stitches** in one scrolling list, one line a row, and
+ * nothing acts on the model itself: `Open in Schema`, `Publish`, `Rename`,
+ * `Export` and `Archive` are on the page header, because they act on what the
+ * page shows. Picking a type opens that type's page.
  *
  * ```
- * NODE TYPES  4                                                    + add
- *   airport   staged   14 props · code · icao …
- * EDGE TYPES  2                                                    + add
+ * AIRROUTES                                          v1.0.1 · active
+ * NODE TYPES  4                                                + add
+ *   ● airport                                             14 props
+ * EDGE TYPES  2                                                + add
+ *   ● route                                      airport → airport
  * STITCHES  3
+ *   ● country ≡ NewsArticles.Country                        anchor
  * ```
  *
  * Scope and panel are one state, and it is the URL's (`useModelsView`).
  */
 
-import { PanelStack, type PanelStackSection } from "@invana/ui";
-import { gateItem, useAccess } from "@invana-studio/shell";
 import {
-	PanelStatusBar,
-	RecordRow,
-	SectionTitle,
-	StatusCount,
-	StatusCrumb,
-} from "@invana-studio/ui";
+	Badge,
+	NavHorizontalItems,
+	type PanelStackSection,
+	SectionHeader,
+} from "@invana/ui";
+import { gateItem, useAccess } from "@invana-studio/shell";
+import { SectionTitle } from "@invana-studio/ui";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useModelsView } from "../model-page/useModelsView";
@@ -40,6 +43,7 @@ import { useStitchesSection } from "../stitch/useStitchesSection";
 import type { GraphModelSummary } from "../types";
 import { EdgeTypeFormDialog } from "./components/EdgeTypeFormDialog";
 import { NodeTypeFormDialog } from "./components/NodeTypeFormDialog";
+import { OutlineRow } from "./components/OutlineRow";
 import type { ModelEditCtx, ModelSelection } from "./types";
 
 interface Props {
@@ -191,7 +195,7 @@ function ModelOutline({
 								key={nt.id}
 								name={nt.name}
 								staged={stagedNames.has(`node_type:${nt.name}`)}
-								detail={propertySummary(nt)}
+								detail={`${nt.property_mappings?.length ?? 0} props`}
 								active={
 									selection?.kind === "node_type" && selection.name === nt.name
 								}
@@ -247,30 +251,38 @@ function ModelOutline({
 		stitchesSection,
 	];
 
+	// The version read, then the draft's staged count when there is one — the
+	// head says what the outline below is the outline of.
+	const versionLine = [
+		active ? `v${active.version} · active` : "never published",
+		...(draft
+			? [
+					`${draft.version ? `v${draft.version} ` : ""}draft · ${staged.data?.count ?? 0} staged`,
+				]
+			: []),
+	].join(" · ");
+
 	return (
 		<div className="flex h-full min-h-0 flex-col">
-			<div className="min-h-0 flex-1">
-				<PanelStack sections={sections} withHandle />
+			<SectionHeader title={model.name} count={versionLine} />
+			{/* One list read down, as the board draws it — not a resizable stack,
+			    which split the column evenly and left two short lists half empty. */}
+			<div className="min-h-0 flex-1 overflow-y-auto">
+				{sections.map((section) => (
+					<section key={section.id}>
+						<SectionHeader
+							bare
+							title={section.title}
+							actions={
+								section.headerActions?.length ? (
+									<NavHorizontalItems items={section.headerActions} />
+								) : undefined
+							}
+						/>
+						{section.content}
+					</section>
+				))}
 			</div>
-			<PanelStatusBar
-				left={<StatusCrumb active>{model.name}</StatusCrumb>}
-				middle={[
-					draft ? (
-						<StatusCount
-							key="staged"
-							tone={staged.data?.count ? "info" : "muted"}
-						>
-							{draft.version ? `v${draft.version} · ` : ""}draft ·{" "}
-							{staged.data?.count ?? 0} staged
-						</StatusCount>
-					) : (
-						<StatusCount key="active">
-							{active ? `v${active.version} · active` : "never published"}
-						</StatusCount>
-					),
-				]}
-				right={`${nodeTypes.length + edgeTypes.length} types`}
-			/>
 			{ctx ? (
 				<>
 					<NodeTypeFormDialog
@@ -312,27 +324,20 @@ function TypeRow({
 	onClick: () => void;
 }) {
 	return (
-		<RecordRow
+		<OutlineRow
+			name={name}
+			meta={detail}
+			tone={staged ? "info" : "muted"}
+			chip={
+				staged ? (
+					<Badge variant="soft" tone="info" size="xs">
+						staged
+					</Badge>
+				) : null
+			}
 			active={active}
 			onClick={onClick}
-			tone={staged ? "info" : "muted"}
-			title={
-				<span className="flex items-center gap-1.5">
-					<span className="font-mono">{name}</span>
-					{staged ? <StagedChip /> : null}
-				</span>
-			}
-			subtitle={<span className="truncate">{detail}</span>}
 		/>
-	);
-}
-
-/** The chip that marks a row as not-yet-published. */
-function StagedChip() {
-	return (
-		<span className="border border-primary/25 bg-primary/15 px-1.5 py-0.5 text-sm font-semibold uppercase leading-none text-primary">
-			staged
-		</span>
 	);
 }
 
@@ -353,15 +358,4 @@ function sortStagedFirst<T extends NamedType>(
 		const bStaged = stagedNames.has(`${kind}:${b.name}`) ? 0 : 1;
 		return aStaged - bStaged || a.name.localeCompare(b.name);
 	});
-}
-
-function propertySummary(type: { property_mappings?: unknown[] }): string {
-	const count = type.property_mappings?.length ?? 0;
-	const names = (type.property_mappings ?? [])
-		.map((m) => (m as { property_key?: { name?: string } }).property_key?.name)
-		.filter(Boolean)
-		.slice(0, 4);
-	return `${count} props${names.length ? ` · ${names.join(" · ")}` : ""}${
-		count > names.length ? " …" : ""
-	}`;
 }

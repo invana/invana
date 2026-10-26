@@ -31,6 +31,7 @@ import { ActButton } from "@invana-studio/shell";
 import { Link2, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { OutlineRow } from "../model-editor/components/OutlineRow";
 import { modelPagePath } from "../model-page/useModelsView";
 import {
 	useModelInsightsQuery,
@@ -144,7 +145,7 @@ export function StitchInspector({
 				defaultValue="stitch"
 				className="flex min-h-0 flex-1 flex-col"
 			>
-				<TabsList className="shrink-0 border-b px-3">
+				<TabsList className="shrink-0 justify-start border-b px-3">
 					<TabsTrigger value="stitch">Stitch</TabsTrigger>
 					<TabsTrigger value="crossed">Crossed by</TabsTrigger>
 					<TabsTrigger value="history">History</TabsTrigger>
@@ -157,20 +158,16 @@ export function StitchInspector({
 					<div className="flex flex-col gap-3 p-3">
 						<section className="flex flex-col gap-1">
 							<Eyebrow>Ends</Eyebrow>
-							<PropertyList labelWidth="auto">
-								<PropertyRow
-									label={`${link.source_model ?? "?"}.${link.source_type}`}
-									mono
-								>
-									{records(link.source_records)}
-								</PropertyRow>
-								<PropertyRow
-									label={`${link.target_model ?? "?"}.${link.target_type}`}
-									mono
-								>
-									{records(link.target_records)}
-								</PropertyRow>
-							</PropertyList>
+							<div className="-mx-3 flex flex-col">
+								<OutlineRow
+									name={`${link.source_model ?? "?"}.${link.source_type}`}
+									meta={records(link.source_records)}
+								/>
+								<OutlineRow
+									name={`${link.target_model ?? "?"}.${link.target_type}`}
+									meta={records(link.target_records)}
+								/>
+							</div>
 						</section>
 
 						<section className="flex flex-col gap-1">
@@ -195,10 +192,14 @@ export function StitchInspector({
 									{crossed}
 								</PropertyRow>
 								<PropertyRow label="declared" mono>
-									{link.declared_by ?? "—"}
-									{link.declared_at
-										? ` · ${formatShortDate(new Date(link.declared_at))}`
-										: ""}
+									{[
+										link.declared_by,
+										link.declared_at
+											? formatShortDate(new Date(link.declared_at))
+											: null,
+									]
+										.filter(Boolean)
+										.join(" · ") || "—"}
 								</PropertyRow>
 							</PropertyList>
 						</section>
