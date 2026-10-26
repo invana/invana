@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from invana.core.events import actions
-from invana.core.events.services import emit_event
 from invana.plugins.core.ingest import stitching
 from invana.plugins.sdk.context import Out, RunVars, TaskContext
 from invana.plugins.sdk.errors import TaskFailure
@@ -16,26 +14,15 @@ async def graph_stitch_declare(ctx: TaskContext, v: RunVars) -> Out:
 
     Staged means the rows exist and nothing a question can reach has changed.
     Writing the edges is `graph.stitch.commit`, and keeping them apart is why a
-    declaration can be reviewed before it is true. Each declared stitch records
-    its declare event under the run's actor, so the inspector names who declared it.
+    declaration can be reviewed before it is true. Each declared stitch is
+    recorded under the run's actor, so the inspector names who declared it.
     """
     root = str((ctx.step.args or {}).get("root") or (v.load.root if v.load else ""))
     if not root:
         raise TaskFailure(
             cls="blocked", cause="no_source", message="No bundle folder to read rules from.", short="no source"
         )
-    applied = await stitching.apply_bundle(ctx.db, graph_id=ctx.step.graph_id, root=Path(root))
-    for outcome in applied.outcomes:
-        if outcome.status == "declared":
-            await emit_event(
-                ctx.db,
-                action=actions.MODEL_LINK_DECLARE,
-                target_kind=actions.TARGET_MODEL_LINK,
-                target_id=outcome.link_id,
-                graph_id=ctx.step.graph_id,
-                actor_id=v.actor_id,
-                details={"kind": outcome.rule.kind, "rule": outcome.rule.describe(), "bundle": applied.name},
-            )
+    applied = await stitching.apply_bundle(ctx.db, graph_id=ctx.step.graph_id, root=Path(root), actor_id=v.actor_id)
     return Out(
         detail=f"{applied.declared} declared · {applied.already} already · {applied.skipped} skipped",
         input={"root": root},

@@ -260,19 +260,7 @@ def apply_cmd(graph_ref: str, file: str, do_commit: bool, dry_run: bool, user_re
     root = _bundle_root(file)
 
     async def work(session, graph, actor_id):
-        run = await apply_bundle(session, _store, graph_id=graph.id, root=root, dry_run=dry_run)
-        for outcome in run.outcomes:
-            if outcome.status == "declared":
-                await emit_event(
-                    session,
-                    action=event_actions.MODEL_LINK_DECLARE,
-                    target_kind=event_actions.TARGET_MODEL_LINK,
-                    target_id=outcome.link_id,
-                    graph_id=graph.id,
-                    details={"kind": outcome.rule.kind, "rule": outcome.rule.describe(), "bundle": run.name},
-                    **_actor(actor_id),
-                )
-        return run
+        return await apply_bundle(session, _store, graph_id=graph.id, root=root, dry_run=dry_run, actor_id=actor_id)
 
     try:
         run = asyncio.run(_with_graph(graph_ref, user_ref, work))

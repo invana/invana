@@ -150,10 +150,11 @@ test("a model nothing was counted for draws no chart of zeros", async ({
 	page,
 }) => {
 	const name = `E2E Growth ${Date.now()}`;
-	const model = await graphApi<{ id: string }>(page, "/models", {
-		method: "POST",
-		data: { name },
-	});
+	const { data: model } = await graphApi<{ data: { id: string } }>(
+		page,
+		"/models",
+		{ method: "POST", data: { name } },
+	);
 	try {
 		await page.goto(`${GRAPH}/modeller/models`);
 		await row(page, name).click();
@@ -267,7 +268,12 @@ test("Add index to draft stages the index on the model that declares the label",
 	await confirm.getByRole("button", { name: "Cancel" }).click();
 
 	// Only what this test staged is discarded; the draft is left as it was found.
-	await page.getByRole("button", { name: "Discard this change" }).click();
+	await page
+		.locator("span")
+		.filter({ has: chip })
+		.getByRole("button", { name: "Discard this change" })
+		.last()
+		.click();
 	await expect(chip).toHaveCount(0);
 });
 
