@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -25,6 +26,9 @@ CACHE = ROOT / ".migration-cache"
 REVIEWS = ROOT / "scripts" / "agents-build" / "reviews"
 RUN_LOG = CACHE / "agents-run.log"
 ID = re.compile(r"^[FI]\d{2}$")
+# The runner's context budget for the lead and every sub-agent, and the grace before it ends a session.
+LIMIT = int(os.environ.get("INVANA_MIGRATION_CONTEXT_LIMIT", "300000"))
+GRACE = int(os.environ.get("INVANA_RUNNER_HANDOFF_GRACE", "50000"))
 
 
 def table(text: str, start: str, end: str | None) -> list[list[str]]:
@@ -60,25 +64,69 @@ def phases() -> list[dict]:
     return out
 
 
+def part(name: str) -> dict:
+    return {"name": name, "model": "", "status": "running", "context": 0, "peak": 0, "turns": 0, "spend": 0,
+            "tools": 0, "doing": ""}
+
+
 def session(path: Path) -> dict:
-    """One session's stream: its id, context, todos, sub-agents and latest actions."""
-    s = {"label": path.stem, "id": "", "context": 0, "peak": 0, "tools": 0, "finished": False, "todos": [],
-         "agents": [], "recent": [], "said": "", "mtime": path.stat().st_mtime}
+    """One session's stream: its id, context and spend, todos, sub-agents and latest actions.
+
+    Spend is every turn's context plus its output, summed: each turn re-reads the whole
+    context, so this is what a session draws from the usage limit. A message with a
+    ``parent_tool_use_id`` belongs to a sub-agent and is counted against that part.
+    """
+    s = {"label": path.stem, "id": "", "context": 0, "peak": 0, "spend": 0, "model": "", "tools": 0,
+         "finished": False, "todos": [], "parts": [], "recent": [], "said": "", "mtime": path.stat().st_mtime}
     tasks: dict[str, dict] = {}
+    parts: dict[str, dict] = {}  # Agent tool use id → part
+    task_ids: dict[str, str] = {}  # background task id → Agent tool use id
+    seen: set[str] = set()
     for line in path.open(errors="replace"):
         try:
             e = json.loads(line)
         except json.JSONDecodeError:
             continue
         s["id"] = s["id"] or e.get("session_id", "")
-        if e.get("type") == "result":
+        kind, sub = e.get("type"), e.get("subtype")
+        if kind == "result":
             s["finished"] = True
-        if e.get("type") != "assistant":
+        if kind == "system" and sub == "task_started" and e.get("task_type") == "local_agent":
+            p = parts.setdefault(e.get("tool_use_id", ""), part(e.get("description", "")))
+            p["name"] = p["name"] or e.get("description", "")
+            task_ids[e.get("task_id", "")] = e.get("tool_use_id", "")
+        elif kind == "system" and sub == "task_progress" and e.get("tool_use_id") in parts:
+            p = parts[e["tool_use_id"]]
+            p["doing"] = e.get("description", "")
+            p["tools"] = (e.get("usage") or {}).get("tool_uses", p["tools"])
+        elif kind == "system" and sub == "task_notification" and task_ids.get(e.get("task_id", "")) in parts:
+            parts[task_ids[e["task_id"]]]["status"] = e.get("status", "completed")
+        if kind != "assistant":
             continue
-        u = e["message"].get("usage") or {}
-        s["context"] = u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + u.get("cache_creation_input_tokens", 0)
+        msg = e["message"]
+        u = msg.get("usage") or {}
+        ctx = u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + u.get("cache_creation_input_tokens", 0)
+        # One API turn can arrive as several events sharing its message id; count it once.
+        first = msg.get("id") not in seen
+        seen.add(msg.get("id", ""))
+        tid = e.get("parent_tool_use_id")
+        if tid:
+            p = parts.setdefault(tid, part(e.get("task_description", "")))
+            p["context"], p["peak"], p["model"] = ctx, max(p["peak"], ctx), msg.get("model", p["model"])
+            if first:
+                p["turns"] += 1
+                p["spend"] += ctx + u.get("output_tokens", 0)
+            for b in msg.get("content", []):
+                if b.get("type") == "tool_use":
+                    inp = b.get("input") or {}
+                    what = inp.get("description") or inp.get("command") or inp.get("file_path") or inp.get("pattern") or ""
+                    p["doing"] = f"{b['name']}: {str(what)[:120]}"
+            continue
+        s["context"], s["model"] = ctx, msg.get("model", s["model"])
         s["peak"] = max(s["peak"], s["context"])
-        for b in e["message"].get("content", []):
+        if first:
+            s["spend"] += ctx + u.get("output_tokens", 0)
+        for b in msg.get("content", []):
             if b.get("type") == "text" and b.get("text", "").strip():
                 s["said"] = b["text"].strip()[:600]
             if b.get("type") != "tool_use":
@@ -92,11 +140,15 @@ def session(path: Path) -> dict:
             elif name == "TaskUpdate" and str(inp.get("taskId")) in tasks:
                 tasks[str(inp["taskId"])]["status"] = inp.get("status", tasks[str(inp["taskId"])]["status"])
             elif name in ("Agent", "Task"):
-                s["agents"].append(inp.get("description", ""))
+                parts.setdefault(b.get("id", ""), part(inp.get("description", "")))
             what = inp.get("description") or inp.get("command") or inp.get("file_path") or inp.get("pattern") or ""
             s["recent"].append(f"{name}: {str(what)[:140]}")
     if tasks and not s["todos"]:
         s["todos"] = list(tasks.values())
+    for p in parts.values():
+        if s["finished"] and p["status"] == "running":
+            p["status"] = "ended"
+    s["parts"] = list(parts.values())
     s["recent"] = s["recent"][-8:]
     return s
 
@@ -117,6 +169,7 @@ def state() -> dict:
     runner = sh("pgrep", "-f", "scripts/migration/run.py")
     log = RUN_LOG.read_text(errors="replace").splitlines()[-25:] if RUN_LOG.exists() else []
     return {"phases": phases(), "sessions": sessions(), "runner": bool(runner), "log": log,
+            "limit": LIMIT, "hard_stop": LIMIT + GRACE,
             "branch": sh("git", "rev-parse", "--abbrev-ref", "HEAD"),
             "commits": sh("git", "log", "--oneline", "main..HEAD").splitlines(),
             "changed": sh("git", "status", "--short").splitlines()}
@@ -128,14 +181,20 @@ PAGE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name
 @media (prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#171a21;--fg:#e6e8ee;--mut:#98a2b3;--bd:#2a2f3a;--ok:#3fb950;--run:#58a6ff;--warn:#d29922;--bad:#f85149}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 header{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--bd);background:var(--card);position:sticky;top:0}
-h1{font-size:15px;margin:0}main{padding:16px;display:grid;gap:14px;max-width:1500px;margin:auto}
+h1{font-size:15px;margin:0}main{padding:16px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px;max-width:1500px;margin:auto}
+.card,.sess,li{min-width:0;overflow-wrap:anywhere}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:6px}.card>h2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:0;padding:10px 12px;border-bottom:1px solid var(--bd)}
 .phases{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;padding:12px}
 .ph{border:1px solid var(--bd);border-radius:6px;padding:10px;cursor:pointer}.ph.on{outline:2px solid var(--run)}
 .ph b{display:block}.mut{color:var(--mut)}.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
 .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid currentColor}
 .done{color:var(--ok)}.in-progress,.partial{color:var(--run)}.blocked{color:var(--bad)}.pending{color:var(--mut)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}@media(max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;margin:6px 0}th,td{text-align:left;padding:4px 6px;border-top:1px solid var(--bd);vertical-align:top}
+th{font-weight:600;color:var(--mut);font-size:11px;white-space:nowrap}td.nw{white-space:nowrap;overflow-wrap:normal}td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.bar.sm{height:4px;min-width:60px}.bar.over i{background:var(--warn)}.bar.kill i{background:var(--bad)}
+.completed{color:var(--ok)}.running{color:var(--run)}.failed,.killed{color:var(--bad)}.stopped,.ended{color:var(--warn)}
 .pad{padding:12px}ul{margin:6px 0;padding-left:18px}li{margin:2px 0}.todo-completed{color:var(--ok);text-decoration:line-through}.todo-in_progress{color:var(--run);font-weight:600}
 .sess{border-top:1px solid var(--bd);padding:12px}.sess:first-of-type{border-top:0}.bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:var(--run)}
 pre{margin:0;padding:12px;white-space:pre-wrap;overflow:auto;max-height:320px}.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
@@ -153,12 +212,20 @@ pre{margin:0;padding:12px;white-space:pre-wrap;overflow:auto;max-height:320px}.d
 </div>
 </main>
 <script>
-const LIMIT = 400000; let pick = null;
+let LIMIT = 300000, HARD = 350000, pick = null;
+const tok = n => n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : Math.round(n / 1e3) + 'k';
+const meter = (peak, sm) => `<div class="bar ${sm ? 'sm' : ''} ${peak > HARD ? 'kill' : peak > LIMIT ? 'over' : ''}"><i style="width:${Math.min(100, peak / HARD * 100)}%"></i></div>`;
+const partsTable = ps => !ps.length ? '' : `<b>Sub-agents (${ps.length})</b><div class="scroll"><table>
+  <tr><th>Part</th><th>Status</th><th>Model</th><th>Context · peak</th><th>Turns</th><th>Spend</th><th>Now</th></tr>
+  ${ps.map(p => `<tr><td>${esc(p.name)}</td><td class="nw ${cls(p.status)}">${esc(p.status)}</td><td class="nw mono">${esc(p.model.replace('claude-', ''))}</td>
+    <td class="n">${tok(p.context)} · ${tok(p.peak)}${meter(p.peak, true)}</td><td class="n">${p.turns}</td><td class="n">${tok(p.spend)}</td>
+    <td class="mut">${esc(p.doing)}</td></tr>`).join('')}</table></div>`;
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cls = s => esc(s).replace(/ /g, '-');
 const md = s => esc(s).replace(/`([^`]+)`/g, '<span class="mono">$1</span>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
 async function tick() {
   let st; try { st = await (await fetch('/api/state')).json(); } catch { document.getElementById('at').textContent = 'dashboard server unreachable'; return; }
+  LIMIT = st.limit; HARD = st.hard_stop;
   document.getElementById('runner').innerHTML = st.runner ? '<span class="pill in-progress">runner running</span>' : '<span class="pill blocked">runner stopped</span>';
   document.getElementById('branch').textContent = st.branch;
   document.getElementById('at').textContent = 'updated ' + new Date().toLocaleTimeString();
@@ -176,12 +243,13 @@ async function tick() {
     ${p.handoffs.length ? `<p><b>Hand-off notes</b></p><ul>${p.handoffs.map(h => `<li>${md(h)}</li>`).join('')}</ul>` : ''}`;
   const ss = st.sessions[pick] || [];
   document.getElementById('sessions').innerHTML = ss.length ? ss.slice().reverse().map(s => `<div class="sess">
-    <div style="display:flex;gap:8px;align-items:center"><span class="dot" style="background:var(${s.finished ? '--ok' : '--run'})"></span>
-      <b>${esc(s.label)}</b><span class="mut">${s.finished ? 'finished' : 'live'}</span><span style="flex:1"></span><span class="mono mut">claude -r ${esc(s.id)}</span></div>
-    <div class="mut">context ${s.context.toLocaleString()} · peak ${s.peak.toLocaleString()} of ${LIMIT.toLocaleString()} · ${s.tools} tool calls</div>
-    <div class="bar"><i style="width:${Math.min(100, s.peak / LIMIT * 100)}%"></i></div>
+    <div class="row"><span class="dot" style="background:var(${s.finished ? '--ok' : '--run'})"></span>
+      <b>${esc(s.label)}</b><span class="mut">${s.finished ? 'finished' : 'live'}</span><span class="mono mut">${esc(s.model.replace('claude-', ''))}</span><span style="flex:1"></span><span class="mono mut">claude -r ${esc(s.id)}</span></div>
+    <div class="mut">context ${tok(s.context)} · peak ${tok(s.peak)} · hand-off at ${tok(LIMIT)}, ended at ${tok(HARD)} · ${s.tools} tool calls
+      · spend ${tok(s.spend)}${s.parts.length ? ` + sub-agents ${tok(s.parts.reduce((a, p) => a + p.spend, 0))}` : ''}</div>
+    ${meter(s.peak)}
     ${s.todos.length ? `<b>Todos</b><ul>${s.todos.map(t => `<li class="todo-${esc(t.status)}">${esc(t.text)}</li>`).join('')}</ul>` : '<div class="mut">No todo list yet — the session has not written one.</div>'}
-    ${s.agents.length ? `<b>Sub-agents</b><ul>${s.agents.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
+    ${partsTable(s.parts)}
     ${s.said ? `<b>Last said</b><div class="mut">${esc(s.said)}</div>` : ''}
     <b>Latest</b><ul class="mono">${s.recent.slice().reverse().map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>`).join('')
     : '<div class="pad mut">No session has run this phase yet.</div>';
