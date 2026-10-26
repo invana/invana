@@ -296,6 +296,7 @@ layers = [
     "invana.apps.semantic",
     "invana.apps.graphs",
     "invana.apps.modeller",
+    "invana.apps.workers",
 ]
 ignore_imports = [
     # graphs ↔ agents · graphs ↔ llm_providers · graphs ↔ skills —

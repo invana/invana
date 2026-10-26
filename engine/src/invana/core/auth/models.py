@@ -20,7 +20,7 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from invana.core.models import Base
@@ -132,5 +132,10 @@ class PersonalAccessToken(Base):
     created_by_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
+    # A join token's pool; such a token only joins workers to it.
+    worker_pool_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+    # How many workers a join token may admit (NULL = no cap), and how many it has.
+    join_cap: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    joins: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
 
     user: Mapped[User] = relationship(back_populates="personal_access_tokens", foreign_keys=[user_id])

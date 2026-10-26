@@ -56,6 +56,7 @@ from invana.apps.work.models import (  # noqa: F401
     Task,
     TaskDependency,
 )
+from invana.apps.workers.models import Worker, WorkerEvent, WorkerPool, WorkerStat  # noqa: F401
 
 # Import all models so metadata is fully populated for autogenerate.
 from invana.core.auth.models import RefreshToken, User  # noqa: F401

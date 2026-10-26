@@ -134,10 +134,17 @@ DE9 · DE10; the options are compared in [workers-and-orchestration](../../../bu
 | WK4 | **A worker dials out over HTTPS and holds no database credential.** It leases envelopes, heartbeats and returns outcomes through the engine's `/api/v1/workers/*` routes |
 | WK5 | **The engine stores every number Workers shows** in `worker_stats` every 30 s; *Suggested* is ready steps ÷ slots a worker over the last 10 min, clamped at zero |
 | WK6 | **Lost is 30 s without a heartbeat** (heartbeat every 2 s); a lost worker's leased envelopes are redelivered with the same idempotency key and a `lost` event is written |
-| WK7 | **Routing is by labels:** a step's function declares resources; a pool covers it when its labels ⊇ them. A step no live pool covers waits as *unroutable* naming the missing label; waiting is never a failure |
+| WK7 | **Routing is by labels:** a step's function declares resources; a pool covers it when its labels ⊇ them. A step no live pool covers waits as *unroutable* naming the missing label. The step waits its own limit plus the queue allowance, then fails `transient · worker_unavailable` naming the label — waiting without a limit needs durable runs (scale-out phase 1) |
 | WK8 | **In F06 tool steps run in workers;** the NL chain and planning stay in the engine until their steps hand over through outputs (scale-out phase 1) |
 | WK9 | **Every pool is scaled by hand.** Invana never starts machines; *Set by* records replicas a person declared for a Kubernetes pool |
 | WK10 | **Drain** stops a worker taking leases; it finishes what it holds, then reports `stopped` |
+| WK11 | **A join token is a `personal_access_tokens` row with the `invana_join_` prefix,** held by the install's `workers` service account (made on the first mint, a member of no Graph) and carrying `worker_pool_id` · `join_cap` · `joins`. The auth edge refuses it on every route but `POST /api/v1/workers/join`. Join tokens are install-wide, so they list on Workers › Join tokens and not on a Graph's IAM › Tokens |
+| WK12 | **The queue is named for the step's resources:** a tool step defers onto `tools.<labels>` (its function's `resources`, sorted, joined by `+` — `tools.cpu`, `tools.cpu+egress`). A lease takes the next job from every queue the pool's labels cover. Each joined worker is a procrastinate worker row; the gateway fetches, heartbeats and finishes jobs under its id, so procrastinate's stalled-job query finds a lost worker's jobs |
+| WK13 | **A worker credential is an `invana_wkr_` secret,** stored as its sha256 on the worker row; a heartbeat an hour after the last rotation returns a new one, and the previous one is honoured until the next rotation |
+| WK14 | **The gateway sweep runs in the engine** under `INVANA_EXECUTOR=procrastinate` on Postgres: every 5 s it marks workers silent 30 s `lost`, redelivers their jobs and writes the event; every 30 s it writes one `worker_stats` row a pool |
+| WK15 | **A remote step's context is its args, its step id, its idempotency key, the secrets its plugin declares (from the worker's environment) and the artifacts it records** — no database session, no graph connection. Tool steps need nothing more; the artifacts ride back with the outcome |
+| WK16 | **A lease long-polls for up to 20 s** and answers `204` when nothing is ready; heartbeats carry the worker's busy slots and CPU, which C3 · C4 show |
+| WK17 | **Workers is an Agents rail section** (`/agents/workers`, tabs Pools · Workers · Capacity · Join tokens); a pool and a worker open in the path under it, and Add workers is a modal whose step is `?add=` |
 
 ## Not building
 
