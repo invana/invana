@@ -5,8 +5,8 @@ no demo writes: ``k8s-prod`` (a Kubernetes Deployment of 24 replicas),
 ``egress`` (four Docker hosts, short), ``gpu-lab`` (no workers) and
 ``laptop-ravi`` (one Python worker). The script writes them as the gateway
 would have — pool rows, worker rows heartbeating now, worker events and 30 s
-``worker_stats`` buckets for the last 30 minutes, plus one bucket a day for a
-week so *vs 7-day* has history — and mints one join token for ``egress``
+``worker_stats`` buckets for the last 30 minutes, the older ones a little
+quieter so *vs 7-day* reads a rise — and mints one join token for ``egress``
 through the join-token manager.
 
 Seeded workers are rows, not processes: under ``INVANA_EXECUTOR=procrastinate``
@@ -117,10 +117,10 @@ async def main() -> None:
         lost = (await db.execute(select(Worker).where(Worker.state == "lost"))).scalars().first()
         joined = (await db.execute(select(Worker).where(Worker.name == "w-egress-08"))).scalar_one()
         for minutes, pool, worker_row, change, detail, why, actor in [
-            (0, k8s, None, "replicas", {"from": 22, "to": 24}, "ravi set replicas 22 → 24", ravi.id),
-            (7, k8s, lost, "lost", {"redelivered": 3}, "no heartbeat 30 s · 3 steps redelivered", None),
-            (41, pools["egress"], joined, "joined", {}, "join token invana_join_…7Hq2", None),
-            (79, k8s, None, "drained", {}, "node upgrade", ravi.id),
+            (0, k8s, None, "replicas", {"delta": 2}, "ravi set replicas 22 → 24", ravi.id),
+            (7, k8s, lost, "lost", {"worker": lost.name}, "no heartbeat 30 s · 3 steps redelivered", None),
+            (41, pools["egress"], joined, "joined", {"worker": joined.name}, "join token invana_join_…7Hq2", None),
+            (79, k8s, None, "drained", {"worker": "w-k8s-prod-12"}, "node upgrade", ravi.id),
         ]:
             db.add(
                 WorkerEvent(
@@ -140,7 +140,6 @@ async def main() -> None:
         envelopes = {"k8s-prod": 420, "egress": 450, "gpu-lab": 0, "laptop-ravi": 50}
         suggested = {"k8s-prod": 24, "egress": 16, "gpu-lab": 1, "laptop-ravi": 1}
         moments = [bucket - timedelta(seconds=30 * k) for k in range(60)]
-        moments += [bucket - timedelta(days=d) for d in range(1, 8)]
         for at in moments:
             ago = (bucket - at).total_seconds() / 60
             for name, pool in pools.items():
@@ -158,7 +157,7 @@ async def main() -> None:
                         slots_busy=min(busy[name], workers * pool.slots_per_worker),
                         ready=QUEUED[name],
                         oldest_s=OLDEST[name],
-                        envelopes=envelopes[name] if ago <= 30 else int(envelopes[name] * 0.89),
+                        envelopes=envelopes[name] if ago < 1 else int(envelopes[name] * 0.89),
                         suggested=suggested[name],
                     )
                 )

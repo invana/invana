@@ -85,6 +85,7 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"connections",
 	"llms",
 	"runs",
+	"workers",
 	"approvals",
 	"ledger",
 	"concurrency",
