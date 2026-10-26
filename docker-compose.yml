@@ -82,6 +82,8 @@ services:
       # dev key when unset (see engine/src/invana/settings.py).
       INVANA_SECRET_KEY: ${INVANA_SECRET_KEY:-}
       INVANA_ENCRYPTION_KEY: ${INVANA_ENCRYPTION_KEY:-}
+      # 0 keeps every run, so e2e churn never prunes the seeded board data.
+      INVANA_RUN_HISTORY_LIMIT: ${INVANA_RUN_HISTORY_LIMIT:-0}
       # Off by default — the OTLP collector only exists under --profile telemetry.
       # When on, spans, metrics and logs go to that collector by service name.
       INVANA_TELEMETRY_ENABLED: ${INVANA_TELEMETRY_ENABLED:-false}
