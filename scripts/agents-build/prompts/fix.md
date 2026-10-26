@@ -11,3 +11,5 @@ Findings from the driver's gates and/or the design review:
 Never edit scripts/migration/baseline.json and never set your own row to `done`.
 
 <scope> in a commit message is `agents` for an F or I phase and `modeller` for an M phase.
+
+Commit each finished step yourself (only the lead, never a sub-agent). How to commit: run exactly two Bash calls from the repo root, each on its own — `git add -A`, then `git commit --no-verify -m "wip(<scope>): {{ID}} · step N — <what>" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"`. No `cd`, no `&&` or `;`, no `$(…)` or variables, no heredoc: a compound or computed command needs an approval nobody is here to give, and the commit is refused.

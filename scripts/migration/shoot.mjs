@@ -12,7 +12,7 @@
 // (default admin / change_me_please) against INVANA_MIGRATION_STUDIO_URL (default http://localhost:8300);
 // a board whose map entry has `as` is shot signed in as that account instead, and one with `click`
 // has those buttons pressed in order after it loads — for a state no URL may hold, like a secret shown once.
-// A `click` entry may also be `text:<visible text>` (click that text), `label:<label>`, `scroll:<text>`, `tick:<row text>` (that row's checkbox), `upload:<repo path>` (the page's file input) or `dark` (dark theme).
+// A `click` entry may also be `text:<visible text>` (click that text), `label:<label>`, `scroll:<text>`, `tick:<row text>` (that row's checkbox), `upload:<repo path>` (the page's file input) or `dark` (dark theme, through the user menu; the previous mode is restored after the shot).
 import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -100,18 +100,31 @@ if (val('--diff')) {
     }
     return pages[user];
   };
+  // User menu › Theme › <label>; returns the mode that was checked before, so a dark shot can put it back.
+  const setMode = async (p, label) => {
+    await p.getByRole('button', { name: 'User menu' }).click({ timeout: 15000 });
+    await p.getByRole('menuitem', { name: 'Theme' }).hover({ timeout: 15000 });
+    await p.getByRole('menuitemradio').first().waitFor({ timeout: 15000 });
+    const checked = await p.getByRole('menuitemradio', { checked: true }).first().textContent().catch(() => null);
+    await p.getByRole('menuitemradio', { name: label, exact: true }).focus();
+    await p.keyboard.press('Enter');
+    await p.keyboard.press('Escape');
+    await p.waitForTimeout(1200);
+    return checked?.trim() ?? null;
+  };
   const targets = flag('--smoke')
     ? SMOKE.map((r, i) => [`smoke-${i}`, r, fallback])
     : boards.map((b) => [b, map.boards[b]?.route, map.boards[b]?.as ?? fallback, map.boards[b]?.click ?? []])
         .filter(([, r]) => r);
   for (const [name, route, user, clicks = []] of targets) {
     const page = await pageFor(user);
+    let priorMode = null;
     await page.goto(base + route, { waitUntil: 'networkidle' }).catch(() => {});
     await page.waitForTimeout(800);
     for (const button of clicks) {
       if (button === 'dark') {
-        await page.evaluate(() => localStorage.setItem('invana-theme', JSON.stringify({ theme: 'default', mode: 'dark' })));
-        await page.reload({ waitUntil: 'networkidle' }).catch(() => {});
+        // The profile's saved theme wins over localStorage on load, so drive the user menu; the choice is saved to the profile.
+        priorMode = await setMode(page, 'Dark');
       } else if (button.startsWith('text:')) {
         // With a dialog open the text is looked for inside it.
         const inDialog = (await page.locator('[role=dialog]').count()) > 0;
@@ -133,6 +146,7 @@ if (val('--diff')) {
     // A board that opens on a running check is shot once it has settled.
     await page.getByText('Testing…').waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
     await page.screenshot({ path: path.join(out, `${name}.png`) });
+    if (priorMode) await setMode(page, priorMode);
     console.log(`${route} → ${path.join(out, `${name}.png`)}`);
   }
 }

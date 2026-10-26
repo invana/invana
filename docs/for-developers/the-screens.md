@@ -706,7 +706,7 @@ field is `RdfSourceField` in `@invana-studio/ui`. Decisions are in
 | Artboard | Story | Studio route | Studio |
 |---|---|---|---|
 | `datasets.standards.import` | DS-15 | `/datasets/standards` › *Import from SKOS* — read, preview, import | ✅ |
-| `modeller.models.new.ontology` | MO-15 | `/modeller/models` › `⋯` › *From an ontology* — read, pick types (names above 500 classes) | ✅ |
+| `modeller.models.new.ontology` | MO-15 | `/modeller/models` › `⋯` › *From an ontology* — read, pick types (names above 500 classes) | 🟡 |
 | `modeller.models.new.ontology.preview` | MO-15 | the same › *Preview* — the mapping, skips and suggestions; *Open as a draft* | ✅ |
 
 ---
