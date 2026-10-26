@@ -122,7 +122,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | F04 | Detail pages | engine+studio | F03 | `feat/agents-fabric` | done | 2026-10-24 | gates green · design review passed |
 | F05 | Runs · approvals · ledger · assistant | engine+studio | F04 | `feat/agents-fabric` | done | 2026-10-25 | gates green · design review passed |
 | I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
-| I02 | Connections in | engine+studio | I01 | `feat/agents-fabric` | in progress | 2026-10-26 | session 2 — built; gates green; board shot live |
+| I02 | Connections in | engine+studio | I01 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | pending |  |  |
 
 ## Hand-off notes
