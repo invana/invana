@@ -17,16 +17,20 @@ test("the workflow runs in front of the reader, step by step", async ({
 
 	// C2: the steps are the surface while a run is live, not a spinner; once
 	// it settles they fold under *How I got this*, one click away. A run this
-	// small can settle before the first look, so the fold is opened when shown.
+	// small can settle before the first look.
 	const howIGotThis = page.getByRole("button", { name: "How I got this" });
 	await expect(
 		page.getByText("Plan", { exact: true }).first().or(howIGotThis.last()),
 	).toBeVisible({ timeout: 30_000 });
-	if (await howIGotThis.last().isVisible()) await howIGotThis.last().click();
+	// The live steps can fold away between one look and the next, so each step
+	// is retried and the fold opened whenever it is what is on screen.
 	for (const step of ["Plan", "Validate", "Execute", "Project", "Verify"]) {
-		await expect(page.getByText(step, { exact: true }).first()).toBeVisible({
-			timeout: 30_000,
-		});
+		await expect(async () => {
+			const label = page.getByText(step, { exact: true }).first();
+			if (!(await label.isVisible()) && (await howIGotThis.last().isVisible()))
+				await howIGotThis.last().click();
+			await expect(label).toBeVisible({ timeout: 1_000 });
+		}).toPass({ timeout: 30_000 });
 	}
 });
 
