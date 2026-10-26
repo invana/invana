@@ -8,7 +8,7 @@ carry a **check** — a machine half, read at the acts it names, and enforced `b
 |---|---|
 | Index | [6.4](../../../README.md#6--skills) · Slice **S12b** · **B04** (P-12: install scope, checks) |
 | Module | [Skills](../spec.md) |
-| API / CLI / Studio | ✅ / ✅ / 🟡 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [authoring-a-skill](authoring-a-skill.md) · [objectives-and-criteria](../../work/features/objectives-and-criteria.md) · [standards](../../bring-data-in/features/standards.md) · products: [modeller.md](../../../../products/modeller.md) MO-12 · MO-F11 |
 
 > **As** someone whose domain has hard facts, **I want** them stated once and offered to every run,
@@ -62,6 +62,25 @@ flowchart TD
     E -->|no · report| H[The act goes through; rule.check recorded]
 ```
 
+A compliance lead on Modeller › Rules:
+
+```mermaid
+flowchart TD
+    A[Modeller rail › Rules] --> B{Rules in force?}
+    B -->|loading| B1[Skeleton rows]
+    B -->|none| B2[Empty: one line on what a rule is · New rule]
+    B -->|error| B3[The rules could not be read]
+    B -->|yes| C[One list, assembly order · Scope and Checked on filters in the URL]
+    C --> D[New rule or a row]
+    D --> E[Rule dialog: statement · scope · check · when broken · because]
+    E --> F[Impact: the last 30 days read back through the check]
+    F --> G{Save rule}
+    G -->|no model access, or Install without install Admin| G1[Acts disabled, the reason named]
+    G -->|422: check not read at that scope · unknown standard| G2[The dialog names the field]
+    G -->|saved| H[Row updated · a new wording is the next version]
+    H --> I[Checked at its acts in its scope only]
+```
+
 ## Seams
 
 | Seam | What the user sees |
@@ -82,8 +101,8 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Graph → Rules | One list, `+` in the header; the install rules above it, read-only |
-| Modeller › Rules (`modeller.rules` · `modeller.rules.edit`) | Studio, MO-12 — scope, statement, check and mode |
+| Modeller › Rules (`modeller.rules`) | `/modeller/rules` — a page in the main area, no leftSection ([RU18](#decisions)). Head: *Rules*, the one-line purpose, the engine's `total` and *New rule*. The *Scope* and *Checked on* filters (`?f.scope=` · `?f.act=`, sent to the server). One list in assembly order: each row the statement, then scope (`install` · `Graph <name>` · `project <name>`) · checked on · mode · `N broken in 30 days`, the mode as a badge; an inactive rule dimmed in place. Under it, one line on what is not a rule: ranges on a property are constraints, shared vocabularies are standards |
+| The rule dialog (`modeller.rules.edit`) | `/modeller/rules/<rule>` or *New rule* (`?new=1`) — a modal, its crumb the statement. Statement · Scope (*Install · Graph · Project*, fixed once saved; *Install* only for an install Admin; *Project* picks the project) · Check (the closed vocabulary and its params) · *Checked on* (the acts the check reads, drawn from it, never picked) · *When broken* (*Block · Warn · Report*) · *Because* (*Shown to whoever the rule stops.*) · the impact line, read as the check changes ([RU21](#decisions)). Footer: *Stop offering it* / *Offer it again* and *Open board* on an existing rule; *Cancel* · *Save rule* |
 | `invana rules list [--graph u/slug] · show <id> · apply --file [--graph u/slug]` | CLI |
 | Project panel → Working rules | A section of the project's **Details** tab, with the inherited invariants above it, greyed and read-only ([RU8](#decisions)) |
 | Step row | The rules **offered**, each drawn as its statement, with the ones the step **cited** marked — the same two certainties as a skill ([RU12](#decisions)). A statement is the row, never an id, and clicking one opens that rule's board — beside the tree on the activity surface, in place of the dialog on the answer surface ([RU13](#decisions)). Drawn on the activity tree and in a step's trace detail |
@@ -94,13 +113,16 @@ flowchart TD
 | Thing | Shape |
 |---|---|
 | `rules` | `graph_id?` · `project_id?` · `active` · `order` · `current_version_id` — the scope read off the two ([RU6](#decisions)) |
-| `rule_versions` | `rule_id` · `version` · `statement` · `check?` · `mode?` · `published_at`, immutable |
+| `rule_versions` | `rule_id` · `version` · `statement` · `check?` · `mode?` · `because?` · `published_at`, immutable |
 | Derived | `scope` and `kind` are read off `graph_id` and `project_id`, not stored |
 | Assembly | install rules → graph invariants → project working rules, each with its id |
 | Citations | `task_runs.rules_offered` · `rules_cited`, both `rule_version_id`s |
 | A step's rules, read | `ActivityNode` and `TraceStep` each carry `rules_offered` · `rules_cited` as `{rule_id, statement}` — the version's wording, and the rule to open ([RU12](#decisions)) |
 | Counts | `offered` · `total` over every version, and a `cited` count **per version**, all derived on read ([RU9](#decisions) · [RU10](#decisions)) |
 | Routes | `…/rules*` · `…/projects/{key}/rules*` · `…/rules/{id}/citations` → `offered` · `total` · `versions` · `items` |
+| `GET …/rules` | Every rule in force in this Graph — the install's, the Graph's and each project's the reader can see — as one list-contract `Page[RuleRead]` in assembly order. Filters `scope` (`install · graph · project`) and `act` (`dataset.share · dataset.bind · project.decide`); `q` on the statement ([RU18](#decisions)) |
+| `POST …/rules/impact` · `POST /api/v1/rules/impact` | `{scope, project_key?, check}` → `RuleImpact` `{days: 30, read, broken, items[{act, subject, at, reason}]}` — the acts of the last 30 days read back through the check, newest first, at most five items. The Graph route reads this Graph's acts (and every share, for an install check); the install route, an install Admin's, every Graph's ([RU21](#decisions)) |
+| `RuleRead` (on the Graph list) | gains `acts` (read off the check), `because`, `project_key` · `project_name` on a project rule, `graph_name`, and `broken_30d` — the same read-back over the current version's check, `null` on a rule with no check ([RU22](#decisions)) |
 | Install routes (`/api/v1/rules`) | `GET ""` (any user) · `POST ""` · `GET · PATCH /{id}` · `POST /{id}/activate · deactivate` (install Admin) · `GET /{id}/versions` |
 | `RuleRead` · `RuleVersionRead` | gain `check?` · `mode?`; `graph_id` is null on an install rule |
 | Events | `rule.create` · `rule.publish` · `rule.activate` · `rule.deactivate` · `rule.check` (a failed warn or report: `act` · `subject` · `mode` · `version` · `reason`; `graph_id` the act's) |
@@ -153,6 +175,11 @@ Four artboards — the page carries the whole feature.
 | RU15 | **A check is `{kind, …params}` from a closed vocabulary, validated at save.** Each kind names the acts it is read at and the scopes it may sit on; a check no act at that scope reads is 422, as is a `dataset.conforms` naming a standard that does not exist. The check and the mode are part of the published wording: changing either mints the next version, so a past `rule.check` names the version it read. A check without a mode is `warn`; a mode without a check is 422. |
 | RU16 | **An act reads every active checked rule in its scope, and every block is named in one refusal.** The act evaluates them all before writing anything: a failed `block` is 409 listing each blocking rule's statement and reason; a failed `warn` adds a line to the response's `warnings` and records `rule.check`; a failed `report` records `rule.check` only. A blocked act writes nothing, its events included — the refusal is the record. |
 | RU17 | **The acts checked are `dataset.share`, `dataset.bind` and `project.decide`.** A project rule may carry a check whose kind a project act reads — the two `evidence.*` kinds — and the decide act reads install, Graph and project rules together ([BD9](../../work/features/branches-and-decisions.md)). A model's publish is checked when it exists. |
+| RU18 | **Modeller › Rules is one page of every rule in force in the Graph.** It lists the install rules, the Graph's own and every project's the reader can see, in assembly order, as one list from `GET …/rules` — the Graph's invariants are its Graph-scope rules and are still offered and cited. The page has no leftSection; a rule opens as a modal over it, at `/modeller/rules/<rule>`. The Scope and Checked-on filters are list-contract filters, held in the URL and applied by the engine. Writing goes to the scope's own route: install rules to `/api/v1/rules` (an install Admin's), Graph rules to `…/rules`, project rules to `…/projects/{key}/rules`. A Project's Details section still reads `…/projects/{key}/rules` with its `inherited` half ([RU8](#decisions)). |
+| RU19 | **What a rule is checked on is read off its check, never chosen.** Each check kind names its acts ([RU15](#decisions)); the row and the dialog draw them in words — *Dataset share · Dataset bind · Project decision* — and the API serves them as `acts`. A rule with no check is *offered only* and is checked on nothing. |
+| RU20 | **`because` is the rule's reason, said to whoever it stops.** One optional line on the version, part of the published wording (changing it mints the next version). A block names it: `blocked by rule — "<statement>" (because <because>): <reason>`; a warning carries it the same way. |
+| RU21 | **A rule shows what it would have broken in the last 30 days before it saves.** The engine reads the acts of the window back through the check as the dialog holds it: shares (`dataset.update` events that moved a dataset to `install`, read against the version current then), binds (`dataset.bind` events, the version they bound) and decisions (`project_decisions`, their cited findings as they stood at the decision — reviewed means reviewed before it). The answer is the count read, the count broken and the newest five, each naming its act, subject, time and reason. The dialog words it by the mode: *would have stopped* (block) · *would have warned on* (warn) · *would have reported* (report). A rule with no check has no impact line. |
+| RU22 | **A row's *broken in 30 days* is the same read-back of its current check, done by the engine.** It is a windowed aggregate over stored acts, returned on the list; Studio formats it. A blocked act writes nothing ([RU16](#decisions)), so the count is a replay, not a tally of `rule.check` events. A Graph's list counts this Graph's binds and decisions — and every share, for an install rule. |
 | RU11 | **`More` opens the rule as a declared board, and the board reads.** The statement, the two counts, the versions and where each was cited are a page; the drawer stays the list of statements. Deactivating keeps its dialog in the drawer, because *what stops* and *what stays* is a consequence to read at the moment of the act ([RU4](#decisions)), and a reading surface that deactivated would put the module's only irreversible-looking gesture on the page people open to browse. Panel set: [skills-boards.md](../../../building-studio/skills-boards.md). |
 | RU13 | **A statement links to its rule on every surface that draws one — and on the answer surface the act is *close the trace, then open the board*.** [RU12](#decisions) states the link without saying what it costs the surface it is drawn on, and the two surfaces differ: the activity tree is a panel and survives the act, the trace dialog is a modal and cannot — a board opened underneath it would be a page nobody can see. Dropping the link there instead would make the answer surface, the one place a reader is asking *why this answer*, the one place a rule cannot be reached, which is the opposite of what a trace is for. So the dialog dismisses itself and the rule's board opens in its place; the trace is one click away again on the same citation chip, and nothing was being edited to lose. **The host is reached through a context, not a prop**: the trace sits five components below anything that can open a page, and every one of them would be carrying a callback it has no use for — the same problem `Save report` already answers one level down ([B20](../../../building-engine/boards-migration.md#9-decisions)). The host publishes *open this board*; a surface that has one to open consumes it, and a surface mounted outside the host draws no link rather than a link that fails. |
 
@@ -162,7 +189,9 @@ Four artboards — the page carries the whole feature.
 |---|---|
 | Rules a step must obey at run time | a run is bounded by its envelope and criteria; a rule's check is read at acts, never mid-run |
 | A free-text or scripted check | a check is a closed vocabulary an auditor can read ([RU15](#decisions)) |
-| The impact preview before a rule saves (*what it would have stopped in the last 30 days*) | needs the acts' history read back through each check; MO-12's Studio session |
+| A rule checked at a record write | a range or a standard's values on one property is a constraint on the model ([constraints](../../connect-and-model/features/property-constraints.md)) |
+| A rule checked at a finding | a finding is evidence, not an act; a decision that cites it is where a rule reads it |
+| Choosing the acts a check is read at | the check kind names its acts ([RU19](#decisions)) |
 | An install rule's history and citations across Graphs | the change log and citations read one Graph; install-wide reads come with roles (P-18) |
 | Contradiction detection | two rules in tension is a judgement, and the trace shows what was used |
 | Rules on an agent | an agent carries bindings and bounds; rules describe the world |
