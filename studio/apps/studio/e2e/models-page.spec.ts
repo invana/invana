@@ -83,6 +83,39 @@ test("archiving a model an active stitch binds is refused, naming the stitches",
 	await expect(page.getByText("Each type")).toBeVisible();
 });
 
+test("a saved report reopens frozen, and Back to live returns to the board", async ({
+	page,
+}) => {
+	// Reports are never deleted, so one is saved only when the Graph has none.
+	const slug = GRAPH.split("/").at(-1);
+	const kept = await graphApi<{ items: { id: string }[] }>(
+		page,
+		`/boards/models/${slug}/versions`,
+	);
+	if (kept.items.length) {
+		await page.goto(
+			`${GRAPH}/modeller/models?page=${encodeURIComponent(`models:${slug}@${kept.items[0].id}`)}`,
+		);
+	} else {
+		await openModels(page);
+		await expect(page.getByText("Each model")).toBeVisible();
+		await page.getByRole("button", { name: "Save report" }).click();
+	}
+
+	// The reading, frozen: the banner, the chip, no tab strip (MP52).
+	await expect(
+		page.getByText(/Saved report · .* it will not change/),
+	).toBeVisible({ timeout: 30_000 });
+	await expect(page.getByText("saved report", { exact: true })).toBeVisible();
+	await expect(page.getByRole("tab", { name: "Usage" })).toHaveCount(0);
+
+	await page.getByRole("button", { name: "Back to live" }).click();
+	await expect(page.getByRole("tab", { name: "Usage" })).toBeVisible({
+		timeout: 30_000,
+	});
+	await expect(page.getByText(/Saved report · /)).toHaveCount(0);
+});
+
 // ── B · Database ─────────────────────────────────────────────────────────────
 
 test("the Database tab marks each label against the models, unmodelled first", async ({
@@ -208,7 +241,7 @@ test("Usage calls nothing unused below 50 queries", async ({ page }) => {
 	await page.goto(`${GRAPH}/modeller/models?models_tab=usage`);
 	await expect(page.getByText("Each model")).toBeVisible({ timeout: 30_000 });
 	const tooFew = page.getByText(/too few to call anything unused/);
-	const unused = page.getByText("Unused types").locator("..");
+	const unused = page.getByText("Unused types", { exact: true }).locator("..");
 	if (await tooFew.isVisible()) {
 		await expect(page.getByText("needs 50 queries").first()).toBeVisible();
 		await expect(unused).toContainText("—");
