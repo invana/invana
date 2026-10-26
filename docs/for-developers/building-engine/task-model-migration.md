@@ -202,7 +202,7 @@ Grouped by the bound it spends, because **the group is what the envelope ceiling
 Roughly twenty-five entries, and the count is meant to stay near it — growth belongs in reusable
 TaskPlans, not in new callables.
 
-### 6.1 The catalogue as it actually is — thirty-one entries
+### 6.1 The catalogue as it actually is — thirty-three entries
 
 `runtime/catalogue/registry.py` is the declaration; one module per bound holds the callables. **The
 keys do not change in M1.** They are stored in `thinking_steps.task_key` and read by Studio, so
@@ -245,6 +245,8 @@ adds its one task type to the catalogue beside them and is not counted here.
 | `withdraw_stitch` | `graph_write` | `link_id` str | `withdrawn` int | — |
 | `bulk_write` | `graph_write` | `root` str · `batch_size` int · `skip_on_error` bool · `keep_source_ids` bool | `nodes` int · `edges` int · `failed` int | **—** |
 | `apply_data_edits` | `graph_write` | `edits` list · `model_id` str | `applied` int · `ids` obj | — |
+| `data.version.check` | *none* | `dataset` str · `records` list | `records` int · `valid` int · `rejected` list · `blocked` list · `warnings` list · `unchanged` bool | — |
+| `data.version.draft` | *none* | `dataset` str · `records` list · `licence` str · `author_chain` list · `why` str · `source` str | `dataset` str · `version` int · `state` str · `record_count` int · `warnings` list | — |
 
 **`snapshot_model` spends `ingest`, not `schema_write`.** It writes no schema: it pins the version the load
 *validated against* and records what landed on the dataset. An agent allowed to load may stamp what it
@@ -259,6 +261,8 @@ writes what the files say. Borrowing `write_graph` would have a bulk load claim 
 ran, and a plan naming `write_graph` without `validate_records` is refused by the validator — correctly.
 So the fast path gets its own entry rather than a relaxed version of somebody else's, and `bulk-load@1`
 is seeded once that entry exists ([LB14](../modules/workflows/features/the-library.md)).
+
+**`data.version.check` and `data.version.draft` are the thirty-second and thirty-third entries, in their own plugin.** They are the two functions this Graph's MCP server serves ([13.16](../modules/platform/features/this-graphs-mcp-server.md)): a caller sends records inline against a dataset, checks them, and pushes them as a draft version a person publishes. They spend nothing a policy ceilings, so their bound is *none*; they call one manager in one app (`DatasetManager`), so `invana.core.datasets` holds them rather than `ingest`, whose bound and span stay one each.
 
 **`apply_data_edits` is the thirtieth entry: a board's saved edits are a write like any other.** Edit
 mode on the Explorer board adds, changes and deletes nodes and relationships
@@ -351,7 +355,7 @@ resolving option values and its result is never returned to the model.
 `snapshot_model`**. [§ 6.2](#62-where-todays-set-and--06s-proposed-set-differ)
 lists § 0.6's *proposed* names — `import_dataset`, `import_report` — and taking
 those would rename a column whose values are stored on 179 live nodes and read
-by Studio, which [§ 6.1](#61-the-catalogue-as-it-actually-is--thirty-one-entries)
+by Studio, which [§ 6.1](#61-the-catalogue-as-it-actually-is--thirty-three-entries)
 already settles: **a stored key is renamed by a data migration, never by a
 declaration.** So M11 declares the keys that exist.
 

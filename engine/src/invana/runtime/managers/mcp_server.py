@@ -490,6 +490,8 @@ class McpServerManager:
 
     async def finish(self, session: AsyncSession, *, run_id: str, message: dict) -> Reply:
         """Read a settled call's run back as the tool's result, and store its one-line outcome."""
+        # The runtime settled the run in its own session; drop what this one remembers of it.
+        session.expire_all()
         run = await self.runs_qs.get(session, run_id)
         assert run is not None
         nodes = await self.runs_qs.nodes_of(session, run_id=run_id)

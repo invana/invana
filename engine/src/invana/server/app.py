@@ -219,6 +219,7 @@ def create_app() -> FastAPI:
     from invana.server.iam.token_routes import tokens_router
     from invana.server.ledger.routes import ledger_router
     from invana.server.llm_providers.routes import llm_providers_router
+    from invana.server.mcp_server.routes import mcp_router
     from invana.server.members.routes import members_router
     from invana.server.notifications.routes import notifications_router
     from invana.server.plugins.routes import plugins_router
@@ -346,6 +347,7 @@ def create_app() -> FastAPI:
     app.include_router(iam_router)
     app.include_router(access_router)
     app.include_router(tokens_router)
+    app.include_router(mcp_router)
 
     # Proxy the studio's browser OTLP/HTTP span export to the collector.
     # Always mounted: the studio exports on its own gate, so a route that

@@ -1,0 +1,6 @@
+name = "invana.core.datasets"
+kind = "core"
+engine = "*"
+secrets = []
+tasks = ["data.version.check", "data.version.draft"]
+flows = []

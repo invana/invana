@@ -77,7 +77,7 @@ CORE_DIR = Path(__file__).parent / "core"
 SIMULATORS_DIR = Path(__file__).parent / "simulators"
 
 #: Load order of the core plugins — and so the order the catalogue lists task types in.
-CORE_PLUGINS = ("pure", "graph_read", "ingest", "graph_write", "schema_write", "llm", "work_write")
+CORE_PLUGINS = ("pure", "graph_read", "ingest", "datasets", "graph_write", "schema_write", "llm", "work_write")
 
 #: The simulator plugins, loaded after the core ones.
 SIMULATOR_PLUGINS = ("genomic",)

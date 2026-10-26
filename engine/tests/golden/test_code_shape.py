@@ -136,6 +136,8 @@ COMMIT_ALLOWED = {
     "server/work/views.py",
     # Saving a board's edits opens its `data-edit` run and works it inline, the same shape.
     "server/data_edits/views.py",
+    # A tool call over MCP opens its run and works it inline, the same shape.
+    "server/mcp_server/views.py",
     "server/admin/auth.py",
     "plugins/core/ingest/records.py",
     # A CLI command is not serving a request: it opens its own session and owns

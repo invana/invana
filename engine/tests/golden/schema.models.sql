@@ -844,6 +844,17 @@ CREATE TABLE llm_providers (
 
 CREATE INDEX ix_llm_providers_graph_id ON llm_providers (graph_id);
 
+CREATE TABLE mcp_served (
+	graph_id VARCHAR(36) NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	ref VARCHAR(64) NOT NULL, 
+	served BOOLEAN NOT NULL, 
+	changed_by_id VARCHAR(36), 
+	changed_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (graph_id, kind, ref), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
 CREATE TABLE mcp_servers (
 	name VARCHAR(32) NOT NULL, 
 	url VARCHAR(2048) NOT NULL, 

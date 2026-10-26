@@ -6,7 +6,7 @@ from pydantic import ValidationError as SchemaError
 
 from invana.apps.datasets.schemas import DatasetVersionCreate
 from invana.core.errors import InvanaError
-from invana.plugins.core.ingest.drafts import dataset_of, datasets, refused
+from invana.plugins.core.datasets.drafts import dataset_of, datasets, refused
 from invana.plugins.sdk.context import Out, RunVars, TaskContext
 from invana.plugins.sdk.errors import TaskFailure
 

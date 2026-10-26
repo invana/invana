@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from invana.plugins.core.ingest.drafts import dataset_of, datasets
+from invana.plugins.core.datasets.drafts import dataset_of, datasets
 from invana.plugins.sdk.context import Out, RunVars, TaskContext
 
 

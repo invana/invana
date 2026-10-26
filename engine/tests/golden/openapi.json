@@ -16036,6 +16036,126 @@
         "title": "MarkReadResponse",
         "type": "object"
       },
+      "McpCallPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/McpCallRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "McpCallPage",
+        "type": "object"
+      },
+      "McpCallRead": {
+        "description": "One call over this Graph's MCP server \u2014 a run.",
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "caller": {
+            "title": "Caller",
+            "type": "string"
+          },
+          "client": {
+            "title": "Client",
+            "type": "string"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token"
+          },
+          "tool": {
+            "title": "Tool",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "number",
+          "at",
+          "caller",
+          "client",
+          "token",
+          "tool",
+          "status",
+          "result"
+        ],
+        "title": "McpCallRead",
+        "type": "object"
+      },
       "McpServerAdd": {
         "properties": {
           "name": {
@@ -16052,6 +16172,50 @@
           "url"
         ],
         "title": "McpServerAdd",
+        "type": "object"
+      },
+      "McpServerInfo": {
+        "description": "The endpoint card, the Claude Code line and the head's counts.",
+        "properties": {
+          "agents_served": {
+            "title": "Agents Served",
+            "type": "integer"
+          },
+          "calls_today": {
+            "title": "Calls Today",
+            "type": "integer"
+          },
+          "connect_command": {
+            "title": "Connect Command",
+            "type": "string"
+          },
+          "functions_served": {
+            "title": "Functions Served",
+            "type": "integer"
+          },
+          "protocol_version": {
+            "title": "Protocol Version",
+            "type": "string"
+          },
+          "transport": {
+            "title": "Transport",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "transport",
+          "protocol_version",
+          "connect_command",
+          "agents_served",
+          "functions_served",
+          "calls_today"
+        ],
+        "title": "McpServerInfo",
         "type": "object"
       },
       "McpServerRead": {
@@ -26163,6 +26327,125 @@
         ],
         "title": "Sensitivity",
         "type": "string"
+      },
+      "ServedPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ServedRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "ServedPage",
+        "type": "object"
+      },
+      "ServedRead": {
+        "description": "One candidate the server may serve, and whether it does.",
+        "properties": {
+          "changed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changed At"
+          },
+          "does": {
+            "title": "Does",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "served": {
+            "title": "Served",
+            "type": "boolean"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "tool": {
+            "title": "Tool",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "ref",
+          "name",
+          "tool",
+          "does",
+          "served"
+        ],
+        "title": "ServedRead",
+        "type": "object"
+      },
+      "ServedUpdate": {
+        "properties": {
+          "served": {
+            "title": "Served",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "served"
+        ],
+        "title": "ServedUpdate",
+        "type": "object"
       },
       "ServiceAccountCreate": {
         "properties": {
@@ -42692,6 +42975,288 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/connections/server": {
+      "get": {
+        "operationId": "server_info_api_v1_u__username___graphSlug__connections_server_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/McpServerInfo"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Server Info",
+        "tags": [
+          "mcp-server"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/connections/server/calls": {
+      "get": {
+        "description": "The newest calls; ``total`` counts every call this Graph has had.",
+        "operationId": "list_calls_api_v1_u__username___graphSlug__connections_server_calls_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/McpCallPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Calls",
+        "tags": [
+          "mcp-server"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/connections/server/served": {
+      "get": {
+        "description": "Every candidate with its switch; ``f.kind`` narrows to agents or functions.",
+        "operationId": "list_served_api_v1_u__username___graphSlug__connections_server_served_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServedPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Served",
+        "tags": [
+          "mcp-server"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/connections/server/served/{kind}/{ref}": {
+      "put": {
+        "operationId": "set_served_api_v1_u__username___graphSlug__connections_server_served__kind___ref__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServedUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServedRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Set Served",
+        "tags": [
+          "mcp-server"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/contention": {
       "get": {
         "description": "The Graph's ceiling, and what it is holding back right now.\n\nRead from the runtime rather than from a table: the queue lives in the\nprocess that owns the runs, and a row would be a second, staler answer to the\nsame question.",
@@ -50161,6 +50726,65 @@
         "summary": "Ping Llm Provider",
         "tags": [
           "llm-providers"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/mcp": {
+      "post": {
+        "description": "Answer one JSON-RPC message from an MCP client.",
+        "operationId": "post_mcp_api_v1_u__username___graphSlug__mcp_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Post Mcp",
+        "tags": [
+          "mcp-server"
         ]
       }
     },

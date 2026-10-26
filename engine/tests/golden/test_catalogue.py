@@ -30,11 +30,12 @@ CORE = {t.key for p in load_plugins().plugins.values() if p.manifest.kind == "co
 #: The core set's size. Growth belongs in reusable Flows, not here — so
 #: changing this number is a decision, and the decision goes in
 #: `building-engine/task-model-migration.md` § 6.1 first.
-ENTRY_COUNT = 31
+ENTRY_COUNT = 33
 
 #: Core plugins that declare task types, and the one bound each of them names.
 BOUND_PLUGINS = {
     "pure": Bound.none,
+    "datasets": Bound.none,
     "graph_read": Bound.graph_read,
     "ingest": Bound.ingest,
     "graph_write": Bound.graph_write,

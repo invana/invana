@@ -21,7 +21,7 @@ pushes **draft** dataset versions through it; a person publishes them.
 | # | Capability | Notes |
 |---|---|---|
 | C1 | One endpoint per Graph | `POST /api/v1/u/{username}/{graphSlug}/mcp`, MCP over Streamable HTTP |
-| C2 | Served agents | Every authored, live agent may be served as the tool `ask_<agent name>` — one question in, its answer out |
+| C2 | Served agents | Every live agent that is not spawned — authored or seeded — may be served as the tool `ask_<agent name>` — one question in, its answer out |
 | C3 | Served functions | `data.version.check` as `validate_records` and `data.version.draft` as `push_draft_version` |
 | C4 | Served is a switch | Per agent and per function, on *Connections › This Graph's server* and on an agent's *Deploy* tab — one record. Everything starts not served |
 | C5 | A token made in IAM | The caller's credential is an IAM token; a narrowed token's inline policy decides which tools it may call |
@@ -105,10 +105,9 @@ sequenceDiagram
 |---|---|
 | `apps/mcp_server/models.py` | `McpServed` |
 | `apps/mcp_server/querysets/served.py` | the served rows of a Graph |
-| `apps/mcp_server/managers/served.py` | `ServedManager` — the candidates (live authored agents + `SERVABLE` functions) joined to their switch; tool names |
-| `runtime/managers/mcp_server.py` | `McpServerManager` — the JSON-RPC methods, the token check per call, opening and running the call's run, the result line |
+| `runtime/managers/mcp_server.py` | `McpServerManager` — the candidates (live, unspawned agents + `SERVABLE` functions) joined to their switch, tool names, the JSON-RPC methods, the token check per call, opening and running the call's run, the result line |
 | `runtime/services.py` | `open_mcp_function_run` · `open_mcp_agent_run` |
-| `plugins/core/ingest/tasks/data_version_check` · `data_version_draft` | the two served functions |
+| `plugins/core/datasets/tasks/data_version_check` · `data_version_draft` | the two served functions, in the `invana.core.datasets` plugin (bound *none*) |
 | `server/mcp_server/` | the endpoint and the Connections reads |
 
 | `mcp_served` column | Type | Notes |
@@ -137,7 +136,7 @@ sequenceDiagram
 | Run field | For an MCP call |
 |---|---|
 | `triggered_by` | `mcp` |
-| `ask_kind` | `mcp` |
+| `ask_kind` | `mcp` for a function; `nl` for an agent's ask, which opens as any question to it does |
 | `author_id` · `on_behalf_of_user_id` | the token's holder |
 | `params.mcp` | `{tool, token_id, token, client, result}` — `result` is the one-line outcome, written when the run settles |
 | `agent_id` | the served agent, for `ask_*`; none for a function |
@@ -150,7 +149,7 @@ sequenceDiagram
 | MS2 | **Streamable HTTP in its JSON response mode, stateless.** Each POST is answered with one JSON-RPC response; a GET for a stream is 405. The server needs no session store, so any engine process answers any call. |
 | MS3 | **The session id carries the client's name.** `initialize` returns `Mcp-Session-Id: <random>.<base64url clientInfo name>`; the client sends it back on every call, and the call's run records it as `client`. Without it the client is `MCP client`. |
 | MS4 | **Only an IAM token connects.** A session JWT is refused at `…/mcp` (401): the caller is software, and the token is what IAM narrows, expires and revokes. |
-| MS5 | **Served is off until a builder turns it on**, per agent and per function, in `mcp_served`. The candidates are every authored agent that is live (not a draft, paused, retired or spawned) and the functions in `SERVABLE`. Turning one on is the *build* area. |
+| MS5 | **Served is off until a builder turns it on**, per agent and per function, in `mcp_served`. The candidates are every agent that is live (not a draft, paused, retired or spawned), seeded or authored, and the functions in `SERVABLE`. Turning one on is the *build* area. |
 | MS6 | **The served functions are `data.version.check` and `data.version.draft`.** `data.records.validate` stays the load's per-record check of a bundle on disk against the model; a caller over MCP sends records inline against a dataset, so the check is its own function, running the gates a draft push runs and writing nothing. |
 | MS7 | **A tool name is fixed for a function** (`validate_records`, `push_draft_version`) and `ask_` + the agent's name in snake case for an agent, ≤ 64 characters; two agents that snake to one name are told apart by their id's first six characters. |
 | MS8 | **A narrowed token is checked per call, not per route.** The narrowing table lets `POST …/mcp` through; each `tools/call` is read as one action on one resource — `data.version.check` / `data.version.draft` on `dataset/<publisher>/<name>`, `agent.ask` on `agent/<name>` for an `ask_*` tool — and refused naming the token and its policy when the inline policy does not allow it. `tools/list` lists every served tool; the policy decides the call. |
