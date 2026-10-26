@@ -83,7 +83,11 @@ export type {
 	CaptureCanvasState,
 } from "./boards/types";
 export { useBoardVersions } from "./boards/useBoardVersions";
-export { DeclaredBoardContext, useReport } from "./boards/useReport";
+export {
+	DeclaredBoardContext,
+	type ReportOptions,
+	useReport,
+} from "./boards/useReport";
 export { boardVersionsApi } from "./boards/versionsApi";
 export * from "./components/AppVersion";
 export * from "./components/ConfirmDialog";

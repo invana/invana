@@ -74,7 +74,13 @@ export const MODELS_ACTIONS = {
 	versions: "versions",
 	openSchema: "open-schema",
 	openModel: "open-model",
+	scope: "scope",
+	saveReport: "save-report",
+	openReports: "open-reports",
 } as const;
+
+/** The scope picker's item for every model at once. */
+export const ALL_MODELS = "all";
 
 /** What `⋯` holds, per scope and state (the-model-page.md · The page). */
 const MODELS_MENU = {
@@ -86,6 +92,7 @@ const MODELS_MENU = {
 	exportModel: "Export",
 	archive: "Archive",
 	delete: "Delete",
+	reports: "Reports",
 } as const;
 export type ModelsMenuItem = keyof typeof MODELS_MENU;
 
@@ -321,13 +328,11 @@ function header(data: ModelsPageData, view: ModelsView): BoardSpec["header"] {
 		// Unknown reads "—", never 0: nothing loaded yet is not nothing stitched.
 		const stitches = data.links?.filter((l) => l.status === "active").length;
 		return {
-			crumbs: ["All models"],
+			crumbs: ["Models", "All models"],
+			crumbMenu: scopeMenu(data, ALL_MODELS),
 			chips: published
 				? [
-						{
-							label: `${published} ${published === 1 ? "model" : "models"}`,
-							variant: "outline",
-						},
+						{ label: `${published} published`, variant: "outline" },
 						{
 							label: `${stitches ?? "—"} ${stitches === 1 ? "stitch" : "stitches"}`,
 							variant: "outline",
@@ -353,7 +358,7 @@ function header(data: ModelsPageData, view: ModelsView): BoardSpec["header"] {
 						icon: "upload",
 						variant: "outline",
 					},
-					menu(["starters", "ontology", "introspect"]),
+					menu(["starters", "ontology", "introspect", "reports"]),
 				],
 				canWrite,
 			),
@@ -421,11 +426,16 @@ function header(data: ModelsPageData, view: ModelsView): BoardSpec["header"] {
 				]
 			: []),
 		...compare,
-		menu(draft ? ["rename", retire] : ["draft", "rename", retire]),
+		menu(
+			draft
+				? ["rename", retire, "reports"]
+				: ["draft", "rename", retire, "reports"],
+		),
 	];
 
 	return {
 		crumbs: ["Models", model.name],
+		crumbMenu: scopeMenu(data, model.id),
 		// The model's own crumb is the way back to its page from the canvas.
 		crumbActions: [
 			MODELS_ACTIONS.allModels,
@@ -478,6 +488,7 @@ const READS: ReadonlySet<string> = new Set([
 ]);
 const READ_ITEMS: ReadonlySet<string> = new Set<ModelsMenuItem>([
 	"exportModel",
+	"reports",
 ]);
 
 /**
@@ -499,6 +510,75 @@ export function readOnly(
 		}
 		return { ...a, disabled: true };
 	});
+}
+
+/** The scope picker on the last crumb: All models, then every authored model. */
+function scopeMenu(
+	data: ModelsPageData,
+	selected: string,
+): NonNullable<BoardSpec["header"]>["crumbMenu"] {
+	return {
+		action: MODELS_ACTIONS.scope,
+		placeholder: "Read a model",
+		items: [
+			{ id: ALL_MODELS, label: "All models" },
+			...data.models.map((m) => ({ id: m.id, label: m.name })),
+		],
+		selected,
+	};
+}
+
+/**
+ * *Save report* — the head's own act, first on the row. `useReport` adds it
+ * with *Reports*; *Reports* lives behind `⋯` here, so the row stays the board's.
+ */
+export function withReportActs(spec: BoardSpec): BoardSpec {
+	const actions = spec.header?.actions ?? [];
+	const save = actions.find((a) => a.id === MODELS_ACTIONS.saveReport);
+	if (!spec.header || !save) return spec;
+	return {
+		...spec,
+		header: {
+			...spec.header,
+			actions: [
+				{ ...save, icon: "save", variant: "ghost" },
+				...actions.filter(
+					(a) =>
+						a.id !== MODELS_ACTIONS.saveReport &&
+						a.id !== MODELS_ACTIONS.openReports,
+				),
+			],
+		},
+	};
+}
+
+/** `Models overview, 30 days` — what a saved report of this reading is called. */
+export function reportLabel(data: ModelsPageData, view: ModelsView): string {
+	const scope = data.scope?.model.name ?? "Models";
+	return `${scope} ${TAB_LABEL[view.tab].toLowerCase()}, ${WINDOW_LABEL[view.window]}`;
+}
+
+/**
+ * The document a saved report keeps: the open tab's tiles and tables, under
+ * a head that says it is a report. A panel the page draws itself — a chart, a
+ * list with links — renders only with its host, so it is not kept.
+ */
+export function reportDocument(spec: BoardSpec): BoardSpec {
+	const open = spec.tabs?.find((t) => t.id === spec.tab);
+	const rows = (open?.rows ?? [])
+		.map((row) => ({
+			...row,
+			panels: row.panels.filter((panel) => !panel.render),
+		}))
+		.filter((row) => row.panels.length);
+	return {
+		title: spec.title,
+		header: spec.header && {
+			crumbs: spec.header.crumbs,
+			chips: [{ label: "saved report", variant: "outline" }],
+		},
+		rows,
+	};
 }
 
 function menu(items: ModelsMenuItem[]): ActionSpec {
@@ -778,14 +858,18 @@ function measuredOf(insights: Insights | undefined) {
 		return {
 			share: fmtPct(r.share),
 			p95: fmtMs(r.p95),
+			// The engine names the first three and counts the rest.
 			signal:
-				r.signals
-					.map((s) =>
+				[
+					...r.signals.map((s) =>
 						one
 							? SIGNAL_TEXT[s.signal]
 							: `${SIGNAL_TEXT[s.signal]} ${s.subject.split(".").pop()}`,
-					)
-					.join(" · ") || "—",
+					),
+					...(r.signals_total > r.signals.length
+						? [`+${r.signals_total - r.signals.length}`]
+						: []),
+				].join(" · ") || "—",
 		};
 	};
 }

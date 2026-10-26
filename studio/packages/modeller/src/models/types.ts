@@ -731,13 +731,22 @@ export interface Overview {
 	slow: boolean;
 	by_caller_by_day: { label: string; counts: Record<CallerKind, number> }[];
 	p95_by_day: DayValue[];
-	rows: { key: string; share: number; p95: number | null; signals: Signal[] }[];
+	rows: {
+		key: string;
+		share: number;
+		p95: number | null;
+		/** The first three; `signals_total` counts them all. */
+		signals: Signal[];
+		signals_total: number;
+	}[];
+	/** The first six flagged signals; `attention_total` counts them all. */
 	attention: {
 		signal: string;
 		subject: string;
 		why: string;
 		tab: "usage" | "performance" | "growth" | "database";
 	}[];
+	attention_total: number;
 }
 
 export interface UsageRow {
@@ -749,6 +758,8 @@ export interface UsageRow {
 	by_caller: Record<CallerKind, number>;
 	last_touched: string | null;
 	signals: Signal[];
+	/** How many types each signal fired on — `{unused: 5}`. */
+	signal_counts: Partial<Record<Signal["signal"], number>>;
 }
 
 export interface Usage {
@@ -808,6 +819,8 @@ export interface Performance {
 	/** `errors` over `total`. */
 	error_rate: number;
 	slow_shapes: number;
+	/** Distinct `label.property` filtered after a scan with no index. */
+	missing_indexes: number;
 	p95_by_day: DayValue[];
 	shapes: ShapeRow[];
 }

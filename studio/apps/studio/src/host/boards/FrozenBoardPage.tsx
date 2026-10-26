@@ -13,12 +13,31 @@
  */
 
 import { Board, type BoardSpec } from "@invana/boards";
-import { EmptyState, Spinner } from "@invana/ui";
-import { formatRelativeTime } from "@invana-studio/core";
-import { boardReportsApi } from "@invana-studio/shell";
+import {
+	Alert,
+	AlertDescription,
+	Button,
+	EmptyState,
+	Spinner,
+} from "@invana/ui";
+import { useMembersQuery } from "@invana-studio/core";
+import {
+	boardReportsApi,
+	DeclaredBoardContext,
+	useBoardReportsQuery,
+} from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useQuery } from "@tanstack/react-query";
+import { Save } from "lucide-react";
+import { useContext } from "react";
 import { DECLARED_WIDGETS } from "@/host/boards/boardWidgets";
+
+/** The one act a report's head carries: every reading kept of this board. */
+const OPEN_REPORTS = "open-reports";
+
+/** `9 Oct` — the day a reading was kept. */
+const keptOn = (at: Date) =>
+	at.toLocaleDateString(undefined, { day: "numeric", month: "short" });
 
 export interface FrozenBoardPageProps {
 	username: string;
@@ -62,6 +81,9 @@ export function FrozenBoardPage({
 	const report = useQuery(
 		boardReportQuery(username, graphSlug, kind, subjectId, versionId),
 	);
+	const board = useContext(DeclaredBoardContext);
+	const reports = useBoardReportsQuery(username, graphSlug, kind, subjectId);
+	const members = useMembersQuery({ username, graphSlug });
 
 	if (report.isLoading) {
 		return (
@@ -80,26 +102,51 @@ export function FrozenBoardPage({
 		);
 	}
 
-	const spec = report.data.snapshot as unknown as BoardSpec;
-	const at = formatRelativeTime(report.data.createdAt);
+	const kept = report.data.snapshot as unknown as BoardSpec;
+	const keeper = members.data?.items.find(
+		(m) => m.user_id === report.data.createdById,
+	)?.username;
+	// The head keeps the reading's crumbs and chips; its one act finds the
+	// other readings kept of this board, counted by the engine.
+	const spec: BoardSpec = kept.header
+		? {
+				...kept,
+				header: {
+					...kept.header,
+					actions: [
+						{
+							id: OPEN_REPORTS,
+							label:
+								reports.data != null
+									? `Reports · ${reports.data.total}`
+									: "Reports",
+							variant: "outline",
+						},
+					],
+				},
+			}
+		: kept;
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			{/* Which reading you are looking at. A frozen page that did not say so
 			    would be a live board that had quietly stopped updating. */}
-			<div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-1.5 text-base text-muted-foreground">
-				<span>
-					A report — the numbers as they were {at}. Nothing here is being
-					re-read.
-				</span>
-				<button
-					type="button"
-					onClick={onOpenLive}
-					className="text-foreground hover:underline"
-				>
-					Open the live board
-				</button>
-			</div>
+			<Alert
+				tone="info"
+				className="flex shrink-0 items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-3 py-1.5"
+			>
+				<AlertDescription className="flex items-center gap-2">
+					<Save className="size-4 shrink-0 text-info" />
+					<span>
+						Saved report · <strong>{report.data.label}</strong> · kept
+						{keeper ? ` by ${keeper}` : ""} on {keptOn(report.data.createdAt)} ·
+						it will not change
+					</span>
+				</AlertDescription>
+				<Button variant="outline" size="sm" onClick={onOpenLive}>
+					Back to live
+				</Button>
+			</Alert>
 			<div className="min-h-0 flex-1">
 				<Board
 					className="h-full min-h-0"
@@ -109,6 +156,9 @@ export function FrozenBoardPage({
 					// pure, so nothing here re-reads the subject.
 					registry={DECLARED_WIDGETS}
 					icons={BOARD_ICONS}
+					onAction={(id) => {
+						if (id === OPEN_REPORTS) board?.openReports();
+					}}
 				/>
 			</div>
 		</div>

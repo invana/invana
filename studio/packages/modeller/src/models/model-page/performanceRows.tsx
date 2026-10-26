@@ -92,12 +92,17 @@ export function performanceRows(
 					{
 						kind: "grid",
 						options: {
-							tiles: ["Queries", "p50", "p95", "Errors", "Slow shapes"].map(
-								(label) => ({
-									label,
-									value: "…",
-								}),
-							),
+							tiles: [
+								"Queries",
+								"p50",
+								"p95",
+								"Errors",
+								"Slow shapes",
+								"Advice",
+							].map((label) => ({
+								label,
+								value: "…",
+							})),
 						},
 					},
 				],
@@ -203,6 +208,16 @@ export function performanceRows(
 								delta:
 									graphP95 != null ? `p95 at or above ${fmtMs(graphP95)}` : "",
 								tone: performance.slow_shapes ? "warn" : undefined,
+							},
+							{
+								label: "Advice",
+								value: String(performance.missing_indexes),
+								delta:
+									performance.missing_indexes === 1
+										? "missing index"
+										: performance.missing_indexes
+											? "missing indexes"
+											: "nothing to advise",
 							},
 						],
 					},

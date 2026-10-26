@@ -22,6 +22,7 @@ import {
 	ReadOnlyNotice,
 	routedAction,
 	useAccess,
+	useReport,
 } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -32,6 +33,7 @@ import {
 	Lock,
 	Network,
 	Plus,
+	Save,
 	Upload,
 } from "lucide-react";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
@@ -71,13 +73,17 @@ import type {
 import { ModelHistory } from "./ModelHistory";
 import { ArchiveRefused, PublishConfirm } from "./ModelsDialogs";
 import {
+	ALL_MODELS,
 	LOCKED_UNTIL_PUBLISHED,
 	MODELS_ACTIONS,
 	type ModelsMenuItem,
 	type ModelsScope,
 	modelsPageSpec,
+	reportDocument,
+	reportLabel,
 	schemaSpec,
 	windowOf,
+	withReportActs,
 } from "./modelsPageSpec";
 import { ShapeSheet } from "./performanceRows";
 import { TypePage } from "./TypePage";
@@ -89,6 +95,7 @@ const ICONS = {
 	upload: Upload,
 	check: Check,
 	schema: Network,
+	save: Save,
 };
 
 /** What each tab waits on until its read ships. */
@@ -369,6 +376,12 @@ export function ModelsPage({
 		),
 	});
 
+	// *Save report* keeps the open tab; *Reports* is behind `⋯`.
+	const report = useReport(spec, {
+		label: reportLabel(pageData, view),
+		document: reportDocument,
+	});
+
 	const archive = (model: GraphModelSummary) =>
 		update.mutate(
 			{ id: model.id, data: { status: "archived" } },
@@ -416,11 +429,14 @@ export function ModelsPage({
 				return scoped && archive(scoped);
 			case "delete":
 				return scoped && setDeleting(scoped);
+			case "reports":
+				return report?.handle(MODELS_ACTIONS.openReports);
 		}
 	};
 
 	const onBoardAction = (action: string, context?: ActionContext) => {
 		const [id, ctx] = routedAction(action, context);
+		if (report?.handle(id)) return;
 		switch (id) {
 			case MODELS_ACTIONS.tab:
 				if (ctx?.option) set({ tab: ctx.option as ModelsTab });
@@ -433,6 +449,13 @@ export function ModelsPage({
 			case MODELS_ACTIONS.allModels:
 				onSelect(null);
 				return set({ scope: null, open: false });
+			case MODELS_ACTIONS.scope:
+				// The head's picker reads one model as a row click does, or all.
+				if (!ctx?.itemId) return;
+				onSelect(null);
+				return ctx.itemId === ALL_MODELS
+					? set({ scope: null, open: false })
+					: set({ scope: ctx.itemId, open: true, type: null });
 			case MODELS_ACTIONS.openModel:
 				// The breadcrumb back to the model's page, from its canvas or a type.
 				onSelect(null);
@@ -547,7 +570,7 @@ export function ModelsPage({
 		body = (
 			<Board
 				className="min-h-0 flex-1"
-				spec={spec}
+				spec={withReportActs(report?.spec ?? spec)}
 				icons={ICONS}
 				onAction={onBoardAction}
 			/>

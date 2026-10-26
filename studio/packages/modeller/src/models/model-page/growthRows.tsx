@@ -237,6 +237,8 @@ export function growthRows(
 				{
 					kind: "grid",
 					options: {
+						// One row across, as the board draws it.
+						minTileWidth: 140,
 						tiles: [
 							{
 								label: "Records",
