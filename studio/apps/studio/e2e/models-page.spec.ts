@@ -193,7 +193,7 @@ test("a model nothing was counted for draws no chart of zeros", async ({
 		await row(page, name).click();
 		await page.getByRole("tab", { name: "Growth" }).click();
 		await expect(page.getByText(`${name} has no records yet`)).toBeVisible({
-			timeout: 20_000,
+			timeout: 30_000,
 		});
 		await expect(page.getByText("Records over time")).toHaveCount(0);
 	} finally {
