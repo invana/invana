@@ -572,7 +572,7 @@
    "route": "/u/admin/airways/modeller/rules",
    "state": "click a rule",
    "click": [
-    "text:Airport codes are IATA"
+    "text:A final decision cites person-reviewed data only"
    ]
   },
   "modeller.requests": {

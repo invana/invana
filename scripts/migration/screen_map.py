@@ -408,7 +408,7 @@ CLICK = {  # board → buttons shoot.mjs presses after the route loads, for a st
     "modeller.model.type.constraint": ["Edit constraint on runways", "fill:Lowest value=1", "fill:Highest value=3",
                                        "fill:Unit=runways", "text:Flag for review"],
     "modeller.global_model.stitch": ["text:Country ≡ country"],
-    "modeller.rules.edit": ["text:Airport codes are IATA"],
+    "modeller.rules.edit": ["text:A final decision cites person-reviewed data only"],
     "modeller.guardrails.edit": ["New rule", "text:Read in counts only", "text:Stays in the Graph"],
     **{f"modeller.models.new.ontology{s}": ["More actions", "text:From an ontology",
                                             "text:File", "upload:demos/arabidopsis/semantic/schema-org-subset.ttl",

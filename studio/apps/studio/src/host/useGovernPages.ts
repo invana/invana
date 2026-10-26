@@ -23,10 +23,10 @@ export function useGovernPages(
 			: settingsSection === "rules"
 				? "rules"
 				: settingsSection === "govern"
-				? params.get(SECTION_PARAM) === "guardrails"
-					? "guardrails"
-					: "worlds"
-				: null;
+					? params.get(SECTION_PARAM) === "guardrails"
+						? "guardrails"
+						: "worlds"
+					: null;
 	// A link that lands on a world's board opens that board, not the page.
 	const landsOnWorldBoard = (params.get("page") ?? "").startsWith("world:");
 	const was = useRef<DeclaredKind | null>(null);

@@ -70,9 +70,9 @@ test("a rail item writes its path: Rules opens, Requests opens its inbox", async
 	await page.goto(`${MODELLER}/global-model`);
 	await page.locator('button[aria-label="Rules"]').click({ timeout: 30_000 });
 	await expect(page).toHaveURL(onPath("rules"));
-	await expect(page.getByText("offered and cited, never enforced")).toBeVisible(
-		{ timeout: 30_000 },
-	);
+	await expect(
+		page.getByText("A guardrail bounds a run; a rule bounds"),
+	).toBeVisible({ timeout: 30_000 });
 
 	await page.locator('button[aria-label="Requests"]').click();
 	await expect(page).toHaveURL(onPath("requests"));

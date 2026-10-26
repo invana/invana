@@ -892,8 +892,8 @@ The `modeller.*` boards of [Invana Products](https://claude.ai/artifact/HcPfkMUY
 | `modeller.guardrails.edit` | MO-11 | `/modeller/guardrails` › a rule — one property rule with its impact | ✅ |
 | `modeller.guardrails.request` | MO-11 | `/modeller/guardrails/<guardrail>` — a request it caused, and its refusals | ✅ |
 | `modeller.requests` | MO-13 | `/modeller/requests` — the inbox of asks | ✅ |
-| `modeller.rules` | MO-12 | `/modeller/rules` — install, Graph and project rules | 🟡 |
-| `modeller.rules.edit` | MO-12 | the same › a rule — scope, checked on, when broken, impact | 🔵 |
+| `modeller.rules` | MO-12 | `/modeller/rules` — install, Graph and project rules | ✅ |
+| `modeller.rules.edit` | MO-12 | the same › a rule — scope, checked on, when broken, impact | ✅ |
 | `modeller.settings` | MO-14 | `/modeller/settings` — Basic · Database · Members as a page | 🟡 |
 
 ## The other direction — every feature, and the screen that draws it
