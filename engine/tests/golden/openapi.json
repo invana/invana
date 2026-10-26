@@ -5717,8 +5717,26 @@
             "title": "Basis",
             "type": "string"
           },
+          "datasets": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/EffectDataset"
+            },
+            "title": "Datasets",
+            "type": "array"
+          },
+          "datasets_failing": {
+            "default": 0,
+            "title": "Datasets Failing",
+            "type": "integer"
+          },
           "failed": {
             "title": "Failed",
+            "type": "integer"
+          },
+          "rows_failing": {
+            "default": 0,
+            "title": "Rows Failing",
             "type": "integer"
           },
           "runs": {
@@ -8829,6 +8847,40 @@
         "title": "EdgeTypeUpdate",
         "type": "object"
       },
+      "EffectDataset": {
+        "description": "A dataset bound to a type a model version's publish changed.",
+        "properties": {
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "rows_failing": {
+            "title": "Rows Failing",
+            "type": "integer"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "dataset_id",
+          "name",
+          "version",
+          "type",
+          "rows_failing"
+        ],
+        "title": "EffectDataset",
+        "type": "object"
+      },
       "EffectiveRead": {
         "properties": {
           "agent": {
@@ -11670,6 +11722,102 @@
           "name"
         ],
         "title": "GlobalType",
+        "type": "object"
+      },
+      "GraphConnect": {
+        "description": "A new Graph from a database: the connection, and the name when one is given.",
+        "properties": {
+          "auth": {
+            "additionalProperties": true,
+            "title": "Auth",
+            "type": "object"
+          },
+          "connector_class": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Connector Class",
+            "type": "string"
+          },
+          "database": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Database"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "read_only": {
+            "default": false,
+            "title": "Read Only",
+            "type": "boolean"
+          },
+          "server_version": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Server Version"
+          },
+          "uri": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri",
+          "connector_class"
+        ],
+        "title": "GraphConnect",
+        "type": "object"
+      },
+      "GraphConnectRead": {
+        "description": "What connecting made: the Graph, and the draft model read from its database.",
+        "properties": {
+          "discovered": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Discovered",
+            "type": "object"
+          },
+          "graph": {
+            "$ref": "#/components/schemas/GraphRead"
+          },
+          "model_id": {
+            "title": "Model Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "graph",
+          "model_id",
+          "discovered"
+        ],
+        "title": "GraphConnectRead",
         "type": "object"
       },
       "GraphConnectionCreate": {
@@ -16803,6 +16951,30 @@
           "kind"
         ],
         "title": "MappedType",
+        "type": "object"
+      },
+      "MarkLine": {
+        "description": "One line of a type's mark: ``+`` added, ``~`` changed, ``-`` removed.",
+        "properties": {
+          "sign": {
+            "enum": [
+              "+",
+              "~",
+              "-"
+            ],
+            "title": "Sign",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sign",
+          "text"
+        ],
+        "title": "MarkLine",
         "type": "object"
       },
       "MarkRead": {
@@ -27282,6 +27454,11 @@
       },
       "SchemaDiff": {
         "properties": {
+          "added": {
+            "default": 0,
+            "title": "Added",
+            "type": "integer"
+          },
           "added_constraints": {
             "default": [],
             "items": {
@@ -27322,6 +27499,11 @@
             "title": "Added Property Keys",
             "type": "array"
           },
+          "changed": {
+            "default": 0,
+            "title": "Changed",
+            "type": "integer"
+          },
           "classification": {
             "default": "patch",
             "enum": [
@@ -27331,6 +27513,14 @@
             ],
             "title": "Classification",
             "type": "string"
+          },
+          "marks": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/TypeMark"
+            },
+            "title": "Marks",
+            "type": "array"
           },
           "modified_edge_types": {
             "default": [],
@@ -27355,6 +27545,11 @@
             },
             "title": "Modified Property Keys",
             "type": "array"
+          },
+          "removed": {
+            "default": 0,
+            "title": "Removed",
+            "type": "integer"
           },
           "removed_constraints": {
             "default": [],
@@ -35284,6 +35479,47 @@
         "title": "TypeCountsResponse",
         "type": "object"
       },
+      "TypeMark": {
+        "description": "What a version pair did to one type \u2014 the chip the map draws beside it.",
+        "properties": {
+          "lines": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MarkLine"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "mark": {
+            "enum": [
+              "added",
+              "changed",
+              "removed"
+            ],
+            "title": "Mark",
+            "type": "string"
+          },
+          "target_kind": {
+            "enum": [
+              "node_type",
+              "edge_type"
+            ],
+            "title": "Target Kind",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "target_kind",
+          "mark"
+        ],
+        "title": "TypeMark",
+        "type": "object"
+      },
       "TypePropertyMappingCreate": {
         "properties": {
           "default_value": {
@@ -39343,6 +39579,102 @@
           }
         ],
         "summary": "Create Graph",
+        "tags": [
+          "graphs"
+        ]
+      }
+    },
+    "/api/v1/graphs/connect": {
+      "post": {
+        "description": "A new Graph from a database: tested, connected, and its schema read into a draft model.",
+        "operationId": "connect_graph_api_v1_graphs_connect_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GraphConnect"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphConnectRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Connect Graph",
+        "tags": [
+          "graphs"
+        ]
+      }
+    },
+    "/api/v1/graphs/connect/test": {
+      "post": {
+        "description": "Prove credentials before any Graph exists \u2014 recorded nowhere, there is no Graph yet.",
+        "operationId": "test_new_connection_api_v1_graphs_connect_test_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GraphConnectionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Test New Connection Api V1 Graphs Connect Test Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Test New Connection",
         "tags": [
           "graphs"
         ]
@@ -56072,7 +56404,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/models/{model_id}/versions/{version_id}/diff": {
       "get": {
-        "description": "What changed between two versions of this model.\n\nThe version bar states this (domain-models.md \u00b7 Surfaces): a list of numbers\nwith no account of what moved between them is a list nobody can act on. With\nno `against`, it diffs against the version immediately before this one, which\nis the question being asked nine times in ten.",
+        "description": "What changed between two versions of this model.\n\nThe version bar states this (domain-models.md \u00b7 Surfaces): a list of numbers\nwith no account of what moved between them is a list nobody can act on. With\nno `against`, it diffs against the version immediately before this one, which\nis the question being asked nine times in ten. `version_id` may be the draft,\nwhich is how the Comparing bar reads *active \u2192 draft*. Each changed type\ncarries its mark, and the counts are of the marks' lines.",
         "operationId": "diff_version_api_v1_u__username___graphSlug__models__model_id__versions__version_id__diff_get",
         "parameters": [
           {

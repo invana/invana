@@ -50,7 +50,8 @@ BOUND_PLUGINS = {
 SPANS_ALLOWED = {
     # validate_proposal reconciles through apps/sessions into apps/modeller.
     # Closes when reconcile_proposal moves to an apps/modeller manager.
-    "schema_write": {"llm", "modeller", "sessions"},
+    # migrate reads the datasets bound to the model, which modeller cannot import.
+    "schema_write": {"datasets", "llm", "modeller", "sessions"},
     # delegate opens a run against a work Task under a child agent.
     # Closes when delegate and create_task merge into one entry (§ 6.2).
     "work_write": {"agents", "work"},

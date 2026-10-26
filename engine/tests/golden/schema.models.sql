@@ -638,6 +638,7 @@ CREATE TABLE graph_versions (
 	change_summary TEXT NOT NULL, 
 	content_hash VARCHAR(64), 
 	axes JSON DEFAULT '{}' NOT NULL, 
+	affected_datasets JSON DEFAULT '[]' NOT NULL, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	activated_at TIMESTAMP WITH TIME ZONE, 
 	PRIMARY KEY (id), 

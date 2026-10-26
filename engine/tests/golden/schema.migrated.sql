@@ -647,6 +647,7 @@ CREATE TABLE graph_versions (
 	activated_at TIMESTAMP WITH TIME ZONE, 
 	content_hash VARCHAR(64), 
 	axes JSON DEFAULT '{}'::json NOT NULL, 
+	affected_datasets JSON DEFAULT '[]'::json NOT NULL, 
 	CONSTRAINT graph_versions_pkey PRIMARY KEY (id), 
 	CONSTRAINT graph_versions_model_id_fkey FOREIGN KEY(model_id) REFERENCES graph_models (id) ON DELETE CASCADE, 
 	CONSTRAINT uq_graph_version UNIQUE NULLS DISTINCT (model_id, version)
