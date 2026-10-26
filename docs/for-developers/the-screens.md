@@ -881,12 +881,12 @@ The `modeller.*` boards of [Invana Products](https://claude.ai/artifact/HcPfkMUY
 | `modeller.connect` | MO-04 | `/graphs/new` — connect a database and draft a model | 🟡 |
 | `modeller.draft` | MO-04 | `/modeller/models?model=<id>` on a draft — the drafted model on the canvas, staged and published from its bar | 🟡 |
 | `modeller.models.new` | MO-06 | `/modeller/models` › *New model* — describe it · a file · a starter | 🟡 |
-| `modeller.models.overview` | MO-07 | `/modeller/models?models_tab=overview` — every model's health | 🟡 |
+| `modeller.models.overview` | MO-07 | `/modeller/models?models_tab=overview` — every model's health | ✅ |
 | `modeller.models.database` | MO-07 | `?models_tab=database` — the model against the database | ✅ |
 | `modeller.models.usage` | MO-07 | `?models_tab=usage` — queries by model and stitches crossed | ✅ |
 | `modeller.models.performance` | MO-07 | `?models_tab=performance` — p95 and query shapes | ✅ |
 | `modeller.models.growth` | MO-07 | `?models_tab=growth` — records over time | ✅ |
-| `modeller.models.report` | MO-07 | the same › *Save report* — a frozen reading | 🔵 |
+| `modeller.models.report` | MO-07 | the same › *Save report* — a frozen reading | ✅ |
 | `modeller.worlds` | MO-10 | `/modeller/worlds` — the lens canvas and the world inspector | 🟡 |
 | `modeller.worlds.board` | MO-10 | `/modeller/worlds/<world>` — a world's layers, cast and runs | ✅ |
 | `modeller.guardrails.edit` | MO-11 | `/modeller/guardrails` › a rule — one property rule with its impact | 🟡 |
