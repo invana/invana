@@ -13,7 +13,7 @@
  * | Requests | `/modeller/requests` | the inbox of what analysts and agents asked for; the rail badge is its open count |
  * | Worlds | `/modeller/worlds[/:world]` | the Govern panel and the lens canvas with the world inspector |
  * | Guardrails | `/modeller/guardrails[/:guardrail]` | the Govern panel and the lens canvas with the guardrail inspector |
- * | Rules | `/modeller/rules` | the Graph's invariants |
+ * | Rules | `/modeller/rules[/:rule]` | every rule in force — install, Graph and project — and the rule dialog |
  * | Graph settings | `/modeller/settings` | Basic · Graph · Agents (`?tab=`; `?tab=info` is the Graph's info) |
  *
  * The levels under the product's route have no element of their own, so
@@ -21,7 +21,7 @@
  * product host, which composes every graph product's regions, so the route's
  * element is whatever the app puts in `ModellerSlotsContext`.
  */
-import type { Lens, ProductDefinition } from "@invana-studio/core";
+import type { Lens, ProductDefinition, Rule } from "@invana-studio/core";
 import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";
 import {
 	Boxes,
@@ -96,6 +96,12 @@ const worldCrumb = (u: string, g: string, id: string) => ({
 const guardrailCrumb = (u: string, g: string, id: string) => ({
 	queryKey: guardrailDetailKey(u, g, id),
 	label: (data: unknown) => (data as GuardrailDetail).name ?? undefined,
+});
+
+/** A rule's crumb is its statement, from the read the dialog made. */
+const ruleCrumb = (u: string, g: string, id: string) => ({
+	queryKey: ["rules", u, g, id] as const,
+	label: (data: unknown) => (data as Rule).statement ?? undefined,
 });
 
 /** The Requests rail item carries the engine's open count. */
@@ -174,7 +180,7 @@ export const modeller: ProductDefinition = {
 				level("requests", "Requests"),
 				drillable("worlds", "Worlds", "world", worldCrumb),
 				drillable("guardrails", "Guardrails", "guardrail", guardrailCrumb),
-				level("rules", "Rules"),
+				drillable("rules", "Rules", "rule", ruleCrumb),
 				level("settings", "Graph settings"),
 			],
 		},

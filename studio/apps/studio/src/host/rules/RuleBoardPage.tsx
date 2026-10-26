@@ -2,18 +2,18 @@
  * The rule board, as a page — artboard `RuleDash`
  * ([34t](../../../../../../docs/for-developers/the-screens.md)).
  *
- * The rule itself comes from the Graph's list — one read the section has
- * already made — and the counts from its citations, which is the one read only
- * this page needs ([rules.md](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * The rule itself is read by id, and the counts from its citations, which is
+ * the one read only this page needs ([rules.md](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */
 
 import { Board } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
 import { SKILL_ACTIONS } from "@invana-studio/agents";
-import { useRuleCitationsQuery, useRulesQuery } from "@invana-studio/core";
+import { useRuleCitationsQuery, useRuleQuery } from "@invana-studio/core";
 import { useReport, VIEW_BOARD } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ruleBoardSpec } from "@/host/rules/ruleBoardSpec";
 
 export interface RuleBoardPageProps {
@@ -21,8 +21,6 @@ export interface RuleBoardPageProps {
 	graphSlug: string;
 	/** The `rules.id` every panel binds to. */
 	ruleId: string;
-	/** `Edit` — puts the Rules section back on this rule, drilled in. */
-	onEdit: (ruleId: string) => void;
 	/** A citation row — opens the run the citing step came from. */
 	onOpenRun?: (runId: string) => void;
 }
@@ -31,11 +29,11 @@ export function RuleBoardPage({
 	username,
 	graphSlug,
 	ruleId,
-	onEdit,
 	onOpenRun,
 }: RuleBoardPageProps) {
-	const rules = useRulesQuery(username, graphSlug);
-	const rule = rules.data?.items.find((r) => r.id === ruleId) ?? null;
+	const navigate = useNavigate();
+	const rules = useRuleQuery(username, graphSlug, ruleId);
+	const rule = rules.data ?? null;
 	const citations = useRuleCitationsQuery(username, graphSlug, ruleId);
 	const [view, setView] = useState(VIEW_BOARD);
 
@@ -77,7 +75,8 @@ export function RuleBoardPage({
 						if (ctx?.option) setView(ctx.option);
 						return;
 					case SKILL_ACTIONS.edit:
-						onEdit(ruleId);
+						// `Edit` opens the rule dialog on Modeller › Rules.
+						navigate(`/u/${username}/${graphSlug}/modeller/rules/${ruleId}`);
 						return;
 					case SKILL_ACTIONS.openRun: {
 						// A citation row is a **step** — two steps of one run cite the

@@ -79,7 +79,6 @@ export function declaredBoardContent(
 		openBoard,
 		setPageId,
 		runStep,
-		settingsPanel,
 		governPanel,
 		openAgentPage,
 		showAgentCanvas,
@@ -188,7 +187,6 @@ export function declaredBoardContent(
 				username={username as string}
 				graphSlug={graphSlug as string}
 				ruleId={board.subjectId}
-				onEdit={() => settingsPanel.setSection("rules")}
 				onOpenRun={(runId) =>
 					openBoard({ kind: "run", subjectId: runId, runId })
 				}

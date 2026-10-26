@@ -185,6 +185,7 @@ export type DeclaredKind =
 	| "worlds"
 	| "guardrails"
 	| "requests"
+	| "rules"
 	| "agent"
 	| "models"
 	| "global_model"
@@ -356,6 +357,16 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		icon: MessageSquarePlus,
 		// Requests on the Modeller's leftNav.
 		panel: "requests",
+		subject: "the graph's slug",
+	},
+	// Every rule in force in the Graph, by scope (rules.md). Bound to the Graph.
+	rules: {
+		kind: "rules",
+		renders: "declared",
+		label: "Rules",
+		icon: ScrollText,
+		// Rules on the Modeller's leftNav.
+		panel: "rules",
 		subject: "the graph's slug",
 	},
 	// The agent's one page — five tabs, the one declared page that edits.

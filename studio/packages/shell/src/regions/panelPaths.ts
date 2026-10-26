@@ -62,7 +62,7 @@ const PANEL_PATHS: readonly PanelPath[] = [
 		section: "guardrails",
 		detail: "guardrail",
 	},
-	{ path: "modeller/rules", panel: "rules" },
+	{ path: "modeller/rules", panel: "rules", detail: "rule" },
 	{ path: "modeller/settings", panel: "settings" },
 	// The Agents rail. Every section is a page; a section with tabs gives each
 	// tab a path under it, and the first is the section's own path.
