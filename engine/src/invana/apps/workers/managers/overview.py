@@ -24,6 +24,7 @@ from invana.apps.workers.schemas import (
     CapacityRow,
     PoolsOverview,
     PoolTotals,
+    QueuePoint,
     SeriesMark,
     SeriesPoint,
 )
@@ -77,9 +78,12 @@ class OverviewManager:
             totals=totals,
             series=[SeriesPoint(at=at, workers=n) for at, n in series],
             marks=[
-                SeriesMark(at=e.at, label=(e.detail or {}).get("worker") or e.change)
+                SeriesMark(
+                    at=e.at,
+                    label=e.why if e.change == "replicas" else (e.detail or {}).get("worker") or e.change,
+                )
                 for e in reversed(marks)
-                if e.change in ("joined", "lost", "stopped")
+                if e.change in ("joined", "lost", "stopped", "replicas")
             ],
         )
 
@@ -117,7 +121,18 @@ class OverviewManager:
                     unroutable_label=unroutable.get(pool.id),
                 )
             )
-        return Capacity(rows=out, computed_at=max((s.at for s in stored.values()), default=None))
+        short = next((r for r in out if r.state == "short"), None)
+        series = (
+            await self.stats.pool_series(session, short.pool_id, datetime.now(UTC) - timedelta(minutes=10))
+            if short
+            else []
+        )
+        return Capacity(
+            rows=out,
+            computed_at=max((s.at for s in stored.values()), default=None),
+            series_pool_id=short.pool_id if short else None,
+            series=[QueuePoint(at=at, ready=ready, workers=n) for at, ready, n in series],
+        )
 
     async def _unroutable(self, session: AsyncSession, pools) -> dict[str, str]:
         """Pool id -> a label steps wait for that no live worker carries.

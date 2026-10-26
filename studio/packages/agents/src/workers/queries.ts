@@ -64,17 +64,40 @@ export const useCapacityQuery = () =>
 		refetchInterval: POLL,
 	});
 
-export const useEventsQuery = (limit = 10) =>
+/** The newest events; `pool` (an id) narrows to one pool's. */
+export const useEventsQuery = (limit = 10, pool?: string) =>
 	useQuery({
-		queryKey: [...ROOT, "events", limit],
-		queryFn: () => workersApi.events({ limit }),
+		queryKey: [...ROOT, "events", limit, pool ?? null],
+		queryFn: () =>
+			workersApi.events(
+				pool ? { limit, filters: { pool_id: [pool] } } : { limit },
+			),
 		refetchInterval: POLL,
 	});
 
-export const useTokensQuery = () =>
+/** Every join token, newest first; `pool` (an id) narrows to one pool's. */
+export const useTokensQuery = (pool?: string | null) =>
 	useQuery({
-		queryKey: [...ROOT, "tokens"],
-		queryFn: () => workersApi.tokens(EVERY),
+		queryKey: [...ROOT, "tokens", pool ?? null],
+		queryFn: () =>
+			workersApi.tokens(
+				pool ? { ...EVERY, filters: { pool_id: [pool] } } : EVERY,
+			),
+		enabled: pool !== null,
+	});
+
+/** A pool's newest `limit` workers — the ones a join token just brought in. */
+export const useNewestWorkersQuery = (pool: string, limit: number) =>
+	useQuery({
+		queryKey: [...ROOT, "workers", "newest", pool, limit],
+		queryFn: () =>
+			workersApi.workers({
+				limit,
+				sort: "-joined_at",
+				filters: { pool_id: [pool] },
+			}),
+		refetchInterval: POLL,
+		enabled: limit > 0,
 	});
 
 /** The Joined step: every 2 s until a worker has joined. */

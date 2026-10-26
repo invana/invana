@@ -1,9 +1,11 @@
 /**
  * **Add workers** — five steps in one modal: Where → Pool → Join token → Run
- * it → Joined. The step lives in the URL as `?add=<step>` and the platform as
- * `?where=`, so every step draws on a cold load. The minted secret lives only
- * in this component: a reload shows Run it with a placeholder, never the
- * token a person already saw.
+ * it → Joined. The step lives in the URL as `?add=<step>`, the platform as
+ * `?where=` (Docker when absent) and the pool as `?pool=<name>` (the first
+ * pool when absent), so every step draws on a cold load. The minted secret
+ * lives only in this component: a reload shows Run it with a placeholder,
+ * never the token a person already saw, and Joined then watches the pool's
+ * newest join token.
  */
 
 import {
@@ -18,6 +20,8 @@ import {
 	SelectValue,
 } from "@invana/forms";
 import {
+	Alert,
+	AlertDescription,
 	Badge,
 	Button,
 	Dialog,
@@ -31,16 +35,26 @@ import {
 } from "@invana/ui";
 import { useUpdateSearchParams } from "@invana-studio/core";
 import { FormError, PanelSection } from "@invana-studio/ui";
-import { ArrowRight, Check } from "lucide-react";
+import {
+	ArrowRight,
+	Box,
+	Check,
+	Container,
+	KeyRound,
+	type LucideIcon,
+	ShieldCheck,
+	Terminal,
+} from "lucide-react";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useAgentsOpen } from "../open";
 import { CopyButton, JoinedStep, RunStep } from "./AddWorkersRun";
 import { labelsText } from "./parts";
 import {
 	useCreatePoolMutation,
 	useCreateTokenMutation,
+	useJoinStatusQuery,
 	usePoolsQuery,
+	useTokensQuery,
 } from "./queries";
 import type { JoinTokenCreated, PoolRow, RunsOn } from "./types";
 
@@ -64,13 +78,20 @@ const STEP_TITLE: Record<AddStep, string> = {
 };
 
 const WHERE_PARAM = "where";
+const POOL_PARAM = "pool";
 
 const PLATFORMS: RunsOn[] = ["docker", "python", "kubernetes"];
 
-const WHERE: { value: RunsOn; title: string; lines: string[] }[] = [
+const WHERE: {
+	value: RunsOn;
+	title: string;
+	icon: LucideIcon;
+	lines: string[];
+}[] = [
 	{
 		value: "docker",
 		title: "Docker",
+		icon: Container,
 		lines: [
 			"one container per worker",
 			"any machine with Docker",
@@ -80,6 +101,7 @@ const WHERE: { value: RunsOn; title: string; lines: string[] }[] = [
 	{
 		value: "python",
 		title: "Python",
+		icon: Terminal,
 		lines: [
 			"pip install, then invana worker",
 			"a laptop, a VM, bare metal",
@@ -89,6 +111,7 @@ const WHERE: { value: RunsOn; title: string; lines: string[] }[] = [
 	{
 		value: "kubernetes",
 		title: "Kubernetes",
+		icon: Box,
 		lines: [
 			"a deployment manifest",
 			"pods in your cluster",
@@ -176,7 +199,6 @@ export function AddWorkersModal({
 	onStep: (step: AddStep) => void;
 	onClose: () => void;
 }) {
-	const open = useAgentsOpen();
 	const pools = usePoolsQuery();
 	const createPool = useCreatePoolMutation();
 	const createToken = useCreateTokenMutation();
@@ -184,9 +206,9 @@ export function AddWorkersModal({
 	const update = useUpdateSearchParams();
 
 	const param = search.get(WHERE_PARAM);
-	const where: RunsOn | null = (PLATFORMS as string[]).includes(param ?? "")
+	const where: RunsOn = (PLATFORMS as string[]).includes(param ?? "")
 		? (param as RunsOn)
-		: null;
+		: "docker";
 	const setWhere = (w: RunsOn) =>
 		update((p) => {
 			p.set(WHERE_PARAM, w);
@@ -201,8 +223,9 @@ export function AddWorkersModal({
 	const [created, setCreated] = useState<JoinTokenCreated | null>(null);
 
 	const items = pools.data?.items ?? [];
-	// The first pool is the default pick, so a cold step still draws a pool.
-	const picked = choice || (items[0]?.id ?? "");
+	// `?pool=` names the pick, else the first pool, so a cold step still draws a pool.
+	const named = items.find((p) => p.name === search.get(POOL_PARAM));
+	const picked = choice || (named?.id ?? items[0]?.id ?? "");
 	const existing = items.find((p) => p.id === picked) ?? null;
 	const creating = picked === NEW || (!existing && items.length === 0);
 	const pool: PoolRow | null = made ?? (creating ? null : existing);
@@ -219,7 +242,7 @@ export function AddWorkersModal({
 			if (creating && !made) {
 				const row = await createPool.mutateAsync({
 					name: fresh.name,
-					runs_on: where ?? "docker",
+					runs_on: where,
 					labels: csv(fresh.labels),
 					slots_per_worker: slots,
 					plugins: csv(fresh.plugins),
@@ -250,19 +273,26 @@ export function AddWorkersModal({
 	};
 
 	const canNext =
-		step === "where"
-			? where != null
-			: step === "pool"
-				? poolReady && !createPool.isPending
-				: step === "token"
-					? created != null
-					: true;
+		step === "pool"
+			? poolReady && !createPool.isPending
+			: step === "token"
+				? created != null
+				: true;
 
 	const poolName = pool?.name ?? (creating ? fresh.name : "");
+	// Joined watches the token minted here, else the pool's newest live one.
+	const tokens = useTokensQuery(
+		step === "joined" && !created ? (pool?.id ?? null) : null,
+	);
+	const watched =
+		created?.id ?? tokens.data?.items.find((t) => !t.revoked)?.id ?? null;
+	const engineUrl = created?.engine_url ?? window.location.origin;
+	const status = useJoinStatusQuery(step === "joined" ? watched : null);
+	const arrived = status.data?.checks.every((c) => c.state === "ok") ?? false;
 
 	return (
 		<Dialog open onOpenChange={(o) => !o && onClose()}>
-			<DialogContent className="sm:max-w-4xl">
+			<DialogContent className="max-w-5xl">
 				<DialogHeader>
 					<DialogTitle>
 						Add workers
@@ -282,25 +312,36 @@ export function AddWorkersModal({
 								{WHERE.map((w) => (
 									<Button
 										key={w.value}
-										variant={where === w.value ? "default" : "outline"}
-										className="h-auto flex-col items-start gap-1 whitespace-normal p-3 text-left"
+										variant="outline"
+										className={`h-auto flex-col items-start gap-1 whitespace-normal p-3 text-left ${
+											where === w.value ? "border-primary bg-primary/5" : ""
+										}`}
 										aria-pressed={where === w.value}
 										onClick={() => setWhere(w.value)}
 									>
-										<span className="font-medium">{w.title}</span>
+										<span className="flex items-center gap-2 font-medium">
+											<w.icon className="size-4" />
+											{w.title}
+										</span>
 										{w.lines.map((l) => (
-											<span key={l} className="text-sm font-normal opacity-80">
+											<span
+												key={l}
+												className="text-sm font-normal text-muted-foreground"
+											>
 												{l}
 											</span>
 										))}
 									</Button>
 								))}
 							</div>
-							<p className="text-sm text-muted-foreground">
-								A worker only dials out to the engine over HTTPS — no inbound
-								ports, no database access. It runs the steps it is sent, with
-								the secrets its pool names.
-							</p>
+							<Alert tone="info">
+								<ShieldCheck className="size-4" />
+								<AlertDescription>
+									A worker only dials out to the engine over HTTPS — no inbound
+									ports, no database access. It runs the steps it is sent, with
+									the secrets its pool names.
+								</AlertDescription>
+							</Alert>
 						</>
 					) : null}
 
@@ -318,7 +359,55 @@ export function AddWorkersModal({
 
 					{step === "token" ? (
 						<div className="flex flex-col gap-3">
-							<div className="grid gap-3 sm:grid-cols-2">
+							{created ? (
+								<Field>
+									<FieldLabel htmlFor="wk-engine">Engine URL</FieldLabel>
+									<Input
+										id="wk-engine"
+										className="font-mono"
+										readOnly
+										value={created.engine_url}
+									/>
+									<FieldDescription>
+										the address workers dial out to
+									</FieldDescription>
+								</Field>
+							) : null}
+							<Field>
+								<FieldLabel htmlFor="wk-secret">
+									Join token · shown once
+								</FieldLabel>
+								<div className="flex gap-2">
+									<Input
+										id="wk-secret"
+										className="font-mono"
+										readOnly
+										placeholder="made when you press Make token"
+										value={created?.token ?? ""}
+									/>
+									{created ? (
+										<CopyButton text={created.token} />
+									) : (
+										<Button
+											size="sm"
+											onClick={mint}
+											disabled={!pool || createToken.isPending}
+										>
+											{createToken.isPending ? "Making…" : "Make token"}
+										</Button>
+									)}
+								</div>
+							</Field>
+							<div className="grid gap-3 sm:grid-cols-3">
+								<Field>
+									<FieldLabel htmlFor="wk-token-pool">Pool</FieldLabel>
+									<Input
+										id="wk-token-pool"
+										className="font-mono"
+										readOnly
+										value={poolName}
+									/>
+								</Field>
 								<Field>
 									<FieldLabel htmlFor="wk-expiry">Expires</FieldLabel>
 									<Select
@@ -350,59 +439,35 @@ export function AddWorkersModal({
 									/>
 								</Field>
 							</div>
-							{created ? (
-								<Field>
-									<FieldLabel htmlFor="wk-secret">
-										Join token · shown once
-									</FieldLabel>
-									<div className="flex gap-2">
-										<Input
-											id="wk-secret"
-											className="font-mono"
-											readOnly
-											value={created.token}
-										/>
-										<CopyButton text={created.token} />
-									</div>
-									<FieldDescription>
-										Engine URL{" "}
-										<span className="font-mono">{created.engine_url}</span> —
-										the address workers dial out to
-									</FieldDescription>
-								</Field>
-							) : (
-								<div>
-									<Button
-										onClick={mint}
-										disabled={!pool || createToken.isPending}
-									>
-										{createToken.isPending ? "Making…" : "Make token"}
-									</Button>
-								</div>
-							)}
-							<p className="text-sm text-muted-foreground">
-								The token only lets a worker join{" "}
-								<span className="font-medium">{poolName || "its pool"}</span>.
-								On joining, each worker gets its own credential, rotated hourly.
-								Revoking the token stops new joins; draining stops the workers.
-							</p>
+							<Alert tone="info">
+								<KeyRound className="size-4" />
+								<AlertDescription>
+									The token only lets a worker join{" "}
+									<span className="font-medium">{poolName || "its pool"}</span>.
+									On joining, each worker gets its own credential, rotated
+									hourly. Revoking the token stops new joins; draining stops the
+									workers.
+								</AlertDescription>
+							</Alert>
 							<FormError error={createToken.error} />
 						</div>
 					) : null}
 
 					{step === "run" ? (
 						<RunStep
-							runsOn={where ?? pool?.runs_on ?? "docker"}
+							runsOn={where}
 							onRunsOn={setWhere}
 							created={created}
-							pool={poolName || "<pool>"}
+							pool={pool}
+							poolName={poolName || "<pool>"}
 						/>
 					) : null}
 
 					{step === "joined" ? (
 						<JoinedStep
-							tokenId={created?.id ?? null}
+							tokenId={watched}
 							pool={pool}
+							engineUrl={engineUrl}
 							onNewToken={() => {
 								setCreated(null);
 								onStep("token");
@@ -426,25 +491,20 @@ export function AddWorkersModal({
 							Back
 						</Button>
 					)}
-					{step === "joined" && pool ? (
-						<Button
-							variant="outline"
-							onClick={() => {
-								onClose();
-								open.pool(pool.name);
-							}}
-						>
-							Open pool
+					{step === "joined" && !arrived ? (
+						<Button variant="ghost" onClick={onClose}>
+							Close
 						</Button>
-					) : null}
-					<Button disabled={!canNext} onClick={next}>
-						{step === "run" ? (
-							<Check />
-						) : step === "joined" ? null : (
-							<ArrowRight />
-						)}
-						{step === "run" ? "I ran it" : step === "joined" ? "Done" : "Next"}
-					</Button>
+					) : (
+						<Button disabled={!canNext} onClick={next}>
+							{step === "run" || step === "joined" ? <Check /> : <ArrowRight />}
+							{step === "run"
+								? "I ran it"
+								: step === "joined"
+									? "Done"
+									: "Next"}
+						</Button>
+					)}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

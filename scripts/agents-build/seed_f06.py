@@ -38,18 +38,27 @@ import invana.apps.work.models  # noqa: F401
 from invana.apps.workers.managers.join_tokens import JoinTokenManager
 from invana.apps.workers.models import Worker, WorkerEvent, WorkerPool, WorkerStat
 from invana.apps.workers.schemas import JoinTokenIn
-from invana.core.auth.models import User
+from invana.core.auth.models import PersonalAccessToken, User
 from invana.core.auth.tokens import hash_token
 from invana.core.db import create_db_engine, create_session_factory
 
 POOLS = [
     # name, runs_on, labels, slots a worker, set_by, replicas, plugins, egress
     ("k8s-prod", "kubernetes", ["cpu", "llm"], 6, "replicas", 24, ["invana.core"], []),
-    ("egress", "docker", ["cpu", "egress"], 8, "hand", None, ["invana.tools.web"], ["*.wikipedia.org", "api.crossref.org"]),
+    (
+        "egress",
+        "docker",
+        ["cpu", "egress"],
+        8,
+        "hand",
+        None,
+        ["invana.tools.web"],
+        ["*.wikipedia.org", "api.crossref.org"],
+    ),
     ("gpu-lab", "python", ["gpu"], 2, "hand", None, ["invana.tools.science"], []),
     ("laptop-ravi", "python", ["cpu", "llm"], 4, "hand", None, ["invana.core"], []),
 ]
-#: k8s-prod's workers by state: 20 busy, 1 idle, 2 starting, 1 lost.
+#: k8s-prod's workers by state: 21 busy, 1 idle, 2 starting, 1 lost — 24 live.
 K8S_STATES = ["busy"] * 3 + ["lost"] + ["busy", "idle"] + ["busy"] * 17 + ["starting"] * 2
 QUEUED = {"k8s-prod": 1204, "egress": 312, "gpu-lab": 1, "laptop-ravi": 0}
 OLDEST = {"k8s-prod": 6, "egress": 41, "gpu-lab": 180, "laptop-ravi": None}
@@ -64,6 +73,13 @@ async def main() -> None:
         ravi = (await db.execute(select(User).where(User.username == "admin"))).scalar_one()
         # The done-when check leaves its own pool behind; the boards draw the four below.
         await db.execute(delete(WorkerPool).where(WorkerPool.name.in_([*(p[0] for p in POOLS), "done-when"])))
+        # A join token outlives no pool: drop every one whose pool is gone (shoots mint them too).
+        await db.execute(
+            delete(PersonalAccessToken).where(
+                PersonalAccessToken.worker_pool_id.is_not(None),
+                PersonalAccessToken.worker_pool_id.not_in(select(WorkerPool.id)),
+            )
+        )
         pools: dict[str, WorkerPool] = {}
         for name, runs_on, labels, slots, set_by, replicas, plugins, egress in POOLS:
             pool = WorkerPool(
@@ -83,10 +99,32 @@ async def main() -> None:
             pools[name] = pool
         await db.flush()
 
-        def worker(pool: WorkerPool, n: int, state: str, node: str, up_min: int) -> Worker:
+        # One join token a pool. egress's newest is the one the Joined step reads: two of
+        # its workers came in on it; gpu-lab's has one worker waiting for its first heartbeat.
+        tokens: dict[str, PersonalAccessToken] = {}
+        for pool, days, cap in (
+            ("k8s-prod", None, None),
+            ("laptop-ravi", 30, 1),
+            ("gpu-lab", 30, 1),
+            ("egress", 1, 2),
+        ):
+            made = await JoinTokenManager().mint(
+                db,
+                payload=JoinTokenIn(pool_id=pools[pool].id, expires_in_days=days, cap=cap),
+                actor=ravi,
+                engine_url="http://localhost:8200",
+            )
+            tokens[pool] = await db.get(PersonalAccessToken, made.id)
+
+        def worker(
+            pool: WorkerPool, n: int, state: str, node: str, up_min: int, via: PersonalAccessToken | None = None
+        ) -> Worker:
             name = f"w-{pool.name}-{n:02d}"
-            busy = {"busy": pool.slots_per_worker - rng.choice([0, 0, 1, 2]), "idle": 0}.get(state, 0)
-            beat = {"lost": now - timedelta(seconds=42), "starting": None}.get(state, now - timedelta(seconds=rng.choice([0, 1, 2])))
+            full = pool.name == "egress"
+            busy = {"busy": pool.slots_per_worker - (0 if full else rng.choice([0, 0, 1, 2])), "idle": 0}.get(state, 0)
+            beat = {"lost": now - timedelta(seconds=42), "starting": None}.get(
+                state, now - timedelta(seconds=rng.choice([0, 1, 2]))
+            )
             return Worker(
                 pool_id=pool.id,
                 name=name,
@@ -103,6 +141,7 @@ async def main() -> None:
                 last_heartbeat_at=beat,
                 from_ip=node.replace("ip-", "").replace("-", ".") if node.startswith("ip-") else "192.168.1.20",
                 redelivered=3 if state == "lost" else 0,
+                joined_via=via.id if via else None,
             )
 
         k8s = pools["k8s-prod"]
@@ -110,8 +149,15 @@ async def main() -> None:
             node = f"ip-10-2-{14 + i // 4}-{(i * 3) % 9 + 1}"
             db.add(worker(k8s, i, state, node, 41 if i < 7 else (3 if state == "starting" else 22)))
         for i in range(1, 9):
-            db.add(worker(pools["egress"], i, "busy", f"egress-host-{(i - 1) // 2 + 1}", 180))
-        db.add(worker(pools["laptop-ravi"], 1, "idle", "ravi-mbp.local", 95))
+            fresh = i > 6
+            via = tokens["egress"] if fresh else None
+            node = f"egress-host-{(i - 1) // 2 + 1}"
+            db.add(worker(pools["egress"], i, "busy", node, 2 if fresh else 180, via))
+        db.add(worker(pools["laptop-ravi"], 1, "idle", "ravi-mbp.local", 95, tokens["laptop-ravi"]))
+        db.add(worker(pools["gpu-lab"], 1, "starting", "ip-10-4-3-17", 0, tokens["gpu-lab"]))
+        tokens["egress"].joins, tokens["egress"].last_used_at = 2, now - timedelta(minutes=2)
+        tokens["laptop-ravi"].joins, tokens["laptop-ravi"].last_used_at = 1, now - timedelta(days=1)
+        tokens["gpu-lab"].joins, tokens["gpu-lab"].last_used_at = 1, now - timedelta(seconds=12)
         await db.flush()
 
         lost = (await db.execute(select(Worker).where(Worker.state == "lost"))).scalars().first()
@@ -138,7 +184,7 @@ async def main() -> None:
         live = {"k8s-prod": (24, 2, 1), "egress": (8, 0, 0), "gpu-lab": (0, 0, 0), "laptop-ravi": (1, 0, 0)}
         busy = {"k8s-prod": 108, "egress": 64, "gpu-lab": 0, "laptop-ravi": 0}
         envelopes = {"k8s-prod": 420, "egress": 450, "gpu-lab": 0, "laptop-ravi": 50}
-        suggested = {"k8s-prod": 24, "egress": 16, "gpu-lab": 1, "laptop-ravi": 1}
+        suggested = {"k8s-prod": 22, "egress": 16, "gpu-lab": 1, "laptop-ravi": 1}
         moments = [bucket - timedelta(seconds=30 * k) for k in range(60)]
         for at in moments:
             ago = (bucket - at).total_seconds() / 60
@@ -155,20 +201,13 @@ async def main() -> None:
                         lost=lost_n if ago <= 7 else 0,
                         slots=workers * pool.slots_per_worker,
                         slots_busy=min(busy[name], workers * pool.slots_per_worker),
-                        ready=QUEUED[name],
+                        # egress's queue built up over the last ten minutes, as run #2310 fanned out.
+                        ready=round(QUEUED[name] * max(0.1, 1 - ago / 12)) if name == "egress" else QUEUED[name],
                         oldest_s=OLDEST[name],
                         envelopes=envelopes[name] if ago < 1 else int(envelopes[name] * 0.89),
                         suggested=suggested[name],
                     )
                 )
-        await db.commit()
-        for pool, days, cap in (("egress", 7, 8), ("k8s-prod", None, None)):
-            await JoinTokenManager().mint(
-                db,
-                payload=JoinTokenIn(pool_id=pools[pool].id, expires_in_days=days, cap=cap),
-                actor=ravi,
-                engine_url="http://localhost:8200",
-            )
         await db.commit()
     await engine.dispose()
     print("seeded", ", ".join(p[0] for p in POOLS))

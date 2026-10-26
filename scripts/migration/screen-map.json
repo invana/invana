@@ -1756,49 +1756,49 @@
   "agents.workers.add": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=where&right=assistant",
+   "route": "/u/admin/airways/agents/workers?add=where&pool=egress&right=assistant",
    "state": "Add workers: step Where"
   },
   "agents.workers.add.pool": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=pool&right=assistant",
+   "route": "/u/admin/airways/agents/workers?add=pool&pool=egress&right=assistant",
    "state": "Add workers \u203a Python \u203a Next: step Pool, egress chosen"
   },
   "agents.workers.add.token": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=token&right=assistant",
+   "route": "/u/admin/airways/agents/workers?add=token&pool=egress&right=assistant",
    "state": "Add workers \u203a Pool \u203a Next: step Join token, before Make token"
   },
   "agents.workers.add.run.docker": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=run&where=docker&right=assistant",
+   "route": "/u/admin/airways/agents/workers?add=run&pool=egress&where=docker&right=assistant",
    "state": "Add workers \u203a Docker \u203a \u2026 \u203a Make token: step Run it"
   },
   "agents.workers.add.run.python": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=run&where=python&right=assistant",
+   "route": "/u/admin/airways/agents/workers?add=run&pool=egress&where=python&right=assistant",
    "state": "Add workers \u203a Python \u203a \u2026 \u203a Make token: step Run it"
   },
   "agents.workers.add.run.k8s": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=run&where=kubernetes&right=assistant",
+   "route": "/u/admin/airways/agents/workers?add=run&pool=egress&where=kubernetes&right=assistant",
    "state": "Add workers \u203a Kubernetes \u203a \u2026 \u203a Make token: step Run it"
   },
   "agents.workers.add.waiting": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=joined&right=assistant",
+   "route": "/u/admin/airways/agents/workers?add=joined&pool=gpu-lab&right=assistant",
    "state": "Add workers \u203a \u2026 \u203a Run it \u203a Next: step Joined, before the first heartbeat"
   },
   "agents.workers.add.joined": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=joined&right=assistant",
+   "route": "/u/admin/airways/agents/workers?add=joined&pool=egress&right=assistant",
    "state": "Add workers \u203a \u2026 \u203a Joined, after a worker started with the command joined"
   },
   "agents.approvals": {

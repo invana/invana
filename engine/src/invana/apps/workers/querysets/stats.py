@@ -41,6 +41,17 @@ class WorkerStatQuerySet:
         )
         return [(at, int(n)) for at, n in (await session.execute(stmt)).all()]
 
+    async def pool_series(
+        self, session: AsyncSession, pool_id: str, since: datetime
+    ) -> list[tuple[datetime, int, int]]:
+        """One pool's ready steps and workers in each bucket since ``since``, oldest first."""
+        stmt = (
+            select(WorkerStat.at, WorkerStat.ready, WorkerStat.workers)
+            .where(WorkerStat.pool_id == pool_id, WorkerStat.at >= since)
+            .order_by(WorkerStat.at)
+        )
+        return [(at, int(ready), int(n)) for at, ready, n in (await session.execute(stmt)).all()]
+
     async def envelopes_since(self, session: AsyncSession, since: datetime) -> int:
         stmt = select(func.coalesce(func.sum(WorkerStat.envelopes), 0)).where(WorkerStat.at >= since)
         return int((await session.execute(stmt)).scalar_one())

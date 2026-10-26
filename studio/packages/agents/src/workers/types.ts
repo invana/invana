@@ -151,9 +151,18 @@ export interface CapacityRow {
 	unroutable_label: string | null;
 }
 
+interface QueuePoint {
+	at: string;
+	ready: number;
+	workers: number;
+}
+
 export interface Capacity {
 	rows: CapacityRow[];
 	computed_at: string | null;
+	/** The first short pool; `series` is its last 10 min. */
+	series_pool_id: string | null;
+	series: QueuePoint[];
 }
 
 export interface WorkerEventRow {
@@ -216,5 +225,7 @@ export interface JoinStatus {
 	checks: JoinCheck[];
 	worker_id: string | null;
 	worker: string | null;
+	/** Workers that have joined with the token. */
+	joins: number;
 	waiting_s: number;
 }

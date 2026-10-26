@@ -69,7 +69,7 @@ class PoolManager:
                     id=pool.id,
                     name=pool.name,
                     runs_on=pool.runs_on,
-                    runs_on_detail=self.runs_on_detail(pool, t["workers"]),
+                    runs_on_detail=self.runs_on_detail(pool, t.get("hosts", 0)),
                     labels=list(pool.labels or []),
                     slots_per_worker=pool.slots_per_worker,
                     plugins=list(pool.plugins or []),
@@ -97,12 +97,12 @@ class PoolManager:
         return out
 
     @staticmethod
-    def runs_on_detail(pool: WorkerPool, workers: int) -> str:
-        """What the pool runs on, in a line."""
+    def runs_on_detail(pool: WorkerPool, hosts: int) -> str:
+        """What the pool runs on, in a line — the replicas are *Set by*'s, not this line's."""
         if pool.runs_on == "kubernetes":
-            return f"{pool.replicas} replicas" if pool.replicas is not None else "invana/worker deployment"
+            return "invana/worker deployment"
         if pool.runs_on == "docker":
-            return f"{workers} host{'s' if workers != 1 else ''}"
+            return f"{hosts} host{'s' if hosts != 1 else ''}"
         return "invana worker"
 
     async def page(self, session: AsyncSession, *, params: ListParams) -> PoolPage:

@@ -34,13 +34,21 @@ export function WorkersSectionPage({ tab, onTab }: SectionPageProps) {
 	const overview = useOverviewQuery();
 	const pools = usePoolsQuery();
 
+	// Closing the modal drops its platform and pool with its step.
 	const setStep = (next: AddStep | null) =>
 		update((params) => {
 			if (next) params.set(ADD_PARAM, next);
-			else params.delete(ADD_PARAM);
+			else for (const k of [ADD_PARAM, "where", "pool"]) params.delete(k);
 			return params;
 		});
-	const add = () => setStep(ADD_STEPS[0]);
+	/** Opens Add workers, on `pool` when a short pool's callout names one. */
+	const add = (pool?: string) =>
+		update((params) => {
+			params.set(ADD_PARAM, ADD_STEPS[0]);
+			if (pool) params.set("pool", pool);
+			else params.delete("pool");
+			return params;
+		});
 
 	const totals = overview.data?.totals;
 	return (
@@ -54,7 +62,7 @@ export function WorkersSectionPage({ tab, onTab }: SectionPageProps) {
 				) : null
 			}
 			actions={
-				<AdminButton onClick={add}>
+				<AdminButton onClick={() => add()}>
 					<Plus />
 					Add workers
 				</AdminButton>
@@ -66,9 +74,9 @@ export function WorkersSectionPage({ tab, onTab }: SectionPageProps) {
 				) : tab === "capacity" ? (
 					<CapacityTab onAdd={add} />
 				) : tab === "tokens" ? (
-					<TokensTab onAdd={add} />
+					<TokensTab onAdd={() => add()} />
 				) : (
-					<PoolsTab onAdd={add} />
+					<PoolsTab onAdd={() => add()} />
 				)}
 			</SectionBody>
 			{step ? (

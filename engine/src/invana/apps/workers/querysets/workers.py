@@ -69,7 +69,7 @@ class WorkerQuerySet:
         return list((await session.execute(stmt)).scalars().all())
 
     async def pool_totals(self, session: AsyncSession, *, since_lost: datetime) -> dict[str, dict[str, int]]:
-        """Per pool: workers, starting, lost (since ``since_lost``), slots, slots_busy — from the worker rows."""
+        """Per pool: workers, starting, lost (since ``since_lost``), slots, slots_busy, hosts — from the worker rows."""
         stmt = select(
             Worker.pool_id,
             Worker.state,
@@ -92,6 +92,12 @@ class WorkerQuerySet:
         )
         for pool_id, n in (await session.execute(lost.group_by(Worker.pool_id))).all():
             out.setdefault(pool_id, {"workers": 0, "starting": 0, "lost": 0, "slots": 0, "slots_busy": 0})["lost"] = n
+        hosts = select(Worker.pool_id, func.count(func.distinct(Worker.node))).where(
+            Worker.state.in_([*LIVE, WorkerState.starting.value])
+        )
+        for pool_id, n in (await session.execute(hosts.group_by(Worker.pool_id))).all():
+            if pool_id in out:
+                out[pool_id]["hosts"] = n
         return out
 
     async def state_counts(self, session: AsyncSession, *, pool_id: str | None = None) -> dict[str, int]:

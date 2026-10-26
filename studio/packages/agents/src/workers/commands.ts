@@ -1,6 +1,7 @@
 /**
- * What *Run it* shows: the exact command or manifest that starts a worker on
- * each platform. Pure text from the minted token, the engine URL and the pool.
+ * What *Run it* shows: the exact command that starts a worker on each
+ * platform, and the Deployment manifest Kubernetes applies. Pure text from the
+ * minted token, the engine URL and the pool.
  */
 
 import type { RunsOn } from "./types";
@@ -8,52 +9,73 @@ import type { RunsOn } from "./types";
 /** The worker image's tag until the engine names the install's version. */
 export const WORKER_IMAGE_TAG = "latest";
 
+const IMAGE = `invana/worker:${WORKER_IMAGE_TAG}`;
+
 export interface RunInputs {
 	engineUrl: string;
 	token: string;
 	pool: string;
+	labels: string[];
+	slots: number;
+	/** Kubernetes only: the replicas to scale to. */
+	replicas?: number;
 }
+
+/** Lines joined with shell continuations, every line after the first indented. */
+const continued = (lines: string[]): string =>
+	lines.map((l, i) => (i === 0 ? l : `  ${l}`)).join(" \\\n");
 
 /** One container per worker. */
-export function dockerCommand({ engineUrl, token, pool }: RunInputs): string {
-	return [
-		"docker run -d --name invana-worker",
-		`-e INVANA_ENGINE_URL=${engineUrl}`,
-		`-e INVANA_JOIN_TOKEN=${token}`,
-		`-e INVANA_POOL=${pool}`,
-		`invana/worker:${WORKER_IMAGE_TAG}`,
-	].join(" ");
+export function dockerCommand(i: RunInputs): string {
+	return continued([
+		"docker run -d --restart unless-stopped --name invana-worker",
+		`-e INVANA_ENGINE_URL=${i.engineUrl}`,
+		`-e INVANA_JOIN_TOKEN=${i.token}`,
+		`-e INVANA_POOL=${i.pool}`,
+		`-e INVANA_LABELS=${i.labels.join(",")}`,
+		`-e INVANA_SLOTS=${i.slots}`,
+		IMAGE,
+	]);
 }
 
-/** `pip install`, then `invana worker`. */
-export function pythonCommand({ engineUrl, token, pool }: RunInputs): string {
+/** `pip install`, then `invana worker`, then how to keep it running. */
+export function pythonCommand(i: RunInputs): string {
 	return [
 		"pip install 'invana[workers]'",
-		`invana worker --engine ${engineUrl} --token ${token} --pool ${pool}`,
+		"",
+		continued([
+			"invana worker",
+			`--engine ${i.engineUrl}`,
+			`--token ${i.token}`,
+			`--pool ${i.pool} --labels ${i.labels.join(",")} --slots ${i.slots}`,
+		]),
+		"",
+		"# keep it running: invana worker install-service  (systemd · launchd)",
 	].join("\n");
 }
 
-/** A Secret holding the token and a Deployment of `replicas` workers. */
-export function kubernetesManifest(
-	{ engineUrl, token, pool }: RunInputs,
-	replicas = 2,
-): string {
-	const name = `invana-worker-${pool}`;
+const deploymentName = (pool: string) => `invana-worker-${pool}`;
+const manifestFile = (pool: string) => `${deploymentName(pool)}.yaml`;
+
+/** The token as a Secret, the Deployment applied from its file, then the replicas. */
+export function kubernetesCommands(i: RunInputs): string {
 	return [
-		"apiVersion: v1",
-		"kind: Secret",
-		"metadata:",
-		"  name: invana-join",
-		"type: Opaque",
-		"stringData:",
-		`  token: ${token}`,
-		"---",
+		`kubectl create secret generic invana-join --from-literal=token=${i.token}`,
+		`kubectl apply -f ${manifestFile(i.pool)}   # a Deployment of invana/worker — Download as a file`,
+		`kubectl scale deployment ${deploymentName(i.pool)} --replicas=${i.replicas ?? 2}`,
+	].join("\n");
+}
+
+/** The Deployment `kubectl apply` reads; the token comes from the `invana-join` Secret. */
+export function kubernetesManifest(i: RunInputs): string {
+	const name = deploymentName(i.pool);
+	return [
 		"apiVersion: apps/v1",
 		"kind: Deployment",
 		"metadata:",
 		`  name: ${name}`,
 		"spec:",
-		`  replicas: ${replicas}`,
+		`  replicas: ${i.replicas ?? 2}`,
 		"  selector:",
 		"    matchLabels:",
 		`      app: ${name}`,
@@ -64,12 +86,16 @@ export function kubernetesManifest(
 		"    spec:",
 		"      containers:",
 		"        - name: worker",
-		`          image: invana/worker:${WORKER_IMAGE_TAG}`,
+		`          image: ${IMAGE}`,
 		"          env:",
 		"            - name: INVANA_ENGINE_URL",
-		`              value: ${engineUrl}`,
+		`              value: ${i.engineUrl}`,
 		"            - name: INVANA_POOL",
-		`              value: ${pool}`,
+		`              value: ${i.pool}`,
+		"            - name: INVANA_LABELS",
+		`              value: ${i.labels.join(",")}`,
+		"            - name: INVANA_SLOTS",
+		`              value: "${i.slots}"`,
 		"            - name: INVANA_JOIN_TOKEN",
 		"              valueFrom:",
 		"                secretKeyRef:",
@@ -79,17 +105,35 @@ export function kubernetesManifest(
 	].join("\n");
 }
 
-/** The text to show for a platform. */
+/** The text shown for a platform. */
 export function runText(runsOn: RunsOn, inputs: RunInputs): string {
 	if (runsOn === "docker") return dockerCommand(inputs);
 	if (runsOn === "python") return pythonCommand(inputs);
-	return kubernetesManifest(inputs);
+	return kubernetesCommands(inputs);
+}
+
+/** What *Download as a file* saves: the script, or the manifest for Kubernetes. */
+export function downloadOf(
+	runsOn: RunsOn,
+	inputs: RunInputs,
+): { name: string; text: string } {
+	if (runsOn === "kubernetes")
+		return {
+			name: manifestFile(inputs.pool),
+			text: kubernetesManifest(inputs),
+		};
+	return {
+		name: `invana-worker-${inputs.pool}.sh`,
+		text: runText(runsOn, inputs),
+	};
 }
 
 /** The line under the command, per platform. */
 export const RUN_NOTE: Record<RunsOn, string> = {
-	docker: "Run it on each machine; each becomes one worker.",
-	python: "Run it on each machine; each becomes one worker.",
+	docker:
+		"Needs Docker and outbound HTTPS (443) to the engine. One container is one worker.",
+	python:
+		"Python 3.14 and outbound HTTPS (443) to the engine. The worker logs to stdout.",
 	kubernetes:
 		"The same image as Docker, as a Deployment. You set the replicas; each pod joins with the token and gets its own credential.",
 };

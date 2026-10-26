@@ -33,8 +33,15 @@ function expiresOf(iso: string): string {
 	return hours > 0 && hours < 48 ? `in ${Math.round(hours)} h` : whenOf(iso);
 }
 
-export function TokensTab({ onAdd }: { onAdd: () => void }) {
-	const tokens = useTokensQuery();
+/** Every join token, or one pool's (`pool` is its id) on the pool's page. */
+export function TokensTab({
+	onAdd,
+	pool,
+}: {
+	onAdd: () => void;
+	pool?: string;
+}) {
+	const tokens = useTokensQuery(pool);
 	const revoke = useRevokeTokenMutation();
 	const [confirming, setConfirming] = useState<JoinTokenRow | null>(null);
 
@@ -82,7 +89,7 @@ export function TokensTab({ onAdd }: { onAdd: () => void }) {
 						<span className="text-muted-foreground">revoked</span>
 					) : (
 						<AdminButton
-							variant="ghost"
+							variant="outline"
 							onClick={(e) => {
 								e.stopPropagation();
 								setConfirming(row.original);

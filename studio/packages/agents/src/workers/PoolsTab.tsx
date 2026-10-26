@@ -112,7 +112,7 @@ function Tiles({ totals: t }: { totals: PoolsOverview["totals"] }) {
 	);
 }
 
-const hhmm = (iso: string) =>
+export const hhmm = (iso: string) =>
 	new Date(iso).toLocaleTimeString(undefined, {
 		hour: "2-digit",
 		minute: "2-digit",
@@ -177,8 +177,15 @@ const eventColumns: ColumnDef<WorkerEventRow>[] = [
 ];
 
 /** The newest worker events; Capacity shows the same list with who made each. */
-export function EventsCard({ withActor }: { withActor?: boolean }) {
-	const events = useEventsQuery();
+/** The newest worker events, or one pool's (`pool` is its id). */
+export function EventsCard({
+	withActor,
+	pool,
+}: {
+	withActor?: boolean;
+	pool?: string;
+}) {
+	const events = useEventsQuery(10, pool);
 	const columns = useMemo<ColumnDef<WorkerEventRow>[]>(
 		() =>
 			withActor

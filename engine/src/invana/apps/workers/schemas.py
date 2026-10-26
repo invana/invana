@@ -216,9 +216,18 @@ class CapacityRow(BaseModel):
     unroutable_label: str | None = None
 
 
+class QueuePoint(BaseModel):
+    at: datetime
+    ready: int
+    workers: int
+
+
 class Capacity(BaseModel):
     rows: list[CapacityRow]
     computed_at: datetime | None = None
+    #: The first short pool, whose last 10 min the *Queued and workers* chart draws.
+    series_pool_id: str | None = None
+    series: list[QueuePoint] = Field(default_factory=list)
 
 
 class WorkerEventRow(BaseModel):
@@ -292,6 +301,8 @@ class JoinStatus(BaseModel):
     checks: list[JoinCheck]
     worker_id: str | None = None
     worker: str | None = None
+    #: Workers that have joined with the token.
+    joins: int = 0
     #: Seconds since the token was minted, for *waiting · 12 s*.
     waiting_s: int
 

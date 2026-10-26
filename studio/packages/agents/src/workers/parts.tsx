@@ -262,11 +262,14 @@ export function WorkersTable({
 	showPool,
 	onOpen,
 	empty,
+	showCount = true,
 }: {
 	page: WorkerListPage;
 	showPool?: boolean;
 	onOpen: (worker: WorkerRow) => void;
 	empty: ReactNode;
+	/** Off where the table is a deliberate slice, not a page of a list. */
+	showCount?: boolean;
 }) {
 	const columns = useMemo(() => workerColumns(!!showPool), [showPool]);
 	return (
@@ -279,9 +282,11 @@ export function WorkersTable({
 				onRowClick={onOpen}
 				emptyState={empty}
 			/>
-			<p className="text-sm text-muted-foreground">
-				Showing {page.items.length} of {page.total}.
-			</p>
+			{showCount ? (
+				<p className="text-sm text-muted-foreground">
+					Showing {page.items.length} of {page.total}.
+				</p>
+			) : null}
 		</>
 	);
 }

@@ -146,6 +146,7 @@ class JoinTokenManager:
             checks=checks,
             worker_id=worker.id if worker else None,
             worker=worker.name if worker else None,
+            joins=token.joins,
             waiting_s=max(0, int((now - token.created_at).total_seconds())),
         )
 

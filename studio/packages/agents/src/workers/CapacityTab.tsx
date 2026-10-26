@@ -4,20 +4,21 @@
  * leads to Add workers.
  */
 
+import { LineChart } from "@invana/charts";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Alert, AlertDescription, PropertyList, PropertyRow } from "@invana/ui";
 import { formatGrouped } from "@invana-studio/core";
 import { PanelSection } from "@invana-studio/ui";
-import { Plus } from "lucide-react";
+import { Plus, TriangleAlert } from "lucide-react";
 import { useMemo } from "react";
 import { FleetReadState } from "../overview/fleetParts";
-import { EventsCard } from "./PoolsTab";
+import { EventsCard, hhmm } from "./PoolsTab";
 import { AdminButton, DASH, span } from "./parts";
 import { useCapacityQuery } from "./queries";
 import type { CapacityRow } from "./types";
 
 /** `keeping up` · `short — 16 clear it in ~10 min` · `no workers — start one`. */
-function stateLine(r: CapacityRow): string {
+export function stateLine(r: CapacityRow): string {
 	if (r.unroutable_label)
 		return `unroutable — no pool carries ${r.unroutable_label}`;
 	if (r.state === "short") return `short — ${r.suggested} clear it in ~10 min`;
@@ -26,7 +27,7 @@ function stateLine(r: CapacityRow): string {
 	return DASH;
 }
 
-export function CapacityTab({ onAdd }: { onAdd: () => void }) {
+export function CapacityTab({ onAdd }: { onAdd: (pool: string) => void }) {
 	const capacity = useCapacityQuery();
 	const columns = useMemo<ColumnDef<CapacityRow>[]>(
 		() => [
@@ -80,8 +81,10 @@ export function CapacityTab({ onAdd }: { onAdd: () => void }) {
 			/>
 		);
 
-	const short = capacity.data.rows.filter((r) => r.state === "short");
-	const first = short[0];
+	const { rows, series, series_pool_id } = capacity.data;
+	const short = rows.filter((r) => r.state === "short");
+	const first = rows.find((r) => r.pool_id === series_pool_id) ?? short[0];
+	const last = series.length - 1;
 	return (
 		<>
 			{short.map((r) => (
@@ -90,6 +93,7 @@ export function CapacityTab({ onAdd }: { onAdd: () => void }) {
 					tone="warning"
 					className="flex items-center gap-3"
 				>
+					<TriangleAlert className="size-4" />
 					<AlertDescription className="flex-1">
 						<span className="font-semibold text-foreground">
 							{r.pool} is short of workers.
@@ -98,27 +102,41 @@ export function CapacityTab({ onAdd }: { onAdd: () => void }) {
 						{span(r.oldest_s)}. Invana never starts machines; add workers where{" "}
 						{r.pool} runs.
 					</AlertDescription>
-					<AdminButton variant="outline" onClick={onAdd}>
+					<AdminButton variant="outline" onClick={() => onAdd(r.pool)}>
 						<Plus />
 						Add workers
 					</AdminButton>
 				</Alert>
 			))}
 			{first ? (
-				<PanelSection card title={`Suggested for ${first.pool}`}>
-					<PropertyList labelWidth={150}>
-						<PropertyRow label="Now">{first.workers} workers</PropertyRow>
-						<PropertyRow label="To clear in 10 min">
-							{first.suggested} workers
-						</PropertyRow>
-						<PropertyRow label="How">
-							ready steps ÷ slots a worker, over the last 10 min
-						</PropertyRow>
-						<PropertyRow label="Computed">
-							by the engine, every 30 s
-						</PropertyRow>
-					</PropertyList>
-				</PanelSection>
+				<div className="grid gap-2.5 lg:grid-cols-[3fr_2fr]">
+					<PanelSection card title={`Queued and workers · ${first.pool}`}>
+						<LineChart
+							name="queued steps"
+							values={series.map((p) => p.ready)}
+							compare={[
+								{ name: "workers", values: series.map((p) => p.workers) },
+							]}
+							labels={series.map((p) => hhmm(p.at))}
+							ticks={last > 0 ? [0, Math.floor(last / 2), last] : undefined}
+							empty="Nothing queued in the last 10 minutes"
+						/>
+					</PanelSection>
+					<PanelSection card title={`Suggested for ${first.pool}`}>
+						<PropertyList labelWidth={150}>
+							<PropertyRow label="Now">{first.workers} workers</PropertyRow>
+							<PropertyRow label="To clear in 10 min">
+								{first.suggested} workers
+							</PropertyRow>
+							<PropertyRow label="How">
+								ready steps ÷ slots a worker, over the last 10 min
+							</PropertyRow>
+							<PropertyRow label="Computed">
+								by the engine, every 30 s
+							</PropertyRow>
+						</PropertyList>
+					</PanelSection>
+				</div>
 			) : null}
 			<PanelSection card title="Every pool">
 				<DataTable
