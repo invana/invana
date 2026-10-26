@@ -190,7 +190,9 @@ test("a model nothing was counted for draws no chart of zeros", async ({
 	);
 	try {
 		await page.goto(`${GRAPH}/modeller/models`);
+		await expect(row(page, name)).toBeVisible({ timeout: 30_000 });
 		await row(page, name).click();
+		await expect(page).toHaveURL(/model=/);
 		await page.getByRole("tab", { name: "Growth" }).click();
 		await expect(page.getByText(`${name} has no records yet`)).toBeVisible({
 			timeout: 30_000,
