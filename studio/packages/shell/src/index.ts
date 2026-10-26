@@ -108,9 +108,7 @@ export {
 	TAB_PARAM,
 	useLeftSection,
 } from "./regions/useLeftSection";
-export {
-	useOpenSessionRequest,
-} from "./regions/useOpenSessionRequest";
+export { useOpenSessionRequest } from "./regions/useOpenSessionRequest";
 export { usePageParams } from "./regions/usePageParams";
 export {
 	type RightSectionKey,
