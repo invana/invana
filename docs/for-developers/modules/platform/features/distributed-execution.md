@@ -10,7 +10,7 @@ built the envelope and the call, then benchmarked three queues under the same wo
 | Index | [13.11](../../../README.md#13--platform) · Slice **B14** |
 | Module | [Platform](../spec.md) |
 | API / CLI / Studio | — / — / — — engine only; workers run tool steps from [13.12](tool-plugins.md) |
-| Related | [the runtime](runtime.md) §2 · [plugins](plugins.md) · [products › plugins §5–§8](../../../../products/plugins.md#7-ready-for-n-workers) |
+| Related | [the runtime](runtime.md) §2 · [plugins](plugins.md) · [products › plugins §5–§8](../../../../products/plugins.md#7-ready-for-n-workers) · [workers](../../agents/features/workers.md) 5.15 · the executor for workers on other machines, open: [workers-and-orchestration](../../../building-engine/workers-and-orchestration.md) |
 
 > **As** an operator whose fan-outs outgrow one process, **I want** to start more workers and have
 > every step run on whichever is free, **so that** a 200-lane plan finishes in a ninth of the time on

@@ -148,6 +148,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 5.12 | [The Agents shell](modules/agents/features/the-agents-shell.md) | A rail and a workbook, no leftSection: Home, Fleet, Performance, Agents, Skills, Functions, Connections › MCP servers, LLMs and Settings as pages, each a tab | — | — | ✅ | F03 |
 | 5.13 | [The agent page](modules/agents/features/the-agent-page.md) | Build an agent on its page — a draft until *Create agent* — and read it in eleven tabs: Overview · Runs · Instructions · Soul · Model · Flow · Access · Limits · Deploy · Evals · History | 🟡 | — | 🟡 | F04 |
 | 5.14 | [Runs and the run page](modules/agents/features/the-run-page.md) | One runs list; a run read in six tabs at any size — Overview · Agents · Stages · Assets · Data touched · Ledger; rerun as it was, on today's versions, or retuned | 🟡 | — | 🟡 | F05 |
+| 5.15 | [Workers and pools](modules/agents/features/workers.md) | Pools by label, every worker and the step it runs, Capacity, join tokens; Add workers (Docker · Python · Kubernetes manifest); a worker dials out, joining with a service-account token | 🔵 | 🔵 | 🔵 | F06 |
 
 ## 6 · [Skills](modules/skills/spec.md)
 
@@ -428,7 +429,7 @@ replacement lands.
 | F05 | 5.14 · 10.9 · 10.8 · 5.4 · 3.15 | The assistant opens Runs with filters it set, and every act in a run has a ledger row |
 | I01 | 11.4–11.10 | A skill need no policy covers is refused naming the policy; a narrowed token can push a draft dataset and nothing else |
 | I02 | 13.16 · 10.4 · 11.5 | Claude Code, with a narrowed token, pushes a draft dataset version over this Graph's MCP server and a person publishes it |
-| F06 | 13.11 | A worker on a second machine joins with a service-account token and runs a tool step |
+| F06 | 5.15 · 13.11 | A worker on a second machine joins with a service-account token and runs a tool step |
 
 F01–F06 and I01–I02 build the Agents design ([agent-fabric](../products/agent-fabric.md)) and then IAM ([iam](../products/iam.md)) on one branch, one commit a phase, run by [agents-build-sessions](../products/agents-build-sessions.md).
 
