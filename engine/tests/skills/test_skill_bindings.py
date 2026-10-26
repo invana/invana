@@ -253,7 +253,7 @@ async def test_a_band_the_guardrails_shut_refuses_the_bind_and_names_its_rule(
     """
     skill = await _builtin(session, graph)
     agent = await _agent(session, graph, name="Analyst", spec=PLANNING_SPEC)
-    await _guardrail(session, graph, rules=[{"match": "llm/**", "allow": False}])
+    await _guardrail(session, graph, rules=[{"match": "llm/**", "allow": False}], scope=f"agent:{agent.id}")
 
     with pytest.raises(ConflictError) as refused:
         await bindings.bind(
@@ -331,7 +331,7 @@ async def test_a_band_the_plan_never_reaches_is_not_checked(session: AsyncSessio
     """BN7 — `third_party/**` is denied, and the playbook goes nowhere near it."""
     skill = await _builtin(session, graph)
     agent = await _agent(session, graph, name="Analyst", spec=PLANNING_SPEC)
-    await _guardrail(session, graph, rules=[{"match": "third_party/**", "allow": False}])
+    await _guardrail(session, graph, rules=[{"match": "third_party/**", "allow": False}], scope=f"agent:{agent.id}")
 
     await bindings.bind(
         session,
@@ -366,6 +366,7 @@ async def test_a_band_whose_every_participant_is_denied_is_shut_even_without_a_l
         session,
         graph,
         rules=[{"match": f"human/role/{role}", "allow": False} for role in ("analyst", "owner", "member")],
+        scope=f"agent:{agent.id}",
     )
 
     with pytest.raises(ConflictError) as refused:
