@@ -81,6 +81,9 @@ BOARD_KINDS: dict[str, BoardKindSpec] = {
         # (docs/for-developers/modules/govern/features/worlds.md WO15).
         _declared("world", "a lenses.id"),
         _declared("guardrail", "a lenses.id"),
+        # The Modeller's models board — one board whatever the scope, so its
+        # subject is the Graph (the-model-page.md MP18).
+        _declared("models", "a graphs.slug"),
     )
 }
 
@@ -102,6 +105,7 @@ BoardKindName = Literal[
     "rule",
     "world",
     "guardrail",
+    "models",
 ]
 
 #: What a version records about why it was written. ``report`` is a declared

@@ -3984,7 +3984,8 @@
               "skill_usage",
               "rule",
               "world",
-              "guardrail"
+              "guardrail",
+              "models"
             ],
             "title": "Kind",
             "type": "string"
@@ -44031,7 +44032,8 @@
                     "skill_usage",
                     "rule",
                     "world",
-                    "guardrail"
+                    "guardrail",
+                    "models"
                   ],
                   "type": "string"
                 },
@@ -44637,7 +44639,8 @@
                 "skill_usage",
                 "rule",
                 "world",
-                "guardrail"
+                "guardrail",
+                "models"
               ],
               "title": "Kind",
               "type": "string"
@@ -44753,7 +44756,8 @@
                 "skill_usage",
                 "rule",
                 "world",
-                "guardrail"
+                "guardrail",
+                "models"
               ],
               "title": "Kind",
               "type": "string"
@@ -44858,7 +44862,8 @@
                 "skill_usage",
                 "rule",
                 "world",
-                "guardrail"
+                "guardrail",
+                "models"
               ],
               "title": "Kind",
               "type": "string"

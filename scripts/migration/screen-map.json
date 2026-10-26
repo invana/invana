@@ -509,8 +509,8 @@
   "modeller.models.report": {
    "story": "MO-07",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/models",
-   "state": "open a saved report"
+   "route": "/u/admin/airways/modeller/models?page=models%3Aairways%40dce818ce-45ca-4f04-998f-89e6129a10a1",
+   "state": "a saved report of the Overview, pinned by id (MODELS_REPORT)"
   },
   "modeller.model.type.constraint": {
    "story": "MO-08",

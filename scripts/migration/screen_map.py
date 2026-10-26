@@ -28,6 +28,7 @@ AIRROUTES = "d5b061e6-e75b-4545-8cbc-23f316331004"  # airways' AirRoutes model, 
 ARABIDOPSIS = "807b30c5-7b5a-4eab-b954-684441467763"  # arabidopsis' only model
 DEALS = "c83c82d2-2eba-40d0-9e95-c3ff62c588e8"  # airways' Deals model, whose draft drops a property
 EU_WORLD = "51356733-0529-43d7-b862-701efbcf6c62"  # airways' world "EU · H1 2026"
+MODELS_REPORT = "dce818ce-45ca-4f04-998f-89e6129a10a1"  # airways' saved report "Models overview, 30 days"
 ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.login", "/login"), ("shell.graphs", "/graphs"), ("shell.first_run", "/graphs?first-run"),
     ("shell.profile", "/settings/profile"), ("shell.runs", f"{G}/activity/runs"), ("shell.run", f"{G}/agents/runs?page=run%3Aeaec1323-ac75-466b-a616-86b031fbeacb"),
@@ -55,6 +56,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("modeller.global_model", f"{G}/modeller/global-model"),
     *[(f"modeller.models.{t}", f"{G}/modeller/models?models_tab={t}")
       for t in ("overview", "database", "usage", "performance", "growth")],
+    ("modeller.models.report", f"{G}/modeller/models?page=models%3Aairways%40{MODELS_REPORT}"),
     ("modeller.models", f"{G}/modeller/models"),
     ("modeller.model.type.constraint", f"{AR}/modeller/models?model={ARABIDOPSIS}&model_open=1&model_type=Accession&type_tab=constraints"),
     ("modeller.model.history", f"{G}/modeller/models?model={AIRROUTES}&model_open=1&models_tab=history"),
@@ -245,7 +247,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "modeller.models.usage": "Usage tab",
     "modeller.models.performance": "Performance tab",
     "modeller.models.growth": "Growth tab",
-    "modeller.models.report": "open a saved report",
+    "modeller.models.report": "a saved report of the Overview, pinned by id (MODELS_REPORT)",
     "modeller.model.type.constraint": "click days_to_flowering",
     "modeller.model.history": MODEL,
     "modeller.worlds.board": "click a world",
