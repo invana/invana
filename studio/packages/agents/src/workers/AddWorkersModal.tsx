@@ -280,12 +280,14 @@ export function AddWorkersModal({
 				: true;
 
 	const poolName = pool?.name ?? (creating ? fresh.name : "");
-	// Joined watches the token minted here, else the pool's newest live one.
+	// Joined watches the token minted here, else the pool's newest live one a
+	// worker joined with, else its newest live one.
 	const tokens = useTokensQuery(
 		step === "joined" && !created ? (pool?.id ?? null) : null,
 	);
+	const live = tokens.data?.items.filter((t) => !t.revoked) ?? [];
 	const watched =
-		created?.id ?? tokens.data?.items.find((t) => !t.revoked)?.id ?? null;
+		created?.id ?? (live.find((t) => t.joins > 0) ?? live[0])?.id ?? null;
 	const engineUrl = created?.engine_url ?? window.location.origin;
 	const status = useJoinStatusQuery(step === "joined" ? watched : null);
 	const arrived = status.data?.checks.every((c) => c.state === "ok") ?? false;

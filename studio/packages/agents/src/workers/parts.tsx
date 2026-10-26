@@ -39,10 +39,6 @@ export function span(s: number | null | undefined): string {
 	return `${Math.round(s / 3600)} h`;
 }
 
-/** `1s` · `42s` — a heartbeat's age. */
-const age = (s: number | null | undefined): string =>
-	s == null ? DASH : `${s}s`;
-
 /** `0.4 s` / `120 ms` for a step time the engine stored in milliseconds. */
 export function millis(ms: number | null | undefined): string {
 	if (ms == null) return DASH;
@@ -167,7 +163,7 @@ function workerColumns(showPool: boolean): ColumnDef<WorkerRow>[] {
 			id: "node",
 			header: "Node",
 			cell: ({ row }) => (
-				<span className="font-mono text-muted-foreground">
+				<span className="whitespace-nowrap font-mono text-muted-foreground">
 					{row.original.node}
 				</span>
 			),
@@ -197,7 +193,7 @@ function workerColumns(showPool: boolean): ColumnDef<WorkerRow>[] {
 			id: "heartbeat",
 			header: "Heartbeat",
 			cell: ({ row }) => (
-				<span className="font-mono">{age(row.original.heartbeat_s)}</span>
+				<span className="font-mono">{span(row.original.heartbeat_s)}</span>
 			),
 		},
 		{

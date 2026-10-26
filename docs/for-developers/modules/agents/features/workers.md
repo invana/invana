@@ -151,10 +151,14 @@ DE9 · DE10; the options are compared in [workers-and-orchestration](../../../bu
 | WK21 | **A lost worker that heartbeats again is revived** with a new queue worker id; a draining worker that reports no busy slots is `stopped` and its credential is refused from then on |
 | WK22 | **Add workers opens on Docker** for *Where*; `?pool=<name>` preselects the pool, so Capacity's per-pool *Add workers* and a pool page's Join tokens open the modal on that pool. Closing drops `add` · `where` · `pool` from the URL |
 | WK23 | **Kubernetes' Run it is three `kubectl` lines** (secret · apply · rollout); *Download as a file* saves the Deployment manifest. Docker's command runs with `--restart unless-stopped` and carries the labels and slots |
-| WK24 | **Joined watches the token minted in the modal;** opened without one, it watches the pool's newest unrevoked join token, and lists that token's newest workers |
+| WK24 | **Joined watches the token minted in the modal;** opened without one, it watches the pool's newest unrevoked join token a worker joined with (else its newest unrevoked one), and lists that token's newest workers |
 | WK25 | **Capacity's chart is one pool's last 10 minutes** — the first pool short of workers, else the first pool — as stored `worker_stats` points (ready · workers); replica changes and joins are marked with the event's *why* |
 | WK26 | **A pool's *Runs on* line is the engine's:** Kubernetes reads *invana/worker deployment* (*Set by* carries the replicas), Docker counts distinct live hosts, Python names the machines. Studio derives no slot or host number — the pool's totals are served |
 | WK27 | **A pool page has tabs Workers · Capacity · Join tokens,** each the Workers page's surface filtered to that pool |
+| WK28 | **A pool's *workers* count is its live workers** (busy · idle · draining); a joined worker that has not heartbeat yet counts only in *starting*, so a pool with only a starting worker reads *0 · no workers*. The pool head reads *N workers · K starting · L lost* when those are non-zero, matching its state chips |
+| WK29 | **Ages read for a person:** a heartbeat's age is `42 s` · `3 min` · `2 h`, the same as every other served span on the Workers pages |
+| WK30 | ***vs 7-day* compares only a measured minute:** with no `worker_stats` bucket in the last minute the change is absent (`—`), never *-100%* |
+| WK31 | **Run it starts the engine's own image,** `invana/worker:<engine version>`, served with the minted token as `worker_image`; the Python note names the engine's Python (3.14) |
 
 ## Not building
 

@@ -4,11 +4,11 @@ import {
 	downloadOf,
 	kubernetesCommands,
 	pythonCommand,
-	WORKER_IMAGE_TAG,
 } from "./commands";
 
 const inputs = {
 	engineUrl: "https://invana.example.com",
+	image: "invana/worker:1.4.0",
 	token: "invana_join_abc",
 	pool: "egress",
 	labels: ["cpu", "egress"],
@@ -25,7 +25,7 @@ describe("run-it commands", () => {
 			"  -e INVANA_POOL=egress",
 			"  -e INVANA_LABELS=cpu,egress",
 			"  -e INVANA_SLOTS=8",
-			`  invana/worker:${WORKER_IMAGE_TAG}`,
+			"  invana/worker:1.4.0",
 		]);
 	});
 

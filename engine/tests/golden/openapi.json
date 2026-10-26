@@ -14313,6 +14313,10 @@
           "token": {
             "title": "Token",
             "type": "string"
+          },
+          "worker_image": {
+            "title": "Worker Image",
+            "type": "string"
           }
         },
         "required": [
@@ -14323,7 +14327,8 @@
           "joins",
           "created_at",
           "token",
-          "engine_url"
+          "engine_url",
+          "worker_image"
         ],
         "title": "JoinTokenCreated",
         "type": "object"

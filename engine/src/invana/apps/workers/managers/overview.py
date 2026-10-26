@@ -48,8 +48,10 @@ class OverviewManager:
 
         per_minute = await self.stats.envelopes_since(session, now - timedelta(seconds=60))
         history_from = await self.stats.first_at(session)
+        last_at = await self.stats.last_at(session)
         vs_7d: int | None = None
-        if history_from is not None:
+        # No bucket in the last minute is no measure, not a fall to zero.
+        if history_from is not None and last_at is not None and last_at >= now - timedelta(seconds=60):
             span_min = max(1.0, (now - max(history_from, now - timedelta(days=7))).total_seconds() / 60)
             average = await self.stats.envelopes_since(session, now - timedelta(days=7)) / span_min
             if average > 0:
@@ -97,7 +99,7 @@ class OverviewManager:
         for pool in pools:
             row, stat = rows[pool.id], stored.get(pool.id)
             suggested = stat.suggested if stat else 0
-            more = suggested - (row.workers - row.starting)
+            more = suggested - (row.workers)
             callout = None
             if row.state == "short" and more > 0:
                 callout = f"{more} more {pool.runs_on} workers would clear it"
@@ -108,10 +110,10 @@ class OverviewManager:
                     runs_on=pool.runs_on,
                     ready=row.queued,
                     oldest_s=row.oldest_s,
-                    workers=row.workers - row.starting,
+                    workers=row.workers,
                     suggested=suggested,
                     state=pool_state(
-                        workers=row.workers - row.starting,
+                        workers=row.workers,
                         slots=row.slots,
                         slots_busy=row.slots_busy,
                         queued=row.queued,

@@ -582,6 +582,13 @@ def phase_boards(sid: str) -> list[str]:
     return sorted(kept - dropped)
 
 
+def reseed() -> None:
+    """Re-seed the boards whose data is relative to now, when the runbook's scope ships a re-seed."""
+    script = PROMPTS.parent / "reseed.py"
+    if script.exists():
+        sh([sys.executable, str(script)])
+
+
 def regression(sid: str) -> str:
     """Shoot every finished phase's boards live and pixel-diff them against the accepted shots.
 
@@ -594,6 +601,7 @@ def regression(sid: str) -> str:
         return "No earlier phase is done; there is no regression set."
     out = CACHE / sid / "regression"
     shutil.rmtree(out, ignore_errors=True)
+    reseed()
     sh(["node", "scripts/migration/shoot.mjs", "--live", "--boards", ",".join(boards), "--out", str(out)])
     sh(["node", "scripts/migration/shoot.mjs", "--diff", str(SHOTS), "--out", str(out)])
     diff = json.loads((out / "diff.json").read_text()) if (out / "diff.json").exists() else {}
@@ -615,6 +623,7 @@ def accept_shots(sid: str) -> None:
     for png in reg.glob("*.png") if reg.exists() else []:
         shutil.copy2(png, SHOTS / png.name)
     if boards := phase_boards(sid):
+        reseed()
         sh(["node", "scripts/migration/shoot.mjs", "--live", "--boards", ",".join(boards), "--out", str(SHOTS)])
 
 

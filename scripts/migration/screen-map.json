@@ -1769,25 +1769,40 @@
    "story": "AF-11",
    "product": "agent-fabric",
    "route": "/u/admin/airways/agents/workers?add=token&pool=egress&right=assistant",
-   "state": "Add workers \u203a Pool \u203a Next: step Join token, before Make token"
+   "state": "Add workers \u203a Pool \u203a Next \u203a Make token: step Join token, the secret shown once",
+   "click": [
+    "Make token"
+   ]
   },
   "agents.workers.add.run.docker": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=run&pool=egress&where=docker&right=assistant",
-   "state": "Add workers \u203a Docker \u203a \u2026 \u203a Make token: step Run it"
+   "route": "/u/admin/airways/agents/workers?add=token&pool=egress&where=docker&right=assistant",
+   "state": "Add workers \u203a Docker \u203a \u2026 \u203a Make token: step Run it",
+   "click": [
+    "Make token",
+    "Next"
+   ]
   },
   "agents.workers.add.run.python": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=run&pool=egress&where=python&right=assistant",
-   "state": "Add workers \u203a Python \u203a \u2026 \u203a Make token: step Run it"
+   "route": "/u/admin/airways/agents/workers?add=token&pool=egress&where=python&right=assistant",
+   "state": "Add workers \u203a Python \u203a \u2026 \u203a Make token: step Run it",
+   "click": [
+    "Make token",
+    "Next"
+   ]
   },
   "agents.workers.add.run.k8s": {
    "story": "AF-11",
    "product": "agent-fabric",
-   "route": "/u/admin/airways/agents/workers?add=run&pool=egress&where=kubernetes&right=assistant",
-   "state": "Add workers \u203a Kubernetes \u203a \u2026 \u203a Make token: step Run it"
+   "route": "/u/admin/airways/agents/workers?add=token&pool=egress&where=kubernetes&right=assistant",
+   "state": "Add workers \u203a Kubernetes \u203a \u2026 \u203a Make token: step Run it",
+   "click": [
+    "Make token",
+    "Next"
+   ]
   },
   "agents.workers.add.waiting": {
    "story": "AF-11",

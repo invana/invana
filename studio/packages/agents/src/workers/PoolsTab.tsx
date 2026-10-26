@@ -241,8 +241,12 @@ function PoolsCard({ pools }: { pools: PoolRow[] }) {
 			{
 				id: "runs_on",
 				header: "Runs on",
-				cell: ({ row }) =>
-					`${RUNS_ON_LABEL[row.original.runs_on]} · ${row.original.runs_on_detail}`,
+				cell: ({ row }) => (
+					<span className="whitespace-nowrap">
+						{RUNS_ON_LABEL[row.original.runs_on]} ·{" "}
+						{row.original.runs_on_detail}
+					</span>
+				),
 			},
 			{
 				id: "labels",

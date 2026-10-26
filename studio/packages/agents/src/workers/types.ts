@@ -204,6 +204,8 @@ export interface JoinTokenCreated extends JoinTokenRow {
 	/** The secret, returned once. */
 	token: string;
 	engine_url: string;
+	/** `invana/worker:<engine version>` — the image *Run it* starts. */
+	worker_image: string;
 }
 
 export type JoinCheckKey =

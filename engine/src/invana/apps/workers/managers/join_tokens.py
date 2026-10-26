@@ -76,7 +76,9 @@ class JoinTokenManager:
             revoked=token.revoked_at is not None,
         )
 
-    async def mint(self, session: AsyncSession, *, payload: JoinTokenIn, actor, engine_url: str) -> JoinTokenCreated:
+    async def mint(
+        self, session: AsyncSession, *, payload: JoinTokenIn, actor, engine_url: str, worker_image: str
+    ) -> JoinTokenCreated:
         """Mint a join token for one pool; the response carries the secret, once."""
         require_install_admin(actor)
         pool = await self.pools.get_by_ref(session, payload.pool_id)
@@ -106,7 +108,7 @@ class JoinTokenManager:
             ),
         )
         row = self._row(token, pool.name, getattr(actor, "username", None))
-        return JoinTokenCreated(**row.model_dump(), token=secret, engine_url=engine_url)
+        return JoinTokenCreated(**row.model_dump(), token=secret, engine_url=engine_url, worker_image=worker_image)
 
     async def page(self, session: AsyncSession, *, params: ListParams) -> JoinTokenPage:
         found, info = await self.qs.page(session, params=params)

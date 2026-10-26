@@ -85,6 +85,7 @@ export function RunStep({
 	const inputs = {
 		engineUrl: created?.engine_url ?? window.location.origin,
 		token: created?.token ?? TOKEN_PLACEHOLDER,
+		image: created?.worker_image ?? "invana/worker",
 		pool: poolName,
 		labels: pool?.labels ?? [],
 		slots: pool?.slots_per_worker ?? 4,

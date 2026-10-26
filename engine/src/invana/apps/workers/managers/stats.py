@@ -59,7 +59,7 @@ class WorkerStatsManager:
                 WorkerStat(
                     pool_id=pool.id,
                     at=at,
-                    workers=t["workers"] - t["starting"],
+                    workers=t["workers"],
                     starting=t["starting"],
                     lost=t["lost"],
                     slots=t["slots"],

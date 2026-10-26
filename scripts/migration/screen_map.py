@@ -100,9 +100,9 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("agents.workers.tokens", f"{G}/agents/workers/tokens"),
     ("agents.workers.add.pool", f"{G}/agents/workers?add=pool&pool=egress"),
     ("agents.workers.add.token", f"{G}/agents/workers?add=token&pool=egress"),
-    ("agents.workers.add.run.docker", f"{G}/agents/workers?add=run&pool=egress&where=docker"),
-    ("agents.workers.add.run.python", f"{G}/agents/workers?add=run&pool=egress&where=python"),
-    ("agents.workers.add.run.k8s", f"{G}/agents/workers?add=run&pool=egress&where=kubernetes"),
+    ("agents.workers.add.run.docker", f"{G}/agents/workers?add=token&pool=egress&where=docker"),
+    ("agents.workers.add.run.python", f"{G}/agents/workers?add=token&pool=egress&where=python"),
+    ("agents.workers.add.run.k8s", f"{G}/agents/workers?add=token&pool=egress&where=kubernetes"),
     ("agents.workers.add.waiting", f"{G}/agents/workers?add=joined&pool=gpu-lab"),
     ("agents.workers.add.joined", f"{G}/agents/workers?add=joined&pool=egress"),
     ("agents.workers.add", f"{G}/agents/workers?add=where&pool=egress"),
@@ -363,7 +363,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "agents.workers.tokens": "Join tokens tab",
     "agents.workers.add": "Add workers: step Where",
     "agents.workers.add.pool": "Add workers › Python › Next: step Pool, egress chosen",
-    "agents.workers.add.token": "Add workers › Pool › Next: step Join token, before Make token",
+    "agents.workers.add.token": "Add workers › Pool › Next › Make token: step Join token, the secret shown once",
     "agents.workers.add.run.docker": "Add workers › Docker › … › Make token: step Run it",
     "agents.workers.add.run.python": "Add workers › Python › … › Make token: step Run it",
     "agents.workers.add.run.k8s": "Add workers › Kubernetes › … › Make token: step Run it",
@@ -375,6 +375,11 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
 }
 AS = {  # board → the account shoot.mjs signs in as; a board absent here is shot as the default user
     b: "e2e-viewer" for b in ("iam.policies.denied", "agents.skill.locked", "agents.ledger.member")
+}
+
+CLICK = {  # board → buttons shoot.mjs presses after the route loads, for a state a URL may not hold
+    "agents.workers.add.token": ["Make token"],
+    **{f"agents.workers.add.run.{w}": ["Make token", "Next"] for w in ("docker", "python", "k8s")},
 }
 
 
@@ -401,6 +406,8 @@ def main() -> None:
                 boards[b] = {"story": m.group(1), "product": doc, "route": route, "state": STATE.get(b, "")}
                 if b in AS:
                     boards[b]["as"] = AS[b]
+                if b in CLICK:
+                    boards[b]["click"] = CLICK[b]
     (ROOT / "scripts" / "migration" / "screen-map.json").write_text(json.dumps({"boards": boards}, indent=1))
     stale = sorted(set(STATE) - set(boards))
     print(len(boards), "boards mapped,", sum(1 for b in boards.values() if b["state"]), "with state")

@@ -85,7 +85,7 @@ class PoolManager:
                     queued=queued,
                     oldest_s=stat.oldest_s if stat else None,
                     state=pool_state(
-                        workers=t["workers"] - t["starting"],
+                        workers=t["workers"],
                         slots=t["slots"],
                         slots_busy=t["slots_busy"],
                         queued=queued,

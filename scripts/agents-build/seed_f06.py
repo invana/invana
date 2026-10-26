@@ -113,6 +113,7 @@ async def main() -> None:
                 payload=JoinTokenIn(pool_id=pools[pool].id, expires_in_days=days, cap=cap),
                 actor=ravi,
                 engine_url="http://localhost:8200",
+                worker_image="invana/worker:0.0.0",
             )
             tokens[pool] = await db.get(PersonalAccessToken, made.id)
 

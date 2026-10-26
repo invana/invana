@@ -6,13 +6,10 @@
 
 import type { RunsOn } from "./types";
 
-/** The worker image's tag until the engine names the install's version. */
-export const WORKER_IMAGE_TAG = "latest";
-
-const IMAGE = `invana/worker:${WORKER_IMAGE_TAG}`;
-
 export interface RunInputs {
 	engineUrl: string;
+	/** The engine's image for its own version, `invana/worker:<version>`. */
+	image: string;
 	token: string;
 	pool: string;
 	labels: string[];
@@ -34,7 +31,7 @@ export function dockerCommand(i: RunInputs): string {
 		`-e INVANA_POOL=${i.pool}`,
 		`-e INVANA_LABELS=${i.labels.join(",")}`,
 		`-e INVANA_SLOTS=${i.slots}`,
-		IMAGE,
+		i.image,
 	]);
 }
 
@@ -86,7 +83,7 @@ function kubernetesManifest(i: RunInputs): string {
 		"    spec:",
 		"      containers:",
 		"        - name: worker",
-		`          image: ${IMAGE}`,
+		`          image: ${i.image}`,
 		"          env:",
 		"            - name: INVANA_ENGINE_URL",
 		`              value: ${i.engineUrl}`,

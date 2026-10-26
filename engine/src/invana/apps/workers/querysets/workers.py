@@ -69,7 +69,7 @@ class WorkerQuerySet:
         return list((await session.execute(stmt)).scalars().all())
 
     async def pool_totals(self, session: AsyncSession, *, since_lost: datetime) -> dict[str, dict[str, int]]:
-        """Per pool: workers, starting, lost (since ``since_lost``), slots, slots_busy, hosts — from the worker rows."""
+        """Per pool: live workers, starting, lost (since ``since_lost``), slots, busy, hosts — from worker rows."""
         stmt = select(
             Worker.pool_id,
             Worker.state,
@@ -82,7 +82,6 @@ class WorkerQuerySet:
             row = out.setdefault(pool_id, {"workers": 0, "starting": 0, "lost": 0, "slots": 0, "slots_busy": 0})
             if state == WorkerState.starting.value:
                 row["starting"] += n
-                row["workers"] += n
             elif state in LIVE:
                 row["workers"] += n
                 row["slots"] += int(slots)

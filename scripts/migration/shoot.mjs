@@ -10,7 +10,8 @@
 //
 // Routes come from screen-map.json. Live shots sign in with INVANA_MIGRATION_USER / _PASSWORD
 // (default admin / change_me_please) against INVANA_MIGRATION_STUDIO_URL (default http://localhost:8300);
-// a board whose map entry has `as` is shot signed in as that account instead.
+// a board whose map entry has `as` is shot signed in as that account instead, and one with `click`
+// has those buttons pressed in order after it loads — for a state no URL may hold, like a secret shown once.
 import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -100,11 +101,17 @@ if (val('--diff')) {
   };
   const targets = flag('--smoke')
     ? SMOKE.map((r, i) => [`smoke-${i}`, r, fallback])
-    : boards.map((b) => [b, map.boards[b]?.route, map.boards[b]?.as ?? fallback]).filter(([, r]) => r);
-  for (const [name, route, user] of targets) {
+    : boards.map((b) => [b, map.boards[b]?.route, map.boards[b]?.as ?? fallback, map.boards[b]?.click ?? []])
+        .filter(([, r]) => r);
+  for (const [name, route, user, clicks = []] of targets) {
     const page = await pageFor(user);
     await page.goto(base + route, { waitUntil: 'networkidle' }).catch(() => {});
     await page.waitForTimeout(800);
+    for (const button of clicks) {
+      await page.getByRole('button', { name: button, exact: true }).click({ timeout: 15000 }).catch(() => {});
+      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForTimeout(800);
+    }
     // A board that opens on a running check is shot once it has settled.
     await page.getByText('Testing…').waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
     await page.screenshot({ path: path.join(out, `${name}.png`) });

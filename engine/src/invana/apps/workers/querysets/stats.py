@@ -59,5 +59,8 @@ class WorkerStatQuerySet:
     async def first_at(self, session: AsyncSession) -> datetime | None:
         return (await session.execute(select(func.min(WorkerStat.at)))).scalar_one()
 
+    async def last_at(self, session: AsyncSession) -> datetime | None:
+        return (await session.execute(select(func.max(WorkerStat.at)))).scalar_one()
+
     async def prune_before(self, session: AsyncSession, before: datetime) -> None:
         await session.execute(delete(WorkerStat).where(WorkerStat.at < before))

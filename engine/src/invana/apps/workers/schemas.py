@@ -73,6 +73,7 @@ class PoolRow(BaseModel):
     egress: list[str]
     set_by: Literal["hand", "replicas"]
     replicas: int | None = None
+    #: Live workers; a joined worker that has not heartbeat yet is in ``starting`` only.
     workers: int
     starting: int
     lost: int
@@ -283,6 +284,8 @@ class JoinTokenCreated(JoinTokenRow):
     token: str
     #: Shown in *Run it*: the engine URL a worker dials.
     engine_url: str
+    #: ``invana/worker:<engine version>`` — the image *Run it* starts.
+    worker_image: str
 
 
 class JoinCheck(BaseModel):

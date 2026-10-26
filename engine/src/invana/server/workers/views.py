@@ -51,6 +51,7 @@ from invana.core.errors import AuthenticationError
 from invana.core.lists import ListParams, list_params
 from invana.core.settings import settings
 from invana.plugins.gateway import Gateway
+from invana.plugins.registry import engine_version
 
 pools = PoolManager()
 workers = WorkerManager()
@@ -161,7 +162,13 @@ async def create_join_token(
     payload: JoinTokenIn, user: User = Depends(require_session_auth), session: AsyncSession = Depends(get_session)
 ) -> JoinTokenCreated:
     """Mint a join token; the response carries the secret, once."""
-    return await join_tokens.mint(session, payload=payload, actor=user, engine_url=settings.engine_base_url)
+    return await join_tokens.mint(
+        session,
+        payload=payload,
+        actor=user,
+        engine_url=settings.engine_base_url,
+        worker_image=f"invana/worker:{engine_version()}",
+    )
 
 
 async def revoke_join_token(
