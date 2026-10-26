@@ -45,7 +45,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.datasets.content import Row, columns_of, content_hash, normalise, property_changes
+from invana.apps.datasets.content import Row, columns_of, content_hash, normalise, property_changes, screen
 from invana.apps.datasets.managers.conformance import ConformanceManager
 from invana.apps.datasets.models import (
     AuthorKind,
@@ -499,6 +499,29 @@ class DatasetManager:
         """Mint the next version from its records — refused when nothing changed,
         or when a standard the dataset claims with ``block`` would break."""
         return await self._mint(session, dataset=dataset, payload=payload, actor=actor, draft=False)
+
+    async def check_records(self, session: AsyncSession, *, dataset: Dataset, records: list[Any]) -> dict[str, Any]:
+        """Read records as a draft push would, and write nothing.
+
+        Every record that cannot be keyed is named with its reason; the keyed
+        ones are scored against the standards the dataset claims — a ``block``
+        claim they break is in ``blocked``, a ``warn`` claim in ``warnings`` —
+        and ``unchanged`` says they match the current version, which a push
+        refuses.
+        """
+        rows, rejected = screen(records, key_column=dataset.key_column)
+        blocked, warnings = await self.claims.verdicts(session, dataset=dataset, rows=rows) if rows else ([], [])
+        current = await self.current(session, dataset)
+        unchanged = bool(rows) and not rejected and current is not None and current.content_hash == content_hash(rows)
+        return {
+            "dataset": dataset.address,
+            "records": len(records),
+            "valid": len(rows),
+            "rejected": rejected,
+            "blocked": blocked,
+            "warnings": warnings,
+            "unchanged": unchanged,
+        }
 
     async def push_draft(
         self, session: AsyncSession, *, dataset: Dataset, payload: DatasetVersionCreate, actor: User

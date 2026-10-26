@@ -36,6 +36,7 @@ from invana.apps.govern.models import Lens, RunTouch
 from invana.apps.graphs.models import Graph, GraphConnection, GraphMember
 from invana.apps.iam.models import Group, GroupMember, Policy, PolicyAttachment, PolicyVersion
 from invana.apps.llm_providers.models import LLMModel, LLMProvider
+from invana.apps.mcp_server.models import McpServed
 from invana.apps.modeller.models import (
     ConstraintDefinition,
     EdgeTypeDefinition,
@@ -130,6 +131,7 @@ from invana.server.iam.admin import (
 )
 from invana.server.ledger.admin import LedgerCheckView, LedgerExportView, LedgerRowView
 from invana.server.llm_providers.admin import LLMModelView, LLMProviderView
+from invana.server.mcp_server.admin import McpServedView
 from invana.server.modeller.admin import (
     ConstraintDefinitionView,
     EdgeTypeDefinitionView,
@@ -470,6 +472,7 @@ def mount_admin(app: FastAPI) -> None:
                 PluginStateView(PluginState, label="Plugin states", icon="fa fa-toggle-on"),
                 EnvelopeOutcomeView(EnvelopeOutcome, label="Envelope outcomes", icon="fa fa-envelope-open"),
                 McpServerView(McpServer, label="MCP servers", icon="fa fa-server"),
+                McpServedView(McpServed),
             ],
         ),
     )

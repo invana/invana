@@ -22,7 +22,12 @@ Route                                                      Action               
 ``GET · HEAD`` under ``/api/v1/datasets``                  ``data.read``             ``dataset/<p>/<n>`` · ``dataset/*``
 ``POST …/{publisher}/{name}/versions/drafts``              ``data.version.draft``    ``dataset/<p>/<n>``
 ``POST …/{publisher}/{name}/versions/{version}/publish``   ``data.version.publish``  ``dataset/<p>/<n>``
+``POST /api/v1/u/{username}/{graphSlug}/mcp``              checked per tool call     —
 =========================================================  ========================  ============================
+
+``POST …/mcp`` is this Graph's MCP server: the route lets a narrowed token
+through, and the server reads each ``tools/call`` as one action on one resource
+against the same inline policy (``runtime/managers/mcp_server.py``).
 
 Pure: no database, no request.
 """
@@ -56,6 +61,7 @@ ALWAYS: Final = ("*", "*")
 
 ROUTE_ACTIONS: tuple[RouteAction, ...] = (
     RouteAction(frozenset({"GET"}), "/api/v1/auth/me", "always"),
+    RouteAction(frozenset({"POST"}), f"{GRAPH_PREFIX}/mcp", "always"),
     RouteAction(frozenset({"POST"}), f"{DATASETS_PREFIX}/{{publisher}}/{{name}}/versions/drafts", "data.version.draft"),
     RouteAction(
         frozenset({"POST"}),

@@ -40,6 +40,7 @@ from invana.apps.graphs.models import (  # noqa: F401
 )
 from invana.apps.iam.models import Group, GroupMember, Policy, PolicyAttachment, PolicyVersion  # noqa: F401
 from invana.apps.llm_providers.models import LLMProvider  # noqa: F401
+from invana.apps.mcp_server.models import McpServed  # noqa: F401
 from invana.apps.sessions.models import Session, SessionMessage  # noqa: F401
 from invana.apps.skills.models import (
     Rule,  # noqa: F401

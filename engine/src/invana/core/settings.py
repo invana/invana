@@ -78,6 +78,8 @@ class Settings(BaseSettings):
 
     # URL Studio is served from — used to build user-facing links (e.g. login).
     studio_base_url: str = "http://localhost:8300"
+    # The engine's public URL — what an MCP client reaches this Graph's MCP server at.
+    engine_base_url: str = "http://localhost:8200"
 
     # Telemetry (OpenTelemetry)
     telemetry_enabled: bool = True

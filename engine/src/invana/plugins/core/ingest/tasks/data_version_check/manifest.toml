@@ -1,0 +1,20 @@
+key = "data.version.check"
+version = "1.0.0"
+summary = "Check records against a dataset as a draft push would — keys, unchanged, the standards it claims — and write nothing."
+bound = "none"
+side_effect = "read"
+requires = []
+resources = ["cpu"]
+
+[args]
+dataset = { type = "str", required = true }
+records = { type = "list", required = true }
+
+[outputs]
+dataset = "str"
+records = "int"
+valid = "int"
+rejected = "list"
+blocked = "list"
+warnings = "list"
+unchanged = "bool"

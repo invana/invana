@@ -92,6 +92,46 @@ def normalise(records: list[dict[str, Any]], *, key_column: str) -> list[Row]:
     return sorted(rows, key=lambda r: r.key)
 
 
+def screen(records: list[Any], *, key_column: str) -> tuple[list[Row], list[dict[str, Any]]]:
+    """Key the records that can be keyed and name every one that cannot.
+
+    The per-record reading of :func:`normalise`: instead of refusing the whole
+    set at the first offender, each record that is not an object, has no key,
+    repeats a key, nests a value or carries bad provenance is returned as
+    ``{record, key, reason}`` (``record`` 1-based) — what a caller fixes before
+    it pushes.
+    """
+    seen: set[str] = set()
+    rows: list[Row] = []
+    rejected: list[dict[str, Any]] = []
+    for index, record in enumerate(records, start=1):
+        if not isinstance(record, dict):
+            rejected.append({"record": index, "key": None, "reason": "not an object"})
+            continue
+        values = dict(record)
+        provenance_raw = values.pop(PROVENANCE_KEY, None)
+        raw_key = values.get(key_column)
+        if raw_key is None or str(raw_key).strip() == "":
+            rejected.append({"record": index, "key": None, "reason": f"no {key_column!r}"})
+            continue
+        key = str(raw_key)
+        if key in seen:
+            rejected.append({"record": index, "key": key, "reason": f"duplicate {key_column!r}"})
+            continue
+        seen.add(key)
+        nested = [column for column, value in values.items() if not _scalar(value)]
+        if nested:
+            rejected.append({"record": index, "key": key, "reason": f"nested values in {', '.join(nested)}"})
+            continue
+        try:
+            provenance = _provenance(provenance_raw, key)
+        except ValidationError as exc:
+            rejected.append({"record": index, "key": key, "reason": str(exc)})
+            continue
+        rows.append(Row(key=key, values=values, provenance=provenance))
+    return sorted(rows, key=lambda r: r.key), rejected
+
+
 def content_hash(rows: list[Row]) -> str:
     """``sha256:`` over the records in key order, each with its provenance."""
     canonical = [{"key": r.key, "values": r.values, "provenance": r.provenance} for r in rows]

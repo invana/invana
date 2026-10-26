@@ -174,6 +174,22 @@ class ConformanceManager:
             raise ConflictError("blocked — " + "; ".join(blocked))
         return scored
 
+    async def verdicts(
+        self, session: AsyncSession, *, dataset: Dataset, rows: list[Row]
+    ) -> tuple[list[str], list[str]]:
+        """What each claim says about records not yet a version — ``(blocked, warnings)``, refusing nothing."""
+        blocked: list[str] = []
+        warnings: list[str] = []
+        pairs = [(r.key, r.values) for r in rows]
+        for claim in await self.attachments(session, dataset=dataset):
+            standard, pinned = await self._pinned(session, claim)
+            result = score(pinned.terms, dict(claim.mapping or {}), pairs)
+            if result.conforms:
+                continue
+            line = _line(standard, pinned, result.score, result.violation_count, result.violations)
+            (blocked if claim.mode == Enforcement.block else warnings).append(line)
+        return blocked, warnings
+
     async def record(
         self,
         session: AsyncSession,

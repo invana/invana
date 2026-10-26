@@ -1,0 +1,22 @@
+key = "data.version.draft"
+version = "1.0.0"
+summary = "Push records as the next draft version of a dataset — listed, never current, until its owner publishes it."
+bound = "none"
+side_effect = "write"
+requires = []
+resources = ["cpu"]
+
+[args]
+dataset = { type = "str", required = true }
+records = { type = "list", required = true }
+licence = { type = "str", required = true }
+author_chain = { type = "list", default = [] }
+why = { type = "str" }
+source = { type = "str" }
+
+[outputs]
+dataset = "str"
+version = "int"
+state = "str"
+record_count = "int"
+warnings = "list"

@@ -278,6 +278,7 @@ ignore_imports = [
 name = "apps are acyclic"
 type = "layers"
 layers = [
+    "invana.apps.mcp_server",
     "invana.apps.work",
     "invana.apps.flows",
     "invana.apps.explorer",

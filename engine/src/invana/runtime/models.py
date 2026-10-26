@@ -71,6 +71,9 @@ class TriggeredBy(enum.StrEnum):
     # The platform acting on a person's behalf — resolving a reopened canvas,
     # a connection check. Also out of the default view.
     system = "system"
+    # A tool call over this Graph's MCP server, by a token's holder
+    # (docs/for-developers/modules/platform/features/this-graphs-mcp-server.md).
+    mcp = "mcp"
 
 
 #: The triggers a person does not read the journal for (orchestration § 4.1b).
