@@ -757,7 +757,9 @@ class Usage(BaseModel):
     #: Active stitches some query crossed.
     stitches_crossed: int = 0
     rows: list[UsageRow]
+    #: The most-crossed active stitches, capped; ``stitches_total`` counts them all.
     stitches: list[StitchUse] = []
+    stitches_total: int = 0
     properties: list[PropertyUse] = []
     #: Some query in the window was explained — properties are known (MP12).
     explains: bool

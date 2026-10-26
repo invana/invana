@@ -45,9 +45,10 @@ HOT_SHARE = 0.25
 SUPERNODE_RATIO = 100
 SUPERNODE_MIN = 1_000
 _SHAPES_SHOWN = 50
-#: How many flagged signals the Overview lists, and how many a row names.
+#: How many flagged signals the Overview lists, how many a row names, and how many stitches Usage lists.
 ATTENTION_SHOWN = 6
 ROW_SIGNALS_SHOWN = 3
+STITCHES_SHOWN = 5
 
 nf = "{:,}".format
 
@@ -275,7 +276,8 @@ class QueryInsights:
             cold_properties=sum(1 for p in properties if p.cold),
             stitches_crossed=sum(1 for s in stitches if s.queries),
             rows=rows,
-            stitches=stitches,
+            stitches=stitches[:STITCHES_SHOWN],
+            stitches_total=len(stitches),
             properties=properties,
             explains=explains,
         )

@@ -199,6 +199,10 @@ export function usageRows(
 										.map((s) => s.subject)
 										.slice(0, 2)
 										.join(" · ") || "every type was asked about",
+							tone:
+								usage.unused_types && !usage.too_few
+									? ("warn" as const)
+									: undefined,
 						},
 						one && usage.explains
 							? {
@@ -261,7 +265,7 @@ export function usageRows(
 				{
 					kind: "text",
 					title: "Stitches crossed",
-					aside: `${usage.stitches.length} active · ${usage.stitches_crossed} crossed by any query`,
+					aside: `${fmtNum(usage.stitches_total)} active · ${fmtNum(usage.stitches_crossed)} crossed by any query`,
 					flush: true,
 					options: { text: "" },
 					render: (

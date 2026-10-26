@@ -35799,6 +35799,11 @@
             "title": "Stitches Crossed",
             "type": "integer"
           },
+          "stitches_total": {
+            "default": 0,
+            "title": "Stitches Total",
+            "type": "integer"
+          },
           "too_few": {
             "title": "Too Few",
             "type": "boolean"

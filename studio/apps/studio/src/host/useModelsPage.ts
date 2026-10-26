@@ -2,6 +2,7 @@ import { useModelsView } from "@invana-studio/modeller";
 import type { useLeftSection } from "@invana-studio/shell";
 import {
 	boardPageId,
+	parseBoardPageId,
 	SECTION_PARAM,
 	usePageParams,
 } from "@invana-studio/shell";
@@ -61,12 +62,21 @@ export function useModelsPage(
 	const [params] = usePageParams();
 	const reading =
 		settingsSection === "model" ? (params.get(SECTION_PARAM) ?? "") : null;
+	// A link to a kept reading of this Graph's boards (`models:airways@<id>`)
+	// lands on that reading; the live board is not opened over it.
+	const page = params.get("page");
+	const frozen = page ? parseBoardPageId(page) : null;
+	const landsOnReading = !!frozen?.versionId && frozen.id === graphSlug;
 	const wasReading = useRef<string | null>(null);
 	useEffect(() => {
-		if (reading !== null && reading !== wasReading.current)
+		if (
+			reading !== null &&
+			reading !== wasReading.current &&
+			!(wasReading.current === null && landsOnReading)
+		)
 			openModelsPage(reading);
 		wasReading.current = reading;
-	}, [reading, openModelsPage]);
+	}, [reading, openModelsPage, landsOnReading]);
 
 	return { modelsView, showModelsPage };
 }

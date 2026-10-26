@@ -774,6 +774,8 @@ export interface Usage {
 	hot_types: number;
 	cold_properties: number;
 	stitches_crossed: number;
+	/** Every active stitch; `stitches` is the most-crossed few. */
+	stitches_total: number;
 	rows: UsageRow[];
 	stitches: {
 		id: string;

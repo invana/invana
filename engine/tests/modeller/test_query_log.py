@@ -251,5 +251,6 @@ class TestInsights:
         assert read.usage.too_few and read.usage.total == 31
         assert all(not r.signals for r in read.usage.rows)
         assert (read.usage.unused_types, read.usage.hot_types, read.usage.stitches_crossed) == (0, 0, 0)
+        assert read.usage.stitches == [] and read.usage.stitches_total == 0
         assert read.overview.attention == [] and read.overview.attention_total == 0
         assert read.performance.missing_indexes == 0
