@@ -12,7 +12,7 @@
  * database cannot hold arrives anyway, listed, and blocks publishing.
  */
 
-import { Input, Label, Textarea } from "@invana/forms";
+import { Input, Label } from "@invana/forms";
 import {
 	Button,
 	Dialog,
@@ -183,7 +183,7 @@ export function NewModelDialog({
 				setError(null);
 			}}
 			className={`rounded-sm border px-3 py-2 text-left ${
-				start === id ? "border-primary bg-primary/10" : "hover:bg-accent"
+				start === id ? "border-primary ring-1 ring-primary" : "hover:bg-accent"
 			}`}
 		>
 			<span className="block font-medium">{title}</span>
@@ -193,7 +193,7 @@ export function NewModelDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={(next) => !next && close()}>
-			<DialogContent className="max-w-lg">
+			<DialogContent className="max-w-2xl">
 				<form onSubmit={submit}>
 					<DialogHeader>
 						<DialogTitle>New model</DialogTitle>
@@ -215,7 +215,7 @@ export function NewModelDialog({
 						</div>
 						<div className="space-y-1.5">
 							<Label htmlFor="new-model-description">Description</Label>
-							<Textarea
+							<Input
 								id="new-model-description"
 								value={description}
 								onChange={(e) => setDescription(e.target.value)}

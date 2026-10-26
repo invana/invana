@@ -19,7 +19,6 @@ export {
 	GlobalModelBoard,
 	type GlobalModelSelect,
 } from "./model/GlobalModelBoard";
-export { GraphModelCanvas } from "./model/GraphModelCanvas";
 export {
 	hueSlotForName,
 	MODEL_EMPTY_TYPE,

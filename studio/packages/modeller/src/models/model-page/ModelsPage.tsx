@@ -495,7 +495,6 @@ export function ModelsPage({
 				className="min-h-0 flex-1"
 				spec={schemaSpec(
 					pageData,
-					view,
 					<ModelCanvas
 						username={username}
 						graphSlug={graphSlug}

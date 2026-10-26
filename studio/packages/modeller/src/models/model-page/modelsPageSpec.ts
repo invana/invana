@@ -251,15 +251,11 @@ const versionLabel = (m: GraphModelSummary) =>
  * One model's canvas, full-bleed (*Open in Schema*): the page's head and its
  * staged bar stay, the tab strip goes, and the canvas fills what is left.
  */
-export function schemaSpec(
-	data: ModelsPageData,
-	view: ModelsView,
-	canvas: ReactNode,
-): BoardSpec {
+export function schemaSpec(data: ModelsPageData, canvas: ReactNode): BoardSpec {
+	// Full-bleed: no head and no strip — the app's breadcrumb names the model
+	// and is the way back, and the canvas floats its own staged bar.
 	return {
 		title: data.scope?.model.name,
-		header: header(data, view),
-		staged: stagedBar(data.scope, data.canWrite),
 		rows: [
 			{
 				fill: true,

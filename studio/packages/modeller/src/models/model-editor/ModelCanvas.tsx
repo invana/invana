@@ -2,8 +2,8 @@
  * One model's canvas — the drawing behind *Open in Schema*.
  *
  * It draws the open version of one model (the draft while one is open) on the
- * same `GraphModelCanvas` as the global model, with no frame: the page's
- * breadcrumb already names the model. It only reads — a type clicked on it is
+ * same board as the global model — toolbar, minimap, schema cards — with no
+ * frame: the app's breadcrumb already names the model. It only reads — a type clicked on it is
  * handed to the page, which opens that type's own page, where a draft's
  * properties, indexes and constraints are edited. On a draft it also marks
  * each changed type against the active version and floats the staged bar;
@@ -13,7 +13,7 @@
 import { EmptyState } from "@invana/ui";
 import {
 	type CanvasBackend,
-	GraphModelCanvas,
+	GlobalModelBoard,
 	hueSlotForName,
 	type ModelCanvasSelection,
 } from "@invana-studio/canvases";
@@ -211,14 +211,14 @@ export function ModelCanvas({
 
 	return (
 		<div className="relative h-full w-full">
-			<GraphModelCanvas
-				data={build.data}
-				{...(marks ? { marks } : {})}
-				message="Hover a type for its properties, an edge for what it connects"
+			<GlobalModelBoard
+				data={marks ? { ...build.data, marks } : build.data}
+				title={model?.name ?? "Model"}
+				summary={`${nodeTypes.length} node · ${edgeTypes.length} edge types`}
 				selected={canvasSelection}
 				onSelect={onCanvasSelect}
 				backend={backend}
-				initialDetail="medium"
+				initialDetail="low"
 			/>
 			{draft ? (
 				<div className="absolute top-3 right-3 z-10">

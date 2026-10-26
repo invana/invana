@@ -103,7 +103,7 @@ export function GraphConnectPage() {
 
 	return (
 		<div className="h-full overflow-auto">
-			<form onSubmit={submit} className="mx-auto max-w-3xl px-10 py-10">
+			<form onSubmit={submit} className="mx-auto max-w-6xl px-10 py-10">
 				<h1 className="text-xl font-semibold">Connect a database</h1>
 				<p className="mt-1 mb-6 text-muted-foreground">
 					A new Graph starts here. Point Invana at a graph database; it reads
@@ -122,7 +122,7 @@ export function GraphConnectPage() {
 							}}
 							className={`rounded-sm border px-3 py-2.5 text-left ${
 								connector === e.connector
-									? "border-primary bg-primary/10"
+									? "border-primary ring-1 ring-primary"
 									: "hover:bg-accent"
 							}`}
 						>

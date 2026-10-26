@@ -28,8 +28,8 @@ import { IamHomeTiles, IamOpenContext } from "@invana-studio/iam";
 import {
 	type ModelSelection,
 	useLensesViewPanel,
+	useModellerCrumb,
 	useModelsQuery,
-	useStitchCrumb,
 } from "@invana-studio/modeller";
 import {
 	parseBoardPageId,
@@ -330,7 +330,8 @@ export function ProductHost() {
 		modelSelection,
 		setModelSelection,
 		showModelsPage,
-		modelOpen: !!modelsView.scope,
+		// The model's canvas is full-bleed: no outline beside it.
+		modelOpen: !!modelsView.scope && !modelsView.schema,
 		modelName,
 		canvas,
 		selected,
@@ -368,11 +369,7 @@ export function ProductHost() {
 	const agentsOpen = activeProductId === "agents";
 	const iamOpen = activeProductId === "iam";
 	const { pathname } = useLocation();
-	const stitchCrumb = useStitchCrumb(
-		username,
-		graphSlug,
-		activeProductId === "modeller" && pathname.endsWith("/global-model"),
-	);
+	const modellerCrumb = useModellerCrumb(username, graphSlug, pathname);
 	// The products on the Agents shell: sections as tabs, Home, no leftSection.
 	const sectionsOpen = agentsOpen || iamOpen;
 	const { user } = useAuth();
@@ -675,8 +672,8 @@ export function ProductHost() {
 								agentsSections.endpointId
 									? llmProviders.find((p) => p.id === agentsSections.endpointId)
 											?.name
-									: stitchCrumb
-										? stitchCrumb
+									: modellerCrumb
+										? modellerCrumb
 										: activeSessionId
 											? sessionTitleById.get(activeSessionId)
 											: undefined

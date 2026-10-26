@@ -2,7 +2,7 @@
  * The all models data build — every published model on one canvas.
  *
  * A model is a **group frame** (stitch-models.md): a `model` node that
- * `GraphModelCanvas` styles as a group, with its node types pointing at it
+ * `GlobalModelBoard` styles as a group, with its node types pointing at it
  * through `parentId`. That is
  * `@invana/graph`'s own group concept, not a drawing convention, which is what
  * buys the rest of it — ELK packs members inside the frame, and a
@@ -116,7 +116,7 @@ interface TypeStitches {
 }
 
 /**
- * Build the canvas payload — `GraphModelCanvas`'s `ModelGraphData`.
+ * Build the canvas payload — `GlobalModelBoard`'s `ModelGraphData`.
  *
  * Ids are namespaced by model because two domains may both own a `Company` and
  * they are different types until an anchor says otherwise (domain-models.md
