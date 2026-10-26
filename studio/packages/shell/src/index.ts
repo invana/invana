@@ -109,7 +109,6 @@ export {
 	useLeftSection,
 } from "./regions/useLeftSection";
 export {
-	requestOpenSession,
 	useOpenSessionRequest,
 } from "./regions/useOpenSessionRequest";
 export { usePageParams } from "./regions/usePageParams";

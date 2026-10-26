@@ -26,7 +26,6 @@ interface Request {
 }
 
 let current: Request | null = null;
-let nonce = 0;
 const listeners = new Set<() => void>();
 
 function emit() {
@@ -36,13 +35,6 @@ function emit() {
 function subscribe(cb: () => void) {
 	listeners.add(cb);
 	return () => listeners.delete(cb);
-}
-
-/** Ask the page to open a session. Callable outside React. */
-export function requestOpenSession(sessionId: string) {
-	nonce += 1;
-	current = { sessionId, nonce };
-	emit();
 }
 
 /**
