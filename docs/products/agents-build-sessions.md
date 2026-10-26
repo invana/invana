@@ -1,34 +1,36 @@
-# Agents and IAM build — sessions
+# Agents, IAM and Modeller build — sessions
 
-The build of the Agents design ([agent-fabric.md](agent-fabric.md)) and then IAM ([iam.md](iam.md)),
+The build of the Agents design ([agent-fabric.md](agent-fabric.md)), IAM ([iam.md](iam.md)) and the Modeller ([modeller.md](modeller.md)),
 run as phases by `scripts/migration/run.py` with this file as its runbook. One phase is one row in the
 log and **a run of small commits**, one per step and session; a phase may span several sessions, handing off when a session's context
-passes 300k tokens (a sub-agent too; past 350k the driver ends the session). Every phase is on **one branch**, `feat/agents-fabric`.
+passes 300k tokens (a sub-agent too; past 350k the driver ends the session). A product's phases share **one branch**: Agents and IAM (`F`, `I`) were built on `feat/agents-fabric`, now merged; the Modeller (`M`) is on `feat/modeller-redesign`.
 
 Run it:
 
 ```sh
 INVANA_RUNBOOK=docs/products/agents-build-sessions.md \
 INVANA_RUNNER_PROMPTS=scripts/agents-build/prompts \
-INVANA_RUNNER_SCOPE=agents INVANA_RUNNER_GATES=full \
+INVANA_RUNNER_SCOPE=modeller INVANA_RUNNER_GATES=full \
 INVANA_MIGRATION_CONTEXT_LIMIT=300000 \
 INVANA_MIGRATION_GRAPH_DB=bolt://localhost:27687 \
-python3 scripts/migration/run.py
+PYTHONUNBUFFERED=1 python3 scripts/migration/run.py
 ```
+
+`INVANA_RUNNER_SCOPE` is the product being built — `agents` for `F`/`I` phases, `modeller` for `M` — and names its commits and tags.
 
 ## Rules for every session
 
 | Rule | Detail |
 |---|---|
-| The designs | The **Invana Products** canvas — <https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg> (v46). Its source is `.design/canvas-products/` (`python3 products.py` rebuilds every board into `project/`); the local build is what is published. Board → story: the tables in `agent-fabric.md` and `iam.md` |
-| Docs before code | Read the feature file before writing code; if the phase's features have no file, or a file disagrees with `agent-fabric.md` / `iam.md`, **write the feature file and its index row first** (CLAUDE.md rules 0–1). Decisions are present tense, no history |
+| The designs | The **Invana Products** canvas — <https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg> (v46). Its source is `.design/canvas-products/` (`python3 products.py` rebuilds every board into `project/`); the local build is what is published. Board → story: the tables in `agent-fabric.md`, `iam.md` and `modeller.md` |
+| Docs before code | Read the feature file before writing code; if the phase's features have no file, or a file disagrees with its product doc (`agent-fabric.md` · `iam.md` · `modeller.md`), **write the feature file and its index row first** (CLAUDE.md rules 0–1). Decisions are present tense, no history |
 | No backward compatibility | Rename records, keys, routes and tables outright; delete the old path in the same change; a migration may drop and recreate. Every capability and `demos/airways` keep working ([Delivery › Sequencing rules](../for-developers/README.md#sequencing-rules)) |
-| Nothing Studio has is lost | Each row of [agent-fabric › Studio today, mapped](agent-fabric.md#studio-today-mapped) keeps its job; its **Deletes** column is deleted in the phase that moves it |
+| Nothing Studio has is lost | Each row of a product's *Studio today, mapped* table ([agent-fabric](agent-fabric.md#studio-today-mapped) · [modeller](modeller.md#studio-today-mapped)) keeps its job; its **Deletes** column is deleted in the phase that moves it |
 | Studio UI | Composed from `@invana/*` and tokens only; a missing component is built in `~/Projects/invana/design-kit` with a story (CLAUDE.md › Design rules). Detail heads use `RecordHeader variant="page"` |
 | The backend owns every number | CLAUDE.md rule 13 — Studio formats, never derives |
 | Validate against the boards | Before a phase is done, every board its stories name is shot live and from the prototype (`node scripts/migration/shoot.mjs --live|--proto --boards …`) and compared, each image viewed once. **Every board of every phase already done is shot live again by the driver** and pixel-diffed against the accepted shots (`.migration-cache/baseline/`, `shoot.mjs --diff`); only boards past 0.5% changed reach the reviewer, so nothing regresses and nothing is re-viewed for free. A passed phase's shots become the accepted ones. The review runs on Sonnet; builds and fixes on Opus. Routes live in `scripts/migration/screen-map.json` — regenerate with `screen_map.py` when a route changes |
 | Tests | Few positive and negative tests, against the graph database, never mocked (CLAUDE.md rules 5–7). Graph-database tests only against the isolated database the driver sets |
-| Commits | A phase is a run of small commits, never one big diff. The lead commits each finished step as `wip(agents): <ID> · step N — <what>` (`--no-verify`; sub-agents never commit); the driver checkpoints whatever is left after every session, fix round and `blocked`, and makes the phase's closing `feat(agents): <ID> · <phase>` commit with hooks on. A phase's first session tags `agents/<ID>-start`; `git reset --hard agents/<ID>-start` undoes the phase, `git revert <sha>` one step. Never amend, rebase, push or open a PR from a session |
+| Commits | A phase is a run of small commits, never one big diff. The lead commits each finished step as `wip(<scope>): <ID> · step N — <what>` (`--no-verify`; sub-agents never commit); the driver checkpoints whatever is left after every session, fix round and `blocked`, and makes the phase's closing `feat(<scope>): <ID> · <phase>` commit with hooks on. A phase's first session tags `<scope>/<ID>-start`; `git reset --hard <scope>/<ID>-start` undoes the phase, `git revert <sha>` one step. Never amend, rebase, push or open a PR from a session |
 | Hand-off | Past 400k tokens of context, stop at a clean point, set the row `partial`, write a hand-off note with exactly where to resume |
 | Ask Ravi | A phase that needs a decision not written in the docs sets its row `blocked` with the question |
 
@@ -110,6 +112,86 @@ python3 scripts/migration/run.py
 | Boards | `agents.pools` · `agents.pool.*` · `agents.workers.*` |
 | Done when | A worker on a second machine joins with a service-account token and runs a tool step |
 
+### M00 · Modeller audit
+
+| | |
+|---|---|
+| Lands | `modeller.md` › **Studio today, mapped** — every Modeller board against today's Studio, and the steps of M01–M07 rewritten to the real gaps. Docs only |
+| Read | `modeller.md` · `the-screens.md` · `migration-sessions.md` › A10a · A10b · C04 · C07 · C08 · `docs/for-developers/modules/connect-and-model/` |
+| Steps | 1. Shoot every `modeller.*` board live and from the prototype; view each once. 2. Audit the Modeller code in `studio/packages/modeller/` and the engine routes it reads. 3. Write *Studio today, mapped* into `modeller.md`: board · story · route · today (built · differs · missing) · what differs · **Deletes**. 4. Add a row to `the-screens.md` for every Modeller board that has none. 5. Rewrite the Steps of M01–M07 to the gaps found; fold away a phase that has none, and say so in its entry |
+| Boards | `modeller.*` |
+| Done when | Every `modeller.*` board has a row in *Studio today, mapped* and in `the-screens.md`, and every M phase's Steps name only real gaps |
+
+### M01 · Modeller shell and the global model
+
+| | |
+|---|---|
+| Lands | The Modeller rail and landing; the global model canvas with drill-in, the dark theme and stitches declared and inspected |
+| Read | `modeller.md` › MO-01 · MO-02 · MO-03 · `stitch-models.md` · `the-shell.md` |
+| Steps | Set by M00 |
+| Boards | `modeller.global_model*` · `modeller.stitches` · `modeller.model.airroutes` · `modeller.model.type` |
+| Done when | A modeller lands on the global model, drills into a model and a type, and declares a stitch |
+
+### M02 · Models: connect, draft, publish, new, history
+
+| | |
+|---|---|
+| Lands | Connect a database and the drafted model; compare on the map and publish with who reads it; new model from a description, file, starter or ontology; history with its effect |
+| Read | `modeller.md` › MO-04 · MO-05 · MO-06 · MO-09 · MO-15 · `the-model-page.md` · `publish-review.md` |
+| Steps | Set by M00 |
+| Boards | `modeller.connect` · `modeller.draft*` · `modeller.models.new*` · `modeller.model.history` |
+| Done when | A draft is compared on the map — each changed type marked — and published, a breaking one through another member's approval |
+
+### M03 · Model dashboards
+
+| | |
+|---|---|
+| Lands | Overview, database drift, usage, performance, growth and a saved report for every model — every number stored by the engine |
+| Read | `modeller.md` › MO-07 · `metrics-are-stored.md` |
+| Steps | Set by M00 |
+| Boards | `modeller.models.overview` · `modeller.models.database` · `modeller.models.usage` · `modeller.models.performance` · `modeller.models.growth` · `modeller.models.report` |
+| Done when | Each dashboard reads only stored columns and endpoint aggregates; a saved report reopens to the same reading |
+
+### M04 · Constraints on properties
+
+| | |
+|---|---|
+| Lands | Ranges on a property and values named by a standard, enforced where records land |
+| Read | `modeller.md` › MO-08 · Decisions › Standards · `datasets.md` |
+| Steps | Set by M00 |
+| Boards | `modeller.model.type.constraint` |
+| Done when | A record outside a property's range or its standard's values is refused, naming the constraint |
+
+### M05 · Govern: worlds, guardrails, requests
+
+| | |
+|---|---|
+| Lands | Worlds that narrow what a run may see; guardrails always in force and the requests they cause; one Requests inbox |
+| Read | `modeller.md` › MO-10 · MO-11 · MO-13 · Govern: four kinds of bound |
+| Steps | Set by M00 |
+| Boards | `modeller.worlds*` · `modeller.guardrails*` · `modeller.requests` |
+| Done when | A run inside a world sees only its scope; a guardrail refusal files a request that a modeller resolves from the inbox |
+
+### M06 · Rules by scope
+
+| | |
+|---|---|
+| Lands | Rules at install, Graph or project scope, checked where they apply — the install is the top scope (no tenancy) |
+| Read | `modeller.md` › MO-12 · `README.md` › P-12 |
+| Steps | Set by M00 |
+| Boards | `modeller.rules*` |
+| Done when | An install rule holds in every Graph, a Graph rule only in its Graph, a project rule only in its project |
+
+### M07 · Graph settings
+
+| | |
+|---|---|
+| Lands | The Graph's name, instructions, connection, members and roles |
+| Read | `modeller.md` › MO-14 |
+| Steps | Set by M00 |
+| Boards | `modeller.settings*` |
+| Done when | Every settings tab matches its board and saves through the engine |
+
 Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/agents/features/remote-agents.md)) — `agents.connections.agent*` · `agents.run.remote*`.
 
 ## Log
@@ -124,6 +206,14 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | I02 | Connections in | engine+studio | I01 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
+| M00 | Modeller audit | docs | F06 | `feat/modeller-redesign` | pending | 2026-10-26 | |
+| M01 | Shell and global model | engine+studio | M00 | `feat/modeller-redesign` | pending | | |
+| M02 | Models | engine+studio | M01 | `feat/modeller-redesign` | pending | | |
+| M03 | Model dashboards | engine+studio | M02 | `feat/modeller-redesign` | pending | | |
+| M04 | Constraints | engine+studio | M03 | `feat/modeller-redesign` | pending | | |
+| M05 | Govern | engine+studio | M04 | `feat/modeller-redesign` | pending | | |
+| M06 | Rules by scope | engine+studio | M05 | `feat/modeller-redesign` | pending | | |
+| M07 | Graph settings | engine+studio | M06 | `feat/modeller-redesign` | pending | | |
 
 ## Hand-off notes
 

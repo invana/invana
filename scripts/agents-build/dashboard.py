@@ -26,10 +26,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 RUNBOOK = ROOT / "docs" / "products" / "agents-build-sessions.md"
 CACHE = ROOT / ".migration-cache"
-REVIEWS = ROOT / "scripts" / "agents-build" / "reviews"
+# The runner writes reviews to scripts/migration/reviews; earlier phases wrote them here.
+REVIEWS = [ROOT / "scripts" / "migration" / "reviews", ROOT / "scripts" / "agents-build" / "reviews"]
 RUN_LOG = CACHE / "agents-run.log"
 TRANSCRIPTS = Path.home() / ".claude" / "projects" / re.sub(r"[^A-Za-z0-9]", "-", str(ROOT))
-ID = re.compile(r"^[FI]\d{2}$")
+ID = re.compile(r"^[A-Z]\d{2}$")
+# A phase's product, by its id's letter.
+PRODUCT = {"F": "Agents", "I": "IAM", "M": "Modeller"}
 # The runner's context budget for the lead and every sub-agent, and the grace before it ends a session.
 LIMIT = int(os.environ.get("INVANA_MIGRATION_CONTEXT_LIMIT", "300000"))
 GRACE = int(os.environ.get("INVANA_RUNNER_HANDOFF_GRACE", "50000"))
@@ -48,7 +51,7 @@ def table(text: str, start: str, end: str | None) -> list[list[str]]:
 def phases() -> list[dict]:
     text = RUNBOOK.read_text()
     entries = {}
-    for m in re.finditer(r"^### ([FI]\d{2}) · (.+?)\n(.*?)(?=^### |^Later|^## )", text, re.S | re.M):
+    for m in re.finditer(r"^### ([A-Z]\d{2}) · (.+?)\n(.*?)(?=^### |^Later|^## )", text, re.S | re.M):
         body = {r[0]: r[1] for r in table(m.group(3), "| |", None) if len(r) > 1}
         entries[m.group(1)] = {"title": m.group(2), "done_when": body.get("Done when", ""), "lands": body.get("Lands", ""),
                                "boards": body.get("Boards", ""), "steps": body.get("Steps", "")}
@@ -61,9 +64,9 @@ def phases() -> list[dict]:
         if len(r) < 8 or not ID.match(r[0]):
             continue
         sid = r[0]
-        review = REVIEWS / f"{sid}.md"
+        review = next((d / f"{sid}.md" for d in REVIEWS if (d / f"{sid}.md").exists()), REVIEWS[0] / f"{sid}.md")
         verdict = review.read_text().splitlines()[0].strip() if review.exists() and review.read_text().strip() else ""
-        out.append({"id": sid, "phase": r[1], "kind": r[2], "needs": r[3], "status": r[5], "date": r[6], "notes": r[7],
+        out.append({"id": sid, "product": PRODUCT.get(sid[0], sid[0]), "phase": r[1], "kind": r[2], "needs": r[3], "status": r[5], "date": r[6], "notes": r[7],
                     "review": verdict, "handoffs": notes.get(sid, []), **entries.get(sid, {})})
     return out
 
@@ -270,7 +273,7 @@ def state() -> dict:
 
 
 PAGE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Agents build</title><style>
+<title>Invana build</title><style>
 :root{--bg:#f6f7f9;--card:#fff;--fg:#16181d;--mut:#667085;--bd:#e4e7ec;--ok:#12805c;--run:#1f6feb;--warn:#b45309;--bad:#c4302b}
 @media (prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#171a21;--fg:#e6e8ee;--mut:#98a2b3;--bd:#2a2f3a;--ok:#3fb950;--run:#58a6ff;--warn:#d29922;--bad:#f85149}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -278,7 +281,7 @@ header{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:
 h1{font-size:15px;margin:0}main{padding:16px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px;max-width:1500px;margin:auto}
 .card,.sess,li{min-width:0;overflow-wrap:anywhere}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:6px}.card>h2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:0;padding:10px 12px;border-bottom:1px solid var(--bd)}
-.phases{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;padding:12px}
+.phases{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;padding:8px 0 4px}.grp{padding:12px;border-top:1px solid var(--bd)}.grp:first-child{border-top:0}
 .ph{border:1px solid var(--bd);border-radius:6px;padding:10px;cursor:pointer}.ph.on{outline:2px solid var(--run)}
 .ph b{display:block}.mut{color:var(--mut)}.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
 .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid currentColor}
@@ -289,17 +292,17 @@ table{border-collapse:collapse;width:100%;margin:6px 0}th,td{text-align:left;pad
 th{font-weight:600;color:var(--mut);font-size:11px;white-space:nowrap}td.nw{white-space:nowrap;overflow-wrap:normal}td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .bar.sm{height:4px;min-width:60px}.bar.over i{background:var(--warn)}.bar.kill i{background:var(--bad)}
 .completed{color:var(--ok)}.running{color:var(--run)}.failed,.killed{color:var(--bad)}.stopped,.ended{color:var(--warn)}
-.pad{padding:12px}ul{margin:6px 0;padding-left:18px}li{margin:2px 0}.todo-completed{color:var(--ok);text-decoration:line-through}.todo-in_progress{color:var(--run);font-weight:600}
+.pad{padding:12px}ul.steps{list-style:none;padding-left:4px}ul{margin:6px 0;padding-left:18px}li{margin:2px 0}.todo-completed{color:var(--ok);text-decoration:line-through}.todo-in_progress{color:var(--run);font-weight:600}
 .sess{border-top:1px solid var(--bd);padding:12px}.sess:first-of-type{border-top:0}.bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:var(--run)}
 .feed{max-height:560px;overflow:auto;padding:8px 12px}.ev{display:grid;grid-template-columns:64px 52px minmax(0,1fr);gap:8px;padding:3px 0;border-top:1px dashed var(--bd)}
 .ev .k{font-size:11px;font-weight:600}.k-said{color:var(--fg)}.k-tool{color:var(--run)}.k-result{color:var(--mut)}.k-error{color:var(--bad)}.k-prompt{color:var(--warn)}
 .ev .x{white-space:pre-wrap;overflow-wrap:anywhere}.ev .x.clip{max-height:5.6em;overflow:hidden}.pick{cursor:pointer}.pick:hover{background:var(--bg)}tr.sel,.sess.sel{background:var(--bg)}
 pre{margin:0;padding:12px;white-space:pre-wrap;overflow:auto;max-height:320px}.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
 </style></head><body>
-<header><h1>Agents build</h1><span id="runner"></span><span class="mut mono" id="branch"></span><span style="flex:1"></span><span class="mut" id="at"></span></header>
+<header><h1>Invana build</h1><span id="runner"></span><span class="mut mono" id="branch"></span><span style="flex:1"></span><span class="mut" id="at"></span></header>
 <main>
 <section class="card"><h2 id="ftitle">Live feed</h2><div class="pad mut" id="fhint">Click a session or a sub-agent to follow it.</div><div class="feed" id="feed"></div></section>
-<section class="card"><h2>Phases</h2><div class="phases" id="phases"></div></section>
+<section class="card"><h2>Phases</h2><div id="phases"></div></section>
 <div class="grid">
 <section class="card"><h2 id="ptitle">Phase</h2><div class="pad" id="pdetail"></div></section>
 <section class="card"><h2>Sessions on this phase</h2><div id="sessions"></div></section>
@@ -318,25 +321,37 @@ const partsTable = (ps, lbl) => !ps.length ? '' : `<b>Sub-agents (${ps.length})<
   ${ps.map(p => `<tr class="pick ${follow && follow.agent === p.agent && p.agent ? 'sel' : ''}" data-label="${esc(lbl)}" data-agent="${esc(p.agent)}" data-name="${esc(p.name)}"><td>${esc(p.name)}${p.todos.length ? `<div class="mut">${p.todos.filter(t => t.status === 'completed').length}/${p.todos.length} todos${(p.todos.find(t => t.status === 'in_progress') || {}).text ? ' · now: ' + esc(p.todos.find(t => t.status === 'in_progress').text) : ''}</div>` : ''}</td><td class="nw ${cls(p.status)}">${esc(p.status)}</td><td class="nw mono">${esc(p.model.replace('claude-', ''))}</td>
     <td class="n">${tok(p.context)} · ${tok(p.peak)}${meter(p.peak, true)}</td><td class="n">${p.turns}</td><td class="n">${tok(p.spend)}</td>
     <td class="mut">${esc(p.doing)}</td></tr>`).join('')}</table></div>`;
+// A phase's steps ("1. … 2. …") as a checklist: all ticked once the phase is done; otherwise a step
+// is ticked when a commit on the branch names it ("<ID> · step N").
+const stepList = p => { const parts = p.steps.split(/(?:^|\s)(?=\d+[a-z]?\.\s)/).map(s => s.trim()).filter(Boolean);
+  if (parts.length < 2) return `<div>${md(p.steps)}</div>`;
+  return `<ul class="steps">${parts.map(s => { const n = (s.match(/^(\d+[a-z]?)\./) || [])[1];
+    const hit = p.status === 'done' || (n && (window.COMMITS || []).some(c => c.includes(`${p.id} · step ${n}`)));
+    return `<li class="${hit ? 'todo-completed' : ''}">${hit ? '✓ ' : '○ '}${md(s.replace(/^\d+[a-z]?\.\s*/, ''))}</li>`; }).join('')}</ul>`; };
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cls = s => esc(s).replace(/ /g, '-');
 const md = s => esc(s).replace(/`([^`]+)`/g, '<span class="mono">$1</span>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
 async function tick() {
   let st; try { st = await (await fetch('/api/state')).json(); } catch { document.getElementById('at').textContent = 'dashboard server unreachable'; return; }
-  LIMIT = st.limit; HARD = st.hard_stop;
+  LIMIT = st.limit; HARD = st.hard_stop; window.COMMITS = st.commits;
   document.getElementById('runner').innerHTML = st.runner ? '<span class="pill in-progress">runner running</span>' : '<span class="pill blocked">runner stopped</span>';
   document.getElementById('branch').textContent = st.branch;
   document.getElementById('at').textContent = 'updated ' + new Date().toLocaleTimeString();
-  const live = st.phases.find(p => p.status === 'in progress' || p.status === 'partial');
+  const live = st.phases.find(p => p.status === 'in progress' || p.status === 'partial') || st.phases.find(p => p.status !== 'done');
   if (!pick) pick = (live || st.phases[0]).id;
-  document.getElementById('phases').innerHTML = st.phases.map(p => `<div class="ph ${p.id === pick ? 'on' : ''}" data-id="${p.id}">
+  const card = p => `<div class="ph ${p.id === pick ? 'on' : ''}" data-id="${p.id}">
     <div style="display:flex;justify-content:space-between"><span class="mono">${p.id}</span><span class="pill ${cls(p.status)}">${esc(p.status)}</span></div>
-    <b>${esc(p.phase)}</b><span class="mut">${esc(p.date)}</span>${p.review ? `<div class="${p.review.includes('PASS') ? 'done' : 'blocked'}">${esc(p.review)}</div>` : ''}</div>`).join('');
+    <b>${esc(p.phase)}</b><span class="mut">${esc(p.date)}</span>${p.review ? `<div class="${p.review.includes('PASS') ? 'done' : 'blocked'}">${esc(p.review)}</div>` : ''}</div>`;
+  const groups = [...new Set(st.phases.map(p => p.product))];
+  document.getElementById('phases').innerHTML = groups.map(g => { const ps = st.phases.filter(p => p.product === g);
+    const done = ps.filter(p => p.status === 'done').length;
+    return `<div class="grp"><div class="row"><b>${esc(g)}</b><span class="mut">${done}/${ps.length} done</span></div>
+      <div class="bar sm"><i style="width:${done / ps.length * 100}%;background:var(--ok)"></i></div><div class="phases">${ps.map(card).join('')}</div></div>`; }).join('');
   document.querySelectorAll('.ph').forEach(el => el.onclick = () => { pick = el.dataset.id; tick(); });
   const p = st.phases.find(x => x.id === pick);
   document.getElementById('ptitle').textContent = `${p.id} · ${p.title || p.phase}`;
   document.getElementById('pdetail').innerHTML = `<p><b>Done when</b><br>${md(p.done_when)}</p><p><b>Lands</b><br>${md(p.lands)}</p>
-    ${p.steps ? `<p><b>Steps</b><br>${md(p.steps)}</p>` : ''}<p><b>Boards validated</b><br>${md(p.boards)}</p>
+    ${p.steps ? `<p><b>Steps</b></p>${stepList(p)}` : ''}<p><b>Boards validated</b><br>${md(p.boards)}</p>
     ${p.notes ? `<p><b>Runner note</b><br>${md(p.notes)}</p>` : ''}
     ${p.handoffs.length ? `<p><b>Hand-off notes</b></p><ul>${p.handoffs.map(h => `<li>${md(h)}</li>`).join('')}</ul>` : ''}`;
   const ss = st.sessions[pick] || [];

@@ -86,6 +86,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | Landing | Global model, not a list |
 | Standards | Defined in Datasets; a property **references** a standard’s values |
 | Imports | Moved to Datasets |
+| Rule scope | Install, Graph and project. The install is the top scope: there is no tenancy, so an install rule holds in every Graph on it |
 | Publish review | Additive changes publish directly. Breaking ones (removed or narrowed property, changed key, loosened guardrail) need another member’s approval, shown in Approvals with the impact list |
 | Breaking data changes | A breaking publish generates a migration run: affected counts, sample before/after, records that would fail. It runs after approval; failures go to Datasets › Validation. Nothing changes silently |
 | Rules show impact | A rule shows what it would have stopped in the last 30 days before it saves |
