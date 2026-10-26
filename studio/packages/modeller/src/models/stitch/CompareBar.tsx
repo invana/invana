@@ -38,18 +38,21 @@ export interface CompareBarProps {
 	onClose: () => void;
 }
 
-const versionLabel = (v: VersionSummary) =>
-	v.status === "draft" ? "draft" : `v${v.version}`;
+/** A draft reads as the version it publishes as, once the diff has said. */
+const versionLabel = (v: VersionSummary, next: string | null | undefined) =>
+	v.status !== "draft" ? `v${v.version}` : next ? `v${next} draft` : "draft";
 
 function VersionSelect({
 	label,
 	value,
 	versions,
+	next,
 	onChange,
 }: {
 	label: string;
 	value: string | undefined;
 	versions: VersionSummary[];
+	next: string | null | undefined;
 	onChange: (versionId: string) => void;
 }) {
 	return (
@@ -60,7 +63,7 @@ function VersionSelect({
 			<SelectContent>
 				{versions.map((v) => (
 					<SelectItem key={v.id} value={v.id}>
-						{versionLabel(v)}
+						{versionLabel(v, next)}
 					</SelectItem>
 				))}
 			</SelectContent>
@@ -101,6 +104,7 @@ export function CompareBar({
 				label="From"
 				value={from}
 				versions={versions}
+				next={diff?.next_version}
 				onChange={onFrom}
 			/>
 			<ArrowRight className="size-3.5 text-muted-foreground" />
@@ -108,18 +112,19 @@ export function CompareBar({
 				label="To"
 				value={to}
 				versions={versions}
+				next={diff?.next_version}
 				onChange={onTo}
 			/>
 			{diff ? (
 				<span className="flex items-center gap-1.5">
 					<Badge variant="soft" tone="success" size="xs">
-						{diff.added} added
+						+ {diff.added} added
 					</Badge>
 					<Badge variant="soft" tone="warning" size="xs">
-						{diff.changed} changed
+						~ {diff.changed} changed
 					</Badge>
 					<Badge variant="soft" tone="destructive" size="xs">
-						{diff.removed} removed
+						− {diff.removed} removed
 					</Badge>
 				</span>
 			) : null}

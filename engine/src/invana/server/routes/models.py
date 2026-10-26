@@ -93,7 +93,7 @@ from invana.apps.modeller.schemas import (
 )
 from invana.apps.modeller.staging import StagedSet, UnknownChange, collect, discard_all, discard_one
 from invana.apps.modeller.store import ModelStore
-from invana.apps.modeller.versioner import Versioner, compute_diff, mark_types
+from invana.apps.modeller.versioner import Versioner, compute_diff, mark_types, next_semver
 from invana.apps.semantic.managers import OntologyImportManager
 from invana.apps.semantic.schemas import OntologyImportRequest, OntologyImportResult
 from invana.core.auth.deps import get_current_user
@@ -1399,8 +1399,20 @@ async def diff_version(
             added_property_keys=[pk.name for pk in target.property_keys],
             classification="major",
         )
-        return mark_types(None, target, everything)
-    return mark_types(base, target, compute_diff(base, target))
+        diff = mark_types(None, target, everything)
+    else:
+        diff = mark_types(base, target, compute_diff(base, target))
+    if target.status == "draft":
+        # Publishing bumps over the active version, whatever `against` names.
+        active = next((v for v in versions if v.status == "active"), None)
+        if active is None:
+            diff.next_version = next_semver(None, "major")
+        elif base is not None and base.id == active.id:
+            diff.next_version = next_semver(base.version, diff.classification)
+        else:
+            current = await _store.get_version(session, active.id)
+            diff.next_version = next_semver(current.version, compute_diff(current, target).classification)
+    return diff
 
 
 # ---------------------------------------------------------------------------

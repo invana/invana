@@ -413,7 +413,10 @@
    "story": "MO-05",
    "product": "modeller",
    "route": "/u/admin/airways/modeller/global-model",
-   "state": "with a draft on airroutes, Compare"
+   "state": "with a draft on airroutes, Compare",
+   "click": [
+    "Compare"
+   ]
   },
   "modeller.draft.publish": {
    "story": "MO-05",
@@ -421,16 +424,16 @@
    "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_view=schema",
    "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, on the draft: Publish",
    "click": [
-    "Publish"
+    "text:Publish v"
    ]
   },
   "modeller.draft.migration": {
    "story": "MO-05",
    "product": "modeller",
-   "route": "/u/admin/airways/modeller/models?model=d5b061e6-e75b-4545-8cbc-23f316331004&model_open=1&models_view=schema",
+   "route": "/u/admin/airways/modeller/models?model=c83c82d2-2eba-40d0-9e95-c3ff62c588e8&model_open=1&models_view=schema",
    "state": "m1 stands for the AirRoutes model id: click AirRoutes on the models board, a breaking draft (remove a property): Publish",
    "click": [
-    "Publish"
+    "text:Publish v"
    ]
   },
   "modeller.models.new": {

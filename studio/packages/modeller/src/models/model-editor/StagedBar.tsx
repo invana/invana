@@ -9,7 +9,7 @@ import { ActButton } from "@invana-studio/shell";
 interface Props {
 	/** The staged set's own count. */
 	staged: number;
-	/** The draft's version, when it has one — `Publish v3`. */
+	/** The version the draft publishes as, once the engine has said — `Publish v1.1.0`. */
 	version: string | null;
 	onPublish: () => void;
 	onDiscard: () => void;

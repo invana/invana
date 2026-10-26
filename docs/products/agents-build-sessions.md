@@ -208,7 +208,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | M00 | Modeller audit | docs | F06 | `feat/modeller-redesign` | done | 2026-10-26 | closed by hand · audit complete (32 boards: 13 built · 12 differs · 7 missing); the review's should-fixes are read by M01–M07 |
 | M01 | Shell and global model | engine+studio | M00 | `feat/modeller-redesign` | done | 2026-10-26 | gates green · design review passed |
-| M02 | Models | engine+studio | M01 | `feat/modeller-redesign` | partial | 2026-10-26 | session 2 at the 300k budget: steps 2c–6 committed, step 7 part done; resume at the board validation (draft marks, global_model.diff, draft.publish/migration), then step 7's inspector items |
+| M02 | Models | engine+studio | M01 | `feat/modeller-redesign` | in progress | 2026-10-26 | session 2 at the 300k budget: steps 2c–6 committed, step 7 part done; resume at the board validation (draft marks, global_model.diff, draft.publish/migration), then step 7's inspector items |
 | M03 | Model dashboards | engine+studio | M02 | `feat/modeller-redesign` | pending | | |
 | M04 | Constraints | engine+studio | M03 | `feat/modeller-redesign` | pending | | |
 | M05 | Govern | engine+studio | M04 | `feat/modeller-redesign` | pending | | |

@@ -2,7 +2,7 @@
 
 import pytest
 
-from invana.apps.modeller.versioner import Versioner, _bump, _parse_semver, compute_diff, mark_types
+from invana.apps.modeller.versioner import Versioner, _parse_semver, compute_diff, mark_types, next_semver
 
 
 class TestSemVer:
@@ -13,17 +13,17 @@ class TestSemVer:
         with pytest.raises(ValueError, match="Invalid SemVer"):
             _parse_semver("1.2")
 
-    def test_bump_major(self):
-        assert _bump("1.2.3", "major") == "2.0.0"
+    def testnext_semver_major(self):
+        assert next_semver("1.2.3", "major") == "2.0.0"
 
-    def test_bump_minor(self):
-        assert _bump("1.2.3", "minor") == "1.3.0"
+    def testnext_semver_minor(self):
+        assert next_semver("1.2.3", "minor") == "1.3.0"
 
-    def test_bump_patch(self):
-        assert _bump("1.2.3", "patch") == "1.2.4"
+    def testnext_semver_patch(self):
+        assert next_semver("1.2.3", "patch") == "1.2.4"
 
-    def test_bump_from_none(self):
-        assert _bump(None, "minor") == "1.0.0"
+    def testnext_semver_from_none(self):
+        assert next_semver(None, "minor") == "1.0.0"
 
 
 @pytest.mark.asyncio
@@ -84,7 +84,7 @@ class TestVersioner:
         with pytest.raises(ValueError, match="not a draft"):
             await versioner.activate(session, version_id=draft.id)
 
-    async def test_auto_version_bump_minor(self, session, store):
+    async def test_auto_versionnext_semver_minor(self, session, store):
         """Adding a node type is a minor change."""
         versioner = Versioner(store)
         schema = await store.create_graph_model(session, name="Minor Bump")
@@ -112,7 +112,7 @@ class TestVersioner:
         activated = await versioner.activate(session, version_id=v2.id)
         assert activated.version == "1.1.0"
 
-    async def test_auto_version_bump_major(self, session, store):
+    async def test_auto_versionnext_semver_major(self, session, store):
         """Removing a node type is a major change."""
         versioner = Versioner(store)
         schema = await store.create_graph_model(session, name="Major Bump")

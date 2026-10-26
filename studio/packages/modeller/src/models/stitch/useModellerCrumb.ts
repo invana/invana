@@ -3,15 +3,16 @@ import {
 	useModelLinkQuery,
 	useModelsQuery,
 	useModelVersionsQuery,
+	useVersionDiffQuery,
 } from "../queries";
 import { stitchPair } from "./allModels";
 
 /**
  * The app header's last crumb on a Modeller page that opens something the
  * route does not name: the open stitch on the global model (`Country ≡
- * country`), or the model whose canvas is open (`AirRoutes v2 · draft`,
- * `AirRoutes` with no draft). Undefined anywhere else. It shares the pages'
- * reads, so it adds no request.
+ * country`), or the model whose canvas is open (`AirRoutes v1.1.0 · draft`,
+ * the version the draft publishes as; `AirRoutes` with no draft). Undefined
+ * anywhere else. It shares the pages' reads, so it adds no request.
  */
 export function useModellerCrumb(
 	username: string | undefined,
@@ -36,13 +37,21 @@ export function useModellerCrumb(
 		modelId ?? undefined,
 	);
 
+	const draft = versions.data?.find((v) => v.status === "draft");
+	const active = versions.data?.find((v) => v.status === "active");
+	const diff = useVersionDiffQuery(
+		username,
+		graphSlug,
+		modelId ?? undefined,
+		draft && active ? draft.id : undefined,
+		active?.id,
+	);
+
 	if (stitchId) return link.data ? stitchPair(link.data, false) : undefined;
 	if (!modelId) return undefined;
 	const model = models.data?.find((m) => m.id === modelId);
 	if (!model) return undefined;
-	const draft = versions.data?.find((v) => v.status === "draft");
 	if (!draft) return model.name;
-	return draft.version
-		? `${model.name} v${draft.version} · draft`
-		: `${model.name} · draft`;
+	const next = diff.data?.next_version;
+	return next ? `${model.name} v${next} · draft` : `${model.name} · draft`;
 }

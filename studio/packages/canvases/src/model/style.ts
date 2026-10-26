@@ -54,15 +54,21 @@ function toneColor(mark: ModelTypeMark["mark"]): number {
 	return readCssColor(`var(--color-${token})`) ?? TONE_FALLBACK[mark];
 }
 
-/** One chip per line, stacked beside the type; a long list ends in `+ n more`. */
+const SIGN_TONE: Record<ModelMarkLine["sign"], ModelTypeMark["mark"]> = {
+	"+": "added",
+	"~": "changed",
+	"-": "removed",
+};
+
+/** One chip per line, toned by its sign, stacked beside the type; a long list ends in `+ n more`. */
 function chips(mark: ModelTypeMark) {
-	const fill = toneColor(mark.mark);
 	const labelColor = readCssColor("var(--color-background)") ?? 0xffffff;
 	const shown: ModelMarkLine[] = mark.lines.slice(0, CHIP_LINES);
 	if (mark.lines.length > CHIP_LINES)
 		shown.push({ sign: "+", text: `${mark.lines.length - CHIP_LINES} more` });
 	return shown.map((line, i) => {
 		const text = `${line.sign === "-" ? "−" : line.sign} ${line.text}`;
+		const fill = toneColor(SIGN_TONE[line.sign]);
 		return {
 			id: `mark-${i}`,
 			placement: "top-right" as const,
@@ -109,6 +115,9 @@ export function decorate(data: ModelGraphData, success: number): GraphData {
 	const edgeMarks = new Map<string, ModelTypeMark>();
 	for (const m of data.marks ?? [])
 		(m.target_kind === "node_type" ? nodeMarks : edgeMarks).set(m.type, m);
+	// On the global model a type's name is only unique within its model.
+	const onMarked = (model: string | undefined) =>
+		!data.markedModel || model === data.markedModel;
 
 	const nodes =
 		nodeMarks.size === 0
@@ -116,13 +125,17 @@ export function decorate(data: ModelGraphData, success: number): GraphData {
 			: data.nodes.map((n) => {
 					if (n.type === MODEL_FRAME_TYPE || n.type === MODEL_EMPTY_TYPE)
 						return n;
-					const mark = nodeMarks.get(
-						(n.data as { label?: string }).label ?? "",
-					);
+					const d = n.data as { label?: string; model?: string };
+					const mark = onMarked(d.model)
+						? nodeMarks.get(d.label ?? "")
+						: undefined;
 					return mark ? { ...n, style: nodeMarkStyle(mark) } : n;
 				});
 	const edges = data.edges.map((e) => {
-		const mark = e.data.kind === "edge" ? edgeMarks.get(e.type) : undefined;
+		const mark =
+			e.data.kind === "edge" && onMarked(e.data.model)
+				? edgeMarks.get(e.type)
+				: undefined;
 		const style = mark
 			? ({
 					badges: chips(mark).map((c) => ({ ...c, placement: "middle" })),

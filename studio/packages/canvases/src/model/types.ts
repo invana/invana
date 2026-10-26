@@ -114,6 +114,8 @@ export interface ModelGraphData {
 	edges: ModelGraphEdge[];
 	/** Types the drawn pair changes: each wears a chip, an added one is dashed. */
 	marks?: ModelTypeMark[];
+	/** The model the marks are on, by name; absent on the one-model canvas. */
+	markedModel?: string;
 }
 
 /** What a click selected — a node or an edge, by its canvas id. */

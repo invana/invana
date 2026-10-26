@@ -474,6 +474,8 @@ export interface SchemaDiff {
 	added: number;
 	changed: number;
 	removed: number;
+	/** The version the draft publishes as; set only when the target is the draft. */
+	next_version: string | null;
 }
 
 /** One line of a type's mark: `+` added, `~` changed, `-` removed. */

@@ -27546,6 +27546,17 @@
             "title": "Modified Property Keys",
             "type": "array"
           },
+          "next_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Version"
+          },
           "removed": {
             "default": 0,
             "title": "Removed",

@@ -26,6 +26,7 @@ G = "/u/admin/airways"
 AR = "/u/admin/arabidopsis"
 AIRROUTES = "d5b061e6-e75b-4545-8cbc-23f316331004"  # airways' AirRoutes model, which holds a draft
 ARABIDOPSIS = "807b30c5-7b5a-4eab-b954-684441467763"  # arabidopsis' only model
+DEALS = "c83c82d2-2eba-40d0-9e95-c3ff62c588e8"  # airways' Deals model, whose draft drops a property
 EU_WORLD = "51356733-0529-43d7-b862-701efbcf6c62"  # airways' world "EU · H1 2026"
 ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.login", "/login"), ("shell.graphs", "/graphs"), ("shell.first_run", "/graphs?first-run"),
@@ -66,6 +67,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("modeller.settings.database", f"{G}/modeller/settings?tab=graph"),
     ("modeller.settings.members", f"{G}/modeller/settings?tab=members"),
     ("modeller.settings", f"{G}/modeller/settings?tab=basic"), ("modeller.connect", "/graphs/new"),
+    ("modeller.draft.migration", f"{G}/modeller/models?model={DEALS}&model_open=1&models_view=schema"),
     ("modeller.draft", f"{G}/modeller/models?model={AIRROUTES}&model_open=1&models_view=schema"),
     ("explorer.sessions", f"{G}/explorer?history"), ("explorer.home", f"{G}/explorer"), ("explorer", f"{G}/explorer/routes-out-of-lhr"),
     ("projects.list", f"{AR}/projects"), ("projects.new", f"{AR}/projects"), ("projects.todo", f"{AR}/projects/todos"), ("projects.decisions", f"{AR}/projects/decisions"),
@@ -394,8 +396,9 @@ CLICK = {  # board → buttons shoot.mjs presses after the route loads, for a st
     **{f"agents.workers.add.run.{w}": ["Make token", "Next"] for w in ("docker", "python", "k8s")},
     "modeller.models.new": ["New model"],
     "modeller.global_model.dark": ["dark"],
-    "modeller.draft.publish": ["Publish"],
-    "modeller.draft.migration": ["Publish"],
+    "modeller.global_model.diff": ["Compare"],
+    "modeller.draft.publish": ["text:Publish v"],
+    "modeller.draft.migration": ["text:Publish v"],
     "modeller.model.type.constraint": ["text:days_to_flowering"],
     "modeller.global_model.stitch": ["text:Country ≡ country"],
     "modeller.rules.edit": ["text:Airport codes are IATA"],

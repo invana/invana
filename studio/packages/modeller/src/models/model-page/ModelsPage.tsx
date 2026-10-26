@@ -59,6 +59,7 @@ import {
 	useShapeQuery,
 	useStagedSetQuery,
 	useUpdateModelMutation,
+	useVersionDiffQuery,
 } from "../queries";
 import { useAllModels } from "../stitch/useAllModels";
 import type {
@@ -201,6 +202,15 @@ export function ModelsPage({
 	const active = versions.data?.find((v) => v.status === "active") ?? null;
 	const previous = previousVersion(versions.data ?? [], active);
 	const staged = useStagedSetQuery(username, graphSlug, scoped?.id, !!draft);
+	// The version the draft publishes as is the engine's, read off its diff.
+	const nextVersion =
+		useVersionDiffQuery(
+			username,
+			graphSlug,
+			scoped?.id,
+			draft && active ? draft.id : undefined,
+			active?.id,
+		).data?.next_version ?? null;
 
 	const createDraft = useCreateDraftMutation(username, graphSlug);
 	const commit = useCommitDraftMutation(username, graphSlug);
@@ -603,7 +613,7 @@ export function ModelsPage({
 					graphSlug={graphSlug}
 					modelId={scoped.id}
 					modelName={scoped.name}
-					version={draft.version}
+					version={nextVersion}
 					active={active?.version ?? null}
 					staged={staged.data ?? null}
 					connector={connectorName(connection.data?.connector_class)}

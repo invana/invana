@@ -5,10 +5,12 @@
  * Without a draft, the left is the models count alone.
  *
  * The shell's `footer` takes its two sides separately, so one component draws
- * either. Which model has a draft is on the models list itself.
+ * either. Which model has a draft is on the models list itself; the open
+ * model's draft is named before any other's.
  */
 
 import { StatusCount } from "@invana-studio/ui";
+import { useSearchParams } from "react-router-dom";
 import {
 	useGlobalModelQuery,
 	useModelsQuery,
@@ -29,13 +31,16 @@ export function ModellerStatusBar({
 	graphSlug,
 	side,
 }: ModellerStatusBarProps) {
+	const [params] = useSearchParams();
+	const open = params.get("model");
 	const models = useModelsQuery(username, graphSlug);
 	const union = useGlobalModelQuery(username, graphSlug);
 	const authored = (models.data ?? []).filter(
 		(m) => m.origin !== "introspected",
 	);
 
-	const drafted = authored.find((m) => m.draft_version);
+	const withDraft = authored.filter((m) => m.draft_version);
+	const drafted = withDraft.find((m) => m.id === open) ?? withDraft[0];
 	const staged = useStagedSetQuery(username, graphSlug, drafted?.id, !!drafted);
 
 	if (side === "right") {

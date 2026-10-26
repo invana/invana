@@ -335,7 +335,7 @@ def _parse_semver(version: str) -> tuple[int, int, int]:
     return int(parts[0]), int(parts[1]), int(parts[2])
 
 
-def _bump(current: str | None, classification: str) -> str:
+def next_semver(current: str | None, classification: str) -> str:
     """Compute the next SemVer string from the current version and classification."""
     if current is None:
         return "1.0.0"
@@ -390,7 +390,7 @@ class Versioner:
             semver = override_version
         elif current_active is not None:
             diff = compute_diff(current_active, draft)
-            semver = _bump(current_active.version, diff.classification)
+            semver = next_semver(current_active.version, diff.classification)
         else:
             semver = "1.0.0"
 

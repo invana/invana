@@ -224,7 +224,7 @@ export function ModelCanvas({
 				<div className="absolute top-3 right-3 z-10">
 					<StagedBar
 						staged={staged.data?.count ?? 0}
-						version={draft.version}
+						version={diff.data?.next_version ?? null}
 						onPublish={onPublish}
 						onDiscard={onDiscard}
 					/>

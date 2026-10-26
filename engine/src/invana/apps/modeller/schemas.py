@@ -388,6 +388,8 @@ class SchemaDiff(BaseModel):
     added: int = 0
     changed: int = 0
     removed: int = 0
+    #: The version the draft publishes as; set only when the diff's target is the draft.
+    next_version: str | None = None
 
 
 # ---------------------------------------------------------------------------

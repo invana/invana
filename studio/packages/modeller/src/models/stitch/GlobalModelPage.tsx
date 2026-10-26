@@ -132,8 +132,19 @@ export function GlobalModelPage({
 		() => buildAllModelsData(frames, links),
 		[frames, links],
 	);
-	// A compare draws the one model's `to` version, with the types it removed
-	// kept from `from` so their chips have something to sit beside.
+	const drawn = useMemo(
+		() =>
+			show === ALL
+				? everything
+				: buildAllModelsData(
+						frames.filter((f) => f.modelId === show),
+						links,
+					),
+		[everything, frames, links, show],
+	);
+	// A compare keeps the map and swaps the compared model's frame for its `to`
+	// version, the types it removed kept from `from` so their chips have
+	// something to sit beside.
 	const compared = useMemo(() => {
 		if (!compare || !toTree.data || !diff.data) return null;
 		const frame = frames.find((f) => f.modelId === compare.modelId);
@@ -145,41 +156,33 @@ export function GlobalModelPage({
 			now: T[],
 			before: T[] | undefined,
 		) => [...now, ...(before ?? []).filter((t) => removed.has(t.name))];
-		const built = buildAllModelsData(
-			[
-				{
-					modelId: compare.modelId,
-					name: frame?.name ?? model?.name ?? "Model",
-					description: frame?.description ?? model?.description ?? "",
-					versionId: pair.to ?? null,
-					versionLabel: null,
-					hue: frame?.hue ?? 1,
-					nodeTypes: keep(toTree.data.node_types, fromTree.data?.node_types),
-					edgeTypes: keep(toTree.data.edge_types, fromTree.data?.edge_types),
-				},
-			],
-			[],
-		);
-		return { ...built.data, marks: diff.data.marks };
+		const name = frame?.name ?? model?.name ?? "Model";
+		const swapped = {
+			modelId: compare.modelId,
+			name,
+			description: frame?.description ?? model?.description ?? "",
+			versionId: pair.to ?? null,
+			versionLabel: null,
+			hue: frame?.hue ?? 1,
+			nodeTypes: keep(toTree.data.node_types, fromTree.data?.node_types),
+			edgeTypes: keep(toTree.data.edge_types, fromTree.data?.edge_types),
+		};
+		const shown =
+			show === ALL ? frames : frames.filter((f) => f.modelId === show);
+		const rest = shown.filter((f) => f.modelId !== compare.modelId);
+		const built = buildAllModelsData([...rest, swapped], links);
+		return { ...built.data, marks: diff.data.marks, markedModel: name };
 	}, [
 		compare,
 		toTree.data,
 		fromTree.data,
 		diff.data,
 		frames,
+		links,
+		show,
 		models.data,
 		pair.to,
 	]);
-	const drawn = useMemo(
-		() =>
-			show === ALL
-				? everything
-				: buildAllModelsData(
-						frames.filter((f) => f.modelId === show),
-						links,
-					),
-		[everything, frames, links, show],
-	);
 
 	const inspect = useCallback(
 		(id: string | null) =>
