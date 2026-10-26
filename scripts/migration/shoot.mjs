@@ -8,8 +8,9 @@
 // --diff writes <dir>/diff.json: board → share of pixels changed (0–1), or "new" with no baseline shot.
 // Only boards past a small threshold need a reviewer's eyes; the rest are unchanged.
 //
-// Routes come from screen-map.json. Live shots sign in once with INVANA_MIGRATION_USER / _PASSWORD
-// (default admin / change_me_please) against INVANA_MIGRATION_STUDIO_URL (default http://localhost:8300).
+// Routes come from screen-map.json. Live shots sign in with INVANA_MIGRATION_USER / _PASSWORD
+// (default admin / change_me_please) against INVANA_MIGRATION_STUDIO_URL (default http://localhost:8300);
+// a board whose map entry has `as` is shot signed in as that account instead.
 import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -30,6 +31,9 @@ const map = JSON.parse(readFileSync(path.join(here, 'screen-map.json'), 'utf8'))
 const base = process.env.INVANA_MIGRATION_STUDIO_URL ?? 'http://localhost:8300';
 const SMOKE = ['/graphs', '/u/admin/airways', '/u/admin/airways?panel=model', '/u/admin/airways?panel=agents',
   '/u/admin/airways?panel=runs', '/u/admin/airways?panel=library', '/settings/profile'];
+
+// The accounts e2e/roles-agents.spec.ts makes (passwords from e2e/members.ts).
+const PASSWORDS = { 'e2e-viewer': 'e2e-member-password-1' };
 
 const boards = (val('--boards') ?? '').split(',').filter(Boolean);
 const browser = await chromium.launch();
@@ -75,18 +79,30 @@ if (val('--diff')) {
     console.log(path.join(out, `${b}.png`));
   }
 } else if (flag('--live')) {
-  await page.goto(`${base}/login`);
-  if (page.url().includes('/login')) {
-    await page.getByLabel(/username/i).fill(process.env.INVANA_MIGRATION_USER ?? 'admin');
-    await page.getByLabel(/password/i).fill(process.env.INVANA_MIGRATION_PASSWORD ?? 'change_me_please');
-    await page.getByRole('button', { name: /sign in/i }).click();
+  const fallback = process.env.INVANA_MIGRATION_USER ?? 'admin';
+  const signIn = async (p, user) => {
+    await p.goto(`${base}/login`);
+    if (!p.url().includes('/login')) return;
+    await p.getByLabel(/username/i).fill(user);
+    await p.getByLabel(/password/i).fill(PASSWORDS[user] ?? process.env.INVANA_MIGRATION_PASSWORD ?? 'change_me_please');
+    await p.getByRole('button', { name: /sign in/i }).click();
     // A click before the form hydrates is lost; wait until sign-in has left /login.
-    await page.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 60000 });
-  }
+    await p.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 60000 });
+  };
+  // A board's `as` names the account it is drawn for; each account signs in once, in its own context.
+  const pages = {};
+  const pageFor = async (user) => {
+    if (!pages[user]) {
+      pages[user] = user === fallback ? page : await browser.newPage({ viewport: { width: 1920, height: 1080 } });
+      await signIn(pages[user], user);
+    }
+    return pages[user];
+  };
   const targets = flag('--smoke')
-    ? SMOKE.map((r, i) => [`smoke-${i}`, r])
-    : boards.map((b) => [b, map.boards[b]?.route]).filter(([, r]) => r);
-  for (const [name, route] of targets) {
+    ? SMOKE.map((r, i) => [`smoke-${i}`, r, fallback])
+    : boards.map((b) => [b, map.boards[b]?.route, map.boards[b]?.as ?? fallback]).filter(([, r]) => r);
+  for (const [name, route, user] of targets) {
+    const page = await pageFor(user);
     await page.goto(base + route, { waitUntil: 'networkidle' }).catch(() => {});
     await page.waitForTimeout(800);
     // A board that opens on a running check is shot once it has settled.

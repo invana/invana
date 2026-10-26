@@ -27,7 +27,7 @@ import {
 import { useListParams, whoToAsk } from "@invana-studio/core";
 import { ActButton, useAccess } from "@invana-studio/shell";
 import { SectionBody } from "@invana-studio/ui";
-import { Lock, Plus, ScrollText, Sparkles } from "lucide-react";
+import { Eye, Lock, Plus, ScrollText, Sparkles } from "lucide-react";
 import { useMemo } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { useIamOpen } from "../open";
@@ -120,6 +120,7 @@ export function PoliciesPage({ username, graphSlug }: SectionPageProps) {
 					description={`Changing policies and tokens needs ${gate.role ?? "iam-admin"}. Ask ${whoToAsk(gate.holders)}.`}
 					actions={
 						<Button variant="ghost" size="sm" onClick={() => setDialog(null)}>
+							<Eye />
 							Open policies read-only
 						</Button>
 					}

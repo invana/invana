@@ -202,7 +202,8 @@
    "story": "SH-20",
    "product": "shell",
    "route": "/u/admin/airways/agents/skills?page=skill%3Acedcf4cc-2d11-4c21-8fd7-dc82d921444c&tab=instructions&right=assistant",
-   "state": "the uuid stands for a published skill (Answer in natural language): open it from Skills, signed in as e2e-viewer (a viewer on the Graph; e2e/roles-agents.spec.ts makes the account, its password is in e2e/members.ts)"
+   "state": "the uuid stands for a published skill (Answer in natural language): open it from Skills, signed in as e2e-viewer (its `as`; e2e/roles-agents.spec.ts makes the account)",
+   "as": "e2e-viewer"
   },
   "shell.profile": {
    "story": "SH-17",
@@ -1774,7 +1775,8 @@
    "story": "AF-14",
    "product": "agent-fabric",
    "route": "/u/admin/airways/agents/ledger?right=assistant",
-   "state": "signed in as e2e-viewer (INVANA_MIGRATION_USER=e2e-viewer INVANA_MIGRATION_PASSWORD=e2e-member-password-1)"
+   "state": "signed in as e2e-viewer (its `as`)",
+   "as": "e2e-viewer"
   },
   "agents.run.ask": {
    "story": "AF-16",
@@ -1929,8 +1931,9 @@
   "iam.policies.denied": {
    "story": "IAM-06",
    "product": "iam",
-   "route": "/u/admin/airways/iam/policies?right=assistant",
-   "state": "signed in as e2e-viewer (INVANA_MIGRATION_USER=e2e-viewer INVANA_MIGRATION_PASSWORD=e2e-member-password-1)"
+   "route": "/u/admin/airways/iam/policies?dialog=new&right=assistant",
+   "state": "New policy, signed in as e2e-viewer (its `as`)",
+   "as": "e2e-viewer"
   },
   "iam.agents": {
    "story": "IAM-07",

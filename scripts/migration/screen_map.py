@@ -35,7 +35,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("shell", f"{G}/explorer"),
     ("iam.home", f"{G}/iam/home"), ("iam.people", f"{G}/iam/people"), ("iam.groups", f"{G}/iam/groups"),
     ("iam.agents", f"{G}/iam/agents"), ("iam.agent.effective", f"{G}/iam/agents?page=iam_agent%3A850f6a82-de3a-432c-a663-a5dcba4dc32a"),
-    ("iam.policies", f"{G}/iam/policies"),
+    ("iam.policies.denied", f"{G}/iam/policies?dialog=new"), ("iam.policies", f"{G}/iam/policies"),
     ("iam.policy.statements", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=statements"),
     ("iam.policy.limits", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=limits"),
     ("iam.policy.held_by", f"{G}/iam/policies?page=policy%3Afare-team-quota&tab=held_by"),
@@ -151,7 +151,7 @@ BUILT = {"agent-fabric": {"AF-26", "AF-02", "AF-01", "AF-17", "AF-19", "AF-20", 
                          "AF-07", "AF-08", "AF-09", "AF-13", "AF-14", "AF-16", "AF-24"}}
 STATE = {  # board → how to reach it from its route; a board absent here is its route's landing view
     "iam.agent.effective": "the uuid stands for Coordinator, which holds fare-team-quota through fare-team and has the skill Hey bound: IAM › Agents, click Coordinator",
-    "iam.policies.denied": "signed in as e2e-viewer (INVANA_MIGRATION_USER=e2e-viewer INVANA_MIGRATION_PASSWORD=e2e-member-password-1)",
+    "iam.policies.denied": "New policy, signed in as e2e-viewer (its `as`)",
     "iam.policy.statements": POLICIES, "iam.policy.limits": POLICIES, "iam.policy.held_by": POLICIES,
     "iam.policy.test": f"{POLICIES}; Test access on the head — the link carries the proto's check: Fare Scout, started by priya, graph.write.records on graph/Fare/LHR-JFK · price",
     "iam.policy.draft": f"{POLICIES}; the assistant's draft",
@@ -180,7 +180,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "shell.first_run": "an install with no Graph yet",
     "agents.plans.detail": "the uuid stands for the newest nl-single flow's id: Functions › Packaged plans, click nl-single; its page opens as a tab after Functions",
     "agents.llms.endpoint": "the uuid stands for an endpoint's id: open any endpoint card; its modal opens in the path",
-    "agents.skill.locked": f"{SKILL}, signed in as e2e-viewer (a viewer on the Graph; e2e/roles-agents.spec.ts makes the account, its password is in e2e/members.ts)",
+    "agents.skill.locked": f"{SKILL}, signed in as e2e-viewer (its `as`; e2e/roles-agents.spec.ts makes the account)",
     "shell.profile.tokens": "Access tokens tab",
     "datasets.dataset": DATASET,
     "datasets.dataset.provenance": f"{DATASET}; Provenance tab",
@@ -278,7 +278,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "agents.approvals.alerts": "Alert rules tab — five seeded rules",
     "agents.ledger.entry": "Rows tab, click the first row (opens ?row=)",
     "agents.ledger.actor": "the uuid stands for Route Auditor",
-    "agents.ledger.member": "signed in as e2e-viewer (INVANA_MIGRATION_USER=e2e-viewer INVANA_MIGRATION_PASSWORD=e2e-member-password-1)",
+    "agents.ledger.member": "signed in as e2e-viewer (its `as`)",
     "agents.runs.filtered": "Route Auditor's runs this month that were not served, as the assistant links them — the uuid stands for Route Auditor (seed_f05.py)",
     "agents.agents.filtered": "Agents searched for fare with spawned helpers shown",
     "agents.functions.detail": "graph.read.query stands for a function's dotted name: click any function in Functions",
@@ -346,6 +346,9 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "agents.plugins.plugin": "click a plugin (needs B06a)",
     "agents.plugins.task": "click a plugin, then a task type (needs B06a)",
 }
+AS = {  # board → the account shoot.mjs signs in as; a board absent here is shot as the default user
+    b: "e2e-viewer" for b in ("iam.policies.denied", "agents.skill.locked", "agents.ledger.member")
+}
 
 
 def route_for(board: str) -> str | None:
@@ -369,6 +372,8 @@ def main() -> None:
                     # and Home's composer is the assistant before a thread exists.
                     route += ("&" if "?" in route else "?") + "right=assistant"
                 boards[b] = {"story": m.group(1), "product": doc, "route": route, "state": STATE.get(b, "")}
+                if b in AS:
+                    boards[b]["as"] = AS[b]
     (ROOT / "scripts" / "migration" / "screen-map.json").write_text(json.dumps({"boards": boards}, indent=1))
     stale = sorted(set(STATE) - set(boards))
     print(len(boards), "boards mapped,", sum(1 for b in boards.values() if b["state"]), "with state")
