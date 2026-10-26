@@ -66,8 +66,10 @@ export function PoolsTab({ onAdd }: { onAdd: () => void }) {
 	return (
 		<>
 			<Tiles totals={overview.data.totals} />
-			<WorkersChart overview={overview.data} />
-			<EventsCard />
+			<div className="grid items-start gap-2.5 lg:grid-cols-2">
+				<WorkersChart overview={overview.data} />
+				<EventsCard />
+			</div>
 			<PoolsCard pools={pools.data.items} />
 		</>
 	);

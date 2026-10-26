@@ -6,10 +6,17 @@
  * Every figure is the engine's; this only formats it.
  */
 
+import { InlineMeter } from "@invana/charts";
 import { type ColumnDef, DataTable } from "@invana/tables";
-import { Button, type ButtonProps, SegmentedControl } from "@invana/ui";
+import {
+	Button,
+	type ButtonProps,
+	SegmentedControl,
+	StatusDot,
+	TypographyInlineCode,
+} from "@invana/ui";
 import { formatGrouped, useAuth } from "@invana-studio/core";
-import { DetailStatus, type Tone } from "@invana-studio/ui";
+import type { Tone } from "@invana-studio/ui";
 import { type ReactNode, useMemo } from "react";
 import type {
 	PoolState,
@@ -42,10 +49,6 @@ export function millis(ms: number | null | undefined): string {
 	return ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(1)} s`;
 }
 
-/** `62%`. */
-const percent = (n: number | null | undefined): string =>
-	n == null ? DASH : `${n}%`;
-
 /** `108 / 144`. */
 export const slotsOf = (busy: number, total: number): string =>
 	`${formatGrouped(busy)} / ${formatGrouped(total)}`;
@@ -64,23 +67,33 @@ export const clockOf = (iso: string): string =>
 	new Date(iso).toLocaleTimeString(undefined, { hour12: false });
 
 const WORKER_TONE: Record<WorkerState, Tone> = {
-	busy: "running",
+	busy: "info",
 	idle: "muted",
-	starting: "queued",
+	starting: "warning",
 	draining: "warning",
 	lost: "error",
 	stopped: "muted",
 };
 
+/** A state as the board draws it: a dot, then the word. */
+function Dotted({ tone, text }: { tone: Tone; text: string }) {
+	return (
+		<span className="inline-flex items-center gap-1.5">
+			<StatusDot tone={tone} />
+			{text}
+		</span>
+	);
+}
+
 export const WorkerStateChip = ({ state }: { state: WorkerState }) => (
-	<DetailStatus tone={WORKER_TONE[state]}>{state}</DetailStatus>
+	<Dotted tone={WORKER_TONE[state]} text={state} />
 );
 
 const POOL_TONE: Record<PoolState, Tone> = {
-	keeping_up: "success",
+	keeping_up: "info",
 	healthy: "success",
 	short: "warning",
-	no_workers: "error",
+	no_workers: "warning",
 };
 
 const POOL_STATE_TEXT: Record<PoolState, string> = {
@@ -91,7 +104,7 @@ const POOL_STATE_TEXT: Record<PoolState, string> = {
 };
 
 export const PoolStateChip = ({ state }: { state: PoolState }) => (
-	<DetailStatus tone={POOL_TONE[state]}>{POOL_STATE_TEXT[state]}</DetailStatus>
+	<Dotted tone={POOL_TONE[state]} text={POOL_STATE_TEXT[state]} />
 );
 
 /** A button only an install admin can press; anyone else sees it disabled, naming the role. */
@@ -118,7 +131,7 @@ function Running({ worker }: { worker: WorkerRow }) {
 	const first: RunningStep = worker.running[0];
 	const more = worker.running.length - 1;
 	return (
-		<span className="font-mono">
+		<span>
 			{[
 				first.function,
 				first.run_number != null ? `#${first.run_number}` : null,
@@ -139,7 +152,7 @@ function workerColumns(showPool: boolean): ColumnDef<WorkerRow>[] {
 			id: "worker",
 			header: "Worker",
 			cell: ({ row }) => (
-				<span className="font-mono font-medium">{row.original.name}</span>
+				<TypographyInlineCode>{row.original.name}</TypographyInlineCode>
 			),
 		},
 	];
@@ -191,7 +204,13 @@ function workerColumns(showPool: boolean): ColumnDef<WorkerRow>[] {
 			id: "cpu",
 			header: "CPU",
 			cell: ({ row }) => (
-				<span className="font-mono">{percent(row.original.cpu)}</span>
+				<InlineMeter
+					className="w-28"
+					label="CPU"
+					value={row.original.cpu}
+					max={100}
+					format={(v) => `${v}%`}
+				/>
 			),
 		},
 		{

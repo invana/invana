@@ -14,8 +14,10 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
+	TypographyInlineCode,
 } from "@invana/ui";
 import { FormError } from "@invana-studio/ui";
+import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { FleetReadState } from "../overview/fleetParts";
 import { AdminButton, DASH, whenOf } from "./parts";
@@ -25,7 +27,13 @@ import type { JoinTokenRow } from "./types";
 const joined = (t: JoinTokenRow) =>
 	t.cap != null ? `${t.joins} of ${t.cap}` : String(t.joins);
 
-export function TokensTab() {
+/** `in 23 h` inside two days, else the date. */
+function expiresOf(iso: string): string {
+	const hours = (new Date(iso).getTime() - Date.now()) / 3_600_000;
+	return hours > 0 && hours < 48 ? `in ${Math.round(hours)} h` : whenOf(iso);
+}
+
+export function TokensTab({ onAdd }: { onAdd: () => void }) {
 	const tokens = useTokensQuery();
 	const revoke = useRevokeTokenMutation();
 	const [confirming, setConfirming] = useState<JoinTokenRow | null>(null);
@@ -36,7 +44,7 @@ export function TokensTab() {
 				id: "token",
 				header: "Token",
 				cell: ({ row }) => (
-					<span className="font-mono">{row.original.display}</span>
+					<TypographyInlineCode>{row.original.display}</TypographyInlineCode>
 				),
 			},
 			{ id: "pool", header: "Pool", cell: ({ row }) => row.original.pool },
@@ -50,7 +58,9 @@ export function TokensTab() {
 				id: "expires",
 				header: "Expires",
 				cell: ({ row }) =>
-					row.original.expires_at ? whenOf(row.original.expires_at) : "never",
+					row.original.expires_at
+						? expiresOf(row.original.expires_at)
+						: "never · in a cluster secret",
 			},
 			{
 				id: "joined",
@@ -97,6 +107,12 @@ export function TokensTab() {
 
 	return (
 		<>
+			<div className="flex justify-end">
+				<AdminButton variant="outline" onClick={onAdd}>
+					<Plus />
+					Add workers
+				</AdminButton>
+			</div>
 			<DataTable
 				columns={columns}
 				data={tokens.data.items}

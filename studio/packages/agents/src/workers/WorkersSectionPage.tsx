@@ -66,7 +66,7 @@ export function WorkersSectionPage({ tab, onTab }: SectionPageProps) {
 				) : tab === "capacity" ? (
 					<CapacityTab onAdd={add} />
 				) : tab === "tokens" ? (
-					<TokensTab />
+					<TokensTab onAdd={add} />
 				) : (
 					<PoolsTab onAdd={add} />
 				)}

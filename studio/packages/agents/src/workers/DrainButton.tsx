@@ -15,6 +15,7 @@ import {
 	AlertDialogTitle,
 } from "@invana/ui";
 import { FormError } from "@invana-studio/ui";
+import { ArrowDownToLine } from "lucide-react";
 import { useState } from "react";
 import { AdminButton } from "./parts";
 
@@ -41,6 +42,7 @@ export function DrainButton({
 				disabled={pending}
 				onClick={() => setAsking(true)}
 			>
+				<ArrowDownToLine />
 				{label}
 			</AdminButton>
 			<AlertDialog open={asking} onOpenChange={setAsking}>

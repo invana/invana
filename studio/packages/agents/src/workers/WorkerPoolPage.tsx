@@ -12,7 +12,7 @@ import { useContext, useState } from "react";
 import { AgentsOpenContext } from "../open";
 import { SECTIONS } from "../sections/spec";
 import { DrainButton } from "./DrainButton";
-import { labelsText, PoolStateChip, StateChips, WorkersTable } from "./parts";
+import { labelsText, StateChips, WorkersTable } from "./parts";
 import { useDrainPoolMutation, usePoolQuery, useWorkersQuery } from "./queries";
 
 const RUNS_ON_LABEL = {
@@ -68,7 +68,6 @@ export function WorkerPoolPage({
 				]}
 				chips={
 					<>
-						<PoolStateChip state={p.state} />
 						<DetailStatus>{RUNS_ON_LABEL[p.runs_on]}</DetailStatus>
 						<span className="text-sm text-muted-foreground">
 							{p.workers} {p.workers === 1 ? "worker" : "workers"} ·{" "}

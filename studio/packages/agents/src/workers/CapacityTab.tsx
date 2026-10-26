@@ -5,15 +5,26 @@
  */
 
 import { type ColumnDef, DataTable } from "@invana/tables";
-import { Alert, AlertDescription, AlertTitle } from "@invana/ui";
+import { Alert, AlertDescription, PropertyList, PropertyRow } from "@invana/ui";
 import { formatGrouped } from "@invana-studio/core";
 import { PanelSection } from "@invana-studio/ui";
+import { Plus } from "lucide-react";
 import { useMemo } from "react";
 import { FleetReadState } from "../overview/fleetParts";
 import { EventsCard } from "./PoolsTab";
-import { AdminButton, DASH, PoolStateChip, span } from "./parts";
+import { AdminButton, DASH, span } from "./parts";
 import { useCapacityQuery } from "./queries";
 import type { CapacityRow } from "./types";
+
+/** `keeping up` · `short — 16 clear it in ~10 min` · `no workers — start one`. */
+function stateLine(r: CapacityRow): string {
+	if (r.unroutable_label)
+		return `unroutable — no pool carries ${r.unroutable_label}`;
+	if (r.state === "short") return `short — ${r.suggested} clear it in ~10 min`;
+	if (r.state === "no_workers") return "no workers — start one";
+	if (r.state === "keeping_up") return "keeping up";
+	return DASH;
+}
 
 export function CapacityTab({ onAdd }: { onAdd: () => void }) {
 	const capacity = useCapacityQuery();
@@ -29,47 +40,30 @@ export function CapacityTab({ onAdd }: { onAdd: () => void }) {
 			{
 				id: "ready",
 				header: "Ready steps",
-				cell: ({ row }) => (
-					<span className="font-mono">{formatGrouped(row.original.ready)}</span>
-				),
+				cell: ({ row }) => formatGrouped(row.original.ready),
 			},
 			{
 				id: "oldest",
 				header: "Oldest",
-				cell: ({ row }) => (
-					<span className="font-mono">
-						{row.original.oldest_s == null ? DASH : span(row.original.oldest_s)}
-					</span>
-				),
+				cell: ({ row }) =>
+					row.original.oldest_s == null ? DASH : span(row.original.oldest_s),
 			},
 			{
 				id: "workers",
 				header: "Workers",
-				cell: ({ row }) => (
-					<span className="font-mono">{row.original.workers}</span>
-				),
+				cell: ({ row }) => row.original.workers,
 			},
 			{
 				id: "suggested",
 				header: "Suggested",
-				cell: ({ row }) => (
-					<span className="font-mono">{row.original.suggested}</span>
-				),
+				cell: ({ row }) => row.original.suggested,
 			},
 			{
 				id: "state",
 				header: "",
 				cell: ({ row }) => (
-					<span className="flex flex-wrap items-center gap-2">
-						<PoolStateChip state={row.original.state} />
-						{row.original.state === "no_workers" ? (
-							<span className="text-muted-foreground">start one</span>
-						) : null}
-						{row.original.unroutable_label ? (
-							<span className="text-muted-foreground">
-								unroutable — no pool carries {row.original.unroutable_label}
-							</span>
-						) : null}
+					<span className="text-muted-foreground">
+						{stateLine(row.original)}
 					</span>
 				),
 			},
@@ -86,35 +80,47 @@ export function CapacityTab({ onAdd }: { onAdd: () => void }) {
 			/>
 		);
 
-	const short = capacity.data.rows.filter((r) => r.callout);
+	const short = capacity.data.rows.filter((r) => r.state === "short");
+	const first = short[0];
 	return (
 		<>
 			{short.map((r) => (
-				<Alert key={r.pool_id} tone="warning">
-					<AlertTitle>{r.pool} is short of workers.</AlertTitle>
-					<AlertDescription>
-						<span>{r.callout} </span>
-						<span>
-							Invana never starts machines; add workers where {r.pool} runs.
-						</span>
-						<span className="mt-2 flex">
-							<AdminButton variant="outline" onClick={onAdd}>
-								Add workers
-							</AdminButton>
-						</span>
+				<Alert
+					key={r.pool_id}
+					tone="warning"
+					className="flex items-center gap-3"
+				>
+					<AlertDescription className="flex-1">
+						<span className="font-semibold text-foreground">
+							{r.pool} is short of workers.
+						</span>{" "}
+						{formatGrouped(r.ready)} steps wait, the oldest for{" "}
+						{span(r.oldest_s)}. Invana never starts machines; add workers where{" "}
+						{r.pool} runs.
 					</AlertDescription>
+					<AdminButton variant="outline" onClick={onAdd}>
+						<Plus />
+						Add workers
+					</AdminButton>
 				</Alert>
 			))}
-			<PanelSection
-				card
-				title="Every pool"
-				action={
-					<span className="text-sm text-muted-foreground">
-						ready steps ÷ slots a worker, over the last 10 min · computed by the
-						engine every 30 s
-					</span>
-				}
-			>
+			{first ? (
+				<PanelSection card title={`Suggested for ${first.pool}`}>
+					<PropertyList labelWidth={150}>
+						<PropertyRow label="Now">{first.workers} workers</PropertyRow>
+						<PropertyRow label="To clear in 10 min">
+							{first.suggested} workers
+						</PropertyRow>
+						<PropertyRow label="How">
+							ready steps ÷ slots a worker, over the last 10 min
+						</PropertyRow>
+						<PropertyRow label="Computed">
+							by the engine, every 30 s
+						</PropertyRow>
+					</PropertyList>
+				</PanelSection>
+			) : null}
+			<PanelSection card title="Every pool">
 				<DataTable
 					columns={columns}
 					data={capacity.data.rows}

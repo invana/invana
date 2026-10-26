@@ -1,8 +1,9 @@
 /**
  * **Add workers** — five steps in one modal: Where → Pool → Join token → Run
- * it → Joined. The step lives in the URL as `?add=<step>`; the minted secret
- * lives only in this component, so a reload reopens at step 1 and a token is
- * never shown twice.
+ * it → Joined. The step lives in the URL as `?add=<step>` and the platform as
+ * `?where=`, so every step draws on a cold load. The minted secret lives only
+ * in this component: a reload shows Run it with a placeholder, never the
+ * token a person already saw.
  */
 
 import {
@@ -17,10 +18,10 @@ import {
 	SelectValue,
 } from "@invana/forms";
 import {
+	Badge,
 	Button,
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -28,8 +29,11 @@ import {
 	PropertyRow,
 	SegmentedControl,
 } from "@invana/ui";
-import { FormError } from "@invana-studio/ui";
-import { useEffect, useState } from "react";
+import { useUpdateSearchParams } from "@invana-studio/core";
+import { FormError, PanelSection } from "@invana-studio/ui";
+import { ArrowRight, Check } from "lucide-react";
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAgentsOpen } from "../open";
 import { CopyButton, JoinedStep, RunStep } from "./AddWorkersRun";
 import { labelsText } from "./parts";
@@ -58,6 +62,10 @@ const STEP_TITLE: Record<AddStep, string> = {
 	run: "Run it",
 	joined: "Joined",
 };
+
+const WHERE_PARAM = "where";
+
+const PLATFORMS: RunsOn[] = ["docker", "python", "kubernetes"];
 
 const WHERE: { value: RunsOn; title: string; lines: string[] }[] = [
 	{
@@ -122,6 +130,43 @@ const BLANK_POOL: NewPool = {
 	egress: "",
 };
 
+/** `1 Where ── 2 Pool ── …` — a tick on the steps behind, the number on the rest. */
+function Stepper({ step }: { step: AddStep }) {
+	const at = ADD_STEPS.indexOf(step);
+	return (
+		<ol className="flex items-center gap-2">
+			{ADD_STEPS.map((s, i) => (
+				<li
+					key={s}
+					className={`flex items-center gap-2 ${i < ADD_STEPS.length - 1 ? "flex-1" : ""}`}
+				>
+					<span
+						className={`flex size-5 shrink-0 items-center justify-center rounded-full border text-xs ${
+							i < at
+								? "border-primary bg-primary text-primary-foreground"
+								: i === at
+									? "border-primary text-primary"
+									: "text-muted-foreground"
+						}`}
+					>
+						{i < at ? <Check className="size-3" /> : i + 1}
+					</span>
+					<span
+						className={
+							i === at ? "font-medium text-primary" : "text-muted-foreground"
+						}
+					>
+						{STEP_TITLE[s]}
+					</span>
+					{i < ADD_STEPS.length - 1 ? (
+						<span className="h-px flex-1 bg-border" />
+					) : null}
+				</li>
+			))}
+		</ol>
+	);
+}
+
 export function AddWorkersModal({
 	step,
 	onStep,
@@ -135,8 +180,19 @@ export function AddWorkersModal({
 	const pools = usePoolsQuery();
 	const createPool = useCreatePoolMutation();
 	const createToken = useCreateTokenMutation();
+	const [search] = useSearchParams();
+	const update = useUpdateSearchParams();
 
-	const [where, setWhere] = useState<RunsOn | null>(null);
+	const param = search.get(WHERE_PARAM);
+	const where: RunsOn | null = (PLATFORMS as string[]).includes(param ?? "")
+		? (param as RunsOn)
+		: null;
+	const setWhere = (w: RunsOn) =>
+		update((p) => {
+			p.set(WHERE_PARAM, w);
+			return p;
+		});
+
 	const [choice, setChoice] = useState<string>("");
 	const [fresh, setFresh] = useState<NewPool>(BLANK_POOL);
 	const [made, setMade] = useState<PoolRow | null>(null);
@@ -144,15 +200,12 @@ export function AddWorkersModal({
 	const [cap, setCap] = useState("");
 	const [created, setCreated] = useState<JoinTokenCreated | null>(null);
 
-	// A reload (or a pasted `?add=run`) has no secret to show: start over.
-	// biome-ignore lint/correctness/useExhaustiveDependencies: on mount only
-	useEffect(() => {
-		if (step !== "where") onStep("where");
-	}, []);
-
-	const existing = pools.data?.items.find((p) => p.id === choice) ?? null;
-	const creating = choice === NEW || (!existing && !pools.data?.items.length);
-	const pool: PoolRow | null = made ?? existing;
+	const items = pools.data?.items ?? [];
+	// The first pool is the default pick, so a cold step still draws a pool.
+	const picked = choice || (items[0]?.id ?? "");
+	const existing = items.find((p) => p.id === picked) ?? null;
+	const creating = picked === NEW || (!existing && items.length === 0);
+	const pool: PoolRow | null = made ?? (creating ? null : existing);
 	const index = ADD_STEPS.indexOf(step);
 
 	const slots = Number(fresh.slots);
@@ -163,10 +216,10 @@ export function AddWorkersModal({
 	const next = async () => {
 		if (step === "where") return onStep("pool");
 		if (step === "pool") {
-			if (creating && !made && where) {
+			if (creating && !made) {
 				const row = await createPool.mutateAsync({
 					name: fresh.name,
-					runs_on: where,
+					runs_on: where ?? "docker",
 					labels: csv(fresh.labels),
 					slots_per_worker: slots,
 					plugins: csv(fresh.plugins),
@@ -205,25 +258,22 @@ export function AddWorkersModal({
 					? created != null
 					: true;
 
+	const poolName = pool?.name ?? (creating ? fresh.name : "");
+
 	return (
 		<Dialog open onOpenChange={(o) => !o && onClose()}>
-			<DialogContent className="max-w-2xl">
+			<DialogContent className="sm:max-w-4xl">
 				<DialogHeader>
-					<DialogTitle>Add workers</DialogTitle>
-					<DialogDescription>
-						{ADD_STEPS.map((s, i) => (
-							<span
-								key={s}
-								className={
-									s === step ? "font-medium text-foreground" : undefined
-								}
-							>
-								{i > 0 ? " · " : ""}
-								{i + 1} {STEP_TITLE[s]}
+					<DialogTitle>
+						Add workers
+						{poolName ? (
+							<span className="ml-2 text-sm font-normal text-muted-foreground">
+								{poolName}
 							</span>
-						))}
-					</DialogDescription>
+						) : null}
+					</DialogTitle>
 				</DialogHeader>
+				<Stepper step={step} />
 
 				<div className="flex min-h-48 flex-col gap-4">
 					{step === "where" ? (
@@ -256,8 +306,8 @@ export function AddWorkersModal({
 
 					{step === "pool" ? (
 						<PoolStep
-							pools={pools.data?.items ?? []}
-							choice={creating ? NEW : choice}
+							pools={items}
+							choice={creating ? NEW : picked}
 							onChoice={setChoice}
 							existing={existing}
 							fresh={fresh}
@@ -266,7 +316,7 @@ export function AddWorkersModal({
 						/>
 					) : null}
 
-					{step === "token" && pool ? (
+					{step === "token" ? (
 						<div className="flex flex-col gap-3">
 							<div className="grid gap-3 sm:grid-cols-2">
 								<Field>
@@ -316,39 +366,43 @@ export function AddWorkersModal({
 									</div>
 									<FieldDescription>
 										Engine URL{" "}
-										<span className="font-mono">{created.engine_url}</span>
+										<span className="font-mono">{created.engine_url}</span> —
+										the address workers dial out to
 									</FieldDescription>
 								</Field>
 							) : (
 								<div>
-									<Button onClick={mint} disabled={createToken.isPending}>
+									<Button
+										onClick={mint}
+										disabled={!pool || createToken.isPending}
+									>
 										{createToken.isPending ? "Making…" : "Make token"}
 									</Button>
 								</div>
 							)}
 							<p className="text-sm text-muted-foreground">
 								The token only lets a worker join{" "}
-								<span className="font-medium">{pool.name}</span>. On joining,
-								each worker gets its own credential, rotated hourly. Revoking
-								the token stops new joins; draining stops the workers.
+								<span className="font-medium">{poolName || "its pool"}</span>.
+								On joining, each worker gets its own credential, rotated hourly.
+								Revoking the token stops new joins; draining stops the workers.
 							</p>
 							<FormError error={createToken.error} />
 						</div>
 					) : null}
 
-					{step === "run" && created && pool ? (
+					{step === "run" ? (
 						<RunStep
-							runsOn={where ?? pool.runs_on}
+							runsOn={where ?? pool?.runs_on ?? "docker"}
 							onRunsOn={setWhere}
 							created={created}
-							pool={pool.name}
+							pool={poolName || "<pool>"}
 						/>
 					) : null}
 
-					{step === "joined" && created && pool ? (
+					{step === "joined" ? (
 						<JoinedStep
-							tokenId={created.id}
-							pool={pool.name}
+							tokenId={created?.id ?? null}
+							pool={pool}
 							onNewToken={() => {
 								setCreated(null);
 								onStep("token");
@@ -384,6 +438,11 @@ export function AddWorkersModal({
 						</Button>
 					) : null}
 					<Button disabled={!canNext} onClick={next}>
+						{step === "run" ? (
+							<Check />
+						) : step === "joined" ? null : (
+							<ArrowRight />
+						)}
 						{step === "run" ? "I ran it" : step === "joined" ? "Done" : "Next"}
 					</Button>
 				</DialogFooter>
@@ -412,126 +471,167 @@ function PoolStep({
 }) {
 	const set = (k: keyof NewPool) => (e: React.ChangeEvent<HTMLInputElement>) =>
 		onFresh({ ...fresh, [k]: e.target.value });
-	return (
-		<div className="flex flex-col gap-3">
-			<SegmentedControl
-				size="sm"
-				aria-label="Pool"
-				value={choice === NEW ? "new" : "existing"}
-				onValueChange={(v) =>
-					onChoice(v === "new" ? NEW : (pools[0]?.id ?? ""))
+	const gives =
+		choice === NEW
+			? {
+					plugins: csv(fresh.plugins),
+					secrets: csv(fresh.secrets),
+					egress: csv(fresh.egress),
+					labels: csv(fresh.labels),
 				}
-				options={[
-					{
-						value: "existing",
-						label: "Existing pool",
-						disabled: !pools.length,
-					},
-					{ value: "new", label: "New pool" },
-				]}
-			/>
-			{choice === NEW ? (
-				<div className="grid gap-3 sm:grid-cols-2">
-					<Field>
-						<FieldLabel htmlFor="wk-name">Name</FieldLabel>
-						<Input
-							id="wk-name"
-							value={fresh.name}
-							disabled={locked}
-							onChange={set("name")}
-							placeholder="egress"
-						/>
-						<FieldDescription>Lower case, digits and -.</FieldDescription>
-					</Field>
-					<Field>
-						<FieldLabel htmlFor="wk-slots">Slots a worker</FieldLabel>
-						<Input
-							id="wk-slots"
-							inputMode="numeric"
-							value={fresh.slots}
-							disabled={locked}
-							onChange={set("slots")}
-						/>
-						<FieldDescription>steps it runs at once</FieldDescription>
-					</Field>
-					<Field>
-						<FieldLabel htmlFor="wk-labels">Labels this worker adds</FieldLabel>
-						<Input
-							id="wk-labels"
-							value={fresh.labels}
-							disabled={locked}
-							onChange={set("labels")}
-							placeholder="cpu, egress"
-						/>
-					</Field>
-					<Field>
-						<FieldLabel htmlFor="wk-plugins">Plugins</FieldLabel>
-						<Input
-							id="wk-plugins"
-							value={fresh.plugins}
-							disabled={locked}
-							onChange={set("plugins")}
-						/>
-					</Field>
-					<Field>
-						<FieldLabel htmlFor="wk-secrets">Secrets</FieldLabel>
-						<Input
-							id="wk-secrets"
-							value={fresh.secrets}
-							disabled={locked}
-							onChange={set("secrets")}
-						/>
-						<FieldDescription>names only, nothing else</FieldDescription>
-					</Field>
-					<Field>
-						<FieldLabel htmlFor="wk-egress">Egress</FieldLabel>
-						<Input
-							id="wk-egress"
-							value={fresh.egress}
-							disabled={locked}
-							onChange={set("egress")}
-							placeholder="*.example.org"
-						/>
-					</Field>
-				</div>
-			) : (
-				<>
-					<Field>
-						<FieldLabel htmlFor="wk-pool">Pool</FieldLabel>
-						<Select value={choice} onValueChange={onChoice}>
-							<SelectTrigger id="wk-pool">
-								<SelectValue placeholder="Pick a pool" />
-							</SelectTrigger>
-							<SelectContent>
-								{pools.map((p) => (
-									<SelectItem key={p.id} value={p.id}>
-										{p.name} · {labelsText(p.labels)} · {p.workers} workers
-									</SelectItem>
+			: existing;
+	return (
+		<div className="grid items-start gap-4 lg:grid-cols-2">
+			<div className="flex flex-col gap-3">
+				<Field>
+					<FieldLabel>Pool</FieldLabel>
+					<SegmentedControl
+						size="sm"
+						aria-label="Pool"
+						value={choice === NEW ? "new" : "existing"}
+						onValueChange={(v) =>
+							onChoice(v === "new" ? NEW : (pools[0]?.id ?? ""))
+						}
+						options={[
+							{
+								value: "existing",
+								label: "Existing pool",
+								disabled: !pools.length,
+							},
+							{ value: "new", label: "New pool" },
+						]}
+					/>
+				</Field>
+				{choice === NEW ? (
+					<>
+						<Field>
+							<FieldLabel htmlFor="wk-name">Name</FieldLabel>
+							<Input
+								id="wk-name"
+								value={fresh.name}
+								disabled={locked}
+								onChange={set("name")}
+								placeholder="egress"
+							/>
+							<FieldDescription>Lower case, digits and -.</FieldDescription>
+						</Field>
+						<Field>
+							<FieldLabel htmlFor="wk-labels">
+								Labels this worker adds
+							</FieldLabel>
+							<Input
+								id="wk-labels"
+								value={fresh.labels}
+								disabled={locked}
+								onChange={set("labels")}
+								placeholder="cpu, egress"
+							/>
+						</Field>
+						<Field>
+							<FieldLabel htmlFor="wk-slots">Slots a worker</FieldLabel>
+							<Input
+								id="wk-slots"
+								inputMode="numeric"
+								value={fresh.slots}
+								disabled={locked}
+								onChange={set("slots")}
+							/>
+							<FieldDescription>steps it runs at once</FieldDescription>
+						</Field>
+						<Field>
+							<FieldLabel htmlFor="wk-plugins">Plugins</FieldLabel>
+							<Input
+								id="wk-plugins"
+								value={fresh.plugins}
+								disabled={locked}
+								onChange={set("plugins")}
+							/>
+						</Field>
+						<Field>
+							<FieldLabel htmlFor="wk-secrets">Secrets</FieldLabel>
+							<Input
+								id="wk-secrets"
+								value={fresh.secrets}
+								disabled={locked}
+								onChange={set("secrets")}
+							/>
+							<FieldDescription>names only, nothing else</FieldDescription>
+						</Field>
+						<Field>
+							<FieldLabel htmlFor="wk-egress">Egress</FieldLabel>
+							<Input
+								id="wk-egress"
+								value={fresh.egress}
+								disabled={locked}
+								onChange={set("egress")}
+								placeholder="*.example.org"
+							/>
+						</Field>
+					</>
+				) : (
+					<>
+						<Field>
+							<FieldLabel htmlFor="wk-pool">Pool</FieldLabel>
+							<Select value={choice} onValueChange={onChoice}>
+								<SelectTrigger id="wk-pool">
+									<SelectValue placeholder="Pick a pool" />
+								</SelectTrigger>
+								<SelectContent>
+									{pools.map((p) => (
+										<SelectItem key={p.id} value={p.id}>
+											{p.name} · {labelsText(p.labels)} · {p.workers} workers
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</Field>
+						<Field>
+							<FieldLabel>Labels this worker adds</FieldLabel>
+							<span className="flex flex-wrap gap-1.5">
+								{(existing?.labels ?? []).map((l) => (
+									<Badge
+										key={l}
+										variant="outline"
+										size="xs"
+										className="font-mono"
+									>
+										{l}
+									</Badge>
 								))}
-							</SelectContent>
-						</Select>
-					</Field>
-					{existing ? (
-						<PropertyList labelWidth={150}>
-							<PropertyRow label="Labels">
-								{labelsText(existing.labels)}
-							</PropertyRow>
-							<PropertyRow label="Slots a worker">
-								{existing.slots_per_worker}
-							</PropertyRow>
-							<PropertyRow label="Plugins">
-								{labelsText(existing.plugins)}
-							</PropertyRow>
-							<PropertyRow label="Secrets">
-								{labelsText(existing.secrets)}
-							</PropertyRow>
-							<PropertyRow label="Egress">
-								{labelsText(existing.egress)}
-							</PropertyRow>
-						</PropertyList>
-					) : null}
-				</>
-			)}
+							</span>
+						</Field>
+						<Field>
+							<FieldLabel htmlFor="wk-slots-existing">
+								Slots a worker
+							</FieldLabel>
+							<Input
+								id="wk-slots-existing"
+								readOnly
+								value={existing ? String(existing.slots_per_worker) : ""}
+							/>
+							<FieldDescription>steps it runs at once</FieldDescription>
+						</Field>
+					</>
+				)}
+			</div>
+			<PanelSection card title="This pool gives its workers">
+				<PropertyList labelWidth={130}>
+					<PropertyRow label="Plugins">
+						{labelsText(gives?.plugins ?? [])}
+					</PropertyRow>
+					<PropertyRow label="Secrets">
+						{gives?.secrets.length
+							? `${gives.secrets.join(", ")} — only these, nothing else`
+							: "—"}
+					</PropertyRow>
+					<PropertyRow label="Egress">
+						{labelsText(gives?.egress ?? [])}
+					</PropertyRow>
+					<PropertyRow label="Gets steps that need">
+						{labelsText(gives?.labels ?? [])}
+					</PropertyRow>
+				</PropertyList>
+			</PanelSection>
 		</div>
 	);
 }

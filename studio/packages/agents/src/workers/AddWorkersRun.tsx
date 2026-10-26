@@ -1,19 +1,22 @@
 /**
  * Add workers › *Run it* and *Joined*. Run it shows the exact command or
- * manifest for the platform picked in Where; Joined polls the token's status
+ * manifest for the platform picked in Where — with a placeholder where the
+ * token goes once it is no longer in memory; Joined polls the token's status
  * every 2 s and shows each check as it lands.
  */
 
 import { CodeBlock } from "@invana/editor";
-import { Button, SegmentedControl, Spinner } from "@invana/ui";
+import { Button, Spinner, Tabs, TabsList, TabsTrigger } from "@invana/ui";
 import { Check, Circle, X } from "lucide-react";
 import { useState } from "react";
 import { RUN_NOTE, runText } from "./commands";
-import { useJoinStatusQuery } from "./queries";
+import { WorkersTable } from "./parts";
+import { useJoinStatusQuery, usePoolQuery, useWorkersQuery } from "./queries";
 import type {
 	JoinCheck,
 	JoinCheckKey,
 	JoinTokenCreated,
+	PoolRow,
 	RunsOn,
 } from "./types";
 
@@ -22,6 +25,9 @@ const PLATFORMS = [
 	{ value: "python", label: "Python" },
 	{ value: "kubernetes", label: "Kubernetes" },
 ];
+
+/** Where the token goes when this page no longer holds it. */
+const TOKEN_PLACEHOLDER = "<join token — shown once>";
 
 /** Copies text; a refusal (no clipboard permission) leaves the text selectable. */
 export function CopyButton({ text }: { text: string }) {
@@ -54,43 +60,49 @@ export function RunStep({
 }: {
 	runsOn: RunsOn;
 	onRunsOn: (r: RunsOn) => void;
-	created: JoinTokenCreated;
+	/** Null after a reload: the secret is never shown twice. */
+	created: JoinTokenCreated | null;
 	pool: string;
 }) {
 	const text = runText(runsOn, {
-		engineUrl: created.engine_url,
-		token: created.token,
+		engineUrl: created?.engine_url ?? window.location.origin,
+		token: created?.token ?? TOKEN_PLACEHOLDER,
 		pool,
 	});
 	const download = () => {
-		const url = URL.createObjectURL(new Blob([text], { type: "text/yaml" }));
+		const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
 		const a = document.createElement("a");
 		a.href = url;
-		a.download = `invana-worker-${pool}.yaml`;
+		a.download =
+			runsOn === "kubernetes"
+				? `invana-worker-${pool}.yaml`
+				: `invana-worker-${pool}.sh`;
 		a.click();
 		URL.revokeObjectURL(url);
 	};
 	return (
 		<div className="flex flex-col gap-3">
-			<SegmentedControl
-				size="sm"
-				aria-label="Where it runs"
-				value={runsOn}
-				onValueChange={(v) => onRunsOn(v as RunsOn)}
-				options={PLATFORMS}
-			/>
+			<Tabs value={runsOn} onValueChange={(v) => onRunsOn(v as RunsOn)}>
+				<TabsList aria-label="Where it runs">
+					{PLATFORMS.map((p) => (
+						<TabsTrigger key={p.value} value={p.value}>
+							{p.label}
+						</TabsTrigger>
+					))}
+				</TabsList>
+			</Tabs>
 			<CodeBlock
 				value={text}
 				language={runsOn === "kubernetes" ? "yaml" : "shell"}
 			/>
-			<p className="text-sm text-muted-foreground">{RUN_NOTE[runsOn]}</p>
-			<div className="flex gap-2">
+			<div className="flex flex-wrap items-center gap-2">
 				<CopyButton text={text} />
-				{runsOn === "kubernetes" ? (
-					<Button size="sm" variant="ghost" onClick={download}>
-						Download as a file
-					</Button>
-				) : null}
+				<Button size="sm" variant="ghost" onClick={download}>
+					Download as a file
+				</Button>
+				<span className="ml-auto text-sm text-muted-foreground">
+					{RUN_NOTE[runsOn]}
+				</span>
 			</div>
 		</div>
 	);
@@ -104,8 +116,13 @@ const CHECK_LABEL: Record<JoinCheckKey, string> = {
 	heartbeat: "First heartbeat",
 };
 
-/** Seconds past which the troubleshooting list opens. */
-const NOTHING_AFTER_S = 120;
+const KEYS: JoinCheckKey[] = [
+	"token",
+	"engine",
+	"plugins",
+	"labels",
+	"heartbeat",
+];
 
 function CheckRow({ check, waitingS }: { check: JoinCheck; waitingS: number }) {
 	const detail =
@@ -135,80 +152,99 @@ function CheckRow({ check, waitingS }: { check: JoinCheck; waitingS: number }) {
 	);
 }
 
+const WAITING: JoinCheck[] = KEYS.map((key) => ({
+	key,
+	state: "waiting",
+	detail: null,
+	fix: null,
+}));
+
+/** The workers of the pool just joined, and what the pool now holds. */
+function Arrived({ pool, worker }: { pool: PoolRow; worker: string | null }) {
+	const fresh = usePoolQuery(pool.name).data ?? pool;
+	const workers = useWorkersQuery({ pool: pool.id });
+	return (
+		<div className="flex flex-col gap-3">
+			<p>
+				<span className="font-mono">{worker ?? "A worker"}</span> joined{" "}
+				<span className="font-medium">{fresh.name}</span> — it now has{" "}
+				{fresh.workers} workers and {fresh.slots} slots.
+			</p>
+			{workers.data ? (
+				<WorkersTable
+					page={workers.data}
+					onOpen={() => {}}
+					empty="No worker has reported yet"
+				/>
+			) : null}
+			<p className="text-sm text-muted-foreground">
+				Every pool is scaled by hand: add or stop Docker and Python workers, or
+				set the Deployment's replicas in Kubernetes.
+			</p>
+		</div>
+	);
+}
+
 /** Step 5 — the checks, live; a worker joined ends the polling. */
 export function JoinedStep({
 	tokenId,
 	pool,
 	onNewToken,
 }: {
-	tokenId: string;
-	pool: string;
+	/** Null after a reload: there is no token to watch. */
+	tokenId: string | null;
+	pool: PoolRow | null;
 	onNewToken: () => void;
 }) {
 	const status = useJoinStatusQuery(tokenId);
 	const s = status.data;
 
-	if (!s)
+	if (tokenId && !s)
 		return (
 			<div className="flex items-center gap-2 text-muted-foreground">
 				<Spinner /> Waiting for the first worker…
 			</div>
 		);
 
-	if (s.worker_id)
-		return (
-			<div className="flex flex-col gap-3">
-				<p>
-					<span className="font-mono">{s.worker ?? "A worker"}</span> joined{" "}
-					<span className="font-medium">{pool}</span>.
-				</p>
-				<ul className="flex flex-col gap-2">
-					{s.checks.map((c) => (
-						<CheckRow key={c.key} check={c} waitingS={s.waiting_s} />
-					))}
-				</ul>
-				<p className="text-sm text-muted-foreground">
-					Every pool is scaled by hand: add or stop Docker and Python workers,
-					or set the Deployment's replicas in Kubernetes.
-				</p>
-			</div>
-		);
+	if (s?.worker_id && pool) return <Arrived pool={pool} worker={s.worker} />;
 
-	const tokenFailed = s.checks.some(
+	const checks = s?.checks ?? WAITING;
+	const waitingS = s?.waiting_s ?? 0;
+	const tokenFailed = checks.some(
 		(c) => c.key === "token" && c.state === "failed",
 	);
 	return (
 		<div className="flex flex-col gap-3">
 			<ul className="flex flex-col gap-2">
-				{s.checks.map((c) => (
-					<CheckRow key={c.key} check={c} waitingS={s.waiting_s} />
+				{checks.map((c) => (
+					<CheckRow key={c.key} check={c} waitingS={waitingS} />
 				))}
 			</ul>
-			{tokenFailed ? (
-				<Button size="sm" variant="outline" onClick={onNewToken}>
-					Make a new token
-				</Button>
-			) : null}
-			{s.waiting_s > NOTHING_AFTER_S ? (
-				<div className="flex flex-col gap-1.5">
-					<p className="font-medium">Nothing after 2 minutes?</p>
-					<ul className="flex flex-col gap-1 text-sm text-muted-foreground">
-						<li>
-							<span className="font-medium text-foreground">Outbound</span> —
-							the machine must reach the engine URL on 443.
-						</li>
-						<li>
-							<span className="font-medium text-foreground">Token</span> —
-							expired or used up; make a new one.
-						</li>
-						<li>
-							<span className="font-medium text-foreground">Plugins</span> — an
-							image without the pool's plugins can't join; the worker says so in
-							its log.
-						</li>
-					</ul>
+			{tokenFailed || !tokenId ? (
+				<div>
+					<Button size="sm" variant="outline" onClick={onNewToken}>
+						Make a new token
+					</Button>
 				</div>
 			) : null}
+			<div className="flex flex-col gap-1.5">
+				<p className="font-medium">Nothing after 2 minutes?</p>
+				<ul className="flex flex-col gap-1 text-sm text-muted-foreground">
+					<li>
+						<span className="font-medium text-foreground">Outbound</span> — the
+						machine must reach the engine URL on 443.
+					</li>
+					<li>
+						<span className="font-medium text-foreground">Token</span> — expired
+						or used up; make a new one.
+					</li>
+					<li>
+						<span className="font-medium text-foreground">Plugins</span> — an
+						image without the pool's plugins can't join; the worker says so in
+						its log.
+					</li>
+				</ul>
+			</div>
 		</div>
 	);
 }

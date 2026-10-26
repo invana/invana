@@ -14,8 +14,9 @@ import {
 	MetricTile,
 	RecordHeader,
 	Spinner,
+	TypographyInlineCode,
 } from "@invana/ui";
-import { DetailStatus, PanelSection } from "@invana-studio/ui";
+import { PanelSection } from "@invana-studio/ui";
 import { useContext } from "react";
 import { AgentsOpenContext } from "../open";
 import { SECTIONS } from "../sections/spec";
@@ -37,14 +38,18 @@ const stepColumns: ColumnDef<RunningStep>[] = [
 		id: "step",
 		header: "Step",
 		cell: ({ row }) => (
-			<span className="font-mono">{row.original.function}</span>
+			<TypographyInlineCode>{row.original.function}</TypographyInlineCode>
 		),
 	},
 	{
 		id: "run",
 		header: "Run",
 		cell: ({ row }) =>
-			row.original.run_number != null ? `#${row.original.run_number}` : DASH,
+			row.original.run_number != null ? (
+				<TypographyInlineCode>#{row.original.run_number}</TypographyInlineCode>
+			) : (
+				DASH
+			),
 	},
 	{
 		id: "agent",
@@ -108,9 +113,8 @@ export function WorkerPage({
 				chips={
 					<>
 						<WorkerStateChip state={w.state} />
-						<DetailStatus>{w.pool}</DetailStatus>
 						<span className="text-sm text-muted-foreground">
-							{w.node} · {w.version}
+							{w.pool} · {w.node} · {w.version}
 						</span>
 					</>
 				}
@@ -151,25 +155,27 @@ export function WorkerPage({
 						/>
 					</MetricGrid>
 
-					<PanelSection card title="Running now">
-						<DataTable
-							columns={stepColumns}
-							data={w.running}
-							enableSorting={false}
-							getRowId={(row) => `${row.run_id}:${row.function}`}
-							emptyState={w.note ?? "Nothing — it is idle"}
-						/>
-					</PanelSection>
+					<div className="grid items-start gap-2.5 lg:grid-cols-2">
+						<PanelSection card title="Running now">
+							<DataTable
+								columns={stepColumns}
+								data={w.running}
+								enableSorting={false}
+								getRowId={(row) => `${row.run_id}:${row.function}`}
+								emptyState={w.note ?? "Nothing — it is idle"}
+							/>
+						</PanelSection>
 
-					<PanelSection card title="CPU · last 30 min">
-						<LineChart
-							values={w.cpu_series.map((p) => p.cpu)}
-							labels={w.cpu_series.map((p) => clockOf(p.at).slice(0, 5))}
-							max={100}
-							format={(v) => `${v}%`}
-							empty="No CPU reading in the last 30 minutes"
-						/>
-					</PanelSection>
+						<PanelSection card title="CPU · last 30 min">
+							<LineChart
+								values={w.cpu_series.map((p) => p.cpu)}
+								labels={w.cpu_series.map((p) => clockOf(p.at).slice(0, 5))}
+								max={100}
+								format={(v) => `${v}%`}
+								empty="No CPU reading in the last 30 minutes"
+							/>
+						</PanelSection>
+					</div>
 
 					<PanelSection card title="Log">
 						{w.log.length ? (
