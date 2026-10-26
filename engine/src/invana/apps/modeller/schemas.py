@@ -350,6 +350,23 @@ class EdgeTypeDiff(BaseModel):
     metadata_changes: dict[str, tuple[Any, Any]] = {}
 
 
+class MarkLine(BaseModel):
+    """One line of a type's mark: ``+`` added, ``~`` changed, ``-`` removed."""
+
+    sign: Literal["+", "~", "-"]
+    text: str
+
+
+class TypeMark(BaseModel):
+    """What a version pair did to one type — the chip the map draws beside it."""
+
+    type: str
+    target_kind: Literal["node_type", "edge_type"]
+    #: ``added`` and ``removed`` are the whole type; ``changed`` lists its lines.
+    mark: Literal["added", "changed", "removed"]
+    lines: list[MarkLine] = []
+
+
 class SchemaDiff(BaseModel):
     added_property_keys: list[str] = []
     removed_property_keys: list[str] = []
@@ -365,6 +382,12 @@ class SchemaDiff(BaseModel):
     added_indexes: list[str] = []
     removed_indexes: list[str] = []
     classification: Literal["major", "minor", "patch"] = "patch"
+    #: One per type the pair changes; set by the version diff read.
+    marks: list[TypeMark] = []
+    #: The marks' lines by sign — what the Comparing bar counts.
+    added: int = 0
+    changed: int = 0
+    removed: int = 0
 
 
 # ---------------------------------------------------------------------------

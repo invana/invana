@@ -141,6 +141,8 @@ class GraphVersion(Base):
     # and the axis, never silently ignored (GV14). Inferring one from a property's
     # name or type would make "which rows did this run see" depend on a guess.
     axes: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict, server_default="{}")
+    #: Datasets bound to a type this version's publish changed, with the rows now failing; set at publish.
+    affected_datasets: Mapped[list] = mapped_column(JSON, nullable=False, default=list, server_default="[]")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     activated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 

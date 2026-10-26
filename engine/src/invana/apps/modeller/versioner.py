@@ -23,9 +23,11 @@ from invana.apps.modeller.models import (
 )
 from invana.apps.modeller.schemas import (
     EdgeTypeDiff,
+    MarkLine,
     NodeTypeDiff,
     PropertyKeyDiff,
     SchemaDiff,
+    TypeMark,
 )
 
 if TYPE_CHECKING:
@@ -237,6 +239,87 @@ def compute_diff(old: GraphVersion, new: GraphVersion) -> SchemaDiff:
     )
     diff.classification = _classify(diff)
     return diff
+
+
+def _mapped_keys(t) -> list[str]:
+    return [m["property_key"] for m in (t.property_mappings or []) if isinstance(m, dict) and m.get("property_key")]
+
+
+def _shown(value: Any) -> str:
+    if isinstance(value, list | tuple):
+        return ", ".join(str(v) for v in value) or "none"
+    return "none" if value in (None, "") else str(value)
+
+
+def mark_types(old: GraphVersion | None, new: GraphVersion, diff: SchemaDiff) -> SchemaDiff:
+    """``diff`` with each changed type's mark and the counts of their lines.
+
+    An added or removed type is one line naming it. A changed one lists its
+    properties added and removed, its endpoints or multiplicity changed, the
+    indexes added or removed on it, and the type change of every property key it
+    maps — a key is shared across types, so its change shows on each type that
+    reads it. Descriptions are not marked: they change nothing on the map.
+    """
+    marks: dict[tuple[str, str], TypeMark] = {}
+    kinds = {t.name: "node_type" for t in new.node_types} | {t.name: "edge_type" for t in new.edge_types}
+    if old is not None:
+        for t in old.node_types:
+            kinds.setdefault(t.name, "node_type")
+        for t in old.edge_types:
+            kinds.setdefault(t.name, "edge_type")
+
+    def line(kind: str, name: str, sign: str, text: str) -> None:
+        mark = marks.setdefault((kind, name), TypeMark(type=name, target_kind=kind, mark="changed"))
+        if mark.mark == "changed":
+            mark.lines.append(MarkLine(sign=sign, text=text))
+
+    for kind, added, removed, modified in (
+        ("node_type", diff.added_node_types, diff.removed_node_types, diff.modified_node_types),
+        ("edge_type", diff.added_edge_types, diff.removed_edge_types, diff.modified_edge_types),
+    ):
+        for name in added:
+            marks[(kind, name)] = TypeMark(
+                type=name, target_kind=kind, mark="added", lines=[MarkLine(sign="+", text=name)]
+            )
+        for name in removed:
+            marks[(kind, name)] = TypeMark(
+                type=name, target_kind=kind, mark="removed", lines=[MarkLine(sign="-", text=name)]
+            )
+        for t in modified:
+            for prop in t.added_property_mappings:
+                line(kind, t.name, "+", prop)
+            for prop in t.removed_property_mappings:
+                line(kind, t.name, "-", prop)
+            for field, (was, now) in t.metadata_changes.items():
+                if field != "description":
+                    line(kind, t.name, "~", f"{field.replace('_', ' ')} {_shown(was)} → {_shown(now)}")
+
+    for key in diff.modified_property_keys:
+        if "type" not in key.changes:
+            continue
+        was, now = key.changes["type"]
+        for kind, types in (("node_type", new.node_types), ("edge_type", new.edge_types)):
+            for t in types:
+                if key.name in _mapped_keys(t):
+                    line(kind, t.name, "~", f"{key.name} {was} → {now}")
+
+    for names, version, sign in ((diff.added_indexes, new, "+"), (diff.removed_indexes, old, "-")):
+        by_name = {i.name: i for i in (version.indexes if version is not None else [])}
+        for name in names:
+            index = by_name.get(name)
+            if index is not None and index.target_label in kinds:
+                line(kinds[index.target_label], index.target_label, sign, f"index {', '.join(index.properties)}")
+
+    ordered = [m for m in marks.values() if m.lines]
+    signs = [ln.sign for m in ordered for ln in m.lines]
+    return diff.model_copy(
+        update={
+            "marks": ordered,
+            "added": signs.count("+"),
+            "changed": signs.count("~"),
+            "removed": signs.count("-"),
+        }
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -365,23 +365,10 @@ async def test_connection_credentials(
     import contextlib  # noqa: PLC0415
     import time  # noqa: PLC0415
 
-    from invana.core.utils import import_class_from_dotted_path  # noqa: PLC0415
-
     try:
-        ConnectorClass = import_class_from_dotted_path(connector_class)
-    except Exception as exc:
-        return {"ok": False, "error": f"Unknown connector '{connector_class}': {exc}"}
-
-    # Only pass the database through when one is named — a blank field means the
-    # connector's own default, and connectors that don't address databases at all
-    # (Gremlin) would otherwise be handed a keyword they ignore.
-    kwargs = dict(auth)
-    if (database or "").strip():
-        kwargs["database"] = database.strip()
-    try:
-        connector = ConnectorClass(uri=uri, **kwargs)
-    except Exception as exc:
-        return {"ok": False, "error": f"Could not build connector: {exc}"}
+        connector = build_connector(connector_class=connector_class, uri=uri, auth=auth, database=database)
+    except ValueError as exc:
+        return {"ok": False, "error": str(exc)}
 
     t0 = time.monotonic()
     try:
@@ -405,3 +392,26 @@ async def test_connection_credentials(
         "server_version": str(resolved.version) if resolved.version else None,
         "compatibility_status": resolved.status.value,
     }
+
+
+def build_connector(*, connector_class: str, uri: str, auth: dict, database: str | None = None):
+    """A connector that is not registered with the pool — for a test or a one-off read.
+
+    The caller connects and disconnects it. Only a named database is passed
+    through: a blank field means the connector's own default, and connectors
+    that do not address databases at all (Gremlin) would otherwise be handed a
+    keyword they ignore. Raises ``ValueError`` naming what could not be built.
+    """
+    from invana.core.utils import import_class_from_dotted_path  # noqa: PLC0415
+
+    try:
+        connector_type = import_class_from_dotted_path(connector_class)
+    except Exception as exc:
+        raise ValueError(f"Unknown connector '{connector_class}': {exc}") from exc
+    kwargs = dict(auth)
+    if (database or "").strip():
+        kwargs["database"] = database.strip()
+    try:
+        return connector_type(uri=uri, **kwargs)
+    except Exception as exc:
+        raise ValueError(f"Could not build connector: {exc}") from exc

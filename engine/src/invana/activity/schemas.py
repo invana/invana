@@ -23,6 +23,18 @@ from invana.core.metrics import Change
 RecordKind = Literal["skill", "rule", "plan", "agent", "model", "dataset"]
 
 
+class EffectDataset(BaseModel):
+    """A dataset bound to a type a model version's publish changed."""
+
+    dataset_id: str
+    #: ``publisher/name``.
+    name: str
+    version: int
+    type: str
+    #: Rows the publish's migration scan found failing on that type; 0 for an additive publish.
+    rows_failing: int
+
+
 class ChangeEffect(BaseModel):
     """What ran on a version — counted, never estimated. Tokens, never currency."""
 
@@ -39,6 +51,11 @@ class ChangeEffect(BaseModel):
     #: The span it was the current version: from its publish to the next one's.
     since: datetime | None
     until: datetime | None
+    #: A model version's: the bound datasets its publish touched, stored at publish.
+    datasets: list[EffectDataset] = []
+    #: How many of ``datasets`` now have failing rows, and those rows summed.
+    datasets_failing: int = 0
+    rows_failing: int = 0
 
 
 class ChangeEntry(BaseModel):

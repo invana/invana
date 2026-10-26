@@ -46,10 +46,14 @@ class Introspector:
         *,
         model_id: str,
         connector: BaseConnector,
+        activate: bool = True,
     ) -> dict[str, Any]:
         """Discover the database schema and create a draft version.
 
-        Returns a dict with ``{"version_id", "status", "discovered"}``.
+        ``activate`` publishes it at once, as the Graph's read-only mirror is;
+        ``False`` leaves it a draft for a person to review and publish — the
+        model a new connection drafts. Returns a dict with
+        ``{"version_id", "status", "discovered"}``.
         """
         caps = connector.capabilities()
         reader = connector.schema_reader
@@ -152,16 +156,17 @@ class Introspector:
 
         await session.flush()
 
-        # 6. Activate the newly built version so it is immediately queryable.
-        from invana.apps.modeller.versioner import Versioner  # noqa: PLC0415
+        # 6. Activate the newly built version so it is immediately queryable —
+        #    the mirror only; a drafted model waits for a person.
+        if activate:
+            from invana.apps.modeller.versioner import Versioner  # noqa: PLC0415
 
-        versioner = Versioner(self._store)
-        await versioner.activate(
-            session,
-            version_id=version.id,
-            change_summary="Auto-introspected from live database",
-        )
-        await session.flush()
+            await Versioner(self._store).activate(
+                session,
+                version_id=version.id,
+                change_summary="Auto-introspected from live database",
+            )
+            await session.flush()
 
         # The mirror is a count too: the Growth line's first point, and the
         # degrees the supernode signal reads (the-model-page.md MP30).
@@ -178,7 +183,7 @@ class Introspector:
 
         return {
             "version_id": version.id,
-            "status": "active",
+            "status": "active" if activate else "draft",
             "discovered": discovered,
         }
 

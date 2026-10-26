@@ -14,14 +14,16 @@ from invana.apps.graphs.compatibility import (
     load_profile,
     resolve_capabilities,
 )
-from invana.apps.graphs.managers import GraphManager
+from invana.apps.graphs.managers import ConnectManager, GraphManager, test_connection_credentials
 from invana.apps.graphs.models import Graph, GraphConnection, GraphMember, GraphStatus
 from invana.apps.graphs.pool import GraphConnectionManager, GraphUnavailableError
 from invana.apps.graphs.querysets import GraphConnectionQuerySet
 from invana.apps.graphs.schemas import (
     ContentionRead,
+    GraphConnect,
     GraphConnectionCreate,
     GraphConnectionRead,
+    GraphConnectRead,
     GraphCreate,
     GraphListResponse,
     GraphRead,
@@ -88,6 +90,33 @@ async def create_graph(
     out = await SetupManager(TaskRunQuerySet()).graph_read(session, graph)
     await session.commit()
     return out
+
+
+async def test_new_connection(
+    payload: GraphConnectionCreate,
+    _: User = Depends(get_current_user),
+) -> dict:
+    """Prove credentials before any Graph exists — recorded nowhere, there is no Graph yet."""
+    return await test_connection_credentials(
+        uri=payload.uri, connector_class=payload.connector_class, auth=payload.auth, database=payload.database
+    )
+
+
+async def connect_graph(
+    payload: GraphConnect,
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+    manager: GraphConnectionManager = Depends(_get_manager),
+) -> GraphConnectRead:
+    """A new Graph from a database: tested, connected, and its schema read into a draft model."""
+    graph, connection, model_id, discovered = await ConnectManager().connect(
+        session, owner=user, payload=payload, encryption_key=settings.encryption_key
+    )
+    out = await SetupManager(TaskRunQuerySet()).graph_read(session, graph)
+    await session.commit()
+    await session.refresh(connection)
+    await manager.register(connection)
+    return GraphConnectRead(graph=out, model_id=model_id, discovered=discovered)
 
 
 async def list_graphs(

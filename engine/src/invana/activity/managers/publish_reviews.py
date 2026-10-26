@@ -26,6 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.activity.managers.approvals import ApprovalManager
 from invana.activity.managers.notifications import InboxManager, Members
 from invana.activity.models import Approval, ApprovalStatus, NotificationKind
+from invana.apps.datasets.managers import DatasetManager
 from invana.apps.datasets.querysets import DatasetBindingQuerySet
 from invana.apps.graphs.models import Graph
 from invana.apps.graphs.roles import GraphRole
@@ -73,8 +74,9 @@ class PublishReviewManager:
         draft, base = await self.publishing.draft_and_base(session, model=model)
         found = classify(base, draft)
         if found.classification == "additive":
+            bound = await DatasetManager().bound_to_model(session, graph_id=graph.id, model_id=model.id)
             version = await self.publishing.publish(
-                session, model=model, actor_id=user.id, why=payload.why, version=payload.version
+                session, model=model, actor_id=user.id, why=payload.why, version=payload.version, bound=bound
             )
             return ModelPublishOutcome(outcome="published", version=version.version, version_id=version.id), None
 

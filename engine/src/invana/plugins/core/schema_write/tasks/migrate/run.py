@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from invana.apps.datasets.managers import DatasetManager
 from invana.apps.modeller.managers import PublishManager
 from invana.graph.connectors.base.exceptions import ConnectorError
 from invana.plugins.core.graph_read.shared import _connector
@@ -29,16 +30,19 @@ async def model_migrate(ctx: TaskContext, v: RunVars) -> Out:
         raise
     await ctx.progress("publishing the reviewed change" if apply else "scanning what the change touches")
     connector = await _connector(ctx, v)
+    model_id = str(args.get("model_id") or "")
+    bound = await DatasetManager().bound_to_model(ctx.db, graph_id=v.graph.id, model_id=model_id) if apply else []
     try:
         out = await publishing.migrate(
             ctx.db,
             reader=connector.data_reader,
-            model_id=str(args.get("model_id") or ""),
+            model_id=model_id,
             version_id=str(args.get("version_id") or ""),
             base_version_id=base_version_id,
             review_id=args.get("review_id") or None,
             apply=apply,
             actor_id=v.actor_id,
+            bound=bound,
         )
     except ConnectorError as exc:
         raise TaskFailure(

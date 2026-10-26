@@ -93,7 +93,7 @@ from invana.apps.modeller.schemas import (
 )
 from invana.apps.modeller.staging import StagedSet, UnknownChange, collect, discard_all, discard_one
 from invana.apps.modeller.store import ModelStore
-from invana.apps.modeller.versioner import Versioner, compute_diff
+from invana.apps.modeller.versioner import Versioner, compute_diff, mark_types
 from invana.apps.semantic.managers import OntologyImportManager
 from invana.apps.semantic.schemas import OntologyImportRequest, OntologyImportResult
 from invana.core.auth.deps import get_current_user
@@ -1369,7 +1369,9 @@ async def diff_version(
     The version bar states this (domain-models.md · Surfaces): a list of numbers
     with no account of what moved between them is a list nobody can act on. With
     no `against`, it diffs against the version immediately before this one, which
-    is the question being asked nine times in ten.
+    is the question being asked nine times in ten. `version_id` may be the draft,
+    which is how the Comparing bar reads *active → draft*. Each changed type
+    carries its mark, and the counts are of the marks' lines.
     """
     await _get_model_or_404(session, graph.id, model_id)
     versions = await _store.list_versions(session, model_id)
@@ -1391,13 +1393,14 @@ async def diff_version(
         base = await _store.get_version(session, previous.id) if previous else None
 
     if base is None:
-        return SchemaDiff(
+        everything = SchemaDiff(
             added_node_types=[nt.name for nt in target.node_types],
             added_edge_types=[et.name for et in target.edge_types],
             added_property_keys=[pk.name for pk in target.property_keys],
             classification="major",
         )
-    return compute_diff(base, target)
+        return mark_types(None, target, everything)
+    return mark_types(base, target, compute_diff(base, target))
 
 
 # ---------------------------------------------------------------------------

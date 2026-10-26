@@ -146,6 +146,22 @@ class GraphConnectionCreate(BaseModel):
     server_version: str | None = Field(default=None, max_length=32)
 
 
+class GraphConnect(GraphConnectionCreate):
+    """A new Graph from a database: the connection, and the name when one is given."""
+
+    #: Left out, the database name, else the URI's host.
+    name: str | None = Field(default=None, min_length=1, max_length=255)
+
+
+class GraphConnectRead(BaseModel):
+    """What connecting made: the Graph, and the draft model read from its database."""
+
+    graph: GraphRead
+    model_id: str
+    #: Counts the read found: ``node_labels`` · ``edge_labels`` · ``indexes`` · ``constraints``.
+    discovered: dict[str, int]
+
+
 class GraphConnectionUpdate(BaseModel):
     uri: str | None = Field(default=None, min_length=1, max_length=2048)
     database: str | None = Field(default=None, max_length=255)
