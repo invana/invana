@@ -2,8 +2,9 @@
 """A live dashboard for the Agents build: the phases, the sessions working them, and each session's todos.
 
 Reads what the runner already writes — the runbook's log (``docs/products/agents-build-sessions.md``),
-``.migration-cache/<ID>/*.jsonl`` (each headless session's event stream), ``.migration-cache/sessions.md``,
-the design reviews and git — every time the page polls. Nothing is stored; standard library only.
+``.migration-cache/<ID>/*.jsonl`` (each headless session's event stream), each sub-agent's transcript under
+``~/.claude/projects/<repo>/<session>/subagents/``, the design reviews and git — every time the page polls.
+A session's or sub-agent's live feed (its latest text, tool calls and results) comes from ``/api/feed``. Nothing is stored; standard library only.
 
 Usage::
 
@@ -17,6 +18,8 @@ import json
 import os
 import re
 import subprocess
+import time
+from urllib.parse import parse_qs, urlparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -25,6 +28,7 @@ RUNBOOK = ROOT / "docs" / "products" / "agents-build-sessions.md"
 CACHE = ROOT / ".migration-cache"
 REVIEWS = ROOT / "scripts" / "agents-build" / "reviews"
 RUN_LOG = CACHE / "agents-run.log"
+TRANSCRIPTS = Path.home() / ".claude" / "projects" / re.sub(r"[^A-Za-z0-9]", "-", str(ROOT))
 ID = re.compile(r"^[FI]\d{2}$")
 # The runner's context budget for the lead and every sub-agent, and the grace before it ends a session.
 LIMIT = int(os.environ.get("INVANA_MIGRATION_CONTEXT_LIMIT", "300000"))
@@ -65,8 +69,8 @@ def phases() -> list[dict]:
 
 
 def part(name: str) -> dict:
-    return {"name": name, "model": "", "status": "running", "context": 0, "peak": 0, "turns": 0, "spend": 0,
-            "tools": 0, "doing": ""}
+    return {"name": name, "agent": "", "model": "", "status": "running", "context": 0, "peak": 0, "turns": 0, "spend": 0,
+            "tools": 0, "doing": "", "todos": []}
 
 
 def session(path: Path) -> dict:
@@ -94,6 +98,7 @@ def session(path: Path) -> dict:
         if kind == "system" and sub == "task_started" and e.get("task_type") == "local_agent":
             p = parts.setdefault(e.get("tool_use_id", ""), part(e.get("description", "")))
             p["name"] = p["name"] or e.get("description", "")
+            p["agent"] = e.get("task_id", "")
             task_ids[e.get("task_id", "")] = e.get("tool_use_id", "")
         elif kind == "system" and sub == "task_progress" and e.get("tool_use_id") in parts:
             p = parts[e["tool_use_id"]]
@@ -148,9 +153,98 @@ def session(path: Path) -> dict:
     for p in parts.values():
         if s["finished"] and p["status"] == "running":
             p["status"] = "ended"
-    s["parts"] = list(parts.values())
+    s["parts"] = [p for p in parts.values() if p["agent"] or p["turns"]]
+    for p in s["parts"]:
+        p["todos"] = transcript_todos(subagent_path(s["id"], p["agent"]))
     s["recent"] = s["recent"][-8:]
     return s
+
+
+def subagent_path(session_id: str, agent: str) -> Path | None:
+    if not (session_id and re.fullmatch(r"[0-9a-f-]+", session_id) and re.fullmatch(r"[0-9a-z]+", agent or "")):
+        return None
+    return TRANSCRIPTS / session_id / "subagents" / f"agent-{agent}.jsonl"
+
+
+def transcript_todos(path: Path | None) -> list[dict]:
+    """The latest TodoWrite list in a sub-agent's transcript."""
+    todos: list[dict] = []
+    if not path or not path.exists():
+        return todos
+    for line in path.open(errors="replace"):
+        if '"TodoWrite"' not in line:
+            continue
+        try:
+            msg = json.loads(line).get("message") or {}
+        except json.JSONDecodeError:
+            continue
+        for b in msg.get("content") or []:
+            if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") == "TodoWrite":
+                items = (b.get("input") or {}).get("todos", [])
+                if isinstance(items, str):  # a model sometimes passes the list as a JSON string
+                    try:
+                        items = json.loads(items)
+                    except json.JSONDecodeError:
+                        items = []
+                todos = [{"text": t.get("content", ""), "status": t.get("status", "pending")} for t in items if isinstance(t, dict)]
+    return todos
+
+
+def feed(path: Path, *, lead: bool, n: int = 80) -> list[dict]:
+    """The last ``n`` things a session did: what it said, each tool call, and each result's first lines.
+
+    Reads the tail of a lead's stream-json or a sub-agent's transcript — both carry
+    ``assistant``/``user`` messages. In a lead's stream, a sub-agent's own messages are
+    skipped (they have their own feed).
+    """
+    if not path.exists():
+        return []
+    lines = path.read_bytes()[-3_000_000:].decode(errors="replace").splitlines()[1:]
+    out: list[dict] = []
+    for line in lines:
+        try:
+            e = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        kind = e.get("type")
+        if kind not in ("assistant", "user") or (lead and e.get("parent_tool_use_id")):
+            continue
+        at = e.get("timestamp", "")
+        content = (e.get("message") or {}).get("content")
+        if isinstance(content, str):
+            if kind == "user" and content.strip():
+                out.append({"at": at, "kind": "prompt", "text": content.strip()[:1500]})
+            continue
+        for b in content or []:
+            if not isinstance(b, dict):
+                continue
+            if b.get("type") == "text" and b.get("text", "").strip():
+                out.append({"at": at, "kind": "said" if kind == "assistant" else "prompt", "text": b["text"].strip()[:1500]})
+            elif b.get("type") == "tool_use":
+                inp = b.get("input") or {}
+                what = inp.get("description") or inp.get("command") or inp.get("file_path") or inp.get("pattern") \
+                    or inp.get("subject") or json.dumps(inp)[:200]
+                out.append({"at": at, "kind": "tool", "text": f"{b.get('name')}: {str(what)[:300]}"})
+            elif b.get("type") == "tool_result":
+                r = b.get("content")
+                r = r if isinstance(r, str) else " ".join(x.get("text", "") for x in r or [] if isinstance(x, dict))
+                out.append({"at": at, "kind": "error" if b.get("is_error") else "result", "text": r.strip()[:400]})
+    return out[-n:]
+
+
+def feed_for(query: dict[str, list[str]]) -> dict:
+    """The feed one ``/api/feed?phase=&label=[&agent=]`` asks for."""
+    phase, label = query.get("phase", [""])[0], query.get("label", [""])[0]
+    agent = query.get("agent", [""])[0]
+    if not ID.match(phase) or not re.fullmatch(r"[A-Za-z0-9_.-]+", label):
+        return {"events": []}
+    lead = CACHE / phase / f"{label}.jsonl"
+    if not agent:
+        return {"events": feed(lead, lead=True), "live": time.time() - lead.stat().st_mtime < 30 if lead.exists() else False}
+    sid = session(lead)["id"] if lead.exists() else ""
+    path = subagent_path(sid, agent)
+    return {"events": feed(path, lead=False) if path else [],
+            "live": bool(path and path.exists() and time.time() - path.stat().st_mtime < 30)}
 
 
 def sessions() -> dict[str, list[dict]]:
@@ -197,6 +291,9 @@ th{font-weight:600;color:var(--mut);font-size:11px;white-space:nowrap}td.nw{whit
 .completed{color:var(--ok)}.running{color:var(--run)}.failed,.killed{color:var(--bad)}.stopped,.ended{color:var(--warn)}
 .pad{padding:12px}ul{margin:6px 0;padding-left:18px}li{margin:2px 0}.todo-completed{color:var(--ok);text-decoration:line-through}.todo-in_progress{color:var(--run);font-weight:600}
 .sess{border-top:1px solid var(--bd);padding:12px}.sess:first-of-type{border-top:0}.bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:var(--run)}
+.feed{max-height:560px;overflow:auto;padding:8px 12px}.ev{display:grid;grid-template-columns:64px 52px minmax(0,1fr);gap:8px;padding:3px 0;border-top:1px dashed var(--bd)}
+.ev .k{font-size:11px;font-weight:600}.k-said{color:var(--fg)}.k-tool{color:var(--run)}.k-result{color:var(--mut)}.k-error{color:var(--bad)}.k-prompt{color:var(--warn)}
+.ev .x{white-space:pre-wrap;overflow-wrap:anywhere}.ev .x.clip{max-height:5.6em;overflow:hidden}.pick{cursor:pointer}.pick:hover{background:var(--bg)}tr.sel,.sess.sel{background:var(--bg)}
 pre{margin:0;padding:12px;white-space:pre-wrap;overflow:auto;max-height:320px}.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
 </style></head><body>
 <header><h1>Agents build</h1><span id="runner"></span><span class="mut mono" id="branch"></span><span style="flex:1"></span><span class="mut" id="at"></span></header>
@@ -206,18 +303,19 @@ pre{margin:0;padding:12px;white-space:pre-wrap;overflow:auto;max-height:320px}.d
 <section class="card"><h2 id="ptitle">Phase</h2><div class="pad" id="pdetail"></div></section>
 <section class="card"><h2>Sessions on this phase</h2><div id="sessions"></div></section>
 </div>
+<section class="card"><h2 id="ftitle">Live feed</h2><div class="pad mut" id="fhint">Click a session or a sub-agent to follow it.</div><div class="feed" id="feed"></div></section>
 <div class="grid">
 <section class="card"><h2>Runner log</h2><pre class="mono" id="log"></pre></section>
 <section class="card"><h2>Branch</h2><div class="pad" id="git"></div></section>
 </div>
 </main>
 <script>
-let LIMIT = 300000, HARD = 350000, pick = null;
+let LIMIT = 300000, HARD = 350000, pick = null, follow = null;
 const tok = n => n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : Math.round(n / 1e3) + 'k';
 const meter = (peak, sm) => `<div class="bar ${sm ? 'sm' : ''} ${peak > HARD ? 'kill' : peak > LIMIT ? 'over' : ''}"><i style="width:${Math.min(100, peak / HARD * 100)}%"></i></div>`;
-const partsTable = ps => !ps.length ? '' : `<b>Sub-agents (${ps.length})</b><div class="scroll"><table>
+const partsTable = (ps, lbl) => !ps.length ? '' : `<b>Sub-agents (${ps.length})</b><div class="scroll"><table>
   <tr><th>Part</th><th>Status</th><th>Model</th><th>Context · peak</th><th>Turns</th><th>Spend</th><th>Now</th></tr>
-  ${ps.map(p => `<tr><td>${esc(p.name)}</td><td class="nw ${cls(p.status)}">${esc(p.status)}</td><td class="nw mono">${esc(p.model.replace('claude-', ''))}</td>
+  ${ps.map(p => `<tr class="pick ${follow && follow.agent === p.agent && p.agent ? 'sel' : ''}" data-label="${esc(lbl)}" data-agent="${esc(p.agent)}" data-name="${esc(p.name)}"><td>${esc(p.name)}${p.todos.length ? `<div class="mut">${p.todos.filter(t => t.status === 'completed').length}/${p.todos.length} todos${(p.todos.find(t => t.status === 'in_progress') || {}).text ? ' · now: ' + esc(p.todos.find(t => t.status === 'in_progress').text) : ''}</div>` : ''}</td><td class="nw ${cls(p.status)}">${esc(p.status)}</td><td class="nw mono">${esc(p.model.replace('claude-', ''))}</td>
     <td class="n">${tok(p.context)} · ${tok(p.peak)}${meter(p.peak, true)}</td><td class="n">${p.turns}</td><td class="n">${tok(p.spend)}</td>
     <td class="mut">${esc(p.doing)}</td></tr>`).join('')}</table></div>`;
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -242,29 +340,53 @@ async function tick() {
     ${p.notes ? `<p><b>Runner note</b><br>${md(p.notes)}</p>` : ''}
     ${p.handoffs.length ? `<p><b>Hand-off notes</b></p><ul>${p.handoffs.map(h => `<li>${md(h)}</li>`).join('')}</ul>` : ''}`;
   const ss = st.sessions[pick] || [];
-  document.getElementById('sessions').innerHTML = ss.length ? ss.slice().reverse().map(s => `<div class="sess">
-    <div class="row"><span class="dot" style="background:var(${s.finished ? '--ok' : '--run'})"></span>
+  document.getElementById('sessions').innerHTML = ss.length ? ss.slice().reverse().map(s => `<div class="sess ${follow && !follow.agent && follow.label === s.label ? 'sel' : ''}">
+    <div class="row pick" data-label="${esc(s.label)}" data-agent="" data-name="${esc(s.label)} (lead)"><span class="dot" style="background:var(${s.finished ? '--ok' : '--run'})"></span>
       <b>${esc(s.label)}</b><span class="mut">${s.finished ? 'finished' : 'live'}</span><span class="mono mut">${esc(s.model.replace('claude-', ''))}</span><span style="flex:1"></span><span class="mono mut">claude -r ${esc(s.id)}</span></div>
     <div class="mut">context ${tok(s.context)} · peak ${tok(s.peak)} · hand-off at ${tok(LIMIT)}, ended at ${tok(HARD)} · ${s.tools} tool calls
       · spend ${tok(s.spend)}${s.parts.length ? ` + sub-agents ${tok(s.parts.reduce((a, p) => a + p.spend, 0))}` : ''}</div>
     ${meter(s.peak)}
     ${s.todos.length ? `<b>Todos</b><ul>${s.todos.map(t => `<li class="todo-${esc(t.status)}">${esc(t.text)}</li>`).join('')}</ul>` : '<div class="mut">No todo list yet — the session has not written one.</div>'}
-    ${partsTable(s.parts)}
+    ${partsTable(s.parts, s.label)}
     ${s.said ? `<b>Last said</b><div class="mut">${esc(s.said)}</div>` : ''}
     <b>Latest</b><ul class="mono">${s.recent.slice().reverse().map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>`).join('')
     : '<div class="pad mut">No session has run this phase yet.</div>';
+  if (!follow || follow.phase !== pick) {
+    const lv = ss.slice().reverse().find(s => !s.finished) || ss[ss.length - 1];
+    follow = lv ? {phase: pick, label: lv.label, agent: '', name: lv.label + ' (lead)'} : null;
+  }
+  document.querySelectorAll('#sessions .pick').forEach(el => el.onclick = () => {
+    follow = {phase: pick, label: el.dataset.label, agent: el.dataset.agent, name: el.dataset.name}; tick(); feedTick();
+  });
   document.getElementById('log').textContent = st.log.join('\n');
   document.getElementById('git').innerHTML = `<b>Phase commits</b><ul class="mono">${st.commits.map(c => `<li>${esc(c)}</li>`).join('') || '<li class="mut">none</li>'}</ul>
     <b>Uncommitted</b> <span class="mut">${st.changed.length} files</span><ul class="mono">${st.changed.slice(0, 30).map(c => `<li>${esc(c)}</li>`).join('')}</ul>`;
 }
-tick(); setInterval(tick, 5000);
+const hm = s => s ? new Date(s).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'}) : '';
+async function feedTick() {
+  const box = document.getElementById('feed');
+  if (!follow) { box.innerHTML = ''; return; }
+  const q = new URLSearchParams({phase: follow.phase, label: follow.label, agent: follow.agent});
+  let f; try { f = await (await fetch('/api/feed?' + q)).json(); } catch { return; }
+  document.getElementById('ftitle').textContent = `Live feed · ${follow.phase} · ${follow.name}`;
+  document.getElementById('fhint').innerHTML = (f.live ? '<span class="pill in-progress">live</span> ' : '<span class="pill pending">idle</span> ')
+    + `<span class="mut">last ${f.events.length} events, newest first · refreshes every 3 s</span>`;
+  box.innerHTML = f.events.slice().reverse().map(e => `<div class="ev"><span class="mono mut">${hm(e.at)}</span><span class="k k-${e.kind}">${e.kind}</span>
+    <span class="x ${e.kind === 'result' ? 'clip mono' : e.kind === 'tool' ? 'mono' : ''}">${esc(e.text)}</span></div>`).join('') || '<div class="mut">Nothing yet.</div>';
+}
+tick(); setInterval(tick, 5000); setInterval(feedTick, 3000); setTimeout(feedTick, 800);
 </script></body></html>"""
 
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
-        body, kind = (json.dumps(state()).encode(), "application/json") if self.path.startswith("/api/state") \
-            else (PAGE.encode(), "text/html; charset=utf-8")
+        url = urlparse(self.path)
+        if url.path == "/api/state":
+            body, kind = json.dumps(state()).encode(), "application/json"
+        elif url.path == "/api/feed":
+            body, kind = json.dumps(feed_for(parse_qs(url.query))).encode(), "application/json"
+        else:
+            body, kind = PAGE.encode(), "text/html; charset=utf-8"
         self.send_response(200)
         self.send_header("Content-Type", kind)
         self.send_header("Cache-Control", "no-store")
