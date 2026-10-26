@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import type { useOpenBoards } from "@/host/useOpenBoards";
 
 /**
- * The Worlds, Guardrails and Requests pages — each opened when the `leftNav`
+ * The Worlds, Guardrails, Requests and Rules pages — each opened when the `leftNav`
  * moves onto its item. It fires on the transition into the item and nothing
  * else, so closing the page with its X while the item is open leaves it
  * closed. A world's board, opened from the Worlds page, is a page of its own
@@ -20,7 +20,9 @@ export function useGovernPages(
 	const kind: DeclaredKind | null =
 		settingsSection === "requests"
 			? "requests"
-			: settingsSection === "govern"
+			: settingsSection === "rules"
+				? "rules"
+				: settingsSection === "govern"
 				? params.get(SECTION_PARAM) === "guardrails"
 					? "guardrails"
 					: "worlds"

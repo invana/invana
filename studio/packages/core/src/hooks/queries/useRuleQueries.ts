@@ -168,17 +168,6 @@ export function useSaveRuleMutation(username: string, graphSlug: string) {
 	});
 }
 
-export function useCreateRuleMutation(username: string, graphSlug: string) {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: (data: RuleCreate) =>
-			rulesApi.create(username, graphSlug, data),
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: rulesKey(username, graphSlug) });
-		},
-	});
-}
-
 export function useCreateProjectRuleMutation(
 	username: string,
 	graphSlug: string,

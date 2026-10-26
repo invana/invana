@@ -8,7 +8,6 @@ import {
 	GovernViewPanel,
 	type ModelSelection,
 	ModelViewPanel,
-	RulesViewPanel,
 } from "@invana-studio/modeller";
 import { ProjectsViewPanel } from "@invana-studio/projects";
 import type {
@@ -112,14 +111,6 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		worldBoardOpen ? null : (
 			<GovernViewPanel username={username} graphSlug={graphSlug} />
 		)
-	) : settingsPanel.section === "rules" ? (
-		// The Modeller's Rules — the Graph's invariants. `More` opens a rule's
-		// board beside the section, as it does from Skills.
-		<RulesViewPanel
-			username={username as string}
-			graphSlug={graphSlug as string}
-			onOpenRuleBoard={(id) => openBoard({ kind: "rule", subjectId: id })}
-		/>
 	) : settingsPanel.section === "explorer" ? (
 		// Sessions is not a left panel; the Explorer's own is the graph's
 		// type list and the selection (selection-and-the-panel.md) — the legend

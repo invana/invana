@@ -25,6 +25,7 @@ import {
 	ModelsPage,
 	parseComparePair,
 	RequestsPage,
+	RulesPage,
 	StitchesPage,
 	type useModelsView,
 	WorldsPage,
@@ -226,6 +227,16 @@ export function declaredBoardContent(
 				username={username as string}
 				graphSlug={graphSlug as string}
 				backend={backend}
+			/>
+		);
+	}
+
+	if (board.kind === "rules") {
+		return (
+			<RulesPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				onOpenRuleBoard={(id) => openBoard({ kind: "rule", subjectId: id })}
 			/>
 		);
 	}

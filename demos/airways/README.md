@@ -138,6 +138,9 @@ inv stitches resolve --graph $GRAPH
 # 9 · the bounds — the guardrails, then four worlds checked against them
 inv govern apply --graph $GRAPH --file $DATA/govern.json
 inv govern list  --graph $GRAPH
+
+# 10 · the install's rules — in force in every Graph (once: apply creates, it does not merge)
+inv rules apply --file $DATA/rules.json --user admin
 ```
 
 Expected at the end: **13 stitches active**, and several thousand new edges in a database
@@ -665,6 +668,7 @@ selectable* has somewhere to bite. [deals/README](deals/README.md) has the table
 | `model.json` | `invana records import` | Identity keys, so a re-import merges rather than duplicates |
 | `graph-model.json` | `invana models import --file` | The domain model, in `invana.model/1` — including its `axes`, which is what a world may narrow it along |
 | `govern.json` *(bundle root)* | `invana govern apply` | The guardrails this Graph runs inside, and the worlds that narrow within them |
+| `rules.json` *(bundle root)* | `invana rules apply --user admin` | The install's rules — a licence warning on every share and bind, and reviewed evidence on every decision |
 | `nodes/<Type>.json` · `edges/<EDGE>.json` | `invana records import` | The records |
 | `build.py` *(where a dataset is generated)* | a person, by hand | Rebuilds the records deterministically. The output is committed beside it, so a diff is a change of shape |
 | `stitches/<EDGE_TYPE>.json` | `invana stitches commit` · `invana records import` | Edge records whose endpoints are their own fact (W3) — loaded for a declared, active stitch of that edge type |

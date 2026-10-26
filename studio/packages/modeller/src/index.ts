@@ -36,5 +36,5 @@ export { StitchesPage } from "./models/stitch/StitchesPage";
 export { useModellerCrumb } from "./models/stitch/useModellerCrumb";
 export { modeller } from "./product";
 export { RequestsPage } from "./requests/RequestsPage";
-export { RulesViewPanel } from "./rules/RulesViewPanel";
+export { RulesPage } from "./rules/RulesPage";
 export { SettingsViewPanel } from "./settings/SettingsViewPanel";
