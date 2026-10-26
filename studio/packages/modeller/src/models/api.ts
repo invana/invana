@@ -1,6 +1,7 @@
 import { request } from "@invana-studio/core";
 import type {
 	CommitResult,
+	ConstraintCheck,
 	ConstraintCreate,
 	ConstraintResponse,
 	DatasetBindingRef,
@@ -28,6 +29,7 @@ import type {
 	OntologyImportResult,
 	PhysicalSchema,
 	ProjectionPlan,
+	PropertyConstraintSet,
 	PropertyKeyCreate,
 	PropertyKeyResponse,
 	PropertyKeyUpdate,
@@ -39,9 +41,11 @@ import type {
 	SchemaDiff,
 	ShapeCard,
 	StagedSet,
+	StandardChoice,
 	StarterSummary,
 	StitchDetail,
 	StitchPreview,
+	ValidationRuleResponse,
 	VersionCreate,
 	VersionSummary,
 } from "./types";
@@ -221,6 +225,40 @@ export const modelsApi = {
 		vid: string,
 		constraintId: string,
 	) => del(`${ver(u, g, id, vid)}/constraints/${constraintId}`),
+
+	// ── Constraints on properties (property-constraints.md) ─────────────────
+	setPropertyConstraint: (
+		u: string,
+		g: string,
+		id: string,
+		vid: string,
+		data: PropertyConstraintSet,
+	) =>
+		request(`${ver(u, g, id, vid)}/property-constraints`, {
+			method: "PUT",
+			body: JSON.stringify(data),
+		}) as Promise<ValidationRuleResponse>,
+	deletePropertyConstraint: (
+		u: string,
+		g: string,
+		id: string,
+		vid: string,
+		ruleId: string,
+	) => del(`${ver(u, g, id, vid)}/property-constraints/${ruleId}`),
+	/** What breaks the unsaved constraint in the graph now; writes nothing. */
+	checkPropertyConstraint: (
+		u: string,
+		g: string,
+		id: string,
+		vid: string,
+		data: PropertyConstraintSet,
+	) =>
+		post(
+			`${ver(u, g, id, vid)}/property-constraints/check`,
+			data,
+		) as Promise<ConstraintCheck>,
+	constraintStandards: (u: string, g: string) =>
+		request<StandardChoice[]>(`${base(u, g)}/property-constraints/standards`),
 
 	createIndex: (
 		u: string,

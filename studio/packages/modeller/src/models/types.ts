@@ -169,8 +169,53 @@ interface ValidationRuleCreate {
 		| "enum"
 		| "min_length"
 		| "max_length"
-		| "custom";
+		| "custom"
+		| "standard";
 	params?: Record<string, unknown>;
+	/** A range's unit — a label, never converted. */
+	unit?: string | null;
+	standard_version_id?: string | null;
+	/** `publisher/name@v` the values were copied from. */
+	standard_ref?: string | null;
+	term?: string | null;
+	on_break?: "reject" | "flag";
+}
+
+// ── Constraints on properties (property-constraints.md) ────────────────────
+
+/** One property's constraint on one type — a range or a standard's values. */
+export interface PropertyConstraintSet {
+	type: string;
+	property: string;
+	kind: "range" | "standard";
+	min?: number | null;
+	max?: number | null;
+	unit?: string | null;
+	/** `publisher/name`; its current version is pinned. */
+	standard?: string | null;
+	term?: string | null;
+	on_break: "reject" | "flag";
+}
+
+/** What breaks a constraint in the graph now — counted by the engine. */
+export interface ConstraintCheck {
+	/** The constraint as a refusal names it. */
+	label: string;
+	counted: boolean;
+	breaking: number | null;
+	samples: { record: string; value: unknown }[];
+	/** Why it was not counted. */
+	reason: string | null;
+}
+
+/** A standard's term with values a constraint may reference. */
+export interface StandardChoice {
+	standard: string;
+	title: string;
+	version: number;
+	term: string;
+	/** How many values the term lists. */
+	values: number;
 }
 
 export interface TypePropertyMappingCreate {
@@ -884,15 +929,9 @@ export interface ShapeCard {
 
 // ── Validation Rules ───────────────────────────────────────────────────────
 
-interface ValidationRuleResponse {
+export interface ValidationRuleResponse
+	extends Required<Omit<ValidationRuleCreate, "params">> {
 	id: string;
-	rule_type:
-		| "range"
-		| "pattern"
-		| "enum"
-		| "min_length"
-		| "max_length"
-		| "custom";
 	params: Record<string, unknown>;
 }
 

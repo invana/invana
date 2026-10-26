@@ -16,6 +16,7 @@ import type {
 	NodeTypeCreate,
 	NodeTypeUpdate,
 	OntologyImportRequest,
+	PropertyConstraintSet,
 	PropertyKeyCreate,
 } from "./types";
 
@@ -320,6 +321,59 @@ export const useDeleteConstraintMutation = (u: string, g: string) =>
 		}: TypeCtx & { constraintId: string }) =>
 			modelsApi.deleteConstraint(u, g, modelId, versionId, constraintId),
 	);
+
+// ── Constraints on properties (property-constraints.md) ────────────────────
+
+export const useSetPropertyConstraintMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, versionId, data }: TypeCtx & { data: PropertyConstraintSet }) =>
+			modelsApi.setPropertyConstraint(u, g, modelId, versionId, data),
+	);
+
+export const useDeletePropertyConstraintMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, versionId, ruleId }: TypeCtx & { ruleId: string }) =>
+			modelsApi.deletePropertyConstraint(u, g, modelId, versionId, ruleId),
+	);
+
+/** Standard terms with values a constraint may reference. */
+export function useConstraintStandardsQuery(
+	u: string,
+	g: string,
+	enabled: boolean,
+) {
+	return useQuery({
+		queryKey: [...root(u, g), "constraint-standards"] as const,
+		queryFn: () => modelsApi.constraintStandards(u, g),
+		enabled,
+	});
+}
+
+/** What breaks the unsaved constraint today — the engine counts; `null` asks nothing. */
+export function useConstraintCheckQuery(
+	u: string,
+	g: string,
+	ctx: TypeCtx,
+	body: PropertyConstraintSet | null,
+) {
+	return useQuery({
+		queryKey: [...root(u, g), "constraint-check", ctx.versionId, body] as const,
+		queryFn: () =>
+			modelsApi.checkPropertyConstraint(
+				u,
+				g,
+				ctx.modelId,
+				ctx.versionId,
+				body as PropertyConstraintSet,
+			),
+		enabled: body !== null,
+		retry: false,
+	});
+}
 
 /** A property's definition, deleted from the draft once no type maps it. */
 export const useDeletePropertyKeyMutation = (u: string, g: string) =>

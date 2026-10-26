@@ -45,10 +45,7 @@ export function mappingsAsCreate(
 		property_key: m.property_key.name,
 		default_value: m.default_value,
 		sort_order: m.sort_order,
-		validation_rules: m.validation_rules.map((r) => ({
-			rule_type: r.rule_type,
-			params: r.params,
-		})),
+		validation_rules: m.validation_rules.map(({ id: _id, ...rule }) => rule),
 	}));
 }
 
