@@ -195,6 +195,54 @@ class GraphManager:
     async def get_graph_connection(self, session: AsyncSession, *, graph_id: str) -> GraphConnection | None:
         return await self.connections_qs.for_graph(session, graph_id)
 
+    @staticmethod
+    def with_stored_password(existing: GraphConnection | None, auth: dict | None, encryption_key: str) -> dict:
+        """The credentials to use: ``auth`` as given, its blank password filled from the stored one.
+
+        Graph settings reads the user back but never the password, so an edit that
+        leaves the password blank means *keep it* — for a save and for a test alike.
+        """
+        from invana.apps.graphs.encryption import decrypt_credentials  # noqa: PLC0415
+
+        given = dict(auth or {})
+        if not given or given.get("password") or existing is None or existing.auth_encrypted is None:
+            return given
+        stored = decrypt_credentials(existing.auth_encrypted, encryption_key)
+        if stored.get("password"):
+            given["password"] = stored["password"]
+        return given
+
+    @staticmethod
+    def stored_username(connection: GraphConnection, encryption_key: str) -> str | None:
+        """The stored user of a connection — readable back; the password never is."""
+        from cryptography.fernet import InvalidToken  # noqa: PLC0415
+
+        from invana.apps.graphs.encryption import decrypt_credentials  # noqa: PLC0415
+
+        if connection.auth_encrypted is None:
+            return None
+        try:
+            return decrypt_credentials(connection.auth_encrypted, encryption_key).get("username") or None
+        except InvalidToken:
+            return None
+
+    async def test_graph_connection(
+        self,
+        session: AsyncSession,
+        *,
+        graph: Graph,
+        payload,  # GraphConnectionCreate
+        encryption_key: str,
+    ) -> dict:
+        """Test the given settings for this Graph, a blank password standing for the stored one."""
+        existing = await self.connections_qs.for_graph(session, graph.id)
+        return await test_connection_credentials(
+            uri=payload.uri,
+            connector_class=payload.connector_class,
+            auth=self.with_stored_password(existing, payload.auth, encryption_key),
+            database=payload.database,
+        )
+
     async def put_graph_connection(
         self,
         session: AsyncSession,
@@ -246,7 +294,9 @@ class GraphManager:
         existing.database = (payload.database or "").strip() or None
         existing.read_only = payload.read_only
         if payload.auth:
-            existing.auth_encrypted = encrypt_credentials(payload.auth, encryption_key)
+            existing.auth_encrypted = encrypt_credentials(
+                self.with_stored_password(existing, payload.auth, encryption_key), encryption_key
+            )
         # Manually-declared version — the fallback for backends we cannot
         # auto-detect (modules/graph-connectors/features/capabilities.md).
         # A successful auto-detect on the reconnect below overrides it.

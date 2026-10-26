@@ -185,7 +185,8 @@ class GraphConnectionRead(BaseModel):
     latency_ms: int | None
     created_at: datetime
     updated_at: datetime
-    # auth_encrypted is intentionally excluded — credentials are never returned
+    # The stored user, read back for the settings form; the password never is.
+    auth_username: str | None = None
 
     # Connector-reported capabilities, resolved server-side at response time
     # from the live connector. `capabilities` is the full set (cypher,

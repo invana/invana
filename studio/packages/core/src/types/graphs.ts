@@ -248,6 +248,8 @@ export interface GraphConnectionRead {
 	// Null means the connector's own default — never an invented name.
 	database: string | null;
 	read_only: boolean;
+	// The stored user, read back for the settings form; the password never is.
+	auth_username: string | null;
 	status: GraphConnectionStatus;
 	last_health_check_at: string | null;
 	latency_ms: number | null;

@@ -16,11 +16,15 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import select
 
+from invana.apps.graphs.encryption import decrypt_credentials
+from invana.apps.graphs.models import GraphConnection
 from invana.apps.llm_providers.models import LLMModel, LLMProvider, LLMProviderKind
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.settings import settings
 from invana.server.app import create_app
 from tests.graphs.conftest import TEST_CONNECTOR_CLASS
 
@@ -177,3 +181,45 @@ class TestGraphsAPI:
         assert data["status"] == "CONNECTING"
         assert "auth_encrypted" not in data
         mock_manager.register.assert_awaited_once()
+
+    async def test_a_blank_password_keeps_the_stored_one(self, client, owner, session_factory):
+        await _create_graph(client, "keep")
+        url = f"/api/v1/u/{owner.username}/keep/connection"
+        first = {
+            "uri": "bolt://a:7687",
+            "connector_class": TEST_CONNECTOR_CLASS,
+            "auth": {"username": "neo4j", "password": "secret"},
+        }
+        assert (await client.put(url, json=first)).status_code == 200
+        again = {**first, "uri": "bolt://b:7687", "auth": {"username": "reader", "password": ""}}
+        resp = await client.put(url, json=again)
+        assert resp.status_code == 200, resp.text
+        read = (await client.get(url)).json()
+        assert read["auth_username"] == "reader"
+        assert "password" not in str(read)
+        async with session_factory() as s:
+            stored = (
+                await s.execute(select(GraphConnection).where(GraphConnection.uri == "bolt://b:7687"))
+            ).scalar_one()
+            assert decrypt_credentials(stored.auth_encrypted, settings.encryption_key) == {
+                "username": "reader",
+                "password": "secret",
+            }
+
+    async def test_a_new_password_replaces_the_stored_one(self, client, owner, session_factory):
+        await _create_graph(client, "swap")
+        url = f"/api/v1/u/{owner.username}/swap/connection"
+        first = {
+            "uri": "bolt://c:7687",
+            "connector_class": TEST_CONNECTOR_CLASS,
+            "auth": {"username": "neo4j", "password": "old"},
+        }
+        assert (await client.put(url, json=first)).status_code == 200
+        assert (
+            await client.put(url, json={**first, "auth": {"username": "neo4j", "password": "new"}})
+        ).status_code == 200
+        async with session_factory() as s:
+            stored = (
+                await s.execute(select(GraphConnection).where(GraphConnection.uri == "bolt://c:7687"))
+            ).scalar_one()
+            assert decrypt_credentials(stored.auth_encrypted, settings.encryption_key)["password"] == "new"

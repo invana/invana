@@ -12063,6 +12063,17 @@
       },
       "GraphConnectionRead": {
         "properties": {
+          "auth_username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auth Username"
+          },
           "capabilities": {
             "items": {
               "type": "string"

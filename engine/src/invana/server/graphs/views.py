@@ -65,6 +65,7 @@ def _build_connection_read(connection: GraphConnection) -> GraphConnectionRead:
     connector class's profile and the connection's detected/declared version.
     """
     payload = GraphConnectionRead.model_validate(connection)
+    payload.auth_username = GraphManager.stored_username(connection, settings.encryption_key)
     resolved, profile = resolve_capabilities(connection)
     caps = resolved.capabilities
     payload.capabilities = sorted(cap.value for cap in caps)
@@ -323,11 +324,8 @@ async def test_connection(
     discard. Used by the studio's "Test Connection" button to gate the
     save action.
     """
-    result = await GraphManager().test_connection_credentials(
-        uri=payload.uri,
-        connector_class=payload.connector_class,
-        auth=payload.auth,
-        database=payload.database,
+    result = await GraphManager().test_graph_connection(
+        session, graph=graph, payload=payload, encryption_key=settings.encryption_key
     )
     await emit_event(
         session,
