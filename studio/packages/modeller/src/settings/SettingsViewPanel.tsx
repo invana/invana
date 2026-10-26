@@ -122,6 +122,7 @@ type SingleTabSection = Exclude<
 	| "llms"
 	| "performance"
 	| "concurrency"
+	| "workers"
 	| "iam-home"
 	| "iam-people"
 	| "iam-groups"
