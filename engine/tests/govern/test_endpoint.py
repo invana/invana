@@ -139,7 +139,7 @@ async def test_renaming_an_endpoint_a_guardrail_bounds_is_refused_and_the_rest_o
         Lens(
             graph_id=graph.id,
             kind=LensKind.guardrail.value,
-            scope="graph",
+            scope="agent:analyst",
             key="global",
             name="Global",
             rules=[{"match": "llm/anthropic-prod/**", "allow": False}],

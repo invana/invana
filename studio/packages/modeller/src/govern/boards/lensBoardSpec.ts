@@ -274,7 +274,7 @@ function castPanel(lens: Lens): PanelSpec {
 				{ key: "last", label: "last", mono: true },
 			],
 			rows: agents.map((a) => ({
-				agent: a.name,
+				agent: a.name ?? a.agent_id,
 				runs: count(a.runs),
 				last: since(a.last_at) ?? "—",
 			})),

@@ -19,26 +19,22 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from invana.apps.govern.catalogue import Catalogue
-from invana.apps.govern.managers import LensManager
-from invana.apps.govern.models import LensKind
-from invana.apps.govern.schemas import LensCreate, RuleIn
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.server.app import create_app
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
+from tests.govern.guardrails import graph_guardrail
 
 pytestmark = pytest.mark.asyncio
 
-lenses = LensManager()
 BASE = "/api/v1/u/owner/atlas/govern"
 
 
 @pytest_asyncio.fixture
 async def client(db_engine):
-    """The app on the suite's schema, with a Graph whose guardrail denies third parties.
+    """The app on the suite's schema, with a Graph whose guardrail keeps every value in the Graph.
 
     Committed rather than flushed: the routes open their own session, and a
     row that only exists inside an uncommitted transaction is a row they
@@ -60,21 +56,7 @@ async def client(db_engine):
         await s.flush()
         member = GraphMember(graph_id=graph.id, user_id=user.id, roles=["owner"])
         s.add(member)
-        await lenses.create(
-            s,
-            graph_id=graph.id,
-            payload=LensCreate(
-                name="Graph guardrails",
-                kind=LensKind.guardrail,
-                scope="graph",
-                rules=[RuleIn(match="third_party/**", allow=False)],
-            ),
-            actor_id=user.id,
-            # An empty catalogue is honest here: the guardrail denies a whole
-            # layer, and a deny is never checked against what exists.
-            catalogue=Catalogue(participants=()),
-            may_edit_guardrails=True,
-        )
+        s.add(graph_guardrail(graph.id))
         await s.commit()
         user_id, graph_id = user.id, graph.id
 
@@ -124,25 +106,6 @@ class TestAuthoringRoutes:
         body = resp.json()
         assert body == {"ok": True, "refusals": [], "warnings": []}
 
-    async def test_a_widening_draft_is_refused_and_the_refusal_reaches_the_wire(self, client):
-        """W3 · GV5 — and the refusal arrives as JSON, naming the guardrail's rule.
-
-        The manager suite already asserts the refusal is *produced*. What this
-        adds is that it survives serialization, which is the half that broke.
-        """
-        resp = await client.post(
-            f"{BASE}/lenses/validate",
-            json={"rules": [{"match": "third_party/api/clearbit.com/**", "allow": True}]},
-        )
-
-        assert resp.status_code == 200
-        body = resp.json()
-        assert body["ok"] is False
-        refusal = body["refusals"][0]
-        assert refusal["code"] == "widens_guardrail"
-        assert refusal["recourse"] == "third_party/**"
-        assert "Deny wins at any specificity" in refusal["message"]
-
     async def test_impact_names_what_a_guardrail_save_would_cost(self, client):
         """GR2 — read before the write, with a headline and one row per world."""
         resp = await client.post(
@@ -177,46 +140,28 @@ class TestWhatTheDrawerReads:
         assert resp.json()["may_edit_guardrails"] is True
 
     async def test_a_lens_reads_back_with_its_cast_resolved_and_checked(self, client):
-        """R4 — innermost wins, *then* the address is checked against the rules.
-
-        The world is saved while its `decide` model is permitted, and the
-        guardrail is tightened afterwards. That is the only way a stored world
-        can carry a denied cast — a save is refused on the spot (WO3) — and it
-        is exactly the case R4 exists to draw: the row comes back
-        `allowed: false` naming the rule, rather than looking fine until a run
-        refuses to open.
-        """
+        """Innermost wins, *then* the address is checked against the rules in force."""
         created = await client.post(
             f"{BASE}/lenses",
             json={"name": "Cast check", "cast": {"decide": "llm/anthropic-prod/claude-opus-5"}},
         )
         assert created.status_code == 201, created.text
-        world_id = created.json()["id"]
 
-        listed = await client.get(f"{BASE}/lenses", params={"kind": "guardrail"})
-        guardrail_id = listed.json()["items"][0]["id"]
-        tightened = await client.patch(
-            f"{BASE}/lenses/{guardrail_id}",
-            json={
-                "rules": [
-                    {"match": "third_party/**", "allow": False},
-                    {"match": "llm/anthropic-prod/**", "allow": False},
-                ]
-            },
-        )
-        assert tightened.status_code == 200, tightened.text
-        assert (tightened.json()["allow_rules"], tightened.json()["deny_rules"]) == (0, 2)
-
-        resp = await client.get(f"{BASE}/lenses/{world_id}")
+        resp = await client.get(f"{BASE}/lenses/{created.json()['id']}")
 
         assert resp.status_code == 200
         assert resp.json()["usage"]["people"] == 0, "nobody has run under it yet"
         rows = {row["role"]: row for row in resp.json()["cast_resolved"]}
         assert set(rows) == {"extract", "decide", "judge", "embed"}
-        decide = rows["decide"]
-        assert decide["address"] == "llm/anthropic-prod/claude-opus-5"
-        assert decide["allowed"] is False
-        assert decide["rule_matched"] == "llm/anthropic-prod/**"
-        assert "does not widen" in decide["refusal"]
-        # A role nobody casts is not a refusal until something asks for it.
-        assert rows["judge"]["address"] is None
+        assert rows["decide"]["address"] == "llm/anthropic-prod/claude-opus-5"
+        assert rows["decide"]["allowed"] is True
+
+    async def test_a_graph_guardrail_is_not_edited_as_a_lens(self, client):
+        """A Graph's guardrail is one property rule, written under Guardrails only."""
+        listed = await client.get(f"{BASE}/lenses", params={"kind": "guardrail"})
+        guardrail_id = listed.json()["items"][0]["id"]
+
+        resp = await client.patch(f"{BASE}/lenses/{guardrail_id}", json={"rules": []})
+
+        assert resp.status_code == 422
+        assert "one property rule" in resp.text

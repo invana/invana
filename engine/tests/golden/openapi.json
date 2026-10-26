@@ -2533,6 +2533,50 @@
         "title": "AgentUpdate",
         "type": "object"
       },
+      "AgentUsageRead": {
+        "description": "One agent whose runs asked under a world \u2014 the world board's cast.",
+        "properties": {
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "last_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last At"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "agent_id",
+          "name",
+          "runs",
+          "last_at"
+        ],
+        "title": "AgentUsageRead",
+        "type": "object"
+      },
       "AlertMatch": {
         "description": "What a ledger row must be to match. Patterns take ``*``; empty matches any.",
         "properties": {
@@ -3163,6 +3207,33 @@
         "title": "AnswerPrompt",
         "type": "object"
       },
+      "AnswersGoRead": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "may_send": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "May Send"
+          }
+        },
+        "required": [
+          "address"
+        ],
+        "title": "AnswersGoRead",
+        "type": "object"
+      },
       "AppliedDiffRead": {
         "description": "How two runs narrowed the same participant differently.\n\n``differs`` names the fields of ``run_touches.applied`` that are not equal,\nand ``a`` / ``b`` carry only those fields \u2014 a reader is shown the difference,\nnot two whole documents to find it in\n([WO18](docs/for-developers/modules/govern/features/worlds.md)).",
         "properties": {
@@ -3217,6 +3288,29 @@
           "label"
         ],
         "title": "AppliedFilter",
+        "type": "object"
+      },
+      "AppliesToRead": {
+        "properties": {
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "type",
+          "property"
+        ],
+        "title": "AppliesToRead",
         "type": "object"
       },
       "ApprovalDecide": {
@@ -4007,8 +4101,10 @@
               "skill_usage",
               "rule",
               "world",
-              "guardrail",
-              "models"
+              "models",
+              "worlds",
+              "guardrails",
+              "requests"
             ],
             "title": "Kind",
             "type": "string"
@@ -13269,6 +13365,406 @@
         "title": "GrowthWrites",
         "type": "object"
       },
+      "GuardedPropertyRead": {
+        "properties": {
+          "access": {
+            "title": "Access",
+            "type": "string"
+          },
+          "guardrail": {
+            "title": "Guardrail",
+            "type": "string"
+          },
+          "guardrail_id": {
+            "title": "Guardrail Id",
+            "type": "string"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "boolean"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          }
+        },
+        "required": [
+          "property",
+          "guardrail_id",
+          "guardrail",
+          "access",
+          "leaves"
+        ],
+        "title": "GuardedPropertyRead",
+        "type": "object"
+      },
+      "GuardrailAccess": {
+        "description": "What a run may do with a guarded property.",
+        "enum": [
+          "read",
+          "counts",
+          "never"
+        ],
+        "title": "GuardrailAccess",
+        "type": "string"
+      },
+      "GuardrailDetail": {
+        "properties": {
+          "access": {
+            "title": "Access",
+            "type": "string"
+          },
+          "allowed_in": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "title": "Allowed In",
+            "type": "array"
+          },
+          "applies_to": {
+            "items": {
+              "$ref": "#/components/schemas/AppliesToRead"
+            },
+            "title": "Applies To",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryRead"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "refusals": {
+            "items": {
+              "$ref": "#/components/schemas/GuardrailRefusalRead"
+            },
+            "title": "Refusals",
+            "type": "array"
+          },
+          "refusals_total": {
+            "default": 0,
+            "title": "Refusals Total",
+            "type": "integer"
+          },
+          "refused_7d": {
+            "default": 0,
+            "title": "Refused 7D",
+            "type": "integer"
+          },
+          "sentence": {
+            "default": "",
+            "title": "Sentence",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "types": {
+            "default": 0,
+            "title": "Types",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "key",
+          "target",
+          "access",
+          "leaves",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "GuardrailDetail",
+        "type": "object"
+      },
+      "GuardrailImpactRead": {
+        "description": "Who reads the target today and would not afterwards \u2014 counted before the write.",
+        "properties": {
+          "schedules": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "title": "Schedules",
+            "type": "array"
+          },
+          "sentence": {
+            "title": "Sentence",
+            "type": "string"
+          },
+          "worlds": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "title": "Worlds",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sentence"
+        ],
+        "title": "GuardrailImpactRead",
+        "type": "object"
+      },
+      "GuardrailIn": {
+        "description": "*When a run touches* ``target`` \u00b7 *it may* ``access`` \u00b7 *and the result* ``leaves``.",
+        "properties": {
+          "access": {
+            "$ref": "#/components/schemas/GuardrailAccess"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "boolean"
+          },
+          "target": {
+            "maxLength": 255,
+            "minLength": 3,
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target",
+          "access",
+          "leaves"
+        ],
+        "title": "GuardrailIn",
+        "type": "object"
+      },
+      "GuardrailPage": {
+        "description": "The Guardrails list, and whether whoever asked may edit it \u2014 in one read.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GuardrailRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "may_edit": {
+            "default": false,
+            "title": "May Edit",
+            "type": "boolean"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "GuardrailPage",
+        "type": "object"
+      },
+      "GuardrailRead": {
+        "properties": {
+          "access": {
+            "title": "Access",
+            "type": "string"
+          },
+          "allowed_in": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "title": "Allowed In",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "refused_7d": {
+            "default": 0,
+            "title": "Refused 7D",
+            "type": "integer"
+          },
+          "sentence": {
+            "default": "",
+            "title": "Sentence",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "types": {
+            "default": 0,
+            "title": "Types",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "key",
+          "target",
+          "access",
+          "leaves",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "GuardrailRead",
+        "type": "object"
+      },
+      "GuardrailRefusalRead": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "where": {
+            "title": "Where",
+            "type": "string"
+          },
+          "who": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Who"
+          }
+        },
+        "required": [
+          "request_id",
+          "who",
+          "where",
+          "at"
+        ],
+        "title": "GuardrailRefusalRead",
+        "type": "object"
+      },
+      "GuardrailTargetRead": {
+        "description": "One ``Type.property`` the picker offers, and the published model it comes from.",
+        "properties": {
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target",
+          "model",
+          "type",
+          "property"
+        ],
+        "title": "GuardrailTargetRead",
+        "type": "object"
+      },
+      "GuardrailUpdate": {
+        "description": "Every field optional; the target is the guardrail's identity and does not move.",
+        "properties": {
+          "access": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GuardrailAccess"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "allowed_in": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allowed In"
+          },
+          "leaves": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Leaves"
+          }
+        },
+        "title": "GuardrailUpdate",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -13432,6 +13928,42 @@
           "how"
         ],
         "title": "HeldPolicy",
+        "type": "object"
+      },
+      "HistoryRead": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "actor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          }
+        },
+        "required": [
+          "action",
+          "actor",
+          "at"
+        ],
+        "title": "HistoryRead",
         "type": "object"
       },
       "HolderPage": {
@@ -16095,19 +16627,6 @@
         "title": "LensListResponse",
         "type": "object"
       },
-      "LensPromote": {
-        "description": "One field, and no re-authoring ([GV3]).",
-        "properties": {
-          "scope": {
-            "default": "graph",
-            "maxLength": 64,
-            "title": "Scope",
-            "type": "string"
-          }
-        },
-        "title": "LensPromote",
-        "type": "object"
-      },
       "LensRead": {
         "properties": {
           "allow_rules": {
@@ -16365,6 +16884,13 @@
             "title": "Actor Ids",
             "type": "array"
           },
+          "by_agent": {
+            "items": {
+              "$ref": "#/components/schemas/AgentUsageRead"
+            },
+            "title": "By Agent",
+            "type": "array"
+          },
           "last_used_at": {
             "anyOf": [
               {
@@ -16386,9 +16912,189 @@
             "default": 0,
             "title": "Runs",
             "type": "integer"
+          },
+          "runs_30d": {
+            "default": 0,
+            "title": "Runs 30D",
+            "type": "integer"
           }
         },
         "title": "LensUsageRead",
+        "type": "object"
+      },
+      "LensView": {
+        "description": "What a world \u2014 or the guardrails alone \u2014 let a run see, resolved by the engine.",
+        "properties": {
+          "answers_go": {
+            "items": {
+              "$ref": "#/components/schemas/AnswersGoRead"
+            },
+            "title": "Answers Go",
+            "type": "array"
+          },
+          "guarded": {
+            "default": 0,
+            "title": "Guarded",
+            "type": "integer"
+          },
+          "hidden_types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Hidden Types",
+            "type": "array"
+          },
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/LensViewModel"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "thinks_with": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Thinks With",
+            "type": "object"
+          },
+          "types": {
+            "items": {
+              "$ref": "#/components/schemas/LensViewType"
+            },
+            "title": "Types",
+            "type": "array"
+          },
+          "used_by": {
+            "items": {
+              "$ref": "#/components/schemas/UsedByRead"
+            },
+            "title": "Used By",
+            "type": "array"
+          },
+          "window": {
+            "$ref": "#/components/schemas/LensViewWindow"
+          },
+          "world": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Ref"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "LensView",
+        "type": "object"
+      },
+      "LensViewModel": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "seen": {
+            "title": "Seen",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "seen"
+        ],
+        "title": "LensViewModel",
+        "type": "object"
+      },
+      "LensViewType": {
+        "properties": {
+          "excluded": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Excluded",
+            "type": "array"
+          },
+          "guarded": {
+            "items": {
+              "$ref": "#/components/schemas/GuardedPropertyRead"
+            },
+            "title": "Guarded",
+            "type": "array"
+          },
+          "hidden": {
+            "title": "Hidden",
+            "type": "boolean"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "sliced": {
+            "title": "Sliced",
+            "type": "boolean"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "type",
+          "hidden",
+          "sliced"
+        ],
+        "title": "LensViewType",
+        "type": "object"
+      },
+      "LensViewWindow": {
+        "description": "The world's slice as a person reads it \u2014 ``2026-01-01 \u2192 2026-06-30`` \u00b7 ``in EU, UK``.",
+        "properties": {
+          "geo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geo"
+          },
+          "time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time"
+          }
+        },
+        "title": "LensViewWindow",
         "type": "object"
       },
       "LifecycleAct": {
@@ -24489,6 +25195,31 @@
         "title": "RecordsSummary",
         "type": "object"
       },
+      "Ref": {
+        "description": "A record by id and the name it reads as.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "Ref",
+        "type": "object"
+      },
       "RefreshRequest": {
         "properties": {
           "refresh_token": {
@@ -24913,6 +25644,375 @@
           "published_at"
         ],
         "title": "ReportVersionSummary",
+        "type": "object"
+      },
+      "RequestCreate": {
+        "description": "An explicit *Ask for a change* \u2014 by the caller, from Explorer or the API.",
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "source": {
+            "default": "explorer",
+            "enum": [
+              "explorer",
+              "api"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "RequestCreate",
+        "type": "object"
+      },
+      "RequestPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RequestRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "may_resolve": {
+            "default": false,
+            "title": "May Resolve",
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "open": {
+            "default": 0,
+            "title": "Open",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "RequestPage",
+        "type": "object"
+      },
+      "RequestRead": {
+        "properties": {
+          "agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "asked_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asked By"
+          },
+          "asked_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asked By Id"
+          },
+          "asks": {
+            "title": "Asks",
+            "type": "integer"
+          },
+          "blocked_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocked By"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "guardrail_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Guardrail Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_asked_at": {
+            "format": "date-time",
+            "title": "Last Asked At",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Ref"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution"
+          },
+          "resolution_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Note"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "resolved_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved By"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "world": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Ref"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "detail",
+          "source",
+          "asked_by_id",
+          "agent_id",
+          "run_id",
+          "session_id",
+          "guardrail_id",
+          "blocked_by",
+          "asks",
+          "last_asked_at",
+          "status",
+          "resolution",
+          "resolution_note",
+          "resolved_at",
+          "created_at"
+        ],
+        "title": "RequestRead",
+        "type": "object"
+      },
+      "RequestResolve": {
+        "properties": {
+          "action": {
+            "enum": [
+              "decline",
+              "allow",
+              "model"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "model_id": {
+            "anyOf": [
+              {
+                "maxLength": 36,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "world_id": {
+            "anyOf": [
+              {
+                "maxLength": 36,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "World Id"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "title": "RequestResolve",
         "type": "object"
       },
       "RerunResponse": {
@@ -36118,6 +37218,41 @@
         "title": "UsageRow",
         "type": "object"
       },
+      "UsedByRead": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "name",
+          "runs"
+        ],
+        "title": "UsedByRead",
+        "type": "object"
+      },
       "UserOut": {
         "description": "Returned by /auth/login, /auth/register, /auth/refresh, /auth/me.",
         "properties": {
@@ -44366,8 +45501,10 @@
                     "skill_usage",
                     "rule",
                     "world",
-                    "guardrail",
-                    "models"
+                    "models",
+                    "worlds",
+                    "guardrails",
+                    "requests"
                   ],
                   "type": "string"
                 },
@@ -44973,8 +46110,10 @@
                 "skill_usage",
                 "rule",
                 "world",
-                "guardrail",
-                "models"
+                "models",
+                "worlds",
+                "guardrails",
+                "requests"
               ],
               "title": "Kind",
               "type": "string"
@@ -45090,8 +46229,10 @@
                 "skill_usage",
                 "rule",
                 "world",
-                "guardrail",
-                "models"
+                "models",
+                "worlds",
+                "guardrails",
+                "requests"
               ],
               "title": "Kind",
               "type": "string"
@@ -45196,8 +46337,10 @@
                 "skill_usage",
                 "rule",
                 "world",
-                "guardrail",
-                "models"
+                "models",
+                "worlds",
+                "guardrails",
+                "requests"
               ],
               "title": "Kind",
               "type": "string"
@@ -49298,6 +50441,476 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/govern/guardrails": {
+      "get": {
+        "description": "The Graph's guardrails, and whether the reader may edit them, in one read.",
+        "operationId": "list_guardrails_api_v1_u__username___graphSlug__govern_guardrails_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardrailPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Guardrails",
+        "tags": [
+          "govern"
+        ]
+      },
+      "post": {
+        "operationId": "create_guardrail_api_v1_u__username___graphSlug__govern_guardrails_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuardrailIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardrailDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Guardrail",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/guardrails/impact": {
+      "post": {
+        "description": "What saving this rule would change, counted before the write.",
+        "operationId": "guardrail_rule_impact_api_v1_u__username___graphSlug__govern_guardrails_impact_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuardrailIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardrailImpactRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Guardrail Rule Impact",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/guardrails/targets": {
+      "get": {
+        "operationId": "guardrail_targets_api_v1_u__username___graphSlug__govern_guardrails_targets_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GuardrailTargetRead"
+                  },
+                  "title": "Response Guardrail Targets Api V1 U  Username   Graphslug  Govern Guardrails Targets Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Guardrail Targets",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/guardrails/{guardrail_id}": {
+      "delete": {
+        "operationId": "delete_guardrail_api_v1_u__username___graphSlug__govern_guardrails__guardrail_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guardrail_id",
+            "required": true,
+            "schema": {
+              "title": "Guardrail Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Guardrail",
+        "tags": [
+          "govern"
+        ]
+      },
+      "get": {
+        "operationId": "get_guardrail_api_v1_u__username___graphSlug__govern_guardrails__guardrail_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guardrail_id",
+            "required": true,
+            "schema": {
+              "title": "Guardrail Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardrailDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Guardrail",
+        "tags": [
+          "govern"
+        ]
+      },
+      "patch": {
+        "operationId": "update_guardrail_api_v1_u__username___graphSlug__govern_guardrails__guardrail_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guardrail_id",
+            "required": true,
+            "schema": {
+              "title": "Guardrail Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuardrailUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardrailDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Guardrail",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/govern/lenses": {
       "get": {
         "description": "The Worlds drawer, or the Guardrails one.\n\nA guardrail **never appears under ``kind=world``**\n([GR1](docs/for-developers/modules/govern/features/guardrails.md)) \u2014 that is\nwhat the filter is for, and why it is not one list with a badge.",
@@ -49872,9 +51485,10 @@
         ]
       }
     },
-    "/api/v1/u/{username}/{graphSlug}/govern/lenses/{lens_id}/promote": {
-      "post": {
-        "operationId": "promote_lens_api_v1_u__username___graphSlug__govern_lenses__lens_id__promote_post",
+    "/api/v1/u/{username}/{graphSlug}/govern/lenses/{lens_id}/usage": {
+      "get": {
+        "description": "Who asked under a lens, and how often \u2014 the world board's tiles and cast.",
+        "operationId": "lens_usage_api_v1_u__username___graphSlug__govern_lenses__lens_id__usage_get",
         "parameters": [
           {
             "in": "path",
@@ -49908,22 +51522,12 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LensPromote"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LensRead"
+                  "$ref": "#/components/schemas/LensUsageRead"
                 }
               }
             },
@@ -49945,7 +51549,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Promote Lens",
+        "summary": "Lens Usage",
         "tags": [
           "govern"
         ]
@@ -50110,6 +51714,84 @@
           }
         ],
         "summary": "List Touches",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/view": {
+      "get": {
+        "description": "A world read on the model \u2014 or, without ``world``, the guardrails alone.",
+        "operationId": "lens_view_api_v1_u__username___graphSlug__govern_view_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "world",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 36,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "World"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LensView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Lens View",
         "tags": [
           "govern"
         ]
@@ -61801,6 +63483,284 @@
         "summary": "Project Summary",
         "tags": [
           "projects"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/requests": {
+      "get": {
+        "description": "The inbox, newest ask first, with the Graph's open count whatever the filter.",
+        "operationId": "list_requests_api_v1_u__username___graphSlug__requests_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Requests",
+        "tags": [
+          "govern"
+        ]
+      },
+      "post": {
+        "description": "*Ask for a change* \u2014 a ``change`` request by the caller, merged into the open one it repeats.",
+        "operationId": "create_request_api_v1_u__username___graphSlug__requests_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Request",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/requests/{request_id}": {
+      "get": {
+        "operationId": "get_request_api_v1_u__username___graphSlug__requests__request_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Request",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/requests/{request_id}/resolve": {
+      "post": {
+        "operationId": "resolve_request_api_v1_u__username___graphSlug__requests__request_id__resolve_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestResolve"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Resolve Request",
+        "tags": [
+          "govern"
         ]
       }
     },

@@ -29,8 +29,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from invana.apps.agents.envelope import Envelope
 from invana.apps.agents.models import Agent, layered_instructions
+from invana.apps.govern.guardrail import parse_target
 from invana.apps.govern.managers.request import RequestManager, asker_of
-from invana.apps.govern.models import RequestKind
+from invana.apps.govern.models import Request, RequestKind
+from invana.apps.govern.querysets import LensQuerySet
 from invana.apps.graphs.models import Graph
 from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.llm.pricing import cost_usd
@@ -115,6 +117,10 @@ _IMPORT_PLAN_KEYS = frozenset({LOAD_PLAN_KEY, BULK_PLAN_KEY})
 log = logging.getLogger(__name__)
 
 _requests = RequestManager()
+_lenses = LensQuerySet()
+
+#: The refusals a Graph guardrail makes — the property is kept out, or counted only.
+_GUARDED = frozenset({"lens_property_excluded", "lens_property_counts_only"})
 
 #: How long a ``send`` step's approval waits for its approver.
 SEND_APPROVAL_DEADLINE_S = 86400
@@ -1000,18 +1006,20 @@ class TaskRuntime:
                     # A legitimate outcome: the run **succeeds**, and the
                     # remaining planned rows are dropped rather than left
                     # queued forever (promise #4).
+                    reason, guardrail = self._refused_by(v, cannot)
                     row.status = RunStatus.succeeded.value
                     row.finished_at = _now()
                     row.detail = "cannot answer · outside this graph"
-                    row.output = {"cannot_answer": cannot.reason, **cannot.exchange}
+                    row.output = {"cannot_answer": reason, **cannot.exchange}
                     self._record(row, ctx, v)
                     await self._ledger_step(db, th, row, v)
                     await self._drop_pending(db, th, message_id)
-                    if "request_id" not in cannot.exchange:
-                        await self._file_unanswered(db, th, v, cannot.reason)
+                    filed = await self._file_request(db, th, v, reason, guardrail_id=guardrail)
+                    if filed is not None:
+                        row.output = {**row.output, "request_id": filed.id}
                     await db.commit()
                     await self._step_finished(db, emitter, th, row)
-                    await self._finish_cannot_answer(db, emitter, th, v, assistant, cannot.reason)
+                    await self._finish_cannot_answer(db, emitter, th, v, assistant, reason)
                     return "cannot_answer"
                 except Converse as conv:
                     # Small talk: the reply is the message, the run succeeds
@@ -1459,25 +1467,52 @@ class TaskRuntime:
         v.summary = reason
         await self._settle(db, emitter, th, v, m, RunStatus.succeeded, outcome="cannot_answer")
 
-    async def _file_unanswered(self, db: AsyncSession, th: TaskRun, v: RunVars, reason: str) -> None:
-        """File (or add to) an ``unanswered`` request for an ask that ended *cannot answer*.
+    @staticmethod
+    def _refused_by(v: RunVars, cannot: CannotAnswer) -> tuple[str, str | None]:
+        """The reason to show, and the Graph guardrail behind a lens refusal if one holds the property.
 
-        Only for a run a person or an agent asked — an eval or a test replay is
-        nobody's ask. A refusal that already filed a guardrail request is not
-        filed twice. Filing never fails the run.
+        A property kept out or counted only is refused by the connector; the
+        frozen lens names which Graph guardrail's target covers it, so the
+        answer says *kept out by the guardrail "…"* and its request names that
+        guardrail as the blocker.
+        """
+        refusal = cannot.refusal or {}
+        prop = refusal.get("property_name")
+        if refusal.get("code") not in _GUARDED or not prop or v.governor is None:
+            return cannot.reason, None
+        type_name = refusal.get("type_name") or ""
+        for contributor in v.governor.effective.contributors:
+            if contributor.get("scope") != "graph" or not contributor.get("target"):
+                continue
+            if parse_target(contributor["target"]).covers(type_name, prop):
+                needs = f"{type_name}.{prop}" if type_name else prop
+                name = contributor.get("name")
+                return f'Cannot answer — this needs {needs}, kept out by the guardrail "{name}".', contributor["id"]
+        return cannot.reason, None
+
+    async def _file_request(
+        self, db: AsyncSession, th: TaskRun, v: RunVars, reason: str, *, guardrail_id: str | None
+    ) -> Request | None:
+        """File (or add to) the request an ask that ended *cannot answer* leaves behind.
+
+        A guardrail's refusal files a ``guardrail`` request naming it; any other
+        *cannot answer* files an ``unanswered`` one. Only for a run a person or
+        an agent asked — an eval or a test replay is nobody's ask. Filing never
+        fails the run.
         """
         if th.role == RunRole.evaluate.value or not (v.prompt or th.body):
-            return
+            return None
+        guardrail = await _lenses.get(db, guardrail_id) if guardrail_id else None
         asker = asker_of(
             triggered_by=th.triggered_by,
             author_id=th.author_id if th.author_kind == "user" else None,
             agent_id=th.agent_id,
             in_session=v.sess is not None,
         )
-        await _requests.file_quietly(
+        return await _requests.file_quietly(
             db,
             graph_id=th.graph_id,
-            kind=RequestKind.unanswered,
+            kind=RequestKind.guardrail if guardrail is not None else RequestKind.unanswered,
             title=v.prompt or th.body or "",
             detail=reason,
             source=asker.source,
@@ -1485,6 +1520,7 @@ class TaskRuntime:
             agent_id=asker.agent_id,
             run_id=th.id,
             session_id=v.sess.id if v.sess else None,
+            guardrail=guardrail,
         )
 
     async def _finish_conversed(

@@ -785,6 +785,10 @@ CREATE TABLE lenses (
 	key VARCHAR(128), 
 	name VARCHAR(255), 
 	scope VARCHAR(64), 
+	target VARCHAR(255), 
+	access VARCHAR(8), 
+	leaves BOOLEAN, 
+	allowed_in JSON NOT NULL, 
 	rules JSON NOT NULL, 
 	"cast" JSON NOT NULL, 
 	closed_layers JSON NOT NULL, 
@@ -797,6 +801,7 @@ CREATE TABLE lenses (
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_lens_graph_key UNIQUE (graph_id, key), 
 	CONSTRAINT ck_lens_kind_shape CHECK ((kind = 'guardrail' AND scope IS NOT NULL AND key IS NOT NULL) OR (kind = 'world' AND scope IS NULL)), 
+	CONSTRAINT ck_lens_graph_guardrail_rule CHECK (kind <> 'guardrail' OR scope <> 'graph' OR (target IS NOT NULL AND access IS NOT NULL AND leaves IS NOT NULL)), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL
 );
@@ -1405,6 +1410,45 @@ CREATE TABLE refresh_tokens (
 CREATE UNIQUE INDEX ix_refresh_tokens_token_hash ON refresh_tokens (token_hash);
 
 CREATE INDEX ix_refresh_tokens_user_id ON refresh_tokens (user_id);
+
+CREATE TABLE requests (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	title VARCHAR(512) NOT NULL, 
+	detail TEXT, 
+	source VARCHAR(16) NOT NULL, 
+	asked_by_id VARCHAR(36), 
+	agent_id VARCHAR(36), 
+	run_id VARCHAR(36), 
+	session_id VARCHAR(36), 
+	guardrail_id VARCHAR(36), 
+	blocked_by VARCHAR(255), 
+	asks INTEGER NOT NULL, 
+	last_asked_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	status VARCHAR(8) NOT NULL, 
+	resolution VARCHAR(16), 
+	resolution_note VARCHAR(512), 
+	world_id VARCHAR(36), 
+	model_id VARCHAR(36), 
+	resolved_by_id VARCHAR(36), 
+	resolved_at TIMESTAMP WITH TIME ZONE, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(asked_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(guardrail_id) REFERENCES lenses (id) ON DELETE SET NULL, 
+	FOREIGN KEY(world_id) REFERENCES lenses (id) ON DELETE SET NULL, 
+	FOREIGN KEY(model_id) REFERENCES graph_models (id) ON DELETE SET NULL, 
+	FOREIGN KEY(resolved_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_requests_graph_id ON requests (graph_id);
+
+CREATE INDEX ix_requests_graph_status ON requests (graph_id, status);
+
+CREATE INDEX ix_requests_guardrail ON requests (guardrail_id);
 
 CREATE TABLE rule_versions (
 	id VARCHAR(36) NOT NULL, 

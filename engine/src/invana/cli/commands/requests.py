@@ -20,8 +20,7 @@ import json
 import click
 
 from invana.apps.govern.managers import LensManager, RequestManager
-from invana.apps.govern.models import LensKind
-from invana.apps.govern.schemas import REQUEST_LIST, RequestResolve
+from invana.apps.govern.schemas import REQUEST_LIST, LensKind, RequestResolve
 from invana.cli.context import graph_options, on_graph
 from invana.core.lists.params import parse_list_params
 

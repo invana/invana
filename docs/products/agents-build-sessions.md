@@ -211,7 +211,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | M02 | Models | engine+studio | M01 | `feat/modeller-redesign` | done | 2026-10-26 | gates green · design review passed |
 | M03 | Model dashboards | engine+studio | M02 | `feat/modeller-redesign` | done | 2026-10-26 | gates green · design review passed |
 | M04 | Constraints | engine+studio | M03 | `feat/modeller-redesign` | done | 2026-10-26 | gates green · design review passed |
-| M05 | Govern | engine+studio | M04 | `feat/modeller-redesign` | partial | 2026-10-26 | session 2 at the 300k budget · engine code done (tests and gates left) · Studio steps 3–4 built and green; resume at the engine tests, then step 5 |
+| M05 | Govern | engine+studio | M04 | `feat/modeller-redesign` | in progress | 2026-10-26 | session 2 at the 300k budget · engine code done (tests and gates left) · Studio steps 3–4 built and green; resume at the engine tests, then step 5 |
 | M06 | Rules by scope | engine+studio | M05 | `feat/modeller-redesign` | pending | | |
 | M07 | Graph settings | engine+studio | M06 | `feat/modeller-redesign` | pending | | |
 

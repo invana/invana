@@ -139,7 +139,7 @@ export interface LensView {
 /** An agent whose runs asked under a world — the world board's cast. */
 export interface WorldCastRow {
 	agent_id: string;
-	name: string;
+	name: string | null;
 	runs: number;
 	last_at: string | null;
 }
