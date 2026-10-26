@@ -203,8 +203,31 @@ async def list_removed_links(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> list[RemovedStitch]:
-    """Removed stitches, newest first, read from their removal events."""
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED)
+    """Removed stitches, newest first, read from their removal events.
+
+    An event written before the rule was recorded in it names no pair and is left out.
+    """
+    out: list[RemovedStitch] = []
+    for details, at, by in await link_service.removal_events(session, graph.id):
+        if not details.get("source_type") or not details.get("target_type"):
+            continue
+        out.append(
+            RemovedStitch(
+                id=details["id"],
+                kind=details.get("kind") or "",
+                source_model=details.get("source_model"),
+                source_type=details["source_type"],
+                target_model=details.get("target_model"),
+                target_type=details["target_type"],
+                source_property=details.get("source_property"),
+                target_property=details.get("target_property"),
+                edge_type=details.get("edge_type"),
+                edges_withdrawn=int(details.get("edges_withdrawn") or 0),
+                removed_by=by,
+                removed_at=at,
+            )
+        )
+    return out
 
 
 @model_links_router.get("/model-links/{link_id}", response_model=StitchDetail)
@@ -215,7 +238,19 @@ async def get_model_link(
     session: AsyncSession = Depends(get_session),
 ) -> StitchDetail:
     """One stitch read whole — the inspector's read."""
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED)
+    link = await link_service.get_link(session, graph.id, link_id)
+    if link is None:
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "link_not_found", "link_id": link_id})
+    facts = await link_service.stitch_facts(session, graph.id, link)
+    base = await _decorate(session, link)
+    return StitchDetail(
+        **base.model_dump(),
+        declared_by=facts.declared_by,
+        declared_at=facts.declared_at,
+        source_records=facts.source_records,
+        target_records=facts.target_records,
+        history=[StitchEvent(action=a, at=at, actor=who) for a, at, who in facts.history],
+    )
 
 
 @model_links_router.post(
@@ -408,6 +443,8 @@ async def remove_model_link(
     link = await link_service.get_link(session, graph.id, link_id)
     if link is None:
         raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "link_not_found", "link_id": link_id})
+    # Read the rule before the row goes — the removal event is all that remembers it.
+    rule = await _decorate(session, link)
 
     withdrawn = 0
     run_id: str | None = None
@@ -445,7 +482,18 @@ async def remove_model_link(
         target_id=link_id,
         graph_id=graph.id,
         actor_id=user.id,
-        details={"edges_withdrawn": withdrawn, "run_id": run_id},
+        details={
+            "edges_withdrawn": withdrawn,
+            "run_id": run_id,
+            "kind": rule.kind,
+            "source_model": rule.source_model,
+            "source_type": rule.source_type,
+            "target_model": rule.target_model,
+            "target_type": rule.target_type,
+            "source_property": rule.source_property,
+            "target_property": rule.target_property,
+            "edge_type": rule.edge_type,
+        },
     )
     await session.commit()
     tail = f" {withdrawn:,} edge(s) it wrote went with it." if withdrawn else ""

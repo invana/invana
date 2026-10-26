@@ -40,7 +40,7 @@ from invana.apps.modeller.links import list_links
 from invana.apps.modeller.solve import solvable, solve_links
 from invana.apps.modeller.validator import SchemaValidator
 from invana.core.settings import settings
-from invana.plugins.core.ingest.stitching import load_stitch_rows
+from invana.plugins.core.ingest.stitching import load_stitch_rows, recount_edges
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -398,6 +398,7 @@ async def _solve_active_stitches(
                 if on_written:
                     on_written(link, loaded.written)
             report.extend(loaded.report)
+        await recount_edges(connector, [*joined, *supplied])
     finally:
         await connector.disconnect()
     return written

@@ -891,6 +891,7 @@ CREATE TABLE model_links (
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	status model_link_status_enum DEFAULT 'active'::model_link_status_enum NOT NULL, 
 	target_property VARCHAR(255), 
+	edges INTEGER, 
 	CONSTRAINT model_links_pkey PRIMARY KEY (id), 
 	CONSTRAINT model_links_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	CONSTRAINT model_links_source_version_id_fkey FOREIGN KEY(source_version_id) REFERENCES graph_versions (id) ON DELETE CASCADE, 

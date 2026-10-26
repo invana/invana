@@ -19,11 +19,15 @@ from invana.apps.modeller.links import (
     discard_staged,
     list_links,
     read_preview,
+    removal_events,
     remove,
+    stitch_facts,
     stitch_preview_query,
 )
 from invana.apps.modeller.versioner import Versioner
 from invana.core.auth.models import User
+from invana.core.events import actions as event_actions
+from invana.core.events.services import emit_event
 
 
 @pytest_asyncio.fixture
@@ -367,3 +371,59 @@ class TestPreviewQuery:
         assert "MATCH (x:`Company`) WHERE x.`ticker` IS NOT NULL" in query
         assert "MATCH (y:`Stock`) WHERE y.`nse_symbol` IS NOT NULL" in query
         assert "unresolved_sample" in query
+
+
+@pytest.mark.asyncio
+class TestReadingAStitch:
+    async def _declared(self, session, store, graph_id, name):
+        _, news = await _published(session, store, name=f"News{name}", graph_id=graph_id, types=["Company"])
+        _, market = await _published(session, store, name=f"Mkt{name}", graph_id=graph_id, types=["Stock"])
+        return await declare(
+            session,
+            store,
+            graph_id=graph_id,
+            kind="anchor",
+            source_version_id=news.id,
+            source_type="Company",
+            target_version_id=market.id,
+            target_type="Stock",
+            source_property="ticker",
+            target_property="nse_symbol",
+        )
+
+    async def test_a_removal_is_read_back_with_its_rule_and_history_oldest_first(self, session, store, graph_id):
+        link = await self._declared(session, store, graph_id, "A")
+        await emit_event(
+            session,
+            action=event_actions.MODEL_LINK_DECLARE,
+            target_kind=event_actions.TARGET_MODEL_LINK,
+            target_id=link.id,
+            graph_id=graph_id,
+            details={},
+        )
+        await emit_event(
+            session,
+            action=event_actions.MODEL_LINK_REMOVE,
+            target_kind=event_actions.TARGET_MODEL_LINK,
+            target_id=link.id,
+            graph_id=graph_id,
+            details={"edges_withdrawn": 7, "source_type": "Company", "target_type": "Stock"},
+        )
+
+        facts = await stitch_facts(session, graph_id, link)
+        assert [action for action, _, _ in facts.history] == [event_actions.MODEL_LINK_DECLARE]
+        assert facts.source_records is None
+
+        removed = await removal_events(session, graph_id)
+        assert [(d["id"], d["edges_withdrawn"], d["source_type"]) for d, _, _ in removed] == [(link.id, 7, "Company")]
+
+    async def test_another_graphs_removals_are_not_read(self, session, store, graph_id):
+        await emit_event(
+            session,
+            action=event_actions.MODEL_LINK_REMOVE,
+            target_kind=event_actions.TARGET_MODEL_LINK,
+            target_id=str(uuid.uuid4()),
+            graph_id=None,
+            details={"edges_withdrawn": 3},
+        )
+        assert await removal_events(session, graph_id) == []

@@ -8,7 +8,7 @@
  * never in the panel.
  */
 
-import { Board } from "@invana/boards";
+import { type ActionContext, Board } from "@invana/boards";
 import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
 import type { CanvasBackend } from "@invana-studio/canvases";
 import {
@@ -25,8 +25,16 @@ import {
 } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import {
+	BookOpen,
+	Boxes,
+	Check,
+	Lock,
+	Network,
+	Plus,
+	Upload,
+} from "lucide-react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { modelsApi } from "../api";
@@ -67,12 +75,20 @@ import {
 	type ModelsMenuItem,
 	type ModelsScope,
 	modelsPageSpec,
+	schemaSpec,
 	windowOf,
 } from "./modelsPageSpec";
 import { ShapeSheet } from "./performanceRows";
+import { TypePage } from "./TypePage";
 import { type ModelsTab, useModelsView } from "./useModelsView";
 
-const ICONS = { ...BOARD_ICONS, plus: Plus, upload: Upload, check: Check };
+const ICONS = {
+	...BOARD_ICONS,
+	plus: Plus,
+	upload: Upload,
+	check: Check,
+	schema: Network,
+};
 
 /** What each tab waits on until its read ships. */
 const WAITS_ON: Partial<Record<ModelsTab, string>> = {
@@ -101,7 +117,7 @@ export function ModelsPage({
 	username: string;
 	graphSlug: string;
 	backend?: CanvasBackend;
-	/** The type selected on the Model tab — its form spans the column beneath. */
+	/** The type the outline or the canvas has picked — the canvas draws it selected. */
 	selection: ModelSelection | null;
 	onSelect: (selection: ModelSelection | null) => void;
 	/** Membership is binary today, so every member writes. */
@@ -250,102 +266,100 @@ export function ModelsPage({
 
 	const firstDraft = authored.find((m) => !m.active_version) ?? null;
 
-	const spec = modelsPageSpec(
-		{
-			models: authored,
-			frames,
-			links: allLinks.data,
-			physical: physical.data,
-			physicalLoading: physical.isLoading,
-			insights: insights.data,
-			insightsLoading: insights.isLoading,
-			scope,
-			canWrite: writable,
-			loading: models.isLoading,
+	const pageData = {
+		models: authored,
+		frames,
+		links: allLinks.data,
+		physical: physical.data,
+		physicalLoading: physical.isLoading,
+		insights: insights.data,
+		insightsLoading: insights.isLoading,
+		scope,
+		canWrite: writable,
+		loading: models.isLoading,
+	};
+
+	const spec = modelsPageSpec(pageData, view, {
+		notMeasured: (tab) => (
+			<EmptyState
+				className="py-10"
+				title="Not measured yet"
+				description={WAITS_ON[tab]}
+			/>
+		),
+		performance: { selected: shape, onSelect: setShape },
+		history: (
+			<ModelHistory
+				username={username}
+				graphSlug={graphSlug}
+				models={scoped ? [scoped] : authored.filter((m) => m.active_version)}
+				all={!scoped}
+			/>
+		),
+		onTab: (tab) => set({ tab }),
+		growth: {
+			canWrite,
+			// A load is a run, so it lands on the Runs journal.
+			onBringDataIn: () => set({}, { panel: "runs" }),
+			onSeeTypes: () => set({ open: true }),
+			onOpenRun: (runId) => onOpenRun?.(runId),
 		},
-		view,
-		{
-			notMeasured: (tab) => (
-				<EmptyState
-					className="py-10"
-					title="Not measured yet"
-					description={WAITS_ON[tab]}
-				/>
-			),
-			performance: { selected: shape, onSelect: setShape },
-			history: (
-				<ModelHistory
-					username={username}
-					graphSlug={graphSlug}
-					models={scoped ? [scoped] : authored.filter((m) => m.active_version)}
-					all={!scoped}
-				/>
-			),
-			onTab: (tab) => set({ tab }),
-			growth: {
-				canWrite,
-				// A load is a run, so it lands on the Runs journal.
-				onBringDataIn: () => set({}, { panel: "runs" }),
-				onSeeTypes: () => set({ open: true }),
-				onOpenRun: (runId) => onOpenRun?.(runId),
-			},
-			database: {
-				canWrite,
-				introspecting: introspect.isPending,
-				onIntrospect: () => introspect.mutate(),
-			},
-			emptyOverview: (
-				<EmptyState
-					className="py-10"
-					icon={<Boxes />}
-					title="No model is published yet"
-					description={
-						firstDraft
-							? `${firstDraft.name} is a draft. Publish it, or bring a model in, and this page starts to count: records, queries, and how fast they run.`
-							: "Author a model, import one, or start from a starter. Once one is published this page starts to count: records, queries, and how fast they run."
-					}
-					actions={
-						canWrite ? (
-							<>
-								{firstDraft ? (
-									<Button
-										onClick={() =>
-											set({ scope: firstDraft.id, open: true, schema: true })
-										}
-									>
-										Open the draft
-									</Button>
-								) : (
-									<ActButton area="model" onClick={() => setEditing("new")}>
-										<Plus /> New model
-									</ActButton>
-								)}
-								<ActButton
-									area="model"
-									variant="outline"
-									onClick={() => setImporting(true)}
-								>
-									<Upload /> Import
-								</ActButton>
-								<ActButton
-									area="model"
-									variant="ghost"
-									onClick={() => setImporting(true)}
-								>
-									<BookOpen /> Starter models
-								</ActButton>
-							</>
-						) : null
-					}
-					locks={LOCKED_UNTIL_PUBLISHED.map((t) => (
-						<EmptyStateLock key={t} icon={<Lock />}>
-							{t[0].toUpperCase() + t.slice(1)} opens once a model is published
-						</EmptyStateLock>
-					))}
-				/>
-			),
+		database: {
+			canWrite,
+			introspecting: introspect.isPending,
+			onIntrospect: () => introspect.mutate(),
 		},
-	);
+		emptyOverview: (
+			<EmptyState
+				className="py-10"
+				icon={<Boxes />}
+				title="No model is published yet"
+				description={
+					firstDraft
+						? `${firstDraft.name} is a draft. Publish it, or bring a model in, and this page starts to count: records, queries, and how fast they run.`
+						: "Author a model, import one, or start from a starter. Once one is published this page starts to count: records, queries, and how fast they run."
+				}
+				actions={
+					canWrite ? (
+						<>
+							{firstDraft ? (
+								<Button
+									onClick={() =>
+										set({ scope: firstDraft.id, open: true, schema: true })
+									}
+								>
+									Open the draft
+								</Button>
+							) : (
+								<ActButton area="model" onClick={() => setEditing("new")}>
+									<Plus /> New model
+								</ActButton>
+							)}
+							<ActButton
+								area="model"
+								variant="outline"
+								onClick={() => setImporting(true)}
+							>
+								<Upload /> Import
+							</ActButton>
+							<ActButton
+								area="model"
+								variant="ghost"
+								onClick={() => setImporting(true)}
+							>
+								<BookOpen /> Starter models
+							</ActButton>
+						</>
+					) : null
+				}
+				locks={LOCKED_UNTIL_PUBLISHED.map((t) => (
+					<EmptyStateLock key={t} icon={<Lock />}>
+						{t[0].toUpperCase() + t.slice(1)} opens once a model is published
+					</EmptyStateLock>
+				))}
+			/>
+		),
+	});
 
 	const archive = (model: GraphModelSummary) =>
 		update.mutate(
@@ -369,6 +383,13 @@ export function ModelsPage({
 			},
 		);
 
+	const openDraft = () =>
+		scoped &&
+		createDraft.mutate({
+			modelId: scoped.id,
+			basedOn: active?.version ?? null,
+		});
+
 	const onMenu = (item: ModelsMenuItem) => {
 		switch (item) {
 			case "starters":
@@ -377,6 +398,8 @@ export function ModelsPage({
 				return setFromOntology(true);
 			case "introspect":
 				return introspect.mutate();
+			case "draft":
+				return openDraft();
 			case "rename":
 				return scoped && setEditing(scoped);
 			case "exportModel":
@@ -388,99 +411,143 @@ export function ModelsPage({
 		}
 	};
 
-	// *Open in Schema*: the model's canvas, full-bleed, in place of the tabs.
-	if (scoped && view.schema)
-		return (
-			<ModelCanvas
-				username={username}
-				graphSlug={graphSlug}
-				modelId={scoped.id}
-				backend={backend}
-				selection={selection}
-				onSelect={onSelect}
-				canWrite={canWrite}
+	const onBoardAction = (action: string, context?: ActionContext) => {
+		const [id, ctx] = routedAction(action, context);
+		switch (id) {
+			case MODELS_ACTIONS.tab:
+				if (ctx?.option) set({ tab: ctx.option as ModelsTab });
+				return;
+			case MODELS_ACTIONS.window: {
+				const w = ctx?.option ? windowOf(ctx.option) : undefined;
+				if (w) set({ window: w });
+				return;
+			}
+			case MODELS_ACTIONS.allModels:
+				onSelect(null);
+				return set({ scope: null, open: false });
+			case MODELS_ACTIONS.openModel:
+				// The breadcrumb back to the model's page, from its canvas or a type.
+				onSelect(null);
+				return set({ schema: false, type: null });
+			case MODELS_ACTIONS.selectModel:
+				// A click selects and keeps the tab.
+				return ctx?.itemId && set({ scope: ctx.itemId });
+			case MODELS_ACTIONS.selectType:
+				if (!ctx?.itemId) return;
+				onSelect({
+					kind: frames
+						.find((f) => f.modelId === scoped?.id)
+						?.edgeTypes.some((t) => t.name === ctx.itemId)
+						? "edge_type"
+						: "node_type",
+					name: ctx.itemId,
+				});
+				return set({ type: ctx.itemId, open: true });
+			case MODELS_ACTIONS.openSchema:
+				return set({ schema: true, type: null });
+			case MODELS_ACTIONS.versions:
+				return set({ tab: "history", schema: false, type: null });
+			case MODELS_ACTIONS.newModel:
+				return setEditing("new");
+			case MODELS_ACTIONS.importModel:
+				return setImporting(true);
+			case MODELS_ACTIONS.more:
+				return ctx?.option && onMenu(ctx.option as ModelsMenuItem);
+			case MODELS_ACTIONS.edit:
+				return openDraft();
+			case MODELS_ACTIONS.exportModel:
+				return scoped && void downloadArtefact(username, graphSlug, scoped);
+			case MODELS_ACTIONS.publish:
+				return setPublishing(true);
+			case MODELS_ACTIONS.compare:
+				return (
+					scoped &&
+					active?.version &&
+					navigate(
+						comparePath({ username, graphSlug }, "model", scoped.id, {
+							a: previous,
+							b: active.version,
+						}),
+					)
+				);
+			case MODELS_ACTIONS.discardDraft:
+				return scoped && discardAll.mutate(scoped.id);
+			case MODELS_ACTIONS.discardOne:
+				return (
+					scoped &&
+					ctx?.itemId &&
+					discardOne.mutate({ modelId: scoped.id, changeId: ctx.itemId })
+				);
+			default:
+				return;
+		}
+	};
+
+	// What each type holds today, from Growth's latest count.
+	const counts = new Map(
+		(insights.data?.growth?.rows ?? []).map((r) => [r.key, r.now]),
+	);
+
+	let body: ReactNode;
+	if (scope && view.schema) {
+		// *Open in Schema*: the model's canvas, full-bleed, in place of the tabs.
+		body = (
+			<Board
+				className="min-h-0 flex-1"
+				spec={schemaSpec(
+					pageData,
+					view,
+					<ModelCanvas
+						username={username}
+						graphSlug={graphSlug}
+						modelId={scope.model.id}
+						backend={backend}
+						selection={selection}
+						onSelect={(next) => {
+							onSelect(next);
+							// A type clicked on the canvas opens as a page of its model.
+							if (next) set({ type: next.name, schema: false });
+						}}
+					/>,
+				)}
+				icons={ICONS}
+				onAction={onBoardAction}
 			/>
 		);
-
-	return (
-		<div className="flex h-full min-h-0 flex-col">
-			<ReadOnlyNotice area="model" noun="model" />
+	} else if (scope && view.type) {
+		body = (
+			<TypePage
+				username={username}
+				graphSlug={graphSlug}
+				scope={scope}
+				typeName={view.type}
+				tab={view.typeTab}
+				counts={counts}
+				canWrite={writable}
+				creatingDraft={createDraft.isPending}
+				onTab={(typeTab) => set({ typeTab })}
+				onGone={() => {
+					onSelect(null);
+					set({ type: null });
+				}}
+				onAction={onBoardAction}
+			/>
+		);
+	} else {
+		body = (
 			<Board
 				className="min-h-0 flex-1"
 				spec={spec}
 				icons={ICONS}
-				onAction={(action, context) => {
-					const [id, ctx] = routedAction(action, context);
-					switch (id) {
-						case MODELS_ACTIONS.tab:
-							if (ctx?.option) set({ tab: ctx.option as ModelsTab });
-							return;
-						case MODELS_ACTIONS.window: {
-							const w = ctx?.option ? windowOf(ctx.option) : undefined;
-							if (w) set({ window: w });
-							return;
-						}
-						case MODELS_ACTIONS.allModels:
-							onSelect(null);
-							return set({ scope: null, open: false });
-						case MODELS_ACTIONS.selectModel:
-							// A click selects and keeps the tab.
-							return ctx?.itemId && set({ scope: ctx.itemId });
-						case MODELS_ACTIONS.selectType:
-							if (!ctx?.itemId) return;
-							onSelect({
-								kind: frames
-									.find((f) => f.modelId === scoped?.id)
-									?.edgeTypes.some((t) => t.name === ctx.itemId)
-									? "edge_type"
-									: "node_type",
-								name: ctx.itemId,
-							});
-							return set({ type: ctx.itemId, open: true });
-						case MODELS_ACTIONS.newModel:
-							return setEditing("new");
-						case MODELS_ACTIONS.importModel:
-							return setImporting(true);
-						case MODELS_ACTIONS.more:
-							return ctx?.option && onMenu(ctx.option as ModelsMenuItem);
-						case MODELS_ACTIONS.edit:
-							return (
-								scoped &&
-								createDraft.mutate({
-									modelId: scoped.id,
-									basedOn: active?.version ?? null,
-								})
-							);
-						case MODELS_ACTIONS.exportModel:
-							return (
-								scoped && void downloadArtefact(username, graphSlug, scoped)
-							);
-						case MODELS_ACTIONS.publish:
-							return setPublishing(true);
-						case MODELS_ACTIONS.compare:
-							return (
-								scoped &&
-								active?.version &&
-								navigate(
-									comparePath({ username, graphSlug }, "model", scoped.id, {
-										a: previous,
-										b: active.version,
-									}),
-								)
-							);
-						case MODELS_ACTIONS.discardDraft:
-							return scoped && discardAll.mutate(scoped.id);
-						case MODELS_ACTIONS.discardOne:
-							return (
-								scoped &&
-								ctx?.itemId &&
-								discardOne.mutate({ modelId: scoped.id, changeId: ctx.itemId })
-							);
-						default:
-							return;
-					}
-				}}
+				onAction={onBoardAction}
 			/>
+		);
+	}
+
+	return (
+		<div className="flex h-full min-h-0 flex-col">
+			<ReadOnlyNotice area="model" noun="model" />
+			{body}
 
 			<ModelFormDialog
 				open={editing !== null}

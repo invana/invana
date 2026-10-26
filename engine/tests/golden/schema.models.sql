@@ -881,6 +881,7 @@ CREATE TABLE model_links (
 	identity_match model_link_match_enum NOT NULL, 
 	edge_type VARCHAR(255), 
 	source_model_id VARCHAR(36), 
+	edges INTEGER, 
 	description TEXT NOT NULL, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 

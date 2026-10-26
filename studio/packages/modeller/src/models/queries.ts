@@ -2,6 +2,7 @@ import { suppressActionToast } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { modelsApi, schemasApi } from "./api";
 import type {
+	ConstraintCreate,
 	EdgeTypeCreate,
 	EdgeTypeUpdate,
 	GraphModelCreate,
@@ -306,6 +307,43 @@ export const useCreateIndexMutation = (u: string, g: string) =>
 			modelsApi.createIndex(u, g, modelId, versionId, data),
 	);
 
+export const useDeleteIndexMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, versionId, indexId }: TypeCtx & { indexId: string }) =>
+			modelsApi.deleteIndex(u, g, modelId, versionId, indexId),
+	);
+
+export const useCreateConstraintMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, versionId, data }: TypeCtx & { data: ConstraintCreate }) =>
+			modelsApi.createConstraint(u, g, modelId, versionId, data),
+	);
+
+export const useDeleteConstraintMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({
+			modelId,
+			versionId,
+			constraintId,
+		}: TypeCtx & { constraintId: string }) =>
+			modelsApi.deleteConstraint(u, g, modelId, versionId, constraintId),
+	);
+
+/** A property's definition, deleted from the draft once no type maps it. */
+export const useDeletePropertyKeyMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, versionId, keyId }: TypeCtx & { keyId: string }) =>
+			modelsApi.deletePropertyKey(u, g, modelId, versionId, keyId),
+	);
+
 // ── The staged set (model-editor.md) ───────────────────────────────────────
 //
 // The bar reads a derived set, so it invalidates with every authoring mutation
@@ -478,7 +516,10 @@ export function useModelLinkQuery(
 /** The Stitches page's Removed group. */
 export function useRemovedLinksQuery(username?: string, graphSlug?: string) {
 	return useQuery({
-		queryKey: [...linksRoot(username ?? "", graphSlug ?? ""), "removed"] as const,
+		queryKey: [
+			...linksRoot(username ?? "", graphSlug ?? ""),
+			"removed",
+		] as const,
 		queryFn: () =>
 			modelsApi.removedLinks(username as string, graphSlug as string),
 		enabled: !!username && !!graphSlug,

@@ -82,11 +82,11 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		// global model, the models board and the stitch list have none.
 		modelOpen ? (
 			<ModelViewPanel
-			username={username as string}
-			graphSlug={graphSlug as string}
-			selection={modelSelection}
-			onSelect={setModelSelection}
-			onShowPage={showModelsPage}
+				username={username as string}
+				graphSlug={graphSlug as string}
+				selection={modelSelection}
+				onSelect={setModelSelection}
+				onShowPage={showModelsPage}
 			/>
 		) : null
 	) : settingsPanel.section === "projects" ? (

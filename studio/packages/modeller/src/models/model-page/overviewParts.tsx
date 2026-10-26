@@ -8,15 +8,8 @@ import type { PanelSpec } from "@invana/boards";
 import { StackedBarChartV } from "@invana/charts";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Button } from "@invana/ui";
-import type { GrowthMark, Overview, PhysicalSchema } from "../types";
-import {
-	CALLER_SERIES,
-	dayLabel,
-	fmtMs,
-	fmtNum,
-	SignalMark,
-} from "./insightParts";
-import { P95Line } from "./performanceRows";
+import type { Overview, PhysicalSchema } from "../types";
+import { CALLER_SERIES, dayLabel, fmtNum, SignalMark } from "./insightParts";
 import type { ModelsTab } from "./useModelsView";
 
 interface AttentionItem {
@@ -149,23 +142,6 @@ export function callersPanel(overview: Overview, days: number): PanelSpec {
 				empty={
 					<span className="text-muted-foreground">no query in the window</span>
 				}
-			/>
-		),
-	};
-}
-
-export function p95Panel(overview: Overview, marks: GrowthMark[]): PanelSpec {
-	const today = overview.p95_by_day.at(-1)?.value ?? null;
-	return {
-		kind: "text",
-		title: "p95 a day",
-		aside: today != null ? `${fmtMs(today)} today` : undefined,
-		options: { text: "" },
-		render: (
-			<P95Line
-				days={overview.p95_by_day}
-				graphP95={overview.graph_p95}
-				marks={marks}
 			/>
 		),
 	};

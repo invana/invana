@@ -473,6 +473,23 @@ async def _records_root(session: AsyncSession, source_model_id: str) -> Path | N
     return Path(root) if root else None
 
 
+async def recount_edges(connector: BaseConnector, links: list[ModelLink]) -> None:
+    """Set each stitch's ``edges`` to how many edges it holds in the graph now.
+
+    A recount, never a sum: a MERGE re-matches what an earlier solve wrote, so what
+    one run reports written says nothing about what the stitch holds. The
+    connector is already open. A stitch that cannot be counted is left as it was.
+    """
+    for link in links:
+        result = await connector.execute(written_query(), {"stitch_id": link.id})
+        rows = getattr(result, "records", None) or getattr(result, "rows", None) or []
+        if not rows:
+            continue
+        row = rows[0]
+        value = row.get("written") if isinstance(row, dict) else getattr(row, "written", 0)
+        link.edges = int(value or 0)
+
+
 async def commit_stitches(
     session: AsyncSession,
     *,
@@ -523,6 +540,7 @@ async def commit_stitches(
                 )
                 continue
             run.loaded.append(await load_stitch_rows(connector, link, root=root, model_id=link.source_model_id))
+        await recount_edges(connector, [link for link in committed if link.id not in refused])
     finally:
         await connector.disconnect()
     return run

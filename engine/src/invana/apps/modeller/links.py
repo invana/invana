@@ -19,12 +19,17 @@ read, which is why there is no row to edit and nothing to keep in sync.
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 from sqlalchemy import select
 
 from invana.apps.modeller.models import GraphModel, GraphVersion, ModelLink
+from invana.apps.modeller.querysets.type_count_snapshot import TypeCountSnapshotQuerySet
+from invana.core.events import actions as event_actions
+from invana.core.events.querysets import EventQuerySet
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -240,6 +245,67 @@ async def remove(session: AsyncSession, graph_id: str, link_id: str) -> bool:
     await session.delete(link)
     await session.flush()
     return True
+
+
+# ---------------------------------------------------------------------------
+# Reading one stitch whole, and the ones that were removed
+# ---------------------------------------------------------------------------
+
+_events = EventQuerySet()
+_snapshots = TypeCountSnapshotQuerySet()
+
+
+@dataclass
+class StitchFacts:
+    """What the inspector reads beside the row: who declared it, each end's records, its history."""
+
+    declared_by: str | None = None
+    declared_at: str | None = None
+    source_records: int | None = None
+    target_records: int | None = None
+    #: ``(action, at, actor)``, oldest first — the declare and commit events.
+    history: list[tuple[str, str, str | None]] = field(default_factory=list)
+
+
+async def stitch_facts(session: AsyncSession, graph_id: str, link: ModelLink) -> StitchFacts:
+    """One stitch's declare and commit events and its two ends' latest counted records."""
+    rows = await _events.of_action(
+        session,
+        graph_id=graph_id,
+        actions=frozenset({event_actions.MODEL_LINK_DECLARE, event_actions.MODEL_LINK_COMMIT}),
+        target_id=link.id,
+        newest_first=False,
+    )
+    facts = StitchFacts()
+    for event, user in rows:
+        actor = user.username if user else None
+        facts.history.append((event.action, event.created_at.isoformat(), actor))
+        if event.action == event_actions.MODEL_LINK_DECLARE and facts.declared_at is None:
+            facts.declared_by, facts.declared_at = actor, event.created_at.isoformat()
+    # Each type's last count at or before now — the latest, never a sum.
+    latest = {
+        snap.type_name: snap.count
+        for snap in await _snapshots.openers(session, graph_id, datetime.now(UTC))
+        if snap.kind == "node"
+    }
+    facts.source_records = latest.get(link.source_type)
+    facts.target_records = latest.get(link.target_type)
+    return facts
+
+
+async def removal_events(session: AsyncSession, graph_id: str) -> list[tuple[dict[str, Any], str, str | None]]:
+    """Every removal in the Graph, newest first, as ``(details, at, removed_by)`` plus the stitch id in details."""
+    rows = await _events.of_action(
+        session, graph_id=graph_id, actions=frozenset({event_actions.MODEL_LINK_REMOVE}), newest_first=True
+    )
+    return [
+        (
+            {**(event.details or {}), "id": event.target_id},
+            event.created_at.isoformat(),
+            user.username if user else None,
+        )
+        for event, user in rows
+    ]
 
 
 # ---------------------------------------------------------------------------

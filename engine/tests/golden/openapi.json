@@ -16526,6 +16526,17 @@
             ],
             "title": "Edge Type"
           },
+          "edges": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edges"
+          },
           "edges_written": {
             "anyOf": [
               {
@@ -24255,6 +24266,111 @@
           "password"
         ],
         "title": "RegisterRequest",
+        "type": "object"
+      },
+      "RemovedStitch": {
+        "description": "A removed stitch, read from its removal event \u2014 the row itself is gone.",
+        "properties": {
+          "edge_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edge Type"
+          },
+          "edges_withdrawn": {
+            "default": 0,
+            "title": "Edges Withdrawn",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "removed_at": {
+            "title": "Removed At",
+            "type": "string"
+          },
+          "removed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Removed By"
+          },
+          "source_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Model"
+          },
+          "source_property": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Property"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "target_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Model"
+          },
+          "target_property": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Property"
+          },
+          "target_type": {
+            "title": "Target Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "source_type",
+          "target_type",
+          "removed_at"
+        ],
+        "title": "RemovedStitch",
         "type": "object"
       },
       "ReportCite": {
@@ -31994,6 +32110,252 @@
           "share_of_work"
         ],
         "title": "StepPerformance",
+        "type": "object"
+      },
+      "StitchDetail": {
+        "description": "One stitch read whole: who declared it, each end's records, its history.",
+        "properties": {
+          "declared_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declared At"
+          },
+          "declared_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declared By"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "edge_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edge Type"
+          },
+          "edges": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edges"
+          },
+          "edges_written": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edges Written"
+          },
+          "history": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StitchEvent"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "identity_match": {
+            "default": "exact",
+            "title": "Identity Match",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "source_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Model"
+          },
+          "source_model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Model Id"
+          },
+          "source_property": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Property"
+          },
+          "source_records": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Records"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "source_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Version"
+          },
+          "source_version_id": {
+            "title": "Source Version Id",
+            "type": "string"
+          },
+          "status": {
+            "default": "active",
+            "title": "Status",
+            "type": "string"
+          },
+          "target_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Model"
+          },
+          "target_property": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Property"
+          },
+          "target_records": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Records"
+          },
+          "target_type": {
+            "title": "Target Type",
+            "type": "string"
+          },
+          "target_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Version"
+          },
+          "target_version_id": {
+            "title": "Target Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "source_version_id",
+          "source_type",
+          "target_version_id",
+          "target_type"
+        ],
+        "title": "StitchDetail",
+        "type": "object"
+      },
+      "StitchEvent": {
+        "description": "One event in a stitch's history \u2014 its declare and its commit.",
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "actor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor"
+          },
+          "at": {
+            "title": "At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "at"
+        ],
+        "title": "StitchEvent",
         "type": "object"
       },
       "StitchPreview": {
@@ -53362,6 +53724,71 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/model-links/removed": {
+      "get": {
+        "description": "Removed stitches, newest first, read from their removal events.\n\nAn event written before the rule was recorded in it names no pair and is left out.",
+        "operationId": "list_removed_links_api_v1_u__username___graphSlug__model_links_removed_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RemovedStitch"
+                  },
+                  "title": "Response List Removed Links Api V1 U  Username   Graphslug  Model Links Removed Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Removed Links",
+        "tags": [
+          "model-links"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/model-links/{link_id}": {
       "delete": {
         "description": "Remove a stitch \u2014 and, if it is active, the edges it wrote (ST48 \u00b7 ST55).\n\nA staged stitch wrote nothing, so its row is deleted here. An active one is\n`stitch-withdraw@1`, awaited: the Graph's guardrails are asked about both\nits models before an edge goes, and a refusal keeps the rule and its edges.",
@@ -53427,6 +53854,74 @@
           }
         ],
         "summary": "Remove Model Link",
+        "tags": [
+          "model-links"
+        ]
+      },
+      "get": {
+        "description": "One stitch read whole \u2014 the inspector's read.",
+        "operationId": "get_model_link_api_v1_u__username___graphSlug__model_links__link_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "link_id",
+            "required": true,
+            "schema": {
+              "title": "Link Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StitchDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Model Link",
         "tags": [
           "model-links"
         ]

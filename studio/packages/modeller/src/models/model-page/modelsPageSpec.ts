@@ -1,12 +1,15 @@
 /**
  * The model page as a board document (the-model-page.md).
  *
- * One header, then **Overview · Model · Database · Usage · Performance ·
- * Growth · History** with the `7 · 30 · 90 days` window on the right of the tab strip —
- * the plan page's layout, read at `All models` or one model. This file
- * composes; `ModelsPage` fetches and answers actions, and `@invana/boards`
- * draws. The tabs, their order and their columns never change with the scope:
- * what one scope lacks is a section, not a tab.
+ * One header, then **Overview · Database · Usage · Performance · Growth** with
+ * the `7 · 30 · 90 days` window on the right of the tab strip — the plan
+ * page's layout, read at `All models` or one model. History is a reading
+ * *Versions* opens. This file composes; `ModelsPage` fetches and answers
+ * actions, and `@invana/boards` draws. The tabs, their order and their columns
+ * never change with the scope: what one scope lacks is a section, not a tab.
+ *
+ * One model has two more readings in place of the tabs: its canvas
+ * ({@link schemaSpec}) and a type's page (`TypePage`).
  */
 
 import type {
@@ -33,9 +36,13 @@ import {
 	databaseRows,
 	driftCount,
 } from "./databaseRows";
-import { type GrowthRowsOptions, growthRows } from "./growthRows";
+import {
+	type GrowthRowsOptions,
+	growthChartPanel,
+	growthRows,
+} from "./growthRows";
 import { fmtMs, fmtPct } from "./insightParts";
-import { attentionPanel, callersPanel, p95Panel } from "./overviewParts";
+import { attentionPanel, callersPanel } from "./overviewParts";
 import {
 	type PerformanceRowsOptions,
 	performanceRows,
@@ -64,6 +71,9 @@ export const MODELS_ACTIONS = {
 	discardDraft: "discard-draft",
 	discardOne: "discard-one",
 	compare: "compare",
+	versions: "versions",
+	openSchema: "open-schema",
+	openModel: "open-model",
 } as const;
 
 /** What `⋯` holds, per scope and state (the-model-page.md · The page). */
@@ -71,6 +81,7 @@ const MODELS_MENU = {
 	starters: "Starter models",
 	ontology: "From an ontology",
 	introspect: "Introspect",
+	draft: "Open a draft",
 	rename: "Rename",
 	exportModel: "Export",
 	archive: "Archive",
@@ -233,12 +244,32 @@ function recordsOf(insights: Insights | null | undefined) {
 	return { byKey, total: growth?.now ?? null, counted: !!growth?.counted };
 }
 
-/** A draft has no number until it is published. */
-const draftLabel = (version: string | null) =>
-	version ? `v${version} draft` : "draft";
-
 const versionLabel = (m: GraphModelSummary) =>
 	m.active_version ? `v${m.active_version.version} active` : "never published";
+
+/**
+ * One model's canvas, full-bleed (*Open in Schema*): the page's head and its
+ * staged bar stay, the tab strip goes, and the canvas fills what is left.
+ */
+export function schemaSpec(
+	data: ModelsPageData,
+	view: ModelsView,
+	canvas: ReactNode,
+): BoardSpec {
+	return {
+		title: data.scope?.model.name,
+		header: header(data, view),
+		staged: stagedBar(data.scope, data.canWrite),
+		rows: [
+			{
+				fill: true,
+				panels: [
+					{ kind: "text", flush: true, options: { text: "" }, render: canvas },
+				],
+			},
+		],
+	};
+}
 
 export function modelsPageSpec(
 	data: ModelsPageData,
@@ -250,7 +281,12 @@ export function modelsPageSpec(
 		!anyPublished && LOCKED_UNTIL_PUBLISHED.includes(tab);
 	const tab: ModelsTab = locked(view.tab) ? "overview" : view.tab;
 
-	const tabs: TabSpec[] = MODELS_TABS.map((id) => ({
+	// History is a reading *Versions* opens, not a tab in the strip: it appears
+	// only while it is the one open.
+	const shown = MODELS_TABS.filter(
+		(id) => id !== "history" || tab === "history",
+	);
+	const tabs: TabSpec[] = shown.map((id) => ({
 		id,
 		label: TAB_LABEL[id],
 		locked: locked(id),
@@ -259,8 +295,8 @@ export function modelsPageSpec(
 
 	return {
 		title: data.scope ? data.scope.model.name : "All models",
-		header: header(data),
-		staged: staged(data),
+		header: header(data, view),
+		staged: stagedBar(data.scope, data.canWrite),
 		tabs,
 		tab,
 		tabAction: MODELS_ACTIONS.tab,
@@ -280,7 +316,7 @@ export function modelsPageSpec(
 	};
 }
 
-function header(data: ModelsPageData): BoardSpec["header"] {
+function header(data: ModelsPageData, view: ModelsView): BoardSpec["header"] {
 	const { scope, canWrite } = data;
 	if (!scope) {
 		const catalog = data.insights?.catalog;
@@ -330,8 +366,9 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 
 	const { model, detail, draft, active, previous, staged: set } = scope;
 	const { published } = scope;
+	const reading = view.tab === "history" && !view.schema;
 	const compare: ActionSpec[] =
-		active && previous
+		reading && active && previous
 			? [
 					{
 						id: MODELS_ACTIONS.compare,
@@ -340,53 +377,64 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 					},
 				]
 			: [];
-	const chips: NonNullable<NonNullable<BoardSpec["header"]>["chips"]> = [];
-	if (draft)
-		chips.push({
-			label: draft.version ? `v${draft.version} · draft` : "draft",
-			tone: "info",
-		});
-	chips.push(
-		active
-			? { label: `v${active.version} · active`, variant: "outline" }
-			: { label: "never published", variant: "outline" },
-	);
+	const chips: NonNullable<NonNullable<BoardSpec["header"]>["chips"]> = [
+		...versionChips(scope),
+	];
 	if (!canWrite) chips.push({ label: "read only", variant: "secondary" });
 
 	const retire: ModelsMenuItem = published ? "archive" : "delete";
-	const actions: ActionSpec[] = draft
-		? [
-				{
-					id: MODELS_ACTIONS.publish,
-					label: draft.version ? `Publish v${draft.version}` : "Publish",
-					icon: "check",
-					variant: "default",
-					// The act says why rather than going quiet (the-model-page.md seams).
-					disabled: !set?.can_commit,
-				},
-				{
-					id: MODELS_ACTIONS.discardDraft,
-					label: "Discard draft",
-					variant: "outline",
-				},
-				...compare,
-				menu(["rename", "exportModel", retire]),
-			]
-		: [
-				{ id: MODELS_ACTIONS.edit, label: "Edit", variant: "default" },
-				{
-					id: MODELS_ACTIONS.exportModel,
-					label: "Export",
-					variant: "outline",
-					disabled: !active,
-				},
-				...compare,
-				menu(["rename", retire]),
-			];
+	const actions: ActionSpec[] = [
+		// On the schema reading the canvas is already open.
+		...(view.schema
+			? []
+			: [
+					{
+						id: MODELS_ACTIONS.openSchema,
+						label: "Open in Schema",
+						icon: "schema",
+						variant: "default" as const,
+					},
+				]),
+		{
+			id: MODELS_ACTIONS.versions,
+			label: "Versions",
+			variant: "outline",
+			disabled: !published,
+		},
+		{
+			id: MODELS_ACTIONS.exportModel,
+			label: "Export",
+			variant: "outline",
+			disabled: !active,
+		},
+		...(draft
+			? [
+					{
+						id: MODELS_ACTIONS.publish,
+						label: draft.version ? `Publish v${draft.version}` : "Publish",
+						icon: "check",
+						variant: "default" as const,
+						// The act says why rather than going quiet (the-model-page.md seams).
+						disabled: !set?.can_commit,
+					},
+					{
+						id: MODELS_ACTIONS.discardDraft,
+						label: "Discard draft",
+						variant: "outline" as const,
+					},
+				]
+			: []),
+		...compare,
+		menu(draft ? ["rename", retire] : ["draft", "rename", retire]),
+	];
 
 	return {
 		crumbs: ["Models", model.name],
-		crumbActions: [MODELS_ACTIONS.allModels, undefined],
+		// The model's own crumb is the way back to its page from the canvas.
+		crumbActions: [
+			MODELS_ACTIONS.allModels,
+			view.schema ? MODELS_ACTIONS.openModel : undefined,
+		],
 		chips,
 		actions: readOnly(actions, canWrite),
 		// One line; `More` for the rest.
@@ -404,10 +452,33 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 	};
 }
 
+/** The active readout and the draft chip — on the page, the canvas and a type's page. */
+export function versionChips(
+	scope: Pick<ModelsScope, "draft" | "active">,
+): NonNullable<NonNullable<BoardSpec["header"]>["chips"]> {
+	return [
+		scope.active
+			? { label: `v${scope.active.version} · active`, variant: "outline" }
+			: { label: "never published", variant: "outline" },
+		...(scope.draft
+			? [
+					{
+						label: scope.draft.version
+							? `v${scope.draft.version} · draft`
+							: "draft",
+						tone: "info" as const,
+					},
+				]
+			: []),
+	];
+}
+
 /** The acts that only read — export and compare — which a reader keeps. */
 const READS: ReadonlySet<string> = new Set([
 	MODELS_ACTIONS.exportModel,
 	MODELS_ACTIONS.compare,
+	MODELS_ACTIONS.versions,
+	MODELS_ACTIONS.openSchema,
 ]);
 const READ_ITEMS: ReadonlySet<string> = new Set<ModelsMenuItem>([
 	"exportModel",
@@ -419,7 +490,10 @@ const READ_ITEMS: ReadonlySet<string> = new Set<ModelsMenuItem>([
  * notice above the page says which role it needs and who holds it. A menu
  * keeps its read-only items, and is disabled only when none are left.
  */
-function readOnly(actions: ActionSpec[], canWrite: boolean): ActionSpec[] {
+export function readOnly(
+	actions: ActionSpec[],
+	canWrite: boolean,
+): ActionSpec[] {
 	if (canWrite) return actions;
 	return actions.map((a) => {
 		if (READS.has(a.id)) return a;
@@ -431,7 +505,7 @@ function readOnly(actions: ActionSpec[], canWrite: boolean): ActionSpec[] {
 	});
 }
 
-function menu(items: ModelsMenuItem[]): ActionSpec {
+export function menu(items: ModelsMenuItem[]): ActionSpec {
 	return {
 		id: MODELS_ACTIONS.more,
 		// Not `More` — that is the description's own fold.
@@ -443,9 +517,13 @@ function menu(items: ModelsMenuItem[]): ActionSpec {
 	};
 }
 
-function staged(data: ModelsPageData): StagedSpec | undefined {
-	const set = data.scope?.staged;
-	if (!data.scope?.draft || !set || set.count === 0) return undefined;
+/** The staged bar under a model's header — on its page, its canvas and its types. */
+export function stagedBar(
+	scope: ModelsScope | null,
+	canWrite: boolean,
+): StagedSpec | undefined {
+	const set = scope?.staged;
+	if (!scope?.draft || !set || set.count === 0) return undefined;
 	return {
 		items: set.changes.map((c) => ({
 			id: c.id,
@@ -453,9 +531,9 @@ function staged(data: ModelsPageData): StagedSpec | undefined {
 			name: c.name,
 			note: c.kind.replace("_", " "),
 		})),
-		discardAction: data.canWrite ? MODELS_ACTIONS.discardOne : undefined,
-		discardAllAction: data.canWrite ? MODELS_ACTIONS.discardDraft : undefined,
-		hint: data.canWrite && set.can_commit ? "⌘↵ publish" : undefined,
+		discardAction: canWrite ? MODELS_ACTIONS.discardOne : undefined,
+		discardAllAction: canWrite ? MODELS_ACTIONS.discardDraft : undefined,
+		hint: canWrite && set.can_commit ? "⌘↵ publish" : undefined,
 	};
 }
 
@@ -492,7 +570,7 @@ function overviewRows(
 			},
 		];
 	return data.scope
-		? overviewOne(data, data.scope, view, slots)
+		? overviewOne(data, data.scope)
 		: overviewAll(data, view, slots);
 }
 
@@ -574,16 +652,11 @@ function overviewAll(
 	return [
 		{ panels: [tiles] },
 		{ panels: [table] },
-		...lowerRow(data, view, slots, false),
+		...lowerRow(data, view, slots),
 	];
 }
 
-function overviewOne(
-	data: ModelsPageData,
-	scope: ModelsScope,
-	view: ModelsView,
-	slots: ModelsPageSlots,
-): RowSpec[] {
+function overviewOne(data: ModelsPageData, scope: ModelsScope): RowSpec[] {
 	const measured = measuredOf(data.insights);
 	const records = recordsOf(data.insights);
 	const catalog = data.insights?.catalog;
@@ -636,14 +709,6 @@ function overviewOne(
 							: "never published"),
 				},
 				...queryTiles(data.insights, true),
-				...driftTile(data.physical),
-				{
-					label: "Staged",
-					value: scope.draft ? String(scope.staged?.count ?? 0) : "—",
-					delta: scope.draft
-						? draftLabel(scope.draft.version)
-						: "no draft open",
-				},
 			],
 		},
 	};
@@ -652,7 +717,7 @@ function overviewOne(
 		id: MODELS_ACTIONS.selectType,
 		kind: "table",
 		title: "Each type",
-		aside: "click a type to open it on the Model tab",
+		aside: "click a type to open it",
 		flush: true,
 		options: {
 			columns: [
@@ -666,10 +731,23 @@ function overviewOne(
 			rowKey: "type",
 		},
 	};
+	const growth = data.insights?.growth;
 	return [
 		{ panels: [tiles] },
 		{ panels: [table] },
-		...lowerRow(data, view, slots, true),
+		// Growth's own series, so the tile above and this line are one count.
+		...(growth?.counted
+			? [
+					{
+						panels: [
+							growthChartPanel(growth, {
+								scopeName: scope.model.name,
+								hueOf: () => undefined,
+							}),
+						],
+					},
+				]
+			: []),
 	];
 }
 
@@ -741,12 +819,11 @@ function queryTiles(insights: Insights | undefined, one: boolean) {
 	];
 }
 
-/** Needs attention, beside queries by caller (All) or p95 a day (one). */
+/** At All models: Needs attention, beside queries by caller. */
 function lowerRow(
 	data: ModelsPageData,
 	view: ModelsView,
 	slots: ModelsPageSlots,
-	one: boolean,
 ): RowSpec[] {
 	const o = data.insights?.overview;
 	if (!o) return [];
@@ -754,10 +831,8 @@ function lowerRow(
 	return [
 		{
 			panels: [
-				attentionPanel(o, data.physical, one, days, slots.onTab),
-				one
-					? p95Panel(o, data.insights?.growth?.marks ?? [])
-					: callersPanel(o, days),
+				attentionPanel(o, data.physical, false, days, slots.onTab),
+				callersPanel(o, days),
 			],
 		},
 	];

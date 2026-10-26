@@ -84,6 +84,30 @@ class EventQuerySet:
         stmt = select(Event).where(*where).order_by(Event.created_at, Event.id)
         return list((await session.execute(stmt)).scalars().all())
 
+    async def of_action(
+        self,
+        session: AsyncSession,
+        *,
+        graph_id: str,
+        actions: frozenset[str],
+        target_id: str | None = None,
+        newest_first: bool = True,
+    ) -> list[tuple[Event, User | None]]:
+        """A Graph's events of the given actions with their user actor, when it has one.
+
+        ``target_id`` narrows to one record. Newest first by default; the actor is
+        ``None`` for an agent, a system act or a user since deleted.
+        """
+        stmt = (
+            select(Event, User)
+            .outerjoin(User, User.id == Event.actor_id)
+            .where(Event.graph_id == graph_id, Event.action.in_(sorted(actions)))
+        )
+        if target_id is not None:
+            stmt = stmt.where(Event.target_id == target_id)
+        order = (Event.created_at.desc(), Event.id.desc()) if newest_first else (Event.created_at, Event.id)
+        return [(event, user) for event, user in (await session.execute(stmt.order_by(*order))).all()]
+
     async def list_page(
         self,
         session: AsyncSession,

@@ -14,8 +14,8 @@
  * construction, and one inside a frame is that model's own edge type.
  *
  * This module is pure — queries live in `useAllModels`, the drawing in
- * `@/canvases/model`, the page in `AllModelsCanvas`. It reads versions and links, never `…/global-model`,
- * so the global-model page stays stated rather than drawn.
+ * `@invana-studio/canvases`, the page in `GlobalModelPage`. It reads versions and links, never `…/global-model`,
+ * whose counts sit beside the drawing.
  */
 
 import { colorSlotByString } from "@invana/styling/color";
