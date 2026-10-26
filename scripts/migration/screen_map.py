@@ -94,6 +94,7 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("agents.plans", f"{G}/agents/functions/promoted"), ("agents.library", f"{G}/agents/functions/plans"),
     ("agents.plugins", f"{G}/agents/functions/plugins"),
     ("agents.connections.mcp", f"{G}/agents/connections/mcp"),
+    ("agents.connections", f"{G}/agents/connections/server"),
     ("agents.llms.endpoint", f"{G}/agents/llms/85a79982-172c-4649-a7eb-2d14c9406182"), ("agents.llms", f"{G}/agents/llms"),
     ("agents.agent.new", f"{G}/agents/agents?page=agent%3A7b1a7963-e9f9-4b1a-8ab0-65435956a245&tab=overview"),
     ("agents.agent.detail", f"{G}/agents/agents?page=agent%3A69421b19-5ab7-4012-a6b4-32ae86a73891&tab=overview"),
@@ -148,7 +149,7 @@ DRAFT_AGENT = "the uuid stands for a draft agent with two bound skills (Route de
 POLICIES = "fare-team-quota and agent-readers are seeded by scripts/agents-build/seed_i01.py"
 BUILT = {"agent-fabric": {"AF-26", "AF-02", "AF-01", "AF-17", "AF-19", "AF-20", "AF-23", "AF-25",
                          "AF-03", "AF-04", "AF-05", "AF-06", "AF-21", "AF-22",
-                         "AF-07", "AF-08", "AF-09", "AF-13", "AF-14", "AF-16", "AF-24"}}
+                         "AF-07", "AF-08", "AF-09", "AF-13", "AF-14", "AF-16", "AF-24", "AF-18"}}
 STATE = {  # board → how to reach it from its route; a board absent here is its route's landing view
     "iam.agent.effective": "the uuid stands for Coordinator, which holds fare-team-quota through fare-team and has the skill Hey bound: IAM › Agents, click Coordinator",
     "iam.policies.denied": "New policy, signed in as e2e-viewer (its `as`)",
@@ -299,6 +300,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "agents.performance.llms": "LLMs tab",
     "agents.llms.endpoint": "anthropic stands for an endpoint's id: click an endpoint's Open",
     "agents.llms.add": "Add endpoint",
+    "agents.connections": "This Graph's server tab, the landing tab of Connections",
     "agents.connections.mcp": "MCP servers tab",
     "agents.connections.mcp.add": "MCP servers › Add MCP server",
     "agents.agent": AGENT,

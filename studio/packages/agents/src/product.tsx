@@ -14,7 +14,7 @@
  * | Agents | `/agents/agents` | — |
  * | Skills | `/agents/skills` | — |
  * | Functions | `/agents/functions` | Functions · `plans` · `promoted` · `templates` · `plugins` |
- * | Connections | `/agents/connections/mcp` | MCP servers |
+ * | Connections | `/agents/connections/server` | This Graph's server · `mcp` |
  * | LLMs | `/agents/llms[/:provider]` | — an endpoint opens in a modal |
  * | Runs | `/agents/runs` | — a run opens as a tab (`?page=run:<id>`) |
  * | Approvals | `/agents/approvals` | Waiting · `alerts` |
@@ -125,7 +125,7 @@ export const agents: ProductDefinition = {
 					"Functions",
 					tabs("plans", "promoted", "templates", "plugins"),
 				),
-				level("connections", "Connections", tabs("mcp")),
+				level("connections", "Connections", tabs("server", "mcp")),
 				// The endpoint's crumb is its name, which the host reads; the id is no label.
 				level("llms", "LLMs", [level(":provider")]),
 				level("runs", "Runs"),

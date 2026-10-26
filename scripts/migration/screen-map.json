@@ -1796,6 +1796,12 @@
    "route": "/u/admin/airways/agents/connections/mcp?right=assistant",
    "state": "MCP servers \u203a Add MCP server"
   },
+  "agents.connections": {
+   "story": "AF-18",
+   "product": "agent-fabric",
+   "route": "/u/admin/airways/agents/connections/server?right=assistant",
+   "state": "This Graph's server tab, the landing tab of Connections"
+  },
   "agents.llms.endpoint": {
    "story": "AF-19",
    "product": "agent-fabric",
