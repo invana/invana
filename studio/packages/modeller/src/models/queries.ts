@@ -461,6 +461,30 @@ export function useModelLinksQuery(username?: string, graphSlug?: string) {
 	});
 }
 
+/** One stitch read whole, for the inspector. */
+export function useModelLinkQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	linkId: string | null,
+) {
+	return useQuery({
+		queryKey: [...linksRoot(username ?? "", graphSlug ?? ""), linkId] as const,
+		queryFn: () =>
+			modelsApi.link(username as string, graphSlug as string, linkId as string),
+		enabled: !!username && !!graphSlug && !!linkId,
+	});
+}
+
+/** The Stitches page's Removed group. */
+export function useRemovedLinksQuery(username?: string, graphSlug?: string) {
+	return useQuery({
+		queryKey: [...linksRoot(username ?? "", graphSlug ?? ""), "removed"] as const,
+		queryFn: () =>
+			modelsApi.removedLinks(username as string, graphSlug as string),
+		enabled: !!username && !!graphSlug,
+	});
+}
+
 export function useGlobalModelQuery(username?: string, graphSlug?: string) {
 	return useQuery({
 		queryKey: ["global-model", username, graphSlug] as const,

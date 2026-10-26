@@ -516,6 +516,42 @@ export interface ModelLink {
 	description: string;
 	/** What committing this stitch wrote. Present on a commit's reply only. */
 	edges_written?: number | null;
+	/** Edges the stitch holds in the graph now; null before it first solves. */
+	edges: number | null;
+}
+
+/** One event in a stitch's history — its declare and its commit. */
+export interface StitchEvent {
+	action: string;
+	at: string;
+	actor: string | null;
+}
+
+/** One stitch read whole: who declared it, each end's records, its history. */
+export interface StitchDetail extends ModelLink {
+	declared_by: string | null;
+	declared_at: string | null;
+	/** Each end type's latest counted records; null when never counted. */
+	source_records: number | null;
+	target_records: number | null;
+	history: StitchEvent[];
+}
+
+/** A removed stitch, read from its removal event — the row itself is gone. */
+export interface RemovedStitch {
+	/** The removed stitch's id. */
+	id: string;
+	kind: LinkKind;
+	source_model: string | null;
+	source_type: string;
+	target_model: string | null;
+	target_type: string;
+	source_property: string | null;
+	target_property: string | null;
+	edge_type: string | null;
+	edges_withdrawn: number;
+	removed_by: string | null;
+	removed_at: string;
 }
 
 export interface ModelLinkDeclare {

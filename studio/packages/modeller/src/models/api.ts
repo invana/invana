@@ -21,6 +21,8 @@ import type {
 	ModelImportResult,
 	ModelLink,
 	ModelLinkDeclare,
+	RemovedStitch,
+	StitchDetail,
 	ModelUpgradeResult,
 	NodeTypeCreate,
 	NodeTypeResponse,
@@ -322,6 +324,12 @@ export const modelsApi = {
 	// ── Links and the global model (stitch-models.md) ────────────────────────
 	links: (u: string, g: string) =>
 		request<ModelLink[]>(`${graphBase(u, g)}/model-links`),
+	/** One stitch read whole — the inspector's read. */
+	link: (u: string, g: string, linkId: string) =>
+		request<StitchDetail>(`${graphBase(u, g)}/model-links/${linkId}`),
+	/** Removed stitches, newest first, from their removal events. */
+	removedLinks: (u: string, g: string) =>
+		request<RemovedStitch[]>(`${graphBase(u, g)}/model-links/removed`),
 	declareLink: (u: string, g: string, data: ModelLinkDeclare) =>
 		post(`${graphBase(u, g)}/model-links`, data) as Promise<ModelLink>,
 	removeLink: (u: string, g: string, linkId: string) =>
