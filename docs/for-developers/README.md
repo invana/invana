@@ -77,6 +77,7 @@ this map.** Feature numbers do not change.
 | 1.8 | [The model page](modules/connect-and-model/features/the-model-page.md) | One page, five tabs — Overview · Database · Usage · Performance · Growth — with the model as a filter; one model's schema canvas and type pages; is it used, is it slow, how has it grown | ✅ | — | 🟡 | S-TBD |
 | 1.9 | [Publish review](modules/connect-and-model/features/publish-review.md) | Additive publishes now; breaking is previewed as a migration run and published after another owner approves | ✅ | ✅ | ✅ | B10 |
 | 1.10 | [Import an ontology](modules/connect-and-model/features/ontology-import.md) | RDFS / OWL subset, schema.org included — JSON-LD, Turtle, RDF/XML — into a draft model; flattened, source IRIs kept, an import report of what was skipped | ✅ | ✅ | ✅ | B12 · C08 |
+| 1.11 | [Constraints on properties](modules/connect-and-model/features/property-constraints.md) | A range with a unit or a standard's values on one property of a type; Reject or Flag for review; checked at record write, bind and validation, naming the constraint; what breaks it today counted before saving | ✅ | — | ✅ | M04 |
 
 ## 2 · [Bring data in](modules/bring-data-in/spec.md)
 

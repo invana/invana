@@ -27,7 +27,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | MO-F4 | Version compare on the map; publish with who-reads-it; breaking publishes previewed as a migration run and approved by another member | In Studio (C04) — the map draws no per-type diff marks | MO-05 |
 | MO-F5 | New model from a description, a file or a starter | In Studio | MO-06 |
 | MO-F6 | Model dashboards — overview, database drift, usage, performance, growth, saved report | In Studio | MO-07 |
-| MO-F7 | Constraints on properties; values named by a standard | New | MO-08 |
+| MO-F7 | Constraints on properties; values named by a standard | In Studio ([1.11](../for-developers/modules/connect-and-model/features/property-constraints.md)) | MO-08 |
 | MO-F8 | Model history with effect downstream | In Studio (C04) | MO-09 |
 | MO-F9 | Worlds | In Studio | MO-10 |
 | MO-F10 | Guardrails and the requests they cause | In Studio | MO-11 |
@@ -84,7 +84,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | Decision | Detail |
 |---|---|
 | Landing | Global model, not a list |
-| Standards | Defined in Datasets; a property **references** a standard’s values |
+| Standards | Defined in Datasets; a property **references** a standard’s values — copied at save from the standard's current version, so a newer version reaches the model only when the constraint is saved again ([1.11](../for-developers/modules/connect-and-model/features/property-constraints.md) PC4) |
 | Imports | Moved to Datasets |
 | Guardrails | A guardrail is one property rule, always in force. The layered-lens guardrails are retired; each existing one is migrated to property rules, so no Graph loses its protection |
 | Rule scope | Install, Graph and project. The install is the top scope: there is no tenancy, so an install rule holds in every Graph on it |
