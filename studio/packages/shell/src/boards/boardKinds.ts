@@ -48,14 +48,14 @@ import {
 	Plug,
 	Quote,
 	ScrollText,
+	Server,
+	ServerCog,
 	ShieldCheck,
 	SlidersHorizontal,
 	SquareActivity,
 	SquareFunction,
 	UsersRound,
 	WandSparkles,
-	Server,
-	ServerCog,
 } from "lucide-react";
 import type { ElementType } from "react";
 

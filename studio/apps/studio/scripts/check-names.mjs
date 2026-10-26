@@ -82,6 +82,8 @@ const ENGINE_ONLY = {
 	evals: "served by the @invana-studio/agents package, outside the host",
 	iam: "served by the @invana-studio/iam package, outside the host",
 	plugins: "served by the @invana-studio/agents package, outside the host",
+	workers:
+		"served by the @invana-studio/agents package (Agents › Workers), outside the host",
 	mcp_server:
 		"this Graph's MCP server — its Connections reads are served by the @invana-studio/agents package, outside the host",
 	datasets: "served by the @invana-studio/datasets package, outside the host",

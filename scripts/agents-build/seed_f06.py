@@ -28,12 +28,16 @@ from sqlalchemy import delete, select
 import invana.apps.annotations.models  # noqa: F401
 import invana.apps.boards.models  # noqa: F401
 import invana.apps.flows.models  # noqa: F401
+import invana.apps.graphs.models  # noqa: F401
+import invana.apps.iam.models  # noqa: F401
 import invana.apps.llm_providers.models  # noqa: F401
 import invana.apps.sessions.models  # noqa: F401
 import invana.apps.skills.models  # noqa: F401
 import invana.apps.standards.models  # noqa: F401
 import invana.apps.work.models  # noqa: F401
+from invana.apps.workers.managers.join_tokens import JoinTokenManager
 from invana.apps.workers.models import Worker, WorkerEvent, WorkerPool, WorkerStat
+from invana.apps.workers.schemas import JoinTokenIn
 from invana.core.auth.models import User
 from invana.core.auth.tokens import hash_token
 from invana.core.db import create_db_engine, create_session_factory
@@ -58,7 +62,8 @@ async def main() -> None:
     factory = create_session_factory(engine)
     async with factory() as db:
         ravi = (await db.execute(select(User).where(User.username == "admin"))).scalar_one()
-        await db.execute(delete(WorkerPool).where(WorkerPool.name.in_([p[0] for p in POOLS])))
+        # The done-when check leaves its own pool behind; the boards draw the four below.
+        await db.execute(delete(WorkerPool).where(WorkerPool.name.in_([*(p[0] for p in POOLS), "done-when"])))
         pools: dict[str, WorkerPool] = {}
         for name, runs_on, labels, slots, set_by, replicas, plugins, egress in POOLS:
             pool = WorkerPool(
@@ -157,6 +162,14 @@ async def main() -> None:
                         suggested=suggested[name],
                     )
                 )
+        await db.commit()
+        for pool, days, cap in (("egress", 7, 8), ("k8s-prod", None, None)):
+            await JoinTokenManager().mint(
+                db,
+                payload=JoinTokenIn(pool_id=pools[pool].id, expires_in_days=days, cap=cap),
+                actor=ravi,
+                engine_url="http://localhost:8200",
+            )
         await db.commit()
     await engine.dispose()
     print("seeded", ", ".join(p[0] for p in POOLS))

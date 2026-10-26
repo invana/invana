@@ -35,8 +35,6 @@ export {
 export { useFlowsQuery } from "./plans/queries";
 export { FunctionPage } from "./plugins/FunctionPage";
 export { PluginPage } from "./plugins/PluginPage";
-export { WorkerPage } from "./workers/WorkerPage";
-export { WorkerPoolPage } from "./workers/WorkerPoolPage";
 export { agents } from "./product";
 export { useRunNumbers } from "./runNumbers";
 export { RunPage } from "./runs/RunPage";
@@ -50,3 +48,5 @@ export { SkillFlowWidget } from "./skills/boards/SkillFlowWidget";
 export { ruleTitle, SKILL_ACTIONS, when } from "./skills/boards/shared";
 export { useSkillsQuery } from "./skills/queries";
 export { SkillBoardPage } from "./skills/SkillBoardPage";
+export { WorkerPage } from "./workers/WorkerPage";
+export { WorkerPoolPage } from "./workers/WorkerPoolPage";

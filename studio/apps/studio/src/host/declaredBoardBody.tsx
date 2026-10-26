@@ -7,11 +7,11 @@ import {
 	PlanExportPage,
 	PlanVersionsPage,
 	PluginPage,
-	WorkerPage,
-	WorkerPoolPage,
 	RunPage,
 	SkillBoardPage,
 	TemplatePage,
+	WorkerPage,
+	WorkerPoolPage,
 } from "@invana-studio/agents";
 import type { CanvasBackend } from "@invana-studio/canvases";
 import { GroupPage, IamAgentPage, PolicyPage } from "@invana-studio/iam";
@@ -289,7 +289,9 @@ export function declaredBoardContent(
 		return (
 			<WorkerPage
 				worker={board.subjectId}
-				onOpenPool={(name) => openBoard({ kind: "worker_pool", subjectId: name })}
+				onOpenPool={(name) =>
+					openBoard({ kind: "worker_pool", subjectId: name })
+				}
 			/>
 		);
 	}
