@@ -23,6 +23,7 @@ from invana.apps.modeller.models import (
     ModelLink,
     NodeTypeDefinition,
     PropertyKeyDefinition,
+    TypePropertyMapping,
 )
 from invana.apps.modeller.solve import ANCHOR_EDGE
 
@@ -105,6 +106,59 @@ class CatalogueQuerySet:
         return [
             (model_name, version_label, axes or {}, by_version.get(version_id, []))
             for version_id, model_name, version_label, axes in rows
+        ]
+
+    async def published_type_properties(
+        self, session: AsyncSession, graph_id: str
+    ) -> list[tuple[str, str, str | None, str, list[str]]]:
+        """``(model id, model name, version label, type name, property names)`` per type.
+
+        One row per node and edge type of every active version, with the
+        properties that type maps — what a guardrail's target is checked
+        against and what the lens view draws.
+        """
+        stmt = (
+            select(GraphVersion.id, GraphModel.id, GraphModel.name, GraphVersion.version)
+            .join(GraphModel, GraphModel.id == GraphVersion.model_id)
+            .where(GraphModel.graph_id == graph_id, GraphVersion.status == "active")
+            .order_by(GraphModel.name, GraphVersion.created_at)
+        )
+        versions = (await session.execute(stmt)).all()
+        if not versions:
+            return []
+        version_ids = [row[0] for row in versions]
+
+        out: dict[str, list[tuple[str, list[str]]]] = {}
+        for model, fk in (
+            (NodeTypeDefinition, TypePropertyMapping.node_type_id),
+            (EdgeTypeDefinition, TypePropertyMapping.edge_type_id),
+        ):
+            types = (
+                await session.execute(
+                    select(model.id, model.version_id, model.name)
+                    .where(model.version_id.in_(version_ids))
+                    .order_by(model.name)
+                )
+            ).all()
+            props: dict[str, list[str]] = {}
+            if types:
+                mapped = (
+                    await session.execute(
+                        select(fk, PropertyKeyDefinition.name)
+                        .join(PropertyKeyDefinition, PropertyKeyDefinition.id == TypePropertyMapping.property_key_id)
+                        .where(fk.in_([t[0] for t in types]))
+                        .order_by(PropertyKeyDefinition.name)
+                    )
+                ).all()
+                for type_id, name in mapped:
+                    props.setdefault(type_id, []).append(name)
+            for type_id, version_id, name in types:
+                out.setdefault(version_id, []).append((name, props.get(type_id, [])))
+
+        return [
+            (model_id, model_name, version_label, type_name, properties)
+            for version_id, model_id, model_name, version_label in versions
+            for type_name, properties in out.get(version_id, [])
         ]
 
     async def version_label(self, session: AsyncSession, version_id: str) -> tuple[str, str | None] | None:

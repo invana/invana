@@ -28,6 +28,26 @@ class ScheduleQuerySet:
         stmt = select(Schedule).where(Schedule.graph_id == graph_id).order_by(Schedule.name)
         return list((await session.execute(stmt)).scalars())
 
+    async def worlds_by_schedule(
+        self, session: AsyncSession, *, graph_id: str
+    ) -> list[tuple[str, str, frozenset[str | None]]]:
+        """``(id, name, worlds)`` per schedule — the worlds its fired runs were asked in.
+
+        ``None`` is *no world*. A schedule that has not fired yet asks in no
+        world, which is where every firing starts.
+        """
+        schedules = await self.list_for_graph(session, graph_id=graph_id)
+        stmt = (
+            select(ScheduleFiring.schedule_id, TaskRun.lens_id)
+            .join(TaskRun, TaskRun.id == ScheduleFiring.run_id)
+            .where(ScheduleFiring.graph_id == graph_id)
+            .distinct()
+        )
+        seen: dict[str, set[str | None]] = {}
+        for schedule_id, lens_id in (await session.execute(stmt)).all():
+            seen.setdefault(schedule_id, set()).add(lens_id)
+        return [(s.id, s.name, frozenset(seen.get(s.id) or {None})) for s in schedules]
+
     async def active_for_agent(self, session: AsyncSession, *, agent_id: str) -> list[Schedule]:
         """The active schedules that start ``agent_id``, by name."""
         stmt = (

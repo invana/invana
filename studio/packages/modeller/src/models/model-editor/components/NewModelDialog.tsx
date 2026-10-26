@@ -26,7 +26,7 @@ import {
 import { sessionsApi } from "@invana-studio/assistant";
 import { ApiError } from "@invana-studio/core";
 import { FormError } from "@invana-studio/ui";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
 	useCreateModelMutation,
@@ -44,6 +44,8 @@ interface Props {
 	onClose: () => void;
 	/** `assistant` is true when the draft was opened with the description asked. */
 	onCreated: (modelId: string, opts: { assistant: boolean }) => void;
+	/** Prefills the description — a request's ask, when *Model it* opens it. */
+	initialDescription?: string;
 }
 
 export function NewModelDialog({
@@ -52,10 +54,14 @@ export function NewModelDialog({
 	graphSlug,
 	onClose,
 	onCreated,
+	initialDescription,
 }: Props) {
 	const fileInput = useRef<HTMLInputElement>(null);
 	const [name, setName] = useState("");
-	const [description, setDescription] = useState("");
+	const [description, setDescription] = useState(initialDescription ?? "");
+	useEffect(() => {
+		if (open && initialDescription) setDescription(initialDescription);
+	}, [open, initialDescription]);
 	const [start, setStart] = useState<Start>("describe");
 	const [artefact, setArtefact] = useState<ModelArtefact | null>(null);
 	const [starter, setStarter] = useState<string | null>(null);

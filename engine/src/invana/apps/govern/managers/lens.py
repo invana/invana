@@ -1,14 +1,14 @@
-"""The rules about a lens — creating, naming, promoting, deleting.
+"""The rules about a lens — creating, naming, deleting, and composing the guardrails.
 
-One record, two kinds ([GV1](docs/for-developers/modules/govern/spec.md)), and
-one ladder where each rung is a single edit
-([GV3](docs/for-developers/modules/govern/spec.md)):
+One record, two kinds ([GV1](docs/for-developers/modules/govern/spec.md)). A
+world starts unnamed and private; naming it is the write that publishes it. A
+guardrail pinned on an agent is a layered lens authored here too. A Graph's
+guardrail is one property rule and is written by
+:class:`~invana.apps.govern.managers.guardrail.GuardrailManager` alone — this
+manager refuses to create or edit one, so its ``rules`` are only ever compiled.
 
-    unnamed lens --name it--> world --kind--> guardrail
-
-Naming is the write that publishes; promotion is a field change, never a
-re-authoring. Both are ordinary audited writes, so *who loosened what, when, and
-what it was before* is answerable from ``core/events`` like everything else
+Every write is an ordinary audited event, so *who loosened what, when, and what
+it was before* is answerable from ``core/events`` like everything else
 ([GR7](docs/for-developers/modules/govern/features/guardrails.md)).
 """
 
@@ -22,7 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.govern.addressing import GOVERNED_LAYERS, Layer
 from invana.apps.govern.catalogue import Catalogue
-from invana.apps.govern.models import Lens, LensKind
+from invana.apps.govern.models import GRAPH_SCOPE, Lens, LensKind
 from invana.apps.govern.querysets import LensQuerySet
 from invana.apps.govern.rules import Closure, Effective, Rule, RuleError, compose, validate_cast, validate_rule
 from invana.apps.govern.schemas import LensCreate, LensUpdate, RuleIn
@@ -32,6 +32,10 @@ from invana.core.events import actions
 from invana.core.events.services import emit_event
 
 _SLUG_STRIP = re.compile(r"[^a-z0-9]+")
+
+_GRAPH_GUARDRAIL_ELSEWHERE = (
+    "A Graph's guardrail is one property rule — set it under Guardrails (…/govern/guardrails), not as a lens."
+)
 
 
 def slugify(name: str) -> str:
@@ -107,17 +111,27 @@ def to_effective(lens: Lens) -> Effective:
             else []
         ),
         as_of=lens.as_of.isoformat() if lens.as_of else None,
-        contributors=[
-            {
-                "id": lens.id,
-                "kind": lens.kind,
-                "key": lens.key,
-                # Frozen with the rest, so a rename never rewrites a past run.
-                "name": lens.display_name,
-                "version": lens.version,
-            }
-        ],
+        contributors=[_contributor(lens)],
     )
+
+
+def _contributor(lens: Lens) -> dict:
+    """How a lens is named in the snapshot it was composed into.
+
+    The name is frozen with the rest, so a rename never rewrites a past run. A
+    Graph guardrail also carries its property rule, so a refusal the connector
+    makes can be traced to the guardrail that holds the property.
+    """
+    out = {
+        "id": lens.id,
+        "kind": lens.kind,
+        "key": lens.key,
+        "name": lens.display_name,
+        "version": lens.version,
+    }
+    if lens.is_graph_guardrail:
+        out.update(scope=lens.scope, target=lens.target, access=lens.access, leaves=lens.leaves)
+    return out
 
 
 class LensManager:
@@ -144,15 +158,28 @@ class LensManager:
         return lens
 
     async def effective_guardrails(
-        self, session: AsyncSession, *, graph_id: str, agent_id: str | None = None
+        self,
+        session: AsyncSession,
+        *,
+        graph_id: str,
+        agent_id: str | None = None,
+        world_id: str | None = None,
     ) -> Effective:
         """Every guardrail in force — the Graph's, plus the agent's if it has one.
 
         Bounds nest, and an agent's guardrail **narrows** the Graph's; it can
         never widen it, which is checked when it is saved rather than composed
         away here.
+
+        ``world_id`` is the world the run is asked in. A Graph guardrail a
+        request allowed in that world is the one exception a guardrail has, and
+        it is left out here — runs asked anywhere else still carry it.
         """
-        pinned = await self.lenses_qs.guardrails_for_graph(session, graph_id)
+        pinned = [
+            lens
+            for lens in await self.lenses_qs.guardrails_for_graph(session, graph_id)
+            if not (world_id and world_id in (lens.allowed_in or []))
+        ]
         if agent_id:
             pinned += await self.lenses_qs.guardrails_for_agent(session, graph_id, agent_id)
 
@@ -176,6 +203,8 @@ class LensManager:
 
         if payload.kind is LensKind.guardrail:
             self._require_guardrail_permission(may_edit_guardrails)
+            if payload.scope == GRAPH_SCOPE:
+                raise ValidationError(_GRAPH_GUARDRAIL_ELSEWHERE)
             if not payload.name:
                 raise ValidationError("A guardrail is always named — it is what an auditor is handed.")
             if not payload.scope:
@@ -236,6 +265,8 @@ class LensManager:
     ) -> Lens:
         if lens.kind == LensKind.guardrail.value:
             self._require_guardrail_permission(may_edit_guardrails)
+        if lens.is_graph_guardrail:
+            raise ValidationError(_GRAPH_GUARDRAIL_ELSEWHERE)
 
         before = {"rules": list(lens.rules or []), "cast": dict(lens.cast or {}), "key": lens.key}
         published = False
@@ -292,42 +323,6 @@ class LensManager:
         )
         return lens
 
-    async def promote(
-        self,
-        session: AsyncSession,
-        *,
-        lens: Lens,
-        scope: str,
-        actor_id: str,
-        may_edit_guardrails: bool,
-    ) -> Lens:
-        """A world becomes a guardrail. **One field**, and no re-authoring.
-
-        It leaves the Worlds list and appears under Guardrails; every world now
-        narrows within it, and none of them is touched.
-        """
-        self._require_guardrail_permission(may_edit_guardrails)
-        if lens.kind == LensKind.guardrail.value:
-            raise ConflictError("This is already a guardrail.")
-        if not lens.is_named:
-            raise ValidationError("Name it first — a guardrail is always named.")
-
-        lens.kind = LensKind.guardrail.value
-        lens.scope = scope
-        lens.version += 1
-        await session.flush()
-
-        await emit_event(
-            session,
-            action=actions.LENS_PROMOTE,
-            target_kind=actions.TARGET_LENS,
-            target_id=lens.id,
-            graph_id=lens.graph_id,
-            actor_id=actor_id,
-            details={"scope": scope, "key": lens.key},
-        )
-        return lens
-
     async def duplicate(self, session: AsyncSession, *, lens: Lens, actor_id: str) -> Lens:
         """A copy, unnamed — so it starts private and naming it is a decision."""
         copy = Lens(
@@ -365,9 +360,18 @@ class LensManager:
         """Delete a lens. No agent carries a world (AG26), and a session that
         started in this one reads *Everything* after, saying the world is gone
         ([AS5](docs/for-developers/modules/ask/spec.md)).
+
+        A world a guardrail was allowed in is dropped from that guardrail's
+        ``allowed_in``; the guardrail binds everywhere else unchanged.
         """
         if lens.kind == LensKind.guardrail.value:
             self._require_guardrail_permission(may_edit_guardrails)
+            if lens.is_graph_guardrail:
+                raise ValidationError(_GRAPH_GUARDRAIL_ELSEWHERE)
+        else:
+            for guardrail in await self.lenses_qs.guardrails_for_graph(session, lens.graph_id):
+                if lens.id in (guardrail.allowed_in or []):
+                    guardrail.allowed_in = [w for w in guardrail.allowed_in if w != lens.id]
 
         await self.lenses_qs.delete(session, lens)
         await emit_event(

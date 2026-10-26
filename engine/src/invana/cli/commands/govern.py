@@ -1,8 +1,9 @@
 """`invana govern …` — the bounds a Graph runs inside, from a file.
 
-A Graph's guardrails and its worlds are one record separated by ``kind``
-(docs/for-developers/modules/govern/spec.md GV1), so one file declares both and
-one command applies it:
+A Graph's guardrails and its worlds are one record separated by ``kind``, so
+one file declares both and one command applies it. A guardrail is one property
+rule — ``{"target": "Deal.contract_value", "access": "counts", "leaves": false}``
+— and a world is layered rules:
 
     invana govern apply --graph demo/airways --file demos/airways/govern.json
     invana govern list  --graph demo/airways
@@ -13,9 +14,9 @@ same order the product enforces: a world is validated at save, not at run
 (WO3), so a world this file cannot legally create is refused here rather than
 landing and failing the first time somebody picks it.
 
-Applying is **idempotent by name** — a lens whose name is already in the Graph
-is updated in place, so re-running the file after an edit does what you mean
-instead of refusing on the unique key.
+Applying is **idempotent** — a guardrail whose target is already held, or a
+world whose name is already in the Graph, is updated in place, so re-running the
+file after an edit does what you mean instead of refusing on the unique key.
 """
 
 from __future__ import annotations
@@ -25,17 +26,19 @@ import json
 from pathlib import Path
 
 import click
+from pydantic import ValidationError as PydanticValidationError
 
 from invana.apps.govern.catalogue import CatalogueResolver
-from invana.apps.govern.managers import LensManager
+from invana.apps.govern.managers import GuardrailManager, LensManager
 from invana.apps.govern.models import LensKind
-from invana.apps.govern.schemas import LensCreate, LensUpdate, RuleIn
+from invana.apps.govern.schemas import GuardrailIn, GuardrailUpdate, LensCreate, LensUpdate, RuleIn
 from invana.apps.graphs.querysets import GraphQuerySet
 from invana.core.auth.querysets import UserQuerySet
 from invana.core.db import create_db_engine, create_session_factory
 from invana.core.errors import InvanaError
 
 _lenses = LensManager()
+_guardrails = GuardrailManager()
 _catalogue = CatalogueResolver()
 
 
@@ -98,47 +101,69 @@ def apply(graph_ref: str, file_path: Path, user_ref: str | None) -> None:
         lines: list[tuple[str, str, str]] = []
         # Guardrails first: a world is checked against them, so applying in the
         # other order would refuse worlds that are perfectly legal by the end.
-        for kind, entries in (
-            (LensKind.guardrail, payload.get("guardrails", [])),
-            (LensKind.world, payload.get("worlds", [])),
-        ):
-            for entry in entries:
-                name = entry["name"]
-                try:
-                    if name in existing:
-                        await _lenses.update(
-                            session,
-                            lens=existing[name],
-                            payload=LensUpdate(
-                                rules=_rules(entry.get("rules", [])),
-                                cast=entry.get("cast", {}),
-                                closed_layers=entry.get("closed_layers", []),
-                            ),
-                            actor_id=actor_id,
-                            catalogue=catalogue,
-                            may_edit_guardrails=True,
-                        )
-                        lines.append(("updated", kind.value, name))
-                    else:
-                        lens = await _lenses.create(
-                            session,
-                            graph_id=graph.id,
-                            payload=LensCreate(
-                                name=name,
-                                kind=kind,
-                                scope=entry.get("scope") if kind is LensKind.guardrail else None,
-                                rules=_rules(entry.get("rules", [])),
-                                cast=entry.get("cast", {}),
-                                closed_layers=entry.get("closed_layers", []),
-                            ),
-                            actor_id=actor_id,
-                            catalogue=catalogue,
-                            may_edit_guardrails=True,
-                        )
-                        existing[name] = lens
-                        lines.append(("created", kind.value, name))
-                except InvanaError as exc:
-                    lines.append(("refused", kind.value, f"{name} — {_why(exc)}"))
+        held = {g.target: g for g in await _lenses.lenses_qs.guardrails_for_graph(session, graph.id) if g.target}
+        for entry in payload.get("guardrails", []):
+            target = str(entry.get("target", ""))
+            try:
+                if target in held:
+                    lens = await _guardrails.update(
+                        session,
+                        guardrail=held[target],
+                        payload=GuardrailUpdate(access=entry["access"], leaves=entry["leaves"]),
+                        actor_id=actor_id,
+                        may_edit=True,
+                    )
+                    lines.append(("updated", "guardrail", lens.name))
+                else:
+                    lens = await _guardrails.create(
+                        session,
+                        graph_id=graph.id,
+                        payload=GuardrailIn(target=target, access=entry["access"], leaves=entry["leaves"]),
+                        actor_id=actor_id,
+                        may_edit=True,
+                    )
+                    held[target] = lens
+                    lines.append(("created", "guardrail", lens.name))
+            except (InvanaError, KeyError, PydanticValidationError) as exc:
+                lines.append(("refused", "guardrail", f"{target} — {_why(exc)}"))
+
+        for entry in payload.get("worlds", []):
+            name = entry["name"]
+            kind = LensKind.world
+            try:
+                if name in existing:
+                    await _lenses.update(
+                        session,
+                        lens=existing[name],
+                        payload=LensUpdate(
+                            rules=_rules(entry.get("rules", [])),
+                            cast=entry.get("cast", {}),
+                            closed_layers=entry.get("closed_layers", []),
+                        ),
+                        actor_id=actor_id,
+                        catalogue=catalogue,
+                        may_edit_guardrails=True,
+                    )
+                    lines.append(("updated", kind.value, name))
+                else:
+                    lens = await _lenses.create(
+                        session,
+                        graph_id=graph.id,
+                        payload=LensCreate(
+                            name=name,
+                            kind=kind,
+                            rules=_rules(entry.get("rules", [])),
+                            cast=entry.get("cast", {}),
+                            closed_layers=entry.get("closed_layers", []),
+                        ),
+                        actor_id=actor_id,
+                        catalogue=catalogue,
+                        may_edit_guardrails=True,
+                    )
+                    existing[name] = lens
+                    lines.append(("created", kind.value, name))
+            except InvanaError as exc:
+                lines.append(("refused", kind.value, f"{name} — {_why(exc)}"))
         return lines
 
     lines = asyncio.run(_with_graph(graph_ref, user_ref, work))
@@ -154,8 +179,12 @@ def apply(graph_ref: str, file_path: Path, user_ref: str | None) -> None:
         raise SystemExit(1)
 
 
-def _why(exc: InvanaError) -> str:
+def _why(exc: Exception) -> str:
     """A refusal, as the surface would word it — the bound named, not a code."""
+    if isinstance(exc, KeyError):
+        return f"missing {exc.args[0]!r}"
+    if isinstance(exc, PydanticValidationError):
+        return "; ".join(e["msg"] for e in exc.errors())
     detail = exc.detail
     if isinstance(detail, dict) and detail.get("refusals"):
         return "; ".join(r["message"] for r in detail["refusals"])
@@ -178,7 +207,10 @@ def list_lenses(graph_ref: str) -> None:
     click.echo("")
     click.echo(f"  guardrails — in force on every run  ({len(guardrails)})")
     for lens in guardrails:
-        click.echo(f"    {lens.name:<26} {len(lens.rules)} rules · {lens.scope}")
+        if lens.target:
+            click.echo(f"    {lens.name:<40} {lens.target} · {lens.access} · {'may leave' if lens.leaves else 'stays'}")
+        else:
+            click.echo(f"    {lens.name:<40} {len(lens.rules)} rules · {lens.scope}")
     if not guardrails:
         click.echo("    nothing set — the widest state: every configured provider, the whole global model")
 

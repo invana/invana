@@ -1,42 +1,16 @@
 {
   "name": "airways",
-  "description": "The guardrails this Graph runs inside, and four worlds that narrow within them. Loaded by `invana govern apply`.",
+  "description": "The guardrails this Graph runs inside — one property rule each — and four worlds that narrow within them. Loaded by `invana govern apply`.",
   "guardrails": [
     {
-      "name": "Airways guardrails",
-      "scope": "graph",
-      "closed_layers": [],
-      "rules": [
-        {
-          "match": "third_party/**",
-          "allow": false
-        },
-        {
-          "match": "graph_data/model/Deals@*",
-          "allow": true,
-          "properties": {
-            "exclude": []
-          },
-          "egress": {
-            "may_send": [
-              "type_names",
-              "property_names",
-              "the_question"
-            ]
-          }
-        },
-        {
-          "match": "llm/**",
-          "allow": true,
-          "egress": {
-            "may_send": [
-              "type_names",
-              "property_names",
-              "the_question"
-            ]
-          }
-        }
-      ]
+      "target": "*.*",
+      "access": "read",
+      "leaves": false
+    },
+    {
+      "target": "Deal.contract_value",
+      "access": "counts",
+      "leaves": false
     }
   ],
   "worlds": [

@@ -1,9 +1,9 @@
 /**
- * Govern — the nine routes under `…/govern/*`.
+ * Govern — the routes under `…/govern/*`.
  *
- * A guardrail and a world are one record separated by `kind`, so `list` filters
- * rather than two paths doing it. Two endpoints would be the second
- * enforcement path the module exists not to have.
+ * A world is a `lenses` row authored as layered rules; a Graph guardrail is one
+ * property rule under `…/guardrails`, stored on the same table with its rules
+ * compiled by the engine, so enforcement keeps one path.
  */
 
 import type {
@@ -12,7 +12,6 @@ import type {
 	CompareResponse,
 	GovernLayer,
 	GovernRule,
-	ImpactResponse,
 	Lens,
 	LensCreate,
 	LensUpdate,
@@ -20,6 +19,15 @@ import type {
 	ValidationResponse,
 } from "@invana-studio/core";
 import { request } from "@invana-studio/core";
+import type {
+	GuardrailDetail,
+	GuardrailImpact,
+	GuardrailPage,
+	GuardrailRule,
+	GuardrailTarget,
+	GuardrailUpdate,
+	LensView,
+} from "./types";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}/govern`;
@@ -57,10 +65,6 @@ export const governApi = {
 	deleteLens: (u: string, g: string, id: string) =>
 		request<void>(`${base(u, g)}/lenses/${id}`, { method: "DELETE" }),
 
-	/** World → guardrail. One field, never a re-authoring. */
-	promoteLens: (u: string, g: string, id: string, scope = "graph") =>
-		post(`${base(u, g)}/lenses/${id}/promote`, { scope }) as Promise<Lens>,
-
 	duplicateLens: (u: string, g: string, id: string) =>
 		post(`${base(u, g)}/lenses/${id}/duplicate`, {}) as Promise<Lens>,
 
@@ -76,16 +80,36 @@ export const governApi = {
 	) =>
 		post(`${base(u, g)}/lenses/validate`, data) as Promise<ValidationResponse>,
 
-	/** What a guardrail save would cost every world that narrows inside it. */
-	guardrailImpact: (
-		u: string,
-		g: string,
-		data: {
-			rules?: GovernRule[];
-			closed_layers?: GovernLayer[];
-			scope?: string;
-		},
-	) => post(`${base(u, g)}/lenses/impact`, data) as Promise<ImpactResponse>,
+	// ── Guardrails — one property rule each ─────────────────────────────────
+	guardrails: (u: string, g: string) =>
+		request<GuardrailPage>(`${base(u, g)}/guardrails`),
+
+	guardrail: (u: string, g: string, id: string) =>
+		request<GuardrailDetail>(`${base(u, g)}/guardrails/${id}`),
+
+	/** Every `Type.property` the picker offers, from published versions. */
+	guardrailTargets: (u: string, g: string) =>
+		request<GuardrailTarget[]>(`${base(u, g)}/guardrails/targets`),
+
+	/** What a guardrail save would cost, counted before the write. */
+	guardrailImpact: (u: string, g: string, data: GuardrailRule) =>
+		post(`${base(u, g)}/guardrails/impact`, data) as Promise<GuardrailImpact>,
+
+	createGuardrail: (u: string, g: string, data: GuardrailRule) =>
+		post(`${base(u, g)}/guardrails`, data) as Promise<GuardrailDetail>,
+
+	updateGuardrail: (u: string, g: string, id: string, data: GuardrailUpdate) =>
+		request<GuardrailDetail>(`${base(u, g)}/guardrails/${id}`, {
+			method: "PATCH",
+			body: JSON.stringify(data),
+		}),
+
+	deleteGuardrail: (u: string, g: string, id: string) =>
+		request<void>(`${base(u, g)}/guardrails/${id}`, { method: "DELETE" }),
+
+	/** The lens canvas and world inspector — the guardrails alone without a world. */
+	view: (u: string, g: string, world?: string) =>
+		request<LensView>(`${base(u, g)}/view${query({ world })}`),
 
 	// ── The catalogue — resolved, never stored ────────────────────────
 	/**

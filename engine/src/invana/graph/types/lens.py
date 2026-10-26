@@ -52,25 +52,30 @@ class TypeBound:
     """What one world says about one type.
 
     ``declared`` is the model version's whole property set and ``excluded`` the
-    part this world does not carry; ``permitted`` is what a rewritten projection
-    enumerates. A type that excludes something and declares nothing cannot be
-    projected and is refused rather than projected to the empty map (CC11).
+    part this world does not carry. ``counts_only`` is the part a query may
+    filter, count and aggregate but never return: it stays referable in a
+    predicate, an ordering or an aggregate, and is left out of whole-element
+    returns like an excluded property is. ``permitted`` is what a rewritten
+    projection enumerates. A type that excludes something and declares nothing
+    cannot be projected and is refused rather than projected to the empty map
+    (CC11).
     """
 
     type_name: str
     declared: frozenset[str] = frozenset()
     excluded: frozenset[str] = frozenset()
     predicates: FilterGroup | None = None
+    counts_only: frozenset[str] = frozenset()
 
     @property
     def permitted(self) -> tuple[str, ...]:
-        """``declared - excluded``, in a stable order so a rewrite is deterministic."""
-        return tuple(sorted(self.declared - self.excluded))
+        """``declared - excluded - counts_only``, in a stable order so a rewrite is deterministic."""
+        return tuple(sorted(self.declared - self.excluded - self.counts_only))
 
     @property
     def narrows_structure(self) -> bool:
         """Whether a whole-element return of this type has to be rewritten."""
-        return bool(self.excluded)
+        return bool(self.excluded or self.counts_only)
 
     @property
     def narrows_records(self) -> bool:

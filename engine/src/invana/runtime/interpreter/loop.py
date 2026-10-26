@@ -29,6 +29,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from invana.apps.agents.envelope import Envelope
 from invana.apps.agents.models import Agent, layered_instructions
+from invana.apps.govern.managers.request import RequestManager, asker_of
+from invana.apps.govern.models import RequestKind
 from invana.apps.graphs.models import Graph
 from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.llm.pricing import cost_usd
@@ -99,7 +101,7 @@ from invana.runtime.interpreter.tracing import (
     run_span,
     step_span,
 )
-from invana.runtime.models import ExitReason, RunStatus, TaskRun, span_ms
+from invana.runtime.models import ExitReason, RunRole, RunStatus, TaskRun, span_ms
 from invana.runtime.planning import plan_payload, queue_plan_steps
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.results import roll_up_run, run_result, run_tokens, step_result
@@ -111,6 +113,8 @@ from invana.runtime.workflows import WORKFLOWS, Step
 _IMPORT_PLAN_KEYS = frozenset({LOAD_PLAN_KEY, BULK_PLAN_KEY})
 
 log = logging.getLogger(__name__)
+
+_requests = RequestManager()
 
 #: How long a ``send`` step's approval waits for its approver.
 SEND_APPROVAL_DEADLINE_S = 86400
@@ -1003,6 +1007,8 @@ class TaskRuntime:
                     self._record(row, ctx, v)
                     await self._ledger_step(db, th, row, v)
                     await self._drop_pending(db, th, message_id)
+                    if "request_id" not in cannot.exchange:
+                        await self._file_unanswered(db, th, v, cannot.reason)
                     await db.commit()
                     await self._step_finished(db, emitter, th, row)
                     await self._finish_cannot_answer(db, emitter, th, v, assistant, cannot.reason)
@@ -1452,6 +1458,34 @@ class TaskRuntime:
             m.timeout_s = v.timeout_s
         v.summary = reason
         await self._settle(db, emitter, th, v, m, RunStatus.succeeded, outcome="cannot_answer")
+
+    async def _file_unanswered(self, db: AsyncSession, th: TaskRun, v: RunVars, reason: str) -> None:
+        """File (or add to) an ``unanswered`` request for an ask that ended *cannot answer*.
+
+        Only for a run a person or an agent asked — an eval or a test replay is
+        nobody's ask. A refusal that already filed a guardrail request is not
+        filed twice. Filing never fails the run.
+        """
+        if th.role == RunRole.evaluate.value or not (v.prompt or th.body):
+            return
+        asker = asker_of(
+            triggered_by=th.triggered_by,
+            author_id=th.author_id if th.author_kind == "user" else None,
+            agent_id=th.agent_id,
+            in_session=v.sess is not None,
+        )
+        await _requests.file_quietly(
+            db,
+            graph_id=th.graph_id,
+            kind=RequestKind.unanswered,
+            title=v.prompt or th.body or "",
+            detail=reason,
+            source=asker.source,
+            asked_by_id=asker.asked_by_id,
+            agent_id=asker.agent_id,
+            run_id=th.id,
+            session_id=v.sess.id if v.sess else None,
+        )
 
     async def _finish_conversed(
         self,

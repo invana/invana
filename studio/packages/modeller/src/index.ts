@@ -16,13 +16,13 @@
 export { matches } from "./govern/addressing";
 export { LensBoardPage } from "./govern/boards/LensBoardPage";
 export { CompareBoardPage, parseComparePair } from "./govern/CompareBoardPage";
-export { LensesViewPanel } from "./govern/LensesViewPanel";
+export { GuardrailsPage } from "./govern/pages/GuardrailsPage";
+export { WorldsPage } from "./govern/pages/WorldsPage";
+export { GovernViewPanel } from "./govern/panel/GovernViewPanel";
 export {
 	useParticipantsQuery,
 	useRunTouchesQuery,
 } from "./govern/queries";
-/** Legacy — frozen reports only. See the file. */
-export { RunLensWidget } from "./govern/RunLensWidget";
 export { useLensesViewPanel } from "./govern/useLensesViewPanel";
 export { type ModellerSlots, ModellerSlotsContext } from "./ModellerSlots";
 export { ModelViewPanel } from "./models/model-editor/ModelViewPanel";
@@ -35,6 +35,7 @@ export { ModellerStatusBar } from "./models/stitch/ModellerStatusBar";
 export { StitchesPage } from "./models/stitch/StitchesPage";
 export { useModellerCrumb } from "./models/stitch/useModellerCrumb";
 export { modeller } from "./product";
-export { RequestsViewPanel } from "./requests/RequestsViewPanel";
+export { useOpenRequestsCount } from "./requests/queries";
+export { RequestsPage } from "./requests/RequestsPage";
 export { RulesViewPanel } from "./rules/RulesViewPanel";
 export { SettingsViewPanel } from "./settings/SettingsViewPanel";

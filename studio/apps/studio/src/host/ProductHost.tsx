@@ -61,6 +61,7 @@ import { setupSlots } from "@/host/setupSlots";
 import { useAgentsSections } from "@/host/useAgentsSections";
 import { useBoardPageTrail } from "@/host/useBoardPageTrail";
 import { useDataBoards } from "@/host/useDataBoards";
+import { useGovernPages } from "@/host/useGovernPages";
 import { useIamSections } from "@/host/useIamSections";
 import { useLayeredCanvas } from "@/host/useLayeredCanvas";
 import { useModelsPage } from "@/host/useModelsPage";
@@ -191,7 +192,6 @@ export function ProductHost() {
 		boardPage,
 		openBoard,
 		openRecordBoard,
-		openLensBoard,
 		planRefById,
 	} = openBoards;
 	// `&step=` — the task open inside the focused run page.
@@ -272,6 +272,8 @@ export function ProductHost() {
 		settingsSection,
 		openBoards,
 	);
+	// The Worlds, Guardrails and Requests pages, opened by the Modeller's rail.
+	useGovernPages(graphSlug, settingsSection, openBoards);
 	// A project's page and the Decisions page, opened by the Projects rail.
 	const { openProjectPage, pageTrail: projectTrail } = useProjectsPage(
 		username,
@@ -324,7 +326,6 @@ export function ProductHost() {
 		closeLeftPanel,
 		layered,
 		openBoard,
-		openLensBoard,
 		openAgentPage,
 		showPlanCanvas,
 		modelSelection,
@@ -332,6 +333,7 @@ export function ProductHost() {
 		showModelsPage,
 		// The model's canvas is full-bleed: no outline beside it.
 		modelOpen: !!modelsView.scope && !modelsView.schema,
+		worldBoardOpen: parseBoardPageId(boardPage.pageId ?? "")?.kind === "world",
 		modelName,
 		canvas,
 		selected,

@@ -6,13 +6,7 @@
  * graph_data` in a terminal must not read as something else on screen.
  */
 
-import type { Narrowing } from "@invana/ui";
-import type {
-	CastRole,
-	GovernLayer,
-	GovernRule,
-	Lens,
-} from "@invana-studio/core";
+import type { GovernLayer, GovernRule, Lens } from "@invana-studio/core";
 
 /** The five layers a rule may govern. The spine is not one of them. */
 export const GOVERNED_LAYERS: GovernLayer[] = [
@@ -24,7 +18,7 @@ export const GOVERNED_LAYERS: GovernLayer[] = [
 ];
 
 /** The layer a rule governs — an address names its layer first. */
-export function ruleLayer(rule: GovernRule): GovernLayer {
+function ruleLayer(rule: GovernRule): GovernLayer {
 	return (rule.match.split("/")[0] ?? "graph_data") as GovernLayer;
 }
 
@@ -37,38 +31,6 @@ function isSliced(rule: GovernRule): boolean {
 	return Boolean(
 		s && (s.time || s.geo || Object.keys(s.dims ?? {}).length > 0),
 	);
-}
-
-/**
- * The six kinds of narrowing, in the order the CLI prints them.
- *
- * An empty result is meaningful and the row renders it in words: *narrows
- * nothing — the whole model, inside the guardrails*. `Everything` is a real
- * world and the default one.
- */
-export function narrowingsOf(lens: Lens): Narrowing[] {
-	const rules = lens.rules ?? [];
-	const allows = rules.filter((r) => r.allow).length;
-	const denies = rules.length - allows;
-	const out: Narrowing[] = [];
-
-	if (allows) out.push({ kind: "allow", count: allows });
-	if (denies) out.push({ kind: "deny", count: denies });
-	if (rules.some(isSliced)) out.push({ kind: "sliced" });
-
-	const excluded = [
-		...new Set(rules.flatMap((r) => r.properties?.exclude ?? [])),
-	].sort();
-	if (excluded.length) out.push({ kind: "excludes", properties: excluded });
-
-	if (lens.closed_layers?.length) {
-		out.push({ kind: "closes", layers: lens.closed_layers });
-	}
-
-	const roles = Object.keys(lens.cast ?? {}).sort() as CastRole[];
-	if (roles.length) out.push({ kind: "casts", roles });
-
-	return out;
 }
 
 /**

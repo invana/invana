@@ -1,14 +1,13 @@
 import type { GraphCanvas } from "@invana/graph";
 import { ErrorBoundary } from "@invana/ui";
 import type { useSessions } from "@invana-studio/assistant";
-import type { LensKind, QueryResultItem } from "@invana-studio/core";
+import type { QueryResultItem } from "@invana-studio/core";
 import { reportBoundaryError } from "@invana-studio/core";
 import { ExplorerViewPanel } from "@invana-studio/explorer";
 import {
-	LensesViewPanel,
+	GovernViewPanel,
 	type ModelSelection,
 	ModelViewPanel,
-	RequestsViewPanel,
 	RulesViewPanel,
 } from "@invana-studio/modeller";
 import { ProjectsViewPanel } from "@invana-studio/projects";
@@ -30,7 +29,6 @@ export interface LeftSectionDeps {
 	closeLeftPanel: () => void;
 	layered: ReturnType<typeof useLayeredCanvas>;
 	openBoard: (board: OpenBoard) => void;
-	openLensBoard: (kind: LensKind, lensId: string) => void;
 	openAgentPage: (id: string) => void;
 	/** The project's plan canvas, brought in front of any focused page. */
 	showPlanCanvas: () => void;
@@ -39,6 +37,8 @@ export interface LeftSectionDeps {
 	showModelsPage: () => Record<string, string | null>;
 	/** One model is open — the only Modeller page with a leftSection. */
 	modelOpen: boolean;
+	/** A world's board is focused — the auditor's page, with no leftSection. */
+	worldBoardOpen: boolean;
 	modelName: (id: string) => string | undefined;
 	canvas: GraphCanvas | null;
 	selected: QueryResultItem | null;
@@ -61,13 +61,13 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		closeLeftPanel,
 		layered,
 		openBoard,
-		openLensBoard,
 		openAgentPage,
 		showPlanCanvas,
 		modelSelection,
 		setModelSelection,
 		showModelsPage,
 		modelOpen,
+		worldBoardOpen,
 		modelName,
 		canvas,
 		selected,
@@ -107,18 +107,11 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			onOpenRule={(ruleId) => openBoard({ kind: "rule", subjectId: ruleId })}
 		/>
 	) : settingsPanel.section === "govern" ? (
-		// Govern holds Worlds over Guardrails as two sections of one panel,
-		// with no panel header above them — the same stack shape Library and
-		// Projects take. It opens no canvas: a world is a bound the *other*
-		// panels run inside, so it hangs over whatever is already drawn.
-		<LensesViewPanel
-			username={username}
-			graphSlug={graphSlug}
-			// A drill-in opens that lens as a page, titled with its own name
-			// — the section keeps the picking reading, the board
-			// carries the auditing one.
-			onOpenBoard={openLensBoard}
-		/>
+		// The Govern panel — Model · Worlds · Guardrails tabs beside the lens
+		// canvas. A world's board is the auditor's page and has no leftSection.
+		worldBoardOpen ? null : (
+			<GovernViewPanel username={username} graphSlug={graphSlug} />
+		)
 	) : settingsPanel.section === "rules" ? (
 		// The Modeller's Rules — the Graph's invariants. `More` opens a rule's
 		// board beside the section, as it does from Skills.
@@ -127,8 +120,6 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			graphSlug={graphSlug as string}
 			onOpenRuleBoard={(id) => openBoard({ kind: "rule", subjectId: id })}
 		/>
-	) : settingsPanel.section === "requests" ? (
-		<RequestsViewPanel />
 	) : settingsPanel.section === "explorer" ? (
 		// Sessions is not a left panel; the Explorer's own is the graph's
 		// type list and the selection (selection-and-the-panel.md) — the legend

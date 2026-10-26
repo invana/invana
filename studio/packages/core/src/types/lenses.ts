@@ -2,9 +2,10 @@
  * Govern — worlds, guardrails, the participant catalogue and what a run touched.
  *
  * A guardrail and a world are **one record separated by `kind`**:
- * one enforcement path, one document frozen onto a run, and promotion is
- * a field change rather than a re-authoring. That is why there is one `Lens`
- * type here and not two.
+ * one enforcement path and one document frozen onto a run. That is why there
+ * is one `Lens` type here and not two. A Graph guardrail is authored as a
+ * property rule (the Modeller's `govern/types.ts`); its `rules` are compiled
+ * from it.
  *
  * Shapes follow the engine's `apps/govern/schemas.py` as the live OpenAPI
  * document reports them.
@@ -51,7 +52,7 @@ interface RuleSelect {
 export interface GovernRule {
 	match: string;
 	allow: boolean;
-	properties?: { exclude?: string[] };
+	properties?: { exclude?: string[]; counts_only?: string[] };
 	select?: RuleSelect;
 	egress?: { may_send?: EgressClass[] };
 	options?: Record<string, unknown>;
@@ -63,6 +64,15 @@ interface LensUsage {
 	actor_ids: string[];
 	/** How many people have run under it. */
 	people: number;
+	/** Runs asked under it in the last 30 days. */
+	runs_30d?: number;
+	/** The agents whose runs asked under it — a world board's cast. */
+	by_agent?: {
+		agent_id: string;
+		name: string;
+		runs: number;
+		last_at: string | null;
+	}[];
 }
 
 export interface Lens {

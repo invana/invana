@@ -63,7 +63,8 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("modeller.model.type", f"{G}/modeller/models?model={AIRROUTES}&model_open=1&model_type=airport"),
     ("modeller.model", f"{G}/modeller/models?model={AIRROUTES}&model_open=1"),
     ("modeller.stitches", f"{G}/modeller/stitches"),
-    ("modeller.worlds.board", f"{G}/modeller/worlds/{EU_WORLD}"), ("modeller.worlds", f"{G}/modeller/worlds"),
+    ("modeller.worlds.board", f"{G}/modeller/worlds/{EU_WORLD}?page=world:{EU_WORLD}"),
+    ("modeller.worlds", f"{G}/modeller/worlds/{EU_WORLD}"),
     ("modeller.guardrails", f"{G}/modeller/guardrails"),
     ("modeller.rules", f"{G}/modeller/rules"), ("modeller.requests", f"{G}/modeller/requests"),
     ("modeller.settings.database", f"{G}/modeller/settings?tab=graph"),
@@ -405,7 +406,7 @@ CLICK = {  # board → buttons shoot.mjs presses after the route loads, for a st
                                        "fill:Unit=runways", "text:Flag for review"],
     "modeller.global_model.stitch": ["text:Country ≡ country"],
     "modeller.rules.edit": ["text:Airport codes are IATA"],
-    "modeller.guardrails.edit": ["text:Airways guardrails"],
+    "modeller.guardrails.edit": ["New rule", "text:Read in counts only", "text:Stays in the Graph"],
     **{f"modeller.models.new.ontology{s}": ["More actions", "text:From an ontology",
                                             "text:File", "upload:demos/arabidopsis/semantic/schema-org-subset.ttl",
                                             "tick:Person", "tick:Organization", "tick:Product", *x]

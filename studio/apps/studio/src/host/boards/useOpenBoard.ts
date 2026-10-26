@@ -20,7 +20,7 @@
 import { createContext, useContext } from "react";
 
 /** A declared kind whose whole address is its subject. */
-export type RecordBoardKind = "skill" | "rule" | "world" | "guardrail";
+export type RecordBoardKind = "skill" | "rule" | "world";
 
 export type OpenBoardFn = (kind: RecordBoardKind, subjectId: string) => void;
 

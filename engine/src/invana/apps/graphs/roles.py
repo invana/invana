@@ -84,6 +84,8 @@ _POLICY: tuple[tuple[tuple[str, ...], Area], ...] = (
     (("boards",), ASK),
     (("notifications", "read"), ASK),
     (("approvals",), ASK),
+    (("requests", "*", "resolve"), MODEL),
+    (("requests",), ASK),
     (("ledger",), ASK),
     (("mcp",), ASK),
     (("iam", "tokens"), ASK),

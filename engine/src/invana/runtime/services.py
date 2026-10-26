@@ -312,10 +312,13 @@ async def freeze_lens(
     Returns the two columns as keyword arguments, so a caller that opens a run
     spreads it into the constructor rather than remembering two field names.
     """
-    contributors = [await _lenses.effective_guardrails(db, graph_id=graph_id, agent_id=agent_id)]
     # The parent's world is already inside its snapshot, so it is composed from
     # there rather than re-read — a world deleted since cannot widen the child.
     inherited = within.lens_id if within is not None else None
+    # A guardrail allowed in the world the run is asked in does not bind it.
+    contributors = [
+        await _lenses.effective_guardrails(db, graph_id=graph_id, agent_id=agent_id, world_id=lens_id or inherited)
+    ]
     if within is not None and within.lens_snapshot:
         contributors.append(from_snapshot(within.lens_snapshot))
 

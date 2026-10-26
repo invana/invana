@@ -64,7 +64,7 @@ test("Declare a stitch opens the declare card, and closing it declares nothing",
 	await expect(active).toHaveText(before ?? "");
 });
 
-test("a rail item writes its path: Rules opens, Requests shows its lock", async ({
+test("a rail item writes its path: Rules opens, Requests opens its inbox", async ({
 	page,
 }) => {
 	await page.goto(`${MODELLER}/global-model`);
@@ -76,9 +76,9 @@ test("a rail item writes its path: Rules opens, Requests shows its lock", async 
 
 	await page.locator('button[aria-label="Requests"]').click();
 	await expect(page).toHaveURL(onPath("requests"));
-	await expect(page.getByText("Opens with engine support")).toBeVisible({
-		timeout: 30_000,
-	});
+	await expect(
+		page.getByText("asks the Graph could not answer").first(),
+	).toBeVisible({ timeout: 30_000 });
 });
 
 test("a rail move keeps the docked chat open", async ({ page }) => {

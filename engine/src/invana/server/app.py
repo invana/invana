@@ -232,6 +232,7 @@ def create_app() -> FastAPI:
     from invana.server.members.routes import members_router
     from invana.server.notifications.routes import notifications_router
     from invana.server.plugins.routes import plugins_router
+    from invana.server.requests.routes import requests_router
     from invana.server.routes.auth import auth_router
     from invana.server.routes.events import events_router, graph_events_router
     from invana.server.routes.model_links import model_links_router
@@ -319,6 +320,7 @@ def create_app() -> FastAPI:
     app.include_router(plugins_router)
     app.include_router(llm_providers_router)
     app.include_router(govern_router)
+    app.include_router(requests_router)
     app.include_router(skills_router)
     app.include_router(rules_router)
     app.include_router(install_rules_router)

@@ -1,15 +1,19 @@
-"""SQLAlchemy models for Govern — the one record, and the projection of the ledger.
+"""SQLAlchemy models for Govern — the lens, the ledger's projection, and requests.
 
 ``lenses`` is **one table for two things**
 ([GV1](docs/for-developers/modules/govern/spec.md)): a *world* people pick per
-question and a *guardrail* always in force, separated by ``kind`` and nothing
-else. One enforcement path, one document frozen onto a run, and promotion is a
-field change rather than a re-authoring.
+question and a *guardrail* always in force, separated by ``kind``. A Graph's
+guardrail is one property rule — ``target`` · ``access`` · ``leaves`` — whose
+``rules`` are compiled from it at save, so enforcement, the frozen snapshot and
+the touch record keep one path. An agent's own guardrail stays a layered lens.
 
 ``run_touches`` is the indexed projection of ``task_stream``
 ([GV20](docs/for-developers/modules/govern/spec.md)) — every row derives from
 exactly one stream row and carries its ``seq``. The stream stays authoritative:
 if the two disagree the ledger wins, and the table is rebuildable from it.
+
+``requests`` is the inbox of what people and agents asked to be modelled or
+allowed — filed by the engine where an ask fails, resolved by a modeller.
 
 Every JSON column is ``sqlalchemy.JSON`` (never JSONB) so SQLite dev keeps
 working; ids are ``String(36)`` UUIDs like every other table.
@@ -24,6 +28,7 @@ from typing import Any
 
 from sqlalchemy import (
     JSON,
+    Boolean,
     CheckConstraint,
     DateTime,
     Float,
@@ -31,6 +36,7 @@ from sqlalchemy import (
     Index,
     Integer,
     String,
+    Text,
     UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -55,6 +61,21 @@ class LensKind(enum.StrEnum):
     guardrail = "guardrail"
 
 
+class GuardrailAccess(enum.StrEnum):
+    """What a run may do with a guarded property."""
+
+    #: Read it — the rule then exists only to keep the result in the Graph.
+    read = "read"
+    #: Filter, count and aggregate it; never return its value.
+    counts = "counts"
+    #: It does not exist in any run.
+    never = "never"
+
+
+#: A Graph guardrail's scope — the one the Guardrails page lists.
+GRAPH_SCOPE = "graph"
+
+
 class TouchDirection(enum.StrEnum):
     """What happened at a participant."""
 
@@ -75,12 +96,16 @@ class Lens(Base):
     __tablename__ = "lenses"
     __table_args__ = (
         # Plain, not partial: SQL NULLs are distinct, so any number of unnamed
-        # lenses coexist while two named the same thing collide — which is the
-        # refusal `worlds.md` promises on `key`.
+        # lenses coexist while two named the same thing collide.
         UniqueConstraint("graph_id", "key", name="uq_lens_graph_key"),
         CheckConstraint(
             "(kind = 'guardrail' AND scope IS NOT NULL AND key IS NOT NULL) OR (kind = 'world' AND scope IS NULL)",
             name="ck_lens_kind_shape",
+        ),
+        CheckConstraint(
+            "kind <> 'guardrail' OR scope <> 'graph' "
+            "OR (target IS NOT NULL AND access IS NOT NULL AND leaves IS NOT NULL)",
+            name="ck_lens_graph_guardrail_rule",
         ),
         Index("ix_lens_graph_kind", "graph_id", "kind"),
     )
@@ -93,42 +118,41 @@ class Lens(Base):
     kind: Mapped[str] = mapped_column(String(16), default=LensKind.world.value, nullable=False)
 
     # ── naming, which is what publishes ──────────────────────────────────────
-    #: The slug. NULL = unnamed, attached to its run, private to whoever ran it.
-    #: Setting it is the write that puts the lens in the Graph's Worlds list
-    #: ([WO1](docs/for-developers/modules/govern/features/worlds.md)); it is
-    #: derived from ``name`` at the first naming and then frozen, because a slug
-    #: that moved on rename would break every schedule that pinned one
-    #: ([GV19](docs/for-developers/modules/govern/spec.md)).
+    #: The slug; NULL while unnamed and private. Frozen at the first naming.
     key: Mapped[str | None] = mapped_column(String(128), nullable=True)
-    #: What a person typed — ``EU · H1 2026``. NULL exactly when ``key`` is.
+    #: What a person typed, or a guardrail's generated name. NULL exactly when ``key`` is.
     name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
-    #: Guardrail only: ``graph`` or ``agent:<id>``. Where it is pinned.
+    #: Guardrail only: ``graph`` or ``agent:<id>``.
     scope: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
+    # ── a Graph guardrail's one property rule ────────────────────────────────
+    #: ``Type.property``, ``*`` allowed on either side.
+    target: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    #: ``read`` · ``counts`` · ``never``.
+    access: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    #: Whether a result built on it may cross to a model or a third party.
+    leaves: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    #: World ids a request allowed this guardrail in; runs asked there do not carry it.
+    allowed_in: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+
     # ── what it says ─────────────────────────────────────────────────────────
+    #: Authored on a world or an agent's guardrail; compiled from the rule on a Graph's.
     rules: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
-    #: ``{role: address}``. Not a bound — a resolution, checked against the
-    #: effective rules once innermost has won
-    #: ([GV6](docs/for-developers/modules/govern/spec.md)).
+    #: ``{role: address}`` — a resolution, checked once innermost has won.
     cast: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
-    #: The layers this lens allow-lists. A layer named here admits only what its
-    #: rules allow; one absent from it is permitted whole
-    #: ([GV23](docs/for-developers/modules/govern/spec.md)).
+    #: Layers this lens allow-lists; one absent is permitted whole.
     closed_layers: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
-    #: Transaction time — which model versions and stitches are in view. NULL
-    #: means now. Composes with ``select.time``, which is *valid* time
-    #: ([GV15](docs/for-developers/modules/govern/spec.md)).
+    #: Transaction time — which versions and stitches are in view. NULL is now.
     as_of: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # ── where it came from ───────────────────────────────────────────────────
-    #: The run an unnamed lens belongs to. No FK: a run may be pruned while the
-    #: lens it created stays, and a lens with a dangling run id is still a lens.
+    #: The run an unnamed lens belongs to. No FK: a run may be pruned first.
     created_in_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
     created_by_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
-    #: Bumped on every ``rules``/``cast`` edit, so a snapshot names what it froze.
+    #: Bumped on every edit, so a snapshot names what it froze.
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
@@ -157,6 +181,11 @@ class Lens(Base):
         if self.scope and self.scope.startswith("agent:"):
             return self.scope.split(":", 1)[1]
         return None
+
+    @property
+    def is_graph_guardrail(self) -> bool:
+        """A Graph's guardrail — one property rule, listed on the Guardrails page."""
+        return self.kind == LensKind.guardrail.value and self.scope == GRAPH_SCOPE
 
 
 def _with_tokens(volume: dict[str, Any]) -> dict[str, Any]:
@@ -187,8 +216,7 @@ class RunTouch(Base):
     run_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("task_runs.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    #: Denormalised from the run so a cross-run query over an address is one
-    #: index hit rather than a join back through ``task_runs``.
+    #: Denormalised from the run, so a cross-run read is one index hit.
     graph_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
     #: The ``task_stream.seq`` this row projects. The ledger stays authoritative.
     seq: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -206,23 +234,13 @@ class RunTouch(Base):
     #: One readable sentence, on a refusal.
     why: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
-    #: ``{rows, tokens_in, tokens_out, bytes, cache_hit, age_s}``. ``rows`` is
-    #: the only count, and there is no second one: what the query would have
-    #: returned unsliced is knowable only by running it unsliced
-    #: ([WO19](docs/for-developers/modules/govern/features/worlds.md)).
+    #: ``{rows, tokens_in, tokens_out, bytes, cache_hit, age_s}`` — ``rows`` is the only count.
     volume: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
-    #: ``{models, select, properties_excluded, projected, composed}`` — the
-    #: narrowing that bit. ``select`` and ``properties_excluded`` are keyed by
-    #: type, because a world narrows per type
-    #: ([WO17](docs/for-developers/modules/govern/features/worlds.md)); a key
-    #: nothing narrowed is absent rather than empty.
+    #: The narrowing that bit — ``models``, ``select`` and the property keys per type.
     applied: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     #: ``{to, classes, cut}`` — what crossed, and what was cut from it.
     sent: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
-    #: ``{generated_sha256, executed_sha256}`` — **both**, so the connector's
-    #: rewrite is visible rather than taken on trust. Digests, not queries: the
-    #: text lives on the step, and duplicating it here would make this table a
-    #: second copy of the trace instead of an index into it.
+    #: ``{generated_sha256, executed_sha256}`` — both, so a rewrite is visible.
     query: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
 
     cost_usd: Mapped[float | None] = mapped_column(Float, nullable=True)
@@ -252,3 +270,103 @@ class RunTouch(Base):
             "cost_usd": self.cost_usd,
             "duration_ms": self.duration_ms,
         }
+
+
+class RequestKind(enum.StrEnum):
+    """Where a request came from."""
+
+    #: A guardrail refused the read, and the guardrail is its blocker.
+    guardrail = "guardrail"
+    #: The run ended *cannot answer · outside this graph*.
+    unanswered = "unanswered"
+    #: Asked for explicitly — Explorer's *Ask for a change*, the CLI, the API.
+    change = "change"
+
+
+class RequestSource(enum.StrEnum):
+    explorer = "explorer"
+    agent = "agent"
+    schedule = "schedule"
+    api = "api"
+
+
+class RequestStatus(enum.StrEnum):
+    open = "open"
+    done = "done"
+
+
+class RequestResolution(enum.StrEnum):
+    declined = "declined"
+    allowed = "allowed"
+    modelled = "modelled"
+
+
+class Request(Base):
+    """One ask the Graph could not serve, waiting on a modeller.
+
+    Repeated asks of the same open request add to ``asks`` rather than filing a
+    second row, so the inbox is one line per gap.
+    """
+
+    __tablename__ = "requests"
+    __table_args__ = (
+        Index("ix_requests_graph_status", "graph_id", "status"),
+        Index("ix_requests_guardrail", "guardrail_id"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    graph_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("graphs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    #: ``guardrail`` · ``unanswered`` · ``change``.
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    #: The ask as asked.
+    title: Mapped[str] = mapped_column(String(512), nullable=False)
+    #: What the run said.
+    detail: Mapped[str | None] = mapped_column(Text, nullable=True)
+    #: ``explorer`` · ``agent`` · ``schedule`` · ``api``.
+    source: Mapped[str] = mapped_column(String(16), nullable=False, default=RequestSource.api.value)
+
+    asked_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    #: The agent that asked, when no person did. No FK: an agent may be deleted.
+    agent_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    #: The run that failed. No FK: runs are pruned.
+    run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    session_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+
+    guardrail_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("lenses.id", ondelete="SET NULL"), nullable=True
+    )
+    #: The guardrail's name frozen at filing, so a deleted one still reads.
+    blocked_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    asks: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    last_asked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+    #: ``open`` · ``done``.
+    status: Mapped[str] = mapped_column(String(8), default=RequestStatus.open.value, nullable=False)
+    #: ``declined`` · ``allowed`` · ``modelled``, once done.
+    resolution: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    #: What resolving did, as the done row reads it.
+    resolution_note: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    world_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("lenses.id", ondelete="SET NULL"), nullable=True
+    )
+    model_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("graph_models.id", ondelete="SET NULL"), nullable=True
+    )
+    resolved_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False
+    )
+
+    @property
+    def is_open(self) -> bool:
+        return self.status == RequestStatus.open.value

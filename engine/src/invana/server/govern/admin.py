@@ -21,6 +21,10 @@ class LensView(ModelView):
         "key",
         "name",
         "scope",
+        "target",
+        "access",
+        "leaves",
+        "allowed_in",
         "rules",
         "cast",
         "closed_layers",
@@ -63,3 +67,34 @@ class RunTouchView(ModelView):
         "at",
     ]
     search_fields = ["address", "participant", "step_key"]
+
+
+class RequestView(ModelView):
+    label = "Requests"
+    icon = "fa fa-inbox"
+    fields = [
+        "id",
+        "graph_id",
+        "kind",
+        "title",
+        "detail",
+        "source",
+        "asked_by_id",
+        "agent_id",
+        "run_id",
+        "session_id",
+        "guardrail_id",
+        "blocked_by",
+        "asks",
+        "last_asked_at",
+        "status",
+        "resolution",
+        "resolution_note",
+        "world_id",
+        "model_id",
+        "resolved_by_id",
+        "resolved_at",
+        "created_at",
+        "updated_at",
+    ]
+    search_fields = ["title", "blocked_by", "status"]

@@ -10,9 +10,9 @@
  * | Global model | `/modeller/global-model` | the Models panel, and the models board on its Model tab: every published model on one canvas, stitches dashed |
  * | Models | `/modeller/models` | the same panel, and the models board on Overview |
  * | Stitches | `/modeller/stitches` | the same panel, and the global canvas, where a stitch is declared and read |
- * | Requests | `/modeller/requests` | what analysts and agents asked for — empty until the engine records requests |
- * | Worlds | `/modeller/worlds[/:world]` | the Govern stack on Worlds |
- * | Guardrails | `/modeller/guardrails[/:guardrail]` | the Govern stack on Guardrails |
+ * | Requests | `/modeller/requests` | the inbox of what analysts and agents asked for; the rail badge is its open count |
+ * | Worlds | `/modeller/worlds[/:world]` | the Govern panel and the lens canvas with the world inspector |
+ * | Guardrails | `/modeller/guardrails[/:guardrail]` | the Govern panel and the lens canvas with the guardrail inspector |
  * | Rules | `/modeller/rules` | the Graph's invariants |
  * | Graph settings | `/modeller/settings` | Basic · Graph · Agents (`?tab=`; `?tab=info` is the Graph's info) |
  *
@@ -34,9 +34,11 @@ import {
 	Shapes,
 	Shield,
 } from "lucide-react";
-import type { Params, RouteObject } from "react-router-dom";
-import { lensDetailKey } from "./govern/queries";
+import { type Params, type RouteObject, useParams } from "react-router-dom";
+import { guardrailDetailKey, lensDetailKey } from "./govern/queries";
+import type { GuardrailDetail } from "./govern/types";
 import { useModellerSlots } from "./ModellerSlots";
+import { useOpenRequestsCount } from "./requests/queries";
 import { searchModeller } from "./search";
 
 function ModellerRoute() {
@@ -60,7 +62,19 @@ function level(
  * A section whose records drill in one level down: `worlds` › `<world>`. The
  * record's crumb is its name once its page has read it; its id until then.
  */
-const drillable = (path: string, label: string, param: string) =>
+const drillable = (
+	path: string,
+	label: string,
+	param: string,
+	from: (
+		u: string,
+		g: string,
+		id: string,
+	) => {
+		queryKey: readonly unknown[];
+		label: (data: unknown) => string | undefined;
+	},
+) =>
 	level(path, label, [
 		{
 			path: `:${param}`,
@@ -68,14 +82,27 @@ const drillable = (path: string, label: string, param: string) =>
 				crumb: (p) => p[param],
 				crumbFrom: (p) =>
 					p.username && p.graphSlug && p[param]
-						? {
-								queryKey: lensDetailKey(p.username, p.graphSlug, p[param]),
-								label: (data) => (data as Lens).display_name ?? undefined,
-							}
+						? from(p.username, p.graphSlug, p[param])
 						: undefined,
 			} satisfies ShellRouteHandle,
 		},
 	]);
+
+const worldCrumb = (u: string, g: string, id: string) => ({
+	queryKey: lensDetailKey(u, g, id),
+	label: (data: unknown) => (data as Lens).display_name ?? undefined,
+});
+
+const guardrailCrumb = (u: string, g: string, id: string) => ({
+	queryKey: guardrailDetailKey(u, g, id),
+	label: (data: unknown) => (data as GuardrailDetail).name ?? undefined,
+});
+
+/** The Requests rail item carries the engine's open count. */
+function useModellerNavBadges(): Partial<Record<string, number>> {
+	const { username, graphSlug } = useParams();
+	return { requests: useOpenRequestsCount(username, graphSlug) || undefined };
+}
 
 export const modeller: ProductDefinition = {
 	id: "modeller",
@@ -123,6 +150,7 @@ export const modeller: ProductDefinition = {
 		],
 	},
 	search: searchModeller,
+	useNavBadges: useModellerNavBadges,
 	commands: [
 		{
 			id: "graph-info",
@@ -144,8 +172,8 @@ export const modeller: ProductDefinition = {
 				level("models", "Models"),
 				level("stitches", "Stitches"),
 				level("requests", "Requests"),
-				drillable("worlds", "Worlds", "world"),
-				drillable("guardrails", "Guardrails", "guardrail"),
+				drillable("worlds", "Worlds", "world", worldCrumb),
+				drillable("guardrails", "Guardrails", "guardrail", guardrailCrumb),
 				level("rules", "Rules"),
 				level("settings", "Graph settings"),
 			],

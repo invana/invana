@@ -73,17 +73,16 @@ BOARD_KINDS: dict[str, BoardKindSpec] = {
         _declared("skill", "a skills.id"),
         _declared("skill_usage", "a skills.id"),
         _declared("rule", "a rules.id"),
-        # A world and a guardrail are **one `lenses` row separated by `kind`**
-        # (docs/for-developers/modules/govern/spec.md GV1), and they are two
-        # board kinds for the reason the two names exist at all: a tab reading
-        # `Lens` would make a reader open it to find out which of the two
-        # bounds they are looking at
-        # (docs/for-developers/modules/govern/features/worlds.md WO15).
+        # A world opens as a board named for itself — the auditor's page. A
+        # guardrail is one property rule read in its inspector beside the lens
+        # canvas, so it has no board of its own.
         _declared("world", "a lenses.id"),
-        _declared("guardrail", "a lenses.id"),
-        # The Modeller's models board — one board whatever the scope, so its
-        # subject is the Graph (the-model-page.md MP18).
+        # The Modeller's Graph-bound pages — one board whatever the scope, so
+        # the subject is the Graph.
         _declared("models", "a graphs.slug"),
+        _declared("worlds", "a graphs.slug"),
+        _declared("guardrails", "a graphs.slug"),
+        _declared("requests", "a graphs.slug"),
     )
 }
 
@@ -104,8 +103,10 @@ BoardKindName = Literal[
     "skill_usage",
     "rule",
     "world",
-    "guardrail",
     "models",
+    "worlds",
+    "guardrails",
+    "requests",
 ]
 
 #: What a version records about why it was written. ``report`` is a declared

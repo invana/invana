@@ -9,11 +9,12 @@ world out of four requests.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from invana.apps.govern.models import LensKind
+from invana.apps.govern.models import GuardrailAccess, LensKind, RequestKind
+from invana.core.lists import Filter, ListSpec, Page
 
 
 class RuleIn(BaseModel):
@@ -53,10 +54,13 @@ class LensUpdate(BaseModel):
     as_of: datetime | None = None
 
 
-class LensPromote(BaseModel):
-    """One field, and no re-authoring ([GV3])."""
+class AgentUsageRead(BaseModel):
+    """One agent whose runs asked under a world — the world board's cast."""
 
-    scope: str = Field(default="graph", max_length=64)
+    agent_id: str
+    name: str | None
+    runs: int
+    last_at: datetime | None
 
 
 class LensUsageRead(BaseModel):
@@ -65,6 +69,10 @@ class LensUsageRead(BaseModel):
     actor_ids: list[str] = Field(default_factory=list)
     #: How many people have run under it.
     people: int = 0
+    #: Runs in the last 30 days.
+    runs_30d: int = 0
+    #: The agents whose runs asked under it, most runs first.
+    by_agent: list[AgentUsageRead] = Field(default_factory=list)
 
 
 class CastResolutionRead(BaseModel):
@@ -326,3 +334,228 @@ class CompareRead(BaseModel):
     #: ([WO18](docs/for-developers/modules/govern/features/worlds.md)).
     differed: dict[str, AppliedDiffRead] = Field(default_factory=dict)
     counts: CompareCounts = Field(default_factory=CompareCounts)
+
+
+# ── a Graph's guardrails — one property rule each ────────────────────────────
+
+
+class Ref(BaseModel):
+    """A record by id and the name it reads as."""
+
+    id: str
+    name: str | None = None
+
+
+class GuardrailIn(BaseModel):
+    """*When a run touches* ``target`` · *it may* ``access`` · *and the result* ``leaves``."""
+
+    target: str = Field(min_length=3, max_length=255)
+    access: GuardrailAccess
+    leaves: bool
+
+
+class GuardrailUpdate(BaseModel):
+    """Every field optional; the target is the guardrail's identity and does not move."""
+
+    access: GuardrailAccess | None = None
+    leaves: bool | None = None
+    allowed_in: list[str] | None = None
+
+
+class GuardrailRead(BaseModel):
+    id: str
+    name: str
+    key: str
+    target: str
+    access: str
+    leaves: bool
+    #: The worlds a request allowed it in — runs asked there do not carry it.
+    allowed_in: list[Ref] = Field(default_factory=list)
+    #: How many published types carry the guarded property.
+    types: int = 0
+    #: Refusals it filed in the last seven days.
+    refused_7d: int = 0
+    #: The rule as one sentence.
+    sentence: str = ""
+    created_at: datetime
+    updated_at: datetime
+
+
+class GuardrailPage(BaseModel):
+    """The Guardrails list, and whether whoever asked may edit it — in one read."""
+
+    items: list[GuardrailRead]
+    total: int
+    may_edit: bool = False
+
+
+class AppliesToRead(BaseModel):
+    model: str
+    type: str
+    property: str
+
+
+class GuardrailRefusalRead(BaseModel):
+    request_id: str
+    #: Who asked — a person's name, or the agent's.
+    who: str | None
+    #: Where from — ``explorer`` · ``agent`` · ``schedule`` · ``api``.
+    where: str
+    at: datetime
+
+
+class HistoryRead(BaseModel):
+    action: str
+    actor: str | None
+    at: datetime
+    details: dict[str, Any] = Field(default_factory=dict)
+
+
+class GuardrailDetail(GuardrailRead):
+    applies_to: list[AppliesToRead] = Field(default_factory=list)
+    #: The latest twenty requests it filed.
+    refusals: list[GuardrailRefusalRead] = Field(default_factory=list)
+    refusals_total: int = 0
+    history: list[HistoryRead] = Field(default_factory=list)
+
+
+class GuardrailTargetRead(BaseModel):
+    """One ``Type.property`` the picker offers, and the published model it comes from."""
+
+    target: str
+    model: str
+    type: str
+    property: str
+
+
+class GuardrailImpactRead(BaseModel):
+    """Who reads the target today and would not afterwards — counted before the write."""
+
+    worlds: list[Ref] = Field(default_factory=list)
+    schedules: list[Ref] = Field(default_factory=list)
+    sentence: str
+
+
+# ── the lens view — a world read on the model ────────────────────────────────
+
+
+class LensViewModel(BaseModel):
+    name: str
+    version: str | None
+    #: ``all`` · ``sliced`` · ``hidden``.
+    seen: str
+
+
+class GuardedPropertyRead(BaseModel):
+    property: str
+    guardrail_id: str
+    guardrail: str
+    access: str
+    leaves: bool
+
+
+class LensViewType(BaseModel):
+    model: str
+    type: str
+    hidden: bool
+    sliced: bool
+    excluded: list[str] = Field(default_factory=list)
+    guarded: list[GuardedPropertyRead] = Field(default_factory=list)
+
+
+class LensViewWindow(BaseModel):
+    """The world's slice as a person reads it — ``2026-01-01 → 2026-06-30`` · ``in EU, UK``."""
+
+    time: str | None = None
+    geo: str | None = None
+
+
+class AnswersGoRead(BaseModel):
+    address: str
+    #: What may accompany a call to it; ``None`` is unbounded.
+    may_send: list[str] | None = None
+
+
+class UsedByRead(BaseModel):
+    #: ``agent`` · ``person``.
+    kind: str
+    id: str
+    name: str | None
+    runs: int
+
+
+class LensView(BaseModel):
+    """What a world — or the guardrails alone — let a run see, resolved by the engine."""
+
+    world: Ref | None = None
+    models: list[LensViewModel] = Field(default_factory=list)
+    types: list[LensViewType] = Field(default_factory=list)
+    hidden_types: list[str] = Field(default_factory=list)
+    #: How many properties a guardrail guards across the published types.
+    guarded: int = 0
+    window: LensViewWindow = Field(default_factory=LensViewWindow)
+    thinks_with: dict[str, str | None] = Field(default_factory=dict)
+    answers_go: list[AnswersGoRead] = Field(default_factory=list)
+    used_by: list[UsedByRead] = Field(default_factory=list)
+
+
+# ── requests ─────────────────────────────────────────────────────────────────
+
+
+REQUEST_LIST = ListSpec(
+    filters={
+        "status": Filter(values=("open", "done")),
+        "kind": Filter(values=tuple(k.value for k in RequestKind)),
+    },
+    sorts=("-last_asked_at", "-created_at"),
+)
+
+
+class RequestCreate(BaseModel):
+    """An explicit *Ask for a change* — by the caller, from Explorer or the API."""
+
+    title: str = Field(min_length=1, max_length=512)
+    detail: str | None = Field(default=None, max_length=4000)
+    source: Literal["explorer", "api"] = "explorer"
+
+
+class RequestResolve(BaseModel):
+    action: Literal["decline", "allow", "model"]
+    world_id: str | None = Field(default=None, max_length=36)
+    model_id: str | None = Field(default=None, max_length=36)
+    note: str | None = Field(default=None, max_length=512)
+
+
+class RequestRead(BaseModel):
+    id: str
+    kind: str
+    title: str
+    detail: str | None
+    source: str
+    asked_by_id: str | None
+    #: The asker's name, when a person asked.
+    asked_by: str | None = None
+    agent_id: str | None
+    #: The agent's name, when an agent asked.
+    agent: str | None = None
+    run_id: str | None
+    session_id: str | None
+    guardrail_id: str | None
+    blocked_by: str | None
+    asks: int
+    last_asked_at: datetime
+    status: str
+    resolution: str | None
+    resolution_note: str | None
+    world: Ref | None = None
+    model: Ref | None = None
+    resolved_by: str | None = None
+    resolved_at: datetime | None
+    created_at: datetime
+
+
+class RequestPage(Page[RequestRead]):
+    #: Open requests in the Graph, whatever the filter — the rail badge's count.
+    open: int = 0
+    #: Whether the reader holds the modeller role and may resolve.
+    may_resolve: bool = False

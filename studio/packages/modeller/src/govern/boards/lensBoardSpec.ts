@@ -1,51 +1,34 @@
 /**
- * One lens as a page — artboards `GovWorld` · `GovGuardrails`
- * ([the-screens.md](../../../../../../docs/for-developers/the-screens.md)).
+ * One world as a page — the auditor's reading of it.
  *
- * **One composer, both kinds.** A world and a guardrail are one `lenses` row
- * separated by `kind` ([spec.md](../../../../../../docs/for-developers/modules/govern/spec.md)),
- * so a second composer would be the second enforcement path this module exists
- * not to have ([guardrails.md](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
- * `kind` changes what the page **says** — the crumb, the usage band, whether
- * `Edit` is offered — and nothing about how it is built.
+ * The Worlds panel is where a world is picked and edited, in a 420px column;
+ * this board is what an auditor is handed: how far the world narrows, whether
+ * it is in force, how it has been used, its five layers with their state, and
+ * the cast — the agents whose runs asked under it, read from the runs, not
+ * from the world's `cast`.
  *
- * **This is the auditing reading, not the section widened**
- * ([worlds.md](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
- * The section is where a bound is picked, in a 420px column, with the run that
- * prompted the narrowing still open beside it. The board is what an auditor is
- * handed: what it narrows, how it has been used, every rule as an addressable
- * row, and the cast resolved against the effective guardrails. Only this one
- * can be **kept** — `Save report` freezes the resolved document
- * ([boards-migration.md](../../../../../../docs/for-developers/building-engine/boards-migration.md)),
- * and *what was this world when the run happened* is the question a live section
- * cannot answer an hour later.
+ * | Band | What it reads |
+ * |---|---|
+ * | Head | `Worlds › <world>` · `last used …` · `world` · `used in N runs` · *Edit* |
+ * | Tiles | Rules (`allow_rules` · `deny_rules`) · Closed layers · In force · Runs (`usage.runs_30d`) · Last used |
+ * | Five layers | each governed layer: what it allows, and `sliced` · `allowed` · `closed` · `denied` |
+ * | Cast | `usage.by_agent` — agent · runs · last; a world nobody asked under says so |
+ *
+ * Every number is the engine's. A guardrail has no board: it is a property
+ * rule read on the Guardrails page.
  *
  * Nothing here fetches and nothing here renders: a composer is a pure function
- * of one read, which is what lets `spec.json` show the document the page is.
+ * of one read.
  */
 
 import type { BoardSpec, PanelSpec } from "@invana/boards";
 import type { GovernLayer, GovernRule, Lens } from "@invana-studio/core";
-import {
-	count,
-	omit,
-	specPanel,
-	VIEW_ACTION,
-	VIEW_BOARD,
-	VIEW_SPEC,
-} from "@invana-studio/shell";
-import {
-	GOVERNED_LAYERS,
-	layerSummary,
-	rulesInLayer,
-	since,
-} from "../narrowing";
+import { count, omit } from "@invana-studio/shell";
+import { GOVERNED_LAYERS, rulesInLayer, since } from "../narrowing";
 
 /** Action ids this page answers. The spec carries the string; the page the behaviour. */
 export const LENS_ACTIONS = {
-	/** `Board ¦ spec.json`. */
-	view: VIEW_ACTION,
-	/** `Edit` — puts the Govern section back on this lens, drilled in. */
+	/** `Edit` — puts the Govern panel back on this world, in its editor. */
 	edit: "edit",
 } as const;
 
@@ -59,295 +42,242 @@ const LAYER_LABEL: Record<GovernLayer, string> = {
 	agent: "agent",
 };
 
+/** A layer's state on the board. */
+type LayerState = "sliced" | "allowed" | "closed" | "denied";
+
+const STATE_TONE: Record<LayerState, "info" | "success" | "warning" | "error"> =
+	{
+		sliced: "info",
+		allowed: "success",
+		closed: "warning",
+		denied: "error",
+	};
+
 export interface LensBoardView {
-	/** `Board` or `spec.json`. */
-	view: string;
 	/** Whether `Edit` is enabled — it is drawn either way, disabled without the role. */
 	mayEdit: boolean;
+	/** The Graph's name, for *inside <Graph> guardrails*. */
+	graphName: string;
+}
+
+function isSliced(rule: GovernRule): boolean {
+	const s = rule.select;
+	return Boolean(
+		s?.time ||
+			s?.geo ||
+			Object.keys(s?.dims ?? {}).length ||
+			rule.properties?.exclude?.length,
+	);
+}
+
+/** What a rule's address names, without its layer. */
+function target(rule: GovernRule): string {
+	const parts = rule.match.split("/");
+	return parts.length > 1 ? parts.slice(1).join("/") : rule.match;
+}
+
+/** How one allow rule narrows, as a short phrase. */
+function narrows(rule: GovernRule): string[] {
+	const bits: string[] = [];
+	const select = rule.select;
+	if (select?.time) {
+		const { from, to } = select.time;
+		bits.push(`${from ?? "…"} – ${to ?? "…"}`);
+	}
+	if (select?.geo) bits.push(select.geo.in.join(" "));
+	for (const values of Object.values(select?.dims ?? {})) {
+		bits.push(values.join(" "));
+	}
+	const excluded = rule.properties?.exclude ?? [];
+	if (excluded.length) bits.push(`without ${excluded.join(" · ")}`);
+	return bits;
+}
+
+/** One layer: what it allows, in words, and its state. */
+function layerReading(
+	lens: Lens,
+	layer: GovernLayer,
+): { allows: string; state: LayerState } {
+	const rules = rulesInLayer(lens, layer);
+	const closed = (lens.closed_layers ?? []).includes(layer);
+	const allows = rules.filter((r) => r.allow);
+	const denies = rules.filter((r) => !r.allow);
+
+	if (!allows.length) {
+		if (closed) return { allows: "nothing is allowed in", state: "closed" };
+		if (denies.length) {
+			return {
+				allows: `all but ${denies.map(target).join(" · ")}`,
+				state: "denied",
+			};
+		}
+		return { allows: "permitted whole", state: "allowed" };
+	}
+
+	const named = allows.map((r) => [target(r), ...narrows(r)].join(" · "));
+	const words = closed
+		? `${named.join(" · ")} only`
+		: `${named.join(" · ")} · the rest permitted whole`;
+	return {
+		allows: denies.length
+			? `${words} · denies ${denies.map(target).join(" · ")}`
+			: words,
+		state: rules.some(isSliced) ? "sliced" : "allowed",
+	};
 }
 
 export function lensBoardSpec(
 	lens: Lens,
-	{ view, mayEdit }: LensBoardView,
+	{ mayEdit, graphName }: LensBoardView,
 ): BoardSpec {
-	const guardrail = lens.kind === "guardrail";
+	const usage = lens.usage ?? null;
+	const lastUsed = since(usage?.last_used_at);
 
 	const header: BoardSpec["header"] = {
-		crumbs: [guardrail ? "Guardrails" : "Worlds", lens.display_name],
+		crumbs: ["Worlds", lens.display_name],
 		chips: omit([
-			{ label: lens.kind },
-			{ label: `v${lens.version}` },
-			guardrail
-				? { label: lens.scope ?? "graph scope" }
-				: lens.is_named
-					? null
-					: // An unnamed lens is attached to its run and private to whoever
-						// ran it — the board says so rather than leaving a reader
-						// to wonder why it is in no list.
-						{ label: "unnamed · private to you", tone: "muted" as const },
-			guardrail ? { label: "audited", tone: "muted" as const } : null,
-		]),
-		actions: omit([
 			{
-				id: LENS_ACTIONS.view,
-				options: [VIEW_BOARD, VIEW_SPEC],
-				value: view,
+				label: lastUsed ? `last used ${lastUsed}` : "never used",
+				tone: "muted" as const,
 			},
+			{ label: "world", variant: "outline" as const },
+			{
+				label: `used in ${count(usage?.runs ?? 0)} runs`,
+				variant: "outline" as const,
+			},
+			lens.is_named
+				? null
+				: // An unnamed world is attached to its run and private to whoever
+					// ran it — the board says so rather than leaving a reader to
+					// wonder why it is in no list.
+					{ label: "unnamed · private to you", tone: "muted" as const },
+		]),
+		actions: [
 			{
 				id: LENS_ACTIONS.edit,
 				label: "Edit",
-				variant: "outline" as const,
 				disabled: !mayEdit,
 			},
-		]),
+		],
 	};
 
-	const spec: BoardSpec = {
+	return {
 		title: lens.display_name,
 		header,
-		rows: bands(lens),
+		rows: [
+			{ panels: [tiles(lens, graphName)] },
+			{ panels: [layersPanel(lens), castPanel(lens)] },
+		],
 	};
-
-	return view === VIEW_SPEC
-		? { ...spec, rows: [{ panels: [specPanel(spec)] }] }
-		: spec;
 }
 
-/** What one rule narrows, in the words the rule row uses. */
-function narrows(rule: GovernRule): string {
-	const bits: string[] = [];
-	const select = rule.select;
-	if (select?.time) {
-		const { axis, from, to } = select.time;
-		bits.push(`time ${from ?? "…"} → ${to ?? "…"} · axis ${axis}`);
-	}
-	if (select?.geo) bits.push(`geo ${select.geo.in.join(" · ")}`);
-	for (const [dim, values] of Object.entries(select?.dims ?? {})) {
-		bits.push(`${dim} ${values.join(" · ")}`);
-	}
-	const excluded = rule.properties?.exclude ?? [];
-	if (excluded.length) bits.push(`excludes ${excluded.join(" · ")}`);
-	for (const [key, value] of Object.entries(rule.options ?? {})) {
-		bits.push(`${key} ${String(value)}`);
-	}
-	return bits.join(" · ");
-}
-
-function bands(lens: Lens): BoardSpec["rows"] {
-	const guardrail = lens.kind === "guardrail";
+function tiles(lens: Lens, graphName: string): PanelSpec {
 	const rules = lens.rules ?? [];
 	const closed = lens.closed_layers ?? [];
 	const usage = lens.usage ?? null;
-	const cast = lens.cast ?? {};
-	const resolved = lens.cast_resolved ?? [];
-	const denied = resolved.filter((row) => row.address && !row.allowed);
+	// The resolved cast is checked against the guardrails; a role the bound
+	// denies is a run that cannot open, so the world is not in force.
+	const denied = (lens.cast_resolved ?? []).filter(
+		(row) => row.address && !row.allowed,
+	);
 
-	return omit<BoardSpec["rows"][number]>([
-		{
-			panels: [
+	return {
+		kind: "grid",
+		options: {
+			minTileWidth: 160,
+			tiles: [
 				{
-					kind: "grid",
-					options: {
-						tiles: omit([
-							{
-								label: "Rules",
-								value: count(rules.length),
-								delta: `${count(lens.allow_rules)} allow · ${count(lens.deny_rules)} deny`,
-							},
-							{
-								label: "Closed layers",
-								value: closed.length
-									? closed.map((l) => LAYER_LABEL[l]).join(" · ")
-									: "none",
-								// A layer named here admits only what its rules allow; one
-								// absent is permitted whole.
-								delta: closed.length
-									? "admit only what a rule allows"
-									: "every layer permitted whole",
-							},
-							// **A guardrail is not picked, so it has no pick count**.
-							// Counting the runs that chose it would print `0`
-							// on the one bound that is on every run.
-							guardrail
-								? {
-										label: "In force",
-										value: "every run",
-										delta: "a guardrail is not a world you pick",
-									}
-								: {
-										label: "Runs",
-										value: count(usage?.runs ?? 0),
-										delta: usage?.runs
-											? "asked under this world"
-											: "nobody has asked under it yet",
-									},
-							guardrail
-								? null
-								: {
-										label: "Last used",
-										value: since(usage?.last_used_at) ?? "—",
-										delta: usage?.people
-											? `${count(usage.people)} people`
-											: "no run has picked it",
-									},
-						]),
-					},
-				} as PanelSpec,
-			],
-		},
-		{
-			panels: [
+					label: "Rules",
+					value: count(rules.length),
+					delta: lens.deny_rules
+						? `${count(lens.allow_rules)} allow · ${count(lens.deny_rules)} deny`
+						: `${count(lens.allow_rules)} allow`,
+				},
 				{
-					kind: "record",
-					title: "The record",
-					aside: "one object — what an auditor is handed",
-					options: {
-						rows: omit([
-							{ label: "kind", value: lens.kind },
-							{ label: "name", value: lens.name ?? "— unnamed" },
-							lens.key ? { label: "key", value: lens.key, mono: true } : null,
-							{ label: "scope", value: lens.scope ?? "graph" },
-							// Null is *now*, and saying so is the point: a blank would
-							// leave a reader wondering whether nothing is set or nothing
-							// loaded.
-							{
-								label: "as_of",
-								value: lens.as_of
-									? `${lens.as_of} — which versions and stitches are in view`
-									: "now",
-								mono: Boolean(lens.as_of),
-							},
-							{ label: "version", value: `v${lens.version}`, mono: true },
-							{ label: "created", value: lens.created_at.slice(0, 10) },
-							{ label: "updated", value: lens.updated_at.slice(0, 10) },
-							lens.created_in_run_id
-								? {
-										label: "created in run",
-										value: lens.created_in_run_id,
-										mono: true,
-									}
-								: null,
-						]),
-					},
-				} as PanelSpec,
-				{
-					kind: "record",
-					title: "The five layers",
-					aside: "what each one says about itself",
-					options: {
-						rows: GOVERNED_LAYERS.map((layer) => ({
-							label: LAYER_LABEL[layer],
-							value: layerSummary(lens, layer),
-						})),
-					},
-				} as PanelSpec,
-			],
-		},
-		// One table per layer that has a rule. A layer with none is already
-		// stated above as *permitted whole* or *closed*, and an empty table
-		// under its name would read as a bound nobody wrote.
-		...GOVERNED_LAYERS.map((layer) => {
-			const inLayer = rulesInLayer(lens, layer);
-			if (!inLayer.length) return null;
-			return {
-				panels: [
-					{
-						kind: "table",
-						title: LAYER_LABEL[layer],
-						aside: layerSummary(lens, layer),
-						flush: true,
-						options: {
-							columns: [
-								{ key: "match", label: "address", mono: true },
-								{ key: "rule", label: "", mono: true },
-								{ key: "narrows", label: "narrows", mono: true },
-								{ key: "egress", label: "may send", mono: true },
-							],
-							rows: inLayer.map((rule) => ({
-								match: rule.match,
-								rule: rule.allow ? "allow" : "deny",
-								narrows: narrows(rule),
-								// The default is `[]` — nothing. An unmatched destination
-								// sends nothing at all, so a blank here is a fact.
-								egress: (rule.egress?.may_send ?? []).join(" · "),
-							})),
+					label: "Closed layers",
+					value: count(closed.length),
+					delta: closed.length
+						? closed.map((l) => LAYER_LABEL[l]).join(" · ")
+						: "none",
+					tone: closed.length ? "warn" : undefined,
+				},
+				denied.length
+					? {
+							label: "In force",
+							value: "no",
+							delta: `${denied.map((d) => d.role).join(" · ")} denied by ${graphName} guardrails`,
+							tone: "bad",
+						}
+					: {
+							label: "In force",
+							value: "yes",
+							delta: `inside ${graphName} guardrails`,
+							tone: "good",
 						},
-					} as PanelSpec,
-				],
-			};
-		}),
-		Object.keys(cast).length || resolved.length
-			? {
-					panels: [
-						{
-							kind: "table",
-							title: "Cast",
-							aside: resolved.length
-								? "resolved, then checked against the effective rules"
-								: "what this lens casts — not yet what a run would get",
-							flush: true,
-							options: {
-								columns: [
-									{ key: "role", label: "role", mono: true },
-									{ key: "address", label: "resolves to", mono: true },
-									{ key: "source", label: "from", mono: true },
-									{ key: "allowed", label: "allowed", mono: true },
-									{ key: "rule", label: "by", mono: true },
-								],
-								// The resolution is the richer read and supersedes the
-								// cast it was computed from; without it the four roles
-								// this lens names are still worth printing.
-								rows: resolved.length
-									? resolved.map((row) => ({
-											role: row.role,
-											address: row.address ?? "— the shipped default",
-											source: row.source,
-											allowed: row.allowed ? "yes" : "no",
-											rule: row.rule_matched ?? "",
-										}))
-									: Object.entries(cast).map(([role, address]) => ({
-											role,
-											address: address ?? "",
-											source: "lens",
-											allowed: "",
-											rule: "",
-										})),
-							},
-						} as PanelSpec,
-					],
-				}
-			: null,
-		// 's seam, on the page where the person who can fix it is reading:
-		// the cast resolves to a model the bound above it denies, so the run
-		// does not open.
-		...denied.map((row) => ({
-			panels: [
 				{
-					kind: "text",
-					title: `${row.role} — this run cannot open`,
-					aside: row.rule_matched ?? undefined,
-					options: {
-						tone: "error" as const,
-						callout: true,
-						text:
-							row.refusal ??
-							`The cast names ${row.address} for ${row.role}, and the effective rules deny it.`,
-					},
-				} as PanelSpec,
-			],
-		})),
-		{
-			panels: [
+					label: "Runs",
+					value: count(usage?.runs_30d ?? 0),
+					delta: "30 days",
+				},
 				{
-					kind: "text",
-					options: {
-						tone: "muted" as const,
-						text: guardrail
-							? "In force on every run in this Graph — a guardrail is not a world you pick. Every world narrows within it, and a world that tries to widen it is refused at save, naming the rule. Runs already in flight keep the lens they froze."
-							: "A world narrows within the guardrails; it can never widen them. It is validated against them when it is saved, not when it is run — so a world that cannot legally run is one nobody can save and then wonder about.",
-					},
-				} as PanelSpec,
+					label: "Last used",
+					value: since(usage?.last_used_at) ?? "—",
+					delta: usage?.last_used_at ? undefined : "no run has picked it",
+				},
 			],
 		},
-	]);
+	} as PanelSpec;
+}
+
+function layersPanel(lens: Lens): PanelSpec {
+	return {
+		kind: "list",
+		title: "Five layers",
+		options: {
+			items: GOVERNED_LAYERS.map((layer) => {
+				const { allows, state } = layerReading(lens, layer);
+				return {
+					id: layer,
+					title: LAYER_LABEL[layer],
+					meta: allows,
+					chip: { label: state, tone: STATE_TONE[state] },
+				};
+			}),
+		},
+	};
+}
+
+function castPanel(lens: Lens): PanelSpec {
+	const agents = lens.usage?.by_agent ?? [];
+	if (!agents.length) {
+		return {
+			kind: "text",
+			title: "Cast",
+			aside: "who runs inside it",
+			options: {
+				tone: "muted",
+				text: lens.usage?.runs
+					? "Only people have asked under this world — no agent's run has."
+					: "Nobody has asked under this world yet.",
+			},
+		};
+	}
+	return {
+		kind: "table",
+		title: "Cast",
+		aside: "who runs inside it",
+		flush: true,
+		options: {
+			columns: [
+				{ key: "agent", label: "agent" },
+				{ key: "runs", label: "runs", align: "right", mono: true },
+				{ key: "last", label: "last", mono: true },
+			],
+			rows: agents.map((a) => ({
+				agent: a.name,
+				runs: count(a.runs),
+				last: since(a.last_at) ?? "—",
+			})),
+		},
+	} as PanelSpec;
 }
