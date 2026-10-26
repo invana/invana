@@ -13,11 +13,13 @@
  *   (`policy.can_be_assigned` · `policy.unattended`), riding the page's one
  *   buffer.
  *
+ *   Last, *Callable over MCP* — its row on this Graph's MCP server.
+ *
  * The functions are the ones its envelope allows. An event trigger and pool
- * labels join with workers; callable over MCP with this Graph's MCP server.
+ * labels join with workers.
  */
 
-import { Checkbox, Field, FieldLabel } from "@invana/forms";
+import { Checkbox, Field, FieldLabel, Switch } from "@invana/forms";
 import {
 	Badge,
 	StatusDot,
@@ -32,6 +34,7 @@ import { graphsApi } from "@invana-studio/core";
 import { useAccess, useSchedulesQuery } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useQueries, useQuery } from "@tanstack/react-query";
+import { useServedQuery, useSetServedMutation } from "../connections/queries";
 import { functionsApi } from "../plugins/api";
 import type { AgentDraft } from "./agentDraft";
 import { TabReadState } from "./agentParts";
@@ -214,8 +217,64 @@ export function AgentDeployTab({
 							</FieldLabel>
 						</Field>
 					))}
+					<CallableOverMcp
+						username={username}
+						graphSlug={graphSlug}
+						agent={agent}
+						allowed={build.allowed}
+						reason={build.reason}
+					/>
 				</div>
 			</PanelSection>
 		</div>
+	);
+}
+
+/**
+ * *Callable over MCP* — the agent's row in Connections › This Graph's server,
+ * flipped here or there. It saves at once, apart from the page's buffer,
+ * because it is that record and not the agent's. Only a live agent is served.
+ */
+function CallableOverMcp({
+	username,
+	graphSlug,
+	agent,
+	allowed,
+	reason,
+}: {
+	username: string;
+	graphSlug: string;
+	agent: Agent;
+	allowed: boolean;
+	reason: string | null;
+}) {
+	const served = useServedQuery(username, graphSlug);
+	const flip = useSetServedMutation(username, graphSlug);
+	const row = served.data?.items.find(
+		(r) => r.kind === "agent" && r.ref === agent.id,
+	);
+	const id = `mcp-${agent.id}`;
+	return (
+		<Field orientation="horizontal">
+			<Switch
+				id={id}
+				checked={row?.served ?? false}
+				disabled={!row || !allowed || flip.isPending}
+				title={reason ?? undefined}
+				onCheckedChange={(on) =>
+					flip.mutate({ kind: "agent", ref: agent.id, served: on })
+				}
+			/>
+			<FieldLabel htmlFor={id} className="font-normal">
+				{row ? (
+					<>
+						Callable over MCP — as <span className="font-mono">{row.tool}</span>{" "}
+						on this Graph's server
+					</>
+				) : (
+					"Callable over MCP — once it is live"
+				)}
+			</FieldLabel>
+		</Field>
 	);
 }

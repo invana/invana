@@ -14,6 +14,7 @@ const PATHS = [
 	"agents/functions/plans",
 	"agents/functions/templates",
 	"agents/functions/plugins",
+	"agents/connections/server",
 	"agents/connections/mcp",
 	"agents/llms",
 	"agents/settings",

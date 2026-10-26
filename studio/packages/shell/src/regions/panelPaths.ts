@@ -93,6 +93,11 @@ const PANEL_PATHS: readonly PanelPath[] = [
 		section: "templates",
 	},
 	{ path: "agents/functions/plugins", panel: "functions", section: "plugins" },
+	{
+		path: "agents/connections/server",
+		panel: "connections",
+		section: "server",
+	},
 	{ path: "agents/connections/mcp", panel: "connections", section: "mcp" },
 	{ path: "agents/llms", panel: "llms", detail: "provider" },
 	{ path: "agents/runs", panel: "runs" },
@@ -152,7 +157,7 @@ const INFO_TAB = "info";
 const LEVEL_LANDINGS: Record<string, string> = {
 	modeller: "modeller/global-model",
 	agents: "agents/home",
-	"agents/connections": "agents/connections/mcp",
+	"agents/connections": "agents/connections/server",
 	iam: "iam/home",
 	activity: "activity/runs",
 };

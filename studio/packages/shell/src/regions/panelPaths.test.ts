@@ -60,7 +60,7 @@ describe("panelPaths", () => {
 		expect(map.get("section")).toBe("map");
 		expect(canonicalRedirect(`${G}/agents/fleet`, "")).toBeNull();
 		expect(canonicalRedirect(`${G}/agents/connections`, "")).toBe(
-			`${G}/agents/connections/mcp`,
+			`${G}/agents/connections/server`,
 		);
 		expect(canonicalRedirect(G, "?panel=llms")).toBe(`${G}/agents/llms`);
 		expect(canonicalRedirect(G, "?panel=llms&provider=openai")).toBe(

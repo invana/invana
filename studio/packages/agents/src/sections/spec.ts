@@ -112,8 +112,11 @@ export const SECTIONS: Record<AgentsSectionKey, SectionSpec> = {
 		label: "Connections",
 		icon: Plug,
 		description:
-			"Where this Graph meets the outside — the MCP servers whose tools it calls",
-		tabs: [{ key: "mcp", label: "MCP servers" }],
+			"Where this Graph meets the outside — the server it offers, the MCP servers whose tools it calls",
+		tabs: [
+			{ key: "server", label: "This Graph's server" },
+			{ key: "mcp", label: "MCP servers" },
+		],
 	},
 	llms: {
 		label: "LLMs",

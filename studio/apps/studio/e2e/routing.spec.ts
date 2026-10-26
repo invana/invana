@@ -30,7 +30,7 @@ const OLD_PANEL_LINKS: [string, string][] = [
 	["?panel=llms&provider=p1", "/agents/llms/p1"],
 	["?panel=fleet&section=map", "/agents/fleet/map"],
 	["?panel=functions&section=templates", "/agents/functions/templates"],
-	["?panel=connections", "/agents/connections/mcp"],
+	["?panel=connections", "/agents/connections/server"],
 	["?panel=runs", "/agents/runs"],
 	["?panel=events", "/activity/events"],
 	["?panel=projects&project=p1", "/projects/p1"],
