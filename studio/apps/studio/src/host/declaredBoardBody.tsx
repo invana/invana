@@ -18,10 +18,12 @@ import { GroupPage, IamAgentPage, PolicyPage } from "@invana-studio/iam";
 import type { useLensesViewPanel } from "@invana-studio/modeller";
 import {
 	CompareBoardPage,
+	GlobalModelPage,
 	LensBoardPage,
 	type ModelSelection,
 	ModelsPage,
 	parseComparePair,
+	StitchesPage,
 	type useModelsView,
 } from "@invana-studio/modeller";
 import { DecisionsPage, ProjectPage } from "@invana-studio/projects";
@@ -232,6 +234,25 @@ export function declaredBoardContent(
 				onOpenRun={(runId) =>
 					openBoard({ kind: "run", subjectId: runId, runId })
 				}
+			/>
+		);
+	}
+
+	if (board.kind === "global_model") {
+		return (
+			<GlobalModelPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				backend={backend}
+			/>
+		);
+	}
+
+	if (board.kind === "stitches") {
+		return (
+			<StitchesPage
+				username={username as string}
+				graphSlug={graphSlug as string}
 			/>
 		);
 	}

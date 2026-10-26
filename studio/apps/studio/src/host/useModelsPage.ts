@@ -26,13 +26,25 @@ export function useModelsPage(
 	 * on the transition into the panel and nothing else, so closing the page with
 	 * its X while the panel is open leaves it closed — a page that reopened
 	 * itself would be a page you cannot close. Moving along the Modeller's rail
-	 * between Global model, Models and Stitches is such a transition too: each is
-	 * a reading of the page, so each brings it forward.
+	 * between Global model, Models and Stitches is such a transition too: each
+	 * brings its own board forward (`global_model`, `models`, `stitches`).
 	 */
 	const modelsView = useModelsView().view;
-	const openModelsPage = useCallback(() => {
-		if (graphSlug) openBoard({ kind: "models", subjectId: graphSlug });
-	}, [openBoard, graphSlug]);
+	const openModelsPage = useCallback(
+		(section: string) => {
+			if (!graphSlug) return;
+			// Each rail item brings its own board forward: the global model, the
+			// stitch list, or the models board.
+			const kind =
+				section === "global"
+					? "global_model"
+					: section === "stitches"
+						? "stitches"
+						: "models";
+			openBoard({ kind, subjectId: graphSlug });
+		},
+		[openBoard, graphSlug],
+	);
 	// The panel brings the board forward and names it in the URL in the same
 	// write as the scope it picked, so this only touches the strip.
 	const showModelsPage = useCallback((): Record<string, string | null> => {
@@ -51,7 +63,8 @@ export function useModelsPage(
 		settingsSection === "model" ? (params.get(SECTION_PARAM) ?? "") : null;
 	const wasReading = useRef<string | null>(null);
 	useEffect(() => {
-		if (reading !== null && reading !== wasReading.current) openModelsPage();
+		if (reading !== null && reading !== wasReading.current)
+			openModelsPage(reading);
 		wasReading.current = reading;
 	}, [reading, openModelsPage]);
 

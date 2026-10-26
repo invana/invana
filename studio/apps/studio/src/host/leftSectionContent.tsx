@@ -37,6 +37,8 @@ export interface LeftSectionDeps {
 	modelSelection: ModelSelection | null;
 	setModelSelection: Dispatch<SetStateAction<ModelSelection | null>>;
 	showModelsPage: () => Record<string, string | null>;
+	/** One model is open — the only Modeller page with a leftSection. */
+	modelOpen: boolean;
 	modelName: (id: string) => string | undefined;
 	canvas: GraphCanvas | null;
 	selected: QueryResultItem | null;
@@ -65,6 +67,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		modelSelection,
 		setModelSelection,
 		showModelsPage,
+		modelOpen,
 		modelName,
 		canvas,
 		selected,
@@ -75,17 +78,17 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 	} = deps;
 	const { setSelectedProjectKey, setWorkKind } = layered;
 	return settingsPanel.section === "model" ? (
-		// The panel lists; the page acts. Its selection is the page's
-		// scope, and both are the URL's — so a row picked here reads on the
-		// `models` board beside it. A stack with no panel header above its
-		// sections, so it takes no `onClose`.
-		<ModelViewPanel
+		// Only one model's page has a leftSection: the model's outline. The
+		// global model, the models board and the stitch list have none.
+		modelOpen ? (
+			<ModelViewPanel
 			username={username as string}
 			graphSlug={graphSlug as string}
 			selection={modelSelection}
 			onSelect={setModelSelection}
 			onShowPage={showModelsPage}
-		/>
+			/>
+		) : null
 	) : settingsPanel.section === "projects" ? (
 		// **Projects owns Todos** — two sections, `Projects` over `Todos`,
 		// the same stack shape Library takes. With no project drilled into, the

@@ -110,7 +110,7 @@ export function ModelViewPanel({
 				selection={selection}
 				onSelect={(next) => {
 					onSelect(next);
-					if (next) set({ tab: "model" }, onShowPage());
+					if (next) set({ type: next.name }, onShowPage());
 				}}
 				onBack={() => set({ open: false })}
 				canWrite={canWrite}
@@ -133,8 +133,8 @@ export function ModelViewPanel({
 				set({ scope: id }, onShowPage());
 			}}
 			onOpenModel={(id) => {
-				// Drilling in is for authoring, so the page turns to the Model tab.
-				set({ scope: id, open: true, tab: "model" }, onShowPage());
+				// Drilling in is for authoring, so the page opens the schema canvas.
+				set({ scope: id, open: true, schema: true }, onShowPage());
 			}}
 			canWrite={canWrite}
 		/>

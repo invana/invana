@@ -52,7 +52,6 @@ import {
 	useStagedSetQuery,
 	useUpdateModelMutation,
 } from "../queries";
-import { AllModelsCanvas } from "../stitch/AllModelsCanvas";
 import { useAllModels } from "../stitch/useAllModels";
 import type {
 	Advice,
@@ -60,7 +59,6 @@ import type {
 	GraphModelSummary,
 	VersionSummary,
 } from "../types";
-import { DraftCompareBar } from "./DraftCompareBar";
 import { ModelHistory } from "./ModelHistory";
 import { ArchiveRefused, PublishConfirm } from "./ModelsDialogs";
 import {
@@ -267,37 +265,6 @@ export function ModelsPage({
 		},
 		view,
 		{
-			modelTab: scoped ? (
-				<ModelCanvas
-					username={username}
-					graphSlug={graphSlug}
-					modelId={scoped.id}
-					backend={backend}
-					selection={selection}
-					onSelect={onSelect}
-					canWrite={canWrite}
-				/>
-			) : (
-				<div className="flex h-full min-h-0 flex-col">
-					<AllModelsCanvas
-						username={username}
-						graphSlug={graphSlug}
-						backend={backend}
-					/>
-					{canWrite ? (
-						<DraftCompareBar
-							username={username}
-							graphSlug={graphSlug}
-							models={authored}
-							onReview={(modelId) => {
-								// The confirm opens once the model's draft is read.
-								set({ scope: modelId, open: true, tab: "model" });
-								setPublishing(true);
-							}}
-						/>
-					) : null}
-				</div>
-			),
 			notMeasured: (tab) => (
 				<EmptyState
 					className="py-10"
@@ -319,7 +286,7 @@ export function ModelsPage({
 				canWrite,
 				// A load is a run, so it lands on the Runs journal.
 				onBringDataIn: () => set({}, { panel: "runs" }),
-				onSeeTypes: () => set({ tab: "model", open: true }),
+				onSeeTypes: () => set({ open: true }),
 				onOpenRun: (runId) => onOpenRun?.(runId),
 			},
 			database: {
@@ -343,7 +310,7 @@ export function ModelsPage({
 								{firstDraft ? (
 									<Button
 										onClick={() =>
-											set({ scope: firstDraft.id, open: true, tab: "model" })
+											set({ scope: firstDraft.id, open: true, schema: true })
 										}
 									>
 										Open the draft
@@ -421,6 +388,20 @@ export function ModelsPage({
 		}
 	};
 
+	// *Open in Schema*: the model's canvas, full-bleed, in place of the tabs.
+	if (scoped && view.schema)
+		return (
+			<ModelCanvas
+				username={username}
+				graphSlug={graphSlug}
+				modelId={scoped.id}
+				backend={backend}
+				selection={selection}
+				onSelect={onSelect}
+				canWrite={canWrite}
+			/>
+		);
+
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			<ReadOnlyNotice area="model" noun="model" />
@@ -455,7 +436,7 @@ export function ModelsPage({
 									: "node_type",
 								name: ctx.itemId,
 							});
-							return set({ tab: "model", open: true });
+							return set({ type: ctx.itemId, open: true });
 						case MODELS_ACTIONS.newModel:
 							return setEditing("new");
 						case MODELS_ACTIONS.importModel:
@@ -516,7 +497,7 @@ export function ModelsPage({
 				onImported={(modelId) => {
 					setImporting(false);
 					// The panel opens beside the page, in the same URL write.
-					set({ scope: modelId, open: true, tab: "model" }, { panel: "model" });
+					set({ scope: modelId, open: true, schema: true }, { panel: "model" });
 				}}
 			/>
 			{fromOntology ? (
@@ -528,7 +509,7 @@ export function ModelsPage({
 					onImported={(modelId) => {
 						setFromOntology(false);
 						set(
-							{ scope: modelId, open: true, tab: "model" },
+							{ scope: modelId, open: true, schema: true },
 							{ panel: "model" },
 						);
 					}}
@@ -604,7 +585,7 @@ export function ModelsPage({
 				stitches={refused?.stitches ?? []}
 				onOpenStitches={() => {
 					setRefused(null);
-					set({ scope: null, open: false, tab: "model" });
+					navigate(`/u/${username}/${graphSlug}/modeller/stitches`);
 				}}
 				onClose={() => setRefused(null)}
 			/>

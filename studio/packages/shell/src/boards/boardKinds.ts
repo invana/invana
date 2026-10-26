@@ -42,7 +42,9 @@ import {
 	Globe,
 	History,
 	LayoutDashboard,
+	Link2,
 	ListTree,
+	Orbit,
 	Pencil,
 	Play,
 	Plug,
@@ -182,6 +184,8 @@ export type DeclaredKind =
 	| "guardrail"
 	| "agent"
 	| "models"
+	| "global_model"
+	| "stitches"
 	| "project"
 	| "decisions"
 	| "plugin"
@@ -355,6 +359,27 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		label: "Models",
 		icon: Boxes,
 		// Switching the `leftNav` to Models opens it.
+		panel: "model",
+		subject: "the graph's slug",
+	},
+	// Every published model on one full-bleed canvas, stitches dashed
+	// (modeller.md). Studio-only and bound to the Graph, like `models`.
+	global_model: {
+		kind: "global_model",
+		renders: "declared",
+		label: "Global model",
+		icon: Orbit,
+		// Global model on the Modeller's leftNav.
+		panel: "model",
+		subject: "the graph's slug",
+	},
+	// The Graph's stitches, active and removed. Studio-only, like `models`.
+	stitches: {
+		kind: "stitches",
+		renders: "declared",
+		label: "Stitches",
+		icon: Link2,
+		// Stitches on the Modeller's leftNav.
 		panel: "model",
 		subject: "the graph's slug",
 	},

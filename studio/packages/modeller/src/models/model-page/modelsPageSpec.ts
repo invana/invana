@@ -80,7 +80,6 @@ export type ModelsMenuItem = keyof typeof MODELS_MENU;
 
 const TAB_LABEL: Record<ModelsTab, string> = {
 	overview: "Overview",
-	model: "Model",
 	database: "Database",
 	usage: "Usage",
 	performance: "Performance",
@@ -97,7 +96,7 @@ export const windowOf = (label: string): ModelsWindow | undefined =>
 	MODELS_WINDOWS.find((w) => WINDOW_LABEL[w] === label);
 
 /** A declaration and a mirror have no window. */
-const UNWINDOWED: ModelsTab[] = ["model", "database", "history"];
+const UNWINDOWED: ModelsTab[] = ["database", "history"];
 /** Nothing to count before a model is published (the-model-page.md seams). */
 export const LOCKED_UNTIL_PUBLISHED: ModelsTab[] = [
 	"usage",
@@ -139,7 +138,6 @@ export interface ModelsPageData {
 
 /** What only the host can draw — the canvases, and the states it composes from kit parts. */
 export interface ModelsPageSlots {
-	modelTab: ReactNode;
 	/** A tab whose read the engine does not serve yet. */
 	notMeasured: (tab: ModelsTab) => ReactNode;
 	/** The Overview when nothing is published. */
@@ -170,15 +168,6 @@ function tabRows(
 	switch (id) {
 		case "overview":
 			return overviewRows(data, view, slots);
-		case "model":
-			return [
-				{
-					fill: true,
-					panels: [
-						{ kind: "text", options: { text: "" }, render: slots.modelTab },
-					],
-				},
-			];
 		case "database":
 			return databaseRows(data.physical, data.physicalLoading, {
 				...slots.database,
@@ -265,9 +254,6 @@ export function modelsPageSpec(
 		id,
 		label: TAB_LABEL[id],
 		locked: locked(id),
-		// One model's canvas is the whole tab, so it meets the tab strip; All
-		// models keeps the padding for the union card beside it.
-		flush: id === "model" && data.scope !== null,
 		rows: id !== tab ? [] : tabRows(id, data, view, slots),
 	}));
 
