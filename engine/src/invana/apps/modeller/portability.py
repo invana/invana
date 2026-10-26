@@ -88,19 +88,33 @@ def canonical_body(export: SchemaExport) -> dict[str, Any]:
     the semver, which is a Graph's own counting. What is left is the shape.
     """
     body = export.model_dump(mode="json", exclude={"schema_name", "schema_description", "version"})
-    return _sorted(_drop_unset_iris(body))
+    return _sorted(_drop_unset(body))
 
 
-def _drop_unset_iris(value: Any) -> Any:
-    """A ``source_iri`` that was never set is not part of the shape.
+#: Keys left out of the shape at these values: never set, or local to one install.
+_UNSET: dict[str, tuple[Any, ...]] = {
+    "source_iri": (None,),
+    "unit": (None,),
+    "standard_ref": (None,),
+    "term": (None,),
+    "on_break": ("reject",),
+}
+#: A rule's pinned standard version is a row id in this install, never shape.
+_LOCAL = {"standard_version_id"}
 
-    It is provenance an ontology import adds; leaving the empty key out keeps
-    every artefact written before it hashing exactly as it did.
+
+def _drop_unset(value: Any) -> Any:
+    """Keys that were never set are not part of the shape.
+
+    A ``source_iri`` is provenance an ontology import adds; a rule's unit,
+    standard and ``on_break`` arrive with constraints on properties. Leaving the
+    empty keys out keeps every artefact written before them hashing exactly as
+    it did, and the standard version's id is this install's, so it never hashes.
     """
     if isinstance(value, dict):
-        return {k: _drop_unset_iris(v) for k, v in value.items() if not (k == "source_iri" and v is None)}
+        return {k: _drop_unset(v) for k, v in value.items() if k not in _LOCAL and not (k in _UNSET and v in _UNSET[k])}
     if isinstance(value, list):
-        return [_drop_unset_iris(v) for v in value]
+        return [_drop_unset(v) for v in value]
     return value
 
 

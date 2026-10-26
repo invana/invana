@@ -8,7 +8,9 @@ Tables
 - ``node_type_definitions``      — node types with inheritance and display metadata
 - ``edge_type_definitions``      — edge types with multiplicity and endpoint restrictions
 - ``type_property_mappings``     — links property keys to node/edge types
-- ``validation_rules``           — per-property-key or per-mapping validation rules
+- ``validation_rules``           — per-property-key or per-mapping validation rules; a range or a
+                                   standard's values is a constraint on a property
+                                   (property-constraints.md)
 - ``constraint_definitions``     — explicit constraints (unique, exists, node_key) on labels
 - ``index_definitions``          — schema-managed indexes
 - ``schema_projections``         — records of DDL pushed to graph databases
@@ -20,8 +22,10 @@ Tables
 
 from __future__ import annotations
 
+import copy
 import uuid
 from datetime import UTC, datetime
+from typing import Any
 
 from sqlalchemy import (
     JSON,
@@ -303,14 +307,49 @@ class ValidationRule(Base):
         ForeignKey("type_property_mappings.id", ondelete="CASCADE"), nullable=True
     )
     rule_type: Mapped[str] = mapped_column(
-        Enum("range", "pattern", "enum", "min_length", "max_length", "custom", name="rule_type_enum"),
+        Enum("range", "pattern", "enum", "min_length", "max_length", "custom", "standard", name="rule_type_enum"),
         nullable=False,
     )
+    #: range ``{min, max}`` · enum and standard ``{values}`` · pattern ``{pattern}`` · lengths ``{value}``.
     params: Mapped[dict] = mapped_column(JSON, default=dict)
+    #: A range's unit — a label, never converted.
+    unit: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    #: The standard version a ``standard`` rule's values were copied from.
+    standard_version_id: Mapped[str | None] = mapped_column(
+        ForeignKey("standard_versions.id", ondelete="SET NULL"), nullable=True
+    )
+    #: ``publisher/name@v`` — kept when the version row is gone.
+    standard_ref: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    #: The standard's term the values are.
+    term: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    #: ``reject`` refuses a breaking record; ``flag`` lets it land and lists it.
+    on_break: Mapped[str] = mapped_column(String(8), nullable=False, default="reject", server_default="reject")
 
     property_key: Mapped[PropertyKeyDefinition | None] = relationship(
         back_populates="validation_rules", foreign_keys=[property_key_id]
     )
+
+    @staticmethod
+    def fields_of(rule: Any, *, portable: bool = False) -> dict[str, Any]:
+        """A rule's authored fields as a dict — what a copy of the rule carries.
+
+        ``rule`` is a row, a schema or a dict. ``portable`` leaves out the pinned
+        standard version's id, a row of this install that a model file must not
+        carry; its ``standard_ref`` still says which version the values are.
+        """
+        get = rule.get if isinstance(rule, dict) else lambda k, d=None: getattr(rule, k, d)
+        out = {
+            "rule_type": get("rule_type"),
+            "params": copy.deepcopy(get("params") or {}),
+            "unit": get("unit"),
+            "standard_ref": get("standard_ref"),
+            "term": get("term"),
+            "on_break": get("on_break") or "reject",
+        }
+        if not portable:
+            out["standard_version_id"] = get("standard_version_id")
+        return out
+
     type_property_mapping: Mapped[TypePropertyMapping | None] = relationship(
         back_populates="validation_rules", foreign_keys=[type_property_mapping_id]
     )

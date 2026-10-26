@@ -578,6 +578,29 @@
         "title": "ActionResponse[TemplateRead]",
         "type": "object"
       },
+      "ActionResponse_ValidationRuleResponse_": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ValidationRuleResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ActionResponse[ValidationRuleResponse]",
+        "type": "object"
+      },
       "ActionResponse_VersionResponse_": {
         "properties": {
           "data": {
@@ -6384,6 +6407,55 @@
         "title": "ConformanceRead",
         "type": "object"
       },
+      "ConstraintCheck": {
+        "description": "What breaks a constraint in the graph now.",
+        "properties": {
+          "breaking": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Breaking"
+          },
+          "counted": {
+            "title": "Counted",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "samples": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ConstraintSample"
+            },
+            "title": "Samples",
+            "type": "array"
+          }
+        },
+        "required": [
+          "label",
+          "counted"
+        ],
+        "title": "ConstraintCheck",
+        "type": "object"
+      },
       "ConstraintCreate": {
         "properties": {
           "constraint_type": {
@@ -6470,6 +6542,22 @@
           "properties"
         ],
         "title": "ConstraintResponse",
+        "type": "object"
+      },
+      "ConstraintSample": {
+        "properties": {
+          "record": {
+            "title": "Record",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "record"
+        ],
+        "title": "ConstraintSample",
         "type": "object"
       },
       "ContentionRead": {
@@ -23431,6 +23519,99 @@
         "title": "PropertyChange",
         "type": "object"
       },
+      "PropertyConstraintSet": {
+        "description": "One property's constraint on one type \u2014 a range or a standard's values.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "range",
+              "standard"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max"
+          },
+          "min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min"
+          },
+          "on_break": {
+            "default": "reject",
+            "enum": [
+              "reject",
+              "flag"
+            ],
+            "title": "On Break",
+            "type": "string"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          },
+          "standard": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          }
+        },
+        "required": [
+          "type",
+          "property",
+          "kind"
+        ],
+        "title": "PropertyConstraintSet",
+        "type": "object"
+      },
       "PropertyKeyCreate": {
         "properties": {
           "description": {
@@ -31705,6 +31886,40 @@
         "title": "StagedSet",
         "type": "object"
       },
+      "StandardChoice": {
+        "description": "A standard's term that carries values \u2014 what a constraint may reference.",
+        "properties": {
+          "standard": {
+            "title": "Standard",
+            "type": "string"
+          },
+          "term": {
+            "title": "Term",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "values": {
+            "title": "Values",
+            "type": "integer"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "standard",
+          "title",
+          "version",
+          "term",
+          "values"
+        ],
+        "title": "StandardChoice",
+        "type": "object"
+      },
       "StandardCreate": {
         "properties": {
           "description": {
@@ -36227,6 +36442,15 @@
             "title": "Id",
             "type": "string"
           },
+          "on_break": {
+            "default": "reject",
+            "enum": [
+              "reject",
+              "flag"
+            ],
+            "title": "On Break",
+            "type": "string"
+          },
           "params": {
             "additionalProperties": true,
             "default": {},
@@ -36240,10 +36464,58 @@
               "enum",
               "min_length",
               "max_length",
-              "custom"
+              "custom",
+              "standard"
             ],
             "title": "Rule Type",
             "type": "string"
+          },
+          "standard_ref": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard Ref"
+          },
+          "standard_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard Version Id"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
           }
         },
         "required": [
@@ -36255,6 +36527,15 @@
       },
       "ValidationRuleSchema": {
         "properties": {
+          "on_break": {
+            "default": "reject",
+            "enum": [
+              "reject",
+              "flag"
+            ],
+            "title": "On Break",
+            "type": "string"
+          },
           "params": {
             "additionalProperties": true,
             "default": {},
@@ -36268,10 +36549,58 @@
               "enum",
               "min_length",
               "max_length",
-              "custom"
+              "custom",
+              "standard"
             ],
             "title": "Rule Type",
             "type": "string"
+          },
+          "standard_ref": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard Ref"
+          },
+          "standard_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard Version Id"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
           }
         },
         "required": [
@@ -54773,6 +55102,71 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/models/property-constraints/standards": {
+      "get": {
+        "description": "Every standard term with values a constraint on a property may reference.",
+        "operationId": "list_constraint_standards_api_v1_u__username___graphSlug__models_property_constraints_standards_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StandardChoice"
+                  },
+                  "title": "Response List Constraint Standards Api V1 U  Username   Graphslug  Models Property Constraints Standards Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Constraint Standards",
+        "tags": [
+          "models"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/models/starters": {
       "get": {
         "description": "The starters shipped with this distribution. Ordinary artefacts (SR1).",
@@ -57251,6 +57645,270 @@
           }
         ],
         "summary": "Update Node Type",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/versions/{version_id}/property-constraints": {
+      "put": {
+        "operationId": "set_property_constraint_api_v1_u__username___graphSlug__models__model_id__versions__version_id__property_constraints_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyConstraintSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse_ValidationRuleResponse_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Set Property Constraint",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/versions/{version_id}/property-constraints/check": {
+      "post": {
+        "description": "What in the graph breaks this constraint now \u2014 counted before it is saved, nothing written.",
+        "operationId": "check_property_constraint_api_v1_u__username___graphSlug__models__model_id__versions__version_id__property_constraints_check_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyConstraintSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstraintCheck"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Check Property Constraint",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/versions/{version_id}/property-constraints/{rule_id}": {
+      "delete": {
+        "operationId": "delete_property_constraint_api_v1_u__username___graphSlug__models__model_id__versions__version_id__property_constraints__rule_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse_NoneType_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Property Constraint",
         "tags": [
           "models"
         ]

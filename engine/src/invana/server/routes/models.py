@@ -31,6 +31,10 @@ GET    /{model_id}/publish-reviews[/{id}]  the model's publish reviews
 # type authoring — only on a draft version (ModelStore._ensure_draft → 409)
 POST/PATCH/DELETE /{model_id}/versions/{vid}/node-types[/{id}]
 POST/DELETE       …/edge-types · …/property-keys · …/constraints · …/indexes
+PUT/DELETE        …/property-constraints[/{rule_id}]   a property's range or standard's values on a type
+
+POST   /{model_id}/versions/{vid}/property-constraints/check   what breaks a constraint today (any version)
+GET    /property-constraints/standards     standard terms with values a constraint may reference
 """
 
 from __future__ import annotations
@@ -62,6 +66,7 @@ from invana.apps.modeller.portability import (
 )
 from invana.apps.modeller.projector import plan_projection
 from invana.apps.modeller.schemas import (
+    ConstraintCheck,
     ConstraintCreate,
     ConstraintResponse,
     EdgeTypeCreate,
@@ -81,11 +86,14 @@ from invana.apps.modeller.schemas import (
     NodeTypeCreate,
     NodeTypeResponse,
     NodeTypeUpdate,
+    PropertyConstraintSet,
     PropertyKeyCreate,
     PropertyKeyResponse,
     PropertyKeyUpdate,
     SchemaDiff,
     ShapeCard,
+    StandardChoice,
+    ValidationRuleResponse,
     VersionActivate,
     VersionCreate,
     VersionResponse,
@@ -101,6 +109,7 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events import actions as event_actions
 from invana.core.events.services import emit_event
+from invana.runtime.managers.property_constraints import PropertyConstraintManager
 from invana.server.evals.views import drift_after
 from invana.server.graphs.deps import (
     require_graph_member,
@@ -115,6 +124,7 @@ _lifecycle = ModelLifecycleManager()
 _publishing = PublishManager()
 _reviews = PublishReviewManager()
 _ontologies = OntologyImportManager()
+_property_constraints = PropertyConstraintManager()
 
 
 # ---------------------------------------------------------------------------
@@ -981,6 +991,75 @@ async def delete_constraint(
         raise _conflict(exc) from exc
     await session.commit()
     return action("Constraint deleted.")
+
+
+@models_router.get("/property-constraints/standards", response_model=list[StandardChoice])
+async def list_constraint_standards(
+    _: GraphMember = Depends(require_graph_member),
+    session: AsyncSession = Depends(get_session),
+) -> list[StandardChoice]:
+    """Every standard term with values a constraint on a property may reference."""
+    return await _property_constraints.standard_choices(session)
+
+
+@models_router.put(
+    "/{model_id}/versions/{version_id}/property-constraints",
+    response_model=ActionResponse[ValidationRuleResponse],
+)
+async def set_property_constraint(
+    payload: PropertyConstraintSet,
+    model_id: str = Path(...),
+    version_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[ValidationRuleResponse]:
+    version = await _get_draft_version_or_404(session, graph.id, model_id, version_id)
+    rule = await _property_constraints.set(session, version=version, body=payload)
+    await session.commit()
+    return action(
+        f"Constraint on {payload.type}.{payload.property} staged.", ValidationRuleResponse.model_validate(rule)
+    )
+
+
+@models_router.delete(
+    "/{model_id}/versions/{version_id}/property-constraints/{rule_id}",
+    response_model=ActionResponse[None],
+)
+async def delete_property_constraint(
+    model_id: str = Path(...),
+    version_id: str = Path(...),
+    rule_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[None]:
+    version = await _get_draft_version_or_404(session, graph.id, model_id, version_id)
+    await _property_constraints.remove(session, version=version, rule_id=rule_id)
+    await session.commit()
+    return action("Constraint removed from the draft.")
+
+
+@models_router.post(
+    "/{model_id}/versions/{version_id}/property-constraints/check",
+    response_model=ConstraintCheck,
+)
+async def check_property_constraint(
+    payload: PropertyConstraintSet,
+    request: Request,
+    model_id: str = Path(...),
+    version_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ConstraintCheck:
+    """What in the graph breaks this constraint now — counted before it is saved, nothing written."""
+    await _get_model_or_404(session, graph.id, model_id)
+    version = await _store.get_version(session, version_id)
+    if version is None or version.model_id != model_id:
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "version_not_found", "version_id": version_id})
+    connector = await _live_connector(request, session, graph)
+    return await _property_constraints.check(session, connector=connector, version=version, body=payload)
 
 
 @models_router.post(

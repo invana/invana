@@ -142,8 +142,7 @@ class VersionScopedQuerySet:
             for rule_data in validation_rules:
                 rule = ValidationRule(
                     type_property_mapping_id=mapping.id,
-                    rule_type=rule_data["rule_type"],
-                    params=rule_data.get("params", {}),
+                    **ValidationRule.fields_of(rule_data),
                 )
                 session.add(rule)
             await session.flush()

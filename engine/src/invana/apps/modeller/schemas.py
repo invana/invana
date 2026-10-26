@@ -15,14 +15,69 @@ from invana.core.metrics import Change
 
 
 class ValidationRuleSchema(BaseModel):
-    rule_type: Literal["range", "pattern", "enum", "min_length", "max_length", "custom"]
+    rule_type: Literal["range", "pattern", "enum", "min_length", "max_length", "custom", "standard"]
     params: dict[str, Any] = {}
+    #: A range's unit — a label, never converted.
+    unit: str | None = Field(default=None, max_length=32)
+    #: The standard version a ``standard`` rule's values were copied from.
+    standard_version_id: str | None = None
+    #: ``publisher/name@v``.
+    standard_ref: str | None = Field(default=None, max_length=160)
+    term: str | None = Field(default=None, max_length=255)
+    on_break: Literal["reject", "flag"] = "reject"
 
 
 class ValidationRuleResponse(ValidationRuleSchema):
     id: str
 
     model_config = {"from_attributes": True}
+
+
+# ---------------------------------------------------------------------------
+# Constraints on properties
+# ---------------------------------------------------------------------------
+
+
+class PropertyConstraintSet(BaseModel):
+    """One property's constraint on one type — a range or a standard's values."""
+
+    type: str
+    property: str
+    kind: Literal["range", "standard"]
+    min: float | None = None
+    max: float | None = None
+    unit: str | None = Field(default=None, max_length=32)
+    #: ``publisher/name``; its current version is pinned.
+    standard: str | None = None
+    term: str | None = None
+    on_break: Literal["reject", "flag"] = "reject"
+
+
+class ConstraintSample(BaseModel):
+    record: str
+    value: Any = None
+
+
+class ConstraintCheck(BaseModel):
+    """What breaks a constraint in the graph now."""
+
+    #: The constraint as a refusal names it — ``80 to 180 days`` · ``CO_338 · Seed type``.
+    label: str
+    counted: bool
+    breaking: int | None = None
+    samples: list[ConstraintSample] = []
+    #: Why it was not counted.
+    reason: str | None = None
+
+
+class StandardChoice(BaseModel):
+    """A standard's term that carries values — what a constraint may reference."""
+
+    standard: str
+    title: str
+    version: int
+    term: str
+    values: int
 
 
 # ---------------------------------------------------------------------------
@@ -1009,3 +1064,5 @@ class ModelIndex(BaseModel):
     version_id: str
     nodes: dict[str, dict[str, str]]
     edges: dict[str, dict[str, str]]
+    #: Each type's rules per key — its mapping's and the key's own.
+    rules: dict[str, dict[str, list[ValidationRuleResponse]]] = {}

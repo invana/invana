@@ -51,3 +51,22 @@ def test_what_the_model_does_not_have_is_refused_naming_the_edit(edit: dict, cod
         check({"op": "delete_edge", "id": "e1", "type": "route"}, edit)
     assert caught.value.detail["error"] == code
     assert caught.value.detail["edit"] == 1
+
+
+def test_a_value_outside_a_rejecting_constraint_is_refused_naming_it_and_a_flagging_one_goes_through() -> None:
+    rule = {"id": "r1", "rule_type": "range", "params": {"min": 1, "max": 6}, "unit": "runways"}
+    flagged = {**rule, "id": "r2", "rule_type": "standard", "params": {"values": ["DOH"]}, "on_break": "flag"}
+    index = INDEX.model_copy(update={"rules": {"airport": {"runways": [rule], "code": [flagged]}}})
+    manager = DataEditManager()
+
+    def batch(props: dict) -> DataEditBatch:
+        return DataEditBatch.model_validate(
+            {"edits": [{"op": "add_node", "ref": "n1", "type": "airport", "properties": props}]}
+        )
+
+    with pytest.raises(ValidationError) as caught:
+        manager.check_batch(batch({"runways": "40"}), index)
+    assert caught.value.detail["error"] == "breaks_constraint"
+    assert caught.value.detail["message"] == "airport.runways breaks its constraint 1 – 6 runways: 40"  # noqa: RUF001
+    (added,) = manager.check_batch(batch({"runways": "2", "code": "LHR"}), index)
+    assert added.properties == {"runways": 2, "code": "LHR"}

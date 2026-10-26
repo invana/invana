@@ -46,8 +46,7 @@ class PropertyKeyQuerySet(VersionScopedQuerySet):
             for rule_data in validation_rules:
                 rule = ValidationRule(
                     property_key_id=pk.id,
-                    rule_type=rule_data["rule_type"],
-                    params=rule_data.get("params", {}),
+                    **ValidationRule.fields_of(rule_data),
                 )
                 session.add(rule)
             await session.flush()
@@ -120,8 +119,7 @@ class PropertyKeyQuerySet(VersionScopedQuerySet):
                 session.add(
                     ValidationRule(
                         property_key_id=pk.id,
-                        rule_type=rule_data["rule_type"],
-                        params=rule_data.get("params", {}),
+                        **ValidationRule.fields_of(rule_data),
                     )
                 )
 

@@ -9,6 +9,7 @@ from sqlalchemy import select
 
 from invana.apps.modeller.models import (
     GraphVersion,
+    ValidationRule,
 )
 
 if TYPE_CHECKING:
@@ -144,9 +145,7 @@ class GraphVersionQuerySet(VersionScopedQuerySet):
                 type=pk.type,
                 value_cardinality=pk.value_cardinality,
                 description=pk.description,
-                validation_rules=[
-                    {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in pk.validation_rules
-                ],
+                validation_rules=[ValidationRule.fields_of(r) for r in pk.validation_rules],
                 source_iri=pk.source_iri,
             )
 
@@ -157,9 +156,7 @@ class GraphVersionQuerySet(VersionScopedQuerySet):
                     "property_key": m.property_key.name,
                     "default_value": m.default_value,
                     "sort_order": m.sort_order,
-                    "validation_rules": [
-                        {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in m.validation_rules
-                    ],
+                    "validation_rules": [ValidationRule.fields_of(r) for r in m.validation_rules],
                 }
                 for m in nt.property_mappings
             ]
@@ -182,9 +179,7 @@ class GraphVersionQuerySet(VersionScopedQuerySet):
                     "property_key": m.property_key.name,
                     "default_value": m.default_value,
                     "sort_order": m.sort_order,
-                    "validation_rules": [
-                        {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in m.validation_rules
-                    ],
+                    "validation_rules": [ValidationRule.fields_of(r) for r in m.validation_rules],
                 }
                 for m in et.property_mappings
             ]

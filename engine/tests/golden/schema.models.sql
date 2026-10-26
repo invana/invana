@@ -2028,9 +2028,15 @@ CREATE TABLE validation_rules (
 	type_property_mapping_id VARCHAR(36), 
 	rule_type rule_type_enum NOT NULL, 
 	params JSON NOT NULL, 
+	unit VARCHAR(32), 
+	standard_version_id VARCHAR(36), 
+	standard_ref VARCHAR(160), 
+	term VARCHAR(255), 
+	on_break VARCHAR(8) DEFAULT 'reject' NOT NULL, 
 	PRIMARY KEY (id), 
 	FOREIGN KEY(property_key_id) REFERENCES property_key_definitions (id) ON DELETE CASCADE, 
-	FOREIGN KEY(type_property_mapping_id) REFERENCES type_property_mappings (id) ON DELETE CASCADE
+	FOREIGN KEY(type_property_mapping_id) REFERENCES type_property_mappings (id) ON DELETE CASCADE, 
+	FOREIGN KEY(standard_version_id) REFERENCES standard_versions (id) ON DELETE SET NULL
 );
 
 CREATE TABLE worker_events (

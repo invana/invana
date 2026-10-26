@@ -129,7 +129,8 @@ class MigrationScan:
                     else:
                         new = after_v.validate_edge_properties(name, props)
                         old = before_v.validate_edge_properties(name, props) if base is not None else []
-                    fresh = [e.message for e in new if e.message not in {o.message for o in old}]
+                    # A flagged break lets the record land, so it does not fail it.
+                    fresh = [e.message for e in new if not e.flag and e.message not in {o.message for o in old}]
                     if fresh:
                         failures[record.id] = fresh
                 old_unique = set(_unique_keys(base, name)) if base is not None else set()
