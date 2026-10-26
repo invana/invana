@@ -189,24 +189,27 @@ def ensure_branch(branch: str) -> None:
     sh(["git", "checkout", branch] if exists else ["git", "checkout", "-b", branch])
 
 
-CONTEXT_LIMIT = int(os.environ.get("INVANA_MIGRATION_CONTEXT_LIMIT", "200000"))
-PART_LIMIT = int(os.environ.get("INVANA_RUNNER_PART_LIMIT", "150000"))
-# Every turn re-reads the whole context, so spend grows with context size × turns. The lead builds on
-# Opus; reviews, fix rounds and every sub-agent run on the cheaper model.
+# One context budget for the lead and every sub-agent. Every turn re-reads the whole context, so spend
+# grows with context size × turns. Past the budget a session hands off; past the hard stop the driver ends it.
+CONTEXT_LIMIT = int(os.environ.get("INVANA_MIGRATION_CONTEXT_LIMIT", "300000"))
+HARD_STOP = CONTEXT_LIMIT + int(os.environ.get("INVANA_RUNNER_HANDOFF_GRACE", "50000"))
+# The lead builds on Opus; fix rounds and every sub-agent run on the cheaper model.
 LEAD_MODEL = os.environ.get("INVANA_RUNNER_LEAD_MODEL", "")
 CHEAP_MODEL = os.environ.get("INVANA_RUNNER_CHEAP_MODEL", "sonnet")
-PART_STOP = ("Sub-agent '{name}' (tool use {tid}) has passed {limit:,} tokens of context. Stop it now with TaskStop. "
-             "Its edits stay on disk: check `git diff` on the files it owns, then finish what is left yourself or in "
-             "one fresh, smaller part. Launch no part with more than one surface.")
+PART_HANDOFF = ("Sub-agent '{name}' (tool use {tid}) has passed {limit:,} tokens of context. Hand it off now:\n"
+                "1. Stop it with TaskStop. Its edits stay on disk.\n"
+                "2. Write its hand-off yourself: the files it owns, what `git diff` shows it changed, and what its "
+                "brief still lists as undone. Make sure the files it was editing compile.\n"
+                "3. Launch one fresh sub-agent with the same brief plus that hand-off, told to continue from it and "
+                "not redo finished work. If it is small enough, finish it yourself instead.")
+HARD_STOPPED = ("stopped by the driver: {who} passed {limit:,} tokens of context without handing off — "
+                "check `git status` and the last wip commit, then continue")
 HANDOFF = ("Context budget reached: this session has used more than {limit:,} tokens of context. Stop at the next clean "
            "point — finish or revert the file you are editing so the tree compiles; do not start anything new. Then set "
            "{sid}'s row in the log to `partial`, write a hand-off note that says exactly where the next session resumes "
            "(files done, files left, the next step number), and stop. A fresh session will continue from your note.")
 
 
-SUBAGENT_OVER = ("A sub-agent (its Agent call is {part}) has passed {limit:,} tokens of context, and every turn it takes "
-                 "re-reads all of it. Stop it now (TaskStop), keep what it reported, and hand what is left to a fresh "
-                 "sub-agent with a smaller share of the work.")
 LIMIT_RETRY = ("A previous attempt at this was cut off by a usage limit. Check `git log` and `git status` for what it "
                "already did, do not redo it, and carry on from there.\n\n")
 
@@ -234,17 +237,24 @@ def _session(text: str, sid: str, label: str, model: str | None) -> tuple[str, f
     Runs ``claude -p`` with streaming input and output. Every assistant message
     reports its usage; the context in use is input + cache-read + cache-written
     tokens. A message with a ``parent_tool_use_id`` belongs to a sub-agent and is
-    counted against that part, not the lead. Past ``CONTEXT_LIMIT`` the driver
-    injects one message asking the lead to stop cleanly and write a hand-off — the
-    run then continues in a new session that starts from that note. A part past
-    ``PART_LIMIT`` gets the lead told to stop it. Reviews and fix rounds run on
-    ``CHEAP_MODEL``, and so does every sub-agent. The full event stream is kept
-    under ``.migration-cache/<ID>/<label>.jsonl``.
+    counted against that part, not the lead. The lead and every part share one
+    budget, ``CONTEXT_LIMIT``:
+
+    - the lead past it is asked to stop cleanly and write a hand-off; the run then
+      continues in a new session that starts from that note;
+    - a part past it gets the lead told to stop the part, write its hand-off, and
+      launch a fresh part from it;
+    - anyone still growing past ``HARD_STOP`` ends the session: the driver marks
+      the row ``partial`` with a note, so a fresh session continues from the disk.
+
+    Fix rounds run on ``CHEAP_MODEL``, and so does every sub-agent; a caller may
+    name the model instead. The full event stream is kept under
+    ``.migration-cache/<ID>/<label>.jsonl``.
     """
     (CACHE / sid).mkdir(parents=True, exist_ok=True)
     cmd = ["claude", "-p", "--input-format", "stream-json", "--output-format", "stream-json", "--verbose",
-           "--max-turns", "500"] + (["--model", model] if model else [])
-    model = CHEAP_MODEL if label.startswith(("review", "fix")) else LEAD_MODEL
+           "--max-turns", "500"]
+    model = model or (CHEAP_MODEL if label.startswith("fix") else LEAD_MODEL)
     if model:
         cmd += ["--model", model]
     if os.environ.get("INVANA_MIGRATION_SANDBOX") == "1":
@@ -263,7 +273,7 @@ def _session(text: str, sid: str, label: str, model: str | None) -> tuple[str, f
     # Sub-agents run in the background: a lead's turn ends while it waits for them, and their
     # completion starts its next turn. The session is over only at a result with none still running.
     warned, result, peak, session_id, running, resets_at = False, "", 0, "", set(), None
-    big_parts: set[str] = set()
+    killed = ""  # who passed HARD_STOP, when the driver ended the session
     parts: dict[str, str] = {}  # tool use id → part description
     part_peak: dict[str, int] = {}
     stopped: set[str] = set()
@@ -282,21 +292,22 @@ def _session(text: str, sid: str, label: str, model: str | None) -> tuple[str, f
                 u = event["message"].get("usage") or {}
                 ctx = u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + u.get("cache_creation_input_tokens", 0)
                 part_peak[tid] = max(part_peak.get(tid, 0), ctx)
-                if ctx > PART_LIMIT and tid not in stopped:
-                    name = parts.get(tid, "unnamed part")
-                    print(f"  {label}: part '{name}' at {ctx:,} > {PART_LIMIT:,} — asking the lead to stop it")
-                    send(PART_STOP.format(name=name, tid=tid, limit=PART_LIMIT))
+                name = parts.get(tid, "unnamed part")
+                if ctx > HARD_STOP:
+                    killed = f"sub-agent '{name}'"
+                    break
+                if ctx > CONTEXT_LIMIT and tid not in stopped:
+                    print(f"  {label}: part '{name}' at {ctx:,} > {CONTEXT_LIMIT:,} — asking the lead to hand it off")
+                    send(PART_HANDOFF.format(name=name, tid=tid, limit=CONTEXT_LIMIT))
                     stopped.add(tid)
             elif event.get("type") == "assistant":
                 u = event["message"].get("usage") or {}
                 ctx = u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + u.get("cache_creation_input_tokens", 0)
                 peak = max(peak, ctx)
-                part = event.get("parent_tool_use_id")
-                if part and ctx > CONTEXT_LIMIT and part not in big_parts:
-                    print(f"  {label}: sub-agent {part} at {ctx:,} tokens of context — asking the lead to stop it")
-                    send(SUBAGENT_OVER.format(limit=CONTEXT_LIMIT, part=part))
-                    big_parts.add(part)
-                elif not part and ctx > CONTEXT_LIMIT and not warned:
+                if ctx > HARD_STOP:
+                    killed = "the lead"
+                    break
+                if ctx > CONTEXT_LIMIT and not warned:
                     print(f"  context {ctx:,} > {CONTEXT_LIMIT:,} — asking {label} to hand off")
                     send(HANDOFF.format(limit=CONTEXT_LIMIT, sid=sid))
                     warned = True
@@ -320,6 +331,11 @@ def _session(text: str, sid: str, label: str, model: str | None) -> tuple[str, f
                     continue
                 break
     proc.stdin.close()
+    if killed:
+        print(f"  {label}: {killed} passed {HARD_STOP:,} tokens of context — ending the session")
+        proc.terminate()
+        set_status(sid, "partial", HARD_STOPPED.format(who=killed, limit=HARD_STOP))
+        warned = True
     # A slow exit hook can hold the process open after the result.
     try:
         proc.wait(timeout=120)

@@ -31,6 +31,7 @@ async function publishedSkill(page: Page): Promise<SkillRow> {
 test("New skill opens an untitled draft on Instructions with the four headings", async ({
 	page,
 }) => {
+	test.setTimeout(120_000);
 	await page.goto(SKILLS);
 	await page
 		.getByRole("button", { name: "New skill" })

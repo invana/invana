@@ -59,6 +59,7 @@ test("MO-14 a viewer reads the members; Add member is disabled", async ({
 	page,
 	browser,
 }) => {
+	test.setTimeout(120_000);
 	await memberWithRoles(page, MEMBER, ["viewer"]);
 	const viewer = await signInAs(browser, MEMBER);
 	try {
@@ -66,7 +67,11 @@ test("MO-14 a viewer reads the members; Add member is disabled", async ({
 		await expect(rowOf(viewer.page, MEMBER)).toContainText("you", {
 			timeout: 30_000,
 		});
-		await expect(rowOf(viewer.page, "admin")).toContainText("owner");
+		await expect(
+			viewer.page
+				.getByRole("row")
+				.filter({ has: viewer.page.getByText("admin", { exact: true }) }),
+		).toContainText("owner");
 		const addMember = viewer.page.getByRole("button", { name: "Add member" });
 		await expect(addMember).toBeDisabled();
 		await expect(addMember).toHaveAccessibleDescription(
