@@ -78,6 +78,7 @@ this map.** Feature numbers do not change.
 | 1.9 | [Publish review](modules/connect-and-model/features/publish-review.md) | Additive publishes now; breaking is previewed as a migration run and published after another owner approves | ✅ | ✅ | ✅ | B10 |
 | 1.10 | [Import an ontology](modules/connect-and-model/features/ontology-import.md) | RDFS / OWL subset, schema.org included — JSON-LD, Turtle, RDF/XML — into a draft model; flattened, source IRIs kept, an import report of what was skipped | ✅ | ✅ | ✅ | B12 · C08 |
 | 1.11 | [Constraints on properties](modules/connect-and-model/features/property-constraints.md) | A range with a unit or a standard's values on one property of a type; Reject or Flag for review; checked at record write, bind and validation, naming the constraint; what breaks it today counted before saving | ✅ | — | ✅ | M04 |
+| 1.12 | [Graph settings](modules/connect-and-model/features/graph-settings.md) | One page, three tabs — Basic · Database · Members — the Graph's name and instructions, its connection always editable behind a passing test, and who is on it | ✅ | — | ✅ | M07 |
 
 ## 2 · [Bring data in](modules/bring-data-in/spec.md)
 

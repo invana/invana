@@ -132,7 +132,7 @@ flowchart TD
 | RO19 | **The roles are the managed policies** `viewer · contributor · builder · modeller · owner · iam-admin` ([policies](policies.md) PO2). A member's directly held ones are `graph_members.roles`; a group's are attachments; the guard checks their union. |
 | RO20 | `iam-admin` is a peer role: `owner` does not imply it. The Graph's creator holds `owner` and `iam-admin`. A Graph always has an iam-admin — removing or demoting the last one is refused (409), as for the last owner. |
 | RO21 | Members moves to the `iam` area: adding, re-roling and removing a member needs iam-admin, from IAM › People or Graph settings › Members. |
-| RO18 | Graph settings' connection tab is labelled **Database** (its `?tab=graph` key unchanged), so the strip reads Basic · Database · Members as the product names them. |
+| RO18 | Graph settings' connection tab is **Database**, keyed `?tab=database`, so the strip reads Basic · Database · Members as the product names them ([1.12](../../connect-and-model/features/graph-settings.md)). |
 
 ## Not building
 

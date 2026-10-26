@@ -827,7 +827,7 @@ RO13–RO18, [9.7 private projects](modules/work/features/private-projects.md) P
 |---|---|---|---|
 | `agents.skills.detail.readonly` | SH-20 | page `skill:<id>` as a member without `builder` — the notice, *Edit instructions* disabled; no *Request access* |✅ |
 | `modeller.settings.members` | MO-14 | `/modeller/settings?tab=members` — members, roles, *Add member*, the Roles key; no agent rows, no LLMs tab |✅ |
-| `modeller.settings.database` | MO-14 | `/modeller/settings?tab=graph` — the connection, labelled *Database* |✅ |
+| `modeller.settings.database` | MO-14 | `/modeller/settings?tab=database` — the connection, always editable |✅ |
 | `projects.new` people | PJ-02 | *New project* › People and agents — the Graph's other members and its agents |✅ |
 
 ## Beyond the 42 · Runs and sharing
@@ -894,7 +894,7 @@ The `modeller.*` boards of [Invana Products](https://claude.ai/artifact/HcPfkMUY
 | `modeller.requests` | MO-13 | `/modeller/requests` — the inbox of asks | ✅ |
 | `modeller.rules` | MO-12 | `/modeller/rules` — install, Graph and project rules | ✅ |
 | `modeller.rules.edit` | MO-12 | the same › a rule — scope, checked on, when broken, impact | ✅ |
-| `modeller.settings` | MO-14 | `/modeller/settings` — Basic · Database · Members as a page | 🟡 |
+| `modeller.settings` | MO-14 | `/modeller/settings` — Basic · Database · Members as a page | ✅ |
 
 ## The other direction — every feature, and the screen that draws it
 

@@ -33,7 +33,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | MO-F10 | Guardrails and the requests they cause | In Studio | MO-11 |
 | MO-F11 | Rules at install, Graph or project scope | New · Blocked · P-12 | MO-12 |
 | MO-F12 | Requests inbox | New | MO-13 |
-| MO-F13 | Graph settings — basic, database, members and roles | In Studio (members and roles, C07) | MO-14 |
+| MO-F13 | Graph settings — basic, database, members and roles | In Studio ([1.12](../for-developers/modules/connect-and-model/features/graph-settings.md)) | MO-14 |
 | MO-F14 | New model from an ontology — **RDFS / OWL subset, including schema.org**; JSON-LD, Turtle or RDF/XML; pick types, preview, open as a draft | ✅ B12 · C08 | MO-15 |
 | MO-F15 | Constraints from **SHACL**; schema from **GQL graph types** (ISO/IEC 39075) | Later | — |
 
@@ -107,7 +107,7 @@ The source of truth humans and agents reason over. Prototype page: *Invana Model
 | Worlds page | The lens canvas (the global model's schema cards, hidden types dimmed, guarded properties shielded, the Lens strip) with the world inspector (Sees · Answers go · Used by) in the page's right column; the Govern panel in the leftSection — Model · Worlds · Guardrails tabs over models, worlds and guardrails ([14.1](../for-developers/modules/govern/features/worlds.md) WO22) |
 | Guardrails page | The same canvas under the guardrails alone; a guardrail opens its inspector (Rule · Refusals · History) and, from a request, the request bar over the canvas. *New rule* is the rule dialog with impact before saving ([14.2](../for-developers/modules/govern/features/guardrails.md)) |
 | The world board | `Worlds › <world>` with *Edit* alone; tiles Rules · Closed layers · In force · Runs · Last used; Five layers beside the cast of agents that ran inside it (WO23) |
-| Graph settings tabs | Basic · Graph. The Graph's concurrency is the Agents product's, in Agents › Settings |
+| Graph settings tabs | A page with Basic · Database · Members (`?tab=basic\|database\|members`). LLMs are Agents › LLMs and the Graph's concurrency is Agents › Settings ([1.12](../for-developers/modules/connect-and-model/features/graph-settings.md)) |
 | A rail move keeps the regions | A rail click carries `right`, `console` and `page`, so the docked chat, the Console and the Workbook's page stay open; the panel's own keys are dropped |
 | No ✕ on a rail panel | Graph settings has no close control: its path is the panel, and closing it would leave the Modeller |
 | Guardrails leads on its rail item | The Govern stack puts Guardrails first on `/guardrails`, Worlds first on `/worlds` |
@@ -157,9 +157,9 @@ Every `modeller.*` board of the *Invana Products* prototype against today's Stud
 | `modeller.requests` | MO-13 | `/modeller/requests` | built | Open and Done, each row's *Decline* · *Allow in a world* (a guardrail's refusal) · *Model it* (anything else), the open count on the head and the rail badge | `RequestsViewPanel` |
 | `modeller.rules` | MO-12 | `/modeller/rules` | built | One page, no leftSection: the purpose line, *Scope* and *Checked on* filters applied by the engine, every rule in force in assembly order (install · Graph · project), each row scope · checked on · mode · broken in 30 days with the mode as a badge, *New rule*. The rows sit in a folding *Rules N* group; the count chip has no *rules* word | `RulesViewPanel`'s invariant-only list; the main area's one-line card |
 | `modeller.rules.edit` | MO-12 | `/modeller/rules/<rule>` · `?new=1` | built | A modal: Statement · Scope (fixed once saved, *Install* an install Admin's) · Check and its params · *Checked on* drawn from the check · When broken · *Because* · the 30-day impact read as the check changes. The board's *Finding* and *Record write* acts are not checked acts (rules.md Not building). *Open board* is offered on Graph and project rules only — an install rule has no Graph board | — |
-| `modeller.settings` | MO-14 | `/modeller/settings` | differs | A page with tabs Basic · Database · Members (LLMs stay in Agents › LLMs): name, description, instructions, *Save*, Archive. Today the form is `SettingsViewPanel` in the leftSection and the main area is a Graph card | `SettingsViewPanel` in the leftSection; the main area's one-line card |
-| `modeller.settings.database` | MO-14 | `/modeller/settings?tab=database` | differs | The board is a full page with an editable URI, User and Password and *Save* · *Test connection*. Live is a read-only summary in the 280px leftSection (truncated URI) with *Edit* · *Introspect*, no *Test connection*; keyed `?tab=graph`. Live adds a connected status line, a Capabilities row and an immutability note the board lacks | — |
-| `modeller.settings.members` | MO-14 | `/modeller/settings?tab=members` | differs | The board has four members, five roles, *Edit* on each row and no agent rows. Live renders in the leftSection with Members and Roles stacked, eight members, six roles (an extra `iam-admin`), no per-row *Edit* and *Add member* in the panel. Live `owner` and `iam-admin` split the board's `owner` powers | — |
+| `modeller.settings` | MO-14 | `/modeller/settings` | built | A page with tabs Basic · Database · Members ([1.12](../for-developers/modules/connect-and-model/features/graph-settings.md)); the board's LLMs tab stays in Agents › LLMs. Basic leads with the setup timeline while setup is unfinished (the Info panel is gone) | `SettingsViewPanel`, `GraphTab`, `InfoTab`, the main area's one-line card |
+| `modeller.settings.database` | MO-14 | `/modeller/settings?tab=database` | built | The summary card and editable URI, User and Password with *Save* · *Test connection*. Live keeps what the board omits: Database, Server version, Read-only, *Introspect* and a collapsed Capabilities row (GS8) | `ConnectionFields`, the shell's `GraphForm` |
+| `modeller.settings.members` | MO-14 | `/modeller/settings?tab=members` | built | Members and Roles side by side, *Edit* · *Remove* per row, *Add member* in the page head. Live lists the engine's six roles: `owner` and `iam-admin` split the board's `owner` powers (members are `iam-admin`'s) | — |
 
 ## Not building
 
