@@ -82,7 +82,7 @@ async def post_mcp(
     return JSONResponse(reply.body, status_code=reply.status, headers=reply.headers)
 
 
-async def no_stream() -> Response:
+async def no_stream(member: GraphMember = Depends(require_graph_member)) -> Response:
     """The server answers each POST with JSON and offers no stream or session to end."""
     return Response(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, headers={"Allow": "POST"})
 
