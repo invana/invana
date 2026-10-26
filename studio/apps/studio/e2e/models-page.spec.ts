@@ -108,7 +108,10 @@ test("one model's Database tab leaves out what no model declares", async ({
 	});
 	await row(page, "AirRoutes").click();
 	await expect(page.getByRole("tab", { name: "AirRoutes" })).toBeVisible();
-	await expect(page.getByText(/\d+ modelled · 0 not/).first()).toBeVisible();
+	// The scoped physical read walks the live database; it can take several seconds.
+	await expect(page.getByText(/\d+ modelled · 0 not/).first()).toBeVisible({
+		timeout: 30_000,
+	});
 	await expect(page.getByText("no model")).toHaveCount(0);
 });
 
