@@ -213,7 +213,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | M04 | Constraints | engine+studio | M03 | `feat/modeller-redesign` | done | 2026-10-26 | gates green · design review passed |
 | M05 | Govern | engine+studio | M04 | `feat/modeller-redesign` | done | 2026-10-27 | gates green · design review passed |
 | M06 | Rules by scope | engine+studio | M05 | `feat/modeller-redesign` | done | 2026-10-27 | gates green · design review passed |
-| M07 | Graph settings | engine+studio | M06 | `feat/modeller-redesign` | in progress | 2026-10-27 |  |
+| M07 | Graph settings | engine+studio | M06 | `feat/modeller-redesign` | done | 2026-10-27 | gates green · design review passed |
 
 ## Hand-off notes
 
