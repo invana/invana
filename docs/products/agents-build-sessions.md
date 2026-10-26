@@ -119,7 +119,7 @@ PYTHONUNBUFFERED=1 python3 scripts/migration/run.py
 | Lands | `modeller.md` › **Studio today, mapped** — every Modeller board against today's Studio, and the steps of M01–M07 rewritten to the real gaps. Docs only |
 | Read | `modeller.md` · `the-screens.md` · `migration-sessions.md` › A10a · A10b · C04 · C07 · C08 · `docs/for-developers/modules/connect-and-model/` |
 | Steps | 1. Shoot every `modeller.*` board live and from the prototype; view each once. 2. Audit the Modeller code in `studio/packages/modeller/` and the engine routes it reads. 3. Write *Studio today, mapped* into `modeller.md`: board · story · route · today (built · differs · missing) · what differs · **Deletes**. 4. Add a row to `the-screens.md` for every Modeller board that has none. 5. Rewrite the Steps of M01–M07 to the gaps found; fold away a phase that has none, and say so in its entry |
-| Boards | `modeller.*` |
+| Boards | (none — the audit shot every `modeller.*` board; each build phase owns its own) |
 | Done when | Every `modeller.*` board has a row in *Studio today, mapped* and in `the-screens.md`, and every M phase's Steps name only real gaps |
 
 ### M01 · Modeller shell and the global model
@@ -127,7 +127,7 @@ PYTHONUNBUFFERED=1 python3 scripts/migration/run.py
 | | |
 |---|---|
 | Lands | The Modeller rail and landing; the global model canvas with drill-in, the dark theme and stitches declared and inspected |
-| Read | `modeller.md` › MO-01 · MO-02 · MO-03 · `stitch-models.md` · `the-shell.md` |
+| Read | `modeller.md` › MO-01 · MO-02 · MO-03 · `stitch-models.md` · `the-shell.md` · `scripts/migration/reviews/M00.md` (the audit review's deltas for this phase's boards) |
 | Steps | 1. Docs first: in `modeller.md` Decisions and [1.6](../for-developers/modules/connect-and-model/features/stitch-models.md) · [1.8](../for-developers/modules/connect-and-model/features/the-model-page.md), replace *One Models panel, three readings* and *Stitches* with the board's layout — the global model is a full-bleed canvas page with no leftSection, and a stitch list exists. 2. The global model page: horizontal toolbar (`@invana/canvas-ui`), floating info bar, minimap, union list in the rightSection, status bar; move the Model tab's canvas here and delete the tab; delete `ModelViewPanel`'s models list and the unread `panelPaths` sections. 3. The stitch inspector in the rightSection (Stitch · Crossed by · History, *Open in a draft* · *Remove stitch*), its counts from the per-stitch aggregate Usage's *Stitches crossed* already reads. 4. The Stitches page (Active · Removed, *Declare a stitch*); delete `useStitchesSection`'s graph-scope branch. 5. One model's page: the head's *Open in Schema* · *Versions* · *Export* on one row, no Model tab, four tiles and no *Needs attention*, Overview ending on *Records over time*. 6. The type page: tabs Properties · Indexes · Constraints · Mappings; `modelsApi.deletePropertyKey` · `createConstraint` · `deleteConstraint` · `deleteIndex` are called by them or deleted |
 | Boards | `modeller.global_model` · `modeller.global_model.dark` · `modeller.global_model.stitch` · `modeller.stitches` · `modeller.model.airroutes` · `modeller.model.type` |
 | Done when | A modeller lands on the global model, drills into a model and a type, and declares a stitch |
@@ -137,8 +137,8 @@ PYTHONUNBUFFERED=1 python3 scripts/migration/run.py
 | | |
 |---|---|
 | Lands | Connect a database and the drafted model; compare on the map and publish with who reads it; new model from a description, file, starter or ontology; history with its effect |
-| Read | `modeller.md` › MO-04 · MO-05 · MO-06 · MO-09 · MO-15 · `the-model-page.md` · `publish-review.md` |
-| Steps | 1. Docs first: [connect-a-database](../for-developers/modules/connect-and-model/features/connect-a-database.md) — connecting drafts an authored model from introspection (today it only refreshes the read-only `global` model); [domain-models](../for-developers/modules/connect-and-model/features/domain-models.md) — what drafts a model from a description. 2. Engine: connect-and-draft in one call; the draft from a description. 3. `/graphs/new` as the board's connect form (six engine cards, *Test*, *Connect and draft a model*). 4. The draft as a full-bleed canvas on its workbook tab: type cards marked staged · changed · guarded · hidden, the staged bar (*Discard* · *Publish vN*), the assistant docked. 5. `@invana/canvas`: per-type diff marks with a story; the Comparing bar with two version selects; the *Compare on the map* decision rewritten. 6. *New model* as one dialog — *Describe it* · *A file* · *A starter*; `ImportModelDialog` folds into it. 7. History's *effect after* names the datasets a version affected, stored at publish. 8. Delete `modelsApi.activate` · `versionDiff` · `upgradeModel` unless a step calls them |
+| Read | `modeller.md` › MO-04 · MO-05 · MO-06 · MO-09 · MO-15 · `the-model-page.md` · `publish-review.md` · `scripts/migration/reviews/M00.md` (the audit review's deltas for this phase's boards) |
+| Steps | 1. Docs first: [connect-a-database](../for-developers/modules/connect-and-model/features/connect-a-database.md) — connecting drafts an authored model from introspection (today it only refreshes the read-only `global` model); [domain-models](../for-developers/modules/connect-and-model/features/domain-models.md) — what drafts a model from a description. 2. Engine: connect-and-draft in one call; the draft from a description. 3. `/graphs/new` as the board's connect form (six engine cards, *Test*, *Connect and draft a model*). 4. The draft as a full-bleed canvas on its workbook tab: type cards marked staged · changed · guarded · hidden, the staged bar (*Discard* · *Publish vN*), the assistant docked. 5. `@invana/canvas`: per-type diff marks with a story; the Comparing bar with two version selects; the *Compare on the map* decision rewritten. 6. *New model* as one dialog — *Describe it* · *A file* · *A starter*; `ImportModelDialog` folds into it. 7. History's *effect after* names the datasets a version affected, stored at publish. 8. Delete `modelsApi.activate` · `versionDiff` · `upgradeModel` unless a step calls them Last: the e2e spec that creates *E2E Growth …* deletes its model when it ends. |
 | Boards | `modeller.connect` · `modeller.draft*` · `modeller.global_model.diff` · `modeller.models.new*` · `modeller.model.history` |
 | Done when | A draft is compared on the map — each changed type marked — and published, a breaking one through another member's approval |
 
@@ -147,7 +147,7 @@ PYTHONUNBUFFERED=1 python3 scripts/migration/run.py
 | | |
 |---|---|
 | Lands | Overview, database drift, usage, performance, growth and a saved report for every model — every number stored by the engine |
-| Read | `modeller.md` › MO-07 · `metrics-are-stored.md` |
+| Read | `modeller.md` › MO-07 · `metrics-are-stored.md` · `scripts/migration/reviews/M00.md` (the audit review's deltas for this phase's boards) |
 | Steps | 1. The models board's head: no leftSection, *All models* select, count chips, *Save report* · *New model* · *Import*, five tabs (Model moved in M01; History stays on one model's page). 2. Needs attention with column heads, capped, *+N* from the API's `total`; Usage's signal list capped the same way. 3. *Save report* on the models board through the shell's `useReport`, and the frozen reading with *Back to live* |
 | Boards | `modeller.models.overview` · `modeller.models.database` · `modeller.models.usage` · `modeller.models.performance` · `modeller.models.growth` · `modeller.models.report` |
 | Done when | Each dashboard reads only stored columns and endpoint aggregates; a saved report reopens to the same reading |
@@ -157,7 +157,7 @@ PYTHONUNBUFFERED=1 python3 scripts/migration/run.py
 | | |
 |---|---|
 | Lands | Ranges on a property and values named by a standard, enforced where records land |
-| Read | `modeller.md` › MO-08 · Decisions › Standards · `datasets.md` |
+| Read | `modeller.md` › MO-08 · Decisions › Standards · `datasets.md` · `scripts/migration/reviews/M00.md` (the audit review's deltas for this phase's boards) |
 | Steps | 1. Write the feature file for constraints on properties (Connect and model) and its index row — a range with a unit, a referenced standard's values, *Reject* or *Flag for review*, checked at record write, bind and validation. 2. Engine: the constraint on a property, its enforcement naming the constraint, the count of records that break it today. 3. Studio: the type page's Constraints tab and the constraint dialog |
 | Boards | `modeller.model.type.constraint` |
 | Done when | A record outside a property's range or its standard's values is refused, naming the constraint |
@@ -167,7 +167,7 @@ PYTHONUNBUFFERED=1 python3 scripts/migration/run.py
 | | |
 |---|---|
 | Lands | Worlds that narrow what a run may see; guardrails always in force and the requests they cause; one Requests inbox |
-| Read | `modeller.md` › MO-10 · MO-11 · MO-13 · Govern: four kinds of bound |
+| Read | `modeller.md` › MO-10 · MO-11 · MO-13 · Govern: four kinds of bound · `scripts/migration/reviews/M00.md` (the audit review's deltas for this phase's boards) |
 | Steps | 1. Docs first: in [guardrails](../for-developers/modules/govern/features/guardrails.md), whether a guardrail is one property rule (the board) or today's layered lens; **dropping today's layered guardrails is Ravi's decision — set `blocked` with that question**. Write the requests feature file and its index row (none exists). 2. Engine: the request record — from Explorer's *Ask for a change*, a guardrail refusal or an ask the Graph could not answer — resolved by *Decline* · *Allow in a world* · *Model it*; its open count. 3. Worlds: the lens canvas (hidden types dimmed, guarded properties shielded, the Lens strip) and the world inspector (Sees · Answers go · Used by). 4. Guardrails: the rule dialog with impact before saving; the guardrail inspector (Rule · Refusals · History) with the request bar. 5. The world board: the *compute* layer, the cast reading real runs (today all denied, 0 runs), the header *Board · spec.json · Edit · Save report · Reports* trimmed to *Edit*, the breadcrumb resolving the world's name, not its UUID. 6. The Requests page and the rail badge; delete `RequestsViewPanel`'s locked empty state and `RunLensWidget` |
 | Boards | `modeller.worlds*` · `modeller.guardrails*` · `modeller.requests` |
 | Done when | A run inside a world sees only its scope; a guardrail refusal files a request that a modeller resolves from the inbox |
@@ -177,7 +177,7 @@ PYTHONUNBUFFERED=1 python3 scripts/migration/run.py
 | | |
 |---|---|
 | Lands | Rules at install, Graph or project scope, checked where they apply — the install is the top scope (no tenancy) |
-| Read | `modeller.md` › MO-12 · `README.md` › P-12 |
+| Read | `modeller.md` › MO-12 · `README.md` › P-12 · `scripts/migration/reviews/M00.md` (the audit review's deltas for this phase's boards) |
 | Steps | 1. Docs first: [rules.md](../for-developers/modules/skills/features/rules.md) moves the impact preview out of *Not building* (modeller.md decides *Rules show impact*); today's Graph invariants become Graph-scope rules, still offered and cited. 2. Engine: what a rule would have stopped in the last 30 days, read back through each check. 3. Studio: the Rules page on `/api/v1/rules` and the Graph and project scopes, filtered by scope and *Checked on*; the rule dialog; delete `RulesViewPanel`'s invariant-only list and the main area's one-line card |
 | Boards | `modeller.rules*` |
 | Done when | An install rule holds in every Graph, a Graph rule only in its Graph, a project rule only in its project |
@@ -187,7 +187,7 @@ PYTHONUNBUFFERED=1 python3 scripts/migration/run.py
 | | |
 |---|---|
 | Lands | The Graph's name, instructions, connection, members and roles |
-| Read | `modeller.md` › MO-14 |
+| Read | `modeller.md` › MO-14 · `scripts/migration/reviews/M00.md` (the audit review's deltas for this phase's boards) |
 | Steps | 1. Docs first: the *Graph settings tabs* decision — Basic · Database · Members, as a page; LLMs stay in Agents › LLMs. 2. Settings as a page in the main area: Basic (name, description, instructions, Archive) · Database (`?tab=database`, renamed from `graph`; editable URI, User and Password, *Save* · *Test connection*, no read-only summary) · Members (Members and Roles as the board lays them out, per-row *Edit*, *Add member* on the page). 3. Delete `SettingsViewPanel` in the leftSection, the main area's one-line card and `product.tsx`'s stale tab comment |
 | Boards | `modeller.settings*` |
 | Done when | Every settings tab matches its board and saves through the engine |
@@ -206,7 +206,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | I02 | Connections in | engine+studio | I01 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
-| M00 | Modeller audit | docs | F06 | `feat/modeller-redesign` | blocked | 2026-10-26 | failed after 3 fix rounds — see .migration-cache/M00/ |
+| M00 | Modeller audit | docs | F06 | `feat/modeller-redesign` | done | 2026-10-26 | closed by hand · audit complete (32 boards: 13 built · 12 differs · 7 missing); the review's should-fixes are read by M01–M07 |
 | M01 | Shell and global model | engine+studio | M00 | `feat/modeller-redesign` | pending | | |
 | M02 | Models | engine+studio | M01 | `feat/modeller-redesign` | pending | | |
 | M03 | Model dashboards | engine+studio | M02 | `feat/modeller-redesign` | pending | | |
@@ -264,3 +264,4 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | M00 | **Fix round 1 — the one e2e finding is a flake, not M00's.** `agents-approvals-ledger.spec.ts › New alert makes a rule that turns off in its row` failed once in the 160-test run and passed 3× alone (plus 3 repeats, 16/16); M00 changed only docs and `scripts/migration/screen_map.py` / `screen-map.json`, nothing the spec touches. The likely cause is the 15s row/switch waits under full-suite load. No code changed. |
 | M00 | **Fix round 2 (design review, attempt 2).** Re-shot with live state: `shoot.mjs` gains click steps `text:` · `label:` · `scroll:` · `tick:` · `upload:` · `dark`; `screen_map.py`'s `CLICK` now drives dark, the type page, a rule, a guardrail, the ontology dialog and preview, and the publish confirms (a staged add for `draft.publish`, a staged removal for `draft.migration`, both discarded after — AirRoutes is back to 0 staged). Verdicts corrected in *Studio today, mapped* from the shots: `model.airroutes`, `models.overview` · `.database` · `.usage` · `.performance` · `.growth`, `settings.database`, `settings.members` and `worlds.board` are *differs* with their deltas; `draft.publish`, `draft.migration`, `models.new.ontology` and `.preview` are *built* with evidence; `global_model.stitch`, `model.type.constraint`, `rules.edit`, `guardrails.request` and `connect` carry what the shot showed. M01, M05 and M07 Steps name the new deltas. **Not fixed:** the stray *E2E Growth* model is the e2e suite's and returns on every run; `modeller.model.type.constraint`'s ERROR status bar is the arabidopsis graph's connector status, not Modeller's. |
 | M00 | **Fix round 3 (design review, attempt 3).** `modeller.global_model.dark` was light because Studio loads the saved profile theme over localStorage: `shoot.mjs`'s `dark` step now drives user menu › Theme › Dark and puts the previous mode back after the shot; the re-shot (`.migration-cache/M00/fix3/`) is dark. *Studio today, mapped* corrected for `models.new.ontology` (now *differs*: no *Pulls in*, no footer counts; `the-screens.md` flipped 🟡) and the *What differs* cells of `model.type` · `model.type.constraint` · `models.overview` · `.usage` · `.performance` · `.growth` · `settings.database` · `.members` · `worlds` · `worlds.board` · `stitches` · `guardrails.edit` · `models.new.ontology.preview`. `draft` · `draft.publish` · `draft.migration` · `global_model.diff` are noted as hand-driven: the reproducible shot has nothing staged. **Not fixed:** the map does not stage a change for those four shots. |
+| M00 | **Closed by hand after fix round 3.** The last review's one blocker — `modeller.global_model.dark` shot light — was the shooter: the user-menu dark step (fix 3) renders dark when re-shot (`.migration-cache/M00/darkcheck/`). The review's 13 should-fixes are finer *What differs* detail for rows of *Studio today, mapped*; they are not folded into `modeller.md` — each M phase reads `scripts/migration/reviews/M00.md` for its boards. `draft.*` and `global_model.diff` shots need a staged change set up first. The e2e suite leaves a stray *E2E Growth …* model in airways on every run; M02 makes that spec clean up after itself. M00 names no boards, so the driver's done-phase regression never re-reviews boards the M phases rebuild. |
