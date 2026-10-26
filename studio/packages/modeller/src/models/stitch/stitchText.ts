@@ -7,13 +7,22 @@
 import { formatGrouped } from "@invana-studio/core";
 import type { ModelLink, RemovedStitch } from "../types";
 
-/** What the stitch holds now — *N joined* for an anchor, *N edges* for a relationship. */
-export function holds(link: Pick<ModelLink, "kind" | "edges">): string {
+/**
+ * What the stitch holds now — *N joined* for an anchor, *N edges* for a
+ * relationship. Given the source end's counted records, an anchor reads
+ * *N of M*: how many of them it joined.
+ */
+export function holds(
+	link: Pick<ModelLink, "kind" | "edges">,
+	sourceRecords?: number | null,
+): string {
 	if (link.edges === null) return "not solved yet";
 	const n = formatGrouped(link.edges);
-	return link.kind === "anchor"
+	if (link.kind !== "anchor")
+		return `${n} ${link.edges === 1 ? "edge" : "edges"}`;
+	return sourceRecords == null
 		? `${n} joined`
-		: `${n} ${link.edges === 1 ? "edge" : "edges"}`;
+		: `${n} of ${formatGrouped(sourceRecords)}`;
 }
 
 /** `NewsArticles.Country ≡ AirRoutes.country` for a removed stitch, as it was declared. */

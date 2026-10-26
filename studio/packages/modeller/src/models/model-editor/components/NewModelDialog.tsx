@@ -28,8 +28,11 @@ import { ApiError } from "@invana-studio/core";
 import { FormError } from "@invana-studio/ui";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { modelsApi } from "../../api";
-import { useStartersQuery } from "../../queries";
+import {
+	useCreateModelMutation,
+	useImportModelMutation,
+	useStartersQuery,
+} from "../../queries";
 import type { ModelArtefact } from "../../types";
 
 type Start = "describe" | "file" | "starter";
@@ -60,6 +63,8 @@ export function NewModelDialog({
 	const [busy, setBusy] = useState(false);
 
 	const starters = useStartersQuery(username, graphSlug);
+	const create = useCreateModelMutation(username, graphSlug);
+	const importModel = useImportModelMutation(username, graphSlug);
 	const starterList = starters.data ?? [];
 
 	const reset = () => {
@@ -138,7 +143,7 @@ export function NewModelDialog({
 			const typed = name.trim();
 			if (start === "describe") {
 				const text = description.trim();
-				const model = await modelsApi.create(username, graphSlug, {
+				const model = await create.mutateAsync({
 					name: typed,
 					description: text,
 				});
@@ -148,7 +153,7 @@ export function NewModelDialog({
 				onCreated(model.id, { assistant: asked });
 				return;
 			}
-			const result = await modelsApi.importModel(username, graphSlug, {
+			const result = await importModel.mutateAsync({
 				...(start === "file"
 					? { artefact: artefact ?? undefined }
 					: { starter: starter ?? undefined }),

@@ -13,6 +13,8 @@ import {
 	Button,
 	EmptyState,
 	Eyebrow,
+	Legend,
+	LegendItem,
 	PropertyList,
 	PropertyRow,
 	RecordHeader,
@@ -22,6 +24,7 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
+import { hueSlotForName } from "@invana-studio/canvases";
 import {
 	formatGrouped,
 	formatRelativeTime,
@@ -31,7 +34,6 @@ import { ActButton } from "@invana-studio/shell";
 import { Link2, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { OutlineRow } from "../model-editor/components/OutlineRow";
 import { modelPagePath } from "../model-page/useModelsView";
 import {
 	useModelInsightsQuery,
@@ -62,6 +64,10 @@ const shortPair = (link: ModelLink) => stitchPair(link, false);
 
 const records = (n: number | null) =>
 	n === null ? "not counted" : `${formatGrouped(n)} records`;
+
+/** An end's dot is its model's hue, the colour the map draws it in. */
+const hue = (model: string | null) =>
+	`var(--color-data-${hueSlotForName(model ?? "?")})`;
 
 export function StitchInspector({
 	username,
@@ -158,16 +164,18 @@ export function StitchInspector({
 					<div className="flex flex-col gap-3 p-3">
 						<section className="flex flex-col gap-1">
 							<Eyebrow>Ends</Eyebrow>
-							<div className="-mx-3 flex flex-col">
-								<OutlineRow
-									name={`${link.source_model ?? "?"}.${link.source_type}`}
-									meta={records(link.source_records)}
+							<Legend orientation="column">
+								<LegendItem
+									color={hue(link.source_model)}
+									label={`${link.source_model ?? "?"}.${link.source_type}`}
+									count={records(link.source_records)}
 								/>
-								<OutlineRow
-									name={`${link.target_model ?? "?"}.${link.target_type}`}
-									meta={records(link.target_records)}
+								<LegendItem
+									color={hue(link.target_model)}
+									label={`${link.target_model ?? "?"}.${link.target_type}`}
+									count={records(link.target_records)}
 								/>
-							</div>
+							</Legend>
 						</section>
 
 						<section className="flex flex-col gap-1">
@@ -179,8 +187,11 @@ export function StitchInspector({
 										sourceModel?.name ?? link.source_model ?? undefined,
 									)}
 								</PropertyRow>
-								<PropertyRow label="holds" mono>
-									{holds(link)}
+								<PropertyRow
+									label={link.kind === "anchor" ? "joined" : "holds"}
+									mono
+								>
+									{holds(link, link.source_records)}
 								</PropertyRow>
 							</PropertyList>
 						</section>

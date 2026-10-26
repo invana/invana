@@ -479,13 +479,13 @@ export interface SchemaDiff {
 }
 
 /** One line of a type's mark: `+` added, `~` changed, `-` removed. */
-export interface MarkLine {
+interface MarkLine {
 	sign: "+" | "~" | "-";
 	text: string;
 }
 
 /** What a version pair did to one type. `added`/`removed` are the whole type. */
-export interface TypeMark {
+interface TypeMark {
 	type: string;
 	target_kind: "node_type" | "edge_type";
 	mark: "added" | "changed" | "removed";

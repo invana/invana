@@ -16,7 +16,7 @@ import { Badge, Button, Card } from "@invana/ui";
 import { ArrowRight, X } from "lucide-react";
 import type { SchemaDiff, VersionSummary } from "../types";
 
-export interface CompareModelOption {
+interface CompareModelOption {
 	id: string;
 	name: string;
 }

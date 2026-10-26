@@ -51,7 +51,7 @@ export interface ChangeEffect {
 }
 
 /** A dataset bound to a type a model version's publish changed. */
-export interface EffectDataset {
+interface EffectDataset {
 	dataset_id: string;
 	/** `publisher/name`. */
 	name: string;
