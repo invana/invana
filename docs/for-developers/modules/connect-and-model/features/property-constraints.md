@@ -9,7 +9,7 @@ records in the graph break it today before the constraint is saved.
 |---|---|
 | Index | [1.11](../../../README.md#1--connect-and-model) · Slice **M04** |
 | Module | [Connect and model](../spec.md) |
-| API / CLI / Studio | ✅ / — / 🟡 |
+| API / CLI / Studio | ✅ / — / ✅ |
 | Related | [the-model-page](the-model-page.md) (the type page) · [publish-review](publish-review.md) · [standards](../../bring-data-in/features/standards.md) · [load-data](../../bring-data-in/features/load-data.md) · products: [modeller.md](../../../../products/modeller.md) MO-08 · MO-F7 · [datasets.md](../../../../products/datasets.md) › Standards and checks |
 
 > **As** a modeller, **I want** ranges on a property, and values named by a standard, **so that**
@@ -64,7 +64,8 @@ flowchart TD
 | Seam | What the user sees |
 |---|---|
 | While the count loads | The dialog's line reads *Counting the records that break it…*; Save stays enabled |
-| The count fails or the connector is Gremlin | *This database cannot count them here* — the constraint still saves |
+| The count fails, the database is not connected, or the connector is Gremlin | The engine's reason (*The Graph's database is not connected.* · *This database cannot count them here.*) — the constraint still saves |
+| A body the engine refuses (inverted range, numeric bounds on text, a term without values) | The refusal's message in place of the count; Save shows it again |
 | No standards with values | The standard select lists *No standard has a term with values* and is disabled |
 | No draft | The tab reads; each row's *Edit constraint* is replaced by the summary alone, and the head offers *Open a draft* |
 | Reload | `model_type=<name>&type_tab=constraints` reopens the tab; the dialog does not survive a reload |

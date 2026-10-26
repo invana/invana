@@ -877,7 +877,7 @@ The `modeller.*` boards of [Invana Products](https://claude.ai/artifact/HcPfkMUY
 | `modeller.stitches` | MO-03 | `/modeller/stitches` — every stitch in the Graph, active and removed | ✅ |
 | `modeller.model.airroutes` | MO-02 | `/modeller/models?model=<id>&model_open=1` — one model's page with its outline in the leftSection | ✅ |
 | `modeller.model.type` | MO-02 | the same › a type — Properties · Indexes · Constraints · Mappings | ✅ |
-| `modeller.model.type.constraint` | MO-08 | the same › Constraints › a property — a range or a standard's values | 🔵 |
+| `modeller.model.type.constraint` | MO-08 | the same › Constraints › a property — a range or a standard's values | ✅ |
 | `modeller.connect` | MO-04 | `/graphs/new` — connect a database and draft a model | 🟡 |
 | `modeller.draft` | MO-04 | `/modeller/models?model=<id>` on a draft — the drafted model on the canvas, staged and published from its bar | 🟡 |
 | `modeller.models.new` | MO-06 | `/modeller/models` › *New model* — describe it · a file · a starter | 🟡 |
