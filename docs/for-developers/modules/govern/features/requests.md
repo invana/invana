@@ -102,6 +102,7 @@ flowchart TD
 | RQ5 | **Resolving needs the `modeller` role**; every member reads the inbox. |
 | RQ6 | **The open count is the engine's** — `RequestPage.open` — never a count of the listed rows. |
 | RQ7 | **Done rows say what was done** — `declined`, `allowed in EU · H1 2026`, `modelled in Fares` — from `resolution_note`, written by the engine at resolve. |
+| RQ8 | **The run loop files, not the task.** `graph.read.query` raises *cannot answer* carrying the connector's refusal (code · type · property); the loop names the Graph guardrail that holds the property — the one whose access makes that refusal (*never* for an excluded property, *counts* for counts only), the most specific target first, so `Deal.price` outranks `*.price` — and files a `guardrail` request naming it, or an `unanswered` one when no guardrail holds it. The query service lets a lens refusal through unwrapped, so it never reads as a failed query. |
 
 ---
 

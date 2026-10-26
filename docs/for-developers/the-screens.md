@@ -887,11 +887,11 @@ The `modeller.*` boards of [Invana Products](https://claude.ai/artifact/HcPfkMUY
 | `modeller.models.performance` | MO-07 | `?models_tab=performance` — p95 and query shapes | ✅ |
 | `modeller.models.growth` | MO-07 | `?models_tab=growth` — records over time | ✅ |
 | `modeller.models.report` | MO-07 | the same › *Save report* — a frozen reading | ✅ |
-| `modeller.worlds` | MO-10 | `/modeller/worlds` — the lens canvas and the world inspector | 🟡 |
+| `modeller.worlds` | MO-10 | `/modeller/worlds` — the lens canvas and the world inspector | ✅ |
 | `modeller.worlds.board` | MO-10 | `/modeller/worlds/<world>` — a world's layers, cast and runs | ✅ |
-| `modeller.guardrails.edit` | MO-11 | `/modeller/guardrails` › a rule — one property rule with its impact | 🟡 |
-| `modeller.guardrails.request` | MO-11 | `/modeller/guardrails/<guardrail>` — a request it caused, and its refusals | 🔵 |
-| `modeller.requests` | MO-13 | `/modeller/requests` — the inbox of asks | 🔵 |
+| `modeller.guardrails.edit` | MO-11 | `/modeller/guardrails` › a rule — one property rule with its impact | ✅ |
+| `modeller.guardrails.request` | MO-11 | `/modeller/guardrails/<guardrail>` — a request it caused, and its refusals | ✅ |
+| `modeller.requests` | MO-13 | `/modeller/requests` — the inbox of asks | ✅ |
 | `modeller.rules` | MO-12 | `/modeller/rules` — install, Graph and project rules | 🟡 |
 | `modeller.rules.edit` | MO-12 | the same › a rule — scope, checked on, when broken, impact | 🔵 |
 | `modeller.settings` | MO-14 | `/modeller/settings` — Basic · Database · Members as a page | 🟡 |

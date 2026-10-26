@@ -10,7 +10,7 @@ A guardrail is one property rule, a world is read on the model, and asks that fa
   rule into the lens every run freezes. *Read in counts only* lets a query filter, count and
   aggregate a property without ever returning it. Promote is gone; existing Graph guardrails are
   re-expressed as property rules by the migration.
-- **Worlds** opens on the lens canvas: hidden types dimmed, guarded properties shielded, a Lens
+- **Worlds** opens on the lens canvas: each hidden, sliced or guarded type marked, a Lens
   strip to pick the world, and the world inspector (Sees · Answers go · Used by). A world's board
   is the auditor's page — five tiles, its layers and the agents whose runs asked under it.
 - **Requests** is one inbox: a guardrail refusal and an ask the Graph could not answer are filed by
