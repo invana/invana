@@ -123,7 +123,7 @@ Later, not scheduled: remote agents over A2A ([5.11](../for-developers/modules/a
 | F05 | Runs · approvals · ledger · assistant | engine+studio | F04 | `feat/agents-fabric` | done | 2026-10-25 | gates green · design review passed |
 | I01 | IAM and policies | engine+studio | F05 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
 | I02 | Connections in | engine+studio | I01 | `feat/agents-fabric` | done | 2026-10-26 | gates green · design review passed |
-| F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | blocked | 2026-10-26 | **Ravi:** which executor carries workers on other machines — procrastinate + an engine-run HTTPS worker gateway (recommended) · Hatchet · Temporal · DBOS + gateway? And build on it now with B2–B5 of the benchmark plan as acceptance tests (recommended), or run the benchmark first? See [workers-and-orchestration](../for-developers/building-engine/workers-and-orchestration.md) § The decision to make; record the answer as a decision in 13.11 |
+| F06 | Workers | engine+studio | I02 | `feat/agents-fabric` | blocked | 2026-10-26 | failed after 3 fix rounds — see .migration-cache/F06/ |
 
 ## Hand-off notes
 
