@@ -145,7 +145,7 @@ sequenceDiagram
 
 | Setting | Default | Notes |
 |---|---|---|
-| `INVANA_EXECUTOR` | `inline` | `inline` · `procrastinate` |
+| `INVANA_EXECUTOR` | `procrastinate` | `procrastinate` · `inline` |
 | `INVANA_SLOTS` | the pool's slots a worker | envelopes one `invana worker` runs at once |
 | `INVANA_SECRET_<NAME>` | — | read in the worker only, for declared secrets |
 
@@ -156,7 +156,7 @@ sequenceDiagram
 | TP1 | **Enablement is a gate, not a load.** Every *installed* tool plugin is in the frozen registry; whether it is *enabled* is checked when a step is dispatched, so an Admin's switch takes effect without a restart while the set of what the process can run stays closed. Disabled is the default. |
 | TP2 | **Only tool plugins switch.** Core plugins are the product; a simulator is run on purpose from a project (9.8) and stays on whenever installed. |
 | TP3 | **"Installed" is read from the engine's own metadata.** A tool plugin's extra lists its requirements; the plugin loads when each is importable. An extra with no third-party requirement — all three today, stdlib plus `httpx` — is always installed, the same rule as `sim-genomic`. |
-| TP4 | **Tools run in workers under `procrastinate`; `inline` is the single-process mode.** `inline` (dev, tests, one-box installs) calls `run_envelope` in the API process for every step; `procrastinate` sends tool steps — and only tool steps (13.11 DE8) — to the `tools` queue. Production images set `procrastinate`. |
+| TP4 | **Tools run in workers; `procrastinate` is the default executor.** It sends tool steps — and only tool steps (13.11 DE8) — to the `tools` queue, and the user starts the `invana worker` that leases them; the engine runs none itself. With no worker carrying the label, a tool step fails `transient · worker_unavailable` after its allowance. `inline` calls `run_envelope` in the API process for every step and is what the engine test suite runs. |
 | TP5 | **procrastinate is the `workers` extra**, not a core dependency: `psycopg` and procrastinate are Postgres-only and a SQLite dev install never needs them. `all` includes it, so every image has it. |
 | TP6 | **Outcomes come back through `envelope_outcomes`**, keyed by idempotency key, polled by the API process. procrastinate stores no result; a row also makes a redelivery return the recorded outcome instead of running twice. |
 | TP7 | **procrastinate's schema is applied by `invana migrate`** on Postgres, through its own schema manager, after Alembic — its tables are not ours to diff in the golden schema. |
