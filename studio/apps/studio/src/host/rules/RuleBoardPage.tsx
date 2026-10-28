@@ -44,7 +44,7 @@ export function RuleBoardPage({
 
 	// `Save report` on the header, and the act behind it. The document
 	// it keeps is `spec` — this page's reading, resolved — never the subject.
-	const report = useReport(spec);
+	const report = useReport<Record<never, never>>(spec);
 
 	if (rules.isLoading) {
 		return (

@@ -93,7 +93,7 @@ export function ruleBoardSpec(
 	};
 
 	return view === VIEW_SPEC
-		? { ...spec, rows: [{ panels: [specPanel(spec)] }] }
+		? { ...spec, rows: [{ panels: [specPanel<Record<never, never>>(spec)] }] }
 		: spec;
 }
 
