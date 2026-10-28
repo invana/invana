@@ -8,21 +8,8 @@ minimumReleaseAge: 60
 minimumReleaseAgeExclude:
   # First-party packages — published by us, safe to install the moment they land.
   - '@invana/*'
-  - '@invana/forms@0.0.11'
-  - '@invana/styling@0.0.11'
-  - '@invana/themes@0.0.11'
-  - '@invana/ui@0.0.11'
-  - '@invana/canvas-react@0.0.7'
-  - '@invana/canvas@0.0.7'
   - '@invana/graph-layout-d3-force@0.0.7'
-  - '@invana/graph-layout-elkjs@0.0.7'
-  - '@invana/graph@0.0.7'
-  - '@invana/canvas-react@0.0.9'
-  - '@invana/canvas-store@0.0.9'
-  - '@invana/canvas@0.0.9'
   - '@invana/graph-layout-d3-force@0.0.9'
-  - '@invana/graph-layout-elkjs@0.0.9'
-  - '@invana/graph@0.0.9'
 
 # **Studio runs on the local canvas and design-kit checkouts, for now.** Every
 # `@invana/*` package resolves to its sibling checkout (`../../canvas`, `../../design-kit`),
