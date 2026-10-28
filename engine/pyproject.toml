@@ -58,7 +58,7 @@ tools-mail = []
 tools-science = []
 # MCP plugins: an MCP server's tools as task types, over the official SDK's Streamable HTTP
 # client (docs/for-developers/modules/platform/features/mcp-plugins.md).
-mcp = ["mcp>=1.29"]
+mcp = ["mcp>=1.30.0"]
 # The distributed executor (`INVANA_EXECUTOR=procrastinate`, `invana worker`). Postgres-only,
 # so a SQLite dev install never needs it (docs/for-developers/modules/platform/features/tool-plugins.md).
 workers = [
