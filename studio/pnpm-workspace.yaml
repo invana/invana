@@ -8,8 +8,6 @@ minimumReleaseAge: 60
 minimumReleaseAgeExclude:
   # First-party packages — published by us, safe to install the moment they land.
   - '@invana/*'
-  - '@invana/graph-layout-d3-force@0.0.7'
-  - '@invana/graph-layout-d3-force@0.0.9'
 
 # **Studio runs on the local canvas and design-kit checkouts, for now.** Every
 # `@invana/*` package resolves to its sibling checkout (`../../canvas`, `../../design-kit`),
