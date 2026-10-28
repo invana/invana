@@ -706,7 +706,7 @@ field is `RdfSourceField` in `@invana-studio/ui`. Decisions are in
 | Artboard | Story | Studio route | Studio |
 |---|---|---|---|
 | `datasets.standards.import` | DS-15 | `/datasets/standards` › *Import from SKOS* — read, preview, import | ✅ |
-| `modeller.models.new.ontology` | MO-15 | `/modeller/models` › `⋯` › *From an ontology* — read, pick types (names above 500 classes) | ✅ |
+| `modeller.models.new.ontology` | MO-15 | `/modeller/models` › `⋯` › *From an ontology* — read, pick types (names above 500 classes) | 🟡 |
 | `modeller.models.new.ontology.preview` | MO-15 | the same › *Preview* — the mapping, skips and suggestions; *Open as a draft* | ✅ |
 
 ---
@@ -827,7 +827,7 @@ RO13–RO18, [9.7 private projects](modules/work/features/private-projects.md) P
 |---|---|---|---|
 | `agents.skills.detail.readonly` | SH-20 | page `skill:<id>` as a member without `builder` — the notice, *Edit instructions* disabled; no *Request access* |✅ |
 | `modeller.settings.members` | MO-14 | `/modeller/settings?tab=members` — members, roles, *Add member*, the Roles key; no agent rows, no LLMs tab |✅ |
-| `modeller.settings.database` | MO-14 | `/modeller/settings?tab=graph` — the connection, labelled *Database* |✅ |
+| `modeller.settings.database` | MO-14 | `/modeller/settings?tab=database` — the connection, always editable |✅ |
 | `projects.new` people | PJ-02 | *New project* › People and agents — the Graph's other members and its agents |✅ |
 
 ## Beyond the 42 · Runs and sharing
@@ -862,6 +862,39 @@ Drawn first on Explorer Chrome, now on [Invana Products](https://claude.ai/artif
 | `explore.graph_canvas.view_chip` · `.copied` | The footer's view chip, and the copy confirmed | 4.4 CO17 | — |
 | `explore.walkthrough.present` · `.one_answer` | *Present* ends the toolbar; with one answer it is not there | 4.6 WT3 | — |
 | `explore.walkthrough.presenting` · `.first` · `.expansion` · `.your_changes` · `.playing` · `.step_failed` | Presenting: the toolbar collapsed to ◀ n/N ▶ ✕, the bar with the question and the assistant's message, and each state | 4.6 WT2 · WT4 · WT7 · seams | — |
+
+---
+
+## Beyond the 42 · The Modeller
+
+The `modeller.*` boards of [Invana Products](https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg) that no section above lists, built in phases M01–M07 of [agents-build-sessions.md](../products/agents-build-sessions.md). What each differs by, and what its move deletes, is [modeller.md › Studio today, mapped](../products/modeller.md#studio-today-mapped).
+
+| Artboard | Story | Studio route | Studio |
+|---|---|---|---|
+| `modeller.global_model` | MO-01 | `/modeller/global-model` — every published model on one full-bleed canvas, the union list in the rightSection | ✅ |
+| `modeller.global_model.dark` | MO-01 | the same, dark theme | ✅ |
+| `modeller.global_model.stitch` | MO-03 | the same › a stitch — the stitch inspector (Stitch · Crossed by · History) | ✅ |
+| `modeller.stitches` | MO-03 | `/modeller/stitches` — every stitch in the Graph, active and removed | ✅ |
+| `modeller.model.airroutes` | MO-02 | `/modeller/models?model=<id>&model_open=1` — one model's page with its outline in the leftSection | ✅ |
+| `modeller.model.type` | MO-02 | the same › a type — Properties · Indexes · Constraints · Mappings | ✅ |
+| `modeller.model.type.constraint` | MO-08 | the same › Constraints › a property — a range or a standard's values | ✅ |
+| `modeller.connect` | MO-04 | `/graphs/new` — connect a database and draft a model | 🟡 |
+| `modeller.draft` | MO-04 | `/modeller/models?model=<id>` on a draft — the drafted model on the canvas, staged and published from its bar | 🟡 |
+| `modeller.models.new` | MO-06 | `/modeller/models` › *New model* — describe it · a file · a starter | 🟡 |
+| `modeller.models.overview` | MO-07 | `/modeller/models?models_tab=overview` — every model's health | ✅ |
+| `modeller.models.database` | MO-07 | `?models_tab=database` — the model against the database | ✅ |
+| `modeller.models.usage` | MO-07 | `?models_tab=usage` — queries by model and stitches crossed | ✅ |
+| `modeller.models.performance` | MO-07 | `?models_tab=performance` — p95 and query shapes | ✅ |
+| `modeller.models.growth` | MO-07 | `?models_tab=growth` — records over time | ✅ |
+| `modeller.models.report` | MO-07 | the same › *Save report* — a frozen reading | ✅ |
+| `modeller.worlds` | MO-10 | `/modeller/worlds` — the lens canvas and the world inspector | ✅ |
+| `modeller.worlds.board` | MO-10 | `/modeller/worlds/<world>` — a world's layers, cast and runs | ✅ |
+| `modeller.guardrails.edit` | MO-11 | `/modeller/guardrails` › a rule — one property rule with its impact | ✅ |
+| `modeller.guardrails.request` | MO-11 | `/modeller/guardrails/<guardrail>` — a request it caused, and its refusals | ✅ |
+| `modeller.requests` | MO-13 | `/modeller/requests` — the inbox of asks | ✅ |
+| `modeller.rules` | MO-12 | `/modeller/rules` — install, Graph and project rules | ✅ |
+| `modeller.rules.edit` | MO-12 | the same › a rule — scope, checked on, when broken, impact | ✅ |
+| `modeller.settings` | MO-14 | `/modeller/settings` — Basic · Database · Members as a page | ✅ |
 
 ## The other direction — every feature, and the screen that draws it
 

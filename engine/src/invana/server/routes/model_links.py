@@ -8,6 +8,8 @@ there is no row behind it (ST3).
 Routes
 ------
 GET    /model-links                list the Graph's declared links (?status= narrows)
+GET    /model-links/removed        removed stitches, from their removal events
+GET    /model-links/{link_id}      one stitch read whole — ends, counts, history
 POST   /model-links                declare one — it lands **staged** (ST21)
 POST   /model-links/commit         flip every staged stitch to active, in one action
 POST   /model-links/discard        delete the staged set, or one of it
@@ -91,6 +93,44 @@ class LinkResponse(BaseModel):
     # What solving this stitch wrote, when the commit that ran it is what is being
     # answered (ST44). Absent on a list: the number belongs to a run, not to the row.
     edges_written: int | None = None
+    # Edges the stitch holds in the graph now; null before it first solves.
+    edges: int | None = None
+
+
+class StitchEvent(BaseModel):
+    """One event in a stitch's history — its declare and its commit."""
+
+    action: str
+    at: str
+    actor: str | None = None
+
+
+class StitchDetail(LinkResponse):
+    """One stitch read whole: who declared it, each end's records, its history."""
+
+    declared_by: str | None = None
+    declared_at: str | None = None
+    # Each end type's latest counted records; null when never counted.
+    source_records: int | None = None
+    target_records: int | None = None
+    history: list[StitchEvent] = []
+
+
+class RemovedStitch(BaseModel):
+    """A removed stitch, read from its removal event — the row itself is gone."""
+
+    id: str
+    kind: str
+    source_model: str | None = None
+    source_type: str
+    target_model: str | None = None
+    target_type: str
+    source_property: str | None = None
+    target_property: str | None = None
+    edge_type: str | None = None
+    edges_withdrawn: int = 0
+    removed_by: str | None = None
+    removed_at: str
 
 
 class DiscardRequest(BaseModel):
@@ -155,6 +195,62 @@ async def list_model_links(
     version's links are history (ST58)."""
     links = await link_service.list_links(session, graph.id, status=status_filter, current=True)
     return [await _decorate(session, link) for link in links]
+
+
+@model_links_router.get("/model-links/removed", response_model=list[RemovedStitch])
+async def list_removed_links(
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> list[RemovedStitch]:
+    """Removed stitches, newest first, read from their removal events.
+
+    An event written before the rule was recorded in it names no pair and is left out.
+    """
+    out: list[RemovedStitch] = []
+    for details, at, by in await link_service.removal_events(session, graph.id):
+        if not details.get("source_type") or not details.get("target_type"):
+            continue
+        out.append(
+            RemovedStitch(
+                id=details["id"],
+                kind=details.get("kind") or "",
+                source_model=details.get("source_model"),
+                source_type=details["source_type"],
+                target_model=details.get("target_model"),
+                target_type=details["target_type"],
+                source_property=details.get("source_property"),
+                target_property=details.get("target_property"),
+                edge_type=details.get("edge_type"),
+                edges_withdrawn=int(details.get("edges_withdrawn") or 0),
+                removed_by=by,
+                removed_at=at,
+            )
+        )
+    return out
+
+
+@model_links_router.get("/model-links/{link_id}", response_model=StitchDetail)
+async def get_model_link(
+    link_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> StitchDetail:
+    """One stitch read whole — the inspector's read."""
+    link = await link_service.get_link(session, graph.id, link_id)
+    if link is None:
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "link_not_found", "link_id": link_id})
+    facts = await link_service.stitch_facts(session, graph.id, link)
+    base = await _decorate(session, link)
+    return StitchDetail(
+        **base.model_dump(),
+        declared_by=facts.declared_by,
+        declared_at=facts.declared_at,
+        source_records=facts.source_records,
+        target_records=facts.target_records,
+        history=[StitchEvent(action=a, at=at, actor=who) for a, at, who in facts.history],
+    )
 
 
 @model_links_router.post(
@@ -347,6 +443,8 @@ async def remove_model_link(
     link = await link_service.get_link(session, graph.id, link_id)
     if link is None:
         raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "link_not_found", "link_id": link_id})
+    # Read the rule before the row goes — the removal event is all that remembers it.
+    rule = await _decorate(session, link)
 
     withdrawn = 0
     run_id: str | None = None
@@ -384,7 +482,18 @@ async def remove_model_link(
         target_id=link_id,
         graph_id=graph.id,
         actor_id=user.id,
-        details={"edges_withdrawn": withdrawn, "run_id": run_id},
+        details={
+            "edges_withdrawn": withdrawn,
+            "run_id": run_id,
+            "kind": rule.kind,
+            "source_model": rule.source_model,
+            "source_type": rule.source_type,
+            "target_model": rule.target_model,
+            "target_type": rule.target_type,
+            "source_property": rule.source_property,
+            "target_property": rule.target_property,
+            "edge_type": rule.edge_type,
+        },
     )
     await session.commit()
     tail = f" {withdrawn:,} edge(s) it wrote went with it." if withdrawn else ""

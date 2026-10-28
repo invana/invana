@@ -51,8 +51,7 @@ interface Props {
 
 /**
  * Per-graph events view. Renders the SSE-driven live tail of audit events
- * for the active graph. Rendered inside the docked SettingsViewPanel; the
- * panel's expand toggle takes the section to full width in place.
+ * for the active graph, as a tab of the Activity page.
  *
  * An event-type filter (server-side) sits above the list, with a derived
  * status filter and a free-text search bar (both client-side over the loaded

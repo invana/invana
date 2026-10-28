@@ -18,6 +18,7 @@ import {
 	ConsoleCounts,
 	ExplorerHeaderToolbar,
 } from "@invana-studio/explorer";
+import { ModellerStatusBar } from "@invana-studio/modeller";
 import type { useRightSection } from "@invana-studio/shell";
 import { Star } from "lucide-react";
 import type { ReactNode } from "react";
@@ -37,6 +38,8 @@ export interface HostChromeDeps {
 	workTarget: ReturnType<typeof useLayeredCanvas>["workTarget"];
 	/** The Explorer draws its own header switch and `footer`. */
 	explorer: boolean;
+	/** Every Modeller page shares one `footer`: the draft, then the counts. */
+	modeller: boolean;
 	/** The user menu's *Assistant* — off, the header has no Assistant button. */
 	assistantShown: boolean;
 	connection: GraphConnectionRead | null | undefined;
@@ -64,6 +67,7 @@ export function hostChrome(deps: HostChromeDeps) {
 		workCanvas,
 		workTarget,
 		explorer,
+		modeller,
 		assistantShown,
 		connection,
 		dataBoardInFront,
@@ -105,7 +109,24 @@ export function hostChrome(deps: HostChromeDeps) {
 					session: activeSession,
 					console: consoleParam,
 				})
-			: undefined,
+			: modeller && username && graphSlug
+				? {
+						left: (
+							<ModellerStatusBar
+								username={username}
+								graphSlug={graphSlug}
+								side="left"
+							/>
+						),
+						right: (
+							<ModellerStatusBar
+								username={username}
+								graphSlug={graphSlug}
+								side="right"
+							/>
+						),
+					}
+				: undefined,
 		headerCenter:
 			!explorer && canvas && activeSessionId ? (
 				// The canvas toolbar reads the live camera; it only initialises

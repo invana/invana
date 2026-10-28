@@ -30,7 +30,6 @@ export {
 	useConsoleParam,
 	useOpenConsoleOnSettle,
 } from "./console/useConsoleParam";
-export { RecentSessions } from "./RecentSessions";
 export { attachmentFor } from "./SessionComposer";
 export { StepList } from "./SessionSteps";
 export {

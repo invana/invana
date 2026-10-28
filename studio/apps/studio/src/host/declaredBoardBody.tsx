@@ -18,11 +18,18 @@ import { GroupPage, IamAgentPage, PolicyPage } from "@invana-studio/iam";
 import type { useLensesViewPanel } from "@invana-studio/modeller";
 import {
 	CompareBoardPage,
+	GlobalModelPage,
+	GraphSettingsPage,
+	GuardrailsPage,
 	LensBoardPage,
 	type ModelSelection,
 	ModelsPage,
 	parseComparePair,
+	RequestsPage,
+	RulesPage,
+	StitchesPage,
 	type useModelsView,
+	WorldsPage,
 } from "@invana-studio/modeller";
 import { DecisionsPage, ProjectPage } from "@invana-studio/projects";
 import type { useLeftSection } from "@invana-studio/shell";
@@ -74,7 +81,6 @@ export function declaredBoardContent(
 		openBoard,
 		setPageId,
 		runStep,
-		settingsPanel,
 		governPanel,
 		openAgentPage,
 		showAgentCanvas,
@@ -183,7 +189,6 @@ export function declaredBoardContent(
 				username={username as string}
 				graphSlug={graphSlug as string}
 				ruleId={board.subjectId}
-				onEdit={() => settingsPanel.setSection("rules")}
 				onOpenRun={(runId) =>
 					openBoard({ kind: "run", subjectId: runId, runId })
 				}
@@ -191,19 +196,66 @@ export function declaredBoardContent(
 		);
 	}
 
-	// One page for both kinds, because they are one record separated by
-	// `kind`. Neither reads a trace, so neither takes
-	// `board.runId`.
-	if (board.kind === "world" || board.kind === "guardrail") {
+	// The world's board — the auditor's page. `Edit` puts the Govern panel
+	// back on this world, in its editor.
+	if (board.kind === "world") {
 		return (
 			<LensBoardPage
 				username={username as string}
 				graphSlug={graphSlug as string}
-				kind={board.kind}
 				lensId={board.subjectId}
-				// `Edit` puts the Govern panel back on this lens, drilled in —
-				// the board reads and the acts stay in the section.
-				onEdit={(kind, lensId) => governPanel.reveal(kind, lensId)}
+				onEdit={(lensId) => governPanel.reveal("world", lensId)}
+			/>
+		);
+	}
+
+	// The lens canvas with its inspector: a world, or a guardrail. The record
+	// picked rides in the URL, so neither takes a subject beyond the Graph.
+	if (board.kind === "worlds") {
+		return (
+			<WorldsPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				backend={backend}
+				onOpenWorldBoard={(id) => openBoard({ kind: "world", subjectId: id })}
+			/>
+		);
+	}
+
+	if (board.kind === "guardrails") {
+		return (
+			<GuardrailsPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				backend={backend}
+			/>
+		);
+	}
+
+	if (board.kind === "rules") {
+		return (
+			<RulesPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				onOpenRuleBoard={(id) => openBoard({ kind: "rule", subjectId: id })}
+			/>
+		);
+	}
+
+	if (board.kind === "settings") {
+		return (
+			<GraphSettingsPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+			/>
+		);
+	}
+
+	if (board.kind === "requests") {
+		return (
+			<RequestsPage
+				username={username as string}
+				graphSlug={graphSlug as string}
 			/>
 		);
 	}
@@ -232,6 +284,25 @@ export function declaredBoardContent(
 				onOpenRun={(runId) =>
 					openBoard({ kind: "run", subjectId: runId, runId })
 				}
+			/>
+		);
+	}
+
+	if (board.kind === "global_model") {
+		return (
+			<GlobalModelPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				backend={backend}
+			/>
+		);
+	}
+
+	if (board.kind === "stitches") {
+		return (
+			<StitchesPage
+				username={username as string}
+				graphSlug={graphSlug as string}
 			/>
 		);
 	}
@@ -453,7 +524,7 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 			? modelsView.scope
 				? (modelName(modelsView.scope) ?? BOARD_KINDS.models.label)
 				: "All models"
-			: board.kind === "world" || board.kind === "guardrail"
+			: board.kind === "world"
 				? (lensNameById.get(board.subjectId) ?? BOARD_KINDS[board.kind].label)
 				: board.kind === "agent" || board.kind === "iam_agent"
 					? (agentNameById.get(board.subjectId) ??

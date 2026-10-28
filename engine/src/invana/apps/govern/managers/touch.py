@@ -238,7 +238,14 @@ class TouchManager:
 #: derived from the documents, so a key one run happens to carry and the other
 #: does not cannot quietly become a difference nobody decided to report
 #: ([WO18](docs/for-developers/modules/govern/features/worlds.md)).
-_APPLIED_FIELDS: tuple[str, ...] = ("models", "select", "properties_excluded", "projected", "composed")
+_APPLIED_FIELDS: tuple[str, ...] = (
+    "models",
+    "select",
+    "properties_excluded",
+    "properties_counts_only",
+    "projected",
+    "composed",
+)
 
 
 def _differing_fields(a: dict, b: dict) -> list[str]:

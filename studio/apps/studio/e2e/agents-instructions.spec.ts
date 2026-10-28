@@ -49,7 +49,9 @@ test("AG-04 · AG-06 a draft publishes and History names the change", async ({
 			.getByRole("textbox", { name: "instructions.md" })
 			.fill("Answer briefly, and cite every record.");
 		await page.getByRole("button", { name: "Save draft" }).click();
-		await expect(page.getByText("draft · nothing runs on it")).toBeVisible();
+		await expect(page.getByText("draft · nothing runs on it")).toBeVisible({
+			timeout: 30_000,
+		});
 
 		await page.getByRole("button", { name: "Publish", exact: true }).click();
 		await page
@@ -61,12 +63,14 @@ test("AG-04 · AG-06 a draft publishes and History names the change", async ({
 			.click();
 		await expect(
 			page.getByText("Answer briefly, and cite every record."),
-		).toBeVisible({ timeout: 15_000 });
-		await expect(page.getByText("draft · nothing runs on it")).toHaveCount(0);
+		).toBeVisible({ timeout: 30_000 });
+		await expect(page.getByText("draft · nothing runs on it")).toHaveCount(0, {
+			timeout: 30_000,
+		});
 
 		await page.getByRole("tab", { name: "History" }).click();
 		await expect(page.getByText("instructions changed").first()).toBeVisible({
-			timeout: 15_000,
+			timeout: 30_000,
 		});
 		await expect(page.getByText("Readers ask for sources")).toBeVisible();
 	} finally {

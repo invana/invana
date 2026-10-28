@@ -2,7 +2,7 @@
  * The all models data build — every published model on one canvas.
  *
  * A model is a **group frame** (stitch-models.md): a `model` node that
- * `GraphModelCanvas` styles as a group, with its node types pointing at it
+ * `GlobalModelBoard` styles as a group, with its node types pointing at it
  * through `parentId`. That is
  * `@invana/graph`'s own group concept, not a drawing convention, which is what
  * buys the rest of it — ELK packs members inside the frame, and a
@@ -14,8 +14,8 @@
  * construction, and one inside a frame is that model's own edge type.
  *
  * This module is pure — queries live in `useAllModels`, the drawing in
- * `@/canvases/model`, the page in `AllModelsCanvas`. It reads versions and links, never `…/global-model`,
- * so the global-model page stays stated rather than drawn.
+ * `@invana-studio/canvases`, the page in `GlobalModelPage`. It reads versions and links, never `…/global-model`,
+ * whose counts sit beside the drawing.
  */
 
 import { colorSlotByString } from "@invana/styling/color";
@@ -116,7 +116,7 @@ interface TypeStitches {
 }
 
 /**
- * Build the canvas payload — `GraphModelCanvas`'s `ModelGraphData`.
+ * Build the canvas payload — `GlobalModelBoard`'s `ModelGraphData`.
  *
  * Ids are namespaced by model because two domains may both own a `Company` and
  * they are different types until an anchor says otherwise (domain-models.md
@@ -238,9 +238,9 @@ export function buildAllModelsData(
 					label: n.name,
 					model: t.name,
 					...(framed ? { frame: t.name } : {}),
-					// The type's own colour, the one the Explorer paints it;
-					// the frame around it carries the model's.
-					hue: colorSlotByString(n.name),
+					// Framed, a type wears its model's colour, so the frames read
+					// as models at a glance; on one model's canvas, its own.
+					hue: framed ? t.hue : colorSlotByString(n.name),
 					description: n.description ?? "",
 					icon: TYPE_ICON,
 					propertyCount: properties.length,

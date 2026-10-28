@@ -123,7 +123,10 @@ test("SH-07 the user menu switches the assistant off, and back on", async ({
 test("4.4 the footer's counts open the console on the canvas's data and on its queries", async ({
 	page,
 }) => {
-	await ask(page, "MATCH (a)-[r]->(b) RETURN a, r, b LIMIT 5");
+	await ask(
+		page,
+		"MATCH (a:airport)-[r:route]->(b:airport) RETURN a, r, b LIMIT 5",
+	);
 
 	// A typed query that answers opens Data: one table per label.
 	await expect(page).toHaveURL(/console=data/, { timeout: 30_000 });
@@ -136,7 +139,9 @@ test("4.4 the footer's counts open the console on the canvas's data and on its q
 	await queries.click();
 	await expect(page).toHaveURL(/console=queries/);
 	await page
-		.getByRole("cell", { name: /MATCH \(a\)-\[r\]->\(b\)/ })
+		.getByRole("cell", {
+			name: /MATCH \(a:airport\)-\[r:route\]->\(b:airport\)/,
+		})
 		.first()
 		.click();
 	await expect(page).toHaveURL(/console=queries(%3A|:)/);

@@ -117,10 +117,10 @@ class Settings(BaseSettings):
     # when a new one opens (docs/for-developers/modules/ask/spec.md). 0 keeps all.
     run_history_limit: int = 500  # INVANA_RUN_HISTORY_LIMIT
 
-    # Where a tool step runs: `inline` in this process, or `procrastinate` — deferred to the
-    # `tools.<labels>` queues and leased by `invana worker` through the worker gateway
-    # (docs/for-developers/modules/agents/features/workers.md).
-    executor: Literal["inline", "procrastinate"] = "inline"  # INVANA_EXECUTOR
+    # Where a tool step runs: `procrastinate` defers it to the `tools.<labels>` queues, leased by an
+    # `invana worker` the user starts (docs/for-developers/modules/agents/features/workers.md);
+    # `inline` runs it in this process.
+    executor: Literal["inline", "procrastinate"] = "procrastinate"  # INVANA_EXECUTOR
 
     # CORS — comma-separated allowed origins; use * for development only
     cors_origins: list[str] = ["http://localhost:8300", "http://127.0.0.1:8300"]

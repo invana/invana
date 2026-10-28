@@ -1,5 +1,4 @@
 import { useFlowsQuery } from "@invana-studio/agents";
-import type { LensKind } from "@invana-studio/core";
 import { runsApi } from "@invana-studio/core";
 import {
 	boardPageId,
@@ -158,16 +157,6 @@ export function useOpenBoards(
 		[openBoard],
 	);
 
-	// Govern's drill-in opens the lens as a page. **Stable**, and
-	// it has to be: the panel opens the board from an effect — the drill-in and
-	// the page id are two keys of one URL, and the second write has to be
-	// composed against the first — so a new identity each render would reopen
-	// the board on every render.
-	const openLensBoard = useCallback(
-		(kind: LensKind, lensId: string) => openBoard({ kind, subjectId: lensId }),
-		[openBoard],
-	);
-
 	return {
 		boards,
 		setBoards,
@@ -177,7 +166,6 @@ export function useOpenBoards(
 		setPageId,
 		openBoard,
 		openRecordBoard,
-		openLensBoard,
 		planRefById,
 	};
 }

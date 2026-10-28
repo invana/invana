@@ -13,7 +13,7 @@ import { GRAPH } from "./explorer";
 
 // Every `?panel=` value the graph page has read, and the path it lands on.
 const OLD_PANEL_LINKS: [string, string][] = [
-	["?panel=info", "/modeller/settings?tab=info"],
+	["?panel=info", "/modeller/settings"],
 	["?panel=connection", "/modeller/settings"],
 	["?panel=settings", "/modeller/settings"],
 	["?panel=explorer", "/explorer"],
@@ -137,20 +137,20 @@ test("a rail item opens its section as a tab; closing it goes back to Home", asy
 });
 
 test("a reload on a path lands on the same screen", async ({ page }) => {
-	await page.goto(`${GRAPH}/modeller/settings?tab=info`);
+	await page.goto(`${GRAPH}/modeller/settings?tab=members`);
 	const crumbs = page.getByLabel("Breadcrumb");
 	await expect(crumbs.getByText("Graph settings", { exact: true })).toBeVisible(
 		{
 			timeout: 30_000,
 		},
 	);
-	await expect(page.getByRole("tab", { name: "Info" })).toBeVisible();
+	const members = page.getByRole("tab", { name: "Members", selected: true });
+	await expect(members).toBeVisible();
 
 	await page.reload();
-	await expect(page).toHaveURL(`${GRAPH}/modeller/settings?tab=info`);
-	await expect(page.getByRole("tab", { name: "Info" })).toBeVisible({
-		timeout: 30_000,
-	});
+	// The open page rides along as `&page=`; the path and the tab are the screen.
+	await expect(page).toHaveURL(/\/modeller\/settings\?tab=members(&|$)/);
+	await expect(members).toBeVisible({ timeout: 30_000 });
 });
 
 test("?right= names who holds the right side", async ({ page }) => {

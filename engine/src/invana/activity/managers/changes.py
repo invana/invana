@@ -49,7 +49,15 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.activity.schemas import ChangeCompare, ChangeEffect, ChangeEntry, ChangeField, RecordHistory, RecordsSummary
+from invana.activity.schemas import (
+    ChangeCompare,
+    ChangeEffect,
+    ChangeEntry,
+    ChangeField,
+    EffectDataset,
+    RecordHistory,
+    RecordsSummary,
+)
 from invana.apps.agents.managers import AgentManager
 from invana.apps.datasets.content import records_summary
 from invana.apps.datasets.querysets import DatasetQuerySet, DatasetRecordQuerySet, DatasetVersionQuerySet
@@ -372,7 +380,15 @@ class ChangeLogManager:
             basis = "window"
             counts = await self.runs_qs.effect_of_roots(session, graph_id=graph_id, since=version.at, until=until)
         runs, failed, tokens_in, tokens_out = counts
+        touched = [
+            EffectDataset.model_validate(d)
+            for d in (getattr(version.row, "affected_datasets", None) or [])
+            if record.kind == "model"
+        ]
         return ChangeEffect(
+            datasets=touched,
+            datasets_failing=sum(1 for d in touched if d.rows_failing > 0),
+            rows_failing=sum(d.rows_failing for d in touched),
             basis=basis,
             runs=runs,
             failed=failed,

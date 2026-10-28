@@ -58,11 +58,13 @@ import type {
 	StagedSet,
 } from "../types";
 
-const OP: Record<string, "add" | "remove" | "change"> = {
-	added: "add",
-	removed: "remove",
-	modified: "change",
-};
+/** A change's sign, from what it did: `*_added`, `*_removed`, or the rest. */
+const opOf = (c: PublishChange): "add" | "remove" | "change" =>
+	c.kind.endsWith("_added")
+		? "add"
+		: c.kind.endsWith("_removed")
+			? "remove"
+			: "change";
 
 /** `Variety.wilt` — where a change lands, as the model names it. */
 const where = (c: PublishChange) =>
@@ -191,6 +193,7 @@ export function PublishConfirm({
 						version={version}
 						active={active}
 						staged={staged}
+						changes={review.data?.changes ?? []}
 						connector={connector}
 						publishing={publishing}
 						onPublish={onPublish}
@@ -210,6 +213,7 @@ function AdditiveConfirm({
 	version,
 	active,
 	staged,
+	changes,
 	connector,
 	publishing,
 	onPublish,
@@ -222,6 +226,8 @@ function AdditiveConfirm({
 	version: string | null;
 	active: string | null;
 	staged: StagedSet | null;
+	/** What the engine says the draft does, against the published version. */
+	changes: PublishChange[];
 	connector: string;
 	publishing: boolean;
 	onPublish: () => void;
@@ -229,7 +235,8 @@ function AdditiveConfirm({
 }) {
 	const projection = useDraftProjectionQuery(username, graphSlug, modelId);
 	const ops = projection.data?.operations ?? [];
-	const count = staged?.count ?? 0;
+	const rows = collapse(changes);
+	const count = rows.length;
 	return (
 		<>
 			<DialogHeader>
@@ -246,9 +253,9 @@ function AdditiveConfirm({
 				</DialogDescription>
 			</DialogHeader>
 			<DiffList>
-				{(staged?.changes ?? []).map((c) => (
-					<DiffRow key={c.id} op={OP[c.op]} kind={c.kind.replace("_", " ")}>
-						<span className="font-mono">{c.name}</span>
+				{rows.map((c) => (
+					<DiffRow key={`${c.kind}-${where(c)}`} op={opOf(c)}>
+						<span className="font-mono">{where(c)}</span>
 					</DiffRow>
 				))}
 			</DiffList>

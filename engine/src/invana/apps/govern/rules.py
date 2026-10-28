@@ -177,11 +177,17 @@ def validate_rule(rule: Rule) -> None:
     if rule.properties and layer not in _PROPERTY_BEARING:
         raise RuleError(f"{rule.match}: only graph data has properties to exclude.")
     if rule.properties:
-        unknown = set(rule.properties) - {"exclude"}
+        unknown = set(rule.properties) - set(PROPERTY_KEYS)
         if unknown:
-            raise RuleError(f"{rule.match}: properties carries exclude, not {', '.join(sorted(unknown))}.")
-        if not isinstance(rule.properties.get("exclude", []), list):
-            raise RuleError(f"{rule.match}: properties.exclude is a list of property names.")
+            raise RuleError(
+                f"{rule.match}: properties carries exclude and counts_only, not {', '.join(sorted(unknown))}."
+            )
+        for key in PROPERTY_KEYS:
+            entries = rule.properties.get(key, [])
+            if not isinstance(entries, list) or not all(_is_property_entry(e) for e in entries):
+                raise RuleError(
+                    f"{rule.match}: properties.{key} is a list of property names, bare or as Type.property."
+                )
 
     if rule.select and layer not in _SELECTABLE:
         raise RuleError(
@@ -209,6 +215,19 @@ def validate_rule(rule: Rule) -> None:
         raise RuleError(
             f"{rule.match}: a {layer.value} rule's options are {', '.join(permitted_options)}, not {named}."
         )
+
+
+#: What ``properties`` may carry: properties absent from the world, and
+#: properties a query may filter, count and aggregate but never return.
+PROPERTY_KEYS: tuple[str, ...] = ("exclude", "counts_only")
+
+
+def _is_property_entry(entry: Any) -> bool:
+    """A bare ``price`` or a qualified ``Deal.price`` — one dot at most, both sides named."""
+    if not isinstance(entry, str) or not entry.strip():
+        return False
+    parts = entry.split(".")
+    return len(parts) <= 2 and all(part.strip() for part in parts)
 
 
 def _validate_select(rule: Rule) -> None:
@@ -260,8 +279,11 @@ class Verdict:
     #: The bound the denying rule came from — :attr:`Rule.by` ([AG6]).
     denied_in: str | None = None
     why: str | None = None
-    #: The merged narrowing that applies, once the address is allowed.
+    #: The merged narrowing that applies, once the address is allowed. Each
+    #: entry is a bare property name or a qualified ``Type.property``.
     properties_excluded: list[str] = field(default_factory=list)
+    #: Properties a query may filter, count and aggregate, never return.
+    properties_counts_only: list[str] = field(default_factory=list)
     select: dict[str, Any] = field(default_factory=dict)
     may_send: list[str] = field(default_factory=list)
     #: Whether any matching rule said anything about egress at all. ``[]`` with
@@ -398,6 +420,7 @@ class Effective:
             decision=Decision.allowed,
             rule_matched=max(allowances, key=lambda r: len(r.match)).match,
             properties_excluded=_union_excluded(allowances),
+            properties_counts_only=_union_excluded(allowances, key="counts_only"),
             select=_intersect_selects(allowances),
             may_send=_intersect_may_send(allowances),
             egress_stated=any(rule.egress.get("may_send") is not None for rule in allowances),
@@ -473,15 +496,16 @@ def from_snapshot(snapshot: dict[str, Any] | None) -> Effective:
     )
 
 
-def _union_excluded(rules: list[Rule]) -> list[str]:
+def _union_excluded(rules: list[Rule], *, key: str = "exclude") -> list[str]:
     """Exclusions **accumulate**: a property any contributor removed is gone.
 
     The mirror of deny-winning, one grain down. If they intersected, adding a
     narrower rule could bring a property back into view, which is widening.
+    ``counts_only`` accumulates the same way, for the same reason.
     """
     out: set[str] = set()
     for rule in rules:
-        out.update(rule.properties.get("exclude", []))
+        out.update(rule.properties.get(key, []))
     return sorted(out)
 
 

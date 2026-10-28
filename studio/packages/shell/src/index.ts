@@ -93,8 +93,7 @@ export * from "./components/ThemeSyncBridge";
 export { CanonicalRoute, graphRoutes } from "./graphRoutes";
 export * from "./pages/auth/LoginPage";
 export * from "./pages/ErrorPage";
-export { GraphCreatePage } from "./pages/graphs/GraphCreatePage";
-export { GraphForm } from "./pages/graphs/GraphForm";
+export { GraphConnectPage } from "./pages/graphs/GraphConnectPage";
 export { GraphsListPage } from "./pages/graphs/GraphsListPage";
 export { PlatformEventsPage } from "./pages/platform/PlatformEventsPage";
 export * from "./pages/settings/ProfileSettingsPage";
@@ -109,10 +108,7 @@ export {
 	TAB_PARAM,
 	useLeftSection,
 } from "./regions/useLeftSection";
-export {
-	requestOpenSession,
-	useOpenSessionRequest,
-} from "./regions/useOpenSessionRequest";
+export { useOpenSessionRequest } from "./regions/useOpenSessionRequest";
 export { usePageParams } from "./regions/usePageParams";
 export {
 	type RightSectionKey,

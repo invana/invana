@@ -92,9 +92,30 @@ export interface ModelGraphEdge {
 	data: ModelEdgeData;
 }
 
+/** One line of a type's mark: `+` added, `~` changed, `-` removed. */
+export interface ModelMarkLine {
+	sign: "+" | "~" | "-";
+	text: string;
+}
+
+/**
+ * What a version pair did to one type — the chip beside it. Matches the
+ * engine's per-type mark structurally; a type is found by its name.
+ */
+export interface ModelTypeMark {
+	type: string;
+	target_kind: "node_type" | "edge_type";
+	mark: "added" | "changed" | "removed";
+	lines: ModelMarkLine[];
+}
+
 export interface ModelGraphData {
 	nodes: (ModelFrameNode | ModelTypeNode)[];
 	edges: ModelGraphEdge[];
+	/** Types the drawn pair changes: each wears a chip, an added one is dashed. */
+	marks?: ModelTypeMark[];
+	/** The model the marks are on, by name; absent on the one-model canvas. */
+	markedModel?: string;
 }
 
 /** What a click selected — a node or an edge, by its canvas id. */

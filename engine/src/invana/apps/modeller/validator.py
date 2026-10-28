@@ -14,6 +14,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from invana.apps.modeller.constraints import VALUE_RULES, breaks, constraint_label, flags, refusal
 from invana.apps.modeller.inheritance import (
     build_type_map,
     get_subtypes,
@@ -41,6 +42,10 @@ class ValidationError:
     code: str
     message: str
     field: str | None = None
+    #: The record lands and the break is listed, rather than the record refused.
+    flag: bool = False
+    #: The broken constraint, as a person reads it.
+    constraint: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -142,30 +147,28 @@ def _validate_rules(
     value: Any,
     rules: list[ValidationRule],
     prop_name: str,
+    type_name: str = "",
 ) -> list[ValidationError]:
-    """Apply validation rules to a single property value."""
+    """Apply validation rules to a single property value.
+
+    A range, enum or standard rule is a constraint on the property: a break is
+    ``breaks_constraint``, naming it, and marked ``flag`` when the constraint
+    lets the record land.
+    """
     errors: list[ValidationError] = []
 
     for rule in rules:
         params = rule.params or {}
 
-        if rule.rule_type == "range":
-            min_val = params.get("min")
-            max_val = params.get("max")
-            if min_val is not None and value < min_val:
+        if rule.rule_type in VALUE_RULES:
+            if breaks(value, rule):
                 errors.append(
                     ValidationError(
-                        code="range_violation",
-                        message=f"Value {value} is below minimum {min_val}",
+                        code="breaks_constraint",
+                        message=refusal(type_name, prop_name, rule, value),
                         field=prop_name,
-                    )
-                )
-            if max_val is not None and value > max_val:
-                errors.append(
-                    ValidationError(
-                        code="range_violation",
-                        message=f"Value {value} exceeds maximum {max_val}",
-                        field=prop_name,
+                        flag=flags(rule),
+                        constraint=constraint_label(rule),
                     )
                 )
 
@@ -176,17 +179,6 @@ def _validate_rules(
                     ValidationError(
                         code="pattern_violation",
                         message=f"Value '{value}' does not match pattern '{pattern}'",
-                        field=prop_name,
-                    )
-                )
-
-        elif rule.rule_type == "enum":
-            allowed = params.get("values", [])
-            if value not in allowed:
-                errors.append(
-                    ValidationError(
-                        code="enum_violation",
-                        message=f"Value '{value}' not in allowed values: {allowed}",
                         field=prop_name,
                     )
                 )
@@ -290,7 +282,7 @@ class SchemaValidator:
         effective = self._cache.effective_mappings.get(label, [])
         label_constraints = self._cache.constraints_by_label.get(label, [])
 
-        errors.extend(self._validate_properties(properties, effective, label_constraints, mode))
+        errors.extend(self._validate_properties(properties, effective, label_constraints, mode, type_name=label))
         return errors
 
     def validate_vertex_update(
@@ -325,6 +317,7 @@ class SchemaValidator:
                 [],  # no constraint checks on update
                 mode,
                 check_required=False,
+                type_name=label,
             )
         )
         return errors
@@ -390,7 +383,7 @@ class SchemaValidator:
         label_constraints = self._cache.constraints_by_label.get(label, [])
 
         mappings = list(et.property_mappings) if et.property_mappings else []
-        errors.extend(self._validate_properties(properties, mappings, label_constraints, mode))
+        errors.extend(self._validate_properties(properties, mappings, label_constraints, mode, type_name=label))
 
         return errors
 
@@ -407,7 +400,9 @@ class SchemaValidator:
             return [ValidationError(code="unknown_label", message=f"Edge label '{label}' is not defined.")]
         mappings = list(et.property_mappings) if et.property_mappings else []
         label_constraints = self._cache.constraints_by_label.get(label, [])
-        return self._validate_properties(properties, mappings, label_constraints, self._cache.validation_mode)
+        return self._validate_properties(
+            properties, mappings, label_constraints, self._cache.validation_mode, type_name=label
+        )
 
     # ------------------------------------------------------------------
     # Property validation (shared)
@@ -421,6 +416,7 @@ class SchemaValidator:
         mode: str,
         *,
         check_required: bool = True,
+        type_name: str = "",
     ) -> list[ValidationError]:
         """Validate a property dict against property mappings and constraints."""
         errors: list[ValidationError] = []
@@ -494,6 +490,6 @@ class SchemaValidator:
             if mapping.validation_rules:
                 all_rules.extend(mapping.validation_rules)
             if all_rules:
-                errors.extend(_validate_rules(value, all_rules, key))
+                errors.extend(_validate_rules(value, all_rules, key, type_name))
 
         return errors

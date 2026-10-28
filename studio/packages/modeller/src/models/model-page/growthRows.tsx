@@ -6,7 +6,7 @@
  * nothing ever counted draws the never-imported state, never a chart of zeros.
  */
 
-import type { RowSpec } from "@invana/boards";
+import type { PanelSpec, RowSpec } from "@invana/boards";
 import { StackedAreaChart } from "@invana/charts";
 import { colorSlotByString } from "@invana/styling/color";
 import { type ColumnDef, DataTable } from "@invana/tables";
@@ -63,6 +63,52 @@ function writtenBy(last: WrittenBy | null, onOpenRun: (id: string) => void) {
 	) : (
 		<span className="font-mono">{label}</span>
 	);
+}
+
+/**
+ * The records-over-time chart as one panel — Growth's own, and the one a
+ * model's Overview ends on, so the two read one series. Stacked by model at
+ * All models and by type at one model.
+ */
+export function growthChartPanel(
+	growth: Growth,
+	opts: Pick<GrowthRowsOptions, "scopeName" | "hueOf">,
+): PanelSpec {
+	const one = !!opts.scopeName;
+	const colorOf = (key: string, name: string) => {
+		const slot = one ? colorSlotByString(name) : opts.hueOf(key);
+		return `var(--color-data-${slot ?? 1})`;
+	};
+	const data = growth.labels.map((label, i) => ({
+		label: dayOf(label),
+		values: Object.fromEntries(
+			growth.series.map((s) => [s.key, s.values[i] ?? 0]),
+		),
+	}));
+	const series = growth.series.map((s) => ({
+		key: s.key,
+		label: s.name,
+		color: colorOf(s.key, s.name),
+	}));
+	const marks = growth.marks.map((m) => ({
+		index: m.index,
+		label: SOURCE_LABEL[m.source],
+	}));
+	return {
+		kind: "text",
+		title: one ? "Records over time, by type" : "Records over time, by model",
+		aside: `${num(growth.now)} today`,
+		options: { text: "" },
+		render: (
+			<StackedAreaChart
+				data={data}
+				series={series}
+				marks={marks}
+				markLegend="a write — an import or a stitch commit"
+				height={200}
+			/>
+		),
+	};
 }
 
 export function growthRows(
@@ -131,26 +177,6 @@ export function growthRows(
 		];
 
 	const one = !!opts.scopeName;
-	const colorOf = (key: string, name: string) => {
-		const slot = one ? colorSlotByString(name) : opts.hueOf(key);
-		return `var(--color-data-${slot ?? 1})`;
-	};
-	const data = growth.labels.map((label, i) => ({
-		label: dayOf(label),
-		values: Object.fromEntries(
-			growth.series.map((s) => [s.key, s.values[i] ?? 0]),
-		),
-	}));
-	const series = growth.series.map((s) => ({
-		key: s.key,
-		label: s.name,
-		color: colorOf(s.key, s.name),
-	}));
-	const marks = growth.marks.map((m) => ({
-		index: m.index,
-		label: SOURCE_LABEL[m.source],
-	}));
-
 	const { now, change } = growth;
 	// The engine picks the row; Studio only looks it up by key.
 	const fastest = growth.rows.find((r) => r.key === growth.fastest);
@@ -211,6 +237,8 @@ export function growthRows(
 				{
 					kind: "grid",
 					options: {
+						// One row across, as the board draws it.
+						minTileWidth: 140,
 						tiles: [
 							{
 								label: "Records",
@@ -255,27 +283,7 @@ export function growthRows(
 				},
 			],
 		},
-		{
-			panels: [
-				{
-					kind: "text",
-					title: one
-						? "Records over time, by type"
-						: "Records over time, by model",
-					aside: `${num(now)} today`,
-					options: { text: "" },
-					render: (
-						<StackedAreaChart
-							data={data}
-							series={series}
-							marks={marks}
-							markLegend="a write — an import or a stitch commit"
-							height={200}
-						/>
-					),
-				},
-			],
-		},
+		{ panels: [growthChartPanel(growth, opts)] },
 		{
 			panels: [
 				{

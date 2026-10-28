@@ -1,6 +1,7 @@
 import { request } from "@invana-studio/core";
 import type {
 	CommitResult,
+	ConstraintCheck,
 	ConstraintCreate,
 	ConstraintResponse,
 	DatasetBindingRef,
@@ -21,7 +22,6 @@ import type {
 	ModelImportResult,
 	ModelLink,
 	ModelLinkDeclare,
-	ModelUpgradeResult,
 	NodeTypeCreate,
 	NodeTypeResponse,
 	NodeTypeUpdate,
@@ -29,6 +29,7 @@ import type {
 	OntologyImportResult,
 	PhysicalSchema,
 	ProjectionPlan,
+	PropertyConstraintSet,
 	PropertyKeyCreate,
 	PropertyKeyResponse,
 	PropertyKeyUpdate,
@@ -36,12 +37,15 @@ import type {
 	PublishOutcome,
 	PublishRequest,
 	PublishReview,
+	RemovedStitch,
 	SchemaDiff,
 	ShapeCard,
 	StagedSet,
+	StandardChoice,
 	StarterSummary,
+	StitchDetail,
 	StitchPreview,
-	VersionActivate,
+	ValidationRuleResponse,
 	VersionCreate,
 	VersionSummary,
 } from "./types";
@@ -114,17 +118,6 @@ export const modelsApi = {
 		request<GraphVersionResponse>(`${base(u, g)}/${id}/active-version`),
 	createDraft: (u: string, g: string, id: string, data: VersionCreate = {}) =>
 		post(`${base(u, g)}/${id}/versions`, data) as Promise<GraphVersionResponse>,
-	activate: (
-		u: string,
-		g: string,
-		id: string,
-		vid: string,
-		data: VersionActivate = {},
-	) =>
-		post(
-			`${base(u, g)}/${id}/versions/${vid}/activate`,
-			data,
-		) as Promise<GraphVersionResponse>,
 
 	// ── Type authoring (draft versions only) ──────────────────────────────────
 	createNodeType: (
@@ -233,6 +226,40 @@ export const modelsApi = {
 		constraintId: string,
 	) => del(`${ver(u, g, id, vid)}/constraints/${constraintId}`),
 
+	// ── Constraints on properties (property-constraints.md) ─────────────────
+	setPropertyConstraint: (
+		u: string,
+		g: string,
+		id: string,
+		vid: string,
+		data: PropertyConstraintSet,
+	) =>
+		request(`${ver(u, g, id, vid)}/property-constraints`, {
+			method: "PUT",
+			body: JSON.stringify(data),
+		}) as Promise<ValidationRuleResponse>,
+	deletePropertyConstraint: (
+		u: string,
+		g: string,
+		id: string,
+		vid: string,
+		ruleId: string,
+	) => del(`${ver(u, g, id, vid)}/property-constraints/${ruleId}`),
+	/** What breaks the unsaved constraint in the graph now; writes nothing. */
+	checkPropertyConstraint: (
+		u: string,
+		g: string,
+		id: string,
+		vid: string,
+		data: PropertyConstraintSet,
+	) =>
+		post(
+			`${ver(u, g, id, vid)}/property-constraints/check`,
+			data,
+		) as Promise<ConstraintCheck>,
+	constraintStandards: (u: string, g: string) =>
+		request<StandardChoice[]>(`${base(u, g)}/property-constraints/standards`),
+
 	createIndex: (
 		u: string,
 		g: string,
@@ -248,7 +275,7 @@ export const modelsApi = {
 		indexId: string,
 	) => del(`${ver(u, g, id, vid)}/indexes/${indexId}`),
 
-	/** What changed between two published versions (domain-models.md · Surfaces). */
+	/** What `against` → `versionId` changed, each type marked; `versionId` may be the draft. */
 	versionDiff: (
 		u: string,
 		g: string,
@@ -312,16 +339,16 @@ export const modelsApi = {
 			`${base(u, g)}/import/ontology`,
 			body,
 		) as Promise<OntologyImportResult>,
-	upgradeModel: (
-		u: string,
-		g: string,
-		id: string,
-		body: { artefact?: ModelArtefact; starter?: string },
-	) => post(`${base(u, g)}/${id}/upgrade`, body) as Promise<ModelUpgradeResult>,
 
 	// ── Links and the global model (stitch-models.md) ────────────────────────
 	links: (u: string, g: string) =>
 		request<ModelLink[]>(`${graphBase(u, g)}/model-links`),
+	/** One stitch read whole — the inspector's read. */
+	link: (u: string, g: string, linkId: string) =>
+		request<StitchDetail>(`${graphBase(u, g)}/model-links/${linkId}`),
+	/** Removed stitches, newest first, from their removal events. */
+	removedLinks: (u: string, g: string) =>
+		request<RemovedStitch[]>(`${graphBase(u, g)}/model-links/removed`),
 	declareLink: (u: string, g: string, data: ModelLinkDeclare) =>
 		post(`${graphBase(u, g)}/model-links`, data) as Promise<ModelLink>,
 	removeLink: (u: string, g: string, linkId: string) =>

@@ -799,6 +799,9 @@ def _applied(
         out["select"] = {k: dict(v) for k, v in selects.items()}
     if excluded:
         out["properties_excluded"] = excluded
+    counts_only = {k: list(v) for k, v in compiled.counts_only.items()} if compiled else {}
+    if counts_only:
+        out["properties_counts_only"] = counts_only
     composed = result.composed
     if composed is not None and composed.projected:
         out["projected"] = list(composed.projected)

@@ -112,7 +112,7 @@ sequenceDiagram
 |---|---|
 | Publish confirm | `modeller.draft.publish` — reads `GET …/draft/review`; additive shows the staged changes, the projection and *Who reads*, then *Publish vN*; breaking shows *— breaking*, the changes, *Who reads*, a why and *Request approval* (`packages/modeller/src/models/model-page/ModelsDialogs.tsx`) |
 | Review | `modeller.draft.migration` — the same confirm after the request: the preview run, the migration table, then *waiting on approval*, linked to the runs and Approvals |
-| Comparing bar | `modeller.global_model.diff` — over the global canvas when a model has a draft: its counts and *Review and publish* (`packages/modeller/src/models/model-page/DraftCompareBar.tsx`) |
+| Comparing bar | `modeller.global_model.diff` — at the bottom of the global canvas whenever a model has a draft or someone picks a pair: `Comparing` · a model's version select → a version select (the draft listed last as `vN draft`) · `+ N added` `~ N changed` `− N removed` · *Review and publish* while the right side is the draft. The map marks each type the pair changes (PB16) (`packages/modeller/src/models/stitch/CompareBar.tsx`) |
 | Activity › Approvals | The approval's `payload` is the impact list, frozen at request |
 | CLI | `invana models publish --graph g --name m [--dry-run] [--why …] [--approver u …] [--user u]` — `--user` is required without `--dry-run` (a review names its requester); the preview runs inline, then one clock step raises the approval |
 
@@ -122,6 +122,7 @@ sequenceDiagram
 |---|---|
 | `GET …/models/{id}/draft/review` | `{classification: additive · breaking, base_version, changes: [{kind, target_kind, type, property, breaking, reason}]}` — reads only |
 | `POST …/models/{id}/publish` | `{why?, version?, approvers?: [username], deadline_s?}` → `{outcome: published · review, version?, review?}` |
+| `GET …/models/{id}/versions/{to}/diff?against={from}` | `SchemaDiff` plus `added` · `changed` · `removed` (the counts of its marks' lines by sign) and `marks: [{type, target_kind, mark: added · changed · removed, lines: [{sign: + · ~ · −, text}]}]` — one entry per type the pair changes; `to` may be the draft |
 | `GET …/models/{id}/publish-reviews` · `…/{review_id}` | the model's reviews, newest first · one |
 | `model_publish_reviews` | `graph_id` · `model_id` · `version_id` (the draft) · `base_version_id` · `draft_hash` · `classification` · `changes` · `preview` · `result` · `why` · `requested_by_id` · `approval_id` · `preview_run_id` · `run_id` · `published_version` · `status` · `reason` · `created_at` · `updated_at` |
 | `status` | `previewing · pending · migrating · published · failed · declined · expired · stale` |
@@ -150,6 +151,8 @@ sequenceDiagram
 | PB12 | **Who reads it** is the datasets bound to a touched type and the stitches on a touched type. Runs do not pin model versions, so a run is not a reader. |
 | PB13 | **Studio asks the engine before it confirms.** The Publish confirm branches on `draft/review`, a commit refused with `breaking_publish_needs_review` re-reads it, and Studio names the readers from the stitches and dataset bindings on the model; the rules are in [modeller.md › Decisions](../../../../products/modeller.md#decisions) *Publish asks the engine first* · *The review in the confirm* · *Compare on the map*. |
 | PB14 | **`draft/review` counts its changes.** It returns `added` (kinds ending `_added`), `removed` (ending `_removed`) and `changed` (the rest) beside `changes`, so the Comparing bar formats three numbers and counts nothing. |
+| PB15 | **Compare is any two versions of one model, on the map.** The Comparing bar picks a model (when several have drafts, or from *Show*), then *from* and *to* among its published versions and its draft; it opens on `active → draft` when the model has a draft, and on the two newest published versions otherwise. Its counts and the map's marks come from one read, the version diff, so the bar and the map never disagree. *Review and publish* appears only when *to* is the draft. |
+| PB16 | **A changed type wears its change on the map.** The engine returns each changed type's lines — `+ timezone`, `+ index city`, `~ dist integer → float`, `− region`; a removed type `− version`; an added one `+ Fleet` — and the canvas draws them as one chip beside the type, toned by its strongest sign (removed over changed over added). A type the pair adds is drawn as a dashed ghost in its model's frame; a type it removes stays drawn from *from* with its `−` chip. A property key's type change is shown on every type that maps it. |
 
 ## Not building
 

@@ -6,11 +6,11 @@ import { GRAPH } from "./explorer";
 
 const MODEL = "NewsArticles";
 
-/** Read one model from the Models panel — a row click opens its board. */
+/** Read one model from the models board — a row click opens its board. */
 async function openModel(page: Page) {
 	await page.setViewportSize({ width: 1600, height: 1000 });
-	await page.goto(`${GRAPH}?panel=model`);
-	const row = page.getByRole("button", { name: new RegExp(`^${MODEL}`) });
+	await page.goto(`${GRAPH}/modeller/models`);
+	const row = page.getByRole("row", { name: new RegExp(`^${MODEL}\\b`) });
 	await expect(row.first()).toBeVisible({ timeout: 30_000 });
 	await row.first().click();
 }
@@ -38,11 +38,11 @@ test("ME25 — the board draws the model, not an empty viewport", async ({
 	page,
 }) => {
 	await openModel(page);
-	// `Open` turns the page to the Model tab, where the model is drawn.
-	await page.getByRole("button", { name: "Open", exact: true }).click();
-	await expect(
-		page.getByRole("tab", { name: "Model", exact: true }),
-	).toHaveAttribute("aria-selected", "true", { timeout: 20_000 });
+	// *Open in Schema* draws the model full-bleed.
+	await page
+		.getByRole("button", { name: "Open in Schema" })
+		.click({ timeout: 20_000 });
+	await expect(page).toHaveURL(/models_view=schema/);
 	// The solve is un-animated: it settles, redraws and frames in one beat.
 	await page.waitForTimeout(8000);
 

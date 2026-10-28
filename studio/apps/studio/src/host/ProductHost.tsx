@@ -28,6 +28,7 @@ import { IamHomeTiles, IamOpenContext } from "@invana-studio/iam";
 import {
 	type ModelSelection,
 	useLensesViewPanel,
+	useModellerCrumb,
 	useModelsQuery,
 } from "@invana-studio/modeller";
 import {
@@ -42,7 +43,12 @@ import {
 } from "@invana-studio/shell";
 import { BoardGround } from "@invana-studio/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+	useLocation,
+	useNavigate,
+	useParams,
+	useSearchParams,
+} from "react-router-dom";
 import { assistantSlots } from "@/host/assistantSlots";
 import { OpenBoardContext } from "@/host/boards";
 import { consoleSection } from "@/host/consoleSection";
@@ -55,6 +61,7 @@ import { setupSlots } from "@/host/setupSlots";
 import { useAgentsSections } from "@/host/useAgentsSections";
 import { useBoardPageTrail } from "@/host/useBoardPageTrail";
 import { useDataBoards } from "@/host/useDataBoards";
+import { useGovernPages } from "@/host/useGovernPages";
 import { useIamSections } from "@/host/useIamSections";
 import { useLayeredCanvas } from "@/host/useLayeredCanvas";
 import { useModelsPage } from "@/host/useModelsPage";
@@ -185,7 +192,6 @@ export function ProductHost() {
 		boardPage,
 		openBoard,
 		openRecordBoard,
-		openLensBoard,
 		planRefById,
 	} = openBoards;
 	// `&step=` — the task open inside the focused run page.
@@ -266,6 +272,8 @@ export function ProductHost() {
 		settingsSection,
 		openBoards,
 	);
+	// The Worlds, Guardrails and Requests pages, opened by the Modeller's rail.
+	useGovernPages(graphSlug, settingsSection, openBoards);
 	// A project's page and the Decisions page, opened by the Projects rail.
 	const { openProjectPage, pageTrail: projectTrail } = useProjectsPage(
 		username,
@@ -318,12 +326,14 @@ export function ProductHost() {
 		closeLeftPanel,
 		layered,
 		openBoard,
-		openLensBoard,
 		openAgentPage,
 		showPlanCanvas,
 		modelSelection,
 		setModelSelection,
 		showModelsPage,
+		// The model's canvas is full-bleed: no outline beside it.
+		modelOpen: !!modelsView.scope && !modelsView.schema,
+		worldBoardOpen: parseBoardPageId(boardPage.pageId ?? "")?.kind === "world",
 		modelName,
 		canvas,
 		selected,
@@ -360,6 +370,8 @@ export function ProductHost() {
 	const explorerOpen = activeProductId === "explorer";
 	const agentsOpen = activeProductId === "agents";
 	const iamOpen = activeProductId === "iam";
+	const { pathname } = useLocation();
+	const modellerCrumb = useModellerCrumb(username, graphSlug, pathname);
 	// The products on the Agents shell: sections as tabs, Home, no leftSection.
 	const sectionsOpen = agentsOpen || iamOpen;
 	const { user } = useAuth();
@@ -591,6 +603,7 @@ export function ProductHost() {
 		workCanvas,
 		workTarget,
 		explorer: explorerOpen,
+		modeller: activeProductId === "modeller",
 		assistantShown,
 		connection: graphLoading ? undefined : (graph ?? null),
 		dataBoardInFront,
@@ -661,9 +674,11 @@ export function ProductHost() {
 								agentsSections.endpointId
 									? llmProviders.find((p) => p.id === agentsSections.endpointId)
 											?.name
-									: activeSessionId
-										? sessionTitleById.get(activeSessionId)
-										: undefined
+									: modellerCrumb
+										? modellerCrumb
+										: activeSessionId
+											? sessionTitleById.get(activeSessionId)
+											: undefined
 							}
 							// A project's page names its own levels: Projects › the project
 							// › its branch › the finding.

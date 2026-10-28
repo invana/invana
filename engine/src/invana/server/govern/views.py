@@ -10,27 +10,43 @@ holds the rule about it.
 
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 from fastapi import Depends, Path, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.activity.querysets.schedules import ScheduleQuerySet
+from invana.apps.agents.querysets.agent import AgentQuerySet
 from invana.apps.govern.addressing import Layer
 from invana.apps.govern.cast import resolve_all
 from invana.apps.govern.catalogue import CatalogueResolver
 from invana.apps.govern.impact import assess
-from invana.apps.govern.managers import LensManager, TouchManager
+from invana.apps.govern.managers import (
+    GuardrailManager,
+    LensManager,
+    LensViewManager,
+    ScheduleWorlds,
+    TouchManager,
+)
 from invana.apps.govern.managers.lens import rule_counts, to_effective, to_rules
 from invana.apps.govern.models import Lens, LensKind
 from invana.apps.govern.rules import Decision, Effective, compose, from_snapshot
 from invana.apps.govern.schemas import (
+    AgentUsageRead,
     CastResolutionRead,
     CatalogueRead,
     CompareRead,
     CompareSideRead,
+    GuardrailDetail,
+    GuardrailImpactRead,
+    GuardrailIn,
+    GuardrailPage,
+    GuardrailTargetRead,
+    GuardrailUpdate,
     ImpactRead,
     ImpactRequest,
     LensCreate,
     LensListResponse,
-    LensPromote,
     LensRead,
     LensUpdate,
     LensUsageRead,
@@ -38,11 +54,13 @@ from invana.apps.govern.schemas import (
     RefusalRead,
     TouchesRead,
     TouchRead,
+    UsedByRead,
     ValidateRequest,
     ValidationRead,
     WarningRead,
     WorldImpactRead,
 )
+from invana.apps.govern.schemas import LensView as LensViewRead
 from invana.apps.govern.validate import validate_draft
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.graphs.roles import GraphRole
@@ -55,9 +73,35 @@ from invana.server.evals.views import drift_after
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 lenses = LensManager()
+guardrails = GuardrailManager()
+lens_views = LensViewManager()
 touches = TouchManager()
 catalogue_resolver = CatalogueResolver()
 task_runs_qs = TaskRunQuerySet()
+agents_qs = AgentQuerySet()
+schedules_qs = ScheduleQuerySet()
+
+
+async def _usage(session: AsyncSession, lens_id: str) -> LensUsageRead:
+    """A lens's usage — runs, last use, who, the last 30 days, and the agents that asked under it.
+
+    Composed here because runs are the runtime's and agents the agents app's,
+    both above Govern.
+    """
+    runs, last, actors = await task_runs_qs.lens_usage(session, lens_id)
+    by_agent = await task_runs_qs.lens_agents(session, lens_id)
+    names = await agents_qs.names_by_ids(session, [agent_id for agent_id, _, _ in by_agent])
+    return LensUsageRead(
+        runs=runs,
+        last_used_at=last,
+        actor_ids=actors,
+        people=len(actors),
+        runs_30d=await task_runs_qs.lens_runs_since(session, lens_id, datetime.now(UTC) - timedelta(days=30)),
+        by_agent=[
+            AgentUsageRead(agent_id=agent_id, name=names.get(agent_id), runs=n, last_at=at)
+            for agent_id, n, at in by_agent
+        ],
+    )
 
 
 def _read(
@@ -143,7 +187,6 @@ async def get_lens(
     looks fine until a run refuses to open.
     """
     lens = await lenses.get(session, lens_id=lens_id, graph_id=graph.id)
-    runs, last, actors = await task_runs_qs.lens_usage(session, lens.id)
     ceiling = await lenses.effective_guardrails(session, graph_id=graph.id)
     # A guardrail pinned on the Graph is already one of the contributors to the
     # ceiling, so composing it a second time would list it twice and decide
@@ -151,7 +194,7 @@ async def get_lens(
     effective = ceiling if lens.kind == LensKind.guardrail.value else compose([ceiling, to_effective(lens)])
     return _read(
         lens,
-        usage=LensUsageRead(runs=runs, last_used_at=last, actor_ids=actors, people=len(actors)),
+        usage=await _usage(session, lens.id),
         cast_resolved=[
             CastResolutionRead(
                 role=r.role.value,
@@ -205,25 +248,6 @@ async def update_lens(
     )
     await drift_after(request, session, graph_id=graph.id, trigger="world_change")
     return _read(updated)
-
-
-async def promote_lens(
-    payload: LensPromote,
-    lens_id: str = Path(...),
-    member: GraphMember = Depends(require_graph_member),
-    graph: Graph = Depends(resolve_graph_by_username_slug),
-    user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-) -> LensRead:
-    lens = await lenses.get(session, lens_id=lens_id, graph_id=graph.id)
-    promoted = await lenses.promote(
-        session,
-        lens=lens,
-        scope=payload.scope,
-        actor_id=user.id,
-        may_edit_guardrails=member.holds(GraphRole.modeller),
-    )
-    return _read(promoted)
 
 
 async def duplicate_lens(
@@ -452,3 +476,142 @@ async def compare_runs(
         ),
         **diff,
     )
+
+
+async def lens_usage(
+    lens_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> LensUsageRead:
+    """Who asked under a lens, and how often — the world board's tiles and cast."""
+    lens = await lenses.get(session, lens_id=lens_id, graph_id=graph.id)
+    return await _usage(session, lens.id)
+
+
+# ── the lens view ────────────────────────────────────────────────────────────
+
+
+async def lens_view(
+    world: str | None = Query(default=None, max_length=36),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> LensViewRead:
+    """A world read on the model — or, without ``world``, the guardrails alone."""
+    lens = None
+    used_by: list[UsedByRead] = []
+    if world:
+        lens = await lenses.get(session, lens_id=world, graph_id=graph.id)
+        by_agent = await task_runs_qs.lens_agents(session, lens.id)
+        agent_names = await agents_qs.names_by_ids(session, [a for a, _, _ in by_agent])
+        people = await task_runs_qs.lens_people(session, lens.id)
+        person_names = await guardrails.requests_qs.user_names(session, {p for p, _ in people})
+        used_by = [UsedByRead(kind="agent", id=a, name=agent_names.get(a), runs=n) for a, n, _ in by_agent] + [
+            UsedByRead(kind="person", id=p, name=person_names.get(p), runs=n) for p, n in people
+        ]
+    return await lens_views.view(session, graph_id=graph.id, world=lens, used_by=used_by)
+
+
+# ── a Graph's guardrails — one property rule each ────────────────────────────
+
+
+async def _agent_names(session: AsyncSession, graph_id: str) -> dict[str, str]:
+    return {a.id: a.name for a in await agents_qs.list_active_for_graph(session, graph_id=graph_id)}
+
+
+async def _detail(session: AsyncSession, guardrail: Lens) -> GuardrailDetail:
+    return await guardrails.detail(
+        session, guardrail=guardrail, agent_names=await _agent_names(session, guardrail.graph_id)
+    )
+
+
+async def list_guardrails(
+    member: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> GuardrailPage:
+    """The Graph's guardrails, and whether the reader may edit them, in one read."""
+    return await guardrails.page(session, graph_id=graph.id, may_edit=member.holds(GraphRole.modeller))
+
+
+async def get_guardrail(
+    guardrail_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> GuardrailDetail:
+    return await _detail(session, await guardrails.get(session, graph_id=graph.id, guardrail_id=guardrail_id))
+
+
+async def guardrail_targets(
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> list[GuardrailTargetRead]:
+    return await guardrails.targets(session, graph_id=graph.id)
+
+
+async def guardrail_rule_impact(
+    payload: GuardrailIn,
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> GuardrailImpactRead:
+    """What saving this rule would change, counted before the write."""
+    schedules = [
+        ScheduleWorlds(id=sid, name=name, worlds=worlds)
+        for sid, name, worlds in await schedules_qs.worlds_by_schedule(session, graph_id=graph.id)
+    ]
+    return await guardrails.impact(session, graph_id=graph.id, payload=payload, schedules=schedules)
+
+
+async def create_guardrail(
+    payload: GuardrailIn,
+    request: Request,
+    member: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> GuardrailDetail:
+    row = await guardrails.create(
+        session, graph_id=graph.id, payload=payload, actor_id=user.id, may_edit=member.holds(GraphRole.modeller)
+    )
+    await drift_after(request, session, graph_id=graph.id, trigger="world_change")
+    return await _detail(session, row)
+
+
+async def update_guardrail(
+    payload: GuardrailUpdate,
+    request: Request,
+    guardrail_id: str = Path(...),
+    member: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> GuardrailDetail:
+    row = await guardrails.update(
+        session,
+        guardrail=await guardrails.get(session, graph_id=graph.id, guardrail_id=guardrail_id),
+        payload=payload,
+        actor_id=user.id,
+        may_edit=member.holds(GraphRole.modeller),
+    )
+    await drift_after(request, session, graph_id=graph.id, trigger="world_change")
+    return await _detail(session, row)
+
+
+async def delete_guardrail(
+    guardrail_id: str = Path(...),
+    member: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    await guardrails.delete(
+        session,
+        guardrail=await guardrails.get(session, graph_id=graph.id, guardrail_id=guardrail_id),
+        actor_id=user.id,
+        may_edit=member.holds(GraphRole.modeller),
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

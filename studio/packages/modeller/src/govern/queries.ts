@@ -17,11 +17,20 @@ import type {
 } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { governApi } from "./api";
+import type { GuardrailRule, GuardrailUpdate } from "./types";
 
 const root = (u: string, g: string) => ["govern", u, g] as const;
 const lensesKey = (u: string, g: string) => [...root(u, g), "lenses"] as const;
 const catalogueKey = (u: string, g: string) =>
 	[...root(u, g), "participants"] as const;
+/** One world read whole — also what its breadcrumb names it from. */
+export const lensDetailKey = (u: string, g: string, lensId: string) =>
+	[...lensesKey(u, g), lensId, "detail"] as const;
+const guardrailsKey = (u: string, g: string) =>
+	[...root(u, g), "guardrails"] as const;
+/** One guardrail read whole — also what its breadcrumb names it from. */
+export const guardrailDetailKey = (u: string, g: string, id: string) =>
+	[...guardrailsKey(u, g), id, "detail"] as const;
 
 // ── Queries ────────────────────────────────────────────────────────────────
 // The lens list is core's `useLensesQuery`, keyed under `lensesKey`, so the
@@ -33,11 +42,7 @@ export function useLensQuery(
 	lensId?: string,
 ) {
 	return useQuery({
-		queryKey: [
-			...lensesKey(username ?? "", graphSlug ?? ""),
-			lensId,
-			"detail",
-		] as const,
+		queryKey: lensDetailKey(username ?? "", graphSlug ?? "", lensId ?? ""),
 		queryFn: () =>
 			governApi.getLens(
 				username as string,
@@ -148,16 +153,6 @@ export function useDeleteLensMutation(username?: string, graphSlug?: string) {
 	});
 }
 
-/** World → guardrail. One field — and every world is revalidated against it. */
-export function usePromoteLensMutation(username?: string, graphSlug?: string) {
-	const invalidate = useLensInvalidation(username, graphSlug);
-	return useMutation({
-		mutationFn: ({ id, scope }: { id: string; scope?: string }) =>
-			governApi.promoteLens(username as string, graphSlug as string, id, scope),
-		onSuccess: invalidate,
-	});
-}
-
 export function useDuplicateLensMutation(
 	username?: string,
 	graphSlug?: string,
@@ -185,17 +180,140 @@ export function useValidateLensMutation(username?: string, graphSlug?: string) {
 	});
 }
 
-/** What a guardrail save would cost each world — *2 of 4 worlds would change*. */
-export function useGuardrailImpactMutation(
+// ── Guardrails ─────────────────────────────────────────────────────────────
+
+export function useGuardrailsQuery(username?: string, graphSlug?: string) {
+	return useQuery({
+		queryKey: guardrailsKey(username ?? "", graphSlug ?? ""),
+		queryFn: () =>
+			governApi.guardrails(username as string, graphSlug as string),
+		enabled: !!username && !!graphSlug,
+	});
+}
+
+export function useGuardrailQuery(
+	username?: string,
+	graphSlug?: string,
+	guardrailId?: string,
+) {
+	return useQuery({
+		queryKey: guardrailDetailKey(
+			username ?? "",
+			graphSlug ?? "",
+			guardrailId ?? "",
+		),
+		queryFn: () =>
+			governApi.guardrail(
+				username as string,
+				graphSlug as string,
+				guardrailId as string,
+			),
+		enabled: !!username && !!graphSlug && !!guardrailId,
+	});
+}
+
+export function useGuardrailTargetsQuery(
+	username?: string,
+	graphSlug?: string,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: [...guardrailsKey(username ?? "", graphSlug ?? ""), "targets"],
+		queryFn: () =>
+			governApi.guardrailTargets(username as string, graphSlug as string),
+		enabled: enabled && !!username && !!graphSlug,
+		staleTime: 30_000,
+	});
+}
+
+/**
+ * What a rule would cost before it is saved — keyed on the rule, so the
+ * dialog's impact line is a query that follows the three fields as they move.
+ */
+export function useGuardrailImpactQuery(
+	username?: string,
+	graphSlug?: string,
+	rule?: GuardrailRule | null,
+) {
+	return useQuery({
+		queryKey: [
+			...guardrailsKey(username ?? "", graphSlug ?? ""),
+			"impact",
+			rule,
+		],
+		queryFn: () =>
+			governApi.guardrailImpact(
+				username as string,
+				graphSlug as string,
+				rule as GuardrailRule,
+			),
+		enabled: !!username && !!graphSlug && !!rule?.target,
+	});
+}
+
+/** The lens canvas: the guardrails alone, or `world` composed inside them. */
+export function useLensViewQuery(
+	username?: string,
+	graphSlug?: string,
+	worldId?: string | null,
+) {
+	return useQuery({
+		queryKey: [...root(username ?? "", graphSlug ?? ""), "view", worldId ?? ""],
+		queryFn: () =>
+			governApi.view(
+				username as string,
+				graphSlug as string,
+				worldId ?? undefined,
+			),
+		enabled: !!username && !!graphSlug,
+	});
+}
+
+/** A guardrail write changes the list, the view and the lenses it compiles to. */
+function useGuardrailInvalidation(username?: string, graphSlug?: string) {
+	const qc = useQueryClient();
+	return () => {
+		qc.invalidateQueries({ queryKey: root(username ?? "", graphSlug ?? "") });
+	};
+}
+
+export function useCreateGuardrailMutation(
 	username?: string,
 	graphSlug?: string,
 ) {
+	const invalidate = useGuardrailInvalidation(username, graphSlug);
 	return useMutation({
-		mutationFn: (data: {
-			rules?: GovernRule[];
-			closed_layers?: GovernLayer[];
-			scope?: string;
-		}) =>
-			governApi.guardrailImpact(username as string, graphSlug as string, data),
+		mutationFn: (data: GuardrailRule) =>
+			governApi.createGuardrail(username as string, graphSlug as string, data),
+		onSuccess: invalidate,
+	});
+}
+
+export function useUpdateGuardrailMutation(
+	username?: string,
+	graphSlug?: string,
+) {
+	const invalidate = useGuardrailInvalidation(username, graphSlug);
+	return useMutation({
+		mutationFn: ({ id, data }: { id: string; data: GuardrailUpdate }) =>
+			governApi.updateGuardrail(
+				username as string,
+				graphSlug as string,
+				id,
+				data,
+			),
+		onSuccess: invalidate,
+	});
+}
+
+export function useDeleteGuardrailMutation(
+	username?: string,
+	graphSlug?: string,
+) {
+	const invalidate = useGuardrailInvalidation(username, graphSlug);
+	return useMutation({
+		mutationFn: (id: string) =>
+			governApi.deleteGuardrail(username as string, graphSlug as string, id),
+		onSuccess: invalidate,
 	});
 }

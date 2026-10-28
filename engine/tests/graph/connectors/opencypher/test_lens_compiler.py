@@ -265,3 +265,34 @@ class TestCompose:
         out = compile_("MATCH (d:Deal) RETURN count(d)", self.SLICED)
 
         assert out.executed.index("WITH * WHERE") < out.executed.index("count(d)")
+
+
+class TestCountsOnly:
+    """A counts-only property computes inside the query; its value never leaves it."""
+
+    COUNTED = QueryLens(
+        bounds={
+            "Deal": TypeBound(
+                type_name="Deal",
+                declared=frozenset({"name", "contract_value"}),
+                counts_only=frozenset({"contract_value"}),
+            )
+        }
+    )
+
+    @pytest.mark.parametrize(
+        "query",
+        [
+            "MATCH (d:Deal) RETURN sum(d.contract_value)",
+            "MATCH (d:Deal) WHERE d.contract_value > 100 RETURN count(d)",
+        ],
+        ids=["aggregated", "filtered"],
+    )
+    def test_it_may_be_filtered_and_aggregated(self, query):
+        assert compile_(query, self.COUNTED).executed
+
+    def test_returning_its_value_is_refused_by_name(self):
+        exc = refusal("MATCH (d:Deal) RETURN d.contract_value", self.COUNTED)
+
+        assert exc.code == "lens_property_counts_only"
+        assert exc.property_name == "contract_value"

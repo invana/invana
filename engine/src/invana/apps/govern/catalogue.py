@@ -83,10 +83,34 @@ class Catalogue:
         return tuple(layer for layer in GOVERNED_LAYERS if layer in present)
 
 
+@dataclass(frozen=True, slots=True)
+class PublishedType:
+    """One node or edge type of a published version, with the properties it maps."""
+
+    model_id: str
+    model: str
+    version: str | None
+    type_name: str
+    properties: tuple[str, ...] = ()
+
+    @property
+    def address(self) -> str:
+        return model_address(model_name=self.model, version_label=self.version)
+
+
 class CatalogueResolver:
     """Builds the catalogue for a Graph, from the rows that already exist."""
 
     catalogue_qs = CatalogueQuerySet()
+
+    async def published_types(self, session: AsyncSession, *, graph_id: str) -> tuple[PublishedType, ...]:
+        """Every type of every published version — what a guardrail's target is checked against."""
+        return tuple(
+            PublishedType(model_id=mid, model=name, version=label, type_name=type_name, properties=tuple(props))
+            for mid, name, label, type_name, props in await self.catalogue_qs.published_type_properties(
+                session, graph_id
+            )
+        )
 
     async def resolve(self, session: AsyncSession, *, graph_id: str) -> Catalogue:
         participants: list[Participant] = []

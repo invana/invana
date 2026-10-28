@@ -40,7 +40,7 @@ from invana.apps.modeller.links import list_links
 from invana.apps.modeller.solve import solvable, solve_links
 from invana.apps.modeller.validator import SchemaValidator
 from invana.core.settings import settings
-from invana.plugins.core.ingest.stitching import load_stitch_rows
+from invana.plugins.core.ingest.stitching import load_stitch_rows, recount_edges
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -184,6 +184,11 @@ def group_report(errors: list[dict]) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 
+def _rule_of(error: Any) -> str:
+    """The report's reason for a refusal — a broken constraint is named as one."""
+    return "breaks_constraint" if error.code == "breaks_constraint" else "invalid_property"
+
+
 def _validate_nodes(
     validator: SchemaValidator,
     node_records: dict[str, list[dict]],
@@ -210,19 +215,21 @@ def _validate_nodes(
         kept = []
         for i, rec in enumerate(records):
             errors = validator.validate_vertex_create(type_name, rec.get("properties", {}))
-            if errors:
-                report.extend(
-                    {
-                        "file": f"nodes/{type_name}.json",
-                        "record_index": i,
-                        "record_id": rec.get("id"),
-                        "field": getattr(e, "field", None),
-                        "rule": "invalid_property",
-                        "message": e.message,
-                    }
-                    for e in errors
-                )
-            else:
+            # A constraint that flags lets its record land; the break is still listed.
+            refused = [e for e in errors if not e.flag]
+            report.extend(
+                {
+                    "file": f"nodes/{type_name}.json",
+                    "record_index": i,
+                    "record_id": rec.get("id"),
+                    "field": getattr(e, "field", None),
+                    "rule": "flagged" if e.flag else _rule_of(e),
+                    "message": e.message,
+                    **({"constraint": e.constraint} if e.constraint else {}),
+                }
+                for e in errors
+            )
+            if not refused:
                 kept.append(rec)
         valid[type_name] = kept
     return valid
@@ -398,6 +405,7 @@ async def _solve_active_stitches(
                 if on_written:
                     on_written(link, loaded.written)
             report.extend(loaded.report)
+        await recount_edges(connector, [*joined, *supplied])
     finally:
         await connector.disconnect()
     return written

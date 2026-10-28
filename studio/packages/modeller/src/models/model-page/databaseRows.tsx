@@ -39,8 +39,11 @@ function DriftMark({ drift }: { drift: Drift }) {
 
 const nf = new Intl.NumberFormat();
 
+/** An edge type several stitches share reads `3 stitches`, the pairs on hover. */
 const modelsCell = (models: string[]) =>
-	models.length ? (
+	models.length > 1 && models.every((m) => m.includes("⇄")) ? (
+		<span title={models.join(" · ")}>{models.length} stitches</span>
+	) : models.length ? (
 		models.join(" · ")
 	) : (
 		<span className="text-destructive">no model</span>

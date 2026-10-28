@@ -40,6 +40,9 @@ from invana.apps.modeller import links as link_service
 from invana.apps.modeller.links import LinkRefused
 from invana.apps.modeller.solve import Solved, rule_of, solvable, solve_links, stamp, withdraw_link, written_query
 from invana.apps.modeller.store import ModelStore
+from invana.core.events import actions as event_actions
+from invana.core.events.models import ActorKind
+from invana.core.events.services import emit_event
 from invana.plugins.core.ingest.bundle import Rule, read_manifest
 from invana.runtime.querysets import TaskRunQuerySet
 
@@ -334,6 +337,7 @@ async def apply_bundle(
     graph_id: str,
     root: Path,
     dry_run: bool = False,
+    actor_id: str | None = None,
 ) -> Applied:
     """Declare every rule `<root>/stitches.json` states, staged (ST21).
 
@@ -343,6 +347,9 @@ async def apply_bundle(
     A rule already declared is reported, never declared twice (ST41), and a rule
     that cannot be resolved is skipped with the reason rather than failing the run
     at the first one — a manifest is read as a whole.
+
+    Each declared stitch records its declare event under ``actor_id`` — the
+    system's when there is none — so its inspector names who declared it.
     """
     store = store or ModelStore()
     root = Path(root).resolve()
@@ -435,6 +442,15 @@ async def apply_bundle(
 
         existing.append(link)
         run.outcomes.append(Outcome(rule=rule, status="declared", source=source, target=target, link_id=link.id))
+        await emit_event(
+            session,
+            action=event_actions.MODEL_LINK_DECLARE,
+            target_kind=event_actions.TARGET_MODEL_LINK,
+            target_id=link.id,
+            graph_id=graph_id,
+            details={"kind": rule.kind, "rule": rule.describe(), "bundle": manifest.name},
+            **({"actor_id": actor_id} if actor_id else {"actor_kind": ActorKind.system}),
+        )
 
     return run
 
@@ -471,6 +487,23 @@ async def _records_root(session: AsyncSession, source_model_id: str) -> Path | N
     """
     root = await _runs_qs.latest_load_root(session, model_id=source_model_id)
     return Path(root) if root else None
+
+
+async def recount_edges(connector: BaseConnector, links: list[ModelLink]) -> None:
+    """Set each stitch's ``edges`` to how many edges it holds in the graph now.
+
+    A recount, never a sum: a MERGE re-matches what an earlier solve wrote, so what
+    one run reports written says nothing about what the stitch holds. The
+    connector is already open. A stitch that cannot be counted is left as it was.
+    """
+    for link in links:
+        result = await connector.execute(written_query(), {"stitch_id": link.id})
+        rows = getattr(result, "records", None) or getattr(result, "rows", None) or []
+        if not rows:
+            continue
+        row = rows[0]
+        value = row.get("written") if isinstance(row, dict) else getattr(row, "written", 0)
+        link.edges = int(value or 0)
 
 
 async def commit_stitches(
@@ -523,6 +556,7 @@ async def commit_stitches(
                 )
                 continue
             run.loaded.append(await load_stitch_rows(connector, link, root=root, model_id=link.source_model_id))
+        await recount_edges(connector, [link for link in committed if link.id not in refused])
     finally:
         await connector.disconnect()
     return run

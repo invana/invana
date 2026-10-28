@@ -74,6 +74,34 @@ _PROJECTION_RE = re.compile(r"\b" + _IDENT + r"\s*\{[^{}]*\}")
 # value: they return an identity, a count or a type, never the property bag.
 _SCALAR_OVER_ELEMENT = {"count", "id", "elementid", "labels", "type"}
 
+# Where a counts-only property may be named without its value leaving the query,
+# and the aggregates that may take it anywhere.
+_COUNTS_ONLY_CLAUSES = {"WHERE", "ORDER BY", "MATCH", "OPTIONAL MATCH"}
+_AGGREGATES = {"count", "sum", "avg", "min", "max"}
+
+
+def _inside_aggregate(masked: str, offset: int) -> bool:
+    """Whether ``offset`` sits inside one of the aggregates, at any depth.
+
+    Walks back over the brackets that enclose it: ``round(avg(d.price))`` is
+    inside ``avg`` and reads as an aggregate, ``toString(d.price)`` is not.
+    """
+    depth = 0
+    i = offset - 1
+    while i >= 0:
+        ch = masked[i]
+        if ch in ")]}":
+            depth += 1
+        elif ch in "([{":
+            if depth:
+                depth -= 1
+            elif ch == "(":
+                fn = re.search(r"(" + _IDENT + r")\s*$", masked[:i])
+                if fn and fn.group(1).lower() in _AGGREGATES:
+                    return True
+        i -= 1
+    return False
+
 
 class _LensParams:
     """Parameter names for composed predicates, namespaced away from the query's own."""
@@ -271,6 +299,7 @@ class CypherLensCompiler(LensCompiler):
                 projected.extend(self._project(masked, clause, depth, bindings, edits, deferred))
 
         self._reject_properties(masked, bindings)
+        self._reject_counts_only(masked, bindings, clauses)
         for why, fragment in deferred:
             self._unreadable(why, fragment)
 
@@ -387,6 +416,41 @@ class CypherLensCompiler(LensCompiler):
                             type_name=binding.type_name,
                             property_name=key,
                         )
+
+    def _reject_counts_only(self, masked: str, bindings: dict[str, _Binding], clauses: list[_Clause]) -> None:
+        """A counts-only property computes; its value is never returned.
+
+        It may be read in a ``WHERE``, an ``ORDER BY`` or a pattern, and inside
+        ``count`` · ``sum`` · ``avg`` · ``min`` · ``max`` wherever those appear.
+        Anywhere else — a bare return item, a ``WITH`` alias, ``collect``, a map
+        projection — would carry the value out of the query, so it is refused
+        naming the property.
+        """
+        for m in _PROP_RE.finditer(masked):
+            binding = bindings.get(m.group(1))
+            if not binding or m.group(2) not in binding.bound.counts_only:
+                continue
+            clause = next((c for c in clauses if c.kw_start <= m.start() < c.end), None)
+            if clause is not None and clause.keyword in _COUNTS_ONLY_CLAUSES:
+                continue
+            if clause is not None and clause.keyword in {"WITH", "RETURN"} and _inside_aggregate(masked, m.start()):
+                continue
+            self._counts_only(binding, m.group(2))
+        for var, binding in bindings.items():
+            if not binding.bound.counts_only:
+                continue
+            for m in re.finditer(r"\b" + re.escape(var) + r"\s*\{", masked):
+                for key in re.findall(r"\.\s*(" + _IDENT + r")", masked[m.end() : masked.find("}", m.end()) + 1]):
+                    if key in binding.bound.counts_only:
+                        self._counts_only(binding, key)
+
+    def _counts_only(self, binding: _Binding, prop: str) -> None:
+        raise LensViolationError(
+            f"{binding.type_name}.{prop} may be filtered, counted and aggregated here, never returned.",
+            code="lens_property_counts_only",
+            type_name=binding.type_name,
+            property_name=prop,
+        )
 
     # -- composing -------------------------------------------------------------
 

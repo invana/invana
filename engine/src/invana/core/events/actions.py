@@ -62,9 +62,11 @@ LENS_UPDATE = "lens.update"
 # The write that publishes — naming a lens is what puts it in the Worlds list,
 # and it is worth telling apart from any other update (GV2).
 LENS_NAME = "lens.name"
-# A world became a guardrail. One field, never a re-authoring (GV3).
-LENS_PROMOTE = "lens.promote"
 LENS_DELETE = "lens.delete"
+# Requests (docs/for-developers/modules/govern/features/requests.md) — filed
+# where an ask fails, resolved by a modeller.
+REQUEST_CREATE = "request.create"
+REQUEST_RESOLVE = "request.resolve"
 # The one field-level permission in the product, granted or taken back (GV22).
 GUARDRAIL_PERMISSION_GRANT = "guardrail_permission.grant"
 GUARDRAIL_PERMISSION_REVOKE = "guardrail_permission.revoke"
@@ -324,9 +326,9 @@ TARGET_MEMBER = "member"
 TARGET_LLM = "llm_provider"
 TARGET_LLM_MODEL = "llm_model"
 # One kind for both a world and a guardrail — they are one row separated by
-# `kind`, and an auditor reading the history of a promoted world should not have
-# to follow it across two target kinds (GV1).
+# `kind` (GV1).
 TARGET_LENS = "lens"
+TARGET_REQUEST = "request"
 TARGET_SKILL = "skill"
 TARGET_RULE = "rule"
 TARGET_MODEL = "graph_model"

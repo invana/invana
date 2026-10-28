@@ -195,6 +195,54 @@ class GraphManager:
     async def get_graph_connection(self, session: AsyncSession, *, graph_id: str) -> GraphConnection | None:
         return await self.connections_qs.for_graph(session, graph_id)
 
+    @staticmethod
+    def with_stored_password(existing: GraphConnection | None, auth: dict | None, encryption_key: str) -> dict:
+        """The credentials to use: ``auth`` as given, its blank password filled from the stored one.
+
+        Graph settings reads the user back but never the password, so an edit that
+        leaves the password blank means *keep it* — for a save and for a test alike.
+        """
+        from invana.apps.graphs.encryption import decrypt_credentials  # noqa: PLC0415
+
+        given = dict(auth or {})
+        if not given or given.get("password") or existing is None or existing.auth_encrypted is None:
+            return given
+        stored = decrypt_credentials(existing.auth_encrypted, encryption_key)
+        if stored.get("password"):
+            given["password"] = stored["password"]
+        return given
+
+    @staticmethod
+    def stored_username(connection: GraphConnection, encryption_key: str) -> str | None:
+        """The stored user of a connection — readable back; the password never is."""
+        from cryptography.fernet import InvalidToken  # noqa: PLC0415
+
+        from invana.apps.graphs.encryption import decrypt_credentials  # noqa: PLC0415
+
+        if connection.auth_encrypted is None:
+            return None
+        try:
+            return decrypt_credentials(connection.auth_encrypted, encryption_key).get("username") or None
+        except InvalidToken:
+            return None
+
+    async def test_graph_connection(
+        self,
+        session: AsyncSession,
+        *,
+        graph: Graph,
+        payload,  # GraphConnectionCreate
+        encryption_key: str,
+    ) -> dict:
+        """Test the given settings for this Graph, a blank password standing for the stored one."""
+        existing = await self.connections_qs.for_graph(session, graph.id)
+        return await test_connection_credentials(
+            uri=payload.uri,
+            connector_class=payload.connector_class,
+            auth=self.with_stored_password(existing, payload.auth, encryption_key),
+            database=payload.database,
+        )
+
     async def put_graph_connection(
         self,
         session: AsyncSession,
@@ -246,7 +294,9 @@ class GraphManager:
         existing.database = (payload.database or "").strip() or None
         existing.read_only = payload.read_only
         if payload.auth:
-            existing.auth_encrypted = encrypt_credentials(payload.auth, encryption_key)
+            existing.auth_encrypted = encrypt_credentials(
+                self.with_stored_password(existing, payload.auth, encryption_key), encryption_key
+            )
         # Manually-declared version — the fallback for backends we cannot
         # auto-detect (modules/graph-connectors/features/capabilities.md).
         # A successful auto-detect on the reconnect below overrides it.
@@ -365,23 +415,10 @@ async def test_connection_credentials(
     import contextlib  # noqa: PLC0415
     import time  # noqa: PLC0415
 
-    from invana.core.utils import import_class_from_dotted_path  # noqa: PLC0415
-
     try:
-        ConnectorClass = import_class_from_dotted_path(connector_class)
-    except Exception as exc:
-        return {"ok": False, "error": f"Unknown connector '{connector_class}': {exc}"}
-
-    # Only pass the database through when one is named — a blank field means the
-    # connector's own default, and connectors that don't address databases at all
-    # (Gremlin) would otherwise be handed a keyword they ignore.
-    kwargs = dict(auth)
-    if (database or "").strip():
-        kwargs["database"] = database.strip()
-    try:
-        connector = ConnectorClass(uri=uri, **kwargs)
-    except Exception as exc:
-        return {"ok": False, "error": f"Could not build connector: {exc}"}
+        connector = build_connector(connector_class=connector_class, uri=uri, auth=auth, database=database)
+    except ValueError as exc:
+        return {"ok": False, "error": str(exc)}
 
     t0 = time.monotonic()
     try:
@@ -405,3 +442,26 @@ async def test_connection_credentials(
         "server_version": str(resolved.version) if resolved.version else None,
         "compatibility_status": resolved.status.value,
     }
+
+
+def build_connector(*, connector_class: str, uri: str, auth: dict, database: str | None = None):
+    """A connector that is not registered with the pool — for a test or a one-off read.
+
+    The caller connects and disconnects it. Only a named database is passed
+    through: a blank field means the connector's own default, and connectors
+    that do not address databases at all (Gremlin) would otherwise be handed a
+    keyword they ignore. Raises ``ValueError`` naming what could not be built.
+    """
+    from invana.core.utils import import_class_from_dotted_path  # noqa: PLC0415
+
+    try:
+        connector_type = import_class_from_dotted_path(connector_class)
+    except Exception as exc:
+        raise ValueError(f"Unknown connector '{connector_class}': {exc}") from exc
+    kwargs = dict(auth)
+    if (database or "").strip():
+        kwargs["database"] = database.strip()
+    try:
+        return connector_type(uri=uri, **kwargs)
+    except Exception as exc:
+        raise ValueError(f"Could not build connector: {exc}") from exc

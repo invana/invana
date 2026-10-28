@@ -13,7 +13,7 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING
 
-from invana.apps.modeller.models import GraphVersion
+from invana.apps.modeller.models import GraphVersion, ValidationRule
 from invana.apps.modeller.schemas import (
     ConstraintCreate,
     DeclaredAxes,
@@ -58,8 +58,7 @@ class SchemaExporter:
                     value_cardinality=pk.value_cardinality,
                     description=pk.description,
                     validation_rules=[
-                        ValidationRuleSchema(rule_type=r.rule_type, params=copy.deepcopy(r.params))
-                        for r in pk.validation_rules
+                        ValidationRuleSchema(**ValidationRule.fields_of(r, portable=True)) for r in pk.validation_rules
                     ],
                     source_iri=pk.source_iri,
                 )
@@ -74,8 +73,7 @@ class SchemaExporter:
                     default_value=m.default_value,
                     sort_order=m.sort_order,
                     validation_rules=[
-                        ValidationRuleSchema(rule_type=r.rule_type, params=copy.deepcopy(r.params))
-                        for r in m.validation_rules
+                        ValidationRuleSchema(**ValidationRule.fields_of(r, portable=True)) for r in m.validation_rules
                     ],
                 )
                 for m in nt.property_mappings
@@ -101,8 +99,7 @@ class SchemaExporter:
                     default_value=m.default_value,
                     sort_order=m.sort_order,
                     validation_rules=[
-                        ValidationRuleSchema(rule_type=r.rule_type, params=copy.deepcopy(r.params))
-                        for r in m.validation_rules
+                        ValidationRuleSchema(**ValidationRule.fields_of(r, portable=True)) for r in m.validation_rules
                     ],
                 )
                 for m in et.property_mappings
@@ -195,7 +192,7 @@ class SchemaImporter:
                 type=pk_data.type,
                 value_cardinality=pk_data.value_cardinality,
                 description=pk_data.description,
-                validation_rules=[{"rule_type": r.rule_type, "params": r.params} for r in pk_data.validation_rules],
+                validation_rules=[ValidationRule.fields_of(r) for r in pk_data.validation_rules],
                 source_iri=pk_data.source_iri,
             )
 
@@ -206,7 +203,7 @@ class SchemaImporter:
                     "property_key": m.property_key,
                     "default_value": m.default_value,
                     "sort_order": m.sort_order,
-                    "validation_rules": [{"rule_type": r.rule_type, "params": r.params} for r in m.validation_rules],
+                    "validation_rules": [ValidationRule.fields_of(r) for r in m.validation_rules],
                 }
                 for m in nt_data.property_mappings
             ]
@@ -229,7 +226,7 @@ class SchemaImporter:
                     "property_key": m.property_key,
                     "default_value": m.default_value,
                     "sort_order": m.sort_order,
-                    "validation_rules": [{"rule_type": r.rule_type, "params": r.params} for r in m.validation_rules],
+                    "validation_rules": [ValidationRule.fields_of(r) for r in m.validation_rules],
                 }
                 for m in et_data.property_mappings
             ]

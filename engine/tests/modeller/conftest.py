@@ -6,7 +6,8 @@ import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-import invana.apps.graphs.models  # noqa: F401 — register the graphs table so graph_models.graph_id FK resolves
+import invana.apps.graphs.models
+import invana.apps.standards.models  # noqa: F401 — a constraint's rule references standard_versions
 from invana.apps.modeller.store import ModelStore
 from invana.core.models import Base
 from invana.core.settings import settings

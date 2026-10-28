@@ -18,6 +18,8 @@ draft review route, the CLI's ``--dry-run`` and the migration run agree on one r
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from invana.apps.modeller.json_io import SchemaExporter
@@ -38,6 +40,41 @@ if TYPE_CHECKING:
 
     from invana.apps.modeller.models import GraphModel, GraphVersion, ModelPublishReview
     from invana.graph.connectors.base.querysets.data_reader import BaseDataReaderQuerySet
+
+
+@dataclass(frozen=True, slots=True)
+class BoundDataset:
+    """One dataset version bound to a type of the model — what a publish may touch."""
+
+    dataset_id: str
+    #: ``publisher/name``.
+    name: str
+    version: int
+    type_name: str
+
+
+def affected_datasets(
+    bound: Sequence[BoundDataset], changes: Sequence[ModelPublishChange], scan: dict | None
+) -> list[dict]:
+    """The bound datasets on a type ``changes`` touch, each with the rows ``scan`` found failing there.
+
+    A publish with no scan (an additive one) fails no row, so every touched
+    dataset reads ``rows_failing: 0``.
+    """
+    touched = {c.type for c in changes if c.type}
+    failing = {t["type"]: int(t.get("would_fail") or 0) for t in (scan or {}).get("types", [])}
+    return [
+        {
+            "dataset_id": b.dataset_id,
+            "name": b.name,
+            "version": b.version,
+            "type": b.type_name,
+            "rows_failing": failing.get(b.type_name, 0),
+        }
+        for b in bound
+        if b.type_name in touched
+    ]
+
 
 _NARROWED = "narrowed property"
 _CHANGED_TYPE = "changed type"
@@ -256,20 +293,25 @@ class PublishManager:
         why: str = "",
         version: str | None = None,
         review_id: str | None = None,
+        bound: Sequence[BoundDataset] = (),
+        scan: dict | None = None,
     ) -> GraphVersion:
         """Publish the draft as the next version — refused when breaking, unless a review carries it.
 
         ``review_id`` is the migration run's: the review was approved, so the
-        breaking check has already been answered by a person.
+        breaking check has already been answered by a person. ``bound`` is the
+        model's dataset bindings and ``scan`` the migration run's; the version
+        keeps which bound datasets the publish touched and how many of their
+        rows now fail, and History reads that back as the effect after.
         """
         draft, base = await self.draft_and_base(session, model=model)
         staged = collect(base, draft)
         if not staged.can_commit:
             raise ConflictError({"error": "nothing_staged", "message": staged.reason})
-        if review_id is None:
-            found = classify(base, draft)
-            if found.classification == "breaking":
-                raise refusal(found)
+        found = classify(base, draft)
+        if review_id is None and found.classification == "breaking":
+            raise refusal(found)
+        affected = affected_datasets(bound, found.changes, scan)
         try:
             published = await Versioner(self.store).activate(
                 session, version_id=draft.id, override_version=version, change_summary=why
@@ -278,11 +320,13 @@ class PublishManager:
             raise ConflictError({"error": "invalid_operation", "message": str(exc)}) from exc
         published = await self.store.get_version(session, published.id)
         published.content_hash = self.content_hash(model, published)
+        published.affected_datasets = affected
         details: dict = {
             "version": published.version,
             "committed": staged.count,
             "content_hash": published.content_hash,
             "changes": [c.id for c in staged.changes],
+            "datasets": [a["dataset_id"] for a in affected],
         }
         if why:
             details["why"] = why
@@ -311,6 +355,7 @@ class PublishManager:
         review_id: str | None,
         apply: bool,
         actor_id: str | None,
+        bound: Sequence[BoundDataset] = (),
     ) -> dict:
         """The migration run's one act: scan, and — applying an approved review — publish.
 
@@ -352,7 +397,13 @@ class PublishManager:
             review.preview = scan
         if apply and review is not None:
             published = await self.publish(
-                session, model=model, actor_id=review.requested_by_id, why=review.why, review_id=review.id
+                session,
+                model=model,
+                actor_id=review.requested_by_id,
+                why=review.why,
+                review_id=review.id,
+                bound=bound,
+                scan=scan,
             )
             review.result = scan
             review.published_version = published.version

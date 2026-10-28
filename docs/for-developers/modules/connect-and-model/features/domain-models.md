@@ -53,6 +53,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
+| *New model* (`modeller.models.new`) | One dialog from the models board's *New model* (and *Import*, which opens it on *A file*): Name, Description, then **Start from** — three cards, *Describe it* (*the assistant drafts*) · *A file* (*JSON or YAML*) · *A starter* (*N templates*, the engine's count). A file card opens the file picker and names the chosen file; a starter card lists the starters to pick one. Footer *Cancel* · *Create draft*. A clashing name, or types this database cannot hold, are said in the dialog as before ([share-a-model](share-a-model.md)) |
 | Model panel | Node types and edge types as stacked sections, each with its own add |
 | Type detail | Properties, keys, constraints; inspect by default, edit while drafting |
 | Version bar | Draft · published versions. The draft's account of what changed is its staged set; a published version's is its diff against the one before it (`GET …/versions/{id}/diff`) |
@@ -81,6 +82,9 @@ flowchart TD
 | DM7 | **The default is `{}` — nothing is selectable.** A model that declares no axes can still be allowed or denied whole; it simply cannot be narrowed. Inferring an axis from a property's name or type would make *which rows did this run see* depend on a guess. |
 | DM8 | **The axes travel with the artefact, inside the content hash.** They are part of the *shape*, not a local setting: two Graphs whose models differ only in what they let a lens narrow are not running the same model. A version published from a draft carries them forward, because a published version that lost them would silently stop being sliceable and every world narrowing it would start refusing — a failure that reads as a governance bug rather than a lost column. |
 | DM9 | **An axis naming a property the version does not have is refused at import**, naming the axis and the property. A declaration that names nothing is worse than none: the model reads as sliceable, a world is authored against it, and the narrowing matches no rows. |
+| DM10 | **A new model starts from a description, a file or a starter — one dialog.** *New model* asks a name and a description and where to start; *Create draft* always lands on the new model's **draft** canvas (`models_view=schema`), never on a published version. The separate import dialog is gone: *A file* and *A starter* are the import path ([share-a-model](share-a-model.md) · [starter-models](starter-models.md)), the name typed in the dialog renaming what arrives. |
+| DM11 | **_Describe it_ is the assistant's draft, through the routes that exist.** *Create draft* makes the model and its empty draft (`POST …/models`), then opens a Modeller session bound to that model whose first ask is the description (`POST …/sessions` with `surface=modeller`, `model_id` and `message {mode: nl}`). The `model.propose` run stages node and edge types on the draft; the canvas opens with the assistant docked on that session, so the person watches the draft arrive and replies in the same thread. Nothing publishes. A Graph with no LLM refuses the ask as every ask is refused, and the empty draft stays to author by hand. |
+| DM12 | **The description is the model's description.** What the person typed to describe it is kept on the model, so the model page's head reads it — the prompt is not a second, hidden text. |
 
 ## Not building
 

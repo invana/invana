@@ -24,6 +24,13 @@ ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "docs" / "products"
 G = "/u/admin/airways"
 AR = "/u/admin/arabidopsis"
+AIRROUTES = "d5b061e6-e75b-4545-8cbc-23f316331004"  # airways' AirRoutes model, which holds a draft
+ARABIDOPSIS = "807b30c5-7b5a-4eab-b954-684441467763"  # arabidopsis' only model
+DEALS = "c83c82d2-2eba-40d0-9e95-c3ff62c588e8"  # airways' Deals model, whose draft drops a property
+EU_WORLD = "51356733-0529-43d7-b862-701efbcf6c62"  # airways' world "EU · H1 2026"
+CONTRACT_GUARDRAIL = "b175ce2c-6769-44a2-bba1-1591e33694b8"  # airways' guardrail "Deal.contract_value in counts only"
+CONTRACT_REQUEST = "8a378e17-2f94-4ad5-a87a-3d6557625168"  # an open request that guardrail refused, from Explorer
+MODELS_REPORT = "dce818ce-45ca-4f04-998f-89e6129a10a1"  # airways' saved report "Models overview, 30 days"
 ROUTES = [  # first match wins: (board prefix, route template)
     ("shell.login", "/login"), ("shell.graphs", "/graphs"), ("shell.first_run", "/graphs?first-run"),
     ("shell.profile", "/settings/profile"), ("shell.runs", f"{G}/activity/runs"), ("shell.run", f"{G}/agents/runs?page=run%3Aeaec1323-ac75-466b-a616-86b031fbeacb"),
@@ -48,12 +55,26 @@ ROUTES = [  # first match wins: (board prefix, route template)
     ("datasets.catalogue", "/datasets/catalogue"), ("datasets.validation", "/datasets/validation"),
     ("datasets.standard", "/datasets/standards"), ("datasets.imports", "/datasets/imports"),
     ("datasets", "/datasets/catalogue/admin/accession-phenotypes"),
-    ("modeller.global_model", f"{G}/modeller/global-model"), ("modeller.models", f"{G}/modeller/models"),
-    ("modeller.model.type.constraint", f"{AR}/modeller/models/arabidopsis/accession"), ("modeller.model.history", f"{G}/modeller/models?model=m1&models_tab=history"),
-    ("modeller.model", f"{G}/modeller/models/airroutes"), ("modeller.stitches", f"{G}/modeller/stitches"),
-    ("modeller.worlds", f"{G}/modeller/worlds"), ("modeller.guardrails", f"{G}/modeller/guardrails"),
+    ("modeller.global_model", f"{G}/modeller/global-model"),
+    *[(f"modeller.models.{t}", f"{G}/modeller/models?models_tab={t}")
+      for t in ("overview", "database", "usage", "performance", "growth")],
+    ("modeller.models.report", f"{G}/modeller/models?page=models%3Aairways%40{MODELS_REPORT}"),
+    ("modeller.models", f"{G}/modeller/models"),
+    ("modeller.model.type.constraint", f"{G}/modeller/models?model={AIRROUTES}&model_open=1&model_type=airport&type_tab=constraints"),
+    ("modeller.model.history", f"{G}/modeller/models?model={AIRROUTES}&model_open=1&models_tab=history"),
+    ("modeller.model.type", f"{G}/modeller/models?model={AIRROUTES}&model_open=1&model_type=airport"),
+    ("modeller.model", f"{G}/modeller/models?model={AIRROUTES}&model_open=1"),
+    ("modeller.stitches", f"{G}/modeller/stitches"),
+    ("modeller.worlds.board", f"{G}/modeller/worlds/{EU_WORLD}?page=world:{EU_WORLD}"),
+    ("modeller.worlds", f"{G}/modeller/worlds/{EU_WORLD}"),
+    ("modeller.guardrails.request", f"{G}/modeller/guardrails/{CONTRACT_GUARDRAIL}?request={CONTRACT_REQUEST}"),
+    ("modeller.guardrails", f"{G}/modeller/guardrails"),
     ("modeller.rules", f"{G}/modeller/rules"), ("modeller.requests", f"{G}/modeller/requests"),
-    ("modeller.settings", f"{G}/modeller/settings"), ("modeller.connect", "/graphs/new"), ("modeller.draft", f"{G}/modeller/models?model=m1"),
+    ("modeller.settings.database", f"{G}/modeller/settings?tab=database"),
+    ("modeller.settings.members", f"{G}/modeller/settings?tab=members"),
+    ("modeller.settings", f"{G}/modeller/settings?tab=basic"), ("modeller.connect", "/graphs/new"),
+    ("modeller.draft.migration", f"{G}/modeller/models?model={DEALS}&model_open=1&models_view=schema"),
+    ("modeller.draft", f"{G}/modeller/models?model={AIRROUTES}&model_open=1&models_view=schema"),
     ("explorer.sessions", f"{G}/explorer?history"), ("explorer.home", f"{G}/explorer"), ("explorer", f"{G}/explorer/routes-out-of-lhr"),
     ("projects.list", f"{AR}/projects"), ("projects.new", f"{AR}/projects"), ("projects.todo", f"{AR}/projects/todos"), ("projects.decisions", f"{AR}/projects/decisions"),
     ("projects.impact", f"{AR}/projects/gene-edited-field-trials"), ("projects", f"{AR}/projects/early-flowering-under-drought"),
@@ -216,8 +237,7 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "datasets.standards.import": "Import from SKOS › File: demos/arabidopsis/semantic/plant-traits.skos.ttl (the preview)",
     "datasets.imports.run": "click an import while it runs: re-run demos/arabidopsis/load.py and open its run",
     "modeller.global_model.dark": DARK,
-    "modeller.model.type": "click node type airport",
-    "modeller.global_model.stitch": "click a dashed stitch on the board",
+    "modeller.global_model.stitch": "click the anchored stitch Country ≡ country in the union list",
     "modeller.connect": "New Graph",
     "modeller.draft": f"{MODEL}, with an unpublished draft: change any property, do not publish",
     "modeller.global_model.diff": "with a draft on airroutes, Compare",
@@ -231,14 +251,14 @@ STATE = {  # board → how to reach it from its route; a board absent here is it
     "modeller.models.usage": "Usage tab",
     "modeller.models.performance": "Performance tab",
     "modeller.models.growth": "Growth tab",
-    "modeller.models.report": "open a saved report",
-    "modeller.model.type.constraint": "Constraints tab; click days_to_flowering",
+    "modeller.models.report": "a saved report of the Overview, pinned by id (MODELS_REPORT)",
+    "modeller.model.type.constraint": "AirRoutes › airport: a row's Edit constraint, a range typed in",
     "modeller.model.history": MODEL,
     "modeller.worlds.board": "click a world",
     "modeller.guardrails.request": "a request from Explorer that meets a guardrail: open it",
     "modeller.guardrails.edit": "click a guardrail rule",
     "modeller.rules.edit": "click a rule",
-    "modeller.settings.database": "Database tab (?tab=graph)",
+    "modeller.settings.database": "Database tab (?tab=database)",
     "modeller.settings.members": "Members tab (?tab=members)",
     "explorer.home": "a new session: empty board, nothing asked",
     "explorer.answer": SESSION,
@@ -380,6 +400,20 @@ AS = {  # board → the account shoot.mjs signs in as; a board absent here is sh
 CLICK = {  # board → buttons shoot.mjs presses after the route loads, for a state a URL may not hold
     "agents.workers.add.token": ["Make token"],
     **{f"agents.workers.add.run.{w}": ["Make token", "Next"] for w in ("docker", "python", "k8s")},
+    "modeller.models.new": ["New model"],
+    "modeller.global_model.dark": ["dark"],
+    "modeller.global_model.diff": ["Compare"],
+    "modeller.draft.publish": ["text:Publish v"],
+    "modeller.draft.migration": ["text:Publish v"],
+    "modeller.model.type.constraint": ["Edit constraint on runways", "fill:Lowest value=1", "fill:Highest value=3",
+                                       "fill:Unit=runways", "text:Flag for review"],
+    "modeller.global_model.stitch": ["text:Country ≡ country"],
+    "modeller.rules.edit": ["text:A final decision cites person-reviewed data only"],
+    "modeller.guardrails.edit": ["New rule", "text:Read in counts only", "text:Stays in the Graph"],
+    **{f"modeller.models.new.ontology{s}": ["More actions", "text:From an ontology",
+                                            "text:File", "upload:demos/arabidopsis/semantic/schema-org-subset.ttl",
+                                            "tick:Person", "tick:Organization", "tick:Product", *x]
+       for s, x in (("", []), (".preview", ["Preview"]))},
 }
 
 

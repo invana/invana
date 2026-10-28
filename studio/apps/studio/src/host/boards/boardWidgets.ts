@@ -21,7 +21,6 @@
 
 import { RUN_PANELS } from "@invana/boards";
 import { PLAN_CHART_WIDGETS, SkillFlowWidget } from "@invana-studio/agents";
-import { RunLensWidget } from "@invana-studio/modeller";
 import { StepTouchWidget, TaskFlowWidget } from "@invana-studio/shell";
 
 export const DECLARED_WIDGETS = {
@@ -35,7 +34,4 @@ export const DECLARED_WIDGETS = {
 	skillFlow: SkillFlowWidget,
 	// A plan's two charts — runs a day, work p50 a day.
 	...PLAN_CHART_WIDGETS,
-	// Named by documents frozen before the kit drew a run's lens. Live pages
-	// compose `lens`; see the note in the file.
-	runLens: RunLensWidget,
 };

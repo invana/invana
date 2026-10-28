@@ -91,6 +91,8 @@ class CompiledLens:
     #: ``{type_name: [property, …]}`` — what the projection was rewritten to
     #: leave out, per type. Keyed the same way and for the same reason.
     excluded: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    #: ``{type_name: [property, …]}`` — what may be counted but never returned.
+    counts_only: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
 
 
 def build_query_lens(
@@ -129,19 +131,23 @@ def compile_lens(
     governed = resolve_types(effective, declared=tuple(declared), verdict=verdict, version=version, bindings=bindings)
 
     closed = Layer.graph_data in effective.closed_layers
-    narrows = closed or any(g.verdict.properties_excluded or g.verdict.select for g in governed.values())
+    narrows = closed or any(
+        g.verdict.properties_excluded or g.verdict.properties_counts_only or g.verdict.select for g in governed.values()
+    )
     if not narrows:
         return CompiledLens(query_lens=QueryLens())
 
     bounds = {}
     for type_name, properties in declared.items():
         here = governed[type_name]
-        excluded = frozenset(here.verdict.properties_excluded) & frozenset(properties)
+        excluded = for_type(here.verdict.properties_excluded, type_name) & frozenset(properties)
+        counts_only = for_type(here.verdict.properties_counts_only, type_name) & frozenset(properties) - excluded
         slices = _predicates(here.verdict.select, axes=here.axes)
         bounds[type_name] = TypeBound(
             type_name=type_name,
             declared=frozenset(properties),
             excluded=excluded,
+            counts_only=counts_only,
             # A type that does not carry the axis is not *on* the axis, so it is
             # left unsliced rather than predicated on a property it lacks — which
             # would return nothing and read as an empty world.
@@ -159,7 +165,25 @@ def compile_lens(
         # touch says was applied and what the connector was handed cannot drift.
         selects={name: dict(b.verdict.select) for name, b in governed.items() if b.verdict.select},
         excluded={name: tuple(sorted(b.excluded)) for name, b in bounds.items() if b.excluded},
+        counts_only={name: tuple(sorted(b.counts_only)) for name, b in bounds.items() if b.counts_only},
     )
+
+
+def for_type(entries: Sequence[str], type_name: str) -> frozenset[str]:
+    """The property names a list of entries names on one type.
+
+    A bare ``price`` names it on every type the rule reached; ``Deal.price``
+    on ``Deal`` alone; ``*.price`` on every type, like a bare one.
+    """
+    out: set[str] = set()
+    for entry in entries:
+        if "." not in entry:
+            out.add(entry)
+            continue
+        owner, prop = entry.split(".", 1)
+        if owner in ("*", type_name):
+            out.add(prop)
+    return frozenset(out)
 
 
 def resolve_types(
@@ -226,6 +250,7 @@ def _merge(current: _Governed, decided: Verdict, binding: ModelBinding) -> _Gove
             rule_matched=kept.rule_matched or decided.rule_matched,
             why=kept.why,
             properties_excluded=sorted({*kept.properties_excluded, *decided.properties_excluded}),
+            properties_counts_only=sorted({*kept.properties_counts_only, *decided.properties_counts_only}),
             select={**decided.select, **kept.select},
             may_send=kept.may_send,
             egress_stated=kept.egress_stated,

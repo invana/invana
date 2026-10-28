@@ -38,6 +38,9 @@ const GOVERN_DETAIL_PARAM: Record<GovernSectionKey, string> = {
 	guardrails: "guardrail",
 };
 
+/** `&edit=1` — the picked world or guardrail is open in its editor. */
+export const EDIT_PARAM = "edit";
+
 /**
  * URL-backed state for the Govern panel's two sections.
  *
@@ -87,6 +90,10 @@ export function useLensesViewPanel() {
 					next.set(SECTION_PARAM, sectionKey);
 					next.set(GOVERN_DETAIL_PARAM[sectionKey], id);
 					next.delete(GOVERN_DETAIL_PARAM[other]);
+					// Opens the record's editor, not only its reading.
+					next.set(EDIT_PARAM, "1");
+					// Leaves any board in front, so the page under the panel shows.
+					next.delete("page");
 					return next;
 				},
 				{ replace: true },

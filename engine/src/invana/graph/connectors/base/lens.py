@@ -113,6 +113,9 @@ def admit_structured(
                     type_name=bound.type_name,
                     property_name=prop,
                 )
+    # A counts-only property may be filtered and sorted on — a structured read
+    # returns elements, never the property's value on its own, and the
+    # projection already leaves it out.
     for bound in lens.bounds.values():
         if bound.narrows_structure and not bound.is_projectable:
             raise LensViolationError(

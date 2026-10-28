@@ -6,12 +6,12 @@
  * refusal changes nothing — an archive refused leaves the model where it was.
  */
 import { expect, type Page, test } from "@playwright/test";
+import { graphApi } from "./api";
 import { ask } from "./explorer";
 
 const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 
-// The Modeller's Models rail item: the models board on Overview. A bare
-// `?panel=model` lands on Global model, which reads the Model tab.
+// The Modeller's Models rail item: the models board on Overview.
 async function openModels(page: Page) {
 	await page.goto(`${GRAPH}/modeller/models`);
 	await expect(page.getByRole("tab", { name: "All models" })).toBeVisible({
@@ -19,10 +19,11 @@ async function openModels(page: Page) {
 	});
 }
 
+// A model is a row of *Each model*; there is no models list in the leftSection.
 const row = (page: Page, name: string) =>
-	page.getByRole("button", { name: new RegExp(`^${name}`) }).first();
+	page.getByRole("row", { name: new RegExp(`^${name}\\b`) }).first();
 
-test("a click scopes the page, Open drills in, and a reload lands on the same reading", async ({
+test("a click opens the model, a type opens its page, and a reload lands on the same reading", async ({
 	page,
 }) => {
 	await openModels(page);
@@ -33,24 +34,31 @@ test("a click scopes the page, Open drills in, and a reload lands on the same re
 	await expect(page.getByRole("tab", { name: "AirRoutes" })).toBeVisible();
 	await expect(page.getByText("Each type")).toBeVisible();
 
-	// `Open` drills the panel in and turns the page to the Model tab.
-	await page.getByRole("button", { name: "Open", exact: true }).click();
+	// The row opens the model: its outline in the leftSection, its own head.
 	await expect(page.getByText("Node types").first()).toBeVisible();
 	await expect(
+		page.getByRole("button", { name: "Open in Schema" }),
+	).toBeVisible();
+	await expect(
 		page.getByRole("tab", { name: "Model", exact: true }),
-	).toHaveAttribute("aria-selected", "true");
-	await expect(page.getByText(/\d+ nodes and \d+ edges rendered/)).toBeVisible({
+	).toHaveCount(0);
+
+	// A type in the outline opens its page.
+	await page
+		.getByRole("button", { name: /^airport/ })
+		.first()
+		.click();
+	await expect(page.getByRole("tab", { name: /^Properties/ })).toBeVisible({
 		timeout: 20_000,
 	});
+	await expect(page.getByRole("tab", { name: "Mappings" })).toBeVisible();
 
-	// Scope, tab and panel are the URL's.
+	// Scope, type and outline are the URL's.
 	await page.reload();
 	await expect(page.getByRole("tab", { name: "AirRoutes" })).toBeVisible({
 		timeout: 30_000,
 	});
-	await expect(
-		page.getByRole("tab", { name: "Model", exact: true }),
-	).toHaveAttribute("aria-selected", "true");
+	await expect(page.getByRole("tab", { name: /^Properties/ })).toBeVisible();
 	await expect(page.getByText("Node types").first()).toBeVisible();
 });
 
@@ -70,8 +78,42 @@ test("archiving a model an active stitch binds is refused, naming the stitches",
 	await expect(card.getByText(/NewsArticles\.\w+/).first()).toBeVisible();
 	await card.getByRole("button", { name: "Close" }).first().click();
 
-	// Nothing moved: the model is still listed.
-	await expect(row(page, "NewsArticles")).toBeVisible();
+	// Nothing moved: the model's page is still open on it.
+	await expect(page.getByRole("tab", { name: "NewsArticles" })).toBeVisible();
+	await expect(page.getByText("Each type")).toBeVisible();
+});
+
+test("a saved report reopens frozen, and Back to live returns to the board", async ({
+	page,
+}) => {
+	// Reports are never deleted, so one is saved only when the Graph has none.
+	const slug = GRAPH.split("/").at(-1);
+	const kept = await graphApi<{ items: { id: string }[] }>(
+		page,
+		`/boards/models/${slug}/versions`,
+	);
+	if (kept.items.length) {
+		await page.goto(
+			`${GRAPH}/modeller/models?page=${encodeURIComponent(`models:${slug}@${kept.items[0].id}`)}`,
+		);
+	} else {
+		await openModels(page);
+		await expect(page.getByText("Each model")).toBeVisible();
+		await page.getByRole("button", { name: "Save report" }).click();
+	}
+
+	// The reading, frozen: the banner, the chip, no tab strip (MP52).
+	await expect(
+		page.getByText(/Saved report · .* it will not change/),
+	).toBeVisible({ timeout: 30_000 });
+	await expect(page.getByText("saved report", { exact: true })).toBeVisible();
+	await expect(page.getByRole("tab", { name: "Usage" })).toHaveCount(0);
+
+	await page.getByRole("button", { name: "Back to live" }).click();
+	await expect(page.getByRole("tab", { name: "Usage" })).toBeVisible({
+		timeout: 30_000,
+	});
+	await expect(page.getByText(/Saved report · /)).toHaveCount(0);
 });
 
 // ── B · Database ─────────────────────────────────────────────────────────────
@@ -79,7 +121,7 @@ test("archiving a model an active stitch binds is refused, naming the stitches",
 test("the Database tab marks each label against the models, unmodelled first", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=model&models_tab=database`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=database`);
 	await expect(page.getByRole("tab", { name: "All models" })).toBeVisible({
 		timeout: 30_000,
 	});
@@ -102,12 +144,15 @@ test("the Database tab marks each label against the models, unmodelled first", a
 test("one model's Database tab leaves out what no model declares", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=model&models_tab=database`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=database`);
 	await expect(page.getByText("Labels", { exact: true })).toBeVisible({
 		timeout: 30_000,
 	});
+	// Model rows are *Each model* on Overview; the tab is kept once one is read.
+	await page.getByRole("tab", { name: "Overview" }).click();
 	await row(page, "AirRoutes").click();
 	await expect(page.getByRole("tab", { name: "AirRoutes" })).toBeVisible();
+	await page.getByRole("tab", { name: "Database" }).click();
 	// The scoped physical read walks the live database; it can take several seconds.
 	await expect(page.getByText(/\d+ modelled · 0 not/).first()).toBeVisible({
 		timeout: 30_000,
@@ -120,7 +165,7 @@ test("one model's Database tab leaves out what no model declares", async ({
 test("Growth stacks records by model, each write marked and named", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}?panel=model&models_tab=growth`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=growth`);
 	await expect(page.getByText("Records over time, by model")).toBeVisible({
 		timeout: 30_000,
 	});
@@ -138,25 +183,26 @@ test("a model nothing was counted for draws no chart of zeros", async ({
 	page,
 }) => {
 	const name = `E2E Growth ${Date.now()}`;
-	await page.goto(`${GRAPH}?panel=model&models_tab=growth`);
-	await expect(page.getByText("Records over time, by model")).toBeVisible({
-		timeout: 30_000,
-	});
-	await page.getByRole("button", { name: "New model", exact: true }).click();
-	await page.getByRole("textbox", { name: "Name" }).fill(name);
-	await page.getByRole("button", { name: "Create model" }).click();
-
-	await row(page, name).click();
-	await expect(page.getByText(`${name} has no records yet`)).toBeVisible({
-		timeout: 20_000,
-	});
-	await expect(page.getByText("Records over time")).toHaveCount(0);
-
-	// Never published, so it is deleted rather than archived (MP7).
-	await page.getByRole("button", { name: "More actions" }).click();
-	await page.getByRole("menuitem", { name: "Delete" }).click();
-	await page.getByRole("button", { name: "Delete", exact: true }).click();
-	await expect(row(page, name)).toHaveCount(0);
+	const { data: model } = await graphApi<{ data: { id: string } }>(
+		page,
+		"/models",
+		{ method: "POST", data: { name } },
+	);
+	try {
+		await page.goto(`${GRAPH}/modeller/models`);
+		await expect(row(page, name)).toBeVisible({ timeout: 30_000 });
+		await row(page, name).click();
+		await expect(page).toHaveURL(/model=/);
+		await page.getByRole("tab", { name: "Growth" }).click();
+		await expect(page.getByText(`${name} has no records yet`)).toBeVisible({
+			timeout: 30_000,
+		});
+		await expect(page.getByText("Records over time")).toHaveCount(0);
+	} finally {
+		// Never published, so it is deleted rather than archived — even when a
+		// step above failed, so no stray model is left in the Graph.
+		await graphApi(page, `/models/${model.id}`, { method: "DELETE" });
+	}
 });
 
 // ── D · Usage and Performance ────────────────────────────────────────────────
@@ -167,7 +213,7 @@ test("Performance groups queries by shape, and a picked shape shows its plan", a
 	// Opening the Graph counts its types — an Explorer read, and so a logged one.
 	await page.goto(GRAPH);
 	await page.waitForTimeout(3_000);
-	await page.goto(`${GRAPH}?panel=model&models_tab=performance`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=performance`);
 	await expect(page.getByText("Query shapes")).toBeVisible({ timeout: 30_000 });
 	await expect(page.getByText("p95 a day")).toBeVisible();
 
@@ -194,10 +240,10 @@ test("Performance groups queries by shape, and a picked shape shows its plan", a
 });
 
 test("Usage calls nothing unused below 50 queries", async ({ page }) => {
-	await page.goto(`${GRAPH}?panel=model&models_tab=usage`);
+	await page.goto(`${GRAPH}/modeller/models?models_tab=usage`);
 	await expect(page.getByText("Each model")).toBeVisible({ timeout: 30_000 });
 	const tooFew = page.getByText(/too few to call anything unused/);
-	const unused = page.getByText("Unused types").locator("..");
+	const unused = page.getByText("Unused types", { exact: true }).locator("..");
 	if (await tooFew.isVisible()) {
 		await expect(page.getByText("needs 50 queries").first()).toBeVisible();
 		await expect(unused).toContainText("—");
@@ -221,7 +267,7 @@ async function adviceFor(page: Page, query: string, shape: RegExp) {
 	// The log is written off the query's path (MP36), so the shape may land a
 	// beat after the reply.
 	await expect(async () => {
-		await page.goto(`${GRAPH}?panel=model&models_tab=performance`);
+		await page.goto(`${GRAPH}/modeller/models?models_tab=performance`);
 		await expect(page.getByText(shape).first()).toBeVisible({
 			timeout: 5_000,
 		});
@@ -257,7 +303,12 @@ test("Add index to draft stages the index on the model that declares the label",
 	await confirm.getByRole("button", { name: "Cancel" }).click();
 
 	// Only what this test staged is discarded; the draft is left as it was found.
-	await page.getByRole("button", { name: "Discard this change" }).click();
+	await page
+		.locator("span")
+		.filter({ has: chip })
+		.getByRole("button", { name: "Discard this change" })
+		.last()
+		.click();
 	await expect(chip).toHaveCount(0);
 });
 

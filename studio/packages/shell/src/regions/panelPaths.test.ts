@@ -18,9 +18,7 @@ describe("panelPaths", () => {
 		expect(canonicalRedirect(G, "?settings=functions&drawer=templates")).toBe(
 			`${G}/agents/functions/templates`,
 		);
-		expect(canonicalRedirect(G, "?panel=info")).toBe(
-			`${G}/modeller/settings?tab=info`,
-		);
+		expect(canonicalRedirect(G, "?panel=info")).toBe(`${G}/modeller/settings`);
 		expect(canonicalRedirect(G, "?panel=sessions")).toBe(
 			`${G}/explorer?right=assistant`,
 		);
@@ -32,7 +30,10 @@ describe("panelPaths", () => {
 	it("leaves a canonical URL alone, whatever its key order", () => {
 		expect(canonicalRedirect(`${G}/agents/agents`, "?provider=p")).toBeNull();
 		expect(
-			canonicalRedirect(`${G}/modeller/settings`, "?right=assistant&tab=info"),
+			canonicalRedirect(
+				`${G}/modeller/settings`,
+				"?right=assistant&tab=members",
+			),
 		).toBeNull();
 		expect(canonicalRedirect(G, "")).toBeNull();
 		expect(

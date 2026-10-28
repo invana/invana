@@ -15,14 +15,69 @@ from invana.core.metrics import Change
 
 
 class ValidationRuleSchema(BaseModel):
-    rule_type: Literal["range", "pattern", "enum", "min_length", "max_length", "custom"]
+    rule_type: Literal["range", "pattern", "enum", "min_length", "max_length", "custom", "standard"]
     params: dict[str, Any] = {}
+    #: A range's unit — a label, never converted.
+    unit: str | None = Field(default=None, max_length=32)
+    #: The standard version a ``standard`` rule's values were copied from.
+    standard_version_id: str | None = None
+    #: ``publisher/name@v``.
+    standard_ref: str | None = Field(default=None, max_length=160)
+    term: str | None = Field(default=None, max_length=255)
+    on_break: Literal["reject", "flag"] = "reject"
 
 
 class ValidationRuleResponse(ValidationRuleSchema):
     id: str
 
     model_config = {"from_attributes": True}
+
+
+# ---------------------------------------------------------------------------
+# Constraints on properties
+# ---------------------------------------------------------------------------
+
+
+class PropertyConstraintSet(BaseModel):
+    """One property's constraint on one type — a range or a standard's values."""
+
+    type: str
+    property: str
+    kind: Literal["range", "standard"]
+    min: float | None = None
+    max: float | None = None
+    unit: str | None = Field(default=None, max_length=32)
+    #: ``publisher/name``; its current version is pinned.
+    standard: str | None = None
+    term: str | None = None
+    on_break: Literal["reject", "flag"] = "reject"
+
+
+class ConstraintSample(BaseModel):
+    record: str
+    value: Any = None
+
+
+class ConstraintCheck(BaseModel):
+    """What breaks a constraint in the graph now."""
+
+    #: The constraint as a refusal names it — ``80 to 180 days`` · ``CO_338 · Seed type``.
+    label: str
+    counted: bool
+    breaking: int | None = None
+    samples: list[ConstraintSample] = []
+    #: Why it was not counted.
+    reason: str | None = None
+
+
+class StandardChoice(BaseModel):
+    """A standard's term that carries values — what a constraint may reference."""
+
+    standard: str
+    title: str
+    version: int
+    term: str
+    values: int
 
 
 # ---------------------------------------------------------------------------
@@ -313,6 +368,8 @@ class GraphModelSummary(BaseModel):
     origin: str
     updated_at: datetime
     active_version: VersionSummary | None = None
+    # The open draft, if any — so a list can say which models have one.
+    draft_version: VersionSummary | None = None
 
     model_config = {"from_attributes": True}
 
@@ -348,6 +405,23 @@ class EdgeTypeDiff(BaseModel):
     metadata_changes: dict[str, tuple[Any, Any]] = {}
 
 
+class MarkLine(BaseModel):
+    """One line of a type's mark: ``+`` added, ``~`` changed, ``-`` removed."""
+
+    sign: Literal["+", "~", "-"]
+    text: str
+
+
+class TypeMark(BaseModel):
+    """What a version pair did to one type — the chip the map draws beside it."""
+
+    type: str
+    target_kind: Literal["node_type", "edge_type"]
+    #: ``added`` and ``removed`` are the whole type; ``changed`` lists its lines.
+    mark: Literal["added", "changed", "removed"]
+    lines: list[MarkLine] = []
+
+
 class SchemaDiff(BaseModel):
     added_property_keys: list[str] = []
     removed_property_keys: list[str] = []
@@ -363,6 +437,14 @@ class SchemaDiff(BaseModel):
     added_indexes: list[str] = []
     removed_indexes: list[str] = []
     classification: Literal["major", "minor", "patch"] = "patch"
+    #: One per type the pair changes; set by the version diff read.
+    marks: list[TypeMark] = []
+    #: The marks' lines by sign — what the Comparing bar counts.
+    added: int = 0
+    changed: int = 0
+    removed: int = 0
+    #: The version the draft publishes as; set only when the diff's target is the draft.
+    next_version: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -653,7 +735,9 @@ class OverviewRow(BaseModel):
     key: str
     share: float
     p95: float | None
+    #: The first three signals; ``signals_total`` says how many fired.
     signals: list[Signal] = []
+    signals_total: int = 0
 
 
 class Attention(BaseModel):
@@ -676,7 +760,9 @@ class Overview(BaseModel):
     by_caller_by_day: list[CallerDay]
     p95_by_day: list[DayValue]
     rows: list[OverviewRow]
+    #: The first six flagged signals; ``attention_total`` counts them all.
     attention: list[Attention]
+    attention_total: int = 0
 
 
 class UsageRow(BaseModel):
@@ -688,6 +774,8 @@ class UsageRow(BaseModel):
     by_caller: dict[str, int]
     last_touched: datetime | None
     signals: list[Signal] = []
+    #: How many types each signal fired on — ``{"unused": 5}``.
+    signal_counts: dict[str, int] = {}
 
 
 class StitchUse(BaseModel):
@@ -724,7 +812,9 @@ class Usage(BaseModel):
     #: Active stitches some query crossed.
     stitches_crossed: int = 0
     rows: list[UsageRow]
+    #: The most-crossed active stitches, capped; ``stitches_total`` counts them all.
     stitches: list[StitchUse] = []
+    stitches_total: int = 0
     properties: list[PropertyUse] = []
     #: Some query in the window was explained — properties are known (MP12).
     explains: bool
@@ -755,6 +845,8 @@ class Performance(BaseModel):
     #: ``errors`` over ``total``; 0 with no queries.
     error_rate: float = 0.0
     slow_shapes: int
+    #: Distinct ``label.property`` filtered after a label scan with no index on it.
+    missing_indexes: int = 0
     p95_by_day: list[DayValue]
     shapes: list[ShapeRow]
 
@@ -972,3 +1064,5 @@ class ModelIndex(BaseModel):
     version_id: str
     nodes: dict[str, dict[str, str]]
     edges: dict[str, dict[str, str]]
+    #: Each type's rules per key — its mapping's and the key's own.
+    rules: dict[str, dict[str, list[ValidationRuleResponse]]] = {}

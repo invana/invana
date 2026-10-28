@@ -110,7 +110,7 @@ export function DecideDialog({
 	);
 	const error = decide.error as Error | null;
 	const blocked = !!error && /blocked by rule/.test(error.message);
-	const broken = blocked ? namedFindings(error.message) : [];
+	const broken = blocked ? [...new Set(namedFindings(error.message))] : [];
 	const label = branch !== null ? branchLabel(project, branch) : "";
 	const isMerge = choice === "merge";
 	// A merge cites what it carries: the findings that move are its evidence.

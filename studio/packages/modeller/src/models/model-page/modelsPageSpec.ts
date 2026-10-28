@@ -1,12 +1,15 @@
 /**
  * The model page as a board document (the-model-page.md).
  *
- * One header, then **Overview · Model · Database · Usage · Performance ·
- * Growth · History** with the `7 · 30 · 90 days` window on the right of the tab strip —
- * the plan page's layout, read at `All models` or one model. This file
- * composes; `ModelsPage` fetches and answers actions, and `@invana/boards`
- * draws. The tabs, their order and their columns never change with the scope:
- * what one scope lacks is a section, not a tab.
+ * One header, then **Overview · Database · Usage · Performance · Growth** with
+ * the `7 · 30 · 90 days` window on the right of the tab strip — the plan
+ * page's layout, read at `All models` or one model. History is a reading
+ * *Versions* opens. This file composes; `ModelsPage` fetches and answers
+ * actions, and `@invana/boards` draws. The tabs, their order and their columns
+ * never change with the scope: what one scope lacks is a section, not a tab.
+ *
+ * One model has two more readings in place of the tabs: its canvas
+ * ({@link schemaSpec}) and a type's page (`TypePage`).
  */
 
 import type {
@@ -33,9 +36,13 @@ import {
 	databaseRows,
 	driftCount,
 } from "./databaseRows";
-import { type GrowthRowsOptions, growthRows } from "./growthRows";
+import {
+	type GrowthRowsOptions,
+	growthChartPanel,
+	growthRows,
+} from "./growthRows";
 import { fmtMs, fmtPct } from "./insightParts";
-import { attentionPanel, callersPanel, p95Panel } from "./overviewParts";
+import { attentionPanel, callersPanel } from "./overviewParts";
 import {
 	type PerformanceRowsOptions,
 	performanceRows,
@@ -64,23 +71,33 @@ export const MODELS_ACTIONS = {
 	discardDraft: "discard-draft",
 	discardOne: "discard-one",
 	compare: "compare",
+	versions: "versions",
+	openSchema: "open-schema",
+	openModel: "open-model",
+	scope: "scope",
+	saveReport: "save-report",
+	openReports: "open-reports",
 } as const;
+
+/** The scope picker's item for every model at once. */
+export const ALL_MODELS = "all";
 
 /** What `⋯` holds, per scope and state (the-model-page.md · The page). */
 const MODELS_MENU = {
 	starters: "Starter models",
 	ontology: "From an ontology",
 	introspect: "Introspect",
+	draft: "Open a draft",
 	rename: "Rename",
 	exportModel: "Export",
 	archive: "Archive",
 	delete: "Delete",
+	reports: "Reports",
 } as const;
 export type ModelsMenuItem = keyof typeof MODELS_MENU;
 
 const TAB_LABEL: Record<ModelsTab, string> = {
 	overview: "Overview",
-	model: "Model",
 	database: "Database",
 	usage: "Usage",
 	performance: "Performance",
@@ -97,7 +114,7 @@ export const windowOf = (label: string): ModelsWindow | undefined =>
 	MODELS_WINDOWS.find((w) => WINDOW_LABEL[w] === label);
 
 /** A declaration and a mirror have no window. */
-const UNWINDOWED: ModelsTab[] = ["model", "database", "history"];
+const UNWINDOWED: ModelsTab[] = ["database", "history"];
 /** Nothing to count before a model is published (the-model-page.md seams). */
 export const LOCKED_UNTIL_PUBLISHED: ModelsTab[] = [
 	"usage",
@@ -139,7 +156,6 @@ export interface ModelsPageData {
 
 /** What only the host can draw — the canvases, and the states it composes from kit parts. */
 export interface ModelsPageSlots {
-	modelTab: ReactNode;
 	/** A tab whose read the engine does not serve yet. */
 	notMeasured: (tab: ModelsTab) => ReactNode;
 	/** The Overview when nothing is published. */
@@ -170,15 +186,6 @@ function tabRows(
 	switch (id) {
 		case "overview":
 			return overviewRows(data, view, slots);
-		case "model":
-			return [
-				{
-					fill: true,
-					panels: [
-						{ kind: "text", options: { text: "" }, render: slots.modelTab },
-					],
-				},
-			];
 		case "database":
 			return databaseRows(data.physical, data.physicalLoading, {
 				...slots.database,
@@ -244,12 +251,28 @@ function recordsOf(insights: Insights | null | undefined) {
 	return { byKey, total: growth?.now ?? null, counted: !!growth?.counted };
 }
 
-/** A draft has no number until it is published. */
-const draftLabel = (version: string | null) =>
-	version ? `v${version} draft` : "draft";
-
 const versionLabel = (m: GraphModelSummary) =>
 	m.active_version ? `v${m.active_version.version} active` : "never published";
+
+/**
+ * One model's canvas, full-bleed (*Open in Schema*): the page's head and its
+ * staged bar stay, the tab strip goes, and the canvas fills what is left.
+ */
+export function schemaSpec(data: ModelsPageData, canvas: ReactNode): BoardSpec {
+	// Full-bleed: no head and no strip — the app's breadcrumb names the model
+	// and is the way back, and the canvas floats its own staged bar.
+	return {
+		title: data.scope?.model.name,
+		rows: [
+			{
+				fill: true,
+				panels: [
+					{ kind: "text", flush: true, options: { text: "" }, render: canvas },
+				],
+			},
+		],
+	};
+}
 
 export function modelsPageSpec(
 	data: ModelsPageData,
@@ -261,20 +284,22 @@ export function modelsPageSpec(
 		!anyPublished && LOCKED_UNTIL_PUBLISHED.includes(tab);
 	const tab: ModelsTab = locked(view.tab) ? "overview" : view.tab;
 
-	const tabs: TabSpec[] = MODELS_TABS.map((id) => ({
+	// History is a reading *Versions* opens, not a tab in the strip: it appears
+	// only while it is the one open.
+	const shown = MODELS_TABS.filter(
+		(id) => id !== "history" || tab === "history",
+	);
+	const tabs: TabSpec[] = shown.map((id) => ({
 		id,
 		label: TAB_LABEL[id],
 		locked: locked(id),
-		// One model's canvas is the whole tab, so it meets the tab strip; All
-		// models keeps the padding for the union card beside it.
-		flush: id === "model" && data.scope !== null,
 		rows: id !== tab ? [] : tabRows(id, data, view, slots),
 	}));
 
 	return {
 		title: data.scope ? data.scope.model.name : "All models",
-		header: header(data),
-		staged: staged(data),
+		header: header(data, view),
+		staged: stagedBar(data.scope, data.canWrite),
 		tabs,
 		tab,
 		tabAction: MODELS_ACTIONS.tab,
@@ -294,7 +319,7 @@ export function modelsPageSpec(
 	};
 }
 
-function header(data: ModelsPageData): BoardSpec["header"] {
+function header(data: ModelsPageData, view: ModelsView): BoardSpec["header"] {
 	const { scope, canWrite } = data;
 	if (!scope) {
 		const catalog = data.insights?.catalog;
@@ -303,13 +328,11 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 		// Unknown reads "—", never 0: nothing loaded yet is not nothing stitched.
 		const stitches = data.links?.filter((l) => l.status === "active").length;
 		return {
-			crumbs: ["All models"],
+			crumbs: ["Models", "All models"],
+			crumbMenu: scopeMenu(data, ALL_MODELS),
 			chips: published
 				? [
-						{
-							label: `${published} ${published === 1 ? "model" : "models"}`,
-							variant: "outline",
-						},
+						{ label: `${published} published`, variant: "outline" },
 						{
 							label: `${stitches ?? "—"} ${stitches === 1 ? "stitch" : "stitches"}`,
 							variant: "outline",
@@ -335,7 +358,7 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 						icon: "upload",
 						variant: "outline",
 					},
-					menu(["starters", "ontology", "introspect"]),
+					menu(["starters", "ontology", "introspect", "reports"]),
 				],
 				canWrite,
 			),
@@ -344,8 +367,9 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 
 	const { model, detail, draft, active, previous, staged: set } = scope;
 	const { published } = scope;
+	const reading = view.tab === "history" && !view.schema;
 	const compare: ActionSpec[] =
-		active && previous
+		reading && active && previous
 			? [
 					{
 						id: MODELS_ACTIONS.compare,
@@ -354,53 +378,69 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 					},
 				]
 			: [];
-	const chips: NonNullable<NonNullable<BoardSpec["header"]>["chips"]> = [];
-	if (draft)
-		chips.push({
-			label: draft.version ? `v${draft.version} · draft` : "draft",
-			tone: "info",
-		});
-	chips.push(
-		active
-			? { label: `v${active.version} · active`, variant: "outline" }
-			: { label: "never published", variant: "outline" },
-	);
+	const chips: NonNullable<NonNullable<BoardSpec["header"]>["chips"]> = [
+		...versionChips(scope),
+	];
 	if (!canWrite) chips.push({ label: "read only", variant: "secondary" });
 
 	const retire: ModelsMenuItem = published ? "archive" : "delete";
-	const actions: ActionSpec[] = draft
-		? [
-				{
-					id: MODELS_ACTIONS.publish,
-					label: draft.version ? `Publish v${draft.version}` : "Publish",
-					icon: "check",
-					variant: "default",
-					// The act says why rather than going quiet (the-model-page.md seams).
-					disabled: !set?.can_commit,
-				},
-				{
-					id: MODELS_ACTIONS.discardDraft,
-					label: "Discard draft",
-					variant: "outline",
-				},
-				...compare,
-				menu(["rename", "exportModel", retire]),
-			]
-		: [
-				{ id: MODELS_ACTIONS.edit, label: "Edit", variant: "default" },
-				{
-					id: MODELS_ACTIONS.exportModel,
-					label: "Export",
-					variant: "outline",
-					disabled: !active,
-				},
-				...compare,
-				menu(["rename", retire]),
-			];
+	const actions: ActionSpec[] = [
+		// On the schema reading the canvas is already open.
+		...(view.schema
+			? []
+			: [
+					{
+						id: MODELS_ACTIONS.openSchema,
+						label: "Open in Schema",
+						icon: "schema",
+						variant: "default" as const,
+					},
+				]),
+		{
+			id: MODELS_ACTIONS.versions,
+			label: "Versions",
+			variant: "outline",
+			disabled: !published,
+		},
+		{
+			id: MODELS_ACTIONS.exportModel,
+			label: "Export",
+			variant: "outline",
+			disabled: !active,
+		},
+		...(draft
+			? [
+					{
+						id: MODELS_ACTIONS.publish,
+						label: draft.version ? `Publish v${draft.version}` : "Publish",
+						icon: "check",
+						variant: "default" as const,
+						// The act says why rather than going quiet (the-model-page.md seams).
+						disabled: !set?.can_commit,
+					},
+					{
+						id: MODELS_ACTIONS.discardDraft,
+						label: "Discard draft",
+						variant: "outline" as const,
+					},
+				]
+			: []),
+		...compare,
+		menu(
+			draft
+				? ["rename", retire, "reports"]
+				: ["draft", "rename", retire, "reports"],
+		),
+	];
 
 	return {
 		crumbs: ["Models", model.name],
-		crumbActions: [MODELS_ACTIONS.allModels, undefined],
+		crumbMenu: scopeMenu(data, model.id),
+		// The model's own crumb is the way back to its page from the canvas.
+		crumbActions: [
+			MODELS_ACTIONS.allModels,
+			view.schema ? MODELS_ACTIONS.openModel : undefined,
+		],
 		chips,
 		actions: readOnly(actions, canWrite),
 		// One line; `More` for the rest.
@@ -418,13 +458,37 @@ function header(data: ModelsPageData): BoardSpec["header"] {
 	};
 }
 
+/** The active readout and the draft chip — on the page, the canvas and a type's page. */
+export function versionChips(
+	scope: Pick<ModelsScope, "draft" | "active">,
+): NonNullable<NonNullable<BoardSpec["header"]>["chips"]> {
+	return [
+		scope.active
+			? { label: `v${scope.active.version} · active`, variant: "outline" }
+			: { label: "never published", variant: "outline" },
+		...(scope.draft
+			? [
+					{
+						label: scope.draft.version
+							? `v${scope.draft.version} · draft`
+							: "draft",
+						tone: "info" as const,
+					},
+				]
+			: []),
+	];
+}
+
 /** The acts that only read — export and compare — which a reader keeps. */
 const READS: ReadonlySet<string> = new Set([
 	MODELS_ACTIONS.exportModel,
 	MODELS_ACTIONS.compare,
+	MODELS_ACTIONS.versions,
+	MODELS_ACTIONS.openSchema,
 ]);
 const READ_ITEMS: ReadonlySet<string> = new Set<ModelsMenuItem>([
 	"exportModel",
+	"reports",
 ]);
 
 /**
@@ -433,7 +497,10 @@ const READ_ITEMS: ReadonlySet<string> = new Set<ModelsMenuItem>([
  * notice above the page says which role it needs and who holds it. A menu
  * keeps its read-only items, and is disabled only when none are left.
  */
-function readOnly(actions: ActionSpec[], canWrite: boolean): ActionSpec[] {
+export function readOnly(
+	actions: ActionSpec[],
+	canWrite: boolean,
+): ActionSpec[] {
 	if (canWrite) return actions;
 	return actions.map((a) => {
 		if (READS.has(a.id)) return a;
@@ -443,6 +510,75 @@ function readOnly(actions: ActionSpec[], canWrite: boolean): ActionSpec[] {
 		}
 		return { ...a, disabled: true };
 	});
+}
+
+/** The scope picker on the last crumb: All models, then every authored model. */
+function scopeMenu(
+	data: ModelsPageData,
+	selected: string,
+): NonNullable<BoardSpec["header"]>["crumbMenu"] {
+	return {
+		action: MODELS_ACTIONS.scope,
+		placeholder: "Read a model",
+		items: [
+			{ id: ALL_MODELS, label: "All models" },
+			...data.models.map((m) => ({ id: m.id, label: m.name })),
+		],
+		selected,
+	};
+}
+
+/**
+ * *Save report* — the head's own act, first on the row. `useReport` adds it
+ * with *Reports*; *Reports* lives behind `⋯` here, so the row stays the board's.
+ */
+export function withReportActs(spec: BoardSpec): BoardSpec {
+	const actions = spec.header?.actions ?? [];
+	const save = actions.find((a) => a.id === MODELS_ACTIONS.saveReport);
+	if (!spec.header || !save) return spec;
+	return {
+		...spec,
+		header: {
+			...spec.header,
+			actions: [
+				{ ...save, icon: "save", variant: "ghost" },
+				...actions.filter(
+					(a) =>
+						a.id !== MODELS_ACTIONS.saveReport &&
+						a.id !== MODELS_ACTIONS.openReports,
+				),
+			],
+		},
+	};
+}
+
+/** `Models overview, 30 days` — what a saved report of this reading is called. */
+export function reportLabel(data: ModelsPageData, view: ModelsView): string {
+	const scope = data.scope?.model.name ?? "Models";
+	return `${scope} ${TAB_LABEL[view.tab].toLowerCase()}, ${WINDOW_LABEL[view.window]}`;
+}
+
+/**
+ * The document a saved report keeps: the open tab's tiles and tables, under
+ * a head that says it is a report. A panel the page draws itself — a chart, a
+ * list with links — renders only with its host, so it is not kept.
+ */
+export function reportDocument(spec: BoardSpec): BoardSpec {
+	const open = spec.tabs?.find((t) => t.id === spec.tab);
+	const rows = (open?.rows ?? [])
+		.map((row) => ({
+			...row,
+			panels: row.panels.filter((panel) => !panel.render),
+		}))
+		.filter((row) => row.panels.length);
+	return {
+		title: spec.title,
+		header: spec.header && {
+			crumbs: spec.header.crumbs,
+			chips: [{ label: "saved report", variant: "outline" }],
+		},
+		rows,
+	};
 }
 
 function menu(items: ModelsMenuItem[]): ActionSpec {
@@ -457,9 +593,13 @@ function menu(items: ModelsMenuItem[]): ActionSpec {
 	};
 }
 
-function staged(data: ModelsPageData): StagedSpec | undefined {
-	const set = data.scope?.staged;
-	if (!data.scope?.draft || !set || set.count === 0) return undefined;
+/** The staged bar under a model's header — on its page, its canvas and its types. */
+export function stagedBar(
+	scope: ModelsScope | null,
+	canWrite: boolean,
+): StagedSpec | undefined {
+	const set = scope?.staged;
+	if (!scope?.draft || !set || set.count === 0) return undefined;
 	return {
 		items: set.changes.map((c) => ({
 			id: c.id,
@@ -467,9 +607,9 @@ function staged(data: ModelsPageData): StagedSpec | undefined {
 			name: c.name,
 			note: c.kind.replace("_", " "),
 		})),
-		discardAction: data.canWrite ? MODELS_ACTIONS.discardOne : undefined,
-		discardAllAction: data.canWrite ? MODELS_ACTIONS.discardDraft : undefined,
-		hint: data.canWrite && set.can_commit ? "⌘↵ publish" : undefined,
+		discardAction: canWrite ? MODELS_ACTIONS.discardOne : undefined,
+		discardAllAction: canWrite ? MODELS_ACTIONS.discardDraft : undefined,
+		hint: canWrite && set.can_commit ? "⌘↵ publish" : undefined,
 	};
 }
 
@@ -506,7 +646,7 @@ function overviewRows(
 			},
 		];
 	return data.scope
-		? overviewOne(data, data.scope, view, slots)
+		? overviewOne(data, data.scope)
 		: overviewAll(data, view, slots);
 }
 
@@ -588,16 +728,11 @@ function overviewAll(
 	return [
 		{ panels: [tiles] },
 		{ panels: [table] },
-		...lowerRow(data, view, slots, false),
+		...lowerRow(data, view, slots),
 	];
 }
 
-function overviewOne(
-	data: ModelsPageData,
-	scope: ModelsScope,
-	view: ModelsView,
-	slots: ModelsPageSlots,
-): RowSpec[] {
+function overviewOne(data: ModelsPageData, scope: ModelsScope): RowSpec[] {
 	const measured = measuredOf(data.insights);
 	const records = recordsOf(data.insights);
 	const catalog = data.insights?.catalog;
@@ -632,6 +767,8 @@ function overviewOne(
 	const tiles: Panel = {
 		kind: "grid",
 		options: {
+			// One row across, as the board draws it — not two by two.
+			minTileWidth: 140,
 			tiles: [
 				{
 					label: "Types",
@@ -650,14 +787,6 @@ function overviewOne(
 							: "never published"),
 				},
 				...queryTiles(data.insights, true),
-				...driftTile(data.physical),
-				{
-					label: "Staged",
-					value: scope.draft ? String(scope.staged?.count ?? 0) : "—",
-					delta: scope.draft
-						? draftLabel(scope.draft.version)
-						: "no draft open",
-				},
 			],
 		},
 	};
@@ -666,7 +795,7 @@ function overviewOne(
 		id: MODELS_ACTIONS.selectType,
 		kind: "table",
 		title: "Each type",
-		aside: "click a type to open it on the Model tab",
+		aside: "click a type to open it",
 		flush: true,
 		options: {
 			columns: [
@@ -680,10 +809,23 @@ function overviewOne(
 			rowKey: "type",
 		},
 	};
+	const growth = data.insights?.growth;
 	return [
 		{ panels: [tiles] },
 		{ panels: [table] },
-		...lowerRow(data, view, slots, true),
+		// Growth's own series, so the tile above and this line are one count.
+		...(growth?.counted
+			? [
+					{
+						panels: [
+							growthChartPanel(growth, {
+								scopeName: scope.model.name,
+								hueOf: () => undefined,
+							}),
+						],
+					},
+				]
+			: []),
 	];
 }
 
@@ -716,14 +858,18 @@ function measuredOf(insights: Insights | undefined) {
 		return {
 			share: fmtPct(r.share),
 			p95: fmtMs(r.p95),
+			// The engine names the first three and counts the rest.
 			signal:
-				r.signals
-					.map((s) =>
+				[
+					...r.signals.map((s) =>
 						one
 							? SIGNAL_TEXT[s.signal]
 							: `${SIGNAL_TEXT[s.signal]} ${s.subject.split(".").pop()}`,
-					)
-					.join(" · ") || "—",
+					),
+					...(r.signals_total > r.signals.length
+						? [`+${r.signals_total - r.signals.length}`]
+						: []),
+				].join(" · ") || "—",
 		};
 	};
 }
@@ -755,12 +901,11 @@ function queryTiles(insights: Insights | undefined, one: boolean) {
 	];
 }
 
-/** Needs attention, beside queries by caller (All) or p95 a day (one). */
+/** At All models: Needs attention, beside queries by caller. */
 function lowerRow(
 	data: ModelsPageData,
 	view: ModelsView,
 	slots: ModelsPageSlots,
-	one: boolean,
 ): RowSpec[] {
 	const o = data.insights?.overview;
 	if (!o) return [];
@@ -768,10 +913,8 @@ function lowerRow(
 	return [
 		{
 			panels: [
-				attentionPanel(o, data.physical, one, days, slots.onTab),
-				one
-					? p95Panel(o, data.insights?.growth?.marks ?? [])
-					: callersPanel(o, days),
+				attentionPanel(o, data.physical, false, days, slots.onTab),
+				callersPanel(o, days),
 			],
 		},
 	];

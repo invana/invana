@@ -72,11 +72,13 @@ this map.** Feature numbers do not change.
 | 1.3 | [Author a model](modules/connect-and-model/features/domain-models.md) | One model per domain, authored on its own | ✅ | — | ✅ | S3 |
 | 1.4 | [Model editor](modules/connect-and-model/features/model-editor.md) | Draw the model on a canvas; staged commit | ✅ | — | ✅ | S3 |
 | 1.5 | [Share a model](modules/connect-and-model/features/share-a-model.md) | Export, import, upgrade; files and git are the registry | ✅ | ✅ | ✅ | S7 |
-| 1.6 | [Stitch models](modules/connect-and-model/features/stitch-models.md) | Anchors and relationships; the global model is derived | ✅ | ✅ | ✅ | S7 |
+| 1.6 | [Stitch models](modules/connect-and-model/features/stitch-models.md) | Anchors and relationships; the global model is derived and drawn on its own page; the Stitches page lists active and removed stitches, each inspected on the canvas | ✅ | ✅ | 🟡 | S7 |
 | 1.7 | [Starter models](modules/connect-and-model/features/starter-models.md) | Importable models to begin from — memory, provenance — renamed on arrival | ✅ | ✅ | ✅ | S7 |
-| 1.8 | [The model page](modules/connect-and-model/features/the-model-page.md) | One page, six tabs — Overview · Model · Database · Usage · Performance · Growth — with the model as a filter; is it used, is it slow, how has it grown | ✅ | — | ✅ | S-TBD |
+| 1.8 | [The model page](modules/connect-and-model/features/the-model-page.md) | One page, five tabs — Overview · Database · Usage · Performance · Growth — with the model as a filter; one model's schema canvas and type pages; is it used, is it slow, how has it grown | ✅ | — | 🟡 | S-TBD |
 | 1.9 | [Publish review](modules/connect-and-model/features/publish-review.md) | Additive publishes now; breaking is previewed as a migration run and published after another owner approves | ✅ | ✅ | ✅ | B10 |
 | 1.10 | [Import an ontology](modules/connect-and-model/features/ontology-import.md) | RDFS / OWL subset, schema.org included — JSON-LD, Turtle, RDF/XML — into a draft model; flattened, source IRIs kept, an import report of what was skipped | ✅ | ✅ | ✅ | B12 · C08 |
+| 1.11 | [Constraints on properties](modules/connect-and-model/features/property-constraints.md) | A range with a unit or a standard's values on one property of a type; Reject or Flag for review; checked at record write, bind and validation, naming the constraint; what breaks it today counted before saving | ✅ | — | ✅ | M04 |
+| 1.12 | [Graph settings](modules/connect-and-model/features/graph-settings.md) | One page, three tabs — Basic · Database · Members — the Graph's name and instructions, its connection always editable behind a passing test, and who is on it | ✅ | — | ✅ | M07 |
 
 ## 2 · [Bring data in](modules/bring-data-in/spec.md)
 
@@ -157,7 +159,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 6.1 | [Authoring a skill](modules/skills/features/authoring-a-skill.md) | Four fields, drawn as a plan — the Playbook and Flow tabs | ✅ | — | ✅ | S5 · M8 |
 | 6.2 | [Offer a skill to an agent](modules/skills/features/bindings.md) | Which agent may be offered which skill | ✅ | — | ✅ | S12c |
 | 6.3 | [Where a skill was used](modules/skills/features/usage.md) | Where a skill was offered, and where it was reported applied | ✅ | — | ✅ | S12c |
-| 6.4 | [Rules](modules/skills/features/rules.md) | Install rules, Graph invariants and project working rules, offered as statements; a rule with a check is enforced block · warn · report at the acts it names | ✅ | ✅ | 🟡 | S12b · B04 |
+| 6.4 | [Rules](modules/skills/features/rules.md) | Install rules, Graph invariants and project working rules, offered as statements; a rule with a check is enforced block · warn · report at the acts it names; one Rules page by scope, with what a rule would have broken in 30 days | ✅ | ✅ | ✅ | S12b · B04 |
 | 6.5 | [Instructions, publish and roll back](modules/skills/features/instructions-publish-rollback.md) | `instructions.md` drafts on skills and agents; publish regenerates the plan; one-act rollback; plans generated or packaged | 🟡 | 🟡 | ✅ | B02 |
 | 6.6 | [Evals](modules/skills/features/evals.md) | Eval sets with rule checks and a labelled judge; the publish gate; drift re-runs; an eval token budget | ✅ | 🟡 | ✅ | B02 |
 | 6.7 | [The skill page](modules/skills/features/the-skill-page.md) | A skill as a document: Instructions with the functions it needs and a plan preview; Flow · Functions · Agents · Usage · Exceptions · Evals · Tests · History | 🟡 | — | 🟡 | F04 |
@@ -266,8 +268,9 @@ touch record that makes the declaration checkable. Decisions: [governance.md](go
 
 | # | Feature | What it does | API | CLI | Studio | Slice |
 |---|---|---|---|---|---|---|
-| 14.1 | [Worlds](modules/govern/features/worlds.md) | Named narrowings picked per question; name it to share it, compare two, promote one | ✅ | 🟡 | ✅ | S16 |
-| 14.2 | [Guardrails](modules/govern/features/guardrails.md) | The bounds every run carries whatever world it is in; one object, one owner | ✅ | 🟡 | ✅ | S16 |
+| 14.1 | [Worlds](modules/govern/features/worlds.md) | Named narrowings picked per question, read on the lens canvas; name it to share it, compare two | ✅ | ✅ | ✅ | S16 · M05 |
+| 14.2 | [Guardrails](modules/govern/features/guardrails.md) | One property rule each — read · counts only · never, may leave or stays — in force on every run, impact counted before saving | ✅ | ✅ | ✅ | S16 · M05 |
+| 14.3 | [Requests](modules/govern/features/requests.md) | One inbox of guardrail refusals, unanswered asks and asks for a change; Decline · Allow in a world · Model it | ✅ | ✅ | ✅ | M05 |
 
 **A lens is authored, enforced, and recorded — and the record is checkable.**
 `lenses` and `run_touches` exist, the rule grammar and its three laws are enforced, the ladder and

@@ -32,7 +32,7 @@ from invana.apps.datasets.models import (
 )
 from invana.apps.flows.models import Flow
 from invana.apps.flows.models import Task as PlanTask
-from invana.apps.govern.models import Lens, RunTouch
+from invana.apps.govern.models import Lens, Request, RunTouch
 from invana.apps.graphs.models import Graph, GraphConnection, GraphMember
 from invana.apps.iam.models import Group, GroupMember, Policy, PolicyAttachment, PolicyVersion
 from invana.apps.llm_providers.models import LLMModel, LLMProvider
@@ -117,7 +117,7 @@ from invana.server.datasets.admin import (
 from invana.server.evals.admin import EvalBudgetView, EvalCaseView, EvalResultView, EvalSetView
 from invana.server.events.admin import EventView
 from invana.server.flows.admin import FlowView, PlanTaskView
-from invana.server.govern.admin import LensView, RunTouchView
+from invana.server.govern.admin import LensView, RequestView, RunTouchView
 from invana.server.graphs.admin import (
     GraphConnectionView,
     GraphContainerView,
@@ -312,6 +312,7 @@ def mount_admin(app: FastAPI) -> None:
             views=[
                 LensView(Lens, label="Lenses", icon="fa fa-filter"),
                 RunTouchView(RunTouch, label="Run touches", icon="fa fa-fingerprint"),
+                RequestView(Request, label="Requests", icon="fa fa-inbox"),
             ],
         ),
     )

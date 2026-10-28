@@ -578,6 +578,29 @@
         "title": "ActionResponse[TemplateRead]",
         "type": "object"
       },
+      "ActionResponse_ValidationRuleResponse_": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ValidationRuleResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ActionResponse[ValidationRuleResponse]",
+        "type": "object"
+      },
       "ActionResponse_VersionResponse_": {
         "properties": {
           "data": {
@@ -2510,6 +2533,50 @@
         "title": "AgentUpdate",
         "type": "object"
       },
+      "AgentUsageRead": {
+        "description": "One agent whose runs asked under a world \u2014 the world board's cast.",
+        "properties": {
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "last_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last At"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "agent_id",
+          "name",
+          "runs",
+          "last_at"
+        ],
+        "title": "AgentUsageRead",
+        "type": "object"
+      },
       "AlertMatch": {
         "description": "What a ledger row must be to match. Patterns take ``*``; empty matches any.",
         "properties": {
@@ -3140,6 +3207,33 @@
         "title": "AnswerPrompt",
         "type": "object"
       },
+      "AnswersGoRead": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "may_send": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "May Send"
+          }
+        },
+        "required": [
+          "address"
+        ],
+        "title": "AnswersGoRead",
+        "type": "object"
+      },
       "AppliedDiffRead": {
         "description": "How two runs narrowed the same participant differently.\n\n``differs`` names the fields of ``run_touches.applied`` that are not equal,\nand ``a`` / ``b`` carry only those fields \u2014 a reader is shown the difference,\nnot two whole documents to find it in\n([WO18](docs/for-developers/modules/govern/features/worlds.md)).",
         "properties": {
@@ -3194,6 +3288,29 @@
           "label"
         ],
         "title": "AppliedFilter",
+        "type": "object"
+      },
+      "AppliesToRead": {
+        "properties": {
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "type",
+          "property"
+        ],
+        "title": "AppliesToRead",
         "type": "object"
       },
       "ApprovalDecide": {
@@ -3984,7 +4101,10 @@
               "skill_usage",
               "rule",
               "world",
-              "guardrail"
+              "models",
+              "worlds",
+              "guardrails",
+              "requests"
             ],
             "title": "Kind",
             "type": "string"
@@ -5717,8 +5837,26 @@
             "title": "Basis",
             "type": "string"
           },
+          "datasets": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/EffectDataset"
+            },
+            "title": "Datasets",
+            "type": "array"
+          },
+          "datasets_failing": {
+            "default": 0,
+            "title": "Datasets Failing",
+            "type": "integer"
+          },
           "failed": {
             "title": "Failed",
+            "type": "integer"
+          },
+          "rows_failing": {
+            "default": 0,
+            "title": "Rows Failing",
             "type": "integer"
           },
           "runs": {
@@ -6365,6 +6503,55 @@
         "title": "ConformanceRead",
         "type": "object"
       },
+      "ConstraintCheck": {
+        "description": "What breaks a constraint in the graph now.",
+        "properties": {
+          "breaking": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Breaking"
+          },
+          "counted": {
+            "title": "Counted",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "samples": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ConstraintSample"
+            },
+            "title": "Samples",
+            "type": "array"
+          }
+        },
+        "required": [
+          "label",
+          "counted"
+        ],
+        "title": "ConstraintCheck",
+        "type": "object"
+      },
       "ConstraintCreate": {
         "properties": {
           "constraint_type": {
@@ -6451,6 +6638,22 @@
           "properties"
         ],
         "title": "ConstraintResponse",
+        "type": "object"
+      },
+      "ConstraintSample": {
+        "properties": {
+          "record": {
+            "title": "Record",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "record"
+        ],
+        "title": "ConstraintSample",
         "type": "object"
       },
       "ContentionRead": {
@@ -8827,6 +9030,40 @@
           }
         },
         "title": "EdgeTypeUpdate",
+        "type": "object"
+      },
+      "EffectDataset": {
+        "description": "A dataset bound to a type a model version's publish changed.",
+        "properties": {
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "rows_failing": {
+            "title": "Rows Failing",
+            "type": "integer"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "dataset_id",
+          "name",
+          "version",
+          "type",
+          "rows_failing"
+        ],
+        "title": "EffectDataset",
         "type": "object"
       },
       "EffectiveRead": {
@@ -11672,6 +11909,102 @@
         "title": "GlobalType",
         "type": "object"
       },
+      "GraphConnect": {
+        "description": "A new Graph from a database: the connection, and the name when one is given.",
+        "properties": {
+          "auth": {
+            "additionalProperties": true,
+            "title": "Auth",
+            "type": "object"
+          },
+          "connector_class": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Connector Class",
+            "type": "string"
+          },
+          "database": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Database"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "read_only": {
+            "default": false,
+            "title": "Read Only",
+            "type": "boolean"
+          },
+          "server_version": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Server Version"
+          },
+          "uri": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri",
+          "connector_class"
+        ],
+        "title": "GraphConnect",
+        "type": "object"
+      },
+      "GraphConnectRead": {
+        "description": "What connecting made: the Graph, and the draft model read from its database.",
+        "properties": {
+          "discovered": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Discovered",
+            "type": "object"
+          },
+          "graph": {
+            "$ref": "#/components/schemas/GraphRead"
+          },
+          "model_id": {
+            "title": "Model Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "graph",
+          "model_id",
+          "discovered"
+        ],
+        "title": "GraphConnectRead",
+        "type": "object"
+      },
       "GraphConnectionCreate": {
         "properties": {
           "auth": {
@@ -11730,6 +12063,17 @@
       },
       "GraphConnectionRead": {
         "properties": {
+          "auth_username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auth Username"
+          },
           "capabilities": {
             "items": {
               "type": "string"
@@ -12136,6 +12480,16 @@
           "description": {
             "title": "Description",
             "type": "string"
+          },
+          "draft_version": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VersionSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "graph_id": {
             "anyOf": [
@@ -13022,6 +13376,406 @@
         "title": "GrowthWrites",
         "type": "object"
       },
+      "GuardedPropertyRead": {
+        "properties": {
+          "access": {
+            "title": "Access",
+            "type": "string"
+          },
+          "guardrail": {
+            "title": "Guardrail",
+            "type": "string"
+          },
+          "guardrail_id": {
+            "title": "Guardrail Id",
+            "type": "string"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "boolean"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          }
+        },
+        "required": [
+          "property",
+          "guardrail_id",
+          "guardrail",
+          "access",
+          "leaves"
+        ],
+        "title": "GuardedPropertyRead",
+        "type": "object"
+      },
+      "GuardrailAccess": {
+        "description": "What a run may do with a guarded property.",
+        "enum": [
+          "read",
+          "counts",
+          "never"
+        ],
+        "title": "GuardrailAccess",
+        "type": "string"
+      },
+      "GuardrailDetail": {
+        "properties": {
+          "access": {
+            "title": "Access",
+            "type": "string"
+          },
+          "allowed_in": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "title": "Allowed In",
+            "type": "array"
+          },
+          "applies_to": {
+            "items": {
+              "$ref": "#/components/schemas/AppliesToRead"
+            },
+            "title": "Applies To",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryRead"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "refusals": {
+            "items": {
+              "$ref": "#/components/schemas/GuardrailRefusalRead"
+            },
+            "title": "Refusals",
+            "type": "array"
+          },
+          "refusals_total": {
+            "default": 0,
+            "title": "Refusals Total",
+            "type": "integer"
+          },
+          "refused_7d": {
+            "default": 0,
+            "title": "Refused 7D",
+            "type": "integer"
+          },
+          "sentence": {
+            "default": "",
+            "title": "Sentence",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "types": {
+            "default": 0,
+            "title": "Types",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "key",
+          "target",
+          "access",
+          "leaves",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "GuardrailDetail",
+        "type": "object"
+      },
+      "GuardrailImpactRead": {
+        "description": "Who reads the target today and would not afterwards \u2014 counted before the write.",
+        "properties": {
+          "schedules": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "title": "Schedules",
+            "type": "array"
+          },
+          "sentence": {
+            "title": "Sentence",
+            "type": "string"
+          },
+          "worlds": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "title": "Worlds",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sentence"
+        ],
+        "title": "GuardrailImpactRead",
+        "type": "object"
+      },
+      "GuardrailIn": {
+        "description": "*When a run touches* ``target`` \u00b7 *it may* ``access`` \u00b7 *and the result* ``leaves``.",
+        "properties": {
+          "access": {
+            "$ref": "#/components/schemas/GuardrailAccess"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "boolean"
+          },
+          "target": {
+            "maxLength": 255,
+            "minLength": 3,
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target",
+          "access",
+          "leaves"
+        ],
+        "title": "GuardrailIn",
+        "type": "object"
+      },
+      "GuardrailPage": {
+        "description": "The Guardrails list, and whether whoever asked may edit it \u2014 in one read.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GuardrailRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "may_edit": {
+            "default": false,
+            "title": "May Edit",
+            "type": "boolean"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "GuardrailPage",
+        "type": "object"
+      },
+      "GuardrailRead": {
+        "properties": {
+          "access": {
+            "title": "Access",
+            "type": "string"
+          },
+          "allowed_in": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "title": "Allowed In",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "refused_7d": {
+            "default": 0,
+            "title": "Refused 7D",
+            "type": "integer"
+          },
+          "sentence": {
+            "default": "",
+            "title": "Sentence",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "types": {
+            "default": 0,
+            "title": "Types",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "key",
+          "target",
+          "access",
+          "leaves",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "GuardrailRead",
+        "type": "object"
+      },
+      "GuardrailRefusalRead": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "where": {
+            "title": "Where",
+            "type": "string"
+          },
+          "who": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Who"
+          }
+        },
+        "required": [
+          "request_id",
+          "who",
+          "where",
+          "at"
+        ],
+        "title": "GuardrailRefusalRead",
+        "type": "object"
+      },
+      "GuardrailTargetRead": {
+        "description": "One ``Type.property`` the picker offers, and the published model it comes from.",
+        "properties": {
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target",
+          "model",
+          "type",
+          "property"
+        ],
+        "title": "GuardrailTargetRead",
+        "type": "object"
+      },
+      "GuardrailUpdate": {
+        "description": "Every field optional; the target is the guardrail's identity and does not move.",
+        "properties": {
+          "access": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GuardrailAccess"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "allowed_in": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allowed In"
+          },
+          "leaves": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Leaves"
+          }
+        },
+        "title": "GuardrailUpdate",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -13185,6 +13939,42 @@
           "how"
         ],
         "title": "HeldPolicy",
+        "type": "object"
+      },
+      "HistoryRead": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "actor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          }
+        },
+        "required": [
+          "action",
+          "actor",
+          "at"
+        ],
+        "title": "HistoryRead",
         "type": "object"
       },
       "HolderPage": {
@@ -15848,19 +16638,6 @@
         "title": "LensListResponse",
         "type": "object"
       },
-      "LensPromote": {
-        "description": "One field, and no re-authoring ([GV3]).",
-        "properties": {
-          "scope": {
-            "default": "graph",
-            "maxLength": 64,
-            "title": "Scope",
-            "type": "string"
-          }
-        },
-        "title": "LensPromote",
-        "type": "object"
-      },
       "LensRead": {
         "properties": {
           "allow_rules": {
@@ -16118,6 +16895,13 @@
             "title": "Actor Ids",
             "type": "array"
           },
+          "by_agent": {
+            "items": {
+              "$ref": "#/components/schemas/AgentUsageRead"
+            },
+            "title": "By Agent",
+            "type": "array"
+          },
           "last_used_at": {
             "anyOf": [
               {
@@ -16139,9 +16923,189 @@
             "default": 0,
             "title": "Runs",
             "type": "integer"
+          },
+          "runs_30d": {
+            "default": 0,
+            "title": "Runs 30D",
+            "type": "integer"
           }
         },
         "title": "LensUsageRead",
+        "type": "object"
+      },
+      "LensView": {
+        "description": "What a world \u2014 or the guardrails alone \u2014 let a run see, resolved by the engine.",
+        "properties": {
+          "answers_go": {
+            "items": {
+              "$ref": "#/components/schemas/AnswersGoRead"
+            },
+            "title": "Answers Go",
+            "type": "array"
+          },
+          "guarded": {
+            "default": 0,
+            "title": "Guarded",
+            "type": "integer"
+          },
+          "hidden_types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Hidden Types",
+            "type": "array"
+          },
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/LensViewModel"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "thinks_with": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Thinks With",
+            "type": "object"
+          },
+          "types": {
+            "items": {
+              "$ref": "#/components/schemas/LensViewType"
+            },
+            "title": "Types",
+            "type": "array"
+          },
+          "used_by": {
+            "items": {
+              "$ref": "#/components/schemas/UsedByRead"
+            },
+            "title": "Used By",
+            "type": "array"
+          },
+          "window": {
+            "$ref": "#/components/schemas/LensViewWindow"
+          },
+          "world": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Ref"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "LensView",
+        "type": "object"
+      },
+      "LensViewModel": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "seen": {
+            "title": "Seen",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "seen"
+        ],
+        "title": "LensViewModel",
+        "type": "object"
+      },
+      "LensViewType": {
+        "properties": {
+          "excluded": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Excluded",
+            "type": "array"
+          },
+          "guarded": {
+            "items": {
+              "$ref": "#/components/schemas/GuardedPropertyRead"
+            },
+            "title": "Guarded",
+            "type": "array"
+          },
+          "hidden": {
+            "title": "Hidden",
+            "type": "boolean"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "sliced": {
+            "title": "Sliced",
+            "type": "boolean"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "type",
+          "hidden",
+          "sliced"
+        ],
+        "title": "LensViewType",
+        "type": "object"
+      },
+      "LensViewWindow": {
+        "description": "The world's slice as a person reads it \u2014 ``2026-01-01 \u2192 2026-06-30`` \u00b7 ``in EU, UK``.",
+        "properties": {
+          "geo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geo"
+          },
+          "time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time"
+          }
+        },
+        "title": "LensViewWindow",
         "type": "object"
       },
       "LifecycleAct": {
@@ -16526,6 +17490,17 @@
             ],
             "title": "Edge Type"
           },
+          "edges": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edges"
+          },
           "edges_written": {
             "anyOf": [
               {
@@ -16782,6 +17757,30 @@
           "kind"
         ],
         "title": "MappedType",
+        "type": "object"
+      },
+      "MarkLine": {
+        "description": "One line of a type's mark: ``+`` added, ``~`` changed, ``-`` removed.",
+        "properties": {
+          "sign": {
+            "enum": [
+              "+",
+              "~",
+              "-"
+            ],
+            "title": "Sign",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sign",
+          "text"
+        ],
+        "title": "MarkLine",
         "type": "object"
       },
       "MarkRead": {
@@ -19093,6 +20092,11 @@
             "title": "Attention",
             "type": "array"
           },
+          "attention_total": {
+            "default": 0,
+            "title": "Attention Total",
+            "type": "integer"
+          },
           "by_caller_by_day": {
             "items": {
               "$ref": "#/components/schemas/CallerDay"
@@ -19249,6 +20253,11 @@
             },
             "title": "Signals",
             "type": "array"
+          },
+          "signals_total": {
+            "default": 0,
+            "title": "Signals Total",
+            "type": "integer"
           }
         },
         "required": [
@@ -19786,6 +20795,50 @@
         "title": "Page[PluginSummary]",
         "type": "object"
       },
+      "Page_RuleRead_": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RuleRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "Page[RuleRead]",
+        "type": "object"
+      },
       "Page_SkillRead_": {
         "properties": {
           "applied": {
@@ -20123,6 +21176,11 @@
           },
           "errors": {
             "title": "Errors",
+            "type": "integer"
+          },
+          "missing_indexes": {
+            "default": 0,
+            "title": "Missing Indexes",
             "type": "integer"
           },
           "p50": {
@@ -23222,6 +24280,99 @@
         "title": "PropertyChange",
         "type": "object"
       },
+      "PropertyConstraintSet": {
+        "description": "One property's constraint on one type \u2014 a range or a standard's values.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "range",
+              "standard"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max"
+          },
+          "min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min"
+          },
+          "on_break": {
+            "default": "reject",
+            "enum": [
+              "reject",
+              "flag"
+            ],
+            "title": "On Break",
+            "type": "string"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          },
+          "standard": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          }
+        },
+        "required": [
+          "type",
+          "property",
+          "kind"
+        ],
+        "title": "PropertyConstraintSet",
+        "type": "object"
+      },
       "PropertyKeyCreate": {
         "properties": {
           "description": {
@@ -24099,6 +25250,31 @@
         "title": "RecordsSummary",
         "type": "object"
       },
+      "Ref": {
+        "description": "A record by id and the name it reads as.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "Ref",
+        "type": "object"
+      },
       "RefreshRequest": {
         "properties": {
           "refresh_token": {
@@ -24255,6 +25431,111 @@
           "password"
         ],
         "title": "RegisterRequest",
+        "type": "object"
+      },
+      "RemovedStitch": {
+        "description": "A removed stitch, read from its removal event \u2014 the row itself is gone.",
+        "properties": {
+          "edge_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edge Type"
+          },
+          "edges_withdrawn": {
+            "default": 0,
+            "title": "Edges Withdrawn",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "removed_at": {
+            "title": "Removed At",
+            "type": "string"
+          },
+          "removed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Removed By"
+          },
+          "source_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Model"
+          },
+          "source_property": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Property"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "target_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Model"
+          },
+          "target_property": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Property"
+          },
+          "target_type": {
+            "title": "Target Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "source_type",
+          "target_type",
+          "removed_at"
+        ],
+        "title": "RemovedStitch",
         "type": "object"
       },
       "ReportCite": {
@@ -24418,6 +25699,375 @@
           "published_at"
         ],
         "title": "ReportVersionSummary",
+        "type": "object"
+      },
+      "RequestCreate": {
+        "description": "An explicit *Ask for a change* \u2014 by the caller, from Explorer or the API.",
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "source": {
+            "default": "explorer",
+            "enum": [
+              "explorer",
+              "api"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "RequestCreate",
+        "type": "object"
+      },
+      "RequestPage": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedFilter"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RequestRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "may_resolve": {
+            "default": false,
+            "title": "May Resolve",
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "open": {
+            "default": 0,
+            "title": "Open",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unfiltered_total": {
+            "title": "Unfiltered Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "unfiltered_total"
+        ],
+        "title": "RequestPage",
+        "type": "object"
+      },
+      "RequestRead": {
+        "properties": {
+          "agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "asked_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asked By"
+          },
+          "asked_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asked By Id"
+          },
+          "asks": {
+            "title": "Asks",
+            "type": "integer"
+          },
+          "blocked_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocked By"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "guardrail_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Guardrail Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_asked_at": {
+            "format": "date-time",
+            "title": "Last Asked At",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Ref"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution"
+          },
+          "resolution_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Note"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "resolved_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved By"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "world": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Ref"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "detail",
+          "source",
+          "asked_by_id",
+          "agent_id",
+          "run_id",
+          "session_id",
+          "guardrail_id",
+          "blocked_by",
+          "asks",
+          "last_asked_at",
+          "status",
+          "resolution",
+          "resolution_note",
+          "resolved_at",
+          "created_at"
+        ],
+        "title": "RequestRead",
+        "type": "object"
+      },
+      "RequestResolve": {
+        "properties": {
+          "action": {
+            "enum": [
+              "decline",
+              "allow",
+              "model"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "model_id": {
+            "anyOf": [
+              {
+                "maxLength": 36,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "world_id": {
+            "anyOf": [
+              {
+                "maxLength": 36,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "World Id"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "title": "RequestResolve",
         "type": "object"
       },
       "RerunResponse": {
@@ -24970,6 +26620,18 @@
       },
       "RuleCreate": {
         "properties": {
+          "because": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Because"
+          },
           "check": {
             "anyOf": [
               {
@@ -25011,6 +26673,101 @@
           "statement"
         ],
         "title": "RuleCreate",
+        "type": "object"
+      },
+      "RuleImpact": {
+        "description": "What a check would have broken over the window, read back act by act.",
+        "properties": {
+          "broken": {
+            "title": "Broken",
+            "type": "integer"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RuleImpactItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "read": {
+            "title": "Read",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "days",
+          "read",
+          "broken"
+        ],
+        "title": "RuleImpact",
+        "type": "object"
+      },
+      "RuleImpactItem": {
+        "description": "One act of the window the check breaks.",
+        "properties": {
+          "act": {
+            "title": "Act",
+            "type": "string"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          }
+        },
+        "required": [
+          "act",
+          "subject",
+          "at",
+          "reason"
+        ],
+        "title": "RuleImpactItem",
+        "type": "object"
+      },
+      "RuleImpactRequest": {
+        "description": "A check as the dialog holds it, and where it would sit.",
+        "properties": {
+          "check": {
+            "$ref": "#/components/schemas/RuleCheck"
+          },
+          "project_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Key"
+          },
+          "scope": {
+            "enum": [
+              "install",
+              "graph",
+              "project"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope",
+          "check"
+        ],
+        "title": "RuleImpactRequest",
         "type": "object"
       },
       "RuleIn": {
@@ -25089,6 +26846,35 @@
             "title": "Active",
             "type": "boolean"
           },
+          "acts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Acts",
+            "type": "array"
+          },
+          "because": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Because"
+          },
+          "broken_30d": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Broken 30D"
+          },
           "check": {
             "anyOf": [
               {
@@ -25131,6 +26917,17 @@
             ],
             "title": "Graph Id"
           },
+          "graph_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graph Name"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -25163,6 +26960,28 @@
               }
             ],
             "title": "Project Id"
+          },
+          "project_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Key"
+          },
+          "project_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Name"
           },
           "scope": {
             "title": "Scope",
@@ -25202,6 +27021,18 @@
       "RuleUpdate": {
         "description": "A rewording, a reorder, or both.\n\nChanging the statement publishes the next version; ``order`` and ``active``\nare properties of the rule and are edited in place\n([RU4](docs/for-developers/modules/skills/features/rules.md)).",
         "properties": {
+          "because": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Because"
+          },
           "check": {
             "anyOf": [
               {
@@ -25319,6 +27150,17 @@
       },
       "RuleVersionRead": {
         "properties": {
+          "because": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Because"
+          },
           "check": {
             "anyOf": [
               {
@@ -27156,6 +28998,11 @@
       },
       "SchemaDiff": {
         "properties": {
+          "added": {
+            "default": 0,
+            "title": "Added",
+            "type": "integer"
+          },
           "added_constraints": {
             "default": [],
             "items": {
@@ -27196,6 +29043,11 @@
             "title": "Added Property Keys",
             "type": "array"
           },
+          "changed": {
+            "default": 0,
+            "title": "Changed",
+            "type": "integer"
+          },
           "classification": {
             "default": "patch",
             "enum": [
@@ -27205,6 +29057,14 @@
             ],
             "title": "Classification",
             "type": "string"
+          },
+          "marks": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/TypeMark"
+            },
+            "title": "Marks",
+            "type": "array"
           },
           "modified_edge_types": {
             "default": [],
@@ -27229,6 +29089,22 @@
             },
             "title": "Modified Property Keys",
             "type": "array"
+          },
+          "next_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Version"
+          },
+          "removed": {
+            "default": 0,
+            "title": "Removed",
+            "type": "integer"
           },
           "removed_constraints": {
             "default": [],
@@ -31357,6 +33233,40 @@
         "title": "StagedSet",
         "type": "object"
       },
+      "StandardChoice": {
+        "description": "A standard's term that carries values \u2014 what a constraint may reference.",
+        "properties": {
+          "standard": {
+            "title": "Standard",
+            "type": "string"
+          },
+          "term": {
+            "title": "Term",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "values": {
+            "title": "Values",
+            "type": "integer"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "standard",
+          "title",
+          "version",
+          "term",
+          "values"
+        ],
+        "title": "StandardChoice",
+        "type": "object"
+      },
       "StandardCreate": {
         "properties": {
           "description": {
@@ -31994,6 +33904,252 @@
           "share_of_work"
         ],
         "title": "StepPerformance",
+        "type": "object"
+      },
+      "StitchDetail": {
+        "description": "One stitch read whole: who declared it, each end's records, its history.",
+        "properties": {
+          "declared_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declared At"
+          },
+          "declared_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declared By"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "edge_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edge Type"
+          },
+          "edges": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edges"
+          },
+          "edges_written": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edges Written"
+          },
+          "history": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StitchEvent"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "identity_match": {
+            "default": "exact",
+            "title": "Identity Match",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "source_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Model"
+          },
+          "source_model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Model Id"
+          },
+          "source_property": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Property"
+          },
+          "source_records": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Records"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "source_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Version"
+          },
+          "source_version_id": {
+            "title": "Source Version Id",
+            "type": "string"
+          },
+          "status": {
+            "default": "active",
+            "title": "Status",
+            "type": "string"
+          },
+          "target_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Model"
+          },
+          "target_property": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Property"
+          },
+          "target_records": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Records"
+          },
+          "target_type": {
+            "title": "Target Type",
+            "type": "string"
+          },
+          "target_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Version"
+          },
+          "target_version_id": {
+            "title": "Target Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "source_version_id",
+          "source_type",
+          "target_version_id",
+          "target_type"
+        ],
+        "title": "StitchDetail",
+        "type": "object"
+      },
+      "StitchEvent": {
+        "description": "One event in a stitch's history \u2014 its declare and its commit.",
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "actor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor"
+          },
+          "at": {
+            "title": "At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "at"
+        ],
+        "title": "StitchEvent",
         "type": "object"
       },
       "StitchPreview": {
@@ -34912,6 +37068,47 @@
         "title": "TypeCountsResponse",
         "type": "object"
       },
+      "TypeMark": {
+        "description": "What a version pair did to one type \u2014 the chip the map draws beside it.",
+        "properties": {
+          "lines": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MarkLine"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "mark": {
+            "enum": [
+              "added",
+              "changed",
+              "removed"
+            ],
+            "title": "Mark",
+            "type": "string"
+          },
+          "target_kind": {
+            "enum": [
+              "node_type",
+              "edge_type"
+            ],
+            "title": "Target Kind",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "target_kind",
+          "mark"
+        ],
+        "title": "TypeMark",
+        "type": "object"
+      },
       "TypePropertyMappingCreate": {
         "properties": {
           "default_value": {
@@ -35164,6 +37361,11 @@
             "title": "Stitches Crossed",
             "type": "integer"
           },
+          "stitches_total": {
+            "default": 0,
+            "title": "Stitches Total",
+            "type": "integer"
+          },
           "too_few": {
             "title": "Too Few",
             "type": "boolean"
@@ -35234,6 +37436,14 @@
             "title": "Share",
             "type": "number"
           },
+          "signal_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "default": {},
+            "title": "Signal Counts",
+            "type": "object"
+          },
           "signals": {
             "default": [],
             "items": {
@@ -35253,6 +37463,41 @@
           "last_touched"
         ],
         "title": "UsageRow",
+        "type": "object"
+      },
+      "UsedByRead": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "name",
+          "runs"
+        ],
+        "title": "UsedByRead",
         "type": "object"
       },
       "UserOut": {
@@ -35579,6 +37824,15 @@
             "title": "Id",
             "type": "string"
           },
+          "on_break": {
+            "default": "reject",
+            "enum": [
+              "reject",
+              "flag"
+            ],
+            "title": "On Break",
+            "type": "string"
+          },
           "params": {
             "additionalProperties": true,
             "default": {},
@@ -35592,10 +37846,58 @@
               "enum",
               "min_length",
               "max_length",
-              "custom"
+              "custom",
+              "standard"
             ],
             "title": "Rule Type",
             "type": "string"
+          },
+          "standard_ref": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard Ref"
+          },
+          "standard_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard Version Id"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
           }
         },
         "required": [
@@ -35607,6 +37909,15 @@
       },
       "ValidationRuleSchema": {
         "properties": {
+          "on_break": {
+            "default": "reject",
+            "enum": [
+              "reject",
+              "flag"
+            ],
+            "title": "On Break",
+            "type": "string"
+          },
           "params": {
             "additionalProperties": true,
             "default": {},
@@ -35620,10 +37931,58 @@
               "enum",
               "min_length",
               "max_length",
-              "custom"
+              "custom",
+              "standard"
             ],
             "title": "Rule Type",
             "type": "string"
+          },
+          "standard_ref": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard Ref"
+          },
+          "standard_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard Version Id"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
           }
         },
         "required": [
@@ -38976,6 +41335,102 @@
         ]
       }
     },
+    "/api/v1/graphs/connect": {
+      "post": {
+        "description": "A new Graph from a database: tested, connected, and its schema read into a draft model.",
+        "operationId": "connect_graph_api_v1_graphs_connect_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GraphConnect"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphConnectRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Connect Graph",
+        "tags": [
+          "graphs"
+        ]
+      }
+    },
+    "/api/v1/graphs/connect/test": {
+      "post": {
+        "description": "Prove credentials before any Graph exists \u2014 recorded nowhere, there is no Graph yet.",
+        "operationId": "test_new_connection_api_v1_graphs_connect_test_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GraphConnectionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Test New Connection Api V1 Graphs Connect Test Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Test New Connection",
+        "tags": [
+          "graphs"
+        ]
+      }
+    },
     "/api/v1/plugins": {
       "get": {
         "operationId": "list_plugins_api_v1_plugins_get",
@@ -39303,6 +41758,53 @@
           }
         ],
         "summary": "Create Install Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rules/impact": {
+      "post": {
+        "description": "What an install check would have broken in the last 30 days, in every Graph.",
+        "operationId": "install_rule_impact_api_v1_rules_impact_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleImpactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleImpact"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Install Rule Impact",
         "tags": [
           "rules"
         ]
@@ -43293,7 +45795,10 @@
                     "skill_usage",
                     "rule",
                     "world",
-                    "guardrail"
+                    "models",
+                    "worlds",
+                    "guardrails",
+                    "requests"
                   ],
                   "type": "string"
                 },
@@ -43899,7 +46404,10 @@
                 "skill_usage",
                 "rule",
                 "world",
-                "guardrail"
+                "models",
+                "worlds",
+                "guardrails",
+                "requests"
               ],
               "title": "Kind",
               "type": "string"
@@ -44015,7 +46523,10 @@
                 "skill_usage",
                 "rule",
                 "world",
-                "guardrail"
+                "models",
+                "worlds",
+                "guardrails",
+                "requests"
               ],
               "title": "Kind",
               "type": "string"
@@ -44120,7 +46631,10 @@
                 "skill_usage",
                 "rule",
                 "world",
-                "guardrail"
+                "models",
+                "worlds",
+                "guardrails",
+                "requests"
               ],
               "title": "Kind",
               "type": "string"
@@ -48221,6 +50735,476 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/govern/guardrails": {
+      "get": {
+        "description": "The Graph's guardrails, and whether the reader may edit them, in one read.",
+        "operationId": "list_guardrails_api_v1_u__username___graphSlug__govern_guardrails_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardrailPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Guardrails",
+        "tags": [
+          "govern"
+        ]
+      },
+      "post": {
+        "operationId": "create_guardrail_api_v1_u__username___graphSlug__govern_guardrails_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuardrailIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardrailDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Guardrail",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/guardrails/impact": {
+      "post": {
+        "description": "What saving this rule would change, counted before the write.",
+        "operationId": "guardrail_rule_impact_api_v1_u__username___graphSlug__govern_guardrails_impact_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuardrailIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardrailImpactRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Guardrail Rule Impact",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/guardrails/targets": {
+      "get": {
+        "operationId": "guardrail_targets_api_v1_u__username___graphSlug__govern_guardrails_targets_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GuardrailTargetRead"
+                  },
+                  "title": "Response Guardrail Targets Api V1 U  Username   Graphslug  Govern Guardrails Targets Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Guardrail Targets",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/guardrails/{guardrail_id}": {
+      "delete": {
+        "operationId": "delete_guardrail_api_v1_u__username___graphSlug__govern_guardrails__guardrail_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guardrail_id",
+            "required": true,
+            "schema": {
+              "title": "Guardrail Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Guardrail",
+        "tags": [
+          "govern"
+        ]
+      },
+      "get": {
+        "operationId": "get_guardrail_api_v1_u__username___graphSlug__govern_guardrails__guardrail_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guardrail_id",
+            "required": true,
+            "schema": {
+              "title": "Guardrail Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardrailDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Guardrail",
+        "tags": [
+          "govern"
+        ]
+      },
+      "patch": {
+        "operationId": "update_guardrail_api_v1_u__username___graphSlug__govern_guardrails__guardrail_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guardrail_id",
+            "required": true,
+            "schema": {
+              "title": "Guardrail Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuardrailUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardrailDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Guardrail",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/govern/lenses": {
       "get": {
         "description": "The Worlds drawer, or the Guardrails one.\n\nA guardrail **never appears under ``kind=world``**\n([GR1](docs/for-developers/modules/govern/features/guardrails.md)) \u2014 that is\nwhat the filter is for, and why it is not one list with a badge.",
@@ -48795,9 +51779,10 @@
         ]
       }
     },
-    "/api/v1/u/{username}/{graphSlug}/govern/lenses/{lens_id}/promote": {
-      "post": {
-        "operationId": "promote_lens_api_v1_u__username___graphSlug__govern_lenses__lens_id__promote_post",
+    "/api/v1/u/{username}/{graphSlug}/govern/lenses/{lens_id}/usage": {
+      "get": {
+        "description": "Who asked under a lens, and how often \u2014 the world board's tiles and cast.",
+        "operationId": "lens_usage_api_v1_u__username___graphSlug__govern_lenses__lens_id__usage_get",
         "parameters": [
           {
             "in": "path",
@@ -48831,22 +51816,12 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LensPromote"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LensRead"
+                  "$ref": "#/components/schemas/LensUsageRead"
                 }
               }
             },
@@ -48868,7 +51843,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Promote Lens",
+        "summary": "Lens Usage",
         "tags": [
           "govern"
         ]
@@ -49033,6 +52008,84 @@
           }
         ],
         "summary": "List Touches",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/view": {
+      "get": {
+        "description": "A world read on the model \u2014 or, without ``world``, the guardrails alone.",
+        "operationId": "lens_view_api_v1_u__username___graphSlug__govern_view_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "world",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 36,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "World"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LensView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Lens View",
         "tags": [
           "govern"
         ]
@@ -53362,6 +56415,71 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/model-links/removed": {
+      "get": {
+        "description": "Removed stitches, newest first, read from their removal events.\n\nAn event written before the rule was recorded in it names no pair and is left out.",
+        "operationId": "list_removed_links_api_v1_u__username___graphSlug__model_links_removed_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RemovedStitch"
+                  },
+                  "title": "Response List Removed Links Api V1 U  Username   Graphslug  Model Links Removed Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Removed Links",
+        "tags": [
+          "model-links"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/model-links/{link_id}": {
       "delete": {
         "description": "Remove a stitch \u2014 and, if it is active, the edges it wrote (ST48 \u00b7 ST55).\n\nA staged stitch wrote nothing, so its row is deleted here. An active one is\n`stitch-withdraw@1`, awaited: the Graph's guardrails are asked about both\nits models before an edge goes, and a refusal keeps the rule and its edges.",
@@ -53427,6 +56545,74 @@
           }
         ],
         "summary": "Remove Model Link",
+        "tags": [
+          "model-links"
+        ]
+      },
+      "get": {
+        "description": "One stitch read whole \u2014 the inspector's read.",
+        "operationId": "get_model_link_api_v1_u__username___graphSlug__model_links__link_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "link_id",
+            "required": true,
+            "schema": {
+              "title": "Link Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StitchDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Model Link",
         "tags": [
           "model-links"
         ]
@@ -53887,6 +57073,71 @@
           }
         ],
         "summary": "Get Shape",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/property-constraints/standards": {
+      "get": {
+        "description": "Every standard term with values a constraint on a property may reference.",
+        "operationId": "list_constraint_standards_api_v1_u__username___graphSlug__models_property_constraints_standards_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StandardChoice"
+                  },
+                  "title": "Response List Constraint Standards Api V1 U  Username   Graphslug  Models Property Constraints Standards Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Constraint Standards",
         "tags": [
           "models"
         ]
@@ -55567,7 +58818,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/models/{model_id}/versions/{version_id}/diff": {
       "get": {
-        "description": "What changed between two versions of this model.\n\nThe version bar states this (domain-models.md \u00b7 Surfaces): a list of numbers\nwith no account of what moved between them is a list nobody can act on. With\nno `against`, it diffs against the version immediately before this one, which\nis the question being asked nine times in ten.",
+        "description": "What changed between two versions of this model.\n\nThe version bar states this (domain-models.md \u00b7 Surfaces): a list of numbers\nwith no account of what moved between them is a list nobody can act on. With\nno `against`, it diffs against the version immediately before this one, which\nis the question being asked nine times in ten. `version_id` may be the draft,\nwhich is how the Comparing bar reads *active \u2192 draft*. Each changed type\ncarries its mark, and the counts are of the marks' lines.",
         "operationId": "diff_version_api_v1_u__username___graphSlug__models__model_id__versions__version_id__diff_get",
         "parameters": [
           {
@@ -56370,6 +59621,270 @@
           }
         ],
         "summary": "Update Node Type",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/versions/{version_id}/property-constraints": {
+      "put": {
+        "operationId": "set_property_constraint_api_v1_u__username___graphSlug__models__model_id__versions__version_id__property_constraints_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyConstraintSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse_ValidationRuleResponse_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Set Property Constraint",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/versions/{version_id}/property-constraints/check": {
+      "post": {
+        "description": "What in the graph breaks this constraint now \u2014 counted before it is saved, nothing written.",
+        "operationId": "check_property_constraint_api_v1_u__username___graphSlug__models__model_id__versions__version_id__property_constraints_check_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyConstraintSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstraintCheck"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Check Property Constraint",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/versions/{version_id}/property-constraints/{rule_id}": {
+      "delete": {
+        "operationId": "delete_property_constraint_api_v1_u__username___graphSlug__models__model_id__versions__version_id__property_constraints__rule_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse_NoneType_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Property Constraint",
         "tags": [
           "models"
         ]
@@ -60265,10 +63780,10 @@
         ]
       }
     },
-    "/api/v1/u/{username}/{graphSlug}/rules": {
+    "/api/v1/u/{username}/{graphSlug}/requests": {
       "get": {
-        "description": "Every invariant on this Graph, active and inactive, in offer order, and the install rules above them.",
-        "operationId": "list_invariants_api_v1_u__username___graphSlug__rules_get",
+        "description": "The inbox, newest ask first, with the Graph's open count whatever the filter.",
+        "operationId": "list_requests_api_v1_u__username___graphSlug__requests_get",
         "parameters": [
           {
             "description": "Owner username from the URL prefix.",
@@ -60298,7 +63813,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RuleListResponse"
+                  "$ref": "#/components/schemas/RequestPage"
                 }
               }
             },
@@ -60320,7 +63835,285 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "List Invariants",
+        "summary": "List Requests",
+        "tags": [
+          "govern"
+        ]
+      },
+      "post": {
+        "description": "*Ask for a change* \u2014 a ``change`` request by the caller, merged into the open one it repeats.",
+        "operationId": "create_request_api_v1_u__username___graphSlug__requests_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Request",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/requests/{request_id}": {
+      "get": {
+        "operationId": "get_request_api_v1_u__username___graphSlug__requests__request_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Request",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/requests/{request_id}/resolve": {
+      "post": {
+        "operationId": "resolve_request_api_v1_u__username___graphSlug__requests__request_id__resolve_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestResolve"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Resolve Request",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/rules": {
+      "get": {
+        "description": "Every rule in force here \u2014 the install's, the Graph's, each visible project's \u2014 in assembly order.",
+        "operationId": "list_rules_api_v1_u__username___graphSlug__rules_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_RuleRead_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Rules",
         "tags": [
           "rules"
         ]
@@ -60389,6 +64182,77 @@
           }
         ],
         "summary": "Create Invariant",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/rules/impact": {
+      "post": {
+        "description": "What this check would have broken in the last 30 days, read in this Graph.",
+        "operationId": "rule_impact_api_v1_u__username___graphSlug__rules_impact_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleImpactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleImpact"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Rule Impact",
         "tags": [
           "rules"
         ]

@@ -15,7 +15,10 @@ export {
 	type LayeredEdge,
 	type LayeredNode,
 } from "./layered/LayeredCanvas";
-export { GraphModelCanvas } from "./model/GraphModelCanvas";
+export {
+	GlobalModelBoard,
+	type GlobalModelSelect,
+} from "./model/GlobalModelBoard";
 export {
 	hueSlotForName,
 	MODEL_EMPTY_TYPE,

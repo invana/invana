@@ -2,6 +2,7 @@ import { suppressActionToast } from "@invana-studio/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { modelsApi, schemasApi } from "./api";
 import type {
+	ConstraintCreate,
 	EdgeTypeCreate,
 	EdgeTypeUpdate,
 	GraphModelCreate,
@@ -15,8 +16,8 @@ import type {
 	NodeTypeCreate,
 	NodeTypeUpdate,
 	OntologyImportRequest,
+	PropertyConstraintSet,
 	PropertyKeyCreate,
-	PropertyKeyUpdate,
 } from "./types";
 
 const root = (u: string, g: string) => ["models", u, g] as const;
@@ -285,25 +286,102 @@ export const useCreatePropertyKeyMutation = (u: string, g: string) =>
 			modelsApi.createPropertyKey(u, g, modelId, versionId, data),
 	);
 
-export const useUpdatePropertyKeyMutation = (u: string, g: string) =>
-	useModelMutation(
-		u,
-		g,
-		({
-			modelId,
-			versionId,
-			keyId,
-			data,
-		}: TypeCtx & { keyId: string; data: PropertyKeyUpdate }) =>
-			modelsApi.updatePropertyKey(u, g, modelId, versionId, keyId, data),
-	);
-
 export const useCreateIndexMutation = (u: string, g: string) =>
 	useModelMutation(
 		u,
 		g,
 		({ modelId, versionId, data }: TypeCtx & { data: IndexCreate }) =>
 			modelsApi.createIndex(u, g, modelId, versionId, data),
+	);
+
+export const useDeleteIndexMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, versionId, indexId }: TypeCtx & { indexId: string }) =>
+			modelsApi.deleteIndex(u, g, modelId, versionId, indexId),
+	);
+
+export const useCreateConstraintMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, versionId, data }: TypeCtx & { data: ConstraintCreate }) =>
+			modelsApi.createConstraint(u, g, modelId, versionId, data),
+	);
+
+export const useDeleteConstraintMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({
+			modelId,
+			versionId,
+			constraintId,
+		}: TypeCtx & { constraintId: string }) =>
+			modelsApi.deleteConstraint(u, g, modelId, versionId, constraintId),
+	);
+
+// ── Constraints on properties (property-constraints.md) ────────────────────
+
+export const useSetPropertyConstraintMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, versionId, data }: TypeCtx & { data: PropertyConstraintSet }) =>
+			modelsApi.setPropertyConstraint(u, g, modelId, versionId, data),
+	);
+
+export const useDeletePropertyConstraintMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, versionId, ruleId }: TypeCtx & { ruleId: string }) =>
+			modelsApi.deletePropertyConstraint(u, g, modelId, versionId, ruleId),
+	);
+
+/** Standard terms with values a constraint may reference. */
+export function useConstraintStandardsQuery(
+	u: string,
+	g: string,
+	enabled: boolean,
+) {
+	return useQuery({
+		queryKey: [...root(u, g), "constraint-standards"] as const,
+		queryFn: () => modelsApi.constraintStandards(u, g),
+		enabled,
+	});
+}
+
+/** What breaks the unsaved constraint today — the engine counts; `null` asks nothing. */
+export function useConstraintCheckQuery(
+	u: string,
+	g: string,
+	ctx: TypeCtx,
+	body: PropertyConstraintSet | null,
+) {
+	return useQuery({
+		queryKey: [...root(u, g), "constraint-check", ctx.versionId, body] as const,
+		queryFn: () =>
+			modelsApi.checkPropertyConstraint(
+				u,
+				g,
+				ctx.modelId,
+				ctx.versionId,
+				body as PropertyConstraintSet,
+			),
+		enabled: body !== null,
+		retry: false,
+	});
+}
+
+/** A property's definition, deleted from the draft once no type maps it. */
+export const useDeletePropertyKeyMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({ modelId, versionId, keyId }: TypeCtx & { keyId: string }) =>
+			modelsApi.deletePropertyKey(u, g, modelId, versionId, keyId),
 	);
 
 // ── The staged set (model-editor.md) ───────────────────────────────────────
@@ -357,6 +435,40 @@ export const useCommitDraftMutation = (u: string, g: string) =>
 // ── Publish review (publish-review.md) ─────────────────────────────────────
 
 /** Additive or breaking — read when the Publish confirm opens, and by the compare bar. */
+/**
+ * What `against` → `to` did, with each changed type's mark — the map's chips
+ * and the Comparing bar's counts. `to` may be the draft's id; `against` left
+ * out reads the version before `to`.
+ */
+export function useVersionDiffQuery(
+	username?: string,
+	graphSlug?: string,
+	modelId?: string,
+	to?: string,
+	against?: string,
+) {
+	return useQuery({
+		queryKey: [
+			"models",
+			username,
+			graphSlug,
+			modelId,
+			"diff",
+			to,
+			against ?? null,
+		] as const,
+		queryFn: () =>
+			modelsApi.versionDiff(
+				username as string,
+				graphSlug as string,
+				modelId as string,
+				to as string,
+				against,
+			),
+		enabled: !!username && !!graphSlug && !!modelId && !!to,
+	});
+}
+
 export function useDraftReviewQuery(
 	username: string,
 	graphSlug: string,
@@ -457,6 +569,33 @@ export function useModelLinksQuery(username?: string, graphSlug?: string) {
 	return useQuery({
 		queryKey: linksRoot(username ?? "", graphSlug ?? ""),
 		queryFn: () => modelsApi.links(username as string, graphSlug as string),
+		enabled: !!username && !!graphSlug,
+	});
+}
+
+/** One stitch read whole, for the inspector. */
+export function useModelLinkQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	linkId: string | null,
+) {
+	return useQuery({
+		queryKey: [...linksRoot(username ?? "", graphSlug ?? ""), linkId] as const,
+		queryFn: () =>
+			modelsApi.link(username as string, graphSlug as string, linkId as string),
+		enabled: !!username && !!graphSlug && !!linkId,
+	});
+}
+
+/** The Stitches page's Removed group. */
+export function useRemovedLinksQuery(username?: string, graphSlug?: string) {
+	return useQuery({
+		queryKey: [
+			...linksRoot(username ?? "", graphSlug ?? ""),
+			"removed",
+		] as const,
+		queryFn: () =>
+			modelsApi.removedLinks(username as string, graphSlug as string),
 		enabled: !!username && !!graphSlug,
 	});
 }

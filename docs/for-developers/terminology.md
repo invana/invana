@@ -54,7 +54,7 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | Term | Means |
 |---|---|
 | **Graph** | The bounded domain and the reasoning boundary. An agent never crosses it. One Graph binds to exactly one graph database. |
-| **Graph settings** | The Graph's own configuration, in four tabs: **Basic** · **Graph** (the connection) · **LLMs** (the providers) · **Agents** (the ceiling). Nothing else is settings. |
+| **Graph settings** | The Graph's own configuration, one page in three tabs: **Basic** · **Database** (the connection) · **Members**. The providers are Agents › LLMs and the ceiling Agents › Settings. Nothing else is settings. |
 | **Rule** | One statement that is always true, scoped `install`, `graph` (an **invariant**) or `project` (a **working** rule). Offered to steps; a rule with a **check** is also enforced `block · warn · report` at the acts the check names. [6.4](modules/skills/features/rules.md) |
 | **Library** | The **definitions** a run is built from: reusable **flows**, the closed **catalogue** of functions, and projection **templates**. One `leftNav` item, three sections ([G41](building-studio/graph-detail-page.md)). Never the journal — that is **Runs**. |
 | **Skill** | A playbook an agent may be offered — named, described, with a "when to use". Offered, never forced. |

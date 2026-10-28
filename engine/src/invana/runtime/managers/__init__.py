@@ -12,6 +12,8 @@ from invana.runtime.managers.plan_performance import PlanPerformanceManager
 from invana.runtime.managers.plugins import PluginManager
 from invana.runtime.managers.rule_checks import RuleCheckManager
 from invana.runtime.managers.rule_citations import RuleCitationManager
+from invana.runtime.managers.rule_impact import RuleImpactManager
+from invana.runtime.managers.rule_pages import RulePageManager
 from invana.runtime.managers.run_stats import RunStatsManager
 from invana.runtime.managers.simulation import SimulationManager
 from invana.runtime.managers.skill_bind import SkillBindManager
@@ -33,6 +35,8 @@ __all__ = [
     "PluginManager",
     "RuleCheckManager",
     "RuleCitationManager",
+    "RuleImpactManager",
+    "RulePageManager",
     "RunStatsManager",
     "SimulationManager",
     "SkillBindManager",

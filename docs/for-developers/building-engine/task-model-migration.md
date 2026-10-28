@@ -337,7 +337,7 @@ finishes.**
 
 | Module | Reaches | Closes when |
 |---|---|---|
-| `catalogue/schema_write.py` | `apps.llm` · `apps.modeller` · `apps.sessions` | `validate_proposal`'s `reconcile_proposal` moves from `apps/sessions` to an `apps/modeller` manager, and `understand_ask` stops going through `SessionManager._ensure_model_and_draft` |
+| `catalogue/schema_write.py` | `apps.llm` · `apps.modeller` · `apps.sessions` · `apps.datasets` | `validate_proposal`'s `reconcile_proposal` moves from `apps/sessions` to an `apps/modeller` manager, and `understand_ask` stops going through `SessionManager._ensure_model_and_draft`; `migrate_model` reads the datasets bound to the model (`apps.datasets` imports `apps.modeller`, so the publish cannot look them up itself) until the publish manager takes them from a lower band |
 | `catalogue/work_write.py` | `apps.agents` · `apps.work` | § 6.2's merge of `delegate` and `create_task` into one entry |
 | `catalogue/contract.py` | `apps.graphs` · `apps.sessions` · `apps.skills` · `apps.llm*` | it declares no entries — it is the shared contract, and the test exempts it for that reason |
 

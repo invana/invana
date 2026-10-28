@@ -26,7 +26,7 @@ may leave. Run the same question in two and read the difference.
 | C6 | Name an unnamed lens | Naming is what puts it in the Graph's list |
 | C7 | Compare two worlds on one question | Two runs, one question, the answers and the touches side by side |
 | C8 | Retune from a run | `Retune` opens this drawer without closing the run |
-| C9 | Promote a world to a guardrail | One field, no re-authoring |
+| C9 | Read a world on the model | The lens canvas: every published model's types, those the world hides dimmed, guarded properties shielded, under a Lens strip naming what it hides and guards |
 | C10 | See what it was actually used for | Run count, last use and who, per world — one grouped read over `task_runs`, never a counter |
 | C11 | Read a world as one object | Five layer sections, one cast section, and `as_of` — the drill-in is the record, in order |
 | C12 | Pin transaction time | `as_of` resolves which versions and stitches are in view; it composes with `select.time`, which is valid time ([GV15](../spec.md)) |
@@ -102,7 +102,7 @@ prompted it. Closing the run to edit what it ran under is the loop this design e
 
 ---
 
-## Journey 3 — a keeper becomes a world, and then a standard
+## Journey 3 — a keeper becomes a world
 
 ```mermaid
 sequenceDiagram
@@ -111,7 +111,6 @@ sequenceDiagram
     participant W as Worlds drawer
     participant E as Engine
     actor S as Sam
-    actor Ad as An admin
 
     Note over P: three unnamed lenses, attached to her runs,<br/>visible to nobody else
     P->>W: this one is right — type a name
@@ -120,12 +119,7 @@ sequenceDiagram
     E-->>W: it is now in the Graph's list
     S->>W: open the drawer
     W-->>S: "EU · H1 2026" · used in 34 runs
-    S->>W: pick it, ask his own question
-    Note over Ad: two weeks later — EU-only should apply to everyone
-    Ad->>E: POST …/lenses/eu-h1-2026/promote · kind = guardrail
-    E-->>Ad: it leaves the Worlds list
-    E-->>Ad: it appears in settings › Guardrails
-    Note over S,Ad: every world now narrows within it;<br/>no world is re-authored
+    S->>W: pick it, ask their own question
 ```
 
 ---
@@ -179,6 +173,8 @@ the answers differ, and it is the only part a person cannot reconstruct by readi
 
 | Surface | Shape | Components |
 |---|---|---|
+| Worlds page | `/modeller/worlds?world=<id>` — leftSection: the Govern panel (Model · Worlds · Guardrails tabs; a type filter; models with their types, worlds with *lens on* beside the open one, guardrails with their type count). Main: the **lens canvas** — `GlobalModelBoard` schema cards, hidden types dimmed, each guarded property a shield chip — under a floating Lens strip (`Lens <world> ▾ · <types> hidden · N guarded`). The page's right column is the **world inspector**: the world and a `world` chip, tabs **Sees** (Models *N of M*, each `all` · `sliced` · `hidden`; Window time and geography; Thinks with; Used by) · **Answers go** (each `llm` and `third_party` destination with what may leave) · **Used by** (agents, schedules and people with their runs), and *Open board* · *Next: guardrails* ([WO22](#decisions)) | `GlobalModelBoard` · `Tabs` · `PropertyList` · `Select` |
+| World board | `/modeller/worlds/<id>` — head `Worlds › <world>` · `last used …` · `world` · `used in N runs` · *Edit*; tiles Rules · Closed layers · In force · Runs (30 days) · Last used; **Five layers** (layer · what it allows · `sliced` · `allowed` · `closed` · `denied`) beside **Cast — who runs inside it** (agent · runs · last) ([WO23](#decisions)) | `Board` |
 | Worlds drawer | First drawer of the **Govern** stack ([GV17](../spec.md)). Header: label · count · `+` · search · filter ([G36](../../../building-studio/graph-detail-page.md)). Body: the locked guardrails strip, then the list | `PanelStack` · `PanelBox` · `SearchInput` · `EmptyState` |
 | A world row | Name · the chips it narrows by · run count and last use | **`LensRow`** · `LayerChip` |
 | A world's detail | The drill-in — header `‹ WORLDS / EU · H1 2026`; a summary band (*narrows · used · validated*), then five sections one per layer, then the cast, then `as_of`; `Compare` · `Promote` · `Duplicate` | `RecordHeader` · **`LayerSection`** · **`RuleRow`** · **`SliceSummary`** · **`CastTable`** |
@@ -201,13 +197,14 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 |---|---|
 | `lenses` | `kind = world` · `key` (slug) null while private · `name` (the typed text) · `rules` · `cast` · `as_of` · `created_in_run_id` · `version` |
 | Naming | `PATCH …/lenses/{id}` setting `key` **and** `name` — the write that publishes. Emits `lens.named` |
-| Promotion | `POST …/lenses/{id}/promote` — sets `kind = guardrail` and `scope`. The guardrail permission only |
+| The lens view | `GET …/govern/view?world=<id>` — `LensView`: `world` · `models[{name, version, seen: all · sliced · hidden}]` · `types[{model, type, hidden, sliced, excluded[], guarded[{property, guardrail_id, guardrail, access, leaves}]}]` · `hidden_types[]` · `guarded` (count) · `window{time, geo}` · `thinks_with{role: address}` · `answers_go[{address, may_send[] · null}]` · `used_by[{kind, id, name, runs}]`. Without `world` it is the guardrails alone. Resolved by the engine against every published version, through the same compile the connector is handed |
+| Usage | `GET …/lenses/{id}/usage` adds `runs_30d` and `by_agent[{agent_id, name, runs, last_at}]` — the board's cast |
 | Validation at edit | A world is checked against the effective guardrails **when saved**, not when run — `POST …/lenses/validate` for the draft |
 | The catalogue | `GET …/graphs/{id}/participants` — what the pickers offer, resolved live from published versions, `llm_models`, cache kinds and roles ([GV21](../spec.md)) |
 | Declared axes | `graph_versions.axes` — `{time, geo, dims}`. Empty means nothing is selectable, and a slice on an undeclared axis is refused naming the model and the axis |
 | Usage | one `GROUP BY lens_id` over `task_runs`: count, last use, distinct actors. No counter column |
 | Resolution | `effective = agent ∩ plan ∩ todo`, computed at run open, frozen as `lens_snapshot` |
-| Routes | `GET · POST · PATCH · DELETE …/lenses?kind=world` · `POST …/lenses/{id}/promote` · `POST …/lenses/{id}/duplicate` · `POST …/lenses/validate` · `GET …/lenses/{id}/usage` |
+| Routes | `GET · POST · PATCH · DELETE …/lenses?kind=world` · `POST …/lenses/{id}/duplicate` · `POST …/lenses/validate` · `GET …/lenses/{id}/usage` |
 
 ---
 
@@ -237,12 +234,18 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 | WO20 | **The engine counts what a world and a compare show.** A lens reads back with `allow_rules` and `deny_rules`, and its detail `usage` with `people`; `GET …/compare` returns `counts` — `touched_a`, `touched_b`, `shared`, `only_one` (either way round) and `read_differently`. Studio's tiles format these and derive none. A frozen report's legacy lens panel carries no share, so it shows its two counts and the meter's fill. |
 | WO21 | **A run's touches come back counted and classified.** `GET …/runs/{id}/touches` returns, beside the ledger, `participants` — one per address the frozen world allowed or the run engaged, with its `layer`, its `verdict` (`refused` over `touched` over `miss` over `never_touched`), `rows`, `tokens`, `calls` (engaged touches) and the first refusal's `why` — and `layers`, one per layer with `allowed` (participants drawn there), `touched`, `refused`, `touches` (every ledger row), `calls` (the engaged ones) and `rows`; and `tallies` — `allowed`, `touched`, `never_touched`, `refused`. The run lens, the layers gantt and the run summary format these and count nothing. |
 
+| WO22 | **A world is read on the model.** The Worlds page is the lens canvas with the world inspector beside it; the canvas reads `GET …/govern/view`, so *hidden*, *sliced* and *guarded* are the engine's compile, never Studio re-reading rules. The world is picked from the Lens strip or the leftSection and rides `?world=`; with none picked, the first named world opens. |
+| WO23 | **The world board is the auditor's page**: one *Edit* in the head (it opens the world editor as a modal), the five tiles, the five layers with their state, and the cast as the agents whose runs asked under the world — read from the runs, not from `cast`. A world nobody has asked under says so in the cast panel. The layers are the engine's five governed ones; the board draws no *compute* layer, because no participant is governed as compute. |
+| WO24 | **No promote.** A guardrail is one property rule ([GR24](guardrails.md#decisions)); a world stays a world. |
+| WO25 | **A `*.*` guardrail is named once.** On the lens canvas a guarded property chips its type; a guardrail on every property of every type is named on the strip and in the inspector, never chipped on each type. |
+
 ---
 
 ## Not building
 
 | Not building | Because |
 |---|---|
+| A *compute* layer | worker pools are capacity, not a participant a lens can allow or deny |
 | A world per step | the lens is the run's circumstances (GV8) |
 | Folders or tags for worlds | a Graph that needs to file its worlds has too many; naming is the filter |
 | Auto-suggested worlds from run history | *declared but never touched* is already the suggestion, and it is a reading a person makes, not one made for them |

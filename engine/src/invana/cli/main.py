@@ -57,6 +57,7 @@ from invana.cli.commands.projects import (
     reports_cmd,
 )
 from invana.cli.commands.records import records_cmd
+from invana.cli.commands.requests import requests_cmd
 from invana.cli.commands.rules import rules_cmd
 from invana.cli.commands.schedules import schedules_cmd
 from invana.cli.commands.search import search_cmd
@@ -239,6 +240,7 @@ app.add_command(simulations_cmd)
 app.add_command(search_cmd)
 app.add_command(stitches_cmd)
 app.add_command(govern_cmd)
+app.add_command(requests_cmd)
 app.add_command(skills_cmd)
 app.add_command(agents_cmd)
 app.add_command(evals_cmd)

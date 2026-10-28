@@ -42,7 +42,10 @@ import {
 	Globe,
 	History,
 	LayoutDashboard,
+	Link2,
 	ListTree,
+	MessageSquarePlus,
+	Orbit,
 	Pencil,
 	Play,
 	Plug,
@@ -50,6 +53,7 @@ import {
 	ScrollText,
 	Server,
 	ServerCog,
+	Settings,
 	ShieldCheck,
 	SlidersHorizontal,
 	SquareActivity,
@@ -179,9 +183,15 @@ export type DeclaredKind =
 	| "skill"
 	| "rule"
 	| "world"
-	| "guardrail"
+	| "worlds"
+	| "guardrails"
+	| "requests"
+	| "rules"
+	| "settings"
 	| "agent"
 	| "models"
+	| "global_model"
+	| "stitches"
 	| "project"
 	| "decisions"
 	| "plugin"
@@ -309,30 +319,67 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		panel: "skills",
 		subject: "a rules.id",
 	},
-	// A world and a guardrail are **one `lenses` row separated by `kind`**,
-	// and one composer draws both. They are two kinds for the reason the
-	// two names exist at all: a tab reading `Lens` would make a reader open it
-	// to find out which of the two bounds they are looking at.
-	//
-	// Neither tab is titled by `label`, either — the host names a lens board
-	// after the lens, so a strip of four worlds reads as four worlds.
+	// A world's board — the auditor's page. The tab is titled with the world's
+	// name, not `label`, so a strip of four worlds reads as four worlds.
 	world: {
 		kind: "world",
 		renders: "declared",
 		label: "World",
 		icon: Globe,
-		// The Worlds drill-in opens it.
+		// *Open board* in the world inspector.
 		panel: "govern",
 		subject: "a lenses.id",
 	},
-	guardrail: {
-		kind: "guardrail",
+	// The Worlds and Guardrails pages: the lens canvas with an inspector
+	// beside it (worlds.md, guardrails.md). Studio-only and bound to the Graph,
+	// like `models`; the world or guardrail picked rides in the URL.
+	worlds: {
+		kind: "worlds",
 		renders: "declared",
-		label: "Guardrail",
-		icon: ShieldCheck,
-		// The Guardrails drill-in opens it.
+		label: "Worlds",
+		icon: Globe,
+		// Worlds on the Modeller's leftNav.
 		panel: "govern",
-		subject: "a lenses.id",
+		subject: "the graph's slug",
+	},
+	guardrails: {
+		kind: "guardrails",
+		renders: "declared",
+		label: "Guardrails",
+		icon: ShieldCheck,
+		// Guardrails on the Modeller's leftNav.
+		panel: "govern",
+		subject: "the graph's slug",
+	},
+	// The Requests inbox (requests.md). Studio-only, bound to the Graph.
+	requests: {
+		kind: "requests",
+		renders: "declared",
+		label: "Requests",
+		icon: MessageSquarePlus,
+		// Requests on the Modeller's leftNav.
+		panel: "requests",
+		subject: "the graph's slug",
+	},
+	// Every rule in force in the Graph, by scope (rules.md). Bound to the Graph.
+	rules: {
+		kind: "rules",
+		renders: "declared",
+		label: "Rules",
+		icon: ScrollText,
+		// Rules on the Modeller's leftNav.
+		panel: "rules",
+		subject: "the graph's slug",
+	},
+	// The Graph's own settings — Basic · Database · Members (graph-settings.md).
+	settings: {
+		kind: "settings",
+		renders: "declared",
+		label: "Graph settings",
+		icon: Settings,
+		// Graph settings at the foot of the Modeller's leftNav.
+		panel: "settings",
+		subject: "the graph's slug",
 	},
 	// The agent's one page — five tabs, the one declared page that edits.
 	// Titled with the agent's name, like a lens board, because a
@@ -355,6 +402,27 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		label: "Models",
 		icon: Boxes,
 		// Switching the `leftNav` to Models opens it.
+		panel: "model",
+		subject: "the graph's slug",
+	},
+	// Every published model on one full-bleed canvas, stitches dashed
+	// (modeller.md). Studio-only and bound to the Graph, like `models`.
+	global_model: {
+		kind: "global_model",
+		renders: "declared",
+		label: "Global model",
+		icon: Orbit,
+		// Global model on the Modeller's leftNav.
+		panel: "model",
+		subject: "the graph's slug",
+	},
+	// The Graph's stitches, active and removed. Studio-only, like `models`.
+	stitches: {
+		kind: "stitches",
+		renders: "declared",
+		label: "Stitches",
+		icon: Link2,
+		// Stitches on the Modeller's leftNav.
 		panel: "model",
 		subject: "the graph's slug",
 	},

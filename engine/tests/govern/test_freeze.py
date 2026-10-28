@@ -22,6 +22,7 @@ from invana.apps.govern.schemas import LensCreate, LensUpdate, RuleIn
 from invana.core.errors import NotFoundError
 from invana.runtime.models import TaskRun
 from invana.runtime.services import freeze_lens
+from tests.govern.guardrails import graph_guardrail
 
 pytestmark = pytest.mark.asyncio
 
@@ -30,19 +31,11 @@ EMPTY = Catalogue(participants=())
 
 
 async def _guardrail(session, graph, user):
-    return await lenses.create(
-        session,
-        graph_id=graph.id,
-        payload=LensCreate(
-            name="Graph guardrails",
-            kind=LensKind.guardrail,
-            scope="graph",
-            rules=[RuleIn(match="third_party/**", allow=False)],
-        ),
-        actor_id=user.id,
-        catalogue=EMPTY,
-        may_edit_guardrails=True,
-    )
+    """``*.*`` read, stays in the Graph — what the demo's guardrail is re-expressed as."""
+    row = graph_guardrail(graph.id)
+    session.add(row)
+    await session.flush()
+    return row
 
 
 class TestFreezingTheLens:
@@ -57,7 +50,7 @@ class TestFreezingTheLens:
         frozen = await freeze_lens(session, graph_id=graph.id, agent_id=None, lens_id=None)
 
         assert frozen["lens_id"] is None
-        assert [r["match"] for r in frozen["lens_snapshot"]["rules"]] == ["third_party/**"]
+        assert [r["match"] for r in frozen["lens_snapshot"]["rules"]] == ["llm/**", "third_party/**"]
 
     async def test_a_picked_world_composes_inside_the_ceiling(self, session, graph, user, member):
         """Both contributors are in the snapshot, and it is one document (GV1)."""
@@ -81,12 +74,13 @@ class TestFreezingTheLens:
         assert frozen["lens_id"] == world.id
         assert sorted(r["match"] for r in snapshot["rules"]) == [
             "graph_data/model/Routes@*",
+            "llm/**",
             "third_party/**",
         ]
         assert snapshot["closed_layers"] == ["graph_data"]
         # The name travels with it, so a rename later cannot rewrite what a past
         # run says it ran under (GR3).
-        assert {c["name"] for c in snapshot["contributors"]} == {"Graph guardrails", "EU · H1 2026"}
+        assert {c["name"] for c in snapshot["contributors"]} == {"*.* never leaves", "EU · H1 2026"}
 
     async def test_a_rename_does_not_reach_a_run_that_already_opened(self, session, graph, user, member):
         """GR3 — the snapshot is the record, and the row is not."""

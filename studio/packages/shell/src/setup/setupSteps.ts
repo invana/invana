@@ -97,7 +97,7 @@ export const SETUP_STEPS: readonly SetupStepMeta[] = [
 			body: "One database can back many Graphs. A Graph is the question you are trying to answer, and everything gathered to answer it.",
 		},
 		settingsSection: "settings",
-		settingsTab: "graph",
+		settingsTab: "database",
 	},
 	{
 		key: "model",

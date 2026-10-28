@@ -647,6 +647,7 @@ CREATE TABLE graph_versions (
 	activated_at TIMESTAMP WITH TIME ZONE, 
 	content_hash VARCHAR(64), 
 	axes JSON DEFAULT '{}'::json NOT NULL, 
+	affected_datasets JSON DEFAULT '[]'::json NOT NULL, 
 	CONSTRAINT graph_versions_pkey PRIMARY KEY (id), 
 	CONSTRAINT graph_versions_model_id_fkey FOREIGN KEY(model_id) REFERENCES graph_models (id) ON DELETE CASCADE, 
 	CONSTRAINT uq_graph_version UNIQUE NULLS DISTINCT (model_id, version)
@@ -800,10 +801,15 @@ CREATE TABLE lenses (
 	version INTEGER DEFAULT 1 NOT NULL, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	target VARCHAR(255), 
+	access VARCHAR(8), 
+	leaves BOOLEAN, 
+	allowed_in JSON DEFAULT '[]'::json NOT NULL, 
 	CONSTRAINT lenses_pkey PRIMARY KEY (id), 
 	CONSTRAINT lenses_created_by_id_fkey FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL, 
 	CONSTRAINT lenses_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	CONSTRAINT uq_lens_graph_key UNIQUE NULLS DISTINCT (graph_id, key), 
+	CONSTRAINT ck_lens_graph_guardrail_rule CHECK (kind::text <> 'guardrail'::text OR scope::text <> 'graph'::text OR target IS NOT NULL AND access IS NOT NULL AND leaves IS NOT NULL), 
 	CONSTRAINT ck_lens_kind_shape CHECK (kind::text = 'guardrail'::text AND scope IS NOT NULL AND key IS NOT NULL OR kind::text = 'world'::text AND scope IS NULL)
 );
 
@@ -891,6 +897,7 @@ CREATE TABLE model_links (
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	status model_link_status_enum DEFAULT 'active'::model_link_status_enum NOT NULL, 
 	target_property VARCHAR(255), 
+	edges INTEGER, 
 	CONSTRAINT model_links_pkey PRIMARY KEY (id), 
 	CONSTRAINT model_links_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	CONSTRAINT model_links_source_version_id_fkey FOREIGN KEY(source_version_id) REFERENCES graph_versions (id) ON DELETE CASCADE, 
@@ -1412,6 +1419,45 @@ CREATE UNIQUE INDEX ix_refresh_tokens_token_hash ON refresh_tokens (token_hash);
 
 CREATE INDEX ix_refresh_tokens_user_id ON refresh_tokens (user_id);
 
+CREATE TABLE requests (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	title VARCHAR(512) NOT NULL, 
+	detail TEXT, 
+	source VARCHAR(16) NOT NULL, 
+	asked_by_id VARCHAR(36), 
+	agent_id VARCHAR(36), 
+	run_id VARCHAR(36), 
+	session_id VARCHAR(36), 
+	guardrail_id VARCHAR(36), 
+	blocked_by VARCHAR(255), 
+	asks INTEGER NOT NULL, 
+	last_asked_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	status VARCHAR(8) NOT NULL, 
+	resolution VARCHAR(16), 
+	resolution_note VARCHAR(512), 
+	world_id VARCHAR(36), 
+	model_id VARCHAR(36), 
+	resolved_by_id VARCHAR(36), 
+	resolved_at TIMESTAMP WITH TIME ZONE, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	CONSTRAINT requests_pkey PRIMARY KEY (id), 
+	CONSTRAINT requests_asked_by_id_fkey FOREIGN KEY(asked_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT requests_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	CONSTRAINT requests_guardrail_id_fkey FOREIGN KEY(guardrail_id) REFERENCES lenses (id) ON DELETE SET NULL, 
+	CONSTRAINT requests_model_id_fkey FOREIGN KEY(model_id) REFERENCES graph_models (id) ON DELETE SET NULL, 
+	CONSTRAINT requests_resolved_by_id_fkey FOREIGN KEY(resolved_by_id) REFERENCES users (id) ON DELETE SET NULL, 
+	CONSTRAINT requests_world_id_fkey FOREIGN KEY(world_id) REFERENCES lenses (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_requests_graph_id ON requests (graph_id);
+
+CREATE INDEX ix_requests_graph_status ON requests (graph_id, status);
+
+CREATE INDEX ix_requests_guardrail ON requests (guardrail_id);
+
 CREATE TABLE rule_versions (
 	id VARCHAR(36) NOT NULL, 
 	rule_id VARCHAR(36) NOT NULL, 
@@ -1421,6 +1467,7 @@ CREATE TABLE rule_versions (
 	published_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	"check" JSON, 
 	mode VARCHAR(8), 
+	because VARCHAR(500), 
 	CONSTRAINT rule_versions_pkey PRIMARY KEY (id), 
 	CONSTRAINT rule_versions_published_by_id_fkey FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL, 
 	CONSTRAINT rule_versions_rule_id_fkey FOREIGN KEY(rule_id) REFERENCES rules (id) ON DELETE CASCADE, 
@@ -2039,7 +2086,13 @@ CREATE TABLE validation_rules (
 	type_property_mapping_id VARCHAR(36), 
 	rule_type rule_type_enum NOT NULL, 
 	params JSON NOT NULL, 
+	unit VARCHAR(32), 
+	standard_version_id VARCHAR(36), 
+	standard_ref VARCHAR(160), 
+	term VARCHAR(255), 
+	on_break VARCHAR(8) DEFAULT 'reject'::character varying NOT NULL, 
 	CONSTRAINT validation_rules_pkey PRIMARY KEY (id), 
+	CONSTRAINT fk_validation_rules_standard_version FOREIGN KEY(standard_version_id) REFERENCES standard_versions (id) ON DELETE SET NULL, 
 	CONSTRAINT validation_rules_property_key_id_fkey FOREIGN KEY(property_key_id) REFERENCES property_key_definitions (id) ON DELETE CASCADE, 
 	CONSTRAINT validation_rules_type_property_mapping_id_fkey FOREIGN KEY(type_property_mapping_id) REFERENCES type_property_mappings (id) ON DELETE CASCADE
 );

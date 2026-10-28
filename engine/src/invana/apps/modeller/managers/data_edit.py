@@ -8,10 +8,11 @@ from a route, since nothing writes outside the runtime.
 **The model is the schema.** :meth:`DataEditManager.model_index` reads the
 active version of the graph's model (its connection's ``model_id``) — the version Studio's
 Element panel reads — and :meth:`DataEditManager.check_batch` refuses a type or
-a key that version does not have, a key both set and removed, and a value its
-key's data type cannot hold. A value is coerced to its key's type here, so the
-database receives a number for a ``float`` key whatever the form sent. The
-client's strictness is a courtesy; this is the check.
+a key that version does not have, a key both set and removed, a value its
+key's data type cannot hold, and a value that breaks a constraint on its key
+which rejects — the refusal names the constraint (property-constraints.md).
+A value is coerced to its key's type here, so the database receives a number
+for a ``float`` key whatever the form sent. The client's strictness is a courtesy; this is the check.
 
 **Identity.** An added element carries the board's id (``ref``);
 :meth:`DataEditManager.apply_edits` maps each to the id the database gave it,
@@ -38,6 +39,7 @@ from typing import Any, Literal
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.modeller.constraints import VALUE_RULES, breaks, constraint_label, flags, refusal
 from invana.apps.modeller.schemas import (
     AddEdge,
     AddNode,
@@ -46,8 +48,10 @@ from invana.apps.modeller.schemas import (
     DeleteEdge,
     DeleteNode,
     ModelIndex,
+    TypePropertyMappingResponse,
     UpdateEdge,
     UpdateNode,
+    ValidationRuleResponse,
     VersionResponse,
 )
 from invana.apps.modeller.store import ModelStore
@@ -56,19 +60,26 @@ from invana.core.errors import ConflictError, ValidationError
 # ── the model, as the check reads it ──────────────────────────────────────
 
 
+def _value_rules(mappings: list[TypePropertyMappingResponse]) -> dict[str, list[ValidationRuleResponse]]:
+    """Each key's constraints on its values — the mapping's and the key's own."""
+    out: dict[str, list[ValidationRuleResponse]] = {}
+    for m in mappings:
+        rules = [r for r in [*m.validation_rules, *m.property_key.validation_rules] if r.rule_type in VALUE_RULES]
+        if rules:
+            out[m.property_key.name] = rules
+    return out
+
+
 def index_of(version: VersionResponse) -> ModelIndex:
-    """Each node type's effective keys (its own and inherited) and each relationship type's keys."""
+    """Each node type's effective keys (its own and inherited), each relationship type's keys, and their constraints."""
+    node_mappings = {t.name: t.effective_property_mappings or t.property_mappings for t in version.node_types}
+    edge_mappings = {t.name: t.property_mappings for t in version.edge_types}
+    rules = {name: _value_rules(ms) for name, ms in [*node_mappings.items(), *edge_mappings.items()]}
     return ModelIndex(
         version_id=version.id,
-        nodes={
-            t.name: {
-                m.property_key.name: m.property_key.type for m in (t.effective_property_mappings or t.property_mappings)
-            }
-            for t in version.node_types
-        },
-        edges={
-            t.name: {m.property_key.name: m.property_key.type for m in t.property_mappings} for t in version.edge_types
-        },
+        nodes={name: {m.property_key.name: m.property_key.type for m in ms} for name, ms in node_mappings.items()},
+        edges={name: {m.property_key.name: m.property_key.type for m in ms} for name, ms in edge_mappings.items()},
+        rules={name: r for name, r in rules.items() if r},
     )
 
 
@@ -126,9 +137,18 @@ def _refuse(code: str, index: int, message: str, **extra: Any) -> ValidationErro
 
 
 def _properties(
-    index: int, type_name: str, keys: dict[str, str], values: dict[str, Any], what: str
+    index: int,
+    type_name: str,
+    keys: dict[str, str],
+    values: dict[str, Any],
+    what: str,
+    rules: dict[str, list[ValidationRuleResponse]] | None = None,
 ) -> tuple[dict[str, Any], list[str]]:
-    """``values`` checked against ``keys`` and coerced; a blank value becomes a key to unset."""
+    """``values`` checked against ``keys`` and coerced; a blank value becomes a key to unset.
+
+    A coerced value that breaks a constraint which rejects is refused, naming
+    the constraint; one that only flags goes through.
+    """
     out: dict[str, Any] = {}
     blank: list[str] = []
     for key, value in values.items():
@@ -145,6 +165,15 @@ def _properties(
             raise _refuse(
                 "bad_value", index, f"{key} on {what} takes {keys[key]}; {value!r} is not one ({exc}).", key=key
             ) from exc
+        for rule in (rules or {}).get(key, []):
+            if not flags(rule) and breaks(out[key], rule):
+                raise _refuse(
+                    "breaks_constraint",
+                    index,
+                    refusal(type_name, key, rule, out[key]),
+                    key=key,
+                    constraint=constraint_label(rule),
+                )
     return out, blank
 
 
@@ -160,7 +189,7 @@ def _check_batch(batch: DataEditBatch, index: ModelIndex) -> list[DataEdit]:
             keys = index.nodes.get(edit.type)
             if keys is None:
                 raise _refuse("not_in_model", i, f"{edit.type} is not a node type in the model.", type=edit.type)
-            props, _ = _properties(i, edit.type, keys, edit.properties, "a new node")
+            props, _ = _properties(i, edit.type, keys, edit.properties, "a new node", index.rules.get(edit.type))
             refs.add(edit.ref)
             checked.append(edit.model_copy(update={"properties": props}))
         elif isinstance(edit, AddEdge):
@@ -169,7 +198,9 @@ def _check_batch(batch: DataEditBatch, index: ModelIndex) -> list[DataEdit]:
                 raise _refuse(
                     "not_in_model", i, f"{edit.type} is not a relationship type in the model.", type=edit.type
                 )
-            props, _ = _properties(i, edit.type, keys, edit.properties, "a new relationship")
+            props, _ = _properties(
+                i, edit.type, keys, edit.properties, "a new relationship", index.rules.get(edit.type)
+            )
             refs.add(edit.ref)
             checked.append(edit.model_copy(update={"properties": props}))
         elif isinstance(edit, UpdateNode | UpdateEdge):
@@ -182,7 +213,7 @@ def _check_batch(batch: DataEditBatch, index: ModelIndex) -> list[DataEdit]:
             if both:
                 key = sorted(both)[0]
                 raise _refuse("duplicate_key", i, f"{key} is both set and removed in one edit.", key=key)
-            props, blank = _properties(i, edit.type, keys, edit.set, edit.id)
+            props, blank = _properties(i, edit.type, keys, edit.set, edit.id, index.rules.get(edit.type))
             checked.append(edit.model_copy(update={"set": props, "unset": sorted({*edit.unset, *blank})}))
         else:
             checked.append(edit)

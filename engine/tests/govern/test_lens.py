@@ -12,8 +12,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.apps.govern.addressing import Layer
 from invana.apps.govern.catalogue import Catalogue, Participant
 from invana.apps.govern.managers import LensManager
+from invana.apps.govern.managers.lens import to_rules
 from invana.apps.govern.models import LensKind
+from invana.apps.govern.rules import Effective
 from invana.apps.govern.schemas import LensCreate, LensUpdate, RuleIn
+from invana.apps.govern.validate import validate_draft
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError, PermissionDeniedError, ValidationError
@@ -60,14 +63,19 @@ def _catalogue() -> Catalogue:
     )
 
 
-async def _guardrail(session: AsyncSession, graph: Graph, user: User, rules: list[RuleIn]):
+def _layered(rules: list[RuleIn]) -> Effective:
+    """A layered guardrail as the world validator sees it — an agent's own is the one that remains."""
+    return Effective(rules=to_rules(rules))
+
+
+async def _agent_guardrail(session: AsyncSession, graph: Graph, user: User, rules: list[RuleIn]):
     return await lenses.create(
         session,
         graph_id=graph.id,
         payload=LensCreate(
-            name="Graph guardrails",
+            name="Analyst bounds",
             kind=LensKind.guardrail,
-            scope="graph",
+            scope="agent:analyst",
             rules=rules,
         ),
         actor_id=user.id,
@@ -146,30 +154,6 @@ async def test_two_worlds_cannot_share_a_name(session: AsyncSession, graph: Grap
 
 
 @pytest.mark.asyncio
-async def test_promoting_is_one_field_and_no_re_authoring(session: AsyncSession, graph: Graph, user: User) -> None:
-    """GV1 · GV3 — a guardrail and a world are one row separated by `kind`."""
-    world = await lenses.create(
-        session,
-        graph_id=graph.id,
-        payload=LensCreate(name="Nothing leaves", rules=[RuleIn(match="third_party/**", allow=False)]),
-        actor_id=user.id,
-        catalogue=_catalogue(),
-    )
-    rules_before = list(world.rules)
-
-    promoted = await lenses.promote(session, lens=world, scope="graph", actor_id=user.id, may_edit_guardrails=True)
-    assert promoted.id == world.id
-    assert promoted.kind == LensKind.guardrail.value
-    assert promoted.rules == rules_before
-
-    # It leaves the Worlds list and appears under Guardrails (GR1).
-    worlds = await lenses.list_for_graph(session, graph_id=graph.id, kind=LensKind.world.value)
-    assert promoted.id not in [w.id for w in worlds]
-    guardrails = await lenses.list_for_graph(session, graph_id=graph.id, kind=LensKind.guardrail.value)
-    assert promoted.id in [g.id for g in guardrails]
-
-
-@pytest.mark.asyncio
 async def test_a_duplicate_starts_private(session: AsyncSession, graph: Graph, user: User) -> None:
     world = await lenses.create(
         session,
@@ -186,45 +170,31 @@ async def test_a_duplicate_starts_private(session: AsyncSession, graph: Graph, u
 # ── the refusals ─────────────────────────────────────────────────────────────
 
 
-@pytest.mark.asyncio
-async def test_a_world_cannot_widen_a_guardrail(session: AsyncSession, graph: Graph, user: User) -> None:
-    """W3 · GV5 — refused at save, naming the guardrail's rule."""
-    await _guardrail(session, graph, user, [RuleIn(match="third_party/**", allow=False)])
-
-    with pytest.raises(ValidationError) as exc:
-        await lenses.create(
-            session,
-            graph_id=graph.id,
-            payload=LensCreate(
-                name="Enriched",
-                rules=[RuleIn(match="third_party/api/clearbit.com/**", allow=True)],
-            ),
-            actor_id=user.id,
-            catalogue=_catalogue(),
-        )
-    refusals = exc.value.detail["refusals"]
-    assert refusals[0]["code"] == "widens_guardrail"
-    assert refusals[0]["recourse"] == "third_party/**"
-    assert "Deny wins at any specificity" in refusals[0]["message"]
-
-
-@pytest.mark.asyncio
-async def test_a_narrowing_world_is_fine_under_the_same_guardrail(
-    session: AsyncSession, graph: Graph, user: User
-) -> None:
-    """The mirror of the test above: a deny never widens, so it is always legal."""
-    await _guardrail(session, graph, user, [RuleIn(match="third_party/**", allow=False)])
-    world = await lenses.create(
-        session,
-        graph_id=graph.id,
-        payload=LensCreate(
-            name="Tighter still",
-            rules=[RuleIn(match="llm/ollama-local/**", allow=False)],
-        ),
-        actor_id=user.id,
+def test_a_world_cannot_widen_a_guardrail() -> None:
+    """Refused at save, naming the guardrail's rule."""
+    result = validate_draft(
+        rules=to_rules([RuleIn(match="third_party/api/clearbit.com/**", allow=True)]),
+        cast={},
+        closed_layers=set(),
+        guardrails=_layered([RuleIn(match="third_party/**", allow=False)]),
         catalogue=_catalogue(),
     )
-    assert world.is_named
+    refusal = result.refusals[0]
+    assert refusal.code == "widens_guardrail"
+    assert refusal.recourse == "third_party/**"
+    assert "Deny wins at any specificity" in refusal.message
+
+
+def test_a_narrowing_world_is_fine_under_the_same_guardrail() -> None:
+    """The mirror of the test above: a deny never widens, so it is always legal."""
+    result = validate_draft(
+        rules=to_rules([RuleIn(match="llm/ollama-local/**", allow=False)]),
+        cast={},
+        closed_layers=set(),
+        guardrails=_layered([RuleIn(match="third_party/**", allow=False)]),
+        catalogue=_catalogue(),
+    )
+    assert result.ok
 
 
 @pytest.mark.asyncio
@@ -276,18 +246,15 @@ async def test_slicing_a_model_that_declared_the_axis_is_allowed(
     assert world.rules[0]["select"]["geo"]["in"] == ["IE", "DE", "FR"]
 
 
-@pytest.mark.asyncio
-async def test_a_cast_the_guardrails_deny_is_refused_at_save(session: AsyncSession, graph: Graph, user: User) -> None:
-    await _guardrail(session, graph, user, [RuleIn(match="llm/ollama-local/**", allow=False)])
-    with pytest.raises(ValidationError) as exc:
-        await lenses.create(
-            session,
-            graph_id=graph.id,
-            payload=LensCreate(name="Local decide", cast={"decide": "llm/ollama-local/llama-3.3"}),
-            actor_id=user.id,
-            catalogue=_catalogue(),
-        )
-    assert exc.value.detail["refusals"][0]["code"] == "cast_denied"
+def test_a_cast_the_guardrails_deny_is_refused_at_save() -> None:
+    result = validate_draft(
+        rules=[],
+        cast={"decide": "llm/ollama-local/llama-3.3"},
+        closed_layers=set(),
+        guardrails=_layered([RuleIn(match="llm/ollama-local/**", allow=False)]),
+        catalogue=_catalogue(),
+    )
+    assert result.refusals[0].code == "cast_denied"
 
 
 # ── the permission ───────────────────────────────────────────────────────────
@@ -295,8 +262,8 @@ async def test_a_cast_the_guardrails_deny_is_refused_at_save(session: AsyncSessi
 
 @pytest.mark.asyncio
 async def test_editing_a_guardrail_is_a_permission(session: AsyncSession, graph: Graph, user: User) -> None:
-    """GR5 — a member without it still reads every rule."""
-    guardrail = await _guardrail(session, graph, user, [RuleIn(match="third_party/**", allow=False)])
+    """A member without it still reads every rule."""
+    guardrail = await _agent_guardrail(session, graph, user, [RuleIn(match="third_party/**", allow=False)])
 
     with pytest.raises(PermissionDeniedError, match="You can read every rule in force"):
         await lenses.update(
@@ -340,7 +307,7 @@ async def test_a_guardrail_is_always_named_and_always_scoped(session: AsyncSessi
         await lenses.create(
             session,
             graph_id=graph.id,
-            payload=LensCreate(kind=LensKind.guardrail, scope="graph"),
+            payload=LensCreate(kind=LensKind.guardrail, scope="agent:analyst"),
             actor_id=user.id,
             catalogue=_catalogue(),
             may_edit_guardrails=True,
@@ -357,11 +324,14 @@ async def test_a_guardrail_is_always_named_and_always_scoped(session: AsyncSessi
 
 
 @pytest.mark.asyncio
-async def test_an_unnamed_guardrail_cannot_be_promoted_into_existence(
-    session: AsyncSession, graph: Graph, user: User
-) -> None:
-    lens = await lenses.create(
-        session, graph_id=graph.id, payload=LensCreate(), actor_id=user.id, catalogue=_catalogue()
-    )
-    with pytest.raises(ValidationError, match="Name it first"):
-        await lenses.promote(session, lens=lens, scope="graph", actor_id=user.id, may_edit_guardrails=True)
+async def test_a_graph_guardrail_is_not_a_lens(session: AsyncSession, graph: Graph, user: User) -> None:
+    """A Graph's guardrail is one property rule, written under Guardrails only."""
+    with pytest.raises(ValidationError, match="one property rule"):
+        await lenses.create(
+            session,
+            graph_id=graph.id,
+            payload=LensCreate(name="Bounds", kind=LensKind.guardrail, scope="graph"),
+            actor_id=user.id,
+            catalogue=_catalogue(),
+            may_edit_guardrails=True,
+        )

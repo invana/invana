@@ -28,7 +28,6 @@ const PANEL = "panel";
 const LEGACY_PANEL = "settings";
 const SECTION = "section";
 const LEGACY_SECTION = "drawer";
-const TAB = "tab";
 const RIGHT = "right";
 
 interface PanelPath {
@@ -62,7 +61,7 @@ const PANEL_PATHS: readonly PanelPath[] = [
 		section: "guardrails",
 		detail: "guardrail",
 	},
-	{ path: "modeller/rules", panel: "rules" },
+	{ path: "modeller/rules", panel: "rules", detail: "rule" },
 	{ path: "modeller/settings", panel: "settings" },
 	// The Agents rail. Every section is a page; a section with tabs gives each
 	// tab a path under it, and the first is the section's own path.
@@ -152,10 +151,6 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	{ path: "projects/decisions", panel: "decisions" },
 ];
 
-// Info is a tab of Modeller's settings, not a path of its own.
-const INFO_PATH = "modeller/settings";
-const INFO_TAB = "info";
-
 // A level with no panel of its own — a product's root, a breadcrumb's middle
 // segment — opens the first section under it.
 const LEVEL_LANDINGS: Record<string, string> = {
@@ -173,6 +168,7 @@ const ALIASES: Record<string, string> = {
 	layers: "explorer",
 	canvases: "explorer",
 	connection: "settings",
+	info: "settings",
 };
 
 // Pages of Activity with no panel behind them — the change log and a change's
@@ -222,11 +218,6 @@ export function pageParamsOf(tail: string, search: string): URLSearchParams {
 	if (!matched) return params;
 
 	const { entry, id } = matched;
-	if (entry.path === INFO_PATH && params.get(TAB) === INFO_TAB) {
-		params.set(PANEL, "info");
-		params.delete(TAB);
-		return params;
-	}
 	params.set(PANEL, entry.panel);
 	if (entry.section) {
 		params.set(SECTION, entry.section);
@@ -253,10 +244,6 @@ export function pageUrlOf(params: URLSearchParams): {
 	if (ASSISTANT_PANELS.has(raw)) {
 		if (!search.has(RIGHT)) search.set(RIGHT, "assistant");
 		return { tail: "explorer", search };
-	}
-	if (raw === "info") {
-		search.set(TAB, INFO_TAB);
-		return { tail: INFO_PATH, search };
 	}
 
 	const panel = ALIASES[raw] ?? raw;

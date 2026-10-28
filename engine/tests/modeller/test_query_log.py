@@ -228,6 +228,9 @@ class TestInsights:
         assert read.usage.caller_share["agent"] == 1.0 and read.usage.per_day == round(40 / 7, 1)
         assert (read.usage.unused_types, read.usage.hot_types) == (1, 1)
         assert read.overview.total == 40 and read.overview.slow
+        assert read.overview.attention_total == len(read.overview.attention) == 4
+        assert {r.name: r.signal_counts for r in read.usage.rows}["version"] == {"unused": 1}
+        assert read.performance.missing_indexes == 1
         assert read.performance.error_rate == 0.0 and read.performance.shapes[0].slow
 
         shape = read.performance.shapes[0]
@@ -248,4 +251,6 @@ class TestInsights:
         assert read.usage.too_few and read.usage.total == 31
         assert all(not r.signals for r in read.usage.rows)
         assert (read.usage.unused_types, read.usage.hot_types, read.usage.stitches_crossed) == (0, 0, 0)
-        assert read.overview.attention == []
+        assert read.usage.stitches == [] and read.usage.stitches_total == 0
+        assert read.overview.attention == [] and read.overview.attention_total == 0
+        assert read.performance.missing_indexes == 0

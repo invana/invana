@@ -1,18 +1,10 @@
 /**
- * the ladder — **one rung, one edit**.
+ * A world's acts — name it, duplicate it, delete it (and, where the rules are
+ * not already open beside them, edit its rules).
  *
- * *As someone whose narrowing turned out to be right, I want naming it, sharing
- * it and making it a standard to be three small acts rather than three
- * re-authorings, so that a keeper becomes a bound without anybody rewriting it.*
- *
- * ```
- * unnamed lens --name it--> world --promote--> guardrail
- * ```
- *
- * ([spec.md](../../../../../docs/for-developers/modules/govern/spec.md)). Each arrow
- * is a single field change on one row, which is the whole reason a guardrail
- * and a world are one record: promotion is not a migration, and demotion is the
- * same edit backwards.
+ * Naming an unnamed lens is what puts it in the Graph's Worlds list; each act
+ * is one field change on one row. The world dialog draws these over its
+ * editor, so there `onEdit` is left out and *Edit rules* is not drawn.
  *
  * **Every refusal here names what is holding it.** Deleting a world a schedule
  * fires into or an agent carries is refused naming them
@@ -43,7 +35,6 @@ import { toast } from "sonner";
 import {
 	useDeleteLensMutation,
 	useDuplicateLensMutation,
-	usePromoteLensMutation,
 	useUpdateLensMutation,
 } from "./queries";
 
@@ -51,7 +42,8 @@ export interface LensActionsProps {
 	username?: string;
 	graphSlug?: string;
 	lens: Lens;
-	onEdit: () => void;
+	/** *Edit rules*; absent where the rules are already open. */
+	onEdit?: () => void;
 	/** Where to go once this row stops being the thing on screen. */
 	onGone: () => void;
 	/** Open the copy the duplicate made, which is a new unnamed lens. */
@@ -72,7 +64,6 @@ export function LensActions({
 	const [refusal, setRefusal] = useState<string | null>(null);
 
 	const update = useUpdateLensMutation(username, graphSlug);
-	const promote = usePromoteLensMutation(username, graphSlug);
 	const duplicate = useDuplicateLensMutation(username, graphSlug);
 	const remove = useDeleteLensMutation(username, graphSlug);
 
@@ -135,14 +126,16 @@ export function LensActions({
 					</div>
 				) : (
 					<div className="flex flex-wrap gap-2">
-						<ActButton
-							area="model"
-							variant="outline"
-							size="sm"
-							onClick={onEdit}
-						>
-							Edit rules
-						</ActButton>
+						{onEdit ? (
+							<ActButton
+								area="model"
+								variant="outline"
+								size="sm"
+								onClick={onEdit}
+							>
+								Edit rules
+							</ActButton>
+						) : null}
 						<ActButton
 							area="model"
 							variant="outline"
@@ -175,28 +168,6 @@ export function LensActions({
 						>
 							Duplicate
 						</ActButton>
-						{lens.kind === "world" ? (
-							<ActButton
-								area="model"
-								variant="outline"
-								size="sm"
-								disabled={promote.isPending}
-								onClick={() =>
-									promote
-										.mutateAsync({ id: lens.id, scope: "graph" })
-										.then(() => {
-											setRefusal(null);
-											toast.success(
-												"Promoted — it leaves Worlds and is now in force on every run",
-											);
-											onGone();
-										})
-										.catch(refused)
-								}
-							>
-								Promote to guardrail
-							</ActButton>
-						) : null}
 						<ActButton
 							area="model"
 							variant="ghost"

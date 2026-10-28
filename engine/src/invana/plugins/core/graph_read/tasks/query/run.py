@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi import HTTPException
 
 from invana.apps.graphs.query_service import QueryExecutionError, execute_query
+from invana.graph.connectors.base.exceptions import LensViolationError
 from invana.plugins.core.graph_read.shared import _rewritten, query_record
 from invana.plugins.sdk.context import (
     Out,
@@ -16,6 +17,7 @@ from invana.plugins.sdk.context import (
     http_failure,
     open_graph,
 )
+from invana.plugins.sdk.errors import CannotAnswer
 
 
 async def graph_read_query(ctx: TaskContext, v: RunVars) -> Out:
@@ -43,6 +45,12 @@ async def graph_read_query(ctx: TaskContext, v: RunVars) -> Out:
             timeout_s=v.timeout_s,
             lens=crossing.lens,
         )
+    except LensViolationError as exc:
+        # The loop names the guardrail that holds the property and files the request.
+        raise CannotAnswer(
+            reason=str(exc),
+            refusal={"code": exc.code, "type_name": exc.type_name, "property_name": exc.property_name},
+        ) from exc
     except HTTPException as exc:
         raise http_failure(exc) from exc
     except QueryExecutionError as exc:

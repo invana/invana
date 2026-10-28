@@ -57,12 +57,16 @@ class CannotAnswer(Exception):
     *Understand*, so the judgement lands before any query is written.
     """
 
-    def __init__(self, *, reason: str, exchange: dict | None = None) -> None:
+    def __init__(self, *, reason: str, exchange: dict | None = None, refusal: dict | None = None) -> None:
         super().__init__(reason)
         self.reason = reason
         #: The prompt and completion that reached the judgement — the evidence
         #: for it, kept on the step like an answer's is (NL10 · SR42).
         self.exchange = exchange or {}
+        #: The lens's refusal (``code`` · ``type_name`` · ``property_name``) when
+        #: the query was refused rather than judged out of scope; the run loop
+        #: names the guardrail that holds the property and files its request.
+        self.refusal = refusal
 
 
 class Converse(Exception):

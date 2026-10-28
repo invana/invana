@@ -272,6 +272,38 @@ class TaskRunQuerySet:
         )
         return {lens_id: (runs, last) for lens_id, runs, last in (await session.execute(stmt)).all()}
 
+    async def lens_runs_since(self, session: AsyncSession, lens_id: str, since: datetime) -> int:
+        """Root runs asked under one lens since ``since`` — the board's *Runs (30 days)*."""
+        stmt = select(func.count(TaskRun.id)).where(
+            TaskRun.lens_id == lens_id, TaskRun.parent_run_id.is_(None), TaskRun.queued_at >= since
+        )
+        return int((await session.execute(stmt)).scalar_one())
+
+    async def lens_agents(self, session: AsyncSession, lens_id: str) -> list[tuple[str, int, datetime | None]]:
+        """``(agent id, runs, last run)`` per agent whose root runs asked under one lens, most runs first."""
+        stmt = (
+            select(TaskRun.agent_id, func.count(TaskRun.id), func.max(TaskRun.queued_at))
+            .where(TaskRun.lens_id == lens_id, TaskRun.parent_run_id.is_(None), TaskRun.agent_id.is_not(None))
+            .group_by(TaskRun.agent_id)
+            .order_by(func.count(TaskRun.id).desc())
+        )
+        return [(agent_id, int(runs), last) for agent_id, runs, last in (await session.execute(stmt)).all()]
+
+    async def lens_people(self, session: AsyncSession, lens_id: str) -> list[tuple[str, int]]:
+        """``(user id, runs)`` per person who asked under one lens without an agent, most runs first."""
+        stmt = (
+            select(TaskRun.author_id, func.count(TaskRun.id))
+            .where(
+                TaskRun.lens_id == lens_id,
+                TaskRun.parent_run_id.is_(None),
+                TaskRun.agent_id.is_(None),
+                TaskRun.author_id.is_not(None),
+            )
+            .group_by(TaskRun.author_id)
+            .order_by(func.count(TaskRun.id).desc())
+        )
+        return [(author_id, int(runs)) for author_id, runs in (await session.execute(stmt)).all()]
+
     # ── roots ────────────────────────────────────────────────────────────────
     async def for_todo(self, session: AsyncSession, *, todo_id: str) -> list[TaskRun]:
         stmt = (

@@ -36,7 +36,9 @@ export function useBoardPage() {
 				(prev) => {
 					const next = new URLSearchParams(prev);
 					// `?tab=` is the page's own tab; another page starts on its default.
-					if (prev.get(PAGE_PARAM) !== id) next.delete("tab");
+					// A link that names no page yet names the tab of the page it opens.
+					const was = prev.get(PAGE_PARAM);
+					if (was && was !== id) next.delete("tab");
 					if (id) next.set(PAGE_PARAM, id);
 					else next.delete(PAGE_PARAM);
 					for (const [key, value] of Object.entries(extra ?? {})) {

@@ -31,6 +31,7 @@ class RuleVersionView(ModelView):
         "statement",
         "check",
         "mode",
+        "because",
         "published_by_id",
         "published_at",
     ]

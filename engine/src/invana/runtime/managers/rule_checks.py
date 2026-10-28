@@ -35,7 +35,7 @@ from invana.apps.datasets.managers import ConformanceManager, DatasetManager
 from invana.apps.datasets.models import Dataset, DatasetVersion, Visibility
 from invana.apps.datasets.schemas import DatasetUpdate
 from invana.apps.skills.checks import ACT_DATASET_SHARE, CONFORMS, LICENCE, kinds_at
-from invana.apps.skills.managers import RuleManager
+from invana.apps.skills.managers import RuleManager, refusal_line
 from invana.apps.skills.models import Rule
 from invana.apps.standards.managers import StandardManager
 from invana.apps.standards.models import Enforcement
@@ -65,7 +65,12 @@ class RuleCheckManager:
         self, session: AsyncSession, *, rule: Rule, dataset: Dataset, version: DatasetVersion
     ) -> str | None:
         """Why *rule*'s check fails for this version — ``None`` when it passes."""
-        check = rule.check or {}
+        return await self.failure(session, check=rule.check or {}, dataset=dataset, version=version)
+
+    async def failure(
+        self, session: AsyncSession, *, check: dict, dataset: Dataset, version: DatasetVersion
+    ) -> str | None:
+        """Why *check* fails for this version — ``None`` when it passes."""
         if check.get("kind") == LICENCE:
             allowed = check.get("allowed") or []
             if version.licence.strip().lower() in {a.lower() for a in allowed}:
@@ -103,7 +108,7 @@ class RuleCheckManager:
             if reason is not None:
                 failed.append((rule, reason))
 
-        blocks = [f'"{rule.statement}": {reason}' for rule, reason in failed if rule.mode == Enforcement.block]
+        blocks = [refusal_line(rule, reason) for rule, reason in failed if rule.mode == Enforcement.block]
         if blocks:
             raise ConflictError("blocked by rule — " + "; ".join(blocks))
 
@@ -111,7 +116,7 @@ class RuleCheckManager:
         subject = f"{dataset.address}@{version.version}"
         for rule, reason in failed:
             if rule.mode == Enforcement.warn:
-                warnings.append(f'Rule "{rule.statement}": {reason}.')
+                warnings.append(f"Rule {refusal_line(rule, reason)}.")
             await emit_event(
                 session,
                 action=actions.RULE_CHECK,

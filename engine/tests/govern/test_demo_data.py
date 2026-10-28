@@ -24,7 +24,9 @@ import pytest
 
 from invana.apps.govern.addressing import Layer
 from invana.apps.govern.catalogue import Catalogue, Participant
+from invana.apps.govern.guardrail import compile_rules, parse_target
 from invana.apps.govern.managers.lens import to_rules
+from invana.apps.govern.models import GuardrailAccess
 from invana.apps.govern.rules import Effective, Rule
 from invana.apps.govern.validate import validate_draft
 
@@ -127,8 +129,11 @@ def test_every_world_in_the_demo_is_legal_against_its_own_guardrails() -> None:
     catalogue = _catalogue_from_demo()
 
     guardrails = Effective(
-        rules=[Rule.from_dict(r) for g in demo["guardrails"] for r in g["rules"]],
-        closed_layers={Layer(v) for g in demo["guardrails"] for v in g.get("closed_layers", [])},
+        rules=[
+            Rule.from_dict(r)
+            for g in demo["guardrails"]
+            for r in compile_rules(parse_target(g["target"]), GuardrailAccess(g["access"]), g["leaves"])
+        ],
     )
 
     for world in demo["worlds"]:

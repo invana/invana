@@ -8,15 +8,8 @@ import type { PanelSpec } from "@invana/boards";
 import { StackedBarChartV } from "@invana/charts";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Button } from "@invana/ui";
-import type { GrowthMark, Overview, PhysicalSchema } from "../types";
-import {
-	CALLER_SERIES,
-	dayLabel,
-	fmtMs,
-	fmtNum,
-	SignalMark,
-} from "./insightParts";
-import { P95Line } from "./performanceRows";
+import type { Overview, PhysicalSchema } from "../types";
+import { CALLER_SERIES, dayLabel, fmtNum, SignalMark } from "./insightParts";
 import type { ModelsTab } from "./useModelsView";
 
 interface AttentionItem {
@@ -71,14 +64,18 @@ export function attentionPanel(
 	days: number,
 	onTab: (tab: ModelsTab) => void,
 ): PanelSpec {
+	// Drift reads from the mirror and sits first; the engine's flags are its
+	// first six, and `attention_total` says how many there are in all.
+	const drift = driftAttention(physical, one);
 	const items: AttentionItem[] = [
+		...drift,
 		...overview.attention.map((a) => ({ ...a, tab: a.tab as ModelsTab })),
-		...driftAttention(physical, one),
 	];
+	const more = overview.attention_total - overview.attention.length;
 	const columns: ColumnDef<AttentionItem>[] = [
 		{
 			id: "signal",
-			header: "",
+			header: "signal",
 			cell: ({ row }) => (
 				<SignalMark
 					signal={
@@ -89,12 +86,12 @@ export function attentionPanel(
 		},
 		{
 			accessorKey: "subject",
-			header: "",
+			header: "type",
 			cell: ({ row }) => (
 				<span className="font-mono">{row.original.subject}</span>
 			),
 		},
-		{ accessorKey: "why", header: "" },
+		{ accessorKey: "why", header: "reading" },
 		{
 			id: "tab",
 			header: "",
@@ -112,22 +109,35 @@ export function attentionPanel(
 	return {
 		kind: "text",
 		title: "Needs attention",
-		aside: `${items.length} · ${days} days`,
+		aside: `${overview.attention_total + drift.length} · ${days} days`,
 		flush: true,
 		grow: 1.2,
 		options: { text: "" },
 		render: (
-			<DataTable
-				columns={columns}
-				data={items}
-				density="compact"
-				bordered={false}
-				emptyState={
-					<p className="px-3 py-6 text-muted-foreground">
-						Nothing is flagged in this window.
-					</p>
-				}
-			/>
+			<>
+				<DataTable
+					columns={columns}
+					data={items}
+					density="compact"
+					bordered={false}
+					emptyState={
+						<p className="px-3 py-6 text-muted-foreground">
+							Nothing is flagged in this window.
+						</p>
+					}
+				/>
+				{more > 0 ? (
+					<div className="border-t border-border px-3 py-1.5">
+						<Button
+							variant="link"
+							className="h-auto p-0"
+							onClick={() => onTab("usage")}
+						>
+							+{more} more in Usage ›
+						</Button>
+					</div>
+				) : null}
+			</>
 		),
 	};
 }
@@ -149,23 +159,6 @@ export function callersPanel(overview: Overview, days: number): PanelSpec {
 				empty={
 					<span className="text-muted-foreground">no query in the window</span>
 				}
-			/>
-		),
-	};
-}
-
-export function p95Panel(overview: Overview, marks: GrowthMark[]): PanelSpec {
-	const today = overview.p95_by_day.at(-1)?.value ?? null;
-	return {
-		kind: "text",
-		title: "p95 a day",
-		aside: today != null ? `${fmtMs(today)} today` : undefined,
-		options: { text: "" },
-		render: (
-			<P95Line
-				days={overview.p95_by_day}
-				graphP95={overview.graph_p95}
-				marks={marks}
 			/>
 		),
 	};

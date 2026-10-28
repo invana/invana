@@ -9,7 +9,7 @@ write; with ``--graph`` it is that Graph's invariants:
     invana rules apply  --file rules.json --user admin [--graph ada/arabidopsis]
 
 **A rules file is JSON**: one rule or a list, each with the fields of
-``POST /api/v1/rules`` — ``statement``, ``order?``, ``check?``, ``mode?`` —
+``POST /api/v1/rules`` — ``statement``, ``order?``, ``check?``, ``mode?``, ``because?`` —
 plus ``id`` to edit an existing rule and ``active`` to turn one off or on.
 An entry without ``id`` creates a rule; one with ``id`` publishes the next
 version only when its statement, check or mode changed. A project's working

@@ -124,6 +124,8 @@ export interface GraphModelSummary {
 	origin: ModelOrigin;
 	updated_at: string;
 	active_version: VersionSummary | null;
+	/** The open draft, if any. */
+	draft_version: VersionSummary | null;
 }
 
 export interface GraphModelResponse {
@@ -160,10 +162,6 @@ export interface VersionCreate {
 	based_on?: string | null;
 }
 
-export interface VersionActivate {
-	version?: string | null;
-}
-
 interface ValidationRuleCreate {
 	rule_type:
 		| "range"
@@ -171,8 +169,53 @@ interface ValidationRuleCreate {
 		| "enum"
 		| "min_length"
 		| "max_length"
-		| "custom";
+		| "custom"
+		| "standard";
 	params?: Record<string, unknown>;
+	/** A range's unit — a label, never converted. */
+	unit?: string | null;
+	standard_version_id?: string | null;
+	/** `publisher/name@v` the values were copied from. */
+	standard_ref?: string | null;
+	term?: string | null;
+	on_break?: "reject" | "flag";
+}
+
+// ── Constraints on properties (property-constraints.md) ────────────────────
+
+/** One property's constraint on one type — a range or a standard's values. */
+export interface PropertyConstraintSet {
+	type: string;
+	property: string;
+	kind: "range" | "standard";
+	min?: number | null;
+	max?: number | null;
+	unit?: string | null;
+	/** `publisher/name`; its current version is pinned. */
+	standard?: string | null;
+	term?: string | null;
+	on_break: "reject" | "flag";
+}
+
+/** What breaks a constraint in the graph now — counted by the engine. */
+export interface ConstraintCheck {
+	/** The constraint as a refusal names it. */
+	label: string;
+	counted: boolean;
+	breaking: number | null;
+	samples: { record: string; value: unknown }[];
+	/** Why it was not counted. */
+	reason: string | null;
+}
+
+/** A standard's term with values a constraint may reference. */
+export interface StandardChoice {
+	standard: string;
+	title: string;
+	version: number;
+	term: string;
+	/** How many values the term lists. */
+	values: number;
 }
 
 export interface TypePropertyMappingCreate {
@@ -470,10 +513,28 @@ export interface SchemaDiff {
 	added_indexes: string[];
 	removed_indexes: string[];
 	classification: "major" | "minor" | "patch";
+	/** One per type the pair changes — the chips the map draws. */
+	marks: TypeMark[];
+	/** The marks' lines by sign — what the Comparing bar counts. */
+	added: number;
+	changed: number;
+	removed: number;
+	/** The version the draft publishes as; set only when the target is the draft. */
+	next_version: string | null;
 }
 
-export interface ModelUpgradeResult extends ModelImportResult {
-	diff: SchemaDiff;
+/** One line of a type's mark: `+` added, `~` changed, `-` removed. */
+interface MarkLine {
+	sign: "+" | "~" | "-";
+	text: string;
+}
+
+/** What a version pair did to one type. `added`/`removed` are the whole type. */
+interface TypeMark {
+	type: string;
+	target_kind: "node_type" | "edge_type";
+	mark: "added" | "changed" | "removed";
+	lines: MarkLine[];
 }
 
 export interface StarterSummary {
@@ -516,6 +577,42 @@ export interface ModelLink {
 	description: string;
 	/** What committing this stitch wrote. Present on a commit's reply only. */
 	edges_written?: number | null;
+	/** Edges the stitch holds in the graph now; null before it first solves. */
+	edges: number | null;
+}
+
+/** One event in a stitch's history — its declare and its commit. */
+export interface StitchEvent {
+	action: string;
+	at: string;
+	actor: string | null;
+}
+
+/** One stitch read whole: who declared it, each end's records, its history. */
+export interface StitchDetail extends ModelLink {
+	declared_by: string | null;
+	declared_at: string | null;
+	/** Each end type's latest counted records; null when never counted. */
+	source_records: number | null;
+	target_records: number | null;
+	history: StitchEvent[];
+}
+
+/** A removed stitch, read from its removal event — the row itself is gone. */
+export interface RemovedStitch {
+	/** The removed stitch's id. */
+	id: string;
+	kind: LinkKind;
+	source_model: string | null;
+	source_type: string;
+	target_model: string | null;
+	target_type: string;
+	source_property: string | null;
+	target_property: string | null;
+	edge_type: string | null;
+	edges_withdrawn: number;
+	removed_by: string | null;
+	removed_at: string;
 }
 
 export interface ModelLinkDeclare {
@@ -679,13 +776,22 @@ export interface Overview {
 	slow: boolean;
 	by_caller_by_day: { label: string; counts: Record<CallerKind, number> }[];
 	p95_by_day: DayValue[];
-	rows: { key: string; share: number; p95: number | null; signals: Signal[] }[];
+	rows: {
+		key: string;
+		share: number;
+		p95: number | null;
+		/** The first three; `signals_total` counts them all. */
+		signals: Signal[];
+		signals_total: number;
+	}[];
+	/** The first six flagged signals; `attention_total` counts them all. */
 	attention: {
 		signal: string;
 		subject: string;
 		why: string;
 		tab: "usage" | "performance" | "growth" | "database";
 	}[];
+	attention_total: number;
 }
 
 export interface UsageRow {
@@ -697,6 +803,8 @@ export interface UsageRow {
 	by_caller: Record<CallerKind, number>;
 	last_touched: string | null;
 	signals: Signal[];
+	/** How many types each signal fired on — `{unused: 5}`. */
+	signal_counts: Partial<Record<Signal["signal"], number>>;
 }
 
 export interface Usage {
@@ -711,6 +819,8 @@ export interface Usage {
 	hot_types: number;
 	cold_properties: number;
 	stitches_crossed: number;
+	/** Every active stitch; `stitches` is the most-crossed few. */
+	stitches_total: number;
 	rows: UsageRow[];
 	stitches: {
 		id: string;
@@ -756,6 +866,8 @@ export interface Performance {
 	/** `errors` over `total`. */
 	error_rate: number;
 	slow_shapes: number;
+	/** Distinct `label.property` filtered after a scan with no index. */
+	missing_indexes: number;
 	p95_by_day: DayValue[];
 	shapes: ShapeRow[];
 }
@@ -817,15 +929,9 @@ export interface ShapeCard {
 
 // ── Validation Rules ───────────────────────────────────────────────────────
 
-interface ValidationRuleResponse {
+export interface ValidationRuleResponse
+	extends Required<Omit<ValidationRuleCreate, "params">> {
 	id: string;
-	rule_type:
-		| "range"
-		| "pattern"
-		| "enum"
-		| "min_length"
-		| "max_length"
-		| "custom";
 	params: Record<string, unknown>;
 }
 

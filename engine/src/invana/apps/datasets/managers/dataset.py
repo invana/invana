@@ -81,6 +81,7 @@ from invana.apps.datasets.schemas import (
     Retraction,
 )
 from invana.apps.graphs.querysets import GraphQuerySet
+from invana.apps.modeller.managers import BoundDataset
 from invana.apps.modeller.querysets import GraphModelQuerySet
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedError, ValidationError
@@ -254,6 +255,18 @@ class DatasetManager:
             dataset = await self.datasets_qs.get(session, version.dataset_id)
             if dataset is not None:
                 out[version.id] = f"{dataset.address}@{version.version}"
+        return out
+
+    async def bound_to_model(self, session: AsyncSession, *, graph_id: str, model_id: str) -> list[BoundDataset]:
+        """The dataset versions bound into one model of a Graph — what publishing it may touch."""
+        out = []
+        for binding in await self.bindings_qs.for_graph(session, graph_id):
+            if binding.model_id != model_id:
+                continue
+            version = await self.versions_qs.get(session, binding.dataset_version_id)
+            dataset = await self.datasets_qs.get(session, binding.dataset_id)
+            if version is not None and dataset is not None:
+                out.append(BoundDataset(dataset.id, dataset.address, version.version, binding.type_name))
         return out
 
     async def read_binding(self, session: AsyncSession, binding: DatasetBinding) -> DatasetBindingRead:

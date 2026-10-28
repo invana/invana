@@ -44,6 +44,21 @@ export interface ChangeEffect {
 	tokens_per_run: number | null;
 	since: string | null;
 	until: string | null;
+	/** A model version's: the bound datasets its publish touched, stored at publish. */
+	datasets?: EffectDataset[];
+	datasets_failing?: number;
+	rows_failing?: number;
+}
+
+/** A dataset bound to a type a model version's publish changed. */
+interface EffectDataset {
+	dataset_id: string;
+	/** `publisher/name`. */
+	name: string;
+	version: number;
+	type: string;
+	/** Rows the publish's scan found failing on that type; 0 when additive. */
+	rows_failing: number;
 }
 
 export interface ChangeEntry {

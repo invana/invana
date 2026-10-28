@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel
 
-from invana.apps.modeller.models import GraphVersion
+from invana.apps.modeller.models import GraphVersion, ValidationRule
 from invana.apps.modeller.schemas import EdgeTypeDiff, NodeTypeDiff
 from invana.apps.modeller.versioner import compute_diff
 
@@ -272,9 +272,7 @@ async def _clone_element(
             type=source.type,
             value_cardinality=source.value_cardinality,
             description=source.description,
-            validation_rules=[
-                {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in source.validation_rules
-            ],
+            validation_rules=[ValidationRule.fields_of(r) for r in source.validation_rules],
         )
         return
 
@@ -284,9 +282,7 @@ async def _clone_element(
                 "property_key": m.property_key.name,
                 "default_value": m.default_value,
                 "sort_order": m.sort_order,
-                "validation_rules": [
-                    {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in m.validation_rules
-                ],
+                "validation_rules": [ValidationRule.fields_of(r) for r in m.validation_rules],
             }
             for m in source.property_mappings
         ]

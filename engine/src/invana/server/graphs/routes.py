@@ -1,6 +1,6 @@
 """Paths for the Graph entity.
 
-``/api/v1/graphs``                          — the collection
+``/api/v1/graphs``                          — the collection, and ``/connect`` that starts one
 ``/api/v1/u/{username}/{graphSlug}``        — one Graph, its connection and setup
 
 Defines no function — path to view, nothing else.
@@ -13,6 +13,7 @@ from fastapi import APIRouter, status
 from invana.apps.graphs.schemas import (
     ContentionRead,
     GraphConnectionRead,
+    GraphConnectRead,
     GraphListResponse,
     GraphRead,
 )
@@ -24,6 +25,10 @@ graph_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}", tags=["graph
 
 graphs_collection_router.post("", response_model=GraphRead, status_code=status.HTTP_201_CREATED)(views.create_graph)
 graphs_collection_router.get("", response_model=GraphListResponse)(views.list_graphs)
+graphs_collection_router.post("/connect/test")(views.test_new_connection)
+graphs_collection_router.post("/connect", response_model=GraphConnectRead, status_code=status.HTTP_201_CREATED)(
+    views.connect_graph
+)
 graph_router.get("", response_model=GraphRead)(views.get_graph)
 graph_router.patch("", response_model=ActionResponse[GraphRead])(views.patch_graph)
 graph_router.delete("", status_code=status.HTTP_204_NO_CONTENT)(views.delete_graph)

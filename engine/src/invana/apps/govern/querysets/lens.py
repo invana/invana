@@ -13,7 +13,7 @@ from __future__ import annotations
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.govern.models import Lens, LensKind
+from invana.apps.govern.models import GRAPH_SCOPE, Lens, LensKind
 
 
 class LensQuerySet:
@@ -60,6 +60,16 @@ class LensQuerySet:
             .order_by(Lens.created_at)
         )
         return list((await session.execute(stmt)).scalars().all())
+
+    async def graph_guardrail_for_target(self, session: AsyncSession, graph_id: str, target: str) -> Lens | None:
+        """The Graph guardrail holding ``target``, if one does — there is one per target."""
+        stmt = select(Lens).where(
+            Lens.graph_id == graph_id,
+            Lens.kind == LensKind.guardrail.value,
+            Lens.scope == GRAPH_SCOPE,
+            Lens.target == target,
+        )
+        return (await session.execute(stmt)).scalars().first()
 
     async def guardrails_for_agent(self, session: AsyncSession, graph_id: str, agent_id: str) -> list[Lens]:
         """The guardrail pinned on one agent, if it has one. Bounds nest."""

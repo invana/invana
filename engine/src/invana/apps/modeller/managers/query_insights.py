@@ -45,6 +45,10 @@ HOT_SHARE = 0.25
 SUPERNODE_RATIO = 100
 SUPERNODE_MIN = 1_000
 _SHAPES_SHOWN = 50
+#: How many flagged signals the Overview lists, how many a row names, and how many stitches Usage lists.
+ATTENTION_SHOWN = 6
+ROW_SIGNALS_SHOWN = 3
+STITCHES_SHOWN = 5
 
 nf = "{:,}".format
 
@@ -189,12 +193,14 @@ class QueryInsights:
         rows = []
         for line in self.f.lines:
             hits = self._line_rows(line)
+            signals = self._line_signals(line)
             rows.append(
                 OverviewRow(
                     key=line.key,
                     share=share(len(hits), self.total),
                     p95=_p(hits, 0.95),
-                    signals=self._line_signals(line),
+                    signals=signals[:ROW_SIGNALS_SHOWN],
+                    signals_total=len(signals),
                 )
             )
         by_day = self._by_day(self.scope_rows)
@@ -233,7 +239,8 @@ class QueryInsights:
             ],
             p95_by_day=self._p95_by_day(),
             rows=rows,
-            attention=attention,
+            attention=attention[:ATTENTION_SHOWN],
+            attention_total=len(attention),
         )
 
     def usage(self) -> Usage:
@@ -251,6 +258,7 @@ class QueryInsights:
                     by_caller={c: sum(1 for r in hits if r.caller_kind == c) for c in CALLERS},
                     last_touched=max((r.at for r in hits), default=None),
                     signals=self._line_signals(line),
+                    signal_counts=dict(Counter(s.signal for s in self._line_signals(line))),
                 )
             )
         callers = {c: sum(1 for r in self.scope_rows if r.caller_kind == c) for c in CALLERS}
@@ -268,7 +276,8 @@ class QueryInsights:
             cold_properties=sum(1 for p in properties if p.cold),
             stitches_crossed=sum(1 for s in stitches if s.queries),
             rows=rows,
-            stitches=stitches,
+            stitches=stitches[:STITCHES_SHOWN],
+            stitches_total=len(stitches),
             properties=properties,
             explains=explains,
         )
@@ -366,6 +375,7 @@ class QueryInsights:
             errors=errors,
             error_rate=share(errors, len(self.scope_rows)),
             slow_shapes=sum(1 for _, s in shapes if s.slow),
+            missing_indexes=len(self.scanned_without_index(self.scope_rows)),
             p95_by_day=self._p95_by_day(),
             shapes=[s for _, s in shapes[:_SHAPES_SHOWN]],
         )

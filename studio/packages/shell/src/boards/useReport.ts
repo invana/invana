@@ -62,6 +62,17 @@ export interface Report<X extends ExtraPanels = Record<never, never>> {
 	handle: (actionId: string) => boolean;
 }
 
+/** What a page may say about the reading it keeps. */
+export interface ReportOptions<X extends ExtraPanels> {
+	/** The report's name — `Models overview, 30 days`. Default: the last crumb. */
+	label?: string;
+	/**
+	 * The document kept, from the page's spec. A page whose panels draw
+	 * themselves keeps only what a report can render with no host.
+	 */
+	document?: (spec: BoardSpec<X>) => BoardSpec<X>;
+}
+
 /**
  * Generic over the page's own panels, because a board that registers one —
  * the run board's `flow` — must keep it through here. Widening to the
@@ -69,7 +80,9 @@ export interface Report<X extends ExtraPanels = Record<never, never>> {
  */
 export function useReport<X extends ExtraPanels>(
 	spec: BoardSpec<X> | null,
+	options: ReportOptions<X> = {},
 ): Report<X> | null {
+	const { label, document: keep } = options;
 	const board = useContext(DeclaredBoardContext);
 	const qc = useQueryClient();
 	const save = useMutation({
@@ -81,7 +94,11 @@ export function useReport<X extends ExtraPanels>(
 				board.kind,
 				board.subjectId,
 				{
-					label: document.header?.crumbs.at(-1) ?? document.title ?? "Report",
+					label:
+						label ??
+						document.header?.crumbs.at(-1) ??
+						document.title ??
+						"Report",
 					snapshot: document as unknown as Record<string, unknown>,
 				},
 			);
@@ -116,10 +133,11 @@ export function useReport<X extends ExtraPanels>(
 			if (actionId !== SAVE_REPORT_ACTION) return false;
 			// A kept reading keeps every tab, and switches them itself: the page
 			// that answered `tabAction` is not there to answer it.
-			if (spec) save.mutate({ ...spec, tabAction: undefined });
+			if (spec)
+				save.mutate({ ...(keep ? keep(spec) : spec), tabAction: undefined });
 			return true;
 		},
-		[spec, save.mutate, board],
+		[spec, save.mutate, board, keep],
 	);
 
 	if (!spec) return null;

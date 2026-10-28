@@ -1,51 +1,37 @@
 /**
- * The model canvas — the one place a gesture writes a type.
+ * One model's canvas — the drawing behind *Open in Schema*.
  *
- * `kind = model` is one of exactly two canvases whose gestures write
- * (canvasKinds.ts), and it writes only three things: **add** a node type,
- * **connect** two into an edge type, **delete**. Everything else about a type —
- * its properties, keys, constraints — is edited in the form, never in a modal
- * over the drawing (model-editor.md).
- *
- * That form spans the main column *beneath* the canvas, which is what the hi-fi
- * `Model · a type selected` draws: the drawing stays visible while the thing it
- * selected is being edited. It is the model page's Model tab at one model
- * (the-model-page.md): what the model is and whether it is drafting read on the
- * page header, so the canvas draws and carries no header of its own.
- *
- * A published version's canvas is read-only — no `ctx`, pan and zoom
- * only. Nothing here commits: Publish is on the page header.
+ * It draws the open version of one model (the draft while one is open) on the
+ * same board as the global model — toolbar, minimap, schema cards — with no
+ * frame: the app's breadcrumb already names the model. It only reads — a type clicked on it is
+ * handed to the page, which opens that type's own page, where a draft's
+ * properties, indexes and constraints are edited. On a draft it also marks
+ * each changed type against the active version and floats the staged bar;
+ * Publish and Discard are handed to the page, which owns their confirms.
  */
 
-import { Button, EmptyState } from "@invana/ui";
+import { EmptyState } from "@invana/ui";
 import {
 	type CanvasBackend,
-	GraphModelCanvas,
+	GlobalModelBoard,
 	hueSlotForName,
 	type ModelCanvasSelection,
 } from "@invana-studio/canvases";
-import { ConfirmDialog } from "@invana-studio/shell";
-import { PanelBottomClose } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
-	useCreateDraftMutation,
-	useDeleteEdgeTypeMutation,
-	useDeleteNodeTypeMutation,
 	useModelsQuery,
 	useModelVersionQuery,
 	useModelVersionsQuery,
+	useStagedSetQuery,
+	useVersionDiffQuery,
 } from "../queries";
 import {
 	buildAllModelsData,
 	memberIdOf,
 	parseMemberId,
 } from "../stitch/allModels";
-import type { EdgeTypeResponse, NodeTypeResponse } from "../types";
-import { EdgeTypeDetail } from "./components/EdgeTypeDetail";
-import { EdgeTypeFormDialog } from "./components/EdgeTypeFormDialog";
-import { NodeTypeDetail } from "./components/NodeTypeDetail";
-import { NodeTypeFormDialog } from "./components/NodeTypeFormDialog";
-import type { ModelEditCtx, ModelSelection } from "./types";
+import { StagedBar } from "./StagedBar";
+import type { ModelSelection } from "./types";
 
 interface Props {
 	username: string;
@@ -53,11 +39,14 @@ interface Props {
 	modelId: string;
 	/** The page's render backend — the canvas starts on it. */
 	backend?: CanvasBackend;
-	/** The type the panel has selected; its form spans the column below. */
+	/** The type the outline has picked — drawn selected. */
 	selection: ModelSelection | null;
+	/** A type clicked on the canvas; the page opens its type page. */
 	onSelect: (selection: ModelSelection | null) => void;
-	/** A member without write reads the form and never edits it (the-model-page.md seams). */
-	canWrite?: boolean;
+	/** *Publish vN* on the staged bar — the page opens its confirm. */
+	onPublish: () => void;
+	/** *Discard* on the staged bar. */
+	onDiscard: () => void;
 }
 
 export function ModelCanvas({
@@ -67,18 +56,9 @@ export function ModelCanvas({
 	backend,
 	selection,
 	onSelect,
-	canWrite = true,
+	onPublish,
+	onDiscard,
 }: Props) {
-	// Editing a type's metadata reopens the same form the create gesture uses —
-	// the panel and the canvas never grow a second one.
-	const [editingNode, setEditingNode] = useState<NodeTypeResponse | null>(null);
-	const [editingEdge, setEditingEdge] = useState<EdgeTypeResponse | null>(null);
-	const [deleting, setDeleting] = useState<{
-		kind: "node" | "edge";
-		id: string;
-		name: string;
-	} | null>(null);
-
 	const models = useModelsQuery(username, graphSlug);
 	const model = (models.data ?? []).find((m) => m.id === modelId) ?? null;
 	const versions = useModelVersionsQuery(username, graphSlug, modelId);
@@ -94,14 +74,52 @@ export function ModelCanvas({
 		openVersionId,
 	);
 	const tree = version.data;
-	const nodeTypes = tree?.node_types ?? [];
-	const edgeTypes = tree?.edge_types ?? [];
 
-	// Editable only while a draft is open, and only by a member who writes.
-	const ctx: ModelEditCtx | undefined =
-		draft && canWrite
-			? { username, graphSlug, modelId, versionId: draft.id }
-			: undefined;
+	// A draft is marked against the active version: with `against` left out
+	// the engine would compare it to nothing and mark every type added.
+	const marked = !!draft && !!active;
+	const diff = useVersionDiffQuery(
+		username,
+		graphSlug,
+		modelId,
+		marked ? draft.id : undefined,
+		active?.id,
+	);
+	const staged = useStagedSetQuery(username, graphSlug, modelId, !!draft);
+	const activeTree = useModelVersionQuery(
+		username,
+		graphSlug,
+		modelId,
+		marked ? active.id : undefined,
+	);
+	const marks = marked ? diff.data?.marks : undefined;
+
+	// A type the draft removes stays drawn, from the active version, with its chip.
+	const removed = useMemo(
+		() =>
+			new Set(
+				(marks ?? []).filter((m) => m.mark === "removed").map((m) => m.type),
+			),
+		[marks],
+	);
+	const nodeTypes = useMemo(
+		() => [
+			...(tree?.node_types ?? []),
+			...(marked
+				? (activeTree.data?.node_types ?? []).filter((t) => removed.has(t.name))
+				: []),
+		],
+		[tree, marked, activeTree.data, removed],
+	);
+	const edgeTypes = useMemo(
+		() => [
+			...(tree?.edge_types ?? []),
+			...(marked
+				? (activeTree.data?.edge_types ?? []).filter((t) => removed.has(t.name))
+				: []),
+		],
+		[tree, marked, activeTree.data, removed],
+	);
 
 	const selectedNode =
 		selection?.kind === "node_type"
@@ -151,7 +169,7 @@ export function ModelCanvas({
 		[modelId, model, openVersionId, draft, active, nodeTypes, edgeTypes],
 	);
 
-	// The panel selects by name; the canvas by id.
+	// The page selects by name; the canvas by id.
 	const canvasSelection: ModelCanvasSelection = selectedNode
 		? { kind: "node", id: memberIdOf(modelId, selectedNode.name) }
 		: selectedEdge
@@ -177,152 +195,40 @@ export function ModelCanvas({
 		select(null);
 	};
 
-	const deleteNode = useDeleteNodeTypeMutation(username, graphSlug);
-	const deleteEdge = useDeleteEdgeTypeMutation(username, graphSlug);
-	// `NodeTypeDetail` and `EdgeTypeDetail` already carry a "Create draft to edit"
-	// affordance for exactly this case — it just needs somewhere to go. Without it
-	// the form renders read-only with no way out, which reads as "editing is not
-	// built" rather than "this version is published".
-	const createDraft = useCreateDraftMutation(username, graphSlug);
-	const openDraft = () =>
-		createDraft.mutate({ modelId, basedOn: active?.version ?? null });
+	// No frame to size, so a model with no types says so instead.
+	if (tree && nodeTypes.length === 0)
+		return (
+			<EmptyState
+				className="h-full"
+				title="No types yet"
+				description={
+					draft
+						? "Add a node type to start drawing this model."
+						: "This version declares no types."
+				}
+			/>
+		);
 
 	return (
-		<div className="flex h-full min-h-0 flex-col">
-			<div className="min-h-0 flex-1">
-				{/* No frame to size, so a model with no types says so instead. */}
-				{tree && nodeTypes.length === 0 ? (
-					<EmptyState
-						className="h-full"
-						title="No types yet"
-						description={
-							ctx
-								? "Add a node type to start drawing this model."
-								: "This version declares no types."
-						}
+		<div className="relative h-full w-full">
+			<GlobalModelBoard
+				data={marks ? { ...build.data, marks } : build.data}
+				title={model?.name ?? "Model"}
+				summary={`${nodeTypes.length} node · ${edgeTypes.length} edge types`}
+				selected={canvasSelection}
+				onSelect={onCanvasSelect}
+				backend={backend}
+				initialDetail="low"
+			/>
+			{draft ? (
+				<div className="absolute top-3 right-3 z-10">
+					<StagedBar
+						staged={staged.data?.count ?? 0}
+						version={diff.data?.next_version ?? null}
+						onPublish={onPublish}
+						onDiscard={onDiscard}
 					/>
-				) : (
-					<GraphModelCanvas
-						data={build.data}
-						message="Hover a type for its properties, an edge for what it connects"
-						selected={canvasSelection}
-						onSelect={onCanvasSelect}
-						backend={backend}
-						initialDetail="medium"
-					/>
-				)}
-			</div>
-
-			{/* — the selected type's form spans the main column, under the drawing. */}
-			{selection && (selectedNode || selectedEdge) ? (
-				<div className="max-h-[45%] shrink-0 overflow-y-auto border-t bg-background">
-					<div className="flex items-center justify-between border-b px-4 py-1.5">
-						<span className="text-sm uppercase tracking-wide text-muted-foreground">
-							{model?.name ?? "Model"} ·{" "}
-							{draft
-								? `v${draft.version ?? "draft"} draft`
-								: `v${active?.version} active`}
-						</span>
-						<Button
-							size="sm"
-							variant="ghost"
-							onClick={() => onSelect(null)}
-							title="Close the form"
-						>
-							<PanelBottomClose className="h-4 w-4" />
-						</Button>
-					</div>
-					<div className="p-4">
-						{selectedNode ? (
-							<NodeTypeDetail
-								nodeType={selectedNode}
-								constraints={tree?.constraints ?? []}
-								indexes={tree?.indexes ?? []}
-								propertyKeys={tree?.property_keys ?? []}
-								editable={!!ctx}
-								ctx={ctx}
-								canEditViaDraft={!ctx && canWrite}
-								creatingDraft={createDraft.isPending}
-								onEditViaDraft={openDraft}
-								onEdit={() => setEditingNode(selectedNode)}
-								onDelete={() =>
-									setDeleting({
-										kind: "node",
-										id: selectedNode.id,
-										name: selectedNode.name,
-									})
-								}
-							/>
-						) : selectedEdge ? (
-							<EdgeTypeDetail
-								edgeType={selectedEdge}
-								constraints={tree?.constraints ?? []}
-								indexes={tree?.indexes ?? []}
-								propertyKeys={tree?.property_keys ?? []}
-								editable={!!ctx}
-								ctx={ctx}
-								canEditViaDraft={!ctx && canWrite}
-								creatingDraft={createDraft.isPending}
-								onEditViaDraft={openDraft}
-								onEdit={() => setEditingEdge(selectedEdge)}
-								onDelete={() =>
-									setDeleting({
-										kind: "edge",
-										id: selectedEdge.id,
-										name: selectedEdge.name,
-									})
-								}
-							/>
-						) : null}
-					</div>
 				</div>
-			) : null}
-
-			{ctx ? (
-				<>
-					<NodeTypeFormDialog
-						open={editingNode !== null}
-						ctx={ctx}
-						nodeType={editingNode}
-						existingNodeTypes={nodeTypes}
-						onClose={() => setEditingNode(null)}
-					/>
-					<EdgeTypeFormDialog
-						open={editingEdge !== null}
-						ctx={ctx}
-						edgeType={editingEdge}
-						existingNodeTypes={nodeTypes}
-						onClose={() => setEditingEdge(null)}
-					/>
-					{/* A delete is staged like anything else — the confirm says
-					    so, because "deleted" and "staged for deletion" are different
-					    promises. */}
-					<ConfirmDialog
-						open={deleting !== null}
-						title={`Delete ${deleting?.name ?? ""}?`}
-						description={
-							"It is staged, not gone: the draft loses it, and it leaves the " +
-							"published model when you publish. Discard the staged set to put it back."
-						}
-						confirmLabel="Stage the delete"
-						destructive
-						onOpenChange={(open) => {
-							if (!open) setDeleting(null);
-						}}
-						onConfirm={() => {
-							if (!deleting) return;
-							const args = {
-								modelId,
-								versionId: ctx.versionId,
-								typeId: deleting.id,
-							};
-							if (deleting.kind === "node") deleteNode.mutate(args);
-							else deleteEdge.mutate(args);
-							onSelect(null);
-							setDeleting(null);
-						}}
-					/>
-				</>
 			) : null}
 		</div>
 	);

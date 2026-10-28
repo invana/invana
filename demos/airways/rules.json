@@ -1,0 +1,14 @@
+[
+  {
+    "statement": "Every dataset carries a licence.",
+    "check": { "kind": "dataset.licence", "allowed": ["CC-BY-4.0", "CC0-1.0", "ODbL-1.0"] },
+    "mode": "warn",
+    "because": "Data Use Policy · shared data names its terms"
+  },
+  {
+    "statement": "A final decision cites person-reviewed data only.",
+    "check": { "kind": "evidence.reviewed" },
+    "mode": "block",
+    "because": "ISO 17025 audit · section 7.5"
+  }
+]

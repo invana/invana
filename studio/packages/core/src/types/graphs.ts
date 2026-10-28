@@ -85,12 +85,6 @@ export interface GraphContention {
 	pools: { pool: string; size: number; in_use: number }[];
 }
 
-export interface GraphCreate {
-	name: string;
-	slug: string;
-	instructions?: string | null;
-}
-
 export interface GraphUpdate {
 	name?: string;
 	description?: string | null;
@@ -254,6 +248,8 @@ export interface GraphConnectionRead {
 	// Null means the connector's own default — never an invented name.
 	database: string | null;
 	read_only: boolean;
+	// The stored user, read back for the settings form; the password never is.
+	auth_username: string | null;
 	status: GraphConnectionStatus;
 	last_health_check_at: string | null;
 	latency_ms: number | null;
@@ -280,6 +276,28 @@ export interface GraphConnectionRead {
 
 // How the detected/declared DB version relates to the connector's tested window.
 type CompatibilityStatus = "supported" | "untested" | "unsupported" | "unknown";
+
+/** A new Graph from a database (connect-a-database.md); `name` left out reads the database, else the host. */
+export interface GraphConnect extends GraphConnectionCreate {
+	name?: string | null;
+}
+
+/** What connecting made: the Graph, and the draft model read from its database. */
+export interface GraphConnectRead {
+	graph: Graph;
+	model_id: string;
+	/** `node_labels` · `edge_labels` · `indexes` · `constraints`. */
+	discovered: Record<string, number>;
+}
+
+/** A connection test's answer — nothing is recorded. */
+export interface ConnectionTestResult {
+	ok: boolean;
+	latency_ms?: number;
+	error?: string;
+	server_version?: string | null;
+	compatibility_status?: string;
+}
 
 export interface GraphConnectionCreate {
 	uri: string;

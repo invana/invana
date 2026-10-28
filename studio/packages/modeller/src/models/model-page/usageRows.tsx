@@ -12,7 +12,7 @@ import { InlineMeter, SegmentedBar, SegmentedBarLegend } from "@invana/charts";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Alert, AlertDescription } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
-import type { Usage, UsageRow } from "../types";
+import type { SignalKind, Usage, UsageRow } from "../types";
 import {
 	CALLER_SERIES,
 	callerSplit,
@@ -27,6 +27,29 @@ export interface UsageRowsOptions {
 }
 
 const TOO_FEW = 50;
+
+/** What a model row's one line says per signal — `5 unused types`. */
+const COUNTED: Record<SignalKind, [string, string]> = {
+	unused: ["unused type", "unused types"],
+	empty: ["empty type", "empty types"],
+	hot: ["hot type", "hot types"],
+	hot_and_slow: ["hot and slow type", "hot and slow types"],
+	supernode: ["supernode", "supernodes"],
+	cold: ["cold property", "cold properties"],
+};
+
+/** A model's signals as one line of counts, the engine's `signal_counts`. */
+function countedSignals(counts: UsageRow["signal_counts"]) {
+	const parts = (Object.keys(COUNTED) as SignalKind[]).flatMap((k) => {
+		const n = counts[k];
+		return n ? [`${n} ${COUNTED[k][n === 1 ? 0 : 1]}`] : [];
+	});
+	return parts.length ? (
+		<span className="whitespace-nowrap">{parts.join(" · ")}</span>
+	) : (
+		<span className="text-muted-foreground">—</span>
+	);
+}
 
 const last = (at: string | null) =>
 	at ? formatRelativeTime(new Date(at)) : "never";
@@ -115,8 +138,10 @@ export function usageRows(
 			cell: ({ row }) =>
 				usage.too_few ? (
 					<span className="text-muted-foreground">—</span>
+				) : one ? (
+					<Signals signals={row.original.signals} named={false} />
 				) : (
-					<Signals signals={row.original.signals} named={!one} />
+					countedSignals(row.original.signal_counts)
 				),
 		},
 	];
@@ -152,6 +177,8 @@ export function usageRows(
 			{
 				kind: "grid",
 				options: {
+					// One row across, as the board draws it.
+					minTileWidth: 140,
 					tiles: [
 						{
 							label: "Queries",
@@ -172,6 +199,10 @@ export function usageRows(
 										.map((s) => s.subject)
 										.slice(0, 2)
 										.join(" · ") || "every type was asked about",
+							tone:
+								usage.unused_types && !usage.too_few
+									? ("warn" as const)
+									: undefined,
 						},
 						one && usage.explains
 							? {
@@ -234,7 +265,7 @@ export function usageRows(
 				{
 					kind: "text",
 					title: "Stitches crossed",
-					aside: `${usage.stitches.length} active · ${usage.stitches_crossed} crossed by any query`,
+					aside: `${fmtNum(usage.stitches_total)} active · ${fmtNum(usage.stitches_crossed)} crossed by any query`,
 					flush: true,
 					options: { text: "" },
 					render: (
